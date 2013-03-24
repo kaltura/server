@@ -27,6 +27,7 @@
 // ===================================================================================================
 package com.kaltura.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.zip.GZIPInputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -100,7 +102,78 @@ abstract public class KalturaClientBase {
     protected KalturaParams multiRequestParamsMap;
 
 	private static KalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
-	
+    
+    private Header[] responseHeaders = null; 
+    
+    private boolean acceptGzipEncoding = true;
+    
+    protected static final String HTTP_HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+
+	protected static final String HTTP_HEADER_CONTENT_ENCODING = "Content-Encoding";
+
+	protected static final String ENCODING_GZIP = "gzip";
+    /**
+	 * Set whether to accept GZIP encoding, that is, whether to
+	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
+	 * <p>Default is "true". Turn this flag off if you do not want
+	 * GZIP response compression even if enabled on the HTTP server.
+	 */
+	public void setAcceptGzipEncoding(boolean acceptGzipEncoding) {
+		this.acceptGzipEncoding = acceptGzipEncoding;
+	}
+    /**
+	 * Return whether to accept GZIP encoding, that is, whether to
+	 * send the HTTP "Accept-Encoding" header with "gzip" as value.
+	 */
+	public boolean isAcceptGzipEncoding() {
+		return acceptGzipEncoding;
+	}
+    
+    /**
+	 * Determine whether the given response is a GZIP response.
+	 * <p>Default implementation checks whether the HTTP "Content-Encoding"
+	 * header contains "gzip" (in any casing).
+	 * @param postMethod the PostMethod to check
+	 */
+	protected boolean isGzipResponse(PostMethod postMethod) {
+		Header encodingHeader = postMethod.getResponseHeader(HTTP_HEADER_CONTENT_ENCODING);
+		if (encodingHeader == null || encodingHeader.getValue() == null) {
+			return false;
+		}
+		return (encodingHeader.getValue().toLowerCase().indexOf(ENCODING_GZIP) != -1);
+	}
+    
+    /**
+	 * Extract the response body from the given executed remote invocation
+	 * request.
+	 * <p>The default implementation simply fetches the PostMethod's response
+	 * body stream. If the response is recognized as GZIP response, the
+	 * InputStream will get wrapped in a GZIPInputStream.
+	 * @param config the HTTP invoker configuration that specifies the target service
+	 * @param postMethod the PostMethod to read the response body from
+	 * @return an InputStream for the response body
+	 * @throws IOException if thrown by I/O methods
+	 * @see #isGzipResponse
+	 * @see java.util.zip.GZIPInputStream
+	 * @see org.apache.commons.httpclient.methods.PostMethod#getResponseBodyAsStream()
+	 * @see org.apache.commons.httpclient.methods.PostMethod#getResponseHeader(String)
+	 */
+	protected InputStream getResponseBody(PostMethod postMethod)
+			throws IOException {
+
+		if (isGzipResponse(postMethod)) {
+			return new GZIPInputStream(postMethod.getResponseBodyAsStream());
+		}
+		else {
+			return postMethod.getResponseBodyAsStream();
+		}
+	}
+    
+    public Header[] getResponseHeaders()
+    {
+        return responseHeaders;
+    }
+
 	public KalturaClientBase() {		
 	}
 	
@@ -191,6 +264,30 @@ abstract public class KalturaClientBase {
 		return resultXml;
 	}
 
+    protected String readRemoteInvocationResult(InputStream is)
+    	throws IOException {
+    
+        try {
+    	  return doReadRemoteInvocationResult(is);
+        }
+        finally {
+    	  is.close();
+        }
+    }
+
+    protected String doReadRemoteInvocationResult(InputStream is)
+    	throws IOException {
+    
+        byte[] buf = new byte[1024];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int len;
+        while ( (len = is.read(buf)) > 0)
+        {
+        	out.write(buf,0,len);
+        }
+        return new String(out.toByteArray());
+    }
+
 	protected String executeMethod(HttpClient client, PostMethod method) {
 		String responseString = "";
 		try {
@@ -209,11 +306,20 @@ abstract public class KalturaClientBase {
 			}
 
 			// Read the response body.
-			byte[] responseBody = method.getResponseBody ( );
+            InputStream responseBodyIS = null;
+            if (isGzipResponse(method)) {
+                responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
+                if (logger.isEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
+            } else {
+                responseBodyIS = method.getResponseBodyAsStream();
+                if (logger.isEnabled()) logger.debug("No gzip compression for this response");
+            }
+            String responseBody = readRemoteInvocationResult(responseBodyIS);
+            responseHeaders = method.getResponseHeaders();
 
 			// Deal with the response.
 			// Use caution: ensure correct character encoding and is not binary data
-			responseString = new String (responseBody, UTF8_CHARSET); // Unicon: this MUST be set to UTF-8 charset -AZ
+			responseString = new String (responseBody.getBytes(), UTF8_CHARSET); // Unicon: this MUST be set to UTF-8 charset -AZ
 			if (logger.isEnabled())
 			{
 				if(responseString.length() < MAX_DEBUG_RESPONSE_STRING_LENGTH) {
@@ -246,6 +352,10 @@ abstract public class KalturaClientBase {
 			method = this.getPostMultiPartWithFiles(method, kparams, kfiles);			
 		} else {
 			method = this.addParams(method, kparams);			
+        }
+        
+        if (isAcceptGzipEncoding()) {
+			method.addRequestHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		}
 
 		// Provide custom retry handler is necessary
