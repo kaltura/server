@@ -10,7 +10,8 @@ class KalturaRequestParameterSerializer
 	public static function serialize (KalturaObject $object, $prefix)
 	{
 		$params = array();
-		$params[] = "$prefix:objectType".get_class($object);
+		if (!($object instanceof KalturaTypedArray))
+			$params[] = "$prefix:objectType".get_class($object);
 		
 		foreach ($object as $prop => $val)
 		{
