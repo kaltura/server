@@ -33,12 +33,27 @@ require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaCurlWrapper.php');
 require_once(dirname(__file__) . '/kalcliSwitches.php');
 
-function formatResponse($resp, $indent = '')
+$DATE_FIELD_SUFFIXES = array('At', 'Date', 'On');
+define('MIN_TIME_STAMP', 946677600);		// 2000
+define('MAX_TIME_STAMP', 2147483647);		// 2038
+
+function formatResponse($resp, $indent = '', $varName = null)
 {
+	global $DATE_FIELD_SUFFIXES;
+	
 	switch (gettype($resp))
 	{
-	case 'boolean':
 	case 'integer':
+		if ($resp > MIN_TIME_STAMP && $resp < MAX_TIME_STAMP)
+		{
+			foreach ($DATE_FIELD_SUFFIXES as $dateSuffix)
+			{
+				if (substr($varName, -strlen($dateSuffix)) === $dateSuffix) 
+					return "{$resp}\t(" . date('Y-m-d H:i:s', $resp) . ")";						
+			}
+		}
+		
+	case 'boolean':
 	case 'double':
 	case 'string':
 	case 'NULL':
@@ -48,7 +63,7 @@ function formatResponse($resp, $indent = '')
 		$result = "array";
 		foreach ($resp as $index => $elem)
 		{
-			$value = formatResponse($elem, $indent . "\t");
+			$value = formatResponse($elem, $indent . "\t", $index);
 			$result .= "\n{$indent}\t{$index}\t{$value}";
 		}
 		return $result;
@@ -61,7 +76,7 @@ function formatResponse($resp, $indent = '')
 		{
 			if ($name == '__PHP_Incomplete_Class_Name')
 				continue;
-			$value = formatResponse($value, $indent . "\t");
+			$value = formatResponse($value, $indent . "\t", $name);
 			$result .= "\n{$indent}\t{$name}\t{$value}";
 		}
 		return $result;
