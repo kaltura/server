@@ -172,6 +172,7 @@ namespace Kaltura
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
             request.Timeout = _Config.Timeout;
             request.Method = "POST";
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 			
 			// Add proxy information if required
 			if( !_Config.ProxyAddress.Equals( "" ) && !_Config.ProxyAddress.Equals( null ) ) {
