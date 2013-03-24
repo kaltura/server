@@ -276,15 +276,22 @@ class KalturaResponseCacher extends kApiCache
 			return;			// invalid secret
 		}
 		
+		$startTime = microtime(true);
+		
 		$userId = isset($params['userId']) ? $params['userId'] : '';
 		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
 		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
 		
 		$result = kSessionBase::generateSession($ksVersion, $adminSecret, $userId, $type, $partnerId, $expiry, $privileges);
+		
+		$processingTime = microtime(true) - $startTime;
+		$cacheKey = md5("{$partnerId}_{$userId}_{$type}_{$expiry}_{$privileges}");
+		header("X-Kaltura:cached-dispatcher,$cacheKey,$processingTime", false);
+		
 		if ($format == self::RESPONSE_TYPE_XML)
 		{
 			header("Content-Type: text/xml");
-			echo "<xml><result>{$result}</result><executionTime>0</executionTime></xml>";
+			echo "<xml><result>{$result}</result><executionTime>{$processingTime}</executionTime></xml>";
 			die;
 		}
 		else if ($format == self::RESPONSE_TYPE_PHP)
