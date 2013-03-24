@@ -61,6 +61,7 @@ class KalturaCurlWrapper
 		}
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		if ($this->ignoreCertErrors)
 		{
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
