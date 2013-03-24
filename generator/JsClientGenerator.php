@@ -166,6 +166,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	protected function writeService(SimpleXMLElement $serviceNodes)
 	{
 		$serviceName = $serviceNodes->attributes()->name;
+		$serviceId = $serviceNodes->attributes()->id;
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		$serviceClass = "function $serviceClassName(client){\r\n";
 		$serviceClass .= "\tthis.init(client);\r\n";
@@ -311,9 +312,9 @@ class JsClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 			if ($haveFiles)
-				$actionClass .= "\tthis.client.queueServiceActionCall(\"$serviceName\", \"$actionName\", kparams, kfiles);\r\n";
+				$actionClass .= "\tthis.client.queueServiceActionCall(\"$serviceId\", \"$actionName\", kparams, kfiles);\r\n";
 			else
-				$actionClass .= "\tthis.client.queueServiceActionCall(\"$serviceName\", \"$actionName\", kparams);\r\n";
+				$actionClass .= "\tthis.client.queueServiceActionCall(\"$serviceId\", \"$actionName\", kparams);\r\n";
 			$actionClass .= "\tif (!this.client.isMultiRequest())\r\n";
 			$actionClass .= "\t\tthis.client.doQueue(callback);\r\n";
 			$actionClass .= "}";
