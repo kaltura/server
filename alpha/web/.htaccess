@@ -8,8 +8,6 @@ Header unset ETag
 FileETag None
 </FilesMatch>
 
-# IE8 download compatiblity
-Header set X-UA-Compatible "IE=EmulateIE7"
 DirectoryIndex index.php
 RedirectMatch permanent ^/index.php/searchmusicians$ /index.php/search?mode=KSHOW\&keywords=music+bands+song+fan+scrapbook\&category=2\&or=t\&promotion=1
 RedirectMatch permanent ^/index.php/index.php/(.+?)$ /index.php/$1
