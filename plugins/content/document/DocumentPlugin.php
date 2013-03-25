@@ -49,6 +49,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
+		
+		// Service
+		if($baseClass == 'KalturaEntryService' && $enumValue == entryType::DOCUMENT) 
+		{
+			return new DocumentsService();			
+		}
+		
 		// ENTRY
 		if($baseClass == 'entry' && $enumValue == entryType::DOCUMENT)
 		{
