@@ -109,6 +109,118 @@ class KalturaEntryService extends KalturaBaseService
 	}
 	
 	/**
+	 * General code that replaces given entry resource with a given resource, and mark the original
+	 * entry as replaced
+	 * @param KalturaEntry $dbEntry The original entry we'd like to replace
+	 * @param KalturaResource $resource The resource we'd like to attach
+	 * @param KalturaEntry $tempMediaEntry The replacing entry
+	 * @throws KalturaAPIException
+	 */
+	protected function replaceResourceByEntry($dbEntry, $resource, $tempMediaEntry) 
+	{
+		$partner = $this->getPartner();
+		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
+		{
+			KalturaLog::notice("Replacement is not allowed to the partner permission [FEATURE_ENTRY_REPLACEMENT] is needed");
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_ENTRY_REPLACEMENT);
+		}
+		
+		if($dbEntry->getReplacingEntryId())
+			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+		
+		$resource->validateEntry($dbEntry);
+		
+		$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
+		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
+		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
+		$tempDbEntry->save();
+		
+		$dbEntry->setReplacingEntryId($tempDbEntry->getId());
+		$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
+		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
+			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+		$dbEntry->save();
+		
+		$kResource = $resource->toObject();
+		$this->attachResource($kResource, $tempDbEntry);
+	}
+	
+	/**
+	 * Approves entry replacement
+	 *
+	 * @param string $entryId entry id to replace
+	 * @param KalturaEntryType $entryType the entry type
+	 * @return KalturaMediaEntry The replaced media entry
+	 *
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	protected function approveReplace($entryId, $entryType)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+	
+		if (!$dbEntry || $dbEntry->getType() != $entryType)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+	
+		switch($dbEntry->getReplacementStatus())
+		{
+			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
+				break;
+	
+			case entryReplacementStatus::READY_BUT_NOT_APPROVED:
+				kBusinessConvertDL::replaceEntry($dbEntry);
+				break;
+	
+			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
+				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$dbEntry->save();
+	
+				//preventing race conditions of temp entry being ready just as you approve the replacement
+				$dbReplacingEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
+				if ($dbReplacingEntry && $dbReplacingEntry->getStatus() == entryStatus::READY)
+					kBusinessConvertDL::replaceEntry($dbEntry);
+				break;
+	
+			case entryReplacementStatus::NONE:
+			default:
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_REPLACED, $entryId);
+				break;
+		}
+	
+		return $this->getEntry($entryId, -1, $entryType);
+	}
+	
+	/**
+	 * Cancels media replacement
+	 *
+	 * @param string $entryId Media entry id to cancel
+	 * @param KalturaEntryType $entryType the entry type
+	 * @return KalturaMediaEntry The canceled media entry
+	 *
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	protected function cancelReplace($entryId, $entryType)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+	
+		if (!$dbEntry || $dbEntry->getType() != $entryType)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+	
+		if($dbEntry->getReplacingEntryId())
+		{
+			$dbTempEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
+			if($dbTempEntry)
+				myEntryUtils::deleteEntry($dbTempEntry);
+		}
+	
+		$dbEntry->setReplacingEntryId(null);
+		$dbEntry->setReplacementStatus(entryReplacementStatus::NONE);
+		$dbEntry->save();
+	
+		return $this->getEntry($entryId, -1, $entryType);
+	}
+	
+	/**
 	 * @param kFileSyncResource $resource
 	 * @param entry $dbEntry
 	 * @param asset $dbAsset

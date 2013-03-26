@@ -585,17 +585,6 @@ class DocumentsService extends KalturaEntryService
 		}
 		else
 		{
-			$partner = $this->getPartner();
-			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
-			{
-				KalturaLog::notice("Replacement is not allowed to the partner permission [FEATURE_ENTRY_REPLACEMENT] is needed");
-				throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_ENTRY_REPLACEMENT);
-			}
-	
-			if($dbEntry->getReplacingEntryId())
-				throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
-	
-			$resource->validateEntry($dbEntry);
 	
 			$tempDocEntry = new KalturaDocumentEntry();
 			$tempDocEntry->type = $dbEntry->getType();
@@ -606,20 +595,7 @@ class DocumentsService extends KalturaEntryService
 			if($conversionProfileId)
 				$tempDocEntry->conversionProfileId = $conversionProfileId;
 	
-			$tempDbEntry = $this->prepareEntryForInsert($tempDocEntry);
-			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-			$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
-			$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-			$tempDbEntry->save();
-	
-			$dbEntry->setReplacingEntryId($tempDbEntry->getId());
-			$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
-			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
-				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-			$dbEntry->save();
-	
-			$kResource = $resource->toObject();
-			$this->attachResource($kResource, $tempDbEntry);
+			$this->replaceResourceByEntry($dbEntry, $resource, $tempDocEntry);
 		}
 		$resource->entryHandled($dbEntry);
 	}
@@ -635,37 +611,7 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function approveReplaceAction($entryId)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-	
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DOCUMENT)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
-		switch($dbEntry->getReplacementStatus())
-		{
-			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
-				break;
-	
-			case entryReplacementStatus::READY_BUT_NOT_APPROVED:
-				kBusinessConvertDL::replaceEntry($dbEntry);
-				break;
-	
-			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
-				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-				$dbEntry->save();
-	
-				//preventing race conditions of temp entry being ready just as you approve the replacement
-				$dbReplacingEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
-				if ($dbReplacingEntry && $dbReplacingEntry->getStatus() == entryStatus::READY)
-					kBusinessConvertDL::replaceEntry($dbEntry);
-				break;
-	
-			case entryReplacementStatus::NONE:
-			default:
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_REPLACED, $entryId);
-				break;
-		}
-	
-		return $this->getEntry($entryId, -1, KalturaEntryType::DOCUMENT);
+		return $this->approveReplace($entryId, KalturaEntryType::DOCUMENT);
 	}
 	
 	/**
@@ -679,23 +625,7 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function cancelReplaceAction($entryId)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-	
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DOCUMENT)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
-		if($dbEntry->getReplacingEntryId())
-		{
-			$dbTempEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
-			if($dbTempEntry)
-				myEntryUtils::deleteEntry($dbTempEntry);
-		}
-	
-		$dbEntry->setReplacingEntryId(null);
-		$dbEntry->setReplacementStatus(entryReplacementStatus::NONE);
-		$dbEntry->save();
-	
-		return $this->getEntry($entryId, -1, KalturaEntryType::DOCUMENT);
+		return $this->cancelReplace($entryId, KalturaEntryType::DOCUMENT);
 	}
 	
 	/* (non-PHPdoc)
