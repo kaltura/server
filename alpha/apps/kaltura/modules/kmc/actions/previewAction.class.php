@@ -92,7 +92,13 @@ class previewAction extends kalturaAction
 
 		// Add flashVars
 		if( isset($_GET['flashvars']) ) {
-			$embedParams['flashVars'] = $_GET['flashvars'];
+			$flashVars = array();
+			foreach($_GET['flashvars'] as $key => $val) {
+				if( $this->isJson($val) ) {
+					$val = json_decode($val, true);
+				}
+				$flashVars[$key] = $val;
+			}
 			//Check for playlist name
 			if( isset($_GET['flashvars']['kpl0Name']) ) {
 				$playlist_name = htmlspecialchars($_GET['flashvars']['kpl0Name']);
@@ -119,8 +125,8 @@ class previewAction extends kalturaAction
 				$flashVars["playlistAPI.kpl0Name"] = htmlspecialchars($this->getRequestParameter('playlist_name'));
 				$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
 			}
-			$embedParams['flashVars'] = $flashVars;
 		}
+		$embedParams['flashVars'] = $flashVars;
 
 		// Export embedParams to our view
 		$this->embedParams = $embedParams;
@@ -152,5 +158,10 @@ class previewAction extends kalturaAction
 			$this->entry_description = '';
 		}
 
+	}
+
+	private function isJson($string) {
+		json_decode($string);
+		return (json_last_error() == JSON_ERROR_NONE);
 	}
 }
