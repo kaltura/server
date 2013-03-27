@@ -249,6 +249,7 @@
 		const AVI = "avi";
 		const MP3 = "mp3";
 		const OGG = "ogg";
+		const OGV = "ogv";
 		const WMV = "wmv";
 		const WMA = "wma";
 		const ISMV = "ismv";
@@ -258,6 +259,7 @@
 		const MPEGTS = "mpegts";
 		const APPLEHTTP = "applehttp";
 		const WAV = "wav";
+		const COPY = "copy";
 	};
 
 	class KDLVideoTarget {
@@ -282,19 +284,21 @@
 		const APCN = "apcn";	// 112mbps,	profile:2, 'apcn' (SD)
 		const APCH = "apch";	// 185mbps,	profile:3, 'apch' (HQ)
 		const DNXHD= "dnxhd";
+		const DV = "dv";
 		const COPY = "copy";
 	}
 
 	class KDLAudioTarget {
 		const MP3 = "mp3";
 		const AAC = "aac";
+		const AACHE = "aache";
 		const WMA = "wma";
 		const WMAPRO = "wmapro";
 		const VORBIS = "vorbis";
 		const AMRNB = "amrnb";
 		const MPEG2= "mpeg2";
 		const AC3= "ac3";
-		const PCMS16LE= "pcm_s16le";
+		const PCM= "pcm";
 		const COPY = "copy";
 	};
 	
