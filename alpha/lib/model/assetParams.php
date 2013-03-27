@@ -17,6 +17,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_MP3 = "mp3";
 	const CONTAINER_FORMAT_3GP = "3gp";
 	const CONTAINER_FORMAT_OGG = "ogg";
+	const CONTAINER_FORMAT_OGV = "ogv";
 	const CONTAINER_FORMAT_WMV = "wmv";
 	const CONTAINER_FORMAT_WMA = "wma";
 	const CONTAINER_FORMAT_ISMV = "ismv";
@@ -26,6 +27,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_MPEGTS = "mpegts";
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	const CONTAINER_FORMAT_WAV = "wav";
+	const CONTAINER_FORMAT_COPY = "copy";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
