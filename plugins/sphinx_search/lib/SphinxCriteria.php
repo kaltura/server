@@ -7,6 +7,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 {
 	const RANKER_NONE = 'none';
 	const RANKER_SPH04 = 'sph04';
+	const MAX_MATCHES = 10000;
 	
 	/**
 	 * @var string none or sph04
@@ -568,6 +569,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if($setLimit && $this->getLimit())
 		{
 			$maxMatches += $this->getOffset();
+			$maxMatches = min($maxMatches, self::MAX_MATCHES);
 			$limit = $this->getLimit();
 			if($this->getOffset())
 				$limit = $this->getOffset() . ", $limit";
