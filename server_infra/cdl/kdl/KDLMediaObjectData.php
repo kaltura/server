@@ -212,7 +212,10 @@ include_once("KDLCommon.php");
 		public $_isShrinkFramesizeToSource=1;	// - frame size
 		public $_isShrinkBitrateToSource=1;		// - frame rate
 		public $_isFrameRateForLowBrAppleHls=0; // for default fr (keep source fr),adjust for Apple HLS recommendations. Relevant only for <200 kbps;
-			   
+		public $_anamorphic=0;					// null,0,1 - regular/square pixs, otherwise - anamorphic
+		public $_isForcedKeyFrames=1;			// ForcedKF not needed for mezz files. default=1
+		public $_maxFrameRate=0;
+		
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
 		/* ------------------------------
