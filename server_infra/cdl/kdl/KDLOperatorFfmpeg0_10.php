@@ -33,6 +33,27 @@ $nullDev ="/dev/null";
 	}
 	
 	/* ---------------------------
+	 * generateH264params
+	*/
+	protected function generateH264params($videoObject)
+	{
+		$h264params=null;
+		$ffQsettings = " -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
+		switch($videoObject->_id) {
+		case KDLVideoTarget::H264H:
+			$h264params=" -subq 7".$ffQsettings." -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0";
+			if($videoObject->_bitRate<KDLConstants::LowBitrateThresHold) {
+				$h264params .= " -crf 30";
+			}
+			break;
+		default:
+			$h264params=parent::generateH264params($videoObject);
+			break;
+		}
+		return $h264params;
+	}
+	
+	/* ---------------------------
 	 * generateVideoParams
 	 */
     protected function generateVideoParams(KDLFlavor $design, KDLFlavor $target)
@@ -53,18 +74,48 @@ $vid = $target->_video;
 
 		return $cmdStr;
 	}
+
+	/* ---------------------------
+	 * generateContainerParams
+	 */
+    protected function generateContainerParams(KDLFlavor $design, KDLFlavor $target)
+	{
+		$cmdStr = parent::generateContainerParams($design, $target);
+		if(!isset($cmdStr)) 
+			return null;
+			/*
+			 * Remove menu and chapter meta data that harms RTMP streaming 
+			 */
+		if($target->ToTags(array("mbr"))) {
+			$cmdStr = " -map_chapters -1 -map_metadata -1 $cmdStr";
+		}
+		
+		return $cmdStr;
+	}
 	
 	/* ---------------------------
-	 * getVideoCodecName
+	 * calcForcedKeyFrames
 	 */
     protected function calcForcedKeyFrames($vidObj, KDLFlavor $target)
     {
-		if(isset($vidObj->_gop) && isset($vidObj->_frameRate) && $vidObj->_frameRate>0){
-			$gopInSecs=($vidObj->_gop/$vidObj->_frameRate);
-			$forcedKF=KDLCmdlinePlaceholders::ForceKeyframes.($target->_container->_duration/1000)."_$gopInSecs";
-			return " -force_key_frames $forcedKF";
-		}
-		return null;
+    	if($vidObj->_isForcedKeyFrames!=true
+    	|| !(isset($vidObj->_gop) && isset($vidObj->_frameRate) && $vidObj->_frameRate>0)){
+    		return null;
+    	}
+
+		/*
+		 * For clipped content, calculate the forcedKF 
+		 * duration according to clipped dur
+		 */
+    	$gopInSecs=($vidObj->_gop/$vidObj->_frameRate);
+		if(isset($target->_explicitClipDur) && $target->_explicitClipDur)
+			$dur=$target->_explicitClipDur/1000;
+		else if(isset($target->_clipDur) && $target->_clipDur)
+			$dur=$target->_clipDur/1000;
+		else
+			$dur = $target->_container->_duration/1000;
+		$forcedKF=KDLCmdlinePlaceholders::ForceKeyframes.$dur."_$gopInSecs";
+		return " -force_key_frames $forcedKF";
     }
     
 	/* ---------------------------
