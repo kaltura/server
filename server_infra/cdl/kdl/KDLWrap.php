@@ -200,7 +200,13 @@ class KDLWrap
 			$flavor->setClipOffset($target->_clipStart);
 		if($target->_clipDur)
 			$flavor->setClipDuration($target->_clipDur);
-			
+/*
+		if(isset($target->_multiStream))
+		{
+			$toJson = json_encode($target->_multiStream);
+			$flavor->setMultiStream($toJson);
+		}
+*/
 		$flavor->_errors   = $flavor->_errors + $target->_errors;
 		$flavor->_warnings = $flavor->_warnings + $target->_warnings;
 		
@@ -301,6 +307,13 @@ class KDLWrap
 		{ 
 			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
 			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
+/*
+			$multiStream = $cdlFlavor->getMultiStream();
+			if(isset($multiStream)) {
+				$fromJson = json_decode($multiStream);
+				$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
+			}
+*/
 		}
 		
 		$kdlFlavor->_cdlObject = $cdlFlavor;
@@ -339,6 +352,9 @@ class KDLWrap
 				$kdlFlavor->_video->_isShrinkFramesizeToSource = !$cdlFlavor->getIsAvoidVideoShrinkFramesizeToSource();
 				$kdlFlavor->_video->_isShrinkBitrateToSource   = !$cdlFlavor->getIsAvoidVideoShrinkBitrateToSource();
 				$kdlFlavor->_video->_isFrameRateForLowBrAppleHls = $cdlFlavor->getIsVideoFrameRateForLowBrAppleHls();
+				$kdlFlavor->_video->_anamorphic = $cdlFlavor->getAnamorphicPixels();
+				$kdlFlavor->_video->_maxFrameRate = $cdlFlavor->getMaxFrameRate();
+				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
 			}
 			//		$flavor->_video->_dar = $api->getVideoDar();
 			if($kdlFlavor->_video->IsDataSet()==false)
@@ -435,10 +451,14 @@ class KDLWrap
 	 */
 	public static function ConvertMediainfoCdl2Mediadataset(mediaInfo $cdlMediaInfo, KDLMediaDataSet &$medSet)
 	{
-//		KalturaLog::log(__METHOD__."->".$cdlMediaInfo->getRawData());
 		$medSet->_container = new KDLContainerData();
-		$medSet->_streamsCollectionStr = $cdlMediaInfo->getMultiStreamInfo();
-		
+/*
+		$multiStream = $cdlMediaInfo->getMultiStream();
+		if(isset($multiStream)) {
+			$fromJson = json_decode($multiStream);
+			$medSet->_multiStream = isset($fromJson)? $fromJson: null;
+		}
+*/
 		$medSet->_container->_id=$cdlMediaInfo->getContainerId();
 		$medSet->_container->_format=$cdlMediaInfo->getContainerFormat();
 		$medSet->_container->_duration=$cdlMediaInfo->getContainerDuration();
