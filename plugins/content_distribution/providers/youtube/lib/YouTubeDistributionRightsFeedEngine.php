@@ -139,7 +139,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			return false;
 			
 		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Process asset');
+		$status = $statusParser->getStatusForAction('Update video');
 		if (is_null($status))
 			throw new Exception('Status could not be found after distribution update');
 		
