@@ -45,18 +45,20 @@ class flavorParams extends assetParams
 	const VIDEO_CODEC_APCN = "apcn";
 	const VIDEO_CODEC_APCH = "apch";
 	const VIDEO_CODEC_DNXHD = "dnxhd";
+	const VIDEO_CODEC_DV = "dv";
 	const VIDEO_CODEC_COPY = "copy";
 	
 	const AUDIO_CODEC_NONE = "";
 	const AUDIO_CODEC_MP3 = "mp3";
 	const AUDIO_CODEC_AAC = "aac";
+	const AUDIO_CODEC_AACHE = "aache";
 	const AUDIO_CODEC_VORBIS = "vorbis";
 	const AUDIO_CODEC_WMA = "wma";
 	const AUDIO_CODEC_WMAPRO = "wmapro";
 	const AUDIO_CODEC_AMRNB = "amrnb";
 	const AUDIO_CODEC_MPEG2 = "mpeg2";
 	const AUDIO_CODEC_AC3 = "ac3";
-	const AUDIO_CODEC_PCMS16LE = "pcm_s16le";
+	const AUDIO_CODEC_PCM = "pcm";
 	const AUDIO_CODEC_COPY = "copy";
 	
 	const CUSTOM_DATA_FIELD_VIDEO_CODEC = "FlavorVideoCodec";
@@ -125,4 +127,17 @@ class flavorParams extends assetParams
 
 	public function setIsVideoFrameRateForLowBrAppleHls($v) 	{$this->putInCustomData('IsVideoFrameRateForLowBrAppleHls', $v);}
 	public function getIsVideoFrameRateForLowBrAppleHls()		{return $this->getFromCustomData('IsVideoFrameRateForLowBrAppleHls', null, 0);}
+
+//	public function setMultiStream($v){ $this->putInCustomData('MultiStream', $v);}
+//	public function getMultiStream(){return $this->getFromCustomData('MultiStream', null, 0);}
+	
+	public function setAnamorphicPixels($v){ $this->putInCustomData('AnamorphicPixels', $v);}
+	public function getAnamorphicPixels(){return $this->getFromCustomData('AnamorphicPixels', null, 0);}
+	
+	public function setIsAvoidForcedKeyFrames($v){ $this->putInCustomData('IsAvoidForcedKeyFrames', $v);}
+	public function getIsAvoidForcedKeyFrames(){return $this->getFromCustomData('IsAvoidForcedKeyFrames', null, 0);}
+	
+	public function setMaxFrameRate($v){ $this->putInCustomData('MaxFrameRate', $v);}
+	public function getMaxFrameRate(){return $this->getFromCustomData('MaxFrameRate', null, 0);}
+	
 }
