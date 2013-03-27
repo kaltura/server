@@ -458,7 +458,7 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 		else if(isset($presetXml->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile))
 			$videoProfile = $presetXml->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile;
 		if(!isset($videoProfile)){
-			continue;
+			return null;
 		}
 		switch($flavor->_video->_id){
 			case KDLVideoTarget::WVC1A:
@@ -478,7 +478,7 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 		}
 		if(!isset($videoCodec) || !isset($videoCodec['SmoothStreaming'])
 				|| ($videoCodec['SmoothStreaming']!='true' && $videoCodec['SmoothStreaming']!='True'))
-			continue;
+			return null;
 		$streams = $videoCodec->Streams;
 		if(!(isset($streams) && isset($streams->StreamInfo))) {
 			return null;
