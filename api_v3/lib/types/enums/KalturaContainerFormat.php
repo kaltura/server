@@ -12,6 +12,7 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const MP3 = "mp3";
 	const _3GP = "3gp";
 	const OGG = "ogg";
+	const OGV = "ogv";
 	const WMV = "wmv";
 	const WMA = "wma";
 	const ISMV = "ismv";
@@ -21,6 +22,7 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const MPEGTS = "mpegts";
 	const APPLEHTTP = "applehttp";
 	const WAV = "wav";
+	const COPY = "copy";
 	
 	const SWF = 'swf';
 	const PDF = 'pdf';
