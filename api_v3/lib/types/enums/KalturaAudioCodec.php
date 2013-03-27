@@ -9,12 +9,13 @@ class KalturaAudioCodec extends KalturaStringEnum
 	
 	const MP3 = "mp3";
 	const AAC = "aac";
+	const AACHE = "aache";
 	const VORBIS = "vorbis";
 	const WMA = "wma";
 	const WMAPRO = "wmapro";
 	const AMRNB = "amrnb";
 	const MPEG2 = "mpeg2";
 	const AC3 = "ac3";
-	const PCMS16LE = "pcm_s16le";
+	const PCM = "pcm";
 	const COPY = "copy";
 }
