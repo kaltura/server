@@ -17,7 +17,7 @@ class KDLMediaDataSet  {
 	public	$_video=null;
 	public	$_audio=null;
 	public	$_image=null;
-	public	$_streamsCollectionStr=null;
+//	public	$_multiStream=null;
 	public  $_errors=array(),
 			$_warnings=array();
 	
@@ -123,9 +123,14 @@ class KDLMediaDataSet  {
 		if($this->_container==null){
 			return $tagsOut;
 		}
+		/*
+		 * The format/codec names used here are both real-life media-info meta data
+		 *  and KDL constants.
+		 */
 		$flashContainerFormats = array("flash video", "flv", "f4v","flash","flashvideo");
-		$mp4ContainerFormats = array("mpeg-4");
-		$mp4VideoFormats = array("avc","avc1","h264","h.264");
+		$mp4ContainerFormats = array("mpeg-4",KDLContainerTarget::MP4,KDLContainerTarget::MOV);
+		$mp4VideoFormats = array("avc","avc1","h264","h.264",
+						KDLVideoTarget::H264,KDLVideoTarget::H264B,KDLVideoTarget::H264M,KDLVideoTarget::H264H);
 		$mp4AudioFormats = array("mpeg audio","mp3","aac");
 		$wmvContainerFormats = array("windows media");
 		$itunesContainerFormats = array("mpeg-4","mpeg audio", "aiff", "wave");
@@ -145,7 +150,6 @@ class KDLMediaDataSet  {
 					if($this->_video && $this->_video->_rotation>0) {
 						break;
 					}
-//					$formats = array("flash video", "flv", "f4v","flash","flashvideo");
 					if($this->_container->IsFormatOf($flashContainerFormats))
 						$tagsOut[] = $tag;
 					else {
