@@ -35,7 +35,24 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 		$cmdStr.= $this->generateVideoParams($design, $target);
 		$cmdStr.= $this->generateAudioParams($design, $target);
 		$cmdStr.= $this->generateContainerParams($design, $target);
-		
+		/*
+		if(isset($target->_multiStream)) {
+			$videoFieldName = KDLConstants::VideoIndex;
+			$videoMultiStream = $target->_multiStream->$videoFieldName;
+			if(isset($videoMultiStream) ){
+				foreach($videoMultiStream->mapping as $i=>$map) {
+					$cmdStr.= " -map 0:$i";
+				}
+			}
+			$audioFieldName = KDLConstants::AudioIndex;
+			$audioMultiStream = $target->_multiStream->$audioFieldName;
+			if(isset($audioMultiStream) ){
+				foreach($audioMultiStream->mapping as $i=>$map) {
+					$cmdStr.= " -map 0:$i";
+				}
+			}
+		}
+		*/
 		/*
 		 * Following 'dummy' seek-to setting is done to ensure preciseness
 		 * of the main seek command that is done at the beginning o fthe command line
@@ -95,9 +112,25 @@ $bt=0;
 			$cmdStr.= " -bt $bt"."k";
 		}
 		
-		if($vid->_width!=null && $vid->_height!=null){
-			$cmdStr .= " -s ".$vid->_width."x".$vid->_height;
+		/*
+		 * DV video should get 'target' operand, rather than frame size.
+		 */
+		if($vid->_id==KDLVideoTarget::DV) {
+			if(isset($vid->_height)) {
+				switch($vid->_height) {
+				case 480: 
+					$cmdStr.= " -target ntsc-dv";
+					break;
+				case 576: 
+					$cmdStr.= " -target pal-dv";
+					break;
+				}
+			}
 		}
+		else if($vid->_width!=null && $vid->_height!=null){
+			$cmdStr.= " -s ".$vid->_width."x".$vid->_height;
+		}
+		
 		if(isset($vid->_dar) && $vid->_dar>0) {
 			$cmdStr.= " -aspect ".round($vid->_dar,4);
 		}
@@ -142,6 +175,8 @@ $vidObj = $target->_video;
 			return "libvpx";
 		case KDLVideoTarget::MPEG2:
 			return "mpeg2video";
+		case KDLVideoTarget::DV:
+			return "dvvideo";
 		case KDLVideoTarget::COPY:
 			return "copy";
 		default:
@@ -184,9 +219,13 @@ $aud = $target->_audio;
 			case KDLAudioTarget::AC3:
 				$acodec = "ac3";
 				break;
-			case KDLAudioTarget::PCMS16LE:
-				$acodec = "pcm_s16le";
-				$aud->_bitRate = null;		// PCM should not have br notation  
+			case KDLAudioTarget::PCM:
+				if(isset($aud->_resolution) && in_array($aud->_resolution, array(16,24,32))) {
+					$acodec = "pcm_s".$aud->_resolution."le";
+				}
+				else {
+					$acodec = "pcm_s16le";
+				}
 				break;
 			case KDLAudioTarget::COPY:
 				$acodec = "copy";
@@ -229,6 +268,9 @@ $con = $target->_container;
 			case KDLContainerTarget::MP3:
 			case KDLContainerTarget::OGG:
 				$format = $con->_id;
+				break;
+			case KDLContainerTarget::OGV:
+				$format = "ogg";
 				break;
 			case KDLContainerTarget::WMV:
 				$format = "asf";
