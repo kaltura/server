@@ -75,8 +75,8 @@ include_once 'KDLUtils.php';
 			}
 			else
 				$streamsColStr = "0+".$streamsCnt.":".$streamsColStr;
-			$dataSet->_streamsCollectionStr = $streamsColStr;
-			KalturaLog::info("StreamsColStr- ".$dataSet->_streamsCollectionStr);
+//			$dataSet->_multiStream = $streamsColStr;
+//			KalturaLog::info("StreamsColStr- ".$dataSet->_multiStream);
 		}
 
 		/* ------------------------------
