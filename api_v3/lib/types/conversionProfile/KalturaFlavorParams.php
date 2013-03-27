@@ -153,6 +153,26 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public $isVideoFrameRateForLowBrAppleHls;
 	
 	/**
+	 * @var string;
+	 */
+//	public $multiStream;
+	
+	/**
+	 * @var float
+	 */
+	public $anamorphicPixels;
+	
+	/**
+	 * @var int
+	 */
+	public $isAvoidForcedKeyFrames;
+	
+	/**
+	 * @var int
+	 */
+	public $maxFrameRate;
+	
+	/**
 	 * @var int
 	 */
 	public $videoConstantBitrate;
@@ -198,6 +218,10 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"isAvoidVideoShrinkFramesizeToSource",
 		"isAvoidVideoShrinkBitrateToSource",
 		"isVideoFrameRateForLowBrAppleHls",
+//		"multiStream",
+		"anamorphicPixels",
+		"isAvoidForcedKeyFrames",
+		"maxFrameRate",
 		"videoConstantBitrate",
 		"videoBitrateTolerance",
 		"clipOffset",
