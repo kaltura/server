@@ -5,6 +5,9 @@
  */
 abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfileConfiguration
 {
+	const EXTEND_FEATURE_CATEGORY_METADATA = '1';
+	const EXTEND_FEATURE_PARENT_CATEGORY_METADATA = '2';
+	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
@@ -12,18 +15,38 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		$object->fieldConfigArray = $this->getFieldConfigArray($fieldConfigArray);
 		
 		$itemXpathsToExtend = isset($properties['itemXpathsToExtend']) && is_array($properties['itemXpathsToExtend']) ? $properties['itemXpathsToExtend'] : array();
-		foreach($itemXpathsToExtend as &$val)
+		$object->itemXpathsToExtend = array();
+		$categoryFeaturesToExtend = array();
+		foreach($itemXpathsToExtend as $key => $val)
 		{
-			$temp = new Kaltura_Client_Type_ExtendingItemMrssParameter();
-			$temp->xpath = $val;
-			$temp->identifier = new Kaltura_Client_Type_EntryIdentifier();
-			$temp->identifier->identifier = Kaltura_Client_Enum_EntryIdentifierField::ID;
-			$temp->identifier->extendedFeatures = "";
-			$temp->extensionMode = Kaltura_Client_Enum_MrssExtensionMode::APPEND;
-			$val = $temp;
+			if ((string)$key == 'includeCategoryInMrss'){
+				$categoryFeaturesToExtend[] = self::EXTEND_FEATURE_CATEGORY_METADATA;
+				continue;
+			}
+			else if ((string)$key == 'includeCategoryParentInMrss'){
+				$categoryFeaturesToExtend[] = self::EXTEND_FEATURE_PARENT_CATEGORY_METADATA;
+				continue;
+			}
+			else{	
+				$temp = new Kaltura_Client_Type_ExtendingItemMrssParameter();
+				$temp->xpath = $val;
+				$temp->identifier = new Kaltura_Client_Type_EntryIdentifier();
+				$temp->identifier->identifier = Kaltura_Client_Enum_EntryIdentifierField::ID;
+				$temp->identifier->extendedFeatures = "";
+				$temp->extensionMode = Kaltura_Client_Enum_MrssExtensionMode::APPEND;
+			}
+			$object->itemXpathsToExtend [] = $temp;
 		}
-		$object->itemXpathsToExtend = $itemXpathsToExtend;
 		
+		if (count($categoryFeaturesToExtend)){
+			$temp = new Kaltura_Client_Type_ExtendingItemMrssParameter();
+			$temp->xpath = '//category';
+			$temp->identifier = new Kaltura_Client_Type_CategoryIdentifier();
+			$temp->identifier->identifier = Kaltura_Client_Enum_CategoryIdentifierField::FULL_NAME;
+			$temp->identifier->extendedFeatures = implode(',', $categoryFeaturesToExtend);
+			$temp->extensionMode = Kaltura_Client_Enum_MrssExtensionMode::REPLACE;
+			$object->itemXpathsToExtend [] = $temp;
+		}
 		return $object;
 	}
 	
@@ -66,9 +89,29 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		));
 		
 		$i = 1;
+		$extendCategory = false;
+		$extendParentCategory = false;
 		foreach($itemXpathsToExtend as $itemXPath)
 		{
 			/* @var $itemXPath Kaltura_Client_Type_ExtendingItemMrssParameter */
+			//if it a category identifier
+			if ($itemXPath->identifier instanceof Kaltura_Client_Type_CategoryIdentifier){
+				/* @var $identifier Kaltura_Client_Type_CategoryIdentifier */
+				$identifier = $itemXPath->identifier;
+				//if the parameters are set exactly as the admin console sets.
+				if ($itemXPath->xpath == '//category' && $itemXPath->extensionMode == Kaltura_Client_Enum_MrssExtensionMode::REPLACE
+					&& $identifier->identifier == Kaltura_Client_Enum_CategoryIdentifierField::FULL_NAME){
+					foreach (explode(',', $identifier->extendedFeatures) as $extendedFeature){
+						if ($extendedFeature == self::EXTEND_FEATURE_CATEGORY_METADATA){
+							$extendCategory = true;
+						}
+						elseif ($extendedFeature == self::EXTEND_FEATURE_PARENT_CATEGORY_METADATA){
+							$extendParentCategory = true;
+						}
+					}
+				}
+				continue;
+			}
 			$subForm = new Zend_Form_SubForm(array('disableLoadDefaultDecorators' => true));
 			$subForm->setDecorators(array(
 				'FormElements',
@@ -81,6 +124,34 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 			
 			$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++);
 		}
+		
+		//set the extend category metadata checkbox
+		$subForm = new Zend_Form_SubForm(array('disableLoadDefaultDecorators' => true));
+		$subForm->setDecorators(array(
+				'FormElements',
+			));
+		$subForm->addElement('checkbox', 'includeCategoryInMrss', array(
+			'label' => 'Include category-level custom metadata in MRSS',
+			'isArray' => true,
+			'value' => $extendCategory,
+		));
+		$subForm->getElement('includeCategoryInMrss')->getDecorator('Label')->setOption('placement', 'APPEND');
+		$subForm->getElement('includeCategoryInMrss')->setChecked($extendCategory);
+		$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++,99);
+
+		//set the extend category parent metadata checkbox
+		$subForm = new Zend_Form_SubForm(array('disableLoadDefaultDecorators' => true));
+		$subForm->setDecorators(array(
+				'FormElements',
+			));
+		$subForm->addElement('checkbox', 'includeCategoryParentInMrss', array(
+			'label' => 'Include parent categories',
+			'isArray' => true,
+			'value' => $extendParentCategory,
+		));
+		$subForm->getElement('includeCategoryParentInMrss')->getDecorator('Label')->setOption('placement', 'APPEND');
+		$subForm->getElement('includeCategoryParentInMrss')->setChecked($extendParentCategory);
+		$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++,100);
 		
 		$this->addSubForm($mainSubForm, 'itemXpathsToExtend_group');
 	}
