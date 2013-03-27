@@ -5,8 +5,6 @@
  */
 abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfileConfiguration
 {
-	const EXTEND_FEATURE_CATEGORY_METADATA = '1';
-	const EXTEND_FEATURE_PARENT_CATEGORY_METADATA = '2';
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
@@ -20,11 +18,11 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		foreach($itemXpathsToExtend as $key => $val)
 		{
 			if ((string)$key == 'includeCategoryInMrss'){
-				$categoryFeaturesToExtend[] = self::EXTEND_FEATURE_CATEGORY_METADATA;
+				$categoryFeaturesToExtend[] = Kaltura_Client_Enum_ObjectFeatureType::METADATA;
 				continue;
 			}
 			else if ((string)$key == 'includeCategoryParentInMrss'){
-				$categoryFeaturesToExtend[] = self::EXTEND_FEATURE_PARENT_CATEGORY_METADATA;
+				$categoryFeaturesToExtend[] = Kaltura_Client_Enum_ObjectFeatureType::ANCESTOR_RECURSIVE;
 				continue;
 			}
 			else{	
@@ -39,6 +37,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		}
 		
 		if (count($categoryFeaturesToExtend)){
+			$categoryFeaturesToExtend[] = Kaltura_Client_Enum_ObjectFeatureType::CUSTOM_DATA;
 			$temp = new Kaltura_Client_Type_ExtendingItemMrssParameter();
 			$temp->xpath = '//category';
 			$temp->identifier = new Kaltura_Client_Type_CategoryIdentifier();
@@ -102,10 +101,10 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 				if ($itemXPath->xpath == '//category' && $itemXPath->extensionMode == Kaltura_Client_Enum_MrssExtensionMode::REPLACE
 					&& $identifier->identifier == Kaltura_Client_Enum_CategoryIdentifierField::FULL_NAME){
 					foreach (explode(',', $identifier->extendedFeatures) as $extendedFeature){
-						if ($extendedFeature == self::EXTEND_FEATURE_CATEGORY_METADATA){
+						if ($extendedFeature == Kaltura_Client_Enum_ObjectFeatureType::METADATA){
 							$extendCategory = true;
 						}
-						elseif ($extendedFeature == self::EXTEND_FEATURE_PARENT_CATEGORY_METADATA){
+						elseif ($extendedFeature == Kaltura_Client_Enum_ObjectFeatureType::ANCESTOR_RECURSIVE){
 							$extendParentCategory = true;
 						}
 					}

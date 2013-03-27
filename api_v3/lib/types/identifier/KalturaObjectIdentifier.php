@@ -16,8 +16,7 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 	
 	
 	private static $map_between_objects = array(
-		"extendedFeatures",
-		);
+	);
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
@@ -37,9 +36,14 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 			return null;
 		}
 		/* @var $dbObject kObjectIdentifier */		
-		if ($this->extendedFeatures)
-			$dbObject->setExtendedFeatures(explode(",", $this->extendedFeatures));
-		
+		if ($this->extendedFeatures){
+			$apiFeaturesArray = explode(",", $this->extendedFeatures);
+			$coreFeatureArray = array();
+			foreach ($apiFeaturesArray as $feature){
+				$coreFeatureArray[] = kPluginableEnumsManager::apiToCore('ObjectFeatureType', $feature);
+			}
+			$dbObject->setExtendedFeatures($coreFeatureArray);
+		}
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
@@ -49,8 +53,13 @@ abstract class KalturaObjectIdentifier extends KalturaObject
 	public function fromObject($dbObject)
 	{
 		parent::fromObject($dbObject);
-		if (is_array($dbObject->getExtendedFeatures()))
-			$this->extendedFeatures = implode(',',$dbObject->getExtendedFeatures());
+		if (is_array($dbObject->getExtendedFeatures())){
+			$apiFeaturesArray = array();
+			foreach ($dbObject->getExtendedFeatures() as $feature){
+				$apiFeaturesArray[] = kPluginableEnumsManager::coreToApi('ObjectFeatureType', $feature);
+			}
+			$this->extendedFeatures = implode(',',$apiFeaturesArray);
+		}
 	}
 
 }
