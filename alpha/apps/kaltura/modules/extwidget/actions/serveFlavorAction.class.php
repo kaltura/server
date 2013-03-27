@@ -79,7 +79,9 @@ class serveFlavorAction extends kalturaAction
 			$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
 		if($clipTo == 0) 
 			$clipTo = 2147483647;
-
+		if(!is_numeric($clipTo) || $clipTo < 0)
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'clipTo must be a positive number');
+		
 
 		if($fileParam && is_dir($path)) {
 			$path .= "/$fileParam";
@@ -91,6 +93,35 @@ class serveFlavorAction extends kalturaAction
 			$limit_file_size = 0;
 			if ($clipTo != 2147483647)
 			{
+				if (strtolower($flavorAsset->getFileExt()) == 'mp4' && 
+					PermissionPeer::isValidForPartner(PermissionName::FEATURE_ACCURATE_SERVE_CLIPPING, $flavorAsset->getPartnerId()))
+				{
+					$contentPath = myContentStorage::getFSContentRootPath();
+					$tempClipName = $flavorAsset->getVersion() . '_' . $clipTo . '.mp4';
+					$tempClipPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/tempclip", $flavorAsset->getIntId(), $flavorAsset->getId(), $tempClipName);
+					if (!file_exists($tempClipPath))
+					{
+						kFile::fullMkdir($tempClipPath);
+						$clipToSec = round($clipTo / 1000, 3);
+						$cmdLine = kConf::get ( "bin_path_ffmpeg" ) . " -i {$path} -vcodec copy -acodec copy -f mp4 -t {$clipToSec} -y {$tempClipPath} 2>&1";
+						KalturaLog::log("Executing {$cmdLine}");
+						$output = array ();
+						$return_value = "";
+						exec($cmdLine, $output, $return_value);
+						KalturaLog::log("ffmpeg returned {$return_value}, output:".implode("\n", $output));
+					}
+					
+					if (file_exists($tempClipPath))
+					{
+						KalturaLog::log("Dumping {$tempClipPath}");
+						kFileUtils::dumpFile($tempClipPath);
+					}
+					else
+					{
+						KalturaLog::err('Failed to clip the file using ffmpeg, falling back to rough clipping');
+					}
+				}
+				
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
 				if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 				{
