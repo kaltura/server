@@ -155,7 +155,7 @@ class KDLFlavor extends KDLMediaDataSet {
 			$target->_video->_gop = KDLConstants::DefaultGOP;
 				
 			$target->_warnings[KDLConstants::ContainerIndex][] =
-			KDLWarnings::ToString(KDLWarnings::ForceCommandline);
+				KDLWarnings::ToString(KDLWarnings::ForceCommandline);
 		}
 		else {
 			$target = $this->generateTargetFlavor($source);
@@ -387,6 +387,7 @@ $plannedDur = 0;
 			case "mov":
 			case "3gp":
 			case "ogg":
+			case "ogv":
 				return $this->_container->_id;
 			default:
 				return "flv";
@@ -444,6 +445,10 @@ $plannedDur = 0;
 			$target->_fastSeekTo = true;
 		}
 		
+		if($target->_container->_id==KDLContainerTarget::COPY){
+			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
+		}
+		
 		$target->_container->_duration = $sourceDur;
 		$target->_video = null;
 		if($this->_video!="") {
@@ -474,9 +479,71 @@ $plannedDur = 0;
 			}
 		}
 		
+		/*
+		 * Handle multi-stream cases
+		 *
+		$target->_multiStream=self::evaluateMultiStream($source->_multiStream, $this->_multiStream);
+		*/
 		return $target;
 	}
 
+	/* ---------------------------
+	 * EvaluateCopyContainer
+	 */
+	public static function EvaluateCopyContainer(KDLContainerData $source)
+	{
+		$format = KDLContainerTarget::MP4;
+//'mp3', 'flash video', 'mpeg audio', 'quicktime', 'mpeg-4','matroska','mpeg video', 'mpeg-ps',
+//'mpeg-ts','ogg','wave','webm','windows media','avi','bdav','dv','jpeg','png','mxf','realmedia','shockwave','aiff'
+		switch($source->_format){
+			case 'mpeg-4':
+				$format = KDLContainerTarget::MP4;
+				break;
+			case 'flash video':
+				$format = KDLContainerTarget::FLV;
+				break;
+			case 'mpeg audio':
+			case 'mp3':
+				$format = KDLContainerTarget::MP3;
+				break;			
+			case 'quicktime':
+				$format = KDLContainerTarget::MOV;
+				break;
+			case 'matroska':
+				$format = KDLContainerTarget::MKV;
+				break;
+			case 'mpeg video':
+			case 'mpeg-ps':
+			case 'mxf':
+				$format = KDLContainerTarget::MPEG;
+				break;
+			case 'mpeg-ts':
+			case 'bdav':
+				$format = KDLContainerTarget::MPEGTS;
+				break;
+			case 'ogg':
+				$format = KDLContainerTarget::OGG;
+				break;
+			case 'wave':
+				$format = KDLContainerTarget::WAV;
+				break;
+			case 'webm':
+				$format = KDLContainerTarget::WEBM;
+				break;
+			case 'windows media':
+				$format = KDLContainerTarget::WMV;
+				break;
+			case 'avi':
+			case 'dv':
+			case 'realmedia':
+			default:
+				$format = KDLContainerTarget::AVI;
+				break;
+		}
+		
+		return $format;
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideo
 	 */
@@ -504,6 +571,7 @@ $plannedDur = 0;
 					$targetVid->_id = KDLVideoTarget::H264;
 					break;
 				case KDLContainerTarget::OGG:
+				case KDLContainerTarget::OGV:
 					$targetVid->_id = KDLVideoTarget::THEORA;
 					break;
 				case KDLContainerTarget::WMV:
@@ -680,6 +748,20 @@ $plannedDur = 0;
 		$target->_width  = round($target->_width);
 		
 		/*
+		 * For anamorphic pixels - set the width to match the required PAR 
+		 * and adjsut the target DAR.
+		 */
+		if(isset($target->_anamorphic) && $target->_anamorphic!=0 && $target->_anamorphic!=1){
+			$dar = $target->_width/$target->_height;
+			if(abs($dar-$target->_anamorphic)>0.2) {
+				$w=$target->_height*$target->_anamorphic;
+				$w = round($w);
+				$target->_dar = $dar;
+				$target->_width = $w;
+			}
+		}
+		
+		/*
 		 * x16 - make sure both hgt/wid comply to x16
 		 * - if the frame size is an 'industry-standard', skip x16 constraint 
 		 */
@@ -721,10 +803,14 @@ $plannedDur = 0;
 		 */
 		if($target->_frameRate==0) {
 			$target->_frameRate = $source->_frameRate;
-			if($target->_frameRate>KDLConstants::MaxFramerate) {
+			if(isset($target->_maxFrameRate) && $target->_maxFrameRate>0)
+				$maxFR = $target->_maxFrameRate;
+			else
+				$maxFR = KDLConstants::MaxFramerate;
+			if($target->_frameRate>$maxFR) {
 				$target->_warnings[KDLConstants::VideoIndex][] =
-					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, KDLConstants::MaxFramerate, $target->_frameRate);
-				$target->_frameRate=$target->_frameRate==50?25:KDLConstants::MaxFramerate;
+					KDLWarnings::ToString(KDLWarnings::TruncatingFramerate, $maxFR, $target->_frameRate);
+				$target->_frameRate=$target->_frameRate==50?25:$maxFR;
 			}
 			// For webcam/h263 - if FR==0, set FR=24
 			else if($target->_frameRate==0 && $source->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) ){
@@ -774,6 +860,7 @@ $plannedDur = 0;
 						$targetAud->_id=KDLAudioTarget::MP3;
 						break;
 					case KDLContainerTarget::OGG:
+					case KDLContainerTarget::OGV:
 						$targetAud->_id=KDLAudioTarget::VORBIS;
 						break;
 					case KDLContainerTarget::FLV:
@@ -815,6 +902,13 @@ $plannedDur = 0;
 			$targetAud->_id=KDLAudioTarget::MP3;
 		}
 
+				/* -------------
+				 * Adjust target bit depth/resolution if it is set in the source
+				 */
+		if(!(isset($targetAud->_resolution) && $targetAud->_resolution>0) 
+		&& isset($source->_resolution)){
+			$targetAud->_resolution=$source->_resolution;
+		}
 				/* ---------------
 				 * Channels (ch):
 				 * - AMRNB: ch 1
@@ -825,7 +919,8 @@ $plannedDur = 0;
 		if ($targetAud->_id==KDLAudioTarget::AMRNB){
 			$targetAud->_channels=1;
 		}
-		else if($targetAud->_channels==0 && $targetAud->_id!=KDLAudioTarget::AAC){
+		else if($targetAud->_channels==0 
+		&& !($targetAud->_id==KDLAudioTarget::AAC || $targetAud->_id==KDLAudioTarget::PCM || $targetAud->_id==KDLAudioTarget::MPEG2)){
 			$targetAud->_channels=KDLConstants::DefaultAudioChannels;
 		}
 		else {
@@ -873,6 +968,81 @@ $plannedDur = 0;
 		}
 
 		return $targetAud;
+	}
+
+	/* ---------------------------
+	 * evaluateMultiStream
+	 * 
+	 */
+	private static function evaluateMultiStream($source, $flavor) 
+	{
+/*
+Supprted options
+1.
+{"audio":{"mapping":[["all"]]}}
+
+
+2.
+{"audio":{"mapping":[["all",1]]}}
+
+
+3.
+{"audio":{"mapping":[[7,0],[8,1]]}}
+
+ */
+		if(is_null($source) || is_null($flavor)){
+			return null;
+		}
+		
+			/*
+			 * No multiple audio source streams ==> nothing to porcess
+			 */
+		if(!array_key_exists(KDLConstants::AudioIndex, $source)){
+			return null;
+		}
+			/*
+			 * No multiple audio mappings in the target ==> default porcessing
+			 */
+		$audioFieldName = KDLConstants::AudioIndex;
+		if(!array_key_exists(KDLConstants::AudioIndex, $flavor) 
+		|| is_null($flavor->$audioFieldName->mapping)
+		|| !is_array($flavor->$audioFieldName->mapping)
+		|| count($flavor->$audioFieldName->mapping)==0 ){
+			return null;
+		}
+		$mapping=$flavor->$audioFieldName->mapping;
+
+		$target = new stdClass();
+		$target->$audioFieldName = new stdClass();
+		foreach($mapping as $map){
+			if($map[0]=='all') {
+					/*
+					 * When 'count($map)==1' (only the source member is assigned)
+					 * - take ALL source streams and convert each of them separatly into an ouput multi-stream
+					 * - else - take ALL source streams and MERGE them into ONE output stream
+					 */ 
+				foreach($source->$audioFieldName as $i=>$aud) {
+					$target->$audioFieldName->mapping[($aud->streamId)] = count($map)==1? $aud->streamId: $map[1];
+				}
+			}
+			else {
+				$target->$audioFieldName->mapping[$map[0]] = count($map)==1? $map[0]: $map[1];				
+			}
+		}
+
+					/*
+					 * Currently there is no video mapping functionality. 
+					 * Therefore if there is audio mapping and there are video source stream, 
+					 * default video stream is added.  
+					 */
+		if(array_key_exists(KDLConstants::VideoIndex, $source)){
+			$videoFieldName = KDLConstants::VideoIndex;
+			$target->$videoFieldName = new stdClass();
+			$sourceVideoStreams = $source->$videoFieldName;
+			$target->$videoFieldName->mapping[$sourceVideoStreams[0]->streamId] = 0;
+		}
+
+		return $target;
 	}
 
 	/* ---------------------------
