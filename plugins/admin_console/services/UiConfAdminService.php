@@ -30,8 +30,11 @@ class UiConfAdminService extends KalturaBaseService
 		// if not specified set to true (default)
 		if(is_null($uiConf->useCdn))
 			$uiConf->useCdn = true;
+			
+		$dbUiConf = $uiConf->toObject(new uiConf());	
+		if ($dbUiConf->getPartnerId() == PartnerPeer::GLOBAL_PARTNER && !kPermissionManager::isPermitted(self::PERMISSION_GLOBAL_PARTNER_UI_CONF_UPDTAE))
+			throw new KalturaAPIException ( KalturaErrors::INVALID_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER );
 		
-		$dbUiConf = $uiConf->toObject(new uiConf());
 		$dbUiConf->save();
 		
 		$uiConf = new KalturaUiConfAdmin();
@@ -104,7 +107,10 @@ class UiConfAdminService extends KalturaBaseService
 		
 		if (!$dbUiConf)
 			throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $id);
-		
+			
+		if ($dbUiConf->getPartnerId() == PartnerPeer::GLOBAL_PARTNER && !kPermissionManager::isPermitted(self::PERMISSION_GLOBAL_PARTNER_UI_CONF_UPDTAE))
+			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
+			
 		$dbUiConf->setStatus(uiConf::UI_CONF_STATUS_DELETED);
 		$dbUiConf->save();
 	}
