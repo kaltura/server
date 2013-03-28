@@ -40,7 +40,7 @@ abstract class kObjectIdentifier
 	 * @param string $extendedFeatures
 	 */
 	public function setExtendedFeatures($extendedFeatures) {
-		$this->extendedFeatures = explode(',', $extendedFeatures);
+		$this->extendedFeatures = $extendedFeatures;
 	}
 	
 	/**
