@@ -13,7 +13,7 @@ class WidgetController extends Zend_Controller_Action
 		
 		$action = $this->view->url(array('controller' => $request->getControllerName(), 'action' => $request->getActionName()), null, true);
 
-		$newButton = new Form_NewButton();
+		$newButton = new Form_NewButton(array('showPartnerId' => false));
 		$newButton->populate($request->getParams());
 		
 		$form = new Form_WidgetFilter();
@@ -59,15 +59,12 @@ class WidgetController extends Zend_Controller_Action
 				$form->setAttrib('class', 'valid');
 				$this->view->formValid = true;
 			}
-		} else 
-		{
-				$form->getElement('partner_id')->setAttrib('readonly',true);
+			$form->populate($request->getParams());
 		}
-		$form->populate($request->getParams());
 		$form->setEditorButtons();
 		$this->view->typesInfo = $client->uiConf->getAvailableTypes();
 		$this->view->form = $form;
-		$this->_helper->viewRenderer('edit'); 
+		$this->_helper->viewRenderer('edit');
 	}
 	
 	public function editAction()
@@ -155,7 +152,7 @@ class WidgetController extends Zend_Controller_Action
 		$this->view->form = $form;
 	}
 	
-	public function deleteAction() 
+	public function deleteAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$request = $this->getRequest();
@@ -168,7 +165,7 @@ class WidgetController extends Zend_Controller_Action
 		echo $this->_helper->json('ok', false);
 	}
 	
-	public function duplicateAction() 
+	public function duplicateAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$request = $this->getRequest();
@@ -186,7 +183,7 @@ class WidgetController extends Zend_Controller_Action
 	public function kcwEditorAction()
 	{
 		$request = $this->getRequest();
-		$this->view->kcwEditorVersion = "v1.2.0"; 
+		$this->view->kcwEditorVersion = "v1.2.0";
 		$this->view->kcwBaseUrl = Infra_ClientHelper::getServiceUrl() . '/flash/kcweditor/';
 		$this->_helper->layout->setLayout('layout_empty');
 	}
@@ -240,7 +237,7 @@ class WidgetController extends Zend_Controller_Action
 			'Generic'
 		);
 		$typesConfig = Zend_Registry::get('config')->settings->uiConfTypes;
-		if ($typesConfig) 
+		if ($typesConfig)
 		{
 			if ($typesConfig === "*")
 				return $this->getAllUiConfTypes();
