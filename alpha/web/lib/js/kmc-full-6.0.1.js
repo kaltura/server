@@ -1,4 +1,4 @@
-/*! KMC - v6.0.1 - 2013-03-21
+/*! KMC - v6.0.1 - 2013-03-28
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2577,7 +2577,12 @@ QRBitBuffer.prototype = {
 		deliveryType: kmc.vars.default_delivery_type,
 		embedType: kmc.vars.default_embed_code_type,
 		secureEmbed: kmc.vars.embed_code_protocol_https
-	};	
+	};
+
+	// Check for current protocol and update secureEmbed
+	if(window.location.protocol == 'https:') {
+		kmc.vars.previewDefaults.secureEmbed = true;
+	}
 
 	Preview.storageName = 'previewDefaults';
 	Preview.el = '#previewModal';
@@ -3142,7 +3147,8 @@ kmc.vars.help_url = kmc.vars.service_url + '/kmc5help.html';
 
 // Set base URL
 kmc.vars.port = (window.location.port) ? ":" + window.location.port : "";
-kmc.vars.base_url = window.location.protocol + '//' + window.location.hostname + kmc.vars.port;
+kmc.vars.base_host = window.location.hostname + kmc.vars.port;
+kmc.vars.base_url = window.location.protocol + '//' + kmc.vars.base_host;
 kmc.vars.api_host = kmc.vars.host;
 kmc.vars.api_url = window.location.protocol + '//' + kmc.vars.api_host;
 
