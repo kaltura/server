@@ -68,21 +68,7 @@ class kBusinessConvertDL
 				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 
-				if($oldAsset instanceof flavorAsset)
-				{
-					$oldAsset->setBitrate($newAsset->getBitrate());
-					$oldAsset->setFrameRate($newAsset->getFrameRate());
-					$oldAsset->setVideoCodecId($newAsset->getVideoCodecId());
-				}
-				$oldAsset->setWidth($newAsset->getWidth());
-				$oldAsset->setHeight($newAsset->getHeight());
-				$oldAsset->setContainerFormat($newAsset->getContainerFormat());
-				$oldAsset->setSize($newAsset->getSize());
-				$oldAsset->setFileExt($newAsset->getFileExt());
-				$oldAsset->setTags($newAsset->getTags());
-				$oldAsset->setDescription($newAsset->getDescription());
-				$oldAsset->incrementVersion();
-				$oldAsset->setStatusLocalReady();
+				$oldAsset->linkFromAsset($newAsset);
 				$oldAsset->save();
 
 				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

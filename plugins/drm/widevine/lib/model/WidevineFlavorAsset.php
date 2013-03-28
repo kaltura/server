@@ -64,4 +64,10 @@ class WidevineFlavorAsset extends flavorAsset
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_WIDEVINE_ASSET_ID, $id);
 	}
+	
+	public function linkFromAsset(asset $fromAsset)
+	{
+		parent::linkFromAsset($fromAsset);
+		$this->setWidevineAssetId($fromAsset->getWidevineAssetId());
+	}
 }

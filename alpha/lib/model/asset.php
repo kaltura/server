@@ -136,6 +136,19 @@ class asset extends Baseasset implements ISyncableFile
 		return $newFlavorAsset;
 	}
 	
+	public function linkFromAsset(asset $fromAsset)
+	{
+		$this->setWidth($fromAsset->getWidth());
+		$this->setHeight($fromAsset->getHeight());
+		$this->setContainerFormat($fromAsset->getContainerFormat());
+		$this->setSize($fromAsset->getSize());
+		$this->setFileExt($fromAsset->getFileExt());
+		$this->setTags($fromAsset->getTags());
+		$this->setDescription($fromAsset->getDescription());
+		$this->incrementVersion();
+		$this->setStatusLocalReady();		
+	}
+	
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isNew())

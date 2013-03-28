@@ -243,6 +243,14 @@ class flavorAsset extends asset
 		return $downloadUrl;
 	}
 	
+	public function linkFromAsset(asset $fromAsset)
+	{
+		parent::linkFromAsset($fromAsset);
+		$this->setBitrate($fromAsset->getBitrate());
+		$this->setFrameRate($fromAsset->getFrameRate());
+		$this->setVideoCodecId($fromAsset->getVideoCodecId());	
+	}
+	
 	/**
 	 * @param int $type
 	 * @return flavorAsset
