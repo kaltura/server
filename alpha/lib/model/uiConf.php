@@ -76,6 +76,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
 										self::UI_CONF_CLIPPER => "",
 										self::UI_CONF_TYPE_KSR => "ScreencastOMaticRun-1.0.32.jar",
+										self::UI_CONF_TYPE_KRECORD => "KRecord.swf",
 										);
 
 	private static $swf_directory_map = array (
