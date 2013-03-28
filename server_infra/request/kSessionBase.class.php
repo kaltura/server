@@ -78,6 +78,10 @@ class kSessionBase
 	public $privileges = null;
 	public $master_partner_id = null;
 	public $additional_data = null;
+	/**
+	 * @var array
+	 */
+	protected $parsedPrivileges = null;
 	
 	/**
 	 * @param string $encoded_str
@@ -101,15 +105,40 @@ class kSessionBase
 	 */
 	public function parseKS($encoded_str)
 	{
+		$success = false;
 		// try V2
 		if ($this->parseKsV2($encoded_str))
-			return true;
+			$success = true;
 	
 		// try V1
-		if ($this->parseKsV1($encoded_str))
-			return true;
+		if (!$success && $this->parseKsV1($encoded_str))
+			$success = true;
 			
-		return false;
+		if ($success)
+		{
+			$parsedPrivileges = array();
+			$privileges = explode(',', $this->privileges);
+			foreach ($privileges as $privilege)
+			{
+				list($privilegeName, $privilegeValue) = explode(':', $privilege);
+				if ($privilegeValue && strlen($privilegeValue))
+				{
+					$privilegeValue = explode(";", $privilegeValue);
+				}
+				if (!isset($parsedPrivileges[$privilegeName]))
+				{
+					$parsedPrivileges[$privilegeName] = array();
+				}
+				if ($privilegeValue && count($privilegeValue))
+				{
+					$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
+				}
+			}
+			
+			$this->parsedPrivileges = $parsedPrivileges;
+		}
+		
+		return $success;
 	}
 	
 	public function parseKsV1($encoded_str)
