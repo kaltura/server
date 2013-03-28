@@ -38,7 +38,9 @@ class Form_NewButton extends Infra_Form
 		}
 		else
 		{
-			$this->addElement('hidden', 'newPartnerId');
+			$this->addElement('hidden', 'newPartnerId', array(
+				'value'			=> 0,
+			));
 		}
 		
 		// submit button
