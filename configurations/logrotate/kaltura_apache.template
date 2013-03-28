@@ -24,3 +24,30 @@
  service @APACHE_SERVICE@ restart
  endscript
 }
+
+@LOG_DIR@/kaltura_apache_errors_ssl.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+ sharedscripts
+ postrotate
+ service @APACHE_SERVICE@ restart
+ endscript
+}
+
+@LOG_DIR@/kaltura_apache_access_ssl.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+ sharedscripts
+ postrotate
+ mv @LOG_DIR@/kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz @LOG_DIR@/`hostname`-kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz
+ service @APACHE_SERVICE@ restart
+ endscript
+}
