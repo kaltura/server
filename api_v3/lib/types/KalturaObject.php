@@ -343,6 +343,17 @@ abstract class KalturaObject
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
+			elseif ($propertyInfo->getDynamicType()&& strlen($value))
+			{
+				$propertyType = $propertyInfo->getDynamicType();
+				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
+				
+				$values = explode(',', $value);
+				$finalValues = array();
+				foreach($values as $val)
+					$finalValues[] = kPluginableEnumsManager::apiToCore($enumType, $val);
+				$value = implode(',', $finalValues);
+			}
 			elseif (is_string($value) && ! kXml::isXMLValidContent($value) )
 			{
 				throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );

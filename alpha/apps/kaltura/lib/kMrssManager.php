@@ -699,15 +699,16 @@ class kMrssManager
 				if ($extendingObject)		
 				{
 					$mrssParams->setItemXpathsToExtend(array());
+					$featuresArray = strlen($itemXPathToExtend->getIdentifier()->getExtendedFeatures()) ? explode(',',$itemXPathToExtend->getIdentifier()->getExtendedFeatures()) : null;
 					if ($itemXPathToExtend->getExtensionMode() == MrssExtensionMode::APPEND)
 					{
 						$parents = $xmlNodeToExtend->xpath("parent::*");
-						self::addExtendingItemNode($extendingObject, $identifierValue, $parents[0], $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+						self::addExtendingItemNode($extendingObject, $identifierValue, $parents[0], $xmlNodeToExtend->getName(), $mrssParams, $featuresArray);
 					}
 					else 
 					{
 						$xmlNodeToExtend[0] = null;
-						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $itemXPathToExtend->getIdentifier()->getExtendedFeatures());
+						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $featuresArray);
 					}
 					
 				}
