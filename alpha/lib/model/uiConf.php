@@ -97,6 +97,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
 		self::UI_CONF_CLIPPER => "kclip",
 		self::UI_CONF_TYPE_KSR => "ksr",
+		self::UI_CONF_TYPE_KRECORD => 'krecord',
 	);
 
 	public function save(PropelPDO $con = null, $isClone = false)
