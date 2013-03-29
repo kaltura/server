@@ -159,16 +159,23 @@ class KalturaFlavorParams extends KalturaAssetParams
 	
 	/**
 	 * @var float
+	 *   The pixels in the stored content don't represent visually square pixels, 
+	 *   but horizantally stretched pixels. This way the content gets smaller 
+	 *   w/out (almost) reducing visual quality.
 	 */
 	public $anamorphicPixels;
 	
 	/**
 	 * @var int
+	 * 	Mezzanine oriented assets does not require alligned and forced 
+	 * 	KeyFrames as web/mbr/hls playable assets
 	 */
 	public $isAvoidForcedKeyFrames;
 	
 	/**
 	 * @var int
+	 * 	Sets max bitrate that is different from the system wide 30fps.
+	 *  Required to support mezzanine formats
 	 */
 	public $maxFrameRate;
 	
