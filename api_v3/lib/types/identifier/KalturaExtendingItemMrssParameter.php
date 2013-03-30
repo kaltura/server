@@ -69,7 +69,8 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 				$this->identifier = new KalturaCategoryIdentifier();
 		}
 		
-		$this->identifier->fromObject($dbObject->getIdentifier());
+		if ($this->identifier)
+			$this->identifier->fromObject($dbObject->getIdentifier());
 	}
 	
 	protected function validate ()
