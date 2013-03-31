@@ -401,6 +401,10 @@ class KalturaFrontController
 				case kCoreException::LOCK_TIMED_OUT:
 					$object = new KalturaAPIException(KalturaErrors::LOCK_TIMED_OUT);
 					break;
+					
+				case kCoreException::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED:
+					$object = new KalturaAPIException(KalturaErrors::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
+					break;
 						
 				default:
 		    		KalturaLog::crit($ex);
