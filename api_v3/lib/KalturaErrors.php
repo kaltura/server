@@ -476,4 +476,6 @@ class KalturaErrors extends APIErrors
 	 */
 	
 	const DELIVERY_TYPE_NOT_SPECIFIED = 'DELIVERY_TYPE_NOT_SPECIFIED, at least one non auto delivery type must be specified';
+	
+	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED,Unable to generate list. max matches value was reached";
 }
