@@ -560,7 +560,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$index = $this->getSphinxIndexName();
-		$maxMatches = self::getMaxRecords();
+		$maxMatches = min(self::getMaxRecords(), $this->getLimit());
 		$limit = $maxMatches;
 		
 		if($this->criteriasLeft)
@@ -568,8 +568,15 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 		if($setLimit && $this->getLimit())
 		{
-			$maxMatches += $this->getOffset();
-			$maxMatches = min($maxMatches, self::MAX_MATCHES);
+			if($this->getOffset() >= self::MAX_MATCHES)
+			{
+				throw new kCoreException("sphinx max matches limit was reached", kCoreException::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
+			}
+			else 
+			{
+				$maxMatches += $this->getOffset();
+				$maxMatches = min($maxMatches, self::MAX_MATCHES);
+			}
 			$limit = $this->getLimit();
 			if($this->getOffset())
 				$limit = $this->getOffset() . ", $limit";
