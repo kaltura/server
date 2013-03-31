@@ -207,17 +207,13 @@ class myPlaylistUtils
 	
 	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $extra_filters = null, $detailed = true)
 	{
+		if(! trim($entry_id_list_str))
+			return null;
+		
 		$entry_id_list = explode ( "," , $entry_id_list_str );
-		if ( (!is_null($entry_id_list_str)) && $entry_id_list )
-		{
-			// clear white spaces - TODO - assume this is done at insert time
-			foreach ( $entry_id_list as &$entry_id ) 
-				$entry_id=trim($entry_id);
-		}
-		else
-		{
-			return null;//array();
-		}
+		// clear white spaces - TODO - assume this is done at insert time
+		foreach ( $entry_id_list as &$entry_id ) 
+			$entry_id=trim($entry_id);
 		
 		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $extra_filters, $detailed);
 	}
