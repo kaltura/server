@@ -85,8 +85,9 @@ $vid = $target->_video;
 			return null;
 			/*
 			 * Remove menu and chapter meta data that harms RTMP streaming 
+			 * This is not relevant for FLV targets (just MP4 derivatives)
 			 */
-		if($target->ToTags(array("mbr"))) {
+		if($target->ToTags(array("mbr")) && $target->_container->_id!=KDLContainerTarget::FLV) {
 			$cmdStr = " -map_chapters -1 -map_metadata -1 $cmdStr";
 		}
 		
