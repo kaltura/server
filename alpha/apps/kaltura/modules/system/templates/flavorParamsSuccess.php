@@ -14,7 +14,7 @@ if ($editFlavorParam)
 ?>
 	<form method="post">
 		<fieldset>
-			<legend>Flavor Params (<?php echo $editFlavorParam->getId(); ?>)</legend>
+			<legend><b>Flavor Params (<?php echo $editFlavorParam->getId(); ?>)</b></legend>
 			<label for="partner-id">Partner Id: </label><br />
 			<input type="text" id="partner-id" name="partner-id" value="<?php echo $editFlavorParam->getPartnerId(); ?>" size="5" />
 			<br />
@@ -31,16 +31,31 @@ if ($editFlavorParam)
 			<input type="text" id="tags" name="tags" value="<?php echo $editFlavorParam->getTags(); ?>" size="40" <?php echo $disabled; ?>/>
 			(<?php echo implode(", ", flavorParams::getValidTags()); ?>)
 			<br />
-			<label for="format">Format: </label><br />
+			<label for="format"><b>Format: </b></label><br />
 			<select id="format" name="format" <?php echo $disabled; ?>>
 				<?php foreach($formats as $name => $format): ?>
 				<option value="<?php echo $format; ?>" <?php echo ($editFlavorParam->getFormat() == $format) ? "selected=\"selected\"" : "" ?>><?php echo $name; ?></option>
 				<?php endforeach; ?>
 			</select>
 			<br />
+			<label for="video-codec"><b>Video codec: </b></label>
+			<select id="video-codec" name="video-codec" <?php echo $disabled; ?>>
+				<?php foreach($videoCodecs as $name => $videoCodec): ?>
+				<option value="<?php echo $videoCodec; ?>" <?php echo ($editFlavorParam->getVideoCodec() == $videoCodec) ? "selected=\"selected\"" : "" ?>><?php echo $name; ?></option>
+				<?php endforeach; ?>
+			</select>,
+			<label for="video-bitrate">Bitrate </label>
+			<input type="text" id="video-bitrate" name="video-bitrate" value="<?php echo $editFlavorParam->getVideoBitrate(); ?>" size="5" <?php echo $disabled; ?>/>kbps,
 			Dimensions (W x H): 
 			<input type="text" id="width" name="width" value="<?php echo $editFlavorParam->getWidth(); ?>" size="5" <?php echo $disabled; ?>/> X  
 			<input type="text" id="height" name="height" value="<?php echo $editFlavorParam->getHeight(); ?>" size="5"  <?php echo $disabled; ?>/> pixels
+			<br />
+			<label for="frame-rate">frame rate </label>
+			<input type="text" id="frame-rate" name="frame-rate" value="<?php echo $editFlavorParam->getFrameRate(); ?>" size="5" <?php echo $disabled; ?>/>fps,
+			<label for="gop-size">gop size</label>
+			<input type="text" id="gop-size" name="gop-size" value="<?php echo $editFlavorParam->getGopSize(); ?>" size="5" <?php echo $disabled; ?>/>frames,
+			<label for="max-frame-rate">max frame rate </label>
+			<input type="text" id="max-frame-rate" name="max-frame-rate" value="<?php echo $editFlavorParam->getMaxFrameRate(); ?>" size="5" <?php echo $disabled; ?>/>fps
 			<br />
 			<label for="two-pass">Two Pass:</label><input type="checkbox" id="two-pass" name="two-pass" value="1" <?php echo ($editFlavorParam->getTwoPass()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<label for="rotate">Rotate:</label><input type="checkbox" id="rotate" name="rotate" value="1" <?php echo ($editFlavorParam->getRotate()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
@@ -51,22 +66,20 @@ if ($editFlavorParam)
 			<br />
 			<label for="isAvoidVideoShrinkFramesizeToSource">NoFrameSizeShrink:</label><input type="checkbox" id="isAvoidVideoShrinkFramesizeToSource" name="isAvoidVideoShrinkFramesizeToSource" value="1" <?php echo ($editFlavorParam->getIsAvoidVideoShrinkFramesizeToSource()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<label for="isAvoidVideoShrinkBitrateToSource">NoBitRateShrink:</label><input type="checkbox" id="isAvoidVideoShrinkBitrateToSource" name="isAvoidVideoShrinkBitrateToSource" value="1" <?php echo ($editFlavorParam->getIsAvoidVideoShrinkBitrateToSource()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="isAvoidForcedKeyFrames">NoForcedKeyFrames:</label><input type="checkbox" id="isAvoidForcedKeyFrames" name="isAvoidForcedKeyFrames" value="1" <?php echo ($editFlavorParam->getIsAvoidForcedKeyFrames()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<br />
 			<label for="isVideoFrameRateForLowBrAppleHls">LowBrAppleHls:</label><input type="checkbox" id="isVideoFrameRateForLowBrAppleHls" name="isVideoFrameRateForLowBrAppleHls" value="1" <?php echo ($editFlavorParam->getIsVideoFrameRateForLowBrAppleHls()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
+			<label for="text">AnamorphicPixels </label>
+			<input type="text" id="anamorphicPixels" name="anamorphicPixels" value="<?php echo $editFlavorParam->getAnamorphicPixels(); ?>" size="5" <?php echo $disabled; ?>/>
 			<br />
-			<label for="video-codec">Video codec: </label>
-			<select id="video-codec" name="video-codec" <?php echo $disabled; ?>>
-				<?php foreach($videoCodecs as $name => $videoCodec): ?>
-				<option value="<?php echo $videoCodec; ?>" <?php echo ($editFlavorParam->getVideoCodec() == $videoCodec) ? "selected=\"selected\"" : "" ?>><?php echo $name; ?></option>
-				<?php endforeach; ?>
-			</select>,
-			<label for="video-bitrate">bitrate </label>
-			<input type="text" id="video-bitrate" name="video-bitrate" value="<?php echo $editFlavorParam->getVideoBitrate(); ?>" size="5" <?php echo $disabled; ?>/>kbps,
-			<label for="frame-rate">frame rate </label>
-			<input type="text" id="frame-rate" name="frame-rate" value="<?php echo $editFlavorParam->getFrameRate(); ?>" size="5" <?php echo $disabled; ?>/>fps,
-			<label for="gop-size">gop size</label>
-			<input type="text" id="gop-size" name="gop-size" value="<?php echo $editFlavorParam->getGopSize(); ?>" size="5" <?php echo $disabled; ?>/>frames
+<!--
+To activate the 'multiStream' remove the remarks from that portion 
+and "" that are placed arround editFlavorParam->getMultiStream
+			<label for="multiStream">MultiStream:</label><br />
+			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?php echo "$editFlavorParam->getMultiStream()"; ?></textarea><br/>
 			<br />
-			<label for="audio-codec">Audio codec </label>
+-->
+			<label for="audio-codec"><b>Audio codec </b></label>
 			<select id="audio-codec" name="audio-codec" <?php echo $disabled; ?>>
 				<?php foreach($audioCodecs as $name => $audioCodec): ?>
 				<option value="<?php echo $audioCodec; ?>" <?php echo ($editFlavorParam->getAudioCodec() == $audioCodec) ? "selected=\"selected\"" : "" ?>><?php echo $name; ?></option>
@@ -81,14 +94,15 @@ if ($editFlavorParam)
 			<label for="audio-resolution">resolution </label>
 			<input type="text" id="audio-resolution" name="audio-resolution" value="<?php echo $editFlavorParam->getAudioResolution(); ?>" size="5" <?php echo $disabled; ?>/>
 			<br />
-			<label for="conversion-engines">Conversion engines:     (Delimited with ",") </label>
-			<span style="color: white; background:white;><label for="name">...............................................</label><span style="color: black; background:white;>
+			<br />
+			<label for="conversion-engines"><b>Conversion engines:</b></label> <label>(Delimited with ",")</label>
+			<span style="color: white; background:white;><label for="name">.....................................</label><span style="color: black; background:white;>
 			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label><br /> 
 			 
 			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/> 
 			<input type="text" id="conversion-engines-extra-params" name="conversion-engines-extra-params" value="<?php echo $editFlavorParam->getConversionEnginesExtraParams(); ?>" size="60" <?php echo $disabled; ?>/> 
 			<br /> 
-			<label for="operators">Operators:</label><br /> 
+			<label for="operators"><b>Operators:</b></label><br /> 
 			<textarea id="operators" name="operators" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getOperators(); ?></textarea><br/>
 			<label for="is-default">Is Default: </label><input type="checkbox" id="is-default" name="is-default" value="1" <?php echo ($editFlavorParam->getIsDefault()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<label for="ready-behavior">Ready Behavior:</label> 
