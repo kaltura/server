@@ -311,6 +311,8 @@ class kContextDataHelper
 			else 
 				$deliveryType = kDeliveryUtils::getDeliveryTypeFromConfig($defaultDeliveryTypeKey);
 			
+			if($deliveryType)
+				$deliveryType = array();
 			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
 			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
 		}
@@ -323,16 +325,15 @@ class kContextDataHelper
 	{
 		$enabledDeliveryTypes = $this->partner->getDeliveryTypes();
 		foreach ($enabledDeliveryTypes as $enabledDeliveryTypeKey => $values){
-		if (isset($enabledDeliveryTypeKey['streamerType']) && $enabledDeliveryTypeKey['streamerType'] == PlaybackProtocol::AUTO)
+		if ($enabledDeliveryTypeKey == PlaybackProtocol::AUTO)
 				unset($enabledDeliveryTypes[$enabledDeliveryTypeKey]);					
 		}
 				
 		if (!count($enabledDeliveryTypes))
 		{
 			KalturaLog::err('At least one non auto delivery type must be specified');
-			return null;
+			return array();
 		}
-		//	throw new KalturaAPIException(KalturaErrors::DELIVERY_TYPE_NOT_SPECIFIED);
 				
 		$deliveryTypeKeys = array();
 		$deliveryTypeName = null; 
@@ -341,7 +342,8 @@ class kContextDataHelper
 		if($this->entry->getDuration() <= kConf::get('short_entries_max_duration'))
 			$deliveryTypeKeys[] = 'short_entries_default_delivery_type';
 		$deliveryTypeKeys[] = 'default_delivery_type';
-				
+
+		reset($enabledDeliveryTypes);
 		$deliveryTypeName = key($enabledDeliveryTypes);
 		foreach ($deliveryTypeKeys as $deliveryTypeKey){
 			$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
