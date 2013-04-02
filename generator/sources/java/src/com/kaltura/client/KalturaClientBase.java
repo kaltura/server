@@ -52,6 +52,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -338,6 +339,10 @@ abstract public class KalturaClientBase {
 			if (logger.isEnabled())
 				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
 			throw new KalturaApiException("Request was timed out");
+		} catch ( ConnectTimeoutException e) {
+			if (logger.isEnabled())
+				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
+			throw new KalturaApiException("Connection to server was timed out");
 		} catch ( IOException e ) {
 			if (logger.isEnabled())
 				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
