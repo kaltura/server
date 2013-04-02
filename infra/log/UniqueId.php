@@ -23,6 +23,8 @@ class UniqueId
 			// due to fact that running from command line will not define this function
 			if (function_exists('apache_note'))
 				apache_note("KalturaLog_UniqueId", self::$_uniqueId);
+			
+			header('X-Kaltura-Session:'.self::$_uniqueId, false);
 		}
 			
 		return self::$_uniqueId;
