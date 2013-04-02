@@ -36,6 +36,7 @@ class kSessionBase
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
+	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 
@@ -105,40 +106,15 @@ class kSessionBase
 	 */
 	public function parseKS($encoded_str)
 	{
-		$success = false;
 		// try V2
 		if ($this->parseKsV2($encoded_str))
-			$success = true;
+			return true;
 	
 		// try V1
-		if (!$success && $this->parseKsV1($encoded_str))
-			$success = true;
+		if ($this->parseKsV1($encoded_str))
+			return true;
 			
-		if ($success)
-		{
-			$parsedPrivileges = array();
-			$privileges = explode(',', $this->privileges);
-			foreach ($privileges as $privilege)
-			{
-				list($privilegeName, $privilegeValue) = explode(':', $privilege);
-				if ($privilegeValue && strlen($privilegeValue))
-				{
-					$privilegeValue = explode(";", $privilegeValue);
-				}
-				if (!isset($parsedPrivileges[$privilegeName]))
-				{
-					$parsedPrivileges[$privilegeName] = array();
-				}
-				if ($privilegeValue && count($privilegeValue))
-				{
-					$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
-				}
-			}
-			
-			$this->parsedPrivileges = $parsedPrivileges;
-		}
-		
-		return $success;
+		return false;
 	}
 	
 	public function parseKsV1($encoded_str)
@@ -190,6 +166,27 @@ class kSessionBase
 			
 		if(isset($parts[6]))
 			$this->privileges = $parts[6];
+
+		$parsedPrivileges = array();
+		$privileges = explode(',', $this->privileges);
+		foreach ($privileges as $privilege)
+		{
+			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege) : array($privilege, null);
+			if (!is_null($privilegeValue) && strlen($privilegeValue))
+			{
+				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
+			}
+			if (!isset($parsedPrivileges[$privilegeName]))
+			{
+				$parsedPrivileges[$privilegeName] = array();
+			}
+			if (!is_null($privilegeValue) && count($privilegeValue))
+			{
+				$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
+			}
+		}
+		
+		$this->parsedPrivileges = $parsedPrivileges;
 			
 		if(isset($parts[7]))
 			$this->master_partner_id = $parts[7];
@@ -461,6 +458,7 @@ class kSessionBase
 		// TODO: the following code translates a KS v2 into members that are more suitable for V1
 		//	in the future it makes sense to change the structure of the ks class
 		$privileges = array();
+		$this->parsedPrivileges = array();
 		foreach ($fieldsArr as $fieldName => $fieldValue)
 		{
 			if (isset(self::$fieldMapping[$fieldName]))
@@ -470,9 +468,15 @@ class kSessionBase
 				continue;
 			}
 			if (strlen($fieldValue))
+			{
 				$privileges[] = "{$fieldName}:{$fieldValue}";
+				$this->parsedPrivileges[$fieldName] = explode(self::PRIVILEGES_DELIMITER, $fieldValue);
+			}
 			else 
+			{
 				$privileges[] = "{$fieldName}";
+				$this->parsedPrivileges[$fieldName] = array();
+			}
 		}
 		
 		$this->hash = bin2hex($hash);
