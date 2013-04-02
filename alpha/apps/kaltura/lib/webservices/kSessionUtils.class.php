@@ -421,7 +421,8 @@ class ks extends kSessionBase
 			 {
 			 	return true;
 			 }
-		else if (isset ($this->parsedPrivileges[$required_priv_name]) && in_array($required_priv_value, $this->parsedPrivileges[$required_priv_name]))
+		else if (in_array(self::PRIVILEGE_WILDCARD, $this->parsedPrivileges) || 
+		(isset ($this->parsedPrivileges[$required_priv_name]) && in_array($required_priv_value, $this->parsedPrivileges[$required_priv_name])))
 		{
 			return true;
 		}
