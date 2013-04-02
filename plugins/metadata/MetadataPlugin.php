@@ -774,6 +774,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			$nodeName = $matches[1];
 			if($index + 1 == count($xPaths))
 			{
+				$value = htmlspecialchars($value,ENT_QUOTES,'UTF-8');
 				KalturaLog::debug("Creating node [$nodeName] xPath [$xPath] with value [$value]");
 				$valueNode = $xml->createElement($nodeName, $value);
 			}
