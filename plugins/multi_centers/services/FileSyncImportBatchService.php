@@ -31,7 +31,7 @@ class FileSyncImportBatchService extends KalturaBatchService
 		if($jobs)
 		{
 
-			foreach ($jobs as $job)
+			foreach ($jobs as $index => $job)
 			{
 				$data = $job->data;
 				// try to get destination path from file sync
@@ -39,7 +39,12 @@ class FileSyncImportBatchService extends KalturaBatchService
 
 				$fileSync = FileSyncPeer::retrieveByPK($fileSyncId);
 				if (!$fileSync) {
-					throw new KalturaAPIException(MultiCentersErrors::INVALID_FILESYNC_RECORD, $fileSyncId);
+					KalturaLog::err("Failed to load file sync [$fileSyncId] aborting job [{$job->id}]");
+					$dbJob = BatchJobPeer::retrieveByPK($job->id);
+					$dbJob->setMessage("Failed to load file sync [$fileSyncId]");
+					kJobsManager::abortDbBatchJob($dbJob);
+					unset($jobs[$index]);
+					continue;
 				}
 				$fileSyncRoot = $fileSync->getFileRoot();
 				$fileSyncPath = $fileSync->getFilePath();
