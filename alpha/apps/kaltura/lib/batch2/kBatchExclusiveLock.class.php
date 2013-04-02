@@ -7,6 +7,8 @@
 	*/
 class kBatchExclusiveLock 
 {
+	const UNLIMITED_QUOTA = 99999;
+	
 	private static function lockObjects(kExclusiveLockKey $lockKey, array $objects, $max_execution_time)
 	{
 		
@@ -113,7 +115,8 @@ class kBatchExclusiveLock
 		$c->addAnd($c->getNewCriterion(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()));
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
-		self::addPrioritizersCondition($c, $prioritizers_ratio);
+		$shouldUseJoin = (BatchJobLockPeer::getMaxJobsForPartner($jobType) != self::UNLIMITED_QUOTA);
+		self::addPrioritizersCondition($c, $prioritizers_ratio, $shouldUseJoin);
 		
 		// Query Parts
 		$statusCondition = "$stat = " . BatchJob::BATCHJOB_STATUS_ALMOST_DONE;
@@ -122,8 +125,11 @@ class kBatchExclusiveLock
 		$recheckCondition = "( $recheck <= '$now_str' OR $recheck IS NULL)";
 		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
 		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
-		$partnerLoadCondition = "(($partnerLoadQuota > 0) OR ($partnerLoadQuota is null))";
-		$newJobsCond = "($unhandledJobCondition AND ($recheckCondition)) AND $partnerLoadCondition";
+		$newJobsCond = "($unhandledJobCondition AND ($recheckCondition))";
+		if($shouldUseJoin) {
+			$partnerLoadCondition = "(($partnerLoadQuota > 0) OR ($partnerLoadQuota is null))";
+			$newJobsCond .= " AND $partnerLoadCondition";
+		}
 			
 		$max_exe_attempts = BatchJobLockPeer::getMaxExecutionAttempts($jobType);
 		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
@@ -238,7 +244,9 @@ class kBatchExclusiveLock
 		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
-		self::addPrioritizersCondition($c, $prioritizers_ratio);
+		$shouldUseJoin = (BatchJobLockPeer::getMaxJobsForPartner($jobType) != self::UNLIMITED_QUOTA);
+		if ($jobType != BatchJobType::FILESYNC_IMPORT)
+			self::addPrioritizersCondition($c, $prioritizers_ratio, $shouldUseJoin);
 		
 		// Query Parts
 		$unClosedStatuses = implode(',', BatchJobPeer::getUnClosedStatusList());
@@ -249,8 +257,12 @@ class kBatchExclusiveLock
 		$pendingJobsCondition = "( $stat = " . BatchJob::BATCHJOB_STATUS_PENDING .
 			" OR ( $stat = " . BatchJob::BATCHJOB_STATUS_RETRY . " AND $recheck <= '$now_str' ))";
 		$unhandledJobCondition = "$schd IS NULL AND $work IS NULL AND $btch IS NULL ";
-		$partnerLoadCondition = "(($partnerLoadQuota > 0) OR ($partnerLoadQuota is null))";
-		$newJobsCond = "($pendingJobsCondition AND ($unhandledJobCondition)) AND $partnerLoadCondition";
+		$newJobsCond = "($pendingJobsCondition AND ($unhandledJobCondition))";
+		if($shouldUseJoin) {
+			$partnerLoadCondition = "(($partnerLoadQuota > 0) OR ($partnerLoadQuota is null))";
+			$newJobsCond .= " AND $partnerLoadCondition";
+		}
+		
 		
 		$jobAlreadyHandledByWorker = "$schd = $schd_id AND $work = $work_id AND $btch = $btch_id";
 			
@@ -267,6 +279,10 @@ class kBatchExclusiveLock
 					AND ($jobWasntExecutedTooMany)";
 				
 		$c->add($stat, $query, Criteria::CUSTOM);
+
+		if ($jobType == BatchJobType::FILESYNC_IMPORT)
+			$c->setOffset(rand(0, 50) * 10);
+
 		$c->setLimit($number_of_objects);
 		
 		$objects = BatchJobLockPeer::doSelect ( $c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
@@ -277,16 +293,21 @@ class kBatchExclusiveLock
 	 * Add the prioritizer specific condition.
 	 * @param Criteria $c The criteria to update
 	 * @param int $prioritizers_ratio the rate between the max throughput prioritizers to the fair one
+	 * @param bool $shouldUseJoin whether we should use join
 	 * @return bool whether we use the fair prioritizer
 	 */
-	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio) 
+	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio, $shouldUseJoin = true) 
 	{
-		$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
-				array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
-				array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE),
-				array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
+		$rand = -1;
+		if($shouldUseJoin) {
+			$rand = rand(0, 100);
+			$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
+					array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
+					array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE),
+					array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
+		}
 		
-		if(rand(0, 100) < $prioritizers_ratio) 
+		if($rand < $prioritizers_ratio) 
 		{	// Throughput
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
