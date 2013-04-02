@@ -416,11 +416,15 @@ class ks extends kSessionBase
 
 		// either the original privileges were general - with a value of a wildcard
 		if ( ( $this->privileges == self::PRIVILEGE_WILDCARD ) || 
-			 ( strpos ( $this->privileges,  $required_priv_name . ":" . self::PRIVILEGE_WILDCARD ) !== FALSE ) ||
-			 ( strpos ( $this->privileges,  $required_priv_name . ":" . $required_priv_value ) !== FALSE ) )
+			 ( strpos ( $this->privileges,  $required_priv_name . ":" . self::PRIVILEGE_WILDCARD ) !== false ) ||
+			 ( strpos ( $this->privileges,  $required_priv_name . ":" . $required_priv_value ) !== false ) )
 			 {
 			 	return true;
 			 }
+		else if (isset ($this->parsedPrivileges[$required_priv_name]) && in_array($required_priv_value, $this->parsedPrivileges[$required_priv_name]))
+		{
+			return true;
+		}
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		if ( $required_priv_name == ks::PRIVILEGE_EDIT && 
 			$this->verifyPlaylistPrivileges(ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST, $required_priv_value, $partnerId))
