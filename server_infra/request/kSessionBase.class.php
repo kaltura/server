@@ -171,7 +171,7 @@ class kSessionBase
 		$privileges = explode(',', $this->privileges);
 		foreach ($privileges as $privilege)
 		{
-			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege) : array($privilege, null);
+			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege, 2) : array($privilege, null);
 			if (!is_null($privilegeValue) && strlen($privilegeValue))
 			{
 				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
