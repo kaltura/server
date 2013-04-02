@@ -153,7 +153,8 @@ public class BaseTest extends TestCase {
 		
 		// upload
 		uploadToken = client.getUploadTokenService().upload(token.id, fileData, KalturaTestConfig.UPLOAD_IMAGE, fileSize, false);
-		container.testIds.add(entry.id);
+		if(container != null)
+			container.testIds.add(entry.id);
 		return client.getMediaService().get(entry.id);
 	}
 	

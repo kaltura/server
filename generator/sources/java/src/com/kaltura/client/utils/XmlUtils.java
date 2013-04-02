@@ -43,8 +43,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import com.kaltura.client.KalturaApiException;
+
 public class XmlUtils {
-	public static Element parseXml(String xml) {
+	public static Element parseXml(String xml) throws KalturaApiException {
 		//get the factory
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -63,14 +65,12 @@ public class XmlUtils {
 			return docEle;
 			
 		} catch(ParserConfigurationException pce) {
-			//pce.printStackTrace();
+			throw new KalturaApiException("Failed building XML parser");
 		} catch(SAXException se) {
-			//se.printStackTrace();
+			throw new KalturaApiException("Failed while parsing response.");
 		} catch(IOException ioe) {
-			//ioe.printStackTrace();
+			throw new KalturaApiException("I/O exception while reading response");
 		}
-		
-		return null;
 	}
 		
 	public static boolean hasChildren (Element e) {

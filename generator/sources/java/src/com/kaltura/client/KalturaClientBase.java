@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -69,7 +70,6 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.w3c.dom.Element;
-
 
 import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.utils.XmlUtils;
@@ -174,20 +174,20 @@ abstract public class KalturaClientBase {
         return responseHeaders;
     }
 
-	public KalturaClientBase() {		
-	}
-	
-	public KalturaClientBase(KalturaConfiguration config) {
-		this.kalturaConfiguration = config;
-		this.callsQueue = new ArrayList<KalturaServiceActionCall>();
-		this.multiRequestParamsMap = new KalturaParams();
-	}
-	
-	abstract String getApiVersion();
-	
-	public String getSessionId() {
-		return this.sessionId;
-	}
+    public KalturaClientBase() {
+    }
+
+    public KalturaClientBase(KalturaConfiguration config) {
+        this.kalturaConfiguration = config;
+        this.callsQueue = new ArrayList<KalturaServiceActionCall>();
+        this.multiRequestParamsMap = new KalturaParams();
+    }
+
+    abstract String getApiVersion();
+
+    public String getSessionId() {
+        return this.sessionId;
+    }
 
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
@@ -257,8 +257,7 @@ abstract public class KalturaClientBase {
 		}
 		
 		Element responseXml = XmlUtils.parseXml(responseString);
-		this.validateXmlResult(responseXml);
-	  	Element resultXml = getElementByXPath(responseXml, "/xml/result");
+		Element resultXml = this.validateXmlResult(responseXml);
 		this.throwExceptionOnAPIError(resultXml);
 				
 		return resultXml;
@@ -288,7 +287,7 @@ abstract public class KalturaClientBase {
         return new String(out.toByteArray());
     }
 
-	protected String executeMethod(HttpClient client, PostMethod method) {
+	protected String executeMethod(HttpClient client, PostMethod method) throws KalturaApiException {
 		String responseString = "";
 		try {
 			// Execute the method.
@@ -305,7 +304,7 @@ abstract public class KalturaClientBase {
 				logger.error("Method failed: " + method.getStatusLine ( ));
 			}
 
-			// Read the response body.
+			// Read the response body
             InputStream responseBodyIS = null;
             if (isGzipResponse(method)) {
                 responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
@@ -329,29 +328,36 @@ abstract public class KalturaClientBase {
 				}
 			}
 			
+			return responseString;
+			
 		} catch ( HttpException e ) {
 			if (logger.isEnabled())
 				logger.error( "Fatal protocol violation: " + e.getMessage ( ) ,e);
+			throw new KalturaApiException("Protocol exception occured while executing request");
+		} catch ( SocketTimeoutException e) {
+			if (logger.isEnabled())
+				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
+			throw new KalturaApiException("Request was timed out");
 		} catch ( IOException e ) {
 			if (logger.isEnabled())
 				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
-		} finally {
+			throw new KalturaApiException("I/O exception occured while reading request response");
+		}  finally {
 			// Release the connection.
 			method.releaseConnection ( );
 		}
-		return responseString;
 	}
 
 	private PostMethod createPostMethod(KalturaParams kparams,
 			KalturaFiles kfiles, String url) {
 		PostMethod method = new PostMethod(url);
-		method.setRequestHeader("Accept","text/xml,application/xml,*/*");
-		method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
-		
-		if (!kfiles.isEmpty()) {			
-			method = this.getPostMultiPartWithFiles(method, kparams, kfiles);			
-		} else {
-			method = this.addParams(method, kparams);			
+        method.setRequestHeader("Accept","text/xml,application/xml,*/*");
+        method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
+        
+        if (!kfiles.isEmpty()) {        	
+            method = this.getPostMultiPartWithFiles(method, kparams, kfiles);        	
+        } else {
+            method = this.addParams(method, kparams);            
         }
         
         if (isAcceptGzipEncoding()) {
@@ -418,7 +424,7 @@ abstract public class KalturaClientBase {
 		}
 	}
 
-	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) {
+	private String extractParamsFromCallQueue(KalturaParams kparams, KalturaFiles kfiles) throws KalturaApiException {
 		
 		String url = this.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";
 		
@@ -547,7 +553,7 @@ abstract public class KalturaClientBase {
 		this.multiRequestParamsMap.put(requestParam, resultParam);
 	}
 
-	private String signature(KalturaParams kparams) {
+	private String signature(KalturaParams kparams) throws KalturaApiException {
 		String str = "";
 		for (String key : kparams.keySet()) {
 			str += (key + kparams.get(key));
@@ -557,7 +563,7 @@ abstract public class KalturaClientBase {
 		try {
 			mdEnc = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			throw new KalturaApiException("Failed to sign parameters");
 		}		
 		mdEnc.update(str.getBytes(), 0, str.length());
 		String md5 = new BigInteger(1, mdEnc.digest()).toString(16); // Encrypted string
@@ -565,13 +571,13 @@ abstract public class KalturaClientBase {
 		return md5;
 	}
 
-	private void validateXmlResult(Element resultXml) throws KalturaApiException {
+	private Element validateXmlResult(Element resultXml) throws KalturaApiException {
 		
 		Element resultElement = null;
    		resultElement = getElementByXPath(resultXml, "/xml/result");
 						
 		if (resultElement != null) {
-			return;			
+			return resultElement;			
 		} else {
 			throw new KalturaApiException("Invalid result");
 		}

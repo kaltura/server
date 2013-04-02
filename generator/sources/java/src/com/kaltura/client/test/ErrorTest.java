@@ -110,7 +110,7 @@ public class ErrorTest extends BaseTest {
 			mockClient.doQueue();
 			fail();
 		} catch (KalturaApiException e) {
-			assertEquals("XPath expression exception evaluating result", e.getMessage());
+			assertEquals("Failed while parsing response.", e.getMessage());
 		}
 	}
 	
