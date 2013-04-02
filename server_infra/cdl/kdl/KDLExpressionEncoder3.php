@@ -168,7 +168,11 @@ $vidObj = $target->_video;
 			}
 			if($target->_container->_id==KDLContainerTarget::ISMV) {
 				$videoCodec['SmoothStreaming'] = 'True';
-				$videoCodec->Streams['AutoSize'] = 'True';
+					/*
+					 * The 'AutoSize' option is not valid with ConstantBR (cbr).
+					 * CBR is the only option for H264.
+					 */	
+				$videoCodec->Streams['AutoSize'] = (isset($cbr)&& $cbr==1)?'False': 'True';
 			}
 			else {
 				$videoCodec['SmoothStreaming'] = 'False';
