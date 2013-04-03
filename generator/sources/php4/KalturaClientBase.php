@@ -370,7 +370,7 @@ class KalturaConfiguration
 	var $serviceUrl    = "http://www.kaltura.com/";
 	var $partnerId     = null;
 	var $format        = 3;
-	var $clientTag 	   = "php4";
+	var $clientTag 	   = "php4:@DATE@";
 	
 	/**
 	 * Constructs new Kaltura configuration object

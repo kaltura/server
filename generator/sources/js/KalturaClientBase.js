@@ -568,7 +568,7 @@ KalturaConfiguration.prototype.serviceUrl	= "http://www.kaltura.com";
 KalturaConfiguration.prototype.serviceBase 	= "/api_v3/index.php?service=";
 KalturaConfiguration.prototype.partnerId	= null;
 KalturaConfiguration.prototype.format		= KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSONP;
-KalturaConfiguration.prototype.clientTag	= "js";
+KalturaConfiguration.prototype.clientTag	= "js:@DATE@";
 
 /**
  * Set logger to get kaltura client debug logs.
