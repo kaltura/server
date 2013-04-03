@@ -182,8 +182,6 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		{
 			$this->systemUserName = $liveParams["systemUserName"];
 			$this->systemPassword = $liveParams["systemPassword"];
-			$this->dvrEnabled = $liveParams["dvrEnabled"];
-			$this->dvrWindow = $liveParams["dvrWindow"];
 			$this->domainName = $liveParams["domainName"]; 
 			$this->streamType = $liveParams["streamType"];
 			$this->primaryContact = $liveParams["primaryContact"];
