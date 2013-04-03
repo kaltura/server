@@ -47,6 +47,8 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$this->configTimestamp = $this->calculateFileTimestamp();
 
 		$configFileName = $this->configFileName;
+		KalturaLog::log("loading configuration $configFileName at ".$this->configTimestamp);
+
 		if(is_dir($this->configFileName))
 		{
 			$configFileName = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
@@ -116,7 +118,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 	protected function calculateFileTimestamp()
 	{
 		clearstatcache();
-		if(!is_dir($this->configTimestamp))
+		if(!is_dir($this->configFileName))
 			return filemtime($this->configFileName);
 
 		$configFilePaths = $this->getConfigFilePaths();
