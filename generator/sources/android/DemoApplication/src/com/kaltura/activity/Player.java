@@ -64,22 +64,6 @@ public class Player extends TemplateActivity implements SurfaceHolder.Callback {
         super.onResume();
         holder = surface.getHolder();
         holder.addCallback(this);
-        try {
-            holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-            holder.setFixedSize(400, 300);
-            viewPlayer = new com.kaltura.player.ViewPlayer(TAG, activity, holder, duration, entryId);
-            viewPlayer.setThumb(url);
-            new DownloadTask().execute();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            Log.w(TAG, "err: " + e);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-            Log.w(TAG, "err: " + e);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            Log.w(TAG, "err: " + e);
-        }
     }
 
     @Override
@@ -101,6 +85,22 @@ public class Player extends TemplateActivity implements SurfaceHolder.Callback {
 
     public void surfaceCreated(SurfaceHolder arg0) {
         Log.w(TAG, "surfaceCreated called");
+        try {
+            holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+            holder.setFixedSize(400, 300);
+            viewPlayer = new com.kaltura.player.ViewPlayer(TAG, activity, holder, duration, entryId);
+            viewPlayer.setThumb(url);
+            new DownloadTask().execute();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            Log.w(TAG, "err: " + e);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.w(TAG, "err: " + e);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            Log.w(TAG, "err: " + e);
+        }
     }
 
     public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
