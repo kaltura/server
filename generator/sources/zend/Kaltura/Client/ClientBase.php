@@ -104,6 +104,11 @@ class Kaltura_Client_ClientBase
 	private $callsQueue = array();
 
 	/**
+	 * @var array<string>
+	 */
+	private $responseHeaders = array();
+	
+	/**
 	 * Kaltura client constructor
 	 *
 	 * @param Kaltura_Client_Configuration $config
@@ -117,6 +122,19 @@ class Kaltura_Client_ClientBase
 			$this->shouldLog = true;
 	}
 
+	/* Store response headers into array */
+	public function readHeader($ch, $string)
+	{
+		array_push($this->responseHeaders, $string);
+		return strlen($string);
+	}
+
+	/* Retrive response headers */
+	public function getResponseHeaders()
+	{
+		return $this->responseHeaders;
+	}
+	
 	public function getServeUrl()
 	{
 		if (count($this->callsQueue) != 1)
@@ -221,10 +239,21 @@ class Kaltura_Client_ClientBase
 		}
 		else
 		{
-//			if(strlen($postResult) > 8192)
-//				$this->log("result (serialized): " . strlen($postResult) . " bytes");
-//			else
-				$this->log("result (serialized): " . $postResult);
+			// print server debug info to log
+			$serverName = null;
+			$serverSession = null;
+			foreach ($this->responseHeaders as $curHeader)
+			{
+				$splittedHeader = explode(':', $curHeader, 2);
+				if ($splittedHeader[0] == 'X-Me')
+					$serverName = trim($splittedHeader[1]);
+				else if ($splittedHeader[0] == 'X-Kaltura-Session')
+					$serverSession = trim($splittedHeader[1]);
+			}
+			if (!is_null($serverName) || !is_null($serverSession))
+				$this->log("server: [{$serverName}], session: [{$serverSession}]");
+			
+			$this->log("result (serialized): " . $postResult);
 
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
 			{
@@ -333,6 +362,7 @@ class Kaltura_Client_ClientBase
 	 */
 	private function doCurl($url, $params = array(), $files = array())
 	{
+		$this->responseHeaders = array();
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -380,6 +410,12 @@ class Kaltura_Client_ClientBase
 			curl_setopt($ch, CURLOPT_CAINFO, $this->config->sslCertificatePath);
 		}
 
+		// Set custom headers
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->requestHeaders );
+
+		// Save response headers
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
+		
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
 		curl_close($ch);
