@@ -89,7 +89,7 @@ class kLevel3UrlManager extends kUrlManager
 		{
 			if($this->extention && strtolower($this->extention) != 'flv' ||
 				$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
-				$url = "mp4:$url";
+				$url = "mp4:".ltrim($url,'/');
 		}
 				
 		$url = str_replace('\\', '/', $url);
@@ -123,7 +123,7 @@ class kLevel3UrlManager extends kUrlManager
 			}
 			if (($this->extention && strtolower($this->extention) != 'flv' ||
 					$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
-				$url = "mp4:$url";
+				$url = "mp4:".ltrim($url,'/');
 		
 			// when serving files directly via RTMP fms doesnt expect to get the file extension
 			$url = str_replace('.flv','',$url);
