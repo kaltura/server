@@ -186,6 +186,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 			$this->streamType = $liveParams["streamType"];
 			$this->primaryContact = $liveParams["primaryContact"];
 			$this->secondaryContact = $liveParams["secondaryContact"];
+			$this->notificationEmail = $liveParams["notificationEmail"];
 		}
 		
 	}
