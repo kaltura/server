@@ -955,7 +955,10 @@ $plannedDur = 0;
 		}
 		else {
 			if($targetAud->_sampleRate==0){
-				if($source->_sampleRate>0) {
+				/*
+				 * AAC targets should get default 44.1, rather than source SR
+				 */
+				if($source->_sampleRate>0 && $targetAud->_id!=KDLAudioTarget::AAC) {
 					$targetAud->_sampleRate=max(KDLConstants::MinAudioSampleRate,min(KDLConstants::MaxAudioSampleRate,$source->_sampleRate));
 				}
 				else {
