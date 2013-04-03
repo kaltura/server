@@ -48,6 +48,7 @@ namespace Kaltura
         private List<KalturaServiceActionCall> _CallsQueue;
         private bool _IsMultiRequest;
         private KalturaParams _MultiRequestParamsMap;
+		private WebHeaderCollection _ResponseHeaders;
 
         #endregion
 
@@ -65,6 +66,11 @@ namespace Kaltura
             set { _IsMultiRequest = value; }
         }
 
+		public WebHeaderCollection ResponseHeaders
+        {
+            get { return _ResponseHeaders; }
+        }
+		
         #endregion
 
         #region CTor
@@ -173,6 +179,7 @@ namespace Kaltura
             request.Timeout = _Config.Timeout;
             request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            request.Headers = _Config.RequestHeaders;
 			
 			// Add proxy information if required
 			if( !_Config.ProxyAddress.Equals( "" ) && !_Config.ProxyAddress.Equals( null ) ) {
@@ -194,6 +201,19 @@ namespace Kaltura
             StreamReader responseStream = new StreamReader(response.GetResponseStream(), enc);
             string responseString = responseStream.ReadToEnd();
 
+			this._ResponseHeaders = response.Headers;
+			string serverName = null;
+			string serverSession = null;
+			for(int i = 0; i < this._ResponseHeaders.Count; ++i)  
+			{
+				if (this._ResponseHeaders.Keys[i] == "X-Me")
+                    serverName = this._ResponseHeaders[i];
+				if (this._ResponseHeaders.Keys[i] == "X-Kaltura-Session")
+					serverSession = this._ResponseHeaders[i];
+			}
+			if (serverName != null || serverSession != null)
+				this.Log("server: [" + serverName + "], session: [" + serverSession + "]");
+			
             this.Log("result (serialized): " + responseString);
 
             DateTime endTime = DateTime.Now;

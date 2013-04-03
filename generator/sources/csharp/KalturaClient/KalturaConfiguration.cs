@@ -27,6 +27,7 @@
 // ===================================================================================================
 ﻿using System;
 using System.Text;
+using System.Net;
 
 namespace Kaltura
 {
@@ -39,8 +40,9 @@ namespace Kaltura
         private int _PartnerId;
         private IKalturaLogger _Logger;
         private int _Timeout = 100000;
-        private string _ClientTag = "dotnet";
+        private string _ClientTag = "dotnet:@DATE@";
 		private string _ProxyAddress = "";
+        private WebHeaderCollection _RequestHeaders; 
 
         #endregion
 
@@ -87,6 +89,12 @@ namespace Kaltura
 			get { return _ProxyAddress; }
 		}
 
+        public WebHeaderCollection RequestHeaders
+        {
+            set { _RequestHeaders = value; }
+            get { return _RequestHeaders; }
+        }
+
         #endregion
 
         #region CTor
@@ -98,6 +106,7 @@ namespace Kaltura
         public KalturaConfiguration(int partnerId)
         {
             this._PartnerId = partnerId;
+            this._RequestHeaders = new WebHeaderCollection();
         } 
 
         #endregion
