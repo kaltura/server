@@ -54,6 +54,7 @@ class CuePointServiceTest < Test::Unit::TestCase
   
     # list the cuepoints
     cue_point_filter = Kaltura::KalturaCuePointFilter.new
+    cue_point_filter.entry_id_equal = created_entry.id
     filter_pager = Kaltura::KalturaFilterPager.new      
     
     cue_point_list = @client.cue_point_service.list(cue_point_filter, filter_pager)    

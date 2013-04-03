@@ -135,10 +135,7 @@ class MediaServiceTest < Test::Unit::TestCase
   should "not create a media entry for a invalid token" do
        
     assert_raise Kaltura::KalturaAPIError do
-      media_entry = Kaltura::KalturaMediaEntry.new
-      media_entry.media_type = Kaltura::KalturaMediaType::VIDEO
-  
-      @created_entry = @client.media_service.add_from_uploaded_file(media_entry, "invalid token")
+      @created_entry = @client.media_service.get("invalid entry id")
     end  
   end 
   
@@ -221,7 +218,7 @@ class MediaServiceTest < Test::Unit::TestCase
     
     @client.start_multirequest
     
-    @client.media_service.add_from_uploaded_file(media_entry, "invalid_video_token")
+    @client.media_service.get("invalid entry id")
     
     media_entry_filter = Kaltura::KalturaMediaEntryFilter.new
     filter_pager = Kaltura::KalturaFilterPager.new

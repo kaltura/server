@@ -81,7 +81,7 @@ abstract class ClientGeneratorFromXml
 			}
 		}
 		
-		$this->_files[$fileName] = $fileContents;
+		$this->_files[$fileName] = str_replace('@DATE@', date('y-m-d'), $fileContents);
 	}
 	
 	protected function addSourceFiles($directory, $rootSourceFolder, $rootDestFolder)

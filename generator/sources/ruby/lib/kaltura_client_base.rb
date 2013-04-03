@@ -45,6 +45,7 @@ module Kaltura
 		attr_accessor 	:config
 		attr_accessor 	:ks
 		attr_reader 	:is_multirequest
+		attr_reader 	:responseHeaders
 	
 		def initialize(config)
 		  @ks = KalturaNotImplemented
@@ -72,6 +73,7 @@ module Kaltura
 	
 		def do_queue()
 		  begin 
+  			@responseHeaders = {}
   			start_time = Time.now
 			
   			if @calls_queue.length == 0
@@ -112,6 +114,9 @@ module Kaltura
   			log("params: " + params.to_yaml)
 								
   			result = do_http_request(url, params)
+
+  			@responseHeaders = result.headers
+  			log("server: [" + result.headers[:x_me].to_s + "], session: [" + result.headers[:x_kaltura_session].to_s + "]")
 			
   			log("result (xml): " + result.body)
   			
@@ -119,7 +124,7 @@ module Kaltura
 			
   			log("result (object yaml dump): " + result_object.to_yaml)
   			
-				end_time = Time.now
+  			end_time = Time.now
   			
   			log("execution time for [#{url}]: [#{end_time - start_time}]")
   			
@@ -159,6 +164,7 @@ module Kaltura
       
       options = {:method => :post, :url => url, :payload => params}
       
+      options.merge!(:headers => @config.requestHeaders)
       options.merge!(:timeout => @config.timeout) if @config.timeout
       options.merge!(:open_timeout => @config.timeout) if @config.timeout
             
@@ -351,6 +357,7 @@ module Kaltura
 		attr_accessor :client_tag
 		attr_accessor :timeout
 		attr_accessor :partner_id
+		attr_accessor :requestHeaders
 	
     #
     # Adding service_url to the initialize signature to pass url to your own kaltura ce instance
@@ -360,9 +367,10 @@ module Kaltura
 		def initialize(partner_id = -1,service_url="http://www.kaltura.com")
 			@service_url 	= service_url
 			@format 		= 2 # xml
-			@client_tag 	= "ruby"
+			@client_tag 	= "ruby:@DATE@"
 			@timeout 		= 10
 			@partner_id 	= partner_id
+			@requestHeaders = {}
 		end
 		
 		def service_url=(url)
