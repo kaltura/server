@@ -310,10 +310,21 @@ class KalturaClientBase
 		}
 		else
 		{
-//			if(strlen($postResult) > 1024)
-//				$this->log("result (serialized): " . strlen($postResult) . " bytes");
-//			else
-				$this->log("result (serialized): " . $postResult);
+			// print server debug info to log
+			$serverName = null;
+			$serverSession = null;
+			foreach ($this->responseHeaders as $curHeader)
+			{
+				$splittedHeader = explode(':', $curHeader, 2);
+				if ($splittedHeader[0] == 'X-Me')
+					$serverName = trim($splittedHeader[1]);
+				else if ($splittedHeader[0] == 'X-Kaltura-Session')
+					$serverSession = trim($splittedHeader[1]);
+			}
+			if (!is_null($serverName) || !is_null($serverSession))
+				$this->log("server: [{$serverName}], session: [{$serverSession}]");
+			
+			$this->log("result (serialized): " . $postResult);
 
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
@@ -1039,7 +1050,7 @@ class KalturaConfiguration
 	public $serviceUrl    				= "http://www.kaltura.com/";
 	public $partnerId    				= null;
 	public $format        				= 3;
-	public $clientTag 	  				= "php5";
+	public $clientTag 	  				= "php5:@DATE@";
 	public $curlTimeout   				= 10;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;

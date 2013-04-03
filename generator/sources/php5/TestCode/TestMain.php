@@ -29,8 +29,13 @@
 require_once('../KalturaClient.php');
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'KalturaTestConfiguration.php');
 
-class TestMain 
+class TestMain implements IKalturaLogger
 {
+	public function log($message)
+	{
+		echo date('Y-m-d H:i:s') . ' ' .  $message . "\n";
+	}
+
 	public static function run()
 	{
 		if(!KalturaTestConfiguration::SECRET)
@@ -49,6 +54,7 @@ class TestMain
 	{
 		$kConfig = new KalturaConfiguration($partnerId);
 		$kConfig->serviceUrl = KalturaTestConfiguration::SERVICE_URL;
+		$kConfig->setLogger($this);
 		$client = new KalturaClient($kConfig);
 		
 		$userId = "SomeUser";
