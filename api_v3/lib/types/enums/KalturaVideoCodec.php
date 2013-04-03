@@ -26,5 +26,6 @@ class KalturaVideoCodec extends KalturaStringEnum
 	const APCN = "apcn";	// 112mbps,	profile:2
 	const APCH = "apch";	// 185mbps,	profile:3
 	const DNXHD= "dnxhd";
+	const DV = "dv";
 	const COPY = "copy";
 }
