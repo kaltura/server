@@ -47,6 +47,9 @@ class BatchJobFilter extends baseObjectFilter
 			"_in_status",
 			"_gte_priority",
 			"_lte_priority",
+			"_eq_priority",
+			"_in_priority",
+			"_notin_priority",
 			"_in_job_type_and_sub_type",);
 	
 	protected $queryFromBatchJob;
