@@ -327,6 +327,17 @@ class KalturaClient:
         endTime = time.time()
         self.log("execution time for [%s]: [%s]" % (url, endTime - startTime))
 
+        # print server debug info to log
+        serverName = None
+        serverSession = None
+        for curHeader in self.responseHeaders:
+            if curHeader.startswith('X-Me:'):
+                serverName = curHeader.split(':', 1)[1].strip()
+            elif curHeader.startswith('X-Kaltura-Session:'):
+                serverSession = curHeader.split(':', 1)[1].strip()
+        if serverName != None or serverSession != None:
+            self.log("server: [%s], session [%s]" % (serverName, serverSession))
+
         return resultNode
 
     def getKs(self):
