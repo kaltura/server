@@ -560,6 +560,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 	public function getFieldPrefix ($fieldName)
 	{
-		return entry::CATEGORIES_INDEXED_FIELD_PREFIX.kCurrentContext::getCurrentPartnerId();	
+		if ($fieldName == entryPeer::CATEGORIES)
+			return entry::CATEGORIES_INDEXED_FIELD_PREFIX.kCurrentContext::getCurrentPartnerId();	
+			
+		return null;
 	}
 }
