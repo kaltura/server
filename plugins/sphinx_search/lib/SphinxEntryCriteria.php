@@ -206,6 +206,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
+		/* @var $filter entryFilter */
 		$categoriesAncestorParsed = null;
 		$categories = $filter->get( "_in_category_ancestor_id");
 		if ($categories !== null)
@@ -248,6 +249,16 @@ class SphinxEntryCriteria extends SphinxCriteria
 		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
 		
+		$categoriesIds = $filter->get("_notcontains_categories_ids");
+		if ($categoriesIds !== null)
+		{
+			$categoriesParsed = $filter->categoryIdsToIdsParsed($categoriesIds);
+			if ( $categoriesParsed !=='' || $categories =='')
+				$filter->set ( "_notcontains_categories_ids", $categoriesParsed);
+			else
+		  		$filter->set ( "_notcontains_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+		}
+		
 		$matchAndCats = $filter->get("_matchand_categories");
 		if ($matchAndCats !== null)
 		{
@@ -270,6 +281,18 @@ class SphinxEntryCriteria extends SphinxCriteria
 			else
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchor_categories');
+		}
+		
+		$notContainsCats = $filter->get("_notcontains_categories");
+		if ($notContainsCats !== null)
+		{
+			//if the category exist or the category name is an empty string
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $notContainsCats );
+			if( $categoriesParsed !=='' || $notContainsCats=='')
+				$filter->set("_notcontains_categories_ids", $categoriesParsed);
+			else
+				$filter->set ( "_notcontains_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			$filter->unsetByName('_notcontains_categories');
 		}
 		
 		// match categories by full name		
@@ -533,5 +556,10 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$entryFields = entryPeer::getFieldNames(BasePeer::TYPE_COLNAME);
 		
 		return in_array($fieldName, $entryFields);
+	}
+	
+	public function getFieldPrefix ($fieldName)
+	{
+		return entry::CATEGORIES_INDEXED_FIELD_PREFIX.kCurrentContext::getCurrentPartnerId();	
 	}
 }
