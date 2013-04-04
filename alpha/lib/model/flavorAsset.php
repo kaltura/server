@@ -3,11 +3,11 @@
 /**
  * Subclass for representing a row from the 'flavor_asset' table.
  *
- * 
+ *
  *
  * @package Core
  * @subpackage model
- */ 
+ */
 class flavorAsset extends asset
 {
 	/**
@@ -117,7 +117,7 @@ class flavorAsset extends asset
      * @see asset::setStatusLocalReady()
      */
     public function setStatusLocalReady()
-	{	    
+	{
 	    KalturaLog::debug('Setting local ready status for asset id ['.$this->getId().']');
 	    $newStatus = asset::ASSET_STATUS_READY;
 	    
@@ -149,13 +149,13 @@ class flavorAsset extends asset
     		    else
     		    {
     		        KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$externalStorage->getId().']');
-    		    }		        
-		    }		    
+    		    }
+		    }
 		    
 		    KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
 		    $newStatus = asset::ASSET_STATUS_EXPORTING;
 		    break;
-		}   
+		}
         KalturaLog::debug('Setting status to ['.$newStatus.']');
 	    $this->setStatus($newStatus);
 	}
@@ -165,22 +165,31 @@ class flavorAsset extends asset
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
-		if(	($this->isColumnModified(assetPeer::STATUS) && 
+		$syncFlavorParamsIds = false;
+		if(	($this->isColumnModified(assetPeer::STATUS) &&
 			($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)))
 		{
 			$entry = $this->getentry();
-	    	if (!$entry) 
+	    	if (!$entry)
 	    	{
 	        	KalturaLog::err('Cannot get entry object for flavor asset id ['.$this->getId().']');
 	    	}
-	    	elseif ($entry->getStatus() != entryStatus::DELETED) 
+	    	elseif ($entry->getStatus() != entryStatus::DELETED)
 	    	{
-	        	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
-	        	$entry->syncFlavorParamsIds();
-	        	$entry->save();
-	    	}				
-		}			
-		return parent::postUpdate($con);
+	    		$syncFlavorParamsIds = true;
+	    	}
+		}
+		
+		$ret = parent::postUpdate($con);
+		
+	    if($syncFlavorParamsIds)
+	    {
+        	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
+        	$entry->syncFlavorParamsIds();
+        	$entry->save();
+	    }
+		
+		return $ret;
 	}
 	
 	public function getDownloadUrlWithExpiry($expiry, $useCdn = false)
@@ -192,17 +201,17 @@ class flavorAsset extends asset
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
 		{
 			$invalidModerationStatuses = array(
-				entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION, 
+				entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
 				entry::ENTRY_MODERATION_STATUS_REJECTED
 			);
 			
 			$entry = $this->getentry();
 			if ($entry &&
 				!in_array($entry->getModerationStatus(), $invalidModerationStatuses) &&
-				($entry->getStartDate() === null || $entry->getStartDate(null) < time()) && 
+				($entry->getStartDate() === null || $entry->getStartDate(null) < time()) &&
 				($entry->getEndDate() === null || $entry->getEndDate(null) > time() + 86400))
-			{ 			
-				$accessControl = $entry->getaccessControl();			
+			{
+				$accessControl = $entry->getaccessControl();
 				if ($accessControl && !$accessControl->getRulesArray())
 					$ksNeeded = false;
 			}
@@ -248,7 +257,7 @@ class flavorAsset extends asset
 		parent::linkFromAsset($fromAsset);
 		$this->setBitrate($fromAsset->getBitrate());
 		$this->setFrameRate($fromAsset->getFrameRate());
-		$this->setVideoCodecId($fromAsset->getVideoCodecId());	
+		$this->setVideoCodecId($fromAsset->getVideoCodecId());
 	}
 	
 	/**
@@ -259,11 +268,11 @@ class flavorAsset extends asset
 	{
 		if(!$type || $type == assetType::FLAVOR)
 			$obj = new flavorAsset();
-		else 
+		else
 		{
-			$obj = KalturaPluginManager::loadObject('flavorAsset', $type);	
+			$obj = KalturaPluginManager::loadObject('flavorAsset', $type);
 			if(!$obj)
-				$obj = new flavorAsset();	
+				$obj = new flavorAsset();
 		}
 		return $obj;
 	}
