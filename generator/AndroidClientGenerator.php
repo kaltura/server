@@ -38,4 +38,13 @@ class AndroidClientGenerator extends JavaClientGenerator
 
 		parent::generate();
 	}
+	
+	protected function addFile($fileName, $fileContents, $addLicense = true)
+	{
+		$fileContents = str_replace(
+				'String clientTag = "java:@DATE@"', 
+				'String clientTag = "android:@DATE@"', 
+				$fileContents);
+		parent::addFile($fileName, $fileContents, $addLicense);
+	}
 }

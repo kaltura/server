@@ -316,6 +316,19 @@ abstract public class KalturaClientBase {
             }
             String responseBody = readRemoteInvocationResult(responseBodyIS);
             responseHeaders = method.getResponseHeaders();
+            
+            // print server debug info
+            String serverName = null;
+            String serverSession = null;
+            for(Header header : responseHeaders)
+            {
+            	if (header.getName().compareTo("X-Me") == 0)
+                    serverName = header.getValue();
+            	else if (header.getName().compareTo("X-Kaltura-Session") == 0)
+                    serverSession = header.getValue();
+			}
+			if (serverName != null || serverSession != null)
+				logger.debug("Server: [" + serverName + "], Session: [" + serverSession + "]");
 
 			// Deal with the response.
 			// Use caution: ensure correct character encoding and is not binary data

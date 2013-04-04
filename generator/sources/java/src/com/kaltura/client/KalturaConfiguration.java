@@ -42,7 +42,7 @@ public class KalturaConfiguration {
 	protected String adminSecret;	
 	protected String endpoint;
 	protected int timeout = 100000;
-	protected String clientTag = "java";
+	protected String clientTag = "java:@DATE@";
     protected EKalturaServiceFormat serviceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
 	
 	private Map<String, String> params;
