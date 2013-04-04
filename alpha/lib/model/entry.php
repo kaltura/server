@@ -127,6 +127,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const CATEGORY_OR_PARENT_SEARCH_PERFIX = 'pc';
 	const CATEGORY_SEARCH_STATUS = 's'; 
 	const PARTNER_STATUS_FORMAT = 'P%sST%s';
+	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
 	
 	private $appears_in = null;
@@ -2644,7 +2645,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		$categoriesEntryStringIndex = array_unique($categoriesEntryStringIndex);
 		
-		return implode(' ', $categoriesEntryStringIndex);
+		return self::CATEGORIES_INDEXED_FIELD_PREFIX . $this->getPartnerId() . " " .  implode(' ', $categoriesEntryStringIndex);
 	}
 	
 	/*
@@ -3108,5 +3109,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this->getFromCustomData('live_stream_configurations', null, array());
 	}
 	
+	public static function getSearchIndexFieldValue ($fieldName, $fieldValue, $partnerId)
+	{
+		
+	}
 	
 }
