@@ -84,9 +84,11 @@ class entryFilter extends baseObjectFilter
 			"_matchor_search_text" ,
 			"_matchand_categories", // see alias (this filter also being used in category::save(), so make sure it is not changed or removed!)
 			"_matchor_categories", // see alias
+			"_notcontains_categories",
 			"_in_categories_full_name",
 			"_matchand_categories_ids", // see alias
 			"_matchor_categories_ids", // see alias
+			"_notcontains_categories_ids",
 			"_matchand_flavor_params_ids",
 			"_matchor_flavor_params_ids",
 			"_matchor_duration_type", // see alias
