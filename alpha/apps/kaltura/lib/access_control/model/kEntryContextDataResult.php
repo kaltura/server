@@ -39,7 +39,7 @@ class kEntryContextDataResult
 	 * @var int
 	 * @deprecated
 	 */
-	private $previewLength = null;
+	private $previewLength = -1; //changed to -1 for backward compatibility
 	
 	/**
 	 * Array of messages as received from the access control rules that invalidated
