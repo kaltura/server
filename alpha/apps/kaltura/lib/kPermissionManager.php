@@ -50,7 +50,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			return true;
 		}
-		return false;	
+		return false;
 	}
 	
 	/**
@@ -64,7 +64,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		if (is_null($partnerId)) {
 			$partnerId = 'null';
-		}		
+		}
 		$key = 'role_'.$roleId.'_partner_'.$partnerId.'_internal_'.intval(kIpAddressUtils::isInternalIp());
 		return $key;
 	}
@@ -98,7 +98,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$cacheStore)
 				continue;
 				
-			$value = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache			
+			$value = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache
 			if ( !$value || !isset($value['updatedAt']) || ( $value['updatedAt'] < $roleCacheDirtyAt ) )
 			{
 				self::$cacheStores[] = $cacheStore;
@@ -106,11 +106,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			}
 			
 			KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
-			self::storeInCache($key, $value);		// store in lower cache layers		
+			self::storeInCache($key, $value);		// store in lower cache layers
 			self::$cacheStores[] = $cacheStore;
 
 			// cache is updated - init from cache
-			unset($value['updatedAt']);			
+			unset($value['updatedAt']);
 			return $value;
 		}
 
@@ -119,7 +119,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	/**
-	 * 
+	 *
 	 * Store given value in cache for with the given key as an identifier
 	 * @param string $key
 	 * @param string $value
@@ -134,8 +134,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		foreach (self::$cacheStores as $cacheStore)
 		{
 			$success = $cacheStore->set(
-				self::getCacheKeyPrefix() . $key, 
-				$value, 
+				self::getCacheKeyPrefix() . $key,
+				$value,
 				kConf::get('apc_cache_ttl')); // try to store in cache
 			if ($success)
 			{
@@ -193,7 +193,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$roleCacheDirtyAt = 0;
 		if (self::$operatingPartner) {
 			$roleCacheDirtyAt = self::$operatingPartner->getRoleCacheDirtyAt();
-		}		
+		}
 		
 		// get role from cache
 		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
@@ -219,7 +219,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				KalturaLog::alert('User role ID ['.$roleId.'] set for user ID ['.self::$ksUserId.'] of partner ['.self::$operatingPartnerId.'] was not found in the DB');
 				throw new kPermissionException('User role ID ['.$roleId.'] set for user ID ['.self::$ksUserId.'] of partner ['.self::$operatingPartnerId.'] was not found in the DB', kPermissionException::ROLE_NOT_FOUND);
 			}
-		}		
+		}
 		
 		$map = self::getPermissionsFromDb($dbRole);
 		
@@ -237,7 +237,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * @param UserRole $dbRole
 	 */
 	private static function getPermissionsFromDb($dbRole)
-	{				
+	{
 		$map = self::initEmptyMap();
 		
 		// get all permission object names from role record
@@ -260,14 +260,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowed);
 		
-		// if the request sent from the internal server set additional permission allowing access without KS 
-		// from internal servers  
+		// if the request sent from the internal server set additional permission allowing access without KS
+		// from internal servers
 		if (kIpAddressUtils::isInternalIp())
 		{
-			KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');		
+			KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');
 			$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
 			$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
-		}			
+		}
 		
 		$permissionNames = array();
 		foreach ($tmpPermissionNames as $name)
@@ -335,12 +335,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	private static function addApiAction(array &$map, kApiActionPermissionItem $item)
 	{
-		if (!isset($map[self::API_ACTIONS_ARRAY_NAME][$item->getService()])) {
-			$map[self::API_ACTIONS_ARRAY_NAME][$item->getService()] = array();
-			$map[self::API_ACTIONS_ARRAY_NAME][$item->getService()][$item->getAction()] = array();		
+		$service = strtolower($item->getService());
+		$action = strtolower($item->getAction());
+		if (!isset($map[self::API_ACTIONS_ARRAY_NAME][$service])) {
+			$map[self::API_ACTIONS_ARRAY_NAME][$service] = array();
+			$map[self::API_ACTIONS_ARRAY_NAME][$service][$action] = array();
 		}
-		else if (!in_array($item->getAction(), $map[self::API_ACTIONS_ARRAY_NAME][$item->getService()], true)) {
-			$map[self::API_ACTIONS_ARRAY_NAME][$item->getService()][$item->getAction()] = array();
+		else if (!in_array($action, $map[self::API_ACTIONS_ARRAY_NAME][$service], true)) {
+			$map[self::API_ACTIONS_ARRAY_NAME][$service][$action] = array();
 		}
 	}
 	
@@ -352,11 +354,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	private static function addApiParameter(array &$map, kApiParameterPermissionItem $item)
 	{
-		$itemAction = $item->getAction(); // ApiParameterPermissionItemAction
-		if (!isset($map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$item->getObject()])) {
-			$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$item->getObject()] = array();
+		$itemAction = strtolower($item->getAction());
+		$itemObject = strtolower($item->getObject());
+		if (!isset($map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObject])) {
+			$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObject] = array();
 		}
-		$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$item->getObject()][] = $item->getParameter();
+		$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObject][] = strtolower($item->getParameter());
 	}
 	
 	/**
@@ -383,8 +386,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				KalturaLog::notice('Permission item id ['.$item->getId().'] is not of type PermissionItemType::API_ACTION_ITEM but still defined in partner group permission id ['.$permission->getId().']');
 				continue;
 			}
-			$service = $item->getService();
-			$action  = $item->getAction();
+			$service = strtolower($item->getService());
+			$action  = strtolower($item->getAction());
 			
 			if (!isset($map[self::PARTNER_GROUP_ARRAY_NAME][$service]))
 			{
@@ -397,7 +400,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			}
 			
 			$map[self::PARTNER_GROUP_ARRAY_NAME][$service][$action] = array_merge($map[self::PARTNER_GROUP_ARRAY_NAME][$service][$action], $partnerGroup);
-		}		
+		}
 	}
 	
 	private static function isEmpty($value)
@@ -411,7 +414,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	// --------------------
 	// -- Public methods --
-	// --------------------	
+	// --------------------
 	
 	/**
 	 * Init with allowed permissions for the user in the given KS or kCurrentContext if not KS given
@@ -421,7 +424,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * @throws TODO: add all exceptions
 	 */
 	public static function init($useCache = null)
-	{					
+	{
 		// verify that kCurrentContext::init has been executed since it must be used to init current context permissions
 		if (!kCurrentContext::$ksPartnerUserInitialized) {
 			KalturaLog::crit('kCurrentContext::initKsPartnerUser must be executed before initializing kPermissionManager');
@@ -429,7 +432,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		
 		// can be initialized more than once to support multirequest with different kCurrentContext parameters
-		self::$initialized = false;		
+		self::$initialized = false;
 		self::$useCache = $useCache ? true : false;
 
 		// copy kCurrentContext parameters (kCurrentContext::init should have been executed before)
@@ -466,7 +469,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static function initRoleIds()
 	{
 		$roleIds = null;
-		if (!self::$ksString || 
+		if (!self::$ksString ||
 			(!self::$operatingPartner && self::$ksPartnerId != Partner::BATCH_PARTNER_ID))
 		{
 			// no partner or session -> no role
@@ -538,7 +541,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			}
 		}
 		
-		self::$roleIds = $roleIds;		
+		self::$roleIds = $roleIds;
 	}
 	
 	
@@ -714,7 +717,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::errorIfNotInitialized();
 		
 		$service = strtolower($service);
-		$action = strtolower($action);	
+		$action = strtolower($action);
 		
 		$partnerAccessPermitted = self::isPartnerAccessAllowed($service, $action);
 		if(!$partnerAccessPermitted)
@@ -738,21 +741,23 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	
-	private static function getParamPermitted($array_name, $object_name, $param_name)
+	private static function getParamPermitted($array_name, $objectName, $paramName)
 	{
 		self::errorIfNotInitialized();
 		
-		if (!isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name]))
+		$objectName = strtolower($objectName);
+		$paramName = strtolower($paramName);
+		if (!isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName]))
 		{
 			return false;
 		}
-		if ($param_name === kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER) {
+		if ($paramName === kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER) {
 			return true;
 		}
-		if (in_array(kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name], true)) {
+		if (in_array(kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName], true)) {
 			return true;
 		}
-		return in_array($param_name, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name], true);
+		return in_array($paramName, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$objectName], true);
 		
 	}
 	
@@ -763,7 +768,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public static function getReadPermitted($object_name, $param_name)
 	{
-		return self::getParamPermitted(ApiParameterPermissionItemAction::READ, $object_name, $param_name);	
+		return self::getParamPermitted(ApiParameterPermissionItemAction::READ, $object_name, $param_name);
 	}
 	
 	/**
@@ -773,7 +778,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public static function getInsertPermitted($object_name, $param_name)
 	{
-		return self::getParamPermitted(ApiParameterPermissionItemAction::INSERT, $object_name, $param_name);	
+		return self::getParamPermitted(ApiParameterPermissionItemAction::INSERT, $object_name, $param_name);
 	}
 	
 	/**
@@ -866,13 +871,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if ($object instanceof PermissionToPermissionItem)
 			return true;
 			
-		return false;		
+		return false;
 	}
 
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
-	public function objectChanged(BaseObject $object, array $modifiedColumns) 
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		if($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 		{
@@ -917,7 +922,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	/* (non-PHPdoc)
 	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
-	public function objectCreated(BaseObject $object) 
+	public function objectCreated(BaseObject $object)
 	{
 		if($object instanceof Permission)
 		{
@@ -955,12 +960,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	/**
-	 * 
+	 *
 	 * add ps2 permission for given partner
 	 * @param Partner $partner
 	 */
 	public static function setPs2Permission(Partner $partner)
- 	{		
+ 	{
  		$ps2Permission = new Permission();
  		$ps2Permission->setName(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
  		$ps2Permission->setPartnerId($partner->getId());
@@ -970,12 +975,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
  	}
  	
 /**
-	 * 
+	 *
 	 * add ps2 permission for given partner
 	 * @param Partner $partner
 	 */
 	public static function sePermissionForPartner(Partner $partner, $permission)
- 	{		
+ 	{
  		$ps2Permission = new Permission();
  		$ps2Permission->setName($permission);
  		$ps2Permission->setPartnerId($partner->getId());
