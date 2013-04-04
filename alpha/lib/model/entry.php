@@ -3108,10 +3108,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		return $this->getFromCustomData('live_stream_configurations', null, array());
 	}
-	
-	public static function getSearchIndexFieldValue ($fieldName, $fieldValue, $partnerId)
-	{
-		
-	}
+
 	
 }
