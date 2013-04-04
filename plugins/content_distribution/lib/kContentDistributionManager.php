@@ -119,7 +119,7 @@ class kContentDistributionManager
 			if(!isset($dcs[$fileSyncDc]))
 				$dcs[$fileSyncDc] = array();
 			
-			$dcs[$fileSyncDc][$assetId] = $fileSync->getId();					
+			$dcs[$fileSyncDc][$assetId] = $fileSync->getId();
 		}
 		
 		if(isset($dcs[$dc]) && count($dcs[$dc]) == count($assets))
@@ -133,7 +133,7 @@ class kContentDistributionManager
 		foreach($otherDcs as $remoteDc)
 		{
 			$remoteDcId = $remoteDc['id'];
-			if(!isset($dcs[$remoteDcId]) && count($dcs[$remoteDcId]) != count($assets))
+			if(!isset($dcs[$remoteDcId]) || count($dcs[$remoteDcId]) != count($assets))
 				continue;
 			
 			$dc = $remoteDcId;
@@ -453,7 +453,7 @@ class kContentDistributionManager
 		{
 			KalturaLog::notice("Wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
-		} 
+		}
 		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isDeleteEnabled())
@@ -495,7 +495,7 @@ class kContentDistributionManager
 		{
 			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
-		} 
+		}
 		
 		
 		$validationErrors = $entryDistribution->getValidationErrors();
@@ -541,7 +541,7 @@ class kContentDistributionManager
 		{
 			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
-		} 
+		}
 		
 		
 		$validationErrors = $entryDistribution->getValidationErrors();
@@ -581,7 +581,7 @@ class kContentDistributionManager
 		{
 			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
-		} 
+		}
 		
 		
 		$validationErrors = $entryDistribution->getValidationErrors();
@@ -619,7 +619,7 @@ class kContentDistributionManager
 		{
 			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
-		} 
+		}
 		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isReportsEnabled())
@@ -657,7 +657,7 @@ class kContentDistributionManager
 		{
 			KalturaLog::notice("Wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
 			return null;
-		} 
+		}
 		
 		$returnValue = false;
 		$validationErrors = $entryDistribution->getValidationErrors();
@@ -729,7 +729,7 @@ class kContentDistributionManager
 			        {
 			            $foundThumbParams = true;
 			            KalturaLog::log("Adding thumbnail [" . $thumbParams->getId() . "] to entry [" . $entryDistribution->getEntryId() . "]");
-					    kBusinessPreConvertDL::decideThumbGenerate($entry, $thumbParams); 
+					    kBusinessPreConvertDL::decideThumbGenerate($entry, $thumbParams);
 					    break;
 			        }
 			    }
@@ -760,7 +760,7 @@ class kContentDistributionManager
 			EntryDistributionStatus::ERROR_SUBMITTING,
 		);
 		
-		// if not in first submmiting status then it's an update and need to check if update is supported. 
+		// if not in first submmiting status then it's an update and need to check if update is supported.
 		if(!in_array($entryDistribution->getStatus(), $submittingStatuses))
 		{
 			$distributionProvider = $distributionProfile->getProvider();
@@ -775,7 +775,7 @@ class kContentDistributionManager
 				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 				return false;
 			}
-		}	
+		}
 		
 		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
 		$optionalFlavorParamsIds = $distributionProfile->getOptionalFlavorParamsIdsArray();
@@ -820,7 +820,7 @@ class kContentDistributionManager
 			EntryDistributionStatus::ERROR_SUBMITTING,
 		);
 		
-		// if not in first submmiting status then it's an update and need to check if update is supported. 
+		// if not in first submmiting status then it's an update and need to check if update is supported.
 		if(!in_array($entryDistribution->getStatus(), $submittingStatuses))
 		{
 			$distributionProvider = $distributionProfile->getProvider();
@@ -835,7 +835,7 @@ class kContentDistributionManager
 				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 				return false;
 			}
-		}	
+		}
 		
 		$thumbAssetsIds = array();
 		$thumbDimensions = $distributionProfile->getThumbDimensionsObjects();
@@ -851,7 +851,7 @@ class kContentDistributionManager
 		{
 			$assignedThumbAssets = assetPeer::retrieveByIds(explode(',', $assignedThumbAssetIds));
 			foreach($assignedThumbAssets as $assignedThumbAsset)
-			{					
+			{
 				$key = $assignedThumbAsset->getWidth() . 'x' . $assignedThumbAsset->getHeight();
 				if(isset($thumbDimensionsWithKeys[$key]))
 				{
@@ -941,7 +941,7 @@ class kContentDistributionManager
 				/* @var $asset asset */
 				if ($assetDistributionRule->fulfilled($asset))
 				{
-					$assetIds[] = $asset->getId(); 
+					$assetIds[] = $asset->getId();
 				}
 			}
 		}
