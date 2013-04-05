@@ -571,3 +571,12 @@ maximumExecutionTime								= 3000
 scriptPath             								= ../plugins/content/caption/search/batch/ParseCaptionAsset/KAsyncParseCaptionAssetExe.php
 
 
+
+[KAsyncTagResolve : PeriodicWorker]
+id													= 470
+name												= KAsyncTagResolve
+friendlyName										= Resolve tags which are pending deletion
+type												= KAsyncTagResolve
+maximumExecutionTime								= 3000
+sleepBetweenStopStart							    = 3600
+scriptPath											= ../plugins/tag_search/lib/batch/tag_resolve/KAsyncTagResolveExe.php
