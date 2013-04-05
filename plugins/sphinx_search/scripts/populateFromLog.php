@@ -1,30 +1,7 @@
 <?php
-
-if($argc <= 1)
-{
-	echo "Config file not specified\n";
-	echo "Usage: php populateFromLog.php {path to config php file}\n";
-	echo "For example\n";
-	echo "	php populateFromLog.php /opt/kaltua/app/scripts/sphinx/configs/pa-sphinx.php\n";
-	exit(1);
-}
-
-$configFile = $argv[1];
-if(!file_exists($configFile))
-{
-	echo "Config file [$configFile] doesn't exist\n";
-	echo "Usage: php populateFromLog.php {path to config php file}\n";
-	echo "For example\n";
-	echo "	php populateFromLog.php /opt/kaltua/app/scripts/sphinx/configs/pa-sphinx.php\n";
-	exit(1);
-}
-
 set_time_limit(0);
 ini_set("memory_limit","700M");
 chdir(dirname(__FILE__));
-
-$sphinxServer = null;
-require_once $configFile;
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
@@ -38,6 +15,16 @@ KAutoloader::register();
 
 error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
+
+$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+$configFile = ROOT_DIR . "/configurations/sphinx/populate/$hostname.ini";
+if(!file_exists($configFile))
+{
+	KalturaLog::err("Configuration file [$configFile] not found.");
+	exit(-1);
+}
+$config = parse_ini_file($configFile);
+$sphinxServer = $config['sphinxServer'];
 
 $systemSettings = kConf::getMap('system');
 if(!$systemSettings || !$systemSettings['LOG_DIR'])
