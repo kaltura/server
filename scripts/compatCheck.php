@@ -12,6 +12,8 @@ define('DB_HOST_NAME', 'dbgoeshere');
 define('DB_USER_NAME', 'root');
 define('DB_PASSWORD', 'root');
 
+define('IP_ADDRESS_SALT', '');
+
 $PS2_TESTED_XML_ACTIONS = array(
 		'extwidget.playmanifest', 
 		'keditorservices.getmetadata', 
@@ -63,6 +65,10 @@ $APIV3_TESTED_ACTIONS = array(
 		'*.serve',
 		'*.goto',
 		'*.search',
+		);
+
+$APIV3_BLOCKED_ACTIONS = array(
+		'*.getexclusive',
 		);
 
 $KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
@@ -192,7 +198,21 @@ function print_r_reverse($in) {
     }
 }
 
-function doCurl($url, $params = array(), $files = array(), $range = null)
+function getSignedIpHeader($ipAddress)
+{
+	if (!IP_ADDRESS_SALT)
+		return array();
+	
+	$salt = IP_ADDRESS_SALT;
+	$curTime = time();
+	$uniqId = rand(1,32767);
+	$baseHeader = array($ipAddress, $curTime, $uniqId);
+	$headerHash = md5(implode(',', $baseHeader) . ',' . $salt);
+	$ipHeader = implode(',', $baseHeader) . ',' . $headerHash;
+	return array("X_KALTURA_REMOTE_ADDR: $ipHeader");
+}
+
+function doCurl($url, $params = array(), $files = array(), $range = null, $requestHeaders = array())
 {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
@@ -219,7 +239,8 @@ function doCurl($url, $params = array(), $files = array(), $range = null)
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_USERAGENT, '');
 	curl_setopt($ch, CURLOPT_TIMEOUT, 0);
-
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders );
+	
 	$beforeTime = microtime(true);	
 	$result = curl_exec($ch);
 	$endTime = microtime(true);
@@ -316,7 +337,7 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 	{
 		if (!array_key_exists($key, $resultNew))
 		{
-			$errors[] = "missing field $key (path=$path)";
+			$errors[$path] = "missing field $key (path=$path)";
 			continue;
 		}
 		
@@ -329,14 +350,14 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 		{
 			if (!compareValues($newValue, $oldValue))
 			{
-				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				$errors[$path] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}
 		}
 		else
 		{
-			$errors[] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
+			$errors[$path] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
 		}
 	}
 
@@ -360,6 +381,36 @@ function compareArraysById($item1, $item2)
 	return 0;
 }
 	
+function getCommonPrefixBase($string1, $string2)
+{
+	$left = 0;
+	$right = strlen($string1);
+	while ($left < $right)
+	{
+		$mid = ceil(($right + $left) / 2);
+		if (substr($string1, 0, $mid) == substr($string2, 0, $mid))
+			$left = $mid;
+		else
+			$right = $mid - 1;
+	}
+	return substr($string1, 0, $left);
+}
+
+function getCommonPrefix(array $strings)
+{
+	$prefix = getCommonPrefixBase(reset($strings), next($strings));
+	for (;;)
+	{
+		$curString = next($strings);
+		if ($curString === false)
+			return $prefix;
+		$curString = substr($curString, 0, strlen($prefix));
+		if ($curString == $prefix)
+			continue;
+		$prefix = getCommonPrefixBase($prefix, $curString);
+	}
+}
+
 function compareArrays($resultNew, $resultOld, $path)
 {
 	global $ID_FIELDS;
@@ -370,6 +421,7 @@ function compareArrays($resultNew, $resultOld, $path)
 	
 	$ids = array();
 	$isOnlyIdErrors = true;
+	$errorPaths = array();
 	foreach ($errors as $curError)
 	{
 		$isCurIdError = false;
@@ -387,9 +439,11 @@ function compareArrays($resultNew, $resultOld, $path)
 			$isOnlyIdErrors = false;
 			break;
 		}
-		$explodedError = explode(' new=', rtrim($curError, ')'));
+		$explodedError = explode('(path=', rtrim($curError, ')'));
+		$explodedError = explode(' new=', $explodedError[1]);
+		$errorPaths[] = $explodedError[0];
+		
 		$explodedError = explode(' old=', $explodedError[1]);
-
 		$ids[] = "'".$explodedError[0]."'";
 		$ids[] = "'".$explodedError[1]."'";
 	}
@@ -402,9 +456,11 @@ function compareArrays($resultNew, $resultOld, $path)
 	$newErrors = compareArraysInternal($resultNew, $resultOld, $path);
 	if ($newErrors)				// sorting didn't help
 		return $errors;
+	
+	$errorPath = getCommonPrefix($errorPaths);
 		
 	$ids = implode(',', array_unique($ids));
-	return array('Different order ' . $ids);
+	return array($errorPath => ('Different order ' . $ids));
 }
 
 function normalizeResultBuffer($result)
@@ -557,7 +613,7 @@ function shouldProcessRequest($fullActionName, $parsedParams)
 	return 'yes';
 }
 
-function testAction($fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML, $kalcliCmd = '')
+function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML, $kalcliCmd = '')
 {
 	global $serviceUrlOld, $serviceUrlNew;
 	
@@ -568,11 +624,17 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 	$range = null;
 	if ($compareMode == CM_BINARY)
 		$range = '0-262144';		// 256K
-	
+		
+	$requestHeaders = array();
 	for ($retries = 0; $retries < 3; $retries++)
 	{
-		list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams, array(), $range);
-		list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams, array(), $range);
+		if ($ipAddress)
+			$requestHeaders = getSignedIpHeader($ipAddress); 
+		list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams, array(), $range, $requestHeaders);
+		
+		if ($ipAddress)
+			$requestHeaders = getSignedIpHeader($ipAddress); 
+		list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams, array(), $range, $requestHeaders);
 		
 		if ($curlErrorNew || $curlErrorOld)
 		{
@@ -622,7 +684,7 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 			return;
 		}
 		
-		if (count($errors) == 1 && beginsWith($errors[0], 'Different order '))
+		if (count($errors) == 1 && beginsWith(reset($errors), 'Different order '))
 		{
 			break;			// retry doesn't help with different order, we can save the time
 		}
@@ -630,20 +692,76 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array(),
 		print "\nRetrying $fullActionName...";
 		usleep(1000000);
 	}
-		
+	
+	// check which requests failed with the multirequest
+	$badRequests = null;
+	if (beginsWith($fullActionName, 'multirequest'))
+	{
+		$badRequests = array();
+		foreach ($errors as $path => $error)
+		{
+			if (beginsWith($path, '/result/item/'))
+			{
+				$explodedPath = explode('/', $path);
+				$badRequests[] =  $explodedPath[3];
+			}
+			else
+			{
+				$badRequests = null;
+				break;
+			}
+		}
+	}
+	
+	if (is_array($badRequests))
+	{
+		$badRequests = array_unique($badRequests);
+		sort($badRequests);
+	}
+	
 	print "\n-------------------------------------------------------------------------------\n";
 	print "\tUrl = $serviceUrlNew$uri\n";
 	print "\tPostParams = ".var_export($postParams, true)."\n";
-	print "\tTestUrl = $serviceUrlNew$uri&".http_build_query($postParams)."\n";	
-	if ($kalcliCmd)
-		print "\tkalcli = {$kalcliCmd}\n";
+	print "\tTestUrl = $serviceUrlNew$uri&".http_build_query($postParams)."\n";
 	
-	foreach ($errors as $error)
+	if ($kalcliCmd)
 	{
-		print "\tError: $error\n";
+		if (is_array($kalcliCmd))
+		{
+			if (is_array($badRequests))
+			{
+				// leave only the bad requests
+				$newCommands = array();
+				foreach ($kalcliCmd as $index => $curCommand)
+				{
+					if (in_array($index, $badRequests))
+						$newCommands[] = $curCommand;
+				}
+				$kalcliCmd = $newCommands;
+			}
+			$kalcliCmd = implode("\n\t", $kalcliCmd);
+		}
+		print "\tkalcli = {$kalcliCmd}\n";
 	}
 	
-	if ($compareMode == CM_XML && (count($errors) != 1 || !beginsWith($errors[0], 'Different order ')))
+	foreach ($errors as $path => $error)
+	{
+		if (beginsWith($fullActionName, 'multirequest') && beginsWith($path, '/result/item/'))
+		{
+			$explodedPath = explode('/', $path);
+			$requestIndex =  $explodedPath[3];
+			$explodedActionName = explode('/', $fullActionName);
+			$actionName = $explodedActionName[$requestIndex + 1];
+		}
+		else
+		{
+			$actionName = $fullActionName;
+		}
+		
+		print "\tError: ($actionName) $error\n";
+	}
+	
+	if ($compareMode == CM_XML && (count($errors) != 1 || !beginsWith(reset($errors), 'Different order ')))
 	{
 		print "Result - new\n";
 		print $resultNew . "\n";
@@ -698,12 +816,27 @@ function isServiceApproved($service)
 
 function isActionApproved($fullActionName, $action)
 {
-	global $APIV3_TESTED_ACTIONS;
+	global $APIV3_TESTED_ACTIONS, $APIV3_BLOCKED_ACTIONS;
+
+	foreach ($APIV3_BLOCKED_ACTIONS as $blockedAction)
+	{
+		if (beginsWith($blockedAction, '*.'))
+		{
+			if (beginsWith(strtolower($action), substr($blockedAction, 2)))
+				return false;
+		}
+		else
+		{
+			if (beginsWith($fullActionName, $blockedAction))
+				return false;
+		}
+	}
+	
 	foreach ($APIV3_TESTED_ACTIONS as $approvedAction)
 	{
 		if (beginsWith($approvedAction, '*.'))
 		{
-			if (beginsWith($action, substr($approvedAction, 2)))
+			if (beginsWith(strtolower($action), substr($approvedAction, 2)))
 				return true;
 		}
 		else
@@ -721,7 +854,7 @@ function generateKalcliCommand($service, $action, $parsedParams)
 	foreach ($parsedParams as $key => $value)
 	{
 		$curParam = "{$key}={$value}";
-		if (!preg_match('/^[a-zA-Z0-9\:_\-,=\.]+$/', $curParam))
+		if (!preg_match('/^[a-zA-Z0-9\:_\-,=\.\/]+$/', $curParam))
 			$kalcliCmd .= " '{$curParam}'";
 		else
 			$kalcliCmd .= " {$curParam}";
@@ -729,14 +862,16 @@ function generateKalcliCommand($service, $action, $parsedParams)
 	return $kalcliCmd;
 }
 
-function processMultiRequest($parsedParams)
+function processMultiRequest($ipAddress, $parsedParams)
 {
+	$commonParams = array();
 	$paramsByRequest = array();
 	foreach ($parsedParams as $paramName => $paramValue)
 	{
 		$explodedName = explode(':', $paramName);
 		if (count($explodedName) <= 1 || !is_numeric($explodedName[0]))
 		{
+			$commonParams[$paramName] = $paramValue;
 			continue;
 		}
 		
@@ -748,6 +883,7 @@ function processMultiRequest($parsedParams)
 		}
 		$paramsByRequest[$requestIndex][$paramName] = $paramValue;
 	}
+	unset($commonParams['action']);		// sometimes multirequests have action=null
 	
 	if (!$paramsByRequest)
 	{
@@ -796,12 +932,19 @@ function processMultiRequest($parsedParams)
 	
 	$uri = "/api_v3/index.php?service=multirequest";
 
-	$kalcliCmd = generateKalcliCommand('multirequest', 'null', $parsedParams);
+	$kalcliCmds = array();
+	for ($reqIndex = 1; $reqIndex <= $maxIndex; $reqIndex++)
+	{
+		$curParams = $paramsByRequest[$reqIndex];
+		$service = $curParams['service'];
+		$action = $curParams['action'];
+		$kalcliCmds[] = generateKalcliCommand($service, $action, array_merge($curParams, $commonParams));
+	}
 	
-	testAction($fullActionName, $parsedParams, $uri, $parsedParams, CM_XML, $kalcliCmd);
+	testAction($ipAddress, $fullActionName, $parsedParams, $uri, $parsedParams, CM_XML, $kalcliCmds);
 }
 
-function processRequest($parsedParams)
+function processRequest($ipAddress, $parsedParams)
 {
 	if (!array_key_exists('service', $parsedParams))
 	{
@@ -816,7 +959,7 @@ function processRequest($parsedParams)
 	{
 		if (strtolower($service) == "multirequest")
 		{
-			processMultiRequest($parsedParams);
+			processMultiRequest($ipAddress, $parsedParams);
 		}
 		return;
 	}
@@ -855,10 +998,10 @@ function processRequest($parsedParams)
 	
 	$uri = "/api_v3/index.php?service=$service&action=$action";
 	$compareMode = (beginsWith($action, 'serve') ? CM_BINARY : CM_XML);
-	testAction($fullActionName, $parsedParams, $uri, $parsedParams, $compareMode, $kalcliCmd);
+	testAction($ipAddress, $fullActionName, $parsedParams, $uri, $parsedParams, $compareMode, $kalcliCmd);
 }
 
-function processFeedRequest($parsedParams)
+function processFeedRequest($ipAddress, $parsedParams)
 {
 	$fullActionName = "getfeed";
 
@@ -883,7 +1026,7 @@ function processFeedRequest($parsedParams)
 	
 	$uri = "/api_v3/getFeed.php?" . http_build_query($parsedParams, null, "&");
 	
-	testAction($fullActionName, $parsedParams, $uri);
+	testAction($ipAddress, $fullActionName, $parsedParams, $uri);
 }
 
 interface LogProcessor
@@ -896,6 +1039,7 @@ class LogProcessorApiV3 implements LogProcessor
 	protected $inParams = false;
 	protected $isFeed = false;
 	protected $params = '';
+	protected $ipAddress = '';
 	
 	function processLine($buffer)
 	{
@@ -904,6 +1048,8 @@ class LogProcessorApiV3 implements LogProcessor
 			$markerPos = strpos($buffer, APIV3_START_MARKER);
 			if ($markerPos !== false)
 			{
+				$explodedBuffer = explode(' ', $buffer);
+				$this->ipAddress = substr($explodedBuffer[3], 1, -1);
 				$this->params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
 				$this->inParams = true;
 				$this->isFeed = false;
@@ -912,6 +1058,8 @@ class LogProcessorApiV3 implements LogProcessor
 			$markerPos = strpos($buffer, APIV3_GETFEED_MARKER);
 			if ($markerPos !== false)
 			{
+				$explodedBuffer = explode(' ', $buffer);
+				$this->ipAddress = substr($explodedBuffer[3], 1, -1);
 				$this->params = substr($buffer, $markerPos + strlen(APIV3_GETFEED_MARKER));
 				$this->inParams = true;
 				$this->isFeed = true;
@@ -933,11 +1081,11 @@ class LogProcessorApiV3 implements LogProcessor
 
 				if ($this->isFeed)
 				{
-					$shouldQuit = processFeedRequest($parsedParams);
+					$shouldQuit = processFeedRequest($this->ipAddress, $parsedParams);
 				}
 				else
 				{
-					$shouldQuit = processRequest($parsedParams);
+					$shouldQuit = processRequest($this->ipAddress, $parsedParams);
 				}
 				
 				if ($shouldQuit)
@@ -955,7 +1103,7 @@ class LogProcessorApiV3 implements LogProcessor
 	}
 }
 
-function processPS2Request($parsedParams)
+function processPS2Request($ipAddress, $parsedParams)
 {
 	global $serviceUrlOld, $serviceUrlNew, $PS2_TESTED_XML_ACTIONS, $PS2_TESTED_BIN_ACTIONS;
 
@@ -1012,7 +1160,7 @@ function processPS2Request($parsedParams)
 		$compareMode = CM_WIDGET;
 	else
 		$compareMode = CM_BINARY;
-	testAction($fullActionName, $parsedParams, $uri, array(), $compareMode);
+	testAction($ipAddress, $fullActionName, $parsedParams, $uri, array(), $compareMode);
 }
 
 class LogProcessorPS2 implements LogProcessor
@@ -1025,9 +1173,12 @@ class LogProcessorPS2 implements LogProcessor
 		$params = trim(substr($buffer, $markerPos + strlen(PS2_START_MARKER)));
 		if (!beginsWith($params, 'array (') || !endsWith($params, ')'))
 			return false;
+
+		$explodedBuffer = explode(' ', $buffer);
+		$ipAddress = substr($explodedBuffer[3], 1, -1);
 		$parsedParams = eval('return ' . $params . ';');
 
-		if (processPS2Request($parsedParams))
+		if (processPS2Request($ipAddress, $parsedParams))
 		{
 			return true;
 		}
@@ -1063,7 +1214,7 @@ class LogProcessorUriList implements LogProcessor
 			$action = $matches[1];
 
 		$fullActionName = "$service.$action";
-		testAction($fullActionName, array(), $uri);
+		testAction(null, $fullActionName, array(), $uri);
 	}
 }
 
