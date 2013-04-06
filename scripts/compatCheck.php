@@ -335,29 +335,31 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 	$errors = array();
 	foreach ($resultOld as $key => $oldValue)
 	{
+		$subPath = "$path/$key";
+		
 		if (!array_key_exists($key, $resultNew))
 		{
-			$errors[$path] = "missing field $key (path=$path)";
+			$errors[$subPath] = "missing field $key (path=$path)";
 			continue;
 		}
 		
 		$newValue = $resultNew[$key];
 		if (is_array($oldValue) && is_array($newValue))
 		{
-			$errors = array_merge($errors, compareArrays($newValue, $oldValue, "$path/$key"));
+			$errors = array_merge($errors, compareArrays($newValue, $oldValue, $subPath));
 		}
 		else if (is_string($oldValue) && is_string($newValue))
 		{
 			if (!compareValues($newValue, $oldValue))
 			{
-				$errors[$path] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}
 		}
 		else
 		{
-			$errors[$path] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
+			$errors[$subPath] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
 		}
 	}
 
