@@ -140,19 +140,19 @@ class Zend2ClientTester
 	public function testServeUrl()
 	{
 		$serveUrl = $this->_client->getDataService()->serve("12345", 5, true);
-    	$expected = sprintf(
-    		'service=%s&action=%s&apiVersion=%s&format=%s&clientTag=%s&entryId=%s&version=%s&forceProxy=%s&partnerId=%s&ks=%s',
-    		'data',
-    		'serve',
-    		$this->_client->getApiVersion(),
-    		2,
-	    	$this->_client->getConfig()->getClientTag(),
-	    	'12345',
-	    	5, 
-	    	1,
-    		$this->_client->getConfig()->getPartnerId(), 
-	    	rawurlencode($this->_client->getKs()));
-	    	
+		$expectedArray = array(
+			'service' => 'data',
+			'action' => 'serve',
+			'apiVersion' => $this->_client->getApiVersion(),
+			'format' => 2,
+			'clientTag' => $this->_client->getConfig()->getClientTag(),
+			'entryId' => '12345',
+			'version' => 5,
+			'forceProxy' => 1,
+			'partnerId' => $this->_client->getConfig()->getPartnerId(),
+			'ks' => $this->_client->getKs());
+		$expected = http_build_query($expectedArray);
+		
 	    	echo($serveUrl.PHP_EOL);
 	    	echo($expected.PHP_EOL);
     	$this->assertTrue(strpos($serveUrl, $expected) !== false);

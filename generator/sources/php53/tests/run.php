@@ -2,7 +2,7 @@
 /* set this path to the location of Zend/Loader/StandardAutoloader.php, 
  * the client library can be used with any other php5.3 namespace style autoloaders (for example symfony2 & doctrine2)
 */
-define('ZEND_AUTOLOADER_PATH', '/_path_/_to_/_zend_/_framework_/Zend/Loader/StandardAutoloader.php');
+define('ZEND_AUTOLOADER_PATH', 'ClassLoader/ClassLoader.php');
 define('CONFIG_FILE', 'config.ini');
 
 use Kaltura\Client\Configuration as KalturaConfiguration;
@@ -13,10 +13,10 @@ use Kaltura\Client\ClientException;
 
 // load zend framework 2
 require_once ZEND_AUTOLOADER_PATH;
-$loader = new \Zend\Loader\StandardAutoloader();
+$loader = new Symfony\Component\ClassLoader\ClassLoader();
 // register Kaltura namespace
-$loader->registerNamespace('Kaltura', dirname(__FILE__).'/../library/Kaltura');
-$loader->registerNamespace('Test', dirname(__FILE__).'/Test');
+$loader->addPrefix('Kaltura', dirname(__FILE__).'/../library');
+$loader->addPrefix('Test', dirname(__FILE__));
 $loader->register();
 
 $testerConfig = parse_ini_file(dirname(__FILE__).'/'.CONFIG_FILE);

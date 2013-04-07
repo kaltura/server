@@ -213,6 +213,20 @@ class Base
 		}
 		else 
 		{
+			// print server debug info to log
+			$serverName = null;
+			$serverSession = null;
+			foreach ($this->responseHeaders as $curHeader)
+			{
+				$splittedHeader = explode(':', $curHeader, 2);
+				if ($splittedHeader[0] == 'X-Me')
+					$serverName = trim($splittedHeader[1]);
+				else if ($splittedHeader[0] == 'X-Kaltura-Session')
+					$serverSession = trim($splittedHeader[1]);
+			}
+			if (!is_null($serverName) || !is_null($serverSession))
+				$this->log("server: [{$serverName}], session: [{$serverSession}]");
+
 			$this->log("result (serialized): " . $postResult);
 			
 			if ($this->config->getFormat() == self::KALTURA_SERVICE_FORMAT_XML)
