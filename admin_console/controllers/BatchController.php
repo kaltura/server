@@ -171,7 +171,8 @@ class BatchController extends Zend_Controller_Action
 		if($request->getParam('createdAtTo', false))
 		{
 			$createdAtTo = new Zend_Date($this->_getParam('createdAtTo', $this->getDefaultToDate()));
-			$filter->createdAtLessThanOrEqual = $createdAtTo->toString(Zend_Date::TIMESTAMP);
+			$createdAtTo->addDay(1);
+            $filter->createdAtLessThanOrEqual = $createdAtTo->toString(Zend_Date::TIMESTAMP);
 		}
 		else
 		{
