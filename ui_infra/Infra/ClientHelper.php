@@ -80,6 +80,7 @@ class Infra_ClientHelper
 		$config->setLogger(new Infra_ClientLoggingProxy());
 
 		$settings = Zend_Registry::get('config')->settings;
+		$config->clientTag = 'Kaltura-' . $settings->applicationName;
 		if(isset($settings->clientConfig))
 		{
 			foreach($settings->clientConfig as $attr => $value)
