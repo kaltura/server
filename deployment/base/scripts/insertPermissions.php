@@ -2,8 +2,10 @@
 /**
  * @package deployment
  * @subpackage base.permissions
- * 
+ *
  * Adds all system default permissions
+ * Arguments:
+ *  d - Directory of permission files
  */
 
 chdir(__DIR__);
@@ -11,6 +13,17 @@ require_once('../../bootstrap.php');
 
 $dirPath = realpath(__DIR__ . '/../../') . '/permissions';
 $scriptPath = realpath(__DIR__ . '/../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
+
+$options = getopt('d:');
+if(isset($options['d']))
+{
+	$dirPath = $options['d'];
+	if(!file_exists($dirPath) || !is_dir($dirPath))
+	{
+		echo "Path [$dirPath] is not a valid dorectory";
+		exit(-1);
+	}
+}
 
 KalturaLog::info("Adding permissions from directory [$dirPath]");
 $dir = dir($dirPath);
