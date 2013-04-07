@@ -43,7 +43,7 @@ while (false !== ($fileName = $dir->read()))
 foreach($files as $index => $fileName)
 {
 	$filePath = realpath("$dirPath/$fileName");
-	if(!preg_match('/\[permissions\]/', file_get_contents($filePath)))
+	if(is_dir($filePath) || !preg_match('/\[permissions\]/', file_get_contents($filePath)))
 		continue;
 	
 	unset($files[$index]);
