@@ -288,13 +288,25 @@ class kJobsManager
 			if(isset($clipDuration)){
 				$flavorParamsOutputs[$flavorParamsOutputIndex]->setClipDuration($clipDuration);
 			}
+
 			if(isset($clipOffset) || isset($clipDuration)){
 				$flavorParamsOutputs[$flavorParamsOutputIndex]->save();
 			}
 		}
+			/*
+			 * Put together all separted flavor XML's into a single Smooth Streaming preset file
+			 */
+		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($flavorParamsOutputs) . "] flavor params");
+		$presetXml = KDLWrap::CDLProceessFlavorsForCollection($flavorParamsOutputs);
+		$presetXml = str_replace(KDLCmdlinePlaceholders::OutFileName, $fileName, $presetXml);
 
 		foreach($flavorParamsOutputs as $flavorParamsOutput)
 		{
+			/*
+			 * Save in case that videoBitrate was changed by the FlavorsForCollection (see above)
+			 */
+			$flavorParamsOutput->save();
+			
 			$convertCollectionFlavorData = new kConvertCollectionFlavorData();
 			$convertCollectionFlavorData->setFlavorAssetId($flavorParamsOutput->getFlavorAssetId());
 			$convertCollectionFlavorData->setFlavorParamsOutputId($flavorParamsOutput->getId());
@@ -336,12 +348,8 @@ class kJobsManager
 		$dbConvertCollectionJob = kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData,
 				BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 
-		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($flavorParamsOutputs) . "] flavor params");
-		$xml = KDLWrap::CDLProceessFlavorsForCollection($flavorParamsOutputs);
-		$xml = str_replace(KDLCmdlinePlaceholders::OutFileName, $fileName, $xml);
-
 		$syncKey = $dbConvertCollectionJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG);
-		kFileSyncUtils::file_put_contents($syncKey, $xml);
+		kFileSyncUtils::file_put_contents($syncKey, $presetXml);
 
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
 		$remoteUrl = $fileSync->getExternalUrl($entry->getId());
