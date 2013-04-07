@@ -225,9 +225,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	private function loadDropFolderFiles(KalturaDropFolder $folder)
 	{
 		$dropFolderFilesMap = array();
-		$count = 0;
 		$dropFolderFiles =null;
-		$eol = false;
 		
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
@@ -237,27 +235,21 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		if($this->taskConfig->params->pageSize)
 			$pager->pageSize = $this->taskConfig->params->pageSize;	
 
-		while(!$eol)
+		do
 		{
 			$pager->pageIndex++;
 			KalturaLog::debug('getting page ['.$pager->pageIndex. '] from Drop Folder File ');
 			$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
-			$totalCount = $dropFolderFiles->totalCount;
 			$dropFolderFiles = $dropFolderFiles->objects;
-			KalturaLog::debug('Total files count ['.$totalCount.']');
 			foreach ($dropFolderFiles as $dropFolderFile) 
 			{
 				if($dropFolderFile->status != KalturaDropFolderFileStatus::PARSED && $dropFolderFile->status != KalturaDropFolderFileStatus::DETECTED)
 				{
 					$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
 				}
-				$count++;				
-				
 			}
-			KalturaLog::debug('Current count ['.$count.']');
-			if($count >= $totalCount)
-				$eol = true;
-		}	
+		}while (count($dropFolderFiles) >= $pager->pageSize);
+			
 		return $dropFolderFilesMap;
 	}
 	
