@@ -42,11 +42,11 @@ logging.basicConfig(level = logging.DEBUG,
                     stream = sys.stdout)
 
 # UPDATE THIS
-PARTNER_ID = 12345678
-SECRET = "abcd"
-ADMIN_SECRET = "efgh"
+PARTNER_ID = 54321
+SECRET = "YOUR_USER_SECRET"
+ADMIN_SECRET = "YOUR_ADMIN_SECRET"
 SERVICE_URL = "http://www.kaltura.com"
-USER_NAME = "user"
+USER_NAME = "testUser"
 
 class KalturaLogger(IKalturaLogger):
     def log(self, msg):

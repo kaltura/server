@@ -1,7 +1,7 @@
 test:
-    user_name: user
-    partner_id: 1234
-    administrator_secret: abcd
-    secret: efgh
+    user_name: testUser
+    partner_id: 54321
+    administrator_secret: YOUR_ADMIN_SECRET
+    secret: YOUR_USER_SECRET
     service_url: http://www.kaltura.com
     timeout: 60

@@ -33,9 +33,9 @@
 
 // Account specific constants
 // TODO: update this
-#define ADMIN_SECRET (@"1234abcd")
-#define PARTNER_ID (1234)
-#define USER_ID (@"user")
+#define ADMIN_SECRET (@"YOUR_ADMIN_SECRET")
+#define PARTNER_ID (54321)
+#define USER_ID (@"testUser")
 
 // Fixed constants
 #define UPLOAD_FILENAME (@"DemoVideo.flv")

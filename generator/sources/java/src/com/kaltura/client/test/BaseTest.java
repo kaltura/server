@@ -65,10 +65,6 @@ public class BaseTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		if (KalturaTestConfig.SECRET.length() == 0) {
-			throw new Error("Please fill the partner credentials to use");
-		}
-		
 		// Create client
 		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
 		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);

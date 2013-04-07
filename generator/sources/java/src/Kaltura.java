@@ -55,10 +55,6 @@ public class Kaltura {
 	
 	public static void main(String[] args) {
 		
-		if (KalturaTestConfig.SECRET.length() == 0) {
-			throw new Error("Please fill the partner credentials to use in the KalturaTestConfig class");
-		}
-		
 		try {
 
 			list();

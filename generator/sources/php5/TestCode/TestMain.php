@@ -38,11 +38,6 @@ class TestMain implements IKalturaLogger
 
 	public static function run()
 	{
-		if(!KalturaTestConfiguration::SECRET)
-		{
-			throw new Exception("Please fill the partner credentials in KalturaTestConfiguration class");
-		}
-		
 		$test = new TestMain();
 		$test->listActions();
 		$test->multiRequest();
