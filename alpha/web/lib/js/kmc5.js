@@ -674,7 +674,7 @@ kmc.preview_embed = {
 				fv = item.flashvars || {};
 				// Add streamerType and mediaProtocol
 				if(item.streamerType)
-					fv.streamerType = item.steamerType;
+					fv.streamerType = item.streamerType;
 				if(item.mediaProtocol)
 					fv.mediaProtocol = item.mediaProtocol;
 
