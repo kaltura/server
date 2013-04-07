@@ -33,7 +33,7 @@ $files = array();
 $returnValue = null;
 while (false !== ($fileName = $dir->read()))
 {
-	if($fileName[0] == '.')
+	if($fileName[0] == '.' || is_dir("$dirPath/$fileName"))
 		continue;
 
 	$files[] = $fileName;
@@ -43,7 +43,7 @@ while (false !== ($fileName = $dir->read()))
 foreach($files as $index => $fileName)
 {
 	$filePath = realpath("$dirPath/$fileName");
-	if(is_dir($filePath) || !preg_match('/\[permissions\]/', file_get_contents($filePath)))
+	if(!preg_match('/\[permissions\]/', file_get_contents($filePath)))
 		continue;
 	
 	unset($files[$index]);
