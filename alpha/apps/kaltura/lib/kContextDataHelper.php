@@ -145,6 +145,8 @@ class kContextDataHelper
 	
 	private function applyAccessControlOnContextData(accessControlScope $accessControlScope)
 	{
+		if($this->isAdmin)
+			return;
 		$accessControl = $this->entry->getAccessControl();		
 		/* @var $accessControl accessControl */
 		if ($accessControl && $accessControl->hasRules())
