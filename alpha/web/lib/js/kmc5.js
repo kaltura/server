@@ -671,13 +671,13 @@ kmc.preview_embed = {
 		var fv = {};
 		$.each(kmc.vars.delivery_types, function(id, item) {
 			if( typeId == id ) {
-				fv = item.flashvars;
+				fv = item.flashvars || {};
 				// Add streamerType and mediaProtocol
 				if(item.streamerType)
 					fv.streamerType = item.steamerType;
 				if(item.mediaProtocol)
 					fv.mediaProtocol = item.mediaProtocol;
-				
+
 				return false;
 			}
 		});
