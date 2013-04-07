@@ -93,6 +93,7 @@ while(count($partners))
 		$dbPermission->save();
 	}
 	
+	kMemoryManager::clearMemory();
 	$criteria->setOffset($offset);
 	$partners = PartnerPeer::retrieveByPKs($stmt->fetchAll(PDO::FETCH_COLUMN));
 	usleep(100);

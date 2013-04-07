@@ -2,9 +2,9 @@
 /**
  * enable feature for each partner
  * exmaples:
- * php enablePermissionForEachPartners.php FEATURE_ENTRY_REPLACEMENT 2 realrun 
+ * php enablePermissionForEachPartners.php FEATURE_ENTRY_REPLACEMENT 2 realrun
  * php enablePermissionForEachPartners.php FEATURE_ENTRY_REPLACEMENT_APPROVAL 2 realrun
- *  
+ *
  * @package Deployment
  * @subpackage updates
  */
@@ -41,7 +41,7 @@ $partners = PartnerPeer::doSelect ( $c, $con );
 while ( count ( $partners ) ) {
 	foreach ( $partners as $partner ) {
 		/* @var $partner partner */
-		echo 'set permission ' . $permissionName . ' for  partner id: ' . $partner->getId();
+		KalturaLog::debug("Set permission [$permissionName] for partner id [" . $partner->getId () . "]");
 		$dbPermission = PermissionPeer::getByNameAndPartner ( $permissionName, $partner->getId () );
 		var_dump($dbPermission);
 		if (!$dbPermission) {
@@ -49,20 +49,18 @@ while ( count ( $partners ) ) {
 			$dbPermission = new Permission ();
 			$dbPermission->setType ( $permissionType );
 			$dbPermission->setPartnerId ( $partner->getId ());
-			$dbPermission->setStatus ( PermissionStatus::ACTIVE );
 			$dbPermission->setName($permissionName);
 		}
 		
 		$dbPermission->setStatus ( PermissionStatus::ACTIVE );
 		$dbPermission->save ();
-		
 	}
 
-	
+	kMemoryManager::clearMemory();
 	$c->setOffset($offset);
 	$partners = PartnerPeer::doSelect ( $c, $con );
 	sleep ( 1 );
 	$offset += $countLimitEachLoop;
 }
 
-
+KalturaLog::debug("Done");
