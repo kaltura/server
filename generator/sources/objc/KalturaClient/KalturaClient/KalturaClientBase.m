@@ -550,6 +550,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 @synthesize partnerId = _partnerId;
 @synthesize requestTimeout = _requestTimeout;
 @synthesize logger = _logger;
+@synthesize requestHeaders = _requestHeaders;
 
 - (id)init
 {
@@ -557,10 +558,11 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     if (self == nil)
         return nil;
 
-    self.clientTag = @"objCLib";
+    self.clientTag = @"objCLib:@DATE@";
     self.partnerId = -1;
     self.serviceUrl = @"http://www.kaltura.com";
     self.requestTimeout = 10;
+	self.requestHeaders = [[NSDictionary alloc] init];
     
     return self;
 }
@@ -570,6 +572,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     [self->_serviceUrl release];
     [self->_clientTag release];
     [self->_logger release];
+    [self->_requestHeaders release];
     [super dealloc];
 }
 
@@ -597,6 +600,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 @synthesize ks = _ks;
 @synthesize apiVersion = _apiVersion;
 @synthesize params = _params;
+@synthesize responseHeaders = _responseHeaders;
 
 - (id)initWithConfig:(KalturaClientConfiguration*)aConfig
 {
@@ -626,6 +630,8 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     [self->_request clearDelegatesAndCancel];
     [self->_request release];
     self->_request = nil;
+    [self->_responseHeaders release];
+	self->_responseHeaders = nil;
     [self->_apiStartTime release];
     self->_apiStartTime = nil;
 	self->_skipParser.delegate = nil;
@@ -714,6 +720,9 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     self->_request.shouldWaitToInflateCompressedResponses = NO;
 	self->_request.uploadProgressDelegate = self.uploadProgressDelegate;
 	self->_request.downloadProgressDelegate = self.downloadProgressDelegate;
+
+	for(NSString* key in self.config.requestHeaders)
+		[self->_request addRequestHeader:key value:[self.config.requestHeaders objectForKey:key]];
 
     [self addGlobalParamsAndSign];
     [self->_params addToRequest:self->_request];
@@ -887,6 +896,12 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 
 - (void)request:(ASIHTTPRequest *)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
 {
+    self->_responseHeaders = [responseHeaders retain];
+    
+    NSString* serverName = [responseHeaders objectForKey:@"X-Me"];
+    NSString* sessionName = [responseHeaders objectForKey:@"X-Kaltura-Session"];
+    [self logFormat:@"server: %@, session: %@", serverName, sessionName];
+    
     int statusCode = [request responseStatusCode];
     
     if (statusCode != 200)

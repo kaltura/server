@@ -201,6 +201,7 @@ typedef enum
 @property (nonatomic, assign) int partnerId;
 @property (nonatomic, assign) int requestTimeout;
 @property (nonatomic, retain) id<KalturaLogger> logger;
+@property (nonatomic, copy) NSDictionary* requestHeaders;
 
 @end
 
@@ -235,6 +236,7 @@ typedef enum
 @property (nonatomic, copy) NSString* ks;
 @property (nonatomic, copy) NSString* apiVersion;
 @property (nonatomic, readonly) KalturaParams* params;
+@property (nonatomic, readonly) NSDictionary* responseHeaders;
 
     // public messages
 - (id)initWithConfig:(KalturaClientConfiguration*)aConfig;
