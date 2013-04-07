@@ -55,7 +55,7 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 			 * Note: For PHP 5.3 the exception re-throw should be enhanced with 'e->getPrevious()'
 			 */
 		$ex=null;
-		for($iEx=0; $iEx<3; $iEx++) {
+		for($iEx=0; $iEx<5; $iEx++) {
 			try {
 					/*
 					 * Successfull execution attempt
@@ -74,7 +74,7 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 					 */ 
 				if(strstr($logStr,"Progress:100")==false)
 					break;
-				$secsToSleep=10;
+				$secsToSleep=rand(10,30);
 				KalturaLog::info("EE got hang up. Waiting $secsToSleep sec for next attempt. Attempt:$iEx");
 				sleep($secsToSleep);
 			}
