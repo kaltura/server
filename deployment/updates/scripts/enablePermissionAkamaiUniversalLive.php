@@ -95,6 +95,7 @@ while(count($partners))
 	
 	kMemoryManager::clearMemory();
 	$criteria->setOffset($offset);
+	$stmt = PermissionPeer::doSelectStmt($criteria, $con);
 	$partners = PartnerPeer::retrieveByPKs($stmt->fetchAll(PDO::FETCH_COLUMN));
 	usleep(100);
 	$offset += $countLimitEachLoop;
