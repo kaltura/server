@@ -125,6 +125,9 @@ class KDLWrap
 		
 		$xml=KDLProcessor::ProceessFlavorsForCollection($kdlFlavorList);
 		KalturaLog::log(__METHOD__."-->".$xml."<--");
+		foreach ($kdlFlavorList as $kdlFlavor){
+			$kdlFlavor->_cdlObject->setVideoBitrate($kdlFlavor->_video->_bitRate);
+		}
 		return $xml;
 	}
 
