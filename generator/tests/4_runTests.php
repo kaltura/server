@@ -14,24 +14,18 @@ function runJavaTests($clientRoot)
 
 	chdir("{$clientRoot}/bin");
 
-	// unpack external jars
-	foreach ($externalJars as $externalJar)
-	{
-		executeCommand("\"{$jdkPath}jar.exe\" xf ../lib/{$externalJar}");
-	}
-
 	// compile the client library
 	executeCommand("\"{$jdkPath}javac.exe\" -d . -sourcepath ../src -cp ".implode(';', addPrefix($externalJars, '../lib/'))." ../src/com/kaltura/client/test/KalturaTestSuite.java");
 
-	// repack
-	executeCommand("\"{$jdkPath}jar.exe\" cvf full.jar .");
+	// pack the client library
+	executeCommand("\"{$jdkPath}jar.exe\" cvf kalturaClient.jar .");
 
 	// run the tests
 	copy("{$clientRoot}/src/DemoImage.jpg", "{$clientRoot}/bin/DemoImage.jpg");
 	copy("{$clientRoot}/src/DemoVideo.flv", "{$clientRoot}/bin/DemoVideo.flv");
 	
 	chdir($clientRoot);
-	executeCommand("\"{$jdkPath}java.exe\" -cp bin/full.jar org.junit.runner.JUnitCore com.kaltura.client.test.KalturaTestSuite");
+	executeCommand("\"{$jdkPath}java.exe\" -cp bin/kalturaClient.jar;".implode(';', addPrefix($externalJars, 'lib/'))." org.junit.runner.JUnitCore com.kaltura.client.test.KalturaTestSuite");
 }
 
 function runCSharpTests($clientRoot)
