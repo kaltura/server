@@ -313,7 +313,7 @@ class kContextDataHelper
 			else 
 				$deliveryType = kDeliveryUtils::getDeliveryTypeFromConfig($defaultDeliveryTypeKey);
 			
-			if($deliveryType)
+			if(!$deliveryType)
 				$deliveryType = array();
 			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
 			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
