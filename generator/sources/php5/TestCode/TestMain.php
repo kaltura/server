@@ -42,7 +42,7 @@ class TestMain implements IKalturaLogger
 		$test->listActions();
 		$test->multiRequest();
 		$test->add();
-		echo "\nSample code finished successfully.";
+		echo "\nFinished running client library tests\n";
 	}
 	
 	private function getKalturaClient($partnerId, $adminSecret, $isAdmin)

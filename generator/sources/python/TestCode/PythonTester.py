@@ -256,3 +256,5 @@ assert(multiResult[1].code == 'ENTRY_ID_NOT_FOUND')
 
 SampleMetadataOperations()
 AdvancedMultiRequestExample()
+
+print 'Finished running client library tests'

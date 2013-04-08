@@ -37,6 +37,7 @@ class ZendClientTester
 				}
 			}
 		}
+		echo "\nFinished running client library tests\n";
 	}
 	
 	public function testSyncFlow()
