@@ -473,6 +473,14 @@ class Kaltura_Client_ClientBase
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getApiVersion()
+	{
+		return $this->apiVersion;
+	}
+
+	/**
 	 * @return Kaltura_Client_Configuration
 	 */
 	public function getConfig()
