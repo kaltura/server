@@ -17,6 +17,8 @@ class KalturaResponseCacher extends kApiCache
 		
 	protected $_defaultExpiry = 600;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
+	
+	private $clientTag;
 		
 	public function __construct($params = null, $cacheType = kCacheManager::CACHE_TYPE_API_V3, $expiry = 0)
 	{
@@ -37,6 +39,10 @@ class KalturaResponseCacher extends kApiCache
 			unset($this->_params[$name]);
 		
 		unset($this->_params['kalsig']);
+		
+		if(isset($this->_params['clientTag']))
+			$this->clientTag = $this->_params['clientTag'];
+		
 		unset($this->_params['clientTag']);
 		unset($this->_params['callback']);
 		
@@ -211,6 +217,9 @@ class KalturaResponseCacher extends kApiCache
 		if (parent::isAnonymous($ks))
 			return true;
 		else if(!$ks)
+			return false;
+			
+		if(isset($this->clientTag) && strpos($this->clientTag, 'kmc') === 0)
 			return false;
         
 		// force caching of actions listed in kConf even if admin ks is used
