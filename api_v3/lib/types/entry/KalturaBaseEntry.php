@@ -45,6 +45,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter eq
+	 * @requiresPermission
 	 */
 	public $userId;
 	
