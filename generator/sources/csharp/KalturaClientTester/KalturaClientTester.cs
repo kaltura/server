@@ -79,9 +79,6 @@ namespace Kaltura
             {
                 Console.WriteLine("Failed AdvancedMultiRequestExample: " + e1.Message);
             }
-
-            Console.WriteLine("Client testing is over, press any key to exit");	    
-            Console.ReadKey();
         }
 
         static KalturaConfiguration GetConfig()
