@@ -293,7 +293,7 @@ package com.kaltura.delegates {
 			if (!kError) {
 				kError = new KalturaError();
 				kError.errorMsg = event.text;
-				//kError.errorCode;
+				kError.errorCode = event.type; 	// either IOErrorEvent.IO_ERROR or SecurityErrorEvent.SECURITY_ERROR
 			}
 
 			call.handleError(kError);
