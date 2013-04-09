@@ -408,6 +408,9 @@ class kUrlManager
 		$urlManagers = kConf::getMap('url_managers');
 		foreach($urlManagers as $cdnHost => $data)
 		{
+			if (!isset($data["class"]))
+				continue;
+
 			$class = $data["class"];
 			$params = @$data["params"];
 			$manager = new $class(null, $params);
@@ -416,6 +419,13 @@ class kUrlManager
 			if ($result !== false)
 				return $result;
 		}
+
+		// if the host wasnt specificed in the url_managers.ini use the http HTTP_X_FORWARDED_HOST or HOST header
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
+			return $_SERVER['HTTP_X_FORWARDED_HOST'];
+
+		if (isset($_SERVER['HTTP_HOST']))
+			return $_SERVER['HTTP_HOST'];
 
 		return false;
 	}
