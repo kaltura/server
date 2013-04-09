@@ -1,4 +1,4 @@
-/*! KMC - v6.0.1 - 2013-03-28
+/*! KMC - v6.0.1 - 2013-04-09
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2751,7 +2751,8 @@ QRBitBuffer.prototype = {
 
 	Preview.emptyDiv = function(divId) {
 		var container = document.getElementById(divId);
-		container.innerHTML = '';
+		if( container )
+			container.innerHTML = '';
 		return container;
 	};
 
@@ -3048,6 +3049,7 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 	$scope.playerOnly = false;
 	$scope.liveBitrates = false;
 	$scope.showAdvancedOptionsStatus = Preview.getDefault('showAdvancedOptions');
+	$scope.shortLinkGenerated = false;
 
 	// Set players on update
 	$scope.$on('playersUpdated', function(e, options) {
@@ -3119,15 +3121,17 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 		if(!Preview.hasIframe()) {
 			Preview.generateIframe($scope.embedCodePreview);
 		}
-		// Generate QR Code
-		Preview.generateQrCode(previewUrl);
 		// Update Short url
 		$scope.previewUrl = 'Updating...';
+		$scope.shortLinkGenerated = false;
 		Preview.generateShortUrl(previewUrl, function(tinyUrl) {
 			if(!tinyUrl) {
 				tinyUrl = 'Error in generating short link';
 			}
+			$scope.shortLinkGenerated = true;
 			$scope.previewUrl = tinyUrl;
+			// Generate QR Code
+			Preview.generateQrCode(tinyUrl);			
 			draw();
 		});
 	});

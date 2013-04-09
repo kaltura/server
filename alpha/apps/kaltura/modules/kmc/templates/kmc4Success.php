@@ -98,7 +98,8 @@ var kmc = {
 				</div>
 				<div class="qr-block">
 					<small class="help-block">Scan the QR code to preview in your mobile device</small>
-					<div id="qrcode"></div>
+					<div ng-hide="shortLinkGenerated" class="qr-placeholder"><div class="qr-text">Generating...</div></div>
+					<div ng-show="shortLinkGenerated" id="qrcode"></div>
 					<div class="hr"></div>
 				</div>
 				<small class="help-block">View a standalone page with this player</small>
