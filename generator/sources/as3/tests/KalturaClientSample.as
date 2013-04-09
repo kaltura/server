@@ -36,8 +36,8 @@
 
 	public class KalturaClientSample extends Sprite
 	{
-		private const API_SECRET = "YOUR_USER_SECRET";
-		private const KALTURA_PARTNER_ID = "54321";
+		private const API_SECRET:String = "YOUR_USER_SECRET";
+		private const KALTURA_PARTNER_ID:int = 54321;
 		
 		public function KalturaClientSample()
 		{
