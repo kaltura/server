@@ -322,7 +322,7 @@ class playManifestAction extends kalturaAction
 		$flavorId = $this->getRequestParameter ( "flavorId", null );
 		if (!is_null($flavorId))
 			$this->flavorIds = array($flavorId);
-			
+						
 		if (!is_null($this->flavorIds))
 			return;
 
@@ -435,8 +435,6 @@ class playManifestAction extends kalturaAction
 				{
 					if (!$flavorAsset->hasTag($tagOption))
 						continue;
-					if(!$this->secureEntryHelper->isAssetAllowed($flavorAsset))
-						continue;
 					$curFlavors[] = $flavorAsset;
 					break;
 				}
@@ -446,6 +444,20 @@ class playManifestAction extends kalturaAction
 				return $curFlavors;
 		}		
 		return array();
+	}
+	
+	private function removeNotAllowedFlavors($flavorAssets)
+	{
+		$returnedFlavors = array();		
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			if ($this->secureEntryHelper->isAssetAllowed($flavorAsset))
+			{
+				$returnedFlavors[] = $flavorAsset;
+			}
+		}
+	
+		return $returnedFlavors;
 	}
 	
 	/**
@@ -492,19 +504,20 @@ class playManifestAction extends kalturaAction
 		}
 				
 		// get initial flavor list by input
-		$flavorAssets = array();		
+		$flavorAssets = array();
 		if ($this->flavorIds)
 		{
-			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);			
+			$flavorAssets = assetPeer::retrieveReadyByEntryId($this->entryId, $this->flavorIds);
+			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);		
 		}
-		if (!$flavorAssets)
+		if (!$flavorAssets || !count($flavorAssets))
 		{
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($this->entryId); 
-		}
-		
-		// filter flavors by tags		
-		$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets);		
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+			$flavorAssets = $this->getReadyFlavorsByTags($flavorAssets);
+			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
+			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
+		}		
 					
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
