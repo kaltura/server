@@ -27,16 +27,25 @@ function listDir($path)
 	return $result;
 }
 
-function executeCommand($cmd)
+function executeCommand($exe, $params = null)
 {
+	if ($exe)
+	{
+		$cmd = "\"{$exe}\"";
+		if ($params)
+			$cmd .= " {$params}";
+	}
+	else
+		$cmd = $params;
+
 	echo "Running {$cmd}\n";
 	system($cmd);
 }
 
-function executeCommandFrom($path, $cmd)
+function executeCommandFrom($path, $exe, $params = null)
 {
 	chdir($path);
-	executeCommand($cmd);
+	executeCommand($exe, $params);
 }
 
 function addPrefix($arr, $prefix)

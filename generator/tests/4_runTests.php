@@ -15,17 +15,24 @@ function runJavaTests($clientRoot)
 	chdir("{$clientRoot}/bin");
 
 	// compile the client library
-	executeCommand("\"{$jdkPath}javac.exe\" -d . -sourcepath ../src -cp ".implode(';', addPrefix($externalJars, '../lib/'))." ../src/com/kaltura/client/test/KalturaTestSuite.java");
+	executeCommand("{$jdkPath}javac.exe", "-d . -sourcepath ../src -cp ".implode(';', addPrefix($externalJars, '../lib/'))." ../src/com/kaltura/client/test/KalturaTestSuite.java");
 
 	// pack the client library
-	executeCommand("\"{$jdkPath}jar.exe\" cvf kalturaClient.jar .");
+	executeCommand("{$jdkPath}jar.exe", "cvf kalturaClient.jar .");
 
 	// run the tests
 	copy("{$clientRoot}/src/DemoImage.jpg", "{$clientRoot}/bin/DemoImage.jpg");
 	copy("{$clientRoot}/src/DemoVideo.flv", "{$clientRoot}/bin/DemoVideo.flv");
 	
+	$log4jConfig = str_replace('\\', '/', "{$clientRoot}/src/log4j/log4j.properties");
+	if ($log4jConfig[1] == ':')
+		$log4jConfig = substr($log4jConfig, 2);		
+	$log4jParam = "-Dlog4j.configuration=file://{$log4jConfig}";
+	
+	$jarList = "bin/kalturaClient.jar;".implode(';', addPrefix($externalJars, 'lib/'));
+	
 	chdir($clientRoot);
-	executeCommand("\"{$jdkPath}java.exe\" -cp bin/kalturaClient.jar;".implode(';', addPrefix($externalJars, 'lib/'))." org.junit.runner.JUnitCore com.kaltura.client.test.KalturaTestSuite");
+	executeCommand("{$jdkPath}java.exe", "-cp {$jarList} {$log4jParam} org.junit.runner.JUnitCore com.kaltura.client.test.KalturaTestSuite");
 }
 
 function runCSharpTests($clientRoot)
@@ -55,8 +62,7 @@ function runCSharpTests($clientRoot)
 		unlink($exeFile);
 	
 	// compile
-	$devenvBinary = $config['csharp']['devenv_bin'];
-	executeCommandFrom($clientRoot, "\"{$devenvBinary}\" /build Debug KalturaClient.sln");
+	executeCommandFrom($clientRoot, $config['csharp']['devenv_bin'], "/build Debug KalturaClient.sln");
 	
 	// wait for compilation to end
 	$startTime = microtime(true);
@@ -65,6 +71,12 @@ function runCSharpTests($clientRoot)
 		if (file_exists($exeFile))
 			break;
 		sleep(1);
+	}
+	
+	if (!file_exists($exeFile))
+	{
+		echo "Error: failed to compile {$exeFile}\n";
+		return;
 	}
 	
 	// run the tests
@@ -83,20 +95,24 @@ runJavaTests(dirname(__file__) . '/java');
 
 // Php5
 echo "Php5\n==================\n";
-executeCommandFrom(dirname(__file__) . '/php5/TestCode', $config['php']['php_bin'] . ' TestMain.php');
+executeCommandFrom(dirname(__file__) . '/php5/TestCode', $config['php']['php_bin'], 'TestMain.php');
 
 // Php5Zend
 echo "Php5Zend\n==================\n";
-executeCommandFrom(dirname(__file__) . '/php5Zend/tests', $config['php']['php_bin'] . ' run.php');
+executeCommandFrom(dirname(__file__) . '/php5Zend/tests', $config['php']['php_bin'], 'run.php');
 
 // Php53
 echo "Php5.3\n==================\n";
-executeCommandFrom(dirname(__file__) . '/php53/tests', $config['php']['php_bin'] . ' run.php');
+executeCommandFrom(dirname(__file__) . '/php53/tests', $config['php']['php_bin'], 'run.php');
 
 // Python
 echo "Python\n==================\n";
-executeCommandFrom(dirname(__file__) . '/python/TestCode', $config['python']['python_bin'] . ' PythonTester.py');
+executeCommandFrom(dirname(__file__) . '/python/TestCode', $config['python']['python_bin'], 'PythonTester.py');
 
 // Ruby
 echo "Ruby\n==================\n";
-executeCommandFrom(dirname(__file__) . '/ruby', $config['ruby']['rake_bin'] . ' test');
+executeCommandFrom(dirname(__file__) . '/ruby', null, 'echo y | ' . $config['ruby']['rake_bin'] . ' test');
+
+// Flex3.5 (test compilation only)
+echo "Flex3.5\n==================\n";
+executeCommandFrom(dirname(__file__) . '/flex35', $config['flex35']['mxmlc_bin'], "-sp tests . -- tests/KalturaClientSample.as");
