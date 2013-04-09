@@ -100,8 +100,16 @@ class previewAction extends kalturaAction
 				$flashVars[$key] = $val;
 			}
 			//Check for playlist name
-			if( isset($_GET['flashvars']['kpl0Name']) ) {
-				$playlist_name = htmlspecialchars($_GET['flashvars']['kpl0Name']);
+			if( isset($_GET['flashvars']['playlistAPI.kpl0Name']) ) {
+				$playlist_name = htmlspecialchars($_GET['flashvars']['playlistAPI.kpl0Name']);
+			}
+			// Get playlist name from playlist id
+			if( isset($_GET['flashvars']['playlistAPI.kpl0Id']) ) {
+				$playlistId = htmlspecialchars($_GET['flashvars']['playlistAPI.kpl0Id']);
+				$playlist = entryPeer::retrieveByPK($playlistId);
+				if( $playlist ) {
+					$playlist_name = $playlist->getName();
+				}
 			}
 		} else {
 			$this->partner_host = myPartnerUtils::getHost($this->partner_id);
@@ -121,8 +129,10 @@ class previewAction extends kalturaAction
 				$playlist_url = $this->partner_host ."/index.php/partnerservices2/executeplaylist?";
 				$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}&playlist_id=" . $this->playlist_id;
 
+				$playlist_name = htmlspecialchars($this->getRequestParameter('playlist_name'));
+
 				// Add playlist flashVars
-				$flashVars["playlistAPI.kpl0Name"] = htmlspecialchars($this->getRequestParameter('playlist_name'));
+				$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
 				$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
 			}
 		}
