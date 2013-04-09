@@ -2,9 +2,14 @@
 
 require_once('utils.php');
 
-chdir(dirname(__file__));
+if ($argc < 2)
+	die("Usage:\n\tphp " . basename(__file__) . " <root dir>\n");
+	
+$rootDir = fixSlashes($argv[1]);
 
-$fileList = listDir(dirname(__file__));
+chdir($rootDir);
+
+$fileList = listDir($rootDir);
 foreach ($fileList as $file)
 {
 	if(endsWith($file, '.tar.gz'))

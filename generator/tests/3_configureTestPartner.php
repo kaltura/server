@@ -2,6 +2,11 @@
 
 require_once('utils.php');
 
+if ($argc < 2)
+	die("Usage:\n\tphp " . basename(__file__) . " <root dir>\n");
+	
+$rootDir = fixSlashes($argv[1]);
+
 $config = parse_ini_file(dirname(__file__) . '/config.ini', true);
 
 $search = array(
@@ -14,4 +19,4 @@ $replace = array(
 	$config['general']['user_secret'],
 	$config['general']['admin_secret']);
 
-replaceInFolder(dirname(__file__), null, array('.tar.gz', 'configureTestPartner.php'), $search, $replace);
+replaceInFolder($rootDir, null, array('.tar.gz', 'configureTestPartner.php'), $search, $replace);

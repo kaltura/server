@@ -1,9 +1,15 @@
 <?php
 
-if ($argc < 2)
-	die("Usage:\n\tphp " . basename(__file__) . " <clients name>\n");
+require_once('utils.php');
+
+if ($argc < 3)
+	die("Usage:\n\tphp " . basename(__file__) . " <clients name> <target dir>\n");
 	
 $clientsName = $argv[1];
+$targetDir = fixSlashes($argv[2]);
+
+if (!is_dir($targetDir))
+	mkdir($targetDir, 0777, true);
 
 $config = parse_ini_file(dirname(__file__) . '/config.ini', true);
 
@@ -20,7 +26,7 @@ foreach ($summary as $index => $name)
 	
 	$fileName = "{$name}_{$generatedDate}.tar.gz";
 	$fileUrl = "http://{$serverName}/{$clientsName}/{$fileName}";
-	$localPath = str_replace('\\', '/', dirname(__file__) . "/{$fileName}");
+	$localPath = "{$targetDir}/{$fileName}";
 	
 	echo "Downloading {$fileUrl} to {$localPath}\n";
 	$clientTarGz = file_get_contents($fileUrl);

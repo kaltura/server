@@ -24,7 +24,7 @@ function runJavaTests($clientRoot)
 	copy("{$clientRoot}/src/DemoImage.jpg", "{$clientRoot}/bin/DemoImage.jpg");
 	copy("{$clientRoot}/src/DemoVideo.flv", "{$clientRoot}/bin/DemoVideo.flv");
 	
-	$log4jConfig = str_replace('\\', '/', "{$clientRoot}/src/log4j/log4j.properties");
+	$log4jConfig = fixSlashes("{$clientRoot}/src/log4j/log4j.properties");
 	if ($log4jConfig[1] == ':')
 		$log4jConfig = substr($log4jConfig, 2);		
 	$log4jParam = "-Dlog4j.configuration=file://{$log4jConfig}";
@@ -57,7 +57,7 @@ function runCSharpTests($clientRoot)
 	replaceInFolder($clientRoot, array('.sln', '.csproj'), null, $search, $replace);
 
 	// clean up
-	$exeFile = str_replace('\\', '/', "{$clientRoot}/KalturaClientTester/bin/Debug/KalturaClientTester.exe");
+	$exeFile = fixSlashes("{$clientRoot}/KalturaClientTester/bin/Debug/KalturaClientTester.exe");
 	if (file_exists($exeFile))
 		unlink($exeFile);
 	
@@ -83,36 +83,41 @@ function runCSharpTests($clientRoot)
 	executeCommandFrom("{$clientRoot}/KalturaClientTester", $exeFile);
 }
 
+if ($argc < 2)
+	die("Usage:\n\tphp " . basename(__file__) . " <root dir>\n");
+	
+$rootDir = fixSlashes($argv[1]);
+
 $config = parse_ini_file(dirname(__file__) . '/config.ini', true);
 
 // C#
 echo "C#\n==================\n";
-runCSharpTests(dirname(__file__) . '/csharp');
+runCSharpTests("{$rootDir}/csharp");
 
 // Java
 echo "Java\n==================\n";
-runJavaTests(dirname(__file__) . '/java');
+runJavaTests("{$rootDir}/java");
 
 // Php5
 echo "Php5\n==================\n";
-executeCommandFrom(dirname(__file__) . '/php5/TestCode', $config['php']['php_bin'], 'TestMain.php');
+executeCommandFrom("{$rootDir}/php5/TestCode", $config['php']['php_bin'], 'TestMain.php');
 
 // Php5Zend
 echo "Php5Zend\n==================\n";
-executeCommandFrom(dirname(__file__) . '/php5Zend/tests', $config['php']['php_bin'], 'run.php');
+executeCommandFrom("{$rootDir}/php5Zend/tests", $config['php']['php_bin'], 'run.php');
 
 // Php53
 echo "Php5.3\n==================\n";
-executeCommandFrom(dirname(__file__) . '/php53/tests', $config['php']['php_bin'], 'run.php');
+executeCommandFrom("{$rootDir}/php53/tests", $config['php']['php_bin'], 'run.php');
 
 // Python
 echo "Python\n==================\n";
-executeCommandFrom(dirname(__file__) . '/python/TestCode', $config['python']['python_bin'], 'PythonTester.py');
+executeCommandFrom("{$rootDir}/python/TestCode", $config['python']['python_bin'], 'PythonTester.py');
 
 // Ruby
 echo "Ruby\n==================\n";
-executeCommandFrom(dirname(__file__) . '/ruby', null, 'echo y | ' . $config['ruby']['rake_bin'] . ' test');
+executeCommandFrom("{$rootDir}/ruby", null, 'echo y | ' . $config['ruby']['rake_bin'] . ' test');
 
 // Flex3.5 (test compilation only)
 echo "Flex3.5\n==================\n";
-executeCommandFrom(dirname(__file__) . '/flex35', $config['flex35']['mxmlc_bin'], "-sp tests . -- tests/KalturaClientSample.as");
+executeCommandFrom("{$rootDir}/flex35", $config['flex35']['mxmlc_bin'], "-sp tests . -- tests/KalturaClientSample.as");

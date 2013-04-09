@@ -1,5 +1,10 @@
 <?php
 
+function fixSlashes($str)
+{
+	return str_replace('\\', '/', $str);
+}
+
 function endsWith($str, $postfix) 
 {
 	if (is_array($postfix))
