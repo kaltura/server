@@ -82,7 +82,13 @@ class kContentDistributionManager
 		$c->add(FileSyncPeer::PARTNER_ID, $entryDistribution->getPartnerId());
 		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 		$fileSyncs = FileSyncPeer::doSelect($c);
-		
+
+		if(!$fileSyncs)
+  		{
+   			KalturaLog::debug("No file syncs to distribute");
+   			return true;
+  		}
+  		
 		$dcs = array();
 		foreach($fileSyncs as $fileSync)
 		{
