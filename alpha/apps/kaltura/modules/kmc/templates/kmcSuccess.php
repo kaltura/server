@@ -1,6 +1,6 @@
 <style>
- body { background-color:#272929 !important; background-image:none !important;}
-  div#login { width:500px; margin: 0 auto; text-align:center;}
+body { background-color:#272929 !important; background-image:none !important;}
+div#login { width:500px; margin: 0 auto; text-align:center;}
 </style>
 
 <div id="kmcHeader">
