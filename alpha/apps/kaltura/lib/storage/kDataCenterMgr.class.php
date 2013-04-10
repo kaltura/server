@@ -228,7 +228,7 @@ class kDataCenterMgr
 		if (!file_exists($resolvedPath))
 		{
 			$file_name_msg = $file_name ? "file name [$file_name] " : '';
-			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist";
+			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist, resolved path [$resolvedPath]";
 			KalturaLog::err($error); 
 			throw new Exception ( $error );	
 		}
