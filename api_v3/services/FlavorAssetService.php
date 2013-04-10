@@ -844,9 +844,9 @@ class FlavorAssetService extends KalturaAssetService
 	
 	
 	/**
-	 * @action export
+	 * manually export an asset
 	 * 
-	 * Action for manually exporting an asset
+	 * @action export
 	 * @param string $assetId
 	 * @param int $storageProfileId
 	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
@@ -860,9 +860,9 @@ class FlavorAssetService extends KalturaAssetService
 	}
 	
 	/**
-	 * @action setAsSource
+	 * Set a given flavor as the original flavor
 	 * 
-	 * Action for setting a given flavor as the original flavor
+	 * @action setAsSource
 	 * @param string $assetId
 	 * @validateUser entry entryId edit
 	 * @throws KalturaErrors::ASSET_ID_NOT_FOUND
@@ -888,7 +888,5 @@ class FlavorAssetService extends KalturaAssetService
 		// Set required as original
 		$asset->setIsOriginal(true);
 		$asset->save();
-		
-		
 	}
 }
