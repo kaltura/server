@@ -317,6 +317,8 @@ class kContextDataHelper
 				$deliveryType = array();
 			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
 			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
+			if ($this->streamerType == PlaybackProtocol::HTTP && infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS)
+				$this->mediaProtocol = 'https';
 		}
 		
 		if ($this->streamerType == PlaybackProtocol::AKAMAI_HD || $this->streamerType == PlaybackProtocol::AKAMAI_HDS)
