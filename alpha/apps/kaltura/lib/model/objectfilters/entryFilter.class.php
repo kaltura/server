@@ -130,6 +130,7 @@ class entryFilter extends baseObjectFilter
 			"_in_category_ancestor_id",
 			"_eq_creator_id",
 			"_lte_total_rank",
+			"_gte_total_rank",
 			"_lt_ms_duration",
 			"_gt_ms_duration",
 			"_lte_ms_duration",
