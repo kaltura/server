@@ -30,6 +30,7 @@ class categoryKuserFilter extends baseObjectFilter
 				"_matchor_permission_names",
 				"_matchand_permission_names",
 				"_notcontains_permission_names",
+				"_category_direct_members",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "full_name");
