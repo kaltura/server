@@ -91,7 +91,7 @@ class category extends Basecategory implements IIndexable
 			$this->addIndexCategoryKuserJob($this->getId());
 		}
 		
-		if (!$this->isNew() && 
+		if (!$this->isNew() && $this->getInheritanceType() !== InheritanceType::INHERIT &&
 			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS))
 		{
 			if ($this->getPrivacyContexts() == '')
@@ -140,7 +140,7 @@ class category extends Basecategory implements IIndexable
 			elseif ($this->inheritance_type == InheritanceType::INHERIT && 
 					$this->old_inheritance_type == InheritanceType::MANUAL)
 			{
-				$this->addDeleteCategoryKuserJob($this->getId());
+				$this->addDeleteCategoryKuserJob($this->getId(), true);
 			}
 		}
 		
@@ -563,11 +563,12 @@ class category extends Basecategory implements IIndexable
 		}
 	}
 	
-	protected function addDeleteCategoryKuserJob($categoryId)
+	protected function addDeleteCategoryKuserJob($categoryId, $deleteCategoryDirectMembersOnly = false)
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($categoryId);
-
+		$filter->set('_category_direct_members', $deleteCategoryDirectMembersOnly);
+		
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
