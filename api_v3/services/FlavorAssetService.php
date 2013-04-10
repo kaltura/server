@@ -858,4 +858,37 @@ class FlavorAssetService extends KalturaAssetService
 	{
 	    return parent::exportAction($assetId, $storageProfileId);
 	}
+	
+	/**
+	 * @action setAsSource
+	 * 
+	 * Action for setting a given flavor as the original flavor
+	 * @param string $assetId
+	 * @validateUser entry entryId edit
+	 * @throws KalturaErrors::ASSET_ID_NOT_FOUND
+	 */
+	public function setAsSourceAction($assetId)
+	{
+		// Retrieve required
+		$asset = assetPeer::retrieveById($assetId);
+		if(is_null($asset)) 
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
+		
+		if($asset->getIsOriginal())
+			return;
+		
+		// Retrieve original
+		$originalAsset = assetPeer::retrieveOriginalByEntryId($asset->getEntryId());
+		if(!is_null($originalAsset)) {
+			// Set original to non-original
+			$originalAsset->setIsOriginal(false);
+			$originalAsset->save();
+		}
+		
+		// Set required as original
+		$asset->setIsOriginal(true);
+		$asset->save();
+		
+		
+	}
 }
