@@ -59,6 +59,8 @@ function cUrl($url, $localFilePath, &$headers, $followLocation = true)
 	curl_setopt($ch, CURLOPT_STDERR, $chStdErr);
 	curl_setopt($ch, CURLOPT_VERBOSE, true);
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $followLocation);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
 	$ret = curl_exec($ch);
 	curl_close($ch);
