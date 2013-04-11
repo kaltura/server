@@ -254,7 +254,7 @@ function addParameterPermissionItem($itemCfg)
 	}
 	
 	// add item to each defined permission
-	$permissionNames = array_map('trim', explode(',', $itemCfg->permissions));
+	$permissionNames = array_map('trim', str_getcsv($itemCfg->permissions));
 	addItemToPermissions($item, $permissionNames);
 }
 
