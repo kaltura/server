@@ -7,7 +7,7 @@ class myContentStorage
 	//const MAX_OBFUSCATOR_VALUE = 900000;
 
 	
-	// TODO - IMPROVE ? - may want to include the getFSContentRootPath as the beginning of the path because it's appended to 
+	// TODO - IMPROVE ? - may want to include the getFSContentRootPath as the beginning of the path because it's appended to
 	// in the beginning everytime anyway in the caller's code - Eran ?
 	
 	
@@ -93,7 +93,7 @@ class myContentStorage
 		$parts = explode($c, $fileName);
 		
 		if (count($parts) == 2 && strlen($parts[1]))
-		{ 
+		{
 			// a template has no versions
 			$dir = '/content/templates/'.$entityName.'/';
 			$file_base = ""; //$parts[1];
@@ -105,7 +105,7 @@ class myContentStorage
 //					(intval($id / 1048576)).'/'.
 //					(intval($id / 1024) % 1024).'/';
 //
-			$dir = '/content/'.$entityName.'/'. self::dirForId ( $int_id, $id , "" ); 
+			$dir = '/content/'.$entityName.'/'. self::dirForId ( $int_id, $id , "" );
 	
 		$file_base = $id.'_'; //.$fileName;
 		}
@@ -121,7 +121,7 @@ class myContentStorage
 		if ( $files == null ) return null;
 				
 		// from each file - strip the id and the file extension
-		// use the refernce to file_tuple - it will be modified 
+		// use the refernce to file_tuple - it will be modified
 		foreach ( $files as &$file_tuple )
 		{
 			//  the file_name includes the id and the _, then the verson and finally the file extension
@@ -242,11 +242,11 @@ class myContentStorage
 		
 		if ( file_exists( $from ))
 		{
-			KalturaLog::log(__METHOD__." - $from file exists");	
+			KalturaLog::log(__METHOD__." - $from file exists");
 		}
 		else
 		{
-			KalturaLog::log(__METHOD__." - $from file doesnt exist");	
+			KalturaLog::log(__METHOD__." - $from file doesnt exist");
 		}
 		
 		if ($copy)
@@ -283,7 +283,13 @@ class myContentStorage
 		
 		//return realpath(sfConfig::get('sf_root_dir')."/../../").'/';
 	}
-
+	
+	public static function getFSTempRootPath ()
+	{
+		$dc = kDataCenterMgr::getCurrentDc();
+		return rtrim($dc["root"], '\\/') . DIRECTORY_SEPARATOR . 'tmp';
+	}
+	
 	public static function getFSFlashRootPath ()
 	{
 		return  "/flash";
@@ -309,10 +315,10 @@ class myContentStorage
 	
 	public static function moveToDeleted ( $original_path , $copy = false )
 	{
-		if ( empty ( $original_path ) ) return ""; 
+		if ( empty ( $original_path ) ) return "";
 		if ( strpos ( $original_path , "templates/" ) !== false ) return ""; // dont' delete or move template files
 		$deleted_path = self::getFSDeletedContentRootPath ( $original_path );
-		if ( $deleted_path  == null ) return ""; 
+		if ( $deleted_path  == null ) return "";
 		if ( ! file_exists( $original_path )) return "";
 		kFile::fullMkdir( $deleted_path );
 		self::moveFile( $original_path , $deleted_path , true , $copy );
@@ -321,14 +327,14 @@ class myContentStorage
 
 	public static function moveFromDeleted ( $deleted_path , $copy = false )
 	{
-		if ( empty ( $deleted_path ) ) return ""; 
+		if ( empty ( $deleted_path ) ) return "";
 		if ( strpos ( $deleted_path , "templates/" ) !== false ) return ""; // dont' undelete or move template files
 		$original_path = str_replace (  "deleted_content/" , "content/" , $deleted_path );
-		if ( $original_path  == null ) return ""; 
+		if ( $original_path  == null ) return "";
 		if ( ! file_exists( $deleted_path )) return "";
 		self::moveFile( $deleted_path , $original_path , true , $copy );
 		return $original_path;
-	}	
+	}
 	/**
 	 * This function returns the FILE SYSTEM path to the uploads folder.
 	 * @return string the uploads folder file system path
@@ -339,7 +345,7 @@ class myContentStorage
 			return myContentStorage::getFSContentRootPath()."content/uploads/";
 		else
 			return "content/uploads/";;
-	}	
+	}
 
 	public static function getFileNameEdit ( $file_name )
 	{
@@ -370,7 +376,7 @@ class myContentStorage
 		return in_array($ext, $fileExts);
 	}
 	
-	// TODO - after solving the conversion issue - FLV 
+	// TODO - after solving the conversion issue - FLV
 	public static function fileExtNeedConversion($ext)
 	{
 		$fileExts = array( "flv" , "asf", "wmv", "qt" , "mov" , "mpg", "mpeg" , "avi" , "mp3", "wav" , "wma" ,

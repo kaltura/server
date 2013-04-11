@@ -4,15 +4,15 @@ class kBusinessPreConvertDL
 {
 
 	/**
-	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion 
-	 * 
+	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
+	 *
 	 * @param string $srcFileSyncLocalPath
 	 * @param int $flavorAssetId
 	 * @param int $flavorParamsOutputId
 	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
 	 * @param int $lastEngineType
-	 * @return BatchJob 
+	 * @return BatchJob
 	 */
 	public static function redecideFlavorConvert($flavorAssetId, $flavorParamsOutputId, $mediaInfoId, BatchJob $parentJob, $lastEngineType)
 	{
@@ -35,7 +35,7 @@ class kBusinessPreConvertDL
 	}
 	
 	/**
-	 * 
+	 *
 	 * Decide from which asset grab the thumbnail.
 	 * @param string $sourceAssetId
 	 * @param string $sourceParamsId
@@ -75,12 +75,12 @@ class kBusinessPreConvertDL
 	
 	
 	/**
-	 * decideThumbGenerate is the decision layer for a single thumbnail generation 
-	 * 
+	 * decideThumbGenerate is the decision layer for a single thumbnail generation
+	 *
 	 * @param entry $entry
 	 * @param thumbParams $destThumbParams
 	 * @param BatchJob $parentJob
-	 * @return thumbAsset 
+	 * @return thumbAsset
 	 */
 	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false , $srcAsset = null)
 	{
@@ -135,7 +135,7 @@ class kBusinessPreConvertDL
 		if(!$destThumbParamsOutput)
 		{
 			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();	
+			$thumbAsset->save();
 			return null;
 		}
 
@@ -182,7 +182,7 @@ class kBusinessPreConvertDL
 			$thumbAsset->setWidth($width);
 			$thumbAsset->setHeight($height);
 			$thumbAsset->setSize(filesize($capturedPath));
-		}		
+		}
 		
 		$logPath = $capturedPath . '.log';
 		if(file_exists($logPath))
@@ -238,8 +238,8 @@ class kBusinessPreConvertDL
 	}
 		
 	/**
-	 * 
-	 * Sets the default thumb for the assets 
+	 *
+	 * Sets the default thumb for the assets
 	 * If others already exists then we don't set the asset as not default
 	 * @param thumbAsset $thumbAsset
 	 */
@@ -249,14 +249,14 @@ class kBusinessPreConvertDL
 		
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
-			//if we found another asset with a defualt tag. we remove our default tag 
+			//if we found another asset with a defualt tag. we remove our default tag
 			if($entryThumbAsset->getId() !== $thumbAsset->getId() &&
 			   $entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			   {
 			   	KalturaLog::debug("Found default tag on thumbAsset id[" . $entryThumbAsset->getId() . "]");
 			   	$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
 			   	KalturaLog::debug("Removed default tag from thumbAsset id[" .  $thumbAsset->getId() . "]");
-			   	return;   	
+			   	return;
 			   }
 		}
 	}
@@ -274,7 +274,7 @@ class kBusinessPreConvertDL
 		
 		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
-		$destPath = kConf::get('temp_folder') . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid.jpg;
+		$destPath = myContentStorage::getFSTempRootPath() . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid.jpg;
 		$logPath = $destPath . '.log';
 	
 		if(!file_exists($srcPath))
@@ -309,7 +309,7 @@ class kBusinessPreConvertDL
 				}
 				$srcPath = $destPath;
 				$uniqid = uniqid('thumb_');
-				$destPath = kConf::get('temp_folder') . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
+				$destPath = myContentStorage::getFSTempRootPath() . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
 			}
 			
 			$quality = $destThumbParamsOutput->getQuality();
@@ -343,17 +343,17 @@ class kBusinessPreConvertDL
 	}
 	
 	/**
-	 * batch decideAddEntryFlavor is the decision layer for adding a single flavor conversion to an entry 
+	 * batch decideAddEntryFlavor is the decision layer for adding a single flavor conversion to an entry
 	 *
 	 * @param BatchJob $parentJob
-	 * @param int $entryId 
+	 * @param int $entryId
 	 * @param int $flavorParamsId
 	 * @param string $errDescription
 	 * @param string $flavorAssetId
 	 * @param array<kOperationAttributes> $dynamicAttributes
-	 * @return BatchJob 
+	 * @return BatchJob
 	 */
-	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null, 
+	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null,
 			array $dynamicAttributes = array(), $priority = 0)
 	{
 		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
@@ -490,8 +490,8 @@ class kBusinessPreConvertDL
 	}
 	
 	/**
-	 * batch validateConversionProfile validates profile completion rules 
-	 * 
+	 * batch validateConversionProfile validates profile completion rules
+	 *
 	 * @param mediaInfo $mediaInfo
 	 * @param array $flavors is array of flavorParams
 	 * @param string $errDescription
@@ -509,7 +509,7 @@ class kBusinessPreConvertDL
 //				$outFlavor = new flavorParamsOutputWrap();
 //				$ret[] = flavorParamsOutputPeer::doCopy($flavor, $outFlavor);
 //			}
-//			return $ret; 
+//			return $ret;
 		}
 		else
 		{
@@ -559,14 +559,14 @@ class kBusinessPreConvertDL
 				// Get conv.prof data for that flavor
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getFlavorParamsId()];
 
-				// Update force-transcode flag. 
+				// Update force-transcode flag.
 				// This flag might be set by the DL, therefore overide only if it is not set.
 			if(!$flavor->_force) {
 				$flavor->_force = $flavorParamsConversionProfile->getForceNoneComplied();
 			}
 				// Overwrite ready behavior from the conversion profile
 			if($flavorParamsConversionProfile->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
-				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());	
+				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());
 
 			if(!$flavor->IsValid())
 			{
@@ -610,13 +610,13 @@ class kBusinessPreConvertDL
 			return null;
 		
 				/*
-				 * For 'playset' collections (MBR & ISM) make sure that the flavor that 
+				 * For 'playset' collections (MBR & ISM) make sure that the flavor that
 				 * matches in the best way the source framee size, will be generated.
-				 * Optimally this procedure should be executed for EVERY tag. But this 
-				 * might cause generation of unrequired flavors that might potentially 
+				 * Optimally this procedure should be executed for EVERY tag. But this
+				 * might cause generation of unrequired flavors that might potentially
 				 * harm the entry playback.
-				 * Furthermore - we have duplicate iOS tagging (iphonenew and ipadnew), 
-				 * therefore anyhow at least one ipad flavor will be always generated. 
+				 * Furthermore - we have duplicate iOS tagging (iphonenew and ipadnew),
+				 * therefore anyhow at least one ipad flavor will be always generated.
 				 * The other tags are less relevant for the framesize adjustment cases.
 				 */
 		if(isset($mediaInfo)) {
@@ -646,8 +646,8 @@ class kBusinessPreConvertDL
 	}
 
 	/**
-	 * batch adjustToFramesize - verify that in the given set of target flvors, 
-	 * there is at least one flavor that matches (or as close as possible) 
+	 * batch adjustToFramesize - verify that in the given set of target flvors,
+	 * there is at least one flavor that matches (or as close as possible)
 	 * to the source frame size. If there is no such flavor - set '_create_anyway' for the best matching.
 	 * The screencast sources are main cases for such adjustments, but there are other cases as well
 	 *
@@ -656,7 +656,7 @@ class kBusinessPreConvertDL
 	 */
 	protected static function adjustToFramesize(mediaInfo $source, array $targetFlavorArr)
 	{
-			/* 
+			/*
 			 * Evaluate the 'adjusted' source height, to use as a for best matching flavor.
 			 */
 		$srcHgt = 0;
@@ -689,8 +689,8 @@ KalturaLog::log("Found COMPLY/forced/create_anyway, leaving - key:$key, srcHgt:$
 			}
 			
 				/*
-				 * If 'matching-target' is unset 
-				 * - set it to the current target  
+				 * If 'matching-target' is unset
+				 * - set it to the current target
 				 */
 			if(!isset($matchSourceHeightIdx)){
 				$matchSourceHeightIdx = $key;
@@ -701,8 +701,8 @@ KalturaLog::log("Set matchSourceHeightIdx:$key, matchSourceOriginalFlavorBR:$mat
 			}
 
 				/*
-				 * If current target is smaller than 'matching-target'  
-				 * - set it to the current target  
+				 * If current target is smaller than 'matching-target'
+				 * - set it to the current target
 				 */
 			$flPrm = assetParamsPeer::retrieveByPKs(array($key));
 			$flPrmBR = $flPrm[0]->getVideoBitrate();
@@ -735,7 +735,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 	/**
 	 * validateFlavorAndMediaInfo validate and manipulate a flavor according to the given media info
-	 * 
+	 *
 	 * @param flavorParams $flavor
 	 * @param mediaInfo $mediaInfo
 	 * @param string $errDescription
@@ -774,7 +774,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 	/**
 	 * validateThumbAndMediaInfo validate and manipulate a thumbnail params according to the given media info
-	 * 
+	 *
 	 * @param thumbParams $thumbParams
 	 * @param mediaInfo $mediaInfo
 	 * @param string $errDescription
@@ -849,7 +849,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		if(!$entry->getCreateThumb())
 		{
-			// mark the asset as ready 
+			// mark the asset as ready
 			$originalFlavorAsset->setStatusLocalReady();
 			$originalFlavorAsset->save();
 			
@@ -869,10 +869,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 	/**
 	 * batch decideProfileConvert is the decision layer for a conversion profile
-	 * 
+	 *
 	 * @param BatchJob $parentJob
 	 * @param BatchJob $convertProfileJob
-	 * @param int $mediaInfoId  
+	 * @param int $mediaInfoId
 	 * @return bool true if created all required conversions
 	 */
 	public static function decideProfileConvert(BatchJob $parentJob, BatchJob $convertProfileJob, $mediaInfoId = null)
@@ -945,8 +945,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 		}
 		
-		// gets the ids of the flavor params 
-		$flavorsIds = array(); 
+		// gets the ids of the flavor params
+		$flavorsIds = array();
 		$conversionProfileFlavorParams = array();
 		foreach($list as $flavorParamsConversionProfile)
 		{
@@ -1066,7 +1066,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 					{
 						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
 						$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-						$originalFlavorAsset->save();	
+						$originalFlavorAsset->save();
 						
 						$errDescription = "Source flavor could not be converted";
 						KalturaLog::err($errDescription);
@@ -1176,8 +1176,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			throw new Exception($errDescription);
 		}
 			
-		// gets the ids of the flavor params 
-		$flavorsIds = array(); 
+		// gets the ids of the flavor params
+		$flavorsIds = array();
 		$conversionProfileFlavorParams = array();
 		foreach($list as $flavorParamsConversionProfile)
 		{
@@ -1211,7 +1211,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				continue;
 			}
 			
-			if(	in_array($flavor->getId(), $entryIngestedFlavors) && 
+			if(	in_array($flavor->getId(), $entryIngestedFlavors) &&
 				$conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
 			{
 				unset($flavors[$index]);
