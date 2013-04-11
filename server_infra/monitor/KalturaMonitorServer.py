@@ -230,7 +230,7 @@ application = tornado.web.Application(
 
 
 def collectRequests():
-	address = ('localhost', 6005)
+	address = ('', 6005)
 	server_socket = socket(AF_INET, SOCK_DGRAM)
 	server_socket.bind(address)
 
