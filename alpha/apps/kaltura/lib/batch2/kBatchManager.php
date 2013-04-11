@@ -92,7 +92,8 @@ class kBatchManager
 				}
 
 				$vidCodec=$flavor->getVideoCodec();
-				if(($flavor->_isRedundant) && !isset($vidCodec))
+				$audCodec=$flavor->getAudioCodec();
+				if(($flavor->_isRedundant) && !isset($vidCodec) && isset($audCodec))
 				{
 					KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is redandant audio-only");
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
