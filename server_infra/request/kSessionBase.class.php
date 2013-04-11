@@ -172,7 +172,7 @@ class kSessionBase
 		foreach ($privileges as $privilege)
 		{
 			list($privilegeName, $privilegeValue) = strpos($privilege, ":") !== false ? explode(':', $privilege, 2) : array($privilege, null);
-			if (is_array($privilegeValue) && strlen($privilegeValue))
+			if (!is_null($privilegeValue) && strlen($privilegeValue))
 			{
 				$privilegeValue = explode(self::PRIVILEGES_DELIMITER, $privilegeValue);
 			}
@@ -180,7 +180,7 @@ class kSessionBase
 			{
 				$parsedPrivileges[$privilegeName] = array();
 			}
-			if (!is_null($privilegeValue) && count($privilegeValue))
+			if (is_array($privilegeValue) && count($privilegeValue))
 			{
 				$parsedPrivileges[$privilegeName] = array_merge($parsedPrivileges[$privilegeName], $privilegeValue);
 			}
