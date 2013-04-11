@@ -142,10 +142,20 @@ class kMonitorQueryHandler(threading.Thread):
 		
 	def digest(self):
 		print "Handler started [%s]" % self.name
-		while self.keepRunning:
-#			print "Fetch from queue"
-			self.handle(self.queue.get());			
-		print "Handler stopped [%s]" % self.name
+		
+		try:
+			while self.keepRunning and not self.connection.is_closed:
+	#			print "Fetch from queue"
+				self.handle(self.queue.get());		
+		finally:
+			print "Handler stopped [%s]" % self.name
+			
+		self.queue.empty()
+		del self.queue
+		del self.cachedData
+		del self.realData
+		del self.sentData
+		del self
 		
 	def ingest(self, apiRequest):
 		for field in self.query.filters:
@@ -169,8 +179,12 @@ class kMonitorClient(tornadio2.SocketConnection):
 			monitorClients[self.session.session_id] = self
 		finally:
 			monitorClientsLock.release()
+		
+		print "Client connected [%s]" % (self.session.session_id)
 
 	def on_close(self):
+		
+		print "Client disconnected [%s]" % (self.session.session_id)
 		
 		monitorClientsLock.acquire()
 		try:
@@ -184,6 +198,8 @@ class kMonitorClient(tornadio2.SocketConnection):
 				self.handlers[name].stop()
 		finally:
 			self.handlersLock.release()
+			
+		del self
 		    
 	@tornadio2.event('applyQuery')
 	def applyQuery(self, query):
