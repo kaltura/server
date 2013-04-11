@@ -274,7 +274,10 @@ class kBusinessPreConvertDL
 		
 		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
-		$destPath = myContentStorage::getFSTempRootPath() . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid.jpg;
+		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
+		if(!file_exists($tempDir))
+			mkdir($tempDir, '700', true);
+		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid.jpg;
 		$logPath = $destPath . '.log';
 	
 		if(!file_exists($srcPath))
@@ -309,7 +312,11 @@ class kBusinessPreConvertDL
 				}
 				$srcPath = $destPath;
 				$uniqid = uniqid('thumb_');
-				$destPath = myContentStorage::getFSTempRootPath() . DIRECTORY_SEPARATOR . "thumb" . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
+				
+				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
+				if(!file_exists($tempDir))
+					mkdir($tempDir, '700', true);
+				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
 			}
 			
 			$quality = $destThumbParamsOutput->getQuality();

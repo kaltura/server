@@ -284,12 +284,6 @@ class myContentStorage
 		//return realpath(sfConfig::get('sf_root_dir')."/../../").'/';
 	}
 	
-	public static function getFSTempRootPath ()
-	{
-		$dc = kDataCenterMgr::getCurrentDc();
-		return rtrim($dc["root"], '\\/') . DIRECTORY_SEPARATOR . 'tmp';
-	}
-	
 	public static function getFSFlashRootPath ()
 	{
 		return  "/flash";
