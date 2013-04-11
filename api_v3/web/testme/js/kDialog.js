@@ -335,6 +335,25 @@ kCall.prototype.getTitle = function(){
 /**
  * Returns the current request data
  */
+kCall.prototype.removeRequest = function(){
+
+	if(this.keepRequest)
+		return;
+	
+	// removing names from field to make sure they won't be submitted
+	kTestMe.jqObjectsContainer.find('input,select').each(function(){
+		var field = jQuery(this);
+		if(!field.attr('name').length)
+			return;
+			
+		field.attr('id', field.attr('name'));
+		field.removeAttr('name');
+	});
+};
+
+/**
+ * Returns the current request data
+ */
 kCall.prototype.getRequest = function(requestIndex){
 
 	var ret = {
@@ -343,16 +362,12 @@ kCall.prototype.getRequest = function(requestIndex){
 			actionId: this.getActionId(),
 			jqParamsContainer: this.jqParamsContainer.clone(true)
 	};
-	
-	// removing names from field to make sure they won't be submitted
+
+	// adding history index class
 	kTestMe.jqObjectsContainer.find('input,select').each(function(){
 		var field = jQuery(this);
-		if(!field.attr('name').length || field.hasClass('history'))
-			return;
-			
-		field.attr('id', field.attr('name'));
-		field.removeAttr('name');
-		field.addClass('history history-field' + requestIndex);
+		if(!field.hasClass('history'))
+			field.addClass('history history-field' + requestIndex);
 	});
 	
 	ret.jqParamsContainer.find('input,select').each(function(){
@@ -366,15 +381,39 @@ kCall.prototype.getRequest = function(requestIndex){
 	});
 	
 	this.close();
-	/*
-	this.jqParamsContainer.hide();
-
-	this.jqParamsContainer = jQuery('<div class="action-params"></div>');
-	this.jqElement.append(this.jqParamsContainer);
-	this.onActionChange();
-	*/
-	
 	return ret;
+};
+
+
+/**
+ * Set and append request data
+ */
+kCall.prototype.setRequest = function(request){
+	this.close();
+
+	this.removeRequest();
+	
+	// restore input names from their ids
+	kTestMe.jqObjectsContainer.find('.history-field' + request.index).each(function(){
+		var field = jQuery(this);
+		field.removeClass('history');
+		if(!field.attr('name').length)
+			field.attr('name', field.attr('id'));
+	});
+	var jqRequestParamsContainer = request.jqParamsContainer.clone(true);
+	jqRequestParamsContainer.find('.history-field' + request.index).each(function(){
+		var field = jQuery(this);
+		field.attr('name', field.attr('id'));
+	});
+
+	this.keepRequest = true;
+	this.setAction(request.serviceId, request.actionId);
+	this.keepRequest = false;
+	
+	this.jqParamsContainer.remove();
+	this.jqParamsContainer = jqRequestParamsContainer;
+	this.jqElement.append(this.jqParamsContainer);
+	this.jqParamsContainer.show();
 };
 
 kCall.prototype.getValue = function(){
@@ -384,31 +423,6 @@ kCall.prototype.getValue = function(){
 	value['action'] = this.getActionId();
 	
 	return value;
-};
-
-/**
- * Set and append request data
- */
-kCall.prototype.setRequest = function(request){
-	this.close();
-	
-	// restore input names from their ids
-	kTestMe.jqObjectsContainer.find('.history-field' + request.index).each(function(){
-		var field = jQuery(this);
-		field.attr('name', field.attr('id'));
-		field.removeClass('history');
-	});
-	var jqRequestParamsContainer = request.jqParamsContainer.clone(true);
-	jqRequestParamsContainer.find('.history-field' + request.index).each(function(){
-		var field = jQuery(this);
-		field.attr('name', field.attr('id'));
-	});
-	
-	this.setAction(request.serviceId, request.actionId);
-	this.jqParamsContainer.remove();
-	this.jqParamsContainer = jqRequestParamsContainer;
-	this.jqElement.append(this.jqParamsContainer);
-	this.jqParamsContainer.show();
 };
 
 /**
@@ -611,6 +625,7 @@ kCall.prototype.onActionChange = function(){
 	var serviceId = this.getLockedServiceId();
 	var actionId = this.getLockedActionId();
 	
+	this.removeRequest();
 	if(kTestMe.actionParamsLoaded(serviceId, actionId)){
 		this.loadActionParams();
 		return;
