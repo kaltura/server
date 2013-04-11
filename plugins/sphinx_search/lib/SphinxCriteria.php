@@ -178,9 +178,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		$pdo = DbManager::getSphinxConnection();
 		
-		$comment = $pdo->getComment();
 		$sphinxIdField = $this->getSphinxIdField();
-		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='$comment'";
+		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
 		if (kConf::hasParam('sphinx_extra_options'))
 			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
@@ -198,14 +197,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		//debug query
 
-		$stmt = $pdo->query($sql);
-		if(!$stmt)
+		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 2);
+		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
 			throw new kCoreException("Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 		}
 		
-		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
 		$ids = $this->applyIds($ids);
 		$this->setFetchedIds($ids);
 		KalturaLog::debug("Found " . count($ids) . " ids");
@@ -227,20 +225,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			$this->setOffset(0);
 			
-			$sql = "show meta";
-			$stmt = $pdo->query($sql);
-			$meta = $stmt->fetchAll(PDO::FETCH_NAMED);
-			if(count($meta))
+			$metaItems = $pdo->queryAndFetchAll("show meta", PDO::FETCH_NAMED, 0, array('Variable_name' => 'total_found'));
+			if ($metaItems)
 			{
-				foreach($meta as $metaItem)
-				{
-					if($metaItem['Variable_name'] == 'total_found')
-					{
-						$this->recordsCount = (int)$metaItem['Value'];
-						KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
-						break;
-					}
-				}
+				$metaItem = reset($metaItems);
+				$this->recordsCount = (int)$metaItem['Value'];
+				KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
 			}
 		}
 		else

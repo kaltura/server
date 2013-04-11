@@ -10,13 +10,14 @@ class KalturaPDO extends PropelPDO
 	 * Use to set logged info for Kaltura logger
 	 */
 	const KALTURA_ATTR_NAME = -1001;
-	
+		
 	/**
 	 * Use to disable transaction
 	 */
 	const KALTURA_ATTR_NO_TRANSACTION = 'noTransaction';
 	
 	protected static $comment = null;
+	protected $dsn = null;
 	protected $kalturaOptions = array();
 	protected $connectionName = null;
 	protected $hostName = null;
@@ -44,6 +45,7 @@ class KalturaPDO extends PropelPDO
 				break;
 			}
 		}
+		$this->dsn = $dsn;
 			
 		$connStart = microtime(true);
 
@@ -126,6 +128,31 @@ class KalturaPDO extends PropelPDO
 		return $result;
 	}
 
+	public function queryAndFetchAll($sql, $fetchStyle, $columnIndex = 0, $filter = null)
+	{
+		$finalSql = str_replace(kApiCache::KALTURA_COMMENT_MARKER, $this->getComment(), $sql);
+		
+		KalturaLog::debug($finalSql);
+		
+		$sqlStart = microtime(true);
+		$stmt = parent::query($finalSql);
+		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		
+		if (!$stmt)
+			return false;
+		
+		if ($fetchStyle == PDO::FETCH_COLUMN)
+			$result = $stmt->fetchAll($fetchStyle, $columnIndex);
+		else
+			$result = $stmt->fetchAll($fetchStyle);
+		
+		$filteredResult = kApiCache::filterQueryResult($result, $filter);
+		
+		kApiCache::addSqlQueryCondition($this->dsn, $sql, $fetchStyle, $columnIndex, $filter, $filteredResult);
+		
+		return $filteredResult;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see PDO::query()
 	 */

@@ -38,7 +38,10 @@ class kApiCache
 	const CACHE_STATUS_DISABLED = 2;			// cache was explicitly disabled by calling DisableCache (e.g. getContentData for an entry with access control)
 
 	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
-
+	const MAX_SQL_CONDITION_DSNS = 1;			// max number of connections required to verify the SQL conditions
+	const MAX_SQL_CONDITION_QUERIES = 4;		// max number of queries per dsn required to verify the SQL conditions
+	const KALTURA_COMMENT_MARKER = '@KALTURA_COMMENT@';
+	
 	const EXTRA_FIELDS_EXPIRY = 604800;			// when using a cache shared between servers it makes sense to have EXTRA_FIELDS_EXPIRY > CONDITIONAL_CACHE_EXPIRY
 												// since the extra fields are stored locally on each server
 
@@ -46,7 +49,7 @@ class kApiCache
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '1';
+	const CACHE_VERSION = '2';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
@@ -104,6 +107,7 @@ class kApiCache
 	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used
 	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
 	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
+	protected $_sqlConditions = array();				// list of sql queries that the api depends on
 
 	// extra fields
 	protected $_extraFields = array();
@@ -231,8 +235,15 @@ class kApiCache
 		foreach (self::$_activeInstances as $curInstance)
 		{
 			// no need to check for CACHE_STATUS_DISABLED, since the instances are removed from the list when they get this status
-			$curInstance->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
+			$curInstance->disableConditionalCacheInternal();
 		}
+	}
+	
+	protected function disableConditionalCacheInternal()
+	{
+		$this->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
+		$this->_invalidationKeys = array();
+		$this->_sqlConditions = array();	
 	}
 
 	protected function removeFromActiveList()
@@ -273,6 +284,39 @@ class kApiCache
 		{
 			$curInstance->_invalidationKeys = array_merge($curInstance->_invalidationKeys, $invalidationKeys);
 			$curInstance->_invalidationTime = max($curInstance->_invalidationTime, $invalidationTime);
+		}
+	}
+	
+	public static function addSqlQueryCondition($dsn, $sql, $fetchStyle, $columnIndex, $filter, $result)
+	{
+		foreach (self::$_activeInstances as $curInstance)
+		{
+			if ($curInstance->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
+				continue;
+			
+			if (!isset($curInstance->_sqlConditions[$dsn]))
+			{
+				if (count($curInstance->_sqlConditions) >= self::MAX_SQL_CONDITION_DSNS)
+				{
+					$curInstance->disableConditionalCacheInternal();
+					continue;
+				}
+
+				$curInstance->_sqlConditions[$dsn] = array();
+			}
+
+			if (count($curInstance->_sqlConditions[$dsn]) >= self::MAX_SQL_CONDITION_QUERIES)
+			{
+				$curInstance->disableConditionalCacheInternal();
+				continue;
+			}
+					
+			$curInstance->_sqlConditions[$dsn][] = array(
+					'sql' => $sql, 
+					'fetchStyle' => $fetchStyle, 
+					'columnIndex' => $columnIndex, 
+					'filter' => $filter, 
+					'expectedResult' => $result);
 		}
 	}
 
@@ -491,6 +535,76 @@ class kApiCache
 		return max($cacheResult);
 	}
 
+	public static function filterQueryResult($input, $filter)
+	{
+		if (!$filter)
+			return $input;
+	
+		$result = array();
+		foreach ($input as $index => $curRow)
+		{
+			$matchesFilter = true;
+			foreach ($filter as $key => $value)
+			{
+				if (!isset($curRow[$key]) || $curRow[$key] != $value)
+				{
+					$matchesFilter = false;
+					break;
+				}
+			}
+			
+			if ($matchesFilter)
+			{
+				$result[] = $curRow;
+			}
+		}
+		return $result;
+	}
+	
+	protected function validateSqlQueries($sqlConditions)
+	{
+		foreach ($sqlConditions as $dsn => $queries)
+		{
+			try
+			{
+				$pdo = new PDO($dsn, null, null, array(PDO::ATTR_TIMEOUT => 1));
+			}
+			catch(PDOException $e)
+			{
+				return false;
+			}
+		
+			foreach ($queries as $query)
+			{
+				$sql = $query['sql'];
+				
+				$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+				$comment .= "[{$this->_cacheKey}]";
+				$sql = str_replace(self::KALTURA_COMMENT_MARKER, $comment, $sql);
+				
+				$stmt = $pdo->query($sql);
+				if(!$stmt)
+				{
+					return false;
+				}
+		
+				if ($query['fetchStyle'] == PDO::FETCH_COLUMN)
+					$result = $stmt->fetchAll($query['fetchStyle'], $query['columnIndex']);
+				else
+					$result = $stmt->fetchAll($query['fetchStyle']);
+				
+				$filteredResult = self::filterQueryResult($result, $query['filter']);
+		
+				if ($filteredResult != $query['expectedResult'])
+				{
+					return false;
+				}
+			}
+		}
+	
+		return true;
+	}
+	
 	protected function validateCachingRules($isWarmupRequest)
 	{
 		foreach ($this->_cacheRules as $rule)
@@ -506,7 +620,7 @@ class kApiCache
 
 			if ($conditions)
 			{
-				list($this->_cacheId, $invalidationKeys, $cachedInvalidationTime) = $conditions;
+				list($this->_cacheId, $invalidationKeys, $cachedInvalidationTime, $sqlConditions) = $conditions;
 				$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
 				if ($invalidationTime === null)
 					continue;					// failed to get the invalidation time from memcache, can't use cache
@@ -514,6 +628,9 @@ class kApiCache
 				if ($cachedInvalidationTime < $invalidationTime)
 					continue;					// something changed since the response was cached
 
+				if (!$this->validateSqlQueries($sqlConditions))
+					continue;
+				
 				if (isset($this->_cacheRules[self::CACHE_MODE_ANONYMOUS]))
 				{
 					// since the conditions matched, we can extend the expiry of the anonymous cache
@@ -720,7 +837,7 @@ class kApiCache
 			switch ($cacheMode)
 			{
 			case self::CACHE_MODE_CONDITIONAL:
-				$conditions = array($this->_cacheId, array_unique($this->_invalidationKeys), $this->_invalidationTime);
+				$conditions = array($this->_cacheId, array_unique($this->_invalidationKeys), $this->_invalidationTime, $this->_sqlConditions);
 				if ($this->_conditionalCacheExpiry)
 					$expiry = $this->_conditionalCacheExpiry;
 				else
