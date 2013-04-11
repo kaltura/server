@@ -6,7 +6,7 @@
 class embedIframeJsAction extends sfAction
 {
 	/**
-	 * Will forward to the regular swf player according to the widget_id 
+	 * Will forward to the regular swf player according to the widget_id
 	 */
 	public function execute()
 	{
@@ -25,7 +25,7 @@ class embedIframeJsAction extends sfAction
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 		
 		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');	
+		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
 		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
 		$host = ($protocol == 'https') ? 'https://' . $embed_host_https : 'http://' . $embed_host;
 
@@ -47,7 +47,10 @@ class embedIframeJsAction extends sfAction
 
 		$autoEmbed = $this->getRequestParameter('autoembed');
 		if ($autoEmbed)
-			$host = "http://localhost/";
+		{
+			$port = $_SERVER['SERVER_PORT'];
+			$host = "$protocol://localhost:$port/";
+		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
