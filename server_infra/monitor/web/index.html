@@ -90,7 +90,7 @@
 		var query = {
 			name: name,
 			groupBy: $form.find('.groupBy').val(),
-			order: $form.find('.order').val(),
+			order: ($form.find('.order').val() == 'on' ? -1 : 1),
 			limit: $form.find('.limit').val() * 1,
 			units: $form.find('.units').val() * 1,
 			filters: filters
