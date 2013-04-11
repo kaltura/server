@@ -203,6 +203,7 @@ class PermissionPeer extends BasePermissionPeer
 			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 		}
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
+		$c->addAscendingOrderByColumn(PermissionPeer::STATUS); // needed in case the permission appears more than once
 		PermissionPeer::setUseCriteriaFilter(false);
 		$permission = PermissionPeer::doSelectOne($c);
 		PermissionPeer::setUseCriteriaFilter(true);
