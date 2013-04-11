@@ -41,28 +41,28 @@
 		sortedCalls.reverse();
 		
 		$('#' + chart).empty();
-		for(var i = 0; i < sortedCalls.length; i++){
-			var sentValue = sortedCalls[i];
-			var sentField;
-			for(sentField in calls){
-				if(sentValue == calls[sentField])
-					break;
-			}
-			var sentFieldId = sentField.replace(/./g, '-');
+		var i = 0;
+		for(var sentField in calls){
+			++i;
+			var sentValue = calls[sentField];
+			var sentFieldId = chart + '_' + i;
+			var sentFieldValue = sentField.replace(/./g, '-');
 			percent100 = Math.max(percent100, sentValue);
 			if($('#bar-tr-' + sentFieldId).size() == 0){
 				var tr = $('<tr id="bar-tr-' + sentFieldId + '"/>');
 				$('#' + chart).append(tr);
 				tr.append('<td class="field">' + sentField + '</td>');
 				tr.append('<td class="value" id="value-' + sentFieldId + '"></td>');
-				tr.append('<td><div class="bar" id="bar-' + sentFieldId + '" title="' + sentFieldId + '"/></td>');
+				tr.append('<td><div class="bar" id="bar-' + sentFieldId + '" title="' + sentFieldValue + '"/></td>');
 			}
 		}
 		var percent = percent100 / 100;
 		
+		i = 0;
 		for(var sentField in calls){
+			++i;
 			var sentValue = calls[sentField];
-			var sentFieldId = sentField.replace(/./g, '-');
+			var sentFieldId = chart + '_' + i;
 			var value = sentValue / percent;
 			$('#bar-' + sentFieldId).width(value * percentWidth[chart]);
 			$('#value-' + sentFieldId).text(calls[sentField]);
