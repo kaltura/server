@@ -37,15 +37,15 @@ class kMonitorQuery:
 			
 		# Ascending (1) or descending (-1)
 		# @var int
-		self.order = data['order']
+		self.order = int(data['order'])
 			
 		# Number of items
 		# @var int
-		self.limit = data['limit']
+		self.limit = int(data['limit'])
 			
 		# How many units change should trigger notification
 		# @var int
-		self.units = data['units']
+		self.units = int(data['units'])
 			
 		# Map of fields with single valid value
 		# @var dictionary
