@@ -1122,6 +1122,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
+				if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+				{
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
+					continue;
+				}
+				
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
@@ -1228,6 +1234,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if(!$distributionProvider->isUpdateEnabled())
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					continue;
+				}
+				
+				if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+				{
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
 					continue;
 				}
 
@@ -1357,6 +1369,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return true;
 		}
 
+		if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+		{
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
+			return true;
+		}
+				
 		if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
 		{
 			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
@@ -1470,6 +1488,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					if(!$distributionProvider->isUpdateEnabled())
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+						continue;
+					}
+					
+					if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+					{
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
 						continue;
 					}
 					
@@ -1716,6 +1740,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					continue;
+				}
+				
+				if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+				{
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
 					continue;
 				}
 				
