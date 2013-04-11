@@ -14,7 +14,7 @@ $testScriptCmd = implode(" ", array_slice($argv, 1));
 $testScriptCmd = substr($testScriptCmd,2);
 
 
-$resStr = exec(@PHP_BIN@ . ' ' . @APP_DIR@ . '/monitoring/' . $testScriptCmd);
+$resStr = exec(@PHP_BIN@ . ' ' . @APP_DIR@ . '/testing/monitoring/' . $testScriptCmd);
 $res = XmlHelper::fromXmlResult($resStr);
 
 if ($res->errors) {
