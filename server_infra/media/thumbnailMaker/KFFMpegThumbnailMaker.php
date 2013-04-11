@@ -21,7 +21,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		if(!isset($frameCount))
 			$frameCount = 1;
 		if(!isset($targetType))
-			$targetType = "image2";		
+			$targetType = "image2";
 		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar]");
 		if(isset($dar) && $dar>0 && isset($height)){
 			$width = floor(round($height*$dar)  /2) * 2;
@@ -33,7 +33,11 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		$rv = null;
 		KalturaLog::info("Executing: $cmd");
 		$logFilePath = "$this->targetPath.log";
-		mkdir(dirname($logFilePath), 0665, true);
+		
+		$logFileDir = dirname($logFilePath);
+		if(!file_exists($logFileDir))
+			mkdir(dirname($logFilePath), 0665, true);
+			
 		file_put_contents($logFilePath, $cmd, FILE_APPEND);
 		$output = system( $cmd , $rv );
 		KalturaLog::debug("Returned value: '$rv'");
@@ -79,7 +83,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 	protected function parseOutput($output)
 	{
 		$output=file_get_contents("$this->targetPath.log");
-		if(strpos($output,"first frame not a keyframe")===false 
+		if(strpos($output,"first frame not a keyframe")===false
 		&& strpos($output,"first frame is no keyframe")===false){
 			return true;
 		}
