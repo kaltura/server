@@ -13,7 +13,7 @@ if($argc == 1)
 	echo "usage...";
 }
 
-$systemConfig = parse_ini_file("$kalturaRootPath/configurations/system.template.ini");
+$systemConfig = parse_ini_file("$kalturaRootPath/configurations/system.ini");
 
 $errorThreshold = null;
 $warningThreshold = null;
