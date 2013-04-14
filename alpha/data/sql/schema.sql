@@ -1635,6 +1635,7 @@ CREATE TABLE `category_entry`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	`status` INTEGER default 2,
+	`privacy_contexts` VARCHAR(255)  NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`),
@@ -2081,6 +2082,23 @@ CREATE TABLE `report`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME,
+	PRIMARY KEY (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- api_server
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `api_server`;
+
+
+CREATE TABLE `api_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`hostname` VARCHAR(256),
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 

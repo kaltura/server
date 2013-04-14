@@ -7,7 +7,7 @@
  * @package api
  * @subpackage services
  */
-class SystemService extends KalturaBaseService 
+class SystemService extends KalturaBaseService
 {
 	
 	protected function partnerRequired($actionName)
@@ -19,8 +19,6 @@ class SystemService extends KalturaBaseService
 	}
 	
 	/**
-	 *
-	 * 
 	 * @action ping
 	 * @return bool Always true if service is working
 	 */
@@ -30,8 +28,29 @@ class SystemService extends KalturaBaseService
 	}
 	
 	/**
+	 * @action pingDatabase
+	 * @return bool Always true if database available and writeable
+	 */
+	function pingDatabaseAction()
+	{
+		$hostname = infraRequestUtils::getHostname();
+		$server = ApiServerPeer::retrieveByHostname($hostname);
+		if(!$server)
+		{
+			$server = new ApiServer();
+			$server->setHostname($hostname);
+		}
+		
+		$server->setUpdatedAt(time());
+		if(!$server->save())
+			return false;
+			
+		return true;
+	}
+	
+	/**
 	 *
-	 * 
+	 *
 	 * @action getTime
 	 * @return int Return current server timestamp
 	 */

@@ -1,71 +1,56 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'category_entry' table.
+ * Base static class for performing query and update operations on the 'api_server' table.
  *
  * 
  *
  * @package Core
  * @subpackage model.om
  */
-abstract class BasecategoryEntryPeer {
+abstract class BaseApiServerPeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'category_entry';
+	const TABLE_NAME = 'api_server';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'categoryEntry';
+	const OM_CLASS = 'ApiServer';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'Core.categoryEntry';
+	const CLASS_DEFAULT = 'Core.ApiServer';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'categoryEntryTableMap';
+	const TM_CLASS = 'ApiServerTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 5;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'category_entry.ID';
+	const ID = 'api_server.ID';
 
-	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'category_entry.PARTNER_ID';
-
-	/** the column name for the ENTRY_ID field */
-	const ENTRY_ID = 'category_entry.ENTRY_ID';
-
-	/** the column name for the CATEGORY_ID field */
-	const CATEGORY_ID = 'category_entry.CATEGORY_ID';
-
-	/** the column name for the CATEGORY_FULL_IDS field */
-	const CATEGORY_FULL_IDS = 'category_entry.CATEGORY_FULL_IDS';
+	/** the column name for the HOSTNAME field */
+	const HOSTNAME = 'api_server.HOSTNAME';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'category_entry.CREATED_AT';
+	const CREATED_AT = 'api_server.CREATED_AT';
 
 	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'category_entry.UPDATED_AT';
+	const UPDATED_AT = 'api_server.UPDATED_AT';
 
 	/** the column name for the CUSTOM_DATA field */
-	const CUSTOM_DATA = 'category_entry.CUSTOM_DATA';
-
-	/** the column name for the STATUS field */
-	const STATUS = 'category_entry.STATUS';
-
-	/** the column name for the PRIVACY_CONTEXTS field */
-	const PRIVACY_CONTEXTS = 'category_entry.PRIVACY_CONTEXTS';
+	const CUSTOM_DATA = 'api_server.CUSTOM_DATA';
 
 	/**
-	 * An identiy map to hold any loaded instances of categoryEntry objects.
+	 * An identiy map to hold any loaded instances of ApiServer objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array categoryEntry[]
+	 * @var        array ApiServer[]
 	 */
 	public static $instances = array();
 
@@ -77,11 +62,11 @@ abstract class BasecategoryEntryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'EntryId', 'CategoryId', 'CategoryFullIds', 'CreatedAt', 'UpdatedAt', 'CustomData', 'Status', 'PrivacyContexts', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'entryId', 'categoryId', 'categoryFullIds', 'createdAt', 'updatedAt', 'customData', 'status', 'privacyContexts', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::ENTRY_ID, self::CATEGORY_ID, self::CATEGORY_FULL_IDS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::STATUS, self::PRIVACY_CONTEXTS, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'entry_id', 'category_id', 'category_full_ids', 'created_at', 'updated_at', 'custom_data', 'status', 'privacy_contexts', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Hostname', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'hostname', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::HOSTNAME, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'hostname', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -91,11 +76,11 @@ abstract class BasecategoryEntryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'EntryId' => 2, 'CategoryId' => 3, 'CategoryFullIds' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'CustomData' => 7, 'Status' => 8, 'PrivacyContexts' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'entryId' => 2, 'categoryId' => 3, 'categoryFullIds' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'customData' => 7, 'status' => 8, 'privacyContexts' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::ENTRY_ID => 2, self::CATEGORY_ID => 3, self::CATEGORY_FULL_IDS => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::CUSTOM_DATA => 7, self::STATUS => 8, self::PRIVACY_CONTEXTS => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'entry_id' => 2, 'category_id' => 3, 'category_full_ids' => 4, 'created_at' => 5, 'updated_at' => 6, 'custom_data' => 7, 'status' => 8, 'privacy_contexts' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Hostname' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'CustomData' => 4, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'hostname' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'customData' => 4, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::HOSTNAME => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::CUSTOM_DATA => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'hostname' => 1, 'created_at' => 2, 'updated_at' => 3, 'custom_data' => 4, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -144,12 +129,12 @@ abstract class BasecategoryEntryPeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. categoryEntryPeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. ApiServerPeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(categoryEntryPeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(ApiServerPeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -165,16 +150,11 @@ abstract class BasecategoryEntryPeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(categoryEntryPeer::ID);
-		$criteria->addSelectColumn(categoryEntryPeer::PARTNER_ID);
-		$criteria->addSelectColumn(categoryEntryPeer::ENTRY_ID);
-		$criteria->addSelectColumn(categoryEntryPeer::CATEGORY_ID);
-		$criteria->addSelectColumn(categoryEntryPeer::CATEGORY_FULL_IDS);
-		$criteria->addSelectColumn(categoryEntryPeer::CREATED_AT);
-		$criteria->addSelectColumn(categoryEntryPeer::UPDATED_AT);
-		$criteria->addSelectColumn(categoryEntryPeer::CUSTOM_DATA);
-		$criteria->addSelectColumn(categoryEntryPeer::STATUS);
-		$criteria->addSelectColumn(categoryEntryPeer::PRIVACY_CONTEXTS);
+		$criteria->addSelectColumn(ApiServerPeer::ID);
+		$criteria->addSelectColumn(ApiServerPeer::HOSTNAME);
+		$criteria->addSelectColumn(ApiServerPeer::CREATED_AT);
+		$criteria->addSelectColumn(ApiServerPeer::UPDATED_AT);
+		$criteria->addSelectColumn(ApiServerPeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -193,27 +173,27 @@ abstract class BasecategoryEntryPeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(categoryEntryPeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(ApiServerPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			categoryEntryPeer::addSelectColumns($criteria);
+			ApiServerPeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		categoryEntryPeer::attachCriteriaFilter($criteria);
+		ApiServerPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'categoryEntryPeer', 
+			'ApiServerPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -222,7 +202,7 @@ abstract class BasecategoryEntryPeer {
 		}
 		
 		// select the connection for the query
-		$con = categoryEntryPeer::alternativeCon ($con, $queryDB);
+		$con = ApiServerPeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -246,7 +226,7 @@ abstract class BasecategoryEntryPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     categoryEntry
+	 * @return     ApiServer
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -254,7 +234,7 @@ abstract class BasecategoryEntryPeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = categoryEntryPeer::doSelect($critcopy, $con);
+		$objects = ApiServerPeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -296,10 +276,10 @@ abstract class BasecategoryEntryPeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = categoryEntryPeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = ApiServerPeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				categoryEntryPeer::addInstanceToPool($curObject);
+				ApiServerPeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -317,7 +297,7 @@ abstract class BasecategoryEntryPeer {
 	{
 		foreach ($queryResult as $curResult)
 		{
-			categoryEntryPeer::addInstanceToPool($curResult);
+			ApiServerPeer::addInstanceToPool($curResult);
 		}
 	}
 	
@@ -332,26 +312,26 @@ abstract class BasecategoryEntryPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = categoryEntryPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = ApiServerPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'categoryEntryPeer', 
+			'ApiServerPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
-			categoryEntryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			categoryEntryPeer::updateInstancePool($cachedResult);
+			ApiServerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			ApiServerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = categoryEntryPeer::alternativeCon($con, $queryDB);
+		$con = ApiServerPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = categoryEntryPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = ApiServerPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
@@ -361,9 +341,9 @@ abstract class BasecategoryEntryPeer {
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 		}
 		
-		categoryEntryPeer::filterSelectResults($queryResult, $criteria);
+		ApiServerPeer::filterSelectResults($queryResult, $criteria);
 		
-		categoryEntryPeer::addInstancesToPool($queryResult);
+		ApiServerPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -387,7 +367,7 @@ abstract class BasecategoryEntryPeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -399,7 +379,7 @@ abstract class BasecategoryEntryPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = categoryEntryPeer::getCriteriaFilter();
+		$criteria_filter = ApiServerPeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -413,12 +393,12 @@ abstract class BasecategoryEntryPeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			categoryEntryPeer::setDefaultCriteriaFilter();
+			ApiServerPeer::setDefaultCriteriaFilter();
 		
-		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('categoryEntry');
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ApiServer');
 		if ($partnerCriteria)
 		{
-			call_user_func_array(array('categoryEntryPeer','addPartnerToCriteria'), $partnerCriteria);
+			call_user_func_array(array('ApiServerPeer','addPartnerToCriteria'), $partnerCriteria);
 		}
 		
 		return self::$s_criteria_filter;
@@ -445,70 +425,11 @@ abstract class BasecategoryEntryPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		categoryEntryPeer::getCriteriaFilter()->applyFilter($criteria);
+		ApiServerPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
-		$criteriaFilter = self::getCriteriaFilter();
-		$criteria = $criteriaFilter->getFilter();
-		
-		if(!$privatePartnerData)
-		{
-			// the private partner data is not allowed - 
-			if($kalturaNetwork)
-			{
-				// allow only the kaltura netword stuff
-				if($partnerId)
-				{
-					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
-					myCriteria::addComment($criteria , "Only Kaltura Network");
-					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
-				}
-			}
-			else
-			{
-				// no private data and no kaltura_network - 
-				// add a criteria that will return nothing
-				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
-			}
-		}
-		else
-		{
-			// private data is allowed
-			if(!strlen(strval($partnerGroup)))
-			{
-				// the default case
-				$criteria->addAnd(self::PARTNER_ID, $partnerId);
-			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
-			{
-				// all is allowed - don't add anything to the criteria
-			}
-			else 
-			{
-				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-				$partners = explode(',', trim($partnerGroup));
-				foreach($partners as &$p)
-					trim($p); // make sure there are not leading or trailing spaces
-
-				// add the partner_id to the partner_group
-				if (!in_array(strval($partnerId), $partners))
-					$partners[] = strval($partnerId);
-				
-				if(count($partners) == 1 && reset($partners) == $partnerId)
-				{
-					$criteria->addAnd(self::PARTNER_ID, $partnerId);
-				}
-				else 
-				{
-					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
-					$criteria->addAnd($criterion);
-				}
-			}
-		}
-			
-		$criteriaFilter->enable();
 	}
 	
 	/**
@@ -527,10 +448,10 @@ abstract class BasecategoryEntryPeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		categoryEntryPeer::attachCriteriaFilter($criteria);
+		ApiServerPeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = categoryEntryPeer::alternativeCon ( $con );
+		$con = ApiServerPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -544,20 +465,20 @@ abstract class BasecategoryEntryPeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				categoryEntryPeer::addSelectColumns($criteria);
+				ApiServerPeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			categoryEntryPeer::addSelectColumns($criteria);
+			ApiServerPeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		categoryEntryPeer::attachCriteriaFilter($criteria);
+		ApiServerPeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -577,9 +498,9 @@ abstract class BasecategoryEntryPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = categoryEntryPeer::alternativeCon($con);
+		$con = ApiServerPeer::alternativeCon($con);
 		
-		$criteria = categoryEntryPeer::prepareCriteriaForSelect($criteria);
+		$criteria = ApiServerPeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -593,10 +514,10 @@ abstract class BasecategoryEntryPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      categoryEntry $value A categoryEntry object.
+	 * @param      ApiServer $value A ApiServer object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(categoryEntry $obj, $key = null)
+	public static function addInstanceToPool(ApiServer $obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -614,18 +535,18 @@ abstract class BasecategoryEntryPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A categoryEntry object or a primary key value.
+	 * @param      mixed $value A ApiServer object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof categoryEntry) {
+			if (is_object($value) && $value instanceof ApiServer) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or categoryEntry object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or ApiServer object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -640,7 +561,7 @@ abstract class BasecategoryEntryPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     categoryEntry Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     ApiServer Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -668,7 +589,7 @@ abstract class BasecategoryEntryPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to category_entry
+	 * Method to invalidate the instance pool of all tables related to api_server
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -706,11 +627,11 @@ abstract class BasecategoryEntryPeer {
 		$results = array();
 	
 		// set the class once to avoid overhead in the loop
-		$cls = categoryEntryPeer::getOMClass(false);
+		$cls = ApiServerPeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = categoryEntryPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = categoryEntryPeer::getInstanceFromPool($key))) {
+			$key = ApiServerPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = ApiServerPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
@@ -741,10 +662,10 @@ abstract class BasecategoryEntryPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BasecategoryEntryPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BasecategoryEntryPeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BaseApiServerPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseApiServerPeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new categoryEntryTableMap());
+	    $dbMap->addTableObject(new ApiServerTableMap());
 	  }
 	}
 
@@ -761,13 +682,13 @@ abstract class BasecategoryEntryPeer {
 	 */
 	public static function getOMClass($withPrefix = true)
 	{
-		return $withPrefix ? categoryEntryPeer::CLASS_DEFAULT : categoryEntryPeer::OM_CLASS;
+		return $withPrefix ? ApiServerPeer::CLASS_DEFAULT : ApiServerPeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a categoryEntry or Criteria object.
+	 * Method perform an INSERT on the database, given a ApiServer or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or categoryEntry object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or ApiServer object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -776,17 +697,17 @@ abstract class BasecategoryEntryPeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from categoryEntry object
+			$criteria = $values->buildCriteria(); // build Criteria from ApiServer object
 		}
 
-		if ($criteria->containsKey(categoryEntryPeer::ID) && $criteria->keyContainsValue(categoryEntryPeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.categoryEntryPeer::ID.')');
+		if ($criteria->containsKey(ApiServerPeer::ID) && $criteria->keyContainsValue(ApiServerPeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.ApiServerPeer::ID.')');
 		}
 
 
@@ -808,9 +729,9 @@ abstract class BasecategoryEntryPeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a categoryEntry or Criteria object.
+	 * Method perform an UPDATE on the database, given a ApiServer or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or categoryEntry object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or ApiServer object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -819,7 +740,7 @@ abstract class BasecategoryEntryPeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -827,10 +748,10 @@ abstract class BasecategoryEntryPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(categoryEntryPeer::ID);
-			$selectCriteria->add(categoryEntryPeer::ID, $criteria->remove(categoryEntryPeer::ID), $comparison);
+			$comparison = $criteria->getComparison(ApiServerPeer::ID);
+			$selectCriteria->add(ApiServerPeer::ID, $criteria->remove(ApiServerPeer::ID), $comparison);
 
-		} else { // $values is categoryEntry object
+		} else { // $values is ApiServer object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -851,26 +772,26 @@ abstract class BasecategoryEntryPeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the category_entry table.
+	 * Method to DELETE all rows from the api_server table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(categoryEntryPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(ApiServerPeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			categoryEntryPeer::clearInstancePool();
-			categoryEntryPeer::clearRelatedInstancePool();
+			ApiServerPeer::clearInstancePool();
+			ApiServerPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -880,9 +801,9 @@ abstract class BasecategoryEntryPeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a categoryEntry or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a ApiServer or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or categoryEntry object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or ApiServer object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -893,27 +814,27 @@ abstract class BasecategoryEntryPeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			categoryEntryPeer::clearInstancePool();
+			ApiServerPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof categoryEntry) { // it's a model object
+		} elseif ($values instanceof ApiServer) { // it's a model object
 			// invalidate the cache for this single object
-			categoryEntryPeer::removeInstanceFromPool($values);
+			ApiServerPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(categoryEntryPeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(ApiServerPeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				categoryEntryPeer::removeInstanceFromPool($singleval);
+				ApiServerPeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -928,7 +849,7 @@ abstract class BasecategoryEntryPeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			categoryEntryPeer::clearRelatedInstancePool();
+			ApiServerPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -938,24 +859,24 @@ abstract class BasecategoryEntryPeer {
 	}
 
 	/**
-	 * Validates all modified columns of given categoryEntry object.
+	 * Validates all modified columns of given ApiServer object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      categoryEntry $obj The object to validate.
+	 * @param      ApiServer $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(categoryEntry $obj, $cols = null)
+	public static function doValidate(ApiServer $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(categoryEntryPeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(categoryEntryPeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(ApiServerPeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(ApiServerPeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -971,7 +892,7 @@ abstract class BasecategoryEntryPeer {
 
 		}
 
-		return BasePeer::doValidate(categoryEntryPeer::DATABASE_NAME, categoryEntryPeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(ApiServerPeer::DATABASE_NAME, ApiServerPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -979,19 +900,19 @@ abstract class BasecategoryEntryPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     categoryEntry
+	 * @return     ApiServer
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = categoryEntryPeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = ApiServerPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(categoryEntryPeer::DATABASE_NAME);
-		$criteria->add(categoryEntryPeer::ID, $pk);
+		$criteria = new Criteria(ApiServerPeer::DATABASE_NAME);
+		$criteria->add(ApiServerPeer::ID, $pk);
 
-		$v = categoryEntryPeer::doSelect($criteria, $con);
+		$v = ApiServerPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1010,16 +931,16 @@ abstract class BasecategoryEntryPeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(categoryEntryPeer::DATABASE_NAME);
-			$criteria->add(categoryEntryPeer::ID, $pks, Criteria::IN);
-			$objs = categoryEntryPeer::doSelect($criteria, $con);
+			$criteria = new Criteria(ApiServerPeer::DATABASE_NAME);
+			$criteria->add(ApiServerPeer::ID, $pks, Criteria::IN);
+			$objs = ApiServerPeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BasecategoryEntryPeer
+} // BaseApiServerPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BasecategoryEntryPeer::buildTableMap();
+BaseApiServerPeer::buildTableMap();
 

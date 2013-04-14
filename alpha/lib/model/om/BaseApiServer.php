@@ -1,21 +1,21 @@
 <?php
 
 /**
- * Base class that represents a row from the 'category_entry' table.
+ * Base class that represents a row from the 'api_server' table.
  *
  * 
  *
  * @package Core
  * @subpackage model.om
  */
-abstract class BasecategoryEntry extends BaseObject  implements Persistent {
+abstract class BaseApiServer extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        categoryEntryPeer
+	 * @var        ApiServerPeer
 	 */
 	protected static $peer;
 
@@ -26,28 +26,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
-	 * The value for the partner_id field.
-	 * @var        int
-	 */
-	protected $partner_id;
-
-	/**
-	 * The value for the entry_id field.
+	 * The value for the hostname field.
 	 * @var        string
 	 */
-	protected $entry_id;
-
-	/**
-	 * The value for the category_id field.
-	 * @var        int
-	 */
-	protected $category_id;
-
-	/**
-	 * The value for the category_full_ids field.
-	 * @var        string
-	 */
-	protected $category_full_ids;
+	protected $hostname;
 
 	/**
 	 * The value for the created_at field.
@@ -66,19 +48,6 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $custom_data;
-
-	/**
-	 * The value for the status field.
-	 * Note: this column has a database default value of: 2
-	 * @var        int
-	 */
-	protected $status;
-
-	/**
-	 * The value for the privacy_contexts field.
-	 * @var        string
-	 */
-	protected $privacy_contexts;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -126,27 +95,6 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Applies default values to this object.
-	 * This method should be called from the object's constructor (or
-	 * equivalent initialization method).
-	 * @see        __construct()
-	 */
-	public function applyDefaultValues()
-	{
-		$this->status = 2;
-	}
-
-	/**
-	 * Initializes internal state of BasecategoryEntry object.
-	 * @see        applyDefaults()
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->applyDefaultValues();
-	}
-
-	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -157,43 +105,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [partner_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getPartnerId()
-	{
-		return $this->partner_id;
-	}
-
-	/**
-	 * Get the [entry_id] column value.
+	 * Get the [hostname] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getEntryId()
+	public function getHostname()
 	{
-		return $this->entry_id;
-	}
-
-	/**
-	 * Get the [category_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getCategoryId()
-	{
-		return $this->category_id;
-	}
-
-	/**
-	 * Get the [category_full_ids] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getCategoryFullIds()
-	{
-		return $this->category_full_ids;
+		return $this->hostname;
 	}
 
 	/**
@@ -287,35 +205,15 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [status] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getStatus()
-	{
-		return $this->status;
-	}
-
-	/**
-	 * Get the [privacy_contexts] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getPrivacyContexts()
-	{
-		return $this->privacy_contexts;
-	}
-
-	/**
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
+	 * @return     ApiServer The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::ID]))
-			$this->oldColumnsValues[categoryEntryPeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[ApiServerPeer::ID]))
+			$this->oldColumnsValues[ApiServerPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -323,110 +221,41 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::ID;
+			$this->modifiedColumns[] = ApiServerPeer::ID;
 		}
 
 		return $this;
 	} // setId()
 
 	/**
-	 * Set the value of [partner_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
-	 */
-	public function setPartnerId($v)
-	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::PARTNER_ID]))
-			$this->oldColumnsValues[categoryEntryPeer::PARTNER_ID] = $this->partner_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->partner_id !== $v) {
-			$this->partner_id = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::PARTNER_ID;
-		}
-
-		return $this;
-	} // setPartnerId()
-
-	/**
-	 * Set the value of [entry_id] column.
+	 * Set the value of [hostname] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
+	 * @return     ApiServer The current object (for fluent API support)
 	 */
-	public function setEntryId($v)
+	public function setHostname($v)
 	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::ENTRY_ID]))
-			$this->oldColumnsValues[categoryEntryPeer::ENTRY_ID] = $this->entry_id;
+		if(!isset($this->oldColumnsValues[ApiServerPeer::HOSTNAME]))
+			$this->oldColumnsValues[ApiServerPeer::HOSTNAME] = $this->hostname;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->entry_id !== $v) {
-			$this->entry_id = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::ENTRY_ID;
+		if ($this->hostname !== $v) {
+			$this->hostname = $v;
+			$this->modifiedColumns[] = ApiServerPeer::HOSTNAME;
 		}
 
 		return $this;
-	} // setEntryId()
-
-	/**
-	 * Set the value of [category_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
-	 */
-	public function setCategoryId($v)
-	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::CATEGORY_ID]))
-			$this->oldColumnsValues[categoryEntryPeer::CATEGORY_ID] = $this->category_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->category_id !== $v) {
-			$this->category_id = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::CATEGORY_ID;
-		}
-
-		return $this;
-	} // setCategoryId()
-
-	/**
-	 * Set the value of [category_full_ids] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
-	 */
-	public function setCategoryFullIds($v)
-	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::CATEGORY_FULL_IDS]))
-			$this->oldColumnsValues[categoryEntryPeer::CATEGORY_FULL_IDS] = $this->category_full_ids;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->category_full_ids !== $v) {
-			$this->category_full_ids = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::CATEGORY_FULL_IDS;
-		}
-
-		return $this;
-	} // setCategoryFullIds()
+	} // setHostname()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     categoryEntry The current object (for fluent API support)
+	 * @return     ApiServer The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -463,7 +292,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = categoryEntryPeer::CREATED_AT;
+				$this->modifiedColumns[] = ApiServerPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -475,7 +304,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     categoryEntry The current object (for fluent API support)
+	 * @return     ApiServer The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
@@ -512,7 +341,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 					)
 			{
 				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = categoryEntryPeer::UPDATED_AT;
+				$this->modifiedColumns[] = ApiServerPeer::UPDATED_AT;
 			}
 		} // if either are not null
 
@@ -523,7 +352,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
+	 * @return     ApiServer The current object (for fluent API support)
 	 */
 	public function setCustomData($v)
 	{
@@ -533,57 +362,11 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::CUSTOM_DATA;
+			$this->modifiedColumns[] = ApiServerPeer::CUSTOM_DATA;
 		}
 
 		return $this;
 	} // setCustomData()
-
-	/**
-	 * Set the value of [status] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
-	 */
-	public function setStatus($v)
-	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::STATUS]))
-			$this->oldColumnsValues[categoryEntryPeer::STATUS] = $this->status;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->status !== $v || $this->isNew()) {
-			$this->status = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::STATUS;
-		}
-
-		return $this;
-	} // setStatus()
-
-	/**
-	 * Set the value of [privacy_contexts] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     categoryEntry The current object (for fluent API support)
-	 */
-	public function setPrivacyContexts($v)
-	{
-		if(!isset($this->oldColumnsValues[categoryEntryPeer::PRIVACY_CONTEXTS]))
-			$this->oldColumnsValues[categoryEntryPeer::PRIVACY_CONTEXTS] = $this->privacy_contexts;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->privacy_contexts !== $v) {
-			$this->privacy_contexts = $v;
-			$this->modifiedColumns[] = categoryEntryPeer::PRIVACY_CONTEXTS;
-		}
-
-		return $this;
-	} // setPrivacyContexts()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -595,10 +378,6 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->status !== 2) {
-				return false;
-			}
-
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -622,15 +401,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->entry_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->category_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->category_full_ids = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->privacy_contexts = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->hostname = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->updated_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->custom_data = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -640,10 +414,10 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 5; // 5 = ApiServerPeer::NUM_COLUMNS - ApiServerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating categoryEntry object", $e);
+			throw new PropelException("Error populating ApiServer object", $e);
 		}
 	}
 
@@ -686,15 +460,15 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		categoryEntryPeer::setUseCriteriaFilter(false);
-		$stmt = categoryEntryPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
-		categoryEntryPeer::setUseCriteriaFilter(true);
+		ApiServerPeer::setUseCriteriaFilter(false);
+		$stmt = ApiServerPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		ApiServerPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -723,14 +497,14 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				categoryEntryPeer::doDelete($this, $con);
+				ApiServerPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -763,7 +537,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(categoryEntryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(ApiServerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -783,7 +557,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 					$this->postUpdate($con);
 				}
 				$this->postSave($con);
-				categoryEntryPeer::addInstanceToPool($this);
+				ApiServerPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
@@ -818,14 +592,14 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->alreadyInSave = true;
 
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = categoryEntryPeer::ID;
+				$this->modifiedColumns[] = ApiServerPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = categoryEntryPeer::doInsert($this, $con);
+					$pk = ApiServerPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -835,7 +609,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = categoryEntryPeer::doUpdate($this, $con);
+					$affectedObjects = ApiServerPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -940,17 +714,6 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		
 		parent::postUpdate($con);
 	}
-	/**
-	 * Code to be run after deleting the object from database
-	 * @param PropelPDO $con
-	 */
-	public function postDelete(PropelPDO $con = null)
-	{
-		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
-		
-		parent::postDelete($con);
-	}
-	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -1064,7 +827,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = categoryEntryPeer::doValidate($this, $columns)) !== true) {
+			if (($retval = ApiServerPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -1087,7 +850,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = categoryEntryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = ApiServerPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -1106,31 +869,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getPartnerId();
+				return $this->getHostname();
 				break;
 			case 2:
-				return $this->getEntryId();
-				break;
-			case 3:
-				return $this->getCategoryId();
-				break;
-			case 4:
-				return $this->getCategoryFullIds();
-				break;
-			case 5:
 				return $this->getCreatedAt();
 				break;
-			case 6:
+			case 3:
 				return $this->getUpdatedAt();
 				break;
-			case 7:
+			case 4:
 				return $this->getCustomData();
-				break;
-			case 8:
-				return $this->getStatus();
-				break;
-			case 9:
-				return $this->getPrivacyContexts();
 				break;
 			default:
 				return null;
@@ -1151,18 +899,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = categoryEntryPeer::getFieldNames($keyType);
+		$keys = ApiServerPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getPartnerId(),
-			$keys[2] => $this->getEntryId(),
-			$keys[3] => $this->getCategoryId(),
-			$keys[4] => $this->getCategoryFullIds(),
-			$keys[5] => $this->getCreatedAt(),
-			$keys[6] => $this->getUpdatedAt(),
-			$keys[7] => $this->getCustomData(),
-			$keys[8] => $this->getStatus(),
-			$keys[9] => $this->getPrivacyContexts(),
+			$keys[1] => $this->getHostname(),
+			$keys[2] => $this->getCreatedAt(),
+			$keys[3] => $this->getUpdatedAt(),
+			$keys[4] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1179,7 +922,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = categoryEntryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = ApiServerPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -1198,31 +941,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setPartnerId($value);
+				$this->setHostname($value);
 				break;
 			case 2:
-				$this->setEntryId($value);
-				break;
-			case 3:
-				$this->setCategoryId($value);
-				break;
-			case 4:
-				$this->setCategoryFullIds($value);
-				break;
-			case 5:
 				$this->setCreatedAt($value);
 				break;
-			case 6:
+			case 3:
 				$this->setUpdatedAt($value);
 				break;
-			case 7:
+			case 4:
 				$this->setCustomData($value);
-				break;
-			case 8:
-				$this->setStatus($value);
-				break;
-			case 9:
-				$this->setPrivacyContexts($value);
 				break;
 		} // switch()
 	}
@@ -1246,18 +974,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = categoryEntryPeer::getFieldNames($keyType);
+		$keys = ApiServerPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setEntryId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setCategoryId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCategoryFullIds($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setPrivacyContexts($arr[$keys[9]]);
+		if (array_key_exists($keys[1], $arr)) $this->setHostname($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCustomData($arr[$keys[4]]);
 	}
 
 	/**
@@ -1267,18 +990,13 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(categoryEntryPeer::DATABASE_NAME);
+		$criteria = new Criteria(ApiServerPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(categoryEntryPeer::ID)) $criteria->add(categoryEntryPeer::ID, $this->id);
-		if ($this->isColumnModified(categoryEntryPeer::PARTNER_ID)) $criteria->add(categoryEntryPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(categoryEntryPeer::ENTRY_ID)) $criteria->add(categoryEntryPeer::ENTRY_ID, $this->entry_id);
-		if ($this->isColumnModified(categoryEntryPeer::CATEGORY_ID)) $criteria->add(categoryEntryPeer::CATEGORY_ID, $this->category_id);
-		if ($this->isColumnModified(categoryEntryPeer::CATEGORY_FULL_IDS)) $criteria->add(categoryEntryPeer::CATEGORY_FULL_IDS, $this->category_full_ids);
-		if ($this->isColumnModified(categoryEntryPeer::CREATED_AT)) $criteria->add(categoryEntryPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(categoryEntryPeer::UPDATED_AT)) $criteria->add(categoryEntryPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
-		if ($this->isColumnModified(categoryEntryPeer::STATUS)) $criteria->add(categoryEntryPeer::STATUS, $this->status);
-		if ($this->isColumnModified(categoryEntryPeer::PRIVACY_CONTEXTS)) $criteria->add(categoryEntryPeer::PRIVACY_CONTEXTS, $this->privacy_contexts);
+		if ($this->isColumnModified(ApiServerPeer::ID)) $criteria->add(ApiServerPeer::ID, $this->id);
+		if ($this->isColumnModified(ApiServerPeer::HOSTNAME)) $criteria->add(ApiServerPeer::HOSTNAME, $this->hostname);
+		if ($this->isColumnModified(ApiServerPeer::CREATED_AT)) $criteria->add(ApiServerPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(ApiServerPeer::UPDATED_AT)) $criteria->add(ApiServerPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(ApiServerPeer::CUSTOM_DATA)) $criteria->add(ApiServerPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1293,18 +1011,18 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(categoryEntryPeer::DATABASE_NAME);
+		$criteria = new Criteria(ApiServerPeer::DATABASE_NAME);
 
-		$criteria->add(categoryEntryPeer::ID, $this->id);
+		$criteria->add(ApiServerPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(categoryEntryPeer::UPDATED_AT))
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(ApiServerPeer::UPDATED_AT))
 		{
 			$theModifiedColumn = null;
 			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != categoryEntryPeer::UPDATED_AT)
+				if($modifiedColumn != ApiServerPeer::UPDATED_AT)
 					$theModifiedColumn = $modifiedColumn;
 					
-			$atomicColumns = categoryEntryPeer::getAtomicColumns();
+			$atomicColumns = ApiServerPeer::getAtomicColumns();
 			if(in_array($theModifiedColumn, $atomicColumns))
 				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 		}
@@ -1338,30 +1056,20 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of categoryEntry (or compatible) type.
+	 * @param      object $copyObj An object of ApiServer (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
-		$copyObj->setPartnerId($this->partner_id);
-
-		$copyObj->setEntryId($this->entry_id);
-
-		$copyObj->setCategoryId($this->category_id);
-
-		$copyObj->setCategoryFullIds($this->category_full_ids);
+		$copyObj->setHostname($this->hostname);
 
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
-
-		$copyObj->setStatus($this->status);
-
-		$copyObj->setPrivacyContexts($this->privacy_contexts);
 
 
 		$copyObj->setNew(true);
@@ -1379,7 +1087,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     categoryEntry Clone of current object.
+	 * @return     ApiServer Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1395,16 +1103,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     categoryEntry Clone of current object.
+	 * @var     ApiServer Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      categoryEntry $copiedFrom Clone of current object.
+	 * @param      ApiServer $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(categoryEntry $copiedFrom)
+	public function setCopiedFrom(ApiServer $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1416,12 +1124,12 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     categoryEntryPeer
+	 * @return     ApiServerPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new categoryEntryPeer();
+			self::$peer = new ApiServerPeer();
 		}
 		return self::$peer;
 	}
@@ -1559,4 +1267,4 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
-} // BasecategoryEntry
+} // BaseApiServer
