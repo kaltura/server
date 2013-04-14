@@ -15,13 +15,16 @@ if($argc == 1)
 
 $systemConfig = parse_ini_file("$kalturaRootPath/configurations/system.template.ini");
 
-$options = getopt("e:w:");
+$errorThreshold = null;
+$warningThreshold = null;
 
-$errorThreshold = $options["e"];
-$warningThreshold = $options["w"];
+$options = getopt('e:w:');
+if(isset($options['e']))
+	$errorThreshold = $options['e'];
+if(isset($options['w']))
+	$warningThreshold = $options['w'];
 
-$testScript = $argv[1];
-$testScriptCmd = implode(" ", array_slice($argv, 1));
+$testScriptCmd = implode(' ', array_slice($argv, 1));
 $testScriptCmd = substr($testScriptCmd, 2);
 
 $outputLines = null;
