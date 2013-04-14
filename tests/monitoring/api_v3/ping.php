@@ -3,6 +3,13 @@ require_once realpath(__DIR__ . '/../../') . '/lib/KalturaClient.php';
 require_once realpath(__DIR__ . '/../') . '/KalturaMonitorResult.php';
 
 $options = getopt('', array('service-url:'));
+
+if(!isset($options['service-url']))
+{
+	echo "Argument service-url is required";
+	exit(-1);
+}
+
 $serviceUrl = $options['service-url'];
 $clientConfig = new KalturaConfiguration();
 $clientConfig->partnerId = null;
@@ -29,3 +36,4 @@ catch(KalturaClientException $ex)
 	$monitorResult->description = $ex->getMessage();
 }
 echo "$monitorResult";
+exit(0);
