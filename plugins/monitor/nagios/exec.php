@@ -25,7 +25,6 @@ if(isset($options['w']))
 	$warningThreshold = $options['w'];
 
 $testScriptCmd = implode(' ', array_slice($argv, 1));
-$testScriptCmd = substr($testScriptCmd, 2);
 
 $outputLines = null;
 $returnedValue = null;
