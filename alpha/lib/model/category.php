@@ -1540,7 +1540,7 @@ class category extends Basecategory implements IIndexable
 		//default non-entitlement fields
 		$this->setPrivacy(PrivacyType::ALL);
 		$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
-		$this->setModeration(false);
+		//$this->setModeration(false);
 		$this->setInheritanceType(InheritanceType::MANUAL);
 		$this->setKuserId(null);
 		$this->setUserJoinPolicy(UserJoinPolicyType::NOT_ALLOWED);
