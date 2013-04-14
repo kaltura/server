@@ -465,6 +465,8 @@ class FlavorAssetService extends KalturaAssetService
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaAssetFilter::entryIdEqual/KalturaAssetFilter::entryIdIn');
 		}
+		
+		$entryIds = array_slice($entryIds, 0, baseObjectFilter::getMaxInValues());
 
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
