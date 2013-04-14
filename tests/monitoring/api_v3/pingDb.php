@@ -2,8 +2,8 @@
 require_once realpath(__DIR__ . '/../../') . '/lib/KalturaClient.php';
 require_once realpath(__DIR__ . '/../') . '/KalturaMonitorResult.php';
 
-$options = getopt("u:");
-$serviceUrl = $options["u"];
+$options = getopt('', array('service-url:'));
+$serviceUrl = $options['service-url'];
 $clientConfig = new KalturaConfiguration();
 $clientConfig->partnerId = null;
 $clientConfig->serviceUrl = $serviceUrl;

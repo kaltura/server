@@ -15,14 +15,44 @@ if($argc == 1)
 
 $systemConfig = parse_ini_file("$kalturaRootPath/configurations/system.ini");
 
-$errorThreshold = null;
-$warningThreshold = null;
+$errorThresholdMax = null;
+$errorThresholdMin = null;
+$warningThresholdMax = null;
+$warningThresholdMin = null;
 
-$options = getopt('e:w:');
-if(isset($options['e']))
-	$errorThreshold = $options['e'];
-if(isset($options['w']))
-	$warningThreshold = $options['w'];
+$options = getopt('', array(
+	'error-threshold:',
+	'warning-threshold:',
+));
+$matches = null;
+if(isset($options['error-threshold']))
+{
+	if(is_numeric($options['error-threshold']))
+	{
+		$errorThresholdMax = intval($options['error-threshold']);
+	}
+	elseif(preg_match('/^([\d]*)-([\d]*)$/', trim($options['error-threshold']), $matches))
+	{
+		if(is_numeric($matches[1]))
+			$errorThresholdMin = $matches[1];
+		if(is_numeric($matches[2]))
+			$errorThresholdMax = $matches[2];
+	}
+}
+if(isset($options['warning-threshold']))
+{
+	if(is_numeric($options['warning-threshold']))
+	{
+		$warningThresholdMax = intval($options['warning-threshold']);
+	}
+	elseif(preg_match('/^([\d]*)-([\d]*)$/', trim($options['warning-threshold']), $matches))
+	{
+		if(is_numeric($matches[1]))
+			$warningThresholdMin = $matches[1];
+		if(is_numeric($matches[2]))
+			$warningThresholdMax = $matches[2];
+	}
+}
 
 $testScriptCmd = implode(' ', array_slice($argv, 1));
 
@@ -49,15 +79,15 @@ if($monitorResult->errors)
 	exit(NAGIOS_CODE_UNKNOWN);
 }
 
-if(isset($errorThreshold) && $monitorResult->value > $errorThreshold)
+if(isset($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
 {
-	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThreshold;
+	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThresholdMax;
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
-if(isset($warningThreshold) && $monitorResult->value > $warningThreshold)
+if(isset($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
 {
-	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThreshold;
+	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMax;
 	exit(NAGIOS_CODE_WARNING);
 }
 
