@@ -4,6 +4,8 @@ class kMemoryManager
 {
 	public static function clearMemory()
 	{
+		KalturaLog::log('Clearing memory');
+		
 		kMrssManager::clearInstancePool();
 		
 		accessControlPeer::clearInstancePool();

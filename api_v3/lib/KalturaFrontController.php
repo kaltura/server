@@ -195,6 +195,8 @@ class KalturaFrontController
 	        }
 	    }
 	    
+	    $lastSecurityContext = null;
+	    
 	    $i = 1;
 	    foreach($listOfRequests as $currentRequest)
 	    {
@@ -228,14 +230,13 @@ class KalturaFrontController
                     }
                 }	            
 	        }
-	        
-	        
+	        	         
 			// cached parameters should be different when the request is part of a multirequest
 			// as part of multirequest - the cached data is a serialized php object
 			// when not part of multirequest - the cached data is the actual response
 			$currentParams['multirequest'] = true;
 			unset($currentParams['format']);
-			
+							
 			$cache = new KalturaResponseCacher($currentParams);
 			if(!isset($currentParams['ks']) && kCurrentContext::$ks) {
 				$cache->setKS(kCurrentContext::$ks);
@@ -251,11 +252,21 @@ class KalturaFrontController
 			}
 			else
 			{
+				// get current security context (partnerId + ks)
+				$ksStr = isset($currentParams["ks"]) ? $currentParams["ks"] : null ;
+				$partnerId = isset($currentParams["p"]) && $currentParams["p"] ? $currentParams["p"] : null;
+				if (!$partnerId)
+					$partnerId = isset($currentParams["partnerId"]) && $currentParams["partnerId"] ? $currentParams["partnerId"] : null;
+				$securityContext = array($partnerId, $ksStr);
+				
 				if ($i != 1)
 				{
-					kMemoryManager::clearMemory();
+					if ($lastSecurityContext !== $securityContext || memory_get_usage() > kConf::get('min_mem_usage_for_clear'))
+						kMemoryManager::clearMemory();
 					KalturaCriterion::clearTags();
 				}
+				
+				$lastSecurityContext = $securityContext;
 			
 				try 
 				{  
