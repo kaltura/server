@@ -1,9 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <title>Kaltura API Dashboard</title>
 <style type="text/css">
 
+	* {	padding: 0; margin: 0; vertical-align: top; }
+	
 	.dashboard{
 		width: 100%;
 	}
@@ -18,10 +20,146 @@
 	TD.value{
 		width: 80px;		
 	}	
+	
+	body {
+		font: 18px/1.5em "proxima-nova", Helvetica, Arial, sans-serif;
+	}
 
+	h1 {
+		margin-top: 15px;
+		font: normal 32px "omnes-pro", Helvetica, Arial, sans-serif;
+	}
+		
+	button {
+		font-size: 18px;
+		padding: 1px 7px;
+	}
+	
+	input {
+		font-size: 18px;
+	}
+	
+	input[type=checkbox] {
+		margin: 7px;
+	}
+	
+	#content {
+		width: 880px;
+		margin: 0 auto;
+		padding: 10px;
+	}
+	
+	.charts-container {
+		width: 100%;		
+	}
+	
+	.servers-container {
+		box-sizing: border-box;
+		width: 100%;
+		height: 200px;
+		padding: 5px 5px 5px 5px;
+		margin: auto 5px auto 5px;
+		border: 1px solid #ddd;
+		background: #fff;
+		background: linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+		box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+		-o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	}
+	
+	.chart {
+		width: 100%;
+		height: 100%;
+		font-size: 14px;
+		line-height: 1.2em;
+	}
+	
+	.legend table {
+		border-spacing: 5px;
+	}
+	
+	.partner-container{
+		box-sizing: border-box;
+		width: 270px;
+		height: 200px;
+		padding: 5px 5px 5px 5px;
+		border: 1px solid #ddd;
+		background: #fff;
+		background: linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+		box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+		-o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);		
+	}	
+	
+	.address-container{
+		box-sizing: border-box;
+		width: 450px;
+		height: 200px;
+		padding: 5px 5px 5px 5px;
+		border: 1px solid #ddd;
+		background: #fff;
+		background: linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+		box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+		-o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);		
+	}		
+	
+	.action-container{
+		box-sizing: border-box;
+		width: 500px;
+		height: 200px;
+		padding: 5px 5px 5px 5px;
+		border: 1px solid #ddd;
+		background: #fff;
+		background: linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+		background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+		box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+		-o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);		
+	}	
+	
+	.cache-container {
+		position: relative;
+		height: 200px;
+		width: 200px;	
+	}	
+	
+	.session-container {
+		position: relative;
+		height: 200px;
+		width: 200px;	
+	}	
+	
 </style>
 <script src="js/jquery-1.8.3.js"></script>
 <script src="js/socket.io/socket.io.js"></script>
+<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/flot/excanvas.min.js"></script><![endif]-->
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.categories.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.pie.js"></script>
 <script type="text/javascript">
 
 	var socket = null;
@@ -29,9 +167,12 @@
 		chart1: 0,
 		chart2: 0,
 	};
+
+	function labelFormatter(label, series) {
+		return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
+	}
 	
 	function handleCalls(chart, calls){
-
 		var percent100 = 0;
 		var sortedCalls = [];
 		for(var sentField in calls){
@@ -69,8 +210,7 @@
 		}
 	}
 	
-	function query(formId)
-	{
+	function query(formId){
 		$form = $('#' + formId);
 		var name = $form.find('.name').val();
 		$('#' + name).empty();
@@ -97,6 +237,402 @@
 		};
 		socket.emit('applyQuery', {query: query});
 	}
+
+	function showTooltip(x, y, contents) {
+		$("<div id='tooltip'>" + contents + "</div>").css({
+			position: "absolute",
+			display: "none",
+			top: y + 5,
+			left: x + 5,
+			border: "1px solid #fdd",
+			padding: "2px",
+			"background-color": "#fee",
+			opacity: 0.80
+		}).appendTo("body").fadeIn(200);
+	}
+	
+	var serversPlot = null;
+	var previousPoint = null;
+	function handleServers(calls){
+		var data = [];
+		for(var server in calls)
+			data.push([ server.replace('pa-', '').replace('ny-', ''), calls[server] ]);
+		
+		if(serversPlot == null){
+			
+			serversPlot = $.plot("#servers-chart", [data], {
+				series: {
+					bars: {
+						show: true,
+						barWidth: 0.5,
+						align: "center"
+					}
+				},
+				grid: {
+					hoverable: true,
+					clickable: false
+				},
+				xaxis: {
+					mode: "categories",
+					tickLength: 0
+				},
+				yaxis: {
+					min: 0,
+					max: null
+				}
+			});
+
+			$("#servers-chart").bind("plothover", function (event, pos, item) {
+
+				if (item) {
+					if (previousPoint != item.dataIndex) {
+						previousPoint = item.dataIndex;
+						$("#tooltip").remove();
+						var itemData = item.series.data[item.dataIndex];
+						var tooltip = itemData[0] + ": " + itemData[1];
+						showTooltip(item.pageX, item.pageY, tooltip);
+					}
+				} else {
+					$("#tooltip").remove();
+					previousPoint = null;            
+				}
+			});
+		}
+		else{
+			serversPlot.setData([data]);
+			serversPlot.setupGrid();
+			serversPlot.draw();
+		}
+	}
+	
+	function queryServers(){
+		
+		var query = {
+			name: 'servers',
+			groupBy: 'server',
+			order: 0,
+			limit: 100,
+			units: 300,
+			filters: {}
+		};
+
+		socket.on(query.name, function (calls) {
+			handleServers(calls);
+		});
+		
+		socket.emit('applyQuery', {query: query});
+	}
+
+	var cachedPlot = null;
+	function handleCached(calls){
+		var data = [{
+				label: "Cached",
+				data: calls[true]
+			},{
+				label: "Uncached",
+				data: calls[false]
+			}
+		];
+		
+		if(cachedPlot == null){
+
+			cachedPlot = $.plot("#cache-chart", data, {
+				series: {
+					pie: { 
+			            radius: 1,
+						show: true,
+			            label: {
+			                show: true,
+			                radius: 5/8,
+			                formatter: labelFormatter,
+			                background: {
+			                    opacity: 0.5
+			                }
+			            }
+					}
+				},
+			    legend: {
+			        show: false
+			    }
+			});
+		}
+		else{
+			cachedPlot.setData(data);
+			cachedPlot.draw();
+		}
+	}
+	
+	function queryCached(){
+		var query = {
+				name: 'cache',
+				groupBy: 'cached',
+				order: 0,
+				limit: 2,
+				units: 300,
+				filters: {}
+			};
+
+			socket.on(query.name, function (calls) {
+				handleCached(calls);
+			});
+			
+			socket.emit('applyQuery', {query: query});
+	}
+
+	function handlePartners(calls){
+
+		var data = [];
+		for(var server in calls)
+			data.push([ server, calls[server] ]);
+
+		var chart = $("#partner-chart");
+		chart.unbind();
+		$.plot(chart, [data], {
+			series: {
+				bars: {
+					show: true,
+					barWidth: 0.3,
+					align: "center"
+				}
+			},
+			grid: {
+				hoverable: true,
+				clickable: false
+			},
+			xaxis: {
+				mode: "categories",
+				tickLength: 0
+			},
+			yaxis: {
+				min: 0,
+				max: null
+			}
+		});
+
+		chart.bind("plothover", function (event, pos, item) {
+
+			if (item) {
+				if (previousPoint != item.dataIndex) {
+					previousPoint = item.dataIndex;
+					$("#tooltip").remove();
+					var itemData = item.series.data[item.dataIndex];
+					var tooltip = itemData[0] + ": " + itemData[1];
+					showTooltip(item.pageX, item.pageY, tooltip);
+				}
+			} else {
+				$("#tooltip").remove();
+				previousPoint = null;            
+			}
+		});
+	}
+	
+	function queryPartners(){
+		var query = {
+				name: 'partners',
+				groupBy: 'partner',
+				order: -1,
+				limit: 5,
+				units: 300,
+				filters: {}
+			};
+
+			socket.on(query.name, function (calls) {
+				handlePartners(calls);
+			});
+			
+			socket.emit('applyQuery', {query: query});
+	}
+
+	function handleAddresses(calls){
+
+		var data = [];
+		for(var server in calls)
+			data.push([ server, calls[server] ]);
+
+		var chart = $("#address-chart");
+		chart.unbind();
+		$.plot(chart, [data], {
+			series: {
+				bars: {
+					show: true,
+					barWidth: 0.3,
+					align: "center"
+				}
+			},
+			grid: {
+				hoverable: true,
+				clickable: false
+			},
+			xaxis: {
+				mode: "categories",
+				tickLength: 0
+			},
+			yaxis: {
+				min: 0,
+				max: null
+			}
+		});
+
+		chart.bind("plothover", function (event, pos, item) {
+
+			if (item) {
+				if (previousPoint != item.dataIndex) {
+					previousPoint = item.dataIndex;
+					$("#tooltip").remove();
+					var itemData = item.series.data[item.dataIndex];
+					var tooltip = itemData[0] + ": " + itemData[1];
+					showTooltip(item.pageX, item.pageY, tooltip);
+				}
+			} else {
+				$("#tooltip").remove();
+				previousPoint = null;            
+			}
+		});
+	}
+	
+	function queryAddresses(){
+		var query = {
+				name: 'addresses',
+				groupBy: 'address',
+				order: -1,
+				limit: 5,
+				units: 300,
+				filters: {}
+			};
+
+			socket.on(query.name, function (calls) {
+				handleAddresses(calls);
+			});
+			
+			socket.emit('applyQuery', {query: query});
+	}
+
+	function handleActions(calls){
+
+		var data = [];
+		for(var server in calls)
+			data.push([ server, calls[server] ]);
+
+		var chart = $("#action-chart");
+		chart.unbind();
+		$.plot(chart, [data], {
+			series: {
+				bars: {
+					show: true,
+					barWidth: 0.3,
+					align: "center"
+				}
+			},
+			grid: {
+				hoverable: true,
+				clickable: false
+			},
+			xaxis: {
+				mode: "categories",
+				tickLength: 0
+			},
+			yaxis: {
+				min: 0,
+				max: null
+			}
+		});
+
+		chart.bind("plothover", function (event, pos, item) {
+
+			if (item) {
+				if (previousPoint != item.dataIndex) {
+					previousPoint = item.dataIndex;
+					$("#tooltip").remove();
+					var itemData = item.series.data[item.dataIndex];
+					var tooltip = itemData[0] + ": " + itemData[1];
+					showTooltip(item.pageX, item.pageY, tooltip);
+				}
+			} else {
+				$("#tooltip").remove();
+				previousPoint = null;            
+			}
+		});
+	}
+	
+	function queryActions(){
+		var query = {
+				name: 'actions',
+				groupBy: 'action',
+				order: -1,
+				limit: 5,
+				units: 300,
+				filters: {}
+			};
+
+			socket.on(query.name, function (calls) {
+				handleActions(calls);
+			});
+			
+			socket.emit('applyQuery', {query: query});
+	}
+
+	var sessionPlot = null;
+	function handleSession(calls){
+		var data = [{
+				label: "Admin",
+				data: calls[2]
+			},{
+				label: "User",
+				data: calls[1]
+			},{
+				label: "Widget",
+				data: calls[0]
+			},{
+				label: "None",
+				data: calls[-1]
+			}
+		];
+		
+		if(sessionPlot == null){
+
+			sessionPlot = $.plot("#session-chart", data, {
+				series: {
+					pie: { 
+			            radius: 1,
+			            innerRadius: 0.4,
+						show: true,
+			            label: {
+			                show: true,
+			                radius: 5/8,
+			                formatter: labelFormatter,
+			                background: {
+			                    opacity: 0
+			                }
+			            }
+					}
+				},
+			    legend: {
+			        show: false
+			    }
+			});
+		}
+		else{
+			sessionPlot.setData(data);
+			sessionPlot.draw();
+		}
+	}
+	
+	function querySession(){
+		var query = {
+				name: 'session',
+				groupBy: 'sessionType',
+				order: 0,
+				limit: 4,
+				units: 300,
+				filters: {}
+			};
+
+			socket.on(query.name, function (calls) {
+				handleSession(calls);
+			});
+			
+			socket.emit('applyQuery', {query: query});
+	}
 	
 	$(function(){
 
@@ -108,6 +644,12 @@
 		socket = io.connect('http://' + location.hostname + ':8001');
 		socket.on('connect', function () {
 			$('.report').attr('disabled', false);
+			queryServers();
+			queryCached();
+			querySession();
+			queryPartners();
+			queryAddresses();
+			queryActions();
 		});
 	});
 	
@@ -115,6 +657,53 @@
 </head>
 <body>
 <h1>Kaltura API Dashboard</h1>
+<table class="charts-container">
+	<tr>
+		<th colspan="5">Servers</th>
+	</tr>
+	<tr>
+		<td colspan="5">
+			<div class="servers-container">
+				<div id="servers-chart" class="chart"></div>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<th>Cache</th>
+		<th>Partners</th>
+		<th>Addresses</th>
+		<th>Actions</th>
+		<th>Session Types</th>
+	</tr>
+	<tr>
+		<td>
+			<div class="cache-container">
+				<div id="cache-chart" class="chart"></div>
+			</div>
+		</td>
+		<td>
+			<div class="partner-container">
+				<div id="partner-chart" class="chart"></div>
+			</div>
+		</td>
+		<td>
+			<div class="address-container">
+				<div id="address-chart" class="chart"></div>
+			</div>
+		</td>
+		<td>
+			<div class="action-container">
+				<div id="action-chart" class="chart"></div>
+			</div>
+		</td>
+		<td>
+			<div class="session-container">
+				<div id="session-chart" class="chart"></div>
+			</div>
+		</td>
+	</tr>
+</table>
+
 <form id="form1">
 	<input type="hidden" class="name" value="chart1"/>
 	Group by:
@@ -145,7 +734,7 @@
 	Filter value:
 	<input type="text" class="filterValue" value=""/>
 	<input type="checkbox" class="order" checked="checked" />Descending
-	<input type="button" value="Report" class="report" disabled="disabled" onclick="query('form1')" />
+	<button class="report" disabled="disabled" onclick="query('form1')">Report</button>
 </form>
 <table id="dashboard1" class="dashboard">
 	<tbody id="chart1">
@@ -181,7 +770,7 @@
 	Filter value:
 	<input type="text" class="filterValue" value=""/>
 	<input type="checkbox" class="order" checked="checked" />Descending
-	<input type="button" value="Report" class="report" disabled="disabled" onclick="query('form2')" />
+	<button class="report" disabled="disabled" onclick="query('form2')" >Report</button>
 </form>
 <table id="dashboard2" class="dashboard">
 	<tbody id="chart2">
