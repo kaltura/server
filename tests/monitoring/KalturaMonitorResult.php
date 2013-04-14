@@ -10,7 +10,7 @@ class KalturaMonitorError
 class KalturaMonitorResult
 {
 	public $value;
-	public $execTime;
+	public $executionTime;
 	public $description;
 	public $errors = array();
 	
@@ -55,7 +55,7 @@ class KalturaMonitorResult
 		
 		$monitorResult = new KalturaMonitorResult();
 		$monitorResult->value = $xml->value;
-		$monitorResult->exeTime = $xml->executionTime;
+		$monitorResult->executionTime = $xml->executionTime;
 		$monitorResult->description = $xml->description;
 		
 		if($xml->error != null)

@@ -28,8 +28,8 @@ catch(KalturaClientException $ex)
 	$monitorResult->errors[] = $error;
 
 }
-$monitorResult->execTime = $end - $start;
-$monitorResult->value = $monitorResult->execTime;
+$monitorResult->executionTime = $end - $start;
+$monitorResult->value = $monitorResult->executionTime;
 $monitorResult->description = "Execution time: $monitorResult->value seconds";
 
 echo "$monitorResult";
