@@ -16,21 +16,16 @@ try
 	$res = $client->system->ping();
 	$end = microtime(true);
 
+	$monitorResult->executionTime = $end - $start;
+	$monitorResult->value = $monitorResult->executionTime;
+	$monitorResult->description = "Execution time: $monitorResult->value seconds";
 }
 catch(KalturaClientException $ex)
 {
 	$end = microtime(true);
 	
-	$error = new KalturaMonitorError();
-	$error->level = "ERR";
-	$error->description = $ex->getMessage();
-	$error->code = $ex->getCode();
-	$monitorResult->errors[] = $error;
-
+	$monitorResult->executionTime = $end - $start;
+	$monitorResult->value = -1;
+	$monitorResult->description = $ex->getMessage();
 }
-$monitorResult->executionTime = $end - $start;
-$monitorResult->value = $monitorResult->executionTime;
-$monitorResult->description = "Execution time: $monitorResult->value seconds";
-
 echo "$monitorResult";
-
