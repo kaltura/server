@@ -25,7 +25,7 @@ try
 
 	$monitorResult->executionTime = $end - $start;
 	$monitorResult->value = $monitorResult->executionTime;
-	$monitorResult->description = "Execution time: $monitorResult->value seconds";
+	$monitorResult->description = "Ping time: $monitorResult->value seconds";
 }
 catch(KalturaClientException $ex)
 {

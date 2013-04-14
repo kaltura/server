@@ -27,7 +27,7 @@ try
 	if($res)
 	{
 		$monitorResult->value = $monitorResult->executionTime;
-		$monitorResult->description = "Execution time: $monitorResult->value seconds";
+		$monitorResult->description = "Database ping time: $monitorResult->value seconds";
 	}
 	else
 	{
