@@ -6,7 +6,6 @@
 class KalturaMonitorClient
 {
 	protected static $stream = null;
-	protected static $hostname = null;
 
 	protected static function init()
 	{
@@ -38,33 +37,13 @@ class KalturaMonitorClient
 		return false;
 	}
 
-	protected static function getHostname()
-	{
-		if(self::$hostname)
-			return self::$hostname;
-
-		if(isset($_SERVER['HOSTNAME']))
-			self::$hostname = $_SERVER['HOSTNAME'];
-
-		if(is_null(self::$hostname))
-			self::$hostname = gethostname();
-
-		if(is_null(self::$hostname))
-			self::$hostname = $_SERVER['SERVER_NAME'];
-
-		if(is_null(self::$hostname))
-			error_log('Host name is not defined, please define environment variable named HOSTNAME');
-
-		return self::$hostname;
-	}
-
 	public static function monitor($cached, $action, $partnerId, $sessionType, $isInMultiRequest = false)
 	{
 		if(!self::$stream && !self::init())
 			return false;
 
 		$data = array(
-			'server'			=> self::getHostname(),
+			'server'			=> infraRequestUtils::getHostname(),
 			'address'			=> infraRequestUtils::getRemoteAddress(),
 			'partner'			=> $partnerId,
 			'action'			=> $action,

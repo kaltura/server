@@ -1,7 +1,7 @@
 <?php
 /**
  * IMPORTANT !!! This class should not depend on anything other than kConf (e.g. NOT KalturaLog)
- * 
+ *
  * Will hold helper functions and conventions for working with the HttpRequest object
  *
  * @package server-infra
@@ -15,6 +15,7 @@ class infraRequestUtils
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = null;
 	protected static $requestParams = null;
+	protected static $hostname = null;
 
 	//
 	// the function check the http range header and sets http response headers accordingly
@@ -98,7 +99,7 @@ class infraRequestUtils
 			header("Content-Length: $length");
 		
 		return array($start, $end, $length);
-	}				  
+	}
 
 	public static function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
 	{
@@ -107,7 +108,7 @@ class infraRequestUtils
 			// added max-stale=0 to fight evil proxies
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
 			if ($last_modified)
 				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . 'GMT');
 			else
@@ -135,7 +136,7 @@ class infraRequestUtils
 				case "mp4":
 					$content_type ="video/mp4";
 					break;
-				case "mov": 
+				case "mov":
 				case "qt":
 					$content_type ="video/quicktime";
 					break;
@@ -181,7 +182,7 @@ class infraRequestUtils
 	}
 
 	public static function getSignedIpAddressHeader($ip = null)
-	{	
+	{
 		if (!kConf::hasParam('remote_addr_header_salt'))
 			return null;
 			
@@ -219,6 +220,26 @@ class infraRequestUtils
 		
 		return false;
 	}
+
+	public static function getHostname()
+	{
+		if(self::$hostname)
+			return self::$hostname;
+
+		if(isset($_SERVER['HOSTNAME']))
+			self::$hostname = $_SERVER['HOSTNAME'];
+
+		if(is_null(self::$hostname))
+			self::$hostname = gethostname();
+
+		if(is_null(self::$hostname))
+			self::$hostname = $_SERVER['SERVER_NAME'];
+
+		if(is_null(self::$hostname))
+			error_log('Host name is not defined, please define environment variable named HOSTNAME');
+
+		return self::$hostname;
+	}
 	
 	public static function getRemoteAddress()
 	{
@@ -230,7 +251,7 @@ class infraRequestUtils
 			return null;
 		
 		self::$isInGetRemoteAddress = true;
-		self::$remoteAddress = self::internalGetRemoteAddress();		
+		self::$remoteAddress = self::internalGetRemoteAddress();
 		self::$isInGetRemoteAddress = false;
 		return self::$remoteAddress;
 	}
@@ -269,11 +290,11 @@ class infraRequestUtils
 				{
 					die("REMOTE_ADDR header invalid signature");
 				}
-			}						
+			}
 		}
 		
 		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
-		if (!$remote_addr && 
+		if (!$remote_addr &&
 			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
 		 	isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
 		 	kConf::hasParam('remote_addr_header_server') &&
@@ -286,7 +307,7 @@ class infraRequestUtils
 
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
 		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
-		if (!$remote_addr && 
+		if (!$remote_addr &&
 			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
 			(in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
 			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
@@ -307,10 +328,10 @@ class infraRequestUtils
 	 			
 	 			$remote_addr = $tempAddr;
 	 			break;
-		 	}			
+		 	}
 		}
 
-		// if still empty .... 
+		// if still empty ....
 		if (!$remote_addr)
 			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
 		
@@ -323,8 +344,8 @@ class infraRequestUtils
 			return self::PROTOCOL_HTTPS;
 		
 		$params = self::getRequestParams();
-		if (isset($params['apiProtocol']) && 
-			kConf::hasParam('https_param_salt') && 
+		if (isset($params['apiProtocol']) &&
+			kConf::hasParam('https_param_salt') &&
 			$params['apiProtocol'] == 'https_' . kConf::get('https_param_salt'))
 			return self::PROTOCOL_HTTPS;
 		
