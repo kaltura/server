@@ -15,7 +15,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	const PARTNER_GROUP_ARRAY_NAME  = 'partner_group';    // name of $map's partner group array
 	const PERMISSION_NAMES_ARRAY    = 'permission_names'; // name of $map's permission names array
 			
-	private static $initialized = false; // map already initialized or not
+	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
 	private static $useCache = true;     // use cache or not
 	
 	private static $ksUserId = null;
@@ -161,7 +161,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	private static function errorIfNotInitialized()
 	{
-		if (!self::$initialized)
+		if (is_null(self::$lastInitializedContext))
 		{
 			throw new Exception('Permission manager has not yet been initialized');
 		}
@@ -425,6 +425,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public static function init($useCache = null)
 	{
+		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
+		if ($securityContext === self::$lastInitializedContext) {
+			KalturaLog::log('Already initalized for this security context');
+			return;
+		}
+		
 		// verify that kCurrentContext::init has been executed since it must be used to init current context permissions
 		if (!kCurrentContext::$ksPartnerUserInitialized) {
 			KalturaLog::crit('kCurrentContext::initKsPartnerUser must be executed before initializing kPermissionManager');
@@ -432,7 +438,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		
 		// can be initialized more than once to support multirequest with different kCurrentContext parameters
-		self::$initialized = false;
+		self::$lastInitializedContext = null;
 		self::$useCache = $useCache ? true : false;
 
 		// copy kCurrentContext parameters (kCurrentContext::init should have been executed before)
@@ -460,7 +466,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::initPermissionsMap();
 								
 		// initialization done
-		self::$initialized = true;
+		self::$lastInitializedContext = $securityContext;
 		return true;
 	}
 	
