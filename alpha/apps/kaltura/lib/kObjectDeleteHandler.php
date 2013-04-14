@@ -21,6 +21,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof asset)
 			return true;
+		
+		if($object instanceof assetParams)
+			return true;
 			
 		if($object instanceof syndicationFeed)
 			return true;
@@ -53,6 +56,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof asset)
 			$this->assetDeleted($object);
+			
+		if($object instanceof assetParams)
+			$this->assetParamDeleted($object);
 			
 		if($object instanceof syndicationFeed)
 			$this->syndicationFeedDeleted($object);
@@ -160,6 +166,36 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	protected function assetDeleted(asset $asset) 
 	{
 		$this->syncableDeleted($asset->getId(), FileSyncObjectType::FLAVOR_ASSET);
+	}
+	
+	/**
+	 * @param assetParams $assetParam
+	 */
+	protected function assetParamDeleted(assetParams $assetParam) 
+	{
+		//In Case Flavor Deleted Belongs To Partner 0 Exit Without Deleteing
+		if($assetParam->getPartnerId() == 0) 
+		{
+			KalturaLog::DEBUG("Deleting Flavor Param Of Partner 0 Is Restricted");
+			return;
+		}
+		
+		$c = new Criteria();
+		$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $assetParam->getId());
+		$flavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelect($c);
+		
+		if($flavorParamsConversionProfiles)
+		{
+			$valuesToDelete = array();
+			foreach($flavorParamsConversionProfiles as $flavorParamsConversionProfile)
+			{
+				/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */ 
+				$valuesToDelete[] = $flavorParamsConversionProfile->getId();
+			}
+
+			KalturaLog::DEBUG("Deleting Flavor Param Conversion Profile Association For Flavor Param ID [" . $assetParam->getId() . "]");
+			flavorParamsConversionProfilePeer::doDelete($valuesToDelete);
+		}
 	}
 	
 	/**
