@@ -8,10 +8,9 @@ import threading
 import json
 import Queue
 import SocketServer
-
-
 import tornado.web
 import tornadio2
+import gc
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -97,6 +96,10 @@ class kMonitorQueryHandler(threading.Thread):
 		# Indicates that the thread should keep running
 		# @var boolean
 		self.keepRunning = True
+			
+		# Number of handled requests since last status
+		# @var int
+		self.handledRequests = 0
 		
 	def stop(self):
 		self.keepRunning = False
@@ -113,6 +116,8 @@ class kMonitorQueryHandler(threading.Thread):
 		
 	def handle(self, apiRequest):
 #		print "Digesting server[%s], address[%s], partner[%s], action[%s], cached[%s], sessionType[%s]" % (apiRequest['server'], apiRequest['address'], apiRequest['partner'], apiRequest['action'], apiRequest['cached'], apiRequest['sessionType'])
+        
+		self.handledRequests += 1
         
 		now = int(time.time())
 		currentSecond = now % 60
@@ -149,13 +154,6 @@ class kMonitorQueryHandler(threading.Thread):
 				self.handle(self.queue.get());		
 		finally:
 			print "Handler stopped [%s]" % self.name
-			
-		self.queue.empty()
-		del self.queue
-		del self.cachedData
-		del self.realData
-		del self.sentData
-		del self
 		
 	def ingest(self, apiRequest):
 		for field in self.query.filters:
@@ -164,13 +162,17 @@ class kMonitorQueryHandler(threading.Thread):
 				
 #		print "Ingesting server[%s], address[%s], partner[%s], action[%s], cached[%s], sessionType[%s]" % (apiRequest['server'], apiRequest['address'], apiRequest['partner'], apiRequest['action'], apiRequest['cached'], apiRequest['sessionType'])
 		self.queue.put(apiRequest)
-				
-monitorClients = {}
-monitorClientsLock = threading.Lock()
 		
+	def getStatus(self):
+		ret = self.name + " q[" + str(self.queue.qsize()) + "] r[" + str(self.handledRequests) + "]"
+		self.handledRequests = 0
+		return ret
+				
+				
 class kMonitorClient(tornadio2.SocketConnection):
 
 	def on_open(self, request):
+		print "Client connected [%s]" % (self.session.session_id)
 		self.handlers = {}
 		self.handlersLock = threading.Lock()
 		
@@ -179,12 +181,8 @@ class kMonitorClient(tornadio2.SocketConnection):
 			monitorClients[self.session.session_id] = self
 		finally:
 			monitorClientsLock.release()
-		
-		print "Client connected [%s]" % (self.session.session_id)
 
 	def on_close(self):
-		
-		print "Client disconnected [%s]" % (self.session.session_id)
 		
 		monitorClientsLock.acquire()
 		try:
@@ -199,7 +197,7 @@ class kMonitorClient(tornadio2.SocketConnection):
 		finally:
 			self.handlersLock.release()
 			
-		del self
+		print "Client disconnected [%s]" % (self.session.session_id)
 		    
 	@tornadio2.event('applyQuery')
 	def applyQuery(self, query):
@@ -220,30 +218,41 @@ class kMonitorClient(tornadio2.SocketConnection):
 			self.handlersLock.release()
 		
 	def sendCalls(self, name, calls):
-		self.emit(name, calls);
+		try:
+			self.emit(name, calls);
+		except IndexError:
+			print "Failed sending calls"
 		
 	def handle(self, apiRequest):
 		# use cloned list in order to overcome changes in the list during the iterations
 		self.handlersLock.acquire()
 		try:
-			keys = self.handlers.keys()
-			for name in keys:
+			for name in self.handlers:
 				self.handlers[name].ingest(apiRequest)		
 		finally:
 			self.handlersLock.release()
 
-kMonitorRouter = tornadio2.TornadioRouter(kMonitorClient)
-
-routes = [
-   ('/', IndexHandler),
-   ('/js/.*', IndexHandler) 
-]
-routes.extend(kMonitorRouter.urls)
-
-application = tornado.web.Application(
-    routes,
-    socket_io_port = 8001)
-
+	def printStatus(self):
+		status = ""
+		for name in self.handlers:
+			status += self.handlers[name].getStatus() + ", "		
+		print "Client [%s] %s" % (self.session.session_id, status)
+		
+class kMonitorStatus(threading.Thread):
+	
+	def __init__(self, interval):
+		self.interval = interval
+		threading.Thread.__init__(self, target = self.printStatus)
+		self.setDaemon(True)
+		
+	def printStatus(self):
+		print "Status reported every %d seconds" % (self.interval)
+		while(True):
+			time.sleep(self.interval)
+			for sessionId in monitorClients:
+				monitorClients[sessionId].printStatus();
+			print "Status reported"
+			gc.collect()
 
 def collectRequests():
 	address = ('', 6005)
@@ -263,15 +272,33 @@ def collectRequests():
 		# use cloned list in order to overcome changes in the list during the iterations
 		monitorClientsLock.acquire()
 		try:
-			keys = monitorClients.keys()
-			for sessionId in keys:
-				if sessionId in monitorClients:
-					monitorClients[sessionId].handle(apiRequest);
+			for sessionId in monitorClients:
+				monitorClients[sessionId].handle(apiRequest);
 		finally:
 			monitorClientsLock.release()
 	
+	
+monitorClients = {}
+monitorClientsLock = threading.Lock()
+		
+monitorStatus = kMonitorStatus(60)
+monitorStatus.start();
+
+kMonitorRouter = tornadio2.TornadioRouter(kMonitorClient)
+
+routes = [
+   ('/', IndexHandler),
+   ('/js/.*', IndexHandler) 
+]
+routes.extend(kMonitorRouter.urls)
+
+application = tornado.web.Application(
+    routes,
+    socket_io_port = 8001)
+
 requestsListener = threading.Thread(target = collectRequests)
 requestsListener.setDaemon(True)
 requestsListener.start()
 
-kSocketServer = tornadio2.server.SocketServer(application)
+kSocketServer = tornadio2.server.SocketServer(application)	
+		
