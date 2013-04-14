@@ -204,9 +204,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			throw new kCoreException("Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 		}
 		
+		$idsCount = count($ids);
 		$ids = $this->applyIds($ids);
 		$this->setFetchedIds($ids);
-		KalturaLog::debug("Found " . count($ids) . " ids");
+		KalturaLog::debug("Found $idsCount ids");
 		
 		foreach($this->keyToRemove as $key)
 		{
@@ -223,15 +224,24 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 		if($setLimit)
 		{
-			$this->setOffset(0);
-			
-			$metaItems = $pdo->queryAndFetchAll("show meta", PDO::FETCH_NAMED, 0, array('Variable_name' => 'total_found'));
-			if ($metaItems)
+			if ($this->getLimit() && $idsCount && $idsCount < $this->getLimit())
 			{
-				$metaItem = reset($metaItems);
-				$this->recordsCount = (int)$metaItem['Value'];
-				KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
+				$this->recordsCount = $idsCount;
+				if($this->getOffset())
+					$this->recordsCount += $this->getOffset();				
 			}
+			else
+			{
+				$metaItems = $pdo->queryAndFetchAll("show meta", PDO::FETCH_NAMED, 0, array('Variable_name' => 'total_found'));
+				if ($metaItems)
+				{
+					$metaItem = reset($metaItems);
+					$this->recordsCount = (int)$metaItem['Value'];
+					KalturaLog::debug('Sphinx query total_found: ' . $this->recordsCount);
+				}
+			}
+			
+			$this->setOffset(0);
 		}
 		else
 		{
