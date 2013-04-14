@@ -25,16 +25,11 @@ class KalturaFilterPager extends KalturaObject
 
 	public function attachToCriteria ( Criteria $c )
 	{
-		$limit = $this->pageSize;
-		if($limit > baseObjectFilter::getMaxInValues()) 
-		{	
-			$limit = baseObjectFilter::getMaxInValues();
-		}
+		$this->pageSize = max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
+		$c->setLimit( $this->pageSize );
 		
-		$page = max ( $this->minPageIndex ,  $this->pageIndex );
-		$offset = ($page-1)* $limit;
-	
-		$c->setLimit( $limit );
-		if ( $offset > 0 ) $c->setOffset( $offset );
+		$this->pageIndex = max($this->minPageIndex, $this->pageIndex);		
+		$offset = ($this->pageIndex - 1) * $this->pageSize;
+		$c->setOffset( $offset );
 	}
 }

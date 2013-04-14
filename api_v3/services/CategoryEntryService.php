@@ -239,9 +239,8 @@ class CategoryEntryService extends KalturaBaseService
 		 
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$categoryEntryFilter->attachToCriteria($c);
-		$totalCount = categoryEntryPeer::doCount($c);
 		
-		if(!kEntitlementUtils::getEntitlementEnforcement() || ($filter->entryIdEqual == null && $filter->entryIdEqual == null))
+		if(!kEntitlementUtils::getEntitlementEnforcement() || $filter->entryIdEqual == null)
 			$pager->attachToCriteria($c);
 			
 		$dbCategoriesEntry = categoryEntryPeer::doSelect($c);
@@ -271,7 +270,15 @@ class CategoryEntryService extends KalturaBaseService
 			
 			$totalCount = $c->getRecordsCount();
 		}
-		
+		else
+		{
+			$resultCount = count($dbCategoriesEntry);
+			if ($resultCount && $resultCount < $pager->pageSize)
+				$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+			else
+				$totalCount = categoryEntryPeer::doCount($c);
+		}
+			
 		$categoryEntrylist = KalturaCategoryEntryArray::fromCategoryEntryArray($dbCategoriesEntry);
 		$response = new KalturaCategoryEntryListResponse();
 		$response->objects = $categoryEntrylist;
