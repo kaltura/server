@@ -512,4 +512,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	{
 		return $id;
 	}
+
+	public function getSphinxConditionsToKeep()
+	{
+		return array(categoryPeer::PARTNER_ID);
+	}
 }
