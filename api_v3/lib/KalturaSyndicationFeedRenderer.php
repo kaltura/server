@@ -112,11 +112,7 @@ class KalturaSyndicationFeedRenderer
 
 		$microTimeStart = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- initialize ");
-		
-		// initialize the database for all services
-		DbManager::setConfig(kConf::getDB());
-		DbManager::initialize();
-		
+				
 		$this->syndicationFeedDB = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");

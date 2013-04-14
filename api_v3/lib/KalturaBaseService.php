@@ -46,15 +46,12 @@ abstract class KalturaBaseService
 	
 	public function __construct()
 	{
-		DbManager::setConfig(kConf::getDB());
-		DbManager::initialize();
 		//TODO: initialize $this->serviceName here instead of in initService method
 	}	
 
 	
 	public function __destruct( )
 	{
-		DbManager::shutdown();
 	}
 	
 	

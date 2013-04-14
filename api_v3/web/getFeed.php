@@ -15,6 +15,10 @@ $cache->checkOrStart();
 
 require_once("../bootstrap.php");
 
+// Database
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
+
 KalturaLog::setContext("syndicationFeedRenderer");
 
 KalturaLog::debug(">------------------------------------- syndicationFeedRenderer -------------------------------------");

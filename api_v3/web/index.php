@@ -9,6 +9,10 @@ $cache->checkOrStart();
 
 require_once(dirname(__FILE__)."/../bootstrap.php");
 
+// Database
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
+
 ActKeyUtils::checkCurrent();
 KalturaLog::setContext("API");
 
