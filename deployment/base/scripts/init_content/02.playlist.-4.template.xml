@@ -24,6 +24,7 @@
 			<referenceId>PLAYLIST_MOST_RECENT</referenceId>
 			<description>10 most  recent videos</description>
 			<userId>template</userId>
+			<totalResults>20</totalResults>
 			<filters objectType="array">
 				<item objectType="KalturaMediaEntryFilterForPlaylist">
 					<limit>10</limit>

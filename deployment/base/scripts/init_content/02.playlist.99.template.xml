@@ -22,6 +22,7 @@
 			<playlistType>10</playlistType>
 			<name>Recent Sea Videos</name>
 			<userId>template</userId>
+			<totalResults>20</totalResults>
 			<filters objectType="array">
 				<item objectType="KalturaMediaEntryFilterForPlaylist">
 					<limit>10</limit>
@@ -39,6 +40,7 @@
 			<name>My images</name>
 			<description>All my images 2</description>
 			<userId>template</userId>
+			<totalResults>20</totalResults>
 			<filters objectType="array">
 				<item objectType="KalturaMediaEntryFilterForPlaylist">
 					<limit>50</limit>
@@ -56,6 +58,7 @@
 			<name>Most recent videos</name>
 			<description>10 most  recent videos</description>
 			<userId>template</userId>
+			<totalResults>20</totalResults>
 			<filters objectType="array">
 				<item objectType="KalturaMediaEntryFilterForPlaylist">
 					<limit>10</limit>
@@ -72,6 +75,7 @@
 			<name>Most popular videos</name>
 			<description>Most Popular videos (top 30)</description>
 			<userId>template</userId>
+			<totalResults>20</totalResults>
 			<filters objectType="array">
 				<item objectType="KalturaMediaEntryFilterForPlaylist">
 					<limit>30</limit>
