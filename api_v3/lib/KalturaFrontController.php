@@ -128,92 +128,66 @@ class KalturaFrontController
 	
 	public function handleMultiRequest() 
 	{
-	    $listOfRequests = array(); 
-	    $results = array();
-	    $found = true;
-	    $i = 1;
-	    while ($found)
-	    {
-	        $currentService = isset($this->params[$i.":service"]) ? $this->params[$i.":service"] : null;
-	        $currentAction = isset($this->params[$i.":action"]) ? $this->params[$i.":action"] : null;
-	        $found = ($currentAction && $currentService);
-	        if ($found)
-	        {
-	            $listOfRequests[$i]["service"] = $currentService;
-	            $listOfRequests[$i]["action"] = $currentAction;
-	            
-	            // find all the parameters for this request
-	            foreach($this->params as $key => $val)
-	            {
-	                // the key "1:myparam" mean that we should input value of this key to request "1", for param "myparam" 
-                    $keyArray = explode(":", $key);
-                    if ($keyArray[0] == $i) 
-                    {
-                        array_shift($keyArray); // remove the request number
-                        $requestKey = implode(":",$keyArray);
-                        
-                        /* remarked by Dor - 13/10/2010
-                         * There is no need to remove service and action from the params in case of multirequest
-                         * while they are needed in KalturaResponseCacher
-                         
-                        if (in_array($requestKey, array("service", "action"))) // don't add service name and action name to the params
-                            continue;
-                        
-                        */ 
-                              
-                        $listOfRequests[$i]["params"][$requestKey] = $val; // store the param                
-                    }                                        
-	            }
-	            
-	            // clientTag param might be used in KalturaResponseCacher
-	            if (isset($this->params['clientTag']) && !isset($listOfRequests[$i]["params"]['clientTag'])) {
-	            	$listOfRequests[$i]["params"]['clientTag'] = $this->params['clientTag'];
-	            }
-	            
-	            // if ks is not set for a specific request, copy the ks from the top params
-	            $currentKs = isset($listOfRequests[$i]["params"]["ks"]) ? $listOfRequests[$i]["params"]["ks"] : null;
-	            if (!$currentKs)
-	            {
-	                $mainKs = isset($this->params["ks"]) ? $this->params["ks"] : null;
-                    if ($mainKs)
-                        $listOfRequests[$i]["params"]["ks"] = $mainKs;
-	            }
-	            
-				$currentPartner = isset($listOfRequests[$i]["params"]["partnerId"]) ? $listOfRequests[$i]["params"]["partnerId"] : null;
-	        	if (!$currentPartner)
-	            {
-	                $mainPartner = isset($this->params["partnerId"]) ? $this->params["partnerId"] : null;
-                    if ($mainPartner)
-                        $listOfRequests[$i]["params"]["partnerId"] = $mainPartner;
-	            }
-	            
-	            $i++;
-	        }
-	        else
-	        {
-	            // will break the loop
-	        }
-	    }
-	    
-	    $lastSecurityContext = null;
-	    
-	    $i = 1;
-	    foreach($listOfRequests as $currentRequest)
-	    {
-	    	kCurrentContext::$multiRequest_index = $i;
-	        $currentService = $currentRequest["service"];
-	        $currentAction = $currentRequest["action"];
-	        $currentParams = $currentRequest["params"];
-	        
+		// arrange the parameters by request index
+		$commonParams = array();
+		$listOfRequests = array();
+		foreach ($this->params as $paramName => $paramValue)
+		{
+			$explodedName = explode(':', $paramName, 2);
+			if (count($explodedName) <= 1 || !is_numeric($explodedName[0]))
+			{
+				$commonParams[$paramName] = $paramValue;
+				continue;
+			}
+		
+			$requestIndex = (int)$explodedName[0];
+			$paramName = $explodedName[1];
+			if (!array_key_exists($requestIndex, $listOfRequests))
+			{
+				$listOfRequests[$requestIndex] = array();
+			}
+			$listOfRequests[$requestIndex][$paramName] = $paramValue;
+		}
+			
+		// process the requests
+		$lastSecurityContext = null;
+		$results = array();
+		for ($i = 1; isset($listOfRequests[$i]); $i++)
+		{
+			$currentParams = $listOfRequests[$i];
+			if (!isset($currentParams["service"]) || !isset($currentParams["action"]))
+				break;
+
+			kCurrentContext::$multiRequest_index = $i;
+			$currentService = $currentParams["service"];
+			$currentAction = $currentParams["action"];
+		
+			// copy derived common params to current params
+			if (isset($commonParams['clientTag']) && !isset($currentParams['clientTag'])) 
+			{
+				$currentParams['clientTag'] = $commonParams['clientTag'];
+			}
+
+			if (isset($commonParams['ks']) && !isset($currentParams['ks']))
+			{
+				$currentParams['ks'] = $commonParams['ks'];
+			}
+
+			if (isset($commonParams['partnerId']) && !isset($currentParams['partnerId']))
+			{
+				$currentParams['partnerId'] = $commonParams['partnerId'];
+			}
+					        
 	        // check if we need to replace params with prev results
 	        foreach($currentParams as $key => &$val)
 	        {
 	        	$matches = array();
-		// keywords: multirequest, result, depend, pass
-		// figuring out if requested params should be extracted from previous result
-		// example: if you want to use KalturaPlaylist->playlistContent result from the first request
-		// in your second request, the second request will contain the following value:
-		// {1:result:playlistContent}
+
+				// keywords: multirequest, result, depend, pass
+				// figuring out if requested params should be extracted from previous result
+				// example: if you want to use KalturaPlaylist->playlistContent result from the first request
+				// in your second request, the second request will contain the following value:
+				// {1:result:playlistContent}
                 if (preg_match('/\{([0-9]*)\:result\:?(.*)?\}/', $val, $matches))
                 {
                     $resultIndex = $matches[1];
@@ -228,7 +202,7 @@ class KalturaFrontController
                             
                         $val = $this->getValueFromObject($results[$resultIndex], $resultPathArray);
                     }
-                }	            
+                }
 	        }
 	        	         
 			// cached parameters should be different when the request is part of a multirequest
@@ -283,7 +257,6 @@ class KalturaFrontController
 			$this->onRequestEnd($success, $errorCode, $i);
 	        
             $results[$i] = $currentResult;	        
-	        $i++;
 	    }
 	    
 	    return $results;
