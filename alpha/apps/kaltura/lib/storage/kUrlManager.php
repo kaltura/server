@@ -43,7 +43,7 @@ class kUrlManager
 	/**
 	 * @var int
 	 */
-	protected $storageProfileId = null;	
+	protected $storageProfileId = null;
 	
 	/**
 	 * @var string
@@ -66,7 +66,7 @@ class kUrlManager
 		if(isset($urlManagers[$cdnHost]))
 		{
 			$class = $urlManagers[$cdnHost]["class"];
-			$params = @$urlManagers[$cdnHost]["params"];
+			$params = isset($urlManagers[$cdnHost]["params"]) ? $urlManagers[$cdnHost]["params"] : null;
 			$entry = entryPeer::retrieveByPK($entryId);
 			$urlManagersMap = kConf::getMap('url_managers');
 			if ($entry && isset($urlManagersMap["override"]))
@@ -140,7 +140,7 @@ class kUrlManager
 	 * @return int
 	 */
 	public function getSeekFromBytes($path)
-	{	
+	{
 		if($this->seekFromTime <= 0)
 			return null;
 			
@@ -163,7 +163,7 @@ class kUrlManager
 	 * @param int $seek miliseconds
 	 */
 	public function setSeekFromTime($seek)
-	{	
+	{
 		$this->seekFromTime = $seek;
 	}
 	
@@ -171,7 +171,7 @@ class kUrlManager
 	 * @param int $clipTo seconds
 	 */
 	public function setClipTo($clipTo)
-	{	
+	{
 		$this->clipTo = $clipTo;
 	}
 	
@@ -179,7 +179,7 @@ class kUrlManager
 	 * @param string $protocol
 	 */
 	public function setProtocol($protocol)
-	{	
+	{
 		$this->protocol = $protocol;
 	}
 	
@@ -187,7 +187,7 @@ class kUrlManager
 	 * @param string $domain
 	 */
 	public function setDomain($domain)
-	{	
+	{
 		$this->domain = $domain;
 	}
 	
@@ -256,7 +256,7 @@ class kUrlManager
 				$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
 				$url = "mp4:$url";
 				
-			// when serving files directly via RTMP fms doesnt expect to get the file extension				
+			// when serving files directly via RTMP fms doesnt expect to get the file extension
 			$url = str_replace('.mp4', '', str_replace('.flv','',$url));
 		}
 				
@@ -358,7 +358,7 @@ class kUrlManager
 		case PlaybackProtocol::RTMP:
 			$url .= '/forceproxy/true';
 			if ($this->extention && strtolower($this->extention) != 'flv' ||
-                        	$this->containerFormat && strtolower($this->containerFormat) != 'flash video')	
+                        	$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
 			{
 				$url = "mp4:$url/name/a.mp4";
 			}
@@ -391,7 +391,7 @@ class kUrlManager
 	 * check whether this url manager sent the current request.
 	 * if so, return a string describing the usage. e.g. cdn.acme.com+token for
 	 * using cdn.acme.com with secure token delivery. This string can be matched to the
-	 * partner settings in order to enforce a specific delivery method. 
+	 * partner settings in order to enforce a specific delivery method.
 	 * @return string
 	 */
 	public function identifyRequest()
