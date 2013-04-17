@@ -67,6 +67,13 @@ abstract class KProvisionEngine
 	 * @return KProvisionEngineResult
 	 */
 	abstract public function delete( KalturaBatchJob $job, KalturaProvisionJobData $data );
+	
+	/**
+	 * @param KalturaBatchJob $job
+	 * @param KalturaProvisionJobData $data
+	 * @return KProvisionEngineResult
+	 */
+	abstract public function checkProvisionedStream ( KalturaBatchJob $job, KalturaProvisionJobData $data ) ;
 }
 
 

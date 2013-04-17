@@ -157,5 +157,38 @@ class KProvisionEngineAkamai extends KProvisionEngine
 		$data->returnVal = $returnVal;
 		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully deleted entry', $data);
 	}
+	
+	
+	/* (non-PHPdoc)
+	 * @see KProvisionEngine::checkProvisionedStream()
+	 */
+	public function checkProvisionedStream(KalturaBatchJob $job, KalturaProvisionJobData $data) 
+	{
+		$data = $job->data;
+		/* @var $data KalturaAkamaiUniversalProvisionJobData */
+		$primaryEntryPoint = parse_url($data->primaryBroadcastingUrl, PHP_URL_HOST);
+		$backupEntryPoint = parse_url($data->secondaryBroadcastingUrl, PHP_URL_HOST);
+		if (!$primaryEntryPoint || !$backupEntryPoint)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Missing one or both entry points");
+		}
+		
+		$pingTimeout = $this->taskConfig->params->pingTimeout;
+		@exec("ping -w $pingTimeout $primaryEntryPoint", $output, $return);
+		if ($return)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::ALMOST_DONE, "No reponse from primary entry point - retry in 5 mins");
+		}
+		
+		@exec("ping -w $pingTimeout $backupEntryPoint", $output, $return);
+		if ($return)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::ALMOST_DONE, "No reponse from backup entry point - retry in 5 mins");
+		}
+		
+		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, "Stream is Provisioned");
+		
+	}
+
 }
 

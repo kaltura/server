@@ -32,32 +32,23 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 
 	protected function closeProvisionProvide (KalturaBatchJob $job)
 	{
-		$data = $job->data;
-		/* @var $data KalturaAkamaiUniversalProvisionJobData */
-		$primaryEntryPoint = parse_url($data->primaryBroadcastingUrl, PHP_URL_HOST);
-		$backupEntryPoint = parse_url($data->secondaryBroadcastingUrl, PHP_URL_HOST);
-		if (!$primaryEntryPoint || !$backupEntryPoint)
-		{
-			return $this->closeJob($job, null, null, "Missing one or both entry points", KalturaBatchJobStatus::FATAL);
-		}
-		
 		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
-		
-		$pingTimeout = $this->taskConfig->params->pingTimeout;
-		@exec("ping -w $pingTimeout $primaryEntryPoint", $output, $return);
-		if ($return)
+			return new KProvisionEngineResult(KalturaBatchJobStatus::CLOSER_TIMEOUT, "Timed out");
+			
+		if ( $engine == null )
 		{
-			return $this->closeJob($job, "No reponse from primary entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
+			$err = "Cannot find provision engine [{$job->jobSubType}] for job id [{$job->id}]";
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
 		}
 		
-		@exec("ping -w $pingTimeout $backupEntryPoint", $output, $return);
-		if ($return)
-		{
-			return $this->closeJob($job, "No reponse from backup entry point - retry in 5 mins", KalturaBatchJobStatus::ALMOST_DONE);
-		}
+		KalturaLog::info( "Using engine: " . $engine->getName() );
+	
+		$results = $engine->checkProvisionedStream($job, $data);
+
+		if($results->status == KalturaBatchJobStatus::FINISHED)
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $results->data);
 		
-		return $this->closeJob($job, null, null, 'Success', KalturaBatchJobStatus::FINISHED);
+		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE, $results->data);
 		
 	}
 	

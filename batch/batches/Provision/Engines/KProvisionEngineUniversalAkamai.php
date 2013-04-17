@@ -17,6 +17,10 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	
 	public static $baseServiceUrl;
 	
+	const PROVISIONED = 'Provisioned';
+	
+	const PENDING = 'Pending';
+	
 	/**
 	 * @var AkamaiUniversalStreamClient
 	 */
@@ -221,5 +225,58 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		
 		return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, 'Succesfully deleted stream', $data);
 	}
+	
 
+	/* (non-PHPdoc)
+	 * @see KProvisionEngine::checkProvisionedStream()
+	 */
+	public function checkProvisionedStream(KalturaBatchJob $job, KalturaProvisionJobData $data) 
+	{
+		KalturaLog::info("Retrieving stream with ID [". $data->streamID ."]" );
+		
+		$url = self::$baseServiceUrl . "/{$this->domainName}/stream/".$data->streamID;
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION , true);
+		curl_setopt($ch, CURLOPT_USERPWD, "{$this->systemUser}:{$this->systemPassword}");
+		$result = curl_exec($ch);
+		
+		if (!$result)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: failed to call RestAPI");
+		}
+		
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if($httpCode<=200 && $httpCode>300)
+		{
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: retrieval failed");
+		}
+		
+		KalturaLog::info("Result received: $result");
+		$resultXML = new SimpleXMLElement($result);
+		$errors = $resultXML->xpath('error');
+		if ($errors && count($errors))
+		{
+			//There is always only 1 error listed in the XML
+			$error = $errors[0];
+			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: ". strval($error[0]));
+		}
+		
+		if ($resultXML->status)
+		{
+			switch (strval($resultXML->status))
+			{
+				case self::PENDING:
+					return new KProvisionEngineResult(KalturaBatchJobStatus::ALMOST_DONE, "Stream is still in status Pending - retry in 5 minutes");
+					break;
+				case self::PROVISIONED:
+					return new KProvisionEngineResult(KalturaBatchJobStatus::FINISHED, "Stream is in status Provisioned");
+					break;
+			}
+		}
+		
+		return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Unable to retrieve valid status from result of Akamai REST API");
+	}
+
+	
 }
