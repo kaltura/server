@@ -191,7 +191,7 @@ class kmc4Action extends kalturaAction
 			'language'					=> $language,
 			'logoutUrl'					=> $logoutUrl,
 			'allowFrame'				=> (bool) $allowFrame,
-			'cientIP'					=> requestUtils::getRemoteAddress(),
+			'clientIP'					=> requestUtils::getRemoteAddress(),
 		);
 		
 		$this->kmcVars = $kmcVars;
