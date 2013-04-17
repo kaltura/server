@@ -394,7 +394,11 @@ abstract class KBatchBase implements IKalturaLogger
 	{
 		if(is_dir($filePath))
 		{
-			@chmod($filePath, 0750);
+			$chmod = 0750;
+			if($this->taskConfig->getDirectoryChmod())
+				$chmod = $this->taskConfig->getDirectoryChmod();
+				
+			@chmod($filePath, $chmod);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -405,7 +409,11 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		else
 		{
-			@chmod($filePath, 0640);
+			$chmod = 0640;
+			if($this->taskConfig->getChmod())
+				$chmod = $this->taskConfig->getChmod();
+		
+			@chmod($filePath, $chmod);
 		}
 	}
 	

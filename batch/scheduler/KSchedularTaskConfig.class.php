@@ -75,6 +75,24 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	}
 
 	/**
+	 * @param $directoryChmod the $directoryChmod to set
+	 */
+	public function setDirectoryChmod($directoryChmod)
+	{
+		if(is_null($this->directoryChmod))
+			$this->directoryChmod = $directoryChmod;
+	}
+
+	/**
+	 * @param $chmod the $chmod to set
+	 */
+	public function setChmod($chmod)
+	{
+		if(is_null($this->chmod))
+			$this->chmod = $chmod;
+	}
+
+	/**
 	 * @param $dwhEnabled the $dwhEnabled to set
 	 */
 	public function setDwhEnabled($dwhEnabled)
@@ -90,6 +108,22 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	{
 		if(is_null($this->dwhPath))
 			$this->dwhPath = $dwhPath;
+	}
+
+	/**
+	 * @return the $directoryChmod
+	 */
+	public function getDirectoryChmod()
+	{
+		return $this->directoryChmod;
+	}
+
+	/**
+	 * @return the $chmod
+	 */
+	public function getChmod()
+	{
+		return $this->chmod;
 	}
 
 	/**

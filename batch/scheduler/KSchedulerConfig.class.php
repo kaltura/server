@@ -74,6 +74,8 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setSchedulerName($this->getName());
 			$task->setServiceUrl($this->getServiceUrl());
 			$task->setDwhPath($this->getDwhPath());
+			$task->setDirectoryChmod($this->getDirectoryChmod());
+			$task->setChmod($this->getChmod());
 			$task->setDwhEnabled($this->getDwhEnabled());
 			$task->setTimezone($this->getTimezone());
 			$task->setInitOnly(false);
@@ -205,6 +207,16 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function getPartnerId()
 	{
 		return $this->partnerId;
+	}
+
+	public function getDirectoryChmod()
+	{
+		return $this->directoryChmod;
+	}
+
+	public function getChmod()
+	{
+		return $this->chmod;
 	}
 
 	public function getDwhEnabled()
