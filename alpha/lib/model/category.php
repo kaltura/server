@@ -818,6 +818,7 @@ class category extends Basecategory implements IIndexable
 		$this->setFullName('');
 		$this->setEntriesCount(0);
 		$this->setDirectEntriesCount(0);
+		$this->setDirectSubCategoriesCount(0);
 		$this->setMembersCount(0);
 		$this->setPendingMembersCount(0);
 		$this->setDisplayInSearch(DisplayInSearchType::PARTNER_ONLY);
