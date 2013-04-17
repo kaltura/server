@@ -1,9 +1,9 @@
 <?php
 /**
  * @package deployment
- * @subpackage dragonfly.roles_and_permissions
+ * @subpackage gemini.roles_and_permissions
  *
- * Adds tvcom permissions
+ * Adds userId parameter permissions
  *
  * No need to re-run after server code deploy
  */
