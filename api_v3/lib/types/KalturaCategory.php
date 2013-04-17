@@ -440,9 +440,6 @@ class KalturaCategory extends KalturaObject implements IFilterable
 			{
 				if($this->appearInList != KalturaAppearInListType::PARTNER_ONLY && !$this->isNull('appearInList'))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT);
-					
-//				if ($this->moderation != KalturaNullableBoolean::FALSE_VALUE && !$this->isNull('moderation'))
-//					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT); 
 				
 				if ($this->inheritanceType != KalturaInheritanceType::MANUAL && !$this->isNull('inheritanceType'))
 					throw new KalturaAPIException(KalturaErrors::CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT);
