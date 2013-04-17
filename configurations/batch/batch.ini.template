@@ -137,6 +137,8 @@ id						= 19
 friendlyName			= Job suspender
 type					= KAsyncJobSuspender
 scriptPath				= batches/Cleanup/KAsyncJobSuspenderExe.php
+
+
 [KAsyncImport : JobHandlerWorker]
 id													= 20
 friendlyName										= Import
