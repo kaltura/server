@@ -65,36 +65,46 @@ abstract class KJobHandlerWorker extends KBatchBase
 			}
 			catch(KalturaException $kex)
 			{
-				$this->unimpersonate();
-				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_API, $kex, KalturaBatchJobStatus::FAILED);
 			}
 			catch(kApplicativeException $kaex)
 			{
-				$this->unimpersonate();
-				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kaex->getCode(), $kaex->getMessage(), KalturaBatchJobStatus::FAILED);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::APP, $kaex, KalturaBatchJobStatus::FAILED);
 			}
 			catch(kTemporaryException $ktex)
 			{
-				$this->unimpersonate();
 				if($ktex->getResetJobExecutionAttempts())
 				{
 					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 				}
-				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex->getCode(), "Error: " . $ktex->getMessage(), KalturaBatchJobStatus::RETRY);
+				
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY);
 			}
 			catch(KalturaClientException $kcex)
 			{
-				$this->unimpersonate();
-				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex, KalturaBatchJobStatus::RETRY);
 			}
 			catch(Exception $ex)
 			{
-				$this->unimpersonate();
-				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ex, KalturaBatchJobStatus::FAILED);
 			}
 		}
 			
 		return $jobs;
+	}
+	
+	protected function closeJobOnError($job, $error, $ex, $status) 
+	{
+		try
+		{
+			$this->unimpersonate();
+			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status);
+		} 
+		catch(Exception $ex)
+		{
+			KalturaLog::err("Failed to close job after expirencing an error.");
+			KalturaLog::err($ex->getMessage());
+		}
 	}
 	
 	/**
