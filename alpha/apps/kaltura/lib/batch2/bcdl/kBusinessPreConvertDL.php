@@ -276,7 +276,7 @@ class kBusinessPreConvertDL
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!file_exists($tempDir))
-			mkdir($tempDir, '700', true);
+			mkdir($tempDir, 0700, true);
 		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid.jpg;
 		$logPath = $destPath . '.log';
 	
@@ -315,7 +315,7 @@ class kBusinessPreConvertDL
 				
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 				if(!file_exists($tempDir))
-					mkdir($tempDir, '700', true);
+					mkdir($tempDir, 0700, true);
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
 			}
 			
