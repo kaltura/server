@@ -116,7 +116,7 @@ class KalturaSyndicationFeedRenderer
 		$this->syndicationFeedDB = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");
-		
+		kPermissionManager::init();
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
 		if(!is_null($syndicationFeedDB->getPrivacyContext()) && $syndicationFeedDB->getPrivacyContext() != '')
