@@ -396,8 +396,9 @@ abstract class KBatchBase implements IKalturaLogger
 		{
 			$chmod = 0750;
 			if($this->taskConfig->getDirectoryChmod())
-				$chmod = $this->taskConfig->getDirectoryChmod();
+				$chmod = octdec($this->taskConfig->getDirectoryChmod());
 				
+			KalturaLog::debug("chmod($filePath, $chmod)");
 			@chmod($filePath, $chmod);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
@@ -411,8 +412,9 @@ abstract class KBatchBase implements IKalturaLogger
 		{
 			$chmod = 0640;
 			if($this->taskConfig->getChmod())
-				$chmod = $this->taskConfig->getChmod();
+				$chmod = octdec($this->taskConfig->getChmod());
 		
+			KalturaLog::debug("chmod($filePath, $chmod)");
 			@chmod($filePath, $chmod);
 		}
 	}
