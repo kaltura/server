@@ -14,18 +14,23 @@ class kFmsUrlManager extends kUrlManager
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
 		$url = parent::doGetFileSyncUrl($fileSync);
-		$url = ltrim($url, '/');
-
+		$url = trim($url, '/');
+		
 		switch ($this->protocol)
 		{
 		case PlaybackProtocol::APPLE_HTTP:
-			return "/hls-vod/{$url}.m3u8";
+			$pattern = isset($this->params["hls_pattern"]) ? $this->params["hls_pattern"] : '/hls-vod/{url}.m3u8';
+			break;
 		
 		case PlaybackProtocol::HDS:
-			return "/hds-vod/{$url}.f4m";
-		
+			$pattern = isset($this->params["hds_pattern"]) ? $this->params["hds_pattern"] : '/hds-vod/{url}.f4m';
+			break;
+			
 		default:
-			return $url;
+			$pattern = isset($this->params["default_pattern"]) ? $this->params["default_pattern"] : '{url}'; 
+			break;
 		}
+		
+		return str_replace('{url}', $url, $pattern);
 	}
 }
