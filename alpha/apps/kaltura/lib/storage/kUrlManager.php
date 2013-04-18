@@ -339,7 +339,8 @@ class kUrlManager
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$partnerId = $flavorAsset->getPartnerId();
-		$subpId = $flavorAsset->getentry()->getSubpId();
+		$entry = $flavorAsset->getentry();
+		$subpId = $entry ? $entry->getSubpId() : $partnerId * 100;
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $flavorAsset->getId();
 		
