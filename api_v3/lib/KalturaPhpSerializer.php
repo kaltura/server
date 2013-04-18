@@ -19,27 +19,7 @@ class KalturaPhpSerializer
 		
 		$object = $this->convertExceptionsToPhpArrays($object);
 		
-		$this->_serializedString .= serialize($object);	
-		
-		if (is_object($object))
-		{
-			if ($object instanceof Exception)
-			{
-				$error = array(
-					"code" => $object->getCode(),
-					"message" => $object->getMessage()
-				);
-				$this->_serializedString = serialize($error);
-			}
-			else 
-			{
-				$this->_serializedString = serialize($object);
-			}
-		}
-		else 
-		{
-					
-		}
+		$this->_serializedString = serialize($object);	
 	}
 	
 	function convertTypedArraysToPhpArrays($object)
