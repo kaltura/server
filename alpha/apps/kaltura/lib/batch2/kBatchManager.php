@@ -300,6 +300,7 @@ class kBatchManager
 		foreach($jobs as $job)
 		{
 			KalturaLog::log("Cleaning job id[" . $job->getId() . "]");
+			$job->setMessage("Job was cleaned up.");
 			kJobsManager::updateBatchJob($job, BatchJob::BATCHJOB_STATUS_FATAL);
 		}
 		
