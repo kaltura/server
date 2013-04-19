@@ -672,14 +672,7 @@ class playManifestAction extends kalturaAction
 		switch($this->format)
 		{
 			case PlaybackProtocol::RTMP:
-				if ($this->entry->getType() == entryType::LIVE_STREAM)
-				{
-					$baseUrl = $this->entry->getStreamUrl();
-				}
-				else
-				{
-					$baseUrl = myPartnerUtils::getRtmpUrl($this->entry->getPartnerId());
-				}
+				$baseUrl = myPartnerUtils::getRtmpUrl($this->entry->getPartnerId());
 				break;
 				
 			case PlaybackProtocol::SILVER_LIGHT:
@@ -952,16 +945,6 @@ class playManifestAction extends kalturaAction
 	 */
 	private function getSecureHdUrl()
 	{
-		$flavor = null;
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
-		{
-			$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
-			if ($liveStreamConfig)
-				$flavor = $this->getFlavorAssetInfo($liveStreamConfig->getUrl());
-			
-			return $flavor;
-		}
-		
 		if (!method_exists($this->urlManager, 'getManifestUrl'))
 		{
 			KalturaLog::debug('URL manager [' . get_class($this->urlManager) . '] does not support manifest URL');
@@ -1133,37 +1116,18 @@ class playManifestAction extends kalturaAction
 	private function serveRtmp()
 	{
 		$baseUrl = null;
-		switch($this->entry->getType())
-		{
-			case entryType::MEDIA_CLIP:
-				
-				$flavors = $this->buildRtmpFlavorsArray($baseUrl);
-				
-				if(!count($flavors))
-					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-
-				$renderer = new kF4MManifestRenderer();
-				$renderer->flavors = $flavors;
-				$renderer->baseUrl = $baseUrl;
-				$renderer->mimeType = $this->getMimeType($flavors);
-				return $renderer;
-
-			case entryType::LIVE_STREAM:
-				
-				$flavors = $this->buildRtmpLiveStreamFlavorsArray($baseUrl);
-
-				$renderer = new kF4MManifestRenderer();
-				$renderer->flavors = $flavors;
-				$renderer->baseUrl = $baseUrl;
-				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
-				$renderer->mimeType = $this->getMimeType($flavors);
-				return $renderer;
-				
-		}
 		
-		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-	}
+		$flavors = $this->buildRtmpFlavorsArray($baseUrl);		
+		if(!count($flavors))
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
+		$renderer = new kF4MManifestRenderer();
+		$renderer->flavors = $flavors;
+		$renderer->baseUrl = $baseUrl;
+		$renderer->mimeType = $this->getMimeType($flavors);
+		return $renderer;
+	}
+	
 	/**
 	 * @return kManifestRenderer
 	 */
@@ -1181,13 +1145,6 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveAppleHttp()
 	{
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
-		{
-			$renderer = new kRedirectManifestRenderer();
-			$renderer->flavor = $this->getFlavorAssetInfo($this->entry->getHlsStreamUrl());
-			return $renderer;
-		}
-		
 		$flavor = $this->getSecureHdUrl();
 		if ($flavor)
 		{
@@ -1214,7 +1171,7 @@ class playManifestAction extends kalturaAction
 		
 		$flavors = $this->sortFlavors($flavors);
 
-		$renderer = new kF4Mv2ManifestRenderer();
+		$renderer = new kF4MManifestRenderer();
 		$renderer->flavors = $flavors;
 		return $renderer;		
 	}
@@ -1282,6 +1239,110 @@ class playManifestAction extends kalturaAction
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Main functions
 
+	private function serveVodEntry()
+	{
+		$this->initFlavorIds();
+				
+		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
+			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+
+		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
+		if($playbackCdnHost)
+			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
+				
+		$this->initFlavorAssetArray();
+		$this->initEntryDuration();
+		
+		if ($this->duration && $this->duration < 10 && $this->format == PlaybackProtocol::AKAMAI_HDS)
+		{
+			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
+			$this->format = PlaybackProtocol::HTTP;
+			$this->flavorAssets = array(reset($this->flavorAssets));
+		}
+		
+		$this->initStorageProfile();
+		$this->initUrlManager();
+	
+		switch($this->format)
+		{
+			case PlaybackProtocol::HTTP:
+				return $this->serveHttp();
+					
+			case PlaybackProtocol::RTMP:
+				return $this->serveRtmp();
+					
+			case PlaybackProtocol::SILVER_LIGHT:
+				return $this->serveSilverLight();
+					
+			case PlaybackProtocol::APPLE_HTTP:
+				return $this->serveAppleHttp();
+		
+			case PlaybackProtocol::HDS:
+				return $this->serveHds();
+					
+			case self::URL:
+				$this->format = "http"; // build url for an http delivery
+				return $this->serveUrl();
+					
+			case PlaybackProtocol::RTSP:
+				return $this->serveRtsp();
+					
+			case self::HDNETWORKSMIL:
+				return $this->serveHDNetworkSmil();
+					
+			case PlaybackProtocol::AKAMAI_HD:
+				return $this->serveHDNetwork();
+		
+			case PlaybackProtocol::AKAMAI_HDS:
+				return $this->serveHDNetworkManifest();
+		}
+		
+		return null;
+	}
+	
+	private function serveLiveEntry()
+	{		
+		$baseUrl = null;
+		
+		switch($this->format)
+		{
+			case PlaybackProtocol::RTMP:
+				$flavors = $this->buildRtmpLiveStreamFlavorsArray($baseUrl);
+				
+				$renderer = new kF4MManifestRenderer();
+				$renderer->flavors = $flavors;
+				$renderer->baseUrl = $baseUrl;
+				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
+				$renderer->mimeType = $this->getMimeType($flavors);
+				break;
+					
+			case PlaybackProtocol::APPLE_HTTP:
+				$renderer = new kRedirectManifestRenderer();
+				$baseUrl = $this->entry->getHlsStreamUrl();
+				$renderer->flavor = $this->getFlavorAssetInfo($baseUrl);
+				break;
+								
+			case PlaybackProtocol::AKAMAI_HDS:
+				$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
+				if (!$liveStreamConfig)
+					return null;
+				
+				$baseUrl = $liveStreamConfig->getUrl();
+				$flavor = $this->getFlavorAssetInfo($baseUrl);
+				$renderer = new kF4MManifestRenderer();
+				$renderer->flavors = array($flavor);
+				break;
+		}
+		
+		if ($baseUrl)
+		{
+			$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
+			$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
+		}
+		
+		return $renderer;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see /symfony/action/sfComponent#getRequestParameter()
 	 */
@@ -1373,77 +1434,27 @@ class playManifestAction extends kalturaAction
 		
 		// Initialize
 		$this->initEntry();
-		$this->initFlavorIds();
-				
-		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
-			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 
-		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
-		if($playbackCdnHost)
-			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
-				
 		$this->enforceEncryption();
-		$this->initFlavorAssetArray();
-		$this->initEntryDuration();
 		
-		
-		if ($this->duration && $this->duration < 10 && $this->format == PlaybackProtocol::AKAMAI_HDS)
-		{
-			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
-			$this->format = PlaybackProtocol::HTTP;
-			$this->flavorAssets = array(reset($this->flavorAssets));
-		}
-		
-		$this->initStorageProfile();
-		$this->initUrlManager();
-		
-		// Build the renderer
 		$renderer = null;
-	
-		switch($this->format)
-		{
-			case PlaybackProtocol::HTTP:
-				$renderer = $this->serveHttp();
-				break;
-				
-			case PlaybackProtocol::RTMP:
-				$renderer = $this->serveRtmp();
-				break;
-				
-			case PlaybackProtocol::SILVER_LIGHT:
-				$renderer = $this->serveSilverLight();
-				break;
-				
-			case PlaybackProtocol::APPLE_HTTP:
-				$renderer = $this->serveAppleHttp();
-				break;
-
-			case PlaybackProtocol::HDS:
-				$renderer = $this->serveHds();
-				break;
-				
-			case self::URL:
-				$this->format = "http"; // build url for an http delivery
-				$renderer = $this->serveUrl();
-				break;
-				
-			case PlaybackProtocol::RTSP:
-				$renderer = $this->serveRtsp();
-				break;				
-				
-			case self::HDNETWORKSMIL:
-				$renderer = $this->serveHDNetworkSmil();
-				break;
-				
-			case PlaybackProtocol::AKAMAI_HD:
-				$renderer = $this->serveHDNetwork();
-				break;
-
-			case PlaybackProtocol::AKAMAI_HDS:
-				$renderer = $this->serveHDNetworkManifest();
-				break;
-		}
 		
+		switch($this->entry->getType())
+		{
+		case entryType::MEDIA_CLIP:
+			// VOD
+			$renderer = $this->serveVodEntry();
+			break;
+			
+		case entryType::LIVE_STREAM:
+			// Live stream
+			$renderer = $this->serveLiveEntry();
+			break;
+		
+		default:
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+		}
+				
 		if (!$renderer)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'This format is unsupported');
 		
