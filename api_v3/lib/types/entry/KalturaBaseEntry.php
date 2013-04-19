@@ -146,7 +146,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $updatedAt;
 	
 	/**
-	 * Calculated rank
+	 * The calculated average rank. rank = totalRank / votes
 	 * 
 	 * @var float
 	 * @readonly
@@ -155,7 +155,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $rank;
 	
 	/**
-	 * The total (sum) of all votes
+	 * The sum of all rank values submitted to the baseEntry.anonymousRank action
 	 * 
 	 * @var int
 	 * @readonly
@@ -164,7 +164,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $totalRank;
 	
 	/**
-	 * Number of votes
+	 * A count of all requests made to the baseEntry.anonymousRank action
 	 *  
 	 * @var int
 	 * @readonly
