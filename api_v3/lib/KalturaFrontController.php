@@ -150,7 +150,6 @@ class KalturaFrontController
 		}
 			
 		// process the requests
-		$lastSecurityContext = null;
 		$results = array();
 		for ($i = 1; isset($listOfRequests[$i]); $i++)
 		{
@@ -226,22 +225,12 @@ class KalturaFrontController
 			}
 			else
 			{
-				// get current security context (partnerId + ks)
-				$ksStr = isset($currentParams["ks"]) ? $currentParams["ks"] : null ;
-				$partnerId = isset($currentParams["p"]) && $currentParams["p"] ? $currentParams["p"] : null;
-				if (!$partnerId)
-					$partnerId = isset($currentParams["partnerId"]) && $currentParams["partnerId"] ? $currentParams["partnerId"] : null;
-				$securityContext = array($partnerId, $ksStr);
-				
 				if ($i != 1)
 				{
-					if ($lastSecurityContext !== $securityContext || memory_get_usage() > kConf::get('min_mem_usage_for_clear'))
-						kMemoryManager::clearMemory();
+					kMemoryManager::clearMemory();
 					KalturaCriterion::clearTags();
 				}
-				
-				$lastSecurityContext = $securityContext;
-			
+							
 				try 
 				{  
 					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
