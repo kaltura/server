@@ -595,6 +595,7 @@ abstract class BaseTagPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('TagPeer');
 		}
 	}
 
