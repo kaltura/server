@@ -22,6 +22,9 @@ class kPlayManifestCacher extends kApiCache
 	
 	protected function init()
 	{
+		if (!parent::init())
+			return false;
+
 		$this->_playbackContext = isset($this->_params['playbackContext']) ? $this->_params['playbackContext'] : null;
 		unset($this->_params['playbackContext']);
 

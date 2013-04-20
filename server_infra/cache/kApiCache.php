@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/kApiCacheBase.php');
 require_once(dirname(__FILE__) . '/../kConf.php');
 require_once(dirname(__FILE__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/kCacheManager.php');
@@ -11,37 +12,10 @@ require_once(dirname(__FILE__) . '/../monitor/KalturaMonitorClient.php');
  * @package server-infra
  * @subpackage cache
  */
-class kApiCache
+class kApiCache extends kApiCacheBase
 {
-	// extra cache fields
-	const ECF_REFERRER = 'referrer';
-	const ECF_USER_AGENT = 'userAgent';
-	const ECF_COUNTRY = 'country';
-	const ECF_IP = 'ip';
-
-	// extra cache fields conditions
-	// 	the conditions will be applied on the extra fields when generating the cache key
-	//	for example, when using country restriction of US allowed, we can take country==US
-	//	in the cache key instead of taking the whole country (2 possible cache key values for
-	//	the entry, instead of 200)
-	const COND_NONE = '';
-	const COND_MATCH = 'match';					// used by kCountryCondition
-	const COND_REGEX = 'regex';					// used by kUserAgentCondition
-	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
-	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
-
 	const EXTRA_KEYS_PREFIX = 'extra-keys-';	// apc cache key prefix
 
-	// cache statuses
-	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled
-	const CACHE_STATUS_ANONYMOUS_ONLY = 1;		// conditional cache was explicitly disabled by calling DisableConditionalCache (e.g. a database query that is not handled by the query cache was issued)
-	const CACHE_STATUS_DISABLED = 2;			// cache was explicitly disabled by calling DisableCache (e.g. getContentData for an entry with access control)
-
-	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
-	const MAX_SQL_CONDITION_DSNS = 1;			// max number of connections required to verify the SQL conditions
-	const MAX_SQL_CONDITION_QUERIES = 4;		// max number of queries per dsn required to verify the SQL conditions
-	const KALTURA_COMMENT_MARKER = '@KALTURA_COMMENT@';
-	
 	const EXTRA_FIELDS_EXPIRY = 604800;			// when using a cache shared between servers it makes sense to have EXTRA_FIELDS_EXPIRY > CONDITIONAL_CACHE_EXPIRY
 												// since the extra fields are stored locally on each server
 
@@ -55,6 +29,9 @@ class kApiCache
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
 	const CACHE_MODE_CONDITIONAL = 2;			// cache the response along with its matching conditions
 
+	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
+	const KALTURA_COMMENT_MARKER = '@KALTURA_COMMENT@';
+	
 	const EXPIRY_MARGIN = 300;
 
 	const CACHE_DELIMITER = "\r\n\r\n";
@@ -72,11 +49,6 @@ class kApiCache
 
 	// time in which a warm cache request will block another request from warming the cache
 	const WARM_CACHE_TTL = 10;
-
-	// cache instances
-	protected $_instanceId = 0;
-	protected static $_activeInstances = array();		// active class instances: instanceId => instanceObject
-	protected static $_nextInstanceId = 0;
 
 	protected $_cacheStoreTypes = array();
 	protected $_cacheStores = array();
@@ -99,28 +71,12 @@ class kApiCache
 	protected $_ksObj = null;
 	protected $_ksPartnerId = null;
 
-	// status
-	protected $_expiry = 600;
-	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the cacher initializes
-
-	// conditional cache fields
-	protected $_conditionalCacheExpiry = 0;				// the expiry used for conditional caching, if 0 CONDITIONAL_CACHE_EXPIRY will be used
-	protected $_invalidationKeys = array();				// the list of query cache invalidation keys for the current request
-	protected $_invalidationTime = 0;					// the last invalidation time of the invalidation keys
-	protected $_sqlConditions = array();				// list of sql queries that the api depends on
-
 	// extra fields
-	protected $_extraFields = array();
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
-	protected static $_usesHttpReferrer = false;	// enabled if the request is dependent on the http referrer field (opposed to an API parameter referrer)
-	protected static $_hasExtraFields = false;		// set to true if the response depends on http headers and should not return caching headers to the user / cdn
 
 	protected function __construct($cacheType, $params = null)
 	{
-		$this->_instanceId = self::$_nextInstanceId;
-		self::$_nextInstanceId++;
-
 		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		if ($params)
@@ -128,18 +84,21 @@ class kApiCache
 		else
 			$this->_params = infraRequestUtils::getRequestParams();
 
+		parent::__construct();
+	}
+
+	protected function init()			// overridable
+	{
 		if (!kConf::get('enable_cache') ||
 			$this->isCacheDisabled())
 		{
-			self::disableCache();
-			return;
+			return false;
 		}
 
 		$ks = $this->getKs();
 		if ($ks === false)
 		{
-			self::disableCache();
-			return;
+			return false;
 		}
 
 		// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well
@@ -149,18 +108,6 @@ class kApiCache
 
 		$this->addKsData($ks);
 		$this->addInternalCacheParams();
-
-		if (!$this->init())
-		{
-			self::disableCache();
-			return;
-		}
-
-		$this->enableCache();
-	}
-
-	protected function init()			// overridable
-	{
 		return true;
 	}
 
@@ -214,131 +161,7 @@ class kApiCache
 		return false;
 	}
 
-	// enable / disable functions
-	protected function enableCache()
-	{
-		self::$_activeInstances[$this->_instanceId] = $this;
-		$this->_cacheStatus = self::CACHE_STATUS_ACTIVE;
-	}
-
-	public static function disableCache()
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			$curInstance->_cacheStatus = self::CACHE_STATUS_DISABLED;
-		}
-		self::$_activeInstances = array();
-	}
-
-	public static function disableConditionalCache()
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			// no need to check for CACHE_STATUS_DISABLED, since the instances are removed from the list when they get this status
-			$curInstance->disableConditionalCacheInternal();
-		}
-	}
-	
-	protected function disableConditionalCacheInternal()
-	{
-		$this->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
-		$this->_invalidationKeys = array();
-		$this->_sqlConditions = array();	
-	}
-
-	protected function removeFromActiveList()
-	{
-		unset(self::$_activeInstances[$this->_instanceId]);
-	}
-
-	public static function isCacheEnabled()
-	{
-		return count(self::$_activeInstances);
-	}
-
-	// expiry control functions
-	public static function setExpiry($expiry)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			if ($curInstance->_expiry && $curInstance->_expiry < $expiry)
-				continue;
-			$curInstance->_expiry = $expiry;
-		}
-	}
-
-	public static function setConditionalCacheExpiry($expiry)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			if ($curInstance->_conditionalCacheExpiry && $curInstance->_conditionalCacheExpiry < $expiry)
-				continue;
-			$curInstance->_conditionalCacheExpiry = $expiry;
-		}
-	}
-
-	// conditional cache
-	public static function addInvalidationKeys($invalidationKeys, $invalidationTime)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			$curInstance->_invalidationKeys = array_merge($curInstance->_invalidationKeys, $invalidationKeys);
-			$curInstance->_invalidationTime = max($curInstance->_invalidationTime, $invalidationTime);
-		}
-	}
-	
-	public static function addSqlQueryCondition($dsn, $sql, $fetchStyle, $columnIndex, $filter, $result)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			if ($curInstance->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
-				continue;
-			
-			if (!isset($curInstance->_sqlConditions[$dsn]))
-			{
-				if (count($curInstance->_sqlConditions) >= self::MAX_SQL_CONDITION_DSNS)
-				{
-					$curInstance->disableConditionalCacheInternal();
-					continue;
-				}
-
-				$curInstance->_sqlConditions[$dsn] = array();
-			}
-
-			if (count($curInstance->_sqlConditions[$dsn]) >= self::MAX_SQL_CONDITION_QUERIES)
-			{
-				$curInstance->disableConditionalCacheInternal();
-				continue;
-			}
-					
-			$curInstance->_sqlConditions[$dsn][] = array(
-					'sql' => $sql, 
-					'fetchStyle' => $fetchStyle, 
-					'columnIndex' => $columnIndex, 
-					'filter' => $filter, 
-					'expectedResult' => $result);
-		}
-	}
-
-	// extra fields functions
-	static public function hasExtraFields()
-	{
-		return self::$_hasExtraFields;
-	}
-
-	static public function addExtraField($extraField, $condition = self::COND_NONE, $refValue = null)
-	{
-		foreach (self::$_activeInstances as $curInstance)
-		{
-			$curInstance->addExtraFieldInternal($extraField, $condition, $refValue);
-		}
-
-		// the following code is required since there are no active cache instances in thumbnail action
-		// and we need _hasExtraFields to be correct
-		if ($extraField != self::ECF_REFERRER || self::$_usesHttpReferrer)
-			self::$_hasExtraFields = true;
-	}
-
+	// extra fields
 	static protected function getCountry()
 	{
 		if (is_null(self::$_country))
@@ -348,12 +171,6 @@ class kApiCache
 			self::$_country = kIP2Location::ipToCountry($ipAddress);
 		}
 		return self::$_country;
-	}
-
-	static public function getHttpReferrer()
-	{
-		self::$_usesHttpReferrer = true;
-		return isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '';
 	}
 
 	protected function getFieldValues($extraField)
@@ -443,15 +260,8 @@ class kApiCache
 		return '';
 	}
 
-	protected function addExtraFieldInternal($extraField, $condition, $refValue)
+	protected function addExtraFieldsToCacheParams($extraField, $condition, $refValue)
 	{
-		$extraFieldParams = array($extraField, $condition, $refValue);
-		if (in_array($extraFieldParams, $this->_extraFields))
-			return;			// already added
-		$this->_extraFields[] = $extraFieldParams;
-		if ($extraField != self::ECF_REFERRER || self::$_usesHttpReferrer)
-			self::$_hasExtraFields = true;
-
 		foreach ($this->getFieldValues($extraField) as $valueIndex => $fieldValue)
 		{
 			if ($extraField == self::ECF_REFERRER)
@@ -465,7 +275,7 @@ class kApiCache
 
 		$this->_cacheKeyDirty = true;
 	}
-
+	
 	protected function addExtraFields()
 	{
 		$extraFieldsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_EXTRA_FIELDS);
@@ -535,32 +345,6 @@ class kApiCache
 		return max($cacheResult);
 	}
 
-	public static function filterQueryResult($input, $filter)
-	{
-		if (!$filter)
-			return $input;
-	
-		$result = array();
-		foreach ($input as $index => $curRow)
-		{
-			$matchesFilter = true;
-			foreach ($filter as $key => $value)
-			{
-				if (!isset($curRow[$key]) || $curRow[$key] != $value)
-				{
-					$matchesFilter = false;
-					break;
-				}
-			}
-			
-			if ($matchesFilter)
-			{
-				$result[] = $curRow;
-			}
-		}
-		return $result;
-	}
-	
 	protected function validateSqlQueries($sqlConditions)
 	{
 		foreach ($sqlConditions as $dsn => $queries)
@@ -1020,14 +804,5 @@ class kApiCache
 			return false;
 
 		return $_SERVER[$headerName];
-	}
-
-	/**
-	 * @return int
-	 */
-	public static function getTime()
-	{
-		self::setConditionalCacheExpiry(600);
-		return time();
 	}
 }

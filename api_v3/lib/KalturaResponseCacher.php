@@ -32,6 +32,9 @@ class KalturaResponseCacher extends kApiCache
 
 	protected function init()
 	{
+		if (!parent::init())
+			return false;
+			
 		self::handleSessionStart($this->_params);
 		
 		// remove parameters that do not affect the api result
