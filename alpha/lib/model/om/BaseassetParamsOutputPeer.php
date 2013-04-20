@@ -715,6 +715,7 @@ abstract class BaseassetParamsOutputPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('assetParamsOutputPeer');
 		}
 	}
 

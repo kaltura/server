@@ -631,6 +631,7 @@ abstract class BasePartnerStatsPeer {
 				$key = (string) $obj->getPartnerId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('PartnerStatsPeer');
 		}
 	}
 

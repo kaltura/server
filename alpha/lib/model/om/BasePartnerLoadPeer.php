@@ -595,6 +595,7 @@ abstract class BasePartnerLoadPeer {
 				$key = serialize(array((string) $obj->getJobType(), (string) $obj->getJobSubType(), (string) $obj->getPartnerId(), (string) $obj->getDc()));
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('PartnerLoadPeer');
 		}
 	}
 

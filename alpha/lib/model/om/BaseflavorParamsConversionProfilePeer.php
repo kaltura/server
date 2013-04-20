@@ -548,6 +548,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('flavorParamsConversionProfilePeer');
 		}
 	}
 

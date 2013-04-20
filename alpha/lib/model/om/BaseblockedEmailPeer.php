@@ -508,6 +508,7 @@ abstract class BaseblockedEmailPeer {
 				$key = (string) $obj->getEmail();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('blockedEmailPeer');
 		}
 	}
 

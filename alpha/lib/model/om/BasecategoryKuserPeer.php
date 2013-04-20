@@ -623,6 +623,7 @@ abstract class BasecategoryKuserPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('categoryKuserPeer');
 		}
 	}
 

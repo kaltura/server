@@ -611,6 +611,7 @@ abstract class BaseEmailIngestionProfilePeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('EmailIngestionProfilePeer');
 		}
 	}
 

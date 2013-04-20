@@ -682,6 +682,7 @@ abstract class BasesyndicationFeedPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('syndicationFeedPeer');
 		}
 	}
 

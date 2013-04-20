@@ -651,6 +651,7 @@ abstract class BaseBatchJobLockPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('BatchJobLockPeer');
 		}
 	}
 

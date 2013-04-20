@@ -655,6 +655,7 @@ abstract class BaseassetPeer {
 				$key = (string) $obj->getIntId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('assetPeer');
 		}
 	}
 

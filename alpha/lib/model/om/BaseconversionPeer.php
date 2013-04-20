@@ -568,6 +568,7 @@ abstract class BaseconversionPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('conversionPeer');
 		}
 	}
 

@@ -536,6 +536,7 @@ abstract class BaseflickrTokenPeer {
 				$key = (string) $obj->getKaltToken();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('flickrTokenPeer');
 		}
 	}
 

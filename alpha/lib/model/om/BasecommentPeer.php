@@ -536,6 +536,7 @@ abstract class BasecommentPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('commentPeer');
 		}
 	}
 

@@ -643,6 +643,7 @@ abstract class BaseconversionProfile2Peer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('conversionProfile2Peer');
 		}
 	}
 

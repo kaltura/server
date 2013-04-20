@@ -599,6 +599,7 @@ abstract class BaseReportPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('ReportPeer');
 		}
 	}
 
