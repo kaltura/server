@@ -53,7 +53,10 @@ class kMrssManager
 	protected static function addInstanceToPool($entryId, SimpleXMLElement $xml)
 	{
 		if (self::isInstancePoolingEnabled())
+		{
 			self::$instancesPool[$entryId] = $xml;
+			kMemoryManager::registerPeer('kMrssManager');
+		}
 	}
 
 	/**

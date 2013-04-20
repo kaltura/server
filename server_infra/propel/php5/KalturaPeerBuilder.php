@@ -1342,4 +1342,46 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	}
 	";
 	}
+
+	/**
+	 * Creates a convenience method to add objects to an instance pool.
+	 * @param      string &$script The script will be modified in this method.
+	 */
+	protected function addAddInstanceToPool(&$script)
+	{
+		$table = $this->getTable();
+		$script .= "
+	/**
+	 * Adds an object to the instance pool.
+	 *
+	 * Propel keeps cached copies of objects in an instance pool when they are retrieved
+	 * from the database.  In some cases -- especially when you override doSelect*()
+	 * methods in your stub classes -- you may need to explicitly add objects
+	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
+	 * and retrieveByPK*() calls.
+	 *
+	 * @param      ".$this->getObjectClassname()." \$value A ".$this->getObjectClassname()." object.
+	 * @param      string \$key (optional) key to use for instance map (for performance boost if key was already calculated externally).
+	 */
+	public static function addInstanceToPool(".$this->getObjectClassname()." \$obj, \$key = null)
+	{
+		if (Propel::isInstancePoolingEnabled()) {
+			if (\$key === null) {";
+
+		$pks = $this->getTable()->getPrimaryKey();
+
+		$php = array();
+		foreach ($pks as $pk) {
+			$php[] = '$obj->get' . $pk->getPhpName() . '()';
+		}
+		$script .= "
+				\$key = ".$this->getInstancePoolKeySnippet($php).";";
+		$script .= "
+			} // if key === null
+			self::\$instances[\$key] = \$obj;
+			kMemoryManager::registerPeer('".$this->getPeerClassname()."');
+		}
+	}
+";
+	} // addAddInstanceToPool()
 }
