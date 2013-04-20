@@ -855,6 +855,9 @@ function generateKalcliCommand($service, $action, $parsedParams)
 	$kalcliCmd = "kalcli -x {$service} {$action}";
 	foreach ($parsedParams as $key => $value)
 	{
+		if (in_array($key, array('action', 'service')))
+			continue;
+		
 		$curParam = "{$key}={$value}";
 		if (!preg_match('/^[a-zA-Z0-9\:_\-,=\.\/]+$/', $curParam))
 			$kalcliCmd .= " '{$curParam}'";
