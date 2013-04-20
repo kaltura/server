@@ -659,6 +659,7 @@ abstract class BaseCuePointPeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('CuePointPeer');
 		}
 	}
 

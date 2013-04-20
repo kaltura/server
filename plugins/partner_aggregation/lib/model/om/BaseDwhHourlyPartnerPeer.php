@@ -807,6 +807,7 @@ abstract class BaseDwhHourlyPartnerPeer {
 				$key = serialize(array((string) $obj->getPartnerId(), (string) $obj->getDateId(), (string) $obj->getHourId()));
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('DwhHourlyPartnerPeer');
 		}
 	}
 

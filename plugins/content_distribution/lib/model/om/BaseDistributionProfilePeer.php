@@ -643,6 +643,7 @@ abstract class BaseDistributionProfilePeer {
 				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
+			kMemoryManager::registerPeer('DistributionProfilePeer');
 		}
 	}
 
