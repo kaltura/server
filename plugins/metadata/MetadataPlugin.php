@@ -3,7 +3,7 @@
  * Enable adding custom metadata objects that releate to core objects
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator, IKalturaObjectValidator
+class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaSphinxConfiguration, IKalturaEnumerator, IKalturaObjectValidator
 {
 
 	const SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS = 10;
@@ -874,16 +874,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			
 		return $searchIndexes[$partnerSearchIndex];
 	}
-	/* (non-PHPdoc)
-	 * @see IKalturaMemoryCleaner::cleanMemory()
-	 */
-	public static function cleanMemory()
-	{
-	    MetadataProfilePeer::clearInstancePool();
-	    MetadataProfileFieldPeer::clearInstancePool();
-	    MetadataPeer::clearInstancePool();
-	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaConfigurator::getConfig()
 	 */

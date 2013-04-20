@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -61,14 +61,6 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		);
 	}
 
-	/* (non-PHPdoc)
-	 * @see IKalturaMemoryCleaner::cleanMemory()
-	 */
-	public static function cleanMemory()
-	{
-	    CuePointPeer::clearInstancePool();
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()
 	 */

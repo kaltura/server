@@ -2,7 +2,7 @@
 /**
  * @package plugins.virusScan
  */
-class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator
+class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'virusScan';
 	const VIRUS_SCAN_FLOW_MANAGER_CLASS = 'kVirusScanFlowManager';
@@ -153,11 +153,6 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
-	public static function cleanMemory()
-	{
-//	    VirusScanProfilePeer::clearInstancePool();
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaAdminConsolePages::getApplicationPages()
 	 */

@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEventConsumers
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'dropFolder';
 	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderEventsConsumer';
@@ -35,12 +35,6 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);		
-	}
-	
-	public static function cleanMemory()
-	{
-		DropFolderPeer::clearInstancePool();
-	    DropFolderFilePeer::clearInstancePool();		
 	}
 	
 	/**

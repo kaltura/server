@@ -2,7 +2,7 @@
 /**
  * @package plugins.eventNotification
  */
-class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader
+class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaEventConsumers, IKalturaServices, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'eventNotification';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -95,14 +95,6 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 			new EventNotificationTemplateConfigureAction(),
 			new EventNotificationTemplateUpdateStatusAction(),
 		);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaMemoryCleaner::cleanMemory()
-	 */
-	public static function cleanMemory() 
-	{
-		EventNotificationTemplatePeer::clearInstancePool();
 	}
 
 	/* (non-PHPdoc)

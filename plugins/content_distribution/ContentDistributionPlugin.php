@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistribution
  */
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaApplicationPartialView, IKalturaPending, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaApplicationPartialView, IKalturaPending, IKalturaConfigurator, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 2;
@@ -342,17 +342,6 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
-	/* (non-PHPdoc)
-	 * @see IKalturaMemoryCleaner::cleanMemory()
-	 */
-	public static function cleanMemory()
-	{
-	    DistributionProfilePeer::clearInstancePool();
-	    EntryDistributionPeer::clearInstancePool();
-//	    GenericDistributionProviderPeer::clearInstancePool();
-//	    GenericDistributionProviderActionPeer::clearInstancePool();
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IKalturaConfigurator::getConfig()
 	 */

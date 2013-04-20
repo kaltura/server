@@ -2,7 +2,7 @@
 /**
  * @package plugins.audit
  */
-class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaConfigurator
+class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'audit';
 	const AUDIT_TRAIL_MANAGER = 'kAuditTrailManager';
@@ -39,13 +39,6 @@ class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 		);
 	}
 
-	public static function cleanMemory()
-	{
-	    AuditTrailPeer::clearInstancePool();
-	    AuditTrailConfigPeer::clearInstancePool();
-//	    AuditTrailDataPeer::clearInstancePool();
-	}
-	
 	/**
 	 * 
 	 * Gets the config for the different config names
