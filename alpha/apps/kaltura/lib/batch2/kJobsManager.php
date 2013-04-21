@@ -102,12 +102,24 @@ class kJobsManager
 	 */
 	public static function abortChildJobs(BatchJob $dbBatchJob)
 	{
-		// aborts all child jobs
-		$dbChildJobs = $dbBatchJob->getChildJobs();
-		foreach($dbChildJobs as $dbChildJob) {
-			$dbChildJob->setMessage("Parent job was aborted.");
-			if($dbChildJob->getId() != $dbBatchJob->getId())
-				self::abortDbBatchJob($dbChildJob);
+		$maxJobsForQuery = 100;
+		$c = new Criteria();
+		$c->add(BatchJobPeer::STATUS, BatchJobPeer::getClosedStatusList(), Criteria::NOT_IN);
+		$c->setLimit($maxJobsForQuery);
+		
+		// aborts all child jobs in chunks
+		while(true) {
+			
+			$dbChildJobs = $dbBatchJob->getChildJobs($c);
+			
+			foreach($dbChildJobs as $dbChildJob) {
+				$dbChildJob->setMessage("Parent job was aborted.");
+				if($dbChildJob->getId() != $dbBatchJob->getId())
+					self::abortDbBatchJob($dbChildJob);
+			}
+			
+			if(count($dbChildJobs) < $maxJobsForQuery)
+				break;
 		}
 	}
 
