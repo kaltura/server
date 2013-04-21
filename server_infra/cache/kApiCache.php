@@ -661,7 +661,7 @@ class kApiCache extends kApiCacheBase
 		$foundHeader = false;
 		foreach($headers as $header)
 		{
-			if (strpos($header, 'X-Kaltura') === 0 && strpos($header, 'cache-key') === false)
+			if (strpos($header, 'X-Kaltura:') === 0 && strpos($header, 'cache-key') === false)
 			{
 				$foundHeader = true;
 				break;
