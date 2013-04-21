@@ -358,8 +358,11 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 	public function getChildJobs(Criteria $c = null)
 	{
-		if(!$c)
+		if($c) {
+			$c = clone $c;
+		} else {
 			$c = new Criteria();
+		}
 			
 		$crit = $c->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id);
 		$crit->addOr($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
