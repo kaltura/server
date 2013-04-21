@@ -2025,11 +2025,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if (kCurrentContext::isApiV3Context())
 			return parent::getPuserId();
 			
-		// HACK for FootBo
-		if ( !$real_puser_id && $this->getPartnerId() == 8304 )
-		{
-			return $this->getContributorScreenName();
-		}		
 		$puser_id = $this->getFromCustomData( "puserId" );
 		if ( $this->m_puser_id ) // ! $puser_id )
 		{
