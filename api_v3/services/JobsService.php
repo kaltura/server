@@ -995,12 +995,13 @@ class JobsService extends KalturaBaseService
 	 * @action retryJob
 	 * @param int $jobId the id of the job  
 	 * @param KalturaBatchJobType $jobType the type of the job  
+	 * @param bool $force should we force the restart. 
 	 * @return KalturaBatchJobResponse 
 	 */
-	function retryJobAction($jobId, $jobType)
+	function retryJobAction($jobId, $jobType, $force = false)
 	{
 		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
-		kJobsManager::retryJob($jobId, $dbJobType);
+		kJobsManager::retryJob($jobId, $dbJobType, $force);
 		return $this->getStatusAction($jobId, $jobType);
 	}
 	
