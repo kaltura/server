@@ -258,7 +258,12 @@ class KAsyncConvert extends KJobHandlerWorker
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
 			clearstatcache();
-			$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
+			$directorySync = is_dir($data->destFileSyncLocalPath);
+			if($directorySync)
+				$fileSize=KBatchBase::foldersize($data->destFileSyncLocalPath);
+			else
+				$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
+			
 			kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
 			
 			// directory sizes may differ on different devices
@@ -276,7 +281,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
 				$job->message = "File ready for download";
 			}
-			elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize))
+			elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, directorySync))
 			{
 				$job->status = KalturaBatchJobStatus::FINISHED;
 				$job->message = "File moved to shared";

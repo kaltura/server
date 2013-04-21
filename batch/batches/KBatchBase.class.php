@@ -424,7 +424,7 @@ abstract class KBatchBase implements IKalturaLogger
 	 * @param int $size
 	 * @return bool
 	 */
-	protected function checkFileExists($file, $size = null)
+	protected function checkFileExists($file, $size = null, $directorySync = null)
 	{
 		$this->setFilePermissions($file);
 		
@@ -437,8 +437,9 @@ abstract class KBatchBase implements IKalturaLogger
 			// If this is not a file but a directory, certain operations should be done diffrently:
 			// - size calcultions
 			// - the response from the client (to check the client size beaviour)
-		$directorySync = is_dir($file);
-		KalturaLog::info("Check File Exists[$file] size[$size]");
+		if(is_null($directorySync))
+			$directorySync = is_dir($file);
+		KalturaLog::info("Check File Exists[$file] size[$size] isDir[$directorySync]");
 		if(is_null($size))
 		{
 			clearstatcache();
