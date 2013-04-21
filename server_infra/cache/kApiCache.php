@@ -29,6 +29,7 @@ class kApiCache extends kApiCacheBase
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
 	const CACHE_MODE_CONDITIONAL = 2;			// cache the response along with its matching conditions
 
+	const ANONYMOUS_CACHE_EXPIRY = 600;
 	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
 	const KALTURA_COMMENT_MARKER = '@KALTURA_COMMENT@';
 	
@@ -630,6 +631,8 @@ class kApiCache extends kApiCacheBase
 
 			case self::CACHE_MODE_ANONYMOUS:
 				$expiry = $this->getAnonymousCachingExpiry();
+				if (!$expiry)
+					$expiry = self::ANONYMOUS_CACHE_EXPIRY;
 				break;
 			}
 

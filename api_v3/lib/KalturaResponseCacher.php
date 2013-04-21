@@ -15,7 +15,7 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
 		
-	protected $_defaultExpiry = 600;
+	protected $_defaultExpiry = 0;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
 	
 	protected $clientTag = null;

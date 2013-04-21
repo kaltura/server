@@ -38,7 +38,7 @@ class kApiCacheBase
 	protected static $_nextInstanceId = 0;
 
 	// status
-	protected $_expiry = 600;
+	protected $_expiry = 0;								// the expiry used for anonymous caching, if 0 ANONYMOUS_CACHE_EXPIRY will be used
 	protected $_cacheStatus = self::CACHE_STATUS_DISABLED;	// enabled after the cacher initializes
 
 	// conditional cache fields
@@ -66,6 +66,10 @@ class kApiCacheBase
 		$this->enableCache();
 	}
 
+	protected function init()			// overridable
+	{
+		return true;
+	}
 	
 	// enable / disable functions
 	protected function enableCache()

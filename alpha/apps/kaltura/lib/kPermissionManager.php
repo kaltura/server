@@ -16,6 +16,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	const PERMISSION_NAMES_ARRAY    = 'permission_names'; // name of $map's permission names array
 			
 	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
+	private static $cacheWatcher = null;
 	private static $useCache = true;     // use cache or not
 	
 	private static $ksUserId = null;
@@ -428,6 +429,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$securityContext = array(kCurrentContext::$partner_id, kCurrentContext::$ks);
 		if ($securityContext === self::$lastInitializedContext) {
 			KalturaLog::log('Already initalized for this security context');
+			self::$cacheWatcher->apply();
 			return;
 		}
 		
@@ -439,6 +441,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		// can be initialized more than once to support multirequest with different kCurrentContext parameters
 		self::$lastInitializedContext = null;
+		self::$cacheWatcher = new kApiCacheWatcher();
 		self::$useCache = $useCache ? true : false;
 
 		// copy kCurrentContext parameters (kCurrentContext::init should have been executed before)
@@ -467,6 +470,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 								
 		// initialization done
 		self::$lastInitializedContext = $securityContext;
+		self::$cacheWatcher->stop();
+		
 		return true;
 	}
 	
