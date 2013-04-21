@@ -285,7 +285,7 @@ class kBatchExclusiveLock
 
 		// In case maxOffset isn't null, we want to take the chunk out of a random offset in between.
 		// That's usefull for load handling
-		if (!is_null($maxOffset)) 
+		if ($maxOffset) 
 			$c->setOffset(rand(0, $maxOffset));
 
 		$c->setLimit($number_of_objects);

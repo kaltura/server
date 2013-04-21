@@ -322,9 +322,10 @@ class KGenericScheduler
 		KalturaLog::info("Executing $taskConfig->name [$taskIndex]");
 		$tasksetPath = $this->schedulerConfig->getTasksetPath();
 		$taskConf = clone $taskConfig;
-		$queueSize = 0;
 		if(array_key_exists($taskConfig->id, $this->queueSizes))
 			$taskConf->setQueueSize($this->queueSizes[$taskConfig->id]);
+		else 
+			$taskConf->setQueueSize(0);
 		
 		$proc = new KProcessWrapper($taskIndex, $this->logDir, $this->phpPath, $tasksetPath, $taskConf);
 
