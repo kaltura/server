@@ -78,12 +78,15 @@ class kBatchExclusiveLock
 	 * @param int $number_of_objects
 	 * @param int $jobType
 	 * @param BatchJobFilter $filter
+	 * @param int $maxOffset
 	 */
-	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType, BatchJobFilter $filter)
+	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType, 
+			BatchJobFilter $filter, $maxOffset = null)
 	{
 		$c = new Criteria();
 		$filter->attachToCriteria($c);
-		return self::getExclusive($c, $lockKey, $max_execution_time, $number_of_objects, $jobType);
+		
+		return self::getExclusive($c, $lockKey, $max_execution_time, $number_of_objects, $jobType, $maxOffset);
 	}
 	
 	public static function getQueueSize(Criteria $c, $schedulerId, $workerId, $jobType)
@@ -216,7 +219,7 @@ class kBatchExclusiveLock
 	 *
 	 * @param Criteria $c
 	 */
-	private static function getExclusive(Criteria $c, kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType)
+	private static function getExclusive(Criteria $c, kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType, $maxOffset = null)
 	{
 		$schd = BatchJobLockPeer::SCHEDULER_ID;
 		$work = BatchJobLockPeer::WORKER_ID;
@@ -280,8 +283,10 @@ class kBatchExclusiveLock
 				
 		$c->add($stat, $query, Criteria::CUSTOM);
 
-		if ($jobType == BatchJobType::FILESYNC_IMPORT)
-			$c->setOffset(rand(0, 50) * 10);
+		// In case maxOffset isn't null, we want to take the chunk out of a random offset in between.
+		// That's usefull for load handling
+		if (!is_null($maxOffset)) 
+			$c->setOffset(rand(0, $maxOffset));
 
 		$c->setLimit($number_of_objects);
 		

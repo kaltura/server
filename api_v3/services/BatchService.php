@@ -411,12 +411,14 @@ class BatchService extends KalturaBatchService
 	 * @param int $numberOfJobs The maximum number of jobs to return.
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs
 	 * @param KalturaBatchJobType $jobType The type of the job - could be a custom extended type
+	 * @param int $maxOffset The maximum offset we accept for the distance from the best result. 
 	 * @return KalturaBatchJobArray
 	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, 
+			KalturaBatchJobFilter $filter = null, $jobType = null, $maxOffset = null)
 	{
 		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType, $maxOffset);
 		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}
 

@@ -321,7 +321,12 @@ class KGenericScheduler
 
 		KalturaLog::info("Executing $taskConfig->name [$taskIndex]");
 		$tasksetPath = $this->schedulerConfig->getTasksetPath();
-		$proc = new KProcessWrapper($taskIndex, $this->logDir, $this->phpPath, $tasksetPath, clone $taskConfig);
+		$taskConf = clone $taskConfig;
+		$queueSize = 0;
+		if(array_key_exists($taskConfig->id, $this->queueSizes))
+			$taskConf->setQueueSize($this->queueSizes[$taskConfig->id]);
+		
+		$proc = new KProcessWrapper($taskIndex, $this->logDir, $this->phpPath, $tasksetPath, $taskConf);
 
 		$this->runningTasks[$taskConfig->name][$taskIndex] = &$proc;
 		self::onRunningInstancesEvent($taskConfig, count($this->runningTasks[$taskConfig->name]));

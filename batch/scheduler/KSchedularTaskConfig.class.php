@@ -4,6 +4,9 @@
  */
 class KSchedularTaskConfig extends Zend_Config_Ini
 {
+	
+	protected $queueSize = 0;
+	
 	public function __construct($configFileName, $workerName, $maxInstances)
 	{
 		parent::__construct($configFileName, $workerName, true);
@@ -245,5 +248,13 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	{
 		if(is_null($this->curlTimeout))
 			$this->curlTimeout = $curlTimeout;
+	}
+	
+	public function getQueueSize() {
+		return $this->queueSize;
+	}
+	
+	public function setQueueSize($queueSize) {
+		$this->queueSize = $queueSize;
 	}
 }
