@@ -104,7 +104,7 @@ class KalturaResponseCacher extends kApiCache
 	public static function endCacheIfDisabled()
 	{
 		$lastInstance = end(self::$_activeInstances);
-		if ($lastInstance)
+		if ($lastInstance && $lastInstance instanceof kApiCache)
 			$lastInstance->initCacheModes();
 		
 		if (self::isCacheEnabled())
