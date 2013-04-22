@@ -961,6 +961,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$flavorsIds[] = $flavorsId;
 			$conversionProfileFlavorParams[$flavorsId] = $flavorParamsConversionProfile;
 		}
+		KalturaLog::debug("Flavors in conversion profile [" . implode(',', $flavorsIds) . "]");
 			
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		
@@ -971,6 +972,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$ingestedNeeded = false;
 		foreach($flavors as $index => $flavor)
 		{
+			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
 			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
 				continue;
 				
@@ -997,6 +999,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			{
 				$sourceFlavor = $flavor;
 				unset($flavors[$index]);
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
 				continue;
 			}
 			
@@ -1007,11 +1010,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			{
 				unset($flavors[$index]);
 				$ingestedNeeded = true;
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it should be ingested");
 				continue;
 			}
 				
 			if(in_array($flavor->getId(), $entryIngestedFlavors))
+			{
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it already ingested");
 				unset($flavors[$index]);
+			}
 		}
 		
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
