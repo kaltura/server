@@ -5,13 +5,17 @@ define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
 
 /**
  * for running the script you need to provide path to ini file like:
- *  --ini=/path/to/config.ini
+ *  --ini={/path/to/config.ini}
  *
  * to get example code for kmc wrapper add:
  *  --include-code
  *
  * to dry-run the script add
  *  --no-create
+ *
+ * to define user (defaults to apache) or group (defaults to kaltura) for files ownership add
+ *  --user={username}
+ *  --group={groupname}
  */
 ini_set("memory_limit", "512M");
 error_reporting(E_ALL);
@@ -545,10 +549,12 @@ class uiConfDeployment
 	{
 		echo $message.PHP_EOL.PHP_EOL;
 		echo 'php '.$_SERVER['SCRIPT_NAME']." --ini={path to ini file} [--no-create]\n\n";
-		echo "    --ini: path to ui_conf deployment ini file\n";
+		echo "    --ini={path}: path to ui_conf deployment ini file\n";
 		echo "    --partner: The partner to deploty for (default is 0)\n";
 		echo "    --include-code: path to ui_conf deployment ini file\n";
 		echo "    --no-create: dry-run, do not really create the uiconfs\n";
+		echo "    --user={username}: define user (defaults to apache) for files ownership add\n";
+		echo "    --group={groupname}: define group (defaults to kaltura) for files ownership add\n";
 		die;
 	}
 
