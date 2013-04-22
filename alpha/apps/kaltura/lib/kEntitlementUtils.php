@@ -5,16 +5,16 @@
  * @subpackage utils
  *
  */
-class kEntitlementUtils 
+class kEntitlementUtils
 {
 	const DEFAULT_CONTEXT = 'DEFAULTPC';
 	const NOT_DEFAULT_CONTEXT = 'NOTDEFAULTPC';
 	
-	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC'; 
+	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC';
 	
 	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
-	protected static $privacyContextSearch = null;	
+	protected static $privacyContextSearch = null;
 	
 	public static function getEntitlementEnforcement()
 	{
@@ -33,7 +33,7 @@ class kEntitlementUtils
 		if(!$ks || !$ks->getPrivacyContext())
 			return false;
 			
-		return true;		
+		return true;
 	}
 	
 	/**
@@ -71,13 +71,13 @@ class kEntitlementUtils
 		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
 		
 		$categories = array();
-		foreach($allCategoriesEntry as $categoryEntry)	
+		foreach($allCategoriesEntry as $categoryEntry)
 			$categories[] = $categoryEntry->getCategoryId();
 			
-		//if entry doesn't belong to any category. 
+		//if entry doesn't belong to any category.
 		$categories[] = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
 			
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->add(categoryPeer::ID, $categories, Criteria::IN);
 		
 				
@@ -99,7 +99,7 @@ class kEntitlementUtils
 		}
 		
 		if($ks)
-		{	
+		{
 			$ksPrivacyContexts = $ks->getPrivacyContext();
 			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
 			{
@@ -138,7 +138,7 @@ class kEntitlementUtils
 				{
 					KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
 					return true;
-				} 
+				}
 			}
 			
 			// kuser is set on the category as member
@@ -147,14 +147,14 @@ class kEntitlementUtils
 			{
 				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::LIKE);
 				$membersCrit->addOr($crit);
-				$crit = $membersCrit;	
+				$crit = $membersCrit;
 			}
 			
 		}
-		else 
+		else
 		{
 			//no ks = set privacy context to default.
-			$c->add(categoryPeer::PRIVACY_CONTEXTS, array(self::DEFAULT_CONTEXT . $partner->getId()), KalturaCriteria::IN_LIKE);
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, array(kEntitlementUtils::getPrivacyContextSearch()), KalturaCriteria::IN_LIKE);
 		}
 		
 		$c->addAnd($crit);
@@ -172,7 +172,7 @@ class kEntitlementUtils
 		
 		KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] not entitled');
 		return false;
-	} 	
+	}
 	
 	/**
 	 * Set Entitlement Enforcement - if entitelement is enabled \ disabled in this session
@@ -182,9 +182,9 @@ class kEntitlementUtils
 	 */
 	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{
-		self::$initialized = true; 
+		self::$initialized = true;
 		
-		if(is_null($partnerId)) 
+		if(is_null($partnerId))
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			
 		if(is_null($partnerId) || $partnerId == Partner::BATCH_PARTNER_ID)
@@ -195,7 +195,7 @@ class kEntitlementUtils
 			return;
 			
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
-			return;		
+			return;
 		
 		$partnerDefaultEntitlementEnforcement = $partner->getDefaultEntitlementEnforcement();
 		
@@ -239,7 +239,7 @@ class kEntitlementUtils
 		if(!$ks || $ks->isAnonymousSession())
 			return array(category::formatPrivacy(PrivacyType::ALL, $partnerId));
 			
-		return array(category::formatPrivacy(PrivacyType::ALL, $partnerId), 
+		return array(category::formatPrivacy(PrivacyType::ALL, $partnerId),
 				category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partnerId));
 	}
 	
@@ -282,15 +282,15 @@ class kEntitlementUtils
 	}
 	
 	public static function getPrivacyContextForEntry(entry $entry)
-	{		
+	{
 		$privacyContexts = array();
 		$entryPrivacy = null;
-		$categories = array();		
+		$categories = array();
 		
 		if (count($entry->getAllCategoriesIds(true)))
 		{
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY); 
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$c->add(categoryPeer::ID, $entry->getAllCategoriesIds(true), Criteria::IN);
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
@@ -299,7 +299,7 @@ class kEntitlementUtils
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			
 			foreach ($categories as $category)
-			{								
+			{
 				$categoryPrivacy = $category->getPrivacy();
 				$categoryPrivacyContexts = $category->getPrivacyContexts();
 				if(!$categoryPrivacyContexts)
