@@ -7,27 +7,30 @@
 */
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
-$partnerId = null;
+if($argc < 3)
+{
+	echo 'usage: php ' . $_SERVER ['SCRIPT_NAME'] . ' {partner_id / \'null\'} {role_name} {permission_names} {realrun / dryrun}' . PHP_EOL;
+	exit(-1);
+}
+
 $page = 500;
 
-$dryRun = false;
-if($argc == 1 || strtolower($argv[1]) != 'realrun')
+$dryRun = true;
+if(in_array('realrun', $argv))
 {
-	$dryRun = true;
+	$dryRun = false;
 	KalturaLog::debug('Using dry run mode');
 }
+KalturaStatement::setDryRun($dryRun);
 
-if($argc > 2)
-{
-	$roleName = $argv[1];
-	$parmissionName = $argv[2];
-}else{
-	echo 'usage: php ' . $_SERVER ['SCRIPT_NAME'] . ' {role_name} {permission_name}' . PHP_EOL;
-	die;
-}
+$partnerId = $argv[1] == 'null' ? null : $argv[1];
+$roleName = $argv[2];
+$parmissionNames = explode(',', $argv[3]);
 	
 	
 $criteria = new Criteria();
+if($partnerId)
+	$criteria->addAnd(UserRolePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 $criteria->addAnd(UserRolePeer::NAME, $roleName, Criteria::EQUAL);
 $criteria->addAscendingOrderByColumn(UserRolePeer::ID);
 $criteria->setLimit($page);
@@ -40,7 +43,8 @@ while(count($userRoles))
 	KalturaLog::info("[" . count($userRoles) . "] user roles .");
 	foreach($userRoles as $userRole)
 	{
-		addPermissionsToRole($userRole, $parmissionName);
+		foreach($parmissionNames as $parmissionName)
+			addPermissionsToRole($userRole, $parmissionName);
 	}
 	kMemoryManager::clearMemory();
 
