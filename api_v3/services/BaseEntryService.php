@@ -325,7 +325,7 @@ class BaseEntryService extends KalturaEntryService
     
 	/**
 	 * Get base entry by ID.
-	 * 
+	 *
 	 * @action get
 	 * @param string $entryId Entry id
 	 * @param int $version Desired version of the data
@@ -352,13 +352,13 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Update base entry. Only the properties that were set will be updated.
-	 * 
+	 *
 	 * @action update
 	 * @param string $entryId Entry id to update
 	 * @param KalturaBaseEntry $baseEntry Base entry metadata to update
 	 * @param KalturaResource $resource Resource to be used to replace entry content
 	 * @return KalturaBaseEntry The updated entry
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit
 	 */
@@ -374,13 +374,13 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Update the content resource associated with the entry.
-	 * 
+	 *
 	 * @action updateContent
 	 * @param string $entryId Entry id to update
 	 * @param KalturaResource $resource Resource to be used to replace entry content
 	 * @param int $conversionProfileId The conversion profile id to be used on the entry
 	 * @return KalturaBaseEntry The updated entry
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit
 	 */
@@ -418,7 +418,7 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Get an array of KalturaBaseEntry objects by a comma-separated list of ids.
-	 * 
+	 *
 	 * @action getByIds
 	 * @param string $entryIds Comma separated string of entry ids
 	 * @return KalturaBaseEntryArray Array of base entry ids
@@ -463,14 +463,14 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * List base entries by filter with paging support.
-	 * 
+	 *
 	 * @action list
      * @param KalturaBaseEntryFilter $filter Entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @return KalturaBaseEntryListResponse Wrapper for array of base entries and total count
 	 */
 	function listAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
-	{		
+	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 		
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
@@ -489,11 +489,12 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * List base entries by filter according to reference id
-	 * 
+	 *
 	 * @action listByReferenceId
 	 * @param string $refId Entry Reference ID
 	 * @param KalturaFilterPager $pager Pager
 	 * @throws KalturaErrors::MISSING_MANDATORY_PARAMETER
+	 * @return KalturaBaseEntryListResponse Wrapper for array of base entries and total count
 	 */
 	function listByReferenceId($refId, KalturaFilterPager $pager = null)
 	{
@@ -508,11 +509,11 @@ class BaseEntryService extends KalturaEntryService
 		}
 		$entryFilter = new entryFilter();
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		//setting reference ID	
+		//setting reference ID
 		$entryFilter->set('_eq_reference_id', $refId);
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);		
-		$pager->attachToCriteria($c);	
-		$entryFilter->attachToCriteria($c);		
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$pager->attachToCriteria($c);
+		$entryFilter->attachToCriteria($c);
 		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 				
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
@@ -530,7 +531,7 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Count base entries by filter.
-	 * 
+	 *
 	 * @action count
      * @param KalturaBaseEntryFilter $filter Entry filter
 	 * @return int
@@ -541,12 +542,12 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Upload a file to Kaltura, that can be used to create an entry. 
-	 * 
+	 * Upload a file to Kaltura, that can be used to create an entry.
+	 *
 	 * @action upload
 	 * @param file $fileData The file data
 	 * @return string Upload token id
-	 * 
+	 *
 	 * @deprecated use upload.upload or uploadToken.add instead
 	 */
 	function uploadAction($fileData)
@@ -565,12 +566,12 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Update entry thumbnail using a raw jpeg file.
-	 * 
+	 *
 	 * @action updateThumbnailJpeg
 	 * @param string $entryId Media entry id
 	 * @param file $fileData Jpeg file data
 	 * @return KalturaBaseEntry The media entry
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
 	 */
@@ -581,12 +582,12 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Update entry thumbnail using url.
-	 * 
+	 *
 	 * @action updateThumbnailFromUrl
 	 * @param string $entryId Media entry id
 	 * @param string $url file url
 	 * @return KalturaBaseEntry The media entry
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
 	 */
@@ -597,13 +598,13 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Update entry thumbnail from a different entry by a specified time offset (in seconds).
-	 * 
+	 *
 	 * @action updateThumbnailFromSourceEntry
 	 * @param string $entryId Media entry id
 	 * @param string $sourceEntryId Media entry id
 	 * @param int $timeOffset Time offset (in seconds)
 	 * @return KalturaBaseEntry The media entry
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
 	 */
@@ -618,7 +619,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @action flag
 	 * @param string $entryId
 	 * @param KalturaModerationFlag $moderationFlag
-	 * 
+	 *
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	public function flagAction(KalturaModerationFlag $moderationFlag)
@@ -632,7 +633,7 @@ class BaseEntryService extends KalturaEntryService
 	 *
 	 * @action reject
 	 * @param string $entryId
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	public function rejectAction($entryId)
@@ -641,11 +642,11 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Approve the entry and mark the pending flags (if any) as moderated (this will make the entry playable). 
+	 * Approve the entry and mark the pending flags (if any) as moderated (this will make the entry playable).
 	 *
 	 * @action approve
 	 * @param string $entryId
-	 * 
+	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	public function approveAction($entryId)
@@ -659,7 +660,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @action listFlags
 	 * @param string $entryId
 	 * @param KalturaFilterPager $pager
-	 * 
+	 *
 	 * @return KalturaModerationFlagListResponse
 	 */
 	public function listFlags($entryId, KalturaFilterPager $pager = null)
@@ -669,7 +670,7 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Anonymously rank an entry, no validation is done on duplicate rankings.
-	 *  
+	 *
 	 * @action anonymousRank
 	 * @param string $entryId
 	 * @param int $rank
@@ -696,7 +697,7 @@ class BaseEntryService extends KalturaEntryService
 		$asset = null;
 		if($contextDataParams->flavorAssetId)
 		{
-			$asset = assetPeer::retrieveById($contextDataParams->flavorAssetId);				
+			$asset = assetPeer::retrieveById($contextDataParams->flavorAssetId);
 			if(!$asset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 		}
@@ -705,8 +706,8 @@ class BaseEntryService extends KalturaEntryService
 		
 		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
 			$accessControlScope = $dbEntry->getAccessControl()->getScope();
-		else 
-			$accessControlScope = new accessControlScope();			
+		else
+			$accessControlScope = new accessControlScope();
 		$contextDataParams->toObject($accessControlScope);
 		
 		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol);
@@ -726,7 +727,7 @@ class BaseEntryService extends KalturaEntryService
 			($dbEntry->getEndDate() &&   abs($dbEntry->getEndDate(null) - time())   <= 86400))
 		{
 			KalturaResponseCacher::setConditionalCacheExpiry(600);
-		}			
+		}
 		return $result;
 	}
 	
@@ -740,14 +741,14 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The exported entry
 	 */
 	public function exportAction ( $entryId , $storageProfileId )
-	{	    
+	{
 	    $dbEntry = entryPeer::retrieveByPK($entryId);
 	    if (!$dbEntry)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	    }
 	    
-	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);	    
+	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
@@ -765,7 +766,7 @@ class BaseEntryService extends KalturaEntryService
 	
 	/**
 	 * Index an entry by id.
-	 * 
+	 *
 	 * @action index
 	 * @param string $id
 	 * @param bool $shouldUpdate
