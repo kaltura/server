@@ -212,6 +212,16 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	private $lastBatchJobLockCriteria = null;
 
 	/**
+	 * @var        array BatchJobLockSuspend[] Collection to store aggregation of BatchJobLockSuspend objects.
+	 */
+	protected $collBatchJobLockSuspends;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collBatchJobLockSuspends.
+	 */
+	private $lastBatchJobLockSuspendCriteria = null;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -1620,6 +1630,9 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 			$this->collBatchJobLocks = null;
 			$this->lastBatchJobLockCriteria = null;
 
+			$this->collBatchJobLockSuspends = null;
+			$this->lastBatchJobLockSuspendCriteria = null;
+
 		} // if (deep)
 	}
 
@@ -1775,6 +1788,14 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 			if ($this->collBatchJobLocks !== null) {
 				foreach ($this->collBatchJobLocks as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collBatchJobLockSuspends !== null) {
+				foreach ($this->collBatchJobLockSuspends as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -2008,6 +2029,14 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 
 				if ($this->collBatchJobLocks !== null) {
 					foreach ($this->collBatchJobLocks as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collBatchJobLockSuspends !== null) {
+					foreach ($this->collBatchJobLockSuspends as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -2529,6 +2558,12 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 				}
 			}
 
+			foreach ($this->getBatchJobLockSuspends() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addBatchJobLockSuspend($relObj->copy($deepCopy));
+				}
+			}
+
 		} // if ($deepCopy)
 
 
@@ -2798,6 +2833,160 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Clears out the collBatchJobLockSuspends collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addBatchJobLockSuspends()
+	 */
+	public function clearBatchJobLockSuspends()
+	{
+		$this->collBatchJobLockSuspends = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collBatchJobLockSuspends collection (array).
+	 *
+	 * By default this just sets the collBatchJobLockSuspends collection to an empty array (like clearcollBatchJobLockSuspends());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initBatchJobLockSuspends()
+	{
+		$this->collBatchJobLockSuspends = array();
+	}
+
+	/**
+	 * Gets an array of BatchJobLockSuspend objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this BatchJob has previously been saved, it will retrieve
+	 * related BatchJobLockSuspends from storage. If this BatchJob is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array BatchJobLockSuspend[]
+	 * @throws     PropelException
+	 */
+	public function getBatchJobLockSuspends($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(BatchJobPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collBatchJobLockSuspends === null) {
+			if ($this->isNew()) {
+			   $this->collBatchJobLockSuspends = array();
+			} else {
+
+				$criteria->add(BatchJobLockSuspendPeer::BATCH_JOB_ID, $this->id);
+
+				BatchJobLockSuspendPeer::addSelectColumns($criteria);
+				$this->collBatchJobLockSuspends = BatchJobLockSuspendPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(BatchJobLockSuspendPeer::BATCH_JOB_ID, $this->id);
+
+				BatchJobLockSuspendPeer::addSelectColumns($criteria);
+				if (!isset($this->lastBatchJobLockSuspendCriteria) || !$this->lastBatchJobLockSuspendCriteria->equals($criteria)) {
+					$this->collBatchJobLockSuspends = BatchJobLockSuspendPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastBatchJobLockSuspendCriteria = $criteria;
+		return $this->collBatchJobLockSuspends;
+	}
+
+	/**
+	 * Returns the number of related BatchJobLockSuspend objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related BatchJobLockSuspend objects.
+	 * @throws     PropelException
+	 */
+	public function countBatchJobLockSuspends(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(BatchJobPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collBatchJobLockSuspends === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(BatchJobLockSuspendPeer::BATCH_JOB_ID, $this->id);
+
+				$count = BatchJobLockSuspendPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(BatchJobLockSuspendPeer::BATCH_JOB_ID, $this->id);
+
+				if (!isset($this->lastBatchJobLockSuspendCriteria) || !$this->lastBatchJobLockSuspendCriteria->equals($criteria)) {
+					$count = BatchJobLockSuspendPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collBatchJobLockSuspends);
+				}
+			} else {
+				$count = count($this->collBatchJobLockSuspends);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a BatchJobLockSuspend object to this object
+	 * through the BatchJobLockSuspend foreign key attribute.
+	 *
+	 * @param      BatchJobLockSuspend $l BatchJobLockSuspend
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addBatchJobLockSuspend(BatchJobLockSuspend $l)
+	{
+		if ($this->collBatchJobLockSuspends === null) {
+			$this->initBatchJobLockSuspends();
+		}
+		if (!in_array($l, $this->collBatchJobLockSuspends, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collBatchJobLockSuspends, $l);
+			$l->setBatchJob($this);
+		}
+	}
+
+	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -2814,9 +3003,15 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collBatchJobLockSuspends) {
+				foreach ((array) $this->collBatchJobLockSuspends as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
 		$this->collBatchJobLocks = null;
+		$this->collBatchJobLockSuspends = null;
 			$this->aBatchJobLock = null;
 	}
 
