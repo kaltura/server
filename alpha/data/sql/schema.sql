@@ -614,6 +614,45 @@ CREATE TABLE `batch_job_lock`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
+#-- batch_job_lock_suspend
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `batch_job_lock_suspend`;
+
+
+CREATE TABLE `batch_job_lock_suspend`
+(
+	`id` INTEGER  NOT NULL,
+	`job_type` INTEGER,
+	`job_sub_type` INTEGER,
+	`object_id` VARCHAR(20) default '',
+	`object_type` INTEGER,
+	`estimated_effort` BIGINT,
+	`status` INTEGER,
+	`start_at` DATETIME,
+	`created_at` DATETIME,
+	`priority` TINYINT,
+	`urgency` TINYINT,
+	`entry_id` VARCHAR(20) default '',
+	`partner_id` INTEGER default 0,
+	`scheduler_id` INTEGER,
+	`worker_id` INTEGER,
+	`batch_index` INTEGER,
+	`expiration` DATETIME,
+	`execution_attempts` TINYINT,
+	`version` INTEGER,
+	`dc` INTEGER,
+	`batch_job_id` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
+	INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
+	CONSTRAINT `batch_job_lock_suspend_FK_1`
+		FOREIGN KEY (`batch_job_id`)
+		REFERENCES `batch_job_sep` (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
 #-- partner_load
 #-----------------------------------------------------------------------------
 
@@ -1635,7 +1674,6 @@ CREATE TABLE `category_entry`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	`status` INTEGER default 2,
-	`privacy_contexts` VARCHAR(255)  NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`),

@@ -644,6 +644,39 @@
 			<index-column name="worker_id" />
 		</index>
 	</table>
+	<table skipSql="false" abstract="false" name="batch_job_lock_suspend" raiseEvents="false">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="false" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" default="" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="object_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="estimated_effort" type="bigint" default="null" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="start_at" type="timestamp" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="urgency" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" default="" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="scheduler_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="worker_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_index" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="expiration" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+        <foreign-key foreignTable="batch_job_sep">
+            <reference local="batch_job_id" foreign="id"/>
+        </foreign-key>
+		<index name="dc_partner_job_type">
+			<index-column name="dc" />
+			<index-column name="partner_id" />
+			<index-column name="job_type" />
+			<index-column name="job_sub_type" />
+		</index>
+	</table>
      <table skipSql="false" abstract="false" name="partner_load" raiseEvents="false">
 		<column primaryKey="true" required="true" autoIncrement="false" lazyLoad="false" name="job_type" type="integer" />
         <column primaryKey="true" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="integer" default="0"/>

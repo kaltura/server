@@ -9,6 +9,9 @@
  */
 class kJobsSuspender {
 	
+	/** The maximum number of jobs we will handle for each (dc,partner_id,job_type,job_sub_type) */
+	const MAX_PROCESSED_ROWS = 500;
+	
 	/**
 	 * Entry point to job balancing.
 	 * - Move jobs from status '0' to status '11' in case there are too many pending jobs
@@ -42,7 +45,7 @@ class kJobsSuspender {
 	
 		// Unsuspend jobs
 		$c = self::createReturnBalancedJobsQuery($dcId);
-		$stmt = BatchJobLockPeer::doSelectStmt($c);
+		$stmt = BatchJobLockSuspendPeer::doSelectStmt($c);
 		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
 		foreach ($rows as $row) {
@@ -82,18 +85,18 @@ class kJobsSuspender {
 	
 	/**
 	 * This function generates the query that gets all the jobs that needs to be unsuspended.
+	 * All those jobs will appear in batch_job_lock_suspend table
 	 */
 	private static function createReturnBalancedJobsQuery($dc) {
 		$c = new Criteria();
 	
 		// Where
-		$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, Criteria::EQUAL);
-		$c->add(BatchJobLockPeer::DC, $dc, Criteria::EQUAL);
+		$c->add(BatchJobLockSuspendPeer::DC, $dc, Criteria::EQUAL);
 		// Group by
-		$c->addGroupByColumn(BatchJobLockPeer::DC);
-		$c->addGroupByColumn(BatchJobLockPeer::PARTNER_ID);
-		$c->addGroupByColumn(BatchJobLockPeer::JOB_TYPE);
-		$c->addGroupByColumn(BatchJobLockPeer::JOB_SUB_TYPE);
+		$c->addGroupByColumn(BatchJobLockSuspendPeer::DC);
+		$c->addGroupByColumn(BatchJobLockSuspendPeer::PARTNER_ID);
+		$c->addGroupByColumn(BatchJobLockSuspendPeer::JOB_TYPE);
+		$c->addGroupByColumn(BatchJobLockSuspendPeer::JOB_SUB_TYPE);
 		foreach($c->getGroupByColumns() as $column)
 			$c->addSelectColumn($column);
 		return $c;
@@ -104,6 +107,8 @@ class kJobsSuspender {
 	 */
 	private static function suspendJobs($limit, $dc, $partnerId, $jobType, $jobSubType) {
 	
+		$limit = min(self::MAX_PROCESSED_ROWS, $limit);
+		
 		// Find IDs
 		$c = new Criteria();
 		$c->addSelectColumn(BatchJobLockPeer::ID);
@@ -128,6 +133,7 @@ class kJobsSuspender {
 	
 		// Suspend chosen ids
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_PENDING, false);
+		self::moveToSuspendedJobsTable($jobIds);
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were suspended");
 	}
 	
@@ -136,28 +142,31 @@ class kJobsSuspender {
 	 */
 	private static function unsuspendJobs($limit, $dc, $partnerId, $jobType, $jobSubType) {
 	
-		// Find IDs
+		$limit = min(self::MAX_PROCESSED_ROWS, $limit);
+		
+		// Find IDs from Batch Job Suspend Table
 		$c = new Criteria();
-		$c->addSelectColumn(BatchJobLockPeer::ID);
-		$c->add( BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, Criteria::EQUAL);
-		$c->add( BatchJobLockPeer::DC, $dc, Criteria::EQUAL);
-		$c->add( BatchJobLockPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-		$c->add( BatchJobLockPeer::JOB_TYPE, $jobType, Criteria::EQUAL);
-		$c->add( BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType, Criteria::EQUAL);
+		$c->addSelectColumn(BatchJobLockSuspendPeer::ID);
+		$c->add( BatchJobLockSuspendPeer::DC, $dc, Criteria::EQUAL);
+		$c->add( BatchJobLockSuspendPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$c->add( BatchJobLockSuspendPeer::JOB_TYPE, $jobType, Criteria::EQUAL);
+		$c->add( BatchJobLockSuspendPeer::JOB_SUB_TYPE, $jobSubType, Criteria::EQUAL);
 	
-		$c->addAscendingOrderByColumn(BatchJobLockPeer::PRIORITY);
-		$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
-		$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
+		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::PRIORITY);
+		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::URGENCY);
+		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::ESTIMATED_EFFORT);
 		$c->setLimit($limit);
 	
-		$stmt = BatchJobLockPeer::doSelectStmt($c);
+		$stmt = BatchJobLockSuspendPeer::doSelectStmt($c);
 		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
 		$jobIds = array();
 		foreach ($rows as $row)
 			$jobIds[] = $row['ID'];
 	
-		// Do update
+		// Return the jobs from batch_job_lock_suspend table
+		self::moveFromSuspendedJobsTable($jobIds);
+		// Update the jobs status to pending
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, true);
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were unsuspended");
 	}
@@ -190,6 +199,76 @@ class kJobsSuspender {
 			$start += $suspenderUpdateChunk;
 		}
 		return $affectedRows;
+	}
+	
+	/**
+	 * This function moves a known list of suspended job ids from batch_job_lock table to batch_job_lock_suspended table
+	 * and deletes them from the batch_job_lock table
+	 * @param array $jobIds The jobs we want to move from batch_job_lock table
+	 */
+	private static function moveToSuspendedJobsTable($jobIds) {
+		
+		$suspenderUpdateChunk = self::getSuspenderUpdateChunk();
+		$con = Propel::getConnection();
+		
+		$start = 0;
+		$end = sizeof($jobIds);
+		while($start < $end) {
+			
+			// Insert into batch_job_lock_suspended table
+			$insertQuery = "INSERT INTO " . BatchJobLockSuspendPeer::TABLE_NAME .
+				" (SELECT * FROM " . BatchJobLockPeer::TABLE_NAME .
+				" WHERE " . BatchJobLockPeer::STATUS . " = " . BatchJob::BATCHJOB_STATUS_DONT_PROCESS .
+				" AND " . BatchJobLockPeer::ID . " IN ( " .  
+				implode(",", array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start))) . 
+				"))";
+			
+			$con->exec($insertQuery);
+			
+			// Delete from batch_job_lock table
+			$deleteQuery = "DELETE FROM " . BatchJobLockPeer::TABLE_NAME .
+				" WHERE " . BatchJobLockPeer::STATUS . " = " . BatchJob::BATCHJOB_STATUS_DONT_PROCESS .
+				" AND " . BatchJobLockPeer::ID . " IN ( " .
+				implode(",", array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start))) .
+				")";
+				
+			$con->exec($deleteQuery);
+			$start += $suspenderUpdateChunk;
+		}
+	}
+	
+	/**
+	 * This function returns a known list of suspended job ids from batch_job_lock_suspended table to batch_job_lock table
+	 * and deletes them from the batch_job_lock_suspended table.
+	 * @param array $jobIds The jobs we want to move from batch_job_lock_suspended table
+	 */
+	private static function moveFromSuspendedJobsTable($jobIds) {
+	
+		$suspenderUpdateChunk = self::getSuspenderUpdateChunk();
+		$con = Propel::getConnection();
+	
+		$start = 0;
+		$end = sizeof($jobIds);
+		while($start < $end) {
+				
+			// Move job from batch_job_lock_suspended to batch_job_lock
+			$insertQuery = "INSERT INTO " . BatchJobLockPeer::TABLE_NAME .
+			" (SELECT * FROM " . BatchJobLockSuspendPeer::TABLE_NAME .
+			" WHERE " . BatchJobLockSuspendPeer::ID . " IN ( " .
+			implode(",", array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start))) .
+			"))";
+				
+			$con->exec($insertQuery);
+				
+			// Delete from batch_job_lock_suspended table
+			$deleteQuery = "DELETE FROM " . BatchJobLockSuspendPeer::TABLE_NAME .
+			" WHERE " . BatchJobLockSuspendPeer::ID . " IN ( " .
+			implode(",", array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start))) .
+			")";
+	
+			$con->exec($deleteQuery);
+			$start += $suspenderUpdateChunk;
+		}
 	}
 	
 	

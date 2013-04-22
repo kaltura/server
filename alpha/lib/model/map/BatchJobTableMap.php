@@ -76,6 +76,7 @@ class BatchJobTableMap extends TableMap {
 	{
     $this->addRelation('BatchJobLock', 'BatchJobLock', RelationMap::MANY_TO_ONE, array('batch_job_lock_id' => 'id', ), null, null);
     $this->addRelation('BatchJobLock', 'BatchJobLock', RelationMap::ONE_TO_MANY, array('id' => 'batch_job_id', ), null, null);
+    $this->addRelation('BatchJobLockSuspend', 'BatchJobLockSuspend', RelationMap::ONE_TO_MANY, array('id' => 'batch_job_id', ), null, null);
 	} // buildRelations()
 
 } // BatchJobTableMap
