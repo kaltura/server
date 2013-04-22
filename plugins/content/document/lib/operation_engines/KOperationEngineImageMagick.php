@@ -58,7 +58,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::linkFile($inFilePath, "$inFilePath.jpg"))
 			$inFilePath = "$inFilePath.jpg";
 			
-		parent::operate($operator, $inFilePath, $configFilePath);
+		parent::operate($operator, realpath($inFilePath), $configFilePath);
 		$imagesListXML = $this->createImagesListXML($outDirPath);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
