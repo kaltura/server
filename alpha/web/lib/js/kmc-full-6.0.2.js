@@ -1,4 +1,4 @@
-/*! KMC - v6.0.2 - 2013-04-21
+/*! KMC - v6.0.2 - 2013-04-22
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2753,7 +2753,7 @@ QRBitBuffer.prototype = {
 		var $targetDiv = $('#' + divId);
 		if( $targetDiv.length ) {
 			$targetDiv.empty();
-			return targetDiv[0];
+			return $targetDiv[0];
 		}
 		return false;
 	};
