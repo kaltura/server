@@ -11,22 +11,22 @@ class kMrssManager
 	private static $addedIsmUrl = false;
 	
 	/**
-	 * Array of XML objects 
-	 * 
+	 * Array of XML objects
+	 *
 	 * @var array<SimpleXMLElement>
 	 */
 	protected static $instancesPool = array();
 	
 	/**
 	 * Indicates that the static instances pool caching is enabled
-	 * 
+	 *
 	 * @var bool
 	 */
 	protected static $instancesEnabled = true;
 
 	/**
 	 * Enables or disables the static instances pool caching
-	 * 
+	 *
 	 * @param bool $enabled
 	 */
 	public static function setInstancePoolingEnabled($enabled = true)
@@ -36,7 +36,7 @@ class kMrssManager
 
 	/**
 	 * Indicates if the static instances pool caching is enabled
-	 * 
+	 *
 	 * @return boolean
 	 */
 	protected static function isInstancePoolingEnabled()
@@ -46,7 +46,7 @@ class kMrssManager
 	
 	/**
 	 * Adds the supplied XML object to the instance pool.
-	 * 
+	 *
 	 * @param string $entryId
 	 * @param SimpleXMLElement $xml
 	 */
@@ -61,14 +61,14 @@ class kMrssManager
 
 	/**
 	 * Gets XML object from the instance pool according to the supplied entry id.
-	 * 
+	 *
 	 * @param string $entryId
 	 * @return SimpleXMLElement
 	 */
 	protected static function getInstanceFromPool($entryId)
 	{
 		if (self::isInstancePoolingEnabled() && isset(self::$instancesPool[$entryId]))
-			return self::$instancesPool[$entryId]; 
+			return self::$instancesPool[$entryId];
 		
 		return null;
 	}
@@ -124,7 +124,7 @@ class kMrssManager
 	 */
 	public static function getMrssXml($title, $link = null, $description = null)
 	{
-		$mrss = new SimpleXMLElement('<rss 
+		$mrss = new SimpleXMLElement('<rss
 			version="2.0"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation="http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION . '"
@@ -193,7 +193,7 @@ class kMrssManager
 		/*$bitrates = $entry->getStreamBitrates();
 		foreach ($bitrates as $bitrate)
 		{
-			$content = $mrss->addChild('content');			
+			$content = $mrss->addChild('content');
 			$content->addAttribute('url', $entry->getPrimaryBroadcastingUrl);
 			$content->addAttribute('height', $entry->getHeight());
 			$content->addAttribute('width', $flavorParams->getWidth());
@@ -345,7 +345,7 @@ class kMrssManager
 				);
 
 				// merge the flavar param details with the flavor asset details
-				// the flavor asset details take precedence whenever they exist 
+				// the flavor asset details take precedence whenever they exist
 				$mediaParams = array_merge($flavorParamsDetails, array_filter($mediaParams));
 			}
 		}
@@ -360,7 +360,7 @@ class kMrssManager
 			$tags->addChild('tag', self::stringToSafeXml($tag));
 				
 		if ($flavorAsset->hasTag(assetParams::TAG_SLWEB))
-			self::addIsmLink($flavorAsset->getentry(), $mrss);	
+			self::addIsmLink($flavorAsset->getentry(), $mrss);
 	}
 	
 	//if the one of the flavors is an .ismv file we will add to the mrss a url of the entry's .ism file.
@@ -388,7 +388,7 @@ class kMrssManager
 		
 		
 		$partner = $entry->getPartner();
-		if(!$partner->getStorageServePriority() || 
+		if(!$partner->getStorageServePriority() ||
 			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY ||
 			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
 		{
@@ -400,13 +400,13 @@ class kMrssManager
 			}
 		}
 		
-		if(!$partner->getStorageServePriority() || 
+		if(!$partner->getStorageServePriority() ||
 			$partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 		{
 			return null;
 		}
 			
-		$externalFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);		
+		$externalFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 		if($externalFileSync)
 		{
 			$urlManager = kUrlManager::getUrlManagerByStorageProfile($externalFileSync->getDc(), $entry->getId());
@@ -428,7 +428,7 @@ class kMrssManager
 				$mrss->addChild('ismUrl',$urlPrefix.$url);
 				return;
 			}
-		}		
+		}
 	}
 	
 	/**
@@ -459,7 +459,7 @@ class kMrssManager
 			$mrss->addChild('link', $mrssParams->getLink() . $entry->getId());
 		$mrss->addChild('type', $entry->getType());
 		$mrss->addChild('licenseType', $entry->getLicenseType());
-		$mrss->addChild('userId', $entry->getPuserId(true));
+		$mrss->addChild('userId', $entry->getPuserId());
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
 		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
@@ -527,8 +527,8 @@ class kMrssManager
 		$assets = assetPeer::retrieveReadyByEntryId($entry->getId());
 		foreach($assets as $asset)
 		{
-			if ($mrssParams && 
-				!is_null($mrssParams->getFilterByFlavorParams()) && 
+			if ($mrssParams &&
+				!is_null($mrssParams->getFilterByFlavorParams()) &&
 				$asset->getFlavorParamsId() != $mrssParams->getFilterByFlavorParams())
 				continue;
 
@@ -556,7 +556,7 @@ class kMrssManager
 			}
 		}
 		
-		if ($mrssParams && 
+		if ($mrssParams &&
 			$mrssParams->getIncludePlayerTag())
 		{
 			$uiconfId = (!is_null($mrssParams->getPlayerUiconfId()))? '/ui_conf_id/'.$mrssParams->getPlayerUiconfId(): '';
@@ -580,7 +580,7 @@ class kMrssManager
 	/**
 	 * Function returns MRSS XML for the object based on its identifier
 	 * @param BaseObject $object
-	 * @param string $identifierValue 
+	 * @param string $identifierValue
 	 * @param SimpleXMLElement $mrss
 	 * @param string $nodeName
 	 * @param kMrssParameters $mrssParams
@@ -641,7 +641,7 @@ class kMrssManager
 			foreach($mrssContributors as $mrssContributor)
 			{
 				/* @var $mrssContributor IKalturaMrssContributor */
-				try 
+				try
 				{
 					if (!$features || in_array($mrssContributor->getObjectFeatureType(), $features))
 						$mrssContributor->contribute($category, $mrss, $mrssParams);
@@ -699,7 +699,7 @@ class kMrssManager
 				/* @var $xmlNodeToExtend SimpleXMLElement */
 				$identifierValue = strval($xmlNodeToExtend[0]);
 				$extendingObject = $itemXPathToExtend->getIdentifier()->retrieveByIdentifier($identifierValue);
-				if ($extendingObject)		
+				if ($extendingObject)
 				{
 					$mrssParams->setItemXpathsToExtend(array());
 					$featuresArray = strlen($itemXPathToExtend->getIdentifier()->getExtendedFeatures()) ? explode(',',$itemXPathToExtend->getIdentifier()->getExtendedFeatures()) : null;
@@ -708,7 +708,7 @@ class kMrssManager
 						$parents = $xmlNodeToExtend->xpath("parent::*");
 						self::addExtendingItemNode($extendingObject, $identifierValue, $parents[0], $xmlNodeToExtend->getName(), $mrssParams, $featuresArray);
 					}
-					else 
+					else
 					{
 						$xmlNodeToExtend[0] = null;
 						self::addExtendingItemNode($extendingObject, $identifierValue, $xmlNodeToExtend, $xmlNodeToExtend->getName(), $mrssParams, $featuresArray);

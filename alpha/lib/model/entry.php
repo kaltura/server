@@ -8,7 +8,7 @@
  * @subpackage model
  */
 class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
-{ 
+{
 	protected $new_categories = '';
 	protected $new_categories_ids = '';
 	protected $old_categories;
@@ -54,8 +54,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_MEDIA_TYPE_PDF = 13;
 	
 	const ENTRY_MEDIA_TYPE_GENERIC_1= 101;	// these types can be used for derived classes - assume this is some kind of TXT file
-	const ENTRY_MEDIA_TYPE_GENERIC_2= 102;	// these types can be used for derived classes 
-	const ENTRY_MEDIA_TYPE_GENERIC_3= 103;	// these types can be used for derived classes 
+	const ENTRY_MEDIA_TYPE_GENERIC_2= 102;	// these types can be used for derived classes
+	const ENTRY_MEDIA_TYPE_GENERIC_3= 103;	// these types can be used for derived classes
 	const ENTRY_MEDIA_TYPE_GENERIC_4= 104;	// these types can be used for derived classes
 	
 	const ENTRY_MEDIA_TYPE_LIVE_STREAM_FLASH = 201;
@@ -89,9 +89,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_MEDIA_SOURCE_AKAMAI_LIVE = 29;
 	const ENTRY_MEDIA_SOURCE_PARTNER_SPECIFIC = 100;
 		
-	const ENTRY_MODERATION_STATUS_PENDING_MODERATION = 1; 
-	const ENTRY_MODERATION_STATUS_APPROVED = 2;   
-	const ENTRY_MODERATION_STATUS_REJECTED = 3;   
+	const ENTRY_MODERATION_STATUS_PENDING_MODERATION = 1;
+	const ENTRY_MODERATION_STATUS_APPROVED = 2;
+	const ENTRY_MODERATION_STATUS_REJECTED = 3;
 	const ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW = 5;
 	const ENTRY_MODERATION_STATUS_AUTO_APPROVED = 6;
 	
@@ -125,7 +125,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const CATEGORY_SEARCH_PERFIX = 'c';
 	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
 	const CATEGORY_OR_PARENT_SEARCH_PERFIX = 'pc';
-	const CATEGORY_SEARCH_STATUS = 's'; 
+	const CATEGORY_SEARCH_STATUS = 's';
 	const PARTNER_STATUS_FORMAT = 'P%sST%s';
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
@@ -215,7 +215,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 			// start by setting the modified_at to the current time
 			$this->setModifiedAt( time() ) ;
-			$this->setModerationCount(0);			
+			$this->setModerationCount(0);
 			
 			if (is_null($this->getAccessControlId()))
 			{
@@ -258,24 +258,24 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		myPartnerUtils::setPartnerIdForObj( $this );
 
-		if ( $this->getType() != entryType::PLAYLIST ) 
+		if ( $this->getType() != entryType::PLAYLIST )
 			mySearchUtils::setDisplayInSearch( $this );
 			
 		// update the admin_tags per partner
 		ktagword::updateAdminTags( $this );
 		
-		// same for puserId ... 
-		$this->getPuserId( true );
+		// same for puserId ...
+		$this->getPuserId();
 
 		// make sure this entry is saved before calling updateAllMetadataVersionsRelevantForEntry, since fixMetadata retrieves the entry from the DB
 		// and checks its data path which was modified above.
 		$res = parent::save( $con );
 		if ($is_new)
 		{
-			// when retrieving the entry - ignore thr filter - when in partner has moderate_content =1 - the entry will have status=3 and will fail the retrieveByPk 
+			// when retrieving the entry - ignore thr filter - when in partner has moderate_content =1 - the entry will have status=3 and will fail the retrieveByPk
 			entryPeer::setUseCriteriaFilter(false);
 			$obj = entryPeer::retrieveByPk($this->getId());
-			$this->setIntId($obj->getIntId());				
+			$this->setIntId($obj->getIntId());
 			entryPeer::setUseCriteriaFilter(true);
 		}
 		
@@ -385,7 +385,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$parts = explode($c, $current_version);
 		
 		if (count($parts) == 2 && strlen($parts[1]))
-		{ 
+		{
 			return null;
 		}
 		
@@ -400,12 +400,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				$result = array();
 				// first - file name (with the full path)
 				$result[] = $local_file_sync->getFilePath();
-				// second - size 
+				// second - size
 				$result[] = $local_file_sync->getFileSize();
 				// third - time
 				$result[] = filemtime ( $local_file_sync->getFullPath());
 				// forth - version
-				$result[] = substr( kFile::getFileNameNoExtension ( $local_file_sync->getFilePath() ) , strlen ($this->getId().'_') );			
+				$result[] = substr( kFile::getFileNameNoExtension ( $local_file_sync->getFilePath() ) , strlen ($this->getId().'_') );
 				$results[] = $result;
 			}
 		}
@@ -423,7 +423,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		foreach ( $res as $version_info )
 		{
-			$formatted []= array ( 
+			$formatted []= array (
 				"version" => $version_info[3] ,
 				"rawData" =>  $version_info[2] ,
 				"date" => strftime( "%d/%m/%y %H:%M:%S" , $version_info[2] ) );
@@ -489,7 +489,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			return "_{$version}";
 		// remove till here
 			
-		return "{$sub_type}_{$version}"; 
+		return "{$sub_type}_{$version}";
 	}
 	
 	/* (non-PHPdoc)
@@ -526,11 +526,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT )
 		{
-			$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version) );			
-		}		
+			$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version) );
+		}
 		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB )
 		{
-			$res =  myContentStorage::getGeneralEntityPath("entry/bigthumbnail", $this->getIntId(), $this->getId(), $this->getThumbnail() , $version);			
+			$res =  myContentStorage::getGeneralEntityPath("entry/bigthumbnail", $this->getIntId(), $this->getId(), $this->getThumbnail() , $version);
 		}
 		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE )
 		{
@@ -553,7 +553,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 					break;
 				}
 				
-				if ( ! $res ) 
+				if ( ! $res )
 					$res =  $archive_pattern;
 			}
 		}
@@ -564,7 +564,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$path = myContentStorage::getGeneralEntityPath("entry/download", $this->getIntId(), $this->getId(), $basename);
 			$download_path = $path.".$version";
 			 $res =  $download_path;
-		}	
+		}
 		else
 		{
 			$path =  "entry/data";
@@ -588,12 +588,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
 		}
 
-		return array ( myContentStorage::getFSContentRootPath( ) , $res ); 
+		return array ( myContentStorage::getFSContentRootPath( ) , $res );
 	}
 	
 	private function getVersionForSubType ( $sub_type, $version = null  )
 	{
-		if ( 
+		if (
 				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISM
 				||
 				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC
@@ -611,12 +611,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if ( $version )
 		{
 			if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD )
-			{			
+			{
 				// MUST have A VERSION !
 				$new_version = $this->getVersion() . "." . $version;
 			}
 			else
-			{			
+			{
 				$new_version = $version;
 			}
 		}
@@ -629,11 +629,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE )
 				$new_version = "";
 			elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD )
-			{			
+			{
 				// MUST have A VERSION !
 				$new_version = $this->getVersion();
 			}
-		}	
+		}
 
 		return $new_version;
 	}
@@ -650,7 +650,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getFileSync ( )
 	{
-		return $this->m_file_sync; 
+		return $this->m_file_sync;
 	}
 	
 	public function setFileSync ( FileSync $file_sync )
@@ -661,9 +661,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	private static function validateFileSyncSubType ( $sub_type )
 	{
-		if ( $sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA && 
+		if ( $sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && 
+			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD  &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ISM  &&
@@ -672,17 +672,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
 		)
 			throw new FileSyncException ( FileSyncObjectType::ENTRY ,
-				 $sub_type , array ( 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT, 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB , 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE , 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISM , 
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC , 
+				 $sub_type , array (
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA ,
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT,
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB ,
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE ,
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD ,
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISM ,
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC ,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG ,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB ,
-				 ) );		
+				 ) );
 	}
 
 	
@@ -691,7 +691,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$path = myContentStorage::getFSContentRootPath() . $this->getDataPath();
 		if ( file_exists( $path )) return $path;
-		return $path; 
+		return $path;
 	}
 	
 	/**
@@ -746,7 +746,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 
 	/**
-	 * 
+	 *
 	 * @param $version
 	 * @param $format
 	 * @return FileSync
@@ -764,13 +764,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 					$sync_key = $flavor_assets->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			}
 			elseif ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE )
-			{ 
+			{
 				$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
 			}
 		}
 		elseif ( $this->getType() == entryType::MIX )
 		{
-			// if roughcut - the version should be used 
+			// if roughcut - the version should be used
 			$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $version );
 		}
 		else
@@ -785,7 +785,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return kFileSyncUtils::getReadyFileSyncForKey ( $sync_key , true , false );
 	}
 	
-	// return the file 
+	// return the file
 	public function getDownloadPath( $version = NULL , $format = null , $sub_type = null )
 	{
 		
@@ -830,25 +830,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return kFileSyncUtils::getLocalFilePathForKey($key);
 	}
 	
-/*	
+/*
  * deprecated - was called from myBatchDownloadVideoServer which is no longer used
 	// given the path of the converted file (not an FLV file) - create its URL
 	public function getConvertedDownoadUrl ( $file_real_path )
 	{
 		$path = str_replace ( myContentStorage::getFSContentRootPath() , "" , $file_real_path );
 		$path = str_replace ( "\\" , "" , $path );
-		return myPartnerUtils::getCdnHost($this->getPartnerId()). myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . $path;	
+		return myPartnerUtils::getCdnHost($this->getPartnerId()). myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . $path;
 	}
 	*/
 	
 	public function setDesiredVersion ( $v )
 	{
-		$this->desired_version = $v;	
+		$this->desired_version = $v;
 	}
 
 	public function getDesiredVersion (  )
 	{
-		return $this->desired_version ;	
+		return $this->desired_version ;
 	}
 	
 	public function setArchiveExtension($v)
@@ -861,15 +861,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this->archive_extension;
 	}
 	
-	// will work only for types that the data can be served as an a response to the service	
+	// will work only for types that the data can be served as an a response to the service
 	public function getDataContent ( $from_cache = false )
 	{
-		if ( $this->getType() == entryType::MIX || 
+		if ( $this->getType() == entryType::MIX ||
 			$this->getType() == entryType::DATA ||
 			$this->getType() == entryType::PLAYLIST ||
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML ||
-			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT || 
-			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 ) 
+			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT ||
+			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
 			if ( $from_cache ) return $this->data_content;
 			$content_path = myContentStorage::getFSContentRootPath();
@@ -894,7 +894,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return null;
 	}
 	
-	// will work only for types that the data can be served as an a response to the service	
+	// will work only for types that the data can be served as an a response to the service
 	public function setDataContent ( $v , $increment_version = true , $allow_type_roughcut = false )
 	{
 		if($v && $v == $this->getDataContent())
@@ -905,12 +905,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 //		if ( $v === null ) return ;
 		// DON'T do this for ENTRY_TYPE_SHOW unless $allow_type_roughcut is true
-		// - the metadata is handling is complex and is done in other places in the code 
+		// - the metadata is handling is complex and is done in other places in the code
 		if ( ($allow_type_roughcut && $this->getType() == entryType::MIX) ||
-			$this->getType() == entryType::DATA || 
+			$this->getType() == entryType::DATA ||
 			$this->getType() == entryType::PLAYLIST ||
-			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML || 
-			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_SHOW || 
+			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML ||
+			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_SHOW ||
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT ||
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
@@ -926,7 +926,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$strict = false;
 			if ( ! $increment_version || $v == $this->data_content )
 			{
-				// attempting to update the same value  
+				// attempting to update the same value
 				$strict = false ;
 			}
 			
@@ -942,25 +942,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				
 				$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
 				kFileSyncUtils::file_put_contents( $sync_key , $v , $strict );
-			}	
-		}		
+			}
+		}
 	}
 	
-	// return the default file suffix according to the entry type 
+	// return the default file suffix according to the entry type
 	private function getFileSuffix ( )
 	{
-		if ( $this->getType() == entryType::MIX || 
-			 $this->getMediaType() == self::ENTRY_MEDIA_TYPE_SHOW || 
-			 $this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML ) 
+		if ( $this->getType() == entryType::MIX ||
+			 $this->getMediaType() == self::ENTRY_MEDIA_TYPE_SHOW ||
+			 $this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML )
 		{
 			return ".xml";
 		}
-		elseif ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT || 
+		elseif ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT ||
 				$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
 			return ".txt";
 		}
-		return ""; 
+		return "";
 	}
 	
 	public function getThumbnail()
@@ -1120,8 +1120,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	/**
 	 * Set the categories (use only the most child categories)
-	 * 
-	 * @param string $categories 
+	 *
+	 * @param string $categories
 	 */
 	public function setCategories($newCats)
 	{
@@ -1161,7 +1161,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	/*public function renameCategory($oldFullName, $newFullName)
 	{
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
-		foreach($categories as &$category) 
+		foreach($categories as &$category)
 		{
 			$oldFullName = str_replace(array ('(', ')'), array ('\(', '\)'), $oldFullName);
 			$category = preg_replace("/^".$oldFullName."/", $newFullName, $category);
@@ -1177,7 +1177,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->old_categories = $this->categories;
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
 		$newCategories = array();
-		foreach($categories as $category) 
+		foreach($categories as $category)
 		{
 			if (!preg_match("/^".$fullName."/", $category))
 				$newCategories[] = $category;
@@ -1344,7 +1344,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$this->save();
 			
 			$sync_key = $this->getSyncKey ( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
-			// TODO: here we assume we are UPDATING an exising version of the file - make sure all the following functions are tolerant. 
+			// TODO: here we assume we are UPDATING an exising version of the file - make sure all the following functions are tolerant.
 			kFileSyncUtils::file_put_contents( $sync_key , $fixed_content , false ); // replaced__setFileContent
 
 			// update the roughcut_entry table
@@ -1434,7 +1434,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$current_version = 0;
 
 		return $current_version;
-	}	
+	}
 	// makes a copy of the desired version from the past as the next coming version of the entry
 	//   $desired_version = 100003, current_version = 100006 -> will conpy the content of <id>_100003.xxx -> <id>_1000007.xxx and will increment the version
 	// so current_version = 100007.xxx now
@@ -1446,7 +1446,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			return $current_version;
 
 		$source_syc_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $desired_version );
-/*		
+/*
 		// check that the file of the desired version really exists
 		$content =  myContentStorage::getFSContentRootPath();
 		$path = $content . $this->getDataPath( $desired_version ); // replaced__getDataPath
@@ -1461,7 +1461,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->setData ( parent::getData() );
 
 		$target_syc_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
-/*		
+/*
 		$new_path = $content . $this->getDataPath( ); //replaced__getDataPath
 
 		// make a copy
@@ -1537,7 +1537,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->setModerationStatus( $new_moderation_status );
 		
 		// TODO - fix loop of updating from entry ot moderation back to entry ...
-		if ( $fix_moderation_objects ) 
+		if ( $fix_moderation_objects )
 		{
 			myModerationMgr::updateModerationsForObject ( $this , $new_moderation_status );
 		}
@@ -1558,7 +1558,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$this->setConversionQuality($conversion_quality);
 	}
-	public function setConversionQuality($conversion_quality)	
+	public function setConversionQuality($conversion_quality)
 	{
 		parent::setConversionProfileId($conversion_quality);
 		$this->putInCustomData("conversion_quality", $conversion_quality);
@@ -1660,7 +1660,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setRootEntryId($v)	{	$this->putInCustomData("rootEntryId", $v); }
 	
 	public function getSphinxMatchOptimizations() {
-		// Please add all you sphinx specific optimizations here. 
+		// Please add all you sphinx specific optimizations here.
 		// Should be equivalant to $sphinxOptimizationMap
 		$matches = array();
 		$matches[] = sprintf(self::PARTNER_STATUS_FORMAT, $this->getPartnerId(), $this->getStatus());
@@ -1671,8 +1671,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setCreatorPuserId( $v )		{	$this->putInCustomData ( "creatorPuserId" , $v );	}
 	
-	public function getCreatorPuserId ( )  	
-	{	
+	public function getCreatorPuserId ( )
+	{
 		$creatorPuserId = $this->getFromCustomData( "creatorPuserId", null, null );
 
 		if(is_null($creatorPuserId))
@@ -1683,8 +1683,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $creatorPuserId;
 	}
 	
-	public function getCreatorKuserId ( )	
-	{	
+	public function getCreatorKuserId ( )
+	{
 		$creatorKuserId = $this->getFromCustomData( "creatorKuserId", null, null );
 
 		if(is_null($creatorKuserId))
@@ -1693,14 +1693,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			return $creatorKuserId;
 	}
 	
-	public function setEntitledPusersEdit($v)		
-	{	
+	public function setEntitledPusersEdit($v)
+	{
 		$entitledUserPuserEdit = array();
 		
 		$v = trim($v);
 		if($v == '')
 		{
-			$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );	
+			$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
 			return;
 		}
 		
@@ -1717,11 +1717,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$entitledUserPuserEdit[$kuser->getId()] = $kuser->getPuserId();
 		}
 				
-		$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );		
+		$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
 	}
 	
-	public function getEntitledKusersEdit()			
-	{	
+	public function getEntitledKusersEdit()
+	{
 		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
 		if (!$entitledUserPuserEdit)
 			return '';
@@ -1729,8 +1729,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', array_keys(unserialize($entitledUserPuserEdit)));
 	}
 	
-	public function getEntitledPusersEdit()			
-	{	
+	public function getEntitledPusersEdit()
+	{
 		$entitledUserPuserEdit = $this->getFromCustomData( "entitledUserPuserEdit", null, 0 );
 		if (!$entitledUserPuserEdit)
 			return '';
@@ -1738,15 +1738,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', unserialize($entitledUserPuserEdit));
 	}
 	
-	public function setEntitledPusersPublish($v)		
-	{	
+	public function setEntitledPusersPublish($v)
+	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$entitledUserPuserPublish = array();
 	
 		$v = trim($v);
 		if($v == '')
 		{
-			$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );	
+			$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 			return;
 		}
 		
@@ -1764,11 +1764,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 			$entitledUserPuserPublish[$kuser->getId()] = $kuser->getPuserId();
 		}
-		$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );	
+		$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 	}
 	
-	public function getEntitledKusersPublish()			
-	{	
+	public function getEntitledKusersPublish()
+	{
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
 		if(!$entitledUserPuserPublish)
 			return '';
@@ -1776,8 +1776,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return implode(',', array_keys(unserialize($entitledUserPuserPublish)));
 	}
 	
-	public function getEntitledPusersPublish()			
-	{	
+	public function getEntitledPusersPublish()
+	{
 		$entitledUserPuserPublish = $this->getFromCustomData( "entitledUserPuserPublish", null, 0 );
 		if (!$entitledUserPuserPublish)
 			return '';
@@ -1787,8 +1787,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getRoots()
 	{
-		// the prefix required becaue combined sphinx match is rrequired, 
-		// only negative expression won't work such as '@roots -entry', 
+		// the prefix required becaue combined sphinx match is rrequired,
+		// only negative expression won't work such as '@roots -entry',
 		// the prefix will enable '@roots prefix -entry'
 		$ret = array(entry::ROOTS_FIELD_PREFIX);
 		 
@@ -1858,10 +1858,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setPrivacySettings ( $v )	{		return $this->setPermissions( $v );	}
 
 	public function incrementIsmVersion (  )
-	{	
+	{
 		$version = $this->getIsmVersion() + 1;
 		$this->setIsmVersion($version);
-		return $version;	
+		return $version;
 	}
 	
 	public function getHeight()
@@ -1954,15 +1954,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if ( $url )
 		{
 			if ( strpos ( $url , '{id}'  ) > 0 )
-			{ 
+			{
 				return str_replace( '{id}' , $this->getId() , $url );
 			}
 			else
 				return $url . $this->getId();
 //			return objectWrapperBase::parseString ( $url , $this );//
-		}	
+		}
 		else
-		{ 
+		{
 			return null;
 		}
 	}
@@ -1973,16 +1973,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$url = $this->getPartner()->getUserLandingPage();
 		if ( $url )
 		{
-			if ( strpos ( $url , '{uid}'  ) > 0 ) 
+			if ( strpos ( $url , '{uid}'  ) > 0 )
 			{
-				return str_replace( '{uid}' , $this->getPuserId( true ) , $url );
+				return str_replace( '{uid}' , $this->getPuserId() , $url );
 			}
 			else
-				return $url . $this->getPuserId( true );
+				return $url . $this->getPuserId();
 //		return objectWrapperBase::parseString ( $url , $this );//
-		}	
+		}
 		else
-		{ 
+		{
 			return null;
 		}
 	}
@@ -2009,18 +2009,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setStorageSize ( $storage_size )	{		$this->putInCustomData ( "storage_size" , $storage_size );	}
 	public function getStorageSize (  )	{		return $this->getFromCustomData( "storage_size" );	}
 
-	public function setExtStorageUrl( $v ) { $this->putInCustomData("ext_storage_url", $v); } 
+	public function setExtStorageUrl( $v ) { $this->putInCustomData("ext_storage_url", $v); }
 	public function getExtStorageUrl() { return $this->getFromCustomData("ext_storage_url"); }
 
 	public function setCacheFlavorVersion($v)       {$this->putInCustomData("cache_flavor_version", $v);}
 	public function getCacheFlavorVersion()       {return $this->getFromCustomData("cache_flavor_version");}
 
 	private $m_puser_id = null;
-	public function tempSetPuserId ( $puser_id ) 
+	public function tempSetPuserId ( $puser_id )
 	{
 		$this->m_puser_id = $puser_id;
 	}
-	public function getPuserId( $real_puser_id = false )
+	public function getPuserId()
 	{
 		if (kCurrentContext::isApiV3Context())
 			return parent::getPuserId();
@@ -2075,7 +2075,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 		$extra_invisible_data = null;
 			
-		$extra_invisible_data = "_MEDIA_TYPE_" . $this->getMediaType(); 
+		$extra_invisible_data = "_MEDIA_TYPE_" . $this->getMediaType();
 		$type = $this->getType();
 		// add the SEARCH_ENTRY_TYPE_RC to the words
 		if ( $type == entryType::MIX )
@@ -2089,8 +2089,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return mySearchUtils::addPartner($partner_id, $prepared_text, $displayInSearch, $extra_invisible_data);
 	}
 	
-/*	
-	public function dumpContent() 
+/*
+	public function dumpContent()
 	{
 		
 //		$dataPath = myContentStorage::getFSContentRootPath() . $this->getDataPath(); // replaced__getDataPath
@@ -2114,7 +2114,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getFileSize()
 	{
-		return 0; // temp fix 
+		return 0; // temp fix
 		$dataFileKey = $this->getSyncKey(self::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($dataFileKey);
 		if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY) return $fileSync->getFileSize();
@@ -2140,11 +2140,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	private $m_filename;
 	public function getFilename() { return $this->m_filename; }
-	public function setFilename ( $v ) { $this->m_filename= $v ;}	
+	public function setFilename ( $v ) { $this->m_filename= $v ;}
 
 	private $m_realFilename;
 	public function getRealFilename() { return $this->m_realFilename; }
-	public function setRealFilename ( $v ) { $this->m_realFilename= $v ;}	
+	public function setRealFilename ( $v ) { $this->m_realFilename= $v ;}
 	
 	private $m_mediaId;
 	public function getMediaId() { return $this->m_mediaId; }
@@ -2154,7 +2154,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	private $m_thumbOffset;
 	
 	public function getThumbOffset($default_offset = 3)
-	{ 	
+	{
 		$offset = $this->getFromCustomData ( "thumb_offset" );
 		if(is_null($offset))
 		{
@@ -2170,7 +2170,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setThumbOffset ( $v ) { 	$this->putInCustomData ( "thumb_offset" , $v ); }
 
-	public function getBestThumbOffset( $default_offset = 3 ) 
+	public function getBestThumbOffset( $default_offset = 3 )
 	{
 		if ($default_offset === null)
 			$default_offset = 3;
@@ -2178,7 +2178,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$offset = $this->getThumbOffset();
 		$duration = $this->getLengthInMsecs();
 		
-		if(!$offset || $offset < 0) 
+		if(!$offset || $offset < 0)
 			$offset = $default_offset;
 
 		return max(0 ,min($offset, $duration));
@@ -2193,8 +2193,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setKuserId($v)
 	{
 		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
-		if ( self::getKuserId() == $v )  // same value - don't set for nothing 
-			return;  		
+		if ( self::getKuserId() == $v )  // same value - don't set for nothing
+			return;
 
 		$this->setCreatorKuserPuserIdMigration();
 		
@@ -2206,15 +2206,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	
 	/**
-	 * 
-	 * Lazy migration for old entries for cases where creator Kuser and Puser id 
+	 *
+	 * Lazy migration for old entries for cases where creator Kuser and Puser id
 	 * wasn't initialized
 	 */
 	private function setCreatorKuserPuserIdMigration()
 	{
-		$creatorKuserId = $this->getFromCustomData( "creatorKuserId", null, null );		
+		$creatorKuserId = $this->getFromCustomData( "creatorKuserId", null, null );
 		if (is_null($creatorKuserId) && !is_null($this->getKuserId()))
-		{	
+		{
 			$this->setCreatorKuserId($this->getKuserId());
 		}
 	}
@@ -2223,8 +2223,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$this->creator_kuser_id = $v;
 		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)
-		if ( $this->getFromCustomData( "creatorKuserId", null, null ) == $v )  // same value - don't set for nothing 
-			return;  	
+		if ( $this->getFromCustomData( "creatorKuserId", null, null ) == $v )  // same value - don't set for nothing
+			return;
 
 		$this->putInCustomData ( "creatorKuserId" , $v );
 		$kuser = kuserPeer::retrieveByPk($v);
@@ -2353,7 +2353,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getRawDownloadUrl()
 	{
 		$finalPath = "/downloadUrl?url=".
-			myPartnerUtils::getUrlForPartner($this->getPartnerId(), $this->getSubpId()). 
+			myPartnerUtils::getUrlForPartner($this->getPartnerId(), $this->getSubpId()).
 			"/raw/entry_id/".
 			$this->getId();
 		
@@ -2372,7 +2372,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		{
 			parent::setEndDate(null);
 		}
-	} 
+	}
 	
 	public function setStartDate($date)
 	{
@@ -2393,9 +2393,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		parent::setCreatedAt($date);
 		if (is_null($this->getAvailableFrom())) // only if the availableFrom was not set yet
 			parent::setAvailableFrom($date);
-	} 
+	}
 	
-// ----------- Extra object connections ----------------	
+// ----------- Extra object connections ----------------
 	public function getBatchJobs()
 	{
 		return BatchJobPeer::retrieveByEntryId( $this->getId() );
@@ -2503,7 +2503,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	/**
 	 * Check if the returned asset (flavor asset or entry file sync could be downloaded)
-	 * 
+	 *
 	 * @param int $flavorParamsId
 	 * @return bool
 	 */
@@ -2591,16 +2591,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 *	let�s say entry belong to 2 categories with these full_ids
 	 * 	111>222>333
 	 *	111>444
-	 * Old categories fields was: 
+	 * Old categories fields was:
 	 *	333,444
-	 * 
+	 *
 	 * New categories filed:
 	 * pc111s2,p111s2,pc222s2,p222s2,pc333s2,c333s2,pc444s2,c444s2
-	 * 
-	 * 
+	 *
+	 *
 	 * so why do we need pc111?
 	 * If baseEntry->list with filter categoriesMatchOr= �111� you need to search for match pc111s2
-	 * 
+	 *
 	 * so why do we need p111?
 	 * If baseEntry->list with filter categoriesMatchOr= �111>� you need to search for match p111s2
 	 */
@@ -2611,7 +2611,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$categoriesEntryStringIndex = array();
 		foreach($allCategoriesEntry as $categoryEntry)
 		{
-			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() . 
+			$categoriesEntryStringIndex[] = self::CATEGORY_SEARCH_PERFIX . $categoryEntry->getCategoryId() .
 				self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 			
 			//index all category's parents - for easier searchs on entry->list with filter of categoriesMatchOr
@@ -2625,17 +2625,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				if($categoryId != $categoryEntry->getCategoryId())
 				{
 					//parent category
-					$categoriesEntryStringIndex[] = self::CATEGORY_PARENT_SEARCH_PERFIX . $categoryId . 
+					$categoriesEntryStringIndex[] = self::CATEGORY_PARENT_SEARCH_PERFIX . $categoryId .
 						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 				}
 				
 				//parent category or category itself
-				$categoriesEntryStringIndex[] = self::CATEGORY_OR_PARENT_SEARCH_PERFIX . $categoryId . 
+				$categoriesEntryStringIndex[] = self::CATEGORY_OR_PARENT_SEARCH_PERFIX . $categoryId .
 						self::CATEGORY_SEARCH_STATUS . $categoryEntry->getStatus();
 			}
 				
 			if($categoryEntry->getStatus() == CategoryEntryStatus::ACTIVE || $categoryEntry->getStatus() == CategoryEntryStatus::PENDING)
-				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();	
+				$categoriesEntryStringIndex[] = $categoryEntry->getCategoryId();
 		}
 		
 		$categoriesEntryStringIndex = array_unique($categoriesEntryStringIndex);
@@ -2741,7 +2741,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				'entitled_kusers' => 'entitledKusers',
 				'privacy_by_contexts' => 'privacyByContexts',
 				'creator_kuser_id' => 'creatorKuserId',
-				'creator_puser_id' => 'creatorPuserId',		
+				'creator_puser_id' => 'creatorPuserId',
 			);
 		}
 		
@@ -2944,7 +2944,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				
 			$privacyContexts = explode(',', $category->getPrivacyContexts());
 			if(!count($privacyContexts))
-				$privacyContexts = array(kEntitlementUtils::DEFAULT_CONTEXT . $this->getPartnerId()); 
+				$privacyContexts = array(kEntitlementUtils::DEFAULT_CONTEXT . $this->getPartnerId());
 							
 			foreach ($privacyContexts as $privacyContext)
 			{
@@ -2999,11 +2999,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	
 /**
-	 * will create thumbnail according to the entry type 
+	 * will create thumbnail according to the entry type
 	 * @return the thumbnail path.
 	 */
 	public function getLocalThumbFilePath(entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null) 
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null)
 	{
 		$contentPath = myContentStorage::getFSContentRootPath ();
 		// if entry type is audio - serve generic thumb:
@@ -3022,11 +3022,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 			$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
-		} elseif ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_SHOW) { // roughcut without any thumbnail, probably just created 
+		} elseif ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_SHOW) { // roughcut without any thumbnail, probably just created
 			$msgPath = $contentPath . "content/templates/entry/thumbnail/auto_edit.jpg";
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		
-		} 
+		}
 		elseif ($this->getType () == entryType::MEDIA_CLIP) {
 			try {
 				return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
