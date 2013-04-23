@@ -248,8 +248,7 @@ class kBatchExclusiveLock
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
 		$shouldUseJoin = (BatchJobLockPeer::getMaxJobsForPartner($jobType) != self::UNLIMITED_QUOTA);
-		if ($jobType != BatchJobType::FILESYNC_IMPORT)
-			self::addPrioritizersCondition($c, $prioritizers_ratio, $shouldUseJoin);
+		self::addPrioritizersCondition($c, $prioritizers_ratio, $shouldUseJoin);
 		
 		// Query Parts
 		$unClosedStatuses = implode(',', BatchJobPeer::getUnClosedStatusList());
@@ -303,13 +302,14 @@ class kBatchExclusiveLock
 	 */
 	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio, $shouldUseJoin = true) 
 	{
-		$rand = -1;
+		$rand = rand(0, 100);
 		if($shouldUseJoin) {
-			$rand = rand(0, 100);
 			$c->addMultipleJoin(array(array(BatchJobLockPeer::PARTNER_ID, PartnerLoadPeer::PARTNER_ID  ),
 					array(BatchJobLockPeer::JOB_TYPE, PartnerLoadPeer::JOB_TYPE),
 					array(BatchJobLockPeer::JOB_SUB_TYPE, PartnerLoadPeer::JOB_SUB_TYPE),
 					array(BatchJobLockPeer::DC, PartnerLoadPeer::DC)), Criteria::LEFT_JOIN);
+		} else {
+			return false;
 		}
 		
 		if($rand < $prioritizers_ratio) 
