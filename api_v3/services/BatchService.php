@@ -122,25 +122,40 @@ class BatchService extends KalturaBatchService
 		$unclosedEntriesCount = 0;
 		$errorObjects = 0;
 		$unclosedEntries = array();
-		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($bulkUploadJobId);
-
+		
+		
+		$criteria = new Criteria();
+		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadJobId);
+		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
+		$criteria->setLimit(100);
+		
 		$bulkUpload = BatchJobPeer::retrieveByPK($bulkUploadJobId);
 		if($bulkUpload)
 		{
-    		foreach($bulkUploadResults as $bulkUploadResult)
-    		{
-    		    /* @var $bulkUploadResult BulkUploadResult */
-    			$status = $bulkUploadResult->updateStatusFromObject();
-
-    			if ($status == BulkUploadResultStatus::IN_PROGRESS )
-    			{
-        			$unclosedEntriesCount++;
-    			}
-    			if ($status == BulkUploadResultStatus::ERROR )
-    			{
-    			    $errorObjects++;
-    			}
-    		}
+			$handledResults = 0;
+			$bulkUploadResults = self::doSelect($criteria);
+			while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
+			{
+				$handledResults += count($bulkUploadResults);
+	    		foreach($bulkUploadResults as $bulkUploadResult)
+	    		{
+	    		    /* @var $bulkUploadResult BulkUploadResult */
+	    			$status = $bulkUploadResult->updateStatusFromObject();
+	
+	    			if ($status == BulkUploadResultStatus::IN_PROGRESS )
+	    			{
+	        			$unclosedEntriesCount++;
+	    			}
+	    			if ($status == BulkUploadResultStatus::ERROR )
+	    			{
+	    			    $errorObjects++;
+	    			}
+	    		}
+	    		
+	    		kMemoryManager::clearMemory();
+	    		$criteria->setOffset($handledResults);
+				$bulkUploadResults = self::doSelect($criteria);
+			}
 			$data = $bulkUpload->getData();
 			if($data && $data instanceof kBulkUploadJobData)
 			{
@@ -411,10 +426,10 @@ class BatchService extends KalturaBatchService
 	 * @param int $numberOfJobs The maximum number of jobs to return.
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs
 	 * @param KalturaBatchJobType $jobType The type of the job - could be a custom extended type
-	 * @param int $maxOffset The maximum offset we accept for the distance from the best result. 
+	 * @param int $maxOffset The maximum offset we accept for the distance from the best result.
 	 * @return KalturaBatchJobArray
 	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, 
+	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs,
 			KalturaBatchJobFilter $filter = null, $jobType = null, $maxOffset = null)
 	{
 		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);

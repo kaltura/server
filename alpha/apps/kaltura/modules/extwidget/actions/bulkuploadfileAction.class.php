@@ -23,6 +23,13 @@ class bulkuploadfileAction extends sfAction
 			
 		if ($type == "log")
 		{
+			$criteria = new Criteria();
+			$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $jobId);
+			$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
+			$criteria->setLimit(100);
+			
+			$bulkUploadResults = self::doSelect($criteria);
+			
 			$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($jobId);
 			if(!count($bulkUploadResults))
 				die("Log file is not ready");
@@ -30,36 +37,45 @@ class bulkuploadfileAction extends sfAction
 			$STDOUT = fopen('php://output', 'w');
 			$data = $batchJob->getData();
 			
-			foreach($bulkUploadResults as $bulkUploadResult)
+			$handledResults = 0;
+			while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
 			{
-				$values = array(
-					$bulkUploadResult->getTitle(),
-					$bulkUploadResult->getDescription(),
-					$bulkUploadResult->getTags(),
-					$bulkUploadResult->getUrl(),
-					$bulkUploadResult->getContentType(),
-				);
-				
-				if($data instanceof kBulkUploadCsvJobData && $data->getCsvVersion() > 1)
+				$handledResults += count($bulkUploadResults);
+				foreach($bulkUploadResults as $bulkUploadResult)
 				{
-					$values[] = $bulkUploadResult->getConversionProfileId();
-					$values[] = $bulkUploadResult->getAccessControlProfileId();
-					$values[] = $bulkUploadResult->getCategory();
-					$values[] = $bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s');
-					$values[] = $bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s');
-					$values[] = $bulkUploadResult->getThumbnailUrl();
-					$values[] = $bulkUploadResult->getPartnerData();
+					$values = array(
+						$bulkUploadResult->getTitle(),
+						$bulkUploadResult->getDescription(),
+						$bulkUploadResult->getTags(),
+						$bulkUploadResult->getUrl(),
+						$bulkUploadResult->getContentType(),
+					);
+					
+					if($data instanceof kBulkUploadCsvJobData && $data->getCsvVersion() > 1)
+					{
+						$values[] = $bulkUploadResult->getConversionProfileId();
+						$values[] = $bulkUploadResult->getAccessControlProfileId();
+						$values[] = $bulkUploadResult->getCategory();
+						$values[] = $bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s');
+						$values[] = $bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s');
+						$values[] = $bulkUploadResult->getThumbnailUrl();
+						$values[] = $bulkUploadResult->getPartnerData();
+					}
+					$values[] = $bulkUploadResult->getEntryId();
+					$values[] = $bulkUploadResult->getEntryStatus();
+					$values[] = $bulkUploadResult->getErrorDescription();
+					
+					fputcsv($STDOUT, $values);
 				}
-				$values[] = $bulkUploadResult->getEntryId();
-				$values[] = $bulkUploadResult->getEntryStatus();
-				$values[] = $bulkUploadResult->getErrorDescription();
-				
-				fputcsv($STDOUT, $values);
+	    		
+	    		kMemoryManager::clearMemory();
+	    		$criteria->setOffset($handledResults);
+				$bulkUploadResults = self::doSelect($criteria);
 			}
 			fclose($STDOUT);
 		}
 		else
-		{ 
+		{
 			$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 
 			if (kFileSyncUtils::file_exists($syncKey, true))

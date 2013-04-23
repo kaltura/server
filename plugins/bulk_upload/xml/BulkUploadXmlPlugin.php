@@ -51,11 +51,11 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		//Gets the right job for the engine	
+		//Gets the right job for the engine
 		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
 			return new kBulkUploadXmlJobData();
 		
-		 //Gets the right job for the engine	
+		 //Gets the right job for the engine
 		if($baseClass == 'KalturaBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
 			return new KalturaBulkUploadXmlJobData();
 		
@@ -100,7 +100,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	}
 	
 	/**
-	 * Returns the log file for bulk upload job 
+	 * Returns the log file for bulk upload job
 	 * @param BatchJob $batchJob bulk upload batchjob
 	 * @return SimpleXMLElement
 	 */
@@ -112,16 +112,21 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			BulkUploadAction::DELETE => 'delete',
 		);
 		
-		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($batchJob->getId());
+		$criteria = new Criteria();
+		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $batchJob->getId());
+		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
+		$criteria->setLimit(100);
+		$bulkUploadResults = self::doSelect($criteria);
+		
 		if(!count($bulkUploadResults)){
 			return null;
 		}
 
-		header("Content-Type: text/xml; charset=UTF-8"); 
+		header("Content-Type: text/xml; charset=UTF-8");
 		
 		$data = $batchJob->getData();
 		
-		$xmlElement = new SimpleXMLElement('<mrss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>'); 
+		$xmlElement = new SimpleXMLElement('<mrss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>');
 		$xmlElement->addAttribute('version', '2.0');
 //		$xmlElement->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
 //		$xmlElement->addAttribute('xmlns', 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION);
@@ -129,32 +134,42 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		
 		$channel = $xmlElement->addChild('channel');
 		
-//		insert all entries to instance pool
-		$pks = array();
-		foreach($bulkUploadResults as $bulkUploadResult){
-			/* @var $bulkUploadResult BulkUploadResult */
-			$pks[] = $bulkUploadResult->getEntryId();
-		}
-		entryPeer::retrieveByPKs($pks);
-		
-		foreach($bulkUploadResults as $bulkUploadResult){
-			/* @var $bulkUploadResult BulkUploadResult */
-			$item = $channel->addChild('item');
+		$handledResults = 0;
+		while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
+		{
+			$handledResults += count($bulkUploadResults);
 			
+	//		insert all entries to instance pool
+			$pks = array();
+			foreach($bulkUploadResults as $bulkUploadResult){
+				/* @var $bulkUploadResult BulkUploadResult */
+				$pks[] = $bulkUploadResult->getEntryId();
+			}
+			entryPeer::retrieveByPKs($pks);
 			
-			$result = $item->addChild('result');
-			$result->addChild('errorDescription', self::stringToSafeXml($bulkUploadResult->getErrorDescription()));
-//			$result->addChild('entryStatus', self::stringToSafeXml($bulkUploadResult->getEntryStatus()));
-//			$result->addChild('entryStatusName', self::stringToSafeXml($title));
-
-			$action = (isset($actionsMap[$bulkUploadResult->getAction()]) ? $actionsMap[$bulkUploadResult->getAction()] : $actionsMap[BulkUploadAction::ADD]);
-			$item->addChild('action', $action);
-			
-			$entry = $bulkUploadResult->getObject();
-			if(!$entry)
-				continue;
+			foreach($bulkUploadResults as $bulkUploadResult){
+				/* @var $bulkUploadResult BulkUploadResult */
+				$item = $channel->addChild('item');
 				
-			kMrssManager::getEntryMrssXml($entry, $item);
+				
+				$result = $item->addChild('result');
+				$result->addChild('errorDescription', self::stringToSafeXml($bulkUploadResult->getErrorDescription()));
+	//			$result->addChild('entryStatus', self::stringToSafeXml($bulkUploadResult->getEntryStatus()));
+	//			$result->addChild('entryStatusName', self::stringToSafeXml($title));
+	
+				$action = (isset($actionsMap[$bulkUploadResult->getAction()]) ? $actionsMap[$bulkUploadResult->getAction()] : $actionsMap[BulkUploadAction::ADD]);
+				$item->addChild('action', $action);
+				
+				$entry = $bulkUploadResult->getObject();
+				if(!$entry)
+					continue;
+					
+				kMrssManager::getEntryMrssXml($entry, $item);
+			}
+	    		
+    		kMemoryManager::clearMemory();
+    		$criteria->setOffset($handledResults);
+			$bulkUploadResults = self::doSelect($criteria);
 		}
 		
 		return $xmlElement;

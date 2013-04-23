@@ -3,11 +3,11 @@
 /**
  * Subclass for performing query and update operations on the 'bulk_upload_result' table.
  *
- * 
+ *
  *
  * @package Core
  * @subpackage model
- */ 
+ */
 class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 {
     protected static $class_types_cache = array(
@@ -16,15 +16,6 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
         BulkUploadResultObjectType::USER => 'BulkUploadResultKuser',
         BulkUploadResultObjectType::CATEGORY_USER => 'BulkUploadResultCategoryKuser',
     );
-    
-	public static function retrieveByBulkUploadId($bulkUploadId)
-	{
-		$criteria = new Criteria();
-		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
-		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
-		
-		return self::doSelect($criteria);
-	}
     
 	/**
 	 * @param int $bulkUploadId
@@ -61,7 +52,7 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 	}
 	
 	/**
-	 * @return BulkUploadResult 
+	 * @return BulkUploadResult
 	 */
 	public static function retrieveLastByBulkUploadId($bulkUploadId)
 	{

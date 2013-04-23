@@ -8,7 +8,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 
 	const FEATURE_CSV_HEADER_ROW = 'FEATURE_CSV_HEADER_ROW';
 	/**
-	 * 
+	 *
 	 * Returns the plugin name
 	 */
 	public static function getPluginName()
@@ -38,11 +38,11 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		 //Gets the right job for the engine	
+		 //Gets the right job for the engine
 		if($baseClass == 'kBulkUploadJobData' && (!$enumValue || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
 			return new kBulkUploadCsvJobData();
 		
-		 //Gets the right job for the engine	
+		 //Gets the right job for the engine
 		if($baseClass == 'KalturaBulkUploadJobData' && (!$enumValue || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
 			return new KalturaBulkUploadCsvJobData();
 		
@@ -105,7 +105,12 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		
 		header("Content-Type: text/plain; charset=UTF-8");
 
-		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($batchJob->getId());
+		$criteria = new Criteria();
+		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $batchJob->getId());
+		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
+		$criteria->setLimit(100);
+		$bulkUploadResults = self::doSelect($criteria);
+		
 		if(!count($bulkUploadResults))
 			die("Log file is not ready");
 			
@@ -125,36 +130,45 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
     		fputcsv($STDOUT, $headerRow);
 		}
 		
-		foreach($bulkUploadResults as $bulkUploadResult)
+		$handledResults = 0;
+		while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
 		{
-		    /* @var $bulkUploadResult BulkUploadResult */
-		    $values = str_getcsv($bulkUploadResult->getRowData());
-//		    switch ($bulkUploadResult->getObjectType())
-//		    {
-//		        case BulkUploadObjectType::ENTRY:
-//		            $values = self::writeEntryBulkUploadResults($bulkUploadResult, $data);
-//		            break;
-//		        case BulkUploadObjectType::CATEGORY:
-//		            $values = self::writeCategoryBulkUploadResults($bulkUploadResult, $data);
-//		            break;
-//		        case BulkUploadObjectType::CATEGORY_USER:
-//		            $values = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
-//		            break;
-//		        case BulkUploadObjectType::USER: 
-//		            $values = self::writeUserBulkUploadResults($bulkUploadResult, $data);
-//		            break;
-//		        default:
-//		            
-//		            break;
-//		    }
-			
-            $values[] = $bulkUploadResult->getStatus();	
-			$values[] = $bulkUploadResult->getObjectId();
-			$values[] = $bulkUploadResult->getObjectStatus();
-			$values[] = preg_replace('/[\n\r\t]/', ' ', $bulkUploadResult->getErrorDescription());
-			
-			
-			fputcsv($STDOUT, $values);
+			$handledResults += count($bulkUploadResults);
+			foreach($bulkUploadResults as $bulkUploadResult)
+			{
+			    /* @var $bulkUploadResult BulkUploadResult */
+			    $values = str_getcsv($bulkUploadResult->getRowData());
+	//		    switch ($bulkUploadResult->getObjectType())
+	//		    {
+	//		        case BulkUploadObjectType::ENTRY:
+	//		            $values = self::writeEntryBulkUploadResults($bulkUploadResult, $data);
+	//		            break;
+	//		        case BulkUploadObjectType::CATEGORY:
+	//		            $values = self::writeCategoryBulkUploadResults($bulkUploadResult, $data);
+	//		            break;
+	//		        case BulkUploadObjectType::CATEGORY_USER:
+	//		            $values = self::writeCategoryUserBulkUploadResults($bulkUploadResult, $data);
+	//		            break;
+	//		        case BulkUploadObjectType::USER:
+	//		            $values = self::writeUserBulkUploadResults($bulkUploadResult, $data);
+	//		            break;
+	//		        default:
+	//
+	//		            break;
+	//		    }
+				
+	            $values[] = $bulkUploadResult->getStatus();
+				$values[] = $bulkUploadResult->getObjectId();
+				$values[] = $bulkUploadResult->getObjectStatus();
+				$values[] = preg_replace('/[\n\r\t]/', ' ', $bulkUploadResult->getErrorDescription());
+				
+				
+				fputcsv($STDOUT, $values);
+			}
+	    		
+    		kMemoryManager::clearMemory();
+    		$criteria->setOffset($handledResults);
+			$bulkUploadResults = self::doSelect($criteria);
 		}
 		fclose($STDOUT);
 		
@@ -173,7 +187,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	        case BulkUploadObjectType::ENTRY:
 	            $ret = array ("*title", "description", "tags", "url", "contentType",);
 	            if ($csvVersion > 1)
-    	            array_merge($ret, array ("conversionProfileId", "accessProfileId",  
+    	            array_merge($ret, array ("conversionProfileId", "accessProfileId",
     	                    "category", "scheduleStartDate", "scheduleEndDate", "thumbnailUrl", "partnerData", "creatorId", "entitledUsersEdit", "entitledUsersPublish", "ownerId"));
 	            return $ret;
     	        break;
