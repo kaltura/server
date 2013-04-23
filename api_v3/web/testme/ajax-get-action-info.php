@@ -1,6 +1,11 @@
 <?php
 require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
+
+if (!isset($_GET["service"]) || !isset($_GET["action"]))
+{
+	die("missing parameter service/action");
+}
 $service = $_GET["service"];
 $action = $_GET["action"];
 $bench_start = microtime(true);
@@ -25,6 +30,12 @@ try
 {
 	
 	$serviceReflector = $serviceMap[strtolower($service)];
+	if (!array_key_exists($action, $serviceReflector->actionMap))
+	{
+		$msg = "<------- api_v3 testme [$service][$action] not found -------";
+		KalturaLog::ERR ($msg);
+		die($msg);
+	}
 	/* @var $serviceReflector KalturaServiceActionItem */
 	$actionReflector = new KalturaActionReflector($service, $action, $serviceReflector->actionMap[$action]);
 	$actionParams = $actionReflector->getActionParams();

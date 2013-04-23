@@ -451,7 +451,7 @@ class kMrssManager
 		
 		$mrss->addChild('entryId', $entry->getId());
 		if($entry->getReferenceID())
-			$mrss->addChild('referenceID', $entry->getReferenceID());
+			$mrss->addChild('referenceID', self::stringToSafeXml($entry->getReferenceID()));
 		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
 		$mrss->addChild('updatedAt', $entry->getUpdatedAt(null));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));

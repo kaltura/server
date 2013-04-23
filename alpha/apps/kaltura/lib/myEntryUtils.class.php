@@ -747,7 +747,7 @@ class myEntryUtils
 			}
 			else
 			{
-				if (!file_exists($orig_image_path))
+				if (!file_exists($orig_image_path) || !filesize($orig_image_path))
 					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 					
 				$imageSizeArray = getimagesize($orig_image_path);

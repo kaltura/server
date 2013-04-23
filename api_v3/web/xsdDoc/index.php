@@ -1,10 +1,9 @@
 <?php 
-require_once("../../bootstrap.php");
+
+require_once(dirname(__FILE__) . '/../../../server_infra/kConf.php');
+
 $INPUT_PATTERN = "/^[a-zA-Z0-9_]*$/";
 $SCHEME_PATTERN = "/^[a-zA-Z0-9_.]*$/";
-
-ActKeyUtils::checkCurrent();
-KalturaLog::setContext("XSD-DOC");
 
 // get inputs
 $inputPage = @$_GET["page"];
@@ -26,13 +25,21 @@ elseif($schemaType)
 $cacheFilePath = "$cachePath/$cacheKey.cache";
 
 // Html headers + scripts
-require_once("header.php");
-
 if (file_exists($cacheFilePath))
 {
+	require_once("header.php");
 	print file_get_contents($cacheFilePath);
 	die;
 }
+
+require_once("../../bootstrap.php");
+
+ActKeyUtils::checkCurrent();
+KalturaLog::setContext("XSD-DOC");
+
+KalturaLog::debug(">------------------------------------- xsd doc -------------------------------------");
+
+require_once("header.php");
 
 ob_start();
 
@@ -58,3 +65,5 @@ print $out;
 kFile::setFileContent($cacheFilePath, $out);
 
 require_once("footer.php");
+
+KalturaLog::debug("<------------------------------------- xsd doc -------------------------------------");

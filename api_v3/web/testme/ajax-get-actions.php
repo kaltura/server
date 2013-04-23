@@ -2,6 +2,9 @@
 require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
 
+if (!isset($_GET["service"]))
+	exit;
+
 $service = $_GET["service"];
 $serviceMap = KalturaServicesMap::getMap();
 $serviceActionItem = $serviceMap[strtolower($service)];

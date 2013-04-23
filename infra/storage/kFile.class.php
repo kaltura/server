@@ -630,6 +630,9 @@ class kFile
 	
 	public static function mimeType($file_name)
 	{
+		if (!file_exists($file_name))
+			return false;
+		
 		if(! function_exists('mime_content_type'))
 		{
 			$type = null;
