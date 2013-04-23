@@ -93,7 +93,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * 
+	 *
 	 */
 	public $numOfObjects;
 	
@@ -158,9 +158,6 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 			if ($jobData->getBulkUploadObjectType())
 			    $this->bulkUploadObjectType = $jobData->getBulkUploadObjectType();
 		}
-		
-//		$results = BulkUploadResultPeer::retrieveByBulkUploadId($this->id);
-//		$this->results = KalturaBulkUploadResultArray::fromBulkUploadResultArray($results);
 	}
 
 	
