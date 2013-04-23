@@ -376,7 +376,7 @@ class kFlowHelper
 
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
-			throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
+			throw new APIException(APIErrors::INVALID_ENTRY, 'entry', $dbBatchJob->getEntryId());
 
 
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
