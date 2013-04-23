@@ -49,9 +49,7 @@ abstract class myBaseObject implements Iterator
 			}
 			catch ( Exception $ex )
 			{
-//				echo "[" . ( $obj ? "1" : "0" ) . "] Error while envoking " . get_class ( $obj ) . "::" . 	$method_name . "!!";
-				echo "[" . get_class ( $obj ) . "] methodName [$method_name]:" . $ex->getMessage() . "<br>";
-//				echo "Error while envoking " . get_class ( $obj ) . "::" . 	$method_name . "!!" ;
+				KalturaLog::err($ex);
 			}
 			
 			return null;

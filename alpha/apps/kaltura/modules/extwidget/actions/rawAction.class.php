@@ -241,6 +241,11 @@ class rawAction extends sfAction
 						KExternalErrors::dieGracefully();
 					}
 					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false ); // NOT strict - if there is no archive, get the data version
+					if(!$file_sync)
+					{
+						header('KalturaRaw: no file sync found for flavor ['.$flavor_asset->getId().']');
+						KExternalErrors::dieGracefully();
+					}
 					$archive_file = $file_sync->getFullPath();
 				}
 			}			
