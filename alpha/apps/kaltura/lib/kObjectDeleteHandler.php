@@ -181,21 +181,26 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		}
 		
 		$c = new Criteria();
+		$c->setLimit(100);
 		$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $assetParam->getId());
-		$flavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelect($c);
 		
-		if($flavorParamsConversionProfiles)
+		for(;;)
 		{
-			$valuesToDelete = array();
+			$flavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelect($c);
+			
 			foreach($flavorParamsConversionProfiles as $flavorParamsConversionProfile)
 			{
 				/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */ 
-				$valuesToDelete[] = $flavorParamsConversionProfile->getId();
+				$flavorParamsConversionProfile->delete();
 			}
-
-			KalturaLog::DEBUG("Deleting Flavor Param Conversion Profile Association For Flavor Param ID [" . $assetParam->getId() . "]");
-			flavorParamsConversionProfilePeer::doDelete($valuesToDelete);
+			
+			if(count($flavorParamsConversionProfiles) < 100)
+				break;	
+			
+			flavorParamsConversionProfilePeer::clearInstancePool();
 		}
+		
+		KalturaLog::DEBUG("Flavor Params Conversion Profile Relations were deleted for flavor param id [" . $assetParam->getId() . "]");
 	}
 	
 	/**
