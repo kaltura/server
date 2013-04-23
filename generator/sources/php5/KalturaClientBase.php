@@ -31,7 +31,7 @@
  * @package Kaltura
  * @subpackage Client
  */
-class MultiRequestSubResult
+class MultiRequestSubResult implements ArrayAccess
 {
     function __construct($value)
 	{
@@ -46,6 +46,24 @@ class MultiRequestSubResult
     function __get($name)
 	{
         return new MultiRequestSubResult($this->value . ':' . $name);
+	}
+	
+	public function offsetExists($offset)
+	{
+		return true;
+	}
+
+	public function offsetGet($offset)
+	{
+        return new MultiRequestSubResult($this->value . ':' . $offset);
+	}
+
+	public function offsetSet($offset, $value)
+	{
+	}
+	
+	public function offsetUnset($offset)
+	{
 	}
 }
 
