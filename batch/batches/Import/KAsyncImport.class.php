@@ -264,15 +264,21 @@ class KAsyncImport extends KJobHandlerWorker
 			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Error: file transfer manager not found for type [$subType]", KalturaBatchJobStatus::FAILED);
 			    return $job;
 			}
-
-			// login to server
-			if (!$privateKey || !$publicKey) {
-			    $fileTransferMgr->login($host, $username, $password, $port);
+			
+			try{
+				// login to server
+				if (!$privateKey || !$publicKey) {
+				    $fileTransferMgr->login($host, $username, $password, $port);
+				}
+				else {
+				    $privateKeyFile = $this->getFileLocationForSshKey($privateKey, 'privateKey');
+				    $publicKeyFile = $this->getFileLocationForSshKey($publicKey, 'publicKey');
+				    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
+				}
 			}
-			else {
-			    $privateKeyFile = $this->getFileLocationForSshKey($privateKey, 'privateKey');
-			    $publicKeyFile = $this->getFileLocationForSshKey($publicKey, 'publicKey');
-			    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
+			catch (kFileTransferMgrException $ex){
+				$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::RETRY);
+				return $job;
 			}
 
 			// check if file exists
