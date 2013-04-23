@@ -85,10 +85,10 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('TagResolveBatchJobType');
+			return array('TagResolveBatchJobType', 'IndexTagsByPrivacyContextJobType');
 		
 		if($baseEnumName == 'BatchJobType')
-			return array('TagResolveBatchJobType');
+			return array('TagResolveBatchJobType', 'IndexTagsByPrivacyContextJobType');
 			
 		return array();
 	}

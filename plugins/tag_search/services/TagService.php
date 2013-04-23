@@ -142,4 +142,42 @@ class TagService extends KalturaBaseService
 	    return 0;
 	}
 	
+	/**
+	 * @action indexCategoryEntryTags
+	 * 
+	 * @param int $categoryId 
+	 * @param string $pcToDecrement
+	 * @param string $pcToIncrement
+	 */
+	public function indexCategoryEntryTagsAction ($categoryId, $pcToDecrement, $pcToIncrement)
+	{
+		$pcToDecrementArray = explode(',', $pcToDecrement);
+		$c = KalturaCriteria::create(TagPeer::OM_CLASS);
+		$c->add(TagPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
+		$c->add(TagPeer::PRIVACY_CONTEXT, Tag::getIndexedFieldValue("TagPeer::PRIVACY_CONTEXT", $pcToDecrementArray, kCurrentContext::getCurrentPartnerId()), KalturaCriteria::IN);
+		TagPeer::setUseCriteriaFilter(false);
+		$tagsToDecrement = TagPeer::doSelect($c);
+		TagPeer::setUseCriteriaFilter(true);	
+		foreach ($tagsToDecrement as $tag)
+		{
+			/* @var $tag Tag */
+			$tag->decrementInstanceCount();
+		}
+		
+		$pcToIncrementArray = explode(',', $pcToIncrement);
+		$tagsToIncrement = array();
+		$c = new Criteria();
+		$c->add(categoryEntryPeer::CATEGORY_ID, $categoryId);
+		$catEntries = categoryEntryPeer::doSelect($c);
+		foreach ($catEntries as $catEntry)
+		{
+			/* @var $catEntry categoryEntry */
+			$entry = entryPeer::retrieveByPK($entry);
+			$tagsToIncrement = array_merge($tagsToIncrement, explode(',', $entry->getTags()));
+		}
+		
+		$tagsToIncrement = array_unique($tagsToIncrement);
+		kTagFlowManager::addOrIncrementTags(implode(",", $tagsToIncrement), kCurrentContext::getCurrentPartnerId(), "entry", $pcToIncrementArray);
+	}
+	
 }

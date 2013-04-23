@@ -1,0 +1,50 @@
+<?php
+/**
+ * @package plugins.tagSearch
+ * @subpackage Scheduler
+ */
+class KAsyncTagIndex extends KJobHandlerWorker
+{
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::exec()
+	 */
+	protected function exec(KalturaBatchJob $job) {
+		
+		$this->reIndexTags($job);
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	protected function getJobType() {
+		return self::getType();
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
+	 */
+	public static function getType()
+	{
+		return KalturaBatchJobType::INDEX_TAGS;
+	}
+	
+	protected static function reIndexTags (KalturaBatchJob $job)
+	{
+		KalturaLog::info("Re-indexing tags according to privacy contexts");
+		$tagPlugin = KalturaTagSearchClientPlugin::get($this->kClient);
+		$this->impersonate($job->partnerId);
+		try 
+		{
+			$tagPlugin->tag->indexCategoryEntryTags($job->data->changedCategoryId, $job->data->deletedPrivacyContexts, $job->data->changedCategoryId);
+		}
+		catch (Exception $e)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		$this->unimpersonate();
+		return $this->closeJob($job, null, null, "Re-index complete", KalturaBatchJobStatus::FINISHED);
+		
+	}
+}
