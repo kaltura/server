@@ -279,6 +279,12 @@ class ConversionProfileService extends KalturaBaseService
 			$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $notInFlavorIds, Criteria::NOT_IN);
 		}
 			
-		flavorParamsConversionProfilePeer::doDelete($c);
+		$flavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelect($c);
+		
+		foreach($flavorParamsConversionProfiles as $flavorParamsConversionProfile)
+		{
+			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */ 
+			$flavorParamsConversionProfile->delete();
+		}
 	}
 }
