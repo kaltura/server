@@ -1051,11 +1051,8 @@ class playManifestAction extends kalturaAction
 	 * @param string $baseUrl
 	 * @return array
 	 */
-	private function buildRtmpLiveStreamFlavorsArray(&$baseUrl)
+	private function buildRtmpLiveStreamFlavorsArray()
 	{		
-		$baseUrl = $this->entry->getStreamUrl();
-		$baseUrl = rtrim($baseUrl, '/');
-
 		$flavors = $this->entry->getStreamBitrates();
 		if(count($flavors))
 		{
@@ -1070,11 +1067,6 @@ class playManifestAction extends kalturaAction
 			$flavors[0]['url'] = str_replace('%i', '1', $this->entry->getStreamName());
 		}
 		
-		if (strpos($this->protocol, "rtmp") === 0)
-			$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-		
-		$this->urlManager->finalizeUrls($baseUrl, $flavors);
-
 		return $flavors;
 	}
 
@@ -1300,14 +1292,47 @@ class playManifestAction extends kalturaAction
 		return null;
 	}
 	
+	private function getLiveEntryBaseUrl()
+	{
+		switch($this->format)
+		{
+			case PlaybackProtocol::RTMP:
+				$baseUrl = $this->entry->getStreamUrl();
+				$baseUrl = rtrim($baseUrl, '/');
+				if (strpos($this->protocol, "rtmp") === 0)
+					$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+				return $baseUrl;
+					
+			case PlaybackProtocol::APPLE_HTTP:
+				return $this->entry->getHlsStreamUrl();
+		
+			case PlaybackProtocol::AKAMAI_HDS:
+				$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
+				if (!$liveStreamConfig)
+					return null;
+		
+				return $liveStreamConfig->getUrl();
+		}
+		return null;
+	}
+	
 	private function serveLiveEntry()
 	{		
-		$baseUrl = null;
+		$baseUrl = $this->getLiveEntryBaseUrl();
+		if (!$baseUrl)
+			return null;
+			
+		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
+		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
+		
+		$renderer = null;
 		
 		switch($this->format)
 		{
 			case PlaybackProtocol::RTMP:
-				$flavors = $this->buildRtmpLiveStreamFlavorsArray($baseUrl);
+				$flavors = $this->buildRtmpLiveStreamFlavorsArray();
+				
+				$this->urlManager->finalizeUrls($baseUrl, $flavors);
 				
 				$renderer = new kF4MManifestRenderer();
 				$renderer->flavors = $flavors;
@@ -1315,31 +1340,20 @@ class playManifestAction extends kalturaAction
 				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 				$renderer->mimeType = $this->getMimeType($flavors);
 				break;
-					
+			
 			case PlaybackProtocol::APPLE_HTTP:
+				$flavor = $this->getFlavorAssetInfo($baseUrl);
 				$renderer = new kRedirectManifestRenderer();
-				$baseUrl = $this->entry->getHlsStreamUrl();
-				$renderer->flavor = $this->getFlavorAssetInfo($baseUrl);
+				$renderer->flavor = $flavor;
 				break;
-								
-			case PlaybackProtocol::AKAMAI_HDS:
-				$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
-				if (!$liveStreamConfig)
-					return null;
 				
-				$baseUrl = $liveStreamConfig->getUrl();
+			case PlaybackProtocol::AKAMAI_HDS:
 				$flavor = $this->getFlavorAssetInfo($baseUrl);
 				$renderer = new kF4MManifestRenderer();
 				$renderer->flavors = array($flavor);
 				break;
 		}
-		
-		if ($baseUrl)
-		{
-			$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
-			$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
-		}
-		
+				
 		return $renderer;
 	}
 	
@@ -1473,7 +1487,8 @@ class playManifestAction extends kalturaAction
 			
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
-		$renderer->tokenizer = $this->urlManager->getTokenizer();
+		if ($this->urlManager)
+			$renderer->tokenizer = $this->urlManager->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		
 		// Handle caching
