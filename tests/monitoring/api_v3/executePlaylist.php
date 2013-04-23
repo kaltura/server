@@ -93,12 +93,12 @@ try
 		$monitorResult->description = "Playlist not found";
 	}
 }
-catch(KalturaClientException $ex)
+catch(Exception $ex)
 {
 	$end = microtime(true);
 	$monitorResult->executionTime = $end - $start;
 	$monitorResult->value = -1;
-	$monitorResult->description = "API: $apiCall, Code: " . $ex->getCode() . ", Message: " . $ex->getMessage();
+	$monitorResult->description = "Exception: " . get_class($ex) . ", API: $apiCall, Code: " . $ex->getCode() . ", Message: " . $ex->getMessage();
 }
 
 echo "$monitorResult";
