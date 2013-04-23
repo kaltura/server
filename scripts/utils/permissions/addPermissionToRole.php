@@ -19,8 +19,11 @@ $dryRun = true;
 if(in_array('realrun', $argv))
 {
 	$dryRun = false;
-	KalturaLog::debug('Using dry run mode');
+	KalturaLog::debug('Using real run mode');
 }
+else
+	KalturaLog::debug('Using dry run mode');
+	
 KalturaStatement::setDryRun($dryRun);
 
 $partnerId = $argv[1] == 'null' ? null : $argv[1];
