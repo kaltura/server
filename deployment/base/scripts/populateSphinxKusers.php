@@ -12,6 +12,8 @@ if($argc > 2 && is_numeric($argv[2]))
 	$c->add(kuserPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 if($argc > 3 && is_numeric($argv[3]))
 	$c->add(kuserPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
+if($argc > 4)
+	kuserPeer::setUseCriteriaFilter((bool)$argv[4]);
 
 $c->addAscendingOrderByColumn(kuserPeer::UPDATED_AT);
 $c->addAscendingOrderByColumn(kuserPeer::ID);

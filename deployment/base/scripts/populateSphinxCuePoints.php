@@ -12,6 +12,8 @@ if($argc > 2 && is_numeric($argv[2]))
 	$c->add(CuePointPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
 if($argc > 3 && is_numeric($argv[3]))
 	$c->add(CuePointPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
+if($argc > 4)
+	CuePointPeer::setUseCriteriaFilter((bool)$argv[4]);
 
 $c->addAscendingOrderByColumn(CuePointPeer::UPDATED_AT);
 $c->addAscendingOrderByColumn(CuePointPeer::ID);
