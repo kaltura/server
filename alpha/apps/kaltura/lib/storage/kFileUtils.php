@@ -160,6 +160,8 @@ class kFileUtils extends kFile
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
 		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
