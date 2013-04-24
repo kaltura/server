@@ -2044,8 +2044,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function getContributorScreenName()
 	{
-		// HACK fro FootBo
-		if ($this->getPartnerId() != 8304 && $this->getCredit())
+		if ($this->getCredit())
 			return $this->getCredit();
 		else
 		{
@@ -2918,7 +2917,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if(count(array_unique($entitledKusersNoPrivacyContext)))
 			$entitledKusers[kEntitlementUtils::ENTRY_PRIVACY_CONTEXT] = array_unique($entitledKusersNoPrivacyContext);
 		
-		if (!count($this->getAllCategoriesIds(true)))
+		$allCategoriesIds = $this->getAllCategoriesIds(true);
+		if (!count($allCategoriesIds))
 			return kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_' . implode(' ' . kEntitlementUtils::ENTRY_PRIVACY_CONTEXT . '_', $entitledKusersNoPrivacyContext);
 		
 		$categoryGroupSize = kConf::get('max_number_of_memebrs_to_be_indexed_on_entry');
@@ -2928,9 +2928,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 		//get categories for this entry that have small amount of members.
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->add(categoryPeer::ID, $this->getAllCategoriesIds(true), Criteria::IN);
+		$c->add(categoryPeer::ID, $allCategoriesIds, Criteria::IN);
 		$c->add(categoryPeer::MEMBERS_COUNT, $categoryGroupSize, Criteria::LESS_EQUAL);
 		$c->add(categoryPeer::ENTRIES_COUNT, kConf::get('category_entries_count_limit_to_be_indexed'), Criteria::LESS_EQUAL);
+		$c->dontCount();
 		
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories	= categoryPeer::doSelect($c);
