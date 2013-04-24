@@ -17,7 +17,7 @@ class flavorParamsAction extends kalturaSystemAction
 	{
 		$this->forceSystemAuthentication();
 		$this->pid = $this->getRequestParameter("pid", 0);
-		if (!is_null($this->getRequestParameter("advanced"))) 
+		if (!is_null($this->getRequestParameter("advanced")))
 		{
 			$this->getResponse()->setCookie('flavor-params-advanced', $this->getRequestParameter("advanced"));
 			$this->advanced = (int)$this->getRequestParameter("advanced");
@@ -45,7 +45,7 @@ class flavorParamsAction extends kalturaSystemAction
 				$newFalvorParams->setIsAvoidForcedKeyFrames($this->editFlavorParam->getIsAvoidForcedKeyFrames());
 //				$newFalvorParams->setMultiStream($this->editFlavorParam->getMultiStream());
 				$newFalvorParams->setAnamorphicPixels($this->editFlavorParam->getAnamorphicPixels());
-				$newFalvorParams->setMaxFrameRate($this->editFlavorParam->setMaxFrameRate());
+				$newFalvorParams->setMaxFrameRate($this->editFlavorParam->getMaxFrameRate());
 				$newFalvorParams->setIsDefault(false);
 				$newFalvorParams->setPartnerId(-1);
 				$newFalvorParams->save();
@@ -77,7 +77,7 @@ class flavorParamsAction extends kalturaSystemAction
 							$this->editFlavorParam->setPartnerId($partnerId);
 					}
 					
-					if ($this->advanced >= 1) 
+					if ($this->advanced >= 1)
 					{
 						$this->editFlavorParam->setName($this->getRequestParameter("name"));
 						$this->editFlavorParam->setSystemName($this->getRequestParameter("systemName"));
@@ -97,7 +97,7 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setIsAvoidForcedKeyFrames($this->getRequestParameter("isAvoidForcedKeyFrames",0));
 //						$this->editFlavorParam->setMultiStream($this->getRequestParameter("multiStream",0));
 						$this->editFlavorParam->setAnamorphicPixels($this->getRequestParameter("anamorphicPixels",0));
-						$this->editFlavorParam->setWidth($this->getRequestParameter("width")); 
+						$this->editFlavorParam->setWidth($this->getRequestParameter("width"));
 						$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
 						$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
 						$this->editFlavorParam->setVideoBitrate($this->getRequestParameter("video-bitrate"));
@@ -157,6 +157,6 @@ class flavorParamsAction extends kalturaSystemAction
 				return str_replace($prefix.'_', '', $key);
 		}
 		return '';
-	} 
+	}
 }
 ?>
