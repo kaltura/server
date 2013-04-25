@@ -653,10 +653,15 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 		case CM_BINARY:
 			$resultOld = normalizeResultBuffer($resultOld);
 			$resultNew = normalizeResultBuffer($resultNew);
+			if (strlen($resultNew) != strlen($resultOld))
+			{
+				$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
+				break;
+			}
 			if (countDifferences($resultNew, $resultOld) <= MAX_BINARY_DIFFS)
 				$errors = array();
 			else
-				$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
+				$errors = array('Data does not match - size='.strlen($resultNew));
 			break;
 					
 		case CM_XML:
