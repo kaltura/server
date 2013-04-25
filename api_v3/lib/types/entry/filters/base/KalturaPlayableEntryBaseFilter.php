@@ -12,10 +12,6 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 		"durationGreaterThan" => "_gt_duration",
 		"durationLessThanOrEqual" => "_lte_duration",
 		"durationGreaterThanOrEqual" => "_gte_duration",
-		"msDurationLessThan" => "_lt_ms_duration",
-		"msDurationGreaterThan" => "_gt_ms_duration",
-		"msDurationLessThanOrEqual" => "_lte_ms_duration",
-		"msDurationGreaterThanOrEqual" => "_gte_ms_duration",
 		"durationTypeMatchOr" => "_matchor_duration_type",
 	);
 
@@ -27,8 +23,6 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 		"-views" => "-views",
 		"+duration" => "+duration",
 		"-duration" => "-duration",
-		"+msDuration" => "+ms_duration",
-		"-msDuration" => "-ms_duration",
 	);
 
 	public function getMapBetweenObjects()
@@ -60,26 +54,6 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 	 * @var int
 	 */
 	public $durationGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $msDurationLessThan;
-
-	/**
-	 * @var int
-	 */
-	public $msDurationGreaterThan;
-
-	/**
-	 * @var int
-	 */
-	public $msDurationLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $msDurationGreaterThanOrEqual;
 
 	/**
 	 * @var string

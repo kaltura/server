@@ -131,10 +131,6 @@ class entryFilter extends baseObjectFilter
 			"_eq_creator_id",
 			"_lte_total_rank",
 			"_gte_total_rank",
-			"_lt_ms_duration",
-			"_gt_ms_duration",
-			"_lte_ms_duration",
-			"_gte_ms_duration",		
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
