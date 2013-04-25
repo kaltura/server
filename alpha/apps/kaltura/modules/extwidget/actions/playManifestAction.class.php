@@ -971,8 +971,6 @@ class playManifestAction extends kalturaAction
 		if (strpos($flavor['urlPrefix'], '://') === false)
 			$flavor['urlPrefix'] = $this->protocol . '://' . $flavor['urlPrefix'];
 
-		$this->urlManager->setProtocol(PlaybackProtocol::AKAMAI_HDS);		// for tokenizer
-		
 		return $flavor;
 	} 
 	
@@ -1306,8 +1304,9 @@ class playManifestAction extends kalturaAction
 			case PlaybackProtocol::APPLE_HTTP:
 				return $this->entry->getHlsStreamUrl();
 		
+			case PlaybackProtocol::HDS:
 			case PlaybackProtocol::AKAMAI_HDS:
-				$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
+				$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $this->format);
 				if (!$liveStreamConfig)
 					return null;
 		
@@ -1324,6 +1323,7 @@ class playManifestAction extends kalturaAction
 			
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
 		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
+		$this->urlManager->setProtocol($this->format);
 		
 		$renderer = null;
 		
@@ -1342,13 +1342,14 @@ class playManifestAction extends kalturaAction
 				break;
 			
 			case PlaybackProtocol::APPLE_HTTP:
-				$flavor = $this->getFlavorAssetInfo($baseUrl);
+				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = new kRedirectManifestRenderer();
 				$renderer->flavor = $flavor;
 				break;
-				
+			
+			case PlaybackProtocol::HDS:
 			case PlaybackProtocol::AKAMAI_HDS:
-				$flavor = $this->getFlavorAssetInfo($baseUrl);
+				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = new kF4MManifestRenderer();
 				$renderer->flavors = array($flavor);
 				break;

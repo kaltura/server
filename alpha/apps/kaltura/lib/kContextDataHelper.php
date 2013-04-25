@@ -292,9 +292,16 @@ class kContextDataHelper
 		}
 		elseif ($this->entry->getType() == entryType::LIVE_STREAM)
 		{
-			$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', PlaybackProtocol::AKAMAI_HDS);
-			if ($config)	
-				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;	
+			$protocols = array(PlaybackProtocol::AKAMAI_HDS, PlaybackProtocol::HDS);
+			foreach ($protocols as $protocol)
+			{
+				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $protocol);
+				if ($config)
+				{	
+					$this->streamerType = $protocol;
+					break;
+				}
+			}	
 			if (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO)
 				$this->streamerType = PlaybackProtocol::RTMP;
 		}

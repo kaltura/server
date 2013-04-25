@@ -248,6 +248,8 @@ class LiveStreamService extends KalturaEntryService
 					KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
 					return $this->hlsUrlExistsRecursive($liveStreamEntry->getHlsStreamUrl());
 					break;
+					
+				case KalturaPlaybackProtocol::HDS:
 				case KalturaPlaybackProtocol::AKAMAI_HDS:
 					$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, "protocol", $protocol);
 					if ($config)

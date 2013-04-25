@@ -54,7 +54,13 @@ class kAkamaiUrlManager extends kUrlManager
 			}
 			break;
 
-		case "hdnetworkmanifest":
+		case PlaybackProtocol::APPLE_HTTP:
+			if (!isset($this->params["hd_secure_ios"]))
+			{
+				break;
+			}
+			
+		case PlaybackProtocol::AKAMAI_HDS:
 			if (isset($this->params['secure_hd_auth_salt']) && $this->params['secure_hd_auth_salt'])
 			{
 				return new kAkamaiSecureHDUrlTokenizer(
