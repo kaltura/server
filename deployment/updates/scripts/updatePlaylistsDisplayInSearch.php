@@ -2,13 +2,14 @@
 require_once (__DIR__ . '/../../bootstrap.php');
 
 $dbConfig = kConf::getDB();
-if(!isset($dbConfig['datasources']['propel']))
+
+if(!isset($dbConfig['datasources']) || !isset($dbConfig['datasources']['propel']) || !isset($dbConfig['datasources']['propel']['connection']))
 {
 	echo "Propel datasource not found\n";
 	exit(-1);
 }
 
-$masterConfig = $dbConfig['datasources']['propel'];
+$masterConfig = $dbConfig['datasources']['propel']['connection'];
 
 if(!isset($masterConfig['database']))
 {
