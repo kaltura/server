@@ -154,23 +154,40 @@ $(function() {
 			<legend>The Problem</legend> 
 			<p><label>* Component/ Feature:
 					<select id="00N70000002RZpf" name="00N70000002RZpf" class="required"> 
-						<option selected="selected" value="">Please select...</option> 
-						<option value="Infrastructure/ Communication/ Network">Infrastructure/ Communication/ Network</option> 
-						<option value="3rd party comp. (Gigya, Plymedia, etc.)">3rd party comp. (Gigya, Plymedia, etc.)</option> 
-						<option value="API/ Integration">API/ Integration</option> 
-						<option value="Entry MetaData (Thumb, Name, etc.)">Entry MetaData (Thumb, Name, etc.)</option> 
-						<option value="Flavors/Transcoding">Flavors/Transcoding</option> 
-						<option value="Ads">Ads</option> 
-						<option value="Analytics">Analytics</option> 
-						<option value="Kaltura Management Console Functionality">Kaltura Management Console Functionality</option> 
-						<option value="Editing/Mixing">Editing/Mixing</option> 
-						<option value="Playback">Playback</option> 
-						<option value="Live Streaming">Live Streaming</option> 
-						<option value="Player customization / Application Studio">Player customization / Application Studio</option> 
-						<option value="Uploading">Uploading</option> 
-						<option value="Downloading">Downloading</option> 
-						<option value="Syndication">Syndication</option> 
-						<option value="Other">Other</option> 
+						<option selected="selected" value="">Please select...</option>
+						<option value="3rd party component">3rd party component</option>
+						<option value="Analytics">Analytics</option>
+						<option value="API">API</option>
+						<option value="Blackboard">Blackboard</option>
+						<option value="Bulk Upload">Bulk Upload</option>
+						<option value="CDN Delivery">CDN Delivery</option>
+						<option value="Customization">Customization</option>
+						<option value="Desire2Learn">Desire2Learn</option>
+						<option value="Distribution Connectors">Distribution Connectors</option>
+						<option value="Downloading">Downloading</option>
+						<option value="Drop Folders">Drop Folders</option>
+						<option value="Drupal">Drupal</option>
+						<option value="Entitlement">Entitlement</option>
+						<option value="Entry - Access Control">Entry - Access Control</option>
+						<option value="Entry - Metadata">Entry - Metadata</option>
+						<option value="Flash Player">Flash Player</option>
+						<option value="HTML5 Player">HTML5 Player</option>
+						<option value="KCW">KCW</option>
+						<option value="KMC User Interface">KMC User Interface</option>
+						<option value="KMS/MediaSpace">KMS/MediaSpace</option>
+						<option value="Live Streaming">Live Streaming</option>
+						<option value="KSR">KSR</option>
+						<option value="KSU">KSU</option>
+						<option value="Moodle">Moodle</option>
+						<option value="OnPrem - Infrastructure/ Communication/ Network">OnPrem - Infrastructure/ Communication/ Network</option>
+						<option value="Playback">Playback</option>
+						<option value="Remote Storage">Remote Storage</option>
+						<option value="SaaS - Infrastructure/ Communication/ Network">SaaS - Infrastructure/ Communication/ Network</option>
+						<option value="Sakai">Sakai</option>
+						<option value="Sharepoint">Sharepoint</option>
+						<option value="Syndication">Syndication</option>
+						<option value="Transcoding">Transcoding</option>
+						<option value="Other">Other</option>
 					</select> 
 					<img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p> 
 			<p><label>* Affected Functionality:
