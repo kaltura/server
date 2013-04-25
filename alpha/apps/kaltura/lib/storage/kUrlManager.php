@@ -339,8 +339,7 @@ class kUrlManager
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$partnerId = $flavorAsset->getPartnerId();
-		$entry = $flavorAsset->getentry();
-		$subpId = $entry ? $entry->getSubpId() : $partnerId * 100;
+		$subpId = $flavorAsset->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $flavorAsset->getId();
 		
@@ -372,15 +371,8 @@ class kUrlManager
 			$url .= "/file/playlist.m3u8";
 			break;
 		case PlaybackProtocol::HTTP:
-			if(kConf::hasParam('url_mgr_http_add_ext'))
-			{
-				$requiredExt = kConf::get('url_mgr_http_add_ext');
-                if(is_array($requiredExt) && array_key_exists($this->extention, $requiredExt))
-                {
-					if($this->extention == 'wvm')
-                    	$url .= "/name/a.".$this->extention;
-				}
- 			}
+			if($this->extention)
+				$url .= "/name/a.".$this->extention;
 			break;
 		}
 		
