@@ -275,32 +275,33 @@ class KAsyncImport extends KJobHandlerWorker
 				    $publicKeyFile = $this->getFileLocationForSshKey($publicKey, 'publicKey');
 				    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
 				}
+			
+				// check if file exists
+				$fileExists = $fileTransferMgr->fileExists($remotePath);
+				if (!$fileExists) {
+				    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, "Error: remote file [$remotePath] does not exist", KalturaBatchJobStatus::FAILED);
+				    return $job;
+				}
+	
+				// get file size
+				$fileSize = $fileTransferMgr->fileSize($remotePath);
+				
+	            // create a temp file path
+				$destFile = $this->getTempFilePath($remotePath);
+				$data->destFileLocalPath = $destFile;
+				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
+				KalturaLog::debug("destFile [$destFile]");
+	
+				// download file - overwrite local if exists
+				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
+				KalturaLog::debug("Downloading remote file [$remotePath] to local path [$destFile]");
+				$res = $fileTransferMgr->getFile($remotePath, $destFile);
+				
 			}
 			catch (kFileTransferMgrException $ex){
 				$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::RETRY);
 				return $job;
 			}
-
-			// check if file exists
-			$fileExists = $fileTransferMgr->fileExists($remotePath);
-			if (!$fileExists) {
-			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, "Error: remote file [$remotePath] does not exist", KalturaBatchJobStatus::FAILED);
-			    return $job;
-			}
-
-			// get file size
-			$fileSize = $fileTransferMgr->fileSize($remotePath);
-
-            // create a temp file path
-			$destFile = $this->getTempFilePath($remotePath);
-			$data->destFileLocalPath = $destFile;
-			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
-			KalturaLog::debug("destFile [$destFile]");
-
-			// download file - overwrite local if exists
-			$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
-			KalturaLog::debug("Downloading remote file [$remotePath] to local path [$destFile]");
-			$res = $fileTransferMgr->getFile($remotePath, $destFile);
 
 			if(!file_exists($data->destFileLocalPath))
 			{
