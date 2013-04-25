@@ -1,5 +1,5 @@
 <?php
-class WidevinePackageNotifyRequest
+class WidevinePackageNotifyRequest extends WidevineVodBaseRequest
 {
 	/*	Example:
 	<PackageNotify 
@@ -19,36 +19,27 @@ class WidevinePackageNotifyRequest
 	*/
 	
 	const FILE_URL_PREFIX = 'file://';
-	const WV_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 	
-	private $packageName;
 	private $sourceUrl; 
 	private $targetUrl;
 	private $outputFileName;
 	private $files; 
-	private $policy;
-	private $portal;
-	private $licenseStartDate = null;
-	private $licenseEndDate = null;
 	
 	public function __construct($packageName, $sourceFolder, $targetFolder, $outputFileName, array $files)
 	{
+		parent::__construct();
 		$this->setPackageName($packageName);
 		$this->setSourceUrl($sourceFolder);
 		$this->setTargetUrl($targetFolder);
 		$this->setOutputFileName($outputFileName);
 		$this->setFiles($files);
-		$this->policy = WidevinePlugin::DEFAULT_POLICY;
-		$this->portal = WidevinePlugin::getWidevineConfigParam('portal');
-		if(!$this->portal)
-			$this->portal = WidevinePlugin::KALTURA_PROVIDER;
 	}
 	
 	/**
 	 * @return the $packageName
 	 */
 	public function getPackageName() {
-		return $this->packageName;
+		return $this->name;
 	}
 
 	/**
@@ -80,39 +71,10 @@ class WidevinePackageNotifyRequest
 	}
 
 	/**
-	 * @return the $policy
-	 */
-	public function getPolicy() {
-		return $this->policy;
-	}
-
-	/**
-	 * @return the $licenseStartDate
-	 */
-	public function getLicenseStartDate() {
-		return $this->licenseStartDate;
-	}
-
-	/**
-	 * @return the $licenseEndDate
-	 */
-	public function getLicenseEndDate() {
-		return $this->licenseEndDate;
-	}
-	
-	public function getOwner(){
-		return $this->portal;
-	}
-
-	public function getProvider(){
-		return $this->portal;
-	}
-	
-	/**
 	 * @param field_type $packageName
 	 */
 	public function setPackageName($packageName) {
-		$this->packageName = $packageName;
+		$this->name = $packageName;
 	}
 
 	/**
@@ -142,28 +104,6 @@ class WidevinePackageNotifyRequest
 	public function setFiles($files) {
 		$this->files = $files;
 	}
-
-	/**
-	 * @param field_type $policy
-	 */
-	public function setPolicy($policy) {
-		$this->policy = $policy;
-	}
-
-	/**
-	 * @param field_type $licenseStartDate
-	 */
-	public function setLicenseStartDate($licenseStartDate) {
-		
-		$this->licenseStartDate = date(self::WV_DATE_FORMAT, $licenseStartDate);
-	}
-
-	/**
-	 * @param field_type $licenseEndDate
-	 */
-	public function setLicenseEndDate($licenseEndDate) {
-		$this->licenseEndDate = date(self::WV_DATE_FORMAT, $licenseEndDate);
-	}	
 	
 	public function createPackageNotifyRequestXml()
 	{
@@ -180,12 +120,11 @@ class WidevinePackageNotifyRequest
 		$packageNotifyXml->addAttribute('sourceUrl', $this->getSourceUrl());
 		$packageNotifyXml->addAttribute('targetUrl', $this->getTargetUrl());
 		$packageNotifyXml->addAttribute('outputFile', $this->getOutputFileName());
+		$packageNotifyXml->addAttribute('licenseStartDate', $this->getLicenseStartDate());			
+		$packageNotifyXml->addAttribute('licenseEndDate', $this->getLicenseEndDate());
 		if($this->getPolicy())
 			$packageNotifyXml->addAttribute('policy', $this->getPolicy());
-		if($this->getLicenseStartDate())
-			$packageNotifyXml->addAttribute('licenseStartDate', $this->getLicenseStartDate());			
-		if($this->getLicenseEndDate())
-			$packageNotifyXml->addAttribute('licenseEndDate', $this->getLicenseEndDate());
+
 		return $packageNotifyXml->asXML();
 	}
 }

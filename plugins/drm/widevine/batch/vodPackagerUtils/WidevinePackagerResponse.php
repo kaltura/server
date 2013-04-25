@@ -1,5 +1,5 @@
 <?php
-class WidevinePackagerResponse
+class WidevinePackagerResponse extends WidevineVodBaseResponse
 {
 /*	Examples:
 	<PackageNotifyResponse 
@@ -22,11 +22,8 @@ class WidevinePackagerResponse
 		status='processing'>
 	</PackageQueryResponse>
 */	
-	private $name;
-	private $status; 
 	private $errorText;
 	private $requestId;
-	private $id;
 	private $assetid;
 	
 	private static $PACKAGE_ERROR_STATUSES = array('error' => 'error', 'importFailed' => 'importFailed', 'processingFailed' => 'processingFailed', 
@@ -49,20 +46,6 @@ class WidevinePackagerResponse
 	}
 
 	/**
-	 * @return the $name
-	 */
-	public function getName() {
-		return $this->name;
-	}
-
-	/**
-	 * @return the $status
-	 */
-	public function getStatus() {
-		return $this->status;
-	}
-
-	/**
 	 * @return the $errorText
 	 */
 	public function getErrorText() {
@@ -74,27 +57,6 @@ class WidevinePackagerResponse
 	 */
 	public function getRequestId() {
 		return $this->requestId;
-	}
-
-	/**
-	 * @return the $id
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * @param field_type $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
-
-	/**
-	 * @param field_type $status
-	 */
-	public function setStatus($status) {
-		$this->status = $status;
 	}
 
 	/**
@@ -111,14 +73,6 @@ class WidevinePackagerResponse
 		$this->requestId = $requestId;
 	}
 
-	/**
-	 * @param field_type $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
- 
-
 	public function isError()
 	{
 		if(array_key_exists($this->getStatus(), self::$PACKAGE_ERROR_STATUSES))
@@ -133,13 +87,6 @@ class WidevinePackagerResponse
 			return true;
 		else
 			return false;
-	}
-	
-	protected function setAttribute($attrName, $attrValue)
-	{
-		$method = "set{$attrName}"; 
-		if(method_exists($this, $method))
-			$this->$method($attrValue);
 	}
 	
 	public static function createWidevinePackagerResponse($responseStr)

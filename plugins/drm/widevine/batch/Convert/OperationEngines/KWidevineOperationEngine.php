@@ -53,8 +53,9 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$this->preparePackageFolders();
-		$requestXml = $this->preparePackageNotifyRequestXml($entry);
-		$response = $this->sendPostRequest(WidevinePlugin::getWidevineConfigParam('package_notify_cgi'), $requestXml);
+		$requestXml = $this->preparePackageNotifyRequestXml();
+		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_NOTIFY_CGI, $requestXml);
+		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
 		$this->handleResponseError($response);
 		
 		return false;
@@ -76,18 +77,12 @@ class KWidevineOperationEngine extends KOperationEngine
 		$requestXmlObj->addAttribute('name', $this->packageName);		
 		$requestXml = $requestXmlObj->asXML();
 		
-		$response = $this->sendPostRequest(WidevinePlugin::getWidevineConfigParam('package_query_cgi'), $requestXml);		
+		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_QUERY_CGI, $requestXml);
+		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
 		$this->message = "Package status: ".$response->getStatus();
 		if($response->isSuccess())
 		{
-			
-			$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
-			$updatedFlavorAsset->widevineAssetId = $response->getAssetid();
-			if($entry->startDate)
-				$updatedFlavorAsset->widevineDistributionStartDate = $entry->startDate;
-			if($entry->endDate)
-				$updatedFlavorAsset->widevineDistributionEndDate = $entry->endDate;
-			$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
+			$this->updateFlavorAsset($response->getAssetid());
 			$this->unimpersonate();
 			return true;
 		}
@@ -116,7 +111,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('Target package file name: '.$this->data->destFileSyncLocalPath);
 	}
 	
-	private function preparePackageNotifyRequestXml(KalturaBaseEntry $entry)
+	private function preparePackageNotifyRequestXml()
 	{
 		$outputFileName = basename($this->data->destFileSyncLocalPath);
 		$targetFolder = dirname($this->data->destFileSyncLocalPath);
@@ -135,39 +130,13 @@ class KWidevineOperationEngine extends KOperationEngine
 				}
 			}
 		}
-		if($entry->startDate)
-			$requestInput->setLicenseStartDate($entry->startDate);
-		if($entry->endDate)
-			$requestInput->setLicenseEndDate($entry->endDate);
+		$requestInput->setLicenseStartDate($this->data->flavorParamsOutput->widevineDistributionStartDate);
+		$requestInput->setLicenseEndDate($this->data->flavorParamsOutput->widevineDistributionEndDate);
 		$requestXml = $requestInput->createPackageNotifyRequestXml();
 			
 		KalturaLog::debug('Package notify request: '.$requestXml);	
 													  
 		return $requestXml;
-	}
-	
-	private function sendPostRequest($url, $requestXml)
-	{
-		if(!$url)
-			throw new KOperationEngineException('CGI URL is not set');
-			
-		$full_url = $this->params->vodPackagerHost . $url;
-		KalturaLog::debug('send Package Notify request, url: '.$full_url);		
-		KalturaLog::debug('request params: '.$requestXml);
-		
-		$ch = curl_init();		
-		curl_setopt($ch, CURLOPT_URL, $full_url );
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $requestXml);
-		
-		$response = curl_exec($ch);
-		curl_close($ch);
-		
-		KalturaLog::debug('Package Notify response: '.$response);
-		$responseObject = WidevinePackagerResponse::createWidevinePackagerResponse($response);
-		
-		return $responseObject;
 	}
 	
 	private function handleResponseError(WidevinePackagerResponse $response)
@@ -210,5 +179,16 @@ class KWidevineOperationEngine extends KOperationEngine
 		}
 		
 		$this->packageName = $entryId.'_'.$flavorAssetId;
+	}
+	
+	private function updateFlavorAsset($wvAssetId)
+	{
+		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
+		$updatedFlavorAsset->widevineAssetId = $wvAssetId;
+		$wvDistributionStartDate = WidevinePackageNotifyRequest::normalizeLicenseStartDate($this->data->flavorParamsOutput->widevineDistributionStartDate);
+		$wvDistributionEndDate = WidevinePackageNotifyRequest::normalizeLicenseEndDate($this->data->flavorParamsOutput->widevineDistributionEndDate);
+		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
+		$updatedFlavorAsset->widevineDistributionEndDate = $wvDistributionEndDate;
+		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
 	}
 }

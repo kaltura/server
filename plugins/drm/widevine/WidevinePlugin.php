@@ -2,12 +2,19 @@
 /**
  * @package plugins.widevine
  */
-class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader/*, IKalturaEventConsumers*/, IKalturaTypeExtender
+class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender
 {
 	const PLUGIN_NAME = 'widevine';
-	
+	const WIDEVINE_EVENTS_CONSUMER = 'kWidevineEventsConsumer';
 	const WIDEVINE_RESPONSE_TYPE = 'widevine';
+	const WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION = 'WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC';
 	
+	//Widevine API's
+	const PACKAGE_NOTIFY_CGI = '/widevine/voddealer/cgi-bin/packagenotify.cgi';
+	const PACKAGE_QUERY_CGI = '/widevine/voddealer/cgi-bin/packagequery.cgi';
+	const ASSET_NOTIFY_CGI = '/widevine/voddealer/cgi-bin/assetnotify.cgi';
+	
+	//Default values
 	const KALTURA_PROVIDER = 'kaltura';
 	const DEFAULT_POLICY = 'default';
 	
@@ -27,14 +34,15 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{	
 		if(is_null($baseEnumName))
-			return array('WidevineConversionEngineType', 'WidevineAssetType', 'WidevinePermissionName');		
+			return array('WidevineConversionEngineType', 'WidevineAssetType', 'WidevinePermissionName', 'WidevineBatchJobType');		
 		if($baseEnumName == 'conversionEngineType')
 			return array('WidevineConversionEngineType');
 		if($baseEnumName == 'assetType')
 			return array('WidevineAssetType');
 		if($baseEnumName == 'PermissionName')
 			return array('WidevinePermissionName');
-			
+		if($baseEnumName == 'BatchJobType')
+			return array('WidevineBatchJobType');		
 			
 		return array();
 	}
@@ -74,6 +82,13 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		if($baseClass == 'KalturaSerializer' && $enumValue == self::WIDEVINE_RESPONSE_TYPE)
 			return new KalturaWidevineSerializer();
 			
+		if ($baseClass == 'KalturaJobData')
+		{
+		    if ($enumValue == WidevinePlugin::getApiValue(WidevineBatchJobType::WIDEVINE_REPOSITORY_SYNC))
+			{
+				return new KalturaWidevineRepositorySyncJobData();
+			}
+		}		
 		return null;
 	}
 	
@@ -81,7 +96,8 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
-	{			
+	{	
+		KalturaLog::debug('base class: '.$baseClass.' enum: '.$enumValue);		
 		if($baseClass == 'KalturaFlavorParams' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'KalturaWidevineFlavorParams';
 	
@@ -111,8 +127,15 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 			
 		if($baseClass == 'KalturaSerializer' && $enumValue == self::WIDEVINE_RESPONSE_TYPE)
 			return 'KalturaWidevineSerializer';
-			
 		
+		if ($baseClass == 'KalturaJobData')
+		{
+		    if ($enumValue == WidevinePlugin::getApiValue(WidevineBatchJobType::WIDEVINE_REPOSITORY_SYNC))
+			{
+				return 'KalturaWidevineRepositorySyncJobData';
+			}
+		}		
+			
 		return null;
 	}
 	
@@ -124,6 +147,15 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getCoreValue($type, $valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore($type, $value);
+	}
+	
 	public static function getConversionEngineCoreValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
@@ -159,16 +191,6 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return null;		
 	}
 
-	
-//	/* (non-PHPdoc)
-//	 * @see IKalturaEventConsumers::getEventConsumers()
-//	 */
-//	public static function getEventConsumers() {
-//		
-//		
-//	}
-//
-//
 	/* (non-PHPdoc)
 	 * @see IKalturaServices::getServicesMap()
 	 */
@@ -187,6 +209,16 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		if(!$partner)
 			return false;
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);			
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::WIDEVINE_EVENTS_CONSUMER,
+		);
 	}
 	
 	public static function getWidevineConfigParam($key)
