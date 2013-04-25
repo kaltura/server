@@ -97,9 +97,9 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 		return $exeCmd;
 	}
 
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
 	{
-		parent::configure($taskConfig, $data, $client);
+		parent::configure($taskConfig, $data, $job, $client, $clientConfig);
 		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
 	}
 }
