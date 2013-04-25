@@ -115,6 +115,14 @@ class kFileSyncImportJobData extends kJobData
 		$this->fileSize = $fileSize;
 	}
 	
+	/**
+	 * @return the $fileSize
+	 */
+	public function getFileSize()
+	{
+		return $this->fileSize;
+	}
+	
 	public function calculateEstimatedEffort(BatchJob $batchJob) {
 		return $this->fileSize;
 	}

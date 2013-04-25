@@ -65,6 +65,9 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			$fileDestination = $job->data->destFilePath;
 		}
 		
+		if($job->data->fileSize == 0) 
+			return $this->fetchEmptyFile($job, $fileDestination);				
+		
 		// start downoading the file to its destination (temp or final)
 		return $this->fetchUrl($job, $job->data->sourceUrl, $fileDestination);	
 	}
@@ -100,28 +103,52 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		
 		if (!$result)
-		{
-			// job failed
+			// job failed and closed inside
 			KalturaLog::debug('fetchUrl - job id ['.$job->id.'] failed!');
-		}
-		else
-		{
-			// job completed successfuly
-			KalturaLog::debug('fetchUrl - job id ['.$job->id.'] completed successfuly!');
-			
-			if ($this->taskConfig->params->useCloser) {
-				// close and mark job as almost done
-				$this->closeJob($job, null, null, "File downloaded successfully to tmp space", KalturaBatchJobStatus::ALMOST_DONE, null, $job->data);
-			}
-			else {
-				// close and mark job as finished
-				$this->closeJob($job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data);
-			}
-		}
+		else  
+			$this->fetchUrlClose($job);
 		
 		return $job;
 	}
 	
+	private function fetchUrlClose(KalturaBatchJob &$job) {
+		
+		// job completed successfuly
+		KalturaLog::debug ( 'fetchUrl - job id [' . $job->id . '] completed successfuly!' );
+		
+		if ($this->taskConfig->params->useCloser) {
+			// close and mark job as almost done
+			$this->closeJob ( $job, null, null, "File downloaded successfully to tmp space", KalturaBatchJobStatus::ALMOST_DONE, null, $job->data );
+		} else {
+			// close and mark job as finished
+			$this->closeJob ( $job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data );
+		}
+		
+	}
+	
+	private function fetchEmptyFile(KalturaBatchJob &$job, $destination) {
+		
+		$res = self::createDir(dirname($destination));
+		if ( !$res )
+		{
+			$msg = 'Error: Cannot create destination directory ['.dirname($destination).']';
+			KalturaLog::err($msg);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);
+			return $job;
+		}
+		
+		$res = touch($destination);
+		if ( !$res )
+		{
+			$msg = 'Error: Cannot create file [$destination]';
+			KalturaLog::err($msg);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, $msg, KalturaBatchJobStatus::RETRY);
+			return $job;
+		}
+		
+		$this->fetchUrlClose($job);
+		return $job;
+	}
 
 	/**
 	 * Fetch all content of a $sourceUrl that leads to a directory and save it in the given $dirDestination.

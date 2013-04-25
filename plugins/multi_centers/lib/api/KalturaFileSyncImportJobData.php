@@ -25,6 +25,11 @@ class KalturaFileSyncImportJobData extends KalturaJobData
 	 */
 	public $destFilePath;
 	
+	/**
+	 * @var int
+	 */
+	public $fileSize;
+	
     
 	private static $map_between_objects = array
 	(
@@ -32,6 +37,7 @@ class KalturaFileSyncImportJobData extends KalturaJobData
 		"filesyncId" ,
 		"tmpFilePath" ,
 		"destFilePath" ,
+		"fileSize",
 	);
 
 	public function getMapBetweenObjects ( )
