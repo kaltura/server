@@ -31,7 +31,7 @@ class PlaylistService extends KalturaEntryService
 	{
 		if ($this->actionName == 'execute')
 			return true;
-	} 
+	}
 	
 	protected function partnerRequired($actionName)
 	{
@@ -50,9 +50,9 @@ class PlaylistService extends KalturaEntryService
 	/**
 	 * Add new playlist
 	 * Note that all entries used in a playlist will become public and may appear in KalturaNetwork
-	 * 
+	 *
 	 * @action add
-	 * @param KalturaPlaylist $playlist 
+	 * @param KalturaPlaylist $playlist
 	 * @param bool $updateStats indicates that the playlist statistics attributes should be updated synchronously now
 	 * @return KalturaPlaylist
 	 */
@@ -74,9 +74,8 @@ class PlaylistService extends KalturaEntryService
 		
 		$dbPlaylist->save();
 		
-		if ( $updateStats ) 
+		if ( $updateStats )
 			myPlaylistUtils::updatePlaylistStatistics( $dbPlaylist->getPartnerId() , $dbPlaylist );
-		$dbPlaylist->setDisplayInSearch ( 2 ); // make all the playlist entries PUBLIC !
 		
 		$trackEntry = new TrackEntry();
 		$trackEntry->setEntryId($dbPlaylist->getId());
@@ -93,9 +92,9 @@ class PlaylistService extends KalturaEntryService
 
 	/**
 	 * Retrieve a playlist
-	 * 
+	 *
 	 * @action get
-	 * @param string $id 
+	 * @param string $id
 	 * @param int $version Desired version of the data
 	 * @return KalturaPlaylist
 	 *
@@ -123,17 +122,17 @@ class PlaylistService extends KalturaEntryService
 	/**
 	 * Update existing playlist
 	 * Note - you cannot change playlist type. updated playlist must be of the same type.
-	 * 
+	 *
 	 * @action update
-	 * @param string $id 
+	 * @param string $id
 	 * @param KalturaPlaylist $playlist
-	 * @param bool $updateStats  
+	 * @param bool $updateStats
 	 * @return KalturaPlaylist
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
 	 * @validateUser entry id edit
-	 */	
+	 */
 	function updateAction( $id , KalturaPlaylist $playlist , $updateStats = false )
 	{
 		$dbPlaylist = entryPeer::retrieveByPK( $id );
@@ -158,7 +157,7 @@ class PlaylistService extends KalturaEntryService
 		$this->validateAccessControlId($playlist);
 		$this->validateEntryScheduleDates($playlist, $dbPlaylist);
 
-		$allowEmpty = true ; // TODO - what is the policy  ? 
+		$allowEmpty = true ; // TODO - what is the policy  ?
 		if ( $playlistUpdate->getMediaType() && ($playlistUpdate->getMediaType() != $dbPlaylist->getMediaType() ) )
 		{
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
@@ -184,19 +183,19 @@ class PlaylistService extends KalturaEntryService
 		$playlist->fromObject( $dbPlaylist );
 		
 		return $playlist;
-	}	
+	}
 		
 
 	/**
 	 * Delete existing playlist
-	 * 
+	 *
 	 * @action delete
-	 * @param string $id 
+	 * @param string $id
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
 	 * @validateUser entry id edit
-	 */		
+	 */
 	function deleteAction(  $id )
 	{
 		$this->deleteEntry($id, KalturaEntryType::PLAYLIST);
@@ -205,7 +204,7 @@ class PlaylistService extends KalturaEntryService
 	
 	/**
 	 * Clone an existing playlist
-	 * 
+	 *
 	 * @action clone
 	 * @param string $id  Id of the playlist to clone
 	 * @param KalturaPlaylist $newPlaylist Parameters defined here will override the ones in the cloned playlist
@@ -213,7 +212,7 @@ class PlaylistService extends KalturaEntryService
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
-	 */	
+	 */
 	function cloneAction( $id, KalturaPlaylist $newPlaylist = null)
 	{
 		$dbPlaylist = entryPeer::retrieveByPK( $id );
@@ -246,7 +245,7 @@ class PlaylistService extends KalturaEntryService
 			if (stristr($prop->getDocComment(), '@readonly')) {
 				continue;
 			}
-			// copy from old to new	
+			// copy from old to new
 			$newPlaylist->$propName = $oldPlaylist->$propName;
 		}
 
@@ -256,9 +255,9 @@ class PlaylistService extends KalturaEntryService
 	
 	/**
 	 * List available playlists
-	 * 
+	 *
 	 * @action list
-	 * @param KalturaPlaylistFilter // TODO 
+	 * @param KalturaPlaylistFilter // TODO
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaPlaylistListResponse
 	 */
@@ -277,15 +276,15 @@ class PlaylistService extends KalturaEntryService
 		$response = new KalturaPlaylistListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
-		return $response;	
+		return $response;
 	}
 	
 	/**
 	 * Retrieve playlist for playing purpose
 	 * @disableTags TAG_WIDGET_SESSION
-	 * 
+	 *
 	 * @action execute
-	 * @param string $id 
+	 * @param string $id
 	 * @param string $detailed
 	 * @param KalturaContext $playlistContext
 	 * @param KalturaMediaEntryFilterForPlaylist $filter
@@ -313,11 +312,11 @@ class PlaylistService extends KalturaEntryService
 	        $corePlaylistContext = $playlistContext->toObject();
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
-		try 
-		{		
+		try
+		{
 			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed);
-		} 
-		catch (kCoreException $ex) 
+		}
+		catch (kCoreException $ex)
 		{
 			if ($ex->getCode() ==  APIErrors::INVALID_ENTRY_ID)
 	    		throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
@@ -325,7 +324,7 @@ class PlaylistService extends KalturaEntryService
 				throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 					    		
     		throw $ex;
-		}	
+		}
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
 			
@@ -336,9 +335,9 @@ class PlaylistService extends KalturaEntryService
 	/**
 	 * Retrieve playlist for playing purpose, based on content
 	 * @disableTags TAG_WIDGET_SESSION
-	 * 
+	 *
 	 * @action executeFromContent
-	 * @param KalturaPlaylistType $playlistType  
+	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
 	 * @param string $detailed
 	 * @return KalturaBaseEntryArray
@@ -379,15 +378,15 @@ class PlaylistService extends KalturaEntryService
 		$tempPlaylist->filters = $filters;
 		$tempPlaylist->totalResults = $totalResults;
 		$tempPlaylist->filtersToPlaylistContentXml();
-		return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, true); 
+		return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, true);
 	}
 	
 	
 	/**
 	 * Retrieve playlist statistics
-	 * 
+	 *
 	 * @action getStatsFromContent
-	 * @param KalturaPlaylistType $playlistType  
+	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
 	 * @return KalturaPlaylist
 	 */
@@ -396,7 +395,7 @@ class PlaylistService extends KalturaEntryService
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 	    
 		$dbPlaylist = new entry();
-		$dbPlaylist->setId( -1 ); // set with some dummy number so the getDataContent will later work properly 
+		$dbPlaylist->setId( -1 ); // set with some dummy number so the getDataContent will later work properly
 		$dbPlaylist->setType ( entryType::PLAYLIST ); // prepare the playlist type before filling from request
 		$dbPlaylist->setMediaType ( $playlistType );
 		$dbPlaylist->setDataContent( $playlistContent );

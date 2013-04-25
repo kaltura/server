@@ -256,13 +256,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 
-		myPartnerUtils::setPartnerIdForObj( $this );
-
-		if ( $this->getType() != entryType::PLAYLIST )
-			mySearchUtils::setDisplayInSearch( $this );
-			
-		// update the admin_tags per partner
-		ktagword::updateAdminTags( $this );
+		myPartnerUtils::setPartnerIdForObj($this);
+		mySearchUtils::setDisplayInSearch($this);
+		ktagword::updateAdminTags($this);
 		
 		// same for puserId ...
 		$this->getPuserId();
