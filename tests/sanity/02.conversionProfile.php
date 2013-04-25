@@ -22,7 +22,7 @@ $client->setKs($client->generateSessionV2($adminSecretForSigning, 'sanity-user',
  * Get all the FLV flavor params
  */
 $flavorParamsfilter = new KalturaFlavorParamsFilter();
-$flavorParamsfilter->formatEqual = KalturaContainerFormat::FLV;
+$flavorParamsfilter->formatEqual = KalturaContainerFormat::MP4;
 $flavorParamsList = $client->flavorParams->listAction($flavorParamsfilter);
 /* @var $flavorParamsList KalturaFlavorParamsListResponse */
 
