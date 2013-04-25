@@ -21,7 +21,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		return '//';
 	}
 	
-	function generate() 
+	function generate()
 	{
 		parent::generate();
 	
@@ -138,7 +138,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 
 		$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 		foreach($dependencyNodes as $dependencyNode)
-			$this->appendLine('require_once(dirname(__FILE__) . "/' . 
+			$this->appendLine('require_once(dirname(__FILE__) . "/' .
 				$this->getPluginClassName($dependencyNode->getAttribute("pluginName")) . '.php");');
 
 		$this->appendLine('');
@@ -248,7 +248,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class $enumName");		
+	 	$this->appendLine("class $enumName");
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -395,20 +395,46 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	function writeAction($serviceId, DOMElement $actionNode, $actionPrefix = "")
 	{
 		$action = $actionNode->getAttribute("name");
+		$method = $action;
+		if (in_array($action, array("list", "clone", "goto"))) // because list & clone are preserved in PHP
+			$method .= 'Action';
+			
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
-		
-		// method signature
-		$signature = "";
-		if (in_array($action, array("list", "clone", "goto"))) // because list & clone are preserved in PHP
-			$signature .= "function ".$action."Action(";
-		else
-			$signature .= "function ".$action."(";
 			
 		$paramNodes = $actionNode->getElementsByTagName("param");
-		$signature .= $this->getSignature($paramNodes);
 		
-		$this->appendLine();	
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * " . $actionNode->getAttribute("description"));
+			$this->appendLine(" * ");
+		
+			foreach($paramNodes as $paramNode)
+			{
+				$paramName = $paramNode->getAttribute("name");
+				$paramType = $paramNode->getAttribute("type");
+				$paramDescription = $paramNode->getAttribute("description");
+				
+				$this->appendLine(" * @param $paramType ${$paramName} $paramDescription");
+			}
+			
+			if($resultType == 'file')
+			{
+				$this->appendLine(' * @param string|boolean $destinationPath Destination file path to save the file, set to FALSE to return the content, leave it NULL to return download URL.');
+			}
+			
+			$this->appendLine(" * @return $resultType");
+			$this->appendLine(' */');
+		}
+				
+		$argumentsSignature = $this->getSignature($paramNodes, $resultType == 'file');
+		
+		// method signature
+		$signature = "function $method($argumentsSignature)";
+		
+		
+		$this->appendLine();
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
 		
@@ -467,17 +493,19 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			}
 		}
 		
-	    if($resultType == 'file')
-	    {
-			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$actionPrefix$action', \$kparams);");
-			$this->appendLine('		$resultObject = $this->client->getServeUrl();');
-	    }
-	    else
-	    {
-			if ($haveFiles)
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams, \$kfiles);");
-			else
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams);");
+		if ($haveFiles)
+			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams, \$kfiles);");
+		else
+			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$actionPrefix$action\", \$kparams);");
+			
+		if($resultType == 'file')
+		{
+			$this->appendLine('		if(is_null($destinationPath))');
+			$this->appendLine('			return $this->client->getServeUrl();');
+			$this->appendLine('		return $this->client->doQueue($destinationPath);');
+		}
+		else
+		{
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
@@ -493,9 +521,10 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("		\$resultObject = (bool) \$resultObject;");
 			else
 				$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
-	    }
-			
-		$this->appendLine("		return \$resultObject;");
+				
+			$this->appendLine("		return \$resultObject;");
+		}
+		
 		$this->appendLine("	}");
 	}
 	
@@ -547,15 +576,16 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	}
 	
 	/**
-	 * 
-	 * Enter description here ...
-	 * @param unknown_type $paramNodes
+	 * @param array<DOMElement> $paramNodes
+	 * @param boolean $addDestinationPath
 	 */
-	function getSignature($paramNodes)
+	function getSignature($paramNodes, $addDestinationPath)
 	{
-		$signature = "";
+		$arguments = array();
+		
 		foreach($paramNodes as $paramNode)
 		{
+			$signature = '';
 			$paramName = $paramNode->getAttribute("name");
 			$paramType = $paramNode->getAttribute("type");
 			$defaultValue = $paramNode->getAttribute("default");
@@ -586,19 +616,19 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 							$signature .= " = \"\""; // hack for partner.getUsage
 						else
 							$signature .= " = $defaultValue";
-					} 
+					}
 				}
 				else
 					$signature .= " = null";
 			}
-				
-			$signature .= ", ";
+			
+			$arguments[] = $signature;
 		}
-		if ($this->endsWith($signature, ", "))
-			$signature = substr($signature, 0, strlen($signature) - 2);
-		$signature .= ")";
 		
-		return $signature;
+		if($addDestinationPath)
+			$arguments[] = '$destinationPath = null';
+		
+		return implode(', ', $arguments);
 	}
 	
 	function writeMainClient(DOMNodeList $serviceNodes)

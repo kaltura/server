@@ -271,8 +271,15 @@ class KalturaClientBase
 	 *
 	 * @return unknown
 	 */
-	public function doQueue()
+	public function doQueue($destinationPath = null)
 	{
+		if(!is_null($destinationPath) && $this->isMultiRequest)
+		{
+			$this->isMultiRequest = false;
+			$this->callsQueue = array();
+			throw new KalturaClientException("Downloading files is not supported as part of multi-request.", KalturaClientException::ERROR_DOWNLOAD_IN_MULTIREQUEST);
+		}
+		
 		if (count($this->callsQueue) == 0)
 		{
 			$this->isMultiRequest = false;
@@ -320,7 +327,7 @@ class KalturaClientBase
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 
-		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
+		list($postResult, $error) = $this->doHttpRequest($url, $params, $files, $destinationPath);
 
 		if ($error)
 		{
@@ -344,7 +351,11 @@ class KalturaClientBase
 			
 			$this->log("result (serialized): " . $postResult);
 
-			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
+			if($destinationPath === false)
+			{
+				$result = $postResult;
+			}
+			elseif ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
 				$result = @unserialize($postResult);
 
@@ -353,8 +364,7 @@ class KalturaClientBase
 					throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
 				}
 				$dump = print_r($result, true);
-//				if(strlen($dump) < 1024)
-					$this->log("result (object dump): " . $dump);
+				$this->log("result (object dump): " . $dump);
 			}
 			else
 			{
@@ -393,12 +403,15 @@ class KalturaClientBase
 	 * @param parameters $params
 	 * @return array of result and error
 	 */
-	private function doHttpRequest($url, $params = array(), $files = array())
+	private function doHttpRequest($url, $params = array(), $files = array(), $destinationPath = null)
 	{
 		if (function_exists('curl_init'))
-			return $this->doCurl($url, $params, $files);
-		else
-			return $this->doPostRequest($url, $params, $files);
+			return $this->doCurl($url, $params, $files, $destinationPath);
+			
+		if(!is_null($destinationPath))
+			throw new KalturaClientException("Downloading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
+				
+		return $this->doPostRequest($url, $params, $files);
 	}
 
 	/**
@@ -406,9 +419,11 @@ class KalturaClientBase
 	 *
 	 * @param string $url
 	 * @param array $params
+	 * @param array $files
+	 * @param string $destinationPath
 	 * @return array of result and error
 	 */
-	private function doCurl($url, $params = array(), $files = array())
+	private function doCurl($url, $params = array(), $files = array(), $destinationPath = null)
 	{
 		$opt = http_build_query($params, null, "&");
 		// Force POST in case we have files
@@ -438,7 +453,6 @@ class KalturaClientBase
 			}
 		}
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, $this->config->userAgent);
 		if (count($files) > 0)
 			curl_setopt($ch, CURLOPT_TIMEOUT, 0);
@@ -489,7 +503,22 @@ class KalturaClientBase
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
 
+		$destinationResource = null;
+		if(!is_null($destinationPath))
+		{
+			$destinationResource = fopen($destinationPath, "wb");
+			curl_setopt($ch, CURLOPT_FILE, $destinationResource);
+		}
+		else
+		{
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		}
+		
 		$result = curl_exec($ch);
+		
+		if($destinationResource)
+			fclose($destinationResource);
+			
 		$curlError = curl_error($ch);
 		curl_close($ch);
 		return array($result, $curlError);
@@ -505,7 +534,7 @@ class KalturaClientBase
 	private function doPostRequest($url, $params = array(), $files = array())
 	{
 		if (count($files) > 0)
-			throw new KalturaClientException("Uploading files is not supported with stream context http request, please use curl", KalturaClientException::ERROR_UPLOAD_NOT_SUPPORTED);
+			throw new KalturaClientException("Uploading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_UPLOAD_NOT_SUPPORTED);
 
 		$formattedData = http_build_query($params , "", "&");
 		$this->log("post: $url&$formattedData");
@@ -1055,6 +1084,8 @@ class KalturaClientException extends Exception
 	const ERROR_INVALID_PARTNER_ID = -7;
 	const ERROR_INVALID_OBJECT_TYPE = -8;
 	const ERROR_INVALID_OBJECT_FIELD = -9;
+	const ERROR_DOWNLOAD_NOT_SUPPORTED = -10;
+	const ERROR_DOWNLOAD_IN_MULTIREQUEST = -11;
 }
 
 /**
