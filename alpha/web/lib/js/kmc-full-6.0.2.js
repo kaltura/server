@@ -1,4 +1,4 @@
-/*! KMC - v6.0.2 - 2013-04-22
+/*! KMC - v6.0.2 - 2013-04-25
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2606,7 +2606,7 @@ QRBitBuffer.prototype = {
 	};
 
 	Preview.clipboard = new ZeroClipboard($('.copy-code'), {
-		moviePath: "lib/flash/ZeroClipboard.swf",
+		moviePath: "/lib/flash/ZeroClipboard.swf",
 		trustedDomains: ['*'],
 		allowScriptAccess: "always"
 	});
