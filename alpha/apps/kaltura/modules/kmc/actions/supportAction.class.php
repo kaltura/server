@@ -49,7 +49,7 @@ class supportAction extends kalturaAction
                     kMailJobData::MAIL_PRIORITY_NORMAL,
                     $_POST['email'], 
                     $_POST['your_name'].' ',
-                    'support@kaltura.com',
+                    'kalturasupport@kaltura.com',
                     $body_params,
                     $subject_params);
 
