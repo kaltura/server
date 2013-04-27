@@ -349,7 +349,8 @@ class kwidgetAction extends sfAction
 				if (kConf::get('track_kdpwrapper') && kConf::get('kdpwrapper_track_url')) {
 					$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
 				}
-				
+			
+				$optimizedConfVars = null;
 				if (kConf::hasMap("optimized_playback"))
 				{
 					$optimizedPlayback = kConf::getMap("optimized_playback");
@@ -361,19 +362,28 @@ class kwidgetAction extends sfAction
 							$swf_url =  $partner_cdnHost . myPartnerUtils::getUrlForPartner ( $partner_id , $subp_id ) . "/flash/kdp3/".$params['kdp_version']."/kdp3.swf";
 							
 						if (array_key_exists('conf_vars', $params))
-							$conf_vars .= "&".$params['conf_vars'];
+							$optimizedConfVars = $params['conf_vars'];
 							
 						// cache immidiately
 						$cache_st =0;
 						$allowCache = true;
 					}
 				}
+
+				if ($optimizedConfVars === null)
+					$optimizedConfVars = "clientDefaultMethod=GET";
+
+				$conf_vars = "&$optimizedConfVars&" . $conf_vars;
 	
 				$stats_host = ($protocol == "https") ? kConf::get("stats_host_https") : kConf::get("stats_host");	
 				$wrapper_stats = kConf::get('kdp3_wrapper_stats_url') ? "&wrapper_stats_url=$protocol://$stats_host".
 					urlencode(str_replace("{partnerId}", $partner_id, kConf::get('kdp3_wrapper_stats_url'))) : "";
 
 				$partner_host = str_replace("http://", "", str_replace("https://", "", $partner_host));
+				// if the host is the default www domain use the cdn api domain
+				if ($partner_host == kConf::get("www_host"))
+					$partner_host = kConf::get("cdn_api_host");
+
 				if ($protocol == "https" && $partner_host = kConf::get("cdn_api_host"))
 					$partner_host = kConf::get("cdn_api_host_https");
 	
