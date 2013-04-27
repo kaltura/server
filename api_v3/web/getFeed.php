@@ -32,6 +32,7 @@ kCurrentContext::$ps_vesion = "ps3";
 $feedId = $_GET['feedId'];
 $entryId = (isset($_GET['entryId']) ? $_GET['entryId'] : null);
 $limit = (isset($_GET['limit']) ? $_GET['limit'] : null);
+$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
 if (function_exists('apc_fetch'))
@@ -44,7 +45,7 @@ if (function_exists('apc_fetch'))
 
 try
 {
-	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId, $feedProcessingKey);
+	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId, $feedProcessingKey, $ks);
 	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
 	
 	kCurrentContext::$partner_id = $syndicationFeedRenderer->syndicationFeed->partnerId;

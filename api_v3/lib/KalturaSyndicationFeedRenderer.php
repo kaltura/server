@@ -104,7 +104,7 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private $nextProcessingSetTime = null;
 	
-	public function __construct($feedId, $feedProcessingKey = null)
+	public function __construct($feedId, $feedProcessingKey = null, $ks = null)
 	{
 		$this->feedProcessingKey = $feedProcessingKey;
 		
@@ -116,6 +116,7 @@ class KalturaSyndicationFeedRenderer
 		$this->syndicationFeedDB = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");
+		kCurrentContext::initKsPartnerUser($ks, $syndicationFeedDB->getPartnerId(), '');
 		kPermissionManager::init();
 		kEntitlementUtils::initEntitlementEnforcement($syndicationFeedDB->getPartnerId(), $syndicationFeedDB->getEnforceEntitlement());
 
