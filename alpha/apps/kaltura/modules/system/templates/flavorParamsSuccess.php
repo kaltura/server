@@ -1,15 +1,15 @@
-<?php 
-$disabledSave = false; 
+<?php
+$disabledSave = false;
 $disabled = '';
 if ($editFlavorParam)
 {
-	if ($editFlavorParam->getPartnerId() == 0 && $advanced != 2) 
+	if ($editFlavorParam->getPartnerId() == 0 && $advanced != 2)
 	{
 		$disabledSave = true;
 		$disabled = 'disabled="disabled"';
 	}
 		
-	if ($advanced == 0) 
+	if ($advanced == 0)
 		$disabled = 'disabled="disabled"';
 ?>
 	<form method="post">
@@ -46,8 +46,8 @@ if ($editFlavorParam)
 			</select>,
 			<label for="video-bitrate">Bitrate </label>
 			<input type="text" id="video-bitrate" name="video-bitrate" value="<?php echo $editFlavorParam->getVideoBitrate(); ?>" size="5" <?php echo $disabled; ?>/>kbps,
-			Dimensions (W x H): 
-			<input type="text" id="width" name="width" value="<?php echo $editFlavorParam->getWidth(); ?>" size="5" <?php echo $disabled; ?>/> X  
+			Dimensions (W x H):
+			<input type="text" id="width" name="width" value="<?php echo $editFlavorParam->getWidth(); ?>" size="5" <?php echo $disabled; ?>/> X
 			<input type="text" id="height" name="height" value="<?php echo $editFlavorParam->getHeight(); ?>" size="5"  <?php echo $disabled; ?>/> pixels
 			<br />
 			<label for="frame-rate">frame rate </label>
@@ -73,10 +73,10 @@ if ($editFlavorParam)
 			<input type="text" id="anamorphicPixels" name="anamorphicPixels" value="<?php echo $editFlavorParam->getAnamorphicPixels(); ?>" size="5" <?php echo $disabled; ?>/>
 			<br />
 <!--
-To activate the 'multiStream' remove the remarks from that portion 
+To activate the 'multiStream' remove the remarks from that portion
 and "" that are placed arround editFlavorParam->getMultiStream
 			<label for="multiStream">MultiStream:</label><br />
-			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?php echo "$editFlavorParam->getMultiStream()"; ?></textarea><br/>
+			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getMultiStream(); ?></textarea><br/>
 			<br />
 -->
 			<label for="audio-codec"><b>Audio codec </b></label>
@@ -97,15 +97,15 @@ and "" that are placed arround editFlavorParam->getMultiStream
 			<br />
 			<label for="conversion-engines"><b>Conversion engines:</b></label> <label>(Delimited with ",")</label>
 			<span style="color: white; background:white;><label for="name">.....................................</label><span style="color: black; background:white;>
-			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label><br /> 
+			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label><br />
 			 
-			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/> 
-			<input type="text" id="conversion-engines-extra-params" name="conversion-engines-extra-params" value="<?php echo $editFlavorParam->getConversionEnginesExtraParams(); ?>" size="60" <?php echo $disabled; ?>/> 
-			<br /> 
-			<label for="operators"><b>Operators:</b></label><br /> 
+			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/>
+			<input type="text" id="conversion-engines-extra-params" name="conversion-engines-extra-params" value="<?php echo $editFlavorParam->getConversionEnginesExtraParams(); ?>" size="60" <?php echo $disabled; ?>/>
+			<br />
+			<label for="operators"><b>Operators:</b></label><br />
 			<textarea id="operators" name="operators" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getOperators(); ?></textarea><br/>
 			<label for="is-default">Is Default: </label><input type="checkbox" id="is-default" name="is-default" value="1" <?php echo ($editFlavorParam->getIsDefault()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
-			<label for="ready-behavior">Ready Behavior:</label> 
+			<label for="ready-behavior">Ready Behavior:</label>
 			<select id="ready-behavior" name="ready-behavior" <?php echo $disabled; ?>>
 				<?php foreach($readyBehaviors as $name => $type): ?>
 				<option value="<?php echo $type; ?>" <?php echo ($editFlavorParam->getReadyBehavior() == $type) ? "selected=\"selected\"" : "" ?>><?php echo $name; ?></option>
@@ -122,16 +122,16 @@ and "" that are placed arround editFlavorParam->getMultiStream
 			<a href="<?php echo url_for("system/flavorParams?pid=".$pid); ?>">Close</a>
 		</fieldset>
 	</form>
-<?php 
+<?php
 }
-else 
+else
 {
 ?>
 <form action="<?php echo url_for("system/flavorParams"); ?>" method="get">
 	<input type="text" id="pid" name="pid" value="<?php echo $pid; ?>" size="5" />
 	<button type="submit">Change</button>
 </form>
-<?php 
+<?php
 }
 ?>
 <br />
