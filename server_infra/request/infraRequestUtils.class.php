@@ -399,7 +399,9 @@ class infraRequestUtils
 			return self::$requestParams;
 		
 		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
-		$pathParts = explode('/', $_SERVER['PHP_SELF']);
+		$pathParts = array();
+		if (isset($_SERVER['PHP_SELF']))
+			$pathParts = explode('/', $_SERVER['PHP_SELF']);
 		$pathParts = array_diff($pathParts, $scriptParts);
 		
 		$params = array();
