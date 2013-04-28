@@ -210,6 +210,17 @@ class KScheduleHelperManager
 		$filtersFilePath = self::getQueueFiltersDir() . DIRECTORY_SEPARATOR . $filtersFileName;
 		file_put_contents($filtersFilePath, $data);
 	}
+	
+	/**
+	 * @param string $configName
+	 * @return boolean whether the filter file exist
+	 */
+	public static function checkForFilter($configName) 
+	{
+		clearstatcache();
+		$filtersFilePath = self::getQueueFiltersDir() . DIRECTORY_SEPARATOR . $configName . ".flt";
+		return file_exists($filtersFilePath);
+	}
 
 	/**
 	 * @param string $file

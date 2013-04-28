@@ -68,6 +68,18 @@ class KGenericScheduler
 		$this->_cleanup();
 	}
 
+	private function initSingleWorker(KSchedularTaskConfig $taskConfig)
+	{
+		$tmpConfig = clone $taskConfig;
+		$tmpConfig->setInitOnly(true);
+		
+		KalturaLog::info('Initilizing ' . $tmpConfig->name);
+		$tasksetPath = $this->schedulerConfig->getTasksetPath();
+		$proc = new KProcessWrapper(0, $this->logDir, $this->phpPath, $tasksetPath, $tmpConfig);
+		
+		$this->runningTasks[$taskConfig->name][0] = &$proc;
+	}
+	
 	private function initAllWorkers()
 	{
 		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
@@ -77,12 +89,7 @@ class KGenericScheduler
 			if(!$taskConfig->type)
 				continue;
 
-			$tmpConfig = clone $taskConfig;
-			$tmpConfig->setInitOnly(true);
-
-			KalturaLog::info('Initilizing ' . $tmpConfig->name);
-			$tasksetPath = $this->schedulerConfig->getTasksetPath();
-			$proc = new KProcessWrapper(0, $this->logDir, $this->phpPath, $tasksetPath, $tmpConfig);
+			$this->initSingleWorker($taskConfig);
 			sleep(1);
 		}
 	}
@@ -202,6 +209,9 @@ class KGenericScheduler
 				$indexedTaskConfigs[$taskConfig->name] = $taskConfig;
 				if(!$taskConfig->type)
 					continue;
+				
+				if(!$this->isInitialized($taskConfig)) 
+					$this->initSingleWorker($taskConfig);
 
 				$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
 				if($fullCycle)
@@ -309,6 +319,17 @@ class KGenericScheduler
 			$this->lastRunTime[$taskName] = time();
 
 		return $this->lastRunTime[$taskName];
+	}
+	
+	private function isInitialized(KSchedularTaskConfig $taskConfig)
+	{
+		$isJobHandlerWorker = is_subclass_of($taskConfig->type, 'KJobHandlerWorker');
+		
+		// If it isn't a job handling worker - there is no need to check for filter
+		if(!$isJobHandlerWorker)
+			return true;
+		
+		return KScheduleHelperManager::checkForFilter($taskConfig->name);
 	}
 
 	private function spawn(KSchedularTaskConfig $taskConfig)
