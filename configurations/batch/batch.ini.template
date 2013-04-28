@@ -310,6 +310,7 @@ type												= KAsyncBulkUpload
 scriptPath											= batches/BulkUpload/KAsyncBulkUploadExe.php
 params.multiRequestSize								= 20
 params.maxRecords									= 1000
+params.localTempPath 								= @TMP_DIR@/bulk
 
 [KAsyncBulkUploadCloser : JobCloserWorker]
 id													= 130

@@ -28,12 +28,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private $currentItem = 0;
 	
 	/**
-	 * The engine xsd file path
-	 * @var string
-	 */
-	protected $xsdFilePath = null;
-	
-	/**
 	 * Allows the usage of server content resource
 	 * @var bool
 	 */
@@ -84,10 +78,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		parent::__construct($taskConfig, $kClient, $job);
 		
-		$this->xsdFilePath = 'http://' . kConf::get('www_host') . '/api_v3/index.php/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML;
-		if($taskConfig->params->xsdFilePath) 
-			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
-			
 		if($taskConfig->params->allowServerResource) 
 			$this->allowServerResource = (bool) $taskConfig->params->allowServerResource;
 	}
@@ -127,7 +117,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		//Validate the XML file against the schema
 		libxml_clear_errors();
-		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
+		$xsdFilePath = $this->taskConfig->params->localTempPath . '/' . uniqid() . '.xsd';
+		$this->kClient->schema->serve(KalturaSchemaType::BULK_UPLOAD_XML, $xsdFilePath);
+		if(!$xdoc->schemaValidate($xsdFilePath)) 
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
 			KalturaLog::debug("XML is invalid:\n$errorMessage");

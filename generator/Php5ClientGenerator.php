@@ -404,28 +404,30 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			
 		$paramNodes = $actionNode->getElementsByTagName("param");
 		
+		$this->appendLine();
+		
 		if($this->generateDocs)
 		{
-			$this->appendLine('/**');
-			$this->appendLine(" * " . $actionNode->getAttribute("description"));
-			$this->appendLine(" * ");
+			$this->appendLine('	/**');
+			$this->appendLine("	 * " . ucfirst(trim($actionNode->getAttribute("description"), " \t\r\n")));
+			$this->appendLine("	 * ");
 		
 			foreach($paramNodes as $paramNode)
 			{
 				$paramName = $paramNode->getAttribute("name");
 				$paramType = $paramNode->getAttribute("type");
-				$paramDescription = $paramNode->getAttribute("description");
+				$paramDescription = ucfirst(trim($paramNode->getAttribute("description"), " \t\r\n"));
 				
-				$this->appendLine(" * @param $paramType ${$paramName} $paramDescription");
+				$this->appendLine("	 * @param $paramType \${$paramName} $paramDescription");
 			}
 			
 			if($resultType == 'file')
 			{
-				$this->appendLine(' * @param string|boolean $destinationPath Destination file path to save the file, set to FALSE to return the content, leave it NULL to return download URL.');
+				$this->appendLine('	 * @param string|boolean $destinationPath Destination file path to save the file, set to FALSE to return the content, leave it NULL to return download URL.');
 			}
 			
-			$this->appendLine(" * @return $resultType");
-			$this->appendLine(' */');
+			$this->appendLine("	 * @return $resultType");
+			$this->appendLine('	 */');
 		}
 				
 		$argumentsSignature = $this->getSignature($paramNodes, $resultType == 'file');
@@ -434,7 +436,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$signature = "function $method($argumentsSignature)";
 		
 		
-		$this->appendLine();
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
 		
@@ -658,7 +659,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				continue;
 				
 			$serviceName = $serviceNode->getAttribute("name");
-			$description = $serviceNode->getAttribute("description");
+			$description = ucfirst(trim($serviceNode->getAttribute("description"), " \t\r\n"));
 			$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 			$this->appendLine("	/**");
 			$description = str_replace("\n", "\n	 * ", $description); // to format multiline descriptions

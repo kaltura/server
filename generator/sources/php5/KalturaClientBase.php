@@ -355,6 +355,11 @@ class KalturaClientBase
 			{
 				$result = $postResult;
 			}
+			elseif($destinationPath)
+			{
+				if(!$postResult)
+					throw new KalturaClientException("failed to download file", KalturaClientException::ERROR_READ_FAILED);
+			}
 			elseif ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
 				$result = @unserialize($postResult);
