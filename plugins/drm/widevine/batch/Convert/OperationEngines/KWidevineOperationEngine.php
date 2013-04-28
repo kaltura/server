@@ -185,8 +185,8 @@ class KWidevineOperationEngine extends KOperationEngine
 	{
 		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 		$updatedFlavorAsset->widevineAssetId = $wvAssetId;
-		$wvDistributionStartDate = WidevinePackageNotifyRequest::normalizeLicenseStartDate($this->data->flavorParamsOutput->widevineDistributionStartDate);
-		$wvDistributionEndDate = WidevinePackageNotifyRequest::normalizeLicenseEndDate($this->data->flavorParamsOutput->widevineDistributionEndDate);
+		$wvDistributionStartDate = $this->data->flavorParamsOutput->widevineDistributionStartDate;
+		$wvDistributionEndDate = $this->data->flavorParamsOutput->widevineDistributionEndDate;
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
 		$updatedFlavorAsset->widevineDistributionEndDate = $wvDistributionEndDate;
 		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		

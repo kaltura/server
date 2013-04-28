@@ -44,6 +44,9 @@ class WidevineRepositorySyncJobDataWrap
 	
 	public function hasAssetId($wvAssetId)
 	{
+		if(!$wvAssetId)
+			return false;
+			
 		return strstr($this->data->wvAssetIds, strval($wvAssetId));
 	}
 }

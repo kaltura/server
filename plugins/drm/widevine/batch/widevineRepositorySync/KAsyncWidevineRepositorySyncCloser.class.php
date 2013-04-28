@@ -72,8 +72,8 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 		$cgiUrl = $this->taskConfig->params->vodPackagerHost . WidevinePlugin::ASSET_NOTIFY_CGI;
 		
 		$widevineAssets = $dataWrap->getWidevineAssetIds();		
-		$startDate = WidevineAssetNotifyRequest::normalizeLicenseStartDate($dataWrap->getLicenseStartDate());
-		$endDate = WidevineAssetNotifyRequest::normalizeLicenseEndDate($dataWrap->getLicenseEndDate());	
+		$startDate = $dataWrap->getLicenseStartDate();
+		$endDate = $dataWrap->getLicenseEndDate();	
 		
 		foreach ($widevineAssets as $assetId) 
 		{
@@ -82,7 +82,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 			$assetGetResponseXml = WidevineAssetNotifyRequest::sendPostRequest($cgiUrl, $getAssetXml);
 			$assetGetResponse = WidevineAssetNotifyResponse::createWidevineAssetNotifyResponse($assetGetResponseXml);
 			
-			if(	!($startDate == $assetGetResponse->getLicenseStartDate()) || !($endDate == $assetGetResponse->getLicenseEndDate()))
+			if(!$this->compareDates($startDate, $endDate, $assetGetResponse))
 				return false;
 		}		
 		return true;
@@ -110,8 +110,8 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 	{
 		$this->impersonate($job->partnerId);
 		
-		$startDate = WidevineAssetNotifyRequest::normalizeLicenseStartDate($dataWrap->getLicenseStartDate());
-		$endDate = WidevineAssetNotifyRequest::normalizeLicenseEndDate($dataWrap->getLicenseEndDate());	
+		$startDate = $dataWrap->getLicenseStartDate();
+		$endDate = $dataWrap->getLicenseEndDate();	
 		
 		$filter = new KalturaAssetFilter();
 		$filter->entryIdEqual = $job->entryId;
@@ -131,5 +131,24 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 			}		
 		}		
 		$this->unimpersonate();
+	}
+	
+	private function compareDates($dataStartDate, $dataEndDate, WidevineAssetNotifyResponse $assetGetResponse)
+	{
+		$dt = new DateTime($assetGetResponse->getLicenseStartDate());
+		$responseStartDate = (int) $dt->format('U');
+		$dt = new DateTime($assetGetResponse->getLicenseEndDate());
+		$responseEndDate = (int) $dt->format('U');
+		
+		KalturaLog::debug("License start date: from data [".$dataStartDate."],  from response [".$responseStartDate."]");
+		KalturaLog::debug("License end date: from data [".$dataEndDate."], from response [".$responseEndDate."]");	
+		
+		if($dataStartDate != $responseStartDate)
+			return false;
+			
+		if($dataEndDate != $responseEndDate)
+			return false;
+			
+		return true;
 	}
 }

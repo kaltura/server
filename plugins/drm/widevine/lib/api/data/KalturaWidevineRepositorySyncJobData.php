@@ -20,12 +20,18 @@ class KalturaWidevineRepositorySyncJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $modifiedAttributes;
+	
+	/**
+	 * @var int
+	 */
+	public $monitorSyncCompletion;
 		
 	private static $map_between_objects = array
 	(
 		"syncMode",
 		"wvAssetIds",
 		"modifiedAttributes",
+		"monitorSyncCompletion"
 	);
 
 	public function getMapBetweenObjects ( )

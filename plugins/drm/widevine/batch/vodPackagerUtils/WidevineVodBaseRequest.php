@@ -3,8 +3,6 @@
 abstract class WidevineVodBaseRequest
 {
 	const WV_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
-	const DEFAULT_LICENSE_START_TIMESTAMP = 0;
-	const DEFAULT_LICENSE_END = '2033-05-18';
 	
 	protected $name;
 	private $policy;
@@ -16,7 +14,8 @@ abstract class WidevineVodBaseRequest
 	{
 		$this->policy = WidevinePlugin::DEFAULT_POLICY;
 		$this->portal = WidevinePlugin::getWidevineConfigParam('portal');
-		$this->portal = WidevinePlugin::KALTURA_PROVIDER;
+		if(!$this->portal)
+			$this->portal = WidevinePlugin::KALTURA_PROVIDER;
 		$this->setLicenseStartDate(null);
 		$this->setLicenseEndDate(null);
 	}
@@ -60,8 +59,12 @@ abstract class WidevineVodBaseRequest
 	/**
 	 * @param field_type $licenseStartDate
 	 */
-	public function setLicenseStartDate($licenseStartDate) {
-		
+	public function setLicenseStartDate($licenseStartDate) {	
+		if(!$licenseStartDate)
+		{
+			$dt = new DateTime(WidevinePlugin::DEFAULT_LICENSE_START);
+			$licenseStartDate = (int) $dt->format('U');
+		}	
 		$this->licenseStartDate = date(self::WV_DATE_FORMAT, $licenseStartDate);
 	}
 
@@ -69,25 +72,13 @@ abstract class WidevineVodBaseRequest
 	 * @param field_type $licenseEndDate
 	 */
 	public function setLicenseEndDate($licenseEndDate) {
-		$licenseEndDate = self::normalizeLicenseEndDate($licenseEndDate);
+		if(!$licenseEndDate)
+		{
+			$dt = new DateTime(WidevinePlugin::DEFAULT_LICENSE_END);
+			$licenseEndDate = (int) $dt->format('U');
+		}
 		$this->licenseEndDate = date(self::WV_DATE_FORMAT, $licenseEndDate);
 	}	
-	
-	public static function normalizeLicenseEndDate($endDate)
-	{
-		if($endDate)
-			return $endDate;
-		else
-			return strtotime(self::DEFAULT_LICENSE_END);
-	}
-	
-	public static function normalizeLicenseStartDate($startDate)
-	{
-		if($startDate)
-			return $startDate;
-		else
-			return self::DEFAULT_LICENSE_START_TIMESTAMP;
-	}
 	
 	public static function sendPostRequest($url, $requestXml)
 	{

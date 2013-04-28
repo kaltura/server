@@ -1,7 +1,6 @@
 <?php
 class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectCreatedEventConsumer
-{
-	
+{	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
@@ -18,7 +17,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 
 			if(count($wvFlavorAssets))
 			{
-				$this->addWidevineRepositoryModifySyncJob($object->getId(), $object->getPartnerId(), $wvFlavorAssets, $object->getStartDate(null), $object->getEndDate(null));
+				$this->addWidevineRepositoryModifySyncJob($object->getId(), $object->getPartnerId(), $wvFlavorAssets, $this->getLicenseStartDateFromEntry($object), $this->getLicenseEndDateFromEntry($object));
 			}
 		}
 		catch(Exception $e)
@@ -49,7 +48,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	{
 		try 
 		{
-			$this->addWidevineRepositoryModifySyncJob($object->getEntryId(), $object->getPartnerId(), array($object), time(), time());
+			$this->addWidevineRepositoryModifySyncJob($object->getEntryId(), $object->getPartnerId(), array($object), time(), time(), false);
 		}
 		catch(Exception $e)
 		{
@@ -79,8 +78,8 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		if($entry && $wvFlavorParamsOutput)
 		{
 			KalturaLog::debug('setting widevine distribution dates from entry');
-			$wvFlavorParamsOutput->setWidevineDistributionStartDate($entry->getStartDate(null));
-			$wvFlavorParamsOutput->setWidevineDistributionEndDate($entry->getEndDate(null));
+			$wvFlavorParamsOutput->setWidevineDistributionStartDate($this->getLicenseStartDateFromEntry($entry));
+			$wvFlavorParamsOutput->setWidevineDistributionEndDate($this->getLicenseEndDateFromEntry($entry));
 			$wvFlavorParamsOutput->save();	
 		}		
 		return true;			
@@ -99,7 +98,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 			return false;				
 	}
 	
-	private function addWidevineRepositoryModifySyncJob($entryId, $partnerId, array $flavorAssets, $entryStartDate, $entryEndDate)
+	private function addWidevineRepositoryModifySyncJob($entryId, $partnerId, array $flavorAssets, $entryStartDate, $entryEndDate, $monitorSyncCompletion = true)
 	{	
 		KalturaLog::debug('adding  WidevineRepositorySync job, mode = MODIFY');		
  		$batchJobType = WidevinePlugin::getCoreValue('BatchJobType', WidevineBatchJobType::WIDEVINE_REPOSITORY_SYNC);
@@ -112,6 +111,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 					
 		$jobData = new kWidevineRepositorySyncJobData();
 		$jobData->setSyncMode(WidevineRepositorySyncMode::MODIFY);
+		$jobData->setMonitorSyncCompletion($monitorSyncCompletion);
 		$wvAssetIds = array();
 		foreach ($flavorAssets as $flavorAsset) 
 		{
@@ -129,6 +129,28 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	private function shouldSyncWidevineRepositoryForPartner($partnerId)
 	{
 		return PermissionPeer::isValidForPartner(WidevinePlugin::WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION, $partnerId);
+	}
+	
+	private function getLicenseStartDateFromEntry($entry)
+	{
+		$startDate = $entry->getStartDate(null);
+		if(!$startDate)
+		{
+			$dt = new DateTime(WidevinePlugin::DEFAULT_LICENSE_START);
+			$startDate = (int) $dt->format('U');
+		}
+		return $startDate;
+	}
+	
+	private function getLicenseEndDateFromEntry($entry)
+	{
+		$endDate = $entry->getEndDate(null);
+		if(!$endDate)
+		{
+			$dt = new DateTime(WidevinePlugin::DEFAULT_LICENSE_END);
+			$endDate = (int) $dt->format('U');
+		}
+		return $endDate;
 	}
 	
 }

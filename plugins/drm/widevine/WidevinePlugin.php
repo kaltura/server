@@ -17,6 +17,8 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	//Default values
 	const KALTURA_PROVIDER = 'kaltura';
 	const DEFAULT_POLICY = 'default';
+	const DEFAULT_LICENSE_START = '1970-01-01 00:00:01';
+	const DEFAULT_LICENSE_END = '2033-05-18 00:00:00';
 	
 	
 	/* (non-PHPdoc)

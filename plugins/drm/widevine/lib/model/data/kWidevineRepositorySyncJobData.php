@@ -15,7 +15,27 @@ class kWidevineRepositorySyncJobData extends kJobData
      * @var string
      */    
     private $modifiedAttributes;
+    
+    /**
+     * Identifies if this job requires closer
+     * @var int
+     */
+    private $monitorSyncCompletion;
 	
+	/**
+	 * @return the $monitorSyncCompletion
+	 */
+	public function getMonitorSyncCompletion() {
+		return $this->monitorSyncCompletion;
+	}
+
+	/**
+	 * @param int $monitorSyncCompletion
+	 */
+	public function setMonitorSyncCompletion($monitorSyncCompletion) {
+		$this->monitorSyncCompletion = $monitorSyncCompletion;
+	}
+
 	/**
 	 * @return the $wvAssetIds
 	 */

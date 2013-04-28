@@ -88,14 +88,14 @@ class WidevineAssetNotifyResponse extends WidevineVodBaseResponse
 	 * @return the $licenseStartDate
 	 */
 	public function getLicenseStartDate() {
-		return strtotime($this->licenseStartDate);
+		return $this->licenseStartDate;
 	}
 
 	/**
 	 * @return the $licenseEndDate
 	 */
 	public function getLicenseEndDate() {
-		return strtotime($this->licenseEndDate);
+		return $this->licenseEndDate;
 	}
 
 	/**
@@ -121,29 +121,35 @@ class WidevineAssetNotifyResponse extends WidevineVodBaseResponse
 		$responseObject = new WidevineAssetNotifyResponse();
 		if(!$responseStr)
 			return $responseObject;
-					
-		$responseXml = new SimpleXMLElement($responseStr);		
-		$asset = reset($responseXml->children());
-		if(!$asset)
-			return $responseObject;
-			
-		foreach($asset->attributes() as $attribute => $value)
+
+		try
 		{
-			$responseObject->setAttribute($attribute, "$value");
-		}
-		if($asset->count())
-		{
-			$provider = reset(reset($asset->children())->children());
-			if(!$provider)
+			$responseXml = new SimpleXMLElement($responseStr);		
+			$asset = reset($responseXml->children());
+			if(!$asset)
 				return $responseObject;
 				
-			foreach($provider->attributes() as $attribute => $value)
+			foreach($asset->attributes() as $attribute => $value)
 			{
-				if($attribute != 'Name')
-					$responseObject->setAttribute($attribute, "$value");
+				$responseObject->setAttribute($attribute, "$value");
+			}
+			if($asset->count())
+			{
+				$provider = reset(reset($asset->children())->children());
+				if(!$provider)
+					return $responseObject;
+					
+				foreach($provider->attributes() as $attribute => $value)
+				{
+					if($attribute != 'Name')
+						$responseObject->setAttribute($attribute, "$value");
+				}
 			}
 		}
-
+		catch (Exception $e)
+		{
+			$responseObject->setStatus('0');
+		}
 		return $responseObject;
 	}
 }

@@ -37,8 +37,12 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 				break;
 			default:
 				throw new kApplicativeException(null, "Unknown sync mode [".$data->syncMode. "]");
-		}		
-		return $this->closeJob($job, null, null, "Sync request sent successfully", KalturaBatchJobStatus::ALMOST_DONE, $data); 
+		}
+
+		if($data->monitorSyncCompletion)
+			return $this->closeJob($job, null, null, "Sync request sent successfully", KalturaBatchJobStatus::ALMOST_DONE, $data); 
+		else 
+			return $this->closeJob($job, null, null, "Sync request sent successfully", KalturaBatchJobStatus::FINISHED, $data);
 	}		
 
 	/**
