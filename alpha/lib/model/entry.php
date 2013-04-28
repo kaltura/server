@@ -399,7 +399,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				// second - size
 				$result[] = $local_file_sync->getFileSize();
 				// third - time
-				$result[] = filemtime ( $local_file_sync->getFullPath());
+				$result[] = file_exists($local_file_sync->getFullPath()) ? filemtime ( $local_file_sync->getFullPath()) : false;
 				// forth - version
 				$result[] = substr( kFile::getFileNameNoExtension ( $local_file_sync->getFilePath() ) , strlen ($this->getId().'_') );
 				$results[] = $result;
