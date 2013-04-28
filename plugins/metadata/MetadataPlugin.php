@@ -28,7 +28,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const BULK_UPLOAD_COLUMN_FIELD_PREFIX = 'metadataField_';
 	const BULK_UPLOAD_MULTI_VALUES_DELIMITER = '|,|';
 	const BULK_UPLOAD_METADATA_FIELD_PREFIX = "metadata::";
-    const BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR = "::";	
+    const BULK_UPLOAD_METADATA_SYSTEMNAME_SEPARATOR = "::";
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
@@ -555,7 +555,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	                $errorMessage = "Unexpected key structure. Expected metadata::ProfileSystemName::FieldSystemName.";
                     KalturaLog::err($errorMessage);
                     self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-				    continue; 
+				    continue;
 	            }
 	            if (!isset($newFieldValuesMap[$metadataProfileSystemName]))
 	                $newFieldValuesMap[$metadataProfileSystemName] = array();
@@ -577,7 +577,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	            $errorMessage = "Metadata profile with system name [$metadataProfileSystemName] could not be found.";
                 KalturaLog::err($errorMessage);
                 self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-				continue;   
+				continue;
 	        }
 	        
 	        if ($metadataProfile->getObjectType() != kMetadataManager::getTypeNameFromObject($object))
@@ -605,7 +605,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
                     $errorMessage = "Metadata profile field with system name [$fieldSysName] missing from metadata profile with id [$metadataProfileId]";
                     KalturaLog::err($errorMessage);
                     self::addBulkUploadResultDescription($object, $object->getBulkUploadId(), $errorMessage);
-					continue;                
+					continue;
                 }
                 
                 $metadataProfileField = $metadataProfileFields[$fieldSysName];
@@ -681,7 +681,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	protected static function createOrFindMetadataObject (BaseObject $object, MetadataProfile $metadataProfile)
 	{
 	    $c = new Criteria();
-	    $c->addAnd(MetadataPeer::PARTNER_ID, $object->getPartnerId(), Criteria::EQUAL);  
+	    $c->addAnd(MetadataPeer::PARTNER_ID, $object->getPartnerId(), Criteria::EQUAL);
 	    $c->addAnd(MetadataPeer::OBJECT_ID, $object->getId(), Criteria::EQUAL);
 	    $c->addAnd(MetadataPeer::METADATA_PROFILE_ID, $metadataProfile->getId(), Criteria::EQUAL);
 	    $c->addAnd(MetadataPeer::METADATA_PROFILE_VERSION, $metadataProfile->getVersion(), Criteria::EQUAL);
@@ -719,6 +719,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	{
 	    $objectPeerClass = get_class($object->getPeer());
 	    $objectType = strtoupper(constant("$objectPeerClass::OM_CLASS"));
+	    if($objectType == 'KUSER')
+	    	$objectType = 'USER';
 	    
 		$bulkUploadResult = BulkUploadResultPeer::retrieveByObjectId($object->getId(), constant("BulkUploadObjectType::$objectType"), $bulkUploadId);
 		if(!$bulkUploadResult)
@@ -781,7 +783,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			else
 			{
 				KalturaLog::debug("Creating node [$nodeName] xPath [$xPath]");
-				$valueNode = $xml->createElement($nodeName);				
+				$valueNode = $xml->createElement($nodeName);
 			}
 			KalturaLog::debug("Appending node [$nodeName] to current node [$currentNode->localName]");
 			$currentNode->appendChild($valueNode);
@@ -862,7 +864,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		{
 			$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME, kuserPeer::TABLE_NAME);
 		}
-		else 
+		else
 		{
 			return 0;
 		}
@@ -907,8 +909,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
-				</xs:annotation>		
-			</xs:any>			
+				</xs:annotation>
+			</xs:any>
 		</xs:sequence>
 		
 		<xs:attribute name="metadataId" use="required" type="xs:int">
@@ -949,12 +951,12 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			<xs:documentation>Custom metadata XML</xs:documentation>
 			<xs:appinfo>
 				<example>
-					<customData	metadataId="{metadata id}" 
-								metadataVersion="1" 
-								metadataProfile="MY_METADATA_PROFILE_SYSTEM_NAME}"  
-								metadataProfileId="{metadata profile id}"  
-								metadataProfileName="my metadata profile" 
-								metadataProfileVersion="1" 
+					<customData	metadataId="{metadata id}"
+								metadataVersion="1"
+								metadataProfile="MY_METADATA_PROFILE_SYSTEM_NAME}"
+								metadataProfileId="{metadata profile id}"
+								metadataProfileName="my metadata profile"
+								metadataProfileVersion="1"
 					>
 						<metadata>
 							<Text1>text test</Text1>
