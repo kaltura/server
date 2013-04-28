@@ -570,7 +570,7 @@ class ks extends kSessionBase
 		{
 			$exPrivileges = explode(':', $priv);
 			//validate setRole
-			if ($exPrivileges[0] == self::PRIVILEGE_PRIVACY_CONTEXT) 
+			if ($exPrivileges[0] == self::PRIVILEGE_PRIVACY_CONTEXT && count($exPrivileges) > 1) 
 				return $exPrivileges[1];
 		}
 		
