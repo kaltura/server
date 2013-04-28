@@ -9,7 +9,7 @@
             allow localhost   # Allow localhost to connect
             allow admin:Monit # Allow Basic Auth
 
-        check system @WWW_HOST@
+        check system @KALTURA_VIRTUAL_HOST_NAME@
            if loadavg (1min) > 4 then alert
            if loadavg (5min) > 2 then alert
            if memory usage > 75% then alert
