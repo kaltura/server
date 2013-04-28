@@ -7,7 +7,7 @@ class KalturaWidevineRepositorySyncJobData extends KalturaJobData
 {
 	/**
 	 * 
-	 * @var int
+	 * @var KalturaWidevineRepositorySyncMode
 	 */
 	public $syncMode;
 	
