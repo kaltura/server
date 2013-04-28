@@ -175,8 +175,15 @@ if ( $partner_id == -1 ) // can add code for specific partners whentrying to deb
 				}
 			}
 			
-			if ( $valid ) continue;
+			if ( $valid ) 
+				continue;
 
+			if(is_array($param_value))
+			{
+				$this->fixRequestContainer($param_value);
+				continue;
+			}
+			
 			$found = 0;
 			// for now - replace the characters < >
 			$fixed_param_value = preg_replace( "/[<>]/" , "" , $param_value , -1 , $found );
