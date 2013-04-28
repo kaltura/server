@@ -77,7 +77,8 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_CLIPPER => "",
 										self::UI_CONF_TYPE_KSR => "ScreencastOMaticRun-1.0.32.jar",
 										self::UI_CONF_TYPE_KRECORD => "KRecord.swf",
-										);
+										self::UI_CONF_TYPE_KUPLOAD => "KUpload.swf",
+									);
 
 	private static $swf_directory_map = array (
 		self::UI_CONF_TYPE_WIDGET => "kdp",
@@ -99,6 +100,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_CLIPPER => "kclip",
 		self::UI_CONF_TYPE_KSR => "ksr",
 		self::UI_CONF_TYPE_KRECORD => 'krecord',
+		self::UI_CONF_TYPE_KUPLOAD => "kupload",
 	);
 
 	public function save(PropelPDO $con = null, $isClone = false)
@@ -191,6 +193,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "KMC Roles and Permissions",
 				self::UI_CONF_CLIPPER => "Kaltura Clipper",
 				self::UI_CONF_TYPE_KSR => "Kaltura Screen Recorder",
+				self::UI_CONF_TYPE_KUPLOAD => "Kaltura Simple Uploader",
 			);
 		}
 	}
@@ -219,6 +222,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => false,
 				self::UI_CONF_CLIPPER => false,
 				self::UI_CONF_TYPE_KSR => true,
+				self::UI_CONF_TYPE_KUPLOAD => false,
 			);
 		}
 	}
