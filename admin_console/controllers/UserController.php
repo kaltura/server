@@ -132,7 +132,7 @@ class UserController extends Zend_Controller_Action
 			$this->proccessResetPasswordLinkForm($form, $token);
 		}
 		
-		$this->view->form = $form;		 
+		$this->view->form = $form;
 	}
 	
 	public function resetPasswordOkAction()
@@ -151,6 +151,7 @@ class UserController extends Zend_Controller_Action
 			$loginForm->isValid($request->getPost());
 			
 			$adapter = new Kaltura_AdminAuthAdapter();
+			$adapter->setPrivileges('disableentitlement');
 			$adapter->setCredentials($request->getPost('email'), $request->getPost('password'));
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
 			$auth = Infra_AuthHelper::getAuthInstance();
@@ -260,7 +261,7 @@ class UserController extends Zend_Controller_Action
 		
 		$form->getElement('name')->setValue($user->fullName);
 		$form->getElement('partners')->setValue($user->allowedPartnerIds);
-		$form->getElement('partner_package')->setValue(explode(",",$user->allowedPartnerPackages));		
+		$form->getElement('partner_package')->setValue(explode(",",$user->allowedPartnerPackages));
 		if ($request->isPost())
 		{
 			$form->isValid($request->getPost());
@@ -322,7 +323,7 @@ class UserController extends Zend_Controller_Action
 					$request->getPost('new_password')
 				);
 				
-				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Infra_ClientHelper::getPartnerId());				
+				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Infra_ClientHelper::getPartnerId());
 				$client->setKs($ks);
 				$user = $client->user->getByLoginId($request->getPost('email_address'), Infra_ClientHelper::getPartnerId());
 				if ($user->partnerId != Infra_ClientHelper::getPartnerId()) {
@@ -362,7 +363,7 @@ class UserController extends Zend_Controller_Action
 				}
 				else {
 					throw $ex;
-				}				
+				}
 			}
 		}
 		else
@@ -543,7 +544,7 @@ class UserController extends Zend_Controller_Action
 				else if ($ex->getCode() === 'PASSWORD_ALREADY_USED')
 					$form->setDescription($ex->getMessage());
 				else if ($ex->getCode() === 'INTERNAL_SERVERL_ERROR')
-					$form->setDescription($ex->getMessage());	
+					$form->setDescription($ex->getMessage());
 				else
 					throw $ex;
 			}

@@ -26,11 +26,17 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	/**
 	 * @var int
 	 */
-	protected $partnerId;	
+	protected $partnerId;
+	
 	/**
 	 * @var int
 	 */
 	protected $timezoneOffset;
+	
+	/**
+	 * @var string
+	 */
+	protected $privileges = null;
 	
 	/**
 	 * @var string
@@ -45,7 +51,15 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		$this->username = $username;
 		$this->password = $password;
 	}
-
+	
+	/**
+	 * Sets ks privileges for authentication
+	 */
+	public function setPrivileges($privileges)
+	{
+		$this->privileges = $privileges;
+	}
+	
 	public function setPartnerId($partnerId)
 	{
 		$this->partnerId = $partnerId;
@@ -65,7 +79,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
 	 * @param int $partnerId
-	 * 
+	 *
 	 * @return Infra_UserIdentity
 	 */
 	protected function getUserIdentity(Kaltura_Client_Type_User $user = null, $ks = null, $partnerId = null)
@@ -107,7 +121,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 		{
 			if ($this->partnerId)
 			{
-			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId);
+			    $ks = $client->user->loginByLoginId($this->username, $this->password, $this->partnerId, null, $this->privileges);
 	    		$client->setKs($ks);
 	    		$user = $client->user->getByLoginId($this->username, $this->partnerId);
 	    		$identity = $this->getUserIdentity($user, $ks, $this->partnerId);
@@ -115,7 +129,7 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 			}
 			
 		    if (!$this->ks)
-    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId);
+    		    $this->ks = $client->user->loginByLoginId($this->username, $this->password, $partnerId, null, $this->privileges);
     		$client->setKs($this->ks);
     		$user = $client->user->getByLoginId($this->username, $partnerId);
     		$identity = $this->getUserIdentity($user, $this->ks, $user->partnerId);
