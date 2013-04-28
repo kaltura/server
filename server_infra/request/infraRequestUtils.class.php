@@ -309,7 +309,8 @@ class infraRequestUtils
 		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
 		if (!$remote_addr &&
 			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-			(in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
+			(isset($_SERVER['HTTP_HOST']) && 
+			in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
 			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
 			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
 		{
