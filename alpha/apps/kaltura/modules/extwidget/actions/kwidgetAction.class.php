@@ -351,6 +351,7 @@ class kwidgetAction extends sfAction
 				}
 			
 				$optimizedConfVars = null;
+				$optimizedHost = null;
 				if (kConf::hasMap("optimized_playback"))
 				{
 					$optimizedPlayback = kConf::getMap("optimized_playback");
@@ -363,6 +364,9 @@ class kwidgetAction extends sfAction
 							
 						if (array_key_exists('conf_vars', $params))
 							$optimizedConfVars = $params['conf_vars'];
+							
+						if (array_key_exists('host', $params))
+							$optimizedHost = $params['host'];
 							
 						// cache immidiately
 						$cache_st =0;
@@ -381,7 +385,7 @@ class kwidgetAction extends sfAction
 
 				$partner_host = str_replace("http://", "", str_replace("https://", "", $partner_host));
 				// if the host is the default www domain use the cdn api domain
-				if ($partner_host == kConf::get("www_host"))
+				if ($partner_host == kConf::get("www_host") && $optimizedHost === null)
 					$partner_host = kConf::get("cdn_api_host");
 
 				if ($protocol == "https" && $partner_host = kConf::get("cdn_api_host"))
