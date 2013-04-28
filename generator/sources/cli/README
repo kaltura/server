@@ -65,7 +65,7 @@ Examples
 > genks 1234 | kalcli playlist execute id=1_1a2b3c | grep -P 'id\t' | sort | uniq | wc -l
 
 4. Using a precreated session
-> kalcli media list ks=MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow== -x
+> kalcli -x media list ks=MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow==
 
 5. Using an expired session
 > renewks MDQ2ZThjOTI0MTJmZGIxYTVlMWVhNDJlZDZhNDAyMDkyMWJhNzE0OXw0Mzc0ODE7NDM3NDgxOzEzNjI0OTI3Njc7MDsxMzYyNDA2MzY3Ljc3NzM7MDt3aWRnZXQ6MSx2aWV3Oio7Ow== | kalcli media list
