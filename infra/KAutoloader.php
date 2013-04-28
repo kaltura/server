@@ -116,11 +116,6 @@ class KAutoloader
 	static function setClassMapFilePath($path)
 	{
 		self::$_classMapFileLocation = $path;
-		$dirName = dirname($path);
-		if (!is_dir($dirName)) {
-			mkdir($dirName);
-			chmod($dirName, 0755);
-		}
 	}
 
 	/**
@@ -302,12 +297,19 @@ class KAutoloader
 				apc_store(self::$_classMapFileLocation, self::$_classMap);
 			}
 
+			$dirName = dirname(self::$_classMapFileLocation);
+			if (!is_dir($dirName)) 
+			{
+				mkdir($dirName);
+				chmod($dirName, 0755);
+			}
+				
 			// save the cached map
 			$bytesWritten = self::safeFilePutContents(self::$_classMapFileLocation, serialize(self::$_classMap));
 			if(!$bytesWritten)
 			{
 				$folderPermission = substr(decoct(fileperms(dirname(self::$_classMapFileLocation))), 2);
-				error_log("PHP Class map could not be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
+				error_log("PHP Class map could not be saved to path [" . self::$_classMapFileLocation . "] folder permissions [$folderPermission]");
 				die("PHP Class map could not be saved");
 			}
 		}
@@ -333,7 +335,7 @@ class KAutoloader
 		if(!is_array(self::$_classMap))
 		{
 			$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
-			error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
+			error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permissions [$permission]");
 			die('PHP Class map could not be loaded');
 		}
 
