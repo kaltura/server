@@ -337,6 +337,9 @@ class myFlvHandler
 		fseek ($this->fh, -$tag_size[1], SEEK_END);
 		
 		$data = fread ($this->fh, 4);
+		if (strlen($data) < 4)
+			return 0;
+		
 		$data = $data[3].substr($data, 0, 3);
 		$res = unpack("N", $data);
 		return $res[1];
