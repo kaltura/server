@@ -265,16 +265,17 @@ class kOldContentCleaner
 		echo "Usage: php " . __FILE__ . " [options]\n";
 		echo "By default the script runs in dry run mode, meaning, the files are not deleted and the database is not affected.\n\n";
 		echo "Options:\n";
-		echo "\t- r / real-run: Real run, commit database updates and file deletions.\n";
-		echo "\t- l: Limit queries records count, default is 1000.\n";
-		echo "\t- p: Purge file syncs days to delete, default is 30.\n";
-		echo "\t- o: Old versions of existing file syncs days to delete, default is 30.\n";
-		echo "\t- b: Blocked partners file syncs months to delete, default is 24.\n";
-		echo "\t- e: Error objects file syncs months to delete, default is 24.\n";
-		echo "\t- error-objects: Delete old error objects.\n";
-		echo "\t- old-versions: Delete file sync objects of old versions.\n";
-		echo "\t- blocked-partners: Delete file sync objects of old blocked partners.\n";
-		echo "\t- files: Delete files from the disc.\n";
+		echo "\t-r / real-run: Real run, commit database updates and file deletions.\n";
+		echo "\t-l: Limit queries records count, default is 1000.\n";
+		echo "\t-p: Purge file syncs days to delete, default is 30.\n";
+		echo "\t-o: Old versions of existing file syncs days to delete, default is 30.\n";
+		echo "\t-b: Blocked partners file syncs months to delete, default is 24.\n";
+		echo "\t-e: Error objects file syncs months to delete, default is 24.\n";
+		echo "\t--error-objects: Delete objects in error status that are also older than 30 days or as configured by –e option.\n";
+		echo "\t--old-versions: Delete file sync objects of old versions that are also older than 30 days or as configured by –o option.\n";
+		echo "\t--blocked-partners: Delete file sync objects of old blocked partners that are also older than 24 months or as configured by –b option.\n";
+		echo "\t--files: Delete files from the disc according to file sync objects that marked as deleted, the file sync objects will be marked as purged after the physical deletion from the disc.\n";
+		
 		
 		exit(-1);
 	}
