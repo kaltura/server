@@ -15,7 +15,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		if (($actionName == 'search') &&
 		  (!$ks || (!$ks->isAdmin() && !$ks->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD))))
-		{			
+		{
 			KalturaCriterion::enableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 			entryPeer::setUserContentOnly(true);
 		}
@@ -61,6 +61,9 @@ class CaptionAssetItemService extends KalturaBaseService
 			return;
 			
     	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
+    	if(!$captionsContentManager)
+    		return;
+    		
     	$itemsData = $captionsContentManager->parse($content);
     	foreach($itemsData as $itemData)
     	{
@@ -77,7 +80,7 @@ class CaptionAssetItemService extends KalturaBaseService
 	
 	/**
 	 * Search caption asset items by filter, pager and free text
-	 * 
+	 *
 	 * @action search
 	 * @param KalturaBaseEntryFilter $entryFilter
 	 * @param KalturaCaptionAssetItemFilter $captionAssetItemFilter
@@ -101,7 +104,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		{
 			$entryCoreFilter = new entryFilter();
 			if($entryFilter)
-				$entryFilter->toObject($entryCoreFilter);		
+				$entryFilter->toObject($entryCoreFilter);
 			$entryCoreFilter->setPartnerSearchScope($this->getPartnerId());
 			$this->addEntryAdvancedSearchFilter($captionAssetItemFilter, $entryCoreFilter);
 				
@@ -126,7 +129,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		$response = new KalturaCaptionAssetItemListResponse();
 		$response->objects = $list;
 		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
-		return $response;    
+		return $response;
 	}
 	
 	private function addEntryAdvancedSearchFilter(KalturaCaptionAssetItemFilter $captionAssetItemFilter, entryFilter $entryCoreFilter)
