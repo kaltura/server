@@ -200,11 +200,18 @@ class KAsyncImport extends KJobHandlerWorker
 //					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Expected file size[$fileSize] actual file size[$actualFileSize]", KalturaBatchJobStatus::RETRY);
 					return $job;
 				}
+				
+				$curlInfo = curl_getinfo($curlWrapper->ch);
+				
+				$pluginInstances = KalturaPluginManager::getPluginInstance('IKalturaImportHandler');
+				foreach ($pluginInstances as $pluginInstance)
+				{
+					/* @var $pluginInstance IKalturaImportHandler */
+					$newRes = $pluginInstance->handleImportContent($curlInfo, $res, $data);
+				}
 			}
 
-
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-
 			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
 		}
 		catch(Exception $ex)
