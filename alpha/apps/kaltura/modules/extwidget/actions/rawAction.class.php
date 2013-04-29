@@ -6,7 +6,7 @@
 class rawAction extends sfAction
 {
 	/**
-	 * Will forward to the regular swf player according to the widget_id 
+	 * Will forward to the regular swf player according to the widget_id
 	 */
 	public function execute()
 	{
@@ -37,7 +37,7 @@ class rawAction extends sfAction
 			}
 			catch (Exception $ex)
 			{
-				KExternalErrors::dieError(KExternalErrors::INVALID_KS);	
+				KExternalErrors::dieError(KExternalErrors::INVALID_KS);
 			}
 		}
 		else
@@ -82,11 +82,11 @@ class rawAction extends sfAction
 			
 		if ($ret_file_name)
 		{
-			//rawurlencode to content-disposition filename to handle spaces and other characters across different browsers			
+			//rawurlencode to content-disposition filename to handle spaces and other characters across different browsers
 			//$name = rawurlencode($ret_file_name);
 			// 19.04.2009 (Roman) - url encode is not needed when the filename in Content-Disposition header is in quotes
 			// IE6/FF3/Chrome - Will show the filename correctly
-			// IE7 - Will show the filename with underscores instead of spaces (this is better than showing %20) 
+			// IE7 - Will show the filename with underscores instead of spaces (this is better than showing %20)
 			$name = $ret_file_name;
 			if ($name)
 			{
@@ -104,6 +104,7 @@ class rawAction extends sfAction
 		else
 		{
 			$ret_file_name = $entry_id;
+			$name = $ret_file_name;
 		}
 		$format = $this->getRequestParameter( "format" );
 		
@@ -193,10 +194,10 @@ class rawAction extends sfAction
 		$media_type =  $entry->getMediaType();
 		if ( $media_type == entry::ENTRY_MEDIA_TYPE_IMAGE )
 		{
-			// image - use data for entry 
+			// image - use data for entry
 			$file_sync = $this->redirectIfRemote ( $entry ,  entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , null );
 			$key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true));			
+			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true));
 		}
 		elseif ( $media_type == entry::ENTRY_MEDIA_TYPE_VIDEO || $media_type == entry::ENTRY_MEDIA_TYPE_AUDIO  )
 		{
@@ -213,7 +214,7 @@ class rawAction extends sfAction
 				{
 					header('KalturaRaw: no flavor asset for extension');
 					KExternalErrors::dieGracefully();
-				}				
+				}
 				
 				$archive_file = $file_sync->getFullPath();
 			}
@@ -248,12 +249,12 @@ class rawAction extends sfAction
 					}
 					$archive_file = $file_sync->getFullPath();
 				}
-			}			
+			}
 		}
 		elseif ( $media_type == entry::ENTRY_MEDIA_TYPE_SHOW )
 		{
-			// in this case "raw" is a bad name 
-			// TODO - add the ability to fetch the actual XML by flagging "xml" or something 
+			// in this case "raw" is a bad name
+			// TODO - add the ability to fetch the actual XML by flagging "xml" or something
 			$version = $this->getRequestParameter ( "version" );
 			
 			// hotfix - links sent after flattening is done look like:
@@ -290,9 +291,9 @@ class rawAction extends sfAction
 			// use fileSync for entry - roughcuts don't have flavors
 			//$file_sync =  $this->redirectIfRemote ( $entry ,  entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $version , true );  // strict - nothing to do if no flattened version
 			
-			// if got to here - fileSync was found for one of the extensions - continue with that file			
+			// if got to here - fileSync was found for one of the extensions - continue with that file
 			$archive_file = $file_sync->getFullPath();
-		}		
+		}
 		else
 		{
 			// no archive for this file
@@ -324,7 +325,7 @@ class rawAction extends sfAction
 		{
 			// for now - if "flv" return "flv" - // TODO - find the real extension from the file itself
 			$ext = "flv";
-		}	
+		}
 		
 		// rebuild the URL and redirect to it with extraa parameters
 		$url = $_SERVER["REQUEST_URI"];
@@ -359,7 +360,7 @@ class rawAction extends sfAction
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param $entry
 	 * @param $sub_type
 	 * @param $version
@@ -370,11 +371,11 @@ class rawAction extends sfAction
 		$dataKey = $obj->getSyncKey( $sub_type , $version );
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
 		
-		if ( ! $file_sync ) 
+		if ( ! $file_sync )
 		{
 			if ( $strict )
 			{
-				// file does not exist on any DC - die 
+				// file does not exist on any DC - die
 
 				KalturaLog::log( "Error - no FileSync for object [{$obj->getId()}]");
 				header("HTTP/1.0 404 Not Found");
@@ -388,7 +389,7 @@ class rawAction extends sfAction
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param $entry
 	 * @param $sub_type
 	 * @param $version
@@ -410,7 +411,7 @@ class rawAction extends sfAction
 				// or redirect if no proxy
 				$this->redirect($remote_url);
 			}
-		}		
+		}
 		
 		return $file_sync;
 	}
@@ -423,7 +424,7 @@ class rawAction extends sfAction
 		{
 			$flavorAssets = assetPeer::retrieveReadyWebByEntryId($entryId);
 		}
-		else 
+		else
 		{
 			$c = new Criteria();
 			$c->add(assetPeer::ENTRY_ID, $entryId);
@@ -435,14 +436,14 @@ class rawAction extends sfAction
 			$flavorAssets =  assetPeer::doSelect($c);
 		}
 
-		foreach ($flavorAssets as $currentFlavorAsset) 
+		foreach ($flavorAssets as $currentFlavorAsset)
 		{
 			if($secureEntryHelper->isAssetAllowed($currentFlavorAsset))
 			{
 				$flavorAsset = $currentFlavorAsset;
 				break;
 			}
-		}		
+		}
 		return $flavorAsset;
 	}
 }
