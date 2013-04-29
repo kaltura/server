@@ -191,14 +191,14 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = null)
 	{
 	    KalturaLog::info("In Object Added handler");
-	    $objectTags = $this->trimObjectTags($tagsForUpdate);
+	    $objectTags = self::trimObjectTags($tagsForUpdate);
 	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 	    if (!count($objectTags))
 	    {
 	        return;
 	    }
 	    
-	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, $this->getObjectTypeByClassName($objectClass), $partnerId);
+	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
 		if (is_null($privacyContexts))
 		{
 			if (count($privacyContexts))
@@ -220,7 +220,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 				$tagsToAdd[$tag] = array();
 				$tagsToAdd[$tag] = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
 			}
-	        return $this->addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
+	        return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
 	    	
 	    }
 	    
@@ -264,7 +264,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        }
         }
 
-	    return $this->addTags($tagsToAdd, $this->getObjectTypeByClassName($objectClass), $partnerId);
+	    return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
 
 	}
 	
@@ -278,9 +278,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 */
 	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, $privacyContexts = null)
 	{
-	    $objectTags = $this->trimObjectTags($tagsToCheck);
+	    $objectTags = self::trimObjectTags($tagsToCheck);
 	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
-		$c = self::getTagObjectsByTagStringsCriteria($objectTags,  $this->getObjectTypeByClassName($objectClass), $partnerId);
+		$c = self::getTagObjectsByTagStringsCriteria($objectTags,  self::getObjectTypeByClassName($objectClass), $partnerId);
 		if (!is_null($privacyContexts))
 		{
 			if (count($privacyContexts))
@@ -305,7 +305,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 * Function creates new propel Tag objects and saves them.
 	 * @param array $tagToAdd
 	 */
-	protected function addTags ($tagsToAdd, $objectType, $partnerId)
+	protected static function addTags ($tagsToAdd, $objectType, $partnerId)
 	{
 	   
 	    foreach ($tagsToAdd as $tagToAdd => $privacyContexts)
@@ -330,7 +330,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 * @param string $className
 	 * @return int
 	 */
-	protected function getObjectTypeByClassName ($className)
+	protected static function getObjectTypeByClassName ($className)
 	{
 	    return self::getClassConstValue("taggedObjectType", $className);
 	}
@@ -366,7 +366,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 * @param string $tagsString
 	 * @return array
 	 */
-	protected function trimObjectTags ($tagsString)
+	protected static function trimObjectTags ($tagsString)
 	{
 	    $tags = explode(",", $tagsString);
 		$tagsToReturn = array();
