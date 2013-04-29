@@ -44,8 +44,9 @@ KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
 
 
 $returnValue = null;
-foreach($fileNames as $filePath)
+foreach($fileNames as $fileName)
 {
+	$filePath = realpath("$dirPath/$fileName");
 	KalturaLog::info("Adding content from file [$filePath]");
 	passthru("php $scriptPath $filePath", $returnValue);
 	if($returnValue !== 0)
