@@ -576,15 +576,17 @@ class myInsertEntryHelper
 						$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($sourceFileKey);
 						
 						// call mediaInfo for file
-						$mediaInfo = new mediaInfo();
+						$mediaInfo = null;
 						try
 						{
 							$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, kConf::get('bin_path_mediainfo'));
-							$KalturaMediaInfo = new KalturaMediaInfo();
 							$KalturaMediaInfo = $mediaInfoParser->getMediaInfo();
-							$mediaInfo = $KalturaMediaInfo->toInsertableObject($mediaInfo);
-							$mediaInfo->setFlavorAssetId($flavorAsset->getId());
-							$mediaInfo->save();
+							if ($KalturaMediaInfo)
+							{
+								$mediaInfo = $KalturaMediaInfo->toInsertableObject($mediaInfo);
+								$mediaInfo->setFlavorAssetId($flavorAsset->getId());
+								$mediaInfo->save();
+							}
 						}
 						catch(Exception $e)
 						{
