@@ -4,7 +4,7 @@
 /**
  * Skeleton subclass for representing a row from the 'category_entry' table.
  *
- * 
+ *
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -16,7 +16,7 @@
 class categoryEntry extends BasecategoryEntry {
 	
 	/*
-	 * when calculating category->entries count, 
+	 * when calculating category->entries count,
 	 * entry might belong to a few sub categories and should not be calculated more than once in the parent category.
 	 * those fields means what categories where already set the calculation of the entry.
 	 */
@@ -39,6 +39,9 @@ class categoryEntry extends BasecategoryEntry {
 	public function preSave(PropelPDO $con = null)
 	{
 		$category = categoryPeer::retrieveByPK($this->getCategoryId());
+		if(!$category)
+			return false;
+			
 		$this->setCategoryFullIds($category->getFullIds());
 		return parent::preSave();
 	}
@@ -47,7 +50,7 @@ class categoryEntry extends BasecategoryEntry {
 	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postInsert(PropelPDO $con = null)
-	{	
+	{
 		parent::postInsert($con);
 		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->getCategoryId());
@@ -69,7 +72,7 @@ class categoryEntry extends BasecategoryEntry {
 	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postUpdate(PropelPDO $con = null)
-	{	
+	{
 		parent::postUpdate($con);
 		
 		categoryPeer::setUseCriteriaFilter(false);
@@ -83,7 +86,7 @@ class categoryEntry extends BasecategoryEntry {
 			throw new kCoreException('entry id [' . $this->getEntryId() . 'was not found', kCoreException::ID_NOT_FOUND);
 		
 		
-		if($entry && $this->getStatus() == CategoryEntryStatus::ACTIVE && 
+		if($entry && $this->getStatus() == CategoryEntryStatus::ACTIVE &&
 			($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING))
 			$entry = $this->setEntryOnCategory($category, $entry);
 		
@@ -92,7 +95,7 @@ class categoryEntry extends BasecategoryEntry {
 			$category->decrementPendingEntriesCount();
 			
 		if($this->getStatus() == CategoryEntryStatus::DELETED)
-		{ 
+		{
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::ACTIVE)
 			{
 				if(is_null($this->entryCategoriesRemovedIds))
@@ -174,7 +177,7 @@ class categoryEntry extends BasecategoryEntry {
 			
 		$category->save();
 
-		//only categories with no context are saved on entry - this is only for Backward compatible 
+		//only categories with no context are saved on entry - this is only for Backward compatible
 		if($entry && !categoryEntryPeer::getSkipSave() && (trim($category->getPrivacyContexts()) == '' || $category->getPrivacyContexts() == null))
 		{
 			$categories = array();
