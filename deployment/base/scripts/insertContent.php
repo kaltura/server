@@ -27,15 +27,29 @@ KalturaLog::info("Adding content from directory [$dirPath]");
 $dir = dir($dirPath);
 /* @var $dir Directory */
 
-$returnValue = null;
+
+$fileNames = array();
 while (false !== ($fileName = $dir->read()))
 {
 	$filePath = realpath("$dirPath/$fileName");
 	if($fileName[0] == '.' || is_dir($filePath) || preg_match('/template.xml$/', $fileName))
 		continue;
 
+	$fileNames[] = $fileName;
+}
+$dir->close();
+
+sort($fileNames);
+KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
+
+
+$returnValue = null;
+foreach($fileNames as $filePath)
+{
 	KalturaLog::info("Adding content from file [$filePath]");
 	passthru("php $scriptPath $filePath", $returnValue);
 	if($returnValue !== 0)
 		exit(-1);
 }
+
+
