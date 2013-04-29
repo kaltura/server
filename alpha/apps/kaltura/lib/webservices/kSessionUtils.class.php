@@ -31,7 +31,7 @@ class kSessionUtils
 			$ks->user = $puser_id;
 			$ks->privileges = "view:*,edit:*"; // give privileges for view & edit
 			$ks_str = $ks->toSecureString();
-			return 0;			
+			return 0;
 		}
 		else
 		{
@@ -91,7 +91,7 @@ class kSessionUtils
 		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "")
 	{
 	// 2009-10-20 - don't limit the expiry of the ks !
-/*		
+/*
 		// TODO - verify the partner allows such sessions (basically allows external widgets)
 		$ks_max_expiry_in_seconds =  myPartnerUtils::getExpiry ( $partner_id );
 
@@ -123,7 +123,7 @@ class kSessionUtils
 	public static function crackKs ( $ks_str )
 	{
 		$ks = ks::fromSecureString( $ks_str );
-		return $ks;	
+		return $ks;
 	}
 	
 	/**
@@ -141,7 +141,7 @@ class kSessionUtils
 	 * if the ks exists - use it - it's already cracked but may not be a valid one (it was created before the partner id was known)
 	 * the $required_ticket_type can be a number or a list of numbers separated by ',' - this means any of the types is valid
 	 * the ks->type can be a number greater than 0.
-	 * if the ks->type & required_ticket_type > 0 - it means the ks->type has the relevant bit of the required_ticket_type - 
+	 * if the ks->type & required_ticket_type > 0 - it means the ks->type has the relevant bit of the required_ticket_type -
 	 * 		consider it a match !
 	 * if the required_ticket_type is a list - there should be at least one match for the validation to succeed
 	 */
@@ -217,7 +217,7 @@ class kSessionUtils
 			if($ksObj)
 				$ksObj->kill();
 		}
-		catch(Exception $e){}	
+		catch(Exception $e){}
 	}
 }
 
@@ -226,7 +226,7 @@ class ks extends kSessionBase
 	const USER_WILDCARD = "*";
 	const PRIVILEGE_WILDCARD = "*";
 
-	static $ERROR_MAP = null; 
+	static $ERROR_MAP = null;
 		
 	const INVALID_STR = -1;
 	const INVALID_PARTNER = -2;
@@ -278,7 +278,7 @@ class ks extends kSessionBase
 		if(empty($encoded_str))
 			return null;
 
-		$ks = new ks();		
+		$ks = new ks();
 		if (!$ks->parseKS($encoded_str))
 		{
 			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
@@ -303,13 +303,13 @@ class ks extends kSessionBase
 		list($ksVersion, $secret) = $this->getKSVersionAndSecret($this->partner_id);
 		return kSessionBase::generateSession(
 			$ksVersion,
-			$secret, 
-			$this->user, 
-			$this->type, 
-			$this->partner_id, 
-			$this->valid_until - time(), 
-			$this->privileges, 
-			$this->master_partner_id, 
+			$secret,
+			$this->user,
+			$this->type,
+			$this->partner_id,
+			$this->valid_until - time(),
+			$this->privileges,
+			$this->master_partner_id,
 			$this->additional_data);
 	}
 	
@@ -324,14 +324,14 @@ class ks extends kSessionBase
 		}
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 
-		$allowedIPRestriction = $this->isSetIPRestriction();			
+		$allowedIPRestriction = $this->isSetIPRestriction();
 		if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
 		{
 			KalturaLog::err("ipRestriction: EXCEEDED_RESTRICTED_IP");
 			return self::EXCEEDED_RESTRICTED_IP;
 		}
 		
-		if($this->original_str && 
+		if($this->original_str &&
 			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
 			!$this->isWidgetSession() &&					// Since anyone can create a widget session, no need to check for invalidation
 			$this->isKSInvalidated() !== false)				// Could not check for invalidation using the memcache
@@ -359,7 +359,7 @@ class ks extends kSessionBase
 		}
 		
 		// creates the kuser
-		if($partner_id != Partner::BATCH_PARTNER_ID && 
+		if($partner_id != Partner::BATCH_PARTNER_ID &&
 			PermissionPeer::isValidForPartner(PermissionName::FEATURE_END_USER_REPORTS, $partner_id))
 		{
 			$this->kuser = kuserPeer::createKuserForPartner($partner_id, $puser_id);
@@ -391,7 +391,7 @@ class ks extends kSessionBase
 	{
 		$this->getKuser();
 		
-		if($this->kuser)			
+		if($this->kuser)
 			return $this->kuser->getId();
 			
 		return null;
@@ -415,25 +415,25 @@ class ks extends kSessionBase
 			return strpos ( $this->privileges,  $required_priv_name ) !== FALSE ;
 
 		// either the original privileges were general - with a value of a wildcard
-		if ( ( $this->privileges == self::PRIVILEGE_WILDCARD ) || 
+		if ( ( $this->privileges == self::PRIVILEGE_WILDCARD ) ||
 			 ( strpos ( $this->privileges,  $required_priv_name . ":" . self::PRIVILEGE_WILDCARD ) !== false ) ||
 			 ( strpos ( $this->privileges,  $required_priv_name . ":" . $required_priv_value ) !== false ) )
 			 {
 			 	return true;
 			 }
-		else if (in_array(self::PRIVILEGE_WILDCARD, $this->parsedPrivileges) || 
+		else if (in_array(self::PRIVILEGE_WILDCARD, $this->parsedPrivileges) ||
 		(isset ($this->parsedPrivileges[$required_priv_name]) && in_array($required_priv_value, $this->parsedPrivileges[$required_priv_name])))
 		{
 			return true;
 		}
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		if ( $required_priv_name == ks::PRIVILEGE_EDIT && 
+		if ( $required_priv_name == ks::PRIVILEGE_EDIT &&
 			$this->verifyPlaylistPrivileges(ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST, $required_priv_value, $partnerId))
 		{
 			return true;
 		}
 		
-	    if ( $required_priv_name == ks::PRIVILEGE_VIEW && 
+	    if ( $required_priv_name == ks::PRIVILEGE_VIEW &&
 			$this->verifyPlaylistPrivileges(ks::PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST, $required_priv_value, $partnerId))
 		{
 			return true;
@@ -497,7 +497,7 @@ class ks extends kSessionBase
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION)
 				if ( preg_match( "/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/", $exPrivileges[1]) )
-				{	
+				{
 					//If $exPrivileges[1] is a valid IP address - return value.
 					return $exPrivileges[1];
 				}
@@ -518,7 +518,7 @@ class ks extends kSessionBase
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
 		{
-			if ($priv == self::PRIVILEGE_ENABLE_ENTITLEMENT) 
+			if ($priv == self::PRIVILEGE_ENABLE_ENTITLEMENT)
 				return true;
 		}
 		
@@ -533,7 +533,7 @@ class ks extends kSessionBase
 		// foreach pair - check privileges on playlist
 		foreach($allPrivileges as $priv)
 		{
-			if ($priv == self::PRIVILEGE_DISABLE_ENTITLEMENT) 
+			if ($priv == self::PRIVILEGE_DISABLE_ENTITLEMENT)
 				return true;
 		}
 		
@@ -552,7 +552,7 @@ class ks extends kSessionBase
 		foreach($allPrivileges as $priv)
 		{
 			$exPrivileges = explode(':', $priv);
-			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY) 
+			if ($exPrivileges[0] == self::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY)
 				$entries[] =  $exPrivileges[1];
 		}
 		
@@ -568,9 +568,9 @@ class ks extends kSessionBase
 		
 		foreach($allPrivileges as $priv)
 		{
-			$exPrivileges = explode(':', $priv);
+			$exPrivileges = explode(':', $priv, 2);
 			//validate setRole
-			if ($exPrivileges[0] == self::PRIVILEGE_PRIVACY_CONTEXT && count($exPrivileges) > 1) 
+			if (count($exPrivileges) == 2 && $exPrivileges[0] == self::PRIVILEGE_PRIVACY_CONTEXT)
 				return $exPrivileges[1];
 		}
 		
@@ -587,7 +587,7 @@ class ks extends kSessionBase
 		{
 			// extract playlist ID from pair
 			$exPrivileges = explode(':', $priv);
-			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE) 
+			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE)
 			{
 				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
 					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_SET_ROLE);
@@ -610,7 +610,7 @@ class ks extends kSessionBase
 			// extract playlist ID from pair
 			$exPrivileges = explode(':', $priv);
 			//validate setRole
-			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE){ 
+			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE){
 				$c = new Criteria();
 				$c->addAnd(is_numeric($exPrivileges[1]) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME, $exPrivileges[1], Criteria::EQUAL);
 				$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
@@ -675,6 +675,6 @@ class ks extends kSessionBase
 		
 	public function kill()
 	{
-		invalidSessionPeer::invalidateKs($this);		
+		invalidSessionPeer::invalidateKs($this);
 	}
 }
