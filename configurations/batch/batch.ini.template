@@ -274,7 +274,7 @@ params.sharedTempPath 								= @WEB_DIR@/tmp/convert
 params.EncodingComUserId							= should-fail
 params.EncodingComUserKey							= should-fail
 params.EncodingComUrl								= http://manage.encoding.com/index.php
-
+params.vodPackagerHost								= http://@VOD_PACKAGER_HOST@
 
 [KAsyncConvertCollectionCloser : JobCloserWorker]
 id													= 81
@@ -583,3 +583,19 @@ type												= KAsyncTagResolve
 maximumExecutionTime								= 3000
 sleepBetweenStopStart							    = 3600
 scriptPath											= ../plugins/tag_search/lib/batch/tag_resolve/KAsyncTagResolveExe.php
+
+[KAsyncWidevineRepositorySync : JobHandlerWorker]
+id													= 480
+name												= KAsyncWidevineRepositorySync
+friendlyName										= Syncronize Widevine assets
+type												= KAsyncWidevineRepositorySync
+maximumExecutionTime								= 3000
+scriptPath             								= ../plugins/drm/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
+params.vodPackagerHost								= http://@VOD_PACKAGER_HOST@
+
+[KAsyncWidevineRepositorySyncCloser : JobCloserWorker]
+id													= 490
+friendlyName										= Syncronize Widevine assets Closer
+type												= KAsyncWidevineRepositorySyncCloser
+scriptPath											= ../plugins/drm/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncCloserExe.php
+params.vodPackagerHost								= http://@VOD_PACKAGER_HOST@
