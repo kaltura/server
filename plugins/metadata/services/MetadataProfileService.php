@@ -160,6 +160,7 @@ class MetadataProfileService extends KalturaBaseService
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_UNABLE_TO_TRANSFORM
 	 * @throws MetadataErrors::METADATA_TRANSFORMING
+	 * @throws MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND
 	 */	
 	function updateAction($id, KalturaMetadataProfile $metadataProfile, $xsdData = null, $viewsData = null)
 	{
@@ -181,7 +182,7 @@ class MetadataProfileService extends KalturaBaseService
 		/* @var $oldXsdFileSync FileSync */
   		
 		if(!$oldXsdFileSync)
-			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $id);
+			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
 		
 		$oldXsd = null;
 		$oldXsdFileSync = kFileSyncUtils::resolve($oldXsdFileSync);
@@ -193,23 +194,22 @@ class MetadataProfileService extends KalturaBaseService
 		else
 		{
 			$oldXsd = kDataCenterMgr::getLocalTempPathForFileSync($oldXsdFileSync);
-			$oldXsd = $oldXsd . "-" . $dbMetadataProfile->getVersion(); // To ensure the URL is unique 
    			
    			if(!file_exists($oldXsd))
             {
             	$xsdContent = kFileSyncUtils::getContentsByFileSync ( $oldXsdFileSync , $local , true , false );
    				
             	if(!$xsdContent)
-    				throw new KalturaAPIException(MetadataErrors::METADATA_NOT_FOUND, $id);
+    				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
     			
     			file_put_contents($oldXsd, $xsdContent);
             }
 		}
 		
 		if(!$oldXsd) //Make sure that at this point oldXsd path is already defined
-				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $id);
+				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
 		
-		KalturaLog::DEBUG("Path: [$oldXsd]");
+		KalturaLog::debug("Path: [$oldXsd]");
 		$oldVersion = $dbMetadataProfile->getVersion();
 		
 		if($xsdData)
