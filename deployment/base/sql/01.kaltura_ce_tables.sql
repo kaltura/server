@@ -2457,5 +2457,5 @@ CREATE TABLE `api_server`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`)
-)Type=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
