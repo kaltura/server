@@ -36,4 +36,6 @@ class MetadataErrors extends KalturaErrors
 	const MUST_FILTER_ON_OBJECT_ID = "MUST_FILTER_ON_OBJECT_ID,Must filter on obejct id";
 	
 	const INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE = "INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE,Metadata Profile object type is %s, metadata object type is %s";
+	
+	const METADATA_PROFILE_FILE_NOT_FOUND = "METADATA_PROFILE_FILE_NOT_FOUND,Metadata profile file not found [%s]";
 }
