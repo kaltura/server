@@ -133,7 +133,7 @@ class BatchService extends KalturaBatchService
 		if($bulkUpload)
 		{
 			$handledResults = 0;
-			$bulkUploadResults = self::doSelect($criteria);
+			$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
 			while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
 			{
 				$handledResults += count($bulkUploadResults);
@@ -154,7 +154,7 @@ class BatchService extends KalturaBatchService
 	    		
 	    		kMemoryManager::clearMemory();
 	    		$criteria->setOffset($handledResults);
-				$bulkUploadResults = self::doSelect($criteria);
+				$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
 			}
 			$data = $bulkUpload->getData();
 			if($data && $data instanceof kBulkUploadJobData)

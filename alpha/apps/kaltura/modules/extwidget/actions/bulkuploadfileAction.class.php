@@ -28,9 +28,7 @@ class bulkuploadfileAction extends sfAction
 			$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
 			$criteria->setLimit(100);
 			
-			$bulkUploadResults = self::doSelect($criteria);
-			
-			$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($jobId);
+			$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
 			if(!count($bulkUploadResults))
 				die("Log file is not ready");
 				
@@ -70,7 +68,7 @@ class bulkuploadfileAction extends sfAction
 	    		
 	    		kMemoryManager::clearMemory();
 	    		$criteria->setOffset($handledResults);
-				$bulkUploadResults = self::doSelect($criteria);
+				$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
 			}
 			fclose($STDOUT);
 		}

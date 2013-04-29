@@ -109,7 +109,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $batchJob->getId());
 		$criteria->addAscendingOrderByColumn(BulkUploadResultPeer::LINE_INDEX);
 		$criteria->setLimit(100);
-		$bulkUploadResults = self::doSelect($criteria);
+		$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
 		
 		if(!count($bulkUploadResults))
 			die("Log file is not ready");
@@ -168,7 +168,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    		
     		kMemoryManager::clearMemory();
     		$criteria->setOffset($handledResults);
-			$bulkUploadResults = self::doSelect($criteria);
+			$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
 		}
 		fclose($STDOUT);
 		
