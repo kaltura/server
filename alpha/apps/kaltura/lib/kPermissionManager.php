@@ -694,7 +694,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return true;
 		}
 		
-		$accessAllowed = myPartnerUtils::allowPartnerAccessPartner ( self::$operatingPartnerId , self::getPartnerGroup($service, $action) , self::$requestedPartnerId );
+		$partnerGroup = self::getPartnerGroup($service, $action);
+		$accessAllowed = myPartnerUtils::allowPartnerAccessPartner ( self::$operatingPartnerId , $partnerGroup , self::$requestedPartnerId );
+		if(!$accessAllowed)
+			KalturaLog::debug("Operating partner [" . self::$operatingPartnerId . "] not allowed using requested partner [" . self::$requestedPartnerId . "] with partner group [$partnerGroup]");
+			
 		return $accessAllowed;
 	}
 	
