@@ -25,6 +25,36 @@ class myEntryUtils
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry);
 	}
 	
+	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
+	{	
+		if (!@file_get_contents($filePath)){
+			KalturaLog::debug("thumbnail cannot be created from $filePath " . error_get_last());
+			throw new Exception("thumbnail file path is not valid");
+		}	
+		
+		$thumbAsset = new thumbAsset();
+		$thumbAsset->setPartnerId($entry->getPartnerId());
+		$thumbAsset->setEntryId($entry->getId());
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
+		$thumbAsset->incrementVersion();
+		$thumbAsset->save();
+		
+		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::file_put_contents($fileSyncKey, file_get_contents($filePath));
+
+		$finalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
+		$ext = pathinfo($finalPath, PATHINFO_EXTENSION);		
+		$thumbAsset->setFileExt($ext);				
+		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		$thumbAsset->setWidth($width);
+		$thumbAsset->setHeight($height);
+		$thumbAsset->setSize(filesize($finalPath));
+		
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->save();
+		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);		
+	}
+	
 	public static function deepClone ( entry $source , $kshow_id , $override_fields, $echo = false)
 	{
 		if ($echo)

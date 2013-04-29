@@ -85,7 +85,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 		try 
 		{
 		    $entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
-			myEntryUtils::updateThumbnailFromFile($entry, $this->getThumbnailUrl());
+			myEntryUtils::createThumbnailAssetFromFile($entry, $this->getThumbnailUrl());
 		}
 		catch (Exception $e)
 		{
