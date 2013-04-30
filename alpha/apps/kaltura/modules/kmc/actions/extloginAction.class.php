@@ -24,7 +24,7 @@ class extloginAction extends kalturaAction
 		$error_code = $error[0];
 		$error_message = $error[1];
 
-		$formated_desc = @call_user_func_array('sprintf', array_merge((array)$error_message, $args)); 
+		$formated_desc = @call_user_func_array('sprintf', array_merge((array)$error_message, $args));
 		
 		header("X-Kaltura:error-$error_code");
 		header('X-Kaltura-App: exiting on error '.$error_code.' - '.$formated_desc);
@@ -35,6 +35,9 @@ class extloginAction extends kalturaAction
 	public function execute()
 	{
 		$ks = $this->getP ( "ks" );
+		if(!$ks)
+			$this->dieOnError  ( APIErrors::MISSING_KS );
+			
 		$requestedPartnerId = $this->getP ( "partner_id" );
 		
 		$expired = $this->getP ( "exp" );
@@ -44,7 +47,7 @@ class extloginAction extends kalturaAction
 		
 
 		if (!$requestedPartnerId) {
-			$requestedPartnerId = $ksPartnerId; 
+			$requestedPartnerId = $ksPartnerId;
 		}
 		
 		try {
@@ -88,7 +91,7 @@ class extloginAction extends kalturaAction
 		
 		if (!$partner)
 		{
-			$this->dieOnError  ( APIErrors::UNKNOWN_PARTNER_ID );	
+			$this->dieOnError  ( APIErrors::UNKNOWN_PARTNER_ID );
 		}
 		
 		if (!$partner->validateApiAccessControl())
@@ -105,7 +108,7 @@ class extloginAction extends kalturaAction
 		$noUserInKs = is_null($ksObj->user) || $ksObj->user === '';
 		if ( ($ksPartnerId != $partner_id) || ($partner->getKmcVersion() >= 4 && $noUserInKs) )
 		{
-			$ks = null;	
+			$ks = null;
 			$sessionType = $adminKuser->getIsAdmin() ? SessionType::ADMIN : SessionType::USER;
 			kSessionUtils::createKSessionNoValidations ( $partner_id ,  $admin_puser_id , $ks , 30 * 86400 , $sessionType , "" , "*," . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT );
 		}
