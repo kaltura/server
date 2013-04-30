@@ -201,14 +201,13 @@ class KAsyncImport extends KJobHandlerWorker
 					return $job;
 				}
 				
-				KalturaLog::info("cURL info: " . curl_getinfo($curlWrapper->ch));
-				$curlInfo = curl_getinfo($curlWrapper->ch);
-				
+				$importRes = file_get_contents($data->destFileLocalPath);
+				KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImportHandler');
 				foreach ($pluginInstances as $pluginInstance)
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
-					$newRes = $pluginInstance->handleImportContent($curlInfo, $res, $data);
+					$data= $pluginInstance->handleImportContent($curlHeaderResponse, $importRes, $data);
 				}
 			}
 
@@ -380,18 +379,8 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			clearstatcache();
-			if($fileSize)
-			{
-				if(kFile::fileSize($sharedFile) != $fileSize)
-				{
-					KalturaLog::err("Error: renamed file have a wrong size");
-					die();
-				}
-			}
-			else
-			{
-				$fileSize = kFile::fileSize($sharedFile);
-			}
+
+			$fileSize = kFile::fileSize($sharedFile);
 
 			$this->setFilePermissions($sharedFile);
 

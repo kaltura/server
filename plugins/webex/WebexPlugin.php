@@ -30,17 +30,13 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 	/* (non-PHPdoc)
 	 * @see IKalturaImportHandler::handleImportData()
 	 */
-	public static function handleImportContent(array $curlInfo, $data, KalturaImportJobData $importData) {
-		if ($curlInfo["download_content_length"] < 16000 && $curlInfo["content_type"] == 'text/html')
+	public static function handleImportContent($curlInfo, $data, $importData) {
+		if ($curlInfo->headers['content-length'] < 16000 && $curlInfo->headers['content-type'] == 'text/html')
 		{
 			KalturaLog::info('Handle Import data: Webex Plugin');
 			$matches = null;
-			$cookies = array();
-			if(preg_match_all('/\nSet-Cookie: ([^\r\n]+) path=.+/i', $data, $matches))
-				$cookies = implode(' ', $matches[1]);
-				
 			$recordId = null;
-			$cookiesArr = explode('; ', trim($cookies, ';'));
+			$cookiesArr = explode('; ', trim($curlInfo->headers["set-cookie"]));
 			foreach($cookiesArr as $cookie)
 			{
 				list($cookieName, $cookieValue) = explode('=', $cookie);
@@ -51,30 +47,30 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 			if(!preg_match("/href='([^']+)';/", $data, $matches))
 			{
 				KalturaLog::info("Starting URL not found");
-				return $data;
+				return $importData;
 			}
 			$url2 = $matches[1];
 			$curlWrapper = new KCurlWrapper($url2);
-			curl_setopt($curlWrapper->ch, CURLOPT_COOKIE, $cookies);
+			curl_setopt($curlWrapper->ch, CURLOPT_COOKIE, $curlInfo->headers["set-cookie"]);
 			$result = $curlWrapper->exec();
 			
 			if(!preg_match("/var prepareTicket = '([^']+)';/", $result, $matches))
 			{
 				KalturaLog::info("prepareTicket parameter not found");
-				return $data;
+				return $importData;
 			}
 			$prepareTicket = $matches[1];
 			
 			if (!preg_match('/function (download\(\).+prepareTicket;)/s', $result, $matches))
 			{
 				KalturaLog::info("download function not found");
-				return $data;
+				return $importData;
 			}
 			
 			if (!preg_match('/http.+prepareTicket/', $matches[0], $matches))
 			{
 				KalturaLog::info("prepareTicket URL not found");
-				return $data;
+				return $importData;
 			}
 			
 			$url3 = $matches[0];
@@ -83,17 +79,17 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 			if (!preg_match('/function (func\_prepare\(.+\).+ticket;)/s', $result, $matches))
 			{
 				KalturaLog::info("func_prepare function not found");
-				return $data;
+				return $importData;
 			}
 			
 			if (!preg_match('/http.+ticket/', $matches[0], $matches))
 			{
 				KalturaLog::info("download URL not found");
-				return $data;
+				return $importData;
 			}
 			
 			$url4 = $matches[0];
-			$url4 = str_replace(array('"',' ','+'), '', $url4);
+			$url4 = str_replace(array("'",' ','+'), '', $url4);
 			
 			curl_setopt($curlWrapper->ch, CURLOPT_URL, $url3);
 			
@@ -105,7 +101,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 				if(!preg_match("/window\.parent\.func_prepare\('([^']+)','([^']*)','([^']*)'\);/", $result, $matches))
 				{
 					KalturaLog::info("Invalid result returned for prepareTicket request - should contain call to the func_prepare method");
-					return $data;
+					return $importData;
 				}
 				$status = $matches[1];
 				if($status == 'OKOK')
@@ -117,7 +113,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 			if($status != 'OKOK')
 			{
 				KalturaLog::info("Invalid result returned for prepareTicket request");
-				return $data;
+				return $importData;
 			}
 				
 			$ticket = $matches[3];
@@ -126,13 +122,23 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 			
 			curl_setopt($curlWrapper->ch, CURLOPT_URL, $url4);
 			curl_setopt($curlWrapper->ch, CURLOPT_RETURNTRANSFER, false);
+			$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
+			$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", "$fileName.arf", $importData->destFileLocalPath);
+			$importData->destFileLocalPath = $destFileLocalPath;
 			KalturaLog::info('destination: ' . $importData->destFileLocalPath);
 			$result = $curlWrapper->exec($importData->destFileLocalPath);
-			$curlWrapper->close();
 			
-			return $result;
+			if (!$result)
+			{	
+				KalturaLog::debug("getError: " . $curlWrapper->getError());
+			}
+			
+			$curlWrapper->close();
+			$importData->fileSize = kFile::fileSize($importData->destFileLocalPath);
+			
+			return $importData;
 		}
 		
-		return $data;
+		return $importData;
 	}
 }
