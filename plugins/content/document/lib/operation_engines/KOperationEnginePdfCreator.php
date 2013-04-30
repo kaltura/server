@@ -27,6 +27,9 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	//this will be the default value if it not set in the task's configuration
 	const DEFAULT_SLEEP_SECONDS = 2;
 	
+	// this will be the default value if it is not set in task's configuration under - killPopupsPath
+	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
+	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		KalturaLog::debug("document : operator [". print_r($operator, true)."] inFilePath [$inFilePath]"); 
@@ -89,6 +92,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		$this->outFilePath = $tmpFile;
 		
+		// Create popups log file
+		$killPopupsPath = $this->getKillPopupsPath();
+		if(file_exists($killPopupsPath))
+			unlink($killPopupsPath);
+		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 
 		$this->outFilePath = $finalOutputPath;
@@ -114,8 +122,18 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			clearstatcache();
 		}
 		
+		// Read popup log file
+		if(file_exists($killPopupsPath)) {
+			$data = file_get_contents($killPopupsPath);
+			KalturaLog::notice("Convert popups warnings - " . $data);
+			$this->message = $data;
+
+			unlink($killPopupsPath);
+		}
+		
 		if (!file_exists(realpath($tmpFile))) {
-			throw new kTemporaryException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.']');
+			throw new kTemporaryException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.'] 
+					Convert Engine message [' . $this->message . ']');
 		}else{
 			KalturaLog::notice('document temp  found ['.$tmpFile.'] output file ['.$this->outFilePath.']'); 
 		}
@@ -148,5 +166,13 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 	}
 		
+	private function getKillPopupsPath() 
+	{
+		$killPopupsPath = $this->taskConfig->params->killPopupsPath;
+		if(!$killPopupsPath){
+			$killPopupsPath = self::DEFAULT_KILL_POPUPS_PATH;
+		}
+		return $killPopupsPath;
+	}
 	
 }

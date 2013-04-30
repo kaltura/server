@@ -7,6 +7,8 @@ import copy
 import time
 import sys
 
+REPORT_FILE = "c:/temp/killWindowsPopupsLog.txt"
+
 class WindowFinder:
     def __init__(self, matchStr):
         self.matchPath = []
@@ -24,6 +26,7 @@ class WindowFinder:
 
     def findWindow(self, parentWnd = None):
         self.results = []
+        self.resultStr = []
         self.curPos = []
         if parentWnd == None:
             win32gui.EnumWindows(WindowFinder.staticFindCallback, self)
@@ -41,6 +44,7 @@ class WindowFinder:
             self.curPos.append(hwnd)
             if len(self.curPos) >= len(self.matchPath):
                 self.results.append(copy.deepcopy(self.curPos))
+                self.resultStr.append(win32gui.GetClassName(hwnd) + ":"+ win32gui.GetWindowText(hwnd))
             else:
                 try:
                     win32gui.EnumChildWindows(hwnd, WindowFinder.staticFindCallback, self)
@@ -68,6 +72,14 @@ def killProcess(processId):
     except pywintypes.error:
         pass
 
+def logResult(resultStr):
+    f = open(REPORT_FILE, 'a')
+    for curStr in resultStr:
+        str = curStr.strip().replace('\n',' ')	
+        f.write(str)
+        f.write("\n")
+    f.close()
+	
 def runCycle():
     for matchStr, resultIdx, subMatchStr, action in CONFIG:
         finder = WindowFinder(matchStr)
@@ -80,6 +92,8 @@ def runCycle():
             resultIdx = -1
             
         results = map(lambda x: x[resultIdx], finder.results)
+		
+        logResult(finder.resultStr)
 
         if action[0] == ET_WINDOW_MESSAGE:
             _, wmMsg, wParam, lParam = action
@@ -195,6 +209,10 @@ CONFIG = [
     
     # Read only file
     ('text:Microsoft Word/text:should be opened as read-only unless changes to it need to be saved', 0, None,(ET_PUSH_BUTTON, 'text:Yes,class:Button')),   
+	
+	#curropted file
+	('text:Microsoft Word/text:The file appears to be corrupted', 0, None,(ET_KILL_PROCESS,)),  
+	('text:(Protected View) - Microsoft Word/class:OPH Previewer Window', 0, None,(ET_KILL_PROCESS,)),  
 ]
 
 if __name__ == '__main__':
