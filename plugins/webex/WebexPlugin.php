@@ -33,6 +33,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 	public static function handleImportContent(array $curlInfo, $data, KalturaImportJobData $importData) {
 		if ($curlInfo["download_content_length"] < 16000 && $curlInfo["content_type"] == 'text/html')
 		{
+			KalturaLog::info('Handle Import data: Webex Plugin');
 			$matches = null;
 			$cookies = array();
 			if(preg_match_all('/\nSet-Cookie: ([^\r\n]+) path=.+/i', $data, $matches))
@@ -125,10 +126,13 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 			
 			curl_setopt($curlWrapper->ch, CURLOPT_URL, $url4);
 			curl_setopt($curlWrapper->ch, CURLOPT_RETURNTRANSFER, false);
+			KalturaLog::info('destination: ' . $importData->destFileLocalPath);
 			$result = $curlWrapper->exec($importData->destFileLocalPath);
 			$curlWrapper->close();
 			
 			return $result;
 		}
+		
+		return $data;
 	}
 }
