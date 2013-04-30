@@ -4,7 +4,7 @@
  * @subpackage model.data
  *
  */
-class kIndexTagsByPrivacyContextJobData
+class kIndexTagsByPrivacyContextJobData extends kJobData
 {
 	/**
 	 * @var int
