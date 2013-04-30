@@ -2,7 +2,7 @@
 define	service{
 		use								local-service
 		hostgroup_name					kaltura-api
-		service_description				Kaltura	Host Ping
+		service_description				Kaltura Host Ping
 		check_command					kaltura-host-ping
 		notifications_enabled			1
 		}
@@ -10,22 +10,22 @@ define	service{
 define	service{
 		use								local-service
 		hostgroup_name					kaltura-api
-		service_description				Kaltura	Host Ping Database
+		service_description				Kaltura Host Ping Database
 		check_command					kaltura-host-ping-db
 		notifications_enabled			0
 		}
 
 define	service{
 		use								local-service
-		host_name						localhost
-		service_description				Kaltura	Playlist Execute
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Playlist Execute
 		check_command					kaltura-host-execute-playlist
 		notifications_enabled			1
 		}
 
 define	service{
 		use								local-service
-		host_name						localhost
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		service_description				Kaltura Session Start
 		check_command					kaltura-host-start-session
 		notifications_enabled			1
@@ -33,7 +33,7 @@ define	service{
 
 define	service{
 		use								local-service
-		host_name						localhost
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		service_description				Kaltura Dynamic Player Request
 		check_command					kaltura-host-kdp-multi-request
 		notifications_enabled			1
@@ -41,7 +41,7 @@ define	service{
 
 define	service{
 		use								local-service
-		host_name						localhost
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		service_description				Kaltura HTML5 Player Request
 		check_command					kaltura-host-html5-multi-request
 		notifications_enabled			1
