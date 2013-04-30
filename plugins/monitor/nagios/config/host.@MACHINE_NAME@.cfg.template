@@ -1,7 +1,7 @@
 
 define	host{
 		use						linux-server
-		host_name				kaltura-@MACHINE_NAME@
+		host_name				@MACHINE_NAME@
 		alias					Kaltura @MACHINE_NAME@
 		address					@MACHINE_NAME@
 		}
