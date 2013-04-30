@@ -201,9 +201,10 @@ class KAsyncImport extends KJobHandlerWorker
 					return $job;
 				}
 				
+				KalturaLog::info("cURL info: " . curl_getinfo($curlWrapper->ch));
 				$curlInfo = curl_getinfo($curlWrapper->ch);
 				
-				$pluginInstances = KalturaPluginManager::getPluginInstance('IKalturaImportHandler');
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImportHandler');
 				foreach ($pluginInstances as $pluginInstance)
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
