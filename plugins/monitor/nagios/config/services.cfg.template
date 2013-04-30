@@ -12,7 +12,7 @@ define	service{
 		hostgroup_name					kaltura-api
 		service_description				Kaltura Host Ping Database
 		check_command					kaltura-host-ping-db
-		notifications_enabled			0
+		notifications_enabled			1
 		}
 
 define	service{
