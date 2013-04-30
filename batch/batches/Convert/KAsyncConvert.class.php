@@ -281,7 +281,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
 				$job->message = "File ready for download";
 			}
-			elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, directorySync))
+			elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
 			{
 				$job->status = KalturaBatchJobStatus::FINISHED;
 				$job->message = "File moved to shared";
