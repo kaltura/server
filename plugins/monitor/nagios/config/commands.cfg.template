@@ -1,0 +1,31 @@
+
+define command{
+        command_name    kaltura-host-ping
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/ping.php -service-url $HOSTADDRESS$ --warning-threshold 1 --error-threshold0-5
+        }
+
+define command{
+        command_name    kaltura-host-ping-db
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/pingDb.php -service-url $HOSTADDRESS$ --warning-threshold 1 --error-threshold0-5
+        }
+
+define command{
+        command_name    kaltura-host-execute-playlist
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/executePlaylist.php --service-url $HOSTADDRESS$ --playlist-reference-id PLAYLIST_MOST_RECENT --warning-threshold 2 --error-threshold0-10
+        }
+
+define command{
+        command_name    kaltura-host-start-session
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/startSession.php --service-url $HOSTADDRESS$ --ks-type user --warning-threshold 1 --error-threshold0-2
+        }
+
+define command{
+        command_name    kaltura-host-kdp-multi-request
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --warning-threshold 1 --error-threshold0-2
+        }
+
+define command{
+        command_name    kaltura-host-html5-multi-request
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --list-flavors --list-cue-points --list-metadata --warning-threshold 1 --error-threshold0-2
+        }
+
