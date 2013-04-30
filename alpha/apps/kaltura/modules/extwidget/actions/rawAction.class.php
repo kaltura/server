@@ -106,6 +106,7 @@ class rawAction extends sfAction
 			$ret_file_name = $entry_id;
 			$name = $ret_file_name;
 		}
+		$name = str_replace(array("\t", "\r", "\n"), array(' ', '', ' '), $name);
 		$format = $this->getRequestParameter( "format" );
 		
 		if ( $type == "download" && $format && $entry->getType() != entryType::DOCUMENT) // mediaType is not relevant when requesting download with format
