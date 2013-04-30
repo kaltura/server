@@ -1,12 +1,12 @@
 
 define command{
         command_name    kaltura-host-ping
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/ping.php -service-url $HOSTADDRESS$ --warning-threshold 1 --error-threshold0-5
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/ping.php --service-url $HOSTADDRESS$ --warning-threshold 1 --error-threshold0-5
         }
 
 define command{
         command_name    kaltura-host-ping-db
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/pingDb.php -service-url $HOSTADDRESS$ --warning-threshold 1 --error-threshold0-5
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php @APP_DIR@/tests/monitoring/api_v3/pingDb.php --service-url $HOSTADDRESS$ --warning-threshold 1 --error-threshold0-5
         }
 
 define command{
