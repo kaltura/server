@@ -1072,12 +1072,17 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] deleted");
 		
+		$entry = entryPeer::retrieveByPK($metadata->getObjectId());
+		if (!$entry){
+			KalturaLog::debug("Entry [".$metadata->getObjectId()."] not found");
+			return true; 
+		}
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
 		{
 			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
 				continue;
-		
+
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
@@ -1095,10 +1100,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
-			
+				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
 					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
@@ -1128,9 +1131,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
+				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
 				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
@@ -1188,6 +1189,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			}
 		}
 		
+		$entry = entryPeer::retrieveByPK($metadata->getObjectId());
+		if (!$entry){
+			KalturaLog::debug("Entry [".$metadata->getObjectId()."] not found");
+			return true; 
+		}
+		
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -1211,10 +1218,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
-			
+				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
 					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
@@ -1284,10 +1289,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						break;
 				}
 				
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
-				
+				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+
 				if(!$updateRequired)
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
@@ -1446,9 +1449,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				case EntryDistributionStatus::PENDING:
 				case EntryDistributionStatus::ERROR_SUBMITTING:	
 				
-					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-					$entryDistribution->setValidationErrorsArray($validationErrors);
-					$entryDistribution->save();
+					$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
 					if (count($distributionProfile->getAutoCreateFlavorsArray()) || count($distributionProfile->getAutoCreateThumbArray()) )
@@ -1460,10 +1461,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					
 				case EntryDistributionStatus::QUEUED:
 				
-					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-					$entryDistribution->setValidationErrorsArray($validationErrors);
-					$entryDistribution->save();
-
+					$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
 					
 					if(!count($validationErrors) && $entry->getStatus() == entryStatus::READY)
@@ -1509,9 +1507,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						}
 					}
 				
-					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-					$entryDistribution->setValidationErrorsArray($validationErrors);
-					$entryDistribution->save();
+					$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 					
 					if(!$updateRequired)
 					{
@@ -1707,19 +1703,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() == EntryDistributionStatus::PENDING)
 			{
-				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
-				$listChanged = ($listChanged | kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
-				
-				if(!$listChanged)
-				{
-					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] asset lists didn't change");
-					continue;
-				}
-				
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
+				$validationErrors = assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
@@ -1749,19 +1733,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
-				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
-				$listChanged = ($listChanged | kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
-				
-				if(!$listChanged)
-				{
-					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] asset lists didn't change");
-					continue;
-				}
-					
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
+				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
 				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
@@ -1778,5 +1750,22 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		
 		return true;
+	}
+	
+	protected static function assignAssetsAndValidateForSubmission(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile, $action){
+		$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+		$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+		$listChanged = ($listChanged | kContentDistributionManager::assignAssets($entryDistribution, $entry, $distributionProfile));
+		
+		if(!$listChanged)
+		{
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] asset lists didn't change");
+		}
+		
+		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, $action);
+		$entryDistribution->setValidationErrorsArray($validationErrors);
+		$entryDistribution->save();
+		
+		return $validationErrors;
 	}
 }
