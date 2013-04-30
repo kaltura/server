@@ -93,11 +93,13 @@ class previewAction extends kalturaAction
 		// Add flashVars
 		if( isset($_GET['flashvars']) ) {
 			$flashVars = array();
-			foreach($_GET['flashvars'] as $key => $val) {
-				if( $this->isJson($val) ) {
-					$val = json_decode($val, true);
+			if(is_array($_GET['flashvars'])) {
+				foreach($_GET['flashvars'] as $key => $val) {
+					if( $this->isJson($val) ) {
+						$val = json_decode($val, true);
+					}
+					$flashVars[$key] = $val;
 				}
-				$flashVars[$key] = $val;
 			}
 			//Check for playlist name
 			if( isset($_GET['flashvars']['playlistAPI.kpl0Name']) ) {
