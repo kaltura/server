@@ -22,6 +22,9 @@ FilterChain COMPRESS
         RewriteCond   %{DOCUMENT_ROOT}%{REQUEST_FILENAME}  !-d
         RewriteCond   %{DOCUMENT_ROOT}%{REQUEST_FILENAME}  !-f
         RewriteRule ^/([a-zA-Z0-9]+[^/])$                /index.php/$1    [PT]
+        
+		# redirect root to start page
+		RewriteRule ^/$ /start/index.php [R]
 </IfModule>
 
 Alias /sf "/usr/share/pear/data/symfony/web/sf/"

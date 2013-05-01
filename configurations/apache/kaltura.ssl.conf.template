@@ -16,9 +16,6 @@ SSLCertificateKeyFile @SSL_CERTIFICATE_KEY_FILE@
 	
 	ErrorLog "@LOG_DIR@/kaltura_apache_errors_ssl.log"
 	CustomLog @LOG_DIR@/kaltura_apache_access_ssl.log vhost_kalt
-		
-	# redirect root to start page
-	RewriteRule ^$ https://@KALTURA_FULL_VIRTUAL_HOST_NAME@/start/index.php
 	
 	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
 </VirtualHost>
