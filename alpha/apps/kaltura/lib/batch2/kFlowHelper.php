@@ -1290,7 +1290,7 @@ class kFlowHelper
 		$ks->additional_data = null;
 		$ks_str = $ks->toSecureString();
 
-		$logFileUrl = "http://".kConf::get("www_host") . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
+		$logFileUrl = kConf::get("apphome_url") . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
 		return $logFileUrl;
 	}
 
