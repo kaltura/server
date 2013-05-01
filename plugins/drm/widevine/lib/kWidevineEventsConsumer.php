@@ -119,6 +119,13 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 			if($flavorAsset->getWidevineAssetId())
 				$wvAssetIds[] = $flavorAsset->getWidevineAssetId();			
 		}
+		
+		if(!count($wvAssetIds))
+		{
+			KalturaLog::debug("No valid WV assets found, Widevine Sync job is not created");
+			return;
+		}
+			
 		$jobData->setWvAssetIds(implode(',', $wvAssetIds));				
 		$jobData->addModifiedAttribute('licenseStartDate', $entryStartDate);
 		$jobData->addModifiedAttribute('licenseEndDate', $entryEndDate);
