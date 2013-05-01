@@ -127,11 +127,17 @@ class kFileUtils extends kFile
 		}
 		
 		$url = $_SERVER['REQUEST_URI'];
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+			$post_params['apiProtocol'] = 'https_' . kConf::get('https_param_salt');
+		
+	  	$ipHeader = infraRequestUtils::getSignedIpAddressHeader();
+	  	if ($ipHeader)
+	  		list($headerName, $headerValue) = $ipHeader;
 		
 		$ch = curl_init();
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $host . $url );
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest"));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest", $headerName .": ". $headerValue));
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
