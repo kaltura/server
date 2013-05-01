@@ -27,30 +27,30 @@ $options = getopt('', array(
 $matches = null;
 if(isset($options['error-threshold']))
 {
-	if(is_numeric($options['error-threshold']))
-	{
-		$errorThresholdMax = intval($options['error-threshold']);
-	}
-	elseif(preg_match('/^([\d]*)-([\d]*)$/', trim($options['error-threshold']), $matches))
+	if(preg_match('/^([\d]*)-([\d]*)$/', trim($options['error-threshold']), $matches))
 	{
 		if(is_numeric($matches[1]))
 			$errorThresholdMin = $matches[1];
 		if(is_numeric($matches[2]))
 			$errorThresholdMax = $matches[2];
 	}
+	elseif(is_numeric($options['error-threshold']))
+	{
+		$errorThresholdMax = intval($options['error-threshold']);
+	}
 }
 if(isset($options['warning-threshold']))
 {
-	if(is_numeric($options['warning-threshold']))
-	{
-		$warningThresholdMax = intval($options['warning-threshold']);
-	}
-	elseif(preg_match('/^([\d]*)-([\d]*)$/', trim($options['warning-threshold']), $matches))
+	if(preg_match('/^([\d]*)-([\d]*)$/', trim($options['warning-threshold']), $matches))
 	{
 		if(is_numeric($matches[1]))
 			$warningThresholdMin = $matches[1];
 		if(is_numeric($matches[2]))
 			$warningThresholdMax = $matches[2];
+	}
+	elseif(is_numeric($options['warning-threshold']))
+	{
+		$warningThresholdMax = intval($options['warning-threshold']);
 	}
 }
 
@@ -88,6 +88,18 @@ if(isset($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
 if(isset($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
 {
 	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMax;
+	exit(NAGIOS_CODE_WARNING);
+}
+
+if(isset($errorThresholdMin) && $monitorResult->value > $errorThresholdMin)
+{
+	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThresholdMin;
+	exit(NAGIOS_CODE_CRITICAL);
+}
+
+if(isset($warningThresholdMin) && $monitorResult->value > $warningThresholdMin)
+{
+	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMin;
 	exit(NAGIOS_CODE_WARNING);
 }
 

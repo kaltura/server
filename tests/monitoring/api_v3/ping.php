@@ -27,13 +27,12 @@ try
 	$monitorResult->value = $monitorResult->executionTime;
 	$monitorResult->description = "Ping time: $monitorResult->value seconds";
 }
-catch(KalturaClientException $ex)
+catch(Exception $ex)
 {
 	$end = microtime(true);
-	
 	$monitorResult->executionTime = $end - $start;
 	$monitorResult->value = -1;
-	$monitorResult->description = $ex->getMessage();
+	$monitorResult->description = "Exception: " . get_class($ex) . ", Code: " . $ex->getCode() . ", Message: " . $ex->getMessage();
 }
 echo "$monitorResult";
 exit(0);

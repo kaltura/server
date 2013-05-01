@@ -35,18 +35,12 @@ try
 		$monitorResult->description = 'Database ping failed';
 	}
 }
-catch(KalturaClientException $ex)
+catch(Exception $ex)
 {
 	$end = microtime(true);
 	$monitorResult->executionTime = $end - $start;
-	$monitorResult->value = 0;
-	$monitorResult->description = $ex->getMessage();;
-	
-	$error = new KalturaMonitorError();
-	$error->level = "ERR";
-	$error->description = $ex->getMessage();
-	$error->code = $ex->getCode();
-	$monitorResult->errors[] = $error;
+	$monitorResult->value = -1;
+	$monitorResult->description = "Exception: " . get_class($ex) . ", Code: " . $ex->getCode() . ", Message: " . $ex->getMessage();
 }
 
 echo "$monitorResult";
