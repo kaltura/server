@@ -27,11 +27,12 @@ class FlavorParamsService extends KalturaBaseService
 	 */
 	protected function partnerGroup($peer = null)
 	{
-		if(
-			$this->actionName == 'get' ||
-			$this->actionName == 'list'
-			)
+		if( $this->actionName == 'get') {
+			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
 			return $this->partnerGroup . ',0';
+		} else if ($this->actionName == 'list') {
+			return $this->partnerGroup . ',0';
+		}
 			
 		return $this->partnerGroup;
 	}
