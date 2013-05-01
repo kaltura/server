@@ -60,14 +60,7 @@ if(!isset($options['script']))
 	exit(NAGIOS_CODE_UNKNOWN);
 }
 
-$testScript = $options['script'];
-$testScriptArguments = array_slice($argv, 1);
-foreach($testScriptArguments as $key => $arg)
-{
-	if($arg == '--script' || $arg == $testScript)
-		unset($testScriptArguments[$key]);
-}
-$testScriptCmd = "$testScript " . implode(' ', $testScriptArguments);
+$testScriptCmd = $options['script'];
 
 $outputLines = null;
 $returnedValue = null;
@@ -94,25 +87,25 @@ if($monitorResult->errors)
 
 if(!is_null($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
 {
-	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThresholdMax;
+	echo "ERROR -  monitor value [$monitorResult->value] exceeded error value[$errorThresholdMax]: $monitorResult->description";
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
 if(!is_null($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
 {
-	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMax;
+	echo "ERROR -  monitor value [$monitorResult->value] exceeded error value[$errorThresholdMax]: $monitorResult->description";
 	exit(NAGIOS_CODE_WARNING);
 }
 
 if(!is_null($errorThresholdMin) && $monitorResult->value < $errorThresholdMin)
 {
-	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThresholdMin;
+	echo "ERROR -  monitor value [$monitorResult->value] exceeded error value[$errorThresholdMax]: $monitorResult->description";
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
 if(!is_null($warningThresholdMin) && $monitorResult->value < $warningThresholdMin)
 {
-	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMin;
+	echo "ERROR -  monitor value [$monitorResult->value] exceeded error value[$errorThresholdMax]: $monitorResult->description";
 	exit(NAGIOS_CODE_WARNING);
 }
 
