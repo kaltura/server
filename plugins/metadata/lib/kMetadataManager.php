@@ -3,7 +3,7 @@
  * @package plugins.metadata
  * @subpackage lib
  */
-class kMetadataManager 
+class kMetadataManager
 {
 	const APP_INFO_SEARCH = 'searchable';
 	const APP_INFO_KEY = 'key';
@@ -20,7 +20,7 @@ class kMetadataManager
 	
 	/**
 	 * @param KalturaMetadataObjectType $objectType
-	 * 
+	 *
 	 * @return IMetadataPeer
 	 */
 	protected static function getObjectPeer($objectType)
@@ -46,7 +46,7 @@ class kMetadataManager
 	
 	/**
 	 * @param Metadata $object
-	 * 
+	 *
 	 * @return BaseObject returns the object referenced by the peer
 	 */
 	public static function getObjectFromPeer(Metadata $metadata)
@@ -103,10 +103,10 @@ class kMetadataManager
 	
 	/**
 	 * Parse the XSD and update the list of search fields
-	 * 
+	 *
 	 * @param MetadataProfile $metadataProfile
 	 * @param partnerId
-	 * 
+	 *
 	 * @return TBD
 	 */
 	public static function parseProfileSearchFields($partnerId, MetadataProfile $metadataProfile)
@@ -135,9 +135,9 @@ class kMetadataManager
 			
 			$xPathData = $xPaths[$xPath];
 			
-			if($profileField->getStatus() != MetadataProfileField::STATUS_ACTIVE && 
+			if($profileField->getStatus() != MetadataProfileField::STATUS_ACTIVE &&
 				isset($xPathData['type']) &&
-				($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || 
+				($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE ||
 				 $xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT))
 			{
 				$availableSearchIndex = self::getAvailableSearchIndex($partnerId, $metadataProfile->getObjectType());
@@ -182,7 +182,7 @@ class kMetadataManager
 			{
 				$profileField->setType($xPathData['type']);
 				
-				if (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) || 
+				if (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) ||
 				    ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT)){
 					$availableSearchIndex = self::getAvailableSearchIndex($partnerId, $metadataProfile->getObjectType());
 					if (!isset($availableSearchIndex))
@@ -251,7 +251,7 @@ class kMetadataManager
 	{
 		$profileFields = MetadataProfileFieldPeer::retrieveIndexableByPartnerAndType($partnerId, $objectType);
 		
-		$occupiedIndexes = array();	
+		$occupiedIndexes = array();
 		foreach($profileFields as $profileField)
 			$occupiedIndexes[$profileField->getSearchIndex()] = true;
 			
@@ -268,10 +268,10 @@ class kMetadataManager
 	
 	/**
 	 * Return search texts per object id
-	 * 
+	 *
 	 * @param int $objectType
 	 * @param string $objectId
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function getSearchValuesByObject($objectType, $objectId)
@@ -293,10 +293,10 @@ class kMetadataManager
 	
 	/**
 	 * Parse the XML and update the list of search values
-	 * 
+	 *
 	 * @param Metadata $metadata
 	 * @param array $searchValues
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function getDataSearchValues(Metadata $metadata, $searchValues = array())
@@ -333,7 +333,7 @@ class kMetadataManager
 			if(!$nodes->length)
 				continue;
 
-			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || 
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE ||
 			   $profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
 				foreach($nodes as $node){
 					if(!is_null($profileField->getSearchIndex()))
@@ -373,7 +373,7 @@ class kMetadataManager
 			foreach($searchItem as $searchPhrase)
 				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_' . $key;
 				
-	 	if(count($textItems)) 
+	 	if(count($textItems))
 	 		$searchTexts['text'] = MetadataSearchFilter::createSphinxSearchCondition($metadata->getPartnerId(), implode(' ', $textItems) , true);
 		
 		$ret = array();
@@ -391,7 +391,7 @@ class kMetadataManager
 	
 	/**
 	 * Check if transforming required and create job if needed
-	 * 
+	 *
 	 * @param MetadataProfile $metadataProfile
 	 * @param int $prevVersion
 	 * @param string $prevXsdPath
@@ -402,19 +402,20 @@ class kMetadataManager
 		if(!PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
 		{
 			$xsl = kXsd::compareXsd($prevXsdPath, $newXsdPath);
-			if(!$xsl)
-				return;
 		}
 			
-		if(is_bool($xsl))
+		if($xsl === true)
 			return self::upgradeMetadataObjects($metadataProfile->getId(), $prevVersion, $newVersion);
-		
+
+		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_TRANSFORMATION, $metadataProfile->getPartnerId()))
+			throw new kXsdException(kXsdException::TRANSFORMATION_REQUIRED);
+			
 		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion, $xsl);
 	}
 
 	/**
-	 * batch getTransformMetadataObjects action retrieve all metadata objects that requires upgrade and the total count 
-	 * 
+	 * batch getTransformMetadataObjects action retrieve all metadata objects that requires upgrade and the total count
+	 *
 	 * @param int $metadataProfileId The id of the metadata profile
 	 * @param int $srcVersion The old metadata profile version
 	 * @param int $destVersion The new metadata profile version
@@ -448,12 +449,12 @@ class kMetadataManager
 	
 	/**
 	 * Validate the XML against the profile XSD and set the metadata status
-	 * 
+	 *
 	 * @param int $metadataProfileId
 	 * @param string $metadata
 	 * @param string $errorMessage
 	 * @param int $metadataProfileVersion leave it null to use the latest
-	 * 
+	 *
 	 * returns bool
 	 */
 	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $metadataProfileVersion = null)
@@ -494,7 +495,7 @@ class kMetadataManager
 	/**
 	 * @param Metadata $metadata
 	 * @param KalturaMetadataStatus $status
-	 * 
+	 *
 	 * returns metadata status
 	 */
 	protected static function setMetadataStatus(Metadata $metadata, $status, $metadataProfileVersion = null)
@@ -510,7 +511,7 @@ class kMetadataManager
 	
 	/**
 	 * @param KalturaMetadataObjectType $objectType
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getObjectTypeName($objectType)
@@ -544,7 +545,7 @@ class kMetadataManager
 	/**
 	 * @param int $metadataId
 	 * @param string $url
-	 * 
+	 *
 	 * @return BatchJob
 	 */
 	public static function addImportMetadataJob($partnerId, $metadataId, $url)
@@ -566,16 +567,16 @@ class kMetadataManager
 	 * @param int $srcVersion
 	 * @param int $destVersion
 	 * @param string $xsl
-	 * 
+	 *
 	 * @return BatchJob
 	 */
-	public static function addTransformMetadataJob($partnerId, $metadataProfileId, $srcVersion, $destVersion, $xsl = null)
+	private static function addTransformMetadataJob($partnerId, $metadataProfileId, $srcVersion, $destVersion, $xsl = null)
 	{
 		// check if any metadata objects require the transform
 		$c = new Criteria();
 		$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
 		$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $destVersion, Criteria::LESS_THAN);
-		$c->add(MetadataPeer::STATUS, Metadata::STATUS_VALID);		
+		$c->add(MetadataPeer::STATUS, Metadata::STATUS_VALID);
 		$metadataCount = MetadataPeer::doCount($c);
 		if(!$metadataCount)
 			return null;
@@ -617,7 +618,7 @@ class kMetadataManager
 		$profileFields = MetadataProfileFieldPeer::retrieveIndexableByPartnerAndType($partnerId, $obejctType);
 		
 		foreach($profileFields as $profileField)
-		{		
+		{
 			if ($profileField->getMetadataProfileId() == $metadataProfileId)
 				continue;
 				
@@ -628,8 +629,8 @@ class kMetadataManager
 		
 		$xPaths = kXsd::findXpathsByAppInfo($xsdData , kMetadataManager::APP_INFO_SEARCH, 'true', $isPath);
 		foreach($xPaths as $xPath => $xPathData)
-		{		
-			if(isset($xPathData['type']) && (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) || 
+		{
+			if(isset($xPathData['type']) && (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) ||
 											 ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT)))
 				$additionalSearchableFieldsCounter++;
 		}

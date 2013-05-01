@@ -22,7 +22,7 @@ class MetadataProfileService extends KalturaBaseService
 		
 	/**
 	 * Allows you to add a metadata profile object and metadata profile content associated with Kaltura object type
-	 * 
+	 *
 	 * @action add
 	 * @param KalturaMetadataProfile $metadataProfile
 	 * @param string $xsdData XSD metadata definition
@@ -72,7 +72,7 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * Allows you to add a metadata profile object and metadata profile file associated with Kaltura object type
-	 * 
+	 *
 	 * @action addFromFile
 	 * @param KalturaMetadataProfile $metadataProfile
 	 * @param file $xsdFile XSD metadata definition
@@ -129,12 +129,12 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * Retrieve a metadata profile object by id
-	 * 
+	 *
 	 * @action get
-	 * @param int $id 
+	 * @param int $id
 	 * @return KalturaMetadataProfile
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
-	 */		
+	 */
 	function getAction($id)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK( $id );
@@ -150,9 +150,9 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * Update an existing metadata object
-	 * 
+	 *
 	 * @action update
-	 * @param int $id 
+	 * @param int $id
 	 * @param KalturaMetadataProfile $metadataProfile
 	 * @param string $xsdData XSD metadata definition
 	 * @param string $viewsData UI views definition
@@ -161,7 +161,7 @@ class MetadataProfileService extends KalturaBaseService
 	 * @throws MetadataErrors::METADATA_UNABLE_TO_TRANSFORM
 	 * @throws MetadataErrors::METADATA_TRANSFORMING
 	 * @throws MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND
-	 */	
+	 */
 	function updateAction($id, KalturaMetadataProfile $metadataProfile, $xsdData = null, $viewsData = null)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
@@ -172,7 +172,7 @@ class MetadataProfileService extends KalturaBaseService
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
 
-		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $dbMetadataProfile->getObjectType(), $id);	
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $dbMetadataProfile->getObjectType(), $id);
 		
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
@@ -258,12 +258,12 @@ class MetadataProfileService extends KalturaBaseService
 		
 		$metadataProfile->fromObject($dbMetadataProfile);
 		return $metadataProfile;
-	}	
+	}
 	
 	
 	/**
 	 * List metadata profile objects by filter and pager
-	 * 
+	 *
 	 * @action list
 	 * @param KalturaMetadataProfileFilter $filter
 	 * @param KalturaFilterPager $pager
@@ -295,7 +295,7 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * List metadata profile fields by metadata profile id
-	 * 
+	 *
 	 * @action listFields
 	 * @param int $metadataProfileId
 	 * @return KalturaMetadataProfileFieldListResponse
@@ -313,11 +313,11 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * Delete an existing metadata profile
-	 * 
+	 *
 	 * @action delete
 	 * @param int $id
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
-	 */		
+	 */
 	function deleteAction($id)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
@@ -358,15 +358,15 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * Update an existing metadata object definition file
-	 * 
+	 *
 	 * @action revert
-	 * @param int $id 
+	 * @param int $id
 	 * @param int $toVersion
 	 * @return KalturaMetadataProfile
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_UNABLE_TO_TRANSFORM
-	 */	
+	 */
 	function revertAction($id, $toVersion)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
@@ -422,19 +422,19 @@ class MetadataProfileService extends KalturaBaseService
 		$metadataProfile->fromObject($dbMetadataProfile);
 		
 		return $metadataProfile;
-	}	
+	}
 	
 	/**
 	 * Update an existing metadata object definition file
-	 * 
+	 *
 	 * @action updateDefinitionFromFile
-	 * @param int $id 
+	 * @param int $id
 	 * @param file $xsdFile XSD metadata definition
 	 * @return KalturaMetadataProfile
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_UNABLE_TO_TRANSFORM
-	 */	
+	 */
 	function updateDefinitionFromFileAction($id, $xsdFile)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
@@ -462,7 +462,7 @@ class MetadataProfileService extends KalturaBaseService
 		}
 		catch(kXsdException $e)
 		{
-			throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM);
+			throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
 		}
 		
 		$dbMetadataProfile->save();
@@ -480,14 +480,14 @@ class MetadataProfileService extends KalturaBaseService
 	
 	/**
 	 * Update an existing metadata object views file
-	 * 
+	 *
 	 * @action updateViewsFromFile
-	 * @param int $id 
+	 * @param int $id
 	 * @param file $viewsFile UI views file
 	 * @return KalturaMetadataProfile
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
-	 */	
+	 */
 	function updateViewsFromFileAction($id, $viewsFile)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
@@ -516,18 +516,18 @@ class MetadataProfileService extends KalturaBaseService
 		$metadataProfile->fromObject($dbMetadataProfile);
 		
 		return $metadataProfile;
-	}	
+	}
 
 	/**
 	 * Update an existing metadata object xslt file
-	 * 
+	 *
 	 * @action updateTransformationFromFile
-	 * @param int $id 
+	 * @param int $id
 	 * @param file $xsltFile XSLT file, will be executed on every metadata add/update
 	 * @return KalturaMetadataProfile
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
-	 */	
+	 */
 	function updateTransformationFromFileAction($id, $xsltFile)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
@@ -556,15 +556,15 @@ class MetadataProfileService extends KalturaBaseService
 		$metadataProfile->fromObject($dbMetadataProfile);
 		
 		return $metadataProfile;
-	}	
+	}
 	
 	/**
 	 * Serves metadata profile XSD file
-	 *  
+	 *
 	 * @action serve
 	 * @param int $id
 	 * @return file
-	 *  
+	 *
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws KalturaErrors::FILE_DOESNT_EXIST
 	 */
@@ -579,15 +579,15 @@ class MetadataProfileService extends KalturaBaseService
 		$fileSubType = MetadataProfile::FILE_SYNC_METADATA_DEFINITION;
 		
 		return $this->serveFile($dbMetadataProfile, $fileSubType, $fileName);
-	}	
+	}
 
 	/**
 	 * Serves metadata profile view file
-	 *  
+	 *
 	 * @action serveView
 	 * @param int $id
 	 * @return file
-	 *  
+	 *
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_FOUND
 	 * @throws KalturaErrors::FILE_DOESNT_EXIST
 	 */
