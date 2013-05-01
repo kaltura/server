@@ -218,7 +218,8 @@ abstract class KBatchBase implements IKalturaLogger
 
 		if(is_null($taskConfig))
 		{
-			$this->taskConfig = unserialize(base64_decode($argv[1]));
+			$data = gzuncompress(base64_decode($argv[1]));
+			$this->taskConfig = unserialize($data);
 		}
 		else
 		{

@@ -53,7 +53,7 @@ class KProcessWrapper
 		
 		$this->taskConfig = $taskConfig;
 		
-		$taskConfigStr = base64_encode(serialize($taskConfig));
+		$taskConfigStr = base64_encode(gzcompress(serialize($taskConfig)));
 		
 		$cmdLine = '';
 		$cmdLine .= (is_null($taskConfig->affinity) ? '' : "$tasksetPath -c " . ($taskConfig->affinity + $taskIndex) . ' ');
