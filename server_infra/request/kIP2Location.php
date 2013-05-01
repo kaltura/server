@@ -28,9 +28,24 @@ class kIP2Location
 		
 		ini_set('memory_limit', '128M'); // ip_files are large array files, sometimes it might break if doesn't have enough memory
 		$country = "";
-		$numbers = preg_split( "/\./", $ip);   
-		include("ip_files/".$numbers[0].".php");
-		$code=($numbers[0] * 16777216) + ($numbers[1] * 65536) + ($numbers[2] * 256) + ($numbers[3]);   
+		$numbers = preg_split( "/\./", $ip);
+		$ipFile = "ip_files/".$numbers[0].".php";
+		
+	    $includePaths = explode(":", ini_get('include_path'));
+		$included = false;
+		$ranges = array();
+		foreach($includePaths as $includePath)
+		{
+			if(file_exists("$includePath/$ipFile"))
+			{
+				$included = true;
+				include("$includePath/$ipFile");
+			}
+		}
+		if(!$included)
+			return "";
+			
+		$code=($numbers[0] * 16777216) + ($numbers[1] * 65536) + ($numbers[2] * 256) + ($numbers[3]);
 		foreach($ranges as $key => $value){
 	        if($key<=$code)
 		{
