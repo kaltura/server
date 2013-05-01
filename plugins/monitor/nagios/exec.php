@@ -21,6 +21,7 @@ $warningThresholdMax = null;
 $warningThresholdMin = null;
 
 $options = getopt('', array(
+	'script:',
 	'error-threshold:',
 	'warning-threshold:',
 ));
@@ -53,8 +54,20 @@ if(isset($options['warning-threshold']))
 		$warningThresholdMax = intval($options['warning-threshold']);
 	}
 }
+if(!isset($options['script']))
+{
+	echo "Script argument not supplied";
+	exit(NAGIOS_CODE_UNKNOWN);
+}
 
-$testScriptCmd = implode(' ', array_slice($argv, 1));
+$testScript = $options['script'];
+$testScriptArguments = array_slice($argv, 1);
+foreach($testScriptArguments as $key => $arg)
+{
+	if($arg == '--script' || $arg == $testScript)
+		unset($testScriptArguments[$key]);
+}
+$testScriptCmd = "$testScript " . implode(' ', $testScriptArguments);
 
 $outputLines = null;
 $returnedValue = null;
@@ -79,25 +92,25 @@ if($monitorResult->errors)
 	exit(NAGIOS_CODE_UNKNOWN);
 }
 
-if(isset($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
+if(!is_null($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
 {
 	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThresholdMax;
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
-if(isset($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
+if(!is_null($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
 {
 	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMax;
 	exit(NAGIOS_CODE_WARNING);
 }
 
-if(isset($errorThresholdMin) && $monitorResult->value > $errorThresholdMin)
+if(!is_null($errorThresholdMin) && $monitorResult->value < $errorThresholdMin)
 {
 	echo 'ERROR -  monitor value: ' . $monitorResult->value . ' exceeded error value: ' . $errorThresholdMin;
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
-if(isset($warningThresholdMin) && $monitorResult->value > $warningThresholdMin)
+if(!is_null($warningThresholdMin) && $monitorResult->value < $warningThresholdMin)
 {
 	echo 'WARNING -  monitor value: ' . $monitorResult->value . ' exceeded warning value: ' . $warningThresholdMin;
 	exit(NAGIOS_CODE_WARNING);
