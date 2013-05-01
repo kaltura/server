@@ -6,6 +6,8 @@ class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 {
 	const PLUGIN_NAME = 'webex';
 	
+	const WEBEX_FLAVOR_PARAM_SYS_NAME = 'webex_flavor_params';
+	
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPermissions::isAllowedPartner()
