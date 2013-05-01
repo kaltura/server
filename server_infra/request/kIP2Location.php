@@ -58,8 +58,23 @@ class kIP2Location
 	public static function ipToCountryAndCode($ip)
 	{
 		$country = "";
-		$numbers = preg_split( "/\./", $ip);
-		include("ip_files/".$numbers[0].".php");
+		$numbers = preg_split( '/\./', $ip);
+		$ipFile = "ip_files/".$numbers[0].".php";
+		
+	    $includePaths = explode(PATH_SEPARATOR, ini_get('include_path'));
+		$included = false;
+		$ranges = array();
+		foreach($includePaths as $includePath)
+		{
+			if(file_exists("$includePath/$ipFile"))
+			{
+				$included = true;
+				include("$includePath/$ipFile");
+			}
+		}
+		if(!$included)
+			return "";
+			
 		$code=($numbers[0] * 16777216) + ($numbers[1] * 65536) + ($numbers[2] * 256) + ($numbers[3]);
 		foreach($ranges as $key => $value)
 		{
