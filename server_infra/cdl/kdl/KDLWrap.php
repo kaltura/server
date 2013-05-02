@@ -92,9 +92,27 @@ class KDLWrap
 				$this->_rv = true;
 		}
 		
+			/*
+			 * For 'passthrough' quick&dirty
+			 */
+		if(isset($mediaSet->_container) && $mediaSet->_container->_id=="arf")
+			$isArf = true;
+		else
+			$isArf = false;
+		
 		foreach ($trgList as $trg){
 			KalturaLog::log("...T-->".$trg->ToString());
-			$this->_targetList[] = self::ConvertFlavorKdl2Cdl($trg);
+			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
+			
+			/*
+			 * 'passthrough' temporal, quick&dirty implementation to support imitation of 
+			 * 'auto-inter-src' for webex/arf.
+			 */
+			if($isArf==false && isset($trg->_transcoders)
+			&& $trg->_transcoders[0]->_id=="webexNbrplayer.WebexNbrplayer"){
+				$cdlFlvrOut->_passthrough=true;
+			}
+			$this->_targetList[] = $cdlFlvrOut;
 		}
 		
 		return $this;
@@ -660,6 +678,7 @@ class flavorParamsOutputWrap extends flavorParamsOutput {
 	public 	$_isNonComply=false;
 	public 	$_force=false;
 	public	$_create_anyway=false;
+	public	$_passthrough = false;		// true: skip execution of this engine,use the source for output.
 	
 	public  $_errors=array(),
 			$_warnings=array();
