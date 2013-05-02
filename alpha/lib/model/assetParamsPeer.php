@@ -299,4 +299,12 @@ class assetParamsPeer extends BaseassetParamsPeer
 	{
 		return array(array("flavorParams:id=%s", self::ID), array("flavorParams:partnerId=%s", self::PARTNER_ID));		
 	}
+	
+	public static function retrieveBySystemName ($v, $con = null)
+	{
+		$c = new Criteria();
+		$c->addAnd(assetParamsPeer::SYSTEM_NAME, $v);
+		
+		return self::doSelectOne($c, $con);
+	}
 }
