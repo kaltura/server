@@ -41,6 +41,11 @@ class Kaltura_Client_Configuration
 	public $curlTimeout   				= 10;
 	public $startZendDebuggerSession 	= false;
 	public $userAgent					= '';
+	public $proxyHost                   = null;
+	public $proxyPort                   = null;
+	public $proxyType                   = 'HTTP';
+	public $proxyUser                   = null;
+	public $proxyPassword               = '';
 	public $verifySSL 					= true;
 	public $sslCertificatePath			= null;
 	public $requestHeaders				= array();
