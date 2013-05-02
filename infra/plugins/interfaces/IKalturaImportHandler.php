@@ -8,8 +8,7 @@ interface IKalturaImportHandler extends IKalturaBase
 {
 	/**
 	 * @param KCurlHeaderResponse $curlInfo
-	 * @param $data
 	 * @param KalturaImportJobData $importData
 	 */
-	public static function handleImportContent($curlInfo, $data, $importData);	
+	public static function handleImportContent($curlInfo, $importData);	
 }

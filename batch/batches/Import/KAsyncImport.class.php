@@ -201,13 +201,12 @@ class KAsyncImport extends KJobHandlerWorker
 					return $job;
 				}
 				
-				$importRes = file_get_contents($data->destFileLocalPath);
 				KalturaLog::info("headers " . print_r($curlHeaderResponse, true));
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImportHandler');
 				foreach ($pluginInstances as $pluginInstance)
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
-					$data= $pluginInstance->handleImportContent($curlHeaderResponse, $importRes, $data);
+					$data= $pluginInstance->handleImportContent($curlHeaderResponse, $data);
 				}
 			}
 
