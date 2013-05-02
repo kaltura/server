@@ -33,10 +33,18 @@ class KDLWrap
 	/* ------------------------------
 	 * function CDLGenerateTargetFlavors
 	 */
-	public static function CDLGenerateTargetFlavors(mediaInfo $cdlMediaInfo=null, $cdlFlavorList)
+	public static function CDLGenerateTargetFlavors($cdlMediaInfo=null, $cdlFlavorList)
 	{
 		$kdlWrap = new KDLWrap();
-		return $kdlWrap->generateTargetFlavors($cdlMediaInfo, $cdlFlavorList);
+		if(!isset($cdlMediaInfo) || is_array($cdlMediaInfo)) {
+			return $kdlWrap->generateTargetFlavors(null, $cdlFlavorList);
+		}
+		else if(get_class($cdlMediaInfo)=='mediaInfo') {
+			return $kdlWrap->generateTargetFlavors($cdlMediaInfo, $cdlFlavorList);
+		}
+		else {
+			throw new Exception("Bad argument (".get_class($cdlMediaInfo)."), should be mediaInfo class");
+		}
 	}
 	
 	/* ------------------------------
