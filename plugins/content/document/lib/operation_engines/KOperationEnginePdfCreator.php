@@ -139,6 +139,8 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		
+		$this->validateOutput($inFilePath, $tmpFile);
+		
 		$fileUnlockRetries = $this->taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
 			$fileUnlockRetries = self::DEFAULT_FILE_UNLOCK_RETRIES;
@@ -164,6 +166,27 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		return true;
 		
+	}
+	
+	private function validateOutput($inFilePath, $outFilePath)
+	{
+		$pdfInfo = $this->taskConfig->params->pdfInfo;
+		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
+		if($inputExtension == 'pdf') {
+			if($this->getNumberOfPages($pdfInfo, $inFilePath) != $this->getNumberOfPages($pdfInfo, $outFilePath))
+				throw new KOperationEngineException("Output file doesn't match expected page count");
+		}
+	}
+	
+	private function getNumberOfPages($pdfInfo, $file) 
+	{
+		$cmd = $pdfInfo . " " . realpath($file);
+		exec($cmd, $output);
+		foreach($output as $cur) {
+			if(preg_match('/Pages:\s*(\d)+/' , $cur, $matches))
+				return $matches[1];
+		}
+		return null;
 	}
 		
 	private function getKillPopupsPath() 
