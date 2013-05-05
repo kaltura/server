@@ -82,7 +82,10 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 	{
 		KalturaLog::debug("extract($job->id)");
 		
-		$mediaFile = trim($data->srcFileSyncLocalPath);
+		$srcFileSyncDescriptor = reset($data->srcFileSyncs);
+		$mediaFile = null;
+		if($srcFileSyncDescriptor)
+			$mediaFile = trim($srcFileSyncDescriptor->fileSyncLocalPath);
 		
  		if(!$this->pollingFileExists($mediaFile))
  			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);

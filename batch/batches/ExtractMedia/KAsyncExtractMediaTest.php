@@ -79,7 +79,10 @@ class KAsyncExtractMediaTest extends PHPUnit_Framework_TestCase
 	private function prepareJobs($value)
 	{
 		$data = new KalturaExtractMediaJobData();
-		$data->srcFileSyncLocalPath = $value;
+		$srcFileSyncDescriptor = new KalturaSourceFileSyncDescriptor();
+		$srcFileSyncDescriptor->fileSyncLocalPath = $value;
+		$data->srcFileSyncs = new KalturaSourceFileSyncDescriptorArray();
+		$data->srcFileSyncs[] = $srcFileSyncDescriptor;
 		
 		$job = new KalturaBatchJob();
 		$job->id = 1;

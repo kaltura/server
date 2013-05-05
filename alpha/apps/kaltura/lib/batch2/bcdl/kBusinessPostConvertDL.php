@@ -98,6 +98,15 @@ class kBusinessPostConvertDL
 		$currentFlavorAsset->setStatusLocalReady();
 		$currentFlavorAsset->save();
 		
+		$waitingFlavorAssets = assetPeer::retrieveByEntryIdAndStatus($currentFlavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($currentFlavorAsset->getEntryId());
+		foreach ($waitingFlavorAssets as $waitingFlavorAsset) 
+		{
+			$flavor = assetParamsOutputPeer::retrieveByAsset($waitingFlavorAsset);
+			KalturaLog::debug('Check waiting flavor asset ['.$waitingFlavorAsset->getId().']');
+			kBusinessPreConvertDL::decideFlavorConvert($waitingFlavorAsset, $flavor, $originalFlavorAsset, null, null, $dbBatchJob->getParentJob());
+		}
+		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
 		
 		return $currentFlavorAsset;

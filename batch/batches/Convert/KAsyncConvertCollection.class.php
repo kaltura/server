@@ -57,31 +57,33 @@ class KAsyncConvertCollection extends KAsyncConvert
 	{
 		KalturaLog::debug ( "Converting collection job");
 	
-		
-		if($this->taskConfig->params->isRemoteInput || !strlen(trim($data->actualSrcFileSyncLocalPath))) // for distributed conversion
-		{
-			if(!strlen(trim($data->actualSrcFileSyncLocalPath)))
-				$data->actualSrcFileSyncLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($data->srcFileSyncRemoteUrl);
-				
-			$err = null;
-			if(!$this->distributedFileManager->getLocalPath($data->actualSrcFileSyncLocalPath, $data->srcFileSyncRemoteUrl, $err))
+		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
+		{				
+			if($this->taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
 			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_FILE_NOT_FOUND, $err, KalturaBatchJobStatus::RETRY);
+				if(!strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))
+					$srcFileSyncDescriptor->actualFileSyncLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
+					
+				$err = null;
+				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err))
+				{
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_FILE_NOT_FOUND, $err, KalturaBatchJobStatus::RETRY);
+				}
 			}
-		}
-		
-		if(file_exists($data->actualSrcFileSyncLocalPath))
-		{
-			KalturaLog::debug("Source file exists [$data->actualSrcFileSyncLocalPath]");
-		}
-		else
-		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file not found [$data->actualSrcFileSyncLocalPath]", KalturaBatchJobStatus::RETRY);
-		}
-		
-		if(!is_file($data->actualSrcFileSyncLocalPath))
-		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file [$data->actualSrcFileSyncLocalPath] is not a file", KalturaBatchJobStatus::FAILED);
+			
+			if(file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath))
+			{
+				KalturaLog::debug("Source file exists [$srcFileSyncDescriptor->actualFileSyncLocalPath]");
+			}
+			else
+			{
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file not found [$srcFileSyncDescriptor->actualFileSyncLocalPath]", KalturaBatchJobStatus::RETRY);
+			}
+			
+			if(!is_file($srcFileSyncDescriptor->actualFileSyncLocalPath))
+			{
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file [$srcFileSyncDescriptor->actualFileSyncLocalPath] is not a file", KalturaBatchJobStatus::FAILED);
+			}
 		}
 		
 		$data->destDirLocalPath = $this->localTempPath;
@@ -127,7 +129,13 @@ class KAsyncConvertCollection extends KAsyncConvert
 		$log = null;
 		try
 		{
-			$this->operationEngine->operate($operator, $data->actualSrcFileSyncLocalPath, $data->destFileSyncLocalPath);
+			$actualFileSyncLocalPath = null;
+			$srcFileSyncDescriptor = reset($data->srcFileSyncs);			
+			if($srcFileSyncDescriptor)
+				$actualFileSyncLocalPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
+			//engine as part of the data
+			$this->operationEngine->operate($operator, $actualFileSyncLocalPath, $data->destFileSyncLocalPath);
 		}
 		catch(KOperationEngineException $e)
 		{

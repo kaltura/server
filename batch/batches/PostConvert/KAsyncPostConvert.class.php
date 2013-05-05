@@ -63,7 +63,10 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		
 		try
 		{
-			$mediaFile = trim($data->srcFileSyncLocalPath);
+			$srcFileSyncDescriptor = reset($data->srcFileSyncs);
+			$mediaFile = null;
+			if($srcFileSyncDescriptor)
+				$mediaFile = trim($srcFileSyncDescriptor->fileSyncLocalPath);
 			
 			if(!$data->flavorParamsOutput || !$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 			{

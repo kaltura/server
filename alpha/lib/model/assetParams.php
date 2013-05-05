@@ -199,4 +199,14 @@ class assetParams extends BaseassetParams
 	{
 		return array("flavorParams:id=".$this->getId(), "flavorParams:partnerId=".$this->getPartnerId());
 	}
+	
+	public function setSourceAssetParamsIds($sourceAssetParamsIds)
+	{
+		$this->putInCustomData('sourceAssetParamsIds', $sourceAssetParamsIds);
+	}
+	
+	public function getSourceAssetParamsIds()
+	{
+		return $this->getFromCustomData('sourceAssetParamsIds');
+	}
 }

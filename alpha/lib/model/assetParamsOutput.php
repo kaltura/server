@@ -134,4 +134,14 @@ class assetParamsOutput extends BaseassetParamsOutput
 	{
 		return array("flavorParamsOutput:id=".$this->getId(), "flavorParamsOutput:flavorAssetId=".$this->getFlavorAssetId());
 	}
+	
+	public function setSourceAssetParamsIds($sourceAssetParamsIds)
+	{
+		$this->putInCustomData('sourceAssetParamsIds', $sourceAssetParamsIds);
+	}
+	
+	public function getSourceAssetParamsIds()
+	{
+		return $this->getFromCustomData('sourceAssetParamsIds');
+	}
 }

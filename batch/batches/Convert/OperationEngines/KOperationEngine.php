@@ -273,6 +273,24 @@ abstract class KOperationEngine
 		$this->clientConfig->partnerId = $this->taskConfig->getPartnerId();
 		$this->client->setConfig($this->clientConfig);
 	}
+	
+	protected function getSrcActualPathFromData()
+	{
+		$srcFileSyncDescriptor = reset($this->data->srcFileSyncs);
+		if($srcFileSyncDescriptor)
+			return $srcFileSyncDescriptor->actualFileSyncLocalPath;		
+		else
+			return null;
+	}
+	
+	protected function getSrcRemoteUrlFromData()
+	{
+		$srcFileSyncDescriptor = reset($this->data->srcFileSyncs);
+		if($srcFileSyncDescriptor)
+			return $srcFileSyncDescriptor->fileSyncRemoteUrl;		
+		else
+			return null;
+	}
 
 }
 

@@ -22,7 +22,6 @@ class kBusinessPreConvertDL
 			KalturaLog::log('Original flavor asset not found');
 			return null;
 		}
-		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
 		$flavor = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 		if (is_null($flavor))
@@ -31,7 +30,13 @@ class kBusinessPreConvertDL
 			return null;
 		}
 		
-		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAssetId, null, $mediaInfoId, $parentJob, $lastEngineType);
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		if (is_null($flavorAsset))
+		{
+			KalturaLog::log("Flavor asset not found [$flavorAssetId]");
+			return null;
+		}
+		return self::decideFlavorConvert($flavorAsset, $flavor, $originalFlavorAsset, null, $mediaInfoId, $parentJob, $lastEngineType);
 	}
 	
 	/**
@@ -416,7 +421,6 @@ class kBusinessPreConvertDL
 				$flavorAssetId = $flavorAsset->getId();
 		}
 		
-		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$flavor->_force = true; // force to convert the flavor, even if none complied
 		
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
@@ -451,6 +455,8 @@ class kBusinessPreConvertDL
 			$flavors = array();
 			foreach($flavorAssets as $tagedFlavorAsset)
 			{
+				$errDescription = null;
+				
 				if($tagedFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE || $tagedFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
 					continue;
 
@@ -479,21 +485,13 @@ class kBusinessPreConvertDL
 			{
 				KalturaLog::log("Updating Collection flavor [" . $flavor->getId() . "] for asset [" . $tagedFlavorAsset->getId() . "]");
 				$flavors[$flavorAssetId] = $flavor;
-			}
-		
-			switch($collectionTag)
-			{
-				case flavorParams::TAG_ISM:
-					KalturaLog::log("Calling addConvertIsmCollectionJob with [" . count($flavors) . "] flavor params");
-					return kJobsManager::addConvertIsmCollectionJob($collectionTag, $srcSyncKey, $entry, $parentJob, $flavors, false);
-					
-				default:
-					KalturaLog::log("Error: Invalid collection tag [$collectionTag]");
-					return null;
-			}
+			}			
+			return self::decideCollectionConvert($collectionTag, $originalFlavorAsset, $entry, $parentJob, $flavors);
 		}
-
-		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
+		else	
+		{	
+			return self::decideFlavorConvert($flavorAsset, $flavor, $originalFlavorAsset, $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
+		}
 	}
 	
 	/**
@@ -896,9 +894,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(! $profile)
 		{
 			$errDescription = "Conversion profile for entryId [$entryId] not found";
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-			KalturaLog::err("No flavors created: $errDescription");
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 			return false;
 		}
 	
@@ -906,23 +902,17 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
-			KalturaLog::err($errDescription);
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 			return false;
 		}
-		
-		$shouldConvert = true;
 		
 		// gets the list of flavor params of the conversion profile
 		$list = flavorParamsConversionProfilePeer::retrieveByConversionProfile($profile->getId());
 		if(! count($list))
 		{
 			$errDescription = "No flavors match the profile id [{$profile->getId()}]";
-			KalturaLog::err($errDescription);
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-			
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
+						
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->setDeletedAt(time());
 			$originalFlavorAsset->save();
@@ -934,24 +924,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if($mediaInfoId)
 			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		
-		if($profile->getCreationMode() == conversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
-		{
-			KalturaLog::log("The profile created from old conversion profile with bypass flv");
-			$isFlv = false;
-			if($mediaInfo)
-				$isFlv = KDLWrap::CDLIsFLV($mediaInfo);
-			
-			if($isFlv && $originalFlavorAsset->hasTag(flavorParams::TAG_MBR))
-			{
-				KalturaLog::log("The source is mbr and flv, conversion will be bypassed");
-				$shouldConvert = false;
-			}
-			else
-			{
-				KalturaLog::log("The source is NOT mbr or flv, conversion will NOT be bypassed");
-			}
-		}
-		
+		$shouldConvert = self::shouldConvertProfileFlavors($profile, $mediaInfo, $originalFlavorAsset);
+				
 		// gets the ids of the flavor params
 		$flavorsIds = array();
 		$conversionProfileFlavorParams = array();
@@ -962,63 +936,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$conversionProfileFlavorParams[$flavorsId] = $flavorParamsConversionProfile;
 		}
 		KalturaLog::debug("Flavors in conversion profile [" . implode(',', $flavorsIds) . "]");
-			
-		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		
 		$sourceFlavor = null;
 		$flavors = assetParamsPeer::retrieveFlavorsByPKs($flavorsIds);
-		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
-
-		$ingestedNeeded = false;
-		foreach($flavors as $index => $flavor)
-		{
-			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
-			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
-				continue;
-				
-			$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$flavor->getId()];
-			
-			// if flavor is not source, apply dynamic attributes defined for id -2 (all flavors)
-			if(!$flavor->hasTag(flavorParams::TAG_SOURCE))
-			{
-    			if(isset($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
-    			{
-    				foreach($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX] as $attributeName => $attributeValue)
-    					$flavor->setDynamicAttribute($attributeName, $attributeValue);
-    			}
-			}
-
-			// overwrite dynamic attributes if defined for this specific flavor
-			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
-			{
-				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)
-					$flavor->setDynamicAttribute($attributeName, $attributeValue);
-			}
-			
-			if($flavor->hasTag(flavorParams::TAG_SOURCE))
-			{
-				$sourceFlavor = $flavor;
-				unset($flavors[$index]);
-				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
-				continue;
-			}
-			
-			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT)
-				continue;
-			
-			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
-			{
-				unset($flavors[$index]);
-				$ingestedNeeded = true;
-				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it should be ingested");
-				continue;
-			}
-				
-			if(in_array($flavor->getId(), $entryIngestedFlavors))
-			{
-				unset($flavors[$index]);
-			}
-		}
+		
+		$ingestedNeeded = self::checkConvertProfileParams($flavors, $conversionProfileFlavorParams, $entry, $sourceFlavor);
 		
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
 		
@@ -1039,87 +961,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Source flavor params [" . $sourceFlavor->getId() . "] found");
 			$originalFlavorAsset->setFlavorParamsId($sourceFlavor->getId());
 			
-			if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
-			{
-				KalturaLog::log("Source flavor asset requires conversion");
-				
-				$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$errDescription = null;
-				$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
-				
-				if(!$sourceFlavorOutput)
-				{
-					if(!$errDescription)
-						$errDescription = "Failed to create flavor params output from source flavor";
+			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $mediaInfo, $parentJob, $sourcePassthrough);
+			if(!$res)
+				return false;
 						
-					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
-					$originalFlavorAsset->setStatus(flavorAsset::ASSET_STATUS_ERROR);
-					$originalFlavorAsset->save();
-					
-					kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
-					return false;
-				}
-				
-				$sourcePassthrough = $sourceFlavorOutput->_passthrough;
-				if($sourcePassthrough==false) {
-				// save flavor params
-					$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
-					$sourceFlavorOutput->setEntryId($entryId);
-					$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
-					$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
-					$sourceFlavorOutput->save();
-					
-					if($errDescription)
-						$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
-						
-					$errDescription = kBusinessConvertDL::parseFlavorDescription($sourceFlavorOutput);
-					if($errDescription)
-						$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
-			
-					// decided by the business logic layer
-					if($sourceFlavorOutput->_create_anyway)
-					{
-						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] selected to be created anyway");
-					}
-					else
-					{
-						if(!$sourceFlavorOutput->IsValid())
-						{
-							KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
-							$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-							$originalFlavorAsset->save();
-							
-							$errDescription = "Source flavor could not be converted";
-							KalturaLog::err($errDescription);
-							$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-							kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-							
-							return false;
-						}
-						
-						if($sourceFlavorOutput->_force)
-							KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is forced");
-						elseif($sourceFlavorOutput->_isNonComply)
-							KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
-						else
-							KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
-					}
-						
-	//				$originalFlavorAsset->incrementVersion();
-					$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
-					$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
-					$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
-					$originalFlavorAsset->save();
-					
-					// save flavor params
-					$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
-					$sourceFlavorOutput->save();
-					
-					kJobsManager::addFlavorConvertJob($srcSyncKey, $sourceFlavorOutput, $originalFlavorAsset->getId(), $profile->getId(), $mediaInfoId, $parentJob);
-					return false;
-				}
-			}
-			
 			if($sourcePassthrough==false) {
 				$originalFlavorAsset->setStatusLocalReady();
 				$originalFlavorAsset->save();
@@ -1168,9 +1013,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(! $profile)
 		{
 			$errDescription = "Conversion profile for entryId [$entryId] not found";
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-			KalturaLog::err("No flavors created: $errDescription");
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $entryId);
 			throw new Exception($errDescription);
 		}
 	
@@ -1178,9 +1021,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
-			KalturaLog::err($errDescription);
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $entryId);
 			throw new Exception($errDescription);
 		}
 		
@@ -1189,9 +1030,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(! count($list))
 		{
 			$errDescription = "No flavors match the profile id [{$profile->getId()}]";
-			KalturaLog::err($errDescription);
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $entryId);
 			
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->setDeletedAt(time());
@@ -1209,53 +1048,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$flavorsIds[] = $flavorsId;
 			$conversionProfileFlavorParams[$flavorsId] = $flavorParamsConversionProfile;
 		}
-			
-		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
-		
+				
 		// gets the flavor params by the id
 		$flavors = assetParamsPeer::retrieveFlavorsByPKs($flavorsIds);
-		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
-		
-		foreach($flavors as $index => $flavor)
-		{
-			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
-				continue;
-				
-			$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$flavor->getId()];
-		
-			if($flavor->hasTag(flavorParams::TAG_SOURCE))
-			{
-				unset($flavors[$index]);
-				continue;
-			}
-			
-			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
-			{
-				unset($flavors[$index]);
-				continue;
-			}
-			
-			if(	in_array($flavor->getId(), $entryIngestedFlavors) &&
-				$conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
-			{
-				unset($flavors[$index]);
-				continue;
-			}
-
-			// if flavor is not source (checked above), apply dynamic attributes defined for id -2 (all flavors)
-			if(isset($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
-			{
-				foreach($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX] as $attributeName => $attributeValue)
-					$flavor->setDynamicAttribute($attributeName, $attributeValue);
-			}
-    			
-			// overwrite dynamic attributes if defined for this specific flavor
-			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
-			{
-				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)
-					$flavor->setDynamicAttribute($attributeName, $attributeValue);
-			}
-		}
+		self::checkConvertProfileParams($flavors, $conversionProfileFlavorParams, $entry);
 		
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
 		
@@ -1275,9 +1071,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
-			KalturaLog::err($errDescription);
-			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+			self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 			return false;
 		}
 		
@@ -1298,9 +1092,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$convertProfileJob->setDescription($err);
 			$convertProfileJob->save();
 		}
-			
-		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		
+				
 		$conversionsCreated = 0;
 		
 		$entry = $convertProfileJob->getEntry();
@@ -1322,31 +1114,23 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			if($collectionTag)
 			{
 				$flavorsCollections[$collectionTag][] = $flavor;
-				continue;
 			}
+			else 
+			{	
+				KalturaLog::log("Adding flavor conversion with flavor params output id [" . $flavor->getId() . "] and flavor params asset id [" . $flavorAsset->getId() . "]");
+				$madiaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
+				$createdJob = self::decideFlavorConvert($flavorAsset, $flavor, $originalFlavorAsset, $conversionProfileId, $madiaInfoId, $parentJob);
 				
-			KalturaLog::log("Adding flavor conversion with flavor params output id [" . $flavor->getId() . "] and flavor params asset id [" . $flavorAsset->getId() . "]");
-			$madiaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
-			$createdJob = kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $conversionProfileId, $madiaInfoId, $parentJob);
-			
-			if($createdJob)
-				$conversionsCreated++;
+				if($createdJob)
+					$conversionsCreated++;
+			}
 		}
 		
 		foreach($flavorsCollections as $tag => $flavors)
 		{
-			switch($tag)
-			{
-				case flavorParams::TAG_ISM:
-					$createdJob = kJobsManager::addConvertIsmCollectionJob($tag, $srcSyncKey, $entry, $parentJob, $flavors);
-					if($createdJob)
-						$conversionsCreated++;
-					break;
-					
-				default:
-					KalturaLog::log("Error: Invalid collection tag [$tag]");
-					break;
-			}
+			$createdJob = self::decideCollectionConvert($tag, $originalFlavorAsset, $entry, $parentJob, $flavors);
+			if($createdJob)
+				$conversionsCreated++;
 		}
 			
 		if(!$conversionsCreated)
@@ -1357,5 +1141,238 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 		
 		return true;
+	}
+	
+	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, flavorAsset $originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
+	{
+		KalturaLog::debug('Source params ids ['.$flavor->getSourceAssetParamsIds().'], flavor asset id ['.$flavorAsset->getId().']');
+		if(strlen(trim($flavor->getSourceAssetParamsIds())))
+		{
+			$srcFlavorParamsIds = explode(',', trim($flavor->getSourceAssetParamsIds()));
+			$readySrcFlavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
+			KalturaLog::debug('Verify source flavors are ready: number of ready assets ['.count($readySrcFlavorAssets).'], number of source params ids ['.count($srcFlavorParamsIds).']');
+			if(count($readySrcFlavorAssets) < count($srcFlavorParamsIds))
+			{
+				KalturaLog::debug('Not all source flavors are ready, changing status to WAIT_FOR_CONVERT');
+				$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT);
+				$flavorAsset->setDescription("Source flavor assets are not ready");
+				$flavorAsset->save();
+				
+				return false;
+			}
+		}
+		else 
+		{
+			$readySrcFlavorAssets = array($originalFlavorAsset);
+		}
+
+		//all source flavors are ready
+		if($flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT)
+		{
+			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_QUEUED);
+			$flavorAsset->save();
+		}
+		
+		$srcSyncKeys = array(); 
+		foreach ($readySrcFlavorAssets as $srcAsset) 
+		{
+			$srcSyncKeys[] = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		}
+		return kJobsManager::addFlavorConvertJob($srcSyncKeys, $flavor, $flavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob, $lastEngineType, $sameRoot, $priority);
+	}
+
+	private static function decideCollectionConvert($collectionTag, flavorAsset $originalFlavorAsset, entry $entry, BatchJob $parentJob, array $flavors)
+	{	
+		//TODO: add support for source other than original	
+		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				
+		switch($collectionTag)
+		{
+			case flavorParams::TAG_ISM:
+				KalturaLog::log("Calling addConvertIsmCollectionJob with [" . count($flavors) . "] flavor params");
+				return kJobsManager::addConvertIsmCollectionJob($collectionTag, $srcSyncKey, $entry, $parentJob, $flavors, false);
+				
+			default:
+				KalturaLog::log("Error: Invalid collection tag [$collectionTag]");
+				return null;
+		}
+	}
+	
+	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo, BatchJob $parentJob, &$sourcePassthrough)
+	{
+		if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
+		{
+			KalturaLog::log("Source flavor asset requires conversion");
+				
+			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$errDescription = null;
+			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
+				
+			if(!$sourceFlavorOutput)
+			{
+				if(!$errDescription)
+					$errDescription = "Failed to create flavor params output from source flavor";
+						
+				$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+				$originalFlavorAsset->setStatus(flavorAsset::ASSET_STATUS_ERROR);
+				$originalFlavorAsset->save();
+					
+				kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
+				return false;
+			}
+			
+			$sourcePassthrough = $sourceFlavorOutput->_passthrough;	
+			if($sourcePassthrough==false) 
+			{
+				// save flavor params
+				$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
+				$sourceFlavorOutput->setEntryId($entryId);
+				$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
+				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
+				$sourceFlavorOutput->save();
+					
+				if($errDescription)
+					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+						
+				$errDescription = kBusinessConvertDL::parseFlavorDescription($sourceFlavorOutput);
+				if($errDescription)
+					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+			
+				// decided by the business logic layer
+				if($sourceFlavorOutput->_create_anyway)
+				{
+					KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] selected to be created anyway");
+				}
+				else
+				{
+					if(!$sourceFlavorOutput->IsValid())
+					{
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
+						$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$originalFlavorAsset->save();
+						
+						$errDescription = "Source flavor could not be converted";
+						KalturaLog::err($errDescription);
+						$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
+						kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+						
+						return false;
+					}
+						
+					if($sourceFlavorOutput->_force)
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is forced");
+					elseif($sourceFlavorOutput->_isNonComply)
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
+					else
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
+				}
+						
+	//			$originalFlavorAsset->incrementVersion();
+				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
+				$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
+				$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
+				$originalFlavorAsset->save();
+					
+				// save flavor params
+				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
+				$sourceFlavorOutput->save();
+					
+				kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfo->getId(), $parentJob);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static function setError($errDescription, BatchJob $batchJob, $batchJobType, $entryId)
+	{
+		$batchJob = kJobsManager::failBatchJob($batchJob, $errDescription, $batchJobType);
+		kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
+		KalturaLog::err($errDescription);		
+	}
+	
+	private static function checkConvertProfileParams(&$flavors, $conversionProfileFlavorParams, $entry, &$sourceFlavor = null)
+	{	
+		$ingestedNeeded = false;
+		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
+		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
+		
+		foreach($flavors as $index => $flavor)
+		{
+			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
+			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
+				continue;
+				
+			$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$flavor->getId()];
+			
+			// if flavor is not source, apply dynamic attributes defined for id -2 (all flavors)
+			if(!$flavor->hasTag(flavorParams::TAG_SOURCE))
+			{
+    			if(isset($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
+    			{
+    				foreach($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX] as $attributeName => $attributeValue)
+    					$flavor->setDynamicAttribute($attributeName, $attributeValue);
+    			}
+			}
+
+			// overwrite dynamic attributes if defined for this specific flavor
+			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
+			{
+				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)
+					$flavor->setDynamicAttribute($attributeName, $attributeValue);
+			}
+			
+			if($flavor->hasTag(flavorParams::TAG_SOURCE))
+			{
+				$sourceFlavor = $flavor;
+				unset($flavors[$index]);
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
+				continue;
+			}
+			
+			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT)
+				continue;
+			
+			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+			{
+				unset($flavors[$index]);
+				$ingestedNeeded = true;
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it should be ingested");
+				continue;
+			}
+
+			if(in_array($flavor->getId(), $entryIngestedFlavors) &&
+				$conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
+			{
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it already ingested");
+				unset($flavors[$index]);
+			}
+		}	
+		
+		return $ingestedNeeded;	
+	}	
+	
+	private static function shouldConvertProfileFlavors(conversionProfile2 $profile, mediaInfo $mediaInfo, flavorAsset $originalFlavorAsset)
+	{
+		$shouldConvert = true;
+					
+		if($profile->getCreationMode() == conversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
+		{
+			KalturaLog::log("The profile created from old conversion profile with bypass flv");
+			$isFlv = false;
+			if($mediaInfo)
+				$isFlv = KDLWrap::CDLIsFLV($mediaInfo);
+			
+			if($isFlv && $originalFlavorAsset->hasTag(flavorParams::TAG_MBR))
+			{
+				KalturaLog::log("The source is mbr and flv, conversion will be bypassed");
+				$shouldConvert = false;
+			}
+			else
+			{
+				KalturaLog::log("The source is NOT mbr or flv, conversion will NOT be bypassed");
+			}
+		}	
+		return $shouldConvert;	
 	}
 }

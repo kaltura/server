@@ -6,20 +6,9 @@
 class kConvartableJobData extends kJobData
 {
 	/**
-	 * @var string
+	 * @var array<kSourceFileSyncDescriptor>
 	 */
-	private $srcFileSyncLocalPath;
-	
-	/**
-	 * The translated path as used by the scheduler
-	 * @var string
-	 */
-	private $actualSrcFileSyncLocalPath;
-	
-	/**
-	 * @var string
-	 */
-	private $srcFileSyncRemoteUrl;
+	private $srcFileSyncs;
 	
 	/**
 	 * @var int
@@ -35,13 +24,7 @@ class kConvartableJobData extends kJobData
 	 * @var string
 	 */
 	private $customData;
-	
-	/**
-	 * @var flavorParamsOutput
-	 * @deprecated
-	 */
-	private $flavorParamsOutput;
-	
+		
 	/**
 	 * @var int
 	 */
@@ -56,15 +39,60 @@ class kConvartableJobData extends kJobData
 	 * @var int
 	 */
 	private $currentOperationIndex = 0;
+
 	
+	/**
+	 * @var flavorParamsOutput
+	 * @deprecated
+	 */
+	private $flavorParamsOutput;
 	
+	/**
+	 * @var string
+	 * @deprecated
+	 */
+	private $srcFileSyncLocalPath;
+	
+	/**
+	 * The translated path as used by the scheduler
+	 * @var string
+	 * @deprecated
+	 */
+	private $actualSrcFileSyncLocalPath;
+	
+	/**
+	 * @var string
+	 * @deprecated
+	 */
+	private $srcFileSyncRemoteUrl;
+
+	/**
+	 * @return the $srcFileSyncs
+	 */
+	public function getSrcFileSyncs() 
+	{
+		return $this->srcFileSyncs;
+	}
+
+	/**
+	 * @param array<kSourceFileSyncDescriptor> $srcFileSyncs
+	 */
+	public function setSrcFileSyncs($srcFileSyncs) 
+	{
+		$this->srcFileSyncs = $srcFileSyncs;
+	}
 
 	/**
 	 * @return the $srcFileSyncLocalPath
 	 */
 	public function getSrcFileSyncLocalPath()
 	{
-		return $this->srcFileSyncLocalPath;
+		$srcDescriptor = reset($this->srcFileSyncs);
+		
+		if(!$srcDescriptor)
+			return null;
+		/* @var $srcDescriptor kSourceFileSyncDescriptor */
+		return $srcDescriptor->getFileSyncLocalPath();
 	}
 	
 	/**
@@ -72,7 +100,18 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setSrcFileSyncRemoteUrl($srcFileSyncRemoteUrl)
 	{
-		$this->srcFileSyncRemoteUrl = $srcFileSyncRemoteUrl;
+		$srcDescriptor = reset($this->srcFileSyncs);
+		
+		if(!$srcDescriptor)
+		{
+			$srcDescriptor = new kSourceFileSyncDescriptor();
+			$srcDescriptor->setFileSyncRemoteUrl($srcFileSyncRemoteUrl);	
+			$this->srcFileSyncs = array($srcDescriptor);
+		}
+		else
+		{
+			$srcDescriptor->setFileSyncRemoteUrl($srcFileSyncRemoteUrl);
+		}		
 	}
 
 	/**
@@ -80,25 +119,29 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getSrcFileSyncRemoteUrl()
 	{
-		return $this->srcFileSyncRemoteUrl;
+		$srcDescriptor = reset($this->srcFileSyncs);
+		
+		if(!$srcDescriptor)
+			return null;
+		/* @var $srcDescriptor kSourceFileSyncDescriptor */
+		return $srcDescriptor->getFileSyncRemoteUrl();
+	}
+	
+	/**
+	* @param $customData the $customData to set
+	*/
+	public function setCustomData($customData)
+	{
+		$this->customData = $customData;
 	}
 
-        /**
-         * @param $customData the $customData to set
-         */
-        public function setCustomData($customData)
-        {
-                $this->customData = $customData;
-        }
-
-        /**
-         * @return the $customData
-         */
-        public function getCustomData()
-        {
-                return $this->customData;
-        }
-
+	/**
+	* @return the $customData
+	*/
+	public function getCustomData()
+	{
+		return $this->customData;
+	}
 
 	/**
 	 * @param $flavorParamsOutput the $flavorParamsOutput to set
@@ -113,7 +156,18 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setSrcFileSyncLocalPath($srcFileSyncLocalPath)
 	{
-		$this->srcFileSyncLocalPath = $srcFileSyncLocalPath;
+		$srcDescriptor = reset($this->srcFileSyncs);
+		
+		if(!$srcDescriptor)
+		{
+			$srcDescriptor = new kSourceFileSyncDescriptor();
+			$srcDescriptor->setFileSyncLocalPath($srcFileSyncLocalPath);	
+			$this->srcFileSyncs = array($srcDescriptor);
+		}
+		else
+		{
+			$srcDescriptor->setFileSyncLocalPath($srcFileSyncLocalPath);	
+		}	
 	}
 
 	/**
@@ -121,7 +175,12 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getActualSrcFileSyncLocalPath()
 	{
-		return $this->actualSrcFileSyncLocalPath;
+		$srcDescriptor = reset($this->srcFileSyncs);
+		
+		if(!$srcDescriptor)
+			return null;
+		/* @var $srcDescriptor kSourceFileSyncDescriptor */
+		return $srcDescriptor->getActualFileSyncLocalPath();
 	}
 
 	/**
@@ -129,7 +188,18 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setActualSrcFileSyncLocalPath($actualSrcFileSyncLocalPath)
 	{
-		$this->actualSrcFileSyncLocalPath = $actualSrcFileSyncLocalPath;
+		$srcDescriptor = reset($this->srcFileSyncs);
+		
+		if(!$srcDescriptor)
+		{
+			$srcDescriptor = new kSourceFileSyncDescriptor();
+			$srcDescriptor->setActualFileSyncLocalPath($actualSrcFileSyncLocalPath);	
+			$this->srcFileSyncs = array($srcDescriptor);
+		}
+		else
+		{
+			$srcDescriptor->setActualFileSyncLocalPath($actualSrcFileSyncLocalPath);	
+		}		
 	}
 	
 	/**

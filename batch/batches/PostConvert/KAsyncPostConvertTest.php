@@ -69,7 +69,10 @@ class KAsyncPostConvertTest extends PHPUnit_Framework_TestCase
 	private function prepareJobs($filePath, $createThumb)
 	{
 		$data = new KalturaPostConvertJobData();
-		$data->srcFileSyncLocalPath = $filePath;
+		$srcFileSyncDescriptor = new KalturaSourceFileSyncDescriptor();
+		$srcFileSyncDescriptor->fileSyncLocalPath = $filePath;
+		$data->srcFileSyncs = new KalturaSourceFileSyncDescriptorArray();
+		$data->srcFileSyncs[] = $srcFileSyncDescriptor;		
 		$data->createThumb = $createThumb;
 		
 		$job = new KalturaBatchJob();

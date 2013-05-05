@@ -45,7 +45,7 @@ class KOperationEngineEncodingCom  extends KOperationEngine
 		$sendData->setUserKey($this->userKey);
 		
 		$sendData->setAction(KEncodingComData::ACTION_ADD_MEDIA);
-		$sendData->setSource($data->srcFileSyncRemoteUrl);
+		$sendData->setSource($this->getSrcRemoteUrlFromData());
 		
 		switch($data->flavorParamsOutput->videoCodec)
 		{

@@ -35,7 +35,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 			{
 				if($index == 0)
 				{
-					$this->inFilePath = $data->actualSrcFileSyncLocalPath;
+					$this->inFilePath = $this->getSrcActualPathFromData($data);
 				}
 				else
 				{
@@ -88,9 +88,10 @@ abstract class KJobConversionEngine extends KConversionEngine
 	{
 
 		$error_message = "";  
-		if ( ! file_exists ( $data->actualSrcFileSyncLocalPath ) )
+		$actualFileSyncLocalPath = $this->getSrcActualPathFromData($data);
+		if ( ! file_exists ( $actualFileSyncLocalPath ) )
 		{
-			$error_message = "File [{$data->actualSrcFileSyncLocalPath}] does not exist";
+			$error_message = "File [{$actualFileSyncLocalPath}] does not exist";
 			KalturaLog::err(  $error_message );
 			return array ( false , $error_message );
 		}
@@ -110,7 +111,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 		$this->addToLogFile ( $log_file , "Executed by [" . $this->getName() . "] flavor params id [" . $data->flavorParamsOutput->flavorParamsId . "]" ) ;
 		
 		// add media info of source 
-		$this->logMediaInfo ( $log_file , $data->actualSrcFileSyncLocalPath );
+		$this->logMediaInfo ( $log_file , $actualFileSyncLocalPath );
 		
 		$duration = 0;
 		foreach ( $conversion_engine_result_list as $conversion_engine_result )

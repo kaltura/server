@@ -422,7 +422,8 @@ class kFlowHelper
 		if($nextOperator)
 		{
 			//			KalturaLog::debug("Found next operator");
-			$nextJob = kJobsManager::addFlavorConvertJob($syncKey, $flavorParamsOutput, $data->getFlavorAssetId(), null,
+			//Note: consequent operators doesn't support at the moment conversion based on outputs of multiple sources
+			$nextJob = kJobsManager::addFlavorConvertJob(array($syncKey), $flavorParamsOutput, $data->getFlavorAssetId(), null,
 					$data->getMediaInfoId(), $dbBatchJob, $dbBatchJob->getJobSubType());
 		}
 

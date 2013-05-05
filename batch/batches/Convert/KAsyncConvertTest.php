@@ -137,7 +137,10 @@ class KAsyncConvertTest extends PHPUnit_Framework_TestCase
 	private function prepareJobs($engineType, $filePath, $flavorParams)
 	{
 		$data = new KalturaConvertJobData();
-		$data->srcFileSyncLocalPath = $filePath;
+		$srcFileSyncDescriptor = new KalturaSourceFileSyncDescriptor();
+		$srcFileSyncDescriptor->fileSyncLocalPath = $filePath;
+		$data->srcFileSyncs = new KalturaSourceFileSyncDescriptorArray();
+		$data->srcFileSyncs[] = $srcFileSyncDescriptor;
 		$data->flavorParamsOutput = $flavorParams;
 		
 		$job = new KalturaBatchJob();

@@ -263,6 +263,24 @@ abstract class KConversionEngine
 		$extra_content = "\n\n----------------------\n$str\n----------------------\n\n";
 		file_put_contents( $file_name , $log_content . $extra_content );
 	}
+	
+	protected function getSrcActualPathFromData($data)
+	{
+		$srcFileSyncDescriptor = reset($data->srcFileSyncs);
+		if($srcFileSyncDescriptor)
+			return $srcFileSyncDescriptor->actualFileSyncLocalPath;		
+		else
+			return null;
+	}
+	
+	protected function getSrcRemoteUrlFromData($data)
+	{
+		$srcFileSyncDescriptor = reset($data->srcFileSyncs);
+		if($srcFileSyncDescriptor)
+			return $srcFileSyncDescriptor->fileSyncRemoteUrl;		
+		else
+			return null;
+	}
 
 }
 

@@ -7,19 +7,28 @@ class KalturaConvartableJobData extends KalturaJobData
 {
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $srcFileSyncLocalPath;
 	
 	/**
 	 * The translated path as used by the scheduler
 	 * @var string
+	 * @deprecated
 	 */
 	public $actualSrcFileSyncLocalPath;
 	
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $srcFileSyncRemoteUrl;
+
+	/**
+	 * 
+	 * @var KalturaSourceFileSyncDescriptorArray
+	 */
+	public $srcFileSyncs;
 	
 	/**
 	 * @var int
@@ -53,9 +62,7 @@ class KalturaConvartableJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
-		"srcFileSyncLocalPath" ,
-		"actualSrcFileSyncLocalPath" ,
-		"srcFileSyncRemoteUrl" ,
+		"srcFileSyncs",
 		"engineVersion" ,
 		"mediaInfoId" ,
 		"flavorParamsOutputId" ,

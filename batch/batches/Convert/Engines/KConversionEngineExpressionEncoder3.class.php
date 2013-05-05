@@ -25,11 +25,12 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 	protected function convertCollection ( KalturaConvertCollectionJobData &$data )
 	{
 		$error_message = "";
-		KalturaLog::debug(__METHOD__ . " Src File Path: " . $data->actualSrcFileSyncLocalPath);
+		$actualFileSyncLocalPath = $this->getSrcActualPathFromData($data);
+		KalturaLog::debug(__METHOD__ . " Src File Path: " . $actualFileSyncLocalPath);
 		
-		if ( ! file_exists ( $data->actualSrcFileSyncLocalPath ) )
+		if ( ! file_exists ( $actualFileSyncLocalPath ) )
 		{
-			$error_message = "File [{$data->actualSrcFileSyncLocalPath}] does not exist";
+			$error_message = "File [{$actualFileSyncLocalPath}] does not exist";
 			KalturaLog::err(  $error_message );
 			return array ( false , $error_message );
 		}
@@ -45,7 +46,7 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 		$this->addToLogFile ( $log_file , "Executed by [" . $this->getName() . "]" ) ;
 		
 		// add media info of source 
-		$this->logMediaInfo ( $log_file , $data->actualSrcFileSyncLocalPath );
+		$this->logMediaInfo ( $log_file , $actualFileSyncLocalPath );
 		
 		$duration = 0;
 		foreach ( $conversion_engine_result_list as $conversion_engine_result )

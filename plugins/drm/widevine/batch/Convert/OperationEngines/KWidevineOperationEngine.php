@@ -72,7 +72,6 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->buildPackageName($entry);
 		
 		KalturaLog::debug('start Widevine package closer: '.$this->packageName);
-		
 		$requestXmlObj = new SimpleXMLElement('<PackageQuery/>');
 		$requestXmlObj->addAttribute('name', $this->packageName);		
 		$requestXml = $requestXmlObj->asXML();
@@ -101,11 +100,13 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('Creating sources directory: '.$this->sourceFolder);
 		mkdir($this->sourceFolder);
 		
-		$fileName = basename($this->data->actualSrcFileSyncLocalPath);		
-		KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
-		symlink($this->data->actualSrcFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
-		$this->packageFiles[] = $fileName;
-		
+		foreach ($this->data->srcFileSyncs as $srcFileSyncDescriptor) 
+		{
+			$fileName = basename($srcFileSyncDescriptor->actualFileSyncLocalPath);		
+			KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
+			symlink($srcFileSyncDescriptor->actualFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
+			$this->packageFiles[] = $fileName;
+		}		
 		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
 		
 		KalturaLog::debug('Target package file name: '.$this->data->destFileSyncLocalPath);

@@ -62,8 +62,8 @@ abstract class KCollectionConversionEngine extends KConversionEngine
 			foreach($cmdArr as $index => $cmd)
 			{
 				if($index == 0)
-				{
-					$this->inFilePath = $data->actualSrcFileSyncLocalPath;
+				{	
+					$this->inFilePath = $this->getSrcActualPathFromData($data);
 				}
 				else
 				{

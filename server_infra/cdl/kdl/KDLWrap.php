@@ -78,7 +78,7 @@ class KDLWrap
 			$profile->_flavors[] = $kdlFlavor;
 			KalturaLog::log( "...F-->".$kdlFlavor->ToString());
 		}
-
+				
 		$trgList = array();
 		{
 			$dlPrc = new KDLProcessor();
@@ -91,7 +91,6 @@ class KDLWrap
 			else
 				$this->_rv = true;
 		}
-		
 			/*
 			 * For 'passthrough' quick&dirty
 			 */
@@ -114,7 +113,6 @@ class KDLWrap
 			}
 			$this->_targetList[] = $cdlFlvrOut;
 		}
-		
 		return $this;
 	}
 
@@ -210,6 +208,7 @@ class KDLWrap
 			$flavor->setSourceRemoteStorageProfileId($target->_cdlObject->getSourceRemoteStorageProfileId());
 			$flavor->setRemoteStorageProfileIds($target->_cdlObject->getRemoteStorageProfileIds());
 			$flavor->setMediaParserType($target->_cdlObject->getMediaParserType());
+			$flavor->setSourceAssetParamsIds($target->_cdlObject->getSourceAssetParamsIds());
 		}
 		
 		if($target->IsRedundant()) {

@@ -59,7 +59,7 @@ class KConversionEngineEncodingCom  extends KJobConversionEngine
 		$sendData->setUserKey($this->getUserKey());
 		
 		$sendData->setAction(KEncodingComData::ACTION_ADD_MEDIA);
-		$sendData->setSource($data->srcFileSyncRemoteUrl);
+		$sendData->setSource($this->getSrcRemoteUrlFromData($data));
 		
 		switch($data->flavorParamsOutput->videoCodec)
 		{

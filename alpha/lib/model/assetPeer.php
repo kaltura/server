@@ -572,4 +572,12 @@ class assetPeer extends BaseassetPeer
 	    $asset = assetPeer::retrieveById($fileSync->getObjectId());
 	    return $asset;
 	}
+	
+	public static function retrieveByEntryIdAndStatus($entryId, $status)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, $status);
+		return self::doSelect($c);
+	}
 }
