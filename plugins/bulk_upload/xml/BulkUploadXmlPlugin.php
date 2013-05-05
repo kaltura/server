@@ -135,7 +135,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		$channel = $xmlElement->addChild('channel');
 		
 		$handledResults = 0;
-		while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
+		while(count($bulkUploadResults))
 		{
 			$handledResults += count($bulkUploadResults);
 			
@@ -167,6 +167,9 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 				kMrssManager::getEntryMrssXml($entry, $item);
 			}
 	    		
+    		if(count($bulkUploadResults) < $criteria->getLimit())
+    			break;
+    			
     		kMemoryManager::clearMemory();
     		$criteria->setOffset($handledResults);
 			$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);

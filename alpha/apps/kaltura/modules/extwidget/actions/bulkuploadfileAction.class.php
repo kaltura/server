@@ -36,7 +36,7 @@ class bulkuploadfileAction extends sfAction
 			$data = $batchJob->getData();
 			
 			$handledResults = 0;
-			while(count($bulkUploadResults) && count($bulkUploadResults) == $criteria->getLimit())
+			while(count($bulkUploadResults))
 			{
 				$handledResults += count($bulkUploadResults);
 				foreach($bulkUploadResults as $bulkUploadResult)
@@ -66,6 +66,9 @@ class bulkuploadfileAction extends sfAction
 					fputcsv($STDOUT, $values);
 				}
 	    		
+	    		if(count($bulkUploadResults) < $criteria->getLimit())
+	    			break;
+	    			
 	    		kMemoryManager::clearMemory();
 	    		$criteria->setOffset($handledResults);
 				$bulkUploadResults = BulkUploadResultPeer::doSelect($criteria);
