@@ -10,7 +10,7 @@ class kCompareMetadataCondition extends kCompareCondition
 	 * 1. Slashed xPath, e.g. /metadata/myElementName
 	 * 2. Using local-name function, e.g. /*[local-name()='metadata']/*[local-name()='myElementName']
 	 * 3. Using only the field name, e.g. myElementName, it will be searched as //myElementName
-	 * 
+	 *
 	 * @var string
 	 */
 	private $xPath;
@@ -40,13 +40,16 @@ class kCompareMetadataCondition extends kCompareCondition
 			return null;
 			
 		$values = kMetadataManager::parseMetadataValues($metadata, $this->xPath);
+		if(is_null($values))
+			return null;
+			
 		return array_map('intval', $values);
 	}
 	
 	/**
 	 * @return string $xPath
 	 */
-	public function getXPath() 
+	public function getXPath()
 	{
 		return $this->xPath;
 	}
@@ -62,7 +65,7 @@ class kCompareMetadataCondition extends kCompareCondition
 	/**
 	 * @param string $xPath
 	 */
-	public function setXPath($xPath) 
+	public function setXPath($xPath)
 	{
 		$this->xPath = $xPath;
 	}
@@ -70,7 +73,7 @@ class kCompareMetadataCondition extends kCompareCondition
 	/**
 	 * @param int $profileId
 	 */
-	public function setProfileId($profileId) 
+	public function setProfileId($profileId)
 	{
 		$this->profileId = $profileId;
 	}
@@ -81,5 +84,5 @@ class kCompareMetadataCondition extends kCompareCondition
 	public function shouldFieldDisableCache($scope)
 	{
 		return false;
-	}	
+	}
 }
