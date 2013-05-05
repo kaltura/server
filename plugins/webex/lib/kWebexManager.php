@@ -18,7 +18,7 @@ class kWebexManager implements kObjectAddedEventConsumer
 		$asset->setFileExt('arf');
 		$asset->setStatus(flavorAsset::ASSET_STATUS_READY);
 		$asset->setIsOriginal(0);
-		$asset->setVersion(1);
+		$asset->incrementVersion();
 		$asset->save();
 		
 		kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET), $object->getSyncKey(FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET));
