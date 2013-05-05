@@ -809,7 +809,7 @@ CREATE TABLE IF NOT EXISTS `dynamic_enum` (
   `value_name` varchar(255) NOT NULL,
   `plugin_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `email_campaign` */
 
