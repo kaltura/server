@@ -1,7 +1,7 @@
 <?php
 /**
- * Class which parses the bulk upload CSV and creates the objects listed in it. 
- * 
+ * Class which parses the bulk upload CSV and creates the objects listed in it.
+ *
  * @package plugins.bulkUploadCsv
  * @subpackage batch
  */
@@ -42,9 +42,9 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		while($values)
 		{
 			//removing UTF-8 BOM if exists
-			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) { 
-       			 $values[0]=substr($values[0], 3); 
-    		} 
+			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
+       			 $values[0]=substr($values[0], 3);
+    		}
 			// use version 3 (dynamic columns cassiopeia) identified by * in first char
 			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
 			{
@@ -83,11 +83,14 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 			$values = fgetcsv($fileHandle);
 		}
 		
-		foreach ($columns as $columnName)
+		if(!count($this->data->columns))
 		{
-		    $columnNameObj = new KalturaString();
-		    $columnNameObj->value = $columnName;
-		    $this->data->columns [] = $columnNameObj;
+			foreach ($columns as $columnName)
+			{
+			    $columnNameObj = new KalturaString();
+			    $columnNameObj->value = $columnName;
+			    $this->data->columns [] = $columnNameObj;
+			}
 		}
 		
 		fclose($fileHandle);
@@ -117,13 +120,13 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
+	 *
 	 * Create the entries from the given bulk upload results
 	 */
 	abstract protected function createObjects();
 	
 	/**
-	 * 
+	 *
 	 * Creates a new upload result object from the given parameters
 	 * @param array $values
 	 * @param array $columns
@@ -157,7 +160,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 
 
 	/**
-	 * 
+	 *
 	 * Gets the columns for V1 csv file
 	 */
 	protected function getV1Columns()
@@ -166,7 +169,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
+	 *
 	 * Gets the columns for V2 csv file
 	 */
 	protected function getV2Columns()
@@ -178,7 +181,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 
 	
 	/**
-	 * 
+	 *
 	 * Gets the columns for V3 csv file (parses the header)
 	 */
 	protected function parseColumns($headers)
