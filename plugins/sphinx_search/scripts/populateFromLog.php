@@ -7,6 +7,19 @@ define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 require_once(ROOT_DIR . '/server_infra/kConf.php');
 
+// ------------------------------------------------------
+class OldLogRecordsFilter {
+	private $logId;
+
+	function __construct($logId) {
+		$this->logId = $logId;
+	}
+
+	function filter($i) {
+		return $i > $this->logId;
+	}
+}
+
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
@@ -44,18 +57,27 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
+$limit = 2000; 	// The number of sphinxLog records we want to query
+$gap = 1000;	// The gap from 'getLastLogId' we want to query 
+
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer);
 $lastLogs = array();
-foreach($serverLastLogs as $serverLastLog)
-	$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
+$handledRecords = array();
 
-$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs);
+foreach($serverLastLogs as $serverLastLog) {
+	$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
+	$handledRecords[$serverLastLog->getDc()] = array();
+}
+
+$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit);
+
 while(true)
 {
+	
 	while(!count($sphinxLogs))
 	{
 		sleep(1);
-		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs);
+		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit);
 	}
 
 	$sphinxCon = null;
@@ -73,52 +95,46 @@ while(true)
 	foreach($sphinxLogs as $sphinxLog)
 	{
 		/* @var $sphinxLog SphinxLog */
-
 		$dc = $sphinxLog->getDc();
 		$executedServerId = $sphinxLog->getExecutedServerId();
-		KalturaLog::log('Sphinx log id ' . $sphinxLog->getId() . " dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
-
+		$sphinxLogId = $sphinxLog->getId();
+		$isOlderThanLast = false;
+		
 		$serverLastLog = null;
-		if(isset($lastLogs[$dc]))
-		{
+		
+		if(isset($lastLogs[$dc])) {
 			$serverLastLog = $lastLogs[$dc];
-
-			if($serverLastLog->getLastLogId() >= $sphinxLog->getId())
-			{
-				KalturaLog::debug('Last log id [' . $serverLastLog->getLastLogId() . "] dc [$dc] is larger than id [" . $sphinxLog->getId() . "]");
+		
+			$isOlderThanLast = ($serverLastLog->getLastLogId() >= $sphinxLogId);
+			$wasHandled = in_array($sphinxLogId, $handledRecords[$dc]);	// Check
+			
+			if($isOlderThanLast && $wasHandled) {
 				continue;
 			}
-		}
-		else
-		{
+		} else {
 			$serverLastLog = new SphinxLogServer();
 			$serverLastLog->setServer($sphinxServer);
 			$serverLastLog->setDc($dc);
-
+			
 			$lastLogs[$dc] = $serverLastLog;
 		}
+		
+		$handledRecords[$dc][] = $sphinxLogId; 
+		KalturaLog::log("Sphinx log id $sphinxLogId dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
 
 		try
 		{
-//			if($serverLastLog->getId() == $executedServerId)
-//			{
-//				KalturaLog::debug("SQL already executed on server [$executedServerId] synchronously.");
-//			}
-//			else
-//			{
-				$sql = $sphinxLog->getSql();
-				$affected = $sphinxCon->exec($sql);
-//			}
+			$sql = $sphinxLog->getSql();
+			$affected = $sphinxCon->exec($sql);
 
 			if(!$affected)
-			{
 				$errorInfo = $sphinxCon->errorInfo();
-//				if(!preg_match('/^duplicate id/', $errorInfo[2]))
-//					die("No affected records [" . $sphinxCon->errorCode() . "]\n" . print_r($sphinxCon->errorInfo(), true));
-			}
 
-			$serverLastLog->setLastLogId($sphinxLog->getId());
-			$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+			// If the record is an historical record, don't take back the last log id
+			if(!$isOlderThanLast) {
+				$serverLastLog->setLastLogId($sphinxLog->getId());
+ 				$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+			}
 		}
 		catch(Exception $e)
 		{
@@ -128,7 +144,15 @@ while(true)
 	unset($sphinxCon);
 
 	SphinxLogPeer::clearInstancePool();
-	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs);
+	
+	// Clear $handledRecords from before last - gap.
+	foreach($serverLastLogs as $serverLastLog) {
+		$dc = $serverLastLog->getDc();
+		$threshold = $serverLastLog->getLastLogId() - $gap;
+		$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
+	}
+	
+	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit);
 }
 
 KalturaLog::log('Done');
