@@ -211,7 +211,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+			$job = $this->moveFile($job, $data->destFileLocalPath);
 		}
 		catch(Exception $ex)
 		{
@@ -332,7 +332,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
 
-			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+			$job = $this->moveFile($job, $data->destFileLocalPath);
 		}
 		catch(Exception $ex)
 		{
@@ -347,9 +347,9 @@ class KAsyncImport extends KJobHandlerWorker
 	 * @param int $fileSize
 	 * @return KalturaBatchJob
 	 */
-	private function moveFile(KalturaBatchJob $job, $destFile, $fileSize = null)
+	private function moveFile(KalturaBatchJob $job, $destFile)
 	{
-		KalturaLog::debug("moveFile($job->id, $destFile, $fileSize)");
+		KalturaLog::debug("moveFile($job->id, $destFile)");
 
 		try
 		{
