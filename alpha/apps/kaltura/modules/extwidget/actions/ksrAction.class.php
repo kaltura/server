@@ -75,6 +75,12 @@ class ksrAction extends sfAction
 	{
 		KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 	}
+
+	$ui_conf_swf_url = $uiConf->getSwfUrl();
+	if (!$ui_conf_swf_url)
+	{
+		KExternalErrors::dieError(KExternalErrors::ILLEGAL_UI_CONF, "SWF URL not found in UI conf");
+	}
         
         @libxml_use_internal_errors(true);
         try
@@ -240,7 +246,12 @@ class ksrAction extends sfAction
     
     private function _prepareLibJs()
     {
-        $this->jsResult = file_get_contents( $this->_getJsFilesPath(). self::KALTURA_LIB_JS_FILENAME);
+	$filePath = $this->_getJsFilesPath(). self::KALTURA_LIB_JS_FILENAME;
+	if(!file_exists($filePath))
+	{
+		KExternalErrors::dieError(KExternalErrors::ILLEGAL_UI_CONF, "Required file is missing");
+	}
+        $this->jsResult = file_get_contents($filePath);
 
         foreach($this->jsTemplateParams as $token => $info)
         {
@@ -251,9 +262,19 @@ class ksrAction extends sfAction
 
     private function _prepareJs()
     {
-        $somDetectJs = file_get_contents($this->_getJsFilesPath(). self::SOM_DETECT_JS_FILENAME);
-        $somJs = file_get_contents($this->_getJsFilesPath(). self::SOM_JS_FILENAME);
-        $apiJs = file_get_contents($this->_getJsFilesPath(). self::KALTURA_LIB_API_JS_FILENAME);
+	$baseFilePath = $this->_getJsFilesPath();
+	$somDetectJsPath = $baseFilePath. self::SOM_DETECT_JS_FILENAME;
+	$somJsPath = $baseFilePath. self::SOM_JS_FILENAME;
+	$apiJsPath = $baseFilePath. self::KALTURA_LIB_API_JS_FILENAME;
+	
+	if(!file_exists() || !file_exists() || !file_exists())
+	{
+		KExternalErrors::dieError(KExternalErrors::ILLEGAL_UI_CONF, "Required file is missing");
+	}
+	
+        $somDetectJs = file_get_contents($somDetectJsPath);
+        $somJs = file_get_contents($somJsPath);
+        $apiJs = file_get_contents($apiJsPath);
         $fullJs = $somDetectJs. PHP_EOL. $somJs . PHP_EOL . $this->jsResult . PHP_EOL . $apiJs;
         $this->jsResult = $fullJs;
     }
