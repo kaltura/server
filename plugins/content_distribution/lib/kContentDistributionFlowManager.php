@@ -1100,7 +1100,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
-				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+				self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
@@ -1131,7 +1131,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
-				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+				self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+				$validationErrors = $entryDistribution->getValidationErrors();
 				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
@@ -1218,7 +1219,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
-				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+				self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
@@ -1289,8 +1290,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						break;
 				}
 				
-				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
-
+				self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+				$validationErrors = $entryDistribution->getValidationErrors();
+				
 				if(!$updateRequired)
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
@@ -1449,8 +1451,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				case EntryDistributionStatus::PENDING:
 				case EntryDistributionStatus::ERROR_SUBMITTING:	
 				
-					$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
-
+					self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+					$validationErrors = $entryDistribution->getValidationErrors();
+					
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
 					if (count($distributionProfile->getAutoCreateFlavorsArray()) || count($distributionProfile->getAutoCreateThumbArray()) )
 					{
@@ -1461,7 +1464,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					
 				case EntryDistributionStatus::QUEUED:
 				
-					$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+					self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+					$validationErrors = $entryDistribution->getValidationErrors();
+					
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
 					
 					if(!count($validationErrors) && $entry->getStatus() == entryStatus::READY)
@@ -1507,7 +1512,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						}
 					}
 				
-					$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+					self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
 					
 					if(!$updateRequired)
 					{
@@ -1703,7 +1708,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() == EntryDistributionStatus::PENDING)
 			{
-				$validationErrors = assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+				$listChanged = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::SUBMIT);
+				if (!$listChanged){
+					continue;
+				}
 				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
@@ -1733,7 +1741,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
-				$validationErrors = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+				$listChanged = self::assignAssetsAndValidateForSubmission($entryDistribution, $entry, $distributionProfile, DistributionAction::UPDATE);
+				if (!$listChanged){
+					continue;
+				}
+				$validationErrors = $entryDistribution->getValidationErrors();
 				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
@@ -1766,6 +1778,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setValidationErrorsArray($validationErrors);
 		$entryDistribution->save();
 		
-		return $validationErrors;
+		return $listChanged;
 	}
 }
