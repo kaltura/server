@@ -475,7 +475,8 @@ class MediaService extends KalturaEntryService
 	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
 		if (!file_exists("$webcamBasePath.flv") && !file_exists("$webcamBasePath.f4v"))
 		{
-			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+			if (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId()))
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			throw new KalturaAPIException ( KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND );
 		}
 
