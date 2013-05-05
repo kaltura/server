@@ -12,6 +12,7 @@ echo "Test started [" . __FILE__ . "]\n";
 $logrotate = $config['dwh']['logRotateBin'];
 $appDir = $config['global']['appDir'];
 $dwhDir = $config['dwh']['baseDir'];
+$kalturaUser = $config['os']['kalturaUser'];
 
 
 /**
@@ -195,7 +196,7 @@ echo " log rotated\n";
 /**
  * Run hourly scripts.
  */
-$cmd = "$dwhDir/etlsource/execute/etl_hourly.sh";
+$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_hourly.sh";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
@@ -209,7 +210,7 @@ echo " OK\n";
 /**
  * Run update dimensions.
  */
-$cmd = "$dwhDir/etlsource/execute/etl_update_dims.sh";
+$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_update_dims.sh";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 //if($returnedValue !== 0)
@@ -224,7 +225,7 @@ echo " OK\n";
 /**
  * Run daily scripts.
  */
-$cmd = "$dwhDir/etlsource/execute/etl_daily.sh";
+$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_daily.sh";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
@@ -300,7 +301,7 @@ echo "Reports OK\n";
 /**
  * Syncyng plays and view from the dwh to the operational db
  */
-$cmd = "$appDir/scripts/dwh/dwh_plays_views_sync.sh";
+$cmd = "su $kalturaUser -c $appDir/scripts/dwh/dwh_plays_views_sync.sh";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
