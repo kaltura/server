@@ -267,7 +267,7 @@ class ksrAction extends sfAction
 	$somJsPath = $baseFilePath. self::SOM_JS_FILENAME;
 	$apiJsPath = $baseFilePath. self::KALTURA_LIB_API_JS_FILENAME;
 	
-	if(!file_exists() || !file_exists() || !file_exists())
+	if(!file_exists($somDetectJsPath) || !file_exists($somJsPath) || !file_exists($apiJsPath))
 	{
 		KExternalErrors::dieError(KExternalErrors::ILLEGAL_UI_CONF, "Required file is missing");
 	}
