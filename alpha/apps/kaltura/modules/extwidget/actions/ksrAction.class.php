@@ -76,7 +76,7 @@ class ksrAction extends sfAction
 		KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 	}
 
-	$ui_conf_swf_url = $uiConf->getSwfUrl();
+	$ui_conf_swf_url = $this->uiconfObj->getSwfUrl();
 	if (!$ui_conf_swf_url)
 	{
 		KExternalErrors::dieError(KExternalErrors::ILLEGAL_UI_CONF, "SWF URL not found in UI conf");
