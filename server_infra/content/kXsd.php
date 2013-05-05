@@ -1,5 +1,5 @@
 <?php
-/** 
+/**
  * @package server-infra
  * @subpackage content
  */
@@ -45,11 +45,8 @@ class kXsd
 		}
 		
 		$xsl = self::compareNode($from, $to, $xPath, $level + 1);
-		if(is_bool($xsl))
+		if($xsl === true)
 		{
-			if(!$xsl)
-				return false;
-
 			if (strlen($restriction)){
 				$xsl = '
 	' . $tabs . '<xsl:for-each select="' . $parentXPath . '/*[local-name()=\'' . $fromName . '\']">
@@ -62,7 +59,7 @@ class kXsd
 	' . $tabs . '	</xsl:choose>
 	' . $tabs . '</xsl:for-each>';
 			}
-			else 
+			else
 			{
 				$xsl = '
 	' . $tabs . '<xsl:for-each select="' . $parentXPath . '/*[local-name()=\'' . $fromName . '\']">
@@ -72,7 +69,7 @@ class kXsd
 	' . $tabs . '</xsl:for-each>';
 			}
 		}
-		else 
+		else
 		{
 			$isIdentical = false;
 			$xsl = '
@@ -105,10 +102,6 @@ class kXsd
 		if($isIdentical)
 			return true;
 
-		//$xsl =  $tabs . $xsl;
-			
-		
-		
 		return $xsl;
 	}
 	
@@ -138,7 +131,7 @@ class kXsd
 				if(strtolower($curChild->localName) != strtolower($element->localName))
 					continue;
 					
-				if(!$curChild->getAttribute('id') || 
+				if(!$curChild->getAttribute('id') ||
 					$curChild->getAttribute('id') != $element->getAttribute('id'))
 					continue;
 					
@@ -165,7 +158,7 @@ class kXsd
 				if ($curChild->getAttribute('id'))
 					continue;
 					
-				if(!$curChild->getAttribute('name') || 
+				if(!$curChild->getAttribute('name') ||
 					$curChild->getAttribute('name') != $element->getAttribute('name'))
 					continue;
 					
@@ -219,7 +212,7 @@ class kXsd
 		$isIdentical = true;
 		
 		// build an array of from children
-		$fromChildren = $from->childNodes;		
+		$fromChildren = $from->childNodes;
 		$fromChildrenArr = array();
 		if($fromChildren)
 		{
@@ -274,12 +267,7 @@ class kXsd
 				if($toChildName != 'element')
 				{
 					$childXsl = self::compareNode($fromChild, $toChild, $xPath, $level + 1);
-					if(is_bool($childXsl))
-					{
-						if(!$childXsl)
-							return false;
-					}
-					else 
+					if($childXsl === true)
 					{
 						$xsl .= $childXsl;
 						$isIdentical = false;
@@ -302,11 +290,8 @@ class kXsd
 				
 
 				$childXsl = self::compareElement($fromChild, $toChild, $xPath, $level);
-				if(is_bool($childXsl))
+				if($childXsl === true)
 				{
-					if(!$childXsl)
-						return false;
-					
 					KalturaLog::debug("Element [$fromElementName] is identical");
 
 					$xsl .= '
@@ -321,7 +306,7 @@ class kXsd
 
 				continue;
 			}
-			else 
+			else
 			{
 				KalturaLog::debug("Node [". $toChild->getAttribute('id') ."] is new");
 				
@@ -333,7 +318,7 @@ class kXsd
 					$isIdentical = false;
 					KalturaLog::info("Node [" . $toChild->getAttribute('name') . "] added with minimum occurs [" . $toChild->getAttribute('minOccurs') . "]");
 						$xsl .= '
-			' . $tabs . '<xsl:element name="' . $toElementName . '">' . $toChild->getAttribute('default') . '</xsl:element>';	
+			' . $tabs . '<xsl:element name="' . $toElementName . '">' . $toChild->getAttribute('default') . '</xsl:element>';
 				}
 			}
 		}
@@ -375,7 +360,7 @@ class kXsd
 		
 		$xpathTo = new DOMXPath($toNode->ownerDocument);
 		
-		$xpathTo->registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema");		
+		$xpathTo->registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 		$enumerations = $xpathTo->query("xsd:simpleType/xsd:restriction/xsd:enumeration", $toNode);
 
 		$enumerationsValueToNode = array();
@@ -383,11 +368,11 @@ class kXsd
 		foreach($enumerations as $enumeration)
 		{
 			$enumerationsValueToNode[] = htmlspecialchars($enumeration->getAttribute('value'),ENT_QUOTES,'UTF-8');
-		}			
+		}
 		
 		
 		$xpathFrom = new DOMXPath($fromNode->ownerDocument);
-		$xpathFrom->registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema");	
+		$xpathFrom->registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 		$enumerations = $xpathFrom->query("xsd:simpleType/xsd:restriction/xsd:enumeration", $fromNode);
 
 		$enumerationsValueFromNode = array();
@@ -418,23 +403,18 @@ class kXsd
 		$from->load($fromXsd);
 		
 		if(!$from || !$from->documentElement)
-			return false;
+			throw new kXsdException(kXsdException::INVALID_XSD_FILE, $fromXsd);
 			
 		$to = new KDOMDocument();
 		$to->load($toXsd);
 		
 		if(!$to || !$to->documentElement)
-			return false;
+			throw new kXsdException(kXsdException::INVALID_XSD_FILE, $toXsd);
 			
 		$xsl = self::compareNode($from->documentElement, $to->documentElement);
 	
-		if(is_bool($xsl))
-		{
-			if($xsl)
-				return true;
-				
-			return false;
-		}
+		if($xsl === true)
+			return true;
 	
 		$xsl = '<?xml version="1.0" encoding="ISO-8859-1"?>
 	<xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">

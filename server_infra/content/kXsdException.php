@@ -5,6 +5,8 @@
  */
 class kXsdException extends kException
 {
+	const INVALID_XSD_FILE = "INVALID_XSD_FILE,Invalid xsd file [%s]";
+	const TRANSFORMATION_REQUIRED = "TRANSFORMATION_REQUIRED,Transformation required but not permitted to the partner";
 	const CAN_NOT_CHANGE_ELEMENT_ID = "CAN_NOT_CHANGE_ELEMENT_ID,Different ids [%s != %s] in path [%s]";
 	const CAN_NOT_CHANGE_ELEMENT_NAME = "CAN_NOT_CHANGE_ELEMENT_NAME,Different names [%s != %s] in path [%s]";
 	const CAN_NOT_CHANGE_ELEMENT_TYPE = "CAN_NOT_CHANGE_ELEMENT_TYPE,Different types [%s != %s] in path [%s]";
