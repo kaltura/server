@@ -2,7 +2,7 @@
 $config = array();
 $client = null;
 /* @var $client KalturaClient */
-require_once __DIR__  . 'common.php';
+require_once __DIR__  . '/common.php';
 
 $options = getopt('', array(
 	'service-url:',

@@ -1,7 +1,7 @@
 <?php
 $client = null;
 /* @var $client KalturaClient */
-require_once __DIR__  . 'common.php';
+require_once __DIR__  . '/common.php';
 
 $start = microtime(true);
 $monitorResult = new KalturaMonitorResult();
