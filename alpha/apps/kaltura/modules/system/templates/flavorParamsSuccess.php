@@ -76,7 +76,7 @@ if ($editFlavorParam)
 To activate the 'multiStream' remove the remarks from that portion
 and "" that are placed arround editFlavorParam->getMultiStream
 			<label for="multiStream">MultiStream:</label><br />
-			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getMultiStream(); ?></textarea><br/>
+			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?/*php echo "$editFlavorParam->getMultiStream()"*/; ?></textarea><br/>
 			<br />
 -->
 			<label for="audio-codec"><b>Audio codec </b></label>
