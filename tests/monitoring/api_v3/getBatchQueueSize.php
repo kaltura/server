@@ -1,18 +1,15 @@
 <?php
-require_once realpath(__DIR__ . '/../../') . '/lib/KalturaClient.php';
-require_once realpath(__DIR__ . '/../') . '/KalturaMonitorResult.php';
+$config = array();
+$client = null;
+/* @var $client KalturaClient */
+require_once __DIR__  . 'common.php';
 
 $options = getopt('', array(
 	'service-url:',
+	'debug',
 	'job-type:',
 	'job-sub-type:',
 ));
-
-if(!isset($options['service-url']))
-{
-	echo "Argument service-url is required";
-	exit(-1);
-}
 
 if(!isset($options['job-type']))
 {
@@ -27,26 +24,6 @@ $jobType = $options['job-type'];
 	exit(-1);
 }
 
-
-class KalturaMonitorClientLogger implements IKalturaLogger
-{
-	function log($msg)
-	{
-		echo "Client: $msg\n";
-	}
-}
-
-$serviceUrl = $options['service-url'];
-$clientConfig = new KalturaConfiguration();
-$clientConfig->partnerId = null;
-$clientConfig->serviceUrl = $serviceUrl;
-
-if(isset($options['debug']))
-	$clientConfig->setLogger(new KalturaMonitorClientLogger());
-
-$config = parse_ini_file(__DIR__ . '/../config.ini', true);
-
-$client = new KalturaClient($clientConfig);
 $monitorResult = new KalturaMonitorResult();
 $apiCall = null;
 

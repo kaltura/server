@@ -1,22 +1,18 @@
 <?php
-require_once realpath(__DIR__ . '/../../') . '/lib/KalturaClient.php';
-require_once realpath(__DIR__ . '/../') . '/KalturaMonitorResult.php';
+$config = array();
+$client = null;
+/* @var $client KalturaClient */
+require_once __DIR__  . 'common.php';
 
 $options = getopt('', array(
 	'service-url:',
+	'debug',
 	'entry-id:',
 	'entry-reference-id:',
 	'list-flavors',
 	'list-cue-points',
 	'list-metadata',
-	'debug',
 ));
-
-if(!isset($options['service-url']))
-{
-	echo "Argument service-url is required";
-	exit(-1);
-}
 
 if(!isset($options['entry-id']) && !isset($options['entry-reference-id']))
 {
@@ -24,25 +20,6 @@ if(!isset($options['entry-id']) && !isset($options['entry-reference-id']))
 	exit(-1);
 }
 
-class KalturaMonitorClientLogger implements IKalturaLogger
-{
-	function log($msg)
-	{
-		echo "Client: $msg\n";
-	}
-}
-
-$serviceUrl = $options['service-url'];
-$clientConfig = new KalturaConfiguration();
-$clientConfig->partnerId = null;
-$clientConfig->serviceUrl = $serviceUrl;
-
-if(isset($options['debug']))
-	$clientConfig->setLogger(new KalturaMonitorClientLogger());
-
-$config = parse_ini_file(__DIR__ . '/../config.ini', true);
-
-$client = new KalturaClient($clientConfig);
 $start = microtime(true);
 $monitorResult = new KalturaMonitorResult();
 $apiCall = null;
