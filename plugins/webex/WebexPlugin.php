@@ -2,22 +2,12 @@
 /**
  * @package plugins.webex
  */
-class WebexPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaImportHandler, IKalturaEventConsumers
+class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'webex';
 	
 	const WEBEX_FLAVOR_PARAM_SYS_NAME = 'webex_flavor_params';
-	
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaPermissions::isAllowedPartner()
-	 */
-	public static function isAllowedPartner($partnerId) {
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
-		
-	}
+
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
