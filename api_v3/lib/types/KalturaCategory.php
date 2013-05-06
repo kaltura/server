@@ -513,22 +513,22 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public function toInsertableObject($object_to_fill = null , $props_to_skip = array())
 	{
-		$isInheritedPrivacyContext = true;
+		$isInheritedPrivacyContext = false;
 		if ($this->parentId != null)
 		{
 			$parentCategory = categoryPeer::retrieveByPK($this->parentId);
 			if(!$parentCategory)
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $this->parentId);
 			
-			if($parentCategory->getPrivacyContexts() == '')
-				$isInheritedPrivacyContext = false;
+			if($parentCategory->getPrivacyContexts())
+				$isInheritedPrivacyContext = true;
 		}
 		
 		if ($isInheritedPrivacyContext)
 		{
 			if (!$this->owner && $this->inheritanceType != KalturaInheritanceType::INHERIT)
 			{
-				$this->owner = kCurrentContext::getCurrentKsKuser();
+				$this->owner = kCurrentContext::getCurrentKsKuser()->getPuserId();
 			}
 		}
 		
