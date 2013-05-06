@@ -944,12 +944,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
 		
-			/*
-			 * 'sourcePassthrough' controls whether the source is to be 'passthrough' although there 
-			 * is a source flavor contains transcoder settings.
-			 * Looks for a 'passthrough' flag on the source's flavor params output.
-			 */
-		$sourcePassthrough = false;
 		if(!$sourceFlavor)
 		{
 			KalturaLog::log("Source flavor params not found");
@@ -961,18 +955,16 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Source flavor params [" . $sourceFlavor->getId() . "] found");
 			$originalFlavorAsset->setFlavorParamsId($sourceFlavor->getId());
 			
-			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $mediaInfo, $parentJob, $sourcePassthrough);
+			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $mediaInfo, $parentJob);
 			if(!$res)
 				return false;
 						
-			if($sourcePassthrough==false) {
-				$originalFlavorAsset->setStatusLocalReady();
-				$originalFlavorAsset->save();
-				
-				$entry->save();
-				
-				kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
-			}
+			$originalFlavorAsset->setStatusLocalReady();
+			$originalFlavorAsset->save();
+			
+			$entry->save();
+			
+			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
 		}
 		
 		if(!count($flavors))
@@ -1198,7 +1190,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 	}
 	
-	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo, BatchJob $parentJob, &$sourcePassthrough)
+	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo, BatchJob $parentJob)
 	{
 		if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
 		{
@@ -1221,8 +1213,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				return false;
 			}
 			
-			$sourcePassthrough = $sourceFlavorOutput->_passthrough;	
-			if($sourcePassthrough==false) 
+			/*
+			 * '_passthrough' controls whether the source is to be 'passthrough' although there 
+			 * is a source flavor that contains transcoder settings.
+			 * Looks for a '_passthrough' flag on the source's flavor params output.
+			 */
+			if($sourceFlavorOutput->_passthrough==false) 
 			{
 				// save flavor params
 				$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
