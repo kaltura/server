@@ -1479,13 +1479,7 @@ class kFlowHelper
 
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 
-		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
-		{
-			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-			$originalflavorAsset->setDeletedAt(time());
-			$originalflavorAsset->save();
-		}
+		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
 
 		return $dbBatchJob;
 	}
@@ -1494,13 +1488,7 @@ class kFlowHelper
 	{
 		KalturaLog::debug("Convert Profile finished");
 
-		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
-		{
-			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-			$originalflavorAsset->setDeletedAt(time());
-			$originalflavorAsset->save();
-		}
+		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 
@@ -1973,5 +1961,36 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+	
+	private static function deleteTemporaryFlavors($entryId)
+	{
+		KalturaLog::debug('checking for temporary flavors to delete');
+		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
+		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
+		{
+			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$originalflavorAsset->setDeletedAt(time());
+			$originalflavorAsset->save();
+		}
+		
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		
+		$criteria = new Criteria();
+		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId());
+		$criteria->add(flavorParamsConversionProfilePeer::DELETE_POLICY, AssetParamsDeletePolicy::DELETE);
+		$tempFlavorsParams = flavorParamsConversionProfilePeer::doSelect($criteria);
+		
+		foreach ($tempFlavorsParams as $tempFlavorsParam) 
+		{
+			$tempFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $tempFlavorsParam->getFlavorParamsId());
+			if($tempFlavorAsset)
+			{
+				KalturaLog::debug('Deleting flavor ['.$tempFlavorAsset->getId().']');				
+				$tempFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+				$tempFlavorAsset->setDeletedAt(time());
+				$tempFlavorAsset->save();
+			}
+		}
 	}
 }

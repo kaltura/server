@@ -1435,6 +1435,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="priority" type="tinyint" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+        <column primaryKey="false" lazyLoad="false" name="delete_policy" type="tinyint" required="false" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="conversion_profile_2">
 			<reference local="conversion_profile_id" foreign="id" />
 		</foreign-key>

@@ -53,6 +53,13 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	 */
 	public $forceNoneComplied;
 	
+	/**
+	 * 
+	 * Specifies how to treat the flavor after conversion is finished
+	 * @var KalturaAssetParamsDeletePolicy
+	 */
+	public $deletePolicy;
+	
 	private static $map_between_objects = array
 	(
 		'conversionProfileId',
@@ -61,6 +68,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 		'origin',
 		'systemName',
 		'forceNoneComplied',
+		'deletePolicy',
 	);
 	
 	public function getMapBetweenObjects ( )

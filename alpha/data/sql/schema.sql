@@ -1599,6 +1599,7 @@ CREATE TABLE `flavor_params_conversion_profile`
 	`updated_at` DATETIME,
 	`priority` TINYINT,
 	`custom_data` TEXT,
+	`delete_policy` TINYINT,
 	PRIMARY KEY (`id`),
 	INDEX `flavor_params_conversion_profile_FI_1` (`conversion_profile_id`),
 	CONSTRAINT `flavor_params_conversion_profile_FK_1`

@@ -48,6 +48,7 @@ class flavorParamsConversionProfileTableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PRIORITY', 'Priority', 'TINYINT', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('DELETE_POLICY', 'DeletePolicy', 'TINYINT', false, null, null);
 		// validators
 	} // initialize()
 

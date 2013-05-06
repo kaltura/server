@@ -1127,8 +1127,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			
 		if(!$conversionsCreated)
 		{
+			KalturaLog::log("No flavors created: $errDescription");			
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription);
-			KalturaLog::log("No flavors created: $errDescription");
 			return false;
 		}
 		

@@ -86,6 +86,12 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	protected $custom_data;
 
 	/**
+	 * The value for the delete_policy field.
+	 * @var        int
+	 */
+	protected $delete_policy;
+
+	/**
 	 * @var        conversionProfile2
 	 */
 	protected $aconversionProfile2;
@@ -308,6 +314,16 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [delete_policy] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDeletePolicy()
+	{
+		return $this->delete_policy;
 	}
 
 	/**
@@ -621,6 +637,29 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	} // setCustomData()
 
 	/**
+	 * Set the value of [delete_policy] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     flavorParamsConversionProfile The current object (for fluent API support)
+	 */
+	public function setDeletePolicy($v)
+	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::DELETE_POLICY]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::DELETE_POLICY] = $this->delete_policy;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->delete_policy !== $v) {
+			$this->delete_policy = $v;
+			$this->modifiedColumns[] = flavorParamsConversionProfilePeer::DELETE_POLICY;
+		}
+
+		return $this;
+	} // setDeletePolicy()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -663,6 +702,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->priority = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->delete_policy = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -672,7 +712,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating flavorParamsConversionProfile object", $e);
@@ -1212,6 +1252,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			case 10:
 				return $this->getCustomData();
 				break;
+			case 11:
+				return $this->getDeletePolicy();
+				break;
 			default:
 				return null;
 				break;
@@ -1244,6 +1287,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$keys[8] => $this->getUpdatedAt(),
 			$keys[9] => $this->getPriority(),
 			$keys[10] => $this->getCustomData(),
+			$keys[11] => $this->getDeletePolicy(),
 		);
 		return $result;
 	}
@@ -1308,6 +1352,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			case 10:
 				$this->setCustomData($value);
 				break;
+			case 11:
+				$this->setDeletePolicy($value);
+				break;
 		} // switch()
 	}
 
@@ -1343,6 +1390,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setPriority($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setDeletePolicy($arr[$keys[11]]);
 	}
 
 	/**
@@ -1365,6 +1413,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::UPDATED_AT)) $criteria->add(flavorParamsConversionProfilePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::PRIORITY)) $criteria->add(flavorParamsConversionProfilePeer::PRIORITY, $this->priority);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::CUSTOM_DATA)) $criteria->add(flavorParamsConversionProfilePeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(flavorParamsConversionProfilePeer::DELETE_POLICY)) $criteria->add(flavorParamsConversionProfilePeer::DELETE_POLICY, $this->delete_policy);
 
 		return $criteria;
 	}
@@ -1450,6 +1499,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		$copyObj->setPriority($this->priority);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setDeletePolicy($this->delete_policy);
 
 
 		$copyObj->setNew(true);
