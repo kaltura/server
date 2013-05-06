@@ -46,3 +46,11 @@ define	service{
 		check_command					kaltura-host-html5-multi-request
 		notifications_enabled			1
 		}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Batch Queue Size Import
+		check_command					kaltura-host-batch-queue-size-import
+		notifications_enabled			1
+		}

@@ -29,3 +29,7 @@ define command{
         command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 0-2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --list-flavors --list-cue-points --list-metadata"
         }
 
+define command{
+        command_name    kaltura-host-batch-queue-size-import
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 80 --error-threshold 100 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type IMPORT"
+        }
