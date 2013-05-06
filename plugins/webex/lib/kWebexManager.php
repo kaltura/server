@@ -13,15 +13,15 @@ class kWebexManager implements kObjectAddedEventConsumer
 		if (!$flavorParams)
 			throw new APIException(APIErrors::OBJECT_NOT_FOUND);
 		
-		$asset = new flavorAsset();
-		$asset->setassetParams($flavorParams->getId());
-		$asset->setFileExt('arf');
+		$asset = $object->copy();
+		$asset->setFlavorParamsId($flavorParams->getId());
+		$asset->setFromAssetParams($flavorParams);
 		$asset->setStatus(flavorAsset::ASSET_STATUS_READY);
 		$asset->setIsOriginal(0);
 		$asset->incrementVersion();
 		$asset->save();
 		
-		kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET), $object->getSyncKey(FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET));
+		kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $object->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 		
 		return true;
 	}
@@ -31,7 +31,7 @@ class kWebexManager implements kObjectAddedEventConsumer
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object) 
 	{
-		if (WebexPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) && $object instanceof flavorAsset)
+		if ($object instanceof flavorAsset)
 		{
 			if ($object->getFileExt() == self::WEBEX_FILE_EXT && $object->getIsOriginal())
 			{
