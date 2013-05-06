@@ -409,7 +409,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	
 	/**
 	 * validate category fields
-	 * 1. category that inherit memebers canno set values to inherited fields.
+	 * 1. category that inherit memebers cannot set values to inherited fields.
 	 * 2. validate the owner id exists as kuser
 	 * 
 	 * @param category $sourceObject
@@ -507,4 +507,32 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		}
 		
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toInsertableObject($object_to_fill, $props_to_skip)
+	 */
+	public function toInsertableObject($object_to_fill = null , $props_to_skip = array())
+	{
+		$isInheritedPrivacyContext = true;
+		if ($this->parentId != null)
+		{
+			$parentCategory = categoryPeer::retrieveByPK($this->parentId);
+			if(!$parentCategory)
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $this->parentId);
+			
+			if($parentCategory->getPrivacyContexts() == '')
+				$isInheritedPrivacyContext = false;
+		}
+		
+		if ($isInheritedPrivacyContext)
+		{
+			if (!$this->owner && $this->inheritanceType != KalturaInheritanceType::INHERIT)
+			{
+				$this->owner = kCurrentContext::getCurrentKsKuser();
+			}
+		}
+		
+		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
+	
 }
