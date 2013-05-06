@@ -157,6 +157,18 @@ class KalturaClientBase
 	* @var Array of response headers
 	*/
 	private $responseHeaders = array();
+	
+	/**
+	 * path to save served results
+	 * @var string
+	 */
+	protected $destinationPath = null;
+	
+	/**
+	 * return served results without unserializing them
+	 * @var boolean
+	 */
+	protected $returnServedResult = null;
 
 	public function __get($serviceName)
 	{
@@ -241,8 +253,7 @@ class KalturaClientBase
 		$this->addParam($params, "clientTag", $this->config->clientTag);
 
 		$call = $this->callsQueue[0];
-		$this->callsQueue = array();
-		$this->isMultiRequest = false;
+		$this->resetRequest();
 
 		$params = array_merge($params, $call->params);
 		$signature = $this->signature($params);
@@ -266,23 +277,30 @@ class KalturaClientBase
 		$this->callsQueue[] = $call;
 	}
 
+	protected function resetRequest()
+	{
+		$this->destinationPath = null;
+		$this->returnServedResult = false;
+		$this->isMultiRequest = false;
+		$this->callsQueue = array();
+	}
+
 	/**
 	 * Call all API service that are in queue
 	 *
 	 * @return unknown
 	 */
-	public function doQueue($destinationPath = null)
+	public function doQueue()
 	{
-		if(!is_null($destinationPath) && $this->isMultiRequest)
+		if($this->isMultiRequest && ($this->destinationPath || $this->returnServedResult))
 		{
-			$this->isMultiRequest = false;
-			$this->callsQueue = array();
+			$this->resetRequest();
 			throw new KalturaClientException("Downloading files is not supported as part of multi-request.", KalturaClientException::ERROR_DOWNLOAD_IN_MULTIREQUEST);
 		}
 		
 		if (count($this->callsQueue) == 0)
 		{
-			$this->isMultiRequest = false;
+			$this->resetRequest();
 			return null;
 		}
 
@@ -320,14 +338,12 @@ class KalturaClientBase
 			$files = $call->files;
 		}
 
-		// reset
-		$this->callsQueue = array();
-		$this->isMultiRequest = false;
+		$this->resetRequest();
 
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 
-		list($postResult, $error) = $this->doHttpRequest($url, $params, $files, $destinationPath);
+		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
 
 		if ($error)
 		{
@@ -351,11 +367,11 @@ class KalturaClientBase
 			
 			$this->log("result (serialized): " . $postResult);
 
-			if($destinationPath === false)
+			if($this->returnServedResult)
 			{
 				$result = $postResult;
 			}
-			elseif($destinationPath)
+			elseif($this->destinationPath)
 			{
 				if(!$postResult)
 					throw new KalturaClientException("failed to download file", KalturaClientException::ERROR_READ_FAILED);
@@ -408,12 +424,12 @@ class KalturaClientBase
 	 * @param parameters $params
 	 * @return array of result and error
 	 */
-	private function doHttpRequest($url, $params = array(), $files = array(), $destinationPath = null)
+	private function doHttpRequest($url, $params = array(), $files = array())
 	{
 		if (function_exists('curl_init'))
-			return $this->doCurl($url, $params, $files, $destinationPath);
+			return $this->doCurl($url, $params, $files);
 			
-		if(!is_null($destinationPath))
+		if($this->destinationPath || $this->returnServedResult)
 			throw new KalturaClientException("Downloading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
 				
 		return $this->doPostRequest($url, $params, $files);
@@ -425,10 +441,9 @@ class KalturaClientBase
 	 * @param string $url
 	 * @param array $params
 	 * @param array $files
-	 * @param string $destinationPath
 	 * @return array of result and error
 	 */
-	private function doCurl($url, $params = array(), $files = array(), $destinationPath = null)
+	private function doCurl($url, $params = array(), $files = array())
 	{
 		$opt = http_build_query($params, null, "&");
 		// Force POST in case we have files
@@ -509,9 +524,9 @@ class KalturaClientBase
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
 
 		$destinationResource = null;
-		if(!is_null($destinationPath))
+		if($this->destinationPath)
 		{
-			$destinationResource = fopen($destinationPath, "wb");
+			$destinationResource = fopen($this->destinationPath, "wb");
 			curl_setopt($ch, CURLOPT_FILE, $destinationResource);
 		}
 		else
@@ -595,6 +610,22 @@ class KalturaClientBase
 	public function setKs($ks)
 	{
 		$this->ks = $ks;
+	}
+
+	/**
+	 * @param boolean $returnServedResult
+	 */
+	public function setReturnServedResult($returnServedResult)
+	{
+		$this->returnServedResult = $returnServedResult;
+	}
+
+	/**
+	 * @param string $destinationPath
+	 */
+	public function setDestinationPath($destinationPath)
+	{
+		$this->destinationPath = $destinationPath;
 	}
 
 	/**

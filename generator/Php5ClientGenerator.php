@@ -421,11 +421,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("	 * @param $paramType \${$paramName} $paramDescription");
 			}
 			
-			if($resultType == 'file')
-			{
-				$this->appendLine('	 * @param string|boolean $destinationPath Destination file path to save the file, set to FALSE to return the content, leave it NULL to return download URL.');
-			}
-			
 			$this->appendLine("	 * @return $resultType");
 			$this->appendLine('	 */');
 		}
@@ -501,9 +496,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			
 		if($resultType == 'file')
 		{
-			$this->appendLine('		if(is_null($destinationPath))');
+			$this->appendLine('		if(!$this->destinationPath && !$this->returnServedResult)');
 			$this->appendLine('			return $this->client->getServeUrl();');
-			$this->appendLine('		return $this->client->doQueue($destinationPath);');
+			$this->appendLine('		return $this->client->doQueue();');
 		}
 		else
 		{
@@ -578,9 +573,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	/**
 	 * @param array<DOMElement> $paramNodes
-	 * @param boolean $addDestinationPath
 	 */
-	function getSignature($paramNodes, $addDestinationPath)
+	function getSignature($paramNodes)
 	{
 		$arguments = array();
 		
@@ -625,9 +619,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			
 			$arguments[] = $signature;
 		}
-		
-		if($addDestinationPath)
-			$arguments[] = '$destinationPath = null';
 		
 		return implode(', ', $arguments);
 	}
