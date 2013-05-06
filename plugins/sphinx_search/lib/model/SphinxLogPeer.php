@@ -25,11 +25,12 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 	 * Retrieve all records larger than the id
 	 *
 	 * @param      array $servers<SphinxLogServer>
+	 * @param	   int $gap
 	 * @param      int $limit
 	 * @param      PropelPDO $con the connection to use
 	 * @return     SphinxLog
 	 */
-	public static function retrieveByLastId(array $servers, $limit = 1000, PropelPDO $con = null)
+	public static function retrieveByLastId(array $servers, $gap = 0, $limit = 1000, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criterions = null;
@@ -38,7 +39,7 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 		
 		foreach($servers as $server)
 		{
-			$crit = $criteria->getNewCriterion(SphinxLogPeer::ID, $server->getLastLogId(), Criteria::GREATER_THAN);
+			$crit = $criteria->getNewCriterion(SphinxLogPeer::ID, $server->getLastLogId() - $gap, Criteria::GREATER_THAN);
 			$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::DC, $server->getDc()));
 			$criterions->addOr($crit);
 		}
