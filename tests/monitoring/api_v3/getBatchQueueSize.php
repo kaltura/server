@@ -18,7 +18,7 @@ if(!isset($options['job-type']))
 {
 	echo "Arguments job-type is required";
 	exit(-1);
-} 
+}
 $jobType = $options['job-type'];
 
  if (!defined("KalturaBatchJobType::$jobType"))
@@ -69,17 +69,36 @@ try
 	
 	$start = microtime(true);
 	$queueSize = $client->batch->getQueueSize($workerQueueFilter);
- 	$requestEnd =  microtime(true);	
+ 	$requestEnd =  microtime(true);
 	$monitorResult->executionTime = $requestEnd - $start;
 	$monitorResult->value =  $queueSize;
 	$monitorResult->description = "Scheduler Queue for $jobType is: $monitorResult->value";
 }
-catch(Exception $ex)
+catch(KalturaException $e)
 {
 	$end = microtime(true);
 	$monitorResult->executionTime = $end - $start;
-	$monitorResult->value = -1;
-	$monitorResult->description = "Exception: " . get_class($ex) . ", API: $apiCall, Code: " . $ex->getCode() . ", Message: " . $ex->getMessage();
+	
+	$error = new KalturaMonitorError();
+	$error->code = $e->getCode();
+	$error->description = $e->getMessage();
+	$error->level = KalturaMonitorError::ERR;
+	
+	$monitorResult->errors[] = $error;
+	$monitorResult->description = "Exception: " . get_class($e) . ", API: $apiCall, Code: " . $e->getCode() . ", Message: " . $e->getMessage();
+}
+catch(KalturaClientException $ce)
+{
+	$end = microtime(true);
+	$monitorResult->executionTime = $end - $start;
+	
+	$error = new KalturaMonitorError();
+	$error->code = $ce->getCode();
+	$error->description = $ce->getMessage();
+	$error->level = KalturaMonitorError::CRIT;
+	
+	$monitorResult->errors[] = $error;
+	$monitorResult->description = "Exception: " . get_class($ce) . ", API: $apiCall, Code: " . $ce->getCode() . ", Message: " . $ce->getMessage();
 }
 
 echo "$monitorResult";

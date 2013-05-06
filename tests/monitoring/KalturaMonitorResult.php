@@ -2,6 +2,15 @@
 
 class KalturaMonitorError
 {
+    const EMERG   = 'EMERG';
+    const ALERT   = 'ALERT';
+    const CRIT    = 'CRIT';
+    const ERR     = 'ERR';
+    const WARN    = 'WARN';
+    const NOTICE  = 'NOTICE';
+    const INFO    = 'INFO';
+    const DEBUG   = 'DEBUG';
+    
 	public $level;
 	public $code;
 	public $description;
@@ -54,18 +63,18 @@ class KalturaMonitorResult
 		$xml = new SimpleXMLElement($xmlString);
 		
 		$monitorResult = new KalturaMonitorResult();
-		$monitorResult->value = $xml->value;
-		$monitorResult->executionTime = $xml->executionTime;
-		$monitorResult->description = $xml->description;
+		$monitorResult->value = floatval($xml->value);
+		$monitorResult->executionTime = strval($xml->executionTime);
+		$monitorResult->description = strval($xml->description);
 		
 		if($xml->error != null)
 		{
 			foreach($xml->error as $error)
 			{
 				$monitorErr = new KalturaMonitorError();
-				$monitorErr->level = $error['level'];
-				$monitorErr->code = $error['code'];
-				$monitorErr->description = $error;
+				$monitorErr->level = strval($error['level']);
+				$monitorErr->code = strval($error['code']);
+				$monitorErr->description = strval($error);
 				$monitorResult->errors[] = $monitorErr;
 			
 			}

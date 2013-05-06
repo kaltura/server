@@ -1,32 +1,32 @@
 
 define command{
         command_name    kaltura-host-ping
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 0-5 --script "@APP_DIR@/tests/monitoring/api_v3/ping.php --service-url $HOSTADDRESS$"
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/ping.php --service-url $HOSTADDRESS$"
         }
 
 define command{
         command_name    kaltura-host-ping-db
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 0-5 --script "@APP_DIR@/tests/monitoring/api_v3/pingDb.php --service-url $HOSTADDRESS$"
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/pingDb.php --service-url $HOSTADDRESS$"
         }
 
 define command{
         command_name    kaltura-host-execute-playlist
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 0-10 --script "@APP_DIR@/tests/monitoring/api_v3/executePlaylist.php --service-url $HOSTADDRESS$ --playlist-reference-id PLAYLIST_MOST_RECENT"
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/api_v3/executePlaylist.php --service-url $HOSTADDRESS$ --playlist-reference-id PLAYLIST_MOST_RECENT"
         }
 
 define command{
         command_name    kaltura-host-start-session
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 0-2 --script "@APP_DIR@/tests/monitoring/api_v3/startSession.php --service-url $HOSTADDRESS$ --ks-type user"
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/startSession.php --service-url $HOSTADDRESS$ --ks-type user"
         }
 
 define command{
         command_name    kaltura-host-kdp-multi-request
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 0-2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY"
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY"
         }
 
 define command{
         command_name    kaltura-host-html5-multi-request
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 0-2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --list-flavors --list-cue-points --list-metadata"
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --list-flavors --list-cue-points --list-metadata"
         }
 
 define command{

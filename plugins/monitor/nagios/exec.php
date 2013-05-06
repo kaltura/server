@@ -76,40 +76,69 @@ $monitorResult = KalturaMonitorResult::fromXml($xml);
 
 if($monitorResult->errors)
 {
-	$strErr = '';
+	$exitCode = NAGIOS_CODE_OK;
+	$descriptions = array();
+	
 	foreach($monitorResult->errors as $error)
 	{
-		$strErr .= $error->description;
+		$descriptions[] = $error->description;
+		
+		switch($error->level)
+		{
+		    case KalturaMonitorError::EMERG:
+		    case KalturaMonitorError::ALERT:
+		    case KalturaMonitorError::CRIT:
+		    	$exitCode = NAGIOS_CODE_CRITICAL;
+		    	break;
+		    	
+		    case KalturaMonitorError::WARN:
+		    	$exitCode = max($exitCode, NAGIOS_CODE_WARNING);
+		    	break;
+		    	
+		    case KalturaMonitorError::NOTICE:
+		    case KalturaMonitorError::INFO:
+		    case KalturaMonitorError::DEBUG:
+		    	break;
+		    	
+		    case KalturaMonitorError::ERR:
+		    default:
+		    	$exitCode = max($exitCode, NAGIOS_CODE_UNKNOWN);
+		    	break;
+		}
 	}
-	echo $strErr;
-	exit(NAGIOS_CODE_UNKNOWN);
+	
+	if($exitCode != NAGIOS_CODE_OK)
+	{
+		echo implode('; ', $descriptions);
+		exit($exitCode);
+	}
 }
 
 if(!is_null($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
 {
-	echo "ERROR -  monitor value [$monitorResult->value] exceeded error threshold [$errorThresholdMax]: $monitorResult->description";
+	echo "Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
 if(!is_null($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
 {
-	echo "ERROR -  monitor value [$monitorResult->value] exceeded error threshold [$errorThresholdMax]: $monitorResult->description";
+	echo "Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_WARNING);
 }
 
 if(!is_null($errorThresholdMin) && $monitorResult->value < $errorThresholdMin)
 {
-	echo "ERROR -  monitor value [$monitorResult->value] exceeded error threshold [$errorThresholdMin]: $monitorResult->description";
+	echo "Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
 if(!is_null($warningThresholdMin) && $monitorResult->value < $warningThresholdMin)
 {
-	echo "ERROR -  monitor value [$monitorResult->value] exceeded error threshold [$warningThresholdMin]: $monitorResult->description";
+	echo "Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_WARNING);
 }
 
-echo 'OK - ' . $monitorResult->description;
+echo $monitorResult->description;
 exit(NAGIOS_CODE_OK);
 
 
