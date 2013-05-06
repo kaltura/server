@@ -135,7 +135,7 @@ class entryFilter extends baseObjectFilter
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
 			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , 
-			"modified_at", "available_from", "duration" , "partner_sort_value" , "total_rank", "weight")	;
+			"modified_at", "available_from", "duration" , "partner_sort_value" , "total_rank", "weight", "start_date", "end_date")	;
 
 		$this->aliases = array ( 
 			"user_id" => "kuser_id",
