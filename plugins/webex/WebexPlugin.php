@@ -35,6 +35,12 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler, IKaltu
 				$recordId = $cookieValue;
 		}
 		
+		if (!$recordId)
+		{
+			KalturaLog::info('recordId value not found - exiting.');
+			return $importData;
+		}
+		
 		$data = file_get_contents($importData->destFileLocalPath);
 		if(!preg_match("/href='([^']+)';/", $data, $matches))
 		{
