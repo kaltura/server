@@ -1,11 +1,11 @@
 <?php
   /**
 	* Will perform get,update and free operations on database BatchJob objects
-	* 
+	*
  * @package Core
  * @subpackage Batch
 	*/
-class kBatchExclusiveLock 
+class kBatchExclusiveLock
 {
 	const UNLIMITED_QUOTA = 99999;
 	
@@ -23,14 +23,14 @@ class kBatchExclusiveLock
 		{
 			$lock_version = $object->getVersion() ;
 			$criteria_for_exclusive_update = new Criteria();
-			$criteria_for_exclusive_update->add(BatchJobLockPeer::ID,$object->getId()); 
+			$criteria_for_exclusive_update->add(BatchJobLockPeer::ID,$object->getId());
 			$criteria_for_exclusive_update->add(BatchJobLockPeer::VERSION, $lock_version);
 			
 			$update = new Criteria();
 
 			// increment the lock_version - this will make sure it's exclusive
 			$update->add(BatchJobLockPeer::VERSION, $lock_version + 1);
-			// increment the execution_attempts 
+			// increment the execution_attempts
 			$update->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, $object->getExecutionAttempts() + 1);
 
 			$update->add(BatchJobLockPeer::SCHEDULER_ID, $lockKey->getSchedulerId() );
@@ -62,7 +62,7 @@ class kBatchExclusiveLock
 			else
 			{
 				$not_exclusive_count++;
-				KalturaLog::log ( "Object not exclusive: [" . get_class ( $object ) . "] id [" . $object->getId() . "]" );  
+				KalturaLog::log ( "Object not exclusive: [" . get_class ( $object ) . "] id [" . $object->getId() . "]" );
 			}
 		}
 		
@@ -80,7 +80,7 @@ class kBatchExclusiveLock
 	 * @param BatchJobFilter $filter
 	 * @param int $maxOffset
 	 */
-	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType, 
+	public static function getExclusiveJobs(kExclusiveLockKey $lockKey, $max_execution_time, $number_of_objects, $jobType,
 			BatchJobFilter $filter, $maxOffset = null)
 	{
 		$c = new Criteria();
@@ -138,11 +138,11 @@ class kBatchExclusiveLock
 		$jobWasntExecutedTooMany = "$atmp <= $max_exe_attempts OR $atmp IS NULL";
 		
 		// Generate query
-		$query = "	($statusCondition							
+		$query = "	($statusCondition
 						AND ($lockExpiredCondition
 							OR	($newJobsCond)
 							OR	($jobAlreadyHandledByWorker)
-						) 
+						)
 						AND ($jobWasntExecutedTooMany)
 					)";
 			
@@ -169,15 +169,15 @@ class kBatchExclusiveLock
 		$now = time();
 		$now_str = date('Y-m-d H:i:s', $now);
 		
-		// same workers unfinished jobs 
+		// same workers unfinished jobs
 		$query1 = "(
-							$schd = $schd_id 
-						AND $work = $work_id 
-						AND $stat IN (" . BatchJobPeer::getInProcStatusList() . ") 
+							$schd = $schd_id
+						AND $work = $work_id
+						AND $stat IN (" . BatchJobPeer::getInProcStatusList() . ")
 					)";
 			
 			
-		//	"others unfinished jobs " - the expiration should be SMALLER than the current time to make sure the job is not 
+		//	"others unfinished jobs " - the expiration should be SMALLER than the current time to make sure the job is not
 		// being processed
 		$unclosedStatuses = BatchJobPeer::getUnClosedStatusList();
 		$unclosedStatuses = implode(',', $unclosedStatuses);
@@ -201,7 +201,8 @@ class kBatchExclusiveLock
 							)";
 								
 		$crit1 = $c->getNewCriterion($stat, BatchJob::BATCHJOB_STATUS_PENDING);
-		$crit1->addOr($c->getNewCriterion($schd, $query1, Criteria::CUSTOM));
+		if($schedulerId && $workerId)
+			$crit1->addOr($c->getNewCriterion($schd, $query1, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query2, Criteria::CUSTOM));
 		$crit1->addOr($c->getNewCriterion($schd, $query3, Criteria::CUSTOM));
 		
@@ -275,16 +276,16 @@ class kBatchExclusiveLock
 		$query = "	$statusCondition
 					AND	(
 						$lockExpiredCondition
-						OR	($newJobsCond) 
+						OR	($newJobsCond)
 						OR ($jobAlreadyHandledByWorker)
-					) 
+					)
 					AND ($jobWasntExecutedTooMany)";
 				
 		$c->add($stat, $query, Criteria::CUSTOM);
 
 		// In case maxOffset isn't null, we want to take the chunk out of a random offset in between.
 		// That's usefull for load handling
-		if ($maxOffset) 
+		if ($maxOffset)
 			$c->setOffset(rand(0, $maxOffset));
 
 		$c->setLimit($number_of_objects);
@@ -300,7 +301,7 @@ class kBatchExclusiveLock
 	 * @param bool $shouldUseJoin whether we should use join
 	 * @return bool whether we use the fair prioritizer
 	 */
-	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio, $shouldUseJoin = true) 
+	private static function addPrioritizersCondition(Criteria $c, $prioritizers_ratio, $shouldUseJoin = true)
 	{
 		$rand = rand(0, 100);
 		if($shouldUseJoin) {
@@ -312,7 +313,7 @@ class kBatchExclusiveLock
 			return false;
 		}
 		
-		if($rand < $prioritizers_ratio) 
+		if($rand < $prioritizers_ratio)
 		{	// Throughput
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::URGENCY);
 			$c->addAscendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
@@ -329,7 +330,7 @@ class kBatchExclusiveLock
 
 	/**
 	 * This function returns all batch jobs in which the batch_job_lock status is RETRY
-	 * and the batch_job_sep status is fatal. 
+	 * and the batch_job_sep status is fatal.
 	 * Those kind of cases can happen when a fatal error occured - Those cases must be investigated
 	 */
 	public static function getStatusInconsistentJob()
@@ -357,7 +358,7 @@ class kBatchExclusiveLock
 				$executionAttempts2jobTypes[$executionAttempts][] = $jobType;
 			else
 				$executionAttempts2jobTypes[$executionAttempts] = array($jobType);
-		}		
+		}
 				
 		// create query
 		$c = new Criteria();
@@ -366,7 +367,7 @@ class kBatchExclusiveLock
 		
 		// Query for each job type
 		$batchJobLocks = array();
-		foreach($executionAttempts2jobTypes as $execAttempts => $jobTypes) 
+		foreach($executionAttempts2jobTypes as $execAttempts => $jobTypes)
 		{
 			$typedCrit = clone $c;
 			$typedCrit->add(BatchJobLockPeer::EXECUTION_ATTEMPTS, $execAttempts, Criteria::GREATER_THAN);
@@ -386,30 +387,30 @@ class kBatchExclusiveLock
 	 * @param int $id
 	 * @param kExclusiveLockKey $lockKey
 	 * @param BatchJob $object
-	 * @return BatchJob 
+	 * @return BatchJob
 	 */
 	public static function updateExclusive($id, kExclusiveLockKey $lockKey, BatchJob $object)
 	{
 		$c = new Criteria();
 		$c->add(BatchJobLockPeer::ID, $id );
-		$c->add(BatchJobLockPeer::SCHEDULER_ID, $lockKey->getSchedulerId() );			
-		$c->add(BatchJobLockPeer::WORKER_ID, $lockKey->getWorkerId() );			
+		$c->add(BatchJobLockPeer::SCHEDULER_ID, $lockKey->getSchedulerId() );
+		$c->add(BatchJobLockPeer::WORKER_ID, $lockKey->getWorkerId() );
 		$c->add(BatchJobLockPeer::BATCH_INDEX, $lockKey->getBatchIndex() );
 		
 		$db_lock_object = BatchJobLockPeer::doSelectOne($c);
 		if(!$db_lock_object) {
 			// If another lock exists
 			$db_lock_object = BatchJobLockPeer::retrieveByPk ( $id );
-			if($db_lock_object) {			
+			if($db_lock_object) {
 				throw new APIException ( APIErrors::UPDATE_EXCLUSIVE_JOB_FAILED , $id,$lockKey->getSchedulerId(), $lockKey->getWorkerId(), $lockKey->getBatchIndex(), print_r ( $db_lock_object , true ));
-			} 
+			}
 		}
 		
 		if($db_lock_object) {
 			$db_object = $db_lock_object->getBatchJob();
 		} else {
 			$db_object = BatchJobPeer::retrieveByPk ($id);
-		} 
+		}
 		
 		baseObjectUtils::fillObjectFromObject( BatchJobPeer::getFieldNames() ,  $object , $db_object , baseObjectUtils::CLONE_POLICY_PREFER_NEW , null , BasePeer::TYPE_PHPNAME );
 		$db_object->save();
@@ -418,32 +419,32 @@ class kBatchExclusiveLock
 		
 	
 	/**
-	 * 
+	 *
 	 * @param $id
 	 * @param kExclusiveLockKey db_lock_object
-	 * @param db_lock_objectstatus - optional. will be used to set the status once the object is free 
-	 * @return BatchJob 
+	 * @param db_lock_objectstatus - optional. will be used to set the status once the object is free
+	 * @return BatchJob
 	 */
 	public static function freeExclusive($id, kExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
 		$c = new Criteria();
 		
 		$c->add(BatchJobLockPeer::ID, $id );
-		$c->add(BatchJobLockPeer::SCHEDULER_ID, $lockKey->getSchedulerId() );			
-		$c->add(BatchJobLockPeer::WORKER_ID, $lockKey->getWorkerId() );			
+		$c->add(BatchJobLockPeer::SCHEDULER_ID, $lockKey->getSchedulerId() );
+		$c->add(BatchJobLockPeer::WORKER_ID, $lockKey->getWorkerId() );
 		$c->add(BatchJobLockPeer::BATCH_INDEX, $lockKey->getBatchIndex() );
 		
 		$db_lock_object = BatchJobLockPeer::doSelectOne ( $c );
 		
 		if(!$db_lock_object) {
-			if(BatchJobLockPeer::retrieveByPK($id)) 
+			if(BatchJobLockPeer::retrieveByPK($id))
 				throw new APIException(APIErrors::FREE_EXCLUSIVE_JOB_FAILED, $id, $lockKey->getSchedulerId(), $lockKey->getWorkerId(), $lockKey->getBatchIndex());
-			else 
+			else
 				return BatchJobPeer::retrieveByPK($id);
 		}
 		
 		$db_object = $db_lock_object->getBatchJob();
-		if($resetExecutionAttempts || in_array($db_lock_object->getStatus(), BatchJobPeer::getClosedStatusList())) 
+		if($resetExecutionAttempts || in_array($db_lock_object->getStatus(), BatchJobPeer::getClosedStatusList()))
 			$db_lock_object->setExecutionAttempts(0);
 			
 		$db_lock_object->setSchedulerId( null );
@@ -453,7 +454,7 @@ class kBatchExclusiveLock
 		$db_lock_object->save();
 	
 		
-		if(($db_object->getStatus() != BatchJob::BATCHJOB_STATUS_ABORTED) && 
+		if(($db_object->getStatus() != BatchJob::BATCHJOB_STATUS_ABORTED) &&
 				($db_object->getExecutionStatus() == BatchJobExecutionStatus::ABORTED))
 			$db_object = kJobsManager::abortDbBatchJob($db_object);
 		
