@@ -32,6 +32,7 @@ class KalturaMonitorClient extends KalturaClient
 
 $serviceUrl = $options['service-url'];
 $clientConfig = new KalturaConfiguration();
+$clientConfig->clientTag = 'monitor';
 $clientConfig->partnerId = null;
 $clientConfig->serviceUrl = $serviceUrl;
 
