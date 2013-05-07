@@ -994,7 +994,7 @@ CREATE TABLE IF NOT EXISTS `favorite` (
 /*Table structure for table `file_sync` */
 
 CREATE TABLE IF NOT EXISTS `file_sync` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `partner_id` int(11) DEFAULT NULL,
   `object_type` int(4) DEFAULT NULL,
   `object_id` varchar(20) DEFAULT NULL,
@@ -1008,14 +1008,15 @@ CREATE TABLE IF NOT EXISTS `file_sync` (
   `sync_time` int(11) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
   `file_type` tinyint(4) DEFAULT NULL,
-  `linked_id` int(11) DEFAULT NULL,
+  `linked_id` bigint(20) DEFAULT NULL,
   `link_count` int(11) DEFAULT NULL,
   `file_root` varchar(64) DEFAULT NULL,
   `file_path` varchar(512) DEFAULT NULL,
   `file_size` bigint(20) DEFAULT NULL,
   `custom_data` text,
+  `deleted_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `object_id_object_type_version_subtype_dc` (`object_id`,`object_type`,`version`,`object_sub_type`,`dc`),
+  UNIQUE KEY `unique_index` (`object_id`,`object_type`,`version`,`object_sub_type`,`dc`,`deleted_id`),
   KEY `linked_id_indx` (`linked_id`),
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_id_dc_status` (`partner_id`,`dc`,`status`)
