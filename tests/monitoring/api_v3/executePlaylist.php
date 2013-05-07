@@ -45,7 +45,7 @@ try
 		else
 		{
 			$error = new KalturaMonitorError();
-			$error->level = "ERR";
+			$error->level = KalturaMonitorError::ERR;
 			$error->description = "Playlist with reference id [" . $options['playlist-reference-id'] . "] not found";
 			$error->level = KalturaMonitorError::CRIT;
 			$monitorResult->errors[] = $error;
