@@ -134,7 +134,7 @@ class ScriptsRunner
 			{
 				if(! isset($this->alreadyRun[$sqlFile]))
 				{
-					if(!$this->runSqlScript($sqlDir . DIRECTORY_SEPARATOR . $sqlFile) || $this->ignoreErrors)
+					if(!$this->runSqlScript($sqlDir . DIRECTORY_SEPARATOR . $sqlFile) && !$this->ignoreErrors)
 					{
 						exit(-1);
 					}
@@ -226,7 +226,7 @@ class ScriptsRunner
 		{
 			if(! isset($this->alreadyRun[$scriptFile]))
 			{
-				if(!$this->runPHPScript($scriptFile) || $this->ignoreErrors)
+				if(!$this->runPHPScript($scriptFile) && !$this->ignoreErrors)
 				{
 					exit(-2);
 				}
