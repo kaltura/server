@@ -45,6 +45,7 @@ class ScriptsRunner
 		$dsnArray = explode(";", $dsn[1]);
 		
 		// init with default port
+		$this->dbParams = $dbConf['datasources']['propel']['connection'];
 		$this->dbParams['port'] = '3306';
 		
 		foreach($dsnArray as $param)
