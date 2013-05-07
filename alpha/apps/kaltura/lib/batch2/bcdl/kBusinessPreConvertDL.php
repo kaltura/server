@@ -1140,18 +1140,9 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		KalturaLog::debug('Source params ids ['.$flavor->getSourceAssetParamsIds().'], flavor asset id ['.$flavorAsset->getId().']');
 		if(strlen(trim($flavor->getSourceAssetParamsIds())))
 		{
-			$srcFlavorParamsIds = explode(',', trim($flavor->getSourceAssetParamsIds()));
-			$readySrcFlavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
-			KalturaLog::debug('Verify source flavors are ready: number of ready assets ['.count($readySrcFlavorAssets).'], number of source params ids ['.count($srcFlavorParamsIds).']');
-			if(count($readySrcFlavorAssets) < count($srcFlavorParamsIds))
-			{
-				KalturaLog::debug('Not all source flavors are ready, changing status to WAIT_FOR_CONVERT');
-				$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT);
-				$flavorAsset->setDescription("Source flavor assets are not ready");
-				$flavorAsset->save();
-				
+			$readySrcFlavorAssets = self::getSourceFlavorAssets($flavorAsset, $flavor);
+			if(!$readySrcFlavorAssets)
 				return false;
-			}
 		}
 		else 
 		{
@@ -1173,7 +1164,32 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		return kJobsManager::addFlavorConvertJob($srcSyncKeys, $flavor, $flavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob, $lastEngineType, $sameRoot, $priority);
 	}
 
-	private static function decideCollectionConvert($collectionTag, flavorAsset $originalFlavorAsset, entry $entry, BatchJob $parentJob, array $flavors)
+	private static function getSourceFlavorAssets(flavorAsset $flavorAsset, flavorParamsOutput $flavor)
+	{
+		$srcFlavorParamsIds = explode(',', trim($flavor->getSourceAssetParamsIds()));
+		
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $flavorAsset->getEntryId());
+		$c->add(assetPeer::STATUS, array(flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_NOT_APPLICABLE), Criteria::IN);
+		$c->add(assetPeer::FLAVOR_PARAMS_ID, $srcFlavorParamsIds, Criteria::IN);
+		
+		$readyAndNonApplicableAssetsCount = assetPeer::doCount($c);
+		
+		KalturaLog::debug('Verify source flavors are ready: number of ready and NA assets ['.$readyAndNonApplicableAssetsCount.'], number of source params ids ['.count($srcFlavorParamsIds).']');
+		if($readyAndNonApplicableAssetsCount < count($srcFlavorParamsIds))
+		{
+			KalturaLog::debug('Not all source flavors are ready, changing status to WAIT_FOR_CONVERT');
+			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT);
+			$flavorAsset->setDescription("Source flavor assets are not ready");
+			$flavorAsset->save();
+				
+			return false;
+		}
+		
+		return assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
+	}
+	
+	private static function decideCollectionConvert($collectionTag, flavorAsset $originalFlavorAsset, entry $entry, BatchJob $parentJob = null, array $flavors)
 	{	
 		//TODO: add support for source other than original	
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -1190,7 +1206,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 	}
 	
-	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo, BatchJob $parentJob)
+	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo = null, BatchJob $parentJob)
 	{
 		if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
 		{

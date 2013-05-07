@@ -49,14 +49,14 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->impersonate($this->job->partnerId);
 		$entry = $this->client->baseEntry->get($this->job->entryId);
 		$this->buildPackageName($entry);
-		$this->unimpersonate();		
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$this->preparePackageFolders();
 		$requestXml = $this->preparePackageNotifyRequestXml();
+		$this->unimpersonate();	
 		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_NOTIFY_CGI, $requestXml);
 		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
-		$this->handleResponseError($response);
+		$this->handleResponseError($response);		
 		
 		return false;
 	}
@@ -93,6 +93,36 @@ class KWidevineOperationEngine extends KOperationEngine
 		}		
 	}
 	
+	private function getAssetIdsWithRedundantBitrates()
+	{
+		$srcAssetIds = array();
+		foreach ($this->data->srcFileSyncs as $srcFileSyncDesc) 
+		{
+			$srcAssetIds[] = $srcFileSyncDesc->assetId;
+		}		
+		$srcAssetIds = implode(',', $srcAssetIds);
+		
+		$filter = new KalturaAssetFilter();
+		$filter->entryIdEqual = $this->job->entryId;
+		$filter->idIn = $srcAssetIds;
+		$flavorAssetList = $this->client->flavorAsset->listAction($filter);	
+
+		$redundantAssets = array();
+		if(count($flavorAssetList->objects) > 0)
+		{
+			$bitrates = array();			
+			foreach ($flavorAssetList->objects as $flavorAsset) 
+			{
+				/* @var $flavorAsset KalturaFlavorAsset */
+				if(in_array($flavorAsset->bitrate, $bitrates))
+					$redundantAssets[] = $flavorAsset->id;
+				else 
+					$bitrates[] = $flavorAsset->bitrate;
+			}
+		}		
+		return $redundantAssets;
+	}
+	
 	private function preparePackageFolders()
 	{
 		$this->sourceFolder = $this->params->sourceRootPath . DIRECTORY_SEPARATOR . basename($this->data->destFileSyncLocalPath);
@@ -100,12 +130,21 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('Creating sources directory: '.$this->sourceFolder);
 		mkdir($this->sourceFolder);
 		
+		$redundantAssets = $this->getAssetIdsWithRedundantBitrates();
+		
 		foreach ($this->data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
-			$fileName = basename($srcFileSyncDescriptor->actualFileSyncLocalPath);		
-			KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
-			symlink($srcFileSyncDescriptor->actualFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
-			$this->packageFiles[] = $fileName;
+			if(in_array($srcFileSyncDescriptor->assetId, $redundantAssets))
+			{
+				KalturaLog::debug('Skipping flavor asset due to redundant bitrate: '.$srcFileSyncDescriptor->assetId);
+			}
+			else 
+			{
+				$fileName = basename($srcFileSyncDescriptor->actualFileSyncLocalPath);		
+				KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
+				symlink($srcFileSyncDescriptor->actualFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
+				$this->packageFiles[] = $fileName;
+			}
 		}		
 		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
 		
@@ -164,7 +203,7 @@ class KWidevineOperationEngine extends KOperationEngine
 			$filter->tagsLike = 'widevine'; 
 			$flavorAssetList = $this->client->flavorAsset->listAction($filter);
 			
-			if($flavorAssetList->totalCount > 0)
+			if(count($flavorAssetList->objects) > 0)
 			{
 				$replacedFlavorParamsId = $this->data->flavorParamsOutput->flavorParamsId;
 				foreach ($flavorAssetList->objects as $flavorAsset) 
