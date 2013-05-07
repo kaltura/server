@@ -66,6 +66,18 @@ class kConvartableJobData extends kJobData
 	 */
 	private $srcFileSyncRemoteUrl;
 
+	public function __construct()
+	{
+		if($this->srcFileSyncLocalPath || $this->srcFileSyncRemoteUrl || $this->actualSrcFileSyncLocalPath)
+		{
+			$srcDescriptor = new kSourceFileSyncDescriptor();
+			$srcDescriptor->setActualFileSyncLocalPath($this->actualSrcFileSyncLocalPath);
+			$srcDescriptor->setFileSyncLocalPath($this->srcFileSyncLocalPath);
+			$srcDescriptor->setFileSyncRemoteUrl($this->srcFileSyncRemoteUrl);
+			$this->srcFileSyncs = array($srcDescriptor);
+		}
+	}
+	
 	/**
 	 * @return the $srcFileSyncs
 	 */
