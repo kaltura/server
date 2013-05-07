@@ -513,18 +513,22 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	 */
 	public function toInsertableObject($object_to_fill = null , $props_to_skip = array())
 	{
-		$isInheritedPrivacyContext = false;
-		if ($this->parentId != null)
+		$hasPrivacyContext = false;
+		if ($this->privacyContext)
+		{
+			$hasPrivacyContext = true;
+		}
+		elseif ($this->parentId != null)
 		{
 			$parentCategory = categoryPeer::retrieveByPK($this->parentId);
 			if(!$parentCategory)
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $this->parentId);
 			
 			if($parentCategory->getPrivacyContexts())
-				$isInheritedPrivacyContext = true;
+				$hasPrivacyContext = true;
 		}
 		
-		if ($isInheritedPrivacyContext)
+		if ($hasPrivacyContext)
 		{
 			if (!$this->owner && $this->inheritanceType != KalturaInheritanceType::INHERIT)
 			{
