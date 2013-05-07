@@ -535,7 +535,7 @@ class kJobsManager
 		return $fileSync;		
 	}
 	
-	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob, $lastEngineType, kConvertJobData $convertData)
+	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData $convertData)
 	{
 		KalturaLog::log("Conversion engines string: '" . $flavor->getConversionEngines() . "'");
 		
