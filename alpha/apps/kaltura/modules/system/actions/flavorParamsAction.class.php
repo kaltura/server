@@ -29,7 +29,7 @@ class flavorParamsAction extends kalturaSystemAction
 		
 		myDbHelper::$use_alternative_con = null;
 		$this->editFlavorParam = null;
-		if ($this->getRequestParameter("id"))
+//		if ($this->getRequestParameter("id"))
 		{
 			$this->editFlavorParam = assetParamsPeer::retrieveByPK($this->getRequestParameter("id"));
 			
