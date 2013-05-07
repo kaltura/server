@@ -560,7 +560,7 @@ class kMrssManager
 			$mrssParams->getIncludePlayerTag())
 		{
 			$uiconfId = (!is_null($mrssParams->getPlayerUiconfId()))? '/ui_conf_id/'.$mrssParams->getPlayerUiconfId(): '';
-			$playerUrl = 'http://'.kConf::get('www_host').
+			$playerUrl = kConf::get('apphome_url').
 							'/kwidget/wid/_'.$entry->getPartnerId().
 							'/entry_id/'.$entry->getId().'/ui_conf' . ($uiconfId ? "/$uiconfId" : '');
 	
