@@ -9,14 +9,43 @@ KAutoloader::register();
 
 $code = array();
 
+$options = getopt('iu:p:h:P:', array(
+	'ignore',
+	'user:',
+	'password:',
+	'host:',
+	'port:',
+));
+
 $ignoreErrors = false;
-if($argc > 1 && $argv[1] == 'ignore')
+if(isset($options['i']) || isset($options['ignore']))
 	$ignoreErrors = true;
 
+$params = array();
+if(isset($options['u']))
+	$params['user'] = $options['u'];
+if(isset($options['user']))
+	$params['user'] = $options['user'];
+	
+if(isset($options['p']))
+	$params['password'] = $options['p'];
+if(isset($options['password']))
+	$params['password'] = $options['password'];
+	
+if(isset($options['h']))
+	$params['host'] = $options['h'];
+if(isset($options['host']))
+	$params['host'] = $options['host'];
+	
+if(isset($options['P']))
+	$params['port'] = $options['P'];
+if(isset($options['port']))
+	$params['port'] = $options['port'];
+	
 $cwd = OsUtils::getCurrentDir();
 
 $updateRunner = new ScriptsRunner();
-$updateRunner->init($ignoreErrors);
+$updateRunner->init($ignoreErrors, $params);
 
 // create version_management table
 $updateRunner->runSqlScript($cwd . DIRECTORY_SEPARATOR . "create_version_mng_table.sql");
@@ -36,7 +65,7 @@ class ScriptsRunner
 	private $alreadyRun;
 	private $ignoreErrors;
 	
-	public function init($ignore)
+	public function init($ignore, array $params)
 	{
 		$this->ignoreErrors = $ignore;
 		$dbConf = kConf::getDB();
@@ -54,6 +83,10 @@ class ScriptsRunner
 			if(count($items) == 2)
 				$this->dbParams[$items[0]] = $items[1];
 		}
+		
+		foreach($params as $key => $value)
+			$this->dbParams[$key] = $value;
+		
 		foreach($this->dbParams as $key => $value)
 		{
 			echo $key . "=>" . $value . "\n";
