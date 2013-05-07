@@ -1130,6 +1130,7 @@ CREATE TABLE IF NOT EXISTS `flavor_params_conversion_profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `priority` tinyint(4) DEFAULT '0',
   `custom_data` text,
+  `delete_policy` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `updated_at_index` (`updated_at`),
   KEY `conversion_profile_id_flavor_params` (`conversion_profile_id`,`flavor_params_id`)
