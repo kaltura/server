@@ -69,15 +69,14 @@ foreach($serverLastLogs as $serverLastLog) {
 	$handledRecords[$serverLastLog->getDc()] = array();
 }
 
-$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit);
-
 while(true)
 {
+	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords);
 	
 	while(!count($sphinxLogs))
 	{
 		sleep(1);
-		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit);
+		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords);
 	}
 
 	$sphinxCon = null;
@@ -104,13 +103,6 @@ while(true)
 		
 		if(isset($lastLogs[$dc])) {
 			$serverLastLog = $lastLogs[$dc];
-		
-			$isOlderThanLast = ($serverLastLog->getLastLogId() >= $sphinxLogId);
-			$wasHandled = in_array($sphinxLogId, $handledRecords[$dc]);	// Check
-			
-			if($isOlderThanLast && $wasHandled) {
-				continue;
-			}
 		} else {
 			$serverLastLog = new SphinxLogServer();
 			$serverLastLog->setServer($sphinxServer);
@@ -131,9 +123,17 @@ while(true)
 				$errorInfo = $sphinxCon->errorInfo();
 
 			// If the record is an historical record, don't take back the last log id
-			if(!$isOlderThanLast) {
+			if($serverLastLog->getLastLogId() < $sphinxLogId) {
 				$serverLastLog->setLastLogId($sphinxLog->getId());
  				$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+ 				
+ 				// Clear $handledRecords from before last - gap.
+ 				foreach($serverLastLogs as $serverLastLog) {
+ 					$dc = $serverLastLog->getDc();
+ 					$threshold = $serverLastLog->getLastLogId() - $gap;
+ 					$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
+ 				}
+ 				
 			}
 		}
 		catch(Exception $e)
@@ -144,15 +144,6 @@ while(true)
 	unset($sphinxCon);
 
 	SphinxLogPeer::clearInstancePool();
-	
-	// Clear $handledRecords from before last - gap.
-	foreach($serverLastLogs as $serverLastLog) {
-		$dc = $serverLastLog->getDc();
-		$threshold = $serverLastLog->getLastLogId() - $gap;
-		$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
-	}
-	
-	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit);
 }
 
 KalturaLog::log('Done');

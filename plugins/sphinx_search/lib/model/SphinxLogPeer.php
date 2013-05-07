@@ -27,10 +27,11 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 	 * @param      array $servers<SphinxLogServer>
 	 * @param	   int $gap
 	 * @param      int $limit
+	 * @param	   array $handledEntries	
 	 * @param      PropelPDO $con the connection to use
 	 * @return     SphinxLog
 	 */
-	public static function retrieveByLastId(array $servers, $gap = 0, $limit = 1000, PropelPDO $con = null)
+	public static function retrieveByLastId(array $servers, $gap = 0, $limit = 1000, array $handledEntries = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criterions = null;
@@ -39,8 +40,12 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 		
 		foreach($servers as $server)
 		{
+			$dc = $server->getDc();
 			$crit = $criteria->getNewCriterion(SphinxLogPeer::ID, $server->getLastLogId() - $gap, Criteria::GREATER_THAN);
-			$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::DC, $server->getDc()));
+			$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::DC, $dc));
+			if(!is_null($handledEntries)) {
+				$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::ID, $handledEntries[$dc], Criteria::NOT_IN));
+			}
 			$criterions->addOr($crit);
 		}
 		
