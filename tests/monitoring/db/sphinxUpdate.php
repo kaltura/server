@@ -4,22 +4,22 @@ require_once realpath(__DIR__ . '/../') . '/KalturaMonitorResult.php';
 
 $options = getopt('', array(
 	'debug',
-	'sphinx-index:',
+	'hostname:',
 	'timeout:',
 ));
 
-if(!isset($options['sphinx-index']))
+if(!isset($options['hostname']))
 {
-	echo "Argument sphinx-index is required";
+	echo "Argument hostname is required";
 	exit(-1);
 }
-$sphinxIndex = $options['sphinx-index'];
 
 if(!isset($options['timeout']))
 {
 	echo "Argument timeout is required";
 	exit(-1);
 }
+$hostname = $options['hostname'];
 $timeout = $options['timeout'];
 
 
@@ -32,18 +32,18 @@ try
 {
 	// connect to the db
 	$logPdo = new PDO($config['sphinx-log']['dsn'], $config['sphinx-log']['username'], $config['sphinx-log']['password']);
+	$sphinxPdo = new PDO("mysql:host=$hostname;port=9312;");
 	
 	$updatedEntryId = uniqid();
 	
 	// insert or update sphinx log
 	$replaceQuery = "replace into kaltura_entry (id, entry_id, str_entry_id) values(1, \'MONITOR_TEST\', \'$updatedEntryId\')";
-	$insertLogQuery = "INSERT INTO sphinx_log (object_type, object_id, partner_id, dc, `sql`, created_at) VALUES ('entry', '$updatedEntryId', -4, 0, '$replaceQuery', NOW())";
+	$insertLogQuery = "INSERT INTO sphinx_log (object_type, object_id, partner_id, dc, `sql`, created_at) VALUES ('test', '$updatedEntryId', -4, 0, '$replaceQuery', NOW())";
 	$affectedRows = $logPdo->exec($insertLogQuery);
 	if(!$affectedRows)
 		throw new Exception("Unable to insert log: $insertLogQuery");
 		
 	$timeoutTime = time() + $timeout;
-	$sphinxPdo = new PDO($config["sphinx-$sphinxIndex"]['dsn']);
 	$selectQuery = "select str_entry_id from kaltura_entry where id = 1";
 	$selectedEntryId = null;
 	

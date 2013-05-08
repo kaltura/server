@@ -29,17 +29,41 @@ define command{
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --list-flavors --list-cue-points --list-metadata"
 }
 define command{
-        command_name    kaltura-host-scheduler-status
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 130 --error-threshold 310 --script "@APP_DIR@/tests/monitoring/db/schedulerLastStatus.php --hostname $HOSTADDRESS$"
-        }
+	command_name		kaltura-host-scheduler-status
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 130 --error-threshold 310 --script "@APP_DIR@/tests/monitoring/db/schedulerLastStatus.php --hostname $HOSTADDRESS$"
+}
 define command{
-        command_name    kaltura-host-sphinx1-update
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxUpdate.php --sphinx-index 1 --timeout 10"
-        }
+	command_name		kaltura-host-sphinx-update
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxUpdate.php --hostname $HOSTADDRESS$ --timeout 10"
+}
 define command{
-        command_name    kaltura-host-sphinx2-update
-        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxUpdate.php --sphinx-index 2 --timeout 10"
-        }
+	command_name		kaltura-host-sphinx-inegrity-entry
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table entry --index kaltura_entry --object-type entry"
+}
+define command{
+	command_name		kaltura-host-sphinx-inegrity-category
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table category --index kaltura_category --object-type category"
+}
+define command{
+	command_name		kaltura-host-sphinx-inegrity-user
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table kuser --index kaltura_kuser --object-type kuser"
+}
+define command{
+	command_name		kaltura-host-sphinx-inegrity-cue-point
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table cue_point --index kaltura_cue_point --object-type CuePoint"
+}
+define command{
+	command_name		kaltura-host-sphinx-inegrity-entry-distribution
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table entry_distribution --index kaltura_entry_distribution --object-type EntryDistribution"
+}
+define command{
+	command_name		kaltura-host-sphinx-inegrity-caption_item
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table caption_asset_item --index kaltura_caption_item --object-type CaptionAssetItem"
+}
+define command{
+	command_name		kaltura-host-sphinx-inegrity-tag
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table tag --index kaltura_tag --object-type Tag"
+}
 
 
 

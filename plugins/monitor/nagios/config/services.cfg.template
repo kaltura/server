@@ -57,32 +57,87 @@ define	service{
 
 define	service{
 		use								local-service
-		hostgroup_name					kaltura-batch
-		service_description				Kaltura Host Sphinx 1 Update
-		check_command					kaltura-host-sphinx1-update
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Update
+		check_command					kaltura-host-sphinx-update
 		notifications_enabled			1
 }
 
 define	service{
 		use								local-service
-		hostgroup_name					kaltura-batch
-		service_description				Kaltura Host Sphinx 2 Update
-		check_command					kaltura-host-sphinx2-update
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity Entry
+		check_command					kaltura-host-sphinx-inegrity-entry
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity Category
+		check_command					kaltura-host-sphinx-inegrity-category
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity User
+		check_command					kaltura-host-sphinx-inegrity-user
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity Cue-Point
+		check_command					kaltura-host-sphinx-inegrity-cue-point
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity Entry-Distribution
+		check_command					kaltura-host-sphinx-inegrity-entry-distribution
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity Caption-Item
+		check_command					kaltura-host-sphinx-inegrity-caption_item
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-sphinx
+		servicegroups					kaltura-host-sphinx
+		service_description				Kaltura Host Sphinx Inegrity Tag
+		check_command					kaltura-host-sphinx-inegrity-tag
 		notifications_enabled			1
 }
 
 
-
-
-
-
-
-
-
-
+		
+		
+		
+		
+		
+		
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Convert - on2
 		check_command					kaltura-host-batch-queue-size-convert-on2
 		notifications_enabled			1
@@ -91,6 +146,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Convert - ffmpeg
 		check_command					kaltura-host-batch-queue-size-convert-ffmpeg
 		notifications_enabled			1
@@ -99,6 +155,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Import
 		check_command					kaltura-host-batch-queue-size-import
 		notifications_enabled			1
@@ -107,6 +164,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Delete
 		check_command					kaltura-host-batch-queue-size-delete
 		notifications_enabled			1
@@ -115,6 +173,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Bulk Upload
 		check_command					kaltura-host-batch-queue-size-bulk-upload
 		notifications_enabled			1
@@ -123,6 +182,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Convert Profile
 		check_command					kaltura-host-batch-queue-size-convert-profile
 		notifications_enabled			1
@@ -131,6 +191,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Post Convert
 		check_command					kaltura-host-batch-queue-size-post-convert
 		notifications_enabled			1
@@ -139,6 +200,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Extract Media
 		check_command					kaltura-host-batch-queue-size-extract-media
 		notifications_enabled			1
@@ -147,6 +209,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Mail
 		check_command					kaltura-host-batch-queue-size-mail
 		notifications_enabled			1
@@ -155,6 +218,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Notification
 		check_command					kaltura-host-batch-queue-size-notification
 		notifications_enabled			1
@@ -163,6 +227,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Bulk Download
 		check_command					kaltura-host-batch-queue-size-bulk-download
 		notifications_enabled			1
@@ -171,6 +236,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Provision Provide
 		check_command					kaltura-host-batch-queue-size-provision-provide
 		notifications_enabled			1
@@ -179,6 +245,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Convert Collection
 		check_command					kaltura-host-batch-queue-size-convert-collection
 		notifications_enabled			1
@@ -187,6 +254,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Storage Export
 		check_command					kaltura-host-batch-queue-size-storage-export
 		notifications_enabled			1
@@ -195,6 +263,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Provision Delete
 		check_command					kaltura-host-batch-queue-size-provision-delete
 		notifications_enabled			1
@@ -203,6 +272,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Storage Delete
 		check_command					kaltura-host-batch-queue-size-storage-delete
 		notifications_enabled			1
@@ -211,6 +281,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Metadata Transform
 		check_command					kaltura-host-batch-queue-size-metadata-transform
 		notifications_enabled			1
@@ -219,6 +290,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size FileSync Import
 		check_command					kaltura-host-batch-queue-size-filesync-import
 		notifications_enabled			1
@@ -227,6 +299,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Capture Thumbnail
 		check_command					kaltura-host-batch-queue-size-capture-thumbnail
 		notifications_enabled			1
@@ -235,6 +308,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Delete File
 		check_command					kaltura-host-batch-queue-size-delete-file
 		notifications_enabled			1
@@ -243,6 +317,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Index Category
 		check_command					kaltura-host-batch-queue-size-index-category
 		notifications_enabled			1
@@ -251,6 +326,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Index Category Entry
 		check_command					kaltura-host-batch-queue-size-index-category-entry
 		notifications_enabled			1
@@ -259,6 +335,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Index Entry
 		check_command					kaltura-host-batch-queue-size-index-entry
 		notifications_enabled			1
@@ -267,6 +344,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Index Category User
 		check_command					kaltura-host-batch-queue-size-index-category-user
 		notifications_enabled			1
@@ -275,6 +353,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Index User
 		check_command					kaltura-host-batch-queue-size-index-user
 		notifications_enabled			1
@@ -283,6 +362,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Move Category Entries
 		check_command					kaltura-host-batch-queue-size-move-category-entries
 		notifications_enabled			1
@@ -291,6 +371,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Copy
 		check_command					kaltura-host-batch-queue-size-copy
 		notifications_enabled			1
@@ -299,6 +380,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Parse Caption Asset
 		check_command					kaltura-host-batch-queue-size-parse-caption-asset
 		notifications_enabled			1
@@ -307,6 +389,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Distribution Delete
 		check_command					kaltura-host-batch-queue-size-distribution-delete
 		notifications_enabled			1
@@ -315,6 +398,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Distribution Disable
 		check_command					kaltura-host-batch-queue-size-distribution-disable
 		notifications_enabled			1
@@ -323,6 +407,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Distribution Enable
 		check_command					kaltura-host-batch-queue-size-distribution-enable
 		notifications_enabled			1
@@ -331,6 +416,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Distribution Fetch Report
 		check_command					kaltura-host-batch-queue-size-distribution-fetch-report
 		notifications_enabled			1
@@ -339,6 +425,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Distribution Submit
 		check_command					kaltura-host-batch-queue-size-distribution-submit
 		notifications_enabled			1
@@ -347,6 +434,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Distribution Update
 		check_command					kaltura-host-batch-queue-size-distribution-update
 		notifications_enabled			1
@@ -355,6 +443,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Event Notification
 		check_command					kaltura-host-batch-queue-size-event-notification
 		notifications_enabled			1
@@ -363,6 +452,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Index Tags
 		check_command					kaltura-host-batch-queue-size-index-tags
 		notifications_enabled			1
@@ -371,6 +461,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Resolve Tags
 		check_command					kaltura-host-batch-queue-size-resolve-tags
 		notifications_enabled			1
@@ -379,11 +470,20 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Virus Scan
 		check_command					kaltura-host-batch-queue-size-virus-scan
 		notifications_enabled			1
 }
 
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-queue-size
+		service_description				Kaltura Batch Queue Size Sync Widevine Repository
+		check_command					kaltura-host-batch-queue-size-sync-widevine-repository
+		notifications_enabled			1
+}
 
 
 
@@ -399,6 +499,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Convert - on2
 		check_command					kaltura-host-batch-error-percent-convert-on2
 		notifications_enabled			1
@@ -407,6 +508,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Convert - ffmpeg
 		check_command					kaltura-host-batch-error-percent-convert-ffmpeg
 		notifications_enabled			1
@@ -415,6 +517,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Import
 		check_command					kaltura-host-batch-error-percent-import
 		notifications_enabled			1
@@ -423,6 +526,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Delete
 		check_command					kaltura-host-batch-error-percent-delete
 		notifications_enabled			1
@@ -431,6 +535,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Bulk Upload
 		check_command					kaltura-host-batch-error-percent-bulk-upload
 		notifications_enabled			1
@@ -439,6 +544,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Convert Profile
 		check_command					kaltura-host-batch-error-percent-convert-profile
 		notifications_enabled			1
@@ -447,6 +553,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Post Convert
 		check_command					kaltura-host-batch-error-percent-post-convert
 		notifications_enabled			1
@@ -455,6 +562,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Extract Media
 		check_command					kaltura-host-batch-error-percent-extract-media
 		notifications_enabled			1
@@ -463,6 +571,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Mail
 		check_command					kaltura-host-batch-error-percent-mail
 		notifications_enabled			1
@@ -471,6 +580,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Notification
 		check_command					kaltura-host-batch-error-percent-notification
 		notifications_enabled			1
@@ -479,6 +589,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Bulk Download
 		check_command					kaltura-host-batch-error-percent-bulk-download
 		notifications_enabled			1
@@ -487,6 +598,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Provision Provide
 		check_command					kaltura-host-batch-error-percent-provision-provide
 		notifications_enabled			1
@@ -495,6 +607,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Convert Collection
 		check_command					kaltura-host-batch-error-percent-convert-collection
 		notifications_enabled			1
@@ -503,6 +616,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Storage Export
 		check_command					kaltura-host-batch-error-percent-storage-export
 		notifications_enabled			1
@@ -511,6 +625,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Provision Delete
 		check_command					kaltura-host-batch-error-percent-provision-delete
 		notifications_enabled			1
@@ -519,6 +634,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Storage Delete
 		check_command					kaltura-host-batch-error-percent-storage-delete
 		notifications_enabled			1
@@ -527,6 +643,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Metadata Transform
 		check_command					kaltura-host-batch-error-percent-metadata-transform
 		notifications_enabled			1
@@ -535,6 +652,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent FileSync Import
 		check_command					kaltura-host-batch-error-percent-filesync-import
 		notifications_enabled			1
@@ -543,6 +661,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Capture Thumbnail
 		check_command					kaltura-host-batch-error-percent-capture-thumbnail
 		notifications_enabled			1
@@ -551,6 +670,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Delete File
 		check_command					kaltura-host-batch-error-percent-delete-file
 		notifications_enabled			1
@@ -559,6 +679,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Index Category
 		check_command					kaltura-host-batch-error-percent-index-category
 		notifications_enabled			1
@@ -567,6 +688,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Index Category Entry
 		check_command					kaltura-host-batch-error-percent-index-category-entry
 		notifications_enabled			1
@@ -575,6 +697,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Index Entry
 		check_command					kaltura-host-batch-error-percent-index-entry
 		notifications_enabled			1
@@ -583,6 +706,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Index Category User
 		check_command					kaltura-host-batch-error-percent-index-category-user
 		notifications_enabled			1
@@ -591,6 +715,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Index User
 		check_command					kaltura-host-batch-error-percent-index-user
 		notifications_enabled			1
@@ -599,6 +724,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Move Category Entries
 		check_command					kaltura-host-batch-error-percent-move-category-entries
 		notifications_enabled			1
@@ -607,6 +733,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Copy
 		check_command					kaltura-host-batch-error-percent-copy
 		notifications_enabled			1
@@ -615,6 +742,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Parse Caption Asset
 		check_command					kaltura-host-batch-error-percent-parse-caption-asset
 		notifications_enabled			1
@@ -623,6 +751,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Distribution Delete
 		check_command					kaltura-host-batch-error-percent-distribution-delete
 		notifications_enabled			1
@@ -631,6 +760,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Distribution Disable
 		check_command					kaltura-host-batch-error-percent-distribution-disable
 		notifications_enabled			1
@@ -639,6 +769,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Distribution Enable
 		check_command					kaltura-host-batch-error-percent-distribution-enable
 		notifications_enabled			1
@@ -647,6 +778,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Distribution Fetch Report
 		check_command					kaltura-host-batch-error-percent-distribution-fetch-report
 		notifications_enabled			1
@@ -655,6 +787,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Distribution Submit
 		check_command					kaltura-host-batch-error-percent-distribution-submit
 		notifications_enabled			1
@@ -663,6 +796,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Distribution Update
 		check_command					kaltura-host-batch-error-percent-distribution-update
 		notifications_enabled			1
@@ -671,6 +805,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Event Notification
 		check_command					kaltura-host-batch-error-percent-event-notification
 		notifications_enabled			1
@@ -679,6 +814,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Index Tags
 		check_command					kaltura-host-batch-error-percent-index-tags
 		notifications_enabled			1
@@ -687,6 +823,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Resolve Tags
 		check_command					kaltura-host-batch-error-percent-resolve-tags
 		notifications_enabled			1
@@ -695,21 +832,23 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Virus Scan
 		check_command					kaltura-host-batch-error-percent-virus-scan
 		notifications_enabled			1
 }
 
-
-
-
 define	service{
 		use								local-service
-		hostgroup_name					kaltura-batch
-		service_description				Kaltura Host Scheduler Status
-		check_command					kaltura-host-scheduler-status
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-error-percent
+		service_description				Kaltura Batch Error Percent Sync Widevine Repository
+		check_command					kaltura-host-batch-error-percent-sync-widevine-repository
 		notifications_enabled			1
-		}
+}
+
+
+
 
 
 
@@ -720,6 +859,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Convert - on2
 		check_command					kaltura-host-batch-fatal-percent-convert-on2
 		notifications_enabled			1
@@ -728,6 +868,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Convert - ffmpeg
 		check_command					kaltura-host-batch-fatal-percent-convert-ffmpeg
 		notifications_enabled			1
@@ -736,6 +877,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Import
 		check_command					kaltura-host-batch-fatal-percent-import
 		notifications_enabled			1
@@ -744,6 +886,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Delete
 		check_command					kaltura-host-batch-fatal-percent-delete
 		notifications_enabled			1
@@ -752,6 +895,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Bulk Upload
 		check_command					kaltura-host-batch-fatal-percent-bulk-upload
 		notifications_enabled			1
@@ -760,6 +904,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Convert Profile
 		check_command					kaltura-host-batch-fatal-percent-convert-profile
 		notifications_enabled			1
@@ -768,6 +913,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Post Convert
 		check_command					kaltura-host-batch-fatal-percent-post-convert
 		notifications_enabled			1
@@ -776,6 +922,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Extract Media
 		check_command					kaltura-host-batch-fatal-percent-extract-media
 		notifications_enabled			1
@@ -784,6 +931,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Mail
 		check_command					kaltura-host-batch-fatal-percent-mail
 		notifications_enabled			1
@@ -792,6 +940,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Notification
 		check_command					kaltura-host-batch-fatal-percent-notification
 		notifications_enabled			1
@@ -800,6 +949,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Bulk Download
 		check_command					kaltura-host-batch-fatal-percent-bulk-download
 		notifications_enabled			1
@@ -808,6 +958,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Provision Provide
 		check_command					kaltura-host-batch-fatal-percent-provision-provide
 		notifications_enabled			1
@@ -816,6 +967,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Convert Collection
 		check_command					kaltura-host-batch-fatal-percent-convert-collection
 		notifications_enabled			1
@@ -824,6 +976,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Storage Export
 		check_command					kaltura-host-batch-fatal-percent-storage-export
 		notifications_enabled			1
@@ -832,6 +985,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Provision Delete
 		check_command					kaltura-host-batch-fatal-percent-provision-delete
 		notifications_enabled			1
@@ -840,6 +994,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Storage Delete
 		check_command					kaltura-host-batch-fatal-percent-storage-delete
 		notifications_enabled			1
@@ -848,6 +1003,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Metadata Transform
 		check_command					kaltura-host-batch-fatal-percent-metadata-transform
 		notifications_enabled			1
@@ -856,6 +1012,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent FileSync Import
 		check_command					kaltura-host-batch-fatal-percent-filesync-import
 		notifications_enabled			1
@@ -864,6 +1021,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Capture Thumbnail
 		check_command					kaltura-host-batch-fatal-percent-capture-thumbnail
 		notifications_enabled			1
@@ -872,6 +1030,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Delete File
 		check_command					kaltura-host-batch-fatal-percent-delete-file
 		notifications_enabled			1
@@ -880,6 +1039,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Index Category
 		check_command					kaltura-host-batch-fatal-percent-index-category
 		notifications_enabled			1
@@ -888,6 +1048,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Index Category Entry
 		check_command					kaltura-host-batch-fatal-percent-index-category-entry
 		notifications_enabled			1
@@ -896,6 +1057,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Index Entry
 		check_command					kaltura-host-batch-fatal-percent-index-entry
 		notifications_enabled			1
@@ -904,6 +1066,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Index Category User
 		check_command					kaltura-host-batch-fatal-percent-index-category-user
 		notifications_enabled			1
@@ -912,6 +1075,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Index User
 		check_command					kaltura-host-batch-fatal-percent-index-user
 		notifications_enabled			1
@@ -920,6 +1084,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Move Category Entries
 		check_command					kaltura-host-batch-fatal-percent-move-category-entries
 		notifications_enabled			1
@@ -928,6 +1093,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Copy
 		check_command					kaltura-host-batch-fatal-percent-copy
 		notifications_enabled			1
@@ -936,6 +1102,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Parse Caption Asset
 		check_command					kaltura-host-batch-fatal-percent-parse-caption-asset
 		notifications_enabled			1
@@ -944,6 +1111,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Distribution Delete
 		check_command					kaltura-host-batch-fatal-percent-distribution-delete
 		notifications_enabled			1
@@ -952,6 +1120,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Distribution Disable
 		check_command					kaltura-host-batch-fatal-percent-distribution-disable
 		notifications_enabled			1
@@ -960,6 +1129,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Distribution Enable
 		check_command					kaltura-host-batch-fatal-percent-distribution-enable
 		notifications_enabled			1
@@ -968,6 +1138,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Distribution Fetch Report
 		check_command					kaltura-host-batch-fatal-percent-distribution-fetch-report
 		notifications_enabled			1
@@ -976,6 +1147,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Distribution Submit
 		check_command					kaltura-host-batch-fatal-percent-distribution-submit
 		notifications_enabled			1
@@ -984,6 +1156,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Distribution Update
 		check_command					kaltura-host-batch-fatal-percent-distribution-update
 		notifications_enabled			1
@@ -992,6 +1165,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Event Notification
 		check_command					kaltura-host-batch-fatal-percent-event-notification
 		notifications_enabled			1
@@ -1000,6 +1174,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Index Tags
 		check_command					kaltura-host-batch-fatal-percent-index-tags
 		notifications_enabled			1
@@ -1008,6 +1183,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Resolve Tags
 		check_command					kaltura-host-batch-fatal-percent-resolve-tags
 		notifications_enabled			1
@@ -1016,9 +1192,17 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Virus Scan
 		check_command					kaltura-host-batch-fatal-percent-virus-scan
 		notifications_enabled			1
 }
 
-		
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-host-batch-fatal-percent
+		service_description				Kaltura Batch Fatal Percent Sync Widevine Repository
+		check_command					kaltura-host-batch-fatal-percent-sync-widevine-repository
+		notifications_enabled			1
+}
