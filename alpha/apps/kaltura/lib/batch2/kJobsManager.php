@@ -439,7 +439,7 @@ class kJobsManager
 				{
 					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)	
 						$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());		
-					$srcFileSyncDescriptor->setFileSyncRemoteUrl($flavorAsset->getEntryId());
+					$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				}
 				else
 				{
