@@ -9,6 +9,7 @@ $options = getopt('', array(
 	'table:',
 	'index:',
 	'object-type:',
+	'check-create-time',
 ));
 
 if(!isset($options['hostname']))
@@ -46,6 +47,9 @@ $timeOffset = $options['time-offset'];
 $table = $options['table'];
 $index = $options['index'];
 $objectType = $options['object-type'];
+$dateColumn = 'updated_at';
+if(isset($options['check-create-time']))
+	$dateColumn = 'created_at';
 
 // define time period - an hour ago
 $timestamp = time() - $timeOffset;
@@ -65,9 +69,9 @@ try
 	$sphinxPdo = new PDO("mysql:host=$hostname;port=9312;");
 	
 	// define queries
-	$tableQuery = "SELECT COUNT(id) FROM $table WHERE updated_at > '$timestampText'";
+	$tableQuery = "SELECT COUNT(id) FROM $table WHERE $dateColumn > '$timestampText'";
 	$logQuery = "SELECT COUNT(DISTINCT object_id) FROM sphinx_log WHERE object_type = '$objectType' AND created_at > '$timestampText'";
-	$sphinxQuery = "SELECT id, (updated_at > $timestamp) AS cnd FROM $index WHERE cnd > 0";
+	$sphinxQuery = "SELECT id, ($dateColumn > $timestamp) AS cnd FROM $index WHERE cnd > 0";
 
 	$tableStatement = $pdo->query($tableQuery);
 	if($tableStatement === false)
@@ -105,7 +109,10 @@ try
 	if($tableCount == $logCount && $tableCount == $sphinxCount)
 	{
 		$monitorResult->value = 1;
-		$monitorResult->description = "Shpinx populated from log";
+		if($tableCount)
+			$monitorResult->description = "$tableCount $objectType objects changed, updated in the log and in the sphinx";
+		else
+			$monitorResult->description = "No updates done";
 	}
 	else
 	{
@@ -126,7 +133,7 @@ try
 		}
 		
 		$monitorResult->value = 0;
-		$monitorResult->description = "$tableCount $objectType objects changed, updated in the log and in the sphinx";
+		$monitorResult->description = "Sphinx integrity is broken";
 	}
 	
 	echo "$monitorResult";
