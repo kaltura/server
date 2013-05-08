@@ -155,7 +155,7 @@ class category extends Basecategory implements IIndexable
 
 		parent::save($con);
 		
-		if ($kuserChanged && $this->inheritance_type != InheritanceType::INHERIT && $this->getKuserId())
+		if ($kuserChanged && $this->getKuserId() && $this->inheritance_type != InheritanceType::INHERIT && $this->getKuserId())
 		{	
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->getId(), $this->getKuserId());
 			if (!$categoryKuser)
@@ -1299,8 +1299,13 @@ class category extends Basecategory implements IIndexable
 		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
 			return;
 
-		parent::setPuserId($puserId);
-			
+		parent::setPuserId($puserId);	
+		if (is_null($puserId))
+		{
+			$this->setKuserId(null);
+			return;
+		}
+		
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$kuser)
