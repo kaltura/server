@@ -43,7 +43,6 @@ class MetadataPeer extends BaseMetadataPeer {
 		
 		$criteria = new Criteria();
 		$criteria->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
-		$criteria->add(MetadataPeer::METADATA_PROFILE_VERSION, $metadataProfile->getVersion());
 		$criteria->add(MetadataPeer::OBJECT_TYPE, $objectType);
 		$criteria->add(MetadataPeer::OBJECT_ID, $objectId);
 
