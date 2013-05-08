@@ -80,7 +80,7 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 		
-		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
+		if ($category->getModeration())
 		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser ||
