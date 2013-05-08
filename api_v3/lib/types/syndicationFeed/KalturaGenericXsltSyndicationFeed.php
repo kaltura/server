@@ -12,18 +12,12 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 	public $xslt;
 
 	/**
-	 * This parameter determines which custom metadata fields of type related-entry should be
-	 * expanded to contain the kaltura MRSS feed of the related entry. Related-entry fields not
-	 * included in this list will contain only the related entry id.
-	 * This property contains a list xPaths in the Kaltura MRSS.
-	 * 
-	 * @var KalturaStringArray
+	 * @var KalturaExtendingItemMrssParameterArray
 	 */
 	public $itemXpathsToExtend;
 	
 	private static $mapBetweenObjects = array
 	(
-   		
 	);
 	
 	public function getMapBetweenObjects()
@@ -44,19 +38,10 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
 
 		$mrssParams = $source_object->getMrssParameters();
+		$this->itemXpathsToExtend = new KalturaExtendingItemMrssParameterArray();
 		if ($mrssParams && $mrssParams->getItemXpathsToExtend())
 		{
-			$xpaths = array();
-			foreach ($mrssParams->getItemXpathsToExtend() as $itemXPathToExtend)
-			{
-				/* @var $itemXPathToExtend kExtendingItemMrssParameter */
-				$xpaths[] = $itemXPathToExtend->getXpath();
-			}
-			$this->itemXpathsToExtend = KalturaStringArray::fromDbArray($xpaths);
-		}
-		else
-		{
-			$this->itemXpathsToExtend = new KalturaStringArray();
+			$this->itemXpathsToExtend = KalturaExtendingItemMrssParameterArray::fromDbArray($mrssParams->getItemXpathsToExtend());
 		}
 	}
 	
@@ -73,19 +58,7 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		if ($this->itemXpathsToExtend)
 		{
 			$itemXpathsToExtend = $this->itemXpathsToExtend->toObjectsArray();
-			$itemXpaths = array();
-			foreach ($itemXpathsToExtend as $itemXPathToExtend)
-			{
-				$itemXPath = new kExtendingItemMrssParameter();
-				$itemXPath->setXpath($itemXPathToExtend);
-				$itemXPath->setExtensionMode(MrssExtensionMode::APPEND);
-				$identifier = new kEntryIdentifier();
-				$identifier->setExtendedFeatures("");
-				$identifier->setIdentifier(EntryIdentifierField::ID);
-				$itemXPath->setIdentifier($identifier);
-				$itemXpaths[] = $itemXPath;
-			}
-			$mrssParams->setItemXpathsToExtend($itemXpaths);
+			$mrssParams->setItemXpathsToExtend($itemXpathsToExtend);
 		}
 		
 		$dbObject->setMrssParameters($mrssParams);
