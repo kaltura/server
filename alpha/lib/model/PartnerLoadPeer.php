@@ -76,8 +76,6 @@ class PartnerLoadPeer extends BasePartnerLoadPeer {
 		$sql .= "AND $colPartnerId = $partnerId ";
 		$sql .= "AND $colDC = $dcId ";
 		
-		$sql .= "LIMIT 1";
-			
 		try {
 			$affectedRows = $con->exec($sql);
 		} catch (Exception $e) {
