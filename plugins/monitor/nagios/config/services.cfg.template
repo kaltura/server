@@ -47,6 +47,30 @@ define	service{
 		notifications_enabled			1
 }
 
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-batch
+		service_description				Kaltura Host Scheduler Status
+		check_command					kaltura-host-scheduler-status
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-batch
+		service_description				Kaltura Host Sphinx 1 Update
+		check_command					kaltura-host-sphinx1-update
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-batch
+		service_description				Kaltura Host Sphinx 2 Update
+		check_command					kaltura-host-sphinx2-update
+		notifications_enabled			1
+}
+
 
 
 
@@ -678,6 +702,14 @@ define	service{
 
 
 
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-batch
+		service_description				Kaltura Host Scheduler Status
+		check_command					kaltura-host-scheduler-status
+		notifications_enabled			1
+		}
 
 
 

@@ -28,8 +28,18 @@ define command{
 	command_name		kaltura-host-html5-multi-request
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --list-flavors --list-cue-points --list-metadata"
 }
-
-
+define command{
+        command_name    kaltura-host-scheduler-status
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 130 --error-threshold 310 --script "@APP_DIR@/tests/monitoring/db/schedulerLastStatus.php --hostname $HOSTADDRESS$"
+        }
+define command{
+        command_name    kaltura-host-sphinx1-update
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxUpdate.php --sphinx-index 1 --timeout 10"
+        }
+define command{
+        command_name    kaltura-host-sphinx2-update
+        command_line    @PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxUpdate.php --sphinx-index 2 --timeout 10"
+        }
 
 
 
