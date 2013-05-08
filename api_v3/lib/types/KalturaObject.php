@@ -93,7 +93,6 @@ abstract class KalturaObject
 		// initialize reflection data
 		$srcObjClass = get_class($srcObj);
 		$srcObjRef = new ReflectionClass($srcObj);
-	
 		$thisClass = get_class($this);
 		$thisRef = KalturaTypeReflectorCacher::get($thisClass);
 		if(!$thisRef)
@@ -137,7 +136,6 @@ abstract class KalturaObject
 			
 			$curGetter = $srcObjRef->getMethod($getterName);
 			$getterFunc = self::getFunctionBody($curGetter);
-	
 			$startBracePos = strpos($getterFunc, '{');
 			$endBracePos = strrpos($getterFunc, '}');
 	
@@ -230,6 +228,46 @@ abstract class KalturaObject
 					$fieldValue = "kPluginableEnumsManager::coreToApi('{$enumClass}', {$fieldValue})";
 				}
 			}
+			else if($thisProps[$apiPropName]->getDynamicType())
+			{
+					$getter_callback = array ( $srcObj ,"get{$dbPropName}"  );
+					if (is_callable($getter_callback))
+					{
+						$values = call_user_func($getter_callback);
+						KalturaLog::debug("assaf:$dbPropName [".print_r($values,true)."]");
+						$propertyType = $thisProps[$apiPropName]->getDynamicType();
+						$enumType = call_user_func(array($propertyType, 'getEnumClass'));
+						if(!is_null($values))
+						{
+							if (!is_array($values))
+								$values = explode(',', $values);
+							$finalValues = array();
+							foreach($values as $val)
+								$finalValues[] = kPluginableEnumsManager::coreToApi($enumType, $val);
+							$fieldValue = implode(',', $finalValues);
+						}
+					}
+			}
+			
+			else if ($thisProps[$apiPropName]->getDynamicType())
+			{
+				$propertyType = $thisProps[$apiPropName]->getDynamicType();
+				$enumClass = call_user_func(array($propertyType, 'getEnumClass'));
+				if ($enumClass)
+				{
+					$curCode = "\$value = {$fieldValue};\n\t\t" . 
+						"if(!is_null(\$value))\n\t\t" . 
+							"{\n\t\t\t" . 
+								"\$values = explode(',', \$value);\n\t\t\t" . 
+								"\$finalValues = array();\n\t\t\t" . 
+								"foreach(\$values as \$val)\n\t\t\t\t" .
+									"\$finalValues[] = kPluginableEnumsManager::coreToApi('{$enumClass}', \$val);\n\t\t\t" .
+								"\$value = implode(',', \$finalValues);\n\t\t" .
+							"}\n\t\t";
+					$fieldValue = '$value';
+				}
+			}
+			
 	
 			// add field copy code
 			$curCode .= "\$apiObj->{$apiPropName} = {$fieldValue};";
