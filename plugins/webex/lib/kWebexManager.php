@@ -18,6 +18,7 @@ class kWebexManager implements kObjectAddedEventConsumer
 		$asset->setFromAssetParams($flavorParams);
 		$asset->setStatus(flavorAsset::ASSET_STATUS_READY);
 		$asset->setIsOriginal(0);
+		$asset->setTags($flavorParams->getTags());
 		$asset->incrementVersion();
 		$asset->save();
 		
