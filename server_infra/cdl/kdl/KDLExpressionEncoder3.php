@@ -408,7 +408,7 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 			if(isset($prevK)) {
 				$ratio = $flavor->_video->_bitRate/$flavorInColl[$prevK]->_video->_bitRate;
 				if($ratio<KDLConstants::IsmvMinimalFlavorRatio){
-					$flavor->_video->_bitRate = $flavorInColl[$prevK]->_video->_bitRate*KDLConstants::IsmvMinimalFlavorRatio;
+					$flavor->_video->_bitRate = round($flavorInColl[$prevK]->_video->_bitRate*KDLConstants::IsmvMinimalFlavorRatio);
 					$flavor->_video->_peakBitRate = round($flavor->_video->_bitRate * KDLConstants::IsmvPeakBitrateRatio * 1.1);
 				}
 			}
