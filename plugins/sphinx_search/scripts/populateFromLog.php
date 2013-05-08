@@ -58,7 +58,7 @@ DbManager::setConfig($dbConf);
 DbManager::initialize();
 
 $limit = 2000; 	// The number of sphinxLog records we want to query
-$gap = 1000;	// The gap from 'getLastLogId' we want to query 
+$gap = 1000;	// The gap from 'getLastLogId' we want to query
 
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer);
 $lastLogs = array();
@@ -97,7 +97,6 @@ while(true)
 		$dc = $sphinxLog->getDc();
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
-		$isOlderThanLast = false;
 		
 		$serverLastLog = null;
 		
@@ -111,7 +110,7 @@ while(true)
 			$lastLogs[$dc] = $serverLastLog;
 		}
 		
-		$handledRecords[$dc][] = $sphinxLogId; 
+		$handledRecords[$dc][] = $sphinxLogId;
 		KalturaLog::log("Sphinx log id $sphinxLogId dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
 
 		try
@@ -124,7 +123,7 @@ while(true)
 
 			// If the record is an historical record, don't take back the last log id
 			if($serverLastLog->getLastLogId() < $sphinxLogId) {
-				$serverLastLog->setLastLogId($sphinxLog->getId());
+				$serverLastLog->setLastLogId($sphinxLogId);
  				$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
  				
  				// Clear $handledRecords from before last - gap.
