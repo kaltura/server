@@ -1,5 +1,10 @@
 
 define command{
+	command_name		kaltura-host-ping-ps2
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/ps2/ping.php --service-url $HOSTADDRESS$"
+}
+
+define command{
 	command_name		kaltura-host-ping
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/ping.php --service-url $HOSTADDRESS$"
 }
@@ -66,6 +71,53 @@ define command{
 }
 
 
+
+
+
+define command{
+	command_name		kaltura-host-dwh-file-events
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 1- --script "@APP_DIR@/tests/monitoring/dwh/filesProcessed.php --file-type events --hours 24"
+}
+
+define command{
+	command_name		kaltura-host-dwh-aggr-complete
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/aggregationsCompleted.php --hours 8"
+}
+
+define command{
+	command_name		kaltura-host-dwh-proc-lock
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/lockedProcesses.php --daily-lock 7200 --hourly-lock 3600 --etl-processes-lock 1800"
+}
+
+define command{
+	command_name		kaltura-host-dwh-failed-cycle-generating-registered
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/failedCycles.php --statuses GENERATING,REGISTERED --time-column run_time --hours 1.5"
+}
+
+define command{
+	command_name		kaltura-host-dwh-failed-cycle-generated-processed-loaded
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/failedCycles.php --statuses GENERATED,PROCESSED,LOADED --time-column insert_time --hours 36"
+}
+
+define command{
+	command_name		kaltura-host-dwh-failed-cycle-running
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/failedCycles.php --statuses RUNNING --time-column run_time --hours 4.5"
+}
+
+define command{
+	command_name		kaltura-host-dwh-failed-cycle-loading
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/failedCycles.php --statuses LOADING --time-column run_time --hours 3"
+}
+
+define command{
+	command_name		kaltura-host-dwh-failed-cycle-transfering
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/failedCycles.php --statuses TRANSFERING --time-column transfer_time --hours 3"
+}
+
+define command{
+	command_name		kaltura-host-dwh-failed-cycle-generating
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --error-threshold 0 --script "@APP_DIR@/tests/monitoring/dwh/failedCycles.php --statuses GENERATING --time-column insert_time --hours 12"
+}
 
 
 

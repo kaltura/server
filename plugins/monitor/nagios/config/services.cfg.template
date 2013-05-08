@@ -2,7 +2,15 @@
 define	service{
 		use								local-service
 		hostgroup_name					kaltura-api
-		service_description				Kaltura Host Ping
+		service_description				Kaltura Host Ping - V2
+		check_command					kaltura-host-ping-ps2
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-api
+		service_description				Kaltura Host Ping - V3
 		check_command					kaltura-host-ping
 		notifications_enabled			1
 }
@@ -10,7 +18,7 @@ define	service{
 define	service{
 		use								local-service
 		hostgroup_name					kaltura-api
-		service_description				Kaltura Host Ping Database
+		service_description				Kaltura Host Ping Database - V3
 		check_command					kaltura-host-ping-db
 		notifications_enabled			1
 }
@@ -18,7 +26,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		service_description				Kaltura Playlist Execute
+		service_description				Kaltura Playlist Execute - V3
 		check_command					kaltura-host-execute-playlist
 		notifications_enabled			1
 }
@@ -26,7 +34,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		service_description				Kaltura Session Start
+		service_description				Kaltura Session Start - V3
 		check_command					kaltura-host-start-session
 		notifications_enabled			1
 }
@@ -34,7 +42,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		service_description				Kaltura Dynamic Player Request
+		service_description				Kaltura Dynamic Player Request - V3
 		check_command					kaltura-host-kdp-multi-request
 		notifications_enabled			1
 }
@@ -42,7 +50,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		service_description				Kaltura HTML5 Player Request
+		service_description				Kaltura HTML5 Player Request - V3
 		check_command					kaltura-host-html5-multi-request
 		notifications_enabled			1
 }
@@ -130,6 +138,33 @@ define	service{
 
 		
 		
+		
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-dwh
+		servicegroups					kaltura-host-dwh
+		service_description				Kaltura Host DWH File Events
+		check_command					kaltura-host-dwh-file-events
+		notifications_enabled			1
+}
+		
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-dwh
+		servicegroups					kaltura-host-dwh
+		service_description				Kaltura Host DWH Aggregations Completed
+		check_command					kaltura-host-dwh-aggr-complete
+		notifications_enabled			1
+}
+		
+define	service{
+		use								local-service
+		hostgroup_name					kaltura-dwh
+		servicegroups					kaltura-host-dwh
+		service_description				Kaltura Host DWH Locked Processes
+		check_command					kaltura-host-dwh-proc-lock
+		notifications_enabled			1
+}
 		
 		
 		

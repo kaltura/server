@@ -18,3 +18,8 @@ define servicegroup{
 		servicegroup_name				kaltura-host-sphinx
 		alias							Kaltura Sphinx
 }
+
+define servicegroup{
+		servicegroup_name				kaltura-host-dwh
+		alias							Kaltura DWH
+}

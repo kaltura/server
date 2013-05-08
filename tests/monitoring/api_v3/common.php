@@ -30,15 +30,17 @@ class KalturaMonitorClient extends KalturaClient
 	}
 }
 
-$serviceUrl = $options['service-url'];
+$config = parse_ini_file(__DIR__ . '/../config.ini', true);
+
+$serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'];
 $clientConfig = new KalturaConfiguration();
-$clientConfig->clientTag = 'monitor';
 $clientConfig->partnerId = null;
 $clientConfig->serviceUrl = $serviceUrl;
 
+foreach($config['client-config'] as $attribute => $value)
+	$clientConfig->$attribute = $value;
+
 if(isset($options['debug']))
 	$clientConfig->setLogger(new KalturaMonitorClientLogger());
-
-$config = parse_ini_file(__DIR__ . '/../config.ini', true);
 
 $client = new KalturaMonitorClient($clientConfig);
