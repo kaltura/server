@@ -1,5 +1,5 @@
 ALTER TABLE file_sync 
-MODIFY id BIGINT, 
+MODIFY id BIGINT(20) NOT NULL AUTO_INCREMENT, 
 MODIFY linked_id BIGINT, 
 ADD deleted_id BIGINT DEFAULT NULL AFTER custom_data,
 DROP INDEX object_id_object_type_version_subtype_dc, 
