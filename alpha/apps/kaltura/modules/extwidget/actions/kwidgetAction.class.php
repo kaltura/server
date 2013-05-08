@@ -350,8 +350,8 @@ class kwidgetAction extends sfAction
 					$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
 				}
 			
-				$optimizedConfVars = null;
-				$optimizedHost = null;
+				$optimizedConfVars = "";
+				$optimizedHost = "";
 				if (kConf::hasMap("optimized_playback"))
 				{
 					$optimizedPlayback = kConf::getMap("optimized_playback");
@@ -387,6 +387,8 @@ class kwidgetAction extends sfAction
 				// if the host is the default www domain use the cdn api domain
 				if ($partner_host == kConf::get("www_host") && $optimizedHost === null)
 					$partner_host = kConf::get("cdn_api_host");
+				else if ($optimizedHost)
+					$partner_host = $optimizedHost;
 
 				if ($protocol == "https" && $partner_host = kConf::get("cdn_api_host"))
 					$partner_host = kConf::get("cdn_api_host_https");
