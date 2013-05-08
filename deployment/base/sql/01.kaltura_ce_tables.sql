@@ -912,7 +912,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   KEY `partner_status_index` (`partner_id`,`status`),
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_created_at` (`partner_id`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `entry_distribution` */
 
@@ -1735,7 +1735,7 @@ CREATE TABLE IF NOT EXISTS `partner` (
   KEY `partner_alias_index` (`partner_alias`),
   KEY `updated_at` (`updated_at`),
   KEY `partner_parent_index` (`partner_parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `partner_activity` */
 
