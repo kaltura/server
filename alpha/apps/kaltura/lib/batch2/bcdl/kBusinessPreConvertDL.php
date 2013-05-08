@@ -955,7 +955,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Source flavor params [" . $sourceFlavor->getId() . "] found");
 			$originalFlavorAsset->setFlavorParamsId($sourceFlavor->getId());
 			
-			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $mediaInfo, $parentJob);
+			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $mediaInfo, $parentJob, $convertProfileJob);
 			if(!$res)
 				return false;
 						
@@ -1206,7 +1206,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 	}
 	
-	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo = null, BatchJob $parentJob)
+	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
 	{
 		if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
 		{
@@ -1264,9 +1264,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 						$originalFlavorAsset->save();
 						
 						$errDescription = "Source flavor could not be converted";
-						KalturaLog::err($errDescription);
-						$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJobType::CONVERT_PROFILE);
-						kBatchManager::updateEntry($convertProfileJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+						self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
 						
 						return false;
 					}
