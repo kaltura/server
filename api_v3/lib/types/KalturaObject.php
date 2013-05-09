@@ -228,26 +228,6 @@ abstract class KalturaObject
 					$fieldValue = "kPluginableEnumsManager::coreToApi('{$enumClass}', {$fieldValue})";
 				}
 			}
-			else if($thisProps[$apiPropName]->getDynamicType())
-			{
-					$getter_callback = array ( $srcObj ,"get{$dbPropName}"  );
-					if (is_callable($getter_callback))
-					{
-						$values = call_user_func($getter_callback);
-						KalturaLog::debug("assaf:$dbPropName [".print_r($values,true)."]");
-						$propertyType = $thisProps[$apiPropName]->getDynamicType();
-						$enumType = call_user_func(array($propertyType, 'getEnumClass'));
-						if(!is_null($values))
-						{
-							if (!is_array($values))
-								$values = explode(',', $values);
-							$finalValues = array();
-							foreach($values as $val)
-								$finalValues[] = kPluginableEnumsManager::coreToApi($enumType, $val);
-							$fieldValue = implode(',', $finalValues);
-						}
-					}
-			}
 			
 			else if ($thisProps[$apiPropName]->getDynamicType())
 			{
