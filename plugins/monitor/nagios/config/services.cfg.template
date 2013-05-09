@@ -42,6 +42,14 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Widget Session Start - V2
+		check_command					kaltura-host-start-widget-session-ps2
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		service_description				Kaltura Dynamic Player Request - V3
 		check_command					kaltura-host-kdp-multi-request
 		notifications_enabled			1

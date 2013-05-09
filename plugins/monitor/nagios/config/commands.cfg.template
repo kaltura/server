@@ -25,6 +25,11 @@ define command{
 }
 
 define command{
+	command_name		kaltura-host-start-widget-session-ps2
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/ps2/startWidgetSession.php --service-url $HOSTADDRESS$"
+}
+
+define command{
 	command_name		kaltura-host-kdp-multi-request
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/playerMultiRequest.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY"
 }
