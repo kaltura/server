@@ -149,6 +149,22 @@ foreach($fileNames as $fileName)
 			$object->$setter($value);
 
 		$object->save();
+
+		if($pkCriteria && count($pkCriteria->keys()))
+		{
+			foreach($primaryKeys as $column)
+			{
+				/* @var $column ColumnMap */
+				$getter = 'get' . $column->getPhpName();
+				$attributeName = lcfirst($column->getPhpName());
+				$value = $object->$getter();
+				if($value != $objectConfiguration->$attributeName)
+				{
+					BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
+					break;
+				}
+			}
+		}
 	}
 }
 
