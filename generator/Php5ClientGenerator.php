@@ -496,7 +496,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			
 		if($resultType == 'file')
 		{
-			$this->appendLine('		if(!$this->destinationPath && !$this->returnServedResult)');
+			$this->appendLine('		if(!$this->client->getDestinationPath() && !$this->client->getReturnServedResult())');
 			$this->appendLine('			return $this->client->getServeUrl();');
 			$this->appendLine('		return $this->client->doQueue();');
 		}

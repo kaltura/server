@@ -338,15 +338,22 @@ class KalturaClientBase
 			$files = $call->files;
 		}
 
-		$this->resetRequest();
-
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 
-		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
+		try
+		{
+			list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
+		}
+		catch(Exception $e)
+		{
+			$this->resetRequest();
+			throw $e;
+		}
 
 		if ($error)
 		{
+			$this->resetRequest();
 			throw new KalturaClientException($error, KalturaClientException::ERROR_GENERIC);
 		}
 		else
@@ -374,7 +381,10 @@ class KalturaClientBase
 			elseif($this->destinationPath)
 			{
 				if(!$postResult)
+				{
+					$this->resetRequest();
 					throw new KalturaClientException("failed to download file", KalturaClientException::ERROR_READ_FAILED);
+				}
 			}
 			elseif ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
@@ -382,6 +392,7 @@ class KalturaClientBase
 
 				if ($result === false && serialize(false) !== $postResult)
 				{
+					$this->resetRequest();
 					throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
 				}
 				$dump = print_r($result, true);
@@ -389,9 +400,11 @@ class KalturaClientBase
 			}
 			else
 			{
+				$this->resetRequest();
 				throw new KalturaClientException("unsupported format: $postResult", KalturaClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
+		$this->resetRequest();
 
 		$endTime = microtime (true);
 
@@ -621,11 +634,27 @@ class KalturaClientBase
 	}
 
 	/**
+	 * @return boolean
+	 */
+	public function getReturnServedResult()
+	{
+		return $this->returnServedResult;
+	}
+
+	/**
 	 * @param string $destinationPath
 	 */
 	public function setDestinationPath($destinationPath)
 	{
 		$this->destinationPath = $destinationPath;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDestinationPath()
+	{
+		return $this->destinationPath;
 	}
 
 	/**
