@@ -17,14 +17,7 @@ chdir(__DIR__);
 require_once('../../bootstrap.php');
 
 myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_MASTER;
-
 $con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
-$sharedPartner = PartnerPeer::retrieveByPK(0);
-if($sharedPartner)
-{
-	KalturaLog::info("Defaults already exists.");
-	exit(0);
-}
 
 $dir = dir($dirName);
 /* @var $dir Directory */
@@ -60,6 +53,7 @@ if(count($errors))
 sort($fileNames);
 KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
 
+
 foreach($fileNames as $fileName)
 {
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
@@ -67,7 +61,45 @@ foreach($fileNames as $fileName)
 	$filePath = realpath("$dirName/$fileName");
 	$objectConfigurations = parse_ini_file($filePath, true);
 
-	$object = new $objectType();
+	$newObjectType = "Insert{$objectType}";
+	if(!class_exists($newObjectType))
+	{
+		eval('
+			class Insert' . $objectType . ' extends ' . $objectType . '
+			{
+				protected function doSave(PropelPDO $con)
+				{
+					$affectedRows = 0; // initialize var to track total num of affected rows
+					if (!$this->alreadyInSave) {
+						$this->alreadyInSave = true;
+			
+						$this->objectSaved = false;
+						if ($this->isModified()) {
+							if ($this->isNew()) {
+								$pk = BasePeer::doInsert($this->buildCriteria(), $con);
+								$affectedRows += 1;
+								$this->setId($pk);  //[IMV] update autoincrement primary key
+								$this->setNew(false);
+								$this->objectSaved = true;
+							} else {
+								$affectedObjects = ' . $objectType . 'Peer::doUpdate($this, $con);
+								if($affectedObjects)
+									$this->objectSaved = true;
+									
+								$affectedRows += $affectedObjects;
+							}
+			
+							$this->resetModified(); // [HL] After being saved an object is no longer \'modified\'
+						}
+			
+						$this->alreadyInSave = false;
+					}
+					return $affectedRows;
+				}
+			}
+		');
+	}
+	$object = new $newObjectType();
 	/* @var $object BaseObject */
 
 	$peer = $object->getPeer();
@@ -76,7 +108,7 @@ foreach($fileNames as $fileName)
 
 	foreach($objectConfigurations as $objectConfiguration)
 	{
-		$object = new $objectType();
+		$object = new $newObjectType();
 		/* @var $object BaseObject */
 		$pkCriteria = new Criteria();
 		$setters = array();
@@ -89,7 +121,6 @@ foreach($fileNames as $fileName)
 				{
 					$columnName = $peer->translateFieldName($attributeName, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME);
 					$pkCriteria->add($columnName, $value);
-					continue;
 				}
 			}
 			catch(PropelException $pe){}
@@ -110,20 +141,14 @@ foreach($fileNames as $fileName)
 			$setters[$setter] = $value;
 		}
 
-		$existingObjects = $peer->doSelect($pkCriteria, $con);
-		if(count($existingObjects))
-		{
-			$object = reset($existingObjects);
-			$pkCriteria = null;
-		}
+		$existingObject = $peer->doSelectOne($pkCriteria, $con);
+		if($existingObject)
+			$object = $existingObject;
 
 		foreach($setters as $setter => $value)
 			$object->$setter($value);
 
 		$object->save();
-
-		if($pkCriteria && count($pkCriteria->keys()))
-			BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
 	}
 }
 
