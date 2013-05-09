@@ -86,7 +86,7 @@ echo "Bulk upload added [$bulkUpload->id]\n";
 $bulkUploadPlugin = KalturaBulkUploadClientPlugin::get($client);
 while($bulkUpload)
 {
-	if($bulkUpload->status == KalturaBatchJobStatus::FINISHED)
+	if($bulkUpload->status == KalturaBatchJobStatus::FINISHED || $bulkUpload->status == KalturaBatchJobStatus::FINISHED_PARTIALLY)
 		break;
 
 	if($bulkUpload->status == KalturaBatchJobStatus::FAILED)
