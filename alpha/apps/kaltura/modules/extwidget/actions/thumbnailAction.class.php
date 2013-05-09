@@ -7,7 +7,7 @@ class thumbnailAction extends sfAction
 {
 	private static function notifyProxy($msg)
 	{
-        $server = kConf::get ( "image_proxy_url" ); 
+        $server = kConf::get ( "image_proxy_url" );
         
         if ($server && (requestUtils::getRemoteAddress() != $server ))
         {
@@ -21,7 +21,7 @@ class thumbnailAction extends sfAction
 	                socket_close($sock);
 	        }
         }
-	}	
+	}
 	
 	static private $extensions = array(
 		'jpg',
@@ -31,7 +31,7 @@ class thumbnailAction extends sfAction
 
 	/* (non-PHPdoc)
 	 * @see /symfony/action/sfComponent#getRequestParameter()
-	 * 
+	 *
 	 * Needed because some partners add .jpg at the end of the url, it might be added to a real attribute.
 	 */
 	public function getRequestParameter($name, $default = null)
@@ -61,7 +61,7 @@ class thumbnailAction extends sfAction
   
   
 	/**
-	 * Will forward to the regular swf player according to the widget_id 
+	 * Will forward to the regular swf player according to the widget_id
 	 */
 	public function execute()
 	{
@@ -202,7 +202,7 @@ class thumbnailAction extends sfAction
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
 					kFileUtils::dumpUrl($remoteUrl);
 				}
-			}			
+			}
 		}
 		
 		
@@ -210,13 +210,13 @@ class thumbnailAction extends sfAction
 		{
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
 			if ( ! $entry )
-			{ 
+			{
 				// problem could be due to replication lag
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			}
 		}
 		else
-		{	
+		{
 			// get the widget
 			$widget = widgetPeer::retrieveByPK( $widget_id );
 			if ( !$widget )
@@ -255,7 +255,7 @@ class thumbnailAction extends sfAction
 		//checks whether the thumbnail display should be restricted by KS
 		$base64Referrer = $this->getRequestParameter("referrer");
 		$referrer = base64_decode($base64Referrer);
-		if (!is_string($referrer)) 
+		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
 		if (!$referrer)
 			$referrer = kApiCache::getHttpReferrer();
@@ -264,17 +264,17 @@ class thumbnailAction extends sfAction
 		$securyEntryHelper->validateForPlay();
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
-		if ($rel_width != -1) {
+		if ($rel_width != -1 && $rel_width) {
 			$widthRatio  = $entry->getWidth() / $rel_width;
 			$src_x = $src_x * $widthRatio;
 			$src_w = $src_w * $widthRatio;
 		}
 		
-		if ($rel_height != -1) {
+		if ($rel_height != -1 && $rel_height) {
 			$heightRatio  = $entry->getHeight() / $rel_height;
 			$src_y  = $src_y * $heightRatio;
 			$src_h  = $src_h * $heightRatio;
-		}						
+		}
 		
 		$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -290,7 +290,7 @@ class thumbnailAction extends sfAction
 		// both 640x480 and 0x0 requests are probably coming from the kdp
 		// 640x480 - old kdp version requesting thumbnail
 		// 0x0 - new kdp version requesting the thumbnail of an unready entry
-		// we need to distinguish between calls from the kdp and calls from a browser: <img src=...> 
+		// we need to distinguish between calls from the kdp and calls from a browser: <img src=...>
 		// that can't handle swf input
 		if (($width == 640 && $height == 480 || $width == 0 && $height == 0) &&
 			($entry_status == entryStatus::PRECONVERT || $entry_status == entryStatus::IMPORT ||
@@ -312,10 +312,10 @@ class thumbnailAction extends sfAction
 			kFileUtils::dumpFile($msgPath, null, 0);
 		}
 			
-		if ( ! $file_sync ) 
+		if ( ! $file_sync )
 		{
 			$tempThumbPath = $entry->getLocalThumbFilePath( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name );
-			if (!$tempThumbPath ){	
+			if (!$tempThumbPath ){
 				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}
 		}
@@ -387,9 +387,9 @@ class thumbnailAction extends sfAction
 			}
 		}
 		
-		$nocache = false;		
+		$nocache = false;
 		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
-			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules())) 
+			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules()))
 			$nocache = true;
 
 		if ($nocache)
