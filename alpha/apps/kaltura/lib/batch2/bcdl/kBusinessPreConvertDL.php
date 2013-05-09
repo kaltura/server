@@ -179,7 +179,7 @@ class kBusinessPreConvertDL
 		}
 		
 		$thumbAsset->incrementVersion();
-		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		
 		if(file_exists($capturedPath))
 		{
@@ -208,6 +208,9 @@ class kBusinessPreConvertDL
 		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($capturedPath, $syncKey);
 		KalturaLog::debug("Thumbnail archived file to: " . kFileSyncUtils::getLocalFilePathForKey($syncKey));
+		
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
+		$thumbAsset->save();
 
 		if($thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 		{
