@@ -138,6 +138,7 @@ class entryFilter extends baseObjectFilter
 			"modified_at", "available_from", "duration" , "partner_sort_value" , "total_rank", "weight", "start_date", "end_date")	;
 
 		$this->aliases = array ( 
+			"creator_id" => "creator_puser_id",
 			"user_id" => "kuser_id",
 			"document_type" => "media_type", // for document listing in api_v3
 			"duration" => "length_in_msecs",
