@@ -3,11 +3,11 @@
 /**
  * Subclass for representing a row from the 'category' table.
  *
- * 
+ *
  *
  * @package Core
  * @subpackage model
- */ 
+ */
 class category extends Basecategory implements IIndexable
 {
 	protected $childs_for_save = array();
@@ -42,7 +42,7 @@ class category extends Basecategory implements IIndexable
 		{
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			$c->add (categoryPeer::STATUS, CategoryStatus::DELETED, Criteria::NOT_EQUAL);
 			$c->add (categoryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			
@@ -61,8 +61,8 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
-		if (!$this->getIsIndex() && 
-			($this->isColumnModified(categoryPeer::NAME) || 
+		if (!$this->getIsIndex() &&
+			($this->isColumnModified(categoryPeer::NAME) ||
 			$this->isColumnModified(categoryPeer::PARENT_ID)))
 		{
 			$this->updateFullName();
@@ -100,7 +100,7 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
-		// save the childs for action category->delete - delete category is not done by async batch. 
+		// save the childs for action category->delete - delete category is not done by async batch.
 		foreach($this->childs_for_save as $child)
 		{
 			$child->save();
@@ -126,8 +126,8 @@ class category extends Basecategory implements IIndexable
 		
 		if (!$this->isNew() &&
 			$this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
-		{ 
-			if ($this->inheritance_type == InheritanceType::MANUAL && 
+		{
+			if ($this->inheritance_type == InheritanceType::MANUAL &&
 				$this->old_inheritance_type == InheritanceType::INHERIT)
 			{
 				if($this->old_parent_id)
@@ -137,7 +137,7 @@ class category extends Basecategory implements IIndexable
 					
 				$this->reSetMembersCount();
 			}
-			elseif ($this->inheritance_type == InheritanceType::INHERIT && 
+			elseif ($this->inheritance_type == InheritanceType::INHERIT &&
 					$this->old_inheritance_type == InheritanceType::MANUAL)
 			{
 				$this->addDeleteCategoryKuserJob($this->getId(), true);
@@ -155,8 +155,8 @@ class category extends Basecategory implements IIndexable
 
 		parent::save($con);
 		
-		if ($kuserChanged && $this->getKuserId() && $this->inheritance_type != InheritanceType::INHERIT && $this->getKuserId())
-		{	
+		if ($kuserChanged && $this->inheritance_type != InheritanceType::INHERIT && $this->getKuserId())
+		{
 			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($this->getId(), $this->getKuserId());
 			if (!$categoryKuser)
 			{
@@ -232,15 +232,15 @@ class category extends Basecategory implements IIndexable
 		$categoryGroupSize = kConf::get('max_number_of_memebrs_to_be_indexed_on_entry');
 		$partner = $this->getPartner();
 		if($partner && $partner->getCategoryGroupSize())
-			$categoryGroupSize = $partner->getCategoryGroupSize();	
+			$categoryGroupSize = $partner->getCategoryGroupSize();
 			
 		//re-index entries
-		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE) || 
-			$this->isColumnModified(categoryPeer::PRIVACY) || 
-			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
-			$this->isColumnModified(categoryPeer::FULL_NAME) || 
-			($this->isColumnModified(categoryPeer::MEMBERS_COUNT) && 
-			$this->members_count <= $categoryGroupSize && 
+		if ($this->isColumnModified(categoryPeer::INHERITANCE_TYPE) ||
+			$this->isColumnModified(categoryPeer::PRIVACY) ||
+			$this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) ||
+			$this->isColumnModified(categoryPeer::FULL_NAME) ||
+			($this->isColumnModified(categoryPeer::MEMBERS_COUNT) &&
+			$this->members_count <= $categoryGroupSize &&
 			$this->entries_count <= kConf::get('category_entries_count_limit_to_be_indexed')))
 		{
 			$this->addIndexEntryJob($this->getId(), true);
@@ -259,10 +259,10 @@ class category extends Basecategory implements IIndexable
 		}
 		
 		if (kCurrentContext::getCurrentPartnerId() != Partner::BATCH_PARTNER_ID &&
-			($this->isColumnModified(categoryPeer::PARENT_ID) || 
+			($this->isColumnModified(categoryPeer::PARENT_ID) ||
 			 $this->isColumnModified(categoryPeer::INHERITANCE_TYPE) ||
 			 $this->isColumnModified(categoryPeer::NAME) ||
-			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) || 
+			 $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS) ||
 			 $this->isColumnModified(categoryPeer::MEMBERS) ||
 			 $this->isColumnModified(categoryPeer::MEMBERS_COUNT)))
 		{
@@ -278,10 +278,10 @@ class category extends Basecategory implements IIndexable
 			$this->addIndexCategoryJob($fullIds, null, $lock);
 		}
 		
-		if ($this->isColumnModified(categoryPeer::STATUS) && 
-			($this->getStatus() == CategoryStatus::PURGED || 
+		if ($this->isColumnModified(categoryPeer::STATUS) &&
+			($this->getStatus() == CategoryStatus::PURGED ||
 			 $this->getStatus() == CategoryStatus::DELETED) &&
-			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE || 
+			($this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::ACTIVE ||
 			 $this->getColumnsOldValue(categoryPeer::STATUS) == CategoryStatus::UPDATING))
 		{
 			$parentCategoryToResetSubCategories = $this->getParentCategory();
@@ -334,7 +334,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function setFullName($v)
 	{
-		$this->old_full_name = $this->getFullName();				
+		$this->old_full_name = $this->getFullName();
 		parent::setFullName($v);
 	}
 	
@@ -409,7 +409,7 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function incrementDirectEntriesCount()
 	{
-		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);           
+		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);
 	}
       
     /**
@@ -417,7 +417,7 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function incrementPendingEntriesCount()
 	{
-		$this->setPendingEntriesCount($this->getPendingEntriesCount() + 1);           
+		$this->setPendingEntriesCount($this->getPendingEntriesCount() + 1);
 		$this->save();
 	}
 	
@@ -468,7 +468,7 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function decrementPendingEntriesCount()
 	{
-		$this->setPendingEntriesCount($this->getPendingEntriesCount() - 1);            
+		$this->setPendingEntriesCount($this->getPendingEntriesCount() - 1);
 	}
       
 	protected function validateFullNameIsUnique()
@@ -510,14 +510,14 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public function getRootCategoryFromFullIds($category)
-	{		
+	{
 		if ($category->getParentId() == null)
-			return null; 	
+			return null;
 			
 		$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $category->getFullIds());
 		
 		//TODO - disable tag for unlisted categories
-		return categoryPeer::retrieveByPK($fullIds[0]); 
+		return categoryPeer::retrieveByPK($fullIds[0]);
 	}
 		
 	private function loadChildsForSave()
@@ -530,7 +530,7 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * Update the current full path by using the parent full path (if exists)
-	 * 
+	 *
 	 * @param category $parentCat
 	 */
 	private function updateFullName()
@@ -602,19 +602,19 @@ class category extends Basecategory implements IIndexable
 		$filter = new entryFilter();
 		$filter->setCategoriesIdsMatchAnd($categoryId);
 		
-		$statusArr = array(entryStatus::BLOCKED, 
-						   entryStatus::ERROR_CONVERTING, 
-						   entryStatus::ERROR_IMPORTING, 
-						   entryStatus::IMPORT, 
-						   entryStatus::MODERATE, 
-						   entryStatus::NO_CONTENT, 
-						   entryStatus::PENDING, 
-						   entryStatus::PRECONVERT, 
+		$statusArr = array(entryStatus::BLOCKED,
+						   entryStatus::ERROR_CONVERTING,
+						   entryStatus::ERROR_IMPORTING,
+						   entryStatus::IMPORT,
+						   entryStatus::MODERATE,
+						   entryStatus::NO_CONTENT,
+						   entryStatus::PENDING,
+						   entryStatus::PRECONVERT,
 						   entryStatus::READY);
 		
 		$filter->setStatusIn($statusArr);
 			
-		//TODO - add batch job size after sharon commits her code.		
+		//TODO - add batch job size after sharon commits her code.
 		kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::ENTRY, $filter, $shouldUpdate, $featureStatusesToRemove);
 	}
 	
@@ -646,8 +646,8 @@ class category extends Basecategory implements IIndexable
 		$filter->setFullIdsStartsWith($fullIdsStartsWithCategoryId);
 		$filter->setIdIn($categoriesIdsIn);
 		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);		
-		$filter->attachToCriteria($c);	
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$filter->attachToCriteria($c);
 			
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		categoryPeer::doSelect($c);
@@ -688,7 +688,7 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * Validate recursivly that the new parent id is not one of the child categories
-	 * 
+	 *
 	 * @param int $parentId
 	 */
 	public function validateParentIdIsNotChild($parentId)
@@ -732,7 +732,7 @@ class category extends Basecategory implements IIndexable
 		}
 
 		return $parentsIds;
-	}	
+	}
 	
 	/**
 	 * @return array
@@ -768,7 +768,7 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * Initialize new category using patnerId and fullName, this will also create the needed categories for the fullName
-	 * 
+	 *
 	 * @param $partnerId
 	 * @param $fullName
 	 * @return category
@@ -848,7 +848,7 @@ class category extends Basecategory implements IIndexable
 	
 	/* (non-PHPdoc)
 	 * @see IIndexable::getEntryId()
-	 * 
+	 *
 	 */
 	public function getEntryId()
 	{
@@ -867,9 +867,9 @@ class category extends Basecategory implements IIndexable
 	 * Return space seperated string of permission level and kusers ids that are active members on this category.
 	 * Example: "CONTRIBUTOR kuserId1 kuserId2 CONTRIBUTOR MANAGER kuserId3 kuserId4 MANAGER"
 	 * Used by index engine.
-	 * 
+	 *
 	 * @return string
-	 */	
+	 */
 	public function getMembersByPermissionLevel()
 	{
 		$categoryIdToGetAllMembers = $this->getId();
@@ -903,9 +903,9 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * Return kusers ids that are active members on this category.
-	 *  
+	 *
 	 * @return array
-	 */	
+	 */
 	public function getMembers()
 	{
 		$categoryIdToGetAllMembers = $this->getId();
@@ -967,7 +967,7 @@ class category extends Basecategory implements IIndexable
 			'tags' => 'tags',
 			'category_status' => 'status',
 			'kuser_id' => 'kuserId',
-			'display_in_search' => 'displayInSearch',	
+			'display_in_search' => 'displayInSearch',
 			'depth' => 'depth',
 			'reference_id' => 'referenceId',
 			'privacy_context' => 'searchIndexprivacyContext',
@@ -990,7 +990,7 @@ class category extends Basecategory implements IIndexable
 			'partner_sort_value' => 'partnerSortValue',
 			'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			
-			);		
+			);
 		}
 		
 		return self::$indexFieldsMap;
@@ -1051,7 +1051,7 @@ class category extends Basecategory implements IIndexable
 	 * @see lib/model/om/Basecategory#postInsert()
 	 */
 	public function postInsert(PropelPDO $con = null)
-	{	
+	{
 		parent::postInsert($con);
 
 		if($this->getFullIds() == null)
@@ -1066,7 +1066,7 @@ class category extends Basecategory implements IIndexable
 		kEventsManager::flushEvents();
 			
 		if($this->getParentCategory())
-		{			
+		{
 			$parentCategory = $this->getParentCategory();
 			
 			if($parentCategory)
@@ -1156,7 +1156,7 @@ class category extends Basecategory implements IIndexable
 	 * to be used when removing inheritance
 	 */
 	public function copyInheritedFields(category $oldParentCategory)
-	{			
+	{
 		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
 		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
 		$this->setKuserId($oldParentCategory->getKuserId());
@@ -1279,7 +1279,7 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * Set the value of [inheritance] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     category The current object (for fluent API support)
 	 */
@@ -1296,16 +1296,16 @@ class category extends Basecategory implements IIndexable
 	
 	public function setPuserId($puserId)
 	{
-		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing 
+		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing
 			return;
 
-		parent::setPuserId($puserId);	
+		parent::setPuserId($puserId);
 		if (is_null($puserId))
 		{
 			$this->setKuserId(null);
 			return;
 		}
-		
+			
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$kuser)
@@ -1315,7 +1315,7 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public function setPrivacyContext($v)
-	{			
+	{
 		if (!$this->getParentId())
 		{
 			$this->setPrivacyContexts($v);
@@ -1393,16 +1393,18 @@ class category extends Basecategory implements IIndexable
 	 * depth should be calculated after full ids is calculated.
 	 */
 	public function reSetDepth()
-	{		
+	{
 		if ($this->getParentId() !== 0 && $this->getParentId() != null)
 		{
 			$parentCat = $this->getParentCategory();
-			$this->setDepth($parentCat->getDepth() + 1);
+			if($parentCat)
+			{
+				$this->setDepth($parentCat->getDepth() + 1);
+				return;
+			}
 		}
-		else
-		{
-			$this->setDepth(0);
-		}
+		
+		$this->setDepth(0);
 	}
 		
 	/**
@@ -1528,7 +1530,7 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * if category is reindexing - recalculating inheritance fields.
-	 * no need to add all batch job, 
+	 * no need to add all batch job,
 	 * because some of the batch jobs are already done by the parent category.
 	 */
 	protected function getIsIndex()
@@ -1557,7 +1559,7 @@ class category extends Basecategory implements IIndexable
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->add (categoryPeer::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN);
 		$c->add (categoryPeer::PARENT_ID, $this->getId(), Criteria::EQUAL);
 			
@@ -1647,7 +1649,7 @@ class category extends Basecategory implements IIndexable
 	
 	/**
 	 * Force modifiedColumns to be affected even if the value not changed
-	 * 
+	 *
 	 * @see Basecategory::setUpdatedAt()
 	 */
 	public function setUpdatedAt($v)
