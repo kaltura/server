@@ -1,16 +1,16 @@
 
 define servicegroup{
-		servicegroup_name				kaltura-host-batch-queue-size
+		servicegroup_name				kaltura-batch-queue-size
 		alias							Kaltura Batch Queue Size
 }
 
 define servicegroup{
-		servicegroup_name				kaltura-host-batch-error-percent
+		servicegroup_name				kaltura-batch-error-percent
 		alias							Kaltura Batch Error Percent
 }
 
 define servicegroup{
-		servicegroup_name				kaltura-host-batch-fatal-percent
+		servicegroup_name				kaltura-batch-fatal-percent
 		alias							Kaltura Batch Fatal Percent
 }
 

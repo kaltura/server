@@ -130,187 +130,187 @@ define command{
 
 
 define command{
-	command_name		kaltura-host-batch-queue-size-convert-on2
+	command_name		kaltura-batch-queue-size-convert-on2
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type CONVERT --job-sub-type KalturaConversionEngineType::ON2"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-convert-ffmpeg
+	command_name		kaltura-batch-queue-size-convert-ffmpeg
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type CONVERT --job-sub-type KalturaConversionEngineType::FFMPEG"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-import
+	command_name		kaltura-batch-queue-size-import
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type IMPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-delete
+	command_name		kaltura-batch-queue-size-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-bulk-upload
+	command_name		kaltura-batch-queue-size-bulk-upload
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type BULKUPLOAD"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-convert-profile
+	command_name		kaltura-batch-queue-size-convert-profile
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type CONVERT_PROFILE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-post-convert
+	command_name		kaltura-batch-queue-size-post-convert
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type POSTCONVERT"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-extract-media
+	command_name		kaltura-batch-queue-size-extract-media
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type EXTRACT_MEDIA"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-mail
+	command_name		kaltura-batch-queue-size-mail
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type MAIL"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-notification
+	command_name		kaltura-batch-queue-size-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type NOTIFICATION"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-bulk-download
+	command_name		kaltura-batch-queue-size-bulk-download
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type BULKDOWNLOAD"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-provision-provide
+	command_name		kaltura-batch-queue-size-provision-provide
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type PROVISION_PROVIDE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-convert-collection
+	command_name		kaltura-batch-queue-size-convert-collection
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type CONVERT_COLLECTION"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-storage-export
+	command_name		kaltura-batch-queue-size-storage-export
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type STORAGE_EXPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-provision-delete
+	command_name		kaltura-batch-queue-size-provision-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type PROVISION_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-storage-delete
+	command_name		kaltura-batch-queue-size-storage-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type STORAGE_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-metadata-transform
+	command_name		kaltura-batch-queue-size-metadata-transform
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type METADATA_TRANSFORM"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-filesync-import
+	command_name		kaltura-batch-queue-size-filesync-import
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type FILESYNC_IMPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-capture-thumbnail
+	command_name		kaltura-batch-queue-size-capture-thumbnail
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type CAPTURE_THUMB"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-delete-file
+	command_name		kaltura-batch-queue-size-delete-file
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DELETE_FILE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-index-category
+	command_name		kaltura-batch-queue-size-index-category
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-index-category-entry
+	command_name		kaltura-batch-queue-size-index-category-entry
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY_ENTRY"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-index-entry
+	command_name		kaltura-batch-queue-size-index-entry
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type INDEX --job-sub-type KalturaIndexObjectType::ENTRY"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-index-category-user
+	command_name		kaltura-batch-queue-size-index-category-user
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY_USER"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-index-user
+	command_name		kaltura-batch-queue-size-index-user
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type INDEX --job-sub-type KalturaIndexObjectType::USER"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-move-category-entries
+	command_name		kaltura-batch-queue-size-move-category-entries
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type MOVE_CATEGORY_ENTRIES"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-copy
+	command_name		kaltura-batch-queue-size-copy
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type COPY"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-parse-caption-asset
+	command_name		kaltura-batch-queue-size-parse-caption-asset
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type PARSE_CAPTION_ASSET"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-distribution-delete
+	command_name		kaltura-batch-queue-size-distribution-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DISTRIBUTION_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-distribution-disable
+	command_name		kaltura-batch-queue-size-distribution-disable
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DISTRIBUTION_DISABLE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-distribution-enable
+	command_name		kaltura-batch-queue-size-distribution-enable
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DISTRIBUTION_ENABLE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-distribution-fetch-report
+	command_name		kaltura-batch-queue-size-distribution-fetch-report
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DISTRIBUTION_FETCH_REPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-distribution-submit
+	command_name		kaltura-batch-queue-size-distribution-submit
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DISTRIBUTION_SUBMIT"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-distribution-update
+	command_name		kaltura-batch-queue-size-distribution-update
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type DISTRIBUTION_UPDATE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-event-notification
+	command_name		kaltura-batch-queue-size-event-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type EVENT_NOTIFICATION_HANDLER"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-resolve-tags
+	command_name		kaltura-batch-queue-size-resolve-tags
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type TAG_RESOLVE"
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-virus-scan
+	command_name		kaltura-batch-queue-size-virus-scan
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type VIRUS_SCAN"
 }
 
@@ -323,187 +323,187 @@ define command{
 
 
 define command{
-	command_name		kaltura-host-batch-error-percent-convert-on2
+	command_name		kaltura-batch-error-percent-convert-on2
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type CONVERT --job-sub-type KalturaConversionEngineType::ON2"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-convert-ffmpeg
+	command_name		kaltura-batch-error-percent-convert-ffmpeg
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type CONVERT --job-sub-type KalturaConversionEngineType::FFMPEG"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-import
+	command_name		kaltura-batch-error-percent-import
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type IMPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-delete
+	command_name		kaltura-batch-error-percent-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-bulk-upload
+	command_name		kaltura-batch-error-percent-bulk-upload
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type BULKUPLOAD"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-convert-profile
+	command_name		kaltura-batch-error-percent-convert-profile
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type CONVERT_PROFILE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-post-convert
+	command_name		kaltura-batch-error-percent-post-convert
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type POSTCONVERT"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-extract-media
+	command_name		kaltura-batch-error-percent-extract-media
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type EXTRACT_MEDIA"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-mail
+	command_name		kaltura-batch-error-percent-mail
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type MAIL"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-notification
+	command_name		kaltura-batch-error-percent-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type NOTIFICATION"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-bulk-download
+	command_name		kaltura-batch-error-percent-bulk-download
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type BULKDOWNLOAD"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-provision-provide
+	command_name		kaltura-batch-error-percent-provision-provide
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type PROVISION_PROVIDE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-convert-collection
+	command_name		kaltura-batch-error-percent-convert-collection
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type CONVERT_COLLECTION"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-storage-export
+	command_name		kaltura-batch-error-percent-storage-export
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type STORAGE_EXPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-provision-delete
+	command_name		kaltura-batch-error-percent-provision-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type PROVISION_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-storage-delete
+	command_name		kaltura-batch-error-percent-storage-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type STORAGE_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-metadata-transform
+	command_name		kaltura-batch-error-percent-metadata-transform
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type METADATA_TRANSFORM"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-filesync-import
+	command_name		kaltura-batch-error-percent-filesync-import
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type FILESYNC_IMPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-capture-thumbnail
+	command_name		kaltura-batch-error-percent-capture-thumbnail
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type CAPTURE_THUMB"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-delete-file
+	command_name		kaltura-batch-error-percent-delete-file
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DELETE_FILE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-index-category
+	command_name		kaltura-batch-error-percent-index-category
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-index-category-entry
+	command_name		kaltura-batch-error-percent-index-category-entry
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY_ENTRY"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-index-entry
+	command_name		kaltura-batch-error-percent-index-entry
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type INDEX --job-sub-type KalturaIndexObjectType::ENTRY"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-index-category-user
+	command_name		kaltura-batch-error-percent-index-category-user
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY_USER"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-index-user
+	command_name		kaltura-batch-error-percent-index-user
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type INDEX --job-sub-type KalturaIndexObjectType::USER"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-move-category-entries
+	command_name		kaltura-batch-error-percent-move-category-entries
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type MOVE_CATEGORY_ENTRIES"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-copy
+	command_name		kaltura-batch-error-percent-copy
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type COPY"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-parse-caption-asset
+	command_name		kaltura-batch-error-percent-parse-caption-asset
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type PARSE_CAPTION_ASSET"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-distribution-delete
+	command_name		kaltura-batch-error-percent-distribution-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DISTRIBUTION_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-distribution-disable
+	command_name		kaltura-batch-error-percent-distribution-disable
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DISTRIBUTION_DISABLE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-distribution-enable
+	command_name		kaltura-batch-error-percent-distribution-enable
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DISTRIBUTION_ENABLE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-distribution-fetch-report
+	command_name		kaltura-batch-error-percent-distribution-fetch-report
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DISTRIBUTION_FETCH_REPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-distribution-submit
+	command_name		kaltura-batch-error-percent-distribution-submit
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DISTRIBUTION_SUBMIT"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-distribution-update
+	command_name		kaltura-batch-error-percent-distribution-update
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type DISTRIBUTION_UPDATE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-event-notification
+	command_name		kaltura-batch-error-percent-event-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type EVENT_NOTIFICATION_HANDLER"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-resolve-tags
+	command_name		kaltura-batch-error-percent-resolve-tags
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type TAG_RESOLVE"
 }
 
 define command{
-	command_name		kaltura-host-batch-error-percent-virus-scan
+	command_name		kaltura-batch-error-percent-virus-scan
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type VIRUS_SCAN"
 }
 
@@ -522,188 +522,196 @@ define command{
 
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-convert-on2
+	command_name		kaltura-batch-fatal-percent-convert-on2
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type CONVERT --job-sub-type KalturaConversionEngineType::ON2"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-convert-ffmpeg
+	command_name		kaltura-batch-fatal-percent-convert-ffmpeg
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type CONVERT --job-sub-type KalturaConversionEngineType::FFMPEG"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-import
+	command_name		kaltura-batch-fatal-percent-import
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type IMPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-delete
+	command_name		kaltura-batch-fatal-percent-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-bulk-upload
+	command_name		kaltura-batch-fatal-percent-bulk-upload
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type BULKUPLOAD"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-convert-profile
+	command_name		kaltura-batch-fatal-percent-convert-profile
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type CONVERT_PROFILE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-post-convert
+	command_name		kaltura-batch-fatal-percent-post-convert
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type POSTCONVERT"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-extract-media
+	command_name		kaltura-batch-fatal-percent-extract-media
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type EXTRACT_MEDIA"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-mail
+	command_name		kaltura-batch-fatal-percent-mail
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type MAIL"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-notification
+	command_name		kaltura-batch-fatal-percent-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type NOTIFICATION"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-bulk-download
+	command_name		kaltura-batch-fatal-percent-bulk-download
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type BULKDOWNLOAD"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-provision-provide
+	command_name		kaltura-batch-fatal-percent-provision-provide
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type PROVISION_PROVIDE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-convert-collection
+	command_name		kaltura-batch-fatal-percent-convert-collection
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type CONVERT_COLLECTION"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-storage-export
+	command_name		kaltura-batch-fatal-percent-storage-export
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type STORAGE_EXPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-provision-delete
+	command_name		kaltura-batch-fatal-percent-provision-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type PROVISION_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-storage-delete
+	command_name		kaltura-batch-fatal-percent-storage-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type STORAGE_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-metadata-transform
+	command_name		kaltura-batch-fatal-percent-metadata-transform
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type METADATA_TRANSFORM"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-filesync-import
+	command_name		kaltura-batch-fatal-percent-filesync-import
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type FILESYNC_IMPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-capture-thumbnail
+	command_name		kaltura-batch-fatal-percent-capture-thumbnail
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type CAPTURE_THUMB"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-delete-file
+	command_name		kaltura-batch-fatal-percent-delete-file
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DELETE_FILE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-index-category
+	command_name		kaltura-batch-fatal-percent-index-category
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-index-category-entry
+	command_name		kaltura-batch-fatal-percent-index-category-entry
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY_ENTRY"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-index-entry
+	command_name		kaltura-batch-fatal-percent-index-entry
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type INDEX --job-sub-type KalturaIndexObjectType::ENTRY"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-index-category-user
+	command_name		kaltura-batch-fatal-percent-index-category-user
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type INDEX --job-sub-type KalturaIndexObjectType::CATEGORY_USER"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-index-user
+	command_name		kaltura-batch-fatal-percent-index-user
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type INDEX --job-sub-type KalturaIndexObjectType::USER"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-move-category-entries
+	command_name		kaltura-batch-fatal-percent-move-category-entries
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type MOVE_CATEGORY_ENTRIES"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-copy
+	command_name		kaltura-batch-fatal-percent-copy
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type COPY"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-parse-caption-asset
+	command_name		kaltura-batch-fatal-percent-parse-caption-asset
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type PARSE_CAPTION_ASSET"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-distribution-delete
+	command_name		kaltura-batch-fatal-percent-distribution-delete
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DISTRIBUTION_DELETE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-distribution-disable
+	command_name		kaltura-batch-fatal-percent-distribution-disable
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DISTRIBUTION_DISABLE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-distribution-enable
+	command_name		kaltura-batch-fatal-percent-distribution-enable
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DISTRIBUTION_ENABLE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-distribution-fetch-report
+	command_name		kaltura-batch-fatal-percent-distribution-fetch-report
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DISTRIBUTION_FETCH_REPORT"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-distribution-submit
+	command_name		kaltura-batch-fatal-percent-distribution-submit
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DISTRIBUTION_SUBMIT"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-distribution-update
+	command_name		kaltura-batch-fatal-percent-distribution-update
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type DISTRIBUTION_UPDATE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-event-notification
+	command_name		kaltura-batch-fatal-percent-event-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type EVENT_NOTIFICATION_HANDLER"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-resolve-tags
+	command_name		kaltura-batch-fatal-percent-resolve-tags
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type TAG_RESOLVE"
 }
 
 define command{
-	command_name		kaltura-host-batch-fatal-percent-virus-scan
+	command_name		kaltura-batch-fatal-percent-virus-scan
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type VIRUS_SCAN"
+}
+
+
+
+
+define command{
+	command_name		kaltura-import
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 30 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/import.php --service-url $HOSTADDRESS$ --timeout 55"
 }
 
 
