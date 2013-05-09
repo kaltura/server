@@ -195,6 +195,26 @@ function checkCache()
 				die;
 			}
 		}
+	}	
+	else if (strpos($uri, "/embedIframe/") !== false)
+	{
+		$cache = new Memcache;
+		$res = @$cache->connect("localhost", "11211");
+		if ( $res )
+		{
+			// check if we cached the patched swf with flashvars
+			$cachedResponse = $cache->get("embedIframe$uri");
+			if ($cachedResponse) // dont use cache if we want to force no caching
+			{
+				header("X-Kaltura:cached-dispatcher");
+				header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+				header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+				header("Pragma: no-cache");
+				header("Location:$cachedResponse");
+				
+				die;
+			}
+		}
 	}
 }
 
