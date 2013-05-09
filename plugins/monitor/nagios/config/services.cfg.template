@@ -519,15 +519,6 @@ define	service{
 		notifications_enabled			1
 }
 
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-host-batch-queue-size
-		service_description				Kaltura Batch Queue Size Sync Widevine Repository
-		check_command					kaltura-host-batch-queue-size-sync-widevine-repository
-		notifications_enabled			1
-}
-
 
 
 
@@ -881,15 +872,6 @@ define	service{
 		notifications_enabled			1
 }
 
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-host-batch-error-percent
-		service_description				Kaltura Batch Error Percent Sync Widevine Repository
-		check_command					kaltura-host-batch-error-percent-sync-widevine-repository
-		notifications_enabled			1
-}
-
 
 
 
@@ -1238,14 +1220,5 @@ define	service{
 		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Virus Scan
 		check_command					kaltura-host-batch-fatal-percent-virus-scan
-		notifications_enabled			1
-}
-
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-host-batch-fatal-percent
-		service_description				Kaltura Batch Fatal Percent Sync Widevine Repository
-		check_command					kaltura-host-batch-fatal-percent-sync-widevine-repository
 		notifications_enabled			1
 }
