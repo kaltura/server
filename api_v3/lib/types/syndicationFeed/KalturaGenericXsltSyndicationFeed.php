@@ -74,7 +74,8 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		if(is_null($object_to_fill))
 			$object_to_fill = new genericSyndicationFeed();
 		
-		kSyndicationFeedManager::validateXsl($this->xslt);	
+		if($this->xslt)
+			kSyndicationFeedManager::validateXsl($this->xslt);
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -89,7 +90,8 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		if(is_null($object_to_fill))
 			$object_to_fill = new genericSyndicationFeed();
 		
-		kSyndicationFeedManager::validateXsl($this->xslt);
+		if($this->xslt)
+			kSyndicationFeedManager::validateXsl($this->xslt);
 		
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip );
 	}
