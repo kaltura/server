@@ -158,9 +158,12 @@ class HuluDistributionEngine extends DistributionEngine implements
 	}
 	
 	private function uploadFileWithAspera($host, $username, $filePath, $password = null, $privateKeyTempPath = null, $passphrase = null, $port = 22, $remoteFilePath = ''){
+		
+		$this->validateParameters($host, $username, $filePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteFilePath);
+				
 		$remoteFilePath = ltrim($remoteFilePath,'/');
 		$cmd= $this->getCmdPrefix($privateKeyTempPath, $passphrase, $password, $port);
-		$cmd.=" $filePath $username@$host:$remoteFilePath";
+		$cmd.=" $filePath $username@$host:'$remoteFilePath'";
 		$res = $this->executeCmd($cmd);
 		if (!$res){
 			$last_error = error_get_last();
@@ -168,16 +171,35 @@ class HuluDistributionEngine extends DistributionEngine implements
 		}
 	}
 	
+	private function validateParameters($host, $username, $filePath, $password = null, $privateKeyTempPath = null, $passphrase = null, $port = 22, $remoteFilePath = '') {
+		
+		$VALID_HOSTNAME_PATTERN = "/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$/";
+		$VALID_USERNAME_PATTERN = "/^([a-z_][a-z0-9_]{0,30})$/";
+		
+		$validInput = TRUE;
+		$validInput &= (preg_match ($VALID_HOSTNAME_PATTERN, $host) === 1); // $host
+		$validInput &= (preg_match ($VALID_USERNAME_PATTERN, $username) === 1); // $username
+		// $filePath : No need in validation, Checked by the callee
+		$validInput &= (is_null($password)) || (strpos($password, "'") === FALSE); // $password : can't contain ' 
+		// $privateKeyTempPath: No need in validation, inner parameter
+		$validInput &= (is_null($passphrase)) || (strpos($passphrase, "'") === FALSE);// $passphrase : can't contain '
+		$validInput &= is_numeric($port); // $port 
+		// $remoteFilePath : No need in validation, inner parameter with validation in creation.
+		
+		if(!$validInput)
+			throw new kFileTransferMgrException("Can't put file, Illegal parameters");
+	}
+	
 	private function getCmdPrefix($privateKeyTempPath, $passphrase, $password, $port){
 		$cmd = '';
 		if ($privateKeyTempPath){
 			if ($passphrase)
-				$cmd = "(echo $passphrase) | ascp ";
+				$cmd = "(echo '$passphrase') | ascp ";
 			else  
 				$cmd = "ascp ";
 		}
 		else 
-			$cmd = "(echo $password) | ascp ";
+			$cmd = "(echo '$password') | ascp ";
 		$cmd.=" -P $port ";
 		
 		//when connecting to a remote host and prompted to accept a host key, ascp ignores the request
