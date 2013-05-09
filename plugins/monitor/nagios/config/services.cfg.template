@@ -496,15 +496,6 @@ define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		servicegroups					kaltura-host-batch-queue-size
-		service_description				Kaltura Batch Queue Size Index Tags
-		check_command					kaltura-host-batch-queue-size-index-tags
-		notifications_enabled			1
-}
-
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-host-batch-queue-size
 		service_description				Kaltura Batch Queue Size Resolve Tags
 		check_command					kaltura-host-batch-queue-size-resolve-tags
 		notifications_enabled			1
@@ -849,15 +840,6 @@ define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		servicegroups					kaltura-host-batch-error-percent
-		service_description				Kaltura Batch Error Percent Index Tags
-		check_command					kaltura-host-batch-error-percent-index-tags
-		notifications_enabled			1
-}
-
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-host-batch-error-percent
 		service_description				Kaltura Batch Error Percent Resolve Tags
 		check_command					kaltura-host-batch-error-percent-resolve-tags
 		notifications_enabled			1
@@ -1193,15 +1175,6 @@ define	service{
 		servicegroups					kaltura-host-batch-fatal-percent
 		service_description				Kaltura Batch Fatal Percent Event Notification
 		check_command					kaltura-host-batch-fatal-percent-event-notification
-		notifications_enabled			1
-}
-
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-host-batch-fatal-percent
-		service_description				Kaltura Batch Fatal Percent Index Tags
-		check_command					kaltura-host-batch-fatal-percent-index-tags
 		notifications_enabled			1
 }
 

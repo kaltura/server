@@ -68,11 +68,11 @@ define command{
 }
 define command{
 	command_name		kaltura-host-sphinx-inegrity-caption_item
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table caption_asset_item --index kaltura_caption_item --object-type CaptionAssetItem"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table caption_asset_item --index kaltura_caption_item --object-type CaptionAssetItem --check-create-time"
 }
 define command{
 	command_name		kaltura-host-sphinx-inegrity-tag
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table tag --index kaltura_tag --object-type Tag"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --script "@APP_DIR@/tests/monitoring/db/sphinxIntegrity.php --hostname $HOSTADDRESS$ --time-offset 3600 --table tag --index kaltura_tag --object-type Tag --check-create-time"
 }
 
 
@@ -305,11 +305,6 @@ define command{
 }
 
 define command{
-	command_name		kaltura-host-batch-queue-size-index-tags
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type INDEX_TAGS"
-}
-
-define command{
 	command_name		kaltura-host-batch-queue-size-resolve-tags
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 10 --error-threshold 50 --script "@APP_DIR@/tests/monitoring/api_v3/getBatchQueueSize.php --service-url $HOSTADDRESS$ --job-type TAG_RESOLVE"
 }
@@ -500,11 +495,6 @@ define command{
 define command{
 	command_name		kaltura-host-batch-error-percent-event-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type EVENT_NOTIFICATION_HANDLER"
-}
-
-define command{
-	command_name		kaltura-host-batch-error-percent-index-tags
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 5 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FAILED --job-type INDEX_TAGS"
 }
 
 define command{
@@ -704,11 +694,6 @@ define command{
 define command{
 	command_name		kaltura-host-batch-fatal-percent-event-notification
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type EVENT_NOTIFICATION_HANDLER"
-}
-
-define command{
-	command_name		kaltura-host-batch-fatal-percent-index-tags
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/db/batchStatusPercent.php --total-count 100 --status FATAL --job-type INDEX_TAGS"
 }
 
 define command{
