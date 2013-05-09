@@ -33,8 +33,10 @@ class asperaMgr extends kFileTransferMgr
 		if (!file_exists(dirname( $linkPath )))
 			mkdir(dirname( $linkPath ), 0750, true);
 		symlink($local_file, $linkPath);
+		
+		$this->validateParameters($remotePath);
 		$cmd= $this->getCmdPrefix();
-		$cmd.=" $linkPath \"$this->user@$this->server:$remotePath\"";
+		$cmd.=" $linkPath \"$this->user@$this->server:'$remotePath'\"";
 		$res = $this->executeCmd($cmd);
 		unlink($linkPath);
 		return $res;
@@ -49,21 +51,43 @@ class asperaMgr extends kFileTransferMgr
 	public function getFile($remote_file, $local_file = null)
 	{	
 		$remote_file = ltrim($remote_file,'/');
+		
+		// $local_file : arrived after validation
+		$this->validateParameters($remote_file);
 		$cmd= $this->getCmdPrefix();
-		$cmd.=" $this->user@$this->server:$remote_file $local_file";
+		$cmd.=" $this->user@$this->server:'$remote_file' '$local_file'";
 		return $this->executeCmd($cmd);
 	}
+	
+	private function validateParameters($remote_file) {
+		
+		$VALID_HOSTNAME_PATTERN = "/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$/";
+		$VALID_USERNAME_PATTERN = "/^([a-z_][a-z0-9_]{0,30})$/";
+		
+		$validInput = TRUE;
+		
+		$validInput &= (preg_match ($VALID_HOSTNAME_PATTERN, $this->server) === 1); // $this->server
+		$validInput &= (preg_match ($VALID_USERNAME_PATTERN, $this->user) === 1); // $this->user
+		$validInput &= (is_null($this->passphrase)) || (strpos($this->passphrase, "'") === FALSE);// $this->passphrase : can't contain '
+		$validInput &= (is_null($this->pass)) || (strpos($this->pass, "'") === FALSE); // $this->pass : can't contain '
+		$validInput &= is_numeric($this->port); // $this->port
+		$validInput &= (is_null($this->privKeyFile)) || (realpath($this->privKeyFile) !== FALSE); // $this->privKeyFile exist
+		$validInput &= (strpos($remote_file, "'") === FALSE); // $remote_file : can't contain '
+	
+		if(!$validInput)
+			throw new kFileTransferMgrException("Can't put file, Illegal parameters");
+	} 
 	
 	private function getCmdPrefix(){
 		$cmd = '';
 		if ($this->privKeyFile){
 			if ($this->passphrase)
-				$cmd = "(echo $this->passphrase) | $this->ascpCmd ";
+				$cmd = "(echo '$this->passphrase') | $this->ascpCmd ";
 			else  
 				$cmd = "$this->ascpCmd ";
 		}
 		else 
-			$cmd = "(echo $this->pass) | $this->ascpCmd ";
+			$cmd = "(echo '$this->pass') | $this->ascpCmd ";
 		//creating folders on remote server
 		$cmd.= " -d ";
 		//when connecting to a remote host and prompted to accept a host key, ascp ignores the request
