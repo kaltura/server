@@ -345,21 +345,23 @@ class kFile
 			KalturaLog::err("Source file doesn't exist [$src]");
 			return false;
 		}
+		
+		if(strpos($trg,'\"') !== false)
+		{
+			KalturaLog::err("Illegal destination file [$trg]");
+			return false;
+		}
 			
-//	KalturaLog::log("before rename");
 		if(rename($src, $trg)) 
 			return true;
 		
-//	KalturaLog::log("failed rename");
 		$out_arr = array();
 		$rv = 0;
+		
 		// We use this case for folders
 		exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
-//			echo "RV($rv)\n";
-		if($rv==0)
-			return true;
-		else
-			return false;
+
+		return ($rv==0);
 	}
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -401,6 +403,12 @@ class kFile
 		if(!file_exists($from))
 		{
 			KalturaLog::err("Source file doesn't exist [$from]");
+			return false;
+		}
+		
+		if(strpos($to,'\"') !== false)
+		{
+			KalturaLog::err("Illegal destination file [$to]");
 			return false;
 		}
 			
