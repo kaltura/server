@@ -8,8 +8,8 @@ Alias /kmc "@APP_DIR@/kmc/web"
     Allow from all
 </Directory>
 
-Alias /hosted_pages "@APP_DIR@/hosted_pages/web"
-<Directory "@APP_DIR@/hosted_pages/web">
+Alias /hosted_pages "@BASE_DIR@/apps/hosted_pages/web"
+<Directory "@BASE_DIR@/apps/hosted_pages/web">
 	DirectoryIndex index.php
 	Options Indexes FollowSymLinks Includes
 	AllowOverride All
