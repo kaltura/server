@@ -24,6 +24,7 @@ class kWebexManager implements kObjectAddedEventConsumer
 		kFileSyncUtils::createSyncFileLinkForKey($asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $object->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 		$origFileSync = kFileSyncUtils::getLocalFileSyncForKey($object->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 		$asset->setSize(intval($origFileSync->getFileSize()/1000));		
+		$asset->save();
 		
 		return true;
 	}
