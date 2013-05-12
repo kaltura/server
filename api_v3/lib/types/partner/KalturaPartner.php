@@ -334,7 +334,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks', 
-		'host', 'cdnHost', 'rtmpUrl', 'language', 'isFirstLogin', 'logoutUrl', 'partnerParentId',
+		'host', 'cdnHost', 'rtmpUrl', 'language', 'isFirstLogin', 'logoutUrl', 'partnerParentId', 'partnerLanguage'=>'language',
 	);
 	
 	public function getMapBetweenObjects ( )
