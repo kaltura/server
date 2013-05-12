@@ -45,7 +45,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter eq
-	 * @requiresPermission read
 	 */
 	public $userId;
 	
@@ -342,7 +341,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"id", 
 	 	"name", 
 	 	"description",
-	 	"userId" => "puserId", // what should be extracted is only the puserId NOT kuserId
 	 	"creatorId" => "creatorPuserId",
 	 	"tags",
 	 	"adminTags",
@@ -419,6 +417,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			$catNames = implode(",", $catsNames);
 			$dbObject->setCategories($catNames);
 		}
+		
+		$dbObject->setPuserId($this->userId);
 			
 		return $dbObject;
 	}
@@ -441,6 +441,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			$this->categories = null;
 			$this->categoriesIds = null;
 		}
+		
+		if (!kConf::hasMap('exclude_userid') || !in_array($sourceObject->getPartnerId(), kConf::get('exclude_userid')) || kCurrentContext::getCurrentSessionType() != kSessionBase::SESSION_TYPE_WIDGET)
+			$this->userId = $sourceObject->getPuserId();
 	}
 	
 	public function validateObjectsExist()

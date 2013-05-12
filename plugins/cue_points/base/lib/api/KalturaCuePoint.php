@@ -72,7 +72,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @var string
 	 * @filter eq,in
 	 * @readonly
-	 * @requiresPermission read
 	 */
 	public $userId;
 	
@@ -143,8 +142,10 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 		
 		if($dbCuePoint->getKuserId() !== null){
 			$dbKuser = kuserPeer::retrieveByPK($dbCuePoint->getKuserId());
-			if($dbKuser)
-				$this->userId = $dbKuser->getPuserId();
+			if($dbKuser){
+				if (!kConf::hasMap('exclude_userid') || !in_array($dbCuePoint->getPartnerId(), kConf::get('exclude_userid')) || kCurrentContext::getCurrentSessionType() != kSessionBase::SESSION_TYPE_WIDGET)
+					$this->userId = $dbKuser->getPuserId();
+			}
 		}
 	}
 	
