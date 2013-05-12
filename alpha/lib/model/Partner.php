@@ -1116,6 +1116,16 @@ class Partner extends BasePartner
 		return $names;
 	}
 	
+	public function setLanguage ($v)
+	{
+		$this->putInCustomData('language', $v);
+	}
+	
+	public function getLanguage ()
+	{
+		$this->getFromCustomData('language', null, 'en');
+	}
+	
 	/**
 	 * Code to be run after persisting the object
 	 * @param PropelPDO $con
