@@ -39,6 +39,13 @@ class PartnerController extends Zend_Controller_Action
 		Form_PackageHelper::addPackagesToForm($form, $packagesVertical,			'vertical_clasiffication');
 		Form_PackageHelper::addPackagesToForm($form, $packagesClassOfService,	'partner_package_class_of_service');
 		
+		//Retrieve partner 0 template partners.
+		$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
+		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
+		$partnerFilter->partnerParentIdEqual = 0;
+		$result = $client->partner->listAction($partnerFilter);
+		Form_PackageHelper::addOptionsToForm($form, $result->objects, 'template_partner_id', 'name');
+		
 		if ($request->isPost())
 		{
 			if ($form->isValid($request->getPost()))
@@ -46,13 +53,15 @@ class PartnerController extends Zend_Controller_Action
 				$partner = $form->getObject("Kaltura_Client_Type_Partner", $request->getPost());
 				if(is_array($partner->contentCategories))
 					$partner->contentCategories = implode(',', $partner->contentCategories);
-					
+				/* @var $partner Kaltura_Client_Type_Partner */	
 				$partner->adminName = $partner->name;
 				$partner->description = "Admin Console";
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
+				$partner->partnerLanguage = $form->getValue('partner_language');
+				$templatePartnerId = $form->getValue('template_partner_id');
 				$client->startMultiRequest();
-				
-				$client->partner->register($partner);
+				KalturaLog::debug("is multi request: ".$client->isMultiRequest());
+				$client->partner->register($partner, null, $templatePartnerId);
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
 				$config->partnerPackageClassOfService = $form->getValue('partner_package_class_of_service');

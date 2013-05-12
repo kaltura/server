@@ -59,6 +59,16 @@ class Form_PartnerCreate extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('select', 'template_partner_id', array(		
+			'label'			=> 'Select Template Partner ID:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('select', 'partner_language', array(		
+			'label'			=> "Select partner's UI language:",
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'partner_package', 'partner_package_class_of_service' , 'vertical_clasiffication'), 'partner_info', array(
 			'legend' => 'Publisher Info',
 			'decorators' => array(
