@@ -1209,3 +1209,11 @@ define	service{
 		notifications_enabled			1
 }
 
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Convert
+		check_command					kaltura-convert
+		notifications_enabled			1
+}
+

@@ -9,7 +9,8 @@ $options = getopt('', array(
 	'service-url:',
 	'debug',
 	'timeout:',
-	'media-url:',
+	'entry-id:',
+	'entry-reference-id:',
 ));
 
 if(!isset($options['timeout']))
@@ -19,9 +20,6 @@ if(!isset($options['timeout']))
 }
 
 $timeout = $options['timeout'];
-$mediaUrl = $serviceUrl . '/content/templates/entry/data/kaltura_logo_animated_blue.flv';
-if(isset($options['media-url']))
-	$mediaUrl = $options['media-url'];
 
 $start = microtime(true);
 $monitorResult = new KalturaMonitorResult();
@@ -31,92 +29,80 @@ try
 	$apiCall = 'session.start';
 	$ks = $client->session->start($config['monitor-partner']['secret'], 'monitor-user', KalturaSessionType::USER, $config['monitor-partner']['id']);
 	$client->setKs($ks);
-		
-	 // Creates a new entry
-	$entry = new KalturaMediaEntry();
-	$entry->name = 'monitor-test';
-	$entry->description = 'monitor-test';
-	$entry->mediaType = KalturaMediaType::VIDEO;
-	
-	$resource = new KalturaUrlResource();
-	$resource->url = $mediaUrl;
-	
-	$apiCall = 'multirequest';
-	$client->startMultiRequest();
-	$requestEntry = $client->media->add($entry);
-	/* @var $requestEntry KalturaMediaEntry */
-	$client->media->addContent($requestEntry->id, $resource);
-	$client->media->get($requestEntry->id);
-	
-	$results = $client->doMultiRequest();
-	foreach($results as $index => $result)
+
+	$entry = null;
+	/* @var $entry KalturaMediaEntry */
+	if(isset($options['entry-id']))
 	{
-		if ($client->isError($result))
-		{
-			echo "Executing failed for request #".($index+1)." with error [" . $result['message'] . "]\n";
-			throw new KalturaException($result["message"], $result["code"]);
-		}
+		$apiCall = 'media.get';
+		$entry = $client->media->get($options['entry-id']);
 	}
-		
-	// Waits for the entry to start conversion
-	$createdEntry = end($results);
+	elseif(isset($options['entry-reference-id']))
+	{
+		$apiCall = 'baseEntry.listByReferenceId';
+		$baseEntryList = $client->baseEntry->listByReferenceId($options['entry-reference-id']);
+		/* @var $baseEntryList KalturaBaseEntryListResponse */
+		if(!count($baseEntryList->objects))
+			throw new Exception("Entry with reference id [" . $options['entry-reference-id'] . "] not found");
+			
+		$entry = reset($baseEntryList->objects);
+	}
+	
+	if($entry->status != KalturaEntryStatus::READY)
+		throw new Exception("Entry id [$entry->id] is not ready for reconvert");
+	
+	$jobId = $client->media->convert($entry->id);
+	
+	$apiCall = 'session.start';
+	$client->setKs(null);
+	$ks = $client->session->start($config['batch-partner']['adminSecret'], 'monitor-user', KalturaSessionType::ADMIN, $config['batch-partner']['id']);
+	$client->setKs($ks);
+	
+	$apiCall = 'jobs.getConvertProfileStatus';
+	$job = $client->jobs->getConvertProfileStatus($jobId);
+	/* @var $job KalturaBatchJobResponse */
+	
 	$timeoutTime = time() + $timeout;
-	/* @var $createdEntry KalturaMediaEntry */
-	while ($createdEntry)
+	while ($job)
 	{
 		if(time() > $timeoutTime)
-			throw new Exception("timed out, entry id: $createdEntry->id");
+			throw new Exception("timed out, entry id: $entry->id");
 			
-		if($createdEntry->status == KalturaEntryStatus::IMPORT)
+		if($job->batchJob->status == KalturaBatchJobStatus::ALMOST_DONE)
 		{
 			sleep(1);
-			$apiCall = 'media.get';
-			$createdEntry = $client->media->get($createdEntry->id);
+			$apiCall = 'jobs.getConvertProfileStatus';
+			$job = $client->jobs->getConvertProfileStatus($jobId);
 			continue;
 		}
 		
 		$monitorResult->executionTime = microtime(true) - $start;
 		$monitorResult->value = $monitorResult->executionTime;
 		
-		if($createdEntry->status == KalturaEntryStatus::READY || $createdEntry->status == KalturaEntryStatus::PRECONVERT)
+		if($job->batchJob->status == KalturaBatchJobStatus::FINISHED || $job->batchJob->status == KalturaBatchJobStatus::FINISHED_PARTIALLY)
 		{
-			$monitorResult->description = "import time: $monitorResult->executionTime seconds";
+			$monitorResult->description = "convert time: $monitorResult->executionTime seconds";
 		}
-		elseif($createdEntry->status == KalturaEntryStatus::ERROR_IMPORTING)
+		elseif($job->batchJob->status == KalturaBatchJobStatus::FAILED || $job->batchJob->status == KalturaBatchJobStatus::FATAL)
 		{
 			$error = new KalturaMonitorError();
-			$error->description = "import failed, entry id: $createdEntry->id";
+			$error->description = "convert failed, entry id: $entry->id";
 			$error->level = KalturaMonitorError::CRIT;
 			
 			$monitorResult->errors[] = $error;
-			$monitorResult->description = "import failed, entry id: $createdEntry->id";
+			$monitorResult->description = "convert failed, entry id: $entry->id";
 		}
 		else
 		{
 			$error = new KalturaMonitorError();
-			$error->description = "unexpected entry status: $createdEntry->status, entry id: $createdEntry->id";
+			$error->description = "unexpected job status: {$job->batchJob->status}, entry id: $entry->id";
 			$error->level = KalturaMonitorError::CRIT;
 			
 			$monitorResult->errors[] = $error;
-			$monitorResult->description = "unexpected entry status: $createdEntry->status, entry id: $createdEntry->id";
+			$monitorResult->description = "unexpected job status: {$job->batchJob->status}, entry id: $entry->id";
 		}
 		
 		break;
-	}
-
-	try
-	{
-		$apiCall = 'media.delete';
-		$createdEntry = $client->media->delete($createdEntry->id);
-	}
-	catch(Exception $ex)
-	{
-		$error = new KalturaMonitorError();
-		$error->code = $ex->getCode();
-		$error->description = $ex->getMessage();
-		$error->level = KalturaMonitorError::WARN;
-		
-		$monitorResult->errors[] = $error;
 	}
 }
 catch(KalturaException $e)
