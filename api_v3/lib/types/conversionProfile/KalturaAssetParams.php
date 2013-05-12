@@ -93,6 +93,13 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	 * @var KalturaMediaParserType
 	 */
 	public $mediaParserType;
+
+	/**
+	 * Comma seperated ids of source flavor params this flavor is created from
+	 *  
+	 * @var string
+	 */
+	public $sourceAssetParamsIds;
 	
 	private static $map_between_objects = array
 	(
@@ -107,6 +114,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"sourceRemoteStorageProfileId",
 		"remoteStorageProfileIds",
 		"mediaParserType",
+		"sourceAssetParamsIds",
 	);
 	
 	/* (non-PHPdoc)
