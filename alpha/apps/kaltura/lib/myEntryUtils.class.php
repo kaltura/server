@@ -27,7 +27,8 @@ class myEntryUtils
 	
 	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
 	{	
-		if (!@file_get_contents($filePath)){
+		$file = @file_get_contents($filePath);
+		if (!$file){
 			KalturaLog::debug("thumbnail cannot be created from $filePath " . error_get_last());
 			throw new Exception("thumbnail file path is not valid");
 		}	
@@ -40,7 +41,7 @@ class myEntryUtils
 		$thumbAsset->save();
 		
 		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::file_put_contents($fileSyncKey, file_get_contents($filePath));
+		kFileSyncUtils::file_put_contents($fileSyncKey, $file);
 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
 		$ext = pathinfo($finalPath, PATHINFO_EXTENSION);		
@@ -53,6 +54,8 @@ class myEntryUtils
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
 		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);		
+		
+		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $entry);
 	}
 	
 	public static function deepClone ( entry $source , $kshow_id , $override_fields, $echo = false)
