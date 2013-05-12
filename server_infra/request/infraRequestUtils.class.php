@@ -416,4 +416,22 @@ class infraRequestUtils
 		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
 		return self::$requestParams;
 	}
+
+	public static function dumpFilePart($file_name, $range_from, $range_length)
+	{
+		$chunk_size = 100000;
+		$fh = fopen($file_name, "rb");
+		if($fh)
+		{
+			$pos = 0;
+			fseek($fh, $range_from);
+			while($range_length > 0)
+			{
+				$content = fread($fh, min($chunk_size, $range_length));
+				echo $content;
+				$range_length -= $chunk_size;
+			}
+			fclose($fh);
+		}
+	}
 }

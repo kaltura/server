@@ -12,6 +12,7 @@ require_once("../lib/KalturaResponseCacher.php");
 $expiry = kConf::hasParam("v3cache_getfeed_default_expiry") ? kConf::get("v3cache_getfeed_default_expiry") : 86400;
 $cache = new KalturaResponseCacher(null, kCacheManager::CACHE_TYPE_API_V3_FEED, $expiry);
 $cache->checkOrStart();
+ob_start();
 
 require_once("../bootstrap.php");
 
@@ -101,6 +102,6 @@ $end = microtime(true);
 KalturaLog::info("syndicationFeedRenderer-end [".($end - $start)."]");
 KalturaLog::debug("<------------------------------------- syndicationFeedRenderer -------------------------------------");
 
-$cache->end();
-
-?>
+$result = ob_get_contents();
+ob_end_clean();
+$cache->end($result);

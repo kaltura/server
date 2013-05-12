@@ -1494,6 +1494,11 @@ class playManifestAction extends kalturaAction
 		
 		// Handle caching
 		$canCacheAccessControl = false;
+		if (kConf::hasParam("force_caching_headers") && in_array($this->entry->getPartnerId(), kConf::get("force_caching_headers")))
+		{
+			$renderer->cachingHeadersAge = 60;
+			$renderer->forceCachingHeaders = true;
+		}
 		if (!$this->secureEntryHelper)
 		{
 			$canCacheAccessControl = true;			// TODO: reconsider this if/when expired ktokens will be used

@@ -303,7 +303,16 @@ abstract class KalturaBaseService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			kFileUtils::dumpFile($filePath, $mimeType); 
+			
+			kFileUtils::closeDbConnections();
+			
+			kFileUtils::pollFileExists($filePath);
+			
+			// if by now there is no file - die !
+			if(! file_exists($filePath))
+				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			
+			return new kRendererDumpFile($filePath, $mimeType, kFileUtils::xSendFileAllowed($filePath));
 		}
 		else if ( in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) )
 		{

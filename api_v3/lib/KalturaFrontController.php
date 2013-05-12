@@ -86,7 +86,6 @@ class KalturaFrontController
 		error_reporting(E_STRICT | E_ALL);
 		
 		set_error_handler(array(&$this, "errorHandler"));
-		set_exception_handler(array(&$this, "exceptionHandler"));
 		
 		KalturaLog::debug("Params [" . print_r($this->params, true) . "]");
 		if ($this->service == "multirequest")
@@ -123,7 +122,7 @@ class KalturaFrontController
 		
 		$this->end = microtime(true);
 		
-		$this->serializeResponse($result, $ignoreNull);
+		return $this->serializeResponse($result, $ignoreNull);
 	}
 	
 	public function handleMultiRequest() 
@@ -242,7 +241,10 @@ class KalturaFrontController
 			}
 			$this->onRequestEnd($success, $errorCode, $i);
 	        
-            $results[$i] = $currentResult;	        
+            $results[$i] = $currentResult;
+            
+            if ($currentResult instanceof kRendererBase)
+            	return $currentResult;
 	    }
 	    
 	    return $results;
@@ -288,15 +290,6 @@ class KalturaFrontController
 			default: // throw it as an exception
 				throw new ErrorException($errStr, 0, $errNo, $errFile, $errLine); 
 		}
-	}
-	
-	public function exceptionHandler($ex)
-	{
-		$object = $this->getExceptionObject($ex);
-		
-		$this->end = microtime(true);
-		
-		$this->serializeResponse($object);
 	}
 	
 	public function getExceptionObject($ex)
@@ -412,11 +405,14 @@ class KalturaFrontController
 	
 	public function serializeResponse($object, $ignoreNull = false)
 	{
+		if ($object instanceof kRendererBase)
+		{
+			return $object;
+		}
+		
 		$start = microtime(true);
 		KalturaLog::debug("Serialize start");
-		
-		KalturaResponseCacher::endCacheIfDisabled();
-		
+				
 		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
 	
 		if(isset($this->params['content-type']))
@@ -445,26 +441,26 @@ class KalturaFrontController
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
 				$serializer = new KalturaXmlSerializer($ignoreNull);
-				
-				echo '<?xml version="1.0" encoding="utf-8"?>';
-				echo "<xml>";
-					echo "<result>";
-						$serializer->serialize($object);
-					echo "</result>";
-					echo "<executionTime>" . ($this->end - $this->start) ."</executionTime>";
-				echo "</xml>";
+				$result = 
+					'<?xml version="1.0" encoding="utf-8"?>' .
+				 	'<xml>' .
+						'<result>' .
+						$serializer->getSerializedData($object) .
+						'</result>' .
+						'<executionTime>' . ($this->end - $this->start) . '</executionTime>' .
+					'</xml>';
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_PHP:
 				$serializer = new KalturaPhpSerializer($ignoreNull);
 				$serializer->serialize($object);
-				echo $serializer->getSerializedData();
+				$result = $serializer->getSerializedData();
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
 				$serializer = new KalturaJsonSerializer($ignoreNull);
 				$serializer->serialize($object);
-				echo $serializer->getSerializedData();
+				$result = $serializer->getSerializedData();
 				break;
 			    
 			case KalturaResponseType::RESPONSE_TYPE_JSONP:
@@ -474,17 +470,18 @@ class KalturaFrontController
 				$serializer = new KalturaJsonSerializer($ignoreNull);
 				$serializer->serialize($object);
 				$response = array();
-				echo $callback, "(", $serializer->getSerializedData(), ");";
+				$result = $callback . "(" . $serializer->getSerializedData() . ");";
 				break;	
 							
 			default:
 				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $format);
 				$serializer->serialize($object);
 				$serializer->setHeaders();
-				echo $serializer->getSerializedData();
+				$result = $serializer->getSerializedData();
 				break;
 		}
 		
 		KalturaLog::debug("Serialize took - " . (microtime(true) - $start));
+		return $result;
 	}
 }

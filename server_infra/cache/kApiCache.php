@@ -23,7 +23,7 @@ class kApiCache extends kApiCacheBase
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '2';
+	const CACHE_VERSION = '3';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
@@ -75,7 +75,9 @@ class kApiCache extends kApiCacheBase
 	// extra fields
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
-
+	
+	protected $clientTag = null;
+	
 	protected function __construct($cacheType, $params = null)
 	{
 		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
@@ -90,6 +92,9 @@ class kApiCache extends kApiCacheBase
 
 	protected function init()			// overridable
 	{
+		if(isset($this->_params['clientTag']))
+			$this->clientTag = $this->_params['clientTag'];
+		
 		if (!kConf::get('enable_cache') ||
 			$this->isCacheDisabled())
 		{
@@ -141,11 +146,10 @@ class kApiCache extends kApiCacheBase
 	protected function isCacheDisabled()
 	{
 		// check the clientTag parameter for a cache start time (cache_st:<time>) directive
-		if (isset($this->_params['clientTag']))
+		if ($this->clientTag)
 		{
-			$clientTag = $this->_params['clientTag'];
 			$matches = null;
-			if (preg_match("/cache_st:(\\d+)/", $clientTag, $matches))
+			if (preg_match("/cache_st:(\\d+)/", $this->clientTag, $matches))
 			{
 				if ($matches[1] > time())
 				{
@@ -432,7 +436,8 @@ class kApiCache extends kApiCacheBase
 			}
 			else if ($cacheTTL < self::WARM_CACHE_INTERVAL) // 1 minute left for cache, lets warm it
 			{
-				self::warmCache($this->_cacheKey);
+				if (kConf::hasParam('disable_cache_warmup_client_tags') && !in_array($this->clientTag, kConf::get('disable_cache_warmup_client_tags')))
+					self::warmCache($this->_cacheKey);
 			}
 
 			return true;
@@ -575,7 +580,20 @@ class kApiCache extends kApiCacheBase
 		{
 			return false;
 		}
-		return (!$ks || (!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null)));
+		if (!$ks ||	(!$ks->isAdmin() && ($ks->user === "0" || $ks->user === null)))
+			return true;
+		
+		if (kConf::hasParam('cache_anonymous_users'))
+		{
+			$anonymousUsers = kConf::get('cache_anonymous_users');
+			foreach ($anonymousUsers as $userName => $partnerIds)
+			{
+				if ($ks->user == $userName && in_array($ks->partner_id, explode(',', $partnerIds)))
+					return true;
+			}
+		}
+		
+		return false;
 	}
 
 	protected function getAnonymousCachingExpiry()		// overridable

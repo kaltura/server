@@ -20,10 +20,10 @@ KalturaLog::debug(">------------------------------------- api_v3 ---------------
 KalturaLog::info("API-start pid:".getmypid());
 
 $controller = KalturaFrontController::getInstance();
-$controller->run();
+$result = $controller->run();
 
 $end = microtime(true);
 KalturaLog::info("API-end [".($end - $start)."] memory: ".memory_get_peak_usage(true));
 KalturaLog::debug("<------------------------------------- api_v3 -------------------------------------");
 
-$cache->end();
+$cache->end($result);

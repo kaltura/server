@@ -27,6 +27,11 @@ abstract class kManifestRenderer
 	public $cachingHeadersAge = 0;
 	
 	/**
+	 * @var bool
+	 */
+	public $forceCachingHeaders = false;
+	
+	/**
 	 * @var string
 	 */
 	public $deliveryCode = '';
@@ -111,7 +116,10 @@ abstract class kManifestRenderer
 			header($header);
 		}
 		
-		infraRequestUtils::sendCachingHeaders(kApiCache::hasExtraFields() ? 0 : $this->cachingHeadersAge);
+		if (kApiCache::hasExtraFields() && !$this->forceCachingHeaders)
+			$this->cachingHeadersAge = 0;
+		
+		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge);
 
 		$header = $this->getManifestHeader();
 		$footer = $this->getManifestFooter();

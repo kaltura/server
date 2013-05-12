@@ -5,10 +5,8 @@
  */
 class kFileUtils extends kFile
 {
-	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
+	public static function pollFileExists($file_name)
 	{
-		self::closeDbConnections();
-		
 		$nfs_file_tries = 0;
 		while(! file_exists($file_name))
 		{
@@ -18,47 +16,56 @@ class kFileUtils extends kFile
 			if($nfs_file_tries > 3) // if after 9 seconds file did not appear in NFS - probably not found...
 			{
 				break;
-			
-		// when breaking, kFile will try to dump, if file not exist - will die...
+					
+				// when breaking, kFile will try to dump, if file not exist - will die...
 			}
 			else
 			{
 				sleep(3);
 			}
 		}
+	}
+	
+	public static function xSendFileAllowed($file_name)
+	{
+		$xsendfile_uri = kConf::hasParam('xsendfile_uri') ? kConf::get('xsendfile_uri') : null;
+		if ($xsendfile_uri === null || strpos($_SERVER["REQUEST_URI"], $xsendfile_uri) === false)
+			return false;
+		
+		$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
+		foreach($xsendfile_paths as $path)
+		{
+			if (strpos($file_name, $path) === 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
+	{
+		self::closeDbConnections();
+		
+		self::pollFileExists($file_name);
 		
 		// if by now there is no file - die !
 		if(! file_exists($file_name))
 			KExternalErrors::dieGracefully();
 		
-		$ext = pathinfo($file_name, PATHINFO_EXTENSION);
-		$total_length = $limit_file_size ? $limit_file_size : self::fileSize($file_name);
-		
 		$useXSendFile = false;
 		if (!$limit_file_size && // if we limit the file size (e.g. preview small portion of a video) we can't use xsendfile module
-			in_array('mod_xsendfile', apache_get_modules()))
+			in_array('mod_xsendfile', apache_get_modules()) && 
+			self::xSendFileAllowed($file_name))
 		{
-			$xsendfile_uri = kConf::hasParam('xsendfile_uri') ? kConf::get('xsendfile_uri') : null;
-			if ($xsendfile_uri !== null && strpos($_SERVER["REQUEST_URI"], $xsendfile_uri) !== false)
-			{
-				$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
-				foreach($xsendfile_paths as $path)
-				{
-					if (strpos($file_name, $path) === 0)
-					{
-						header('X-Kaltura-Sendfile:');
-						$useXSendFile = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if ($useXSendFile)
+			header('X-Kaltura-Sendfile:');
+			$useXSendFile = true;
 			$range_length = null;
+		}
 		else
 		{
 			// get range parameters from HTTP range requst headers
+			$total_length = $limit_file_size ? $limit_file_size : self::fileSize($file_name);
 			list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
 		}
 		
@@ -67,7 +74,10 @@ class kFileUtils extends kFile
 			infraRequestUtils::sendCdnHeaders($file_name, $range_length, $max_age, $mime_type);
 		}
 		else
+		{
+			$ext = pathinfo($file_name, PATHINFO_EXTENSION);
 			infraRequestUtils::sendCdnHeaders($ext, $range_length, $max_age);
+		}
 
 		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
 		// upon detecting this header it cancels its original request and starts sending byte range requests
@@ -82,21 +92,7 @@ class kFileUtils extends kFile
 			KExternalErrors::dieGracefully();
 		}
 
-		$chunk_size = 100000;
-		$fh = fopen($file_name, "rb");
-		if($fh)
-		{
-			$pos = 0;
-			fseek($fh, $range_from);
-			while($range_length > 0)
-			{
-				$content = fread($fh, min($chunk_size, $range_length));
-				echo $content;
-				$range_length -= $chunk_size;
-			}
-			fclose($fh);
-		}
-		
+		infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
 		KExternalErrors::dieGracefully();
 	}
 

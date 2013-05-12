@@ -12,6 +12,15 @@ class KalturaXmlSerializer
 		$this->_ignoreNull = (bool)$ignoreNull;
 	}
 	
+	function getSerializedData($object)
+	{
+		ob_start();
+		$this->serialize($object);
+		$result = ob_get_contents();
+		ob_end_clean();
+		return $result;
+	}
+	
 	function serialize($object)
 	{
 		$type = gettype($object);

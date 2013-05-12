@@ -17,9 +17,7 @@ class KalturaResponseCacher extends kApiCache
 		
 	protected $_defaultExpiry = 0;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
-	
-	protected $clientTag = null;
-		
+			
 	public function __construct($params = null, $cacheType = kCacheManager::CACHE_TYPE_API_V3, $expiry = 0)
 	{
 		if ($expiry)
@@ -41,11 +39,7 @@ class KalturaResponseCacher extends kApiCache
 		foreach(kConf::get('v3cache_ignore_params') as $name)
 			unset($this->_params[$name]);
 		
-		unset($this->_params['kalsig']);
-		
-		if(isset($this->_params['clientTag']))
-			$this->clientTag = $this->_params['clientTag'];
-		
+		unset($this->_params['kalsig']);		
 		unset($this->_params['clientTag']);
 		unset($this->_params['callback']);
 		
@@ -101,19 +95,6 @@ class KalturaResponseCacher extends kApiCache
 		return $ks;
 	}
 
-	public static function endCacheIfDisabled()
-	{
-		$lastInstance = end(self::$_activeInstances);
-		if ($lastInstance && $lastInstance instanceof kApiCache)
-			$lastInstance->initCacheModes();
-		
-		if (self::isCacheEnabled())
-			return;
-		
-		while(ob_get_level())
-			ob_end_clean();
-	}	
-	
 	protected function sendCachingHeaders($usingCache)
 	{
 		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
@@ -121,8 +102,13 @@ class KalturaResponseCacher extends kApiCache
 		// we should never return caching headers for non widget sessions since the KS can be ended and the CDN won't know
 		$isAnonymous = !$this->_ks || ($this->_ksObj && $this->_ksObj->isWidgetSession());
 		
+		$forceCachingHeaders = false;
+		if ($this->_ksObj && kConf::hasParam("force_caching_headers") && in_array($this->_ksObj->partner_id, kConf::get("force_caching_headers")))
+			$forceCachingHeaders = true;
+		
 		// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
-		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) && !self::hasExtraFields())
+		if ($usingCache && $isAnonymous && $_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]) &&  
+			(!self::hasExtraFields() || $forceCachingHeaders)) 
 		{
 			$max_age = $this->_cacheHeadersExpiry;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
@@ -149,14 +135,23 @@ class KalturaResponseCacher extends kApiCache
 		if (!$response)
 		{
 			$this->sendCachingHeaders(false);
-			ob_start();
 			return;
 		}
 		
-		if ($this->_responseMetadata) 
+		list($responseType, $contentType) = explode('|', $this->_responseMetadata, 2);
+		
+		if ($contentType) 
 		{
-			header($this->_responseMetadata, true);
-		}	
+			header($contentType, true);
+		}
+		
+		if ($responseType)
+		{
+			require_once(dirname(__file__) . "/../../server_infra/renderers/{$responseType}.php");
+			$response = unserialize($response);
+			$response->output();
+			die;
+		}
 
 		$this->sendCachingHeaders(true);
 
@@ -175,29 +170,48 @@ class KalturaResponseCacher extends kApiCache
 		die;
 	}
 	
-		
-	public function end()
+	protected function getContentTypeHeader()
 	{
-		$this->initCacheModes();
-		if (!$this->_cacheModes)
-			return;
-	
-		$response = ob_get_contents();
 		$headers = headers_list();
-		$contentType = "";
 		foreach($headers as $headerStr)
 		{
 			$header = explode(":", $headerStr);
 			if (isset($header[0]) && strtolower($header[0]) == "content-type")
 			{
-				$contentType = $headerStr;
-				break;	
+				return $headerStr;
 			}
 		}
+		return '';
+	}
+	
+	public function end($response)
+	{
+		$this->initCacheModes();
+		if ($this->_cacheModes)
+		{
+			$responseType = '';
+			$serializeResponse = false;
+			if ($response instanceof kRendererBase)
+			{
+				$responseType = get_class($response);
+				$serializeResponse = true;
+			}
+			
+			$contentType = $this->getContentTypeHeader();
+						
+			$this->storeCache($response, "$responseType|$contentType", $serializeResponse);
+		}
 		
-		$this->storeCache($response, $contentType);
-		
-		ob_end_flush();
+		if ($response instanceof kRendererBase)
+		{
+			$response->output();
+			die;
+		}
+		else
+		{
+			echo $response;
+			die;
+		}
 	}
 
 	protected function getAnonymousCachingExpiry()
