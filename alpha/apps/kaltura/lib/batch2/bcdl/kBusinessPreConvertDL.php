@@ -958,7 +958,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			KalturaLog::log("Source flavor params [" . $sourceFlavor->getId() . "] found");
 			$originalFlavorAsset->setFlavorParamsId($sourceFlavor->getId());
 			
-			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $mediaInfo, $parentJob, $convertProfileJob);
+			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $conversionProfileFlavorParams, $mediaInfo, $parentJob, $convertProfileJob);
 			if(!$res)
 				return false;
 						
@@ -1089,6 +1089,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 				
 		$conversionsCreated = 0;
+		$waitingAssets = 0;
 		
 		$entry = $convertProfileJob->getEntry();
 		if(!$entry)
@@ -1118,6 +1119,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				
 				if($createdJob)
 					$conversionsCreated++;
+				if($flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT)
+					$waitingAssets++;
 			}
 		}
 		
@@ -1128,7 +1131,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$conversionsCreated++;
 		}
 			
-		if(!$conversionsCreated)
+		if(!$conversionsCreated && !$waitingAssets)
 		{
 			KalturaLog::log("No flavors created: $errDescription");			
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription);
@@ -1156,7 +1159,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if($flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT)
 		{
 			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_QUEUED);
+			$flavorAsset->setDescription('');
 			$flavorAsset->save();
+			
+			$parentJob = self::getParentJobForWaitingAssetConversion($flavorAsset->getEntryId(), $parentJob);
 		}
 		
 		$srcSyncKeys = array(); 
@@ -1167,6 +1173,31 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		return kJobsManager::addFlavorConvertJob($srcSyncKeys, $flavor, $flavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob, $lastEngineType, $sameRoot, $priority);
 	}
 
+	private static function getParentJobForWaitingAssetConversion($entryId, BatchJob $parentJob = null)
+	{
+		KalturaLog::debug('start');
+		if($parentJob && $parentJob->getJobType() == BatchJobType::POSTCONVERT) 
+		{
+			KalturaLog::debug('parent is postconvert');
+			//In case the flavor conversion is triggered by the ingested flavor add the conversion job
+			//under the convert profile job if available
+			$c = new Criteria();
+			$c->add ( BatchJobPeer::ENTRY_ID , $entryId );
+			$c->add ( BatchJobPeer::JOB_TYPE , BatchJobType::CONVERT_PROFILE );
+			$statuses = BatchJobPeer::getUnClosedStatusList();
+			$statuses[] = BatchJob::BATCHJOB_STATUS_ALMOST_DONE;
+			$c->add ( BatchJobPeer::STATUS, $statuses,  Criteria::IN);
+			
+			$batchJob = BatchJobPeer::doSelectOne( $c );
+			if($batchJob)
+			{
+				KalturaLog::debug("parent job id ".$batchJob->getId());
+				return $batchJob;
+			}
+		}
+		return $parentJob;
+	}
+	
 	private static function getSourceFlavorAssets(flavorAsset $flavorAsset, flavorParamsOutput $flavor)
 	{
 		$srcFlavorParamsIds = explode(',', trim($flavor->getSourceAssetParamsIds()));
@@ -1209,9 +1240,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 	}
 	
-	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
+	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, $conversionProfileFlavorParams, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
 	{
-		if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
+		$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$sourceFlavor->getId()];
+		$isIngest = false;
+		if($conversionProfileFlavorParamsItem)
+		{
+			$isIngest = ($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST); 
+		}
+		if(($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()) && !$isIngest)
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				
@@ -1365,7 +1402,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		return $ingestedNeeded;	
 	}	
 	
-	private static function shouldConvertProfileFlavors(conversionProfile2 $profile, mediaInfo $mediaInfo, flavorAsset $originalFlavorAsset)
+	private static function shouldConvertProfileFlavors(conversionProfile2 $profile, mediaInfo $mediaInfo = null, flavorAsset $originalFlavorAsset)
 	{
 		$shouldConvert = true;
 					
