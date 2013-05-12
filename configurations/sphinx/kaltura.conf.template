@@ -116,7 +116,7 @@ index kaltura_category
 	rt_attr_uint	 = parent_id
 	rt_field	 = name
 	rt_attr_bigint	 = partner_id
-	rt_field	 = full_name
+	rt_attr_string	 = full_name
 	rt_field	 = full_ids
 	rt_field	 = description
 	rt_field	 = tags
