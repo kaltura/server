@@ -8,17 +8,9 @@ require_once __DIR__  . '/common.php';
 $options = getopt('', array(
 	'service-url:',
 	'debug',
-	'timeout:',
 	'entry-id:',
 	'entry-reference-id:',
 ));
-
-if(!isset($options['timeout']))
-{
-	echo "Argument timeout is required";
-	exit(-1);
-}
-$timeout = $options['timeout'];
 
 $start = microtime(true);
 $monitorResult = new KalturaMonitorResult();
@@ -28,7 +20,7 @@ try
 	$apiCall = 'session.start';
 	$ks = $client->session->start($config['monitor-partner']['secret'], 'monitor-user', KalturaSessionType::USER, $config['monitor-partner']['id']);
 	$client->setKs($ks);
-
+	
 	$entry = null;
 	/* @var $entry KalturaMediaEntry */
 	if(isset($options['entry-id']))
@@ -48,60 +40,40 @@ try
 	}
 	
 	if($entry->status != KalturaEntryStatus::READY)
-		throw new Exception("Entry id [$entry->id] is not ready for reconvert");
+		throw new Exception("Entry id [$entry->id] is not ready for thumbnail capturing");
 	
-	$jobId = $client->media->convert($entry->id);
+	$thumbParams = new KalturaThumbParams();
+	$thumbParams->videoOffset = 3;
 	
-	$apiCall = 'session.start';
-	$client->setKs(null);
-	$ks = $client->session->start($config['batch-partner']['adminSecret'], 'monitor-user', KalturaSessionType::ADMIN, $config['batch-partner']['id']);
-	$client->setKs($ks);
+	$apiCall = 'thumbAsset.generate';
+	$thumbAsset = $client->thumbAsset->generate($entry->id, $thumbParams);
+	/* @var $thumbAsset KalturaThumbAsset */
+	if(!$thumbAsset)
+		throw new Exception("thumbnail asset not created");
 	
-	$apiCall = 'jobs.getConvertProfileStatus';
-	$job = $client->jobs->getConvertProfileStatus($jobId);
-	/* @var $job KalturaBatchJobResponse */
+	$monitorResult->executionTime = microtime(true) - $start;
+	$monitorResult->value = $monitorResult->executionTime;
 	
-	$timeoutTime = time() + $timeout;
-	while ($job)
+	if($thumbAsset->status == KalturaThumbAssetStatus::READY || $thumbAsset->status == KalturaThumbAssetStatus::EXPORTING)
 	{
-		if(time() > $timeoutTime)
-			throw new Exception("timed out, entry id: $entry->id");
-			
-		if($job->batchJob->status == KalturaBatchJobStatus::ALMOST_DONE)
-		{
-			sleep(1);
-			$apiCall = 'jobs.getConvertProfileStatus';
-			$job = $client->jobs->getConvertProfileStatus($jobId);
-			continue;
-		}
+		$monitorResult->description = "capture time: $monitorResult->executionTime seconds";
+	}
+	elseif($thumbAsset->status == KalturaThumbAssetStatus::ERROR)
+	{
+		$error = new KalturaMonitorError();
+		$error->description = "captura failed, asset id, $thumbAsset->id: $thumbAsset->description";
+		$error->level = KalturaMonitorError::CRIT;
 		
-		$monitorResult->executionTime = microtime(true) - $start;
-		$monitorResult->value = $monitorResult->executionTime;
+		$monitorResult->description = "captura failed, asset id, $thumbAsset->id";
+	}
+	else
+	{
+		$error = new KalturaMonitorError();
+		$error->description = "unexpected thumbnail status, $thumbAsset->status, asset id, $thumbAsset->id: $thumbAsset->description";
+		$error->level = KalturaMonitorError::CRIT;
 		
-		if($job->batchJob->status == KalturaBatchJobStatus::FINISHED || $job->batchJob->status == KalturaBatchJobStatus::FINISHED_PARTIALLY)
-		{
-			$monitorResult->description = "convert time: $monitorResult->executionTime seconds";
-		}
-		elseif($job->batchJob->status == KalturaBatchJobStatus::FAILED || $job->batchJob->status == KalturaBatchJobStatus::FATAL)
-		{
-			$error = new KalturaMonitorError();
-			$error->description = "convert failed, entry id: $entry->id";
-			$error->level = KalturaMonitorError::CRIT;
-			
-			$monitorResult->errors[] = $error;
-			$monitorResult->description = "convert failed, entry id: $entry->id";
-		}
-		else
-		{
-			$error = new KalturaMonitorError();
-			$error->description = "unexpected job status: {$job->batchJob->status}, entry id: $entry->id";
-			$error->level = KalturaMonitorError::CRIT;
-			
-			$monitorResult->errors[] = $error;
-			$monitorResult->description = "unexpected job status: {$job->batchJob->status}, entry id: $entry->id";
-		}
-		
-		break;
+		$monitorResult->errors[] = $error;
+		$monitorResult->description = "unexpected thumbnail status, $thumbAsset->status, asset id, $thumbAsset->id: $thumbAsset->description";
 	}
 }
 catch(KalturaException $e)

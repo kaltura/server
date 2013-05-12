@@ -1217,3 +1217,11 @@ define	service{
 		notifications_enabled			1
 }
 
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Capture Thumbnail
+		check_command					kaltura-capture-thumb
+		notifications_enabled			1
+}
+
