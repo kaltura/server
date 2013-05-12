@@ -392,21 +392,21 @@ class kXsd
 	}
 	
 	/**
-	 * @param string $fromXsd old xsd path
-	 * @param string $toXsd new xsd path
+	 * @param string $fromXsd old xsd
+	 * @param string $toXsd new xsd
 	 * @return bool|string true if no change required, or, xsl text if transform required
 	 * @throws kXsdException
 	 */
 	public static function compareXsd($fromXsd, $toXsd)
 	{
 		$from = new KDOMDocument();
-		$from->load($fromXsd);
+		$from->loadXML($fromXsd, 0);
 		
 		if(!$from || !$from->documentElement)
 			throw new kXsdException(kXsdException::INVALID_XSD_FILE, $fromXsd);
 			
 		$to = new KDOMDocument();
-		$to->load($toXsd);
+		$to->loadXML($toXsd, 0);
 		
 		if(!$to || !$to->documentElement)
 			throw new kXsdException(kXsdException::INVALID_XSD_FILE, $toXsd);
