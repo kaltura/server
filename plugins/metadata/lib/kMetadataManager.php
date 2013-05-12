@@ -396,12 +396,12 @@ class kMetadataManager
 	 * @param int $prevVersion
 	 * @param string $prevXsdPath
 	 */
-	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsdPath, $newVersion, $newXsdPath)
+	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsd, $newVersion, $newXsd)
 	{
 		$xsl = true;
 		if(!PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
 		{
-			$xsl = kXsd::compareXsd($prevXsdPath, $newXsdPath);
+			$xsl = kXsd::compareXsd($prevXsd, $newXsd);
 		}
 			
 		if($xsl === true)
