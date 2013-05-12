@@ -41,6 +41,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -573,7 +574,9 @@ abstract public class KalturaClientBase {
 
 	private String signature(KalturaParams kparams) throws KalturaApiException {
 		String str = "";
-		for (String key : kparams.keySet()) {
+		List<String> keys = new ArrayList<String>(kparams.keySet());
+		Collections.sort(keys);
+		for (String key : keys) {
 			str += (key + kparams.get(key));
 		}
 
