@@ -178,38 +178,10 @@ class MetadataProfileService extends KalturaBaseService
 		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		
-		list($oldXsdFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
-		/* @var $oldXsdFileSync FileSync */
-  		
-		if(!$oldXsdFileSync)
+		$oldXsd = kFileSyncUtils::file_get_contents($key, true, false);
+		if(!$oldXsd)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
 		
-		$oldXsd = null;
-		$oldXsdFileSync = kFileSyncUtils::resolve($oldXsdFileSync);
-		
-		if($local)
-		{
-			$oldXsd = $oldXsdFileSync->getFullPath();
-		}
-		else
-		{
-			$oldXsd = kDataCenterMgr::getLocalTempPathForFileSync($oldXsdFileSync);
-   			
-   			if(!file_exists($oldXsd))
-            {
-            	$xsdContent = kFileSyncUtils::getContentsByFileSync ( $oldXsdFileSync , $local , true , false );
-   				
-            	if(!$xsdContent)
-    				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
-    			
-    			file_put_contents($oldXsd, $xsdContent);
-            }
-		}
-		
-		if(!$oldXsd) //Make sure that at this point oldXsd path is already defined
-				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
-		
-		KalturaLog::debug("Path: [$oldXsd]");
 		$oldVersion = $dbMetadataProfile->getVersion();
 		
 		if($xsdData)
@@ -225,13 +197,10 @@ class MetadataProfileService extends KalturaBaseService
 		}
 			
 		if($xsdData)
-		{
-		    $xsdPath = sys_get_temp_dir() . '/' . uniqid() . '.xsd';
-		    file_put_contents($xsdPath, $xsdData);
-		    
+		{		    
 			try
 			{
-				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $xsdPath);
+				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $xsdData);
 			}
 			catch(kXsdException $e)
 			{
@@ -241,7 +210,7 @@ class MetadataProfileService extends KalturaBaseService
 			$dbMetadataProfile->save();
 			
 			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-			kFileSyncUtils::moveFromFile($xsdPath, $key);
+			kFileSyncUtils::file_put_contents($key, $xsdData);
 		}
 		else
 		{
@@ -450,15 +419,23 @@ class MetadataProfileService extends KalturaBaseService
 				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsdFile['name']);
 		}
 		
+		$newXsd = file_get_contents($filePath);
+		if(!$newXsd)
+			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsdFile['name']);
+		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$oldXsd = kFileSyncUtils::getLocalFilePathForKey($key);
+		
+		$oldXsd = kFileSyncUtils::file_get_contents($key);
+		if(!$oldXsd)
+			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
+		
 		$oldVersion = $dbMetadataProfile->getVersion();
 		
 		$dbMetadataProfile->incrementVersion();
 		
 		try
 		{
-			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $filePath);
+			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $newXsd);
 		}
 		catch(kXsdException $e)
 		{
