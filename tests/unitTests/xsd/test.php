@@ -42,7 +42,10 @@ class thumbnailTest extends PHPUnit_Framework_TestCase
 			$fromXsd = $xsdFiles[$prevVersion];
 			$toXsd = $xsdFiles[$currentVersion];
 			
-			$xsl = kXsd::compareXsd($fromXsd, $toXsd);
+			$fromXsdContent = file_get_contents($fromXsd);
+			$toXsdContent = file_get_contents($toXsdContent);
+			
+			$xsl = kXsd::compareXsd($fromXsdContent, $toXsdContent);
 			$this->assertTrue($xsl, "XSD [$fromXsd => $toXsd] Created XSL");
 			
 			$prevVersion = $currentVersion;
