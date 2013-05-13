@@ -69,7 +69,7 @@ class Form_PartnerCreate extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'partner_package', 'partner_package_class_of_service' , 'vertical_clasiffication'), 'partner_info', array(
+		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'partner_package', 'partner_package_class_of_service' , 'vertical_clasiffication', 'partner_language' , 'template_partner_id'), 'partner_info', array(
 			'legend' => 'Publisher Info',
 			'decorators' => array(
 				'Description', 
