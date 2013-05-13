@@ -1,6 +1,6 @@
 <?php
 
-abstract class ClientGeneratorFromPhp 
+abstract class ClientGeneratorFromPhp
 {
 	protected $_files = array();
 	protected $_services = array();
@@ -46,7 +46,7 @@ abstract class ClientGeneratorFromPhp
 		return $this->_includeList;
 	}
 
-	public function ClientGeneratorFromPhp($sourcePath = null) 
+	public function ClientGeneratorFromPhp($sourcePath = null)
 	{
 		$this->_sourcePath = realpath($sourcePath);
 		
@@ -54,7 +54,7 @@ abstract class ClientGeneratorFromPhp
 			throw new Exception("Source path was not found [$sourcePath]");
 		
 		if (is_dir($sourcePath))
-			$this->addSourceFiles($this->_sourcePath);	
+			$this->addSourceFiles($this->_sourcePath);
 
 		$typesClassMapPath = $this->getTypesClassMapPath();
 		if(file_exists($typesClassMapPath))
@@ -74,7 +74,7 @@ abstract class ClientGeneratorFromPhp
 	protected function addSourceFiles($directory)
 	{
 		// add if file
-		if (is_file($directory)) 
+		if (is_file($directory))
 		{
 			$file = str_replace($this->_sourcePath.DIRECTORY_SEPARATOR, "", $directory);
 			$this->addFile($file, file_get_contents($directory));
@@ -83,10 +83,10 @@ abstract class ClientGeneratorFromPhp
 		
 		// loop through the folder
 		$dir = dir($directory);
-		while (false !== $entry = $dir->read()) 
+		while (false !== $entry = $dir->read())
 		{
 			// skip pointers & hidden files
-			if ($this->beginsWith($entry, ".")) 
+			if ($this->beginsWith($entry, "."))
 			{
 				continue;
 			}
@@ -102,8 +102,8 @@ abstract class ClientGeneratorFromPhp
 	 * Main generation method, can be overload to support a different flow
 	 *
 	 */
-	public function generate() 
-	{		
+	public function generate()
+	{
 		$this->load();
 		
 		$this->writeHeader();
@@ -137,7 +137,7 @@ abstract class ClientGeneratorFromPhp
 					
 				$outputTypeReflector = $actionReflector->getActionOutputType();
 				$actionParams = $actionReflector->getActionParams();
-				$this->writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);				
+				$this->writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
 			}
 			$this->writeAfterService($serviceActionItem);
 		}
@@ -151,8 +151,7 @@ abstract class ClientGeneratorFromPhp
 		if ($this->_classMap !== null)
 			return;
 		
-		$classMapFileLocation = KAutoloader::getClassMapFilePath();		
-		$this->_classMap = unserialize(file_get_contents($classMapFileLocation));
+		$this->_classMap = KAutoloader::getClassMap();
 	}
 	
 	public function load()
@@ -258,8 +257,8 @@ abstract class ClientGeneratorFromPhp
 	
 	/**
 	 * Called to write the description of a type
-	 * 
-	 * @param array $typeDescription 
+	 *
+	 * @param array $typeDescription
 	 */
 	protected abstract function writeType(KalturaTypeReflector $type);
 	
@@ -270,7 +269,7 @@ abstract class ClientGeneratorFromPhp
 	 * Scans the file system and loads the description of the services to an array
 	 *
 	 */
-	protected function loadServicesInfo() 
+	protected function loadServicesInfo()
 	{
 		$this->initClassMap();
 		
@@ -290,7 +289,7 @@ abstract class ClientGeneratorFromPhp
 		        list ( $serviceClassName, $actionMethodName) = array_values($actionCallback);
 		        
 		        //Check if the service path for the current action is excluded
-		        $servicePath = $this->_classMap[$serviceClassName];	
+		        $servicePath = $this->_classMap[$serviceClassName];
     		    if ($this->isPathExcluded($servicePath))
       			{
       			    unset($serviceActionItemToAdd->actionMap[$actionId]);
@@ -300,7 +299,7 @@ abstract class ClientGeneratorFromPhp
       			// check if the current action is included
       			if (count($actionsToInclude) && !array_key_exists(strtolower($actionId), $actionsToInclude))
       			{
-      			    unset($serviceActionItemToAdd->actionMap[$actionId]); 
+      			    unset($serviceActionItemToAdd->actionMap[$actionId]);
       			    continue;
       			}
       			
@@ -425,7 +424,7 @@ abstract class ClientGeneratorFromPhp
 				{
 					$classTypeReflector = KalturaTypeReflectorCacher::get($class);
 					
-					$pluginName = $classTypeReflector->getPlugin();					
+					$pluginName = $classTypeReflector->getPlugin();
 					if ($pluginName && !KalturaPluginManager::getPluginInstance($pluginName))
 					{
 						unset($this->_typesClassMap[$class]);
@@ -536,7 +535,7 @@ abstract class ClientGeneratorFromPhp
 		        list ($serviceClass, $actionMethodName) = array_values($actionCallback);
 		        
 		        
-    			$servicePath = $this->_classMap[$serviceClass];			
+    			$servicePath = $this->_classMap[$serviceClass];
     			if ($this->isPathExcluded($servicePath))
     			{
     				continue;
@@ -546,7 +545,7 @@ abstract class ClientGeneratorFromPhp
 		}
 					
 		$includeList = array();
-		if ($include !== null) 
+		if ($include !== null)
 		{
 			$tempList = explode(",", str_replace(" ", "", $include));
 			foreach($tempList as $item)
@@ -566,9 +565,9 @@ abstract class ClientGeneratorFromPhp
 						throw new Exception("Service [$service] not found");
 						
 					$includeList[$service] = $fullList[$service];
-				} 
-				else 
-					$includeList[$service][$action] = true; 
+				}
+				else
+					$includeList[$service][$action] = true;
 			}
 		}
 		else if ($exclude !== null)
@@ -589,10 +588,10 @@ abstract class ClientGeneratorFromPhp
 					unset($includeList[$service]);
 				}
 				else
-				{ 
+				{
 	//				KalturaLog::debug("Excluding action [$service.$action]");
 					unset($includeList[$service][$action]);
-				} 
+				}
 			}
 		}
 		else
@@ -652,7 +651,7 @@ abstract class ClientGeneratorFromPhp
 	 * @param string $end
 	 * @return boolean
 	 */
-	protected function endsWith($str, $end) 
+	protected function endsWith($str, $end)
 	{
 		return (substr($str, strlen($str) - strlen($end)) === $end);
 	}
@@ -664,7 +663,7 @@ abstract class ClientGeneratorFromPhp
 	 * @param string $end
 	 * @return boolean
 	 */
-	protected function beginsWith($str, $end) 
+	protected function beginsWith($str, $end)
 	{
 		return (substr($str, 0, strlen($end)) === $end);
 	}
