@@ -653,7 +653,7 @@ class kMrssManager
 			}
 		}
 		
-		if (in_array(ObjectFeatureType::ANCESTOR_RECURSIVE, $features))
+		if ($features && in_array(ObjectFeatureType::ANCESTOR_RECURSIVE, $features))
 		{
 			$ancestorIds = explode(">", $category->getFullIds());
 			$ancestorCategories = categoryPeer::retrieveByPKs($ancestorIds);
