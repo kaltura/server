@@ -3,7 +3,7 @@
  * @package api
  * @subpackage v3
  */
-class KalturaFrontController 
+class KalturaFrontController
 {
     private static $instance;
 	private $requestStart = null;
@@ -14,7 +14,7 @@ class KalturaFrontController
 	private $action = "";
 	private $disptacher = null;
 	
-    private function KalturaFrontController() 
+    private function KalturaFrontController()
     {
         $this->dispatcher = KalturaDispatcher::getInstance();
         
@@ -51,8 +51,8 @@ class KalturaFrontController
 			'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname()),
 			'clientTag' => '"' . (isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null) . '"',
 			'time' => $this->requestStart,
-			'service' => $service, 
-			'action' => $action, 
+			'service' => $service,
+			'action' => $action,
 			'requestIndex' => $requestIndex,
 			'isInMultiRequest' => intval($isInMultiRequest)
 		));
@@ -96,7 +96,7 @@ class KalturaFrontController
 		    $result = $this->handleMultiRequest();
 		}
 		else
-		{	
+		{
 			$success = true;
 			$errorCode = null;
 			$this->onRequestStart($this->service, $this->action, $this->params);
@@ -107,7 +107,7 @@ class KalturaFrontController
 			catch(Exception $ex)
 			{
 				$success = false;
-				$errorCode = $ex->getCode();				
+				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex);
 			}
 	        $this->onRequestEnd($success, $errorCode);
@@ -125,7 +125,7 @@ class KalturaFrontController
 		return $this->serializeResponse($result, $ignoreNull);
 	}
 	
-	public function handleMultiRequest() 
+	public function handleMultiRequest()
 	{
 		// arrange the parameters by request index
 		$commonParams = array();
@@ -161,7 +161,7 @@ class KalturaFrontController
 			$currentAction = $currentParams["action"];
 		
 			// copy derived common params to current params
-			if (isset($commonParams['clientTag']) && !isset($currentParams['clientTag'])) 
+			if (isset($commonParams['clientTag']) && !isset($currentParams['clientTag']))
 			{
 				$currentParams['clientTag'] = $commonParams['clientTag'];
 			}
@@ -227,8 +227,8 @@ class KalturaFrontController
 					KalturaCriterion::clearTags();
 				}
 							
-				try 
-				{  
+				try
+				{
 					$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
 				}
 				catch(Exception $ex)
@@ -241,10 +241,14 @@ class KalturaFrontController
 			}
 			$this->onRequestEnd($success, $errorCode, $i);
 	        
+<<<<<<< .mine
+            $results[$i] = $currentResult;
+=======
             $results[$i] = $currentResult;
             
             if ($currentResult instanceof kRendererBase)
             	return $currentResult;
+>>>>>>> .r98152
 	    }
 	    
 	    return $results;
@@ -255,7 +259,7 @@ class KalturaFrontController
 	    if ($path === null || count($path) == 0)
 	    {
 	        if (!is_object($object))
-	            return $object;  
+	            return $object;
 	        else
 	            return null;
 	    }
@@ -288,7 +292,7 @@ class KalturaFrontController
 				KalturaLog::log(sprintf($errorFormat, $errFile, $errLine, $errStr), KalturaLog::WARN);
 				break;
 			default: // throw it as an exception
-				throw new ErrorException($errStr, 0, $errNo, $errFile, $errLine); 
+				throw new ErrorException($errStr, 0, $errNo, $errFile, $errLine);
 		}
 	}
 	
@@ -312,7 +316,7 @@ class KalturaFrontController
 		else if ($ex instanceof kCoreException)
 		{
 			switch($ex->getCode())
-			{	
+			{
 				case kCoreException::PARTNER_BLOCKED:
 					$object = new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
 					break;
@@ -380,7 +384,7 @@ class KalturaFrontController
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_DATABASE_ERROR);
 		}
 		else
-		{ 
+		{
 		    KalturaLog::crit($ex);
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
@@ -471,13 +475,16 @@ class KalturaFrontController
 				$serializer->serialize($object);
 				$response = array();
 				$result = $callback . "(" . $serializer->getSerializedData() . ");";
-				break;	
+				break;
 							
 			default:
 				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $format);
-				$serializer->serialize($object);
-				$serializer->setHeaders();
-				$result = $serializer->getSerializedData();
+				if($serializer)
+				{
+					$serializer->serialize($object);
+					$serializer->setHeaders();
+					$result = $serializer->getSerializedData();
+				}
 				break;
 		}
 		
