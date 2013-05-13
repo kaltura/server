@@ -49,7 +49,7 @@ class PartnerController extends Zend_Controller_Action
 		//Add languages
 		$languages = Zend_Registry::get('config')->languages;
 		/* @var $languages Zend_Config */
-		Form_PackageHelper::addOptionsToForm($form, $languages->toArray(), 'partner_language', 'name');
+		Form_PackageHelper::addOptionsToForm($form, $languages, 'partner_language', 'name');
 		
 		if ($request->isPost())
 		{
