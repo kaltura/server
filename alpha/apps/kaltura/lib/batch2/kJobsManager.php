@@ -438,16 +438,16 @@ class kJobsManager
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
 					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)	
-						$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());		
-					$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
+						$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());							
 				}
 				else
 				{
 					$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFilePath());
-					$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				}
+				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());
-				//TODO: check how to set assetParamId or remove it from the descriptor
+				$flavorAsset = assetPeer::retrieveById($fileSync->getObjectId());
+				$srcFileSyncDescriptor->setAssetParamsId($flavorAsset->getFlavorParamsId());
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}

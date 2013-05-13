@@ -108,6 +108,13 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	 */
 	public $partnerDescription;
 	
+	/**
+	 * 
+	 * Comma separated list of source flavor params ids
+	 * @var string
+	 */
+	public $actualSourceAssetParamsIds;
+	
 		
 	private static $map_between_objects = array
 	(
@@ -124,6 +131,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 		"description",
 		"partnerData",
 		"partnerDescription",
+		"actualSourceAssetParamsIds",
 	);
 	
 	public function getMapBetweenObjects ( )

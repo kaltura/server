@@ -28,6 +28,9 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	private $packageName;
 	
+	private $actualSrcAssetParams = array();
+	
+	
 	public function __construct($params, $outFilePath)
 	{
 		$this->params = $params;
@@ -144,6 +147,7 @@ class KWidevineOperationEngine extends KOperationEngine
 				KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
 				symlink($srcFileSyncDescriptor->actualFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
 				$this->packageFiles[] = $fileName;
+				$this->actualSrcAssetParams[] = $srcFileSyncDescriptor->assetParamsId;
 			}
 		}		
 		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
@@ -225,6 +229,7 @@ class KWidevineOperationEngine extends KOperationEngine
 	{
 		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 		$updatedFlavorAsset->widevineAssetId = $wvAssetId;
+		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);
 		$wvDistributionStartDate = $this->data->flavorParamsOutput->widevineDistributionStartDate;
 		$wvDistributionEndDate = $this->data->flavorParamsOutput->widevineDistributionEndDate;
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;

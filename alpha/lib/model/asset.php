@@ -88,6 +88,7 @@ class asset extends Baseasset implements ISyncableFile
 	
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
+	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
 	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
@@ -544,5 +545,9 @@ class asset extends Baseasset implements ISyncableFile
 	{
 	    parent::setStatus(asset::ASSET_STATUS_READY);
 	}
+	
+	public function getActualSourceAssetParamsIds()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS);}
+	public function setActualSourceAssetParamsIds($v)	{$this->putInCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS, $v);}
+	
 	
 }
