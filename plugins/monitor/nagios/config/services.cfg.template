@@ -18,7 +18,7 @@ define	service{
 define	service{
 		use								local-service
 		hostgroup_name					kaltura-api
-		service_description				Kaltura Host Ping Database - V3
+		service_description				Kaltura Host Ping Database
 		check_command					kaltura-host-ping-db
 		notifications_enabled			1
 }
@@ -26,7 +26,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		service_description				Kaltura Playlist Execute - V3
+		service_description				Kaltura Playlist Execute
 		check_command					kaltura-host-execute-playlist
 		notifications_enabled			1
 }
