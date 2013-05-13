@@ -43,7 +43,7 @@ class PartnerController extends Zend_Controller_Action
 		$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
 		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
 		$partnerFilter->partnerParentIdEqual = 0;
-		$result = $client->partner->listAction($partnerFilter);
+		$result = $systemPartnerPlugin->systemPartner->listAction($partnerFilter);
 		Form_PackageHelper::addOptionsToForm($form, $result->objects, 'template_partner_id', 'name');
 		
 		//Add languages
