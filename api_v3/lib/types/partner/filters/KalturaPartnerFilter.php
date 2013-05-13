@@ -5,4 +5,5 @@
  */
 class KalturaPartnerFilter extends KalturaPartnerBaseFilter
 {
+
 }
