@@ -243,6 +243,8 @@ class KalturaFrontController
 	        
             $results[$i] = $currentResult;
             
+            // in case a serve action is included in a multirequest, return only the result of the serve action
+            // in order to avoid serializing the kRendererBase object and returning the internal server paths to the client
             if ($currentResult instanceof kRendererBase)
             	return $currentResult;
 	    }
