@@ -40,11 +40,14 @@ class PartnerController extends Zend_Controller_Action
 		Form_PackageHelper::addPackagesToForm($form, $packagesClassOfService,	'partner_package_class_of_service');
 		
 		//Retrieve partner 0 template partners.
-		$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
+		$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
 		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
-		Infra_ClientHelper::impersonate(0);
+		$partnerFilter->partnerParentIdEqual = 0;
 		$result = $client->partner->listAction($partnerFilter);
 		Form_PackageHelper::addOptionsToForm($form, $result->objects, 'template_partner_id', 'name');
+		
+		//Add languages
+		$languages = Zend_Registry::get('config')->languages;
 		
 		if ($request->isPost())
 		{
