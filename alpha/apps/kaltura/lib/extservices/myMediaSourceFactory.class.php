@@ -101,6 +101,9 @@ class myMediaSourceFactory
 			case entry::ENTRY_MEDIA_SOURCE_PARTNER_SPECIFIC:
 				$pid = kCurrentContext::$ks_partner_id;
 				$partner = PartnerPeer::retrieveByPK($pid);
+				if(!$partner)
+					throw new Exception("Cannot find partner id [$pid]");
+					
 				$specServices = $partner->getPartnerSpecificServices();
 				if ($specServices) {
 					if (class_exists($specServices)) {
