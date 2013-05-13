@@ -28,6 +28,8 @@ class partnerFilter extends baseObjectFilter
 			"_lte_partner_package",
 		    "_eq_partner_group_type",
 		    "_in_partner_group_type",
+			"_eq_partner_parent_id",
+			"_in_partner_parent_id",
 		    "_notin_id",
 			"_partner_permissions_exist",
 			) , NULL );
