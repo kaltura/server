@@ -721,7 +721,22 @@ define command{
 
 define command{
 	command_name		kaltura-capture-thumb
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 3 --error-threshold 10 --script "@APP_DIR@/tests/monitoring/api_v3/capturethumbnail.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_CONVERT"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/capturethumbnail.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_CONVERT"
+}
+
+define command{
+	command_name		kaltura-ingest-flavors-multirequest
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/ingest.php --service-url $HOSTADDRESS$ --timeout 70 --conversion-profile-system-name INGESTED_FALVORS --use-multi-request"
+}
+
+define command{
+	command_name		kaltura-ingest-flavors
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/ingest.php --service-url $HOSTADDRESS$ --timeout 70 --conversion-profile-system-name INGESTED_FALVORS"
+}
+
+define command{
+	command_name		kaltura-ingest-single
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/ingest.php --service-url $HOSTADDRESS$ --timeout 70 --conversion-profile-system-name INGESTED_FALVORS --use-single-resource --use-multi-request"
 }
 
 

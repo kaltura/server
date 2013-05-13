@@ -25,4 +25,40 @@
 			<flavorParamsIds>0,1,2,3,4,5,6,7,8</flavorParamsIds>
 		</conversionProfile>
 	</request>
+	
+	<multirequest>
+		<request service="conversionProfile" action="add">
+			<conversionProfile objectType="KalturaConversionProfile">
+				<name>Ingested Falvors</name>
+				<systemName>INGESTED_FALVORS</systemName>
+				<description>Light set of flavors to be ingested</description>
+				<flavorParamsIds>0,1,2,3</flavorParamsIds>
+			</conversionProfile>
+		</request>
+		<request service="conversionProfileAssetParams" action="update">
+			<conversionProfileId>{1:result:id}</conversionProfileId>
+			<assetParamsId>1</assetParamsId>
+			<conversionProfileAssetParams objectType="KalturaConversionProfileAssetParams">
+				<origin>1</origin>
+				<readyBehavior>1</readyBehavior>
+			</conversionProfileAssetParams>
+		</request>
+		<request service="conversionProfileAssetParams" action="update">
+			<conversionProfileId>{1:result:id}</conversionProfileId>
+			<assetParamsId>2</assetParamsId>
+			<conversionProfileAssetParams objectType="KalturaConversionProfileAssetParams">
+				<origin>1</origin>
+				<readyBehavior>1</readyBehavior>
+			</conversionProfileAssetParams>
+		</request>
+		<request service="conversionProfileAssetParams" action="update">
+			<conversionProfileId>{1:result:id}</conversionProfileId>
+			<assetParamsId>3</assetParamsId>
+			<conversionProfileAssetParams objectType="KalturaConversionProfileAssetParams">
+				<origin>1</origin>
+				<readyBehavior>1</readyBehavior>
+			</conversionProfileAssetParams>
+		</request>
+	</multirequest>
+	
 </xml>

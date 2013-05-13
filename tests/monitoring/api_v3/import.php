@@ -17,8 +17,8 @@ if(!isset($options['timeout']))
 	echo "Argument timeout is required";
 	exit(-1);
 }
-
 $timeout = $options['timeout'];
+
 $mediaUrl = $serviceUrl . '/content/templates/entry/data/kaltura_logo_animated_blue.flv';
 if(isset($options['media-url']))
 	$mediaUrl = $options['media-url'];
@@ -52,10 +52,7 @@ try
 	foreach($results as $index => $result)
 	{
 		if ($client->isError($result))
-		{
-			echo "Executing failed for request #".($index+1)." with error [" . $result['message'] . "]\n";
 			throw new KalturaException($result["message"], $result["code"]);
-		}
 	}
 		
 	// Waits for the entry to start conversion

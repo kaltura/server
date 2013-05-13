@@ -1225,3 +1225,27 @@ define	service{
 		notifications_enabled			1
 }
 
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Ingest Single Resource
+		check_command					kaltura-ingest-single
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Ingest Multiple Flavors
+		check_command					kaltura-ingest-flavors
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Ingest Multiple Flavors in Multirequest
+		check_command					kaltura-ingest-flavors-multirequest
+		notifications_enabled			1
+}
+
