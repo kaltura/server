@@ -15,6 +15,8 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
 		
+	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
+	
 	protected $_defaultExpiry = 0;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
 			
@@ -138,16 +140,14 @@ class KalturaResponseCacher extends kApiCache
 			return;
 		}
 		
-		list($responseType, $contentType) = explode('|', $this->_responseMetadata, 2);
+		$responseMetadata = unserialize($this->_responseMetadata);
+
+		foreach ($responseMetadata['headers'] as $curHeader)
+			header($curHeader, true);
 		
-		if ($contentType) 
+		if ($responseMetadata['class'])
 		{
-			header($contentType, true);
-		}
-		
-		if ($responseType)
-		{
-			require_once(dirname(__file__) . "/../../server_infra/renderers/{$responseType}.php");
+			require_once(dirname(__file__) . "/../../server_infra/renderers/{$responseMetadata['class']}.php");
 			$response = unserialize($response);
 			$response->output();
 			die;
@@ -170,18 +170,19 @@ class KalturaResponseCacher extends kApiCache
 		die;
 	}
 	
-	protected function getContentTypeHeader()
+	protected function getContentHeaders()
 	{
+		$result = array();
 		$headers = headers_list();
 		foreach($headers as $headerStr)
 		{
 			$header = explode(":", $headerStr);
-			if (isset($header[0]) && strtolower($header[0]) == "content-type")
+			if (isset($header[0]) && in_array(strtolower($header[0]), self::$cachedContentHeaders))
 			{
-				return $headerStr;
+				$result[] = $headerStr;
 			}
 		}
-		return '';
+		return $result;
 	}
 	
 	public function end($response)
@@ -189,17 +190,19 @@ class KalturaResponseCacher extends kApiCache
 		$this->initCacheModes();
 		if ($this->_cacheModes)
 		{
-			$responseType = '';
+			$responseClass = '';
 			$serializeResponse = false;
 			if ($response instanceof kRendererBase)
 			{
-				$responseType = get_class($response);
+				$responseClass = get_class($response);
 				$serializeResponse = true;
 			}
 			
-			$contentType = $this->getContentTypeHeader();
+			$contentHeaders = $this->getContentHeaders();
+			
+			$responseMetadata = array('headers' => $contentHeaders, 'class' => $responseClass);
 						
-			$this->storeCache($response, "$responseType|$contentType", $serializeResponse);
+			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
 		}
 		
 		if ($response instanceof kRendererBase)

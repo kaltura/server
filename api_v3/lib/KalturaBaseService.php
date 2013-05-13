@@ -285,6 +285,24 @@ abstract class KalturaBaseService
 	}
 	
 	/**
+	 * @param string $file_name
+	 * @param string $mime_type
+	 * @return kRendererDumpFile
+	 */
+	protected function dumpFile($filePath, $mimeType)
+	{
+		kFileUtils::closeDbConnections();
+		
+		kFileUtils::pollFileExists($filePath);
+		
+		// if by now there is no file - die !
+		if(! file_exists($filePath))
+			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+		
+		return new kRendererDumpFile($filePath, $mimeType, kFileUtils::xSendFileAllowed($filePath));
+	}
+	
+	/**
 	 * @param ISyncableFile $syncable
 	 * @param int $fileSubType
 	 * @param string $fileName
@@ -302,17 +320,8 @@ abstract class KalturaBaseService
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();
-			$mimeType = kFile::mimeType($filePath);
-			
-			kFileUtils::closeDbConnections();
-			
-			kFileUtils::pollFileExists($filePath);
-			
-			// if by now there is no file - die !
-			if(! file_exists($filePath))
-				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-			
-			return new kRendererDumpFile($filePath, $mimeType, kFileUtils::xSendFileAllowed($filePath));
+			$mimeType = kFile::mimeType($filePath);			
+			return $this->dumpFile($filePath, $mimeType);
 		}
 		else if ( in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) )
 		{

@@ -50,7 +50,5 @@ class kRendererDumpFile implements kRendererBase
 		{
 			infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
 		}
-		
-		die;
 	}
 }

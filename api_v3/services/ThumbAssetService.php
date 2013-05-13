@@ -519,7 +519,7 @@ class ThumbAssetService extends KalturaAssetService
 			null);
 		
 		$mimeType = kFile::mimeType($tempThumbPath);
-		kFileUtils::dumpFile($tempThumbPath, $mimeType); 
+		return $this->dumpFile($tempThumbPath, $mimeType); 
 	}
 	
 	/**
