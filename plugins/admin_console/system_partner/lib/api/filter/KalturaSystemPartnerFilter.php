@@ -11,6 +11,11 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 		"partnerParentIdIn" => "_in_partner_parent_id",
 	);
 	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+	}
+	
 	/**
 	 * @var int
 	 * @requiresPermission write
