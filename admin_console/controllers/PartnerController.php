@@ -48,6 +48,8 @@ class PartnerController extends Zend_Controller_Action
 		
 		//Add languages
 		$languages = Zend_Registry::get('config')->languages;
+		/* @var $languages Zend_Config */
+		Form_PackageHelper::addOptionsToForm($form, $languages->toArray(), 'partner_language', 'name');
 		
 		if ($request->isPost())
 		{
@@ -60,7 +62,7 @@ class PartnerController extends Zend_Controller_Action
 				$partner->adminName = $partner->name;
 				$partner->description = "Admin Console";
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
-				$partner->partnerLanguage = $form->getValue('partner_language');
+				$partner->language = $form->getValue('partner_language');
 				$templatePartnerId = $form->getValue('template_partner_id');
 				$client->startMultiRequest();
 				KalturaLog::debug("is multi request: ".$client->isMultiRequest());
