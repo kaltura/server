@@ -32,6 +32,8 @@ class kFileUtils extends kFile
 		if ($xsendfile_uri === null || strpos($_SERVER["REQUEST_URI"], $xsendfile_uri) === false)
 			return false;
 		
+		// Note: xsend-file requires explicit listing of paths that are allowed for file dumping,
+		//		the parameter xsendfile_paths should be configured exactly the same as in the apache.conf 
 		$xsendfile_paths = kConf::hasParam('xsendfile_paths') ? kConf::get('xsendfile_paths') : array();
 		foreach($xsendfile_paths as $path)
 		{
