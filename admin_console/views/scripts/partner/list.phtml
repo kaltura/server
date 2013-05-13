@@ -80,14 +80,14 @@
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users')): ?>
 									<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 								<?php endif; ?>
-								<?php if ($partner->groupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->parentParentId == 0): ?>
+								<?php if ($partner->groupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId== 0): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')): ?>
 										<option value="configure"><?php echo $this->translate('Configure'); ?></option>
 									<?php endif; ?>
 								<?php elseif (Infra_AclHelper::isAllowed('partner','configure')) :?>
 									<option value="configure"><?php echo $this->translate('Configure'); ?></option>
 								<?php endif;?>
-								<?php if ($partner->groupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->parentParentId == 0): ?>
+								<?php if ($partner->groupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId == 0): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')): ?>
 										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE): ?>
 											<option value="block"><?php echo $this->translate('Block'); ?></option>
