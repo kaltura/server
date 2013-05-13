@@ -42,7 +42,7 @@ class PartnerController extends Zend_Controller_Action
 		//Retrieve partner 0 template partners.
 		$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
 		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
-		$partnerFilter->partnerParentIdEqual = 0;
+		Infra_ClientHelper::impersonate(0);
 		$result = $client->partner->listAction($partnerFilter);
 		Form_PackageHelper::addOptionsToForm($form, $result->objects, 'template_partner_id', 'name');
 		
