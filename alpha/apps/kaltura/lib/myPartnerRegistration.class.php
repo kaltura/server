@@ -163,7 +163,11 @@ class myPartnerRegistration
 		$secret = md5($this->str_makerand(5,10,true, false, true));
 		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
 
-		$newPartner = new Partner();
+		if ($partner)
+			$newPartner = $partner;
+		else
+			$newPartner = new Partner();
+			
 		if ($partner_name)
 			$newPartner->setPartnerName($partner_name);
 		$newPartner->setAdminSecret($admin_secret);
@@ -198,23 +202,7 @@ class myPartnerRegistration
 			$newPartner->setType(102);
 			if($partner) $partner->setType(102);
 		}
-		
-		if ( $partner )
-		{
-			if ( $partner->getType() ) $newPartner->setType ( $partner->getType() );
-			if ( $partner->getContentCategories() ) $newPartner->setContentCategories( $partner->getContentCategories() );
-			if ( $partner->getPhone() ) $newPartner->setPhone( $partner->getPhone() );
-			if ( $partner->getDescribeYourself() ) $newPartner->setDescribeYourself( $partner->getDescribeYourself() );
-			if ( $partner->getAdultContent() ) $newPartner->setAdultContent( $partner->getAdultContent() );
-			if ( $partner->getDefConversionProfileType() ) $newPartner->setDefConversionProfileType( $partner->getDefConversionProfileType() );
-			// new fields of registration form
-			if ( $partner->getFirstName() ) $newPartner->setFirstName( $partner->getFirstName() );
-			if ( $partner->getLastName() ) $newPartner->setLastName( $partner->getLastName() );
-			if ( $partner->getCountry() ) $newPartner->setCountry( $partner->getCountry() );
-			if ( $partner->getState() ) $newPartner->setState( $partner->getState() );
-			if ( $partner->getAdditionalParams() && is_array($partner->getAdditionalParams()) && count($partner->getAdditionalParams())) $newPartner->setAdditionalParams( $partner->getAdditionalParams() );
-			
-		}
+
 		$newPartner->save();
 
 		// if name was left empty - which should not happen - use id as name
