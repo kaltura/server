@@ -241,14 +241,10 @@ class KalturaFrontController
 			}
 			$this->onRequestEnd($success, $errorCode, $i);
 	        
-<<<<<<< .mine
-            $results[$i] = $currentResult;
-=======
             $results[$i] = $currentResult;
             
             if ($currentResult instanceof kRendererBase)
             	return $currentResult;
->>>>>>> .r98152
 	    }
 	    
 	    return $results;
