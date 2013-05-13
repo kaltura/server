@@ -323,6 +323,24 @@ class asset extends Baseasset implements ISyncableFile
 		 $this->m_file_sync = $file_sync;
 	}
 	
+	/**
+	 * Set the value of [file_ext] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     asset The current object (for fluent API support)
+	 */
+	public function setFileExt($v)
+	{
+		if (preg_match('/[\s\t\n\r]/', $v)){
+			preg_match('/\w*/', $v, $v);
+			KalturaLog::err("File extension cannot contain spaces, saving only ".$v[0]);
+			parent::setFileExt($v[0]);
+		}
+		else{
+			parent::setFileExt($v);
+		}
+	}
+	
 	private function calculateId()
 	{
 		$dc = kDataCenterMgr::getCurrentDc();
