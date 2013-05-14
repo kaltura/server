@@ -38,7 +38,11 @@ abstract class kMatchCondition extends kCondition
 	 */
 	function getStringValues($scope = null)
 	{
+		if(!is_array($this->values))
+			return array();
+			
 		$values = array();
+		
 		foreach($this->values as $value)
 		{
 			/* @var $value kStringValue */
