@@ -1249,3 +1249,26 @@ define	service{
 		notifications_enabled			1
 }
 
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Bulk Upload Entries CSV
+		check_command					kaltura-bulk-upload-entries-csv
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Bulk Upload Categories CSV
+		check_command					kaltura-bulk-upload-categories-csv
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Bulk Upload Users CSV
+		check_command					kaltura-bulk-upload-users-csv
+		notifications_enabled			1
+}

@@ -739,4 +739,17 @@ define command{
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/ingest.php --service-url $HOSTADDRESS$ --timeout 70 --conversion-profile-system-name INGESTED_FALVORS --use-single-resource --use-multi-request"
 }
 
+define command{
+	command_name		kaltura-bulk-upload-entries-csv
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/entriesBulkUploadCsv.php --service-url $HOSTADDRESS$"
+}
 
+define command{
+	command_name		kaltura-bulk-upload-categories-csv
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/ctegoriesBulkUploadCsv.php --service-url $HOSTADDRESS$"
+}
+
+define command{
+	command_name		kaltura-bulk-upload-users-csv
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/usersBulkUploadCsv.php --service-url $HOSTADDRESS$"
+}
