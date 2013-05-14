@@ -331,6 +331,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function setFileExt($v)
 	{
+		$v = trim($v);
 		if (preg_match('/[\s\t\n\r]/', $v)){
 			preg_match('/\w*/', $v, $v);
 			KalturaLog::err("File extension cannot contain spaces, saving only ".$v[0]);
