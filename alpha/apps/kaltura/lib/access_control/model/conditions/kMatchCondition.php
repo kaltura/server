@@ -142,13 +142,17 @@ abstract class kMatchCondition extends kCondition
 	 */
 	public function shouldDisableCache($scope)
 	{
-		foreach($this->values as $value)
+		if(is_array($this->values))
 		{
-			if (is_object($value) && $value->shouldDisableCache($scope))
+			foreach($this->values as $value)
 			{
-				return true;
+				if (is_object($value) && $value->shouldDisableCache($scope))
+				{
+					return true;
+				}
 			}
 		}
+		
 		return $this->shouldFieldDisableCache($scope);
 	}
 
