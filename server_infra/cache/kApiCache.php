@@ -114,6 +114,23 @@ class kApiCache extends kApiCacheBase
 
 		$this->addKsData($ks);
 		$this->addInternalCacheParams();
+		
+		// print the partner id using apache note
+		$partnerId = null;
+		if ($this->_ksPartnerId)
+		{
+			$partnerId = $this->_ksPartnerId;
+		}
+		else if (isset($this->_params["partnerId"]))
+		{
+			$partnerId = $this->_params["partnerId"];
+		}
+		
+		if ($partnerId && is_numeric($partnerId) && function_exists('apache_note'))
+		{
+			apache_note("Kaltura_PartnerId", $partnerId);
+		}
+		
 		return true;
 	}
 
