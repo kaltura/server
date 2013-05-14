@@ -2,7 +2,7 @@
 /**
  * @package Core
  * @subpackage model.filters
- */ 
+ */
 class criteriaFilter
 {
 	/**
@@ -36,6 +36,9 @@ class criteriaFilter
 	 */
 	public function & getFilter ()
 	{
+		if(!$this->criteria)
+			$this->criteria = new Criteria();
+			
 		return $this->criteria;
 	}
 	
@@ -52,7 +55,7 @@ class criteriaFilter
 	
 	/**
 	 * copy all constraints from the criteria to $criteria_to_filter
-	 * 
+	 *
 	 */
 	private function copyCriteriaConstraints($fromCriteria, $toCriteria)
 	{
@@ -71,7 +74,7 @@ class criteriaFilter
 			$existingCriterion = $toCriteria->getCriterion ( $column );
 
 			// don't add duplicates !!
-			if ( $existingCriterion && ( $existingCriterion->getValue() == $filterCriterion->getValue() &&  $existingCriterion->getComparison() == $filterCriterion->getComparison() ) ) 
+			if ( $existingCriterion && ( $existingCriterion->getValue() == $filterCriterion->getValue() &&  $existingCriterion->getComparison() == $filterCriterion->getComparison() ) )
 				continue;
 			
 				// go one step deeper to copy the inner clauses
@@ -82,9 +85,9 @@ class criteriaFilter
 
 		// TODO - adda more robust way to copy the orderBy from this->criteria
 		$orderBy = $fromCriteria->getOrderByColumns();
-		if ( $orderBy ) 
+		if ( $orderBy )
 		{
-			foreach ( $orderBy as $orderByColumn ) 
+			foreach ( $orderBy as $orderByColumn )
 			{
 				@list ( $name , $order ) = explode ( " " , $orderByColumn );
 				if ( $order == Criteria::ASC )
@@ -96,11 +99,11 @@ class criteriaFilter
 	}
 	
 	/**
-	 * add inner criteria for criterions 
-	 * ----------------- IMPORTANT ----------------- 
+	 * add inner criteria for criterions
+	 * ----------------- IMPORTANT -----------------
 	 *  for this to work - we have to change the access modifier of the Creterion::getClauses() function from private to public
 	 * It's in the Criteria.php file under
-	 * 	/symfony/vendor/propel/util/Criteria.php 
+	 * 	/symfony/vendor/propel/util/Criteria.php
 	 */
 	private function addClauses ( Criteria $criteriaToFilter , Criterion $filterCriterion , Criterion $criterion  )
 	{
@@ -110,7 +113,7 @@ class criteriaFilter
 		$clauses = $filterCriterion->getClauses();
 		$i=0;
 		foreach ( $clauses as $clause )
-		{	
+		{
 			if($clause instanceof KalturaCriterion && !$clause->isEnabled())
 				continue;
 				
