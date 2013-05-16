@@ -1,10 +1,5 @@
 <?php
 /**
- * @package Scheduler
- * @subpackage Mailer
- */
-
-/**
  * Will import a single URL and store it in the file system.
  * The state machine of the job is as follows:
  * 	 	parse URL	(youTube is a special case) 
@@ -46,7 +41,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	const MAILER_DEFAULT_SENDER_NAME = 'Kaltura Notification Service';
 	
 	// replace email config mechanism !!
-	protected $texts_array; // will hold the configuration of the in file
+	protected $texts_array; // will hold the configuration of the ini file
 	
 	/**
 	 * @var PHPMailer
@@ -111,6 +106,11 @@ class KAsyncMailer extends KJobHandlerWorker
 	{
 		KalturaLog::debug("send($job->id)");
 		
+		if (!isset($data->language))
+		{
+			$this->initConfig($data->language);	
+		}
+		
 		try
 		{
  			$result = $this->sendEmail( 
@@ -121,7 +121,7 @@ class KAsyncMailer extends KJobHandlerWorker
  				explode ( "|" , $data->bodyParams ),
  				$data->fromEmail ,
  				$data->fromName,
- 				$data->culture,
+ 				$data->language,
  				$data->isHtml);
 			
 	 		if ( $result )
@@ -147,9 +147,9 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 
-	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $culture = 'en', $isHtml = false  )
+	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $language = 'en', $isHtml = false  )
 	{
-		KalturaLog::debug(__METHOD__ . "($recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $culture, $fromemail , $fromname)");
+		KalturaLog::debug(__METHOD__ . "($recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $language, $fromemail , $fromname)");
 		
 		$this->mail = new PHPMailer();
 		$this->mail->CharSet = 'utf-8';
@@ -172,8 +172,8 @@ class KAsyncMailer extends KJobHandlerWorker
 			$this->mail->FromName = self::MAILER_DEFAULT_SENDER_NAME ;
 		}
 			
-		$this->mail->Subject = $this->getSubjectByType( $type, $culture, $subjectParams  ) ;
-		$this->mail->Body = $this->getBodyByType( $type, $culture, $bodyParams, $recipientemail, $isHtml ) ;
+		$this->mail->Subject = $this->getSubjectByType( $type, $language, $subjectParams  ) ;
+		$this->mail->Body = $this->getBodyByType( $type, $language, $bodyParams, $recipientemail, $isHtml ) ;
 			
 //		$this->mail->setContentType( "text/plain; charset=\"utf-8\"" ) ; //; charset=utf-8" );
 		// definition of the required parameters
@@ -204,14 +204,14 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 	
-	public function getSubjectByType( $type, $culture, $subjectParamsArray  )
+	public function getSubjectByType( $type, $language, $subjectParamsArray  )
 	{
-		KalturaLog::debug(__METHOD__ . "($type, $culture, $subjectParamsArray)");
+		KalturaLog::debug(__METHOD__ . "($type, $language, $subjectParamsArray)");
 		
 		if ( $type > 0 )
 		{
-			$cultureTexts = isset($this->texts_array[$culture]) ? $this->texts_array[$culture] : reset($this->texts_array);
-			$subject = $cultureTexts['subjects'][$type];
+			$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
+			$subject = $languageTexts['subjects'][$type];
 			$subject = vsprintf( $subject, $subjectParamsArray );
 			//$this->mail->setSubject( $subject );
 			return $subject;
@@ -222,16 +222,16 @@ class KAsyncMailer extends KJobHandlerWorker
 		}
 	}
 
-	public function getBodyByType( $type, $culture, $bodyParamsArray, $recipientemail, $isHtml = false  )
+	public function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false  )
 	{
-		KalturaLog::debug(__METHOD__ . "($type, $culture, $bodyParamsArray, $recipientemail)");
+		KalturaLog::debug(__METHOD__ . "($type, $language, $bodyParamsArray, $recipientemail)");
 
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
-		$cultureTexts = isset($this->texts_array[$culture]) ? $this->texts_array[$culture] : reset($this->texts_array);
-		$common_taxt_arr = $cultureTexts['common_text'];
+		$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
+		$common_taxt_arr = $languageTexts['common_text'];
 		$footer = ( isset($common_taxt_arr[$type . '_footer']) ) ? $common_taxt_arr[$type . '_footer'] : $common_taxt_arr['footer'];
-		$body = $cultureTexts['bodies'][$type];
+		$body = $languageTexts['bodies'][$type];
 
 		// TODO - move to batch config
 		$forumsLink = kConf::get('forum_url');
@@ -261,28 +261,31 @@ class KAsyncMailer extends KJobHandlerWorker
 		return $body;
 	}
 		
-	protected function initConfig ( )
+	protected function initConfig ( $language = null)
 	{
 		KalturaLog::debug(__METHOD__ . "()");
-		$cultures = array( 'en' );
+		$languages = array($language ? $language :'en' );
 
 		// now we read the ini files with the texts
 		// NOTE: '=' signs CANNOT be used inside the ini files, instead use "<EQ>"
 		$rootdir =  realpath(dirname(__FILE__).'');
 			
-		foreach ( $cultures as $culture)
+		foreach ( $languages as $language)
 		{
-			$filename = $rootdir."/emails_".$culture.".ini";
-			KalturaLog::debug( 'ini filename = '.$filename );
-			if ( ! file_exists ( $filename )) 
+			if (!isset($this->texts_array[$language]))
 			{
-				KalturaLog::crit( 'Fatal:::: Cannot find file: '.$filename );
-				die();
+				$filename = $rootdir."/emails_".$language.".ini";
+				KalturaLog::debug( 'ini filename = '.$filename );
+				if ( ! file_exists ( $filename )) 
+				{
+					KalturaLog::crit( 'Fatal:::: Cannot find file: '.$filename );
+					die();
+				}
+				$ini_array = parse_ini_file( $filename, true );
+				$this->texts_array[$language] = array( 'subjects' => $ini_array['subjects'],
+				'bodies'=>$ini_array['bodies'] ,
+				'common_text'=> $ini_array['common_text'] );
 			}
-			$ini_array = parse_ini_file( $filename, true );
-			$this->texts_array[$culture] = array( 'subjects' => $ini_array['subjects'],
-			'bodies'=>$ini_array['bodies'] ,
-			'common_text'=> $ini_array['common_text'] );
 		}		
 	}
 	
