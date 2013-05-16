@@ -268,11 +268,11 @@ class kXsd
 				{
 					$childXsl = self::compareNode($fromChild, $toChild, $xPath, $level + 1);
 					if($childXsl === true)
-					{
-						$xsl .= $childXsl;
-						$isIdentical = false;
-						KalturaLog::info("Nodes [$fromName] [$toName] are different");
-					}
+						continue;
+						
+					$xsl .= $childXsl;
+					$isIdentical = false;
+					KalturaLog::info("Nodes [$fromName] [$toName] are different");
 					continue;
 				}
 				$fromChildName = strtolower($toChild->localName);
