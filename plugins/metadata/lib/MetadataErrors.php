@@ -33,7 +33,9 @@ class MetadataErrors extends KalturaErrors
 	
 	const XSLT_VALIDATION_ERROR = "XSLT_VALIDATION_ERROR,XSLT validation error [%s]";
 	
-	const MUST_FILTER_ON_OBJECT_ID = "MUST_FILTER_ON_OBJECT_ID,Must filter on obejct id";
+	const MUST_FILTER_ON_OBJECT_ID = "MUST_FILTER_ON_OBJECT_ID,Must filter on object id";
+
+	const MUST_FILTER_ON_OBJECT_TYPE = "MUST_FILTER_ON_OBJECT_TYPE,Must filter on object type";
 	
 	const INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE = "INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE,Metadata Profile object type is %s, metadata object type is %s";
 	

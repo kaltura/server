@@ -333,7 +333,10 @@ class MetadataService extends KalturaBaseService
 			
 		if (kEntitlementUtils::getEntitlementEnforcement() && (is_null($filter->objectIdIn) && is_null($filter->objectIdEqual)))
 			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
-			
+
+		if (!$filter->metadataObjectTypeEqual)
+			throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_TYPE);
+				
 		$applyPartnerFilter = true;
 		if ($filter->metadataObjectTypeEqual == MetadataObjectType::ENTRY)
 		{
@@ -345,6 +348,10 @@ class MetadataService extends KalturaBaseService
 			{
 				$entryIds = explode(',', $filter->objectIdIn);
 			}
+			
+			if (!$entryIds && kConf::hasParam('metadata_list_without_object_filtering_partners') && 
+				!in_array($this->getPartnerId(), kConf::get('metadata_list_without_object_filtering_partners'))) 
+				throw new KalturaAPIException(MetadataErrors::MUST_FILTER_ON_OBJECT_ID);
 			
 			if($entryIds)
 			{
