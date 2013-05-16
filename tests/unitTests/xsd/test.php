@@ -7,7 +7,7 @@ class thumbnailTest extends PHPUnit_Framework_TestCase
 	{
 		$path = realpath(__DIR__ . '/xsd');
 		$xsdDir = dir($path);
-		while (false !== ($entry = $xsdDir->read())) 
+		while (false !== ($entry = $xsdDir->read()))
 		{
 			if($entry == '.' || $entry == '..' || $entry == '.svn')
 				continue;
@@ -22,7 +22,7 @@ class thumbnailTest extends PHPUnit_Framework_TestCase
 	{
 		$xsdFiles = array();
 		$xsdDir = dir($path);
-		while (false !== ($entry = $xsdDir->read())) 
+		while (false !== ($entry = $xsdDir->read()))
 		{
 			$matches = null;
 			if(!preg_match('/(\d+)\.xsd/', $entry, $matches))
@@ -43,7 +43,7 @@ class thumbnailTest extends PHPUnit_Framework_TestCase
 			$toXsd = $xsdFiles[$currentVersion];
 			
 			$fromXsdContent = file_get_contents($fromXsd);
-			$toXsdContent = file_get_contents($toXsdContent);
+			$toXsdContent = file_get_contents($toXsd);
 			
 			$xsl = kXsd::compareXsd($fromXsdContent, $toXsdContent);
 			$this->assertTrue($xsl, "XSD [$fromXsd => $toXsd] Created XSL");
