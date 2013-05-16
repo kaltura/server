@@ -73,9 +73,9 @@ class kMailJobData extends kJobData
     private $templatePath;
 
 	/**
- 	* @var int
+ 	* @var string
  	*/
-    private $culture;
+    private $language;
 
 	/**
  	* @var int
@@ -181,11 +181,11 @@ class kMailJobData extends kJobData
 	}
 
 	/**
-	 * @return the $culture
+	 * @return string $language
 	 */
-	public function getCulture()
+	public function getLanguage()
 	{
-		return $this->culture;
+		return $this->language;
 	}
 
 	/**
@@ -323,11 +323,11 @@ class kMailJobData extends kJobData
 	}
 
 	/**
-	 * @param $culture the $culture to set
+	 * @param string $culture the $culture to set
 	 */
-	public function setCulture($culture)
+	public function setLanguage($language)
 	{
-		$this->culture = $culture;
+		$this->language = $language;
 	}
 
 	/**
