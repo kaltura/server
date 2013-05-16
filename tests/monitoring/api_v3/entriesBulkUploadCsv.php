@@ -29,8 +29,8 @@ try
 	
 	$csvData = array(
 		array(
-			'*title' => 'bulk-monitor-csv1',
-			'description' => 'bulk-monitor-csv1',
+			'*title' => 'monitor-bulk-csv1',
+			'description' => 'monitor bulk upload csv 1',
 			'tags' => 'monitor,csv',
 			'url' => $clientConfig->serviceUrl . '/content/templates/entry/data/kaltura_logo_animated_black.flv',
 			'contentType' => 'video',
@@ -38,8 +38,8 @@ try
 			'thumbnailUrl' => $clientConfig->serviceUrl . '/content/templates/entry/thumbnail/kaltura_logo_animated_black.jpg',
 		),
 		array(
-			'*title' => 'bulk-monitor-csv2',
-			'description' => 'bulk-monitor-csv2',
+			'*title' => 'monitor-bulk-csv2',
+			'description' => 'monitor bulk upload csv 2',
 			'tags' => 'monitor,csv',
 			'url' => $clientConfig->serviceUrl . '/content/templates/entry/data/kaltura_logo_animated_blue.flv',
 			'contentType' => 'video',
