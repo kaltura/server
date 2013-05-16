@@ -175,6 +175,9 @@ class kJobsManager
 		$jobData->setCampaignId($camaignId);
 	 	$jobData->setTemplatePath($templatePath);
 	
+	 	$partner = PartnerPeer::retrieveByPK($partnerId);
+		$jobData->setLanguage($partner->getLanguage()); 
+	 	
 		$batchJob = null;
 		if($parentJob)
 		{
