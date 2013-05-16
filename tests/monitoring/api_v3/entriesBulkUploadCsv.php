@@ -29,18 +29,18 @@ try
 	
 	$csvData = array(
 		array(
-			'*title' => 'bulk-monitor-test1',
-			'description' => 'bulk-monitor-test1',
-			'tags' => 'monitor,test1',
+			'*title' => 'bulk-monitor-csv1',
+			'description' => 'bulk-monitor-csv1',
+			'tags' => 'monitor,csv',
 			'url' => $clientConfig->serviceUrl . '/content/templates/entry/data/kaltura_logo_animated_black.flv',
 			'contentType' => 'video',
 			'category' => 'monitor>csv',
 			'thumbnailUrl' => $clientConfig->serviceUrl . '/content/templates/entry/thumbnail/kaltura_logo_animated_black.jpg',
 		),
 		array(
-			'*title' => 'bulk-monitor-test2',
-			'description' => 'bulk-monitor-test2',
-			'tags' => 'monitor,test2',
+			'*title' => 'bulk-monitor-csv2',
+			'description' => 'bulk-monitor-csv2',
+			'tags' => 'monitor,csv',
 			'url' => $clientConfig->serviceUrl . '/content/templates/entry/data/kaltura_logo_animated_blue.flv',
 			'contentType' => 'video',
 			'category' => 'monitor>csv',
