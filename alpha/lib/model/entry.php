@@ -193,7 +193,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		for ( $i = 0 ; $i < 10 ; ++$i)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existing_object = entryPeer::retrieveByPk( $id );
+			$existing_object = entryPeer::retrieveByPKNoFilter( $id );
 			
 			if ( ! $existing_object ) return $id;
 		}
