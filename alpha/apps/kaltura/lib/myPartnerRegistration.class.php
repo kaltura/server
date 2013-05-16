@@ -158,16 +158,14 @@ class myPartnerRegistration
 	 * @param int $templatePartnerId
 	 * @return Partner
 	 */
-	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $templatePartnerId = null )
+	private function createNewPartner( $partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $newPartner = null, $templatePartnerId = null )
 	{
 		$secret = md5($this->str_makerand(5,10,true, false, true));
 		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
 
-		if ($partner)
-			$newPartner = $partner;
-		else
+		if (!$newPartner)
 			$newPartner = new Partner();
-			
+
 		if ($partner_name)
 			$newPartner->setPartnerName($partner_name);
 		$newPartner->setAdminSecret($admin_secret);
@@ -200,7 +198,6 @@ class myPartnerRegistration
 		if(substr_count($description, 'Drupal module|'))
 		{
 			$newPartner->setType(102);
-			if($partner) $partner->setType(102);
 		}
 
 		$newPartner->save();
