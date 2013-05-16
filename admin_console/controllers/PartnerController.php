@@ -62,7 +62,6 @@ class PartnerController extends Zend_Controller_Action
 				$partner->adminName = $partner->name;
 				$partner->description = "Admin Console";
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
-				$partner->language = $form->getValue('partner_language');
 				$templatePartnerId = $form->getValue('template_partner_id');
 				$client->startMultiRequest();
 				KalturaLog::debug("is multi request: ".$client->isMultiRequest());
@@ -73,6 +72,7 @@ class PartnerController extends Zend_Controller_Action
 				$config->verticalClasiffication = $form->getValue('vertical_clasiffication');
 				$config->storageDeleteFromKaltura = true;
 				$config->storageServePriority = Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST;
+				$config->language = $form->getValue('partner_language');
 				$systemPartnerPlugin->systemPartner->updateConfiguration('{1:result:id}', $config);
 				
 				// set request timeout
