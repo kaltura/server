@@ -33,7 +33,6 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	 * Permission level
 	 * @deprecated
 	 * @var KalturaCategoryUserPermissionLevel
-	 * @filter eq,in
 	 */
 	public $permissionLevel;
 	
@@ -238,7 +237,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 		{
 			if($sourceObject->getKuserId() == $category->getKuserId())
 			{
-				if (strpos($this->permissionNames, PermissionName::CATEGORY_EDIT) === false)
+				if (strpos($this->permissionNames, PermissionName::CATEGORY_EDIT) === null)
 				{
 					throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER_OWNER);
 				}
