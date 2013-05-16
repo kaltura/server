@@ -305,6 +305,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $restrictEntryByMetadata;
 	
+	/**
+	 * @var KalturaLanguageCode
+	 */
+	public $language;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -363,6 +368,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"defaultDeliveryType",
 		"defaultEmbedCodeType",
 		"disabledDeliveryTypes",
+		"language",
 	);
 
 	public function getMapBetweenObjects()
