@@ -47,8 +47,11 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		if($data->getSrcXslPath())
 		{
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($data->getMetadataProfileId());
-			$metadataProfile->setStatus(MetadataProfile::STATUS_TRANSFORMING);
-			$metadataProfile->save();
+			if($metadataProfile)
+			{
+				$metadataProfile->setStatus(MetadataProfile::STATUS_TRANSFORMING);
+				$metadataProfile->save();
+			}
 		}
 		
 		return $dbBatchJob;
@@ -59,8 +62,11 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		if($data->getSrcXslPath())
 		{
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($data->getMetadataProfileId());
-			$metadataProfile->setStatus(MetadataProfile::STATUS_ACTIVE);
-			$metadataProfile->save();
+			if($metadataProfile)
+			{
+				$metadataProfile->setStatus(MetadataProfile::STATUS_ACTIVE);
+				$metadataProfile->save();
+			}
 		}
 		
 		return $dbBatchJob;
