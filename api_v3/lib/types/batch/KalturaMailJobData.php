@@ -62,9 +62,9 @@ class KalturaMailJobData extends KalturaJobData
     public $templatePath;
 
 	/**
- 	* @var int
+ 	* @var KalturaLanguageCode
  	*/
-    public $culture;
+    public $language;
 
 	/**
  	* @var int
@@ -94,7 +94,7 @@ class KalturaMailJobData extends KalturaJobData
 	    "bodyParams" ,
 	    "subjectParams" ,  
 	    "templatePath" ,
-	    "culture" ,
+	    "language" ,
 	    "campaignId" ,
 	    "minSendDate" ,
 		"isHtml" ,
