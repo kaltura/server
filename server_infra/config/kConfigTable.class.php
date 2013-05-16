@@ -3,7 +3,7 @@
  * Will read a configuration from a table-like file.
  * The file will be split into 4 parts.
  * After each part will come the part-separator which is a line starting with at least 5 - (-----)
- * 
+ *
  * The first part will define the parser instructions and will be of the following structure:
  * 	first character will define the delimiter of this part (example & )
  *  the following will be key=value pairs separated by this delimiter (don't mix this delimiter with the table dilimiter)
@@ -18,22 +18,22 @@
  * 		nopk - should throw exception if requested pk was not found (default '1');
  * example for the first part
  * &delimiter=|&trim=1&null=NULL&pk=1
- * 
+ *
  * The second part is optional and can include as many lines of arbitrary text.
  * Use this part tp describe the structure of the table and non-standard issues
- * 
+ *
  * The third part is mandatory and defined the names of the columns separated by the table-delimiter (see part-1)
  * Column names are always trimmed and should never include duplicates.
- * 
+ *
  * The forth part holds the rows of the table.
  * Each row in a separate line.
  * Each line separated into columns by the table-delimiter.
- * In the column defined as the pk there should be no duplicates. 
- * 
+ * In the column defined as the pk there should be no duplicates.
+ *
  * @package server-infra
  * @subpackage config
  */
-class kConfigTable 
+class kConfigTable
 {
 	const LINE_SEPARATOR = "\r\n";
 	const SEPARATOR_LINE_PREFIX = "-----";
@@ -54,7 +54,7 @@ class kConfigTable
 	private $inherit = "~";
 	
 	private $id;
-	private $nopk = 1; 				// throw exception if no pk was found 
+	private $nopk = 1; 				// throw exception if no pk was found
 	private $ignore_non_existing_columns;
 	
 	private $comment ;				// comments from part 2 of the table
@@ -67,8 +67,8 @@ class kConfigTable
 	public static function getInstance ( $file_name , $ignore_non_existing_columns = false )
 	{
 		if ( ! self::$should_use_cache )
-		{ 
-			// if places in the code need to skip hte cahce - better to create the object fro mthe file 
+		{
+			// if places in the code need to skip hte cahce - better to create the object fro mthe file
 			return new kConfigTable ( $file_name , $ignore_non_existing_columns );
 		}
 		
@@ -93,7 +93,7 @@ class kConfigTable
 		$this->id = $file_name;
 		
 		$this->initFromFile( $file_name );
-		$this->ignore_non_existing_columns = $ignore_non_existing_columns;	
+		$this->ignore_non_existing_columns = $ignore_non_existing_columns;
 	}
 	
 	
@@ -105,7 +105,7 @@ class kConfigTable
 	// compare a vlaue with the parser's inherit-value
 	public function isInheritValue ( $str )
 	{
-		return $str == $this->inherit;	
+		return $str == $this->inherit;
 	}
 	
 	// allow getting a single column or the whole line (if column_name not specified).
@@ -115,15 +115,15 @@ class kConfigTable
 		if ( $column_name != null )
 		{
 			$column_index = @$this->column_names[$column_name];
-			// if ignore_non_existing_columns is false - throw an exception for non-existing columns 
+			// if ignore_non_existing_columns is false - throw an exception for non-existing columns
 			if ( ! $column_index )
 			{
-//echo __METHOD__ . ":[" . $this->getId() . "][$column_name][$column_index][" . 	$this->ignore_non_existing_columns . "]\n" ;			
+//echo __METHOD__ . ":[" . $this->getId() . "][$column_name][$column_index][" . 	$this->ignore_non_existing_columns . "]\n" ;
 				if ( $this->ignore_non_existing_columns )
 				{
-					// instead of making an issue of the missing column - return the inherit string to indicate the search should continue in the chain 
+					// instead of making an issue of the missing column - return the inherit string to indicate the search should continue in the chain
 					// (if part of a chain)
-					return $this->inherit;	
+					return $this->inherit;
 				}
 				else
 				{
@@ -167,13 +167,13 @@ class kConfigTable
 	
 	public function getColumnNames ()
 	{
-		return $this->columns;	
+		return $this->columns;
 	}
 
 	public function getColumnNameByIndex ( $index )
 	{
 		if ( isset ( $this->columns[$index] ) )
-			return @$this->columns[$index];	
+			return @$this->columns[$index];
 		return null;
 	}
 	
@@ -185,7 +185,7 @@ class kConfigTable
 	public function isSetPk ( $pk )
 	{
 		return isset ( $this->rows[$pk] ) ;
-//		$row = @$this->rows[$pk]; 
+//		$row = @$this->rows[$pk];
 //		return ( $row != null );
 	}
 	
@@ -196,9 +196,13 @@ class kConfigTable
  */
 	private function initFromFile ( $file_name )
 	{
+		if(!file_exists($file_name))
+			throw new kConfigTableException ( "Cannot init from file [$file_name]" );
+		
 		$content = file_get_contents ( $file_name );
 		
-		if ( ! $content ) throw new kConfigTableException ( "Cannot init from file [$file_name]" );
+		if ( ! $content )
+			throw new kConfigTableException ( "Cannot init from file [$file_name]" );
 		
 		$lines = explode ( self::LINE_SEPARATOR , $content );
 		$part = 1;
@@ -248,7 +252,7 @@ class kConfigTable
 				list ( $key , $value ) = explode ( "=" , $rule ); // hard-coded separator etween the kwy and value - '=' character
 				if ( in_array ( $key , self::$parser_rules) )
 				{
-					$this->$key = trim($value); // store in the member variable; 
+					$this->$key = trim($value); // store in the member variable;
 				}
 				else
 				{
@@ -261,7 +265,7 @@ class kConfigTable
 	
 	private function addComment ( $line )
 	{
-		if ( $this->comment ) $this->commnet .= "\n"; 
+		if ( $this->comment ) $this->commnet .= "\n";
 		$this->comment .= $line;
 	}
 	
@@ -295,21 +299,21 @@ class kConfigTable
 	{
 		if ( trim($line) == "" ) return; // empty line
 		$values = explode ( $this->delimiter , $line );
-//echo __METHOD__ . ":$line\n" . print_r ( $values ,true ) . "\n";		
+//echo __METHOD__ . ":$line\n" . print_r ( $values ,true ) . "\n";
 		foreach ( $values as & $value )
 		{
 			if ( $this->trim ) $value = trim ($value );
-			if ( $this->null == $value ) $value = null;  		
+			if ( $this->null == $value ) $value = null;
 		}
 		
 		// TODO - validate the nuber if the same as the column number
 //echo __METHOD__ . ":pk index [" . $this->pk . "]\n";
 		$pk = @$values[$this->pk-1];
-//echo __METHOD__ . ":pk[$pk]\n";		
+//echo __METHOD__ . ":pk[$pk]\n";
 		if ( isset ( $this->rows[$pk] ) )
 		{
 			// TODO - should throw exception ??
-			throw new kConfigTableException( "Duplicate pk [$pk]" ); 
+			throw new kConfigTableException( "Duplicate pk [$pk]" );
 		}
 		
 		$this->rows[$pk] = $values;
@@ -318,7 +322,7 @@ class kConfigTable
 	private static function isSeparatorLine ( $line )
 	{
 		// lines starts with SEPARATOR_LINE_PREFIX
-		return ( substr ( $line , 0 , strlen ( self::SEPARATOR_LINE_PREFIX ) ) == self::SEPARATOR_LINE_PREFIX ); 
+		return ( substr ( $line , 0 , strlen ( self::SEPARATOR_LINE_PREFIX ) ) == self::SEPARATOR_LINE_PREFIX );
 	}
 	
 	private static function isCommentLine ( $line )
@@ -331,7 +335,7 @@ class kConfigTable
 /**
  * Will allow chaining several kConfigTable objects in a given order and handle fallback searchs in specific cases
  */
-class kConfigTableChain 
+class kConfigTableChain
 {
 	private $file_names;
 	private $config_chain = null;
@@ -340,7 +344,7 @@ class kConfigTableChain
 
 	/*
 	 * the FIRST file in the array is the most impornat one and is the first to search.
-	 * the LAST file should always be set NOT to ignore non-existing columns 
+	 * the LAST file should always be set NOT to ignore non-existing columns
 	 */
  	public function  kConfigTableChain ( array $file_names , $path = null)
 	{
@@ -372,17 +376,17 @@ class kConfigTableChain
 					if ( is_array ( $val ) )
 					{
 						$i=0;
-						// replace all inherit values in the array - 
+						// replace all inherit values in the array -
 						foreach ( $val as & $column_val )
 						{
 							if ( $config->isInheritValue ( $column_val ))
 							{
 								$column_val = $this->get ( $pk , $config->getColumnNameByIndex ( $i ) );
 							}
-							$i++; 
+							$i++;
 						}
 					}
-					if ( $config->isInheritValue ( $val ) ) 
+					if ( $config->isInheritValue ( $val ) )
 					{
 						continue;
 					}
