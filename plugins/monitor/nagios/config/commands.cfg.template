@@ -745,6 +745,11 @@ define command{
 }
 
 define command{
+	command_name		kaltura-bulk-upload-entries-xml
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/entriesBulkUploadXml.php --service-url $HOSTADDRESS$"
+}
+
+define command{
 	command_name		kaltura-bulk-upload-categories-csv
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/ctegoriesBulkUploadCsv.php --service-url $HOSTADDRESS$"
 }

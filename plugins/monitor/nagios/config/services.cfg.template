@@ -1260,6 +1260,14 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Kaltura Bulk Upload Entries XML
+		check_command					kaltura-bulk-upload-entries-xml
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		service_description				Kaltura Bulk Upload Categories CSV
 		check_command					kaltura-bulk-upload-categories-csv
 		notifications_enabled			1
