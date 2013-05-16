@@ -1272,3 +1272,91 @@ define	service{
 		check_command					kaltura-bulk-upload-users-csv
 		notifications_enabled			1
 }
+
+
+
+
+
+
+
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play RTMP
+		check_command					kaltura-play-rtmp
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play Silver Light
+		check_command					kaltura-play-sl
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play Apple HTTP
+		check_command					kaltura-play-applehttp
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play HDS
+		check_command					kaltura-play-hds
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play RTSP
+		check_command					kaltura-play-rtsp
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play URL
+		check_command					kaltura-play-url
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play HD Network
+		check_command					kaltura-play-hdnetwork
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play HD Network SMIL
+		check_command					kaltura-play-hdnetworksmil
+		notifications_enabled			1
+}
+
+define	service{
+		use								local-service
+		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-play
+		service_description				Kaltura Play HTTP
+		check_command					kaltura-play-http
+		notifications_enabled			1
+}

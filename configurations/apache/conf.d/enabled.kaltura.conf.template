@@ -52,64 +52,64 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	# redirect flash file with swfparams parameters to the bare flash file
 	RewriteRule ^(.*)/swfparams/(.*) /$1
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/thumbnail/(.*)$ /index.php/extwidget/thumbnail/$1 [L]
-	RewriteRule ^p/[0-9]+/thumbnail/(.*)$ /index.php/extwidget/thumbnail/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/thumbnail/(.*)$ /index.php/extwidget/thumbnail/$1 [L]
+	RewriteRule ^p/[-0-9]+/thumbnail/(.*)$ /index.php/extwidget/thumbnail/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
-	RewriteRule ^p/[0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
+	RewriteRule ^p/[-0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
-	RewriteRule ^p/[0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
+	RewriteRule ^p/[-0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
 	
 	# added Kaltura Screen Recorder Rewrite
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/ksr/(.*)$ index.php/extwidget/ksr/$1 [L]
-	RewriteRule ^p/[0-9]+/ksr/(.*)$ index.php/extwidget/ksr/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/ksr/(.*)$ index.php/extwidget/ksr/$1 [L]
+	RewriteRule ^p/[-0-9]+/ksr/(.*)$ index.php/extwidget/ksr/$1 [L]
 
 	RewriteRule ^index.php/downloadUrl(.*)$ /index.php/extwidget/downloadUrl/$1 [L]
 	RewriteRule ^downloadUrl(.*)$ /index.php/extwidget/downloadUrl/$1 [L]
 	RewriteRule ^entryPage(.*)$ /index.php/extwidget/entryPage/$1 [L]
 	RewriteRule ^userPage(.*)$ /index.php/extwidget/userPage/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
-	RewriteRule ^p/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+	RewriteRule ^p/[-0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
 	RewriteRule ^flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
 	
-	RewriteRule ^s/p/[0-9]+/sp/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
-	RewriteRule ^s/p/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
 	RewriteRule ^s/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
-	RewriteRule ^p/[0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
+	RewriteRule ^p/[-0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/serveIsm/(.*)$ /index.php/extwidget/serveIsm/$1 [L]
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveIsm/(.*)$ /index.php/extwidget/serveIsm/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
-	RewriteRule ^s/p/[0-9]+/sp/[0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^s/p/[0-9]+/sp/[0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
-	RewriteRule ^s/p/[0-9]+/sp/[0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
-	RewriteRule ^s/p/[0-9]+/sp/[0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^p/[0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
-	RewriteRule ^p/[0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
-	RewriteRule ^p/[0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
+	RewriteRule ^p/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
+	RewriteRule ^p/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^p/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
+	RewriteRule ^p/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
-	RewriteRule ^s/p/[0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
-	RewriteRule ^s/p/[0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
-	RewriteRule ^s/p/[0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
-	RewriteRule ^s/p/[0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
-	RewriteRule ^p/[0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
+	RewriteRule ^p/[-0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
 	RewriteRule ^kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/swf/(.*)$ /swf/$1 [L]
-	RewriteRule ^p/[0-9]+/swf/(.*)$ /swf/$1 [L]
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/flash/(.*)$ /flash/$1 [L]
-	RewriteRule ^p/[0-9]+/flash/(.*)$ /flash/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/swf/(.*)$ /swf/$1 [L]
+	RewriteRule ^p/[-0-9]+/swf/(.*)$ /swf/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/flash/(.*)$ /flash/$1 [L]
+	RewriteRule ^p/[-0-9]+/flash/(.*)$ /flash/$1 [L]
 	
 	RewriteRule ^kwidget/(.*)$ /index.php/extwidget/kwidget/$1 [L]
 	
@@ -122,8 +122,8 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	
 	RewriteRule ^api/(.*)$ /index.php/partnerservices2/$1 [L]
 	
-	RewriteRule ^p/[0-9]+/content/(.*)$ /content/$1 [L]
-	RewriteRule ^p/[0-9]+/sp/[0-9]+/content/(.*)$ /content/$1 [L]
+	RewriteRule ^p/[-0-9]+/content/(.*)$ /content/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/content/(.*)$ /content/$1 [L]
 	
 	RewriteRule ^extservices/(.*)$ /index.php/extservices/$1 [L]
 	

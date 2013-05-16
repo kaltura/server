@@ -23,3 +23,8 @@ define servicegroup{
 		servicegroup_name				kaltura-host-dwh
 		alias							Kaltura DWH
 }
+
+define servicegroup{
+		servicegroup_name				kaltura-play
+		alias							Kaltura Play
+}
