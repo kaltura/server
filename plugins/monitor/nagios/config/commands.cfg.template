@@ -770,11 +770,6 @@ define command{
 }
 
 define command{
-	command_name		kaltura-play-sl
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/play.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --protocol http --format sl"
-}
-
-define command{
 	command_name		kaltura-play-applehttp
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/play.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --protocol http --format applehttp"
 }

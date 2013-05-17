@@ -28,3 +28,8 @@ define servicegroup{
 		servicegroup_name				kaltura-play
 		alias							Kaltura Play
 }
+
+define servicegroup{
+		servicegroup_name				kaltura-bulk-upload
+		alias							Kaltura Bulk Upload
+}

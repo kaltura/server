@@ -1252,6 +1252,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-bulk-upload
 		service_description				Kaltura Bulk Upload Entries CSV
 		check_command					kaltura-bulk-upload-entries-csv
 		notifications_enabled			1
@@ -1260,6 +1261,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-bulk-upload
 		service_description				Kaltura Bulk Upload Entries XML
 		check_command					kaltura-bulk-upload-entries-xml
 		notifications_enabled			1
@@ -1268,6 +1270,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-bulk-upload
 		service_description				Kaltura Bulk Upload Categories CSV
 		check_command					kaltura-bulk-upload-categories-csv
 		notifications_enabled			1
@@ -1276,6 +1279,7 @@ define	service{
 define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
+		servicegroups					kaltura-bulk-upload
 		service_description				Kaltura Bulk Upload Users CSV
 		check_command					kaltura-bulk-upload-users-csv
 		notifications_enabled			1
@@ -1294,15 +1298,6 @@ define	service{
 		servicegroups					kaltura-play
 		service_description				Kaltura Play RTMP
 		check_command					kaltura-play-rtmp
-		notifications_enabled			1
-}
-
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-play
-		service_description				Kaltura Play Silver Light
-		check_command					kaltura-play-sl
 		notifications_enabled			1
 }
 
