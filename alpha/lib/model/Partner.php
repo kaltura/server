@@ -1123,7 +1123,7 @@ class Partner extends BasePartner
 	
 	public function getLanguage ()
 	{
-		$this->getFromCustomData('language', null, 'en');
+		return $this->getFromCustomData('language', null, 'en');
 	}
 	
 	/**
