@@ -13,6 +13,18 @@
  */
 class KAsyncMailer extends KJobHandlerWorker
 {
+	const MAILER_DEFAULT_SENDER_EMAIL = 'notifications@kaltura.com';
+	const MAILER_DEFAULT_SENDER_NAME = 'Kaltura Notification Service';
+	const DEFAULT_LANGUAGE = 'en';
+	
+	protected $texts_array; // will hold the configuration of the ini file
+	
+	/**
+	 * @var PHPMailer
+	 */
+	protected $mail;
+	
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -36,17 +48,6 @@ class KAsyncMailer extends KJobHandlerWorker
 	{
 		return $job;
 	}
-	
-	const MAILER_DEFAULT_SENDER_EMAIL = 'notifications@kaltura.com';
-	const MAILER_DEFAULT_SENDER_NAME = 'Kaltura Notification Service';
-	
-	// replace email config mechanism !!
-	protected $texts_array; // will hold the configuration of the ini file
-	
-	/**
-	 * @var PHPMailer
-	 */
-	protected $mail;
 	
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::run()
@@ -106,7 +107,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	{
 		KalturaLog::debug("send($job->id)");
 		
-		if (!isset($data->language))
+		if (!isset($this->texts_array[$data->language]))
 		{
 			$this->initConfig($data->language);	
 		}
@@ -229,9 +230,8 @@ class KAsyncMailer extends KJobHandlerWorker
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
 		$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
-		$common_taxt_arr = $languageTexts['common_text'];
-		$footer = ( isset($common_taxt_arr[$type . '_footer']) ) ? $common_taxt_arr[$type . '_footer'] : $common_taxt_arr['footer'];
-		$body = $languageTexts['bodies'][$type];
+		$common_text_arr = $languageTexts['common_text'];
+		$footer = ( isset($common_text_arr[$type . '_footer']) ) ? $common_text_arr[$type . '_footer'] : $common_text_arr['footer'];
 
 		// TODO - move to batch config
 		$forumsLink = kConf::get('forum_url');
@@ -264,7 +264,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	protected function initConfig ( $language = null)
 	{
 		KalturaLog::debug(__METHOD__ . "()");
-		$languages = array($language ? $language :'en' );
+		$languages = array($language ? $language : self::DEFAULT_LANGUAGE );
 
 		// now we read the ini files with the texts
 		// NOTE: '=' signs CANNOT be used inside the ini files, instead use "<EQ>"
@@ -279,7 +279,7 @@ class KAsyncMailer extends KJobHandlerWorker
 				if ( ! file_exists ( $filename )) 
 				{
 					KalturaLog::crit( 'Fatal:::: Cannot find file: '.$filename );
-					die();
+					continue;
 				}
 				$ini_array = parse_ini_file( $filename, true );
 				$this->texts_array[$language] = array( 'subjects' => $ini_array['subjects'],
