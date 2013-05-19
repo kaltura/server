@@ -89,6 +89,38 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $liveStreamConfigurations;
 	
+	/**
+	 * The broadcast primary ip
+	 * @requiresPermission all
+	 * @var string
+	 */
+	public $encodingIP1;
+	
+	/**
+	 * The broadcast secondary ip
+	 * 
+	 * @requiresPermission all
+	 * @var string
+	 */
+	public $encodingIP2;
+	
+	/**
+	 * The broadcast password
+	 * 
+	 * @requiresPermission all
+	 * @var string
+	 */
+	public $streamPassword;
+	
+	/**
+	 * The broadcast username
+	 * 
+	 * @requiresPermission read
+	 * @var string
+	 * @readonly
+	 */
+	public $streamUsername;
+	
 	
 	
 	private static $map_between_objects = array
@@ -105,6 +137,10 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	    "dvrWindow",
 	    "urlManager",
 		"liveStreamConfigurations",
+		"encodingIP1",
+		"encodingIP2",
+		"streamPassword",
+		"streamUsername",
 	);
 
 	public function __construct()
@@ -163,8 +199,16 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		{
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
+			$this->validateEncodingIP($this->encodingIP1);
+			$this->validateEncodingIP($this->encodingIP2);
 		}
 	}
 	
+	protected function validateEncodingIP ($ip)
+	{
+		@exec("ping -w " . kConf::get('ping_default_timeout') . " {$this->encodingIP1}", $output, $return);
+		if ($return)
+			throw new KalturaAPIException(KalturaErrors::ENCODING_IP_NOT_PINGABLE);
+	}
 }
 ?>
