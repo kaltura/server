@@ -394,7 +394,7 @@ class kMetadataManager
 	 *
 	 * @param MetadataProfile $metadataProfile
 	 * @param int $prevVersion
-	 * @param string $prevXsdPath
+	 * @param string $prevXsd
 	 */
 	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsd, $newVersion, $newXsd)
 	{
