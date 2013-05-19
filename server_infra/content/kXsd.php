@@ -400,13 +400,13 @@ class kXsd
 	public static function compareXsd($fromXsd, $toXsd)
 	{
 		$from = new KDOMDocument();
-		$from->loadXML($fromXsd, 0);
+		$from->loadXML($fromXsd);
 		
 		if(!$from || !$from->documentElement)
 			throw new kXsdException(kXsdException::INVALID_XSD_FILE, $fromXsd);
 			
 		$to = new KDOMDocument();
-		$to->loadXML($toXsd, 0);
+		$to->loadXML($toXsd);
 		
 		if(!$to || !$to->documentElement)
 			throw new kXsdException(kXsdException::INVALID_XSD_FILE, $toXsd);
