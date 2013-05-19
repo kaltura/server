@@ -212,7 +212,8 @@ class KAsyncMailer extends KJobHandlerWorker
 		if ( $type > 0 )
 		{
 			$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
-			$subject = $languageTexts['subjects'][$type];
+			$defaultLanguageTexts = $this->texts_array[self::DEFAULT_LANGUAGE];
+			$subject = isset ($languageTexts['subjects'][$type]) ? $languageTexts['subjects'][$type] : $defaultLanguageTexts['subjects'][$type];
 			$subject = vsprintf( $subject, $subjectParamsArray );
 			//$this->mail->setSubject( $subject );
 			return $subject;
@@ -230,9 +231,11 @@ class KAsyncMailer extends KJobHandlerWorker
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
 		$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
+		$defaultLanguageTexts = $this->texts_array[self::DEFAULT_LANGUAGE];
 		$common_text_arr = $languageTexts['common_text'];
-		$footer = ( isset($common_text_arr[$type . '_footer']) ) ? $common_text_arr[$type . '_footer'] : $common_text_arr['footer'];
-		$body = $languageTexts['bodies'][$type];
+		$defaultCommonTexts = $defaultLanguageTexts['common_text'];
+		$footer = ( isset($common_text_arr[$type . '_footer']) ) ? $common_text_arr[$type . '_footer'] : ($common_text_arr['footer'] ? $common_text_arr['footer'] : $defaultCommonTexts['footer']);
+		$body = isset($languageTexts['bodies'][$type]) ? $languageTexts['bodies'][$type] : $defaultLanguageTexts['bodies'][$type];
 		
 		// TODO - move to batch config
 		$forumsLink = kConf::get('forum_url');
