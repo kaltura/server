@@ -434,6 +434,7 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_CATEGORY_FIELD_IS_DEPRECATED = "ENTRY_CATEGORY_FIELD_IS_DEPRECATED, entry->categories and entry->categoriesIds fields are deprecated - user categoryEntry service";
 
+	
 	/**
 	 * categoryEntry
 	 */
@@ -469,7 +470,10 @@ class KalturaErrors extends APIErrors
 	// live stream
 	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = 'LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED,Status cannot be determined for live stream protocol [%s]';
 
+	const ENCODING_IP_NOT_PINGABLE = 'ENCODING_IP_NOT_PINGABLE';
+	
 	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = 'EXTENDING_ITEM_INCOMPATIBLE_COMBINATION,This extending object MRSS must replace the XPath contents';
+	
 	
 	/*
 	 * BaseEntry Service
