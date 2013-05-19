@@ -170,7 +170,7 @@ namespace Kaltura
             _IsMultiRequest = false;
             _MultiRequestParamsMap.Clear();
 
-            kparams.Add("sig", this.Signature(kparams));
+            kparams.Add("kalsig", this.Signature(kparams));
 
             this.Log("full reqeust url: [" + url + "]");
 

@@ -206,8 +206,9 @@ module Kaltura
 		end
 
 		def signature(params)
-			str = params.keys.map {|key| key.to_s }.sort.map {|key|
-				"#{escape(key)}#{escape(params[key])}"
+			kParams = params.select { |key, value| !value.is_a?(File) }
+			str = kParams.keys.map {|key| key.to_s }.sort.map {|key|
+				"#{key}#{params[key]}"
 			}.join("")
 			
 			Digest::MD5.hexdigest(str)

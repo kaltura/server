@@ -33,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
@@ -53,6 +52,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.Header;
@@ -488,7 +488,7 @@ abstract public class KalturaClientBase {
 		// cleanup
 		this.callsQueue.clear();
 		
-		kparams.put("sig", this.signature(kparams));
+		kparams.put("kalsig", this.signature(kparams));
 		return url;
 	}
 
@@ -580,14 +580,7 @@ abstract public class KalturaClientBase {
 			str += (key + kparams.get(key));
 		}
 
-		MessageDigest mdEnc = null;
-		try {
-			mdEnc = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			throw new KalturaApiException("Failed to sign parameters");
-		}		
-		mdEnc.update(str.getBytes(), 0, str.length());
-		String md5 = new BigInteger(1, mdEnc.digest()).toString(16); // Encrypted string
+		String md5 = DigestUtils.md5Hex(str);
 		
 		return md5;
 	}
