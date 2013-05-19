@@ -341,7 +341,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"id", 
 	 	"name", 
 	 	"description",
-	 	"creatorId" => "creatorPuserId",
 	 	"tags",
 	 	"adminTags",
 	 	"partnerId",
@@ -417,9 +416,12 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			$catNames = implode(",", $catsNames);
 			$dbObject->setCategories($catNames);
 		}
-		
-		$dbObject->setPuserId($this->userId);
+		if (!is_null($this->userId))
+			$dbObject->setPuserId($this->userId);
 			
+		if (!is_null($this->creatorId))
+			$dbObject->setCreatorPuserId($this->creatorId);
+		
 		return $dbObject;
 	}
 	
@@ -441,9 +443,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			$this->categories = null;
 			$this->categoriesIds = null;
 		}
-		
-		if (!kConf::hasParam('protect_userid_in_api') || !in_array($sourceObject->getPartnerId(), kConf::get('protect_userid_in_api')) || !in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)))
+		if (!kConf::hasParam('protect_userid_in_api') || !in_array($sourceObject->getPartnerId(), kConf::get('protect_userid_in_api')) || !in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET))){
 			$this->userId = $sourceObject->getPuserId();
+			$this->creatorId = $sourceObject->getCreatorPuserId();
+		}
 	}
 	
 	public function validateObjectsExist()
