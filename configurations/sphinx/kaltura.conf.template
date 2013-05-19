@@ -77,6 +77,7 @@ index kaltura_base
 
 index kaltura_kuser_base:kaltura_base
 {
+	dict	 = keywords
 	blend_chars		 = `, ~, U+23, (, ), -, =, [, ], {, }, ', \, |, /, <, *, ^, $, !, :, ;
 	charset_table	 = _, %, &, ?, @, +, ., >, U+FF10..U+FF19->0..9, U+FF21..U+FF3A->a..z, U+FF41..U+FF5A->a..z, 0..9, A..Z->a..z, a..z,\
 						U+00C0->a, U+00C1->a, U+00C2->a, U+00C3->a, U+00C4->a, U+00C5->a, U+00E0->a, U+00E1->a, U+00E2->a, U+00E3->a, U+00E4->a, U+00E5->a, U+0100->a, U+0101->a, U+0102->a, U+0103->a, U+010300->a, U+0104->a, U+0105->a, U+01CD->a, U+01CE->a, U+01DE->a, U+01DF->a, U+01E0->a, U+01E1->a, U+01FA->a, U+01FB->a, U+0200->a, U+0201->a, U+0202->a, U+0203->a, U+0226->a, U+0227->a, U+023A->a, U+0250->a, U+04D0->a, U+04D1->a, U+1D2C->a, U+1D43->a, U+1D44->a, U+1D8F->a, U+1E00->a, U+1E01->a, U+1E9A->a, U+1EA0->a, U+1EA1->a, U+1EA2->a, U+1EA3->a, U+1EA4->a, U+1EA5->a, U+1EA6->a, U+1EA7->a, U+1EA8->a, U+1EA9->a, U+1EAA->a, U+1EAB->a, U+1EAC->a, U+1EAD->a, U+1EAE->a, U+1EAF->a, U+1EB0->a, U+1EB1->a, U+1EB2->a, U+1EB3->a, U+1EB4->a, U+1EB5->a, U+1EB6->a, U+1EB7->a, U+2090->a, U+2C65->a,\
@@ -150,7 +151,6 @@ index kaltura_kuser_base:kaltura_base
 
 index kaltura_entry:kaltura_base
 {
-	type	 = rt
 	path	 = @BASE_DIR@/sphinx/kaltura_rt
 	rt_field	 = entry_id
 	rt_field	 = name
@@ -206,7 +206,6 @@ index kaltura_entry:kaltura_base
 	rt_field	 = entitled_kusers
 	rt_field	 = privacy_by_contexts
     rt_field     = sphinx_match_optimizations
-	blend_chars	 = `, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, ', \, |, /, ?, <, >
 }
 
 index kaltura_category
@@ -331,7 +330,6 @@ index kaltura_category
 index kaltura_kuser:kaltura_kuser_base
 {
 	path	 = @BASE_DIR@/sphinx/kaltura_kuser_rt
-	dict	 = keywords
 	min_prefix_len	 = 3
 	enable_star	 = 1
 	rt_attr_uint	 = login_data_id
@@ -365,9 +363,7 @@ index kaltura_kuser:kaltura_kuser_base
 
 index kaltura_category_kuser:kaltura_kuser_base
 {
-	type	 = rt
 	path	 = @BASE_DIR@/sphinx/kaltura_category_kuser_rt
-	dict	 = keywords
 	min_prefix_len	 = 3
 	enable_star	 = 1
 	rt_field	 = category_id
@@ -413,7 +409,6 @@ index kaltura_cue_point:kaltura_base
 	rt_attr_timestamp	 = updated_at
 	rt_attr_string	 = str_entry_id
 	rt_attr_string	 = str_cue_point_id
-	type	 = rt
 }
 index kaltura_entry_distribution:kaltura_base
 {
@@ -480,7 +475,6 @@ index kaltura_tag:kaltura_kuser_base
 	rt_field	 = privacy_context
 	rt_attr_uint	 = instance_count
 	rt_attr_timestamp	 = created_at
-	dict	 = keywords
 	min_prefix_len	 = 3
 	enable_star	 = 1
 	
