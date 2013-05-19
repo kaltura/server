@@ -470,7 +470,7 @@ class KalturaErrors extends APIErrors
 	// live stream
 	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = 'LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED,Status cannot be determined for live stream protocol [%s]';
 
-	const ENCODING_IP_NOT_PINGABLE = 'ENCODING_IP_NOT_PINGABLE';
+	const ENCODING_IP_NOT_PINGABLE = 'ENCODING_IP_NOT_PINGABLE,One or both of the provided encoding IPs is not pingable';
 	
 	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = 'EXTENDING_ITEM_INCOMPATIBLE_COMBINATION,This extending object MRSS must replace the XPath contents';
 	
