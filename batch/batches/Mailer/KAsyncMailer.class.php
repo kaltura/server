@@ -205,7 +205,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 	
-	public function getSubjectByType( $type, $language, $subjectParamsArray  )
+	protected function getSubjectByType( $type, $language, $subjectParamsArray  )
 	{
 		KalturaLog::debug(__METHOD__ . "($type, $language, $subjectParamsArray)");
 		
@@ -223,7 +223,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		}
 	}
 
-	public function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false  )
+	protected function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false  )
 	{
 		KalturaLog::debug(__METHOD__ . "($type, $language, $bodyParamsArray, $recipientemail)");
 
@@ -232,7 +232,8 @@ class KAsyncMailer extends KJobHandlerWorker
 		$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
 		$common_text_arr = $languageTexts['common_text'];
 		$footer = ( isset($common_text_arr[$type . '_footer']) ) ? $common_text_arr[$type . '_footer'] : $common_text_arr['footer'];
-
+		$body = $languageTexts['bodies'][$type];
+		
 		// TODO - move to batch config
 		$forumsLink = kConf::get('forum_url');
 		$unsubscribeLink = kConf::get('unsubscribe_mail_url').self::createBlockEmailStr($recipientemail);
@@ -295,7 +296,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	const SEPARATOR = ";";
 	const EXPIRY_INTERVAL = 2592000; // 30 days in seconds
 	
-	public static function createBlockEmailStr ( $email )
+	protected static function createBlockEmailStr ( $email )
 	{
 		KalturaLog::debug(__METHOD__ . "($email)");
 		return  $email . self::SEPARATOR . kString::expiryHash( $email , self::$key , self::EXPIRY_INTERVAL );
