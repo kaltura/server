@@ -15,6 +15,7 @@ class kIpAddressUtils
 	const IP_ADDRESS_MASK_CHAR     = '/';
 	const IP_ADDRESS_PARTS_DELIMETER = '.';
 	
+	static protected $isInternalIp = null;
 	
 	private static function getAddressType($ip)
 	{
@@ -95,18 +96,20 @@ class kIpAddressUtils
 	
 	public static function isInternalIp()
 	{
+		if (!is_null(self::$isInternalIp))
+			return self::$isInternalIp;
+		
 		if (kConf::hasParam('internal_ip_range'))
 		{
 			$range = kConf::get('internal_ip_range');
 					
 			if(self::isIpInRange(infraRequestUtils::getRemoteAddress(), $range))
 			{
+				self::$isInternalIp = true;
 				return true;
 			}
-		}	
+		}
+		self::$isInternalIp = false;
 		return false;				
 	}
-	
-	
-	
 }
