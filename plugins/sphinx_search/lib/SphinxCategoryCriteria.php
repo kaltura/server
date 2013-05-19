@@ -45,7 +45,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	
 	public static $sphinxOrderFields = array(
 		'category.FULL_NAME' => 'sort_full_name',
-		'category.NAME' => 'sort_name',
+		'category.NAME' => 'sort_name_str',
 		'category.ID' => 'category_id',
 		'category.PARTNER_ID' => 'partner_id',
 		'category.STATUS' => 'category_status',

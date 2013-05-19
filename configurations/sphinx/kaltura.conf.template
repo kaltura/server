@@ -239,6 +239,7 @@ index kaltura_category
 	rt_field	 = privacy
     rt_field     = sphinx_match_optimizations
 	rt_attr_bigint	 = sort_name
+	rt_attr_string	 = sort_name_str
 	rt_attr_string	 = sort_full_name
 	rt_attr_uint	 = members_count
 	rt_attr_uint	 = pending_members_count
