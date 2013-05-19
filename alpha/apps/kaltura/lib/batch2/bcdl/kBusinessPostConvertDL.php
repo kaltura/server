@@ -307,7 +307,10 @@ class kBusinessPostConvertDL
 			
 		$childJobs = $rootBatchJob->getChildJobs();
 		KalturaLog::debug('Child jobs found [' . count($childJobs) . ']');
-		if(count($childJobs) > 1)
+		$waitingFlavorAssets = assetPeer::retrieveByEntryIdAndStatus($currentFlavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
+		KalturaLog::debug('Waiting assets found [' . count($waitingFlavorAssets) . ']');
+		
+		if(count($childJobs) > 1 && count($waitingFlavorAssets) < 1)
 		{
 			$allDone = true;
 			foreach($childJobs as $childJob)
