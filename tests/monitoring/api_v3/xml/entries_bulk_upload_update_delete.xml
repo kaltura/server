@@ -30,55 +30,15 @@ at: http://www.kaltura.com/api_v3/xsdDoc/?type=bulkUploadXml.bulkUploadXML
 <mrss xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ingestion.xsd">
 	<channel>
 		<item>
-			<action>add</action>
-			<type>1</type>
+			<action>@ACTION@</action>
 			<referenceId>@ENTRY1_REF_ID@</referenceId>
-			<userId>monitor-user</userId>
-			<name>monitor_bulk_xml1</name>
-			<description>monitor bulk upload xml 1</description>
-			<tags>
-				<tag>monitor</tag>
-				<tag>xml</tag>
-			</tags>
-			<categories>
-				<category>monitor>xml</category>
-			</categories>
-			<media>
-				<mediaType>1</mediaType> 
-			</media>
-			<contentAssets>
-				<content>
-					<urlContentResource url="@ENTRY1_URL@"/>
-				</content>
-			</contentAssets>
-			<!-- <thumbnails>...</thumbnails> -->
-			<!-- <scenes>..</scenes> -->
-			<!-- <customDataItems>...</customDataItems>  -->
-			<!-- <distribution>...</distribution>  -->
+			<description>@ENTRY1_DESC@</description>
 		</item>
 		
 		<item>
-			<action>add</action>
-			<type>1</type>
+			<action>@ACTION@</action>
 			<referenceId>@ENTRY2_REF_ID@</referenceId>
-			<userId>monitor-user</userId>
-			<name>monitor_bulk_xml2</name>
-			<description>monitor bulk upload xml 2</description>
-			<tags>
-				<tag>monitor</tag>
-				<tag>xml</tag>
-			</tags>
-			<categories>
-				<category>monitor>xml</category>
-			</categories>
-			<media>
-				<mediaType>1</mediaType> 
-			</media>
-			<contentAssets>
-				<content>
-					<urlContentResource url="@ENTRY2_URL@"/>
-				</content>
-			</contentAssets>
+			<description>@ENTRY2_DESC@</description>
 		</item>
 		
 	</channel>
