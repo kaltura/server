@@ -501,19 +501,14 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	}
 
 	// use this field only if the version is not empty
-	public function setSwfUrlVersion ( $version )
+	public function setSwfUrlVersion($version)
 	{
-		$flash_url = myContentStorage::getFSFlashRootPath ();
-		$default_swf_name = $this->getSwfNameFromType ( );
-
-		// assume the parent path is "kdp" (and add hack for kdp3)
-		if ( $version )
-		{
-			if (strpos($this->swf_url, "kdp3") !== false)
-				$this->setSwfUrl( "$flash_url/kdp3/v{$version}/kdp3.swf" );
-			else
-				$this->setSwfUrl( "$flash_url/kdp/v{$version}/{$default_swf_name}" );
-		}
+		$flashUrl = myContentStorage::getFSFlashRootPath();
+		$swfName = $this->getSwfNameFromType();
+		$dir = $this->getDirectoryFromType();
+		
+		if($version)
+			$this->setSwfUrl("$flashUrl/$dir/v{$version}/$swfName");
 	}
 
 	public function getSwfUrlVersion ()
@@ -715,8 +710,17 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function getSwfNameFromType ()
 	{
-		$name = @self::$swf_names [ $this->getObjType() ];
-		if ( $name ) return $name;
+		$name = @self::$swf_names [ $this->getObjType()];
+		if($name)
+			return $name;
+		return "";
+	}
+	
+	public function getDirectoryFromType()
+	{
+		if(isset(self::$swf_directory_map[$this->getObjType()]))
+			return self::$swf_directory_map[$this->getObjType()];
+			
 		return "";
 	}
 
