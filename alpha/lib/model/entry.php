@@ -2570,15 +2570,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		return kUTF8::str2int64($this->getName());
 	}
-	
-	/**
-	 * @return string sorting value
-	 */
-	public function getSortNameStr()
-	{
-		return $this->getName();
-	}
-	
+		
 	/**
 	 * @return int
 	 */
@@ -2697,7 +2689,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 				'name' => 'name',
 				'sort_name' => 'sortName',
-				'sort_name_str' => 'sortNameStr',
+				'sort_name_str' => 'name',
 				'tags' => 'tags',
 				'categories' => 'categoriesEntryIds',
 				'flavor_params' => 'flavorParamsIds',

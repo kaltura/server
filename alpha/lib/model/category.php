@@ -841,14 +841,6 @@ class category extends Basecategory implements IIndexable
 	/**
 	 * @return string sorting value
 	 */
-	public function getSortNameStr()
-	{
-		return $this->getName();
-	}
-	
-	/**
-	 * @return string sorting value
-	 */
 	public function getSortFullName()
 	{
 		return $this->getFullName();
@@ -979,7 +971,7 @@ class category extends Basecategory implements IIndexable
 			'full_name' => 'searchIndexfullName',
 			'full_ids' => 'searchIndexfullIds',
 			'sort_name' => 'sortName',
-			'sort_name_str' => 'sortNameStr',
+			'sort_name_str' => 'name',
 			'sort_full_name' => 'sortFullName',
 			'description' => 'description',
 			'tags' => 'tags',
