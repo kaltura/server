@@ -173,21 +173,13 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);				
 		$entryFilter->attachToCriteria($c);	
 		$c->add(entryPeer::ID, $entryId, Criteria::NOT_EQUAL);		
-		$entries = entryPeer::doSelect($c);
-			
-		foreach ($entries as $entry) 
+		$entriesCount = entryPeer::doCount($c);
+		if($entriesCount)
 		{
-			$wvFlavorAssets = $this->getWidevineFlavorAssetsForEntry($entry->getId());
-			foreach ($wvFlavorAssets as $wvFlavorAsset) 
-			{
-				if($wvFlavorAsset->getWidevineAssetId() == $wvAssetId)
-				{
-					KalturaLog::debug('Found active flavors for WV asset id ['.$wvAssetId.']');
-					return true;
-				}
-			}
+			KalturaLog::debug('Found active flavors for WV asset id ['.$wvAssetId.']');
+			return true;
 		}
-						
-		return false;		
+		else					
+			return false;		
 	}
 }
