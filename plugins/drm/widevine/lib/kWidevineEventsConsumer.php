@@ -8,11 +8,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	{
 		try 
 		{
-			$c = new Criteria();
-			$c->add(assetPeer::ENTRY_ID, $object->getId());		
-			$flavorType = WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR);
-			$c->add(assetPeer::TYPE, $flavorType);		
-			$wvFlavorAssets = assetPeer::doSelect($c);
+			$wvFlavorAssets = $this->getWidevineFlavorAssetsForEntry($object->getId());
 			KalturaLog::debug('Found '.count($wvFlavorAssets).' widevine flavors');	
 
 			if(count($wvFlavorAssets))
@@ -32,7 +28,6 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns) 
 	{
-		//TODO: check permission
 		if(	$object instanceof entry && 
 			(in_array(entryPeer::START_DATE, $modifiedColumns) || in_array(entryPeer::END_DATE, $modifiedColumns)) &&
 			$this->shouldSyncWidevineRepositoryForPartner($object->getPartnerId())) 
@@ -47,8 +42,10 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
 	{
 		try 
-		{
-			$this->addWidevineRepositoryModifySyncJob($object->getEntryId(), $object->getPartnerId(), array($object), time(), time(), false);
+		{	
+			$hasActiveFlavors = $this->hasWidevineFlavorAssetsWithSameWvAssetIdInOtherEntries($object->getWidevineAssetId(), $object->getEntryId());
+			if(!$hasActiveFlavors)
+				$this->addWidevineRepositoryModifySyncJob($object->getEntryId(), $object->getPartnerId(), array($object), time(), time(), false);
 		}
 		catch(Exception $e)
 		{
@@ -62,7 +59,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object) 
 	{
-		if($object instanceof WidevineFlavorAsset) 
+		if($object instanceof WidevineFlavorAsset && $object->getWidevineAssetId()) 
 			return true;
 		else		
 			return false;		
@@ -160,4 +157,37 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		return $endDate;
 	}
 	
+	private function getWidevineFlavorAssetsForEntry($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);		
+		$flavorType = WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorType);		
+		return assetPeer::doSelect($c);		
+	}
+	
+	private function hasWidevineFlavorAssetsWithSameWvAssetIdInOtherEntries($wvAssetId, $entryId)
+	{
+		$entryFilter = new entryFilter();
+		$entryFilter->fields['_like_plugins_data'] = WidevinePlugin::getWidevineAssetIdSearchData($wvAssetId);
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);				
+		$entryFilter->attachToCriteria($c);	
+		$c->add(entryPeer::ID, $entryId, Criteria::NOT_EQUAL);		
+		$entries = entryPeer::doSelect($c);
+			
+		foreach ($entries as $entry) 
+		{
+			$wvFlavorAssets = $this->getWidevineFlavorAssetsForEntry($entry->getId());
+			foreach ($wvFlavorAssets as $wvFlavorAsset) 
+			{
+				if($wvFlavorAsset->getWidevineAssetId() == $wvAssetId)
+				{
+					KalturaLog::debug('Found active flavors for WV asset id ['.$wvAssetId.']');
+					return true;
+				}
+			}
+		}
+						
+		return false;		
+	}
 }

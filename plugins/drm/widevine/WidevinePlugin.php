@@ -2,12 +2,13 @@
 /**
  * @package plugins.widevine
  */
-class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender
+class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaTypeExtender, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'widevine';
 	const WIDEVINE_EVENTS_CONSUMER = 'kWidevineEventsConsumer';
 	const WIDEVINE_RESPONSE_TYPE = 'widevine';
 	const WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION = 'WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC';
+	const SEARCH_DATA_SUFFIX = 's';
 	
 	//Widevine API's
 	const PACKAGE_NOTIFY_CGI = '/widevine/voddealer/cgi-bin/packagenotify.cgi';
@@ -221,6 +222,37 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return array(
 			self::WIDEVINE_EVENTS_CONSUMER,
 		);
+	}
+	
+	public static function getWidevineAssetIdSearchData($wvAssetId)
+	{
+		return self::getPluginName() . $wvAssetId . self::SEARCH_DATA_SUFFIX;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof entry)
+		{
+			$c = new Criteria();
+			$c->add(assetPeer::ENTRY_ID, $object->getId());		
+			$flavorType = self::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR);
+			$c->add(assetPeer::TYPE, $flavorType);		
+			$wvFlavorAssets = assetPeer::doSelect($c);
+			if(count($wvFlavorAssets))
+			{			
+				$searchData = array();
+				foreach ($wvFlavorAssets as $wvFlavorAsset) 
+				{
+					$searchData[] = self::getWidevineAssetIdSearchData($wvFlavorAsset->getWidevineAssetId());
+				}				
+				return array('plugins_data' => implode(' ', $searchData));
+			}
+		}
+			
+		return null;
 	}
 	
 	public static function getWidevineConfigParam($key)
