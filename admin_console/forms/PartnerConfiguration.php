@@ -1,10 +1,10 @@
-<?php 
+<?php
 /**
  * @package Admin
  * @subpackage Partners
  */
 class Form_PartnerConfiguration extends Infra_Form
-{    
+{
 	const GROUP_ENABLE_DISABLE_FEATURES = 'GROUP_ENABLE_DISABLE_FEATURES';
     const GROUP_CONTENT_INGESTION_OPTIONS = 'GROUP_CONTENT_INGESTION_OPTIONS';
     const GROUP_PUBLISHER_DELIVERY_SETTINGS = 'GROUP_PUBLISHER_DELIVERY_SETTINGS';
@@ -44,13 +44,13 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		//$this->setDescription('partner-configure intro text');
 		$this->loadDefaultDecorators();
-		$this->addDecorator('Description', array('placement' => 'prepend'));	
+		$this->addDecorator('Description', array('placement' => 'prepend'));
 		
 //		$this->addElement('text', 'account_name', array(
 //			'label' => 'Publisher Name:',
 //			'decorators' 	=> array('Label', 'Description')
 //		));
-//--------------------------- General Information ---------------------------			
+//--------------------------- General Information ---------------------------
 		$this->addElement('text', 'partner_name', array(
 			'label'			=> 'partner-configure Publisher Name',
 			'filters'		=> array('StringTrim'),
@@ -67,9 +67,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'partner-configure Administrator Name',
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
-		));	
+		));
 		
-		// change to read only		 
+		// change to read only
 		$this->addElement('text', 'admin_email', array(
 			'label'			=> 'Administrator E-Mail:',
 			'filters'		=> array('StringTrim'),
@@ -91,12 +91,23 @@ class Form_PartnerConfiguration extends Infra_Form
 			'ignore' 		=> true,
 		));
 		
+		$this->addElement('select', 'language', array(
+			'label'			=> "UI language:",
+			'filters'		=> array('StringTrim'),
+			'value'			=> 'en',
+		));
+		
+		$arr = array();
+		foreach(Zend_Registry::get('config')->languages as $language)
+			$arr[$language->id] = $language->name;
+		$this->getElement('language')->setMultiOptions($arr);
+		
 		$this->addElement('checkbox', 'default_entitlement_enforcement', array(
 				'label'	  => 'Default Entitlement Enforcement',
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 			));
 						
-//--------------------------- Publisher specific Delivery Settings ---------------------------		 
+//--------------------------- Publisher specific Delivery Settings ---------------------------
 		$this->addElement('checkbox', 'checkbox_host', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field'))),
 		));
@@ -197,10 +208,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		
 
-//--------------------------- Remote Storage Account policy ---------------------------				
+//--------------------------- Remote Storage Account policy ---------------------------
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
-		$this->addElements(array($storageServP));	
+		$this->addElements(array($storageServP));
 		
 		$this->addElement('checkbox', 'storage_delete_from_kaltura', array(
 			'label'	  => 'Delete exported storage from Kaltura',
@@ -212,7 +223,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 	
-//--------------------------- Advanced Notification settings ---------------------------		
+//--------------------------- Advanced Notification settings ---------------------------
 		$this->addElement('text', 'notifications_config', array(
 			'label'			=> 'Notification Configuration:',
 			'filters'		=> array('StringTrim'),
@@ -221,15 +232,15 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('checkbox', 'allow_multi_notification', array(
 			'label'	  => 'Allow multi-notifications',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
-		));	
-//--------------------------- Content Ingestion Options ---------------------------	
+		));
+//--------------------------- Content Ingestion Options ---------------------------
 		$this->addElement('text', 'def_thumb_offset', array(
 			'label'	  => 'Default Thumbnail Offset',
-		));	
+		));
 
 		$this->addElement('text', 'def_thumb_density', array(
 			'label'	  => 'Default Thumbnail Density',
-		));	
+		));
 
 		$this->addElement('checkbox', 'enable_bulk_upload_notifications_emails', array(
 			'label'	  => 'Bulk Upload Notifications Emails (Legacy)',
@@ -240,7 +251,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Bulk Upload Notifications Email (Legacy)',
 		));
 			
-//--------------------------- Password Security ---------------------------			
+//--------------------------- Password Security ---------------------------
 		
 		$this->addElement('text', 'login_block_period', array(
 			'label'			=> 'Login Block Period (seconds):',
@@ -255,8 +266,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'pass_replace_freq', array(
 			'label'			=> 'Password replacement frequency (seconds):',
 			'filters'		=> array('StringTrim'),
-		));				
-//--------------------------- Single Sign On ---------------------------			
+		));
+//--------------------------- Single Sign On ---------------------------
 		
 		$this->addElement('text', 'logout_url', array(
 			'label'			=> 'Logout Url:',
@@ -276,7 +287,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 
-//--------------------------- Group Association ---------------------------			
+//--------------------------- Group Association ---------------------------
 		$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('partner_group_type', array('enum' => 'Kaltura_Client_Enum_PartnerGroupType'));
 		$partnerGroupTypes->setLabel('Account Type:');
 		$this->addElements(array($partnerGroupTypes));
@@ -285,19 +296,19 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Parent Account Id:',
 			'filters'		=> array('StringTrim'),
 		));
-//--------------------------- Service Packages ---------------------------		
-		$this->addElement('select', 'partner_package', array(		
+//--------------------------- Service Packages ---------------------------
+		$this->addElement('select', 'partner_package', array(
 			'label'			=> 'Service Edition Type:',
 			'filters'		=> array('StringTrim'),
 			'onChange'		=> 'openChangeServicePackageAlertBox()',
 		));
 		
-		$this->addElement('select', 'partner_package_class_of_service', array(		
+		$this->addElement('select', 'partner_package_class_of_service', array(
 			'label'			=> 'Class of Service:',
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('select', 'vertical_clasiffication', array(		
+		$this->addElement('select', 'vertical_clasiffication', array(
 			'label'			=> 'Vertical Clasiffication:',
 			'filters'		=> array('StringTrim'),
 		));
@@ -315,9 +326,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('checkbox', 'internal_use', array(
 			'label'	  => 'Internal Use Account',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
-		));	
+		));
 		
-//--------------------------- New Account Options ---------------------------			
+//--------------------------- New Account Options ---------------------------
 												
 		$this->addElement('checkbox', 'extended_free_trail', array(
 			'label'	  => 'Extended Free Trial',
@@ -334,7 +345,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('button', 'monitor_usage_history', array(
 			'label'	  => 'View History',
-		));	
+		));
 		
 		
 		$this->addElement('checkbox', 'is_first_login', array(
@@ -343,17 +354,17 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 				
 
-//--------------------------- Included Usage ---------------------------	
+//--------------------------- Included Usage ---------------------------
 		$element = new Zend_Form_Element_Hidden('includedUsageLabel');
 		$element->setLabel('For reporting purposes only. Leave empty for unlimited usage or when not applicable');
-		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partnerConfigurationDescription'))));	
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partnerConfigurationDescription'))));
 		$this->addElements(array($element));
 		
 		
 		$this->addElement('radio', 'mothly_bandwidth_combined', array(
 			'label'	  => 'Mothly Bandwidth:',
 			'multiOptions' => array(
-					        '1'=>'Combined Usage:', 
+					        '1'=>'Combined Usage:',
 					        '2'=>'Separated Usage:'),
 					        
 			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'mothly_bandwidth_combined')))
@@ -371,16 +382,16 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'live_stream_provision_params', array(
 			'label'			=> 'Provision parameters (JSON format)',
 			'filters'		=> array('StringTrim'),
-		));	
+		));
 		
 		
-//-----------------------------------------------------------------------	
+//-----------------------------------------------------------------------
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		$this->addLimitsElements();	
+		$this->addLimitsElements();
 			
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
@@ -394,7 +405,7 @@ class Form_PartnerConfiguration extends Infra_Form
 					'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 				);
 				if(!$modul->enabled)
-					$attributes['disabled'] = true;	
+					$attributes['disabled'] = true;
 				$this->addElement('checkbox', $modul->permissionName, $attributes);
 				if ($modul->indexLink != null)
 				{
@@ -403,7 +414,7 @@ class Form_PartnerConfiguration extends Infra_Form
 					
 					$element = $this->getElement($modul->permissionName);
 					$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
-					$element->addDecorators(array('ViewHelper',		      
+					$element->addDecorators(array('ViewHelper',
 				        array('Label', array('placement' => 'append')),
 				        array('Description', array('escape' => false, 'tag' => false)),
 				      ));
@@ -420,8 +431,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		    $permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
-			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
-			ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);		
+			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
+			ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);
 			$this->addAllDisplayGroups($permissionNames);
 		}
 		
@@ -435,17 +446,17 @@ class Form_PartnerConfiguration extends Infra_Form
 		foreach ($displayGroups as $displayGroup)
 		{
 			$displayGroup->removeDecorator ('label');
-	  		$displayGroup->removeDecorator('DtDdWrapper');		
+	  		$displayGroup->removeDecorator('DtDdWrapper');
 		}
 		//creating divs for left right dividing
 		$this->setDisplayColumn('generalInformation',  'passwordSecurity', true);
 		$this->setDisplayColumn('accountPackagesService', 'enableDisableFeatures', false);
 				
-		//---------------- Display DisplayGroups according to Permissions ---------------	
+		//---------------- Display DisplayGroups according to Permissions ---------------
 		$this->handlePermissions();
 	}
 	/**
-	 * creating a form display in two columns (left and right).	
+	 * creating a form display in two columns (left and right).
 	 * $firstColumnElement - the first display group in the column
 	 * $lastColumnElement - the last display group in the column
 	 */
@@ -469,7 +480,7 @@ class Form_PartnerConfiguration extends Infra_Form
              'FormElements',
              'Fieldset',
               array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
-     	));   
+     	));
 	}
 	
 	/**
@@ -483,7 +494,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			$displayGroupElements = $this->getDisplayGroup($dispalyGroupName)->getElements();
 			foreach ($displayGroupElements as $el)
 			{
-				$el->setAttrib('readonly', true);				
+				$el->setAttrib('readonly', true);
 				//$el->setAttrib('disable', 'disable');
 				//disable links
 				if ($dispalyGroupName == 'enableDisableFeatures'){
@@ -504,7 +515,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			$displayGroupElements = $this->getDisplayGroup($dispalyGroupName)->getElements();
 			foreach ($displayGroupElements as $el)
 			{
-				$el->setAttrib('readonly', true);				
+				$el->setAttrib('readonly', true);
 				$el->setAttrib('disable', 'disable');
 				//disable links
 				if ($dispalyGroupName == 'enableDisableFeatures'){
@@ -517,7 +528,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	
 	private function handlePermissions()
 	{
-		//permissions groups 
+		//permissions groups
 		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy', 'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity'); //EAGLE PRD group 1
 		$configureGeneralInformation = array('generalInformation'); // EAGLE PRD group 2
 		$configureAccountsGroup = array('groupAssociation'); // EAGLE PRD group 3
@@ -526,7 +537,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$configureAccountsOptions = array('accountPackages','accountOptions','includedUsage', 'includedUsageSecondPart', 'enableDisableFeatures'); // EAGLE PRD group 6
 		$configureKmcUsers = array('configureKmcUsers');
 		
-		//according to current permissin call to setPermissionGroupElementsToReadOnly		
+		//according to current permissin call to setPermissionGroupElementsToReadOnly
 		//with the correct group array as parameter
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-tech-data'))){
 			$this->setPermissionGroupElementsToReadOnly($configureAccountsTechData);
@@ -551,7 +562,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		
 	}
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	/**
 	 * @param Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration $object
 	 * @param bool $add_underscore
@@ -570,7 +581,7 @@ class Form_PartnerConfiguration extends Infra_Form
 					$subFormObject = $this->limitSubForms[$limit->type];
 					$subFormObject->populateFromObject($this, $limit, false);
 				}
-			}			
+			}
 		}
 		
         $element = $this->getElement('use_default_streamers');
@@ -645,12 +656,12 @@ class Form_PartnerConfiguration extends Infra_Form
 					$permissionSet = false;
 					KalturaLog::debug("try to add permission: ". $basePermission->name);
 					foreach ($systemPartnerConfiguration->permissions as $permission)
-					{				
+					{
 						if (($permission->name == $basePermission->name) && ($permission->type == $basePermission->type))
 						{
 							if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
 								$permission->status = $basePermission->status;
-							KalturaLog::debug("permission exists with status : " . $permission->status);		
+							KalturaLog::debug("permission exists with status : " . $permission->status);
 							$permissionSet = true;
 							break;
 						}
@@ -662,7 +673,7 @@ class Form_PartnerConfiguration extends Infra_Form
 						$systemPartnerConfiguration->permissions[] = $basePermission;
 					}
 				}
-			}	
+			}
 		}
 			
 		foreach ($this->limitSubForms as $subForm)
@@ -671,7 +682,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			{
 				$limitType = $subForm->getName();
 				$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
-				$systemPartnerConfiguration->limits[] = $limit;			
+				$systemPartnerConfiguration->limits[] = $limit;
 			}
 		}
 
@@ -733,7 +744,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		//adding display groups
 		
-		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
+		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		$this->addDisplayGroup(array_merge(array('checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_rtmp_url', 'rtmp_url', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_delivery_restrictions', 'delivery_restrictions', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		
@@ -788,11 +799,11 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addDisplayGroup(
 			array_merge(
-				array('default_live_stream_entry_source_type', 'live_stream_provision_params'), 
-				array('crossLine')), 
-			'liveStreamConfig', 
+				array('default_live_stream_entry_source_type', 'live_stream_provision_params'),
+				array('crossLine')),
+			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
-		);	
+		);
 									
 	}
 	
