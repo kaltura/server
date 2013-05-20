@@ -291,15 +291,7 @@ abstract class KalturaBaseService
 	 */
 	protected function dumpFile($filePath, $mimeType)
 	{
-		kFileUtils::closeDbConnections();
-		
-		kFileUtils::pollFileExists($filePath);
-		
-		// if by now there is no file - die !
-		if(! file_exists($filePath))
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-		
-		return new kRendererDumpFile($filePath, $mimeType, kFileUtils::xSendFileAllowed($filePath));
+		return kFileUtils::getDumpFileRenderer($filePath, $mimeType);
 	}
 	
 	/**

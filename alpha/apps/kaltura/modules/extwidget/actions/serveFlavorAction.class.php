@@ -130,7 +130,16 @@ class serveFlavorAction extends kalturaAction
 					$limit_file_size = floor((@kFile::fileSize($path) * ($clipTo / $duration))*1.2);
 				}
 			}
-			kFileUtils::dumpFile($path, null, null, $limit_file_size);
+			
+			$renderer = kFileUtils::getDumpFileRenderer($path, null, null, $limit_file_size);
+			if (function_exists('apc_store') && $_SERVER["REQUEST_METHOD"] == "GET")
+			{
+				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+				apc_store('dumpFile-'.$host.$_SERVER["REQUEST_URI"], $renderer, 86400);
+			}
+
+			$renderer->output();
+			
 			KExternalErrors::dieGracefully();
 		}
 		

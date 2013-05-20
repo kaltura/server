@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__file__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__file__) . '/kRendererBase.php');
 
 /*
@@ -15,14 +16,22 @@ class kRendererDumpFile implements kRendererBase
 	protected $maxAge;
 	protected $xSendFileAllowed;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
 		$this->maxAge = $maxAge;
 		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
-		$this->fileSize = kFile::fileSize($filePath);
-		$this->xSendFileAllowed = $xSendFileAllowed;
+		if ($limitFileSize)
+		{
+			$this->fileSize = $limitFileSize;
+			$this->xSendFileAllowed = false;
+		}
+		else
+		{
+			$this->fileSize = kFile::fileSize($filePath);
+			$this->xSendFileAllowed = $xSendFileAllowed;
+		}
 	}
 	
 	public function output()

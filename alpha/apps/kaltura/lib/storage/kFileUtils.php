@@ -45,56 +45,25 @@ class kFileUtils extends kFile
 		return false;
 	}
 
-	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
+	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0)
 	{
 		self::closeDbConnections();
 		
-		self::pollFileExists($file_name);
+		self::pollFileExists($filePath);
 		
 		// if by now there is no file - die !
-		if(! file_exists($file_name))
-			KExternalErrors::dieGracefully();
+		if(! file_exists($filePath))
+			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
-		$useXSendFile = false;
-		if (!$limit_file_size && // if we limit the file size (e.g. preview small portion of a video) we can't use xsendfile module
-			in_array('mod_xsendfile', apache_get_modules()) && 
-			self::xSendFileAllowed($file_name))
-		{
-			header('X-Kaltura-Sendfile:');
-			$useXSendFile = true;
-			$range_length = null;
-		}
-		else
-		{
-			// get range parameters from HTTP range requst headers
-			$total_length = $limit_file_size ? $limit_file_size : self::fileSize($file_name);
-			list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
-		}
+		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize);
+	}
+	
+	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
+	{
+		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size);
 		
-		if($mime_type)
-		{
-			infraRequestUtils::sendCdnHeaders($file_name, $range_length, $max_age, $mime_type);
-		}
-		else
-		{
-			$ext = pathinfo($file_name, PATHINFO_EXTENSION);
-			infraRequestUtils::sendCdnHeaders($ext, $range_length, $max_age);
-		}
-
-		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
-		// upon detecting this header it cancels its original request and starts sending byte range requests
-		header("Accept-Ranges: bytes");
-		header("Access-Control-Allow-Origin:*");		
-
-		if ($useXSendFile)
-		{
-			if (isset($GLOBALS["start"]))
-				header("X-Kaltura:dumpFile:".(microtime(true) - $GLOBALS["start"]));
-			header("X-Sendfile: $file_name");
-			KExternalErrors::dieGracefully();
-		}
-
-		infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
+		$renderer->output();
+		
 		KExternalErrors::dieGracefully();
 	}
 

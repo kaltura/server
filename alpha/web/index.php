@@ -216,6 +216,20 @@ function checkCache()
 			}
 		}
 	}
+	else if (strpos($uri, "/serveFlavor/") !== false && function_exists('apc_fetch') && $_SERVER["REQUEST_METHOD"] == "GET")
+	{
+		require_once(dirname(__FILE__).'/../../server_infra/renderers/kRendererDumpFile.php');
+
+		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+		
+		$renderer = apc_fetch("dumpFile-{$host}{$uri}");
+		if ($renderer)
+		{
+			header("X-Kaltura:cached-dispatcher");
+			$renderer->output();
+			die;
+		}
+	}
 }
 
 
