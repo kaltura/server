@@ -7,10 +7,10 @@
            depends on my.cnf, mysqld
 
         check file my.cnf
-            with path /etc/my.cnf
+            with path "/etc/my.cnf"
             # Reload mysql if the my.cnf file was changed
             if changed checksum
                then exec "/etc/init.d/mysqld reload"
 
         check file mysqld
-            with path /usr/bin/mysqld_safe
+            with path "/usr/bin/mysqld_safe"

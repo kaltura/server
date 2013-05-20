@@ -7,5 +7,5 @@
            depends on batch_script
 
         check file batch_script
-            with path @APP_DIR@/batch/KGenericBatchMgr.class.php
+            with path "@APP_DIR@/batch/KGenericBatchMgr.class.php"
             

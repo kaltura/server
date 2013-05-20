@@ -8,10 +8,10 @@
            depends on kaltura.conf, searchd
 
         check file kaltura.conf
-            with path @APP_DIR@/configurations/sphinx/kaltura.conf
+            with path "@APP_DIR@/configurations/sphinx/kaltura.conf"
             # Reload Sphinx if the kaltura.conf file was changed
             if changed checksum
                then exec "/etc/init.d/kaltura_sphinx restart"
 
         check file searchd
-            with path @BIN_DIR@/sphinx/searchd
+            with path "@BIN_DIR@/sphinx/searchd"

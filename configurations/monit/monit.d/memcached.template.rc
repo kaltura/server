@@ -6,5 +6,5 @@
            group kaltura
            depends on memcached
         check file memcached
-            with path /usr/bin/memcached
+            with path "/usr/bin/memcached"
 
