@@ -348,7 +348,7 @@ class asset extends Baseasset implements ISyncableFile
 		for ($i = 0; $i < 10; $i++)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existingObject = assetPeer::retrieveById($id);
+			$existingObject = assetPeer::retrieveByIdNoFilter($id);
 			
 			if ($existingObject)
 				KalturaLog::log(__METHOD__ . ": id [$id] already exists");
