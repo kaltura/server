@@ -226,7 +226,7 @@ class kshow extends Basekshow
 		for ( $i = 0 ; $i < 10 ; ++$i)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existing_object = kshowPeer::retrieveByPk( $id );
+			$existing_object = kshowPeer::retrieveByPKNoFilter( $id );
 			
 			if ( ! $existing_object ) return $id;
 		}

@@ -164,7 +164,7 @@ class widget extends Basewidget
 		for ( $i = 0 ; $i < 10 ; ++$i)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existing_widget = widgetPeer::retrieveByPk( $id );
+			$existing_widget = widgetPeer::retrieveByPKNoFilter( $id );
 			
 			if ( ! $existing_widget ) return $id;
 		}

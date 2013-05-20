@@ -77,7 +77,7 @@ class UploadToken extends BaseUploadToken
 		for ($i = 0; $i < 10; $i++)
 		{
 			$id = $dc["id"].'_'.md5(microtime(true));
-			$existingObject = UploadTokenPeer::retrieveByPk($id);
+			$existingObject = UploadTokenPeer::retrieveByPKNoFilter($id);
 			
 			if (!$existingObject)
 				return $id;
