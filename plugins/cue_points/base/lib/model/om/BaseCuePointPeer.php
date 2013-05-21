@@ -1057,21 +1057,6 @@ abstract class BaseCuePointPeer {
 	}
 	
 	/**
-	 * Retrieve a single object by pkey.
-	 *
-	 * @param      string $pk the primary key.
-	 * @param      PropelPDO $con the connection to use
-	 * @return     CuePoint
-	 */
-	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)
-	{
-		self::setUseCriteriaFilter ( false );
-		$res = self::retrieveByPK($pk, $con);
-		self::setUseCriteriaFilter ( true );
-		return $res;
-	}
-
-	/**
 	 * Retrieve multiple objects by pkey.
 	 *
 	 * @param      array $pks List of primary keys

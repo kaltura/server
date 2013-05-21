@@ -145,4 +145,19 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	{
 		return array(array("cuePoint:id=%s", self::ID), array("cuePoint:entryId=%s", self::ENTRY_ID));		
 	}
+	
+	/**
+	 * Retrieve a single object by pkey.
+	 *
+	 * @param      string $pk the primary key.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     CuePoint
+	 */
+	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)
+	{
+		self::setUseCriteriaFilter ( false );
+		$res = self::retrieveByPK($pk, $con);
+		self::setUseCriteriaFilter ( true );
+		return $res;
+	}
 }
