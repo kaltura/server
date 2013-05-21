@@ -1,4 +1,4 @@
-<?php 
+<?php
 class myInsertEntryHelper
 {
 	private $action = null;
@@ -33,7 +33,7 @@ class myInsertEntryHelper
 	
 	public function setPartnerId ( $partner_id, $subp_id )
 	{
-		$this->partner_id = $partner_id;	
+		$this->partner_id = $partner_id;
 		$this->subp_id = $subp_id;
 	}
 	
@@ -93,7 +93,7 @@ class myInsertEntryHelper
 		{
 			$entry = new entry();
 		}
-		$this->entry = $entry;	
+		$this->entry = $entry;
 		
 		$entry_status = $entry->getStatus();
 		if(is_null($entry_status))
@@ -105,7 +105,7 @@ class myInsertEntryHelper
 		// a background image is always previewed by the user no matter what source he used
 		// so the entry is already in the /uploads directory
 
-		// continue tracking the file upload 
+		// continue tracking the file upload
 		$te = new TrackEntry();
 		$te->setEntryId( $entry_id );
 		$te->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY );
@@ -115,7 +115,7 @@ class myInsertEntryHelper
 		if ($media_source == entry::ENTRY_MEDIA_SOURCE_FILE || $prefix == 'bg_')
 		{
 			$full_path = $this->getParam('entry_full_path');
-			if ( $full_path ) 
+			if ( $full_path )
 				$entry_fullPath = $full_path;
 			else
 				$entry_fullPath = $uploads.$entry_data_prefix.strrchr($entry_fileName, '.');
@@ -157,7 +157,7 @@ class myInsertEntryHelper
 				myFlvStaticHandler::clipToNewFile( $entry_fixedFullPath, $entry_newFullPath, $entry_from_time, $entry_to_time );
 				$entry_fullPath = $entry_newFullPath ;
 	
-				// continue tracking the webcam 
+				// continue tracking the webcam
 				$te->setParam3Str( $entry_fullPath );
 				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
 							
@@ -168,11 +168,11 @@ class myInsertEntryHelper
 				$entry_status = entryStatus::PRECONVERT;
 				$ext = 'f4v';
 				$entry_fullPath = $entry_fullPathF4v;
-				// continue tracking the webcam 
+				// continue tracking the webcam
 				$te->setParam3Str( $entry_fullPath );
 				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
 			}
-			else 
+			else
 			{
 				KalturaLog::err("File [$entry_fullPath] does not exist");
 				$entry_status = entryStatus::ERROR_IMPORTING;
@@ -195,7 +195,7 @@ class myInsertEntryHelper
 					$media_source == entry::ENTRY_MEDIA_SOURCE_PHOTOBUCKET ||
 					$media_source == entry::ENTRY_MEDIA_SOURCE_NYPL ||
 					$media_source == entry::ENTRY_MEDIA_SOURCE_MEDIA_COMMONS ||
-					$media_source == entry::ENTRY_MEDIA_SOURCE_URL || 
+					$media_source == entry::ENTRY_MEDIA_SOURCE_URL ||
 					$media_source == entry::ENTRY_MEDIA_SOURCE_KALTURA )
 */
 				{
@@ -207,7 +207,7 @@ class myInsertEntryHelper
 					}
 				}
 				
-				// track images 
+				// track images
 				$te->setParam3Str( $entry_fullPath );
 				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_URL:ENTRY_MEDIA_TYPE_IMAGE" );
 				
@@ -221,7 +221,7 @@ class myInsertEntryHelper
 					
  				$entry_status = entryStatus::IMPORT;
  				
-				// track images 
+				// track images
 				$te->setParam3Str( $ext );
 				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_URL:ENTRY_MEDIA_TYPE_VIDEO" );
  				
@@ -249,7 +249,7 @@ class myInsertEntryHelper
 //
 //		if ($entry_status == entryStatus::PRECONVERT && !myContentStorage::fileExtNeedConversion($ext))
 //		{
-//			
+//
 //			$this->errorMsg = "insertEntryAction Error - PRECONVERT file type not acceptable ($ext)";
 //			KalturaLog::debug("handleEntry: err: $this->errorMsg");
 //			if(is_null($entry) && $this->entry_id)
@@ -327,7 +327,7 @@ class myInsertEntryHelper
 					}
 				}
 				
-				// create thumb			
+				// create thumb
 				$thumbFullPath = $thumbTempPrefix.'1.jpg';
 				$entry_thumbNum = 1;
 				$need_thumb = true;
@@ -362,7 +362,7 @@ class myInsertEntryHelper
 					if ($duration && $duration < $thumbTime * 1000)
 						$thumbTime = floor($duration / 1000);
 						
-					// for videos - thumbail should be created in post convert 
+					// for videos - thumbail should be created in post convert
 					// otherwise this code will fail if the thumbanil wasn't created successfully (roman)
 					//myFileConverter::autoCaptureFrame($entry_fullPath, $thumbTempPrefix."big_", $thumbTime, -1, -1);
 					$need_thumb = false;
@@ -447,7 +447,7 @@ class myInsertEntryHelper
 				}
 				catch (Exception $e) {
 					$entry->setStatus(entryStatus::ERROR_CONVERTING);
-					$entry->save();											
+					$entry->save();
 					throw $e;
 				}
 			}
@@ -467,7 +467,7 @@ class myInsertEntryHelper
  			// remarked by Tan-Tan
 //			$entry_fullPath = $content.'/content/imports/data/'.$this->entry_id.".".$ext;
 //			myContentStorage::fullMkdir($entry_fullPath);
-//			
+//
 //			$batchClient = new myBatchUrlImportClient();
 // 			$batchClient->addJob($this->entry_id, $entry_url, $entry_fullPath);
  		}
@@ -493,7 +493,7 @@ class myInsertEntryHelper
 						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$entry->save();
-						$flavorAsset->save();												
+						$flavorAsset->save();
 						throw $e;
 					}
 					
@@ -508,11 +508,11 @@ class myInsertEntryHelper
 
 //				$targetFileName = $this->entry_id.".".$ext;
 //				if ( false /* old conversion */)
-//				{				
+//				{
 //								// if we need to convert move entry to conversion directory
 //								$preConvPath = $content.'/content/preconvert/';
 //								myContentStorage::moveFile($entry_fullPath, $preConvPath."data/".$targetFileName, true , $should_copy );
-//								
+//
 //								$signalFilePath = $preConvPath."files/".$targetFileName;
 //								myContentStorage::fullMkdir($signalFilePath);
 //								touch($signalFilePath);
@@ -520,9 +520,9 @@ class myInsertEntryHelper
 //				else
 //				{
 //								$preConvPath = myContentStorage::getFSContentRootPath (). "/content/new_preconvert";
-//								$to_data = $preConvPath . "/$targetFileName" ;	
+//								$to_data = $preConvPath . "/$targetFileName" ;
 //								myContentStorage::moveFile($entry_fullPath, $to_data , true);
-//								touch ( $to_data . ".indicator" );	
+//								touch ( $to_data . ".indicator" );
 //				}
 			}
 		}
@@ -557,7 +557,7 @@ class myInsertEntryHelper
 						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$entry->save();
-						$flavorAsset->save();												
+						$flavorAsset->save();
 						throw $e;
 					}
 					
@@ -598,7 +598,7 @@ class myInsertEntryHelper
 						if($mediaInfo)
 						{
 							KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfo, $flavorAsset);
-							$flavorTags = KDLWrap::CDLMediaInfo2Tags($mediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
+							$flavorTags = KDLWrap::CDLMediaInfo2Tags($mediaInfo, array(flavorParams::TAG_WEB));
 							$flavorAsset->setTags(implode(',', $flavorTags));
 						}
 						$flavorAsset->save();
@@ -641,12 +641,12 @@ class myInsertEntryHelper
 						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$entry->save();
-						$flavorAsset->save();												
+						$flavorAsset->save();
 						throw $e;
 					}
 					
 					kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
-				}					 
+				}
 			}
 			else
 			{
@@ -667,15 +667,15 @@ class myInsertEntryHelper
 					}
 					catch (Exception $e) {
 						$entry->setStatus(entryStatus::ERROR_CONVERTING);
-						$entry->save();											
+						$entry->save();
 						throw $e;
 					}
 				}
 				$entry->setStatus(entryStatus::READY);
-				$entry->save();			
+				$entry->save();
 			}
 			
-//			Remarked by Tan-Tan, the flavor asset should be synced instead of the entry 
+//			Remarked by Tan-Tan, the flavor asset should be synced instead of the entry
 //
 //			$entryDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 //			if(!$should_copy)
@@ -695,6 +695,6 @@ class myInsertEntryHelper
 		$entry->save();
 		
 		return true;
-	} 
+	}
 }
 ?>

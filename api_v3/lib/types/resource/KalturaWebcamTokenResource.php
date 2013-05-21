@@ -1,14 +1,14 @@
 <?php
 /**
  * Used to ingest media that streamed to the system and represented by token that returned from media server such as FMS or red5.
- * 
+ *
  * @package api
  * @subpackage objects
  */
-class KalturaWebcamTokenResource extends KalturaDataCenterContentResource 
+class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 {
 	/**
-	 * Token that returned from media server such as FMS or red5. 
+	 * Token that returned from media server such as FMS or red5.
 	 * @var string
 	 */
 	public $token;
@@ -58,7 +58,7 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 		if($dbMediaInfo)
 		{
 			KDLWrap::ConvertMediainfoCdl2FlavorAsset($dbMediaInfo, $originalFlavorAsset);
-			$flavorTags = KDLWrap::CDLMediaInfo2Tags($dbMediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
+			$flavorTags = KDLWrap::CDLMediaInfo2Tags($dbMediaInfo, array(flavorParams::TAG_WEB));
 			$originalFlavorAsset->setTags(implode(',', array_unique($flavorTags)));
 		}
    		$originalFlavorAsset->setStatusLocalReady();
