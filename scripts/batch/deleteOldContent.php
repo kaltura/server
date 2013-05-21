@@ -108,13 +108,16 @@ class kOldContentCleaner
 		PartnerPeer::setUseCriteriaFilter(false);
 		FileSyncPeer::setUseCriteriaFilter(false);
 		
-		$options = getopt('rl:o:e:', array(
+		$options = getopt('hrl:o:e:', array(
 			'error-objects',
 			'old-versions',
 			'blocked-partners',
 			'files',
 			'real-run',
 		));
+	
+		if(isset($options['h']))
+			self::failWrongInputs();
 		
 		if(isset($options['blocked-partners']))
 			self::$deleteDeletedPartnersFileSyncs = true;
@@ -259,12 +262,16 @@ class kOldContentCleaner
 		}
 	}
 	
-	protected static function failWrongInputs($message)
+	protected static function failWrongInputs($message = null)
 	{
-		echo "$message\n\n";
+		if($message)
+			echo "\n$message\n";
+			
+		echo "\n";
 		echo "Usage: php " . __FILE__ . " [options]\n";
 		echo "By default the script runs in dry run mode, meaning, the files are not deleted and the database is not affected.\n\n";
 		echo "Options:\n";
+		echo "\t-h Show this help.\n";
 		echo "\t-r / real-run: Real run, commit database updates and file deletions.\n";
 		echo "\t-l: Limit queries records count, default is 1000.\n";
 		echo "\t-p: Purge file syncs days to delete, default is 30.\n";
