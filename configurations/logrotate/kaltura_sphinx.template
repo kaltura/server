@@ -1,0 +1,26 @@
+
+@LOG_DIR@/sphinx/kaltura_sphinx_query.log{
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+ sharedscripts
+ postrotate
+ service kaltura_sphinx restart
+ endscript
+}
+
+@LOG_DIR@/sphinx/kaltura_sphinx_searchd.log{
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+ sharedscripts
+ postrotate
+ service kaltura_sphinx restart
+ endscript
+}

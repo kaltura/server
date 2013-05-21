@@ -1,4 +1,17 @@
-@LOG_DIR@/kaltura_admin.log {
+@LOG_DIR@/kaltura_monit.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+ sharedscripts
+ postrotate
+ service kaltura_monit restart
+ endscript
+}
+
+@LOG_DIR@/kaltura_deploy.log {
  rotate 5
  daily
  missingok
@@ -7,16 +20,7 @@
  notifempty
 }
 
-@LOG_DIR@/kaltura_multi_publishers.log {
- rotate 5
- daily
- missingok
- compress
- dateext
- notifempty
-}
-
-@LOG_DIR@/kaltura_hosted_pages.log {
+@LOG_DIR@/kaltura_scripts.log {
  rotate 5
  daily
  missingok
