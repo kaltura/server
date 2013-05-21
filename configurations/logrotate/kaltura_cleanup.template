@@ -1,0 +1,10 @@
+
+@LOG_DIR@/kaltura_cleanup.log {
+ rotate 5
+ daily
+ missingok
+ compress
+ dateext
+ notifempty
+}
+
