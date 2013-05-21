@@ -1395,21 +1395,6 @@ abstract class BasekshowPeer {
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
-	
-	/**
-	 * Retrieve a single object by pkey.
-	 *
-	 * @param      string $pk the primary key.
-	 * @param      PropelPDO $con the connection to use
-	 * @return     kshow
-	 */
-	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)
-	{
-		self::setUseCriteriaFilter ( false );
-		$res = self::retrieveByPK($pk, $con);
-		self::setUseCriteriaFilter ( true );
-		return $res;
-	}
 
 	/**
 	 * Retrieve multiple objects by pkey.
