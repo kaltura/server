@@ -172,8 +172,9 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		$entryFilter->fields['_like_plugins_data'] = WidevinePlugin::getWidevineAssetIdSearchData($wvAssetId);
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);				
 		$entryFilter->attachToCriteria($c);	
-		$c->add(entryPeer::ID, $entryId, Criteria::NOT_EQUAL);		
-		$entriesCount = entryPeer::doCount($c);
+		$c->add(entryPeer::ID, $entryId, Criteria::NOT_EQUAL);
+		$c->applyFilters();
+		$entriesCount = $c->getRecordsCount();
 		if($entriesCount)
 		{
 			KalturaLog::debug('Found active flavors for WV asset id ['.$wvAssetId.']');
