@@ -196,7 +196,7 @@ echo " log rotated\n";
 /**
  * Run hourly scripts.
  */
-$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_hourly.sh";
+$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_hourly.sh -p $dwhDir";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
@@ -210,7 +210,7 @@ echo " OK\n";
 /**
  * Run update dimensions.
  */
-$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_update_dims.sh";
+$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_update_dims.sh -p $dwhDir";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 //if($returnedValue !== 0)
@@ -225,7 +225,7 @@ echo " OK\n";
 /**
  * Run daily scripts.
  */
-$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_daily.sh";
+$cmd = "su $kalturaUser -c $dwhDir/etlsource/execute/etl_daily.sh -p $dwhDir";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
