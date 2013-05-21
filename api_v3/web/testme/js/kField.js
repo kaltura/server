@@ -168,7 +168,7 @@ kField.prototype = {
 	},
 
 	disable: function() {
-		if(!this.enabled)
+		if(!this.enabled || this.jqCheckBox.hasClass('alwaysEnabled'))
 			return;
 		
 		this.jqInput.attr('readonly', true).removeAttr('name');

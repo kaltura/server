@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once("../../bootstrap.php");
 ActKeyUtils::checkCurrent();
 KalturaLog::setContext("TESTME");
@@ -21,7 +21,7 @@ if (file_exists($cacheFileName))
 {
 	$services = unserialize(file_get_contents($cacheFileName));
 }
-else 
+else
 {
 	$clientGenerator = new DummyForDocsClientGenerator();
 	$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
@@ -63,7 +63,7 @@ ksort($services, SORT_STRING);
 <script type="text/javascript" src="js/kTestMe.js"></script>
 <!-- script type="text/javascript" src="js/kHttpSpy.js"></script -->
 <script type="text/javascript">
-<?php 
+<?php
 	foreach($services as $serviceId => $serviceActionItem)
 	{
 		/* @var $serviceActionItem KalturaServiceActionItem */
@@ -76,8 +76,8 @@ ksort($services, SORT_STRING);
 	}
 ?>
 </script>
-</head> 
-	<?php 
+</head>
+	<?php
 		
 		if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
 		{
@@ -88,10 +88,10 @@ ksort($services, SORT_STRING);
 					<li><a href="../testmeDoc/index.php">API Documentation</a></li>
 					<li><a href="../xsdDoc/index.php">XML Schema</a></li>
 					<li><a href="client-libs.php">API Client Libraries</a></li>
-				</ul>	
+				</ul>
 			<?php
 		}
-		else 
+		else
 		{
 			?>
 			<body>
@@ -103,7 +103,7 @@ ksort($services, SORT_STRING);
 		<form id="request" action="../" method="post" target="response" enctype="multipart/form-data">
 			<div class="left-content">
 				<div class="attr">
-					<label for="history">History: </label> 
+					<label for="history">History: </label>
 					<select id="history">
 						<option>Select request</option>
 					</select>
@@ -111,10 +111,10 @@ ksort($services, SORT_STRING);
 				
 				<div class="param">
 					<label for="ks">KS (string):</label>
-					<input id="ks" type="text" class="" name="ks" size="30" /> 
+					<input id="ks" type="text" class="" name="ks" size="30" />
 					<input id="chk-ks" type="checkbox" checked="checked" />
-				</div>	
-				<?php 
+				</div>
+				<?php
 					if($indexConfig->additionals)
 					{
 						foreach($indexConfig->additionals as $fieldName => $additionalField)
@@ -122,32 +122,32 @@ ksort($services, SORT_STRING);
 							?>
 								<div class="param">
 									<label for="<?php echo $fieldName; ?>"><?php echo $additionalField->title; ?> (<?php echo $additionalField->type; ?>):</label>
-									<?php if($additionalField->values): ?> 
+									<?php if($additionalField->values): ?>
 										<select name="<?php echo $fieldName; ?>">
-											<?php 
+											<?php
 												foreach($additionalField->values as $value)
 												{
 													echo "<option value=\"{$value->value}\">{$value->title}</option>";
-												} 
-											?> 
+												}
+											?>
 										</select>
 									<?php else: ?>
-										<input type="text" name="<?php echo $fieldName; ?>" size="30" />
+										<input type="text" name="<?php echo $fieldName; ?>" size="30" value="<?php echo (isset($additionalField->value) ? $additionalField->value : ''); ?>" />
 									<?php endif; ?>
-									<input type="checkbox" />
+									<input type="checkbox" <?php echo (isset($additionalField->checked) && $additionalField->checked ? 'checked="checked" class="alwaysEnabled"' : ''); ?> />
 								</div>
-							<?php 
+							<?php
 						}
-					} 
+					}
 				?>
 			
 				<div id="dvService">
 					<div class="attr">
-						<label for="service">Select service:</label> 
+						<label for="service">Select service:</label>
 						<select name="service">
 							<option value="">Select service</option>
 							<option value="multirequest">Multirequest</option>
-							<?php 
+							<?php
 								foreach($services as $serviceId => $serviceActionItem)
 								{
 									/* @var $serviceActionItem KalturaServiceActionItem */
@@ -170,7 +170,7 @@ ksort($services, SORT_STRING);
 					</div>
 					<div class="attr" style="display: none">
 						<label for="action">Select action:</label>
-						<select name="action"></select> 
+						<select name="action"></select>
 						<img src="images/help.png" class="action-help help" title="" />
 					</div>
 					<div class="attr" style="display: none">
@@ -185,7 +185,7 @@ ksort($services, SORT_STRING);
 					<button type="submit">Send</button>
 				</div>
 				
-				<?php 
+				<?php
 					
 					if($indexConfig->get("logParser"))
 					{
