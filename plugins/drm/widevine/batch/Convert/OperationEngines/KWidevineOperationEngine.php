@@ -55,12 +55,16 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$this->preparePackageFolders();
-		$requestXml = $this->preparePackageNotifyRequestXml();
-		$this->unimpersonate();	
+		$requestXml = $this->preparePackageNotifyRequestXml();		
 		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_NOTIFY_CGI, $requestXml);
 		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
-		$this->handleResponseError($response);		
+		$this->handleResponseError($response);	
+
+		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
+		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);
+		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
 		
+		$this->unimpersonate();	
 		return false;
 	}
 	
@@ -90,8 +94,8 @@ class KWidevineOperationEngine extends KOperationEngine
 		}
 		else 
 		{
-			$this->unimpersonate();
 			$this->handleResponseError($response);
+			$this->unimpersonate();			
 			return false;
 		}		
 	}
@@ -188,6 +192,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('Response status: '. $response->getStatus());
 		if($response->isError())
 		{
+			$this->unimpersonate();
 			$logMessage = 'Package Notify request failed, package name: '.$response->getName().' error: '.$response->getErrorText();
 			KalturaLog::err($logMessage);
 			throw new KOperationEngineException($logMessage);
@@ -229,7 +234,7 @@ class KWidevineOperationEngine extends KOperationEngine
 	{
 		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 		$updatedFlavorAsset->widevineAssetId = $wvAssetId;
-		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);
+		
 		$wvDistributionStartDate = $this->data->flavorParamsOutput->widevineDistributionStartDate;
 		$wvDistributionEndDate = $this->data->flavorParamsOutput->widevineDistributionEndDate;
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
