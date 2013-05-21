@@ -239,7 +239,8 @@ class kBusinessPostConvertDL
 					$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED 
 				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING 
 				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING 
-				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
+				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING
+				||  $siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
 				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
