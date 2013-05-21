@@ -59,7 +59,7 @@ CREATE TABLE `drop_folder_file`
 	`parsed_flavor` VARCHAR(500),
 	`lead_drop_folder_file_id` INTEGER,
 	`deleted_drop_folder_file_id` INTEGER,
-	`md5_file_name` VARCHAR(32),
+	`md5_file_name` VARCHAR(32)  NOT NULL,
 	`entry_id` VARCHAR(20),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,

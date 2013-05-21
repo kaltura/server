@@ -44,7 +44,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_flavor" type="varchar" size="500" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="lead_drop_folder_file_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_drop_folder_file_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="md5_file_name" type="varchar" size="32" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="md5_file_name" type="varchar" size="32" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
