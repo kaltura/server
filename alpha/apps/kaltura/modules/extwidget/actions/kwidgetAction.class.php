@@ -350,8 +350,8 @@ class kwidgetAction extends sfAction
 					$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
 				}
 			
-				$optimizedConfVars = "";
-				$optimizedHost = "";
+				$optimizedConfVars = null;
+				$optimizedHost = null;
 				if (kConf::hasMap("optimized_playback"))
 				{
 					$optimizedPlayback = kConf::getMap("optimized_playback");
