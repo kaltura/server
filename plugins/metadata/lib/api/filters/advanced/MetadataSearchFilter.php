@@ -83,19 +83,19 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						}
 						
 						switch ($item->getComparison()){
-							case KalturaSearchConditionComparison::EQUEL:
+							case KalturaSearchConditionComparison::EQUAL:
 								$comparison = ' = ';
 								break;
 							case KalturaSearchConditionComparison::GREATER_THAN:
 								$comparison = ' > ';
 								break;
-							case KalturaSearchConditionComparison::GREATER_THAN_OR_EQUEL:
+							case KalturaSearchConditionComparison::GREATER_THAN_OR_EQUAL:
 								$comparison = ' >= ';
 								break;
 							case KalturaSearchConditionComparison::LESS_THAN:
 								$comparison = " < ";
 								break;
-							case KalturaSearchConditionComparison::LESS_THAN_OR_EQUEL:
+							case KalturaSearchConditionComparison::LESS_THAN_OR_EQUAL:
 								$comparison = " <= ";
 								break;
 							default:
@@ -140,7 +140,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 							
 						$newCondition = $metadataField . $comparison . $value;
 						
-						if ($item->getComparison() != KalturaSearchConditionComparison::EQUEL)
+						if ($item->getComparison() != KalturaSearchConditionComparison::EQUAL)
 							$newCondition = "($newCondition AND $metadataField <> 0)";
 							
 						$this->addCondition($newCondition);
