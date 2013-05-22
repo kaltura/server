@@ -1082,6 +1082,7 @@ class kJobsManager
 			
 			if($conversionRequired)
 			{
+				$importingSources = false;
 				foreach($sourceFileRequiredStorages as $storageId)
 				{
 					if($storageId == StorageProfile::STORAGE_KALTURA_DC)
@@ -1093,6 +1094,7 @@ class kJobsManager
 							KalturaLog::debug("Creates import job for remote file sync");
 							$url = $syncFile->getExternalUrl($entry->getId());
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
+							$importingSources = true;
 							continue;
 						}
 					}
@@ -1167,6 +1169,8 @@ class kJobsManager
 		
 		$batchJob->setObjectId($entry->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		if($importingSources)
+			$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
 		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_PROFILE);
 	}

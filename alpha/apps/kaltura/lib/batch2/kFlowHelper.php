@@ -180,7 +180,9 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		if($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT)
+		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);		
+		
+		if(($isNewContent || $dbEntry->getStatus() == entryStatus::IMPORT) && !$convertProfileExist)
 			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
@@ -1992,5 +1994,26 @@ class kFlowHelper
 				$tempFlavorAsset->save();
 			}
 		}
+	}
+	
+	private static function activateConvertProfileJob($entryId, $localFilePath)
+	{
+		$c = new Criteria();
+		$c->add ( BatchJobPeer::ENTRY_ID , $entryId );
+		$c->add ( BatchJobPeer::JOB_TYPE , BatchJobType::CONVERT_PROFILE );
+		$c->add ( BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
+		
+		$batchJob = BatchJobPeer::doSelectOne( $c );	
+		if($batchJob)
+		{
+			KalturaLog::debug('Activating convert profile job, local file path ['.$localFilePath.']');
+			$data = $batchJob->getData();
+			$data->setInputFileSyncLocalPath($localFilePath);
+			$batchJob->setData($data);
+			kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+			return true;
+		}
+		else 
+			return false;
 	}
 }
