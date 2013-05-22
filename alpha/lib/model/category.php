@@ -838,14 +838,6 @@ class category extends Basecategory implements IIndexable
 		return kUTF8::str2int64($this->getName());
 	}
 	
-	/**
-	 * @return string sorting value
-	 */
-	public function getSortFullName()
-	{
-		return $this->getFullName();
-	}
-	
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIntId()
 	 */
@@ -971,8 +963,6 @@ class category extends Basecategory implements IIndexable
 			'full_name' => 'searchIndexfullName',
 			'full_ids' => 'searchIndexfullIds',
 			'sort_name' => 'sortName',
-			'sort_name_str' => 'name',
-			'sort_full_name' => 'sortFullName',
 			'description' => 'description',
 			'tags' => 'tags',
 			'category_status' => 'status',
@@ -1022,8 +1012,6 @@ class category extends Basecategory implements IIndexable
 				'full_name' => IIndexable::FIELD_TYPE_STRING,
 				'full_ids' => IIndexable::FIELD_TYPE_STRING,
 				'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
-				'sort_name_str' => IIndexable::FIELD_TYPE_STRING,
-				'sort_full_name' => IIndexable::FIELD_TYPE_STRING,
 				'description' => IIndexable::FIELD_TYPE_STRING,
 				'tags' => IIndexable::FIELD_TYPE_STRING,
 				'category_status' => IIndexable::FIELD_TYPE_INTEGER,

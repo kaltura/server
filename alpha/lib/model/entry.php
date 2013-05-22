@@ -2689,7 +2689,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 				'name' => 'name',
 				'sort_name' => 'sortName',
-				'sort_name_str' => 'name',
 				'tags' => 'tags',
 				'categories' => 'categoriesEntryIds',
 				'flavor_params' => 'flavorParamsIds',
@@ -2772,7 +2771,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			
 			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
-			'sort_name_str' => IIndexable::FIELD_TYPE_STRING,
 			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
 			'puser_id' => IIndexable::FIELD_TYPE_STRING,

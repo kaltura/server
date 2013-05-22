@@ -156,6 +156,7 @@ index kaltura_entry:kaltura_base
 	path	 = @BASE_DIR@/sphinx/kaltura_rt
 	rt_field	 = entry_id
 	rt_field	 = name
+	rt_attr_string	 = name
 	rt_field	 = tags
 	rt_field	 = categories
 	rt_field	 = flavor_params
@@ -170,8 +171,7 @@ index kaltura_entry:kaltura_base
 	rt_field	 = replacing_entry_id
 	rt_field	 = replaced_entry_id
 	rt_field	 = roots
-	rt_attr_bigint	 = sort_name
-	rt_attr_string	 = sort_name_str
+	rt_attr_bigint	 = sort_name	
 	rt_attr_uint	 = int_entry_id
 	rt_field	 = kuser_id
 	rt_field	 = puser_id
@@ -222,8 +222,10 @@ index kaltura_category
 	rt_field	 = str_category_id
 	rt_attr_uint	 = parent_id
 	rt_field	 = name
+	rt_attr_string	 = name
 	rt_attr_bigint	 = partner_id
 	rt_field	 = full_name
+	rt_attr_string	 = full_name
 	rt_field	 = full_ids
 	rt_field	 = description
 	rt_field	 = tags
@@ -238,9 +240,7 @@ index kaltura_category
 	rt_field	 = privacy_contexts
 	rt_field	 = privacy
     rt_field     = sphinx_match_optimizations
-	rt_attr_bigint	 = sort_name
-	rt_attr_string	 = sort_name_str
-	rt_attr_string	 = sort_full_name
+	rt_attr_bigint	 = sort_name	
 	rt_attr_uint	 = members_count
 	rt_attr_uint	 = pending_members_count
 	rt_attr_uint	 = entries_count

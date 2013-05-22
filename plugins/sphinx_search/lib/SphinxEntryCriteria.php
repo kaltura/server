@@ -62,7 +62,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	);
 	
 	public static $sphinxOrderFields = array(
-		entryPeer::NAME => 'sort_name_str',
+		entryPeer::NAME => 'name',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
