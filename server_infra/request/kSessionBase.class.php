@@ -106,27 +106,38 @@ class kSessionBase
 	 */
 	public function parseKS($encoded_str)
 	{
-		// try V2
-		if ($this->parseKsV2($encoded_str))
-			return true;
-	
-		// try V1
-		if ($this->parseKsV1($encoded_str))
-			return true;
-			
-		return false;
+		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $encoded_str), true);
+		if (!$decodedKs)
+		{
+			$this->logError("Couldn't base 64 decode the KS.");
+			return false;
+		}
+		
+		if (substr($decodedKs, 0, 3) == 'v2|')
+		{		
+			if (!$this->parseKsV2($decodedKs))
+				return false;
+		}
+		else
+		{
+			if (!$this->parseKsV1($decodedKs))
+				return false;
+		}
+		$this->original_str = $encoded_str;
+		
+		return true;
 	}
 	
-	public function parseKsV1($encoded_str)
+	public function parseKsV1($str)
 	{
-		$str = base64_decode($encoded_str, true);
-		if (strpos($str, "|") === false)
+		$explodedStr = explode( "|" , $str , 2 );
+		if (count($explodedStr) != 2)
 		{
 			$this->logError("Couldn't find | seperator in the KS");
 			return false;
 		}
 			
-		list($hash , $real_str) = explode( "|" , $str , 2 );
+		list($hash , $real_str) = $explodedStr;
 
 		$parts = explode(self::SEPARATOR, $real_str);
 		if (count($parts) < 3)
@@ -196,7 +207,6 @@ class kSessionBase
 
 		$this->hash = $hash;
 		$this->real_str = $real_str;
-		$this->original_str = $encoded_str;
 		
 		return true;
 	}
@@ -411,25 +421,13 @@ class kSessionBase
 		return str_replace(array('+', '/'), array('-', '_'), base64_encode($decodedKs));
 	}
 	
-	public function parseKsV2($ks)
+	public function parseKsV2($decodedKs)
 	{
-		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $ks), true);
-		if (!$decodedKs)
-		{
-			$this->logError("Couldn't base 64 decode the KS.");
-			return false;
-		}
-		
 		$explodedKs = explode('|', $decodedKs , 3);
 		if (count($explodedKs) != 3)
 			return false;						// not KS V2
 		
 		list($version, $partnerId, $encKs) = $explodedKs;
-		if ($version != 'v2')
-		{
-			$this->logError("KS version [$version] is not [v2].");
-			return false;						// not KS V2
-		}
 		
 		$adminSecret = $this->getAdminSecret($partnerId);
 		if (!$adminSecret)
@@ -481,7 +479,6 @@ class kSessionBase
 		
 		$this->hash = bin2hex($hash);
 		$this->real_str = $fields;
-		$this->original_str = $ks;
 		$this->partner_id = $partnerId;
 		$this->rand = bin2hex($rand);
 		$this->privileges = implode(',', $privileges);
