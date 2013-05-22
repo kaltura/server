@@ -79,8 +79,12 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		if ($entryDistributionDb)
 			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
-		else
+		else{
 			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
+			return; 
+			//22.5.13 this return is a hack because of bad inheritance of kYouTubeDistributionJobProviderData causing some YouTube distribution 
+			//batch jobs to not have fieldValues. it can be removed at some point.   
+		}
 
 		if ($distributionJobData->distributionProfile->feedSpecVersion != YouTubeDistributionFeedSpecVersion::VERSION_2)
 			return;

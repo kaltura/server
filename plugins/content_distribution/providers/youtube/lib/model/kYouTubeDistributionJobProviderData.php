@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage model.data
  */
-class kYouTubeDistributionJobProviderData extends kDistributionJobProviderData
+class kYouTubeDistributionJobProviderData extends kConfigurableDistributionJobProviderData
 {
 	/**
 	 * @var string
