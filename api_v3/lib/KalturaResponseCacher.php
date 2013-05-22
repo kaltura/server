@@ -127,12 +127,6 @@ class KalturaResponseCacher extends kApiCache
 		
 	public function checkOrStart()
 	{
-		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
-		{
-			$this->sendCachingHeaders(false);
-			return;
-		}
-					
 		$response = $this->checkCache();		
 		if (!$response)
 		{

@@ -41,8 +41,6 @@ class KalturaFrontController
 	
 	public function onRequestStart($service, $action, array $params, $requestIndex = 0, $isInMultiRequest = false)
 	{
-		KalturaMonitorClient::monitor(false, "{$this->service}.{$this->action}", kCurrentContext::getCurrentPartnerId(), kCurrentContext::getCurrentSessionType(), $isInMultiRequest);
-		
 		$this->requestStart = microtime(true);
 		KalturaLog::analytics(array(
 			'request_start',
@@ -90,8 +88,6 @@ class KalturaFrontController
 		KalturaLog::debug("Params [" . print_r($this->params, true) . "]");
 		if ($this->service == "multirequest")
 		{
-			KalturaMonitorClient::monitor(false, 'multirequest', kCurrentContext::getCurrentPartnerId(), kCurrentContext::getCurrentSessionType());
-			
 		    set_exception_handler(null);
 		    $result = $this->handleMultiRequest();
 		}

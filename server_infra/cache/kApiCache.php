@@ -71,7 +71,8 @@ class kApiCache extends kApiCacheBase
 	protected $_ks = "";
 	protected $_ksObj = null;
 	protected $_ksPartnerId = null;
-
+	protected $_partnerId = null;
+	
 	// extra fields
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
@@ -116,19 +117,23 @@ class kApiCache extends kApiCacheBase
 		$this->addInternalCacheParams();
 		
 		// print the partner id using apache note
-		$partnerId = null;
 		if ($this->_ksPartnerId)
 		{
-			$partnerId = $this->_ksPartnerId;
+			$this->_partnerId = $this->_ksPartnerId;
 		}
 		else if (isset($this->_params["partnerId"]))
 		{
-			$partnerId = $this->_params["partnerId"];
+			$this->_partnerId = $this->_params["partnerId"];
 		}
 		
-		if ($partnerId && is_numeric($partnerId) && function_exists('apache_note'))
+		if (!is_numeric($this->_partnerId))
 		{
-			apache_note("Kaltura_PartnerId", $partnerId);
+			$this->_partnerId = null;
+		}
+		
+		if ($this->_partnerId && function_exists('apache_note'))
+		{
+			apache_note("Kaltura_PartnerId", $this->_partnerId);
 		}
 		
 		return true;
@@ -545,6 +550,23 @@ class kApiCache extends kApiCacheBase
 	 */
 	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
+		$result = $this->checkCacheInternal($cacheHeaderName, $cacheHeader);
+		
+		if(isset($this->_params['service']))
+		{
+			$isInMultiRequest = isset($this->_params['multirequest']);
+			$action = $this->_params['service'];
+			if ($action != 'multirequest' && isset($this->_params['action']))
+				$action = $this->_params['service'] . '.' . $this->_params['action'];
+		
+			KalturaMonitorClient::monitor($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $isInMultiRequest);
+		}
+		
+		return $result;
+	}
+
+	protected function checkCacheInternal($cacheHeaderName, $cacheHeader)
+	{
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return false;
 
@@ -567,16 +589,6 @@ class kApiCache extends kApiCacheBase
 		{
 			$this->_cacheStores[] = $cacheStore;
 			return false;
-		}
-
-		if(isset($this->_params['service']))
-		{
-			$isInMultiRequest = isset($this->_params['multirequest']);
-			$action = $this->_params['service'];
-			if ($action != 'multirequest')
-				$action = $this->_params['service'] . '.' . $this->_params['action'];
-
-			KalturaMonitorClient::monitor(true, $action, $this->_ksPartnerId, $this->getCurrentSessionType(), $isInMultiRequest);
 		}
 
 		$this->_responseMetadata = $responseMetadata;
