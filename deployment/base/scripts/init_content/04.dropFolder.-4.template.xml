@@ -29,6 +29,7 @@
 				<fileHandlerConfig objectType="KalturaDropFolderXmlBulkUploadFileHandlerConfig">
 				</fileHandlerConfig>
 				<dc>0</dc>
+				<fileNamePatterns>*.xml</fileNamePatterns>
 				<conversionProfileId>{1:result:id}</conversionProfileId>
 			</dropFolder>
 		</request>
