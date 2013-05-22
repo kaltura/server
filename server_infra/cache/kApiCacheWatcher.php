@@ -32,7 +32,7 @@ class kApiCacheWatcher extends kApiCacheBase
 		
 		// anonymous cache fields
 		if ($this->_expiry)
-			kApiCache::setConditionalCacheExpiry($this->_expiry);
+			kApiCache::setExpiry($this->_expiry);
 		
 		if ($this->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
 		{
@@ -46,18 +46,6 @@ class kApiCacheWatcher extends kApiCacheBase
 		
 		kApiCache::addInvalidationKeys($this->_invalidationKeys, $this->_invalidationTime);
 
-		foreach ($this->_sqlConditions as $dsn => $queries)
-		{
-			foreach ($queries as $query)
-			{
-				kApiCache::addSqlQueryCondition(
-					$dsn, 
-					$query['sql'],
-					$query['fetchStyle'],
-					$query['columnIndex'],
-					$query['filter'],
-					$query['expectedResult']);
-			}
-		}
+		kApiCache::addSqlQueryConditions($this->_sqlConditions);
 	}
 }

@@ -445,6 +445,16 @@ class kApiCache extends kApiCacheBase
 					$this->_cacheRules[self::CACHE_MODE_ANONYMOUS] = array($cacheExpiry, $expiryInterval, $conditions);
 					$this->_cacheRulesDirty = true;
 				}
+				
+				if (count(self::$_activeInstances) > 1)
+				{
+					// in case of multirequest need to add the current conditions to the conditions of the full multirequest
+					self::setConditionalCacheExpiry($cacheTTL);
+					self::addInvalidationKeys($invalidationKeys, $cachedInvalidationTime);
+					self::addSqlQueryConditions($sqlConditions);
+				}
+				
+				return self::CACHE_MODE_CONDITIONAL;
 			}
 			else if ($isWarmupRequest)
 			{
@@ -457,16 +467,16 @@ class kApiCache extends kApiCacheBase
 					self::warmCache($this->_cacheKey);
 			}
 
-			return true;
+			return self::CACHE_MODE_ANONYMOUS;
 		}
 
-		return false;
+		return null;
 	}
 
 	protected function getCacheStoreForRead()
 	{
 		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
-			return null;					// ks not valid, do not return from cache
+			return array(null, null);					// ks not valid, do not return from cache
 
 		// if the request is for warming the cache, disregard the cache and run the request
 		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
@@ -488,9 +498,10 @@ class kApiCache extends kApiCacheBase
 			if ($cacheRules)
 			{
 				$this->_cacheRules = unserialize($cacheRules);
-				if ($this->validateCachingRules($warmCacheHeader !== false))
+				$cacheMode = $this->validateCachingRules($warmCacheHeader !== false);
+				if (!is_null($cacheMode))
 				{
-					return $cacheStore;
+					return array($cacheMode, $cacheStore);
 				}
 			}
 
@@ -498,7 +509,7 @@ class kApiCache extends kApiCacheBase
 			$this->_cacheStores[] = $cacheStore;
 		}
 
-		return null;
+		return array(null, null);
 	}
 
 	/**
@@ -538,7 +549,7 @@ class kApiCache extends kApiCacheBase
 			return false;
 
 		$startTime = microtime(true);
-		$cacheStore = $this->getCacheStoreForRead();
+		list($cacheMode, $cacheStore) = $this->getCacheStoreForRead();
 		if (!$cacheStore)
 		{
 			return false;
@@ -578,15 +589,21 @@ class kApiCache extends kApiCacheBase
 
 		$this->saveToCacheStores($response);
 
-		// in case of multirequest, we must not condtionally cache the multirequest when a sub request comes from cache
-		// for single requests, the next line has no effect
-		self::disableConditionalCache();
+		if ($cacheMode == self::CACHE_MODE_ANONYMOUS)
+		{
+			// in case of multirequest, we must not condtionally cache the multirequest when a sub request comes 
+			// from anonymous cache. for single requests, the next line has no effect
+			self::disableConditionalCache();
+		}
 
 		$processingTime = microtime(true) - $startTime;
 		if (self::hasExtraFields() && $cacheHeaderName == 'X-Kaltura')
 			$cacheHeader = 'cached-with-extra-fields';
 		header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
 
+		// remove $this from the list of active instances - the request is complete
+		$this->removeFromActiveList();
+		
 		return $response;
 	}
 

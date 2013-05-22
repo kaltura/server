@@ -177,6 +177,23 @@ class kApiCacheBase
 		}
 	}
 
+	protected static function addSqlQueryConditions($sqlConditions)
+	{
+		foreach ($sqlConditions as $dsn => $queries)
+		{
+			foreach ($queries as $query)
+			{
+				self::addSqlQueryCondition(
+					$dsn,
+					$query['sql'],
+					$query['fetchStyle'],
+					$query['columnIndex'],
+					$query['filter'],
+					$query['expectedResult']);
+			}
+		}
+	}
+		
 	// extra fields functions
 	static public function hasExtraFields()
 	{
