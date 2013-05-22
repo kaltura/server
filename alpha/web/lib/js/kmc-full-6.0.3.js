@@ -1,4 +1,4 @@
-/*! KMC - v6.0.3 - 2013-05-08
+/*! KMC - v6.0.3 - 2013-05-21
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -3136,7 +3136,8 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 		$scope.shortLinkGenerated = false;
 		Preview.generateShortUrl(previewUrl, function(tinyUrl) {
 			if(!tinyUrl) {
-				tinyUrl = 'Error in generating short link';
+				// Set tinyUrl to fullUrl
+				tinyUrl = previewUrl;
 			}
 			$scope.shortLinkGenerated = true;
 			$scope.previewUrl = tinyUrl;
