@@ -154,7 +154,7 @@ class kEntitlementUtils
 		else
 		{
 			//no ks = set privacy context to default.
-			$c->add(categoryPeer::PRIVACY_CONTEXTS, array(kEntitlementUtils::getPrivacyContextSearch()), KalturaCriteria::IN_LIKE);
+			$c->add(categoryPeer::PRIVACY_CONTEXTS, kEntitlementUtils::getPrivacyContextSearch(), KalturaCriteria::IN_LIKE);
 		}
 		
 		$c->addAnd($crit);
