@@ -620,6 +620,7 @@ class kOldContentCleaner
 		        $join->addCondition(FileSyncPeer::VERSION, assetPeer::VERSION, Criteria::NOT_EQUAL);
 				$join->setJoinType(Criteria::LEFT_JOIN);
 				$criteria->addJoinObject($join);
+				$criteria->add(assetPeer::VERSION, null, Criteria::ISNOTNULL);
 				break;
 				
 			case FileSyncObjectType::UICONF:
@@ -628,6 +629,7 @@ class kOldContentCleaner
 		        $join->addCondition(FileSyncPeer::VERSION, uiConfPeer::VERSION, Criteria::NOT_EQUAL);
 				$join->setJoinType(Criteria::LEFT_JOIN);
 				$criteria->addJoinObject($join);
+				$criteria->add(uiConfPeer::VERSION, null, Criteria::ISNOTNULL);
 				break;
 				
 			case FileSyncObjectType::ENTRY:
@@ -638,11 +640,13 @@ class kOldContentCleaner
 				{
 					case entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB:
 				        $join->addCondition(FileSyncPeer::VERSION, entryPeer::THUMBNAIL, Criteria::NOT_EQUAL);
+						$criteria->add(entryPeer::THUMBNAIL, null, Criteria::ISNOTNULL);
 				        break;
 					
 					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA:
 					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD:
 				        $join->addCondition(FileSyncPeer::VERSION, entryPeer::DATA, Criteria::NOT_EQUAL);
+						$criteria->add(entryPeer::DATA, null, Criteria::ISNOTNULL);
 				        break;
 					
 					default:
@@ -659,6 +663,7 @@ class kOldContentCleaner
 		        $join->addCondition(FileSyncPeer::VERSION, MetadataPeer::VERSION, Criteria::NOT_EQUAL);
 				$join->setJoinType(Criteria::LEFT_JOIN);
 				$criteria->addJoinObject($join);
+				$criteria->add(MetadataPeer::VERSION, null, Criteria::ISNOTNULL);
 				break;
 				
 			case FileSyncObjectType::METADATA_PROFILE:
@@ -669,10 +674,12 @@ class kOldContentCleaner
 				{
 					case MetadataProfile::FILE_SYNC_METADATA_DEFINITION:
 				        $join->addCondition(FileSyncPeer::VERSION, MetadataProfilePeer::VERSION, Criteria::NOT_EQUAL);
+						$criteria->add(MetadataProfilePeer::VERSION, null, Criteria::ISNOTNULL);
 				        break;
 					
 					case MetadataProfile::FILE_SYNC_METADATA_VIEWS:
 				        $join->addCondition(FileSyncPeer::VERSION, MetadataProfilePeer::VIEWS_VERSION, Criteria::NOT_EQUAL);
+						$criteria->add(MetadataProfilePeer::VIEWS_VERSION, null, Criteria::ISNOTNULL);
 				        break;
 					
 					default:
