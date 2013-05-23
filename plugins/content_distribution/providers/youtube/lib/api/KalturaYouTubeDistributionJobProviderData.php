@@ -79,16 +79,17 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		if ($entryDistributionDb)
 			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
-		else{
-			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
-			return; 
-			//22.5.13 this return is a hack because of bad inheritance of kYouTubeDistributionJobProviderData causing some YouTube distribution 
-			//batch jobs to not have fieldValues. it can be removed at some point.   
-		}
+		else
+			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');  
 
 		if ($distributionJobData->distributionProfile->feedSpecVersion != YouTubeDistributionFeedSpecVersion::VERSION_2)
 			return;
-
+			
+		if (is_null($this->fieldValues))
+			return;
+			//23.5.13 this return is a hack because of bad inheritance of kYouTubeDistributionJobProviderData causing some YouTube distribution 
+			//batch jobs to not have fieldValues. it can be removed at some point. 
+			
 		$videoFilePath = $this->videoAssetFilePath;
 		$thumbnailFilePath = $this->thumbAssetFilePath;
 
