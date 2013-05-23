@@ -11,10 +11,10 @@ class KalturaErrors extends APIErrors
 	 */
 
 	//
-	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR,Internal server error occured";
+	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR,Internal server error occurred";
 
 	// should be used for internal actions only
-	const INTERNAL_SERVERL_ERROR_DEBUG = "INTERNAL_SERVERL_ERROR,Internal server error occured \"%s\"";
+	const INTERNAL_SERVERL_ERROR_DEBUG = "INTERNAL_SERVERL_ERROR,Internal server error occurred \"%s\"";
 
 	//
 	const MISSING_KS ="MISSING_KS,Missing KS, session not established";
