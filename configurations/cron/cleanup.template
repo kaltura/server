@@ -1,1 +1,1 @@
-*/15 * * * * kaltura @PHP_BIN@ @APP_DIR@/scripts/batch/deleteOldContent.php --old-versions --files 2>&1 >> @LOG_DIR@/kaltura_cleanup.log
+*/15 * * * * kaltura @PHP_BIN@ @APP_DIR@/scripts/batch/deleteOldContent.php --real-run --old-versions --files 2>&1 >> @LOG_DIR@/kaltura_cleanup.log

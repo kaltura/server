@@ -108,12 +108,12 @@ class kOldContentCleaner
 		PartnerPeer::setUseCriteriaFilter(false);
 		FileSyncPeer::setUseCriteriaFilter(false);
 		
-		$options = getopt('hrl:o:e:', array(
+		$options = getopt('hrl:p:o:b:e:', array(
+			'real-run',
 			'error-objects',
 			'old-versions',
 			'blocked-partners',
 			'files',
-			'real-run',
 		));
 	
 		if(isset($options['h']))
@@ -136,7 +136,7 @@ class kOldContentCleaner
 		$cacheFilePath = kConf::get('cache_root_path') . '/scripts/deleteOldContent.cache';
 		if(file_exists($cacheFilePath))
 		{
-			$cache = parse_ini_file($cacheFilePath);
+			$cache = unserialize(file_get_contents($cacheFilePath));
 			if(isset($cache['oldVersionsStartUpdatedAt']))
 				self::$oldVersionsStartUpdatedAt = $cache['oldVersionsStartUpdatedAt'];
 			if(isset($cache['purgeStartUpdatedAt']))
@@ -163,7 +163,7 @@ class kOldContentCleaner
 		$oldVersionsUpdatedAtPeriod = 30; // days
 		if(isset($options['o']))
 		{
-			if(!is_numeric($options['o']) || $options['o'] > 0)
+			if(!is_numeric($options['o']) || $options['o'] < 0)
 				self::failWrongInputs("Period of old versions to delete must be positive numeric of days");
 				
 			$oldVersionsUpdatedAtPeriod = $options['o'];
@@ -173,7 +173,7 @@ class kOldContentCleaner
 		$purgeUpdatedAtPeriod = 30; // days
 		if(isset($options['p']))
 		{
-			if(!is_numeric($options['p']) || $options['p'] > 0)
+			if(!is_numeric($options['p']) || $options['p'] < 0)
 				self::failWrongInputs("Period of purge must be positive numeric of days");
 				
 			$purgeUpdatedAtPeriod = $options['p'];
@@ -183,7 +183,7 @@ class kOldContentCleaner
 		$oldPartnersUpdatedAtPeriod = 24; // months
 		if(isset($options['b']))
 		{
-			if(!is_numeric($options['b']) || $options['b'] > 0)
+			if(!is_numeric($options['b']) || $options['b'] < 0)
 				self::failWrongInputs("Period of blocked partners to delete must be positive numeric of months");
 				
 			$oldPartnersUpdatedAtPeriod = $options['b'];
@@ -193,7 +193,7 @@ class kOldContentCleaner
 		$errObjectsUpdatedAtPeriod = 24; // months
 		if(isset($options['e']))
 		{
-			if(!is_numeric($options['e']) || $options['e'] > 0)
+			if(!is_numeric($options['e']) || $options['e'] < 0)
 				self::failWrongInputs("Period of error objects to delete must be positive numeric of months");
 				
 			$errObjectsUpdatedAtPeriod = $options['e'];
@@ -202,7 +202,7 @@ class kOldContentCleaner
 		
 		if(isset($options['l']))
 		{
-			if(!is_numeric($options['l']) || $options['l'] > 0)
+			if(!is_numeric($options['l']) || $options['l'] < 0)
 				self::failWrongInputs("Limit querymust be positive numeric value");
 				
 			self::$queryLimit = $options['l'];
@@ -212,12 +212,12 @@ class kOldContentCleaner
 	protected static function finit()
 	{
 		$cache = array(
-			'oldVersionsStartUpdatedAt = ' . self::$oldVersionsEndUpdatedAt,
-			'purgeStartUpdatedAt = ' . self::$purgeEndUpdatedAt,
+			'oldVersionsStartUpdatedAt' => self::$oldVersionsEndUpdatedAt,
+			'purgeStartUpdatedAt' => self::$purgeEndUpdatedAt,
 		);
 	
 		$cacheFilePath = kConf::get('cache_root_path') . '/scripts/deleteOldContent.cache';
-		file_put_contents($cacheFilePath, implode("\n", $cache));
+		file_put_contents($cacheFilePath, serialize($cache));
 		
 		if(isset(self::$sums['entry']))
 			KalturaLog::info('Deleted ' . self::$sums['entry'] . ' entries.');
@@ -280,7 +280,7 @@ class kOldContentCleaner
 		echo "\t-e: Error objects file syncs months to delete, default is 24.\n";
 		echo "\t--error-objects: Delete objects in error status that are also older than 30 days or as configured by -e option.\n";
 		echo "\t--old-versions: Delete file sync objects of old versions that are also older than 30 days or as configured by -o option.\n";
-		echo "\t--blocked-partners: Delete file sync objects of old blocked partners that are also older than 24 months or as configured by -b option.\n";
+		echo "\t--blocked-partners: Delete file sync objects of old blocked or deleted partners that are also older than 24 months or as configured by -b option.\n";
 		echo "\t--files: Delete files from the disc according to file sync objects that marked as deleted, the file sync objects will be marked as purged after the physical deletion from the disc.\n";
 		
 		
@@ -433,8 +433,8 @@ class kOldContentCleaner
 		if(count($fileSyncs))
 		{
 			$fileSync = end($fileSyncs);
-			if($fileSync->getUpdatedAt())
-				self::$purgeEndUpdatedAt = $fileSync->getUpdatedAt();
+			if($fileSync->getUpdatedAt(null))
+				self::$purgeEndUpdatedAt = $fileSync->getUpdatedAt(null);
 		}
 		return $fileSyncs;
 	}
@@ -672,8 +672,8 @@ class kOldContentCleaner
 		{
 			/* @var $fileSync FileSync */
 			self::deleteFileSync($fileSync);
-			if($fileSync->getUpdatedAt())
-				self::$oldVersionsEndUpdatedAt = $fileSync->getUpdatedAt();
+			if($fileSync->getUpdatedAt(null))
+				self::$oldVersionsEndUpdatedAt = $fileSync->getUpdatedAt(null);
 		}
 		kMemoryManager::clearMemory();
 	}
