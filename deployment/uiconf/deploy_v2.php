@@ -1,7 +1,6 @@
 <?php
+require_once (__DIR__ . "/../bootstrap.php");
 
-define('KALTURA_ROOT_PATH', realpath(__DIR__ . '/../../'));
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
 
 /**
  * for running the script you need to provide path to ini file like:
@@ -180,8 +179,8 @@ class uiConfDeployment
 						//Then we need to insert the ui conf to the DB (so we can get his id)
 						$uiconf_id = uiConfDeployment::addUiConfThroughPropel($uiConf);
 
-						echo "creating uiconf [$uiconf_id] for widget $widgetName with default values ( $baseSwfUrl , $swfName , $objectType ) for partner " . self::$partnerId . PHP_EOL;
-						echo "$widgetName , $baseSwfUrl , $swfName , $objectType".PHP_EOL;
+						KalturaLog::debug("creating uiconf [$uiconf_id] for widget $widgetName with default values ( $baseSwfUrl , $swfName , $objectType ) for partner " . self::$partnerId);
+						KalturaLog::debug("$widgetName , $baseSwfUrl , $swfName , $objectType");
 					
 						if(isset($widgetValue->features))
 						{
@@ -207,7 +206,7 @@ class uiConfDeployment
 								else
 								{
 									uiConfDeployment::updateFeaturesFile($uiConf, $dependencyValue, "@@{$dependencyName}@@");
-									echo "Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}. Attempting to replace the token in uiconf features file" . PHP_EOL;
+									KalturaLog::debug("Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}. Attempting to replace the token in uiconf features file");
 								}
 							}
 						}
@@ -215,10 +214,8 @@ class uiConfDeployment
 					}
 					else
 					{
-						echo "failed to create uiconf object ($widgetName) due to missing values. check your config.ini".PHP_EOL;
+						KalturaLog::debug("failed to create uiconf object ($widgetName) due to missing values. check your config.ini");
 					}
-					
-					echo PHP_EOL;
 				}
 			}
 		}
@@ -252,7 +249,7 @@ class uiConfDeployment
 			$deprecatedTag = $newTag;
 			$deprecatedTag = str_replace("autodeploy", "deprecated", $deprecatedTag);
 		
-			echo "newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner ". self::$partnerId . "\n";
+			KalturaLog::debug("newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner ". self::$partnerId);
 			
 			$confCriteria = new Criteria();
 			$confCriteria->add(uiConfPeer::ID, $oldUiConf[0]);
@@ -263,19 +260,19 @@ class uiConfDeployment
 			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID
 			$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
 			
-			echo "uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag} \n\n";
+			KalturaLog::debug("uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag}");
 			
 			$totalDepractedCount += $deprecatedCount;
 		}
 		
 		//Add the status check to the select factor
-		echo "{$totalDepractedCount} uiConfs were updated\n\n\n";
+		KalturaLog::debug("{$totalDepractedCount} uiConfs were updated");
 
 		$count = uiConfPeer::doCount($oldConfCriteria);
 		
 		if($count > 0)
 		{
-			echo "Exiting, Tag: {$newTag} already found in the DB";
+			KalturaLog::debug("Exiting, Tag: {$newTag} already found in the DB");
 			exit;
 		}
 	}
@@ -301,50 +298,7 @@ class uiConfDeployment
 	 */
 	public static function init($conf_file_path)
 	{
-		require_once(KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."server_infra".DIRECTORY_SEPARATOR."kConf.php");
-		
-		
-		// Autoloader
-		require_once(KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."KAutoloader.php");
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"));
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "*"));
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*")); // needed for testmeDoc
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator")); // needed for testmeDoc
-		KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/' . basename(__FILE__) . '.cache');
-		//KAutoloader::dumpExtra();
-		KAutoloader::register();
-		
-		$dbConf = kConf::getDB();
-		DbManager::setConfig($dbConf);
-		DbManager::initialize();
-		
-		$loggerConfigPath = realpath(KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "configurations" . DIRECTORY_SEPARATOR . "logger.ini");
-		try // we don't want to fail when logger is not configured right
-		{
-			$config = new Zend_Config_Ini($loggerConfigPath);
-			$deploy = $config->deploy;
-			
-			KalturaLog::initLog($deploy);
-		}
-		catch(Zend_Config_Exception $ex)
-		{
-		}
-				
-		date_default_timezone_set(kConf::get("date_default_timezone"));
-		
-//		try
-//		{
-			$confObj = new Zend_Config_Ini($conf_file_path);
-//		}
-//		catch(Exception $ex)
-//		{
-//			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
-//			exit(1);
-//		}
-		return $confObj;
+		return new Zend_Config_Ini($conf_file_path);
  	}
 	
 	/**
@@ -407,7 +361,7 @@ class uiConfDeployment
 		passthru("chmod 640 $localPath", $ret);
 		if($ret !== 0)
 		{
-			echo "chmod [640] failed on path [$localPath]" . PHP_EOL;
+			KalturaLog::debug("chmod [640] failed on path [$localPath]");
 			exit(1);
 		}
 	
@@ -415,7 +369,7 @@ class uiConfDeployment
 		passthru("chown $user_group $localPath", $ret);
 		if($ret !== 0)
 		{
-			echo "chown [$user_group] failed on path [$localPath]" . PHP_EOL;
+			KalturaLog::debug("chown [$user_group] failed on path [$localPath]");
 			exit(1);
 		}
 
@@ -439,7 +393,7 @@ class uiConfDeployment
 		
 		if(!$confFileContents)
 		{
-			echo "Unable to read xml file from: {$widget->conf_file}" . PHP_EOL;
+			KalturaLog::debug("Unable to read xml file from: {$widget->conf_file}");
 		}
 		
 		if ($disableUrlHashing)
@@ -461,7 +415,7 @@ class uiConfDeployment
 		
 		if($uiconf->getConfFileFeatures() === FALSE)
 		{
-			echo "missing features conf file for uiconf {$widget->name}".PHP_EOL; // conf file is a must, features is not.
+			KalturaLog::debug("missing features conf file for uiconf {$widget->name}"); // conf file is a must, features is not.
 		}
 		
 		//Set values to the ui conf
@@ -510,7 +464,7 @@ class uiConfDeployment
 		passthru("chmod 640 $localPath", $ret);
 		if($ret !== 0)
 		{
-			echo "chmod [640] failed on path [$localPath]" . PHP_EOL;
+			KalturaLog::debug("chmod [640] failed on path [$localPath]");
 			exit(1);
 		}
 	
@@ -518,7 +472,7 @@ class uiConfDeployment
 		passthru("chown $user_group $localPath", $ret);
 		if($ret !== 0)
 		{
-			echo "chown [$user_group] failed on path [$localPath]" . PHP_EOL;
+			KalturaLog::debug("chown [$user_group] failed on path [$localPath]");
 			exit(1);
 		}
 	}
@@ -616,7 +570,7 @@ class uiConfDeployment
 		//Checks if the partner argument was given
 		if(!isset($arguments['partner']) || !($arguments['partner']) || is_null($arguments['partner']))
 		{
-			echo "--partner argument wasn't given. Using defualt partner 0\n";
+			KalturaLog::debug("--partner argument wasn't given. Using defualt partner 0");
 		}
 		else
 		{
