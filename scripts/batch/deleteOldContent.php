@@ -36,6 +36,12 @@ class kOldContentCleaner
 	protected static $oldVersionsEndUpdatedAt = null;
 	
 	/**
+	 * The updated at time to start search for file syncs of old versions on the next execution
+	 * @var int
+	 */
+	protected static $oldVersionsNextStartUpdatedAt = null;
+	
+	/**
 	 * The updated at time to start search for file syncs to purge
 	 * @var int
 	 */
@@ -46,6 +52,12 @@ class kOldContentCleaner
 	 * @var int
 	 */
 	protected static $purgeEndUpdatedAt = null;
+	
+	/**
+	 * The updated at time to start search for file syncs to purge on the next execution
+	 * @var int
+	 */
+	protected static $purgeNextStartUpdatedAt = null;
 	
 	/**
 	 * Blocked partners file syncs months to delete
@@ -160,6 +172,9 @@ class kOldContentCleaner
 			}
 		}
 		
+		self::$oldVersionsNextStartUpdatedAt = self::$oldVersionsStartUpdatedAt;
+		self::$purgeNextStartUpdatedAt = self::$purgeStartUpdatedAt;
+		
 		$oldVersionsUpdatedAtPeriod = 30; // days
 		if(isset($options['o']))
 		{
@@ -212,8 +227,8 @@ class kOldContentCleaner
 	protected static function finit()
 	{
 		$cache = array(
-			'oldVersionsStartUpdatedAt' => self::$oldVersionsEndUpdatedAt,
-			'purgeStartUpdatedAt' => self::$purgeEndUpdatedAt,
+			'oldVersionsStartUpdatedAt' => self::$oldVersionsNextStartUpdatedAt,
+			'purgeStartUpdatedAt' => self::$purgeNextStartUpdatedAt,
 		);
 	
 		$cacheFilePath = kConf::get('cache_root_path') . '/scripts/deleteOldContent.cache';
@@ -434,7 +449,7 @@ class kOldContentCleaner
 		{
 			$fileSync = end($fileSyncs);
 			if($fileSync->getUpdatedAt(null))
-				self::$purgeEndUpdatedAt = $fileSync->getUpdatedAt(null);
+				self::$purgeNextStartUpdatedAt = $fileSync->getUpdatedAt(null);
 		}
 		return $fileSyncs;
 	}
@@ -673,7 +688,7 @@ class kOldContentCleaner
 			/* @var $fileSync FileSync */
 			self::deleteFileSync($fileSync);
 			if($fileSync->getUpdatedAt(null))
-				self::$oldVersionsEndUpdatedAt = $fileSync->getUpdatedAt(null);
+				self::$oldVersionsNextStartUpdatedAt = $fileSync->getUpdatedAt(null);
 		}
 		kMemoryManager::clearMemory();
 	}
