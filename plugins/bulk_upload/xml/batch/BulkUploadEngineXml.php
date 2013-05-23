@@ -91,6 +91,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	    $this->parse();
 	}
 	
+	protected function getSchemaType()
+	{
+		return KalturaSchemaType::BULK_UPLOAD_XML;
+	}
+	
 	/**
 	 * Validates that the xml is valid using the XSD
 	 *@return bool - if the validation is ok
@@ -118,7 +123,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Validate the XML file against the schema
 		libxml_clear_errors();
 		$this->kClient->setReturnServedResult(true);
-		$xsd = $this->kClient->schema->serve(KalturaSchemaType::BULK_UPLOAD_XML);
+		$xsd = $this->kClient->schema->serve($this->getSchemaType());
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);

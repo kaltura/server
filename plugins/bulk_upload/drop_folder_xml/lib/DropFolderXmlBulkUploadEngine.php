@@ -21,24 +21,23 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	private $physicalFileUtils = null;
 	
 	/**
-	 * 
+	 *
 	 * @var array
 	 */
 	private $contentResourceNameToIdMap = null;
 	
 	/* (non-PHPdoc)
-	 * @see BulkUploadEngineXml::__construct()
+	 * @see BulkUploadEngineXml::getSchemaType()
 	 */
-	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
+	protected function getSchemaType()
 	{
-		parent::__construct($taskConfig, $kClient, $job);
-		
-		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/index.php/service/schema/action/serve/type/' . KalturaSchemaType::DROP_FOLDER_XML;
-		if($taskConfig->params->xsdFilePath) 
-			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
+		return KalturaSchemaType::DROP_FOLDER_XML;
 	}
 	
-	public function handleBulkUpload() 
+	/* (non-PHPdoc)
+	 * @see BulkUploadEngineXml::handleBulkUpload()
+	 */
+	public function handleBulkUpload()
 	{
 		KalturaLog::debug("Starting BulkUpload for XML drop folder file with id [".$this->job->jobObjectId.']');
 		
@@ -47,7 +46,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		$this->kClient->startMultiRequest();
 		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
 		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
-		list($this->xmlDropFolderFile, $this->dropFolder) = $this->kClient->doMultiRequest(); 
+		list($this->xmlDropFolderFile, $this->dropFolder) = $this->kClient->doMultiRequest();
 				
 		$this->physicalFileUtils = new KPhysicalDropFolderUtils($this->dropFolder);
 		$this->data->filePath = $this->physicalFileUtils->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
@@ -64,7 +63,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		$pager->pageIndex = 1;		
+		$pager->pageIndex = 1;
 		
 		$getNextPage = true;
 		
@@ -73,15 +72,15 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		while($getNextPage)
 		{
 			$dropFolderFiles = $dropFolderPlugin->dropFolderFile->listAction($filter, $pager);
-			foreach ($dropFolderFiles->objects as $dropFolderFile) 
+			foreach ($dropFolderFiles->objects as $dropFolderFile)
 			{
 				$this->contentResourceNameToIdMap[$dropFolderFile->fileName] = $dropFolderFile->id;
 			}
 			
 			if(count($dropFolderFiles->objects) < $pager->pageSize)
 				$getNextPage = false;
-			else 
-				$pager->pageIndex++;			
+			else
+				$pager->pageIndex++;
 		}
 	}
 	
@@ -110,9 +109,9 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		KalturaLog::debug('In validateResource');
 		if($resource instanceof KalturaDropFolderFileResource)
-		{			
+		{
 			$fileId = $resource->dropFolderFileId;
-			KalturaLog::debug('drop folder file id '.$fileId);			
+			KalturaLog::debug('drop folder file id '.$fileId);
 			if (is_null($fileId)) {
 				throw new KalturaBulkUploadXmlException("Drop folder id is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
@@ -130,7 +129,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	
 	private function getFilePath(SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug('In getFilePath');			
+		KalturaLog::debug('In getFilePath');
 		$attributes = $elementToSearchIn->dropFolderFileContentResource->attributes();
 		$filePath = (string)$attributes['filePath'];
 		
@@ -144,7 +143,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		else
 		{
 			throw new KalturaBulkUploadXmlException("Can't validate file as file path is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}		
+		}
 	}
 	
 	private function validateFileSize(SimpleXMLElement $elementToSearchIn, $filePath)
