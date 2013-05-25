@@ -66,7 +66,10 @@ class kConvartableJobData extends kJobData
 	 */
 	private $srcFileSyncRemoteUrl;
 
-	public function __construct()
+	/**
+	 * Migrates old members to new used members
+	 */
+	public function migrateOldSerializedData()
 	{
 		if($this->srcFileSyncLocalPath || $this->srcFileSyncRemoteUrl || $this->actualSrcFileSyncLocalPath)
 		{
