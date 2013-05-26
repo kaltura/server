@@ -216,15 +216,8 @@ class kJobsManager
 		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_DELETE, $subType);
 	}
 	
-	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry)
+	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry, kProvisionJobData $jobData)
 	{
-		$sourceType = $entry->getSource();
-		$jobData = kProvisionJobData::getInstance($sourceType);
-			$partner = $entry->getPartner();
-		$jobData->populateFromPartner($partner);
-
- 		$jobData->populateFromEntry($entry);
- 		
 		$batchJob = null;
 		if($parentJob)
 		{
