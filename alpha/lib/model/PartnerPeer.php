@@ -68,7 +68,7 @@ class PartnerPeer extends BasePartnerPeer
 		return $priorityFactor;
 	}
 	
-	private static function getPriority($partner)
+	private static function getPriority(Partner $partner)
 	{
 		$priorityGroup = PriorityGroupPeer::retrieveByPK($partner->getPriorityGroupId());
 	
