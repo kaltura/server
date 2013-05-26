@@ -276,6 +276,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$key->object_id = $this->getId();
 		$key->version = $version;
 		$key->partner_id = $this->getPartnerId();
+		$key->version = 0;
 		
 		return $key;
 	}
