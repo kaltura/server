@@ -206,9 +206,11 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	
 	protected function validateEncodingIP ($ip)
 	{
+		if (!filter_var($this->encodingIP1, FILTER_VALIDATE_IP))
+			throw new KalturaAPIException(KalturaErrors::ENCODING_IP_NOT_PINGABLE);	
+		
 		@exec("ping -w " . kConf::get('ping_default_timeout') . " {$this->encodingIP1}", $output, $return);
 		if ($return)
 			throw new KalturaAPIException(KalturaErrors::ENCODING_IP_NOT_PINGABLE);
 	}
 }
-?>
