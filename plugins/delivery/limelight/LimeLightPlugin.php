@@ -2,7 +2,7 @@
 /**
  * @package plugins.limeLight
  */
-class LimeLightPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers
+class LimeLightPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'limeLight';
 	const LIMELIGHT_LIVE_EVENT_CONSUMER = 'kLimeLightLiveFlowManager';
@@ -19,50 +19,6 @@ class LimeLightPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);		
-	}
-	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
-	 */
-	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
-	{			
-		$objectClass = self::getObjectClass($baseClass, $enumValue);
-		
-		if (is_null($objectClass)) {
-			return null;
-		}
-		
-		if (!is_null($constructorArgs))
-		{
-			$reflect = new ReflectionClass($objectClass);
-			return $reflect->newInstanceArgs($constructorArgs);
-		}
-		else
-		{
-			return new $objectClass();
-		}
-	}
-	
-	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @return string
-	 */
-	public static function getObjectClass($baseClass, $enumValue)
-	{			
-	    if ($baseClass == 'KProvisionEngine')
-		{
-		    if ($enumValue == self::getApiValue(LimeLightLiveEntrySourceType::LIMELIGHT_LIVE))
-			{
-				return 'KProvisionEngineLimelight';
-			}
-		}
-		
-		return null;
 	}
 	
 	

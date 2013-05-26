@@ -3,63 +3,48 @@
  * @package plugins.limeLight
  * @subpackage lib
  */
-class kLimeLightLiveFlowManager implements kBatchJobStatusEventConsumer
+class kLimeLightLiveFlowManager implements kObjectCreatedEventConsumer
 {
 	/* (non-PHPdoc)
-	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
-	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	public function objectCreated(BaseObject $object)
 	{
-
-		if ($dbBatchJob->getJobSubType() == LimeLightPlugin::getEntrySourceTypeCoreValue(LimeLightLiveEntrySourceType::LIMELIGHT_LIVE)){
-		
-			if($dbBatchJob->getJobType() == BatchJobType::PROVISION_PROVIDE)
-				return true;
-			
-			if($dbBatchJob->getJobType() == BatchJobType::PROVISION_DELETE)
-				return true;
-		}
-			
-		
-		return false;
-	}
-	
-	public function updatedJob(BatchJob $dbBatchJob)
-	{
-		
-		if ($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING)
+		/* @var $object entry */
+		$partner = $object->getPartner();
+		$limeLightLiveParamsJSON = $partner->getLiveStreamProvisionParams();
+		$limeLightLiveParams = json_decode($limeLightLiveParamsJSON);
+		if ((!isset($limeLightLiveParams->Limelight))
+			|| (!isset($limeLightLiveParams->Limelight->limelightPrimaryPublishUrl)) 
+			|| (!isset($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl))
+			|| (!isset($limeLightLiveParams->Limelight->limelightStreamUrl))){
+			$object->setStatus(entryStatus::ERROR_IMPORTING);
+			$object->save();
 			return true;
-
-		if ($dbBatchJob->getJobType() == BatchJobType::PROVISION_PROVIDE){
-			
-			$entry = $dbBatchJob->getEntry(false, false);
-			
-			$partner = $entry->getPartner();
-			
-			
-			$limeLightLiveParamsJSON = $partner->getLiveStreamProvisionParams();
-			$limeLightLiveParams = json_decode($limeLightLiveParamsJSON);
-
-			if ((!isset($limeLightLiveParams->Limelight))
-				|| (!isset($limeLightLiveParams->Limelight->limelightPrimaryPublishUrl)) 
-				|| (!isset($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl))
-				|| (!isset($limeLightLiveParams->Limelight->limelightStreamUrl))){
-				kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FAILED);
-				return true;
-			}
-			
-			$data = $dbBatchJob->getData();
-			$data->setPrimaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightPrimaryPublishUrl);
-			$data->setSecondaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl);
-			$data->setRtmp($limeLightLiveParams->Limelight->limelightStreamUrl);
-			$data->setStreamName($entry->getId().'_%i');
-			
-			$dbBatchJob->setData($data);
-			
 		}
+
+		$object->setPrimaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightPrimaryPublishUrl);
+		$object->setSecondaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl);
+		$object->setStreamUrl($limeLightLiveParams->Limelight->limelightStreamUrl);
+		$object->setStreamName($object->getId().'_%i');
+		$object->save();
 		
-		kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-				
 		return true;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object) 
+	{
+		if ($object instanceof entry && $object->getSource() == LimeLightPlugin::getEntrySourceTypeCoreValue(LimeLightLiveEntrySourceType::LIMELIGHT_LIVE))
+		{
+			return true;
+		}
+		
+		return false;
+		
+	}
+
+	
 }
