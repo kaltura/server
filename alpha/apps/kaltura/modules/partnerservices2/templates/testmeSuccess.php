@@ -257,7 +257,7 @@ function createInputs ( $arr , $context_id )
 	static $group_prefix = "";
 	$str = "";
 	
-	$is_ie = strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false ;
+	$is_ie = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false ;
 	
 	if(!is_array($arr))
 		return '';
