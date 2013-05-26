@@ -1,22 +1,25 @@
 <snapshot fullPlayerId="31008">
   <featuresData>
-    <feature k_fullName="TopTitleScreen" k_value="true"/>
+    <feature k_fullName="TopTitleScreen" k_value="false"/>
     <feature k_fullName="watermark" k_value="true"/>
-    <feature k_fullName="watermark.watermarkPath" k_value="http://www.kaltura.com/content/uiconf/kaltura/generic/kaltura_watermark.png"/>
+    <feature k_fullName="watermark.watermarkPath" k_value="http://www.kaltura.com/content/uiconf/kaltura/kmc/appstudio/kdp3/exampleWatermark.png"/>
     <feature k_fullName="watermark.watermarkClickPath" k_value="http://www.kaltura.com/"/>
     <feature k_fullName="watermark.watermarkPosition" k_value="bottomLeft"/>
+    <feature k_fullName="watermark.padding" k_value="5"/>
     <feature k_fullName="timerControllerScreen1" k_value="true"/>
     <feature k_fullName="timerControllerScreen1.ControllerScreen" k_value="true"/>
     <feature k_fullName="timerControllerScreen1.timerType" k_value="forwards"/>
     <feature k_fullName="timerControllerScreen2" k_value="true"/>
     <feature k_fullName="timerControllerScreen2.ControllerScreen" k_value="true"/>
     <feature k_fullName="timerControllerScreen2.timerType" k_value="total"/>
+    <feature k_fullName="flavorComboControllerScreen" k_value="false"/>
     <feature k_fullName="fullScreenBtn" k_value="true"/>
     <feature k_fullName="fullScreenBtn.showOnVideoControllers" k_value="true"/>
     <feature k_fullName="fullScreenBtn.showOnVideoControllers.StartScreen" k_value="false"/>
     <feature k_fullName="fullScreenBtn.showOnVideoControllers.PlayScreen" k_value="false"/>
     <feature k_fullName="fullScreenBtn.showOnVideoControllers.PauseScreen" k_value="false"/>
     <feature k_fullName="fullScreenBtn.showOnVideoControllers.EndScreen" k_value="false"/>
+    <feature k_fullName="fullScreenBtn.ControllerScreen" k_value="true"/>
     <feature k_fullName="fullScreenBtn.Display" k_value="buttonIconControllerArea"/>
     <feature k_fullName="fullScreenBtn.Label" k_value="fullscreen"/>
     <feature k_fullName="fullScreenBtn.Tooltip" k_value=""/>
@@ -58,11 +61,13 @@
     <feature k_fullName="shareBtn.Display" k_value="buttonIconControllerArea"/>
     <feature k_fullName="shareBtn.Label" k_value="Share"/>
     <feature k_fullName="shareBtn.Tooltip" k_value="share with friends"/>
+    <feature k_fullName="shareBtn.uiconfId" k_value=""/>
     <feature k_fullName="downloadBtn" k_value="false"/>
-    <feature k_fullName="downloadBtn.StartScreen" k_value="true"/>
-    <feature k_fullName="downloadBtn.PlayScreen" k_value="true"/>
-    <feature k_fullName="downloadBtn.PauseScreen" k_value="true"/>
-    <feature k_fullName="downloadBtn.EndScreen" k_value="true"/>
+    <feature k_fullName="downloadBtn.showOnVideoControllers" k_value="true"/>
+    <feature k_fullName="downloadBtn.showOnVideoControllers.StartScreen" k_value="true"/>
+    <feature k_fullName="downloadBtn.showOnVideoControllers.PlayScreen" k_value="true"/>
+    <feature k_fullName="downloadBtn.showOnVideoControllers.PauseScreen" k_value="true"/>
+    <feature k_fullName="downloadBtn.showOnVideoControllers.EndScreen" k_value="true"/>
     <feature k_fullName="downloadBtn.ControllerScreen" k_value="true"/>
     <feature k_fullName="downloadBtn.Display" k_value="buttonIconControllerArea"/>
     <feature k_fullName="downloadBtn.Label" k_value="download"/>
@@ -164,25 +169,26 @@
     <screenasset id="TopTitleScreen" height="30"/>
   </screenAssets>
   <visual>
-    <theme>
+    <theme id="dark" name="Dark">
+      <themeSkinPath>/content/uiconf/kaltura/kmc/appstudio/kdp3/skin.swf?a=12</themeSkinPath>
       <color1>14540253</color1>
       <color2>16777215</color2>
-      <color3>16777215</color3>
-      <color4>14540253</color4>
-      <color5>0</color5>
+      <color3>3355443</color3>
+      <color4>10066329</color4>
+      <color5>16777215</color5>
       <font>Arial</font>
     </theme>
   </visual>
   <playerProperties>
-    <width>400</width>
-    <height>360</height>
+    <width>560</width>
+    <height>395</height>
     <theme>dark</theme>
   </playerProperties>
   <uiVars>
-    <var key="video.mantainAspectRatio" value="true"/>
+    <var key="video.keepAspectRatio" value="true"/>
     <var key="playlistAPI.autoContinue" value="false"/>
-    <var key="pictureDefaultDuration" value="2"/>
+    <var key="imageDefaultDuration" value="2"/>
     <var key="autoPlay" value="false"/>
-    <var key="mute" value="false"/>
+    <var key="autoMute" value="false"/>
   </uiVars>
 </snapshot>

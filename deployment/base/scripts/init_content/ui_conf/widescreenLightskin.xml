@@ -1,21 +1,21 @@
 <layout id="full" name="player" skinPath="/content/uiconf/kaltura/kmc/appstudio/kdp3/skin_light.swf?12">
   <HBox id="topLevel" width="100%" height="100%">
     <VBox id="player" width="100%" height="100%" styleName="black">
-      <Plugin id="kalturaMix" disableUrlHashing="true" width="0%" height="0%" includeInLayout="false" loadingPolicy="onDemand"/>
+      <Plugin id="kalturaMix" width="0%" height="0%" includeInLayout="false" loadingPolicy="onDemand"/>
       <Plugin id="statistics" width="0%" height="0%" includeInLayout="false"/>
       <HBox id="TopTitleScreen" width="100%" height="30" styleName="darkBg">
         <Label height="22" id="movieName" styleName="movieName" width="100%" text="{mediaProxy.entry.name}" dynamicColor="true" color1="0" font="Arial"/>
       </HBox>
       <Canvas height="100%" width="100%" id="PlayerHolder" styleName="black">
         <Video id="video" width="100%" height="100%" mantainAspectRatio="false"/>
-        <Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
+		<Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
         <Watermark id="watermark" width="100%" height="100%" watermarkPath="http://www.kaltura.com/content/uiconf/kaltura/generic/kaltura_watermark.png" watermarkClickPath="http://www.kaltura.com/" watermarkPosition="bottomLeft"/>
         <Plugin id="gigya" width="100%" height="100%"/>
       </Canvas>
       <HBox id="ControllerScreenHolder" width="100%" height="30" verticalAlign="middle" styleName="darkBg">
         <HBox id="ControllerScreen" width="100%" height="30" horizontalGap="9" verticalAlign="middle" styleName="darkBg">
           <Button id="playBtnControllerScreen" command="play" buttonType="iconButton" focusRectPadding="0" icon="playIcon" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="pauseIcon" selectedOverIcon="pauseIcon" selectedDownIcon="pauseIcon" selectedDisabledIcon="pauseIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-          <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3">
+		  <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3">
             <Scrubber id="scrubber" width="100%" height="10" styleName="" color1="0" color2="0"/>
             <HBox width="100%">
               <Timer id="timerControllerScreen1" width="60" styleName="timerProgressLeft" format="mm:ss" height="12" timerType="forwards"/>
