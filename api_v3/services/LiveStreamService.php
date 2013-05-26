@@ -182,8 +182,6 @@ class LiveStreamService extends KalturaEntryService
 	
 	private function insertLiveStreamEntry(KalturaLiveStreamAdminEntry $liveStreamEntry)
 	{
-		
-		
 		// create a default name if none was given
 		if (!$liveStreamEntry->name)
 			$liveStreamEntry->name = $this->getPartnerId().'_'.time();
@@ -208,17 +206,13 @@ class LiveStreamService extends KalturaEntryService
 		$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE" );
 		TrackEntry::addTrackEntry( $te );
 		
-		//if type is manual don't create batch job, just change entry status to ready
-		if ($liveStreamEntry->sourceType == KalturaSourceType::MANUAL_LIVE_STREAM)
+		//If a jobData can be created for entry sourceType, add provision job. Otherwise, just save the entry.
+		$jobData = kProvisionJobData::getInstance($dbEntry);
+		if ($jobData)
 		{
-			$dbEntry->setStatus(entryStatus::READY);
-			$dbEntry->save();
+			kJobsManager::addProvisionProvideJob(null, $dbEntry, $jobData);
 		}
-		else
-		{
-			$dbEntry->save();
-			kJobsManager::addProvisionProvideJob(null, $dbEntry);
-		}
+		$dbEntry->save();
  			
 		return $dbEntry;
 	}	
