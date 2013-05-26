@@ -284,20 +284,31 @@ abstract class kProvisionJobData extends kJobData
 	 * @param int $sourceType
 	 * @return kProvisionJobData
 	 */
-	public static function getInstance($sourceType)
+	public static function getInstance(entry $entry)
 	{
-		switch ($sourceType)
+		$data = null;
+		switch ($entry->getSource())
 		{
 			case EntrySourceType::AKAMAI_LIVE:
-				return new kAkamaiProvisionJobData();
+				$data =  new kAkamaiProvisionJobData();
 				break;
 			case EntrySourceType::AKAMAI_UNIVERSAL_LIVE:
-				return new kAkamaiUniversalProvisionJobData();
+				$data =  new kAkamaiUniversalProvisionJobData();
 				break;
 			default:
-				return KalturaPluginManager::loadObject('kProvisionJobData', $sourceType);
+				$data =  KalturaPluginManager::loadObject('kProvisionJobData', $entry);
 				break;
 		}
+		
+		if ($data)
+		{
+			/* @var $data kProvisionJobData */
+			$data->populateFromEntry($entry);
+			$data->populateFromPartner($entry->getPartner());
+		}
+		
+		return $data;
+		
 	}
 	
 	/**
