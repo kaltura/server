@@ -101,6 +101,12 @@ def runCycle():
                 hwnd = curResult
                 print '%s Sending window message %s to window %s, text=%s, class=%s' % (time.ctime(), wmMsg, hwnd, win32gui.GetWindowText(hwnd), win32gui.GetClassName(hwnd))
                 win32gui.SendMessage(hwnd, wmMsg, wParam, lParam)
+        elif action[0] == ET_POST_WINDOW_MESSAGE:
+            _, wmMsg, wParam, lParam = action
+            for curResult in results:
+                hwnd = curResult
+                print '%s Posting window message %s to window %s, text=%s, class=%s' % (time.ctime(), wmMsg, hwnd, win32gui.GetWindowText(hwnd), win32gui.GetClassName(hwnd))
+                win32gui.PostMessage(hwnd, wmMsg, wParam, lParam)
         elif action[0] == ET_KILL_PROCESS:
             for curResult in results:
                 processId = win32process.GetWindowThreadProcessId(curResult)[1]
@@ -134,6 +140,7 @@ ET_WINDOW_MESSAGE = 1
 ET_KILL_PROCESS = 2
 ET_PUSH_BUTTON = 3
 ET_PRESS_KEY = 4
+ET_POST_WINDOW_MESSAGE = 5
 
 CONFIG = [
     # error accessing file
@@ -187,6 +194,11 @@ CONFIG = [
     ('text:Microsoft Excel/text:Verify that the file is not corrupted and is from a trusted source before opening the file.',  0, None, (ET_KILL_PROCESS,)),         # Office 2010
 
     ('text:OpenOffice.org 3.3,class:SALFRAME',                              0, None, (ET_PRESS_KEY, 'y')),
+	
+    ('text:OpenOffice.org 3.3,class:SALFRAME',                              0, None, (ET_WINDOW_MESSAGE, win32con.WM_ACTIVATE, 0x1, 0x0)),
+    ('text:OpenOffice.org 3.3,class:SALFRAME',                              0, None, (ET_POST_WINDOW_MESSAGE, win32con.WM_CHAR, 0x1b, 0x10001)),		# press esc
+    ('text:OpenOffice.org 3.3,class:SALSUBFRAME',    						0, None, (ET_PRESS_KEY, 'y')),
+
     ('text:Application Error/text:Click OK to close the application.',      0, None, (ET_PUSH_BUTTON, 'text:OK,class:Button')),
     ('text:Microsoft Word/text:Do you want to recover the contents of this document',      0, None, (ET_PUSH_BUTTON, 'text:No,class:Button')),
 

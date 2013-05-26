@@ -97,7 +97,7 @@ else:
     commandParams = sys.argv[1:-2]
 
 # clean up any previous convert leftovers
-if killProcessesByName(['powerpnt.exe', 'excel.exe', 'winword.exe', 'pdfcreator.exe']):
+if killProcessesByName(['powerpnt.exe', 'excel.exe', 'winword.exe', 'pdfcreator.exe', 'soffice.exe']):
     time.sleep(5)
 clearCacheCmd = '%s /CLEARCACHE /NoStart' % ' '.join(commandParams)
 print '\nclearing cache: %s' % clearCacheCmd
