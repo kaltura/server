@@ -27,6 +27,7 @@ class kLimeLightLiveFlowManager implements kObjectCreatedEventConsumer
 		$object->setSecondaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl);
 		$object->setStreamUrl($limeLightLiveParams->Limelight->limelightStreamUrl);
 		$object->setStreamName($object->getId().'_%i');
+		$object->setStatus(entryStatus::READY);
 		$object->save();
 		
 		return true;
