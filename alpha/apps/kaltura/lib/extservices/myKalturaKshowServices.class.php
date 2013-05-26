@@ -191,7 +191,8 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 		$kuser = kuserPeer::getKuserByScreenName( $userName );
 		if ( $kuser )
 		{
-			if ( $kuser->isPasswordValid ( $password ) )
+			$loginData = $kuser->getLoginData();
+			if ($loginData && $loginData->isPasswordValid($password))
 			{
 				$authData= self::createHashString ( $kuser->getId() );
 				
