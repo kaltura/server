@@ -303,8 +303,8 @@ abstract class kProvisionJobData extends kJobData
 		if ($data)
 		{
 			/* @var $data kProvisionJobData */
-			$data->populateFromEntry($entry);
 			$data->populateFromPartner($entry->getPartner());
+			$data->populateFromEntry($entry);
 		}
 		
 		return $data;
