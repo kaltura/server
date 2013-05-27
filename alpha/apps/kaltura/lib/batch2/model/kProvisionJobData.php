@@ -300,13 +300,6 @@ abstract class kProvisionJobData extends kJobData
 				break;
 		}
 		
-		if ($data)
-		{
-			/* @var $data kProvisionJobData */
-			$data->populateFromPartner($entry->getPartner());
-			$data->populateFromEntry($entry);
-		}
-		
 		return $data;
 		
 	}
