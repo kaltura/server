@@ -156,7 +156,7 @@ class asset extends Baseasset implements ISyncableFile
 		{
 			$this->setId($this->calculateId());
 		}
-		parent::save($con);
+		return parent::save($con);
 	}
 
 	/* (non-PHPdoc)
