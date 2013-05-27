@@ -34,6 +34,9 @@ class Kaltura_View_Helper_PrintKalturaObject extends Zend_View_Helper_Abstract
 	
 	private function printObject($object)
 	{
+		if(!is_object($object))
+			return strval($object);
+			
 		$class = get_class($object);
 		if(!class_exists($class))
 			return print_r($object, true);
