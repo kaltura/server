@@ -67,11 +67,11 @@ class DropFolderListAction extends KalturaApplicationPlugin implements IKalturaA
 	
 	private function getDropFolderFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
+		$filter = new Kaltura_Client_DropFolder_Type_DropFolderFilter();
 		$filterInput = $request->getParam('filter_input');
 		if(!strlen($filterInput))
-			return null;
+			return $filter;
 			
-		$filter = new Kaltura_Client_DropFolder_Type_DropFolderFilter();
 		$filterType = $request->getParam('filter_type');
 		$filter->$filterType = $filterInput;
 		
