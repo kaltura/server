@@ -63,13 +63,6 @@ try
 		$monitorResult->value = $playlistEnd - $playlistStart;
 		$monitorResult->description = "Playlist execution time: $monitorResult->value seconds";
 	}
-	else
-	{
-		$end = microtime(true);
-		$monitorResult->executionTime = $end - $start;
-		$monitorResult->value = -1;
-		$monitorResult->description = "Playlist not found";
-	}
 }
 catch(KalturaException $e)
 {
