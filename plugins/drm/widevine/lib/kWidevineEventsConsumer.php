@@ -71,6 +71,10 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	public function objectCreated(BaseObject $object) 
 	{
 		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry && $entry->getReplacedEntryId())
+		{
+			$entry = entryPeer::retrieveByPK($entry->getReplacedEntryId());
+		}		
 		$wvFlavorParamsOutput = assetParamsOutputPeer::retrieveByPK($object->getId());
 		if($entry && $wvFlavorParamsOutput)
 		{
