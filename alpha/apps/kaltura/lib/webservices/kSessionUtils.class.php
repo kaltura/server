@@ -540,6 +540,21 @@ class ks extends kSessionBase
 		return false;
 	}
 	
+	public function getEnableCategoryModeration()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			if ($priv == self::PRIVILEGE_ENABLE_CATEGORY_MODERATION)
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public function getDisableEntitlementForEntry()
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
