@@ -19,7 +19,7 @@ class Form_PackageHelper
 		self::addOptionsToForm($form, $packages, $fieldName, 'name');
 	}
 
-	public static function addOptionsToForm(Zend_Form $form, $options, $fieldName, $attributeName)
+	public static function addOptionsToForm(Zend_Form $form, array $options, $fieldName, $attributeName)
 	{
 		$arr = array();
 		foreach($options as $option)
