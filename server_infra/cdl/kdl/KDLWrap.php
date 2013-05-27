@@ -450,6 +450,7 @@ class KDLWrap
 			$kdlFlavor->_swf->_useShapes    = $cdlFlavor->getUseShapes();
 			$kdlFlavor->_swf->_storeFonts   = $cdlFlavor->getStoreFonts();
 			$kdlFlavor->_swf->_flatten      = $cdlFlavor->getFlatten();
+			$kdlFlavor->_swf->_poly2Bitmap	= $cdlFlavor->getPoly2bitmap();
 		}
 		
 		if($cdlFlavor instanceof PdfFlavorParams || $cdlFlavor instanceof PdfFlavorParamsOutput) {

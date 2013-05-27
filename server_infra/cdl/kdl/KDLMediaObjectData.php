@@ -398,7 +398,8 @@ include_once("KDLCommon.php");
 				$_insertStop,
 				$_useShapes,
 				$_storeFonts,
-				$_flatten;
+				$_flatten,
+				$_poly2Bitmap;
 
 		public function GetSectionEnum() { return KDLConstants::SwfIndex; }
 		
