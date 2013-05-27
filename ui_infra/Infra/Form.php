@@ -78,7 +78,7 @@ class Infra_Form extends Zend_Form
 
 			if ($value !== '' || $include_empty_fields)
 			{
-				if(is_array($value) && $object->$prop)
+				if(is_array($value) && isset($object->$prop) && $object->$prop)
 				{
 					foreach($value as $sub_prop => $sub_value)
 						$object->$prop->$sub_prop = $sub_value;
