@@ -301,6 +301,18 @@ class kBusinessConvertDL
 		$flavorA = $a->getId();
 		$flavorB = $b->getId();
 
+		$isSourceFlavor = self::isSourceFlavor($a, $b);
+		if($isSourceFlavor == 1)
+		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
+			return 1;
+		}
+		if($isSourceFlavor == -1)
+		{
+			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
+			return -1;
+		}		
+		
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT && $b->getReadyBehavior() > flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 		{
 			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
@@ -333,5 +345,24 @@ class kBusinessConvertDL
 
 		KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 		return -1;
+	}
+	
+	private static function isSourceFlavor(flavorParamsOutput $a, flavorParamsOutput $b)
+	{
+		$aSources = explode(',', $a->getSourceAssetParamsIds());
+		$bSources = explode(',',$b->getSourceAssetParamsIds());
+		
+		if(in_array($a->getFlavorParamsId(), $bSources))
+		{
+			KalturaLog::debug('Flavor '.$a->getId().' is source of flavor '.$b->getId());
+			return -1;
+		}
+		if(in_array($b->getFlavorParamsId(), $aSources))
+		{
+			KalturaLog::debug('Flavor '.$b->getId().' is source of flavor '.$a->getId());
+			return 1;
+		}
+			
+		return 0;
 	}
 }

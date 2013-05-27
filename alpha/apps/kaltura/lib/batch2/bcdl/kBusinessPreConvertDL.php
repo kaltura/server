@@ -1159,8 +1159,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if($flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_WAIT_FOR_CONVERT)
 		{
 			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_QUEUED);
-			$flavorAsset->setDescription('');
-			$flavorAsset->save();
+			$affectedRows = $flavorAsset->save();
+			KalturaLog::debug('Changing asset status from Waiting to Queued, affected rows ['.$affectedRows.']');
+			if(!$affectedRows)
+				return false;
 			
 			$parentJob = self::getParentJobForWaitingAssetConversion($flavorAsset->getEntryId(), $parentJob);
 		}
@@ -1220,7 +1222,16 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			return false;
 		}
 		
-		return assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
+		$srcFlavors = assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
+		if(!count($srcFlavors))
+		{
+			//assuming all source flavors are Not Applicable
+			KalturaLog::log("Flavor [" . $flavorAsset->getFlavorParamsId() . "] is set to N/A since all it's sources are N/A");
+			$flavorAsset->setStatus(flavorAsset::ASSET_STATUS_NOT_APPLICABLE);
+			$flavorAsset->save();	
+			return false;
+		}
+		return $srcFlavors;
 	}
 	
 	private static function decideCollectionConvert($collectionTag, flavorAsset $originalFlavorAsset, entry $entry, BatchJob $parentJob = null, array $flavors)

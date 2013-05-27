@@ -580,4 +580,9 @@ class assetPeer extends BaseassetPeer
 		$c->add(assetPeer::STATUS, $status);
 		return self::doSelect($c);
 	}
+	
+	public static function getAtomicColumns()
+	{
+		return array(assetPeer::STATUS);
+	}
 }
