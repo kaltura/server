@@ -53,7 +53,6 @@ class adddvdjobAction extends defPartnerservices2Action
 			$job->setJobType(BatchJobType::DVDCREATOR);
 			$job->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
 			//$job->setCheckAgainTimeout(time() + 10);
-			$job->setUpdatesCount(0);
 			$job->setEntryId( $entry_id );
 			$job->setPartnerId( $entry->getPartnerId());
 			$job->setSubpId ( $entry->getSubpId());

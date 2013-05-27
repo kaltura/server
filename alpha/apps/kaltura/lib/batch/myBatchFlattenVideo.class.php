@@ -42,7 +42,6 @@ class myBatchFlattenClient
 		//$job->setCheckAgainTimeout(time() + 10);
 		$job->setMessage('Queued');
 		$job->setDescription('Queued, waiting to run');
-		$job->setUpdatesCount(0);
 		$job->setEntryId( $entryId );
 		$job->setPartnerId( $entry->getPartnerId());
 		$job->setSubpId ( $entry->getSubpId());

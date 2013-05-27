@@ -8,7 +8,7 @@ class BatchJobWrapper extends objectWrapperBase
 
 	protected $basic_fields = array ( "id" , "jobType" , "jobSubType"  );
 	
-	protected $regular_fields_ext = array ( "data" , "status" , "executionStatus" , "message", "description" ,  "updatesCount" , "createdAt" , "updatedAt" , "entryId" );
+	protected $regular_fields_ext = array ( "data" , "status" , "executionStatus" , "message", "description" , "createdAt" , "updatedAt" , "entryId" );
 	
 	protected $detailed_fields_ext = array ();
 	
@@ -17,7 +17,7 @@ class BatchJobWrapper extends objectWrapperBase
 	protected $objs_cache = array ( "entry" => "entry,entryId" ); 
 
 	protected $updateable_fields = array ( "data", "status", "executionStatus", "checkAgainTimeout", "message", "description",
-		"updatesCount", "processorExpiration" );
+		"processorExpiration" );
 	
 	public function getUpdateableFields()
 	{
