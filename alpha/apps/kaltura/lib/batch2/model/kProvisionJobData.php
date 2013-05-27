@@ -296,7 +296,7 @@ abstract class kProvisionJobData extends kJobData
 				$data =  new kAkamaiUniversalProvisionJobData();
 				break;
 			default:
-				$data =  KalturaPluginManager::loadObject('kProvisionJobData', $entry);
+				$data =  KalturaPluginManager::loadObject('kProvisionJobData', $entry->getSource());
 				break;
 		}
 		
