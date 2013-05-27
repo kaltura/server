@@ -9,6 +9,8 @@ class ErrorController extends Zend_Controller_Action
 
 	public function errorAction()
 	{
+		$this->view->request = $this->getRequest();
+		
 		$this->_helper->layout->disableLayout();
 		$errors = $this->_getParam('error_handler');
 
@@ -41,6 +43,7 @@ class ErrorController extends Zend_Controller_Action
 
 	public function deniedAction()
 	{
+		$this->view->request = $this->getRequest();
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
 		$this->_helper->viewRenderer('error');
 		$this->view->code	= Kaltura_AdminException::ERROR_CODE_ACCESS_DENIED;
