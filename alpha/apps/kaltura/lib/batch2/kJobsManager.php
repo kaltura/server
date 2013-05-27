@@ -221,7 +221,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_PROVIDE, $sourceType);
+			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_PROVIDE, $entry->getSource());
 		}
 		else
 		{
@@ -232,7 +232,7 @@ class kJobsManager
 				
 		$batchJob->setObjectId($entry->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $sourceType);
+		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $entry->getSource());
 	}
 
 	/**
