@@ -173,7 +173,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function setPermissions($filePath)
 	{
-		chgrp($filePath, kConf::get('content_group'));
+		$contentGroup = kConf::get('content_group');
+		if(is_numeric($contentGroup))
+			$contentGroup = intval($contentGroup);
+			
+		chgrp($filePath, $contentGroup);
 		
 		if(is_dir($filePath))
 		{
@@ -194,6 +198,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function fullMkdir($filePath)
 	{
+		$contentGroup = kConf::get('content_group');
+		if(is_numeric($contentGroup))
+			$contentGroup = intval($contentGroup);
+				
 	    $dirs = explode(DIRECTORY_SEPARATOR , dirname($filePath));
 	    $path = '';
 	    foreach ($dirs as $dir)
@@ -205,7 +213,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	        if(!kFile::fullMkfileDir($path, 0750))
 	        	return false;
 	        	
-	        chgrp($path, kConf::get('content_group'));
+	        chgrp($path, $contentGroup);
 	    }
 	    return true;
 	}
