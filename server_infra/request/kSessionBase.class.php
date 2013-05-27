@@ -36,6 +36,7 @@ class kSessionBase
 	const PRIVILEGE_DISABLE_ENTITLEMENT = "disableentitlement";
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
+	const PRIVILEGE_ENABLE_CATEGORY_MODERATION = "enablecategorymoderation";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
