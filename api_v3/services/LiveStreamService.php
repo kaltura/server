@@ -208,7 +208,7 @@ class LiveStreamService extends KalturaEntryService
 		
 		$dbEntry->save();
 		//If a jobData can be created for entry sourceType, add provision job. Otherwise, just save the entry.
-		$jobData = kProvisionJobData::getInstance($dbEntry);
+		$jobData = kProvisionJobData::getInstance($dbEntry->getSource());
 		if ($jobData)
 		{
 			/* @var $data kProvisionJobData */
