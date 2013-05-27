@@ -15,10 +15,16 @@ class kEntitlementUtils
 	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
 	protected static $privacyContextSearch = null;
+	protected static $categoryModeration = false;
 	
 	public static function getEntitlementEnforcement()
 	{
 		return self::$entitlementEnforcement;
+	}
+	
+	public static function getCategoryModeration ()
+	{
+		return self::$categoryModeration;
 	}
 	
 	public static function getInitialized()
@@ -185,7 +191,7 @@ class kEntitlementUtils
 		self::$initialized = true;
 		
 		if(is_null($partnerId))
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$partnerId = kCurrentContext::getCurrentPartnerId();
 			
 		if(is_null($partnerId) || $partnerId == Partner::BATCH_PARTNER_ID)
 			return;
@@ -193,7 +199,16 @@ class kEntitlementUtils
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
 			return;
-			
+
+		$ks = null;
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if ($ksString != '') // for actions with no KS or when creating ks.
+		{
+			$ks = ks::fromSecureString($ksString);
+		}
+		
+		self::initCategoryModeration($ks);
+		
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
 			return;
 		
@@ -205,10 +220,8 @@ class kEntitlementUtils
 		
 		self::$entitlementEnforcement = $partnerDefaultEntitlementEnforcement;
 		
-		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
-		if ($ksString != '') // for actions with no KS or when creating ks.
+		if ($ks) // for actions with no KS or when creating ks.
 		{
-			$ks = ks::fromSecureString($ksString);
 			$enableEntitlement = $ks->getDisableEntitlement();
 			if ($enableEntitlement)
 				self::$entitlementEnforcement = false;
@@ -216,6 +229,7 @@ class kEntitlementUtils
 			$enableEntitlement = $ks->getEnableEntitlement();
 			if ($enableEntitlement)
 				self::$entitlementEnforcement = true;
+				
 		}
 		
 		if(!is_null($enableEntit))
@@ -385,5 +399,15 @@ class kEntitlementUtils
 			return array(self::DEFAULT_CONTEXT);
 			
 		return explode(',', $ksPrivacyContexts);
+	}
+	
+	protected static function initCategoryModeration (ks $ks = null)
+	{
+		if (!$ks)
+			return;
+			
+		$enableCategoryModeration = $ks->getEnableCategoryModeration();
+		if ($enableCategoryModeration)
+			self::$categoryModeration = true;
 	}
 }
