@@ -173,8 +173,10 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		$pdfInfo = $this->taskConfig->params->pdfInfo;
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
-			if($this->getNumberOfPages($pdfInfo, $inFilePath) != $this->getNumberOfPages($pdfInfo, $outFilePath))
-				throw new KOperationEngineException("Output file doesn't match expected page count");
+			$inputNum = $this->getNumberOfPages($pdfInfo, $inFilePath);
+			$outputNum = $this->getNumberOfPages($pdfInfo, $outFilePath);
+			if($inputNum != $outputNum)
+				throw new KOperationEngineException("Output file doesn't match expected page count (input: $inputNum, output: $outputNum) ");
 		}
 	}
 	
