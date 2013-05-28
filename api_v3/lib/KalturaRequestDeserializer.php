@@ -181,21 +181,12 @@ class KalturaRequestDeserializer
 	private function validateFile($fileData) 
 	{
 		$name = $fileData['name'];
-		$error = isset($fileData['error']) ? $fileData['error'] : null;
-		if ($error !== UPLOAD_ERR_OK)
-		{
+		$tempName = $fileData['tmp_name'];
+		
+		if (file_exists($tempName) && !is_uploaded_file($tempName)) {
 			$msg = "An error occured while uploading file. Error [$error]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
-		}
-		
-		// check if is a real uploaded file
-		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null;
-		if (!is_uploaded_file($tempPath))
-		{
-			$msg = "An error occured while uploading file.";
-			KalturaLog::log($msg . ' ' . print_r($fileData, true));
-			throw new KalturaAPIException(kUploadTokenException::UPLOADED_FILE_NOT_FOUND, $name);
 		}
 	}
 

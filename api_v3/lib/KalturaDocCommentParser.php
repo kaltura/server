@@ -37,8 +37,6 @@ class KalturaDocCommentParser
 
     const DOCCOMMENT_SERVER_ONLY = "/\\@serverOnly/i";
     
-    const DOCCOMMENT_SKIP_FILES_VALIDATION = "/\\@skipInputFileValidation/i";
-    
     const DOCCOMMENT_DYNAMIC_TYPE = "/\\@dynamicType (\\w*)/i";
     
     const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
@@ -145,11 +143,6 @@ class KalturaDocCommentParser
     public $serverOnly = false;
     
     /**
-     * @var bool
-     */
-    public $skipInputFilesValidation = false;
-    
-    /**
      * @var array
      */
     public $errors;
@@ -205,7 +198,6 @@ class KalturaDocCommentParser
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
-        $this->skipInputFilesValidation = preg_match( self::DOCCOMMENT_SKIP_FILES_VALIDATION, $comment);
         
         $result = null;
         if (is_array($replacements) && key_exists(self::DOCCOMMENT_REPLACENET_PARAM_NAME, $replacements))

@@ -103,16 +103,6 @@ class KalturaActionReflector extends KalturaReflector
 		return $this->_actionInfo;
 	}
 	
-	public function shouldValidateInputFiles() 
-	{
-		$reflectionClass = new ReflectionClass($this->_actionClass);
-		$reflectionMethod = $reflectionClass->getMethod($this->_actionMethodName);
-			
-		$docComment = $reflectionMethod->getDocComment();
-		$parsedDocComment = new KalturaDocCommentParser( $docComment, null );
-		return $parsedDocComment->skipInputFilesValidation;
-	}
-	
 	/**
 	 * Action returns array of the parameters the action method expects
 	 * @return array

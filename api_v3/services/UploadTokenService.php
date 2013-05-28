@@ -69,7 +69,6 @@ class UploadTokenService extends KalturaBaseService
 	 * Upload a file using the upload token id, returns an error on failure (an exception will be thrown when using one of the Kaltura clients) 
 	 * 
 	 * @action upload
-	 * @skipInputFileValidation
 	 * @param string $uploadTokenId
 	 * @param file $fileData
 	 * @param bool $resume
