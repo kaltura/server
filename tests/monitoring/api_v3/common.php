@@ -121,7 +121,7 @@ class KalturaMonitorClient extends KalturaClient
 
 $config = parse_ini_file(__DIR__ . '/../config.ini', true);
 
-$serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'];
+$serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'] . ':' . $config['client-config']['port'];;
 $clientConfig = new KalturaConfiguration();
 $clientConfig->partnerId = null;
 $clientConfig->serviceUrl = $serviceUrl;

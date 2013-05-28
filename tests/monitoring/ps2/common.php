@@ -12,7 +12,8 @@ class KalturaMonitorClientPs2
 	const RESPONSE_TYPE_HTML = 7;
 	const RESPONSE_TYPE_MRSS = 8;
 	
-	protected $curlTimeout		= 10;
+	protected $debug				= false;
+	protected $curlTimeout			= 10;
 	protected $userAgent			= '';
 	protected $proxyHost			= null;
 	protected $proxyPort			= null;
@@ -25,7 +26,10 @@ class KalturaMonitorClientPs2
 	
 	public function __construct(array $config, array $options)
 	{
-		$this->serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'];
+		$this->serviceUrl = $config['client-config']['protocol'] . '://' . $options['service-url'] . ':' . $config['client-config']['port'];
+		
+		if(isset($options['debug']))
+			$this->debug = true;
 		
 		foreach($config['client-config'] as $attribute => $value)
 			$this->$attribute = $value;
@@ -37,6 +41,11 @@ class KalturaMonitorClientPs2
 		$params['nocache'] = true;
 		
 		$url = "$this->serviceUrl/index.php/partnerservices2/$action";
+		if($this->debug)
+		{
+			echo "URL: $url\n";
+			echo "POST Params: " . print_r($params, true) . "\n";
+		}
 		
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -86,7 +95,16 @@ class KalturaMonitorClientPs2
 		}
 		catch(Exception $e)
 		{
-			return unserialize($response);
+			$result = @unserialize($response);
+
+			if ($result === false && serialize(false) !== $response)
+			{
+				$errorMessage = "failed to unserialize server result\n$response";
+			}
+			else
+			{
+				return $result;
+			}
 		}
 		
 		throw new Exception($errorMessage);
