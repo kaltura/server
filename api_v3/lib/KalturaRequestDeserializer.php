@@ -184,7 +184,7 @@ class KalturaRequestDeserializer
 		$tempName = $fileData['tmp_name'];
 		
 		if (file_exists($tempName) && !is_uploaded_file($tempName)) {
-			$msg = "An error occured while uploading file. Error [$error]";
+			$msg = "An error occured while uploading file.";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
 		}
