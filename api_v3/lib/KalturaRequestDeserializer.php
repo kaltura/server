@@ -84,8 +84,7 @@ class KalturaRequestDeserializer
 				if (array_key_exists($name, $this->paramsGrouped)) 
 				{
 					$fileData = $this->paramsGrouped[$name];
-					if(!$skipFileValidation)
-						self::validateFile($fileData);
+					self::validateFile($fileData);
 					$serviceArguments[] = $fileData;
 					continue;
 				}
