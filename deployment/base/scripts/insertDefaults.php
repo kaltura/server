@@ -65,6 +65,14 @@ foreach($fileNames as $fileName)
 	if(!class_exists($newObjectType))
 	{
 		eval('
+			public function setId($v)
+			{
+				if(!$this->getId())
+					$this->setId($v);
+				
+				return $this;
+			}
+			
 			class Insert' . $objectType . ' extends ' . $objectType . '
 			{
 				protected function doSave(PropelPDO $con)
