@@ -49,7 +49,7 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 		if($results->status == KalturaBatchJobStatus::FINISHED)
 			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $results->data);
 		
-		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE, $results->data);
+		return $this->closeJob($job, null, null, $results->errMessage, KalturaBatchJobStatus::ALMOST_DONE, $results->data);
 		
 	}
 	
