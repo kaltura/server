@@ -18,7 +18,7 @@
 	<multirequest>
 		<request service="conversionProfile" action="getDefault">
 		</request>
-		<request service="dropFolder" action="add">
+		<request service="dropFolder" action="add" plugin="dropFolder">
 			<dropFolder objectType="KalturaDropFolder">
 				<partnerId>-4</partnerId>
 				<name>monitor local</name>
