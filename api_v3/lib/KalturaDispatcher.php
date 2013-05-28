@@ -69,8 +69,9 @@ class KalturaDispatcher
 		// services.ct - check if partner is allowed to access service ...
         
 		// validate it's ok to access this service
+		$skipFilesValidation = $actionReflector->shouldValidateInputFiles();
 		$deserializer = new KalturaRequestDeserializer($params);
-		$this->arguments = $deserializer->buildActionArguments($actionParams);
+		$this->arguments = $deserializer->buildActionArguments($actionParams, $skipFilesValidation);
 		KalturaLog::debug("Dispatching service [".$service."], action [".$action."], reqIndex [".
 			kCurrentContext::$multiRequest_index."] with params " . print_r($this->arguments, true));
 

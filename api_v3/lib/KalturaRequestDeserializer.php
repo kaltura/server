@@ -52,7 +52,7 @@ class KalturaRequestDeserializer
 	    return ($key = array_pop($path)) ? $this->set_element($path, array($key=>$data)) : $data;
 	}
 
-	public function buildActionArguments(&$actionParams)
+	public function buildActionArguments(&$actionParams, $skipFileValidation = false)
 	{
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
@@ -79,11 +79,14 @@ class KalturaRequestDeserializer
 				}
 			}
 			
-			if ($actionParam->isFile())
+			if ($actionParam->isFile()) // File
 			{
 				if (array_key_exists($name, $this->paramsGrouped)) 
 				{
-					$serviceArguments[]	= $this->paramsGrouped[$name];
+					$fileData = $this->paramsGrouped[$name];
+					if(!$skipFileValidation)
+						self::validateFile($fileData);
+					$serviceArguments[] = $fileData;
 					continue;
 				}
 				
@@ -173,6 +176,27 @@ class KalturaRequestDeserializer
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $name);
 		}
 		return $serviceArguments;
+	}
+	
+	private function validateFile($fileData) 
+	{
+		$name = $fileData['name'];
+		$error = isset($fileData['error']) ? $fileData['error'] : null;
+		if ($error !== UPLOAD_ERR_OK)
+		{
+			$msg = "An error occured while uploading file. Error [$error]";
+			KalturaLog::log($msg . ' ' . print_r($fileData, true));
+			throw new KalturaAPIException($msg, KalturaErrors::UPLOAD_ERROR);
+		}
+		
+		// check if is a real uploaded file
+		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null;
+		if (!is_uploaded_file($tempPath))
+		{
+			$msg = "An error occured while uploading file.";
+			KalturaLog::log($msg . ' ' . print_r($fileData, true));
+			throw new KalturaAPIException($msg, kUploadTokenException::UPLOADED_FILE_NOT_FOUND, $name);
+		}
 	}
 
 	private function buildObject(KalturaTypeReflector $typeReflector, array &$params, $objectName)
