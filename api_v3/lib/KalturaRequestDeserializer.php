@@ -52,7 +52,7 @@ class KalturaRequestDeserializer
 	    return ($key = array_pop($path)) ? $this->set_element($path, array($key=>$data)) : $data;
 	}
 
-	public function buildActionArguments(&$actionParams, $skipFileValidation = false)
+	public function buildActionArguments(&$actionParams)
 	{
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
