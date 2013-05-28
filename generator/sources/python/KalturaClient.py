@@ -156,13 +156,14 @@ class KalturaClient:
         if len(self.callsQueue) != 1:
             return None
 
-        (url, params, _) = self.getRequestParams()
+        (result, params, _) = self.getRequestParams()
 
         # reset state
         self.callsQueue = []
         self.multiRequest = False
 
-        result = '%s&%s' % (url, urllib.urlencode(params.get()))
+        if params != None:
+            result += '&' + urllib.urlencode(params.get())
         self.log("Returned url [%s]" % result)
         return result        
         
