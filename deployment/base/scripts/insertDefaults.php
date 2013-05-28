@@ -65,16 +65,16 @@ foreach($fileNames as $fileName)
 	if(!class_exists($newObjectType))
 	{
 		eval('
-			public function setId($v)
-			{
-				if(!$this->getId())
-					$this->setId($v);
-				
-				return $this;
-			}
-			
 			class Insert' . $objectType . ' extends ' . $objectType . '
 			{
+				public function setId($v)
+				{
+					if(!$this->getId())
+						$this->setId($v);
+					
+					return $this;
+				}
+				
 				protected function doSave(PropelPDO $con)
 				{
 					$affectedRows = 0; // initialize var to track total num of affected rows
