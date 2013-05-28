@@ -186,7 +186,7 @@ class KalturaRequestDeserializer
 		{
 			$msg = "An error occured while uploading file. Error [$error]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
-			throw new KalturaAPIException($msg, KalturaErrors::UPLOAD_ERROR);
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
 		}
 		
 		// check if is a real uploaded file
@@ -195,7 +195,7 @@ class KalturaRequestDeserializer
 		{
 			$msg = "An error occured while uploading file.";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
-			throw new KalturaAPIException($msg, kUploadTokenException::UPLOADED_FILE_NOT_FOUND, $name);
+			throw new KalturaAPIException(kUploadTokenException::UPLOADED_FILE_NOT_FOUND, $name);
 		}
 	}
 
