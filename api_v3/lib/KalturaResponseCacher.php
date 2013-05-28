@@ -237,10 +237,10 @@ class KalturaResponseCacher extends kApiCache
 			return false;
         
 		// force caching of actions listed in kConf even if admin ks is used
-		if(!kConf::hasMap('v3cache_ignore_admin_ks'))
+		if(!kConf::hasParam('v3cache_ignore_admin_ks'))
 			return false;
 			
-		$v3cacheIgnoreAdminKS = kConf::getMap('v3cache_ignore_admin_ks');
+		$v3cacheIgnoreAdminKS = kConf::get('v3cache_ignore_admin_ks');
 		if(!isset($v3cacheIgnoreAdminKS[$ks->partner_id]))
 			return false;
 			
