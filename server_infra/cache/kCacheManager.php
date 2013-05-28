@@ -27,9 +27,7 @@ class kCacheManager
 	 */
 	public static function getCacheSectionNames($cacheType)
 	{
-		$cacheConfig = kConf::getMap('cache');
-		
-		$cacheMap =  $cacheConfig['mapping'];
+		$cacheMap = kConf::get('mapping', 'cache');		
 		if (!isset($cacheMap[$cacheType]))
 			return null;
 		
@@ -52,12 +50,11 @@ class kCacheManager
 		}
 		
 		// get configuration
-		$cacheConfig = kConf::getMap('cache');
-		if (!isset($cacheConfig[$cacheSection]))
+		$sectionConfig = kConf::get($cacheSection, 'cache', null);
+		if (!$sectionConfig)
 		{
 			return null;
 		}
-		$sectionConfig = $cacheConfig[$cacheSection];
 		
 		// create cache class
 		$className = $sectionConfig['class'];

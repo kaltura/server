@@ -16,118 +16,60 @@ require_once __DIR__ . '/../infra/kEnvironment.php';
 class kConf extends kEnvironment
 {
 	const APC_CACHE_MAP = 'kConf-';
-	const CACHE_VERSION_KEY = '__config_cache_version';
 	
-	protected static $initialized = false;
+	const FULL_MAP_KEY = '__full';
 	
 	protected static $cacheKey = null;
 	
-	protected static function getCacheKey()
-	{
-		if (self::$cacheKey)
-			return self::$cacheKey;
-		self::$cacheKey = self::APC_CACHE_MAP . md5(realpath(__file__));
-		return self::$cacheKey;
-	}
+	protected static $cacheVersion = null;
+	
+	protected static $map = array();
 	
 	protected static function init()
 	{
-		if (self::$initialized) 
+		if (self::$cacheVersion) 
 			return;
-		
-		self::$initialized = true;
+						
 		parent::init();
 		
-		$cacheDir = self::$map['cache_root_path'];
+		// check for the reload file
+		$cacheDir = self::$envMap['cache_root_path'];
 		$reloadFileExists = file_exists("$cacheDir/base.reload");
+
+		// fetch the cache version from APC
+		$cacheVersionKey = self::APC_CACHE_MAP . md5(realpath(__file__));
 		
 		if (!$reloadFileExists && function_exists('apc_fetch'))
 		{
-			$apcMap = apc_fetch(self::getCacheKey());
-			if($apcMap)
+			self::$cacheVersion = apc_fetch($cacheVersionKey);
+			if(self::$cacheVersion)
 			{
-				self::$map = $apcMap;
+				self::$cacheKey = 'kConf-'.self::$cacheVersion.'-';
 				return;
 			}
 		}
 		
-		$configDir = self::getConfigDir();
-		if(!file_exists("$configDir/base.ini"))
-		{
-			error_log("Base configuration not found [$configDir/base.ini]");
-			die("Base configuration not found [$configDir/base.ini]");
-		}
-		$config = parse_ini_file("$configDir/base.ini", true);
-	
-		if(!file_exists("$configDir/local.ini"))
-		{
-			error_log("Local configuration not found [$configDir/local.ini]");
-			die("Local configuration not found [$configDir/local.ini]");
-		}		
-		$localConfig = parse_ini_file("$configDir/local.ini", true);
-		$config = self::mergeConfigItem($config, $localConfig);
+		// no cache version in APC - create a new one
+		self::$cacheVersion = time();
+		self::$cacheKey = 'kConf-'.self::$cacheVersion.'-';
 		
-		$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-		if($hostname)
+		// save the cache version
+		if(function_exists('apc_store') && PHP_SAPI != 'cli')
 		{
-			$localConfigFile = "$hostname.ini";
-			
-			$configPath = "$configDir/hosts";
-			$configDir = dir($configPath);
-			while (false !== ($iniFile = $configDir->read())) 
-			{
-				$iniFileMatch = str_replace('#', '*', $iniFile);
-				if(!fnmatch($iniFileMatch, $localConfigFile))
-					continue;
-					
-				$localConfig = parse_ini_file("$configPath/$iniFile", true);
-				$config = self::mergeConfigItem($config, $localConfig);
-			}
-			$configDir->close();
-		}
-			
-		self::$map = array_merge(self::$map, $config);
-		
-		if(function_exists('apc_store'))
-		{
-			self::$map[self::CACHE_VERSION_KEY] = uniqid();
-			$res = apc_store(self::getCacheKey(), self::$map);
-			if($reloadFileExists && $res && PHP_SAPI != 'cli')
+			$res = apc_store($cacheVersionKey, self::$cacheVersion);
+			if($reloadFileExists && $res)
 			{
 				$deleted = @unlink("$cacheDir/base.reload");
 				error_log("Base configuration reloaded");
 				if(!$deleted)
 					error_log("Failed to delete base.reload file");
 			}
-		}			
+		}
 	}
 	
-	public static function getCachedVersionId()
-	{
-		if (!isset(self::$map[self::CACHE_VERSION_KEY]))
-			return null;
-		
-		return self::$map[self::CACHE_VERSION_KEY];
-	}
-
-	public static function get($paramName)
-	{
-		self::init();
-		return parent::get($paramName); 
-	}
-	
-	public static function getAll()
-	{
-		self::init();
-		return self::$map;
-	}
-		
 	public static function hasMap($mapName)
 	{
 		self::init();
-		
-		if($mapName == 'local')
-			return true;
 		
 		if(isset(self::$map[$mapName]))
 			return true;
@@ -140,16 +82,55 @@ class kConf extends kEnvironment
 	{
 		self::init();
 		
-		if($mapName == 'local')
-			return self::$map;
-		
-		if(isset(self::$map[$mapName]))
+		// check for a previously loaded map
+		if(isset(self::$map[$mapName . self::FULL_MAP_KEY]))
 			return self::$map[$mapName];
 		
-		$configDir = realpath(dirname(__file__) . '/../configurations');
-		if(!file_exists("$configDir/$mapName.ini"))
-			throw new Exception("Cannot find map [$mapName] in config folder");
+		// try to fetch from APC
+		$cacheKey = self::$cacheKey . '-' . $mapName;
+		if(function_exists('apc_fetch'))
+		{
+			$result = apc_fetch($cacheKey);
+			if ($result !== false)
+			{
+				self::$map[$mapName] = $result;
+				self::$map[$mapName . self::FULL_MAP_KEY] = true;
+				return $result;
+			}
+		}
 		
+		// get the list of ini files
+		$configDir = realpath(dirname(__file__) . '/../configurations');
+		$iniFiles = array();
+		if ($mapName == 'local')
+			$iniFiles[] = "$configDir/base.ini";
+		$iniFiles[] = "$configDir/$mapName.ini";
+		
+		$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+		if($hostname)
+		{			
+			$configPath = "$configDir/hosts";
+			if ($mapName != 'local')
+				$configPath .= "/$mapName";
+			
+			if(is_dir($configPath))
+			{
+				$localConfigFile = "$hostname.ini";
+				
+				$configDir = dir($configPath);
+				while (false !== ($iniFile = $configDir->read()))
+				{
+					$iniFileMatch = str_replace('#', '*', $iniFile);
+					if(!fnmatch($iniFileMatch, $localConfigFile))
+						continue;
+						
+					$iniFiles[] = "$configPath/$iniFile";
+				}
+				$configDir->close();
+			}
+		}
+			
+		// load zend config classes
 		if(!class_exists('Zend_Config_Ini'))
 		{
 			$oldIncludePath = get_include_path();
@@ -159,47 +140,103 @@ class kConf extends kEnvironment
 			set_include_path($oldIncludePath);
 		}
 		
-		$config = new Zend_Config_Ini("$configDir/$mapName.ini");
-		self::$map[$mapName] = $config->toArray();
-	
-		$hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-		if($hostname)
+		// load and merge the configurations
+		$result = array();
+		if ($mapName == 'local')
+			$result = self::$envMap;
+		foreach ($iniFiles as $iniFile)
 		{
-			$localConfigFile = "$hostname.ini";
+			if(!file_exists($iniFile))
+				throw new Exception("Cannot find configuration file [$iniFile]");
+					
+			$config = new Zend_Config_Ini($iniFile);
+			$result = self::mergeConfigItem($result, $config->toArray());
+		}
 			
-			$configPath = "$configDir/hosts/$mapName";
-			if(file_exists($configPath) && is_dir($configPath)){			
-				$configDir = dir($configPath);
-				while (false !== ($iniFile = $configDir->read())) 
-				{
-					$iniFileMatch = str_replace('#', '*', $iniFile);
-					if(!fnmatch($iniFileMatch, $localConfigFile))
-						continue;
-						
-					$config = new Zend_Config_Ini("$configPath/$iniFile");
-					self::$map[$mapName] = self::mergeConfigItem(self::$map[$mapName], $config->toArray());
-				}
-				$configDir->close();
+		// cache the result
+		self::$map[$mapName] = $result;
+		self::$map[$mapName . self::FULL_MAP_KEY] = true;
+		
+		if(function_exists('apc_store'))
+		{
+			apc_store($cacheKey, $result);
+		}
+		
+		return $result;
+	}
+	
+	protected static function getInternal($paramName, $mapName)
+	{
+		self::init();
+		
+		// check for a previously loaded var
+		if(array_key_exists($mapName, self::$map) && 
+			array_key_exists($paramName, self::$map[$mapName]))		// not using isset, since we want to return if it's null
+			return self::$map[$mapName][$paramName];
+		
+		// try to fetch from APC
+		$cacheKey = self::$cacheKey . '-' . $mapName . '-' . $paramName; 
+		if (function_exists('apc_fetch'))
+		{
+			$result = apc_fetch($cacheKey);
+			if ($result !== false)
+			{
+				self::$map[$mapName][$paramName] = $result;
+				return $result;
 			}
 		}
 		
-		if(function_exists('apc_store'))
-			apc_store(self::getCacheKey(), self::$map);
+		// load all map fields since we don't know whether:
+		// 1. the key does not exist in the config
+		// 2. the key was evicted from APC
+		// 3. the map configuration was not loaded since the last reload 
+		self::getMap($mapName);
+
+		// the parameter is still not there, mark it with null so that we don't have to load entire map next time
+		if (!array_key_exists($paramName, self::$map[$mapName]))
+			self::$map[$mapName][$paramName] = null;
 		
-		return self::$map[$mapName];
+		if(function_exists('apc_store'))
+		{
+			apc_store($cacheKey, self::$map[$mapName][$paramName]);
+		}
+		return self::$map[$mapName][$paramName];
 	}
 	
-	public static function hasParam($paramName)
+	public static function hasParam($paramName, $mapName = 'local')
 	{
-		self::init();
-		return isset(self::$map[$paramName]);
+		$result = self::getInternal($paramName, $mapName);
+		return !is_null($result);
 	}
 
+	public static function get($paramName, $mapName = 'local', $defaultValue = false)
+	{
+		$result = self::getInternal($paramName, $mapName);
+		if (is_null($result))
+		{
+			if ($defaultValue === false)
+				throw new Exception("Cannot find [$paramName] in config");
+			return $defaultValue;
+		}
+		return $result;
+	}
+		
+	public static function getCachedVersionId()
+	{
+		self::init();
+		return self::$cacheVersion;
+	}
+	
+	public static function getAll()
+	{
+		return self::getMap('local');
+	}
+	
 	public static function getDB()
 	{
 		return self::getMap('db');
 	}
-
+	
 	/**
 	 * @param array $srcConfig
 	 * @param array $newConfig
