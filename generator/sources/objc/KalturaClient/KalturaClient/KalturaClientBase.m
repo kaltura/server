@@ -561,7 +561,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     self.clientTag = @"objCLib:@DATE@";
     self.partnerId = -1;
     self.serviceUrl = @"http://www.kaltura.com";
-    self.requestTimeout = 10;
+    self.requestTimeout = 120;
 	self.requestHeaders = [[NSDictionary alloc] init];
     
     return self;

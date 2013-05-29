@@ -1165,7 +1165,7 @@ class KalturaConfiguration
 	public $partnerId    				= null;
 	public $format        				= 3;
 	public $clientTag 	  				= "php5:@DATE@";
-	public $curlTimeout   				= 10;
+	public $curlTimeout   				= 120;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;
 	public $proxyHost                   = null;

@@ -4,4 +4,4 @@ test:
     administrator_secret: YOUR_ADMIN_SECRET
     secret: YOUR_USER_SECRET
     service_url: http://www.kaltura.com
-    timeout: 60
+    timeout: 120

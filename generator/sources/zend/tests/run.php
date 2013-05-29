@@ -13,7 +13,7 @@ $testerConfig = parse_ini_file(dirname(__FILE__).'/'.CONFIG_FILE);
 // init kaltura configuration
 $config = new Kaltura_Client_Configuration((int)$testerConfig['partnerId']);
 $config->serviceUrl = $testerConfig['serviceUrl'];
-$config->curlTimeout = 30;
+$config->curlTimeout = 120;
 $config->setLogger(new SampleLoggerImplementation());
 
 // init kaltura client

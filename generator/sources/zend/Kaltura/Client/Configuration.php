@@ -38,7 +38,7 @@ class Kaltura_Client_Configuration
 	public $partnerId    				= null;
 	public $format        				= Kaltura_Client_ClientBase::KALTURA_SERVICE_FORMAT_XML;
 	public $clientTag 	  				= "php5zend:@DATE@";
-	public $curlTimeout   				= 10;
+	public $curlTimeout   				= 120;
 	public $startZendDebuggerSession 	= false;
 	public $userAgent					= '';
 	public $proxyHost                   = null;

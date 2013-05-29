@@ -369,7 +369,7 @@ module Kaltura
 			@service_url 	= service_url
 			@format 		= 2 # xml
 			@client_tag 	= "ruby:@DATE@"
-			@timeout 		= 10
+			@timeout 		= 120
 			@partner_id 	= partner_id
 			@requestHeaders = {}
 		end

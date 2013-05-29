@@ -263,7 +263,7 @@ class KalturaConfiguration:
         self.partnerId                  = None
         self.format                     = KALTURA_SERVICE_FORMAT_XML
         self.clientTag                  = "python:@DATE@"
-        self.requestTimeout             = 10
+        self.requestTimeout             = 120
         
         if partnerId != None and type(partnerId) != int:
             raise KalturaClientException("Invalid partner id", KalturaClientException.ERROR_INVALID_PARTNER_ID)

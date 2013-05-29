@@ -61,7 +61,7 @@ class Configuration
 	/**
 	 * @var int
 	 */
-	private $curlTimeout   				= 10;
+	private $curlTimeout   				= 120;
 	
 	/**
 	 * @var string

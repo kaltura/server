@@ -24,7 +24,7 @@ $testerConfig = parse_ini_file(dirname(__FILE__).'/'.CONFIG_FILE);
 // init kaltura configuration
 $config = new KalturaConfiguration($testerConfig['partnerId']);
 $config->setServiceUrl($testerConfig['serviceUrl']);
-$config->setCurlTimeout(30);
+$config->setCurlTimeout(120);
 $config->setLogger(new \Test\SampleLoggerImplementation());
 
 // init kaltura client

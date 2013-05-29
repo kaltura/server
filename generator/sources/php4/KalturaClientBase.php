@@ -185,7 +185,7 @@ class KalturaClientBase
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, '');
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10 );
+		curl_setopt($ch, CURLOPT_TIMEOUT, 120 );
 		if (defined('CURLOPT_ENCODING'))
 			curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 

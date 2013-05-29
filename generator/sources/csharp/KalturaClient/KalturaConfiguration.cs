@@ -39,7 +39,7 @@ namespace Kaltura
         private EKalturaServiceFormat _ServiceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
         private int _PartnerId;
         private IKalturaLogger _Logger;
-        private int _Timeout = 100000;
+        private int _Timeout = 120000;
         private string _ClientTag = "dotnet:@DATE@";
 		private string _ProxyAddress = "";
         private WebHeaderCollection _RequestHeaders; 
