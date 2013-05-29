@@ -12,12 +12,9 @@
  */
 class myCache
 {
-	const STATS = "_stats_";
 	const DEFAULT_EXPIRY_IN_SECONDS = 0	;
-
 	
 	private $m_namespace;
-	private $m_stats ;
 	private $m_expiry;
 	private static $s_ready = false;
 	private static $s_memcache;
@@ -62,38 +59,8 @@ class myCache
 		{
 			$this->m_expiry = $expiry;
 		}
+	}
 		
-		if ( $this->calculateStats() )
-		{
-			$this->m_stats = $this->getStatsObj();
-			if ( $this->m_stats == NULL )
-			{
-				$this->m_stats = new cacheStats ;
-			}
-		}
-		else
-		{
-			$this->m_stats = new cacheStats ;
-		}
-
-	}
-	
-	static private function calculateStats()
-	{
-		return false;
-	}
-	
-	private function getStatsObj ()
-	{
-//		self::$s_memcache->get ( $this->m_namespace . self::STATS ); 	
-	}
-
-	private function setStatsObj ()
-	{
-//		self::$s_memcache->set ( $this->m_namespace . self::STATS , $this->m_stats ); 	
-	}
-	
-	
 	public function put ( $obj_name , $obj , $expiry = NULL )
 	{
 		if ( ! self::$s_ready ) return;
@@ -109,16 +76,11 @@ class myCache
 		}
 		
 		self::$s_memcache->set ( $this->m_namespace . $obj_name , $obj , false , $expiry );
-		
-		// TODO - maintain the linked_list
-//		//$this->m_obj_container[$obj_name] = $obj;
-		$this->m_stats->m_puts++;
 	}
 	
 	public function get ( $obj_name )
 	{
 		if ( ! self::$s_ready ) return NULL ;
-//		$this->m_stats->m_gets++;
 
 		kApiCache::disableConditionalCache();
 		
@@ -126,12 +88,10 @@ class myCache
 
 		if ( !isset ( $value ) )
 		{
-			$this->m_stats->m_misses++;
 			return NULL;
 		}
 		else
 		{
-			$this->m_stats->m_hits++;
 			return $value;
 		}
 			
@@ -173,27 +133,4 @@ class myCache
 		
 		return $new_value;
 	}
-	
 }
-
-class cacheStats
-{
-	public $m_size = 0;
-	public $m_puts = 0;
-	public $m_gets = 0;
-	public $m_hits = 0;
-	public $m_misses = 0;
-	
-	function cacheStats (  )
-	{
-		//$this->m_gets = 0;
-	}
-	
-	function toString()
-	{
-		var_dump( $this );
-	}
-	
-	
-}
-?>
