@@ -173,6 +173,7 @@ foreach($fileNames as $fileName)
 				}
 			}
 		}
+		kMemoryManager::clearMemory();
 	}
 }
 
