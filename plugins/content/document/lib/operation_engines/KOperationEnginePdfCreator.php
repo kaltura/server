@@ -139,7 +139,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		
-		$this->validateOutput($inFilePath, $tmpFile);
+		// $this->validateOutput($inFilePath, $tmpFile);
 		
 		$fileUnlockRetries = $this->taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
