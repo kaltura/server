@@ -179,10 +179,7 @@ class KalturaRequestDeserializer
 	
 	private function validateFile($fileData) 
 	{
-		$name = $fileData['name'];
-		$tempName = $fileData['tmp_name'];
-		
-		if (!is_uploaded_file($tempName)) {
+		if (!isset($fileData['tmp_name']) || !is_uploaded_file($fileData['tmp_name'])) {
 			$msg = "An error occured while uploading file.";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);

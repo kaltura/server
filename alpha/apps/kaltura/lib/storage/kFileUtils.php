@@ -86,6 +86,9 @@ class kFileUtils extends kFile
 		foreach($_FILES as $key => $value)
 		{
 			$post_params[$key] = "@".$value['tmp_name'].";filename=".$value['name'];
+			if(!is_uploaded_file($value['tmp_name'])) {
+				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			}
 		}
 		
 		foreach($_POST as $key => $value)

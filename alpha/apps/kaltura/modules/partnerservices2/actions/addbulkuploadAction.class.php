@@ -44,6 +44,7 @@ class addbulkuploadAction extends defPartnerservices2Action
     
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		die("This action is no longer supported");
 		$fileField = "csv_file";
 		$profileId = $this->getP ( "profile_id" );
 
