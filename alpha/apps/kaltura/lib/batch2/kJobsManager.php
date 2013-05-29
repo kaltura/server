@@ -442,8 +442,8 @@ class kJobsManager
 				}
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
-				$flavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
-				$srcFileSyncDescriptor->setAssetParamsId($flavorAsset->getFlavorParamsId());
+				$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
+				$srcFileSyncDescriptor->setAssetParamsId($srcFlavorAsset->getFlavorParamsId());
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
