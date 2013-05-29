@@ -252,7 +252,7 @@ abstract class KBatchBase implements IKalturaLogger
 		$this->kClientConfig->setLogger($this);
 		$this->kClientConfig->serviceUrl = $this->taskConfig->getServiceUrl();
 		$this->kClientConfig->curlTimeout = $this->taskConfig->getCurlTimeout();
-		$this->kClientConfig->clientTag = 'batch: ' . $this->taskConfig->getSchedulerName();
+		$this->kClientConfig->clientTag = 'batch: ' . $this->taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::$_uniqueId;
 
 		if(isset($this->taskConfig->clientConfig))
 		{
