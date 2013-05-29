@@ -186,14 +186,18 @@ class kFlowHelper
 			// check if status == import for importing file of type url (filesync exists, and we want to raise event for conversion profile to start)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
-		if(!$isNewFlavor && $flavorAsset->getIsOriginal())
+		if(!$isNewFlavor)
 		{
-			$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
+			$entryFlavors = assetPeer::retrieveByEntryIdAndStatus($flavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
+			$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
 			foreach($entryFlavors as $entryFlavor)
 			{
 				/* @var $entryFlavor flavorAsset */
 				if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
-					kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
+				{
+					$flavor = assetParamsOutputPeer::retrieveByAsset($entryFlavor);
+					kBusinessPreConvertDL::decideFlavorConvert($entryFlavor, $flavor, $originalFlavorAsset, null, null, $dbBatchJob);
+				}
 			}
 
 			$entryThumbnails = assetPeer::retrieveThumbnailsByEntryId($flavorAsset->getEntryId());

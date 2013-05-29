@@ -415,7 +415,8 @@ class kJobsManager
 			$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
 			if(!$fileSync)
 				return null;
-
+				
+			$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 			if($addImportJob)
 			{
 				KalturaLog::debug("Creates import job for remote file sync");
@@ -424,9 +425,8 @@ class kJobsManager
 				$flavorAsset->setDescription("Source file sync is importing: $srcSyncKey");
 				$flavorAsset->save();
 
-				$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
 				$url = $fileSync->getExternalUrl($flavorAsset->getEntryId());
-				kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset, null, null, true);
+				kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $srcFlavorAsset, null, null, true);
 				$waitForImportComplete = true;			
 			}
 			else 
@@ -442,7 +442,6 @@ class kJobsManager
 				}
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
-				$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 				$srcFileSyncDescriptor->setAssetParamsId($srcFlavorAsset->getFlavorParamsId());
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
