@@ -166,7 +166,7 @@ foreach($fileNames as $fileName)
 				$getter = 'get' . $column->getPhpName();
 				$attributeName = lcfirst($column->getPhpName());
 				$value = $object->$getter();
-				if($value != $objectConfiguration->$attributeName)
+				if(isset($objectConfiguration[$attributeName]) && $value != $objectConfiguration[$attributeName])
 				{
 					BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
 					break;
