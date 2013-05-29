@@ -1,4 +1,10 @@
 <?php
+
+class KalturaManifestException extends Exception
+{
+	
+}
+
 $config = array();
 $client = null;
 $serviceUrl = null;
@@ -76,28 +82,28 @@ try
 	{
 		if($httpCode != 302)
 		{
-			throw new Exception("fetch manifest failed, HTTP Code: $httpCode, URL: $manifestUrl");
+			throw new KalturaManifestException("fetch manifest failed, HTTP Code: $httpCode, URL: $manifestUrl");
 		}
 		if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 		{
 			list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-			throw new Exception($message);
+			throw new KalturaManifestException($message);
 		}
 	}
 	else
 	{
 		if($httpCode != 200)
 		{
-			throw new Exception("fetch manifest failed, HTTP Code: $httpCode, URL: $manifestUrl");
+			throw new KalturaManifestException("fetch manifest failed, HTTP Code: $httpCode, URL: $manifestUrl");
 		}
 		if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 		{
 			list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-			throw new Exception($message);
+			throw new KalturaManifestException($message);
 		}
 		if(!file_exists($manifestLocalPath) || !filesize($manifestLocalPath))
 		{
-			throw new Exception("no manifest file returned, URL: $manifestUrl");
+			throw new KalturaManifestException("no manifest file returned, URL: $manifestUrl");
 		}
 	}
 	
@@ -107,51 +113,51 @@ try
 			$manifest = new SimpleXMLElement($manifestLocalPath, LIBXML_NOERROR | LIBXML_NOWARNING, true);
 			
 			if($manifest->getName() != 'manifest')
-				throw new Exception("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
+				throw new KalturaManifestException("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
 			
 			if(!isset($manifest->id))
-				throw new Exception("id element expected under manifest element.");
+				throw new KalturaManifestException("id element expected under manifest element.");
 				
 			if(strval($manifest->id) != $entry->id)
-				throw new Exception("id value should be the entry id, '$manifest->id' returned.");
+				throw new KalturaManifestException("id value should be the entry id, '$manifest->id' returned.");
 			
 			if(!isset($manifest->mimeType))
-				throw new Exception("mimeType element expected under manifest element.");
+				throw new KalturaManifestException("mimeType element expected under manifest element.");
 				
 			if(strval($manifest->mimeType) != 'video/x-flv')
-				throw new Exception("mimeType value should be 'video/x-flv', '$manifest->mimeType' returned.");
+				throw new KalturaManifestException("mimeType value should be 'video/x-flv', '$manifest->mimeType' returned.");
 			
 			if(!isset($manifest->streamType))
-				throw new Exception("streamType element expected under manifest element.");
+				throw new KalturaManifestException("streamType element expected under manifest element.");
 				
 			if(strval($manifest->streamType) != 'recorded')
-				throw new Exception("streamType value should be 'recorded', '$manifest->streamType' returned.");
+				throw new KalturaManifestException("streamType value should be 'recorded', '$manifest->streamType' returned.");
 			
 			if(!isset($manifest->duration))
-				throw new Exception("duration element expected under manifest element.");
+				throw new KalturaManifestException("duration element expected under manifest element.");
 				
 //			$expectedDuration = $entry->msDuration / 1000;
 //			if(floatval($manifest->duration) != $expectedDuration)
-//				throw new Exception("duration value should be $expectedDuration, $manifest->duration returned.");
+//				throw new KalturaManifestException("duration value should be $expectedDuration, $manifest->duration returned.");
 			
 			if(!isset($manifest->media))
-				throw new Exception("media element expected under manifest element.");
+				throw new KalturaManifestException("media element expected under manifest element.");
 				
 			foreach($manifest->media as $media)
 			{
 				$mediaAttributes = $media->attributes();
 				
 				if(!isset($mediaAttributes->bitrate))
-					throw new Exception("bitrate attribute expected in media element.");
+					throw new KalturaManifestException("bitrate attribute expected in media element.");
 					
 				if(!isset($mediaAttributes->width))
-					throw new Exception("width attribute expected in media element.");
+					throw new KalturaManifestException("width attribute expected in media element.");
 					
 				if(!isset($mediaAttributes->height))
-					throw new Exception("height attribute expected in media element.");
+					throw new KalturaManifestException("height attribute expected in media element.");
 					
 				if(!isset($mediaAttributes->url))
-					throw new Exception("url attribute expected in media element.");
+					throw new KalturaManifestException("url attribute expected in media element.");
 			}
 			break;
 				
@@ -159,31 +165,31 @@ try
 			$manifest = new SimpleXMLElement($manifestLocalPath, LIBXML_NOERROR | LIBXML_NOWARNING, true);
 			
 			if($manifest->getName() != 'manifest')
-				throw new Exception("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
+				throw new KalturaManifestException("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
 			
 			$manifestAttributes = $manifest->attributes();
 				
 			if(!isset($manifestAttributes->url))
-				throw new Exception("url attribute expected in manifest element.");
+				throw new KalturaManifestException("url attribute expected in manifest element.");
 				
 			if(!isset($manifest->id))
-				throw new Exception("id element expected under manifest element.");
+				throw new KalturaManifestException("id element expected under manifest element.");
 				
 			if(strval($manifest->id) != $entry->id)
-				throw new Exception("id value should be the entry id, '$manifest->id' returned.");
+				throw new KalturaManifestException("id value should be the entry id, '$manifest->id' returned.");
 			
 			if(!isset($manifest->streamType))
-				throw new Exception("streamType element expected under manifest element.");
+				throw new KalturaManifestException("streamType element expected under manifest element.");
 				
 			if(strval($manifest->streamType) != 'recorded')
-				throw new Exception("streamType value should be 'recorded', '$manifest->streamType' returned.");
+				throw new KalturaManifestException("streamType value should be 'recorded', '$manifest->streamType' returned.");
 			
 			if(!isset($manifest->duration))
-				throw new Exception("duration element expected under manifest element.");
+				throw new KalturaManifestException("duration element expected under manifest element.");
 				
 //			$expectedDuration = $entry->msDuration / 1000;
 //			if(floatval($manifest->duration) != $expectedDuration)
-//				throw new Exception("duration value should be $expectedDuration, $manifest->duration returned.");
+//				throw new KalturaManifestException("duration value should be $expectedDuration, $manifest->duration returned.");
 			
 			$serveFlavorUrl = strval($manifestAttributes->url);
 			
@@ -194,16 +200,16 @@ try
 	
 			if($httpCode != 200)
 			{
-				throw new Exception("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+				throw new KalturaManifestException("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 			}
 			if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 			{
 				list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-				throw new Exception($message);
+				throw new KalturaManifestException($message);
 			}
 			if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 			{
-				throw new Exception("no media file returned, URL: $serveFlavorUrl");
+				throw new KalturaManifestException("no media file returned, URL: $serveFlavorUrl");
 			}
 			
 			break;
@@ -211,11 +217,11 @@ try
 		case 'applehttp':
 			$manifest = file_get_contents($manifestLocalPath);
 			if(strpos($manifest, '#EXTM3U') !== 0)
-				throw new Exception("apple HTTP format must start with header '#EXTM3U'");
+				throw new KalturaManifestException("apple HTTP format must start with header '#EXTM3U'");
 				
 			$matches = null;
 			if(!preg_match_all('/#EXT-X-STREAM-INF:PROGRAM-ID=\d+,BANDWIDTH=\d+\n([^\n]+)/', $manifest, $matches))
-				throw new Exception("manifest format does not match Apple HTTP expected format.");
+				throw new KalturaManifestException("manifest format does not match Apple HTTP expected format.");
 					
 			foreach($matches[1] as $serveFlavorUrl)
 			{
@@ -226,16 +232,16 @@ try
 		
 				if($httpCode != 200)
 				{
-					throw new Exception("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+					throw new KalturaManifestException("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 				}
 				if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 				{
 					list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-					throw new Exception($message);
+					throw new KalturaManifestException($message);
 				}
 				if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 				{
-					throw new Exception("no media file returned, URL: $serveFlavorUrl");
+					throw new KalturaManifestException("no media file returned, URL: $serveFlavorUrl");
 				}
 			}
 			break;
@@ -245,35 +251,35 @@ try
 			$manifest = new SimpleXMLElement($manifestLocalPath, LIBXML_NOERROR | LIBXML_NOWARNING, true);
 			
 			if($manifest->getName() != 'manifest')
-				throw new Exception("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
+				throw new KalturaManifestException("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
 			
 			if(!isset($manifest->id))
-				throw new Exception("id element expected under manifest element.");
+				throw new KalturaManifestException("id element expected under manifest element.");
 				
 			if(strval($manifest->id) != $entry->id)
-				throw new Exception("id value should be the entry id, '$manifest->id' returned.");
+				throw new KalturaManifestException("id value should be the entry id, '$manifest->id' returned.");
 			
 			if(!isset($manifest->mimeType))
-				throw new Exception("mimeType element expected under manifest element.");
+				throw new KalturaManifestException("mimeType element expected under manifest element.");
 				
 			if(strval($manifest->mimeType) != 'video/x-flv')
-				throw new Exception("mimeType value should be 'video/x-flv', '$manifest->mimeType' returned.");
+				throw new KalturaManifestException("mimeType value should be 'video/x-flv', '$manifest->mimeType' returned.");
 			
 			if(!isset($manifest->streamType))
-				throw new Exception("streamType element expected under manifest element.");
+				throw new KalturaManifestException("streamType element expected under manifest element.");
 				
 			if(strval($manifest->streamType) != 'recorded')
-				throw new Exception("streamType value should be 'recorded', '$manifest->streamType' returned.");
+				throw new KalturaManifestException("streamType value should be 'recorded', '$manifest->streamType' returned.");
 			
 			if(!isset($manifest->duration))
-				throw new Exception("duration element expected under manifest element.");
+				throw new KalturaManifestException("duration element expected under manifest element.");
 				
 //			$expectedDuration = $entry->msDuration / 1000;
 //			if(floatval($manifest->duration) != $expectedDuration)
-//				throw new Exception("duration value should be $expectedDuration, $manifest->duration returned.");
+//				throw new KalturaManifestException("duration value should be $expectedDuration, $manifest->duration returned.");
 			
 			if(!isset($manifest->media))
-				throw new Exception("media element expected under manifest element.");
+				throw new KalturaManifestException("media element expected under manifest element.");
 				
 			foreach($manifest->media as $media)
 			{
@@ -282,17 +288,17 @@ try
 				if($format == 'hds')
 				{
 					if(!isset($mediaAttributes->bitrate))
-						throw new Exception("bitrate attribute expected in media element.");
+						throw new KalturaManifestException("bitrate attribute expected in media element.");
 						
 					if(!isset($mediaAttributes->width))
-						throw new Exception("width attribute expected in media element.");
+						throw new KalturaManifestException("width attribute expected in media element.");
 						
 					if(!isset($mediaAttributes->height))
-						throw new Exception("height attribute expected in media element.");
+						throw new KalturaManifestException("height attribute expected in media element.");
 				}
 					
 				if(!isset($mediaAttributes->url))
-					throw new Exception("url attribute expected in media element.");
+					throw new KalturaManifestException("url attribute expected in media element.");
 			
 				$serveFlavorUrl = strval($mediaAttributes->url);
 
@@ -303,16 +309,16 @@ try
 
 				if($httpCode != 200)
 				{
-					throw new Exception("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+					throw new KalturaManifestException("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 				}
 				if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 				{
 					list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-					throw new Exception($message);
+					throw new KalturaManifestException($message);
 				}
 				if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 				{
-					throw new Exception("no media file returned, URL: $serveFlavorUrl");
+					throw new KalturaManifestException("no media file returned, URL: $serveFlavorUrl");
 				}
 			}
 			break;
@@ -325,16 +331,16 @@ try
 			
 			if($httpCode != 200)
 			{
-				throw new Exception("fetch redirected flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+				throw new KalturaManifestException("fetch redirected flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 			}
 			if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 			{
 				list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-				throw new Exception($message);
+				throw new KalturaManifestException($message);
 			}
 			if(!file_exists($manifestLocalPath) || !filesize($manifestLocalPath))
 			{
-				throw new Exception("no redirected flavor file returned, URL: $manifestUrl");
+				throw new KalturaManifestException("no redirected flavor file returned, URL: $manifestUrl");
 			}
 			break;
 				
@@ -342,7 +348,7 @@ try
 			$html = file_get_contents($manifestLocalPath);
 			$matches = null;
 			if(!preg_match('/<html><head><meta http-equiv="refresh" content="0;url=([^"]+)"><\/head><\/html>/', $html, $matches))
-				throw new Exception("HTML format does not match RTSP expected format.");
+				throw new KalturaManifestException("HTML format does not match RTSP expected format.");
 					
 			$serveFlavorUrl = $clientConfig->serviceUrl . $matches[1];
 
@@ -353,16 +359,16 @@ try
 
 			if($httpCode != 200)
 			{
-				throw new Exception("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+				throw new KalturaManifestException("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 			}
 			if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 			{
 				list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-				throw new Exception($message);
+				throw new KalturaManifestException($message);
 			}
 			if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 			{
-				throw new Exception("no media file returned, URL: $serveFlavorUrl");
+				throw new KalturaManifestException("no media file returned, URL: $serveFlavorUrl");
 			}
 			break;
 				
@@ -370,60 +376,60 @@ try
 			$manifest = new SimpleXMLElement($manifestLocalPath, LIBXML_NOERROR | LIBXML_NOWARNING, true);
 			
 			if($manifest->getName() != 'smil')
-				throw new Exception("root element expected to be 'smil', '" . $manifest->getName() . "' returned.");
+				throw new KalturaManifestException("root element expected to be 'smil', '" . $manifest->getName() . "' returned.");
 			
 			if(!isset($manifest->head))
-				throw new Exception("head element expected under smil element.");
+				throw new KalturaManifestException("head element expected under smil element.");
 				
 			$metaData = array();
 			foreach($manifest->head->children() as $meta)
 			{
 				/* @var $meta SimpleXMLElement */
 				if($meta->getName() != 'meta')
-					throw new Exception("only meta elements expected under smil/head element, '" . $meta->getName() . "' returned.");
+					throw new KalturaManifestException("only meta elements expected under smil/head element, '" . $meta->getName() . "' returned.");
 				
 				$metaAttributes = $meta->attributes();
 				
 				if(!isset($metaAttributes->name))
-					throw new Exception("name attribute expected in smil/head/meta elements.");
+					throw new KalturaManifestException("name attribute expected in smil/head/meta elements.");
 				
 				if(!isset($metaAttributes->content))
-					throw new Exception("content attribute expected in smil/head/meta elements.");
+					throw new KalturaManifestException("content attribute expected in smil/head/meta elements.");
 					
 				$metaData[strval($metaAttributes->name)] = strval($metaAttributes->content);
 			}
 			
 			if(!isset($metaData['vod']))
-				throw new Exception("meta element with name 'vod' expected under smil/head element.");
+				throw new KalturaManifestException("meta element with name 'vod' expected under smil/head element.");
 			
 			if(strtolower($metaData['vod']) != 'true')
-				throw new Exception("vod meta element expected to be true.");
+				throw new KalturaManifestException("vod meta element expected to be true.");
 				
 			if(!isset($metaData['httpBase']))
-				throw new Exception("meta element with name 'httpBase' expected under smil/head element.");
+				throw new KalturaManifestException("meta element with name 'httpBase' expected under smil/head element.");
 				
 			$httpBase = $metaData['httpBase'];
 			
 			if(!isset($manifest->body))
-				throw new Exception("body element expected under smil element.");
+				throw new KalturaManifestException("body element expected under smil element.");
 	
 			if(!isset($manifest->body->switch))
-				throw new Exception("switch element expected under smil/body element.");
+				throw new KalturaManifestException("switch element expected under smil/body element.");
 	
 			foreach($manifest->body->switch->children() as $video)
 			{
 				/* @var $video SimpleXMLElement */
 				if($video->getName() != 'video')
-					throw new Exception("only video elements expected under smil/body/switch element, '" . $video->getName() . "' returned.");
+					throw new KalturaManifestException("only video elements expected under smil/body/switch element, '" . $video->getName() . "' returned.");
 				
 				$videoAttributes = $video->attributes();
 				
 				if(!isset($videoAttributes->src))
-					throw new Exception("src attribute expected in smil/body/switch/video elements.");
+					throw new KalturaManifestException("src attribute expected in smil/body/switch/video elements.");
 				
 				$systemBitrate = 'system-bitrate';
 				if(!isset($videoAttributes->$systemBitrate))
-					throw new Exception("$systemBitrate attribute expected in smil/body/switch/video elements.");
+					throw new KalturaManifestException("$systemBitrate attribute expected in smil/body/switch/video elements.");
 				
 				$serveFlavorUrl = $httpBase . strval($videoAttributes->src);
 
@@ -434,16 +440,16 @@ try
 
 				if($httpCode != 200)
 				{
-					throw new Exception("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+					throw new KalturaManifestException("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 				}
 				if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 				{
 					list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-					throw new Exception($message);
+					throw new KalturaManifestException($message);
 				}
 				if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 				{
-					throw new Exception("no media file returned, URL: $serveFlavorUrl");
+					throw new KalturaManifestException("no media file returned, URL: $serveFlavorUrl");
 				}
 			}
 			
@@ -455,49 +461,49 @@ try
 			$manifest = new SimpleXMLElement($manifestLocalPath, LIBXML_NOERROR | LIBXML_NOWARNING, true);
 			
 			if($manifest->getName() != 'manifest')
-				throw new Exception("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
+				throw new KalturaManifestException("root element expected to be 'manifest', '" . $manifest->getName() . "' returned.");
 			
 			if(!isset($manifest->id))
-				throw new Exception("id element expected under manifest element.");
+				throw new KalturaManifestException("id element expected under manifest element.");
 				
 			if(strval($manifest->id) != $entry->id)
-				throw new Exception("id value should be the entry id, '$manifest->id' returned.");
+				throw new KalturaManifestException("id value should be the entry id, '$manifest->id' returned.");
 			
 			if(!isset($manifest->mimeType))
-				throw new Exception("mimeType element expected under manifest element.");
+				throw new KalturaManifestException("mimeType element expected under manifest element.");
 				
 			if(strval($manifest->mimeType) != 'video/x-flv')
-				throw new Exception("mimeType value should be 'video/x-flv', '$manifest->mimeType' returned.");
+				throw new KalturaManifestException("mimeType value should be 'video/x-flv', '$manifest->mimeType' returned.");
 			
 			if(!isset($manifest->streamType))
-				throw new Exception("streamType element expected under manifest element.");
+				throw new KalturaManifestException("streamType element expected under manifest element.");
 				
 			if(strval($manifest->streamType) != 'recorded')
-				throw new Exception("streamType value should be 'recorded', '$manifest->streamType' returned.");
+				throw new KalturaManifestException("streamType value should be 'recorded', '$manifest->streamType' returned.");
 			
 			if(!isset($manifest->duration))
-				throw new Exception("duration element expected under manifest element.");
+				throw new KalturaManifestException("duration element expected under manifest element.");
 				
 //			$expectedDuration = $entry->msDuration / 1000;
 //			if(floatval($manifest->duration) != $expectedDuration)
-//				throw new Exception("duration value should be $expectedDuration, $manifest->duration returned.");
+//				throw new KalturaManifestException("duration value should be $expectedDuration, $manifest->duration returned.");
 			
 			if(!isset($manifest->media))
-				throw new Exception("media element expected under manifest element.");
+				throw new KalturaManifestException("media element expected under manifest element.");
 				
 			$mediaAttributes = $manifest->media->attributes();
 			
 			if(!isset($mediaAttributes->bitrate))
-				throw new Exception("bitrate attribute expected in media element.");
+				throw new KalturaManifestException("bitrate attribute expected in media element.");
 				
 			if(!isset($mediaAttributes->width))
-				throw new Exception("width attribute expected in media element.");
+				throw new KalturaManifestException("width attribute expected in media element.");
 				
 			if(!isset($mediaAttributes->height))
-				throw new Exception("height attribute expected in media element.");
+				throw new KalturaManifestException("height attribute expected in media element.");
 				
 			if(!isset($mediaAttributes->url))
-				throw new Exception("url attribute expected in media element.");
+				throw new KalturaManifestException("url attribute expected in media element.");
 				
 			$serveFlavorUrl = strval($mediaAttributes->url);
 			
@@ -508,16 +514,16 @@ try
 	
 			if($httpCode != 200)
 			{
-				throw new Exception("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
+				throw new KalturaManifestException("serve flavor failed, HTTP Code: $httpCode, URL: $manifestUrl");
 			}
 			if(isset($headers['x-kaltura-app']) && strpos($headers['x-kaltura-app'], 'exiting on error') === 0)
 			{
 				list($prefix, $message) = explode(' - ', $headers['x-kaltura-app'], 2);
-				throw new Exception($message);
+				throw new KalturaManifestException($message);
 			}
 			if(!file_exists($mediaLocalPath) || !filesize($mediaLocalPath))
 			{
-				throw new Exception("no media file returned, URL: $serveFlavorUrl");
+				throw new KalturaManifestException("no media file returned, URL: $serveFlavorUrl");
 			}
 			
 			break;
@@ -550,6 +556,18 @@ catch(KalturaClientException $ce)
 	
 	$monitorResult->errors[] = $error;
 	$monitorResult->description = "Exception: " . get_class($ce) . ", API: $apiCall, Code: " . $ce->getCode() . ", Message: " . $ce->getMessage();
+}
+catch(KalturaManifestException $me)
+{
+	$monitorResult->executionTime = microtime(true) - $start;
+	
+	$error = new KalturaMonitorError();
+	$error->code = $me->getCode();
+	$error->description = $me->getMessage();
+	$error->level = KalturaMonitorError::CRIT;
+	
+	$monitorResult->errors[] = $error;
+	$monitorResult->description = $me->getMessage();
 }
 catch(Exception $ex)
 {
