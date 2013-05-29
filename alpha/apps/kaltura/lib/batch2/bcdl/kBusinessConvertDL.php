@@ -143,6 +143,9 @@ class kBusinessConvertDL
 		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
 
+		//flush deffered events to re-index sphinx before temp entry deletion
+		kEventsManager::flushEvents();
+		
 		myEntryUtils::deleteEntry($tempEntry,null,true);
 
 		$te = new TrackEntry();
