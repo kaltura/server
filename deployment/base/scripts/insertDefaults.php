@@ -70,7 +70,7 @@ foreach($fileNames as $fileName)
 				public function setId($v)
 				{
 					if(!$this->getId())
-						$this->setId($v);
+						parent::setId($v);
 					
 					return $this;
 				}
