@@ -185,7 +185,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		$cmd = $pdfInfo . " " . realpath($file);
 		exec($cmd, $output);
 		foreach($output as $cur) {
-			if(preg_match('/Pages:\s*(\d)+/' , $cur, $matches))
+			if(preg_match('/Pages:\s*(\d+)/' , $cur, $matches))
 				return $matches[1];
 		}
 		return null;
