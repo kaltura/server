@@ -1063,6 +1063,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
 				$remote_dc_file_sync->setFileRoot ( $source_file_sync->getFileRoot() );
 				$remote_dc_file_sync->setFilePath ( $source_file_sync->getFilePath() );
+				$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
+				self::incrementLinkCountForFileSync($source_file_sync);
 			}
 			else
 			{
@@ -1115,13 +1117,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(!$file)
 			return null;
 
-		if($file->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
+		if($file->getLinkedId())
 		{
 			$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
-		}
-		elseif($file->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-		{
-			$newStatus = FileSync::FILE_SYNC_STATUS_DELETED;
 		}
 		else
 		{
@@ -1170,7 +1168,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c = new Criteria();
 
 			$c->add(FileSyncPeer::DC, $fileSync->getDc());
-			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
+			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::in);
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
 			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
 
@@ -1250,7 +1248,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$c = new Criteria();
 		$c->add(FileSyncPeer::DC, $object->getDc());
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
+		$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
 		$c->add(FileSyncPeer::LINKED_ID, $object->getId());
 
 		$links = FileSyncPeer::doSelect($c);
