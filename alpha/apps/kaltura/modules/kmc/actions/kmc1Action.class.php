@@ -53,32 +53,37 @@ class kmc1Action extends kalturaAction
 		}
 
 		$this->payingPartner = 'false';
-		if($partner && $partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE)
-		{
-			$this->payingPartner = 'true';
-		}
-
 		$this->visibleCT = 'false';
-		if(kConf::get('kmc_content_enable_commercial_transcoding') && $partner)
-		{
-			// 2009-08-27 is the date we added ON2 to KMC trial account
-			if ($partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE ||
-			    ($partner->getType() == 1 && strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27')) )
-			{
-				$this->visibleCT = 'true';
-			}
-		}
 		
-		// 2009-08-27 is the date we added ON2 to KMC trial account
-		// TODO - should be depracated
-		if(strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27') ||
-		   $partner->getEnableAnalyticsTab())
+		if($partner)
 		{
-			$this->allow_reports = true;
-		}
-		if($partner->getEnableAnalyticsTab())
-		{
-			$this->allow_reports = true;
+			if($partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE)
+			{
+				$this->payingPartner = 'true';
+			}
+	
+			if(kConf::get('kmc_content_enable_commercial_transcoding'))
+			{
+				// 2009-08-27 is the date we added ON2 to KMC trial account
+				if ($partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE ||
+				    ($partner->getType() == 1 && strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27')) )
+				{
+					$this->visibleCT = 'true';
+				}
+			}
+			
+			// 2009-08-27 is the date we added ON2 to KMC trial account
+			// TODO - should be depracated
+			if(strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27') ||
+			   $partner->getEnableAnalyticsTab())
+			{
+				$this->allow_reports = true;
+			}
+			
+			if($partner->getEnableAnalyticsTab())
+			{
+				$this->allow_reports = true;
+			}
 		}
 		
 		// set content kdp version according to partner id
