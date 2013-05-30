@@ -225,6 +225,9 @@ CONFIG = [
 	#curropted file
 	('text:Microsoft Word/text:The file appears to be corrupted', 0, None,(ET_KILL_PROCESS,)),  
 	('text:(Protected View) - Microsoft Word/class:OPH Previewer Window', 0, None,(ET_KILL_PROCESS,)),  
+	
+	# Command Encoder crash
+	('text:CommandEncoder/text:Close the program,class:Button', 0, None, (ET_PUSH_BUTTON, 'text:Close the program,class:Button')),
 ]
 
 if __name__ == '__main__':
