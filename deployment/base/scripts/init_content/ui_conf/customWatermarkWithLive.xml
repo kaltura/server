@@ -1,18 +1,49 @@
-<layout id="full" name="player" skinPath="/content/uiconf/kaltura/kmc/appstudio/kdp3/skin.swf?a=12">
+<?xml version="1.0" encoding="UTF-8"?>
+<layout id="full" name="player" skinPath="/content/uiconf/kaltura/kmc/nab/skin.swf?a=12">
   <HBox id="topLevel" width="100%" height="100%">
     <VBox id="player" width="100%" height="100%" styleName="black">
-      <Plugin id="kalturaMix" disableUrlHashing="true" width="0%" height="0%" includeInLayout="false" loadingPolicy="onDemand"/>
+      <Plugin id="kalturaMix" width="0%" height="0%" includeInLayout="false" loadingPolicy="onDemand"/>
       <Plugin id="statistics" width="0%" height="0%" includeInLayout="false"/>
       <Canvas height="100%" width="100%" id="PlayerHolder" styleName="black">
         <Video id="video" width="100%" height="100%" mantainAspectRatio="false"/>
-        <Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
+        <VBox id="offlineMessageHolder" 
+	     			verticalAlign="middle" horizontalAlign="center" 
+	     			includeInLayout="false"
+				    width="100%" height="100%" >
+				    <Spacer height="100%" />
+				    <Spacer height="100%" />
+				    <Label 
+				      id="offlineMessage" styleName="offlineMessage"
+				      text="{mediaProxy.entry.offlineMessage}" visible="{mediaProxy.isOffline}"
+				      width="100%" height="30"/> <!-- mediaProxy.entry.offlineMessage-->
+			     	<Spacer height="100%" />
+		    	</VBox>
+		<Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
         <Watermark id="watermark" width="100%" height="100%" watermarkPath="http://www.kaltura.com/content/uiconf/kaltura/generic/kaltura_watermark.png" watermarkClickPath="http://www.kaltura.com/" watermarkPosition="bottomLeft"/>
         <Plugin id="gigya" width="100%" height="100%"/>
       </Canvas>
       <HBox id="ControllerScreenHolder" width="100%" height="30" verticalAlign="middle" styleName="darkBg">
         <HBox id="ControllerScreen" width="100%" height="30" horizontalGap="9" verticalAlign="middle" styleName="darkBg">
           <Button id="playBtnControllerScreen" command="play" buttonType="iconButton" focusRectPadding="0" icon="playIcon" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="pauseIcon" selectedOverIcon="pauseIcon" selectedDownIcon="pauseIcon" selectedDisabledIcon="pauseIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
-          <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3">
+           <Button id="liveToggleStatus"
+					toggle="true"
+					color1="0xFF0000"
+					color2="0xFF0000"
+					upIcon="onAirIcon" 
+					overIcon="onAirIcon" 
+					downIcon="onAirIcon" 
+					disabeledIcon="onAirIcon" 
+					selectedUpIcon="offlineIcon"  
+					selectedOverIcon="offlineIcon"  
+					selectedDownIcon="offlineIcon"  
+					selectedDisabledIcon="offlineIcon"  
+					isSelected="{mediaProxy.isOffline}"
+					visible="{mediaProxy.isLive}"
+					includeInLayout="{mediaProxy.isLive}"
+					useHandCursor=""
+					mouseEnable="false"
+					/>
+		  <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3" notVisible="{mediaProxy.isLive}">
             <Scrubber id="scrubber" width="100%" height="10" styleName="" color1="14540253" color2="14540253"/>
             <HBox width="100%">
               <Timer id="timerControllerScreen1" width="60" styleName="timerProgressLeft" format="mm:ss" height="12" timerType="forwards"/>

@@ -1,36 +1,45 @@
-<layout id="full" name="player" skinPath="/content/uiconf/kaltura/kmc/appstudio/kdp3/skin_light.swf?12">
+<?xml version="1.0" encoding="UTF-8"?>
+<layout id="widePlaylist" skinPath="/content/uiconf/kaltura/kmc/appstudio/kdp3/skin.swf?a=12" isPlaylist="true">
   <HBox id="topLevel" width="100%" height="100%">
     <VBox id="player" width="100%" height="100%" styleName="black">
+      <Plugin id="playlistAPI" width="0%" height="0%" includeInLayout="false"/>
       <Plugin id="kalturaMix" width="0%" height="0%" includeInLayout="false" loadingPolicy="onDemand"/>
       <Plugin id="statistics" width="0%" height="0%" includeInLayout="false"/>
-      <HBox id="TopTitleScreen" width="100%" height="30" styleName="darkBg">
-        <Label height="22" id="movieName" styleName="movieName" width="100%" text="{mediaProxy.entry.name}" dynamicColor="true" color1="0" font="Arial"/>
-      </HBox>
       <Canvas height="100%" width="100%" id="PlayerHolder" styleName="black">
         <Video id="video" width="100%" height="100%" mantainAspectRatio="false"/>
-		<Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
-        <Watermark id="watermark" width="100%" height="100%" watermarkPath="http://www.kaltura.com/content/uiconf/kaltura/generic/kaltura_watermark.png" watermarkClickPath="http://www.kaltura.com/" watermarkPosition="bottomLeft"/>
+        <Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
         <Plugin id="gigya" width="100%" height="100%"/>
       </Canvas>
       <HBox id="ControllerScreenHolder" width="100%" height="30" verticalAlign="middle" styleName="darkBg">
         <HBox id="ControllerScreen" width="100%" height="30" horizontalGap="9" verticalAlign="middle" styleName="darkBg">
-          <Button id="playBtnControllerScreen" command="play" buttonType="iconButton" focusRectPadding="0" icon="playIcon" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="pauseIcon" selectedOverIcon="pauseIcon" selectedDownIcon="pauseIcon" selectedDisabledIcon="pauseIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-		  <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3">
-            <Scrubber id="scrubber" width="100%" height="10" styleName="" color1="0" color2="0"/>
+          <Button id="playBtnControllerScreen" command="play" buttonType="iconButton" focusRectPadding="0" icon="playIcon" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="pauseIcon" selectedOverIcon="pauseIcon" selectedDownIcon="pauseIcon" selectedDisabledIcon="pauseIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="previousBtnControllerScreen" kClick="sendNotification('playlistPlayPrevious')" height="22" focusRectPadding="0" buttonType="iconButton" styleName="controllerScreen" icon="PreviousIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="nextBtnControllerScreen" kClick="sendNotification('playlistPlayNext')" focusRectPadding="0" height="22" buttonType="iconButton" icon="NextIcon" styleName="controllerScreen" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3">
+            <Scrubber id="scrubber" width="100%" height="10" styleName="" color1="14540253" color2="14540253"/>
             <HBox width="100%">
               <Timer id="timerControllerScreen1" width="60" styleName="timerProgressLeft" format="mm:ss" height="12" timerType="forwards"/>
               <Spacer width="100%" height="8"/>
               <Timer id="timerControllerScreen2" width="60" styleName="timerProgressRight" format="mm:ss" height="12" timerType="total"/>
             </HBox>
           </VBox>
-          <VolumeBar id="volumeBar" styleName="volumeBtn" width="20" buttonType="iconButton" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-          <Button id="shareBtnControllerScreen" buttonType="iconButton" kClick="sendNotification('doGigya')" height="22" styleName="controllerScreen" focusRectPadding="0" icon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-          <Button id="fullScreenBtnControllerScreen" command="fullScreen" buttonType="iconButton" height="22" styleName="controllerScreen" icon="openFullScreenIcon" selectedUpIcon="closeFullScreenIcon" selectedOverIcon="closeFullScreenIcon" selectedDownIcon="closeFullScreenIcon" selectedDisabledIcon="closeFullScreenIcon" focusRectPadding="0" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
+          <VolumeBar id="volumeBar" styleName="volumeBtn" width="20" buttonType="iconButton" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="shareBtnControllerScreen" buttonType="iconButton" kClick="sendNotification('doGigya')" height="22" styleName="controllerScreen" focusRectPadding="0" icon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="fullScreenBtnControllerScreen" command="fullScreen" buttonType="iconButton" height="22" styleName="controllerScreen" icon="openFullScreenIcon" selectedUpIcon="closeFullScreenIcon" selectedOverIcon="closeFullScreenIcon" selectedDownIcon="closeFullScreenIcon" selectedDisabledIcon="closeFullScreenIcon" focusRectPadding="0" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
         </HBox>
         <Spacer width="13"/>
         <Button id="kalturaLogo" height="50" width="100" kClick="navigate('http://www.kaltura.com')" styleName="controllerScreen" icon="kalturaLogo"/>
         <Spacer width="13"/>
       </HBox>
+    </VBox>
+    <VBox id="playlist" width="340" height="100%" styleName="List_background_default" hideInFullScreen="true">
+      <Spacer height="8"/>
+      <HBox id="playlistPadding" width="100%" height="100%" styleName="List_background_default">
+        <Spacer width="8"/>
+        <Plugin id="list" width="100%" height="100%" styleName="List_background_default" dataProvider="{playlistAPI.dataProvider}" itemRenderer="playlistItemRenderer" rowHeight="50"/>
+        <Spacer width="8"/>
+      </HBox>
+      <Spacer height="8"/>
     </VBox>
   </HBox>
   <screens>
@@ -38,8 +47,8 @@
       <VBox id="startContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
         <Spacer width="100%"/>
         <Tile id="startTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
-          <Button id="onVideoPlayBtnStartScreen" command="play" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Play" styleName="onScreenBtn" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="playIcon" selectedOverIcon="playIcon" selectedDownIcon="playIcon" selectedDisabledIcon="playIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-          <Button id="shareBtnStartScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
+          <Button id="onVideoPlayBtnStartScreen" command="play" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Play" styleName="onScreenBtn" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="playIcon" selectedOverIcon="playIcon" selectedDownIcon="playIcon" selectedDisabledIcon="playIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="shareBtnStartScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
         </Tile>
         <Spacer width="100%"/>
       </VBox>
@@ -48,8 +57,8 @@
       <VBox id="pauseContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
         <Spacer height="100%"/>
         <Tile id="startTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
-          <Button id="onVideoPlayBtnPauseScreen" command="play" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Play" styleName="onScreenBtn" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="playIcon" selectedOverIcon="playIcon" selectedDownIcon="playIcon" selectedDisabledIcon="playIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-          <Button id="shareBtnPauseScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
+          <Button id="onVideoPlayBtnPauseScreen" command="play" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Play" styleName="onScreenBtn" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="playIcon" selectedOverIcon="playIcon" selectedDownIcon="playIcon" selectedDisabledIcon="playIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="shareBtnPauseScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
         </Tile>
         <Spacer height="100%"/>
       </VBox>
@@ -58,7 +67,7 @@
       <VBox id="playContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
         <Spacer height="100%"/>
         <Tile id="startTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
-          <Button id="shareBtnPlayScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
+          <Button id="shareBtnPlayScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
         </Tile>
         <Spacer height="100%"/>
       </VBox>
@@ -67,19 +76,29 @@
       <VBox id="startContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
         <Spacer height="100%"/>
         <Tile id="startTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
-          <Button id="replayBtnEndScreen" kClick="sendNotification('doSeek','0');sendNotification('doPlay')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="replay" styleName="onScreenBtn" upIcon="replayIcon" k_buttonType="buttonIconControllerArea" tooltip="replay" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
-          <Button id="shareBtnEndScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="0" color2="0" color3="16777215" color4="13421772" color5="0" font="Arial"/>
+          <Button id="replayBtnEndScreen" kClick="sendNotification('doSeek','0');sendNotification('doPlay')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="replay" styleName="onScreenBtn" upIcon="replayIcon" k_buttonType="buttonIconControllerArea" tooltip="" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
+          <Button id="shareBtnEndScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" color1="14540253" color2="16777215" color3="16777215" color4="14540253" color5="0" font="Arial"/>
         </Tile>
         <Spacer height="100%"/>
       </VBox>
     </screen>
   </screens>
+  <renderers>
+    <renderer id="playlistItemRenderer">
+      <HBox id="irCont" height="100%" width="100%" x="10" y="10" verticalAlign="top">
+        <VBox height="100%" width="100%" id="labelsHolder" verticalGap="0">
+          <Label id="irLinkIrScreen" width="240" height="18" text="{this.name}" styleName="itemRendererLabel" label="{this.name}" prefix=""/>
+          <Label id="irDescriptionIrScreen" width="240" height="18" text="{this.description}" styleName="itemRendererLabel" prefix=""/>
+        </VBox>
+      </HBox>
+    </renderer>
+  </renderers>
   <strings>
     <string code="NO_MIX_PLUGIN_TITLE" text="N Plugin Mix"/>
     <string code="NO_MIX_PLUGIN" text="Para ver la entrada de mezcla, debe agregar el plugin de la mezcla a la uiconf XML"/>
   </strings>
   <extraData>
-    <GigyaUI theme="light">
+    <GigyaUI theme="dark">
       <config>
         <display showEmail="true" useTransitions="true" showBookmark="true" codeBoxHeight="auto" showCodeBox="true" showCloseButton="true" networksWithCodeBox="" networksToHide="livespaces, piczo, orkut, pageflakes, vox, tagged, hi5, wordpress, multiply" networksToShow="myspace, facebook, bebo, blogger, freewebs, livejournal, blackplanet, myyearbook, typepad, xanga, igoogle, netvibes, migente, friendster" bookmarksToShow="googlebookmarks,delicious,digg,facebookshare,newsvine,reddit,twitter,ask,myaol,slashdot,skimbit,simpy,blogmarks,spurl,linkagogo,Magnolia,faves,segnalo,netvouz,blinklist,dropjack,feedmelinks"/>
         <body>
@@ -114,8 +133,8 @@
     </GigyaUI>
   </extraData>
   <uiVars>
-    <var key="video.mantainAspectRatio" value="false"/>
-    <var key="playlistAPI.autoContinue" value="false"/>
+    <var key="video.mantainAspectRatio" value="true"/>
+    <var key="playlistAPI.autoContinue" value="true"/>
     <var key="pictureDefaultDuration" value="2"/>
     <var key="autoPlay" value="false"/>
     <var key="mute" value="false"/>

@@ -1,7 +1,8 @@
-<snapshot fullPlayerId="31008">
+<?xml version="1.0" encoding="UTF-8"?>
+<snapshot fullPlayerId="31009">
   <featuresData>
     <feature k_fullName="TopTitleScreen" k_value="false"/>
-    <feature k_fullName="watermark" k_value="true"/>
+    <feature k_fullName="watermark" k_value="false"/>
     <feature k_fullName="watermark.watermarkPath" k_value="http://www.kaltura.com/content/uiconf/kaltura/generic/kaltura_watermark.png"/>
     <feature k_fullName="watermark.watermarkClickPath" k_value="http://www.kaltura.com/"/>
     <feature k_fullName="watermark.watermarkPosition" k_value="bottomLeft"/>
@@ -19,7 +20,7 @@
     <feature k_fullName="fullScreenBtn.showOnVideoControllers.EndScreen" k_value="false"/>
     <feature k_fullName="fullScreenBtn.Display" k_value="buttonIconControllerArea"/>
     <feature k_fullName="fullScreenBtn.Label" k_value="fullscreen"/>
-    <feature k_fullName="fullScreenBtn.Tooltip" k_value="Toggle fullscreen"/>
+    <feature k_fullName="fullScreenBtn.Tooltip" k_value=""/>
     <feature k_fullName="onVideoPlayBtn" k_value="true"/>
     <feature k_fullName="onVideoPlayBtn.showOnVideoControllers" k_value="true"/>
     <feature k_fullName="onVideoPlayBtn.showOnVideoControllers.StartScreen" k_value="true"/>
@@ -48,6 +49,16 @@
     <feature k_fullName="unmuteBtn.showOnVideoControllers.EndScreen" k_value="true"/>
     <feature k_fullName="unmuteBtn.Label" k_value="unmute"/>
     <feature k_fullName="unmuteBtn.Tooltip" k_value="unmute sound"/>
+    <feature k_fullName="previousBtn" k_value="true"/>
+    <feature k_fullName="previousBtn.ControllerScreen" k_value="true"/>
+    <feature k_fullName="previousBtn.Display" k_value="buttonIconControllerArea"/>
+    <feature k_fullName="previousBtn.Label" k_value="Next"/>
+    <feature k_fullName="previousBtn.Tooltip" k_value=""/>
+    <feature k_fullName="nextBtn" k_value="true"/>
+    <feature k_fullName="nextBtn.ControllerScreen" k_value="true"/>
+    <feature k_fullName="nextBtn.Display" k_value="buttonIconControllerArea"/>
+    <feature k_fullName="nextBtn.Label" k_value="Next"/>
+    <feature k_fullName="nextBtn.Tooltip" k_value=""/>
     <feature k_fullName="shareBtn" k_value="true"/>
     <feature k_fullName="shareBtn.showOnVideoControllers" k_value="true"/>
     <feature k_fullName="shareBtn.showOnVideoControllers.StartScreen" k_value="true"/>
@@ -57,7 +68,7 @@
     <feature k_fullName="shareBtn.ControllerScreen" k_value="true"/>
     <feature k_fullName="shareBtn.Display" k_value="buttonIconControllerArea"/>
     <feature k_fullName="shareBtn.Label" k_value="Share"/>
-    <feature k_fullName="shareBtn.Tooltip" k_value=""/>
+    <feature k_fullName="shareBtn.Tooltip" k_value="share with friends"/>
     <feature k_fullName="downloadBtn" k_value="false"/>
     <feature k_fullName="downloadBtn.StartScreen" k_value="true"/>
     <feature k_fullName="downloadBtn.PlayScreen" k_value="true"/>
@@ -157,6 +168,49 @@
     <feature k_fullName="custom5Btn.Display" k_value="buttonIconControllerArea"/>
     <feature k_fullName="custom5Btn.Label" k_value="custom5"/>
     <feature k_fullName="custom5Btn.Tooltip" k_value="Custom5 tooltip"/>
+    <feature k_fullName="irImage" k_value="false"/>
+    <feature k_fullName="irImage.irScreen" k_value="true"/>
+    <feature k_fullName="irImage.source" k_value="{this.thumbnailUrl}"/>
+    <feature k_fullName="irLink" k_value="true"/>
+    <feature k_fullName="irLink.irScreen" k_value="true"/>
+    <feature k_fullName="irLink.name" k_value="{this.name}"/>
+    <feature k_fullName="irLink.prefix" k_value=""/>
+    <feature k_fullName="irDescription" k_value="true"/>
+    <feature k_fullName="irDescription.irScreen" k_value="true"/>
+    <feature k_fullName="irDescription.Description" k_value="{this.description}"/>
+    <feature k_fullName="irDescription.prefix" k_value=""/>
+    <feature k_fullName="irDuration" k_value="false"/>
+    <feature k_fullName="irDuration.irScreen" k_value="true"/>
+    <feature k_fullName="irDuration.duration" k_value="{formatDate(this.duration, 'NN:SS')}"/>
+    <feature k_fullName="irDuration.prefix" k_value=""/>
+    <feature k_fullName="irPlays" k_value="false"/>
+    <feature k_fullName="irPlays.irScreen" k_value="true"/>
+    <feature k_fullName="irPlays.playscountData" k_value="Plays: {this.plays}"/>
+    <feature k_fullName="irPlays.prefix" k_value=""/>
+    <feature k_fullName="irRank" k_value="false"/>
+    <feature k_fullName="irRank.irScreen" k_value="true"/>
+    <feature k_fullName="irRank.rank" k_value="Rank: {this.rank}"/>
+    <feature k_fullName="irRank.prefix" k_value=""/>
+    <feature k_fullName="irVotes" k_value="false"/>
+    <feature k_fullName="irVotes.irScreen" k_value="true"/>
+    <feature k_fullName="irVotes.votes" k_value=" ({this.votes} votes)"/>
+    <feature k_fullName="irVotes.prefix" k_value=""/>
+    <feature k_fullName="irTags" k_value="false"/>
+    <feature k_fullName="irTags.irScreen" k_value="true"/>
+    <feature k_fullName="irTags.tags" k_value="Tags: {this.tags}"/>
+    <feature k_fullName="irTags.prefix" k_value=""/>
+    <feature k_fullName="irAdminTags" k_value="false"/>
+    <feature k_fullName="irAdminTags.irScreen" k_value="true"/>
+    <feature k_fullName="irAdminTags.adminTags" k_value="Categories: {this.adminTags}"/>
+    <feature k_fullName="irAdminTags.prefix" k_value=""/>
+    <feature k_fullName="irCreated" k_value="false"/>
+    <feature k_fullName="irCreated.irScreen" k_value="true"/>
+    <feature k_fullName="irCreated.createDate" k_value="Created at: {formatDate(this.createdAt, 'DD/MM/YYY')}"/>
+    <feature k_fullName="irCreated.prefix" k_value=""/>
+    <feature k_fullName="irCreatedBy" k_value="false"/>
+    <feature k_fullName="irCreatedBy.irScreen" k_value="true"/>
+    <feature k_fullName="irCreatedBy.irCreatedBy" k_value="Created by: {this.userScreenName}"/>
+    <feature k_fullName="irCreatedBy.prefix" k_value=""/>
   </featuresData>
   <screenAssets>
     <player ratio="4:3"/>
@@ -174,13 +228,13 @@
     </theme>
   </visual>
   <playerProperties>
-    <width>400</width>
+    <width>740</width>
     <height>330</height>
     <theme>dark</theme>
   </playerProperties>
   <uiVars>
     <var key="video.mantainAspectRatio" value="true"/>
-    <var key="playlistAPI.autoContinue" value="false"/>
+    <var key="playlistAPI.autoContinue" value="true"/>
     <var key="pictureDefaultDuration" value="2"/>
     <var key="autoPlay" value="false"/>
     <var key="mute" value="false"/>
