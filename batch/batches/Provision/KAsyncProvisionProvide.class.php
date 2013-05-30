@@ -55,7 +55,26 @@ class KAsyncProvisionProvide extends KJobHandlerWorker
 		}
 		
 		KalturaLog::info( "Using engine: " . $engine->getName() );
-	
+
+		$hops = $this->taskConfig->params->hops;
+		$encoderIP = kIpAddressUtils::tracerouteIP($data->encoderIP, $hops);
+		if (!$encoderIP)
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Unable to perform traceroute to primary IP", KalturaBatchJobStatus::FAILED);
+		if ($encoderIP != $data->encoderIP)
+		{
+			$data->encoderIP = $encoderIP;
+			$this->updateJob($job, "traceroute IP replacing non-reachable original IP" , KalturaBatchJobStatus::QUEUED, $data);
+		}	
+		
+		$backupEncoderIP = kIpAddressUtils::tracerouteIP($data->backupEncoderIP, $hops);
+		if (!$backupEncoderIP)
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Unable to perform traceroute to backup IP", KalturaBatchJobStatus::FAILED);
+		if ($backupEncoderIP != $data->encoderIP)
+		{
+			$data->backupEncoderIP = $backupEncoderIP;
+			$this->updateJob($job, "traceroute IP replacing non-reachable original IP" , KalturaBatchJobStatus::QUEUED, $data);
+		}
+		
 		$results = $engine->provide($job, $data);
 
 		if($results->status == KalturaBatchJobStatus::FINISHED)
