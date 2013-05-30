@@ -39,14 +39,22 @@
 	
 	//Get the generated clients summary
 	$root = myContentStorage::getFSContentRootPath();
-	$summaryData = file_get_contents("$root/content/clientlibs/summary.kinf");
-	$summary = unserialize($summaryData);
-	$schemaGenDate = $summary['generatedDate'];
-	$apiVersion = $summary['apiVersion'];
 	
+	$summary = array();
+	$schemaGenDate = '';
+	$apiVersion = '';
 	
-	unset($summary['generatedDate']);
-	unset($summary['apiVersion']);
+	if(file_exists("$root/content/clientlibs/summary.kinf"))
+	{
+		$summaryData = file_get_contents("$root/content/clientlibs/summary.kinf");
+		$summary = unserialize($summaryData);
+		
+		$schemaGenDate = $summary['generatedDate'];
+		$apiVersion = $summary['apiVersion'];
+		
+		unset($summary['generatedDate']);
+		unset($summary['apiVersion']);
+	}
 ?>
 	<?php
 	if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
