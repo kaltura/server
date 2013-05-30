@@ -27,11 +27,12 @@ class DistributionProfileListAction extends KalturaApplicationPlugin implements 
 	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
+		$filter = new Kaltura_Client_Type_PartnerFilter();
+		
 		$filterInput = $request->getParam('filter_input');
 		if(!strlen($filterInput))
-			return null;
+			return $filter;
 			
-		$filter = new Kaltura_Client_Type_PartnerFilter();
 		$filterType = $request->getParam('filter_type');
 		if ($filterType == 'byid')
 		{
