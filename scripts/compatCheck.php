@@ -280,11 +280,29 @@ function printStringDiff($string1, $string2)
 	}
 }
 
+function stripInvalidUtf8Chars($value)
+{
+	$regex = <<<'END'
+/
+  (
+    (?: [\x00-\x7F]                 # single-byte sequences   0xxxxxxx
+    |   [\xC0-\xDF][\x80-\xBF]      # double-byte sequences   110xxxxx 10xxxxxx
+    |   [\xE0-\xEF][\x80-\xBF]{2}   # triple-byte sequences   1110xxxx 10xxxxxx * 2
+    |   [\xF0-\xF7][\x80-\xBF]{3}   # quadruple-byte sequence 11110xxx 10xxxxxx * 3
+    ){1,100}                        # ...one or more times
+  )
+| .                                 # anything else
+/x
+END;
+	return preg_replace($regex, '$1', $value);
+	
+}
+
 function xmlToArray($xmlstring)
 {
 	// fix the xml if it's invalid
 	$origstring = $xmlstring;
-	$xmlstring = @iconv('utf-8', 'utf-8', $xmlstring);
+	$xmlstring = stripInvalidUtf8Chars($xmlstring);
 	$xmlstring = stripXMLInvalidChars($xmlstring);
 	$xmlstring = str_replace('&', '&amp;', $xmlstring);
 	$xmlstring = str_replace(array('&amp;#', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&#', '&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
@@ -522,9 +540,19 @@ function compareResults($resultNew, $resultOld)
 	$resultNew = xmlToArray($resultNew);
 	$resultOld = xmlToArray($resultOld);
 
-	if (!$resultNew || !$resultOld)
+	if (!$resultNew && !$resultOld)
 	{
-		return array('failed to parse XMLs');
+		return array('failed to parse both XMLs');
+	}
+	
+	if (!$resultNew)
+	{
+		return array('failed to parse new XML');
+	}
+	
+	if (!$resultOld)
+	{
+		return array('failed to parse old XML');
 	}
 	
 	return compareArrays($resultNew, $resultOld, "");
