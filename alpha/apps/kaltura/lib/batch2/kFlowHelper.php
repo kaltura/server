@@ -1505,6 +1505,11 @@ class kFlowHelper
 		foreach($entryIds as $entryId)
 		{
 			$entry = entryPeer::retrieveByPK($entryId);
+			if ($entry->getType() != entryType::MEDIA_CLIP || ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_AUDIO && $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO))
+			{
+				continue;
+			}
+			
 			if (is_null($entry))
 			{
 				KalturaLog::err("Entry id [$entryId] not found.");
@@ -1627,7 +1632,12 @@ class kFlowHelper
 			$entry = entryPeer::retrieveByPK($entryId);
 			if (is_null($entry))
 				continue;
-
+			if ($entry->getType() != entryType::MEDIA_CLIP)
+			{
+				KalturaLog::info("This entry cannot be downloaded $entryId");
+				continue;
+			}
+			
 			$link = $entry->getDownloadAssetUrl($flavorParamsId);
 
 			if (is_null($link))
