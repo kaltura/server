@@ -15,6 +15,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	protected $hostName;
 	protected $port;
 	protected $flags = 0;
+	protected $persistent = false;
 
 	protected $memcache = null;
 	protected $gotError = false;
@@ -34,6 +35,8 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 		$this->port = $config['port'];
 		if (isset($config['flags']) && $config['flags'] == self::COMPRESSED)
 			$this->flags = MEMCACHE_COMPRESSED;
+		if (isset($config['persistent']) && $config['persistent'])
+			$this->persistent = true;
 		
 		return $this->reconnect();
 	}
@@ -61,7 +64,10 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 			//$memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
 
 			$curConnStart = microtime(true);
-			$connectResult = @$memcache->connect($this->hostName, $this->port);
+			if ($this->persistent)
+				$connectResult = @$memcache->pconnect($this->hostName, $this->port);
+			else 
+				$connectResult = @$memcache->connect($this->hostName, $this->port);			
 			if ($connectResult || microtime(true) - $curConnStart < .5)		// retry only if there's an error and it's a timeout error
 				break;
 
