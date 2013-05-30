@@ -3,7 +3,7 @@
  * @package server-infra
  * @subpackage request
  */
-include(__DIR__ . "/../vendor/IP2Location/IP2Location.inc.php");
+include(__DIR__ . "/../../vendor/IP2Location/IP2Location.inc.php");
 
 /**
  * @package server-infra
@@ -32,18 +32,14 @@ class kIP2Location
 		ini_set('memory_limit', '128M'); // ip_files are large array files, sometimes it might break if doesn't have enough memory
 		$country = "";
 		$numbers = preg_split( '/\./', $ip);
-		$ipFile = "ip_files/".$numbers[0].".php";
+		$ipFile = __DIR__ . "/../../vendor/IP2Location/ip_files/".$numbers[0].".php";
 		
-	    $includePaths = explode(PATH_SEPARATOR, ini_get('include_path'));
 		$included = false;
 		$ranges = array();
-		foreach($includePaths as $includePath)
+		if(file_exists($ipFile))
 		{
-			if(file_exists("$includePath/$ipFile"))
-			{
-				$included = true;
-				include("$includePath/$ipFile");
-			}
+			$included = true;
+			include($ipFile);
 		}
 		if(!$included)
 			return "";
@@ -62,18 +58,14 @@ class kIP2Location
 	{
 		$country = "";
 		$numbers = preg_split( '/\./', $ip);
-		$ipFile = "ip_files/".$numbers[0].".php";
+		$ipFile = __DIR__ . "/../../vendor/IP2Location/ip_files/".$numbers[0].".php";
 		
-	    $includePaths = explode(PATH_SEPARATOR, ini_get('include_path'));
-		$included = false;
+	    $included = false;
 		$ranges = array();
-		foreach($includePaths as $includePath)
+		if(file_exists($ipFile))
 		{
-			if(file_exists("$includePath/$ipFile"))
-			{
-				$included = true;
-				include("$includePath/$ipFile");
-			}
+			$included = true;
+			include($ipFile);
 		}
 		if(!$included)
 			return "";
