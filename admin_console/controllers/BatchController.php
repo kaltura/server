@@ -637,6 +637,7 @@ class BatchController extends Zend_Controller_Action
 		}
 		catch(Exception $e){
 			$errors[] = 'Tracks not found: ' . $e->getMessage();
+			$investigateData->tracks = array();
 		}
 		
 		$filter = new Infra_BatchJobFilter();
