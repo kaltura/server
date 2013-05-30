@@ -12,6 +12,7 @@ class kCacheManager
 	const CACHE_TYPE_PERMISSION_MANAGER = 'permissionManager';
 	const CACHE_TYPE_QUERY_CACHE_KEYS = 'queryCacheKeys';
 	const CACHE_TYPE_QUERY_CACHE_QUERIES = 'queryCacheQueries';
+	const CACHE_TYPE_PS2 = 'ps2Cache';
 	const CACHE_TYPE_API_V3 = 'apiV3Cache';
 	const CACHE_TYPE_API_V3_FEED = 'apiV3Feed';
 	const CACHE_TYPE_FEED_ENTRY = 'feedEntry';

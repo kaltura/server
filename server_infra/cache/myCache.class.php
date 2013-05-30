@@ -16,98 +16,54 @@ class myCache
 	
 	private $m_namespace;
 	private $m_expiry;
-	private static $s_ready = false;
-	private static $s_memcache;
+	private $m_cache;
 
 	// if the cache will be used many times, a default expiry can be set to avoid setting evey time in the put method
 	// this is good when most objects have the same expiry time
 	public function myCache ( $namespace , $expiry = NULL )
 	{
 		$this->m_namespace = $namespace;
-		
-		if ( self::$s_memcache == NULL )
-		{
-			if (!function_exists('memcache_connect')) return;
-						
-			self::$s_memcache = new Memcache;
-			$connStart = microtime(true);
-			//self::$s_memcache->pconnect(self::SERVER, self::PORT) // this will use a persistent connection 
-			try {
-				$res = @self::$s_memcache->connect( kConf::get ( "memcache_host") , kConf::get ( "memcache_port" ) );
-			}
-			catch (Exception $e) {
-				$res = false;
-			}
-			KalturaLog::debug("myCache ($namespace): connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("memcache_host"));
-			
-			if ( !$res )
-			{
-				KalturaLog::info( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
-					kConf::get ( "memcache_host") . ":" . kConf::get ( "memcache_port" ) );
-				//throw new Exception ("Error while trying to connect to memcache. Make sure it is properly running on " . self::SERVER . ":" . self::PORT );
-			}
-			else
-			{
-				self::$s_ready = true;
-			}
-			
-//				or die ("Error while trying to connect to memcache. Make sure it is properly running on " . self::SERVER . ":" . self::PORT );
-		}
-
-		
-		if ( $expiry != null )
-		{
-			$this->m_expiry = $expiry;
-		}
+		$this->m_expiry = $expiry ? $expiry : self::DEFAULT_EXPIRY_IN_SECONDS;
+		$this->m_cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 	}
 		
 	public function put ( $obj_name , $obj , $expiry = NULL )
 	{
-		if ( ! self::$s_ready ) return;
+		if ( ! $this->m_cache ) return;
+		
 		if ($expiry == NULL  )
 		{
 			$expiry = $this->m_expiry;
-			
-			// if it is still NULL
-			if ($expiry == NULL  )
-			{
-				$expiry == self::DEFAULT_EXPIRY_IN_SECONDS;
-			}
 		}
-		
-		self::$s_memcache->set ( $this->m_namespace . $obj_name , $obj , false , $expiry );
+		$this->m_cache->set ($this->m_namespace . $obj_name , $obj , $expiry);
 	}
 	
 	public function get ( $obj_name )
 	{
-		if ( ! self::$s_ready ) return NULL ;
+		if ( ! $this->m_cache ) return NULL;
 
 		kApiCache::disableConditionalCache();
 		
-		$value = self::$s_memcache->get ( $this->m_namespace . $obj_name );
-
+		$value = $this->m_cache->get ( $this->m_namespace . $obj_name );
 		if ( !isset ( $value ) )
 		{
 			return NULL;
 		}
-		else
-		{
-			return $value;
-		}
-			
+		return $value;
 	}
 
 	public function remove ( $obj_name )
 	{
-		if ( ! self::$s_ready ) return  NULL ;
-		self::$s_memcache->delete ( $this->m_namespace . $obj_name );
+		if ( ! $this->m_cache ) return  NULL ;
+		
+		$this->m_cache->delete ( $this->m_namespace . $obj_name );
 	}
 
 	public function increment ( $obj_name , $delta = 1 )
 	{
-		if ( ! self::$s_ready ) return NULL ;
-		$new_value = self::$s_memcache->increment ( ( $this->m_namespace . $obj_name ) , $delta );
+		if ( ! $this->m_cache ) return  NULL ;
 		
+		$new_value = $this->m_cache->increment ( ( $this->m_namespace . $obj_name ) , $delta );
 		if (  $new_value == NULL )
 		{
 			// this might happen if the value was never set before
@@ -122,8 +78,9 @@ class myCache
 	// Note: New item's value will not be less than zero. 
 	public function decrement ( $obj_name , $delta = 1 )
 	{
-		if ( ! self::$s_ready ) return NULL ;
-		$new_value = self::$s_memcache->decrement ( ( $this->m_namespace . $obj_name ) , $delta );
+		if ( ! $this->m_cache ) return  NULL ;
+		
+		$new_value = $this->m_cache->decrement ( ( $this->m_namespace . $obj_name ) , $delta );
 		if ( $new_value == FALSE ) 
 		{
 			// this might happen if the value was never set before

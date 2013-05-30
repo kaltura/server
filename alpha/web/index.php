@@ -33,9 +33,8 @@ function checkCache()
 		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kPlayManifestCacher.php");
 		$cache = kPlayManifestCacher::getInstance();
 		$cache->checkOrStart();
-	}
-	
-	if(strpos($uri, "/partnerservices2") !== false)
+	}	
+	else if(strpos($uri, "/partnerservices2") !== false)
 	{
 		$params = $_GET + $_POST;
 		unset($params['ks']);
@@ -88,14 +87,12 @@ function checkCache()
 			}
 		}
 	}
-
-	if (strpos($uri, "/kwidget") !== false)	
+	else if (strpos($uri, "/kwidget") !== false)	
 	{
-		if (!function_exists('memcache_connect')) return;
-						
-		$cache = new Memcache;
-		$res = @$cache->connect("localhost", "11211");
-		if ( $res )
+		require_once(dirname(__FILE__)."/../../server_infra/cache/kCacheManager.php");
+
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
+		if ($cache)
 		{
 			// check if we cached the patched swf with flashvars
 			$uri = $protocol.$uri;
@@ -147,16 +144,14 @@ function checkCache()
 				header("Location:$cachedResponse");
 				die;
 			}
-		}
-		
+		}		
 	}
 	else if (strpos($uri, "/thumbnail") !== false)	
 	{
-		if (!function_exists('memcache_connect')) return;
-						
-		$cache = new Memcache;
-		$res = @$cache->connect("localhost", "11211");
-		if ( $res )
+		require_once(dirname(__FILE__)."/../../server_infra/cache/kCacheManager.php");
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
+		if ($cache)
 		{
 			$file_name = $cache->get("thumb$uri");
 			if ($file_name && file_exists($file_name))
@@ -198,9 +193,10 @@ function checkCache()
 	}	
 	else if (strpos($uri, "/embedIframe/") !== false)
 	{
-		$cache = new Memcache;
-		$res = @$cache->connect("localhost", "11211");
-		if ( $res )
+		require_once(dirname(__FILE__)."/../../server_infra/cache/kCacheManager.php");
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
+		if ($cache)
 		{
 			// check if we cached the patched swf with flashvars
 			$cachedResponse = $cache->get("embedIframe$uri");
