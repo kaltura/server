@@ -132,7 +132,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		Infra_ClientHelper::unimpersonate();
 		$action->view->form = $form;
 	
-			
+		$action->view->plugins = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
 		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)
