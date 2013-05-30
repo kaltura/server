@@ -150,7 +150,10 @@ class kConf extends kEnvironment
 				throw new Exception("Cannot find configuration file [$iniFile]");
 					
 			$config = new Zend_Config_Ini($iniFile);
-			$result = self::mergeConfigItem($result, $config->toArray());
+			if (!$result)
+				$result = $config->toArray();
+			else
+				$result = self::mergeConfigItem($result, $config->toArray());
 		}
 			
 		// cache the result
