@@ -1168,7 +1168,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c = new Criteria();
 
 			$c->add(FileSyncPeer::DC, $fileSync->getDc());
-			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::in);
+			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
 			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
 
