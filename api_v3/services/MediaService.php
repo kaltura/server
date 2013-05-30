@@ -96,13 +96,14 @@ class MediaService extends KalturaEntryService
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 
-
-
-    	$resource->validateEntry($dbEntry);
-    	$kResource = $resource->toObject();
-    	$this->attachResource($kResource, $dbEntry);
-
-    	$resource->entryHandled($dbEntry);
+		if($resource)
+		{
+	    	$resource->validateEntry($dbEntry);
+	    	$kResource = $resource->toObject();
+	    	$this->attachResource($kResource, $dbEntry);
+	
+	    	$resource->entryHandled($dbEntry);
+		}
 
 		return $this->getEntry($entryId);
     }
