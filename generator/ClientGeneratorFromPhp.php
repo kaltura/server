@@ -423,7 +423,9 @@ abstract class ClientGeneratorFromPhp
 				if ($reflector->isSubclassOf('KalturaObject') && $reflector->isSubclassOf($typeReflector->getType()))
 				{
 					$classTypeReflector = KalturaTypeReflectorCacher::get($class);
-					
+					if(!$classTypeReflector)
+						throw new Exception("Type [$class] reflector not found");
+						
 					$pluginName = $classTypeReflector->getPlugin();
 					if ($pluginName && !KalturaPluginManager::getPluginInstance($pluginName))
 					{
