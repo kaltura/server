@@ -3,7 +3,7 @@
  * @package server-infra
  * @subpackage request
  */
-include(__DIR__ . "/IP2Location.inc.php");
+include(__DIR__ . "/../vendor/IP2Location/IP2Location.inc.php");
 
 /**
  * @package server-infra
