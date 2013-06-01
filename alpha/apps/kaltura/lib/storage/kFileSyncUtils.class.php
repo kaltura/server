@@ -1063,15 +1063,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
 				$remote_dc_file_sync->setFileRoot ( $source_file_sync->getFileRoot() );
 				$remote_dc_file_sync->setFilePath ( $source_file_sync->getFilePath() );
-				$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
-				self::incrementLinkCountForFileSync($source_file_sync);
 			}
 			else
 			{
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
-				$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
-				self::incrementLinkCountForFileSync($source_file_sync);
 			}
+			
+			$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
+			self::incrementLinkCountForFileSync($source_file_sync);
 			$remote_dc_file_sync->setPartnerID ( $target_key->partner_id );
 			$remote_dc_file_sync->save();
 
@@ -1117,7 +1116,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(!$file)
 			return null;
 
-		if($file->getLinkedId())
+		if(in_array($file->getFileType(), array(filesync::FILE_SYNC_FILE_TYPE_LINK, filesync::FILE_SYNC_FILE_TYPE_URL)) && $file->getLinkedId())
 		{
 			$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
 		}
@@ -1168,7 +1167,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c = new Criteria();
 
 			$c->add(FileSyncPeer::DC, $fileSync->getDc());
-			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
 			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
 
