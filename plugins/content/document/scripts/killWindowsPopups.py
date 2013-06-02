@@ -1,13 +1,78 @@
-import pywintypes
+import ntsecuritycon
+import win32security
 import win32process
+import pywintypes
 import win32gui
 import win32con
 import win32api
+import ctypes
 import copy
 import time
 import sys
 
 REPORT_FILE = "c:/temp/killWindowsPopupsLog.txt"
+MONITORED_PROCESSES = ['pdfcreator.exe']
+USER_TIME_THRESHOLD_SEC = 90
+
+TH32CS_SNAPPROCESS = 0x00000002
+class PROCESSENTRY32(ctypes.Structure):
+     _fields_ = [("dwSize", ctypes.c_ulong),
+                 ("cntUsage", ctypes.c_ulong),
+                 ("th32ProcessID", ctypes.c_ulong),
+                 ("th32DefaultHeapID", ctypes.c_ulong),
+                 ("th32ModuleID", ctypes.c_ulong),
+                 ("cntThreads", ctypes.c_ulong),
+                 ("th32ParentProcessID", ctypes.c_ulong),
+                 ("pcPriClassBase", ctypes.c_ulong),
+                 ("dwFlags", ctypes.c_ulong),
+                 ("szExeFile", ctypes.c_char * 260)]
+
+def getProcessList():
+     # See http://msdn2.microsoft.com/en-us/library/ms686701.aspx
+     CreateToolhelp32Snapshot = ctypes.windll.kernel32.\
+                                CreateToolhelp32Snapshot
+     Process32First = ctypes.windll.kernel32.Process32First
+     Process32Next = ctypes.windll.kernel32.Process32Next
+     CloseHandle = ctypes.windll.kernel32.CloseHandle
+     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+     pe32 = PROCESSENTRY32()
+     pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
+     if Process32First(hProcessSnap,
+                       ctypes.byref(pe32)) == win32con.FALSE:
+         print "%s Failed getting first process" % time.ctime()
+         return
+     while True:
+         yield (pe32.szExeFile, pe32.th32ProcessID)
+         if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
+             break
+     CloseHandle(hProcessSnap)
+
+def adjustPrivilege(priv, enable = True):
+    flags = ntsecuritycon.TOKEN_ADJUST_PRIVILEGES | ntsecuritycon.TOKEN_QUERY
+    htoken = win32security.OpenProcessToken(win32api.GetCurrentProcess(), flags)
+    id = win32security.LookupPrivilegeValue(None, priv)
+    if enable:
+        newPrivileges = [(id, ntsecuritycon.SE_PRIVILEGE_ENABLED)]
+    else:
+        newPrivileges = [(id, 0)]
+    win32security.AdjustTokenPrivileges(htoken, 0, newPrivileges)
+    win32api.CloseHandle(htoken)
+
+def runProcessesCycle():
+    for (exeName, processId) in getProcessList():
+        if not exeName.lower() in MONITORED_PROCESSES:
+            continue
+            
+        handle = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_TERMINATE, 0, processId)
+        if not handle:
+            continue
+            
+        userTimeSec = win32process.GetProcessTimes(handle)['UserTime'] / 10000000
+        if userTimeSec > USER_TIME_THRESHOLD_SEC:
+            print '%s Killing process %s, pid=%s userTimeSec=%s' % (time.ctime(), exeName, processId, userTimeSec)
+            win32api.TerminateProcess(handle, 0)
+            
+        win32api.CloseHandle(handle)
 
 class WindowFinder:
     def __init__(self, matchStr):
@@ -79,8 +144,8 @@ def logResult(resultStr):
         f.write(str)
         f.write("\n")
     f.close()
-	
-def runCycle():
+
+def runWindowsCycle():
     for matchStr, resultIdx, subMatchStr, action in CONFIG:
         finder = WindowFinder(matchStr)
         finder.findWindow()
@@ -92,7 +157,7 @@ def runCycle():
             resultIdx = -1
             
         results = map(lambda x: x[resultIdx], finder.results)
-		
+
         logResult(finder.resultStr)
 
         if action[0] == ET_WINDOW_MESSAGE:
@@ -131,10 +196,10 @@ def runCycle():
 
 def safeRunCycle():
     try:
-        runCycle()
+        runWindowsCycle()
     except pywintypes.error:
         pass
-
+    runProcessesCycle()
 
 ET_WINDOW_MESSAGE = 1
 ET_KILL_PROCESS = 2
@@ -194,7 +259,7 @@ CONFIG = [
     ('text:Microsoft Excel/text:Verify that the file is not corrupted and is from a trusted source before opening the file.',  0, None, (ET_KILL_PROCESS,)),         # Office 2010
 
     ('text:OpenOffice.org 3.3,class:SALFRAME',                              0, None, (ET_PRESS_KEY, 'y')),
-	
+
     ('text:OpenOffice.org 3.3,class:SALFRAME',                              0, None, (ET_WINDOW_MESSAGE, win32con.WM_ACTIVATE, 0x1, 0x0)),
     ('text:OpenOffice.org 3.3,class:SALFRAME',                              0, None, (ET_POST_WINDOW_MESSAGE, win32con.WM_CHAR, 0x1b, 0x10001)),		# press esc
     ('text:OpenOffice.org 3.3,class:SALSUBFRAME',    						0, None, (ET_PRESS_KEY, 'y')),
@@ -221,7 +286,7 @@ CONFIG = [
     
     # Read only file
     ('text:Microsoft Word/text:should be opened as read-only unless changes to it need to be saved', 0, None,(ET_PUSH_BUTTON, 'text:Yes,class:Button')),   
-	
+
 	#curropted file
 	('text:Microsoft Word/text:The file appears to be corrupted', 0, None,(ET_KILL_PROCESS,)),  
 	('text:(Protected View) - Microsoft Word/class:OPH Previewer Window', 0, None,(ET_KILL_PROCESS,)),  
@@ -231,6 +296,8 @@ CONFIG = [
 ]
 
 if __name__ == '__main__':
+    adjustPrivilege(ntsecuritycon.SE_DEBUG_NAME)
+
     _, iterCount, sleepTime = sys.argv
     if iterCount == 'infinite':
         while True:
