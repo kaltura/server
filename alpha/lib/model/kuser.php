@@ -176,7 +176,7 @@ class kuser extends Basekuser implements IIndexable
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
 		
-		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->getIsAccountOwner() && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
+		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->getIsAccountOwner() && isset($this->oldColumnsValues[kuserPeer::EMAIL]) && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
 			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
 		}
 
