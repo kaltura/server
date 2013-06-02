@@ -45,7 +45,7 @@ class KalturaResponseCacher extends kApiCache
 		unset($this->_params['clientTag']);
 		unset($this->_params['callback']);
 		
-		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
+		$this->_params['___cache___uri'] = $_SERVER['SCRIPT_NAME'];
 
 		// extract any baseEntry.getContentData referrer parameters
 		$contextDataObjectType = 'contextDataParams:objectType';
