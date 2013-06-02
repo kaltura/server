@@ -13,6 +13,8 @@ abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 		"userIdEqual" => "_eq_user_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"fileNameEqual" => "_eq_file_name",
+		"fileSizeEqual" => "_eq_file_size",
 	);
 
 	static private $order_by_map = array
@@ -55,4 +57,14 @@ abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * @var string
+	 */
+	public $fileNameEqual;
+
+	/**
+	 * @var float
+	 */
+	public $fileSizeEqual;
 }

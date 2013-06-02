@@ -40,6 +40,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * Name of the file for the upload token, can be empty when the upload token is created and will be updated internally after the file is uploaded
 	 * @var string
 	 * @insertonly
+	 * @filter eq
 	 */
 	public $fileName;
 	
@@ -47,6 +48,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 * File size in bytes, can be empty when the upload token is created and will be updated internally after the file is uploaded
 	 * @var float
 	 * @insertonly
+	 * @filter eq
 	 */
 	public $fileSize;
 	
