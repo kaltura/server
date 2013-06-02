@@ -37,6 +37,7 @@
 				<isAdmin>1</isAdmin>
 				<allowedPartnerIds>*</allowedPartnerIds>
 				<roleIds>{1:result:id}</roleIds>
+				<fullName>Kaltura Administrator</fullName>
 			</user>
 		</request>
 	</multirequest>
