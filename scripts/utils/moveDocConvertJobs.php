@@ -105,6 +105,7 @@ foreach ($jobLocks as $jobLock)
 	
 	// update batch job
 	$srcFileSync->setFileSyncLocalPath($sourceFileSyncs[$targetDc]->getFullPath());
+	$srcFileSync->setFileSyncRemoteUrl($sourceFileSyncs[$targetDc]->getExternalUrl($sourceAsset->getEntryId()));
 	$jobData->setSrcFileSyncs(array($srcFileSync));
 	$job->setData($jobData);
 	$job->setDc($targetDc);
