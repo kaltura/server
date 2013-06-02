@@ -109,13 +109,11 @@ foreach ($jobLocks as $jobLock)
 	$jobData->setSrcFileSyncs(array($srcFileSync));
 	$job->setData($jobData);
 	$job->setDc($targetDc);
+	$job->save();
 	
 	// update batch job lock
 	$jobLock->setStatus($jobStatus);
 	$jobLock->setDc($targetDc);
-
-	// save
-	$job->save();
 	$jobLock->save();
 	
 	echo 'Moved job '.$job->getId()."\n";
