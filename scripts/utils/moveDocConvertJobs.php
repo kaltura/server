@@ -55,6 +55,7 @@ function lockJob($object)
 	if ( $affectedRows != 1 )
 		return false;
 	
+	// update $object with what is in the database
 	$object->setVersion($lock_version + 1);
 	$object->setStatus(TEMP_JOB_STATUS);
 	return true;
