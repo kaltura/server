@@ -781,7 +781,7 @@ HTML;
     	                $replaceValue = $replaceValue->$getter();
     	            }
     	            
-    	            if(is_null($replaceValue))
+    	            if(!$replaceValue)
     	            	continue;
     	            
     	            if (is_numeric($replaceValue) || is_string($replaceValue))
