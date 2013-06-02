@@ -45,29 +45,5 @@ class addbulkuploadAction extends defPartnerservices2Action
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
 		die("This action is no longer supported");
-		$fileField = "csv_file";
-		$profileId = $this->getP ( "profile_id" );
-
-		if (count($_FILES) == 0)
-		{
-			$this->addError(APIErrors::NO_FILES_RECEIVED);
-			return;
-		}
-		
-		if (!@$_FILES[$fileField]) 
-		{
-			$this->addError(APIErrors::INVALID_FILE_FIELD, $fileField);
-			return;
-		}
-				
-		// first we copy the file to "content/batchfiles/[partner_id]/"
-		$fileName = $_FILES[$fileField]['name'];
-		$filePath = $_FILES[$fileField]['tmp_name'];
-			
-		$kuser = kuser::getKuserById($puser_kuser->getKuserId());
-		$partner = PartnerPeer::retrieveByPK($partner_id);
-		
-		// no way it's still working, the method arguments changed
-		kJobsManager::addBulkUploadJob($filePath, $fileName, $partner, $kuser->getPuserId(), $kuser->getPuserId(), $profileId);
 	}
 }
