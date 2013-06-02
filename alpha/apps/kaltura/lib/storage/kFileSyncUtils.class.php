@@ -1116,7 +1116,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(!$file)
 			return null;
 
-		if(in_array($file->getFileType(), array(filesync::FILE_SYNC_FILE_TYPE_LINK, filesync::FILE_SYNC_FILE_TYPE_URL)) && $file->getLinkedId())
+		if($file->getLinkedId())
 		{
 			$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
 		}
@@ -1153,7 +1153,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @return void
 	 */
-	public static function convertLinksToFiles(FileSyncKey $key)
+	protected static function convertLinksToFiles(FileSyncKey $key)
 	{
 		// fetch sources from all DCs
 		$c = new Criteria();
@@ -1167,7 +1167,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c = new Criteria();
 
 			$c->add(FileSyncPeer::DC, $fileSync->getDc());
-			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_LINK);
+			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
 			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
 
@@ -1186,7 +1186,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					$firstLink->setFileSize($fileSync->getFileSize());
 					$firstLink->setFileRoot($fileSync->getFileRoot());
 					$firstLink->setFilePath($fileSync->getFilePath());
-					$firstLink->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+					$firstLink->setFileType($fileSync->getFileType());
 					$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 					$firstLink->setLinkCount(count($links));
 					$firstLink->save();
