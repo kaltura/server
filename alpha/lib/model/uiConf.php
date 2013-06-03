@@ -10,6 +10,8 @@
  */
 class uiConf extends BaseuiConf implements ISyncableFile
 {
+	const MYSQL_CODE_DUPLICATE_KEY = 23000;
+	
 	const UI_CONF_TYPE_GENERIC = 0;
 	const UI_CONF_TYPE_WIDGET = 1;
 	const UI_CONF_TYPE_CW = 2;
@@ -106,8 +108,22 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	public function save(PropelPDO $con = null, $isClone = false)
 	{
 		$this->validateConfFilesExistance();
-
-		$res = parent::save( $con );
+			
+		try
+		{
+			$res = parent::save( $con );
+		}
+		catch (PropelException $e)
+		{
+			/**
+			 * Because many ui-conf objects have hard-coded id, the auto-incremented id of new ui-conf could exist in the db.
+			 * Just retry to save the ui-conf with a different auto-inceremented id.
+			 */
+			
+			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+				$res = parent::save( $con );
+		}
+		
 		if($this->should_call_set_data_content2 || $this->should_call_set_data_content)
 		{
 			$confFile = $this->getConfFile();
