@@ -122,7 +122,7 @@ class Tag extends BaseTag implements IIndexable
 	 */
 	public function decrementInstanceCount ()
 	{
-	    $this->setInstanceCount($this->getInstanceCount() - 1);
+	    $this->setInstanceCount(max(array (intval($this->getInstanceCount() - 1), 0)));
 	    $this->save();
 	}
 	
