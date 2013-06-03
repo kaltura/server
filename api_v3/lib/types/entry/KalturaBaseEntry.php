@@ -78,7 +78,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Categories with no entitlement that this entry belongs to.
 	 * 
 	 * @var string
-	 * @filter matchand, matchor
+	 * @filter matchand, matchor, notcontains
 	 * @requiresPermission insert,update
 	 */
 	public $categories;
@@ -87,7 +87,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Categories Ids of categories with no entitlement that this entry belongs to
 	 * 
 	 * @var string
-	 * @filter matchand, matchor
+	 * @filter matchand, matchor, notcontains
 	 * @requiresPermission insert,update
 	 */
 	public $categoriesIds;
