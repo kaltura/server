@@ -1350,15 +1350,6 @@ define	service{
 		use								local-service
 		host_name						@KALTURA_VIRTUAL_HOST_NAME@
 		servicegroups					kaltura-play
-		service_description				Kaltura Play HD Network SMIL
-		check_command					kaltura-play-hdnetworksmil
-		notifications_enabled			1
-}
-
-define	service{
-		use								local-service
-		host_name						@KALTURA_VIRTUAL_HOST_NAME@
-		servicegroups					kaltura-play
 		service_description				Kaltura Play HTTP
 		check_command					kaltura-play-http
 		notifications_enabled			1
