@@ -18,7 +18,7 @@
 	</session>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>8</objType>
+			<objType>1</objType>
 			<name>Player with captions</name>
 			<width>560</width>
 			<height>395</height>
@@ -33,7 +33,7 @@
 	</request>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>8</objType>
+			<objType>1</objType>
 			<name>Hovering controllers player</name>
 			<width>560</width>
 			<height>315</height>
@@ -48,7 +48,7 @@
 	</request>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>8</objType>
+			<objType>1</objType>
 			<name>Widescreen player</name>
 			<width>460</width>
 			<height>290</height>
@@ -63,7 +63,7 @@
 	</request>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>5</objType>
+			<objType>1</objType>
 			<name>Multiple vertical playlist</name>
 			<width>525</width>
 			<height>665</height>
@@ -106,7 +106,7 @@
 	</request>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>5</objType>
+			<objType>8</objType>
 			<name>Widescreen playlist player - dark skin, minimal - with live support</name>
 			<width>740</width>
 			<height>255</height>
@@ -134,7 +134,7 @@
 	</request>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>5</objType>
+			<objType>8</objType>
 			<name>Widescreen playlist player - dark skin, minimal</name>
 			<width>740</width>
 			<height>255</height>
@@ -149,7 +149,7 @@
 	</request>
 	<request service="uiConf" action="add">
 		<uiConf objectType="KalturaUiConf">
-			<objType>8</objType>
+			<objType>1</objType>
 			<name>Player with no share button</name>
 			<width>560</width>
 			<height>395</height>
