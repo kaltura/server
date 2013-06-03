@@ -14,6 +14,9 @@ class KalturaXmlSerializer
 	
 	function getSerializedData($object)
 	{
+		if (function_exists('kaltura_serialize_xml'))
+			return kaltura_serialize_xml($object, $this->_ignoreNull);
+		
 		ob_start();
 		$this->serialize($object);
 		$result = ob_get_contents();
