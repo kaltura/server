@@ -10,7 +10,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "access_control", 					'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
 	array('table' => "permission", 						'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "kuser_to_user_role",	 			'keys' => array(array("'kuserToUserRole:kuserId='", '@OBJ@.kuser_id'))),
-	array('table' => "category", 						'keys' => array(array("'category:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "category", 						'keys' => array(array("'category:id='", '@OBJ@.id'), array("'category:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "file_sync", 						'keys' => array(array("'fileSync:id='", '@OBJ@.id'), array("'fileSync:objectId='", '@OBJ@.object_id'))),
 	array('table' => "media_info", 						'keys' => array(array("'mediaInfo:flavorAssetId='", '@OBJ@.flavor_asset_id'))),
 	array('table' => "storage_profile", 				'keys' => array(array("'storageProfile:id='", '@OBJ@.id'), array("'storageProfile:partnerId='", '@OBJ@.partner_id'))),
