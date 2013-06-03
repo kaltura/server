@@ -828,17 +828,30 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return new SphinxCriterion($this, $column, $value, $comparison);
 	}
 	
-	private function getAllCriterionFields($criterion)
+	static private function addCriterionField(&$criterionFields, $field, $comparisons)
+	{
+		if (!isset($criterionFields[$field]))
+			$criterionFields[$field] = array();
+		$criterionFields[$field] = array_unique(array_merge($criterionFields[$field], $comparisons));
+	}
+	
+	static private function getAllCriterionFields($criterions)
 	{
 		$criterionFields = array();
-		if(!($criterion instanceof SphinxCriterion))
-				return $criterionFields;
 		
-		$criterionFields[] = $criterion->getTable() . '.' . $criterion->getColumn();
+		foreach ($criterions as $criterion)
+		{
+			if(!($criterion instanceof SphinxCriterion))
+				continue;
 		
-		$clauses = $criterion->getClauses();
-		foreach($clauses as $clause)
-			$criterionFields = array_merge($criterionFields, $this->getAllCriterionFields($clauses));
+			self::addCriterionField($criterionFields, $criterion->getTable() . '.' . $criterion->getColumn(), array($criterion->getComparison()));
+				
+			$clausesFields = self::getAllCriterionFields($criterion->getClauses());			
+			foreach ($clausesFields as $field => $fieldComparisons)
+			{
+				self::addCriterionField($criterionFields, $field, $fieldComparisons);
+			}
+		}
 		
 		return $criterionFields;
 	}
@@ -891,10 +904,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if (!$hasSkipField)
 			return false;
 		
-		$fields = array();
-		
-		foreach($this->getMap() as $criterion)
-			$fields = array_merge($fields, $this->getAllCriterionFields($criterion));
+		$fields = self::getAllCriterionFields($this->getMap());
 		
 		foreach ($this->getOrderByColumns() as $orderByColumn)
 		{
@@ -909,11 +919,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$explodedColumn = explode('<>', $orderByColumn);
 			$orderByColumn = $explodedColumn[0];
 			
-			$fields[] = $orderByColumn;
+			self::addCriterionField($fields, $orderByColumn, array(Criteria::GREATER_THAN));		// treat the order by comparison as >
 		}
-		$fields = array_unique($fields);
 								
-		foreach($fields as $field)
+		foreach($fields as $field => $comparisons)
 		{	
 			$fieldName = $this->getSphinxFieldName($field);
 
@@ -926,9 +935,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				KalturaLog::debug('Peer does not have the field [' . print_r($field,true) .']');
 				return false;
 			}
-			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING)
+			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING && 
+					array_diff($comparisons, array(Criteria::EQUAL, Criteria::IN)))
 			{
-				KalturaLog::debug('Field is textual [' . print_r($fieldName,true) .']');
+				KalturaLog::debug('Field is textual [' . print_r($fieldName,true) .'] and using comparisons [' . implode(',', $comparisons), ']');
 				return false;
 			}
 		}
