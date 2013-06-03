@@ -15,6 +15,7 @@ export PATH
 
 # Get a sane screen width
 [ -z "${COLUMNS:-}" ] && COLUMNS=80
+CONSOLETYPE="pty"
 
 [ -z "${CONSOLETYPE:-}" ] && CONSOLETYPE="$(/sbin/consoletype)"
 
