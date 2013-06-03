@@ -687,16 +687,12 @@ class KalturaSyndicationFeedRenderer
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 		
-		$this->protocol = PlaybackProtocol::HTTP;
-		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId, $this->protocol);
+		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId);
 		
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
 		$urlManager->setDomain($this->cdnHost);
 		$url = $urlManager->getAssetUrl($flavorAsset);
-		$url = $this->cdnHost . $url;
-		$url = preg_replace('/^https?:\/\//', '', $url);
-			
-		return $this->protocol . '://' . $url;
+		return $this->cdnHost . $url;
 	}
 	
 	private function getSpacesForLevel($level)

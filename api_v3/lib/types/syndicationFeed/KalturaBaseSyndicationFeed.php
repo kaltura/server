@@ -205,7 +205,7 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 		parent::fromObject($source_object);
 		if(isset($this->id) && $this->id)
 		{
-			$this->feedUrl = 'http://' . kConf::get('www_host') . '/api_v3/getFeed.php';
+			$this->feedUrl = kConf::get('apphome_url') . '/api_v3/getFeed.php';
 			
 			if($this->partnerId)
 				$this->feedUrl .= '?partnerId=' . $this->partnerId . '&';
