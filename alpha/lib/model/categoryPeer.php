@@ -307,7 +307,7 @@ class categoryPeer extends BasecategoryPeer
 
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("category:partnerId=%s", self::PARTNER_ID));		
+		return array(array("category:id=%s", self::ID), array("category:partnerId=%s", self::PARTNER_ID));		
 	}
 	
 	/**
