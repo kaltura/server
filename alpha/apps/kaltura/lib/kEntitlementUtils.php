@@ -301,13 +301,15 @@ class kEntitlementUtils
 		$entryPrivacy = null;
 		$categories = array();
 		
-		if (count($entry->getAllCategoriesIds(true)))
+		$allCategoriesIds = $entry->getAllCategoriesIds(true);
+		if (count($allCategoriesIds))
 		{
 			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-			$c->add(categoryPeer::ID, $entry->getAllCategoriesIds(true), Criteria::IN);
+			$c->add(categoryPeer::ID, $allCategoriesIds, Criteria::IN);
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-			
+			$c->dontCount();
+						
 			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 			$categories = categoryPeer::doSelect($c);
 			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
