@@ -72,7 +72,8 @@ $fltStr = null;
 			else if($vid->_rotation==270 || $vid->_rotation==-90)
 				$fltStr.=" -vf transpose=2";
 		}
-		if(isset($vid->_letterBox) && $vid->_letterBox==true){
+			// Letterboxing 
+		if(isset($vid->_arProcessingMode) && $vid->_arProcessingMode==2){
 			if(!isset($fltStr)) 
 				$fltStr =" -vf ";
 			else
