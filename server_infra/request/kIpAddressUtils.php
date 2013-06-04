@@ -112,35 +112,4 @@ class kIpAddressUtils
 		self::$isInternalIp = false;
 		return false;				
 	}
-	
-	/**
- 	 * @param string $ip
-	 */
-	public static function tracerouteIP ($ip, $hops = null)
-	{
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') 
-		{
-			$execStatement = "tracert " . ($hops ? "-h $hops " : "") . $ip;
-			$regex = '/[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/';
-		}
-		elseif (PHP_OS == 'Linux') 
-		{
-			$execStatement = "traceroute " . ($hops ? "-m $hops " : "") . $ip;
-			$regex = '/[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/';
-		}
-		@exec($execStatement, $output, $return);
-		if ($return)
-			return false;
-		$output = array_reverse($output);
-		KalturaLog::info("traceroute output: " . print_r($output, true));
-		foreach ($output as $line)
-		{
-			if(preg_match($regex, $line, $matches))
-			{
-				return $matches[0];
-			}
-		}
-		
-		return false;
-	}
 }
