@@ -709,27 +709,54 @@ $plannedDur = 0;
 			 * Scale down the source to match inside the flavor params 
 			 * predefined frame size while keeping source the aspect ratio
 			 */
-		else if(isset($target->_arProcessingMode) && $target->_arProcessingMode==1){
+		else if(isset($target->_arProcessingMode) && $target->_arProcessingMode>0){
 			$darTrgFrame = $target->_width/$target->_height;
+				/*
+				 * AR Mode - Match the both dims frame size & preserve AR mode 
+				 */
+			if($target->_arProcessingMode==1){
 				/*
 				 * The target AR is wider than the source
 				 */
-			if($darTrgFrame>$darSrcFrame){
-				$target->_width = $target->_height*$darSrcFrame;
-				if($shrinkToSource && $target->_width>$widSrc) {
-					$target->_height = $hgtSrc;
-					$target->_width  = $widSrc;
+				if($darTrgFrame>$darSrcFrame){
+					$target->_width = $target->_height*$darSrcFrame;
+					if($shrinkToSource && $target->_width>$widSrc) {
+						$target->_height = $hgtSrc;
+						$target->_width  = $widSrc;
+					}
 				}
-			}
 				/*
 				 * The target AR is narrower than the source
 				 */
-			else {
-				$target->_height = $target->_width/$darSrcFrame;
-				if($shrinkToSource && $target->_height>$hgtSrc) {
-					$target->_height = $hgtSrc;
-					$target->_width  = $widSrc;
+				else {
+					$target->_height = $target->_width/$darSrcFrame;
+					if($shrinkToSource && $target->_height>$hgtSrc) {
+						$target->_height = $hgtSrc;
+						$target->_width  = $widSrc;
+					}
 				}
+			}
+				/*
+				 * AR Mode - letter boxing
+				 */
+			else if($target->_arProcessingMode==2){
+				/*
+				 * The target AR is wider than the source
+				 */
+				if($shrinkToSource){
+					if($darTrgFrame>$darSrcFrame){
+						$target->_height = $hgtSrc;
+						$target->_width = $target->_height*$darTrgFrame;
+					}
+					/*
+					 * The target AR is narrower than the source
+					 */
+					else {
+						$target->_width  = $widSrc;
+						$target->_height = $target->_width/$darTrgFrame;
+					}
+				}
+				$target->_letterBox=true;
 			}
 		}
 			/*
