@@ -191,7 +191,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	{
 	    KalturaLog::info("In Object Added handler");
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
-	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 	    if (!count($objectTags))
 	    {
 	        return;
@@ -282,7 +281,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    {
 	        return;
 	    }
-	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 		$c = self::getTagObjectsByTagStringsCriteria($objectTags,  self::getObjectTypeByClassName($objectClass), $partnerId);
 		if (!is_null($privacyContexts))
 		{

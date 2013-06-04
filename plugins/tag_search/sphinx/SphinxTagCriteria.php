@@ -120,6 +120,7 @@ class SphinxTagCriteria extends SphinxCriteria
 	public function translateSphinxCriterion(SphinxCriterion $crit)
 	{
 		$field = $crit->getTable() . '.' . $crit->getColumn();
+		$value = $crit->getValue();
 		
 		$fieldName = null;
 		if ($field == TagPeer::OBJECT_TYPE)
@@ -135,12 +136,14 @@ class SphinxTagCriteria extends SphinxCriteria
 			else
 				$partnerId = kCurrentContext::getCurrentPartnerId();
 			
-			return array(
-					$field,
-					$crit->getComparison(),
-					Tag::getIndexedFieldValue($fieldName, $crit->getValue(), $partnerId));
+			$value = Tag::getIndexedFieldValue($fieldName, $value, $partnerId);
 		}
 		
-		return parent::translateSphinxCriterion($crit);
+		if ($field == TagPeer::TAG && in_array($crit->getComparison(), array(Criteria::EQUAL, Criteria::IN)))
+		{
+			$value = str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $value);
+		}
+
+		return array($field, $crit->getComparison(), $value);
 	}
 }
