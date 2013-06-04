@@ -244,7 +244,28 @@ $vidObj = $target->_video;
 			if($vidObj->_width!=null && $vidObj->_height!=null){
 				$videoCodec->Streams->StreamInfo['Size'] = $vidObj->_width.", ".$vidObj->_height;
 			}
-			
+
+ 				/*
+				 * For anamorphic pixels - update aspect ratio
+				 */
+ 			if(isset($vidObj->_anamorphic) && $vidObj->_anamorphic>0 
+			&& isset($vidObj->_dar) && $vidObj->_dar>0) { 		
+ 				if(abs(1-(16/9)/$vidObj->_dar)<0.1) {
+					$videoCodec['AspectRatio'] = "16,9";
+				}
+				else if(abs(1-(4/3)/$vidObj->_dar)<0.1) {
+					$videoCodec['AspectRatio'] = "4,3";
+				}
+				else if(abs(1-(5/4)/$vidObj->_dar)<0.1) {
+					$videoCodec['AspectRatio'] = "5,4";
+				}
+				else {
+					$w=round($vidObj->_height*$vidObj->_dar);
+					$videoCodec['AspectRatio'] = "$w,$vidObj->_height";
+				}
+			}
+
+ 
 //			$strmInfo = clone ($vidProfile->Streams->StreamInfo[0]);
 			KDLUtils::AddXMLElement($videoProfileElem->VideoProfile, $videoCodec);
 			
@@ -330,7 +351,8 @@ $contObj = $target->_container;
 			}
 			$jobElem = new SimpleXMLElement(self::jobXml);
 			$vidObj=$target->_video;
-			if(isset($vidObj) && isset($vidObj->_letterBox) && $vidObj->_letterBox==true){
+			// Letterboxing
+			if(isset($vidObj) && isset($vidObj->_arProcessingMode) && $vidObj->_arProcessingMode==2){
 				$jobElem->MediaFile['VideoResizeMode'] = 'Letterbox';
 			}
 			$outputFormat=$jobElem->MediaFile->OutputFormat->addChild($formatName);
