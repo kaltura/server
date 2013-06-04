@@ -311,6 +311,7 @@
 		const InvalidDuration = 1105;
 		const PackageMovOnly = 1106;
 		const DnxhdUnsupportedParams = 1107;
+		const InvalidRequest = 1108;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -345,6 +346,9 @@
 					break;
 				case self::DnxhdUnsupportedParams:
 					$str = $err."#Following params set is not supported by DNXHD video codec ($param1).";
+					break;
+				case self::InvalidRequest:
+					$str = $err."#Invalid request ($param1).";
 					break;
 				case self::Other:
 				default:
