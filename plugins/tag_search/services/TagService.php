@@ -154,7 +154,7 @@ class TagService extends KalturaBaseService
 		$pcToDecrementArray = explode(',', $pcToDecrement);
 		$c = KalturaCriteria::create(TagPeer::OM_CLASS);
 		$c->add(TagPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
-		$c->add(TagPeer::PRIVACY_CONTEXT, Tag::getIndexedFieldValue("TagPeer::PRIVACY_CONTEXT", $pcToDecrementArray, kCurrentContext::getCurrentPartnerId()), KalturaCriteria::IN);
+		$c->add(TagPeer::PRIVACY_CONTEXT, $pcToDecrementArray, KalturaCriteria::IN);
 		TagPeer::setUseCriteriaFilter(false);
 		$tagsToDecrement = TagPeer::doSelect($c);
 		TagPeer::setUseCriteriaFilter(true);	

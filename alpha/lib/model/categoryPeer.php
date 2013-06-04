@@ -197,7 +197,7 @@ class categoryPeer extends BasecategoryPeer
 			return null;
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::FULL_NAME, $fullName . category::FULL_NAME_EQUAL_MATCH_STRING, Criteria::LIKE);
+		$c->add(categoryPeer::FULL_NAME, $fullName);
 		
 		if($ignoreCategoryId)
 			$c->add(categoryPeer::ID, $ignoreCategoryId, Criteria::NOT_EQUAL);
@@ -230,15 +230,14 @@ class categoryPeer extends BasecategoryPeer
 		foreach ($fullNames as $fullName)
 		{
 			$fullName = self::getParsedFullName($fullName);
-			
 			if (trim($fullName) == '')
 				continue;
 				
-			$fullNameParsed[] = $fullName . category::FULL_NAME_EQUAL_MATCH_STRING;
+			$fullNameParsed[] = $fullName;
 		}
 		
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS); 
-		$c->add(categoryPeer::FULL_NAME, $fullNameParsed, KalturaCriteria::IN_LIKE);
+		$c->add(categoryPeer::FULL_NAME, $fullNameParsed, KalturaCriteria::IN);
 
 		return categoryPeer::doSelect($c);
 	}

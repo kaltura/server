@@ -414,7 +414,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		
 		return parent::applyFilterFields($filter);
 	}
-
+	
 	public function hasSphinxFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
@@ -493,7 +493,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 
 	public function getSkipFields()
 	{
-		return array(categoryPeer::ID);
+		return array(categoryPeer::ID, categoryPeer::FULL_NAME);
 	}
 	
 	public function hasPeerFieldName($fieldName)
@@ -517,5 +517,26 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	public function getSphinxConditionsToKeep()
 	{
 		return array(categoryPeer::PARTNER_ID);
+	}
+
+	public function translateSphinxCriterion(SphinxCriterion $crit)
+	{
+		$field = $crit->getTable() . '.' . $crit->getColumn();
+		if ($field == categoryPeer::FULL_NAME && $crit->getComparison() == Criteria::EQUAL)
+		{
+			return array(
+					categoryPeer::FULL_NAME, 
+					Criteria::LIKE, 
+					$crit->getValue() . category::FULL_NAME_EQUAL_MATCH_STRING);
+		}		
+		else if ($field == categoryPeer::FULL_NAME && $crit->getComparison() == Criteria::IN)
+		{
+			return array(
+					categoryPeer::FULL_NAME, 
+					Criteria::IN_LIKE, 
+					kString::addSuffixToArray($crit->getValue(), category::FULL_NAME_EQUAL_MATCH_STRING));
+		}
+
+		return parent::translateSphinxCriterion($crit);
 	}
 }

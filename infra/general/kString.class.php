@@ -413,4 +413,11 @@ class kString
 			$postfix = self::getCommonPostfixBase($postfix, $curString);
 		}
 	}
+	
+	public static function addSuffixToArray(array $strings, $suffix)
+	{
+		foreach ($strings as &$value)
+			$value .= $suffix;
+		return $strings;		
+	}
 }

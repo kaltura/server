@@ -1033,4 +1033,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		return null;	
 	}
+
+	public function translateSphinxCriterion(SphinxCriterion $crit)
+	{
+		return array(
+				$crit->getTable() . '.' . $crit->getColumn(),
+				$crit->getComparison(),
+				$crit->getValue());
+	}
 }

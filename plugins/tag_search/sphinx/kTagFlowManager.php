@@ -201,11 +201,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		if (is_null($privacyContexts))
 		{
 			if (count($privacyContexts))
-				$c->addAnd(TagPeer::PRIVACY_CONTEXT, Tag::getIndexedFieldValue("TagPeer::PRIVACY_CONTEXT", $privacyContexts, $partnerId), Criteria::IN);
+				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
 			}
 		else
 		{
-			$c->addAnd(TagPeer::PRIVACY_CONTEXT, Tag::getIndexedFieldValue("TagPeer::PRIVACY_CONTEXT", self::NULL_PC, $partnerId));
+			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
 		}
 	    $c->applyFilters();
 	    
@@ -287,11 +287,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		if (!is_null($privacyContexts))
 		{
 			if (count($privacyContexts))
-				$c->addAnd(TagPeer::PRIVACY_CONTEXT, Tag::getIndexedFieldValue("TagPeer::PRIVACY_CONTEXT", $privacyContexts, $partnerId), Criteria::IN);
+				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
 		}
 		else
 		{
-			$c->addAnd(TagPeer::PRIVACY_CONTEXT, Tag::getIndexedFieldValue("TagPeer::PRIVACY_CONTEXT", self::NULL_PC, $partnerId));
+			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
 		}
 		TagPeer::setUseCriteriaFilter(false);
 		$tagsToDecrement = TagPeer::doSelect($c);
@@ -360,7 +360,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    $c = KalturaCriteria::create(TagPeer::OM_CLASS);
 	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
 	    $c->addAnd(TagPeer::PARTNER_ID, $partnerId, KalturaCriteria::EQUAL);
-	    $c->addAnd(TagPeer::OBJECT_TYPE, Tag::getIndexedFieldValue("TagPeer::OBJECT_TYPE", $objectType, $partnerId), KalturaCriteria::EQUAL);
+	    $c->addAnd(TagPeer::OBJECT_TYPE, $objectType, KalturaCriteria::EQUAL);
 	    return $c;
 	}
 	

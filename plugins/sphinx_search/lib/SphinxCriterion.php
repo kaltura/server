@@ -259,12 +259,11 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	{
 		$this->currentQuery = $query;
 		
-		$field = $this->getTable() . '.' . $this->getColumn();
+		list($field, $comparison, $value) = $this->criteria->translateSphinxCriterion($this);
 		
 		// Can apply criterion
 		KalturaLog::debug("Applies criterion [$field]");
 	
-		$comparison = $this->getComparison();
 		if($comparison == Criteria::CUSTOM || $comparison == Criteria::CUSTOM_EQUAL || $comparison == Criteria::ISNOTNULL)
 		{
 			KalturaLog::debug("Skip criterion[$field] unhandled comparison [$comparison]");
@@ -276,9 +275,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			KalturaLog::debug("Skip criterion[$field] has no sphinx field");
 			return false;
 		}
-		
-		$value = $this->getValue();
-		
+				
 		$sphinxField	= $this->criteria->getSphinxFieldName($field);
 		$type			= $this->criteria->getSphinxFieldType($sphinxField);
 		
