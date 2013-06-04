@@ -1159,8 +1159,6 @@ class myPartnerUtils
  	
  	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner, $dontCopyUsers = false)
  	{
- 		kEventsManager::enableDeferredEvents(false);
- 		
  		$partnerCustomDataArray = $fromPartner->getCustomDataObj()->toArray();
  		$excludeCustomDataFields = kConf::get('template_partner_custom_data_exclude_fields');
  		foreach($partnerCustomDataArray as $customDataName => $customDataValue)
@@ -1187,8 +1185,6 @@ class myPartnerUtils
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
- 		
- 		kEventsManager::enableDeferredEvents(true);
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
