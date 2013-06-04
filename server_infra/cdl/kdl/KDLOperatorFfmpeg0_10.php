@@ -63,15 +63,25 @@ $nullDev ="/dev/null";
 			return $cmdStr;
 
 $vid = $target->_video;
+$fltStr = null;
 		if(isset($vid->_rotation)) {
 			if($vid->_rotation==180)
-				$cmdStr.= " -vf vflip,hflip";
+				$fltStr.= " -vf vflip,hflip";
 			else if($vid->_rotation==90)
-				$cmdStr.= " -vf transpose=1";
+				$fltStr.= " -vf transpose=1";
 			else if($vid->_rotation==270 || $vid->_rotation==-90)
-				$cmdStr.=" -vf transpose=2";
+				$fltStr.=" -vf transpose=2";
 		}
-
+		if(isset($vid->_letterBox) && $vid->_letterBox==true){
+			if(!isset($fltStr)) 
+				$fltStr =" -vf ";
+			else
+				$fltStr.=",";
+			$fltStr.='"scale=iw*sar*min('.$vid->_width.'/(iw*sar)\,';
+			$fltStr.=$vid->_height.'/ih):ih*min('.$vid->_width.'/(iw*sar)\,';
+			$fltStr.=$vid->_height.'/ih),pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2"';
+		}
+		$cmdStr.= $fltStr;
 		return $cmdStr;
 	}
 
@@ -165,7 +175,7 @@ $paramsStr = null;
 
 		if(!isset($target->_video))
 			return false;
-			
+		
 			/*
 			 * HD codecs (prores & dnxhd) can be packaged only in MOV
 			 */
