@@ -737,7 +737,7 @@ $plannedDur = 0;
 				}
 			}
 				/*
-				 * AR Mode - letter boxing
+				 * AR Mode - letterboxing
 				 */
 			else if($target->_arProcessingMode==2){
 				/*
@@ -756,7 +756,6 @@ $plannedDur = 0;
 						$target->_height = $target->_width/$darTrgFrame;
 					}
 				}
-				$target->_letterBox=true;
 			}
 		}
 			/*
@@ -778,7 +777,7 @@ $plannedDur = 0;
 		 * For anamorphic pixels - set the width to match the required PAR 
 		 * and adjsut the target DAR.
 		 */
-		if(isset($target->_anamorphic) && $target->_anamorphic!=0 && $target->_anamorphic!=1){
+		if(isset($target->_anamorphic) && $target->_anamorphic!=0){
 			$dar = $target->_width/$target->_height;
 			if(abs($dar-$target->_anamorphic)>0.2) {
 				$w=$target->_height*$target->_anamorphic;
