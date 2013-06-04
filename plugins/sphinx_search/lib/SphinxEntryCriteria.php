@@ -79,7 +79,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::TOTAL_RANK => 'total_rank',
 		entryPeer::PLAYS => 'plays',
 		'entry.PARTNER_SORT_VALUE' => 'partner_sort_value',
-		'entry.WEIGHT' => '@weight',
+		'entry.WEIGHT' => SphinxCriteria::WEIGHT,
 		
 		entryPeer::CREATED_AT => 'created_at',
 		entryPeer::UPDATED_AT => 'updated_at',

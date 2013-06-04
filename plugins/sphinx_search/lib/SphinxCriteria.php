@@ -7,6 +7,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 {
 	const RANKER_NONE = 'none';
 	const RANKER_SPH04 = 'sph04';
+	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
 	
 	/**
@@ -516,6 +517,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				if(isset($replace[$orderField]))
 				{
+					if($replace[$orderField] == self::WEIGHT) {
+						$replace[$orderField] = "w";
+						$conditions .= ",weight() as w";
+					}
+					
 					KalturaLog::debug("Add sort field[$orderField] copy from [$orderByColumn]");
 					$orders[] = str_replace($search, $replace, $orderByColumn);
 				}
@@ -554,7 +560,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$this->ranker = self::RANKER_NONE;
-		if (strpos($orderBy, '@weight') !== false)
+		if (strpos($orderBy, self::WEIGHT) !== false)
 		{
 			$this->ranker = self::RANKER_SPH04;
 		}
