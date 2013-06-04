@@ -64,6 +64,8 @@ class KalturaEntryResource extends KalturaContentResource
 			$object_to_fill = new kFileSyncResource();
 			
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
+    	if(!$srcEntry)
+    		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
     	
     	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{
@@ -76,10 +78,19 @@ class KalturaEntryResource extends KalturaContentResource
     	
     	$srcFlavorAsset = null;
     	if(is_null($this->flavorParamsId))
+    	{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
+	    	if(!$srcFlavorAsset)
+	    		throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
+    	}
 		else
+		{
 			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
-			
+	    	if(!$srcFlavorAsset)
+	    		throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $this->flavorParamsId);
+		}
+		
+    		
 		$object_to_fill->setFileSyncObjectType(FileSyncObjectType::FLAVOR_ASSET);
 		$object_to_fill->setObjectSubType(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$object_to_fill->setObjectId($srcFlavorAsset->getId());
