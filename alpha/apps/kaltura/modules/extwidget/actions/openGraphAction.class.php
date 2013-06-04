@@ -32,7 +32,7 @@ class openGraphAction extends sfAction
 			die();
 		}
 		
-		$widgetPath = "/kwidget/wid/$widgetId/entry_id/$entryId/ui_conf/$uiConfId"; 
+		$widgetPath = "/kwidget/wid/$widgetId/entry_id/$entryId/uiconf_id/$uiConfId"; 
 		
 		$this->widget = $widget;
 		$this->entry = $entry; 
