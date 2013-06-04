@@ -43,7 +43,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		}
 			
 		if($this->_id==KDLTranscoders::FFMPEG) {
-			$transcoder = new KDLOperatorFfmpeg0_10($this->_id);
+			$transcoder = new KDLOperatorFfmpeg1_1_1($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
@@ -72,7 +72,23 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "non square pixels");
 			return true;
 		}
-					
+		
+		/*
+		 * Prevent invalid copy attempts, that might erronously end up with 'false-positive' result
+		 */
+		if((isset($target->_video) && $target->_video->_id==KDLVideoTarget::COPY)
+		|| (isset($target->_audio) && $target->_audio->_id==KDLAudioTarget::COPY)){
+			if($target->_container->_id==KDLContainerTarget::FLV){
+				$rvArr=$source->ToTags(array("web"));
+				if(count($rvArr)==0){
+					$errStr = "Copy to Target format:FLV, Source:".$source->ToString();
+					$target->_errors[KDLConstants::ContainerIndex][] = 
+						KDLErrors::ToString(KDLErrors::InvalidRequest, $errStr);
+					return true;
+				}
+			}
+		}
+		
 		return false;	
 	}
 }
@@ -130,7 +146,7 @@ class KDLTranscoderCommand {
 	 */
 	public function FFMpeg($extra=null)
 	{
-		$transcoder = new KDLOperatorFfmpeg0_10(KDLTranscoders::FFMPEG); 
+		$transcoder = new KDLOperatorFfmpeg1_1_1(KDLTranscoders::FFMPEG); 
 		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
