@@ -13,9 +13,7 @@ const jobXml = '<?xml version="1.0"?>
     OutputDirectory="C:\Tmp\Prod"
     DefaultMediaOutputFileName="{OriginalFilename}" CreateSubfolder="False" />
   <MediaFile
-    VideoResizeMode="Letterbox"
-	ThumbnailCodec="Jpeg" 
-    ThumbnailMode="Custom">
+    VideoResizeMode="Stretch">
     <OutputFormat>
     </OutputFormat>
   </MediaFile>
@@ -81,6 +79,32 @@ const h264CodecXml = '<?xml version="1.0"?>
 		</StreamInfo>
 	</Streams>
 </MainH264VideoProfile>';
+
+const h264hCodecXml = '<?xml version="1.0"?>
+<HighH264VideoProfile
+	SmoothStreaming="False"
+	BFrameCount="1"
+	EntropyMode="Cabac"
+	RDOptimization="False"
+	KeyFrameDistance="00:00:05"
+	InLoopFilter="True"
+	MEPartitionLevel="EightByEight"
+	NumberOfReferenceFrames="4"
+	SearchRange="32"
+	AutoFit="False"
+	Force16Pixels="False"
+	Complexity="Normal"
+	FrameRate="0"
+	SeparateFilesPerStream="True"
+	NumberOfEncoderThreads="0">
+	<Streams
+		AutoSize="True"
+		FreezeSort="False">
+		<StreamInfo
+			Size="640, 480">
+		</StreamInfo>
+	</Streams>
+</HighH264VideoProfile>';
 
 const audioBitrateXml = '<Bitrate>
 	<ConstantBitrate
@@ -160,8 +184,12 @@ $vidObj = $target->_video;
 				case KDLVideoTarget::H264:
 				case KDLVideoTarget::H264B:
 				case KDLVideoTarget::H264M:
-				case KDLVideoTarget::H264H:				
 					$videoCodec = new SimpleXMLElement(self::h264CodecXml);
+					$fileFormat = 'mp4';
+					$cbr = 1;
+					break;
+				case KDLVideoTarget::H264H:				
+					$videoCodec = new SimpleXMLElement(self::h264hCodecXml);
 					$fileFormat = 'mp4';
 					$cbr = 1;
 					break;
@@ -301,6 +329,10 @@ $contObj = $target->_container;
 					break;
 			}
 			$jobElem = new SimpleXMLElement(self::jobXml);
+			$vidObj=$target->_video;
+			if(isset($vidObj) && isset($vidObj->_letterBox) && $vidObj->_letterBox==true){
+				$jobElem->MediaFile['VideoResizeMode'] = 'Letterbox';
+			}
 			$outputFormat=$jobElem->MediaFile->OutputFormat->addChild($formatName);
 		}
 		
@@ -470,8 +502,10 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 				break;
 			case KDLVideoTarget::H264:
 			case KDLVideoTarget::H264M:
-			case KDLVideoTarget::H264H:
 				$videoCodec = $videoProfile->MainH264VideoProfile;
+				break;
+			case KDLVideoTarget::H264H:
+				$videoCodec = $videoProfile->HighH264VideoProfile;
 				break;
 			case KDLVideoTarget::H264B:
 				//					$videoCodec = $videoProfile->BaselineH264VideoProfile;
