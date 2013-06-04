@@ -41,6 +41,7 @@ class kFileTransferMgrException extends Exception
 	const localFileNotExists = 4; // local file not found (when uploading a file)
 	const remotePathNotValid = 5; // remote file / path string is not valid
 	const remoteFileExists   = 6; // trying to putFile that already exists with $overwrite == false
+	const extensionMissing   = 7; // php extension is not installed
 	const otherError         = 99; // other - exception's getMessage() will provide more details
 }
 

@@ -12,6 +12,9 @@ class scpMgr extends kFileTransferMgr
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
+		if(!function_exists('ssh2_connect'))
+			throw new kFileTransferMgrException("SSH2 extension is not installed.", kFileTransferMgrException::extensionMissing);
+	
 		parent::__construct($options);
 	}
 	
