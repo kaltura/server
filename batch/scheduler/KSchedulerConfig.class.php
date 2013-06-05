@@ -89,25 +89,59 @@ class KSchedulerConfig extends Zend_Config_Ini
 	/* (non-PHPdoc)
 	 * @see Zend_Config_Ini::_loadIniFile()
 	 */
-	protected function _loadIniFile($filename)
-	{
-        $iniArray = parent::_loadIniFile($filename);
-        
-        foreach($iniArray as $extensionName => $extension)
+    protected function _loadIniFile($filename)
+    {
+        set_error_handler(array($this, '_loadFileErrorHandler'));
+        $loaded = parse_ini_file($filename, true); // Warnings and errors are suppressed
+        restore_error_handler();
+        // Check if there was a error while loading file
+        if ($this->_loadFileErrorStr !== null) {
+            /**
+             * @see Zend_Config_Exception
+             */
+            require_once 'Zend/Config/Exception.php';
+            throw new Zend_Config_Exception($this->_loadFileErrorStr);
+        }
+    
+        foreach($loaded as $extensionName => $extension)
         {
         	if(strpos($extensionName, self::EXTENSION_SEPARATOR) === false)
         		continue;
         		
         	list($section, $extensionSufix) = explode(self::EXTENSION_SEPARATOR, $extensionName, 2);
-        	if(!isset($iniArray[$section]))
+        	if(!isset($loaded[$section]))
         		throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
         		
-        	$iniArray[$section] = kConf::mergeConfigItem($iniArray[$section], $extension, false, false);
-        	unset($iniArray[$extensionName]);
+        	$loaded[$section] = kConf::mergeConfigItem($loaded[$section], $extension, false, false);
+        	unset($loaded[$extensionName]);
         }
         
+        $iniArray = array();
+        foreach ($loaded as $key => $data)
+        {
+            $pieces = explode($this->_sectionSeparator, $key);
+            $thisSection = trim($pieces[0]);
+            switch (count($pieces)) {
+                case 1:
+                    $iniArray[$thisSection] = $data;
+                    break;
+
+                case 2:
+                    $extendedSection = trim($pieces[1]);
+                    $iniArray[$thisSection] = array_merge(array(';extends'=>$extendedSection), $data);
+                    break;
+
+                default:
+                    /**
+                     * @see Zend_Config_Exception
+                     */
+                    require_once 'Zend/Config/Exception.php';
+                    throw new Zend_Config_Exception("Section '$thisSection' may not extend multiple sections in $filename");
+            }
+        }
+
         return $iniArray;
-	}
+    }
 
 	static public function getHostname()
 	{
