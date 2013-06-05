@@ -38,8 +38,8 @@ class WidevineDrmService extends KalturaBaseService
 				return WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::WIDEVINE_ASSET_ID_CANNOT_BE_NULL, 0);
 			}
 			$wvAssetId = $requestParams[WidevineLicenseProxyUtils::ASSETID];
-			
-			$this->validateLicenseRequest($flavorAssetId, $wvAssetId);
+			$referrer = $requestParams["referrer"];
+			$this->validateLicenseRequest($flavorAssetId, $wvAssetId, $referrer);
 			$response = WidevineLicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges(), kCurrentContext::$ks_object->isAdmin());
 		}
 		catch(KalturaWidevineLicenseProxyException $e)
@@ -57,7 +57,7 @@ class WidevineDrmService extends KalturaBaseService
 		return $response;
 	}
 	
-	private function validateLicenseRequest($flavorAssetId, $wvAssetId)
+	private function validateLicenseRequest($flavorAssetId, $wvAssetId, $referrer64base)
 	{
 		if(!$flavorAssetId)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::FLAVOR_ASSET_ID_CANNOT_BE_NULL);
@@ -74,14 +74,17 @@ class WidevineDrmService extends KalturaBaseService
 		if(!$entry)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::FLAVOR_ASSET_ID_NOT_FOUND);
 			
-		$this->validateAccessControl($entry, $flavorAsset);		
+		$this->validateAccessControl($entry, $flavorAsset, $referrer64base);		
 	}
 	
-	private function validateAccessControl(entry $entry, flavorAsset $flavorAsset)
+	private function validateAccessControl(entry $entry, flavorAsset $flavorAsset, $referrer64base)
 	{
 		KalturaLog::debug("Validating access control");
 		
-		$secureEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::PLAY);
+		$referrer = base64_decode(str_replace(" ", "+", $referrer64base));
+		if (!is_string($referrer))
+			$referrer = ""; // base64_decode can return binary data		
+		$secureEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, $referrer, accessControlContextType::PLAY);
 		if(!$secureEntryHelper->isKsAdmin())
 		{
 			if(!$entry->isScheduledNow())
