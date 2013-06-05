@@ -100,7 +100,6 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{	
-		KalturaLog::debug('base class: '.$baseClass.' enum: '.$enumValue);		
 		if($baseClass == 'KalturaFlavorParams' && $enumValue == WidevinePlugin::getAssetTypeCoreValue(WidevineAssetType::WIDEVINE_FLAVOR))
 			return 'KalturaWidevineFlavorParams';
 	
