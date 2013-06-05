@@ -148,7 +148,7 @@ class category extends Basecategory implements IIndexable
 		if ($this->isColumnModified(categoryPeer::KUSER_ID))
 			$kuserChanged = true;
 
-		if ($this->isColumnModified(categoryPeer::PRIVACY) && $this->getPrivacy() == PrivacyType::MEMBERS_ONLY)
+		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY) && $this->getPrivacy() == PrivacyType::MEMBERS_ONLY)
 		{
 			$this->removeNonMemberKusers ();
 		}
