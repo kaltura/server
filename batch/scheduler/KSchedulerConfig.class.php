@@ -6,7 +6,7 @@
 
 class KSchedulerConfig extends Zend_Config_Ini
 {
-    const SECTION_SEPARATOR = ':';
+    const EXTENSION_SEPARATOR = '-';
 
 	/**
 	 * @var host name as initiated by self::getHostname()
@@ -84,6 +84,29 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 			$this->taskConfigList[$workerName] = $task;
 	  	}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Zend_Config_Ini::_loadIniFile()
+	 */
+	protected function _loadIniFile($filename)
+	{
+        $iniArray = parent::_loadIniFile($filename);
+        
+        foreach($iniArray as $extensionName => $extension)
+        {
+        	if(strpos($extensionName, self::EXTENSION_SEPARATOR) === false)
+        		continue;
+        		
+        	list($section, $extensionSufix) = explode(self::EXTENSION_SEPARATOR, $extensionName, 2);
+        	if(!isset($iniArray[$section]))
+        		throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
+        		
+        	$iniArray[$section] = kConf::mergeConfigItem($iniArray[$section], $extension, false, false);
+        	unset($iniArray[$extensionName]);
+        }
+        
+        return $iniArray;
 	}
 
 	static public function getHostname()

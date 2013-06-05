@@ -247,7 +247,7 @@ class kConf extends kEnvironment
 	 * @param bool $overwrite
 	 * @return array
 	 */
-	protected static function mergeConfigItem(array $srcConfig, array $newConfig, $valuesOnly = false, $overwrite = true)
+	public static function mergeConfigItem(array $srcConfig, array $newConfig, $valuesOnly = false, $overwrite = true)
 	{
 		$returnedConfig = $srcConfig;
 		
