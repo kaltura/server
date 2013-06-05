@@ -217,6 +217,12 @@ class kUploadTokenMgr
 		
 		// get the upload path
 		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+
+		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
+		// the original file name that was passed to the uploadToken
+		if ($extension === "")
+			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
+
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
 		kFile::fullMkdir($uploadFilePath, 0700);
