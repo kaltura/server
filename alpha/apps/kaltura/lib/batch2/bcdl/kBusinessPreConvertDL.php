@@ -1260,7 +1260,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$errDescription = null;
 			$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
-				
+		
 			if(!$sourceFlavorOutput)
 			{
 				if(!$errDescription)
@@ -1273,70 +1273,74 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
 				return false;
 			}
-			
+		}
+		else {
+			/*
+			 * Check wethere there is a need for an intermediate source pre-processing
+			 */
+		}
+		
 			/*
 			 * '_passthrough' controls whether the source is to be 'passthrough' although there 
 			 * is a source flavor that contains transcoder settings.
 			 * Looks for a '_passthrough' flag on the source's flavor params output.
 			 */
-			if($sourceFlavorOutput->_passthrough==false) 
-			{
-				// save flavor params
-				$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
-				$sourceFlavorOutput->setEntryId($entryId);
-				$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
-				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
-				$sourceFlavorOutput->save();
-					
-				if($errDescription)
-					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
-						
-				$errDescription = kBusinessConvertDL::parseFlavorDescription($sourceFlavorOutput);
-				if($errDescription)
-					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+		if($sourceFlavorOutput->_passthrough==true)
+			return true;
+		
+		// save flavor params
+		$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
+		$sourceFlavorOutput->setEntryId($entryId);
+		$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
+		$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
+		$sourceFlavorOutput->save();
 			
-				// decided by the business logic layer
-				if($sourceFlavorOutput->_create_anyway)
-				{
-					KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] selected to be created anyway");
-				}
-				else
-				{
-					if(!$sourceFlavorOutput->IsValid())
-					{
-						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
-						$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-						$originalFlavorAsset->save();
-						
-						$errDescription = "Source flavor could not be converted";
-						self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
-						
-						return false;
-					}
-						
-					if($sourceFlavorOutput->_force)
-						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is forced");
-					elseif($sourceFlavorOutput->_isNonComply)
-						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
-					else
-						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
-				}
-						
-	//			$originalFlavorAsset->incrementVersion();
-				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
-				$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
-				$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
+		if($errDescription)
+			$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+				
+		$errDescription = kBusinessConvertDL::parseFlavorDescription($sourceFlavorOutput);
+		if($errDescription)
+			$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+	
+		// decided by the business logic layer
+		if($sourceFlavorOutput->_create_anyway)
+		{
+			KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] selected to be created anyway");
+		}
+		else
+		{
+			if(!$sourceFlavorOutput->IsValid())
+			{
+				KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
+				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 				$originalFlavorAsset->save();
-					
-				// save flavor params
-				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
-				$sourceFlavorOutput->save();
-					
-				kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfo->getId(), $parentJob);
+				
+				$errDescription = "Source flavor could not be converted";
+				self::setError($errDescription, $convertProfileJob, BatchJobType::CONVERT_PROFILE, $convertProfileJob->getEntryId());
+				
 				return false;
 			}
+				
+			if($sourceFlavorOutput->_force)
+				KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is forced");
+			elseif($sourceFlavorOutput->_isNonComply)
+				KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
+			else
+				KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
 		}
-		return true;
+				
+//			$originalFlavorAsset->incrementVersion();
+		$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
+		$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
+		$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
+		$originalFlavorAsset->save();
+			
+		// save flavor params
+		$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
+		$sourceFlavorOutput->save();
+			
+		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfo->getId(), $parentJob);
+		return false;
 	}
 
 	private static function setError($errDescription, BatchJob $batchJob, $batchJobType, $entryId)
