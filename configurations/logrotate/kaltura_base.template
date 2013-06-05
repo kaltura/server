@@ -6,10 +6,6 @@
  compress
  dateext
  notifempty
- sharedscripts
- postrotate
- service @APACHE_SERVICE@ restart
- endscript
 }
 
 @LOG_DIR@/kaltura_monit.log {
