@@ -82,8 +82,6 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	protected function doCloseOperation()
 	{
-		$this->impersonate($this->job->partnerId);
-		$entry = $this->client->baseEntry->get($this->job->entryId);
 		$wvJobId = $this->getWvPackagerJobId();		
 		KalturaLog::debug('start Widevine package closer for WV job: '.$wvJobId);
 		$requestXmlObj = new SimpleXMLElement('<PackageQuery/>');
@@ -95,6 +93,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->message = "Package status: ".$response->getStatus();
 		if($response->isSuccess())
 		{
+			$this->impersonate($this->job->partnerId);			
 			$this->updateFlavorAsset($response->getAssetid());
 			$this->unimpersonate();
 			return true;
@@ -102,7 +101,6 @@ class KWidevineOperationEngine extends KOperationEngine
 		else 
 		{
 			$this->handleResponseError($response);
-			$this->unimpersonate();			
 			return false;
 		}		
 	}
