@@ -16,8 +16,8 @@ inputfile=
 media=
 showui=0
 PCAudio=0
-;[UI]
-video=1
+[UI]
+;video=1
 chat=0
 qa=0
 notes=0
@@ -26,8 +26,8 @@ ft=0
 largeroutline=1
 [__webexTargetFormat__]
 outputfile=
-width=																			
-height=
+;width=																			
+;height=
 ;videocodec options: 
 ;  Windows Media Video 9 
 ;  Windows Media Video 9 Screen
