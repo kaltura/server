@@ -216,6 +216,11 @@ class LiveStreamService extends KalturaEntryService
 			$jobData->populateFromEntry($dbEntry);
 			kJobsManager::addProvisionProvideJob(null, $dbEntry, $jobData);
 		}
+		else
+		{
+			$dbEntry->setStatus(entryStatus::READY);
+			$dbEntry->save();
+		}
  			
 		return $dbEntry;
 	}	
