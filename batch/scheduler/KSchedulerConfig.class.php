@@ -6,7 +6,7 @@
 
 class KSchedulerConfig extends Zend_Config_Ini
 {
-    const EXTENSION_SEPARATOR = '-';
+    const EXTENSION_SEPARATOR = '@';
 
 	/**
 	 * @var host name as initiated by self::getHostname()
@@ -103,17 +103,14 @@ class KSchedulerConfig extends Zend_Config_Ini
             throw new Zend_Config_Exception($this->_loadFileErrorStr);
         }
     
+        $extensions = array();
         foreach($loaded as $extensionName => $extension)
         {
-        	if(strpos($extensionName, self::EXTENSION_SEPARATOR) === false)
-        		continue;
-        		
-        	list($section, $extensionSufix) = explode(self::EXTENSION_SEPARATOR, $extensionName, 2);
-        	if(!isset($loaded[$section]))
-        		throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
-        		
-        	$loaded[$section] = kConf::mergeConfigItem($loaded[$section], $extension, false, false);
-        	unset($loaded[$extensionName]);
+        	if(strpos($extensionName, self::EXTENSION_SEPARATOR) > 0)
+        	{
+        		$extensions[$extensionName] = $extension;
+        		unset($loaded[$extensionName]);
+        	}
         }
         
         $iniArray = array();
@@ -139,8 +136,22 @@ class KSchedulerConfig extends Zend_Config_Ini
                     throw new Zend_Config_Exception("Section '$thisSection' may not extend multiple sections in $filename");
             }
         }
+    
+        foreach($extensions as $extensionName => $extension)
+        {
+        	list($section, $extensionSufix) = explode(self::EXTENSION_SEPARATOR, $extensionName, 2);
+        	if(!isset($iniArray[$section]))
+        		throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
+        		
+        	$iniArray[$section] = kConf::mergeConfigItem($iniArray[$section], $extension, false, false);
+        }
 
         return $iniArray;
+    }
+
+	static public function setHostname($hostname)
+	{
+		self::$hostname = $hostname;
     }
 
 	static public function getHostname()
