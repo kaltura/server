@@ -73,27 +73,40 @@ class kJobsManager
 	
 	public static function abortDbBatchJob(BatchJob $dbBatchJob, $force = false)
 	{
-		
-		if(!$force && in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
-			return $dbBatchJob;
-			
-		$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED); 
-		
-		// if not currently locked
-		$dbBatchJobLock = $dbBatchJob->getBatchJobLock();
-		
-		if(!$dbBatchJobLock || !$dbBatchJobLock->getSchedulerId())
-		{
-			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ABORTED);
+		// No need to abort finished job
+		if(in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList())) {
+			return;
 		}
-		else
-		{
+		
+		$lockObject = $dbBatchJob->getBatchJobLock();
+		
+		// Update status 
+		$con = Propel::getConnection();
+		$update = new Criteria();
+		$update->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_ABORTED);
+		$update->add(BatchJobLockPeer::VERSION, $lockObject->getVersion() + 1);
+		
+		$updateCondition = new Criteria();
+		$updateCondition->add(BatchJobLockPeer::ID, $lockObject->getId(), Criteria::EQUAL);
+		$updateCondition->add(BatchJobLockPeer::VERSION, $lockObject->getVersion(), Criteria::EQUAL);
+		$updateCondition->add(BatchJobLockPeer::SCHEDULER_ID, null, Criteria::ISNULL);
+		
+		$affectedRows = BasePeer::doUpdate($updateCondition, $update, $con);
+		
+		// If currently locked by other, and we don't want to force update
+		if((!$affectedRows) && (!force)) {
+			return;
+		}
+		
+		$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
+		if($affectedRows) {
+			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ABORTED);
+		} else {
 			$dbBatchJob->save();
 		}
 		
 		// aborts all child jobs
 		self::abortChildJobs($dbBatchJob);
-			
 		return $dbBatchJob;
 	}
 	
