@@ -206,11 +206,11 @@ class LiveStreamService extends KalturaEntryService
 		$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE" );
 		TrackEntry::addTrackEntry( $te );
 		
-		$dbEntry->save();
 		//If a jobData can be created for entry sourceType, add provision job. Otherwise, just save the entry.
 		$jobData = kProvisionJobData::getInstance($dbEntry->getSource());
 		if ($jobData)
 		{
+			$dbEntry->save();
 			/* @var $data kProvisionJobData */
 			$jobData->populateFromPartner($dbEntry->getPartner());
 			$jobData->populateFromEntry($dbEntry);
