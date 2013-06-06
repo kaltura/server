@@ -740,7 +740,7 @@ class kJobsManager
 	 * @param string $customData
 	 * @return BatchJob
 	 */
-	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3, $customData=null)
+	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setPostConvertAssetType($postConvertAssetType);
@@ -749,7 +749,6 @@ class kJobsManager
 		$postConvertData->setFlavorAssetId($flavorAssetId);
 		$postConvertData->setThumbOffset($thumbOffset);
 		$postConvertData->setCreateThumb($createThumb);
-		if(isset($customData)) $postConvertData->setCustomData($customData);
 		
 		if($parentJob)
 		{

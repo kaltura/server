@@ -3,6 +3,7 @@
 class KWidevineOperationEngine extends KOperationEngine
 {
 	const PACKAGE_FILE_EXT = '.wvm';
+	const WV_JOB_ID_KEY = 'wvJobId';
 		
 	/**
 	 * @var array
@@ -63,8 +64,15 @@ class KWidevineOperationEngine extends KOperationEngine
 		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);
 		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
-		
 		$this->unimpersonate();	
+		
+		$wvJobId = new KalturaKeyValue();
+		$wvJobId->key = self::WV_JOB_ID_KEY;
+		$wvJobId->value = $response->getId();
+		if(!is_array($this->data->pluginData))
+			$this->data->pluginData = array();
+		$this->data->pluginData[] = $wvJobId;
+		
 		return false;
 	}
 	
@@ -76,11 +84,10 @@ class KWidevineOperationEngine extends KOperationEngine
 	{
 		$this->impersonate($this->job->partnerId);
 		$entry = $this->client->baseEntry->get($this->job->entryId);
-		$this->buildPackageName($entry);
-		
-		KalturaLog::debug('start Widevine package closer: '.$this->packageName);
+		$wvJobId = $this->getWvPackagerJobId();		
+		KalturaLog::debug('start Widevine package closer for WV job: '.$wvJobId);
 		$requestXmlObj = new SimpleXMLElement('<PackageQuery/>');
-		$requestXmlObj->addAttribute('name', $this->packageName);		
+		$requestXmlObj->addAttribute('id', $wvJobId);		
 		$requestXml = $requestXmlObj->asXML();
 		
 		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_QUERY_CGI, $requestXml);
@@ -240,5 +247,14 @@ class KWidevineOperationEngine extends KOperationEngine
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
 		$updatedFlavorAsset->widevineDistributionEndDate = $wvDistributionEndDate;
 		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
+	}
+	
+	private function getWvPackagerJobId()
+	{
+		$pluginData = $this->data->pluginData->toObjectsArray();
+		if(array_key_exists(self::WV_JOB_ID_KEY, $pluginData))
+			return $pluginData[self::WV_JOB_ID_KEY];
+		else
+			return null;
 	}
 }

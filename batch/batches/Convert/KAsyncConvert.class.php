@@ -210,6 +210,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			//TODO: in future remove the inFilePath parameter from operate method, the input files passed to operation
 			//engine as part of the data
 			$isDone = $this->operationEngine->operate($operator, $actualFileSyncLocalPath);
+			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
 			
 			$this->stopMonitor();
 				

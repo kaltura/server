@@ -60,6 +60,11 @@ class KalturaConvartableJobData extends KalturaJobData
 	 */
 	public $currentOperationIndex;
 	
+	/**
+	 * @var KalturaKeyValueArray
+	 */
+	public $pluginData;
+	
 	private static $map_between_objects = array
 	(
 		"srcFileSyncs",
@@ -68,6 +73,7 @@ class KalturaConvartableJobData extends KalturaJobData
 		"flavorParamsOutputId" ,
 		"currentOperationSet" ,
 		"currentOperationIndex" ,
+		"pluginData",
 	);
 
 

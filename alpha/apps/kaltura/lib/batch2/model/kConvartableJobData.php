@@ -19,11 +19,6 @@ class kConvartableJobData extends kJobData
 	 * @var int
 	 */
 	private $flavorParamsOutputId;
-
-	/**
-	 * @var string
-	 */
-	private $customData;
 		
 	/**
 	 * @var int
@@ -40,6 +35,11 @@ class kConvartableJobData extends kJobData
 	 */
 	private $currentOperationIndex = 0;
 
+	/**
+	 * @var array
+	 * key-value pair for holding plugin specific data
+	 */
+	private $pluginData;
 	
 	/**
 	 * @var flavorParamsOutput
@@ -140,22 +140,6 @@ class kConvartableJobData extends kJobData
 			return null;
 		/* @var $srcDescriptor kSourceFileSyncDescriptor */
 		return $srcDescriptor->getFileSyncRemoteUrl();
-	}
-	
-	/**
-	* @param $customData the $customData to set
-	*/
-	public function setCustomData($customData)
-	{
-		$this->customData = $customData;
-	}
-
-	/**
-	* @return the $customData
-	*/
-	public function getCustomData()
-	{
-		return $this->customData;
 	}
 
 	/**
@@ -331,6 +315,22 @@ class kConvartableJobData extends kJobData
 	public function setEngineVersion($engineVersion)
 	{
 		$this->engineVersion = $engineVersion;
+	}
+	
+	/**
+	 * @return the $pluginData
+	 */
+	public function getPluginData()
+	{
+		return $this->pluginData;
+	}
+
+	/**
+	 * @param $pluginData the $pluginData to set
+	 */
+	public function setPluginData($pluginData)
+	{
+		$this->pluginData = $pluginData;
 	}
 
 }

@@ -291,6 +291,11 @@ abstract class KOperationEngine
 		else
 			return null;
 	}
+	
+	public function getData()
+	{
+		return $this->data;
+	}
 
 }
 
