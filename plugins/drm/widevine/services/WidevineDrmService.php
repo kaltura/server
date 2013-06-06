@@ -21,10 +21,11 @@ class WidevineDrmService extends KalturaBaseService
 	 * 
 	 * @action getLicense
 	 * @param string $flavorAssetId
+	 * @param string $referrer 64base encoded  
 	 * @return string $response
 	 * 
 	 */
-	public function getLicenseAction($flavorAssetId)
+	public function getLicenseAction($flavorAssetId, $referrer = null)
 	{
 		KalturaResponseCacher::disableCache();
 		
@@ -38,9 +39,6 @@ class WidevineDrmService extends KalturaBaseService
 				return WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::WIDEVINE_ASSET_ID_CANNOT_BE_NULL, 0);
 			}
 			$wvAssetId = $requestParams[WidevineLicenseProxyUtils::ASSETID];
-			$referrer = "";
-			if(array_key_exists("referrer", $requestParams))
-				$referrer = $requestParams["referrer"];
 				
 			$this->validateLicenseRequest($flavorAssetId, $wvAssetId, $referrer);
 			$response = WidevineLicenseProxyUtils::sendLicenseRequest($requestParams, kCurrentContext::$ks_object->getPrivileges(), kCurrentContext::$ks_object->isAdmin());
