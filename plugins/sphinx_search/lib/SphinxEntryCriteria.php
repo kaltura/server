@@ -253,8 +253,8 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$categoriesIds = $filter->get("_notcontains_categories_ids");
 		if ($categoriesIds !== null)
 		{
-			$categoriesParsed = $filter->categoryIdsToIdsParsed($categoriesIds);
-			if ( $categoriesParsed !=='' || $categories =='')
+			$categoriesParsed = $filter->categoryIdsToAllSubCategoriesIdsParsed($categoriesIds);
+			if ( $categoriesParsed !=='' || $categoriesIds =='')
 				$filter->set ( "_notcontains_categories_ids", $categoriesParsed);
 			else
 		  		$filter->set ( "_notcontains_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
@@ -561,7 +561,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 	public function getFieldPrefix ($fieldName)
 	{
-		if ($fieldName == entryPeer::CATEGORIES)
+		if ($fieldName == 'categories')
 			return entry::CATEGORIES_INDEXED_FIELD_PREFIX.kCurrentContext::getCurrentPartnerId();	
 			
 		return null;
