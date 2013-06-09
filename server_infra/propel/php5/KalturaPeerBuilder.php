@@ -277,6 +277,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 			\$queryDB);
 		if (\$cachedResult !== null)
 		{
+			\$cacheKey = null;
 			".$this->getPeerClassname()."::filterSelectResults(\$cachedResult, \$criteriaForSelect);
 			".$this->getPeerClassname()."::updateInstancePool(\$cachedResult);
 			return \$cachedResult;
@@ -292,6 +293,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		if (\$cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults(\$cacheKey, \$queryResult);
+			\$cacheKey = null;
 		}
 		
 		".$this->getPeerClassname()."::filterSelectResults(\$queryResult, \$criteria);
