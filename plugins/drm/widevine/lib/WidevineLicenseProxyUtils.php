@@ -31,7 +31,7 @@ class WidevineLicenseProxyUtils
 	* @param $isAdmin - true/false, identifies if called with admin KS
 	* @return byte sequence
 	*/
-	public static function sendLicenseRequest($requestParams, $overrideParamsStr, $isAdmin)
+	public static function sendLicenseRequest($requestParams, $overrideParamsStr = null, $isAdmin = false)
 	{
 		if(	!array_key_exists(self::CLIENTID, $requestParams) ||
 			!array_key_exists(self::MK, $requestParams) ||
