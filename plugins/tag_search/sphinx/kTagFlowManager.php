@@ -224,12 +224,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    	
 	    }
 	    
-	    KalturaLog::info("Found tags ids: ".print_r($c->getFetchedIds(), true));
-	    
-	    $crit = new Criteria();
-	    $crit->addAnd(TagPeer::ID , $c->getFetchedIds(), KalturaCriteria::IN);
 	    TagPeer::setUseCriteriaFilter(false);
-	    $foundTagObjects = TagPeer::doSelect($crit);
+	    $foundTagObjects = TagPeer::doSelect($c);
 	    TagPeer::setUseCriteriaFilter(true);
 	    $foundTagsToPc = array();
 		$tagsToAdd = array();
