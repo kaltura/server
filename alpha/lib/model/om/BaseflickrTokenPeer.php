@@ -336,6 +336,7 @@ abstract class BaseflickrTokenPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			flickrTokenPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			flickrTokenPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -351,6 +352,7 @@ abstract class BaseflickrTokenPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		flickrTokenPeer::filterSelectResults($queryResult, $criteria);

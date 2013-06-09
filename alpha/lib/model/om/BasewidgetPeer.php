@@ -364,6 +364,7 @@ abstract class BasewidgetPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			widgetPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			widgetPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -379,6 +380,7 @@ abstract class BasewidgetPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		widgetPeer::filterSelectResults($queryResult, $criteria);

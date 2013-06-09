@@ -376,6 +376,7 @@ abstract class BaseaccessControlPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			accessControlPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			accessControlPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -391,6 +392,7 @@ abstract class BaseaccessControlPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		accessControlPeer::filterSelectResults($queryResult, $criteria);

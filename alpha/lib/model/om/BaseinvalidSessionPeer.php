@@ -324,6 +324,7 @@ abstract class BaseinvalidSessionPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			invalidSessionPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			invalidSessionPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -339,6 +340,7 @@ abstract class BaseinvalidSessionPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		invalidSessionPeer::filterSelectResults($queryResult, $criteria);

@@ -368,6 +368,7 @@ abstract class BaseWidgetLogPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			WidgetLogPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			WidgetLogPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -383,6 +384,7 @@ abstract class BaseWidgetLogPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		WidgetLogPeer::filterSelectResults($queryResult, $criteria);

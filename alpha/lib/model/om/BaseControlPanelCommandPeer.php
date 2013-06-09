@@ -376,6 +376,7 @@ abstract class BaseControlPanelCommandPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			ControlPanelCommandPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ControlPanelCommandPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -391,6 +392,7 @@ abstract class BaseControlPanelCommandPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		ControlPanelCommandPeer::filterSelectResults($queryResult, $criteria);

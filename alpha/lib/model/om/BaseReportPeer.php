@@ -340,6 +340,7 @@ abstract class BaseReportPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			ReportPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ReportPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -355,6 +356,7 @@ abstract class BaseReportPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		ReportPeer::filterSelectResults($queryResult, $criteria);

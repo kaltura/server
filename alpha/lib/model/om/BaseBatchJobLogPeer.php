@@ -500,6 +500,7 @@ abstract class BaseBatchJobLogPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			BatchJobLogPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			BatchJobLogPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -515,6 +516,7 @@ abstract class BaseBatchJobLogPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		BatchJobLogPeer::filterSelectResults($queryResult, $criteria);

@@ -348,6 +348,7 @@ abstract class BasemoderationFlagPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			moderationFlagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			moderationFlagPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -363,6 +364,7 @@ abstract class BasemoderationFlagPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		moderationFlagPeer::filterSelectResults($queryResult, $criteria);

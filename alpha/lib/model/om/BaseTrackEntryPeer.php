@@ -380,6 +380,7 @@ abstract class BaseTrackEntryPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			TrackEntryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			TrackEntryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -395,6 +396,7 @@ abstract class BaseTrackEntryPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		TrackEntryPeer::filterSelectResults($queryResult, $criteria);

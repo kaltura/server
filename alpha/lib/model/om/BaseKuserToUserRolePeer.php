@@ -324,6 +324,7 @@ abstract class BaseKuserToUserRolePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			KuserToUserRolePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			KuserToUserRolePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -339,6 +340,7 @@ abstract class BaseKuserToUserRolePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		KuserToUserRolePeer::filterSelectResults($queryResult, $criteria);

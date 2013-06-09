@@ -352,6 +352,7 @@ abstract class BaseUserRolePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			UserRolePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			UserRolePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -367,6 +368,7 @@ abstract class BaseUserRolePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		UserRolePeer::filterSelectResults($queryResult, $criteria);

@@ -344,6 +344,7 @@ abstract class BasekvotePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			kvotePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			kvotePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -359,6 +360,7 @@ abstract class BasekvotePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		kvotePeer::filterSelectResults($queryResult, $criteria);

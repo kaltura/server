@@ -508,6 +508,7 @@ abstract class BasekshowPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			kshowPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			kshowPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -523,6 +524,7 @@ abstract class BasekshowPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		kshowPeer::filterSelectResults($queryResult, $criteria);

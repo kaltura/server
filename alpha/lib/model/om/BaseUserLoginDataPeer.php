@@ -348,6 +348,7 @@ abstract class BaseUserLoginDataPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			UserLoginDataPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			UserLoginDataPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -363,6 +364,7 @@ abstract class BaseUserLoginDataPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		UserLoginDataPeer::filterSelectResults($queryResult, $criteria);

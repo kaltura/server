@@ -344,6 +344,7 @@ abstract class BasePuserKuserPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			PuserKuserPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PuserKuserPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -359,6 +360,7 @@ abstract class BasePuserKuserPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		PuserKuserPeer::filterSelectResults($queryResult, $criteria);

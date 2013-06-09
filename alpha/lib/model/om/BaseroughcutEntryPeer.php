@@ -340,6 +340,7 @@ abstract class BaseroughcutEntryPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			roughcutEntryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			roughcutEntryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -355,6 +356,7 @@ abstract class BaseroughcutEntryPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		roughcutEntryPeer::filterSelectResults($queryResult, $criteria);

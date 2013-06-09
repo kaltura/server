@@ -392,6 +392,7 @@ abstract class BaseuiConfPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			uiConfPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			uiConfPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -407,6 +408,7 @@ abstract class BaseuiConfPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		uiConfPeer::filterSelectResults($queryResult, $criteria);

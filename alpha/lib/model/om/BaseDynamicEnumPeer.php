@@ -320,6 +320,7 @@ abstract class BaseDynamicEnumPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			DynamicEnumPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			DynamicEnumPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -335,6 +336,7 @@ abstract class BaseDynamicEnumPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		DynamicEnumPeer::filterSelectResults($queryResult, $criteria);

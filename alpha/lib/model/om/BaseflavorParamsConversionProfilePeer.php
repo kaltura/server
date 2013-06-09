@@ -352,6 +352,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			flavorParamsConversionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			flavorParamsConversionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -367,6 +368,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		flavorParamsConversionProfilePeer::filterSelectResults($queryResult, $criteria);

@@ -324,6 +324,7 @@ abstract class BaseApiServerPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			ApiServerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ApiServerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -339,6 +340,7 @@ abstract class BaseApiServerPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		ApiServerPeer::filterSelectResults($queryResult, $criteria);

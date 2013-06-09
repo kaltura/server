@@ -364,6 +364,7 @@ abstract class BaseConversionProfilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			ConversionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ConversionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -379,6 +380,7 @@ abstract class BaseConversionProfilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		ConversionProfilePeer::filterSelectResults($queryResult, $criteria);

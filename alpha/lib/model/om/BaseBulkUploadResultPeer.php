@@ -432,6 +432,7 @@ abstract class BaseBulkUploadResultPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			BulkUploadResultPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			BulkUploadResultPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -447,6 +448,7 @@ abstract class BaseBulkUploadResultPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		BulkUploadResultPeer::filterSelectResults($queryResult, $criteria);

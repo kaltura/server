@@ -352,6 +352,7 @@ abstract class BaseEmailIngestionProfilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			EmailIngestionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			EmailIngestionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -367,6 +368,7 @@ abstract class BaseEmailIngestionProfilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		EmailIngestionProfilePeer::filterSelectResults($queryResult, $criteria);

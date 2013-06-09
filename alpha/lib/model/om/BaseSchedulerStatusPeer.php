@@ -352,6 +352,7 @@ abstract class BaseSchedulerStatusPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			SchedulerStatusPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SchedulerStatusPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -367,6 +368,7 @@ abstract class BaseSchedulerStatusPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		SchedulerStatusPeer::filterSelectResults($queryResult, $criteria);

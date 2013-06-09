@@ -436,6 +436,7 @@ abstract class BasecategoryPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			categoryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			categoryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -451,6 +452,7 @@ abstract class BasecategoryPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		categoryPeer::filterSelectResults($queryResult, $criteria);

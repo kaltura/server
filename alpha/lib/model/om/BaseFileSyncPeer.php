@@ -380,6 +380,7 @@ abstract class BaseFileSyncPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			FileSyncPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			FileSyncPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -395,6 +396,7 @@ abstract class BaseFileSyncPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		FileSyncPeer::filterSelectResults($queryResult, $criteria);

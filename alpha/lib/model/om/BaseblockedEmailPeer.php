@@ -308,6 +308,7 @@ abstract class BaseblockedEmailPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			blockedEmailPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			blockedEmailPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -323,6 +324,7 @@ abstract class BaseblockedEmailPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		blockedEmailPeer::filterSelectResults($queryResult, $criteria);

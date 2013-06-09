@@ -344,6 +344,7 @@ abstract class BaseKceInstallationErrorPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			KceInstallationErrorPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			KceInstallationErrorPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -359,6 +360,7 @@ abstract class BaseKceInstallationErrorPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		KceInstallationErrorPeer::filterSelectResults($queryResult, $criteria);

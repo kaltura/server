@@ -324,6 +324,7 @@ abstract class BasefavoritePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			favoritePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			favoritePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -339,6 +340,7 @@ abstract class BasefavoritePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		favoritePeer::filterSelectResults($queryResult, $criteria);

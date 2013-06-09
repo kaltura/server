@@ -364,6 +364,7 @@ abstract class BaseUploadTokenPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			UploadTokenPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			UploadTokenPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -379,6 +380,7 @@ abstract class BaseUploadTokenPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		UploadTokenPeer::filterSelectResults($queryResult, $criteria);

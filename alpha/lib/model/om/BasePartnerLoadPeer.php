@@ -336,6 +336,7 @@ abstract class BasePartnerLoadPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			PartnerLoadPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PartnerLoadPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -351,6 +352,7 @@ abstract class BasePartnerLoadPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		PartnerLoadPeer::filterSelectResults($queryResult, $criteria);

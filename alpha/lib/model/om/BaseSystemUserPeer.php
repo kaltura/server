@@ -360,6 +360,7 @@ abstract class BaseSystemUserPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			SystemUserPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SystemUserPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -375,6 +376,7 @@ abstract class BaseSystemUserPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		SystemUserPeer::filterSelectResults($queryResult, $criteria);

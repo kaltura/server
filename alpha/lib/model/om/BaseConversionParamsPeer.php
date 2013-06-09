@@ -368,6 +368,7 @@ abstract class BaseConversionParamsPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			ConversionParamsPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ConversionParamsPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -383,6 +384,7 @@ abstract class BaseConversionParamsPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		ConversionParamsPeer::filterSelectResults($queryResult, $criteria);

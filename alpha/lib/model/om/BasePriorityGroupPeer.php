@@ -340,6 +340,7 @@ abstract class BasePriorityGroupPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			PriorityGroupPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PriorityGroupPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -355,6 +356,7 @@ abstract class BasePriorityGroupPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		PriorityGroupPeer::filterSelectResults($queryResult, $criteria);

@@ -408,6 +408,7 @@ abstract class BaseStorageProfilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			StorageProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			StorageProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -423,6 +424,7 @@ abstract class BaseStorageProfilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		StorageProfilePeer::filterSelectResults($queryResult, $criteria);

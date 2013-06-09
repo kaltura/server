@@ -444,6 +444,7 @@ abstract class BasemediaInfoPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			mediaInfoPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			mediaInfoPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -459,6 +460,7 @@ abstract class BasemediaInfoPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		mediaInfoPeer::filterSelectResults($queryResult, $criteria);

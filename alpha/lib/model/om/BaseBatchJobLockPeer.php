@@ -392,6 +392,7 @@ abstract class BaseBatchJobLockPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			BatchJobLockPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			BatchJobLockPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -407,6 +408,7 @@ abstract class BaseBatchJobLockPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		BatchJobLockPeer::filterSelectResults($queryResult, $criteria);

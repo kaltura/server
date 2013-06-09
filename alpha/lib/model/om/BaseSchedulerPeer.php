@@ -348,6 +348,7 @@ abstract class BaseSchedulerPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			SchedulerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SchedulerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -363,6 +364,7 @@ abstract class BaseSchedulerPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		SchedulerPeer::filterSelectResults($queryResult, $criteria);

@@ -336,6 +336,7 @@ abstract class BasecommentPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			commentPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			commentPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -351,6 +352,7 @@ abstract class BasecommentPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		commentPeer::filterSelectResults($queryResult, $criteria);

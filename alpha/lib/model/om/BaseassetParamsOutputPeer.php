@@ -456,6 +456,7 @@ abstract class BaseassetParamsOutputPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			assetParamsOutputPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			assetParamsOutputPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -471,6 +472,7 @@ abstract class BaseassetParamsOutputPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		assetParamsOutputPeer::filterSelectResults($queryResult, $criteria);

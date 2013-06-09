@@ -336,6 +336,7 @@ abstract class BaseflagPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			flagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			flagPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -351,6 +352,7 @@ abstract class BaseflagPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		flagPeer::filterSelectResults($queryResult, $criteria);

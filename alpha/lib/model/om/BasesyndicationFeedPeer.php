@@ -416,6 +416,7 @@ abstract class BasesyndicationFeedPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			syndicationFeedPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			syndicationFeedPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -431,6 +432,7 @@ abstract class BasesyndicationFeedPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		syndicationFeedPeer::filterSelectResults($queryResult, $criteria);

@@ -324,6 +324,7 @@ abstract class BasePermissionToPermissionItemPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			PermissionToPermissionItemPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			PermissionToPermissionItemPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -339,6 +340,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		PermissionToPermissionItemPeer::filterSelectResults($queryResult, $criteria);
