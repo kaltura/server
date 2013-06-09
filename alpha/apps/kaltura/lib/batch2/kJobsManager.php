@@ -1031,6 +1031,7 @@ class kJobsManager
 			return null;
 		}
 		
+		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
@@ -1086,7 +1087,6 @@ class kJobsManager
 			
 			if($conversionRequired)
 			{
-				$importingSources = false;
 				foreach($sourceFileRequiredStorages as $storageId)
 				{
 					if($storageId == StorageProfile::STORAGE_KALTURA_DC)
