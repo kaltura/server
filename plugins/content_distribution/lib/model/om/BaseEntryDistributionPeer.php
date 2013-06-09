@@ -396,6 +396,7 @@ abstract class BaseEntryDistributionPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			EntryDistributionPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			EntryDistributionPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -411,6 +412,7 @@ abstract class BaseEntryDistributionPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		EntryDistributionPeer::filterSelectResults($queryResult, $criteria);

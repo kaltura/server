@@ -548,6 +548,7 @@ abstract class BaseDwhHourlyPartnerPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			DwhHourlyPartnerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			DwhHourlyPartnerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -563,6 +564,7 @@ abstract class BaseDwhHourlyPartnerPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		DwhHourlyPartnerPeer::filterSelectResults($queryResult, $criteria);

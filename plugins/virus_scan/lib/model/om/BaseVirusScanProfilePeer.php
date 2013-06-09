@@ -344,6 +344,7 @@ abstract class BaseVirusScanProfilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			VirusScanProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			VirusScanProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -359,6 +360,7 @@ abstract class BaseVirusScanProfilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		VirusScanProfilePeer::filterSelectResults($queryResult, $criteria);

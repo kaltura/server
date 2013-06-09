@@ -400,6 +400,7 @@ abstract class BaseAuditTrailPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			AuditTrailPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			AuditTrailPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -415,6 +416,7 @@ abstract class BaseAuditTrailPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		AuditTrailPeer::filterSelectResults($queryResult, $criteria);

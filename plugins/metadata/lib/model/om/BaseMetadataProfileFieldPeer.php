@@ -352,6 +352,7 @@ abstract class BaseMetadataProfileFieldPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			MetadataProfileFieldPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			MetadataProfileFieldPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -367,6 +368,7 @@ abstract class BaseMetadataProfileFieldPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		MetadataProfileFieldPeer::filterSelectResults($queryResult, $criteria);

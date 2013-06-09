@@ -336,6 +336,7 @@ abstract class BaseTagPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			TagPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			TagPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -351,6 +352,7 @@ abstract class BaseTagPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		TagPeer::filterSelectResults($queryResult, $criteria);

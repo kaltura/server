@@ -400,6 +400,7 @@ abstract class BaseCuePointPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			CuePointPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			CuePointPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -415,6 +416,7 @@ abstract class BaseCuePointPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		CuePointPeer::filterSelectResults($queryResult, $criteria);
@@ -1055,7 +1057,7 @@ abstract class BaseCuePointPeer {
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
-	
+
 	/**
 	 * Retrieve multiple objects by pkey.
 	 *

@@ -328,6 +328,7 @@ abstract class BaseSphinxLogServerPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			SphinxLogServerPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			SphinxLogServerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -343,6 +344,7 @@ abstract class BaseSphinxLogServerPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		SphinxLogServerPeer::filterSelectResults($queryResult, $criteria);

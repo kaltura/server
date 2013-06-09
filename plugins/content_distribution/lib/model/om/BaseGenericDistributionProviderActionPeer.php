@@ -368,6 +368,7 @@ abstract class BaseGenericDistributionProviderActionPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			GenericDistributionProviderActionPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			GenericDistributionProviderActionPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -383,6 +384,7 @@ abstract class BaseGenericDistributionProviderActionPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		GenericDistributionProviderActionPeer::filterSelectResults($queryResult, $criteria);

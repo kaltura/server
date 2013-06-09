@@ -348,6 +348,7 @@ abstract class BaseShortLinkPeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			ShortLinkPeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			ShortLinkPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -363,6 +364,7 @@ abstract class BaseShortLinkPeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		ShortLinkPeer::filterSelectResults($queryResult, $criteria);

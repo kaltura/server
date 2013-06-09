@@ -384,6 +384,7 @@ abstract class BaseDistributionProfilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			DistributionProfilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			DistributionProfilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -399,6 +400,7 @@ abstract class BaseDistributionProfilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		DistributionProfilePeer::filterSelectResults($queryResult, $criteria);

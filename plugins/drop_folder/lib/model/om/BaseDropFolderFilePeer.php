@@ -392,6 +392,7 @@ abstract class BaseDropFolderFilePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			DropFolderFilePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			DropFolderFilePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -407,6 +408,7 @@ abstract class BaseDropFolderFilePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		DropFolderFilePeer::filterSelectResults($queryResult, $criteria);

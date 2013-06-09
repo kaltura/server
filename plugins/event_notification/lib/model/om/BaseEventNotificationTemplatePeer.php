@@ -352,6 +352,7 @@ abstract class BaseEventNotificationTemplatePeer {
 			$queryDB);
 		if ($cachedResult !== null)
 		{
+			$cacheKey = null;
 			EventNotificationTemplatePeer::filterSelectResults($cachedResult, $criteriaForSelect);
 			EventNotificationTemplatePeer::updateInstancePool($cachedResult);
 			return $cachedResult;
@@ -367,6 +368,7 @@ abstract class BaseEventNotificationTemplatePeer {
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+			$cacheKey = null;
 		}
 		
 		EventNotificationTemplatePeer::filterSelectResults($queryResult, $criteria);
