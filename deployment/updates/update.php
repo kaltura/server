@@ -42,17 +42,15 @@ if(isset($options['P']))
 if(isset($options['port']))
 	$params['port'] = $options['port'];
 	
-$cwd = OsUtils::getCurrentDir();
-
 $updateRunner = new ScriptsRunner();
 $updateRunner->init($ignoreErrors, $params);
 
 // create version_management table
-$updateRunner->runSqlScript($cwd . DIRECTORY_SEPARATOR . "create_version_mng_table.sql");
-$sqlDir = $cwd . DIRECTORY_SEPARATOR . "sql";
+$updateRunner->runSqlScript(dirname(__FILE__) . DIRECTORY_SEPARATOR . "create_version_mng_table.sql");
+$sqlDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "sql";
 $updateRunner->runSqlScripts($sqlDir);
 
-$phpDir = $cwd . DIRECTORY_SEPARATOR . "scripts";
+$phpDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "scripts";
 $updateRunner->runPhpScripts($phpDir);
 
 exit(0);
