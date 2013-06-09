@@ -63,7 +63,6 @@ $gap = 1000;	// The gap from 'getLastLogId' we want to query
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer);
 $lastLogs = array();
 $handledRecords = array();
-$lastSaveTime = array();
 
 foreach($serverLastLogs as $serverLastLog) {
 	$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
@@ -125,11 +124,6 @@ while(true)
 			// If the record is an historical record, don't take back the last log id
 			if($serverLastLog->getLastLogId() < $sphinxLogId) {
 				$serverLastLog->setLastLogId($sphinxLogId);
-				if (!isset($lastSaveTime[$dc]) || time() > $lastSaveTime[$dc] + 5)
-				{
-					$lastSaveTime[$dc] = time();
-	 				$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
-				}
  				
  				// Clear $handledRecords from before last - gap.
  				foreach($serverLastLogs as $serverLastLog) {
@@ -137,7 +131,6 @@ while(true)
  					$threshold = $serverLastLog->getLastLogId() - $gap;
  					$handledRecords[$dc] = array_filter($handledRecords[$dc], array(new OldLogRecordsFilter($threshold), 'filter'));
  				}
- 				
 			}
 		}
 		catch(Exception $e)
@@ -145,6 +138,12 @@ while(true)
 			KalturaLog::err($e->getMessage());
 		}
 	}
+	
+	foreach ($lastLogs as $serverLastLog)
+	{
+		$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+	}
+	
 	unset($sphinxCon);
 
 	SphinxLogPeer::clearInstancePool();
