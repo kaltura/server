@@ -532,7 +532,8 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		{
 			if (!$this->owner && $this->inheritanceType != KalturaInheritanceType::INHERIT)
 			{
-				$this->owner = kCurrentContext::getCurrentKsKuser()->getPuserId();
+				if (kCurrentContext::getCurrentKsKuser())
+					$this->owner = kCurrentContext::getCurrentKsKuser()->getPuserId();
 			}
 		}
 		
