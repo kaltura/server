@@ -158,7 +158,16 @@ class ksrAction extends sfAction
 
     private function _getKalturaHost()
     {
-        return kConf::get('www_host'); 
+        $proto='http';
+        $kalturaHost = kConf::get('www_host');
+        if (infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS){
+            $proto='https';
+            if(kConf::hasParam('www_host_https')){
+                $kalturaHost = kConf::get('www_host_https');
+            }
+        }
+        $url = $proto .'://'. $kalturaHost;
+        return $url;
     }
 
     private function _getSomPartnerInfo($what)
