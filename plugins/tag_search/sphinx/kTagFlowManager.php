@@ -73,7 +73,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     		{
     			/* @var $object categoryEntry */
     			$category = categoryPeer::retrieveByPK($object->getCategoryId());
-    			$privacyContexts = $category->getPrivacyContexts() != "" ? explode(",", $category->getPrivacyContexts()) : array();
+    			$privacyContexts = $category->getPrivacyContexts() != "" ? self::trimObjectTags($category->getPrivacyContexts()) : array();
     			if (!count($privacyContexts))
     				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
     			$entry = entryPeer::retrieveByPK($object->getEntryId());
@@ -130,7 +130,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        		$category = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
 	        		if ($category->getPrivacyContexts() != "")
 	        		{
-	        			$privacyContexts = array_merge($privacyContexts, explode(',', $category->getPrivacyContexts()));
+	        			$privacyContexts = array_merge($privacyContexts, self::trimObjectTags($category->getPrivacyContexts()));
 	        		}
 	        		else 
 	        		{
@@ -169,8 +169,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         {
         	if (in_array(categoryPeer::PRIVACY_CONTEXTS, $modifiedColumns))
         	{
-        		$currentPCs = explode(',', $object->getPrivacyContexts());
-        		$oldPCs = explode(',', $object->getColumnsOldValue(categoryPeer::PRIVACY_CONTEXTS));
+        		$currentPCs = self::trimObjectTags($object->getPrivacyContexts());
+        		$oldPCs = self::trimObjectTags($object->getColumnsOldValue(categoryPeer::PRIVACY_CONTEXTS));
         		self::addReIndexTagsJob ($object->getId(), implode(',', array_diff($oldPCs, $currentPCs)), implode(',', array_diff($currentPCs, $oldPCs)), $object->getPartnerId());
         	}
         }
@@ -197,7 +197,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    }
 	    
 	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
-		if (is_null($privacyContexts))
+		if (!is_null($privacyContexts))
 		{
 			if (count($privacyContexts))
 				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
@@ -206,10 +206,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		{
 			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
 		}
+		TagPeer::setUseCriteriaFilter(false);
 	    $c->applyFilters();
-	    
 	    $numTagsFound = $c->getRecordsCount(); 
-	   
+	    TagPeer::setUseCriteriaFilter(true);
+	    
 	    if (!$numTagsFound)
 	    {
 	         $tagsToAdd = array();
@@ -249,7 +250,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         	//If the tag itself is missing from the DB, we must add it with all the specified privacy contexts
         	$tagsToAdd[$missingTag] = $missingPrivacyContexts;
         }
-
         if (!is_null($privacyContexts) && count($privacyContexts))
         {
 	        foreach ($foundTagsToPc as $tag=>$foundPrivacyContexts)
@@ -378,7 +378,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             	$tagsToReturn[] = $tag;
             }
         }
-        return $tagsToReturn;		
+        return array_unique($tagsToReturn);		
 	}
 
 	
