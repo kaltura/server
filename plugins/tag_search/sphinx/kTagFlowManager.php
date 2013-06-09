@@ -191,7 +191,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	{
 	    KalturaLog::info("In Object Added handler");
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
-	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 	    if (!count($objectTags))
 	    {
 	        return;
@@ -208,13 +207,12 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
 		}
 		TagPeer::setUseCriteriaFilter(false);
-	    $c->applyFilters();
-	    $numTagsFound = $c->getRecordsCount(); 
+	    $foundTagObjects = TagPeer::doSelect($c);
 	    TagPeer::setUseCriteriaFilter(true);
 	    
-	    if (!$numTagsFound)
+	    if (!$foundTagObjects || !count($foundTagObjects))
 	    {
-	         $tagsToAdd = array();
+	        $tagsToAdd = array();
 			foreach ($objectTags as $tag)
 			{
 				$tagsToAdd[$tag] = array();
@@ -224,9 +222,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    	
 	    }
 	    
-	    TagPeer::setUseCriteriaFilter(false);
-	    $foundTagObjects = TagPeer::doSelect($c);
-	    TagPeer::setUseCriteriaFilter(true);
 	    $foundTagsToPc = array();
 		$tagsToAdd = array();
 		
@@ -278,7 +273,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    {
 	        return;
 	    }
-	    $objectTags = str_replace(self::$specialCharacters, self::$specialCharactersReplacement, $objectTags);
 		$c = self::getTagObjectsByTagStringsCriteria($objectTags,  self::getObjectTypeByClassName($objectClass), $partnerId);
 		if (!is_null($privacyContexts))
 		{
