@@ -228,8 +228,11 @@ class downloadAction extends sfAction
 			
 		if (!$local)
 		{
-			$remote_url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-			$this->redirect($remote_url);
+			$dc = kDataCenterMgr::getDcById($fileSync->getDc());
+			$url = $dc["url"] . $_SERVER['REQUEST_URI'];
+			$url = preg_replace('/^https?:\/\//', '', $url);
+			$url = infraRequestUtils::getProtocol() . '://' . $url;
+			$this->redirect($url);
 		}
 	}
 }
