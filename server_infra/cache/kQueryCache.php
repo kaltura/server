@@ -1,5 +1,39 @@
 <?php
 
+/**
+ *  @package server-infra
+ *  @subpackage cache
+ */
+ class kQueryCacheKey
+{
+	static protected $exists = false;
+	
+	protected $key;
+	
+	public function __construct($key)
+	{
+		if (self::$exists)
+			KalturaLog::crit('Unexpected - query cache key already exists');
+		self::$exists = true;
+		$this->key = $key; 
+	}
+	
+	public function __destruct()
+	{
+		self::$exists = false;
+	}
+	
+	public function getKey()
+	{
+		return $this->key;
+	}
+	
+	static public function exists()
+	{
+		return self::$exists;
+	} 
+}
+
 class kQueryCache 
 {
 	const CLOCK_SYNC_TIME_MARGIN_SEC = 10;			// When comparing the invalidation key timestamp to the query timestamp, 
@@ -267,7 +301,7 @@ class kQueryCache
 		if ($cacheQuery)
 		{
 			kApiCache::addInvalidationKeys($invalidationKeys, $maxInvalidationTime);
-			$cacheKey = $origCacheKey; 
+			$cacheKey = new kQueryCacheKey($origCacheKey); 
 		}
 		else 
 		{
@@ -319,8 +353,9 @@ class kQueryCache
 		$debugInfo .= "[$uniqueId]";
 		
 		$queryTime = time();
-		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
-		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
+		$key = $cacheKey->getKey();
+		KalturaLog::debug("kQueryCache: Updating memcache, key=$key queryTime=$queryTime");
+		self::$s_memcacheQueries->set($key, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);
 	}
 	
 	public static function invalidateQueryCache($object)
@@ -353,5 +388,10 @@ class kQueryCache
 				KalturaLog::err("kQueryCache: failed to update invalidation key");
 			}
 		}
+	}
+	
+	public static function isCurrentQueryHandled()
+	{
+		return kQueryCacheKey::exists();
 	}
 }

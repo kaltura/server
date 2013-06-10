@@ -30,7 +30,8 @@ class KalturaStatement extends PDOStatement
 
 	public function execute ($input_parameters = null) 
 	{
-		kApiCache::disableConditionalCache();
+		if (!kQueryCache::isCurrentQueryHandled())
+			kApiCache::disableConditionalCache();
 	
 		$search = array();
 		$replace = array();
