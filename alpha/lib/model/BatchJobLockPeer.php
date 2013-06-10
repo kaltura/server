@@ -42,6 +42,7 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	public static function getRetryInterval($job_type = null)
 	{
 		$job_type = kPluginableEnumsManager::coreToApi('BatchJobType', $job_type);
+		$job_type = str_replace('.', '_', $job_type);		// in Zend_Ini . is used to create hierarchy
 		$jobCheckAgainTimeouts = kConf::get('job_retry_intervals');
 		if(isset($jobCheckAgainTimeouts[$job_type]))
 			return $jobCheckAgainTimeouts[$job_type];
