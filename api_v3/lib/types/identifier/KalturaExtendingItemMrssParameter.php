@@ -80,5 +80,10 @@ class KalturaExtendingItemMrssParameter extends KalturaObject
 		{
 			throw new KalturaAPIException(KalturaErrors::EXTENDING_ITEM_INCOMPATIBLE_COMBINATION);
 		}
+		
+		if (!$this->xpath)
+		{
+			throw new KalturaAPIException(KalturaErrors::EXTENDING_ITEM_MISSING_XPATH);
+		}
 	}
 }

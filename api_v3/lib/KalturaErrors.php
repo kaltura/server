@@ -474,6 +474,7 @@ class KalturaErrors extends APIErrors
 	
 	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = 'EXTENDING_ITEM_INCOMPATIBLE_COMBINATION,This extending object MRSS must replace the XPath contents';
 	
+	const EXTENDING_ITEM_MISSING_XPATH = 'EXTENDING_ITEM_MISSING_XPATH,Extending item must contain xpath';
 	
 	/*
 	 * BaseEntry Service
