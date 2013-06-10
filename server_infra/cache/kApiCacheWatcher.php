@@ -44,7 +44,7 @@ class kApiCacheWatcher extends kApiCacheBase
 		if ($this->_conditionalCacheExpiry)
 			kApiCache::setConditionalCacheExpiry($this->_conditionalCacheExpiry);
 		
-		kApiCache::addInvalidationKeys($this->_invalidationKeys, $this->_invalidationTime);
+		kApiCache::addInvalidationKeys(array_keys($this->_invalidationKeys), $this->_invalidationTime);
 
 		kApiCache::addSqlQueryConditions($this->_sqlConditions);
 	}

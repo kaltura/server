@@ -139,7 +139,10 @@ class kApiCacheBase
 	{
 		foreach (self::$_activeInstances as $curInstance)
 		{
-			$curInstance->_invalidationKeys = array_merge($curInstance->_invalidationKeys, $invalidationKeys);
+			foreach ($invalidationKeys as $invalidationKey)
+			{
+				$curInstance->_invalidationKeys[$invalidationKey] = true;
+			}
 			$curInstance->_invalidationTime = max($curInstance->_invalidationTime, $invalidationTime);
 		}
 	}

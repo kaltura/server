@@ -686,7 +686,7 @@ class kApiCache extends kApiCacheBase
 			switch ($cacheMode)
 			{
 			case self::CACHE_MODE_CONDITIONAL:
-				$conditions = array($this->_cacheId, array_unique($this->_invalidationKeys), $this->_invalidationTime, $this->_sqlConditions);
+				$conditions = array($this->_cacheId, array_keys($this->_invalidationKeys), $this->_invalidationTime, $this->_sqlConditions);
 				if ($this->_conditionalCacheExpiry)
 					$expiry = $this->_conditionalCacheExpiry;
 				else
