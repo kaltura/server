@@ -217,6 +217,8 @@ friendlyName										= Convert Widevine
 filter.jobSubTypeIn									= widevine.Widevine
 params.sourceRootPath								= /web/tmp/encrypt
 params.vodPackagerHost								= http://@VOD_PACKAGER_HOST@
+params.retryInterval                                = 10
+params.maxTimeBeforeFail 							= 10000
 ;The path for local temporary generated product
 params.localTempPath 								= /web/tmp/encrypt
 ;The path for finished products, acessable from the apache
@@ -274,7 +276,6 @@ params.sharedTempPath 								= @WEB_DIR@/tmp/convert
 params.EncodingComUserId							= should-fail
 params.EncodingComUserKey							= should-fail
 params.EncodingComUrl								= http://manage.encoding.com/index.php
-params.vodPackagerHost								= http://@VOD_PACKAGER_HOST@
 
 [KAsyncConvertCollectionCloser : JobCloserWorker]
 id													= 81

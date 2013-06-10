@@ -4,6 +4,7 @@ class KWidevineOperationEngine extends KOperationEngine
 {
 	const PACKAGE_FILE_EXT = '.wvm';
 	const WV_JOB_ID_KEY = 'wvJobId';
+	const VOD_PACKAGER_HOST = 'vodPackagerHost';
 		
 	/**
 	 * @var array
@@ -56,7 +57,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
 		
 		$this->preparePackageFolders();
-		$requestXml = $this->preparePackageNotifyRequestXml();		
+		$requestXml = $this->preparePackageNotifyRequestXml();	
 		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_NOTIFY_CGI, $requestXml);
 		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
 		$this->handleResponseError($response);	
@@ -66,31 +67,27 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
 		$this->unimpersonate();	
 		
-		$wvJobId = new KalturaKeyValue();
-		$wvJobId->key = self::WV_JOB_ID_KEY;
-		$wvJobId->value = $response->getId();
-		if(!is_array($this->data->pluginData))
-			$this->data->pluginData = array();
-		$this->data->pluginData[] = $wvJobId;
+		while(($this->job->queueTime + $this->params->maxTimeBeforeFail)>= time())
+		{
+			$res = $this->queryPackage($response->getId());
+			if($res)
+				return true;
+			sleep($this->params->retryInterval);
+		}
 		
-		return false;
+		throw new KOperationEngineException("Job execution timed-out");
 	}
 	
-	/*
-	 * (non-PHPdoc)
-	 * @see KOperationEngine::doCloseOperation()
-	 */
-	protected function doCloseOperation()
+	private function queryPackage($wvJobId)
 	{
-		$wvJobId = $this->getWvPackagerJobId();		
-		KalturaLog::debug('start Widevine package closer for WV job: '.$wvJobId);
+		KalturaLog::debug('start Widevine package query for WV job: '.$wvJobId);
 		$requestXmlObj = new SimpleXMLElement('<PackageQuery/>');
 		$requestXmlObj->addAttribute('id', $wvJobId);		
 		$requestXml = $requestXmlObj->asXML();
 		
 		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($this->params->vodPackagerHost . WidevinePlugin::PACKAGE_QUERY_CGI, $requestXml);
 		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
-		$this->message = "Package status: ".$response->getStatus();
+		KalturaLog::debug("Package status: ".$response->getStatus());
 		if($response->isSuccess())
 		{
 			$this->impersonate($this->job->partnerId);			
@@ -245,14 +242,5 @@ class KWidevineOperationEngine extends KOperationEngine
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
 		$updatedFlavorAsset->widevineDistributionEndDate = $wvDistributionEndDate;
 		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
-	}
-	
-	private function getWvPackagerJobId()
-	{
-		$pluginData = $this->data->pluginData->toObjectsArray();
-		if(array_key_exists(self::WV_JOB_ID_KEY, $pluginData))
-			return $pluginData[self::WV_JOB_ID_KEY];
-		else
-			return null;
 	}
 }
