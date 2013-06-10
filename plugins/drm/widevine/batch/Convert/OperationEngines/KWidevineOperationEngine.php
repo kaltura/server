@@ -3,8 +3,6 @@
 class KWidevineOperationEngine extends KOperationEngine
 {
 	const PACKAGE_FILE_EXT = '.wvm';
-	const WV_JOB_ID_KEY = 'wvJobId';
-	const VOD_PACKAGER_HOST = 'vodPackagerHost';
 		
 	/**
 	 * @var array
