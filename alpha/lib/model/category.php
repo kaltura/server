@@ -1601,7 +1601,7 @@ class category extends Basecategory implements IIndexable
 		
 		$fullNameArr = explode(categoryPeer::CATEGORY_SEPARATOR, $fullNameLowerCase);
 		
-		$parsedFullName = '';
+		$parsedFullName = $fullNameLowerCase. " ";
 		$fullName = '';
 		foreach ($fullNameArr as $categoryName)
 		{
