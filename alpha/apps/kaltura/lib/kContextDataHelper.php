@@ -152,7 +152,6 @@ class kContextDataHelper
 		if ($accessControl && $accessControl->hasRules())
 		{
 			$this->isSecured = true;
-			$this->disableCache = true;
 			if (kConf::hasMap("optimized_playback"))
 			{
 				$partnerId = $accessControl->getPartnerId();
@@ -160,17 +159,15 @@ class kContextDataHelper
 				if (array_key_exists($partnerId, $optimizedPlayback))
 				{
 					$params = $optimizedPlayback[$partnerId];
-					if (array_key_exists('cache_kdp_acccess_control', $params) && $params['cache_kdp_acccess_control'])
-						$this->disableCache = false;
+					if (array_key_exists('cache_kdp_access_control', $params) && $params['cache_kdp_access_control'])
+						return;
 				}
 			}		
-	        $accessControlScope->setEntryId($this->entry->getId());
+
+			$accessControlScope->setEntryId($this->entry->getId());
 			$this->isAdmin = ($accessControlScope->getKs() && $accessControlScope->getKs()->isAdmin());
             
-			if($accessControl->applyContext($this->contextDataResult) && $this->disableCache)
-				$this->disableCache = true;
-			else 
-				$this->disableCache = false;
+			$this->disableCache = $accessControl->applyContext($this->contextDataResult); 
 		}
 	}
 	
