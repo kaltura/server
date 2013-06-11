@@ -213,10 +213,8 @@ class kDataCenterMgr
 		
 		// resolve if file_sync is link
 		$file_sync_resolved = $file_sync;
-		if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
-		{
-			$file_sync_resolved = kFileSyncUtils::resolve($file_sync);
-		}
+		
+		$file_sync_resolved = kFileSyncUtils::resolve($file_sync);
 		
 		// check if file sync path leads to a file or a directory
 		$resolvedPath = $file_sync_resolved->getFullPath();
