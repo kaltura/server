@@ -75,7 +75,7 @@ class kJobsManager
 	{
 		// No need to abort finished job
 		if(in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList())) {
-			return;
+			return $dbBatchJob;
 		}
 		
 		$lockObject = $dbBatchJob->getBatchJobLock();
@@ -93,19 +93,16 @@ class kJobsManager
 		
 		$affectedRows = BasePeer::doUpdate($updateCondition, $update, $con);
 		
-		// If currently locked by other, and we don't want to force update
-		if((!$affectedRows) && (!force)) {
-			return;
-		}
-		
-		$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
 		if($affectedRows) {
+			$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
 			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ABORTED);
 		} else {
-			$dbBatchJob->save();
+			if($force) {
+				$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
+				$dbBatchJob->save();
+			} 
 		}
 		
-		// aborts all child jobs
 		self::abortChildJobs($dbBatchJob);
 		return $dbBatchJob;
 	}
