@@ -228,24 +228,20 @@ class kConvertJobData extends kConvartableJobData
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
-		
-		if($batchJob->getEntry() && ($batchJob->getEntry()->getType() != entryType::MEDIA_CLIP)) {
-			$maxEffort = 0;
+		$mediaInfo = mediaInfoPeer::retrieveByPK($this->getMediaInfoId());
+		if(is_null($mediaInfo)) {
+			$sumEffort = 0;
 			$fileSyncs = $this->getSrcFileSyncs();
 			foreach ($fileSyncs as $fileSync) {
 				$fileSize = filesize($fileSync->getFileSyncLocalPath());
 				if($fileSize !== False)
-					$maxEffort = max($fileSize, $maxEffort);
+					$sumEffort += $fileSize;
 			}
 				
-			if($maxEffort != 0)
-				return $maxEffort;
+			if($sumEffort != 0)
+				return $sumEffort;
 			return self::MAX_ESTIMATED_EFFORT;
-		}
-		
-		$mediaInfo = mediaInfoPeer::retrieveByPK($this->getMediaInfoId());
-		if(is_null($mediaInfo)) {
-			return self::MAX_ESTIMATED_EFFORT;
+			
 		} else {
 			return max($mediaInfo->getVideoDuration(),$mediaInfo->getAudioDuration(),$mediaInfo->getContainerDuration());
 		}
