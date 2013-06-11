@@ -170,10 +170,10 @@ function ksort(arr) {
   var tArr = [];
   var n = 0;
   for (i in arr)
-    tArr[n++] = i+"|"+arr[i];
+	  tArr[n++] = i+" |"+arr[i];
   tArr = tArr.sort();
   for (var i=0; i<tArr.length; i++) {
-    var x = tArr[i].split("|");
+	var x = tArr[i].split(" |");
     sArr[x[0]] = x[1];
   }
   return sArr;
@@ -400,7 +400,7 @@ KalturaClientBase.prototype.signature = function(params)
 	var str = "";
 	for(var v in params) {
 		var k = params[v];
-		str += k + v;
+		str += v + k;
 	}
 	return MD5(str);
 };
