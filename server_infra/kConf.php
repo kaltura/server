@@ -44,14 +44,14 @@ class kConf extends kEnvironment
 			self::$cacheVersion = apc_fetch($cacheVersionKey);
 			if(self::$cacheVersion)
 			{
-				self::$cacheKey = 'kConf-'.self::$cacheVersion.'-';
+				self::$cacheKey = 'kConf-'.self::$cacheVersion;
 				return;
 			}
 		}
 		
 		// no cache version in APC - create a new one
 		self::$cacheVersion = time();
-		self::$cacheKey = 'kConf-'.self::$cacheVersion.'-';
+		self::$cacheKey = 'kConf-'.self::$cacheVersion;
 		
 		// save the cache version
 		if(function_exists('apc_store') && PHP_SAPI != 'cli')
