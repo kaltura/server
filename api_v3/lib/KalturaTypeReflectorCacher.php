@@ -46,7 +46,7 @@ class KalturaTypeReflectorCacher
 			{
 				$typeReflector = new KalturaTypeReflector($type);
 				$cachedData = serialize($typeReflector);
-				$bytesWritten = file_put_contents($cachedFilePath, $cachedData);
+				$bytesWritten = kFile::safeFilePutContents($cachedFilePath, $cachedData);
 				if(!$bytesWritten)
 				{
 					$folderPermission = substr(decoct(fileperms(dirname($cachedFilePath))), 2);
