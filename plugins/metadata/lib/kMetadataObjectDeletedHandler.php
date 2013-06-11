@@ -117,7 +117,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler implements kObj
 		$update = new Criteria();
 		$update->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED);
 			
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
 		BasePeer::doUpdate($c, $update, $con);
 	}
 }

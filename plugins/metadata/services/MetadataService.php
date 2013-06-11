@@ -448,7 +448,7 @@ class MetadataService extends KalturaBaseService
 		$update = new Criteria();
 		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
 			
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
 		$count = BasePeer::doUpdate($c, $update, $con);
 		return $count;
 	}	
