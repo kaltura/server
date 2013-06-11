@@ -412,7 +412,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function resolve(FileSync $file)
 	{
 		$parent = null;
-		if($file->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
+		if($file->getLinkedId())
 		{
 			$source_file_sync = FileSyncPeer::retrieveByPK($file->getLinkedId());
 			if(!$source_file_sync)
@@ -746,12 +746,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			$tmp_file_sync = $file_sync;
 			// make sure not link and work on original
-			if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
-			{
-				$tmp_file_sync = self::resolve($file_sync);
-				if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-					continue;
-			}
+			
+			$tmp_file_sync = self::resolve($file_sync);
+			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+				continue;
+			
 
 			// always prefer the current dc
 			if ( $tmp_file_sync->getDc() == $dc_id)
@@ -1161,11 +1160,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSyncList = FileSyncPeer::doSelect($c);
 		foreach($fileSyncList as $fileSync)
 		{
+			$linkToatlCount = 0;
 			/* @var $fileSync FileSync */
 
 			// for each source, find its links and fix them
 			$c = new Criteria();
-
 			$c->add(FileSyncPeer::DC, $fileSync->getDc());
 			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
 			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
@@ -1175,23 +1174,24 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->setLimit(100);
 
 			$links = FileSyncPeer::doSelect($c);
+			$linkToatlCount += count($links);
+			
+			// choose the first link and convert it to file
+			$firstLink = array_shift($links);
+			/* @var $firstLink FileSync */
+			if($firstLink)
+			{
+				$firstLink->setStatus($fileSync->getStatus());
+				$firstLink->setFileSize($fileSync->getFileSize());
+				$firstLink->setFileRoot($fileSync->getFileRoot());
+				$firstLink->setFilePath($fileSync->getFilePath());
+				$firstLink->setFileType($fileSync->getFileType());
+				$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
+				$firstLink->save();
+			}
+			
 			while(count($links))
 			{
-				// choose the first link and convert it to file
-				$firstLink = array_shift($links);
-				/* @var $firstLink FileSync */
-				if($firstLink)
-				{
-					$firstLink->setStatus($fileSync->getStatus());
-					$firstLink->setFileSize($fileSync->getFileSize());
-					$firstLink->setFileRoot($fileSync->getFileRoot());
-					$firstLink->setFilePath($fileSync->getFilePath());
-					$firstLink->setFileType($fileSync->getFileType());
-					$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
-					$firstLink->setLinkCount(count($links));
-					$firstLink->save();
-				}
-
 				// change all the rest of the links to point on the new file sync
 				foreach($links as $link)
 				{
@@ -1200,10 +1200,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					$link->setLinkedId($firstLink->getId());
 					$link->save();
 				}
-
+				
 				FileSyncPeer::clearInstancePool();
 				$links = FileSyncPeer::doSelect($c);
 			}
+			
+			$firstLink->setLinkCount($linkToatlCount);
 		}
 	}
 
@@ -1244,18 +1246,26 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		/* @var $object FileSync */
-
 		$c = new Criteria();
 		$c->add(FileSyncPeer::DC, $object->getDc());
 		$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
 		$c->add(FileSyncPeer::LINKED_ID, $object->getId());
+		$c->addAscendingOrderByColumn(FileSyncPeer::ID);
+		$c->setLimit(100);
 
+		$offset = 0;
 		$links = FileSyncPeer::doSelect($c);
-		foreach($links as $link)
+		while($links)
 		{
-			$link->setStatus($object->getStatus());
-			$link->save();
-		}
+			$offset += count($links);
+			foreach($links as $link)
+			{
+				$link->setStatus($object->getStatus());
+				$link->save();
+			}
+			$c->setOffset($offset);
+			$links = FileSyncPeer::doSelect($c);
+		}	
 	}
 
 	/* (non-PHPdoc)
