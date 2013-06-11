@@ -145,7 +145,7 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 					
 	RewriteRule clientTest/api_v3/index.php /api_v3/web/clientTest.php [L]
 					
-	RedirectMatch permanent ^/tiny/([0-9a-z]{4})$ /api_v3/index.php?service=shortLink_shortLink\&action=goto\&id=$1	
+	RedirectMatch permanent ^/tiny/([0-9a-z]{4,})$ /api_v3/index.php?service=shortLink_shortLink\&action=goto\&id=$1	
 	RedirectMatch permanent ^/api_v3/service/(.*)$ /api_v3/index.php/service/$1
 
     Options FollowSymLinks ExecCGI Includes
