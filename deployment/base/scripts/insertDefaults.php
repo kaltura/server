@@ -149,9 +149,12 @@ foreach($fileNames as $fileName)
 			$setters[$setter] = $value;
 		}
 
-		$existingObject = $peer->doSelectOne($pkCriteria, $con);
-		if($existingObject)
-			$object = $existingObject;
+		if($pkCriteria->size())
+		{
+			$existingObject = $peer->doSelectOne($pkCriteria, $con);
+			if($existingObject)
+				$object = $existingObject;
+		}
 
 		foreach($setters as $setter => $value)
 			$object->$setter($value);
