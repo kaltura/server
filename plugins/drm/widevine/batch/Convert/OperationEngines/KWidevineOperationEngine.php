@@ -250,6 +250,6 @@ class KWidevineOperationEngine extends KOperationEngine
 		if(!count($hosts))
 			throw new KOperationEngineException("VOD packager host is not defined");
 		$index = crc32($this->originalEntryId) % count($hosts);
-		return $hosts[$index];
+		return trim($hosts[$index]);
 	}
 }
