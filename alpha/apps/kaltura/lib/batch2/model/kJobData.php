@@ -5,7 +5,7 @@
  */
 abstract class kJobData
 {
-	const MAX_ESTIMATED_EFFORT = 99999999;
+	const MAX_ESTIMATED_EFFORT = 1099511627776; // 1 TB
 	const BATCH_JOB_DEFAULT_PRIORITY = 3;
 	
 	/**
