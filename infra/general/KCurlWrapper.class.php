@@ -1,10 +1,10 @@
 <?php
 
 /**
- *
- * @package Scheduler
- *
+ *  @package infra
+ *  @subpackage general
  */
+
 class KCurlHeaderResponse
 {
 	const HTTP_STATUS_CONTINUE = 100; //The request can be continued.
@@ -136,7 +136,7 @@ class KCurlWrapper
 		}
 		catch ( Exception $exception )
 		{
-
+			throw new Exception($exception->getMessage());
 		}
 
 		KalturaLog::info("Fetching url [$url]");
@@ -168,6 +168,46 @@ class KCurlWrapper
 	public static function encodeUrl($url)
 	{
 		return str_replace(array(' ', '[', ']'), array('%20', '%5B', '%5D'), $url);
+	}
+	
+	/**
+	 * Get file with max file size limitation
+	 * @param string $url
+	 * @param int $maxFileSize
+	 * @throws Exception | file as string
+	 */
+	
+	public static function getDataFromFile($url, $maxFileSize = null)
+	{
+		$curlWrapper = new KCurlWrapper($url);
+		$curlHeaderResponse = $curlWrapper->getHeader(true);
+		
+		if(!$curlHeaderResponse || $curlWrapper->getError())
+			throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
+			
+		if(!$curlHeaderResponse->isGoodCode())
+			throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
+		
+		if(isset($curlHeaderResponse->headers['content-length']))
+				$fileSize = $curlHeaderResponse->headers['content-length'];
+		else
+			throw new Exception("File With Unknown File Size Dropping request");
+
+		if(isset($maxFileSize))
+		{
+			if($fileSize > $maxFileSize)
+				throw new Exception("File size [$fileSize] Excedded Max Siae Allowed [$maxFileSize]");
+		}
+			
+		$curlWrapper->close();
+		
+		$curlWrapper = new KCurlWrapper($url);
+		KalturaLog::debug("Executing curl");
+		$res = $curlWrapper->exec();
+		$curlWrapper->close();
+		KalturaLog::debug("Done Curl Executing");
+		
+		return $res;
 	}
 
 
