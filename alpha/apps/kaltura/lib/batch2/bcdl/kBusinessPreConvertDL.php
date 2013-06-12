@@ -571,10 +571,9 @@ class kBusinessPreConvertDL
 				// This flag might be set by the DL, therefore overide only if it is not set.
 			if(!$flavor->_force) {
 				$flavor->_force = $flavorParamsConversionProfile->getForceNoneComplied();
-			}
-				// Overwrite ready behavior from the conversion profile
-			if($flavorParamsConversionProfile->getReadyBehavior() != flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
-				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());
+			}  
+			
+			$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());
 
 			if(!$flavor->IsValid())
 			{
