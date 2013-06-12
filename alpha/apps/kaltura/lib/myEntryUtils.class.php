@@ -27,7 +27,14 @@ class myEntryUtils
 	
 	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
 	{	
-		$file = @file_get_contents($filePath);
+		try {
+			$file = KCurlWrapper::getDataFromFile($filePath, kConf::get('thumb_size_limit'));
+		}
+		catch(Exception $e) {
+			KalturaLog::debug($e->getMessage());
+			throw new Exception("Data Retrieval Failed");	
+		}
+		
 		if (!$file){
 			KalturaLog::debug("thumbnail cannot be created from $filePath " . error_get_last());
 			throw new Exception("thumbnail file path is not valid");
