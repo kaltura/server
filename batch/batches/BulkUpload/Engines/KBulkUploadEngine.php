@@ -194,19 +194,7 @@ abstract class KBulkUploadEngine
 	{
 		$str = KCurlWrapper::encodeUrl($str);
 		
-		$strRegex = "^(?P<protocol>(https?)|(ftp)|(sftp)|(scp)):\\/\\/?" .
-					"(?P<credentials>([ 0-9a-zA-Z_!~*'().&=+$%-\\[\\]]+:)?[ 0-9a-zA-Z_!~*'().&=+$%-\\[\\]]+@)?" . //user@
-					"(?P<domain>([0-9]{1,3}\\.){3}[0-9]{1,3}" . // IP- 199.194.52.184
-					"|" . // allows either IP or domain
-					"(?P<tertiary_domain>[0-9a-zA-Z_!~*'()-]+[.])*" . // tertiary domain(s)- www.
-					"(?P<second_level_domain>([0-9a-zA-Z][0-9a-zA-Z-]{0,61})?[0-9a-zA-Z])\\." . // second level domain
-					"(?P<first_level_domain>[a-zA-Z]{2,6}))" . // first level domain- .com or .museum
-					"([.](?P<additional_level_domain>[a-zA-Z]{2,6}))*" . // additional domain level .il
-					"(?P<port>:[0-9]{1,4})?" . // port number- :80
-					"(?P<path>(\\/?)|" . // a slash isn't required if there is no file name
-					"(\\/[ 0-9a-zA-Z_!~*'().;?:@&=+$,%#-\\[\\]]+)+)$";
-		
-		return preg_match("/$strRegex/i", $str);
+		return filter_var($str, FILTER_VALIDATE_URL);
 	}
 		
 	/**
