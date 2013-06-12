@@ -124,10 +124,9 @@ try
 			else if ($fileExists && !$file) //file exisit on the file system, but not in database
 			{
 				writeLog($logPrefix, 'No file exists with status UPLOADING or PARSED, checking if this is a duplicated UPLOADED event..');
-				$inStatuses = ''; //all statuses
-				$olderFile = getFile($folder->id, $fileName, $inStatuses, $dropFolderPlugin); 
+				$olderFile = getFile($folder->id, $fileName, null, $dropFolderPlugin); 
 				if ($olderFile && (time() - $olderFile->uploadEndDetectedAt) < $ignoreTime){
-						writeLog($logPrefix, 'This is a duplicated UPLOADED event, ignoring it');
+						writeLog($logPrefix, 'This is a duplicated UPLOADED event, ignoring it due to drop folder file id ' . $olderFile->id);
 				}
 				else{
 					$file = addPendingFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);
