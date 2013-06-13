@@ -806,6 +806,14 @@ abstract class baseObjectFilter extends myBaseObject
 			$new_value = self::createSqlIn ( $value );
 			$crit = Criteria::IN;
 		}
+		elseif ( $operator_str == self::IS_EMPTY )
+		{
+			$new_value = null;
+			if($value)
+				$crit = Criteria::ISNULL;
+			else
+				$crit = Criteria::ISNOTNULL;
+		}
 		elseif ( $operator_str == self::NOT_IN )
 		{
 			$new_value = self::createSqlIn ( $value );
