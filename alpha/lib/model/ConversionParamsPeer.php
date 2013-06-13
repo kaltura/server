@@ -9,18 +9,7 @@
  * @subpackage model
  */ 
 class ConversionParamsPeer extends BaseConversionParamsPeer
-{
-	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
-	{
-		if($con === null)
-			$con = myDbHelper::alternativeCon($con);
-			
-		if($con === null)
-			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3);
-		
-		return $con;
-	}
-	
+{	
 	// TODO - should override kaltura's params with the partner's params for any profile_type
 	// -> if there are both params for the profile_type both under partner_id=0 and the profile's partner_id - 
 	// prefer the partner's  
