@@ -180,27 +180,27 @@ class KCurlWrapper
 	
 	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null)
 	{
-		$curlWrapper = new KCurlWrapper($url);
-		$curlHeaderResponse = $curlWrapper->getHeader(true);
-		
-		if(!$curlHeaderResponse || $curlWrapper->getError())
-			throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
-			
-		if(!$curlHeaderResponse->isGoodCode())
-			throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
-		
-		if(isset($curlHeaderResponse->headers['content-length']))
-				$fileSize = $curlHeaderResponse->headers['content-length'];
-		else
-			throw new Exception("File With Unknown File Size Dropping request");
-
-		if(isset($maxFileSize))
+		if(!is_null($maxFileSize))
 		{
+			$curlWrapper = new KCurlWrapper($url);
+			$curlHeaderResponse = $curlWrapper->getHeader(true);
+			
+			if(!$curlHeaderResponse || $curlWrapper->getError())
+				throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
+				
+			if(!$curlHeaderResponse->isGoodCode())
+				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
+			
+			if(isset($curlHeaderResponse->headers['content-length']))
+					$fileSize = $curlHeaderResponse->headers['content-length'];
+			else
+				throw new Exception("File With Unknown File Size Dropping request");
+			
 			if($fileSize > $maxFileSize)
 				throw new Exception("File size [$fileSize] Excedded Max Siae Allowed [$maxFileSize]");
+				
+			$curlWrapper->close();
 		}
-			
-		$curlWrapper->close();
 		
 		$curlWrapper = new KCurlWrapper($url);
 		KalturaLog::debug("Executing curl");
