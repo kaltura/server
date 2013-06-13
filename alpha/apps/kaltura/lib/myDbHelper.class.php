@@ -23,7 +23,19 @@ class myDbHelper
 			DbManager::setConfig(kConf::getDB());
 			DbManager::initialize();
 		}
-		return Propel::getConnection ($name);
+		
+		$slaves = array(self::DB_HELPER_CONN_PROPEL2, self::DB_HELPER_CONN_PROPEL3);
+		if (!in_array($name, $slaves))
+			return Propel::getConnection($name);
+		
+		list($connection, $connIndex) = DbManager::connectFallbackLogic(
+				array('Propel', 'getConnection'),
+				array(),
+				$slaves);
+		if (!$connection)
+			throw new PropelException('Could not connect to any database server');
+			
+		return $connection;
 	}
 	
 	public static function alternativeCon ( $con )
@@ -33,7 +45,7 @@ class myDbHelper
 		// only null connection will be overriden
 		if ( $con === null && self::$use_alternative_con )
 		{
-			$con = Propel::getConnection ( self::$use_alternative_con);
+			$con = self::getConnection ( self::$use_alternative_con);
 		}
 		
 		return $con;
@@ -47,4 +59,3 @@ class myDbHelper
 		Propel::close();
 	}
 }
-?>
