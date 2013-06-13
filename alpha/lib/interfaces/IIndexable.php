@@ -21,11 +21,6 @@ interface IIndexable extends IBaseObject
 	public function getEntryId();
 	
 	/**
-	 * @return int
-	 */
-	public function getPartnerId();
-	
-	/**
 	 * @return string object propel name
 	 */
 	public function getObjectIndexName();
