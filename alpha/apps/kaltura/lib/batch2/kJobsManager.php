@@ -697,7 +697,7 @@ class kJobsManager
 				
 				KalturaLog::debug("Downloading remote file sync [$url]");
 				$downloadPath = myContentStorage::getFSUploadsPath() . '/' . $thumbAsset->getId() . '.jpg';
-				if (kFile::downloadUrlToFile($url, $downloadPath))
+				if (KCurlWrapper::getDataFromFile($url, $downloadPath))
 				{
 					kFileSyncUtils::moveFromFile($downloadPath, $srcSyncKey);
 					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, false, false);
