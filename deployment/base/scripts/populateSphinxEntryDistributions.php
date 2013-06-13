@@ -45,3 +45,4 @@ while(count($entries))
 }
 
 KalturaLog::log('Done. Cureent time: ' . time());
+exit(0);

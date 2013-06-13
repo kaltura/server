@@ -45,3 +45,4 @@ while(count($tags))
 }
 
 KalturaLog::log('Done');
+exit(0);

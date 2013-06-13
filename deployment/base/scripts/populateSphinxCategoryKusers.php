@@ -46,3 +46,4 @@ while(count($categoryKusers))
 }
 
 KalturaLog::log('Done. Current time: ' . time());
+exit(0);

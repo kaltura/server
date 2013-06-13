@@ -44,3 +44,4 @@ while(count($captions))
 }
 
 KalturaLog::log('Done. Cureent time: ' . time());
+exit(0);
