@@ -140,7 +140,7 @@ class myBatchFlattenServer extends myBatchBase
 					}
 					
 					KalturaLog::debug("Downloading: $fullFinalPath");
-					kFile::downloadUrlToFile($data["serverUrl"], $fullFinalPath);
+					KCurlWrapper::getDataFromFile($data["serverUrl"], $fullFinalPath);
 					if (!file_exists($fullFinalPath))
 					{
 						KalturaLog::debug("file doesnt exist: ". $data["serverUrl"]);
