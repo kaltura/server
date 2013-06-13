@@ -213,7 +213,7 @@ class CaptionAssetService extends KalturaAssetService
 	protected function attachUrl(CaptionAsset $captionAsset, $url)
 	{
     	$fullPath = myContentStorage::getFSUploadsPath() . '/' . basename($url);
-		if (kFile::downloadUrlToFile($url, $fullPath))
+		if (KCurlWrapper::getDataFromFile($url, $fullPath))
 			return $this->attachFile($captionAsset, $fullPath);
 			
 		if($captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_NOT_APPLICABLE)
