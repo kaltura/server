@@ -41,29 +41,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$useCloser = $this->taskConfig->params->useCloser;
-		if ($useCloser)
-		{
-			// if closer is used, the file will be download to a temporary directory, and then moved to its final destination by the KAsyncFileSyncImportCloser batch
-			if (!$job->data->tmpFilePath)
-			{
-				// adding temp path to the job data, so that the closer will be able to use it later
-				$tmpPath = $this->getTmpPath($job->data->sourceUrl);
-				if (!$tmpPath) {
-					$msg = 'Error: Cannot create temporary directory for url ['.$job->data->sourceUrl.']';
-					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
-				}
-				$job->data->tmpFilePath = $tmpPath;
-				$this->updateJob($job, "Temp destination set", KalturaBatchJobStatus::PROCESSING, $job->data);
-			}
-			// destination = temporary path
-			$fileDestination = $job->data->tmpFilePath;
-		}
-		else
-		{
-			// destination = final path
-			$fileDestination = $job->data->destFilePath;
-		}
+		$fileDestination = $job->data->destFilePath;
 		
 		if($job->data->fileSize == 0) 
 			return $this->fetchEmptyFile($job, $fileDestination);				
@@ -116,14 +94,8 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		// job completed successfuly
 		KalturaLog::debug ( 'fetchUrl - job id [' . $job->id . '] completed successfuly!' );
 		
-		if ($this->taskConfig->params->useCloser) {
-			// close and mark job as almost done
-			$this->closeJob ( $job, null, null, "File downloaded successfully to tmp space", KalturaBatchJobStatus::ALMOST_DONE, null, $job->data );
-		} else {
-			// close and mark job as finished
-			$this->closeJob ( $job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data );
-		}
-		
+		// close and mark job as finished
+		$this->closeJob ( $job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data );
 	}
 	
 	private function fetchEmptyFile(KalturaBatchJob &$job, $destination) {
@@ -364,8 +336,8 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			{
 				// part of file was downloaded - will resume in next run
 				KalturaLog::debug('File partialy downloaded - will resumt in next run');
-				$this->updateJob($job, "Downloaded size: $actualFileSize", KalturaBatchJobStatus::PROCESSING);
 				$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+				$this->closeJob($job, null, null, "Downloaded size: $actualFileSize", KalturaBatchJobStatus::RETRY);
 				return false;
 			}
 		}
