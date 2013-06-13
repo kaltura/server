@@ -52,6 +52,7 @@ class categoryFilter extends baseObjectFilter
 			'_gte_pending_members_count',
 			'_lte_pending_members_count',
 		    '_eq_reference_id',
+			'_empty_reference_id',
 			'_eq_contribution_policy',		
 			'_matchor_full_name',
 			'_matchor_likex_full_name',
