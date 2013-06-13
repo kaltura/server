@@ -28,14 +28,15 @@ class myEntryUtils
 	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
 	{	
 		try {
-			$file = KCurlWrapper::getDataFromFile($filePath, kConf::get('thumb_size_limit'));
+			$fileLocation = tempnam(sys_get_temp_dir(), $entry->getId());
+			$res = KCurlWrapper::getDataFromFile($filePath, $fileLocation, kConf::get('thumb_size_limit'));
 		}
 		catch(Exception $e) {
 			KalturaLog::debug($e->getMessage());
 			throw new Exception("Data Retrieval Failed");	
 		}
 		
-		if (!$file){
+		if (!$res){
 			KalturaLog::debug("thumbnail cannot be created from $filePath " . error_get_last());
 			throw new Exception("thumbnail file path is not valid");
 		}	
@@ -48,7 +49,7 @@ class myEntryUtils
 		$thumbAsset->save();
 		
 		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::file_put_contents($fileSyncKey, $file);
+		kFileSyncUtils::moveFromFile($fileLocation, $fileSyncKey);
 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
 		$ext = pathinfo($finalPath, PATHINFO_EXTENSION);		
