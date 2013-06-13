@@ -1270,6 +1270,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$originalFlavorAsset->save();
 					
 				kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
+				
+				kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FAILED);
 				return false;
 			}
 		}
