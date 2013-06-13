@@ -68,11 +68,21 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	{
 		$fieldsEscapeType = $this->criteria->getSearchIndexFieldsEscapeType($sphinxField);
 		
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$notEmpty = kSphinxSearchManager::HAS_VALUE . $partnerId;
+		
 		switch($comparison)
 		{
 			case Criteria::EQUAL:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
-				return "@$sphinxField ^$value$";
+				return "@$sphinxField ^$value $notEmpty$";
+				
+			case Criteria::ISNULL:
+				$isEmpty = kSphinxSearchManager::HAS_NO_VALUE . $partnerId;
+				return "@$sphinxField $isEmpty";
+				
+			case Criteria::ISNOTNULL:
+				return "@$sphinxField $notEmpty";
 				
 			case Criteria::NOT_IN:
 				$vals = is_array($value) ? $value : explode(',', $value);
@@ -107,7 +117,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				if(count($vals))
 				{
 					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-					$val = '((^' . implode('$) | (^', $vals) . '$))';
+					$val = '((^' . implode(" $notEmpty$) | (^", $vals) . " $notEmpty$))";
 					return "@$sphinxField $val";
 				}
 				break;

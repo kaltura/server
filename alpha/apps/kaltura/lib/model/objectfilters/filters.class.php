@@ -42,6 +42,7 @@ abstract class baseObjectFilter extends myBaseObject
 	const MATCH_OR = "matchor";
 	const MATCH_AND = "matchand";
 	const NOT_CONTAINS = "notcontains";
+	const IS_EMPTY = "empty";
 
 	// TODO - make sure client-generators know how to generate this OR_SEPARATOR
 	const OR_SEPARATOR = "-";

@@ -640,6 +640,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$notEmpty = kSphinxSearchManager::HAS_VALUE . $partnerId;
+			
 			switch($operator)
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
@@ -699,7 +702,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = '((^' . implode('$) | (^', $vals) . '$))';
+						$val = '((^' . implode(" $notEmpty$) | (^", $vals) . " $notEmpty$))";
 						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
@@ -709,9 +712,22 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(is_numeric($val) || strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);								
-						$this->addMatch("@$sphinxField ^$val$");
+						$this->addMatch("@$sphinxField ^$val $notEmpty$");
 						$filter->unsetByName($field);
 					}
+					break;
+					
+				case baseObjectFilter::IS_EMPTY:
+					if($val)
+					{
+						$isEmpty = kSphinxSearchManager::HAS_NO_VALUE . $partnerId;
+						$this->addMatch("@$sphinxField $isEmpty");
+					}
+					else 
+					{
+						$this->addMatch("@$sphinxField $notEmpty");
+					}
+					$filter->unsetByName($field);
 					break;
 				
 				case baseObjectFilter::MULTI_LIKE_AND:

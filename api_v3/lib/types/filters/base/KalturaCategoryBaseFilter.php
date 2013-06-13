@@ -32,6 +32,7 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 		"inheritanceTypeEqual" => "_eq_inheritance_type",
 		"inheritanceTypeIn" => "_in_inheritance_type",
 		"referenceIdEqual" => "_eq_reference_id",
+		"referenceIdEmpty" => "_empty_reference_id",
 		"contributionPolicyEqual" => "_eq_contribution_policy",
 		"membersCountGreaterThanOrEqual" => "_gte_members_count",
 		"membersCountLessThanOrEqual" => "_lte_members_count",
@@ -199,6 +200,11 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $referenceIdEqual;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $referenceIdEmpty;
 
 	/**
 	 * @var KalturaContributionPolicyType

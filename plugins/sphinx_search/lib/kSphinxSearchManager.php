@@ -6,6 +6,10 @@
 class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer, kObjectErasedEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura';
+	
+	const HAS_VALUE = 'HASVALUE';
+	
+	const HAS_NO_VALUE = 'HASNOVALUE';
 
 	/**
 	 * @param string $baseName
@@ -198,7 +202,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			switch($fieldType)
 			{
 				case IIndexable::FIELD_TYPE_STRING:
-					$dataStrings[$field] = $object->$getter();
+					$value = $object->$getter();
+					if(is_null($value) || $value === '')
+						$value = self::HAS_NO_VALUE . $object->getPartnerId();
+					else
+						$value = ' ' . self::HAS_VALUE . $object->getPartnerId();
+						
+					$dataStrings[$field] = $value;
 					break;
 					
 				case IIndexable::FIELD_TYPE_INTEGER:
