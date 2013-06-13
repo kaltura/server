@@ -211,7 +211,7 @@ class AttachmentAssetService extends KalturaAssetService
 	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
 	{
     	$fullPath = myContentStorage::getFSUploadsPath() . '/' . basename($url);
-		if (kFile::downloadUrlToFile($url, $fullPath))
+		if (KCurlWrapper::getDataFromFile($url, $fullPath))
 			return $this->attachFile($attachmentAsset, $fullPath);
 			
 		if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
