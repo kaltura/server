@@ -200,7 +200,7 @@ class myInsertEntryHelper
 */
 				{
 					$entry_fullPath = $uploads.$entry_fileName;
-					if (!kFile::downloadUrlToFile($entry_url, $entry_fullPath))
+					if (!KCurlWrapper::getDataFromFile($entry_url, $entry_fullPath))
 					{
 						KalturaLog::debug("Failed downloading file[$entry_url]");
 						$entry_status = entryStatus::ERROR_IMPORTING;
@@ -344,7 +344,7 @@ class myInsertEntryHelper
 					$entry_thumbNum = 1;
 					$importedThumbPath = $uploads.$entry_data_prefix.'_temp_thumb'.strrchr($entry_thumbUrl, '.');
 					
-					if ( kFile::downloadUrlToFile($entry_thumbUrl, $importedThumbPath) )
+					if (KCurlWrapper::getDataFromFile($entry_thumbUrl, $importedThumbPath))
 					{
 						myFileConverter::createImageThumbnail($importedThumbPath, $thumbFullPath, "image2" );
 						// set thumb as big thumb so fileSync will be created.
