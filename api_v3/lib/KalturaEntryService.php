@@ -656,7 +656,7 @@ class KalturaEntryService extends KalturaBaseService
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
-    			if (kFile::downloadUrlToFile($url, $entryFullPath))
+    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     			
     			KalturaLog::err("Failed downloading file[$url]");
@@ -670,7 +670,7 @@ class KalturaEntryService extends KalturaBaseService
     		{
     			$ext = pathinfo($url, PATHINFO_EXTENSION);
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (kFile::downloadUrlToFile($url, $entryFullPath))
+    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     			{
     				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     				return $dbAsset;
