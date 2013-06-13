@@ -514,50 +514,6 @@ class kFile
 		return $content;
 	}
 	
-	static public function downloadUrlToFile($sourceUrl, $fullPath)
-	{
-		if(empty($sourceUrl))
-		{
-			$fullPath = null;
-			return false;
-		}
-		$f = fopen($fullPath, "wb");
-		
-		$ch = curl_init();
-		
-		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, $sourceUrl);
-		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
-		curl_setopt($ch, CURLOPT_FILE, $f);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-		
-		$result = 0;
-		if(curl_exec($ch))
-		{
-			$result = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			KalturaLog::info("curl_exec result [$result]");
-		}
-		else
-		{
-			KalturaLog::info("curl_exec failed [$sourceUrl]");
-		}
-		
-		curl_close($ch);
-		fclose($f);
-		
-		//226:The server has fulfilled a GET request for the resource, and the response is a representation 
-		//    of the result of one or more instance-manipulations applied to the current instance.
-		//200:Standard response for successful HTTP requests. The actual response will depend on the request
-		//    method used. In a GET request, the response will contain an entity corresponding to the 
-		//    requested resource. In a POST request the response will contain an entity describing or
-		//    containing the result of the action
-		$validCodes = array(
-			200,
-			226
-		);
-		return in_array($result, $validCodes);
-	}
-	
 	public static function getFileData($file_full_path)
 	{
 		return new kFileData($file_full_path);
