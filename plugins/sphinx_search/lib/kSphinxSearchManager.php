@@ -206,7 +206,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 					if(is_null($value) || $value === '')
 						$value = self::HAS_NO_VALUE . $object->getPartnerId();
 					else
-						$value = ' ' . self::HAS_VALUE . $object->getPartnerId();
+						$value .= ' ' . self::HAS_VALUE . $object->getPartnerId();
 						
 					$dataStrings[$field] = $value;
 					break;
