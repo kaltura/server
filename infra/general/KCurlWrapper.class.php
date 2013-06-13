@@ -171,13 +171,14 @@ class KCurlWrapper
 	}
 	
 	/**
-	 * Get file with max file size limitation
-	 * @param string $url
-	 * @param int $maxFileSize
-	 * @throws Exception | file as string
+	 * This Function can work in two ways if destFilePath is provided it will copy the url to the dest file else will return the file as string as an output
+	 * @param string $url - URL to get data from
+	 * @param $destFilePath - Optional URL to copy data to
+	 * @param int $maxFileSize - Optional max file size allowed for the retrieval action
+	 * @throws Exception | file as string | if $destFilePath provide - true or false
 	 */
 	
-	public static function getDataFromFile($url, $maxFileSize = null)
+	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null)
 	{
 		$curlWrapper = new KCurlWrapper($url);
 		$curlHeaderResponse = $curlWrapper->getHeader(true);
@@ -203,7 +204,7 @@ class KCurlWrapper
 		
 		$curlWrapper = new KCurlWrapper($url);
 		KalturaLog::debug("Executing curl");
-		$res = $curlWrapper->exec();
+		$res = $curlWrapper->exec($destFilePath);
 		$curlWrapper->close();
 		KalturaLog::debug("Done Curl Executing");
 		
