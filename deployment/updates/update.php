@@ -9,18 +9,29 @@ KAutoloader::register();
 
 $code = array();
 
-$options = getopt('iu:p:h:P:', array(
+$options = getopt('iu:p:h:P:ds', array(
 	'ignore',
 	'user:',
 	'password:',
 	'host:',
 	'port:',
+	'database-only:',
+	'scripts-only:',
 ));
 
 $ignoreErrors = false;
+$skipDB = false;
+$skipScripts = false;
+
 if(isset($options['i']) || isset($options['ignore']))
 	$ignoreErrors = true;
 
+if(isset($options['d']) || isset($options['database-only']))
+	$skipScripts = true;
+	
+if(isset($options['s']) || isset($options['scripts-only']))
+	$skipDB = true;
+	
 $params = array();
 if(isset($options['u']))
 	$params['user'] = $options['u'];
@@ -47,11 +58,18 @@ $updateRunner->init($ignoreErrors, $params);
 
 // create version_management table
 $updateRunner->runSqlScript(dirname(__FILE__) . DIRECTORY_SEPARATOR . "create_version_mng_table.sql");
-$sqlDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "sql";
-$updateRunner->runSqlScripts($sqlDir);
 
-$phpDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "scripts";
-$updateRunner->runPhpScripts($phpDir);
+if(!$skipDB)
+{
+	$sqlDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "sql";
+	$updateRunner->runSqlScripts($sqlDir);
+}
+
+if(!$skipScripts)
+{
+	$phpDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "scripts";
+	$updateRunner->runPhpScripts($phpDir);
+}
 
 exit(0);
 
