@@ -949,7 +949,7 @@ class category extends Basecategory implements IIndexable
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexNullableFields()
 	 */
-	public function getIndexNullableFields()
+	public static function getIndexNullableFields()
 	{
 		if (!self::$indexNullableFields)
 		{

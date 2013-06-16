@@ -34,7 +34,7 @@ interface IIndexable extends IBaseObject
 	/**
 	 * @return array of fields that should be indexed with suffix that indicates that the content is not null or text that indicates that the value is null
 	 */
-	public function getIndexNullableFields();
+	public static function getIndexNullableFields();
 	
 	/**
 	 * @return string field type, string, int or timestamp

@@ -472,6 +472,14 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return self::$sphinxFieldsEscapeType[$fieldName];
 	}
 	
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::isNullableField()
+	 */
+	public function isNullableField($fieldName)
+	{
+		return in_array($fieldName, category::getIndexNullableFields());
+	}
+	
 	public function hasMatchableField ( $field_name )
 	{
 		return in_array($field_name, array(

@@ -2679,7 +2679,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexNullableFields()
 	 */
-	public function getIndexNullableFields()
+	public static function getIndexNullableFields()
 	{
 		if (!self::$indexNullableFields)
 		{

@@ -1136,7 +1136,7 @@ class kuser extends Basekuser implements IIndexable
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexNullableFields()
 	 */
-	public function getIndexNullableFields()
+	public static function getIndexNullableFields()
 	{
 		return array();
 	}

@@ -513,6 +513,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return parent::getPositiveMatch($field);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::isNullableField()
+	 */
+	public function isNullableField($fieldName)
+	{
+		return in_array($fieldName, entry::getIndexNullableFields());
+	}
+	
 	public function hasMatchableField ( $field_name )
 	{
 		return in_array($field_name, array(
