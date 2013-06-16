@@ -99,7 +99,7 @@ foreach($expiryArr as $item)
 }
 
 $end = microtime(true);
-KalturaLog::info("syndicationFeedRenderer-end [".($end - $start)."]");
+KalturaLog::info("syndicationFeedRenderer-end [".($end - $start)."] memory: ".memory_get_peak_usage(true));
 KalturaLog::debug("<------------------------------------- syndicationFeedRenderer -------------------------------------");
 
 $result = ob_get_contents();

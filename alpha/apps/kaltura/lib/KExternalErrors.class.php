@@ -114,6 +114,6 @@ class KExternalErrors
 	public static function terminateDispatch() 
 	{
 		if (class_exists('KalturaLog') && isset($GLOBALS["start"])) 
-			KalturaLog::debug("Disptach took - " . (microtime(true) - $GLOBALS["start"]) . " seconds");
+			KalturaLog::debug("Disptach took - " . (microtime(true) - $GLOBALS["start"]) . " seconds, memory: ".memory_get_peak_usage(true));
 	}
 }	

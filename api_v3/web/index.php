@@ -23,7 +23,7 @@ $controller = KalturaFrontController::getInstance();
 $result = $controller->run();
 
 $end = microtime(true);
-KalturaLog::info("API-end [".($end - $start)."] memory: ".memory_get_peak_usage(true));
+KalturaLog::info("API-end [".($end - $start)."]");
 KalturaLog::debug("<------------------------------------- api_v3 -------------------------------------");
 
 $cache->end($result);
