@@ -194,7 +194,7 @@ function addActionPermissionItem($itemCfg)
 	
 	// add item to each defined permission
 	$permissionNames = array_map('trim', explode(',', $itemCfg->permissions));
-	addItemToPermissions($item, $permissionNames);
+	addItemToPermissions($item, $permissionNames, $itemCfg->partnerId);
 	
 }
 
@@ -255,20 +255,19 @@ function addParameterPermissionItem($itemCfg)
 	
 	// add item to each defined permission
 	$permissionNames = array_map('trim', str_getcsv($itemCfg->permissions));
-	addItemToPermissions($item, $permissionNames);
+	addItemToPermissions($item, $permissionNames, $itemCfg->partnerId);
 }
 
-function addItemToPermissions($item, $permissionNames)
+function addItemToPermissions($item, $permissionNames, $partnerId)
 {
 	foreach ($permissionNames as $permissionName)
 	{
 		PermissionToPermissionItemPeer::clearInstancePool();
 		
 		$partnerPermission = array_map('trim', explode('>', $permissionName));
-		$partnerId = PartnerPeer::GLOBAL_PARTNER;
-		if (count($partnerPermission) === 2) {
+		if (count($partnerPermission) === 2)
 			$partnerId = trim($partnerPermission[0]);
-		}
+			
 		$permissionName = trim(end($partnerPermission));
 		
 		$c = new Criteria();
