@@ -24,75 +24,6 @@ CREATE TABLE IF NOT EXISTS `access_control` (
   KEY `partner_id` (`partner_id`,`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-/*Table structure for table `admin_kuser` */
-
-CREATE TABLE IF NOT EXISTS `admin_kuser` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `screen_name` varchar(20) DEFAULT NULL,
-  `full_name` varchar(40) DEFAULT NULL,
-  `email` varchar(50) DEFAULT NULL,
-  `sha1_password` varchar(40) DEFAULT NULL,
-  `salt` varchar(32) DEFAULT NULL,
-  `picture` varchar(48) DEFAULT NULL,
-  `icon` tinyint(4) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `partner_id` int(11) DEFAULT NULL,
-  `login_blocked_until` datetime DEFAULT NULL,
-  `custom_data` text,
-  PRIMARY KEY (`id`),
-  KEY `screen_name_index` (`screen_name`),
-  KEY `admin_kuser_FI_1` (`partner_id`),
-  KEY `email_index` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `admin_permission` */
-
-CREATE TABLE IF NOT EXISTS `admin_permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `groups` varchar(512) DEFAULT NULL,
-  `admin_kuser_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `admin_permission_FI_1` (`admin_kuser_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `alert` */
-
-CREATE TABLE IF NOT EXISTS `alert` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `kuser_id` int(11) DEFAULT NULL,
-  `alert_type` int(11) DEFAULT NULL,
-  `subject_id` int(11) DEFAULT NULL,
-  `rule_type` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `kuser_index` (`kuser_id`),
-  KEY `subject_index` (`alert_type`,`subject_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `annotation` */
-
-CREATE TABLE IF NOT EXISTS `annotation` (
-  `int_id` int(11) NOT NULL AUTO_INCREMENT,
-  `id` varchar(255) NOT NULL,
-  `parent_id` varchar(255) DEFAULT NULL,
-  `entry_id` varchar(31) NOT NULL,
-  `partner_id` int(11) NOT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `text` text,
-  `tags` varchar(255) DEFAULT NULL,
-  `start_time` int(11) DEFAULT NULL,
-  `end_time` int(11) DEFAULT NULL,
-  `status` tinyint(4) NOT NULL,
-  `type` tinyint(4) NOT NULL DEFAULT '1',
-  `kuser_id` int(11) DEFAULT NULL,
-  `custom_data` text,
-  `partner_data` text,
-  PRIMARY KEY (`id`),
-  KEY `partner_entry_index` (`partner_id`,`entry_id`),
-  KEY `int_id_index` (`int_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 /*Table structure for table `audit_trail` */
 
 CREATE TABLE IF NOT EXISTS `audit_trail` (
@@ -294,43 +225,6 @@ CREATE TABLE IF NOT EXISTS `batch_job_sep` (
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_type_status_index` (`partner_id`,`job_type`,`status`),
   KEY `status_job_type_job_sub_type_created_at` (`status`,`job_type`,`job_sub_type`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `bb_forum` */
-
-CREATE TABLE IF NOT EXISTS `bb_forum` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `description` text,
-  `post_count` int(11) DEFAULT '0',
-  `thread_count` int(11) DEFAULT '0',
-  `last_post` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `is_live` int(11) DEFAULT '1',
-  PRIMARY KEY (`id`),
-  KEY `bb_forum_FI_1` (`last_post`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `bb_post` */
-
-CREATE TABLE IF NOT EXISTS `bb_post` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) DEFAULT NULL,
-  `content` text,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `kuser_id` int(11) DEFAULT NULL,
-  `forum_id` int(11) DEFAULT NULL,
-  `parent_id` int(11) DEFAULT NULL,
-  `node_level` int(11) DEFAULT NULL,
-  `node_id` varchar(64) DEFAULT NULL,
-  `num_childern` int(11) DEFAULT '0',
-  `last_child` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `bb_post_FI_1` (`kuser_id`),
-  KEY `bb_post_FI_2` (`forum_id`),
-  KEY `bb_post_FI_3` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `blocked_email` */
@@ -750,25 +644,6 @@ CREATE TABLE IF NOT EXISTS `dynamic_enum` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8;
 
-/*Table structure for table `email_campaign` */
-
-CREATE TABLE IF NOT EXISTS `email_campaign` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `criteria_id` smallint(6) DEFAULT NULL,
-  `criteria_str` varchar(1024) DEFAULT NULL,
-  `criteria_params` varchar(1024) DEFAULT NULL,
-  `template_path` varchar(256) DEFAULT NULL,
-  `campaign_mgr_kuser_id` int(11) DEFAULT NULL,
-  `send_count` int(11) DEFAULT NULL,
-  `open_count` int(11) DEFAULT NULL,
-  `click_count` int(11) DEFAULT NULL,
-  `status` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `campaign_mgr_kuser_id_index` (`campaign_mgr_kuser_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 /*Table structure for table `email_ingestion_profile` */
 
 CREATE TABLE IF NOT EXISTS `email_ingestion_profile` (
@@ -902,20 +777,6 @@ CREATE TABLE IF NOT EXISTS `event_notification_template` (
   PRIMARY KEY (`id`),
   KEY `partner_id_status_index` (`partner_id`,`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `facebook_invite` */
-
-CREATE TABLE IF NOT EXISTS `facebook_invite` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `puser_id` varchar(64) DEFAULT NULL,
-  `invited_puser_id` varchar(64) DEFAULT NULL,
-  `status` smallint(6) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `puser_id_index` (`puser_id`),
-  KEY `invited_puser_id_index` (`invited_puser_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `favorite` */
 
@@ -1417,43 +1278,6 @@ CREATE TABLE IF NOT EXISTS `kwidget_log` (
   KEY `kwidget_log_FI_4` (`ui_conf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `mail_job` */
-
-CREATE TABLE IF NOT EXISTS `mail_job` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `mail_type` smallint(6) DEFAULT NULL,
-  `mail_priority` smallint(6) DEFAULT NULL,
-  `recipient_name` varchar(64) DEFAULT NULL,
-  `recipient_email` varchar(64) DEFAULT NULL,
-  `recipient_id` int(11) DEFAULT NULL,
-  `from_name` varchar(64) DEFAULT NULL,
-  `from_email` varchar(64) DEFAULT NULL,
-  `body_params` varchar(2048) DEFAULT NULL,
-  `subject_params` varchar(512) DEFAULT NULL,
-  `template_path` varchar(512) DEFAULT NULL,
-  `culture` tinyint(4) DEFAULT NULL,
-  `status` tinyint(4) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `campaign_id` int(11) DEFAULT NULL,
-  `min_send_date` datetime DEFAULT NULL,
-  `scheduler_id` int(11) DEFAULT NULL,
-  `worker_id` int(11) DEFAULT NULL,
-  `batch_index` int(11) DEFAULT NULL,
-  `processor_name` varchar(64) DEFAULT NULL,
-  `processor_location` varchar(64) DEFAULT NULL,
-  `processor_expiration` datetime DEFAULT NULL,
-  `execution_attempts` tinyint(4) DEFAULT NULL,
-  `lock_version` int(11) DEFAULT NULL,
-  `partner_id` int(11) DEFAULT '0',
-  `updated_at` datetime DEFAULT NULL,
-  `dc` varchar(2) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `campaign_id_index` (`campaign_id`),
-  KEY `STATUS_PRIORITY_INDEX` (`status`,`mail_priority`),
-  KEY `recipient_id_index` (`recipient_id`),
-  KEY `partner_id_index` (`partner_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 /*Table structure for table `media_info` */
 
 CREATE TABLE IF NOT EXISTS `media_info` (
@@ -1596,35 +1420,6 @@ CREATE TABLE IF NOT EXISTS `moderation_flag` (
   KEY `entry_object_index` (`partner_id`,`status`,`object_type`,`flagged_kuser_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
-/*Table structure for table `notification` */
-
-CREATE TABLE IF NOT EXISTS `notification` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `partner_id` int(11) DEFAULT NULL,
-  `puser_id` varchar(64) DEFAULT NULL,
-  `type` smallint(6) DEFAULT NULL,
-  `object_id` varchar(20) DEFAULT NULL,
-  `status` int(11) DEFAULT NULL,
-  `notification_data` varchar(4096) DEFAULT NULL,
-  `number_of_attempts` smallint(6) DEFAULT '0',
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `notification_result` varchar(256) DEFAULT NULL,
-  `object_type` smallint(6) DEFAULT NULL,
-  `scheduler_id` int(11) DEFAULT NULL,
-  `worker_id` int(11) DEFAULT NULL,
-  `batch_index` int(11) DEFAULT NULL,
-  `processor_name` varchar(64) DEFAULT NULL,
-  `processor_location` varchar(64) DEFAULT NULL,
-  `processor_expiration` datetime DEFAULT NULL,
-  `execution_attempts` tinyint(4) DEFAULT NULL,
-  `lock_version` int(11) DEFAULT NULL,
-  `dc` varchar(2) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `status_partner_id_index` (`status`,`partner_id`),
-  KEY `object_type_object_id` (`object_type`,`object_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 /*Table structure for table `partner` */
 
 CREATE TABLE IF NOT EXISTS `partner` (
@@ -1756,22 +1551,6 @@ CREATE TABLE IF NOT EXISTS `partner_transactions` (
   KEY `partner_id_index` (`partner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `partnership` */
-
-CREATE TABLE IF NOT EXISTS `partnership` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `partnership_order` int(11) DEFAULT NULL,
-  `image_path` varchar(256) DEFAULT NULL,
-  `href` varchar(1024) DEFAULT NULL,
-  `text` varchar(1024) DEFAULT NULL,
-  `alt` varchar(256) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `partnership_date` varchar(128) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `partnership_order_index` (`partnership_order`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 /*Table structure for table `permission` */
 
 CREATE TABLE IF NOT EXISTS `permission` (
@@ -1822,21 +1601,6 @@ CREATE TABLE IF NOT EXISTS `permission_to_permission_item` (
   PRIMARY KEY (`id`),
   KEY `permission_to_permission_item_FI_2` (`permission_item_id`),
   KEY `permission_to_permission_item_FI_1` (`permission_id`,`permission_item_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `pr_news` */
-
-CREATE TABLE IF NOT EXISTS `pr_news` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `pr_order` int(11) DEFAULT NULL,
-  `image_path` varchar(256) DEFAULT NULL,
-  `href` varchar(1024) DEFAULT NULL,
-  `text` varchar(1024) DEFAULT NULL,
-  `alt` varchar(256) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `press_date` varchar(128) DEFAULT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `priority_group` */
@@ -2093,27 +1857,6 @@ CREATE TABLE IF NOT EXISTS `syndication_feed` (
   KEY `int_id_index` (`int_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-/*Table structure for table `system_user` */
-
-CREATE TABLE IF NOT EXISTS `system_user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(50) NOT NULL,
-  `first_name` varchar(40) NOT NULL,
-  `last_name` varchar(40) NOT NULL,
-  `sha1_password` varchar(40) NOT NULL,
-  `salt` varchar(32) NOT NULL,
-  `created_by` int(11) DEFAULT NULL,
-  `status` tinyint(4) NOT NULL,
-  `is_primary` tinyint(4) DEFAULT '0',
-  `status_updated_at` datetime DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `deleted_at` datetime DEFAULT NULL,
-  `role` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `system_user_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 /*Table structure for table `tag` */
 
 CREATE TABLE IF NOT EXISTS `tag` (
@@ -2129,15 +1872,6 @@ CREATE TABLE IF NOT EXISTS `tag` (
   KEY `partner_tag` (`partner_id`),
   KEY `partner_object_tag` (`partner_id`,`object_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `tagword_count` */
-
-CREATE TABLE IF NOT EXISTS `tagword_count` (
-  `tag` varchar(30) NOT NULL,
-  `tag_count` int(11) DEFAULT NULL,
-  PRIMARY KEY (`tag`),
-  KEY `count_index` (`tag_count`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `temp_entry_update` */
 
