@@ -29,6 +29,7 @@ class kApiCacheBase
 	const CACHE_STATUS_DISABLED = 2;			// cache was explicitly disabled by calling DisableCache (e.g. getContentData for an entry with access control)
 
 	// conditional cache constants
+	const MAX_INVALIDATION_KEYS = 250;
 	const MAX_SQL_CONDITION_DSNS = 1;			// max number of connections required to verify the SQL conditions
 	const MAX_SQL_CONDITION_QUERIES = 4;		// max number of queries per dsn required to verify the SQL conditions
 		
@@ -139,11 +140,19 @@ class kApiCacheBase
 	{
 		foreach (self::$_activeInstances as $curInstance)
 		{
+			if ($curInstance->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
+				continue;
+			
 			foreach ($invalidationKeys as $invalidationKey)
 			{
 				$curInstance->_invalidationKeys[$invalidationKey] = true;
 			}
 			$curInstance->_invalidationTime = max($curInstance->_invalidationTime, $invalidationTime);
+			
+			if (count($curInstance->_invalidationKeys) > self::MAX_INVALIDATION_KEYS)
+			{
+				$curInstance->disableConditionalCacheInternal();
+			}
 		}
 	}
 	

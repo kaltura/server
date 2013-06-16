@@ -48,7 +48,7 @@ class kQueryCache
 	const CACHED_QUERIES_EXPIRY_SEC = 86400;		// The expiry of the query keys in the memcache 	
 	const INVALIDATION_KEYS_EXPIRY_MARGIN = 3600;	// An extra expiry time given to invalidation keys over cached queries
 
-	const MAX_IN_CRITERION_INVALIDATION_KEYS = 10;	// Maximum number of allowed elements in 'IN' to use the query cache
+	const MAX_IN_CRITERION_INVALIDATION_KEYS = 50;	// Maximum number of allowed elements in 'IN' to use the query cache
 	
 	const CACHE_PREFIX_QUERY = 'QCQ-';				// = Query Cache - Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCI-';	// = Query Cache - Invalidation key
