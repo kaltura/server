@@ -661,7 +661,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					$vals = is_array($val) ? $val : explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!$valValue)
+						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
@@ -682,7 +682,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!$valValue)							
+						if(!strlen($valValue))							
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
@@ -704,7 +704,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!$valValue)
+						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
@@ -753,7 +753,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					$vals = is_array($val) ? $val : explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!$valValue)
+						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue)) //if there are spaces or tabs - should add "<VALUE>"
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
