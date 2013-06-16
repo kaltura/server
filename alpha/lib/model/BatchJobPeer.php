@@ -59,6 +59,20 @@ class BatchJobPeer extends BaseBatchJobPeer
 		return self::doSelect( $c );
 	}
 	
+	public static function retrieveByJobTypeAndObject($objectId, $objectType, $jobType, $jobSubType = null) 
+	{
+		$c = new Criteria();
+		$c->add ( self::OBJECT_ID , $objectId );
+		$c->add ( self::OBJECT_TYPE , $objectType );
+		$c->add ( self::JOB_TYPE , $jobType );
+		
+		if(!is_null($jobSubType))
+			$c->add ( self::JOB_SUB_TYPE , $jobSubType );
+		
+		$c->addAscendingOrderByColumn(self::CREATED_AT);
+		return self::doSelect( $c );
+	}
+	
 	public static function retrieveByEntryId($obj_id)
 	{
 		$c = new Criteria();

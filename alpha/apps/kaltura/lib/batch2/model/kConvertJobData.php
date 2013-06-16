@@ -185,6 +185,16 @@ class kConvertJobData extends kConvartableJobData
 		// If you have no conversion profile, there is no poinr in this calculation
 		if(is_null($this->conversionProfileId)) 
 			return BatchJobUrgencyType::DEFAULT_URGENCY;
+
+		if($batchJob->getObjectId() && $batchJob->getObjectType()) {
+			$batchJobs = BatchJobPeer::retrieveByJobTypeAndObject($batchJob->getObjectId(), $batchJob->getObjectType(), 
+				$batchJob->getJobType(), $batchJob->getJobSubType());
+			
+			if(count($batchJobs)) {
+				return $batchJobs[0]->getLockInfo()->getUrgency() + 1;
+			}
+		}
+		
 		
 		// a conversion job will be considered as required in one of the following cases:
 		// 1. The flavor is required
