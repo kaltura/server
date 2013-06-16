@@ -41,8 +41,7 @@ $fileSize = $argv[3];
 $config = parse_ini_file("config.ini");
 $serviceUrl = $config['service_url'];
 writeLog($logPrefix, 'Service URL '.$serviceUrl);
-$sleepSec = $config['sleep_time'];
-$ignoreTime = $config['ignore_time']; 
+$sleepSec = $config['sleep_time']; 
 
 $fileName=basename($filePath);
 $folderPath = dirname($filePath);
@@ -95,7 +94,7 @@ try
 		if($action == DETECTED)
 		{
 			writeLog($logPrefix, 'Handle file detected');
-			$file = addFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);			
+			$file = addFile($folder->id, $filePath, $fileSize, $dropFolderPlugin);			
 			writeLog($logPrefix, 'created file with id '.$file->id);
 			
 		}
@@ -105,22 +104,20 @@ try
 			sleep($sleepSec);
 			writeLog($logPrefix, 'Handle file uploaded');
 			
-			$file = null;
 			$olderFile = null; 
-			$files = getFiles($folder->id, $fileName, $dropFolderPlugin);
-			if (!is_null($files)){
-				foreach ($files as $dfFile){
-					if (is_null($file) && ($dfFile->status == KalturaDropFolderFileStatus::PARSED || $dfFile->status == KalturaDropFolderFileStatus::UPLOADING)){
-						$file = $dfFile; 
-					}
-					else if ($dfFile->fileSize == $fileSize && (time() - $dfFile->lastModificationTime < $ignoreTime)){
-						$olderFile = $dfFile;
-					}
-					
+			$file = null;
+			$dfFile = getFile($folder->id, $fileName, $dropFolderPlugin);
+			if (!is_null($dfFile)){
+				if ($dfFile->status == KalturaDropFolderFileStatus::PARSED || $dfFile->status == KalturaDropFolderFileStatus::UPLOADING){
+					$file = $dfFile; 
+					writeLog($logPrefix, 'found drop folder file id '.$file->id);	
+				}
+				else if ($dfFile->fileSize == $fileSize && $dfFile->lastModificationTime == filemtime($filePath)){
+					$olderFile = $dfFile;
+					writeLog($logPrefix, 'found older drop folder file id '.$olderFile->id);	
 				}
 			}
-			writeLog($logPrefix, 'drop folder file id '.$file->id);		
-					
+			
 			writeLog($logPrefix, 'Check if file exists on the file system...');
 			$fileExists = file_exists($filePath);
 			if($fileExists)
@@ -130,7 +127,7 @@ try
 				
 			if($fileExists && $file) //file exists on the file system and in database
 			{
-				updateFile($file->id, $fileSize, $dropFolderPlugin);				
+				updateFile($file->id, $fileSize, $filePath, $dropFolderPlugin);				
 				writeLog($logPrefix, 'drop folder file id '.$file->id.' updated ');
 			}
 			else if ($fileExists && !$file) //file exists on the file system, but not in database
@@ -140,7 +137,7 @@ try
 						writeLog($logPrefix, 'This is a duplicated UPLOADED event, ignoring it due to drop folder file id ' . $olderFile->id);
 				}
 				else{
-					$file = addPendingFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);
+					$file = addPendingFile($folder->id, $filePath, $fileSize, $dropFolderPlugin);
 					writeLog($logPrefix, 'created PENDING file with id '.$file->id);
 				}											
 			}
@@ -153,7 +150,7 @@ try
 		else if($action == RENAMED)
 		{
 			writeLog($logPrefix, 'Handle file renamed');
-			$file = addPendingFile($folder->id, $fileName, $fileSize, $dropFolderPlugin);			
+			$file = addPendingFile($folder->id, $filePath, $fileSize, $dropFolderPlugin);			
 			writeLog($logPrefix, 'created PENDING file with id '.$file->id);
 			
 		}		
@@ -184,44 +181,44 @@ function writeLog($prefix, $message)
 	echo $prefix.':'.$message."\n";
 }
 
-function addFile($folderId, $fileName, $fileSize, $dropFolderPlugin)
+function addFile($folderId, $filePath, $fileSize, $dropFolderPlugin)
 {
 	$newDropFolderFile = new KalturaDropFolderFile();
 	$newDropFolderFile->dropFolderId = $folderId;
-	$newDropFolderFile->fileName = $fileName;
+	$newDropFolderFile->fileName = basename($filePath);
 	$newDropFolderFile->fileSize = $fileSize;
-	$newDropFolderFile->lastModificationTime = time(); 
+	$newDropFolderFile->lastModificationTime = filemtime($filePath);
 	$newDropFolderFile->uploadStartDetectedAt = time();
 			
 	$file = $dropFolderPlugin->dropFolderFile->add($newDropFolderFile);
 	return $file;
 }
 
-function updateFile($fileId, $fileSize, $dropFolderPlugin)
+function updateFile($fileId, $fileSize, $filePath, $dropFolderPlugin)
 {
 	$updateDropFolderFile = new KalturaDropFolderFile();				
-	$updateDropFolderFile->lastModificationTime = time();
+	$updateDropFolderFile->lastModificationTime = filemtime($filePath);
 	$updateDropFolderFile->uploadEndDetectedAt = time();
 	$updateDropFolderFile->fileSize = $fileSize;
 	$dropFolderPlugin->dropFolderFile->update($fileId, $updateDropFolderFile);
 	$dropFolderPlugin->dropFolderFile->updateStatus($fileId, KalturaDropFolderFileStatus::PENDING);	
 }
 
-function addPendingFile($folderId, $fileName, $fileSize, $dropFolderPlugin)
+function addPendingFile($folderId, $filePath, $fileSize, $dropFolderPlugin)
 {
-	$file = addFile($folderId, $fileName, $fileSize, $dropFolderPlugin);
-	updateFile($file->id, $fileSize, $dropFolderPlugin);
+	$file = addFile($folderId, $filePath, $fileSize, $dropFolderPlugin);
+	updateFile($file->id, $fileSize, $filePath, $dropFolderPlugin);
 	return $file;
 }
 
-function getFiles($folderId, $fileName, $dropFolderPlugin)
+function getFile($folderId, $fileName, $dropFolderPlugin)
 {
 	$filter = new KalturaDropFolderFileFilter();
 	$filter->dropFolderIdEqual = $folderId;
 	$filter->fileNameEqual = $fileName;
 	$dropFolderFiles = $dropFolderPlugin->dropFolderFile->listAction($filter);
-	if($dropFolderFiles->totalCount > 0)
-		return $dropFolderFiles->objects;
+	if($dropFolderFiles->totalCount == 1)
+		return $dropFolderFiles->objects[0];
 	else 
 		return null;	
 }
