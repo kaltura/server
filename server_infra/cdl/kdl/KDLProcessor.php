@@ -117,16 +117,63 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 						$targetList[] = $target;
 				}
 				$this->validateProfileTarget($targetList);
-//print_r($this->ProceessFlavorsForCollection($targetList));
 			}
-/*			else{
-				$flavor = $profile->_flavors[0];
-				$target = $flavor->GenerateTarget($this->_srcDataSet);
-				$targetList[] = $target;
-			}
-*/
 		}
+		
+		/* ------------------------------
+		 * GenerateIntermediateSource
+		 */
+		public function GenerateIntermediateSource(KDLMediaDataSet $mediaSet, KDLProfile $profile=null)
+		{
+			if($mediaSet==null || !$mediaSet->IsDataSet()){
+				return null;
+			}
+			if(!((isset($mediaSet->_container) && $mediaSet->_container->_format=="arf")
+			|| $mediaSet->Initialize())){
+				return null;			
+			}
+			$interSrcProfile = null;
+			if($mediaSet->_container->IsFormatOf(array("arf"))) {
+				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::COPY,
+						KDLVideoTarget::WVC1A, 4000, 1080,
+						KDLAudioTarget::WMA, 128, 0,
+						1, "webexNbrplayer.WebexNbrplayer");
+			}
+			else if($mediaSet->_video->IsFormatOf(array("g2m3","g2m4","gotomeeting3","gotomeeting3","gotomeeting"))) {
+				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::WMV,
+						KDLVideoTarget::WVC1A, 4000, 1080,
+						KDLAudioTarget::WMA, 128, 0,
+						1, "expressionEncoder.ExpressionEncoder");
+			}
+			else if($mediaSet->_video->IsFormatOf(array("icod","intermediate codec"))
+				 || ( $mediaSet->_container->IsFormatOf(array("qt","mov")) 
+				   && $mediaSet->_video->IsFormatOf(array("wmv","wmv3","wvc1","vc1","vc-1")) 
+				   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","windows media audio","windows media audio 10 professional"))  )){
+				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
+						KDLVideoTarget::H264H, 4000, 1080, 
+						KDLAudioTarget::AAC, 128, 0, 
+						1, "quickTimeTools.QuickTimeTools");
+			}
+			else if($mediaSet->_video->IsFormatOf(array("tscc","tsc2"))) {
+				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
+						KDLVideoTarget::H264H, 4000, 1080, 
+						KDLAudioTarget::AAC, 128, 0, 
+						0, KDLTranscoders::FFMPEG);
+			}
+			
+			if(!isset($interSrcProfile))
+				return null;
 
+KalturaLog::log("Automatic Intermediate Source will be generated");
+			$targetList = array();
+			$this->Generate($mediaSet, $interSrcProfile, $targetList);
+			if(count($targetList)==0)
+				return null;
+			if(!isset($targetList[0]->_video->_width)){
+				$targetList[0]->_video->_width = 0;
+			}
+			return $targetList[0];
+		}
 		
 		/* ------------------------------
 		 * ProceessFlavorsForCollection
@@ -177,6 +224,46 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 				}
 			}
 		}
+
+		/* ------------------------------
+		 * setProfileWithIntermediateSource
+		*/
+		private function setProfileWithIntermediateSource($contId, $vidId, $vidBr, $vidHeight, $audId, $audBr, $audSr, $engVer, $engine)
+		{
+			$interSrcFlavor = new KDLFlavor();
+			$interSrcFlavor->_name = "Automatic Intermediate Source";
+			$interSrcFlavor->_id = 0;
+			$interSrcFlavor->_container = new KDLContainerData();
+			$interSrcFlavor->_container->_id = $contId;
+			$vid = new KDLVideoData();
+				$vid->_id = $vidId;
+				$vid->_bitRate = $vidBr;
+				$vid->_height = $vidHeight;
+			$interSrcFlavor->_video = $vid;
+			$aud = new KDLAudioData();
+				$aud->_id = $audId;
+				$aud->_bitRate = $audBr;
+				$aud->_sampleRate = $audSr;
+			$interSrcFlavor->_audio = $aud;
+			$interSrcFlavor->_engineVersion = $engVer;
+			
+			$opr = new KDLOperationParams(); 
+			$opr->Set($engine);
+			if($interSrcFlavor->_engineVersion==1) {
+				$opr->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $opr->_id);
+			}
+			else {
+				$opr->_engine = new KDLOperatorWrapper($opr->_id);
+			}
+			if($opr->_engine==null)
+				return null;
+			$interSrcFlavor->_transcoders[] = $opr;
+			$interSrcProfile = new KDLProfile();
+			$interSrcProfile->_flavors[] = $interSrcFlavor;
+			
+			return $interSrcProfile;
+		}
+		
 	}
 
 	/* ===========================
