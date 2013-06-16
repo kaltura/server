@@ -104,48 +104,42 @@ try
 			sleep($sleepSec);
 			writeLog($logPrefix, 'Handle file uploaded');
 			
-			$olderFile = null; 
-			$file = null;
-			$dfFile = getFile($folder->id, $fileName, $dropFolderPlugin);
-			if (!is_null($dfFile)){
-				if ($dfFile->status == KalturaDropFolderFileStatus::PARSED || $dfFile->status == KalturaDropFolderFileStatus::UPLOADING){
-					$file = $dfFile; 
-					writeLog($logPrefix, 'found drop folder file id '.$file->id);	
-				}
-				else if ($dfFile->fileSize == $fileSize && $dfFile->lastModificationTime == filemtime($filePath)){
-					$olderFile = $dfFile;
-					writeLog($logPrefix, 'found older drop folder file id '.$olderFile->id);	
-				}
-			}
-			
+			$file = getFile($folder->id, $fileName, $dropFolderPlugin);
+				
 			writeLog($logPrefix, 'Check if file exists on the file system...');
 			$fileExists = file_exists($filePath);
 			if($fileExists)
 				writeLog($logPrefix, 'file exists on the file system');
 			else 
 				writeLog($logPrefix, 'file does not exists on the file system');
-				
-			if($fileExists && $file) //file exists on the file system and in database
+
+			if ($file && ($file->status == KalturaDropFolderFileStatus::PARSED || $file->status == KalturaDropFolderFileStatus::UPLOADING))
 			{
-				updateFile($file->id, $fileSize, $filePath, $dropFolderPlugin);				
-				writeLog($logPrefix, 'drop folder file id '.$file->id.' updated ');
+				writeLog($logPrefix, 'found drop folder file in status PARSED or UPLOADING with id '.$file->id);
+				if ($fileExists) //file exists on the file system and in database
+				{
+					updateFile($file->id, $fileSize, $filePath, $dropFolderPlugin);				
+					writeLog($logPrefix, 'drop folder file id '.$file->id.' updated ');
+				}
+				else //file does not exists on file system (temporary file), but exists in database
+				{
+					$dropFolderPlugin->dropFolderFile->updateStatus($file->id, KalturaDropFolderFileStatus::PURGED);
+					writeLog($logPrefix, 'file deleted from the file system, status updated to PURGED');
+				}
 			}
-			else if ($fileExists && !$file) //file exists on the file system, but not in database
+			else if ($fileExists)
 			{
 				writeLog($logPrefix, 'No drop folder file exists with status UPLOADING or PARSED');
-				if ($olderFile){
-						writeLog($logPrefix, 'This is a duplicated UPLOADED event, ignoring it due to drop folder file id ' . $olderFile->id);
+				if ($file && $file->fileSize == $fileSize && $file->lastModificationTime == filemtime($filePath)) //an older drop folder file already exists
+				{
+					writeLog($logPrefix, 'This is a duplicated UPLOADED event, ignoring it due to drop folder file id ' . $file->id);
 				}
-				else{
+				else //file exists on the file system, but not in database 
+				{
 					$file = addPendingFile($folder->id, $filePath, $fileSize, $dropFolderPlugin);
 					writeLog($logPrefix, 'created PENDING file with id '.$file->id);
-				}											
+				}
 			}
-			else if(!$fileExists && $file) //file does not exists on file system (temporary file), but exists in database
-			{
-				$dropFolderPlugin->dropFolderFile->updateStatus($file->id, KalturaDropFolderFileStatus::PURGED);
-				writeLog($logPrefix, 'file deleted from the file system, status updated to PURGED');
-			}				
 		}
 		else if($action == RENAMED)
 		{
