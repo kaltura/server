@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."server_infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
 
+define('SF_ROOT_DIR', KALTURA_ROOT_PATH . '/alpha');
 define("KALTURA_API_V3", true); // used for different logic in alpha libs
 
 define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");

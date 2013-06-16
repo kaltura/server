@@ -1,7 +1,5 @@
 <?php
 $start = microtime(true);
-require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
-
 // check cache before loading anything
 require_once(dirname(__FILE__)."/../lib/KalturaResponseCacher.php");
 $cache = new KalturaResponseCacher();
