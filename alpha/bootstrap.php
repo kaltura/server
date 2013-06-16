@@ -17,6 +17,9 @@ $sf_symfony_data_dir = KALTURA_ROOT_DIR . '/symfony-data';
 $include_path = realpath(dirname(__FILE__).'/../../vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
 set_include_path($include_path);
 
+// symfony bootstraping
+require_once("$sf_symfony_lib_dir/util/sfCore.class.php");
+sfCore::bootstrap($sf_symfony_lib_dir, $sf_symfony_data_dir);
 
 // Logger
 kLoggerCache::InitLogger(KALTURA_LOG, 'PS2');
