@@ -187,6 +187,7 @@ class downloadAction extends sfAction
 	
 	private function dumpFile($file_path, $file_name)
 	{
+		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
 		$directServe = $this->getRequestParameter("direct_serve");
 
