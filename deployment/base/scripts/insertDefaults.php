@@ -118,20 +118,12 @@ foreach($fileNames as $fileName)
 	{
 		$object = new $newObjectType();
 		/* @var $object BaseObject */
-		$pkCriteria = new Criteria();
+		$pk = null;
 		$setters = array();
 		foreach($objectConfiguration as $attributeName => $value)
 		{
-			try
-			{
-				$fieldName = strtoupper($peer->translateFieldName($attributeName, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_FIELDNAME));
-				if(isset($primaryKeys[$fieldName]))
-				{
-					$columnName = $peer->translateFieldName($attributeName, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME);
-					$pkCriteria->add($columnName, $value);
-				}
-			}
-			catch(PropelException $pe){}
+			if($attributeName == 'id')
+				$pk = $value;
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
@@ -149,8 +141,11 @@ foreach($fileNames as $fileName)
 			$setters[$setter] = $value;
 		}
 
-		if($pkCriteria->size())
+		$pkCriteria = null;
+		if(!is_null($pk))
 		{
+			$pkCriteria = new Criteria();
+			$pkCriteria->add(constant(get_class($peer) . '::ID'), $pk);
 			$existingObject = $peer->doSelectOne($pkCriteria, $con);
 			if($existingObject)
 				$object = $existingObject;
@@ -161,21 +156,9 @@ foreach($fileNames as $fileName)
 
 		$object->save();
 
-		if($pkCriteria && count($pkCriteria->keys()))
-		{
-			foreach($primaryKeys as $column)
-			{
-				/* @var $column ColumnMap */
-				$getter = 'get' . $column->getPhpName();
-				$attributeName = lcfirst($column->getPhpName());
-				$value = $object->$getter();
-				if(isset($objectConfiguration[$attributeName]) && $value != $objectConfiguration[$attributeName])
-				{
-					BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
-					break;
-				}
-			}
-		}
+		if(!is_null($pkCriteria))
+			BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
+			
 		kMemoryManager::clearMemory();
 	}
 }
