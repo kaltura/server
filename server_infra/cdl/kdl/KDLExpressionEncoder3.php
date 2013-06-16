@@ -231,14 +231,17 @@ $vidObj = $target->_video;
 					$vbr=$vidObj->_bitRate;
 				if($cbr==0){
 					$videoBitrateElem = new SimpleXMLElement(self::videoVariableBitrateXml);
+					$videoBitrateElem->VariableConstrainedBitrate['PeakBitrate'] = round($vbr*1.3);
+					$videoBitrateElem->VariableConstrainedBitrate['AverageBitrate'] = $vbr;
 					KDLUtils::AddXMLElement($videoCodec->Streams->StreamInfo, $videoBitrateElem);
-					$videoCodec->Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate'] = round($vbr*1.3);
-					$videoCodec->Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'] = $vbr;
 				}
 				else {
 					$videoBitrateElem = new SimpleXMLElement(self::videoConstantBitrateXml);
+					$videoBitrateElem->ConstantBitrate['Bitrate'] = $vbr;
+					if(isset($target->_isTwoPass) && $target->_isTwoPass==1){
+						$videoBitrateElem->ConstantBitrate['IsTwoPass'] = 'True';
+					}
 					KDLUtils::AddXMLElement($videoCodec->Streams->StreamInfo, $videoBitrateElem);
-					$videoCodec->Streams->StreamInfo->Bitrate->ConstantBitrate['Bitrate'] = $vbr;
 				}
 			}
 			if($vidObj->_width!=null && $vidObj->_height!=null){
