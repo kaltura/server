@@ -152,4 +152,63 @@ class CaptionAssetItemService extends KalturaBaseService
 			$entryCoreFilter->setAdvancedSearch($entryCaptionAdvancedSearch);
 		}
 	}
+	
+	
+	/**
+	 * Search caption asset items by filter, pager and free text
+	 *
+	 * @action searchEntries
+	 * @param KalturaBaseEntryFilter $entryFilter
+	 * @param KalturaCaptionAssetItemFilter $captionAssetItemFilter
+	 * @param KalturaFilterPager $captionAssetItemPager
+	 * @return KalturaBaseEntryListResponse
+	 */
+	public function searchEntriesAction (KalturaBaseEntryFilter $entryFilter = null, KalturaCaptionAssetItemFilter $captionAssetItemFilter = null, KalturaFilterPager $captionAssetItemPager = null)
+	{
+		if (!$captionAssetItemPager)
+			$captionAssetItemPager = new KalturaFilterPager();
+			
+		if (!$captionAssetItemFilter)
+			$captionAssetItemFilter = new KalturaCaptionAssetItemFilter();
+
+		$captionAssetItemFilter->validatePropertyNotNull(array("contentLike", "contentMultiLikeOr", "contentMultiLikeAnd"));
+		
+		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
+		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
+		
+		if($entryFilter || kEntitlementUtils::getEntitlementEnforcement())
+		{
+			$entryCoreFilter = new entryFilter();
+			if($entryFilter)
+				$entryFilter->toObject($entryCoreFilter);
+			$entryCoreFilter->setPartnerSearchScope($this->getPartnerId());
+			$this->addEntryAdvancedSearchFilter($captionAssetItemFilter, $entryCoreFilter);
+				
+			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$entryCoreFilter->attachToCriteria($entryCriteria);
+			$entryCriteria->applyFilters();
+				
+			$entryIds = $entryCriteria->getFetchedIds();
+			if(!$entryIds || !count($entryIds))
+				$entryIds = array('NOT_EXIST');
+				
+			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
+		}
+		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
+		
+		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
+		$captionAssetItemPager->attachToCriteria($captionAssetItemCriteria);
+		$captionAssetItemCriteria->addGroupByColumn('str_entry_id');
+		$captionAssetItemCriteria->addSelectColumn('str_entry_id');
+		$captionAssetItemCriteria->applyFilters();
+		
+		$entryIds = $captionAssetItemCriteria->getFetchedIds();
+		$dbList = entryPeer::retrieveByPKs($entryIds);
+		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $list;
+		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
+		
+		return $response;
+	}
 }
