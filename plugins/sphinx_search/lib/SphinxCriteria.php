@@ -191,7 +191,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if (!$this->selectColumn)
 			$this->selectColumn = $this->getSphinxIdField();
 		
-		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres $orderBy GROUP BY {$this->groupByColumn} LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
+		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres $orderBy " . ($this->groupByColumn ? "GROUP BY {$this->groupByColumn} " : "" ) . "LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
+		
 		if (kConf::hasParam('sphinx_extra_options'))
 			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
