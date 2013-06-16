@@ -168,6 +168,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 	
+	public function isNullableField($fieldName)
+	{
+		return false;
+	}
+	
 	/**
 	 * @param string $index index name
 	 * @param string $wheres
@@ -705,7 +710,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = '((^' . implode(" $notEmpty$) | (^", $vals) . " $notEmpty$))";
+						if($this->isNullableField($fieldName))
+							$val = '((^' . implode(" $notEmpty$) | (^", $vals) . " $notEmpty$))";
+						else
+							$val = '((^' . implode("$) | (^", $vals) . "$))";
+							
 						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}
@@ -714,8 +723,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 0)
 					{
-						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);								
-						$this->addMatch("@$sphinxField ^$val $notEmpty$");
+						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);	
+						if($this->isNullableField($fieldName))
+							$this->addMatch("@$sphinxField ^$val $notEmpty$");
+						else							
+							$this->addMatch("@$sphinxField ^$val$");
 						$filter->unsetByName($field);
 					}
 					break;
