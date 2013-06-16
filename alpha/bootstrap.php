@@ -1,20 +1,16 @@
 <?php
 
-define('KALTURA_ROOT_PATH',			realpath(__DIR__ . '/../'));
-define('KALTURA_INFRA_DIR',			KALTURA_ROOT_PATH . '/infra');
-define('KALTURA_SERVER_INFRA_DIR',	KALTURA_ROOT_PATH . '/server_infra');
-define('KALTURA_PLUGINS_DIR',		KALTURA_ROOT_PATH . '/plugins');
-define('KALTURA_VENDOR_DIR',		KALTURA_ROOT_PATH . '/vendor');
+define('KALTURA_ROOT_PATH',				realpath(__DIR__ . '/../'));
 
-define('SF_APP',					'kaltura');
-define('SF_ROOT_DIR',				KALTURA_ROOT_PATH . '/alpha');
-define('MODULES', 					SF_ROOT_DIR . '/apps/kaltura/modules/');
+define('SF_APP',						'kaltura');
+define('SF_ROOT_DIR',					KALTURA_ROOT_PATH . '/alpha');
+define('MODULES', 						SF_ROOT_DIR . '/apps/kaltura/modules/');
 
 
 $sf_symfony_lib_dir = KALTURA_ROOT_PATH . '/symfony';
 $sf_symfony_data_dir = KALTURA_ROOT_PATH . '/symfony-data';
 
-$include_path = realpath(KALTURA_VENDOR_DIR . '/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
+$include_path = realpath(KALTURA_ROOT_PATH . '/vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
 set_include_path($include_path);
 
 // symfony bootstraping

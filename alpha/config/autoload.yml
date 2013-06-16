@@ -1,31 +1,31 @@
 autoload:
   infra:
     name:           infra
-    path:           %KALTURA_INFRA_DIR%
+    path:           %SF_MODEL_LIB_DIR%/../../../infra
 #    prefix:         1
     recursive:      on   
     
   server_infra:
     name:           server_infra
-    path:           %KALTURA_SERVER_INFRA_DIR%
+    path:           %SF_MODEL_LIB_DIR%/../../../server_infra
 #    prefix:         1
     recursive:      on   
     
   plugins:
     name:           plugins
-    path:           %KALTURA_PLUGINS_DIR%
+    path:           %SF_MODEL_LIB_DIR%/../../../plugins
     recursive:      on   
     
     
   propel:
     name:           propel
-    path:           %KALTURA_VENDOR_DIR%/propel
+    path:           %SF_MODEL_LIB_DIR%/../../../vendor/propel
 #    prefix:         1
     recursive:      on   
     
     
   zend:
     name:           zend
-    path:           %KALTURA_VENDOR_DIR%/ZendFramework/library
+    path:           %SF_MODEL_LIB_DIR%/../../../vendor/ZendFramework/library
 #    prefix:         1
     recursive:      on   
