@@ -177,6 +177,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	{
 		return CuePointPeer::TABLE_NAME;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		return array();
+	}
 
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldsMap()

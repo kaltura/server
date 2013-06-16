@@ -1132,6 +1132,14 @@ class kuser extends Basekuser implements IIndexable
     {
        return kuserPeer::getOMClass(false);
     }
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		return array();
+	}
 
 	/* (non-PHPdoc)
      * @see IIndexable::getIndexFieldsMap()

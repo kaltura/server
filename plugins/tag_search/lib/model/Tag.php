@@ -46,6 +46,14 @@ class Tag extends BaseTag implements IIndexable
         return TagSearchPlugin::INDEX_NAME;
         
     }
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		return array();
+	}
 
 	/* (non-PHPdoc)
      * @see IIndexable::getIndexFieldsMap()

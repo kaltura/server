@@ -248,6 +248,14 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	public function getObjectIndexName() {
 		return categoryKuserPeer::TABLE_NAME;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		return array();
+	}
 
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldsMap()

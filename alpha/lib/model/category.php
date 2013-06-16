@@ -33,7 +33,7 @@ class category extends Basecategory implements IIndexable
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
 	private static $indexFieldsMap = null;
-	
+	private static $indexNullableFields = null;	
 	private static $indexFieldTypes = null;
 	
 	public function save(PropelPDO $con = null)
@@ -946,7 +946,26 @@ class category extends Basecategory implements IIndexable
 		return '';
 	}
 	
-/* (non-PHPdoc)
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		if (!self::$indexNullableFields)
+		{
+			self::$indexNullableFields = array(
+				'description',
+				'tags',
+				'reference_id',
+				'privacy_contexts',
+				'members',
+			);
+		}
+		
+		return self::$indexNullableFields;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldsMap()
 	 */
 	public function getIndexFieldsMap()

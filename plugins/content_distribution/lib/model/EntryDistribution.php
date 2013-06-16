@@ -328,6 +328,14 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	{
 		return EntryDistributionPeer::TABLE_NAME;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		return array();
+	}
 
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldsMap()

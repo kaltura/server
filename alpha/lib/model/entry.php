@@ -17,7 +17,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	protected $creator_kuser_id = null;
 	
 	private static $indexFieldsMap = null;
-	
+	private static $indexNullableFields = null;	
 	private static $indexFieldTypes = null;
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
@@ -2675,6 +2675,36 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		return $partnerSearchIndex;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexNullableFields()
+	 */
+	public function getIndexNullableFields()
+	{
+		if (!self::$indexNullableFields)
+		{
+			self::$indexNullableFields = array(
+				'tags',
+				'categories',
+				'flavor_params',
+				'kshow_id',
+				'group_id',
+				'description',
+				'admin_tags',
+				'reference_id',
+				'replacing_entry_id',
+				'replaced_entry_id',
+				'roots',
+				'entitled_kusers_publish',
+				'entitled_kusers_edit',
+				'entitled_kusers',
+				'privacy_by_contexts',
+			);
+		}
+		
+		return self::$indexNullableFields;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIndexFieldsMap()
 	 */

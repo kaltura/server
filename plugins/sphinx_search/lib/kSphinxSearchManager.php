@@ -195,6 +195,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$dataTimes = array();
 		
 		$fields = $object->getIndexFieldsMap();
+		$nullableFields = $object->getIndexNullableFields();
 		foreach($fields as $field => $getterName)
 		{
 			$fieldType = $object->getIndexFieldType($field);
@@ -203,11 +204,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			{
 				case IIndexable::FIELD_TYPE_STRING:
 					$value = $object->$getter();
-					if(is_null($value) || $value === '')
-						$value = self::HAS_NO_VALUE . $object->getPartnerId();
-					else
-						$value .= ' ' . self::HAS_VALUE . $object->getPartnerId();
-						
+					if(in_array($field, $nullableFields))
+					{
+						if(is_null($value) || $value === '')
+							$value = self::HAS_NO_VALUE . $object->getPartnerId();
+						else
+							$value .= ' ' . self::HAS_VALUE . $object->getPartnerId();
+					}
 					$dataStrings[$field] = $value;
 					break;
 					
