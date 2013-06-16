@@ -28,6 +28,8 @@
 // @ignore
 // ===================================================================================================
 
+require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
+
 function print_r_reverse($in) {
     $lines = explode("\n", trim($in));
     if (trim($lines[0]) != 'Array') {
@@ -138,6 +140,48 @@ function genKalcliCommand($parsedParams)
 	return $res;
 }
 
+function generateOutput($parsedParams, $multireqMode)
+{
+	if (isset($parsedParams['service']) && $parsedParams['service'] == 'multirequest')
+	{
+		if ($multireqMode == 'multi')
+		{
+			unset($parsedParams['service']);
+			unset($parsedParams['action']);
+			$requestByParams = parseMultirequest($parsedParams);
+			foreach ($requestByParams as $curParams)
+			{
+				$curCmd = genKalcliCommand($curParams);
+				echo $curCmd . "\n";
+			}
+			return;
+		}
+		$parsedParams['action'] = 'null';
+	}
+	
+	$curCmd = genKalcliCommand($parsedParams);
+	echo $curCmd . "\n";
+}
+
+// parse the command line
+$commandLineSwitches = array(
+		array(KalturaCommandLineParser::SWITCH_NO_VALUE, 's', 'single', 'Generate a single command for multirequest'),
+		array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'h', 'help', 'Prints usage information'),
+);
+
+$options = KalturaCommandLineParser::parseArguments($commandLineSwitches);
+if (isset($options['help']))
+{
+	$usage = "Usage: logToCli [switches]\nOptions:\n";
+	$usage .= KalturaCommandLineParser::getArgumentsUsage($commandLineSwitches);
+	echo $usage; 
+	exit(1);
+}
+
+$multireqMode = 'multi';
+if (isset($options['single']))
+	$multireqMode = 'single';
+
 // read parameters from stdin
 $f = fopen('php://stdin', 'r');
 $logSection = '';
@@ -154,30 +198,30 @@ fclose($f);
 // parse the log section
 $logSection = str_replace("\r", '', $logSection);
 $arrayPos = strpos($logSection, 'Array');
-if ($arrayPos === false)
-	die('Error: failed to parse log section (missing "Array")');
-
-$logSection = substr($logSection, $arrayPos);
-$parsedParams = print_r_reverse($logSection);
-if (!is_array($parsedParams))
-	die('Error: failed to parse action parameters');
-
-// output the result
-if (isset($parsedParams['service']) && $parsedParams['service'] == 'multirequest')
+$curlPos = strpos($logSection, 'curl: ');
+if ($arrayPos !== false)
 {
-	unset($parsedParams['service']);
-	unset($parsedParams['action']);
-	$requestByParams = parseMultirequest($parsedParams);
-	foreach ($requestByParams as $curParams)
+	$logSection = substr($logSection, $arrayPos);
+	$parsedParams = print_r_reverse($logSection);
+	if (!is_array($parsedParams))
 	{
-		$curCmd = genKalcliCommand($curParams);
-		echo $curCmd . "\n";
-		exec('history -s "' . $curCmd . '"');
+		echo 'Error: failed to parse action parameters';
+		exit(1);
 	}
 }
-else
+else if ($curlPos !== false)
 {
-	$curCmd = genKalcliCommand($parsedParams);
-	echo $curCmd . "\n";
-	exec('history -s "' . $curCmd . '"');
+	$logSection = substr($logSection, $curlPos);
+	$parsedUrl = parse_url(trim($logSection));
+	$parsedParams = null;
+	parse_str($parsedUrl['query'], $parsedParams);
+	
 }
+else 
+{
+	echo 'Error: failed to parse log section (missing "Array")';
+	exit(1);
+}
+
+// output the result
+generateOutput($parsedParams, $multireqMode);

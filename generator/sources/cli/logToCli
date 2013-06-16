@@ -30,15 +30,19 @@ TMPFILE=/tmp/logToCli.tmp
 BASEDIR=@BASEDIR@
 
 echo Paste the log portion here
-php ${BASEDIR}/logToCli.php > $TMPFILE
+php ${BASEDIR}/logToCli.php $@ > $TMPFILE
 
-echo Command lines:
-cat $TMPFILE
+if [ $? -eq 0 ]; then
+	echo Command lines:
+	cat $TMPFILE
 
-while read line
-do
-        history -s "$line"
-done < $TMPFILE
-echo Note: commands were added to shell history - use up arrow to access them
+	while read line
+	do
+	        history -s "$line"
+	done < $TMPFILE
+	echo Note: commands were added to shell history - use up arrow to access them
+else
+	cat $TMPFILE
+fi
 
 rm -f $TMPFILE
