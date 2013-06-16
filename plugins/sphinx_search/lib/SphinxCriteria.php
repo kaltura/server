@@ -67,7 +67,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	protected $hasAdvancedSearchFilter = false;
 	
-	protected $sphinxSkiped = false;
+	protected $sphinxSkipped = false;
 	
 	protected function applyIds(array $ids)
 	{
@@ -179,8 +179,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		$pdo = DbManager::getSphinxConnection();
 		
-		$sphinxIdField = $this->getSphinxIdField();
-		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
+		$selectFields = implode(',', $this->getSelectColumns());
+		if (!$selectFields)
+			$selectFields = $this->getSphinxIdField();
+		
+		$sql = "SELECT $selectFields $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
 		if (kConf::hasParam('sphinx_extra_options'))
 			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
@@ -195,7 +198,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 		}
 
-		
+		$this->clearSelectColumns();
 		//debug query
 
 		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 2);
@@ -433,7 +436,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx())
 		{
 			KalturaLog::debug('Skip Sphinx');
-			$this->sphinxSkiped = true;
+			$this->sphinxSkipped = true;
 			return;
 		}
 		
@@ -978,7 +981,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	public function getRecordsCount() 
 	{
-		if (!$this->sphinxSkiped)
+		if (!$this->sphinxSkipped)
 			return $this->recordsCount;
 		
 		$c = clone $this;
@@ -986,7 +989,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$c->setOffset(null);
 		$this->recordsCount = $this->doCountOnPeer($c);
 		
-		$this->sphinxSkiped = false;
+		$this->sphinxSkipped = false;
 
 		return $this->recordsCount;
 		
@@ -1056,5 +1059,17 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$crit->getTable() . '.' . $crit->getColumn(),
 				$crit->getComparison(),
 				$crit->getValue());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Criteria::addSelectColumn()
+	 */
+	public function addSelectColumn($name)
+	{
+		$sphinxColumnName = $this->getSphinxFieldName($name);
+		if ($this->getSphinxFieldType($sphinxColumnName) == IIndexable::FIELD_TYPE_INTEGER)
+		{
+			parent::addSelectColumn($sphinxColumnName);
+		}
 	}
 }
