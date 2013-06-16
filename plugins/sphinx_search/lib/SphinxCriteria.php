@@ -69,6 +69,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	protected $sphinxSkipped = false;
 	
+	protected $selectColumn = null;
+	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -179,11 +181,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		$pdo = DbManager::getSphinxConnection();
 		
-		$selectFields = implode(',', $this->getSelectColumns());
-		if (!$selectFields)
-			$selectFields = $this->getSphinxIdField();
+		if (!$this->selectColumn)
+			$this->selectColumn = $this->getSphinxIdField();
 		
-		$sql = "SELECT $selectFields $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
+		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
 		if (kConf::hasParam('sphinx_extra_options'))
 			$sql .= ', ' . kConf::get('sphinx_extra_options');
 
@@ -198,7 +199,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 		}
 
-		$this->clearSelectColumns();
 		//debug query
 
 		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 2);
@@ -1061,15 +1061,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$crit->getValue());
 	}
 	
-	/* (non-PHPdoc)
-	 * @see Criteria::addSelectColumn()
-	 */
-	public function addSelectColumn($name)
+
+	public function setSelectColumn($name)
 	{
 		$sphinxColumnName = $this->getSphinxFieldName($name);
-		if ($this->getSphinxFieldType($sphinxColumnName) == IIndexable::FIELD_TYPE_INTEGER)
-		{
-			parent::addSelectColumn($sphinxColumnName);
-		}
+		$this->selectColumn = $sphinxColumnName;
 	}
 }

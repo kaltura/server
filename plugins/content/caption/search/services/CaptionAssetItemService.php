@@ -199,7 +199,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemPager->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemCriteria->addGroupByColumn('str_entry_id');
-		$captionAssetItemCriteria->addSelectColumn('str_entry_id');
+		$captionAssetItemCriteria->setSelectColumn('str_entry_id');
 		$captionAssetItemCriteria->applyFilters();
 		
 		$entryIds = $captionAssetItemCriteria->getFetchedIds();
