@@ -34,6 +34,9 @@ class uploadAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		if(!isset($_FILES['Filedata'])) 
+			$this->addException(APIErrors::MANDATORY_PARAMETER_MISSING, 'Filedata');
+		
   		$filename = $this->getPM ('filename');
 		// strip the filename from invalid characters
 		$token = $this->getKsUniqueString();
