@@ -18,6 +18,7 @@ class kCountryCondition extends kMatchCondition
 	 * The ip geo coder engine to be used
 	 * 
 	 * @var int of enum geoCoderType
+	 * TODO take the default from kConf for on-prem
 	 */
 	protected $geoCoderType = geoCoderType::KALTURA;
 	

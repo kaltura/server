@@ -228,27 +228,11 @@ function checkCache()
 	}
 }
 
-
 checkCache();
 
-require_once(realpath(dirname(__FILE__)).'/../config/sfrootdir.php');
-define('SF_APP',         'kaltura');
-define('SF_ENVIRONMENT', 'prod');
-define('SF_DEBUG',       false);
+define('KALTURA_LOG', 		'ps2');
+define('SF_ENVIRONMENT',	'prod');
+define('SF_DEBUG',			false);
 
-define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
+require_once(__DIR__ . '/../bootstrap.php');
 
-require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
-
-// Logger
-kLoggerCache::InitLogger('ps2', 'PS2');
-
-sfLogger::getInstance()->registerLogger(KalturaLog::getInstance());
-sfLogger::getInstance()->setLogLevel(7);
-sfConfig::set('sf_logging_enabled', true);
-
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
-
-ActKeyUtils::checkCurrent();
-sfContext::getInstance()->getController()->dispatch();
