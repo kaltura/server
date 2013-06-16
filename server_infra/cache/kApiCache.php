@@ -782,21 +782,28 @@ class kApiCache extends kApiCacheBase
 		if (self::$_cacheWarmupInitiated)
 			return;
 
-		self::$_cacheWarmupInitiated = true;
-
-		// require apc for checking whether warmup is already in progress
-		if (!function_exists('apc_fetch'))
-			return;
-
+		self::$_cacheWarmupInitiated = true;		
+		
 		$key = "cache-warmup-$key";
-
-		// abort warming if a previous warmup started less than 10 seconds ago
-		if (apc_fetch($key) !== false)
+		
+		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_API_WARMUP);
+		if (!$cacheSections)
 			return;
-
-		// flag we are running a warmup for the current request
-		apc_store($key, true, self::WARM_CACHE_TTL);
-
+		
+		foreach ($cacheSections as $cacheSection)
+		{
+			$cacheStore = kCacheManager::getCache($cacheSection);
+			if (!$cacheStore)
+				return;
+		
+			// abort warming if a previous warmup started less than 10 seconds ago
+			if ($cacheStore->get($key) !== false)
+				return;
+			
+			// flag we are running a warmup for the current request
+			$cacheStore->set($key, true, self::WARM_CACHE_TTL);
+		}
+		
 		$uri = $_SERVER["REQUEST_URI"];
 
 		$fp = fsockopen('127.0.0.1', 80, $errno, $errstr, 1);
