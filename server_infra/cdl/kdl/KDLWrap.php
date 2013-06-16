@@ -22,12 +22,8 @@ class KDLWrap
 		conversionEngineType::FFMPEG_AUX=>KDLTranscoders::FFMPEG_AUX,
 		conversionEngineType::FFMPEG_VP8=>KDLTranscoders::FFMPEG_VP8,
 		conversionEngineType::EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
-//		"expressionEncoder.ExpressionEncoder"=>KDLTranscoders::EXPRESSION_ENCODER,
+			
 		"quickTimeTools.QuickTimeTools"=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
-//		"fastStart.FastStart"=>KDLTranscoders::QT_FASTSTART,
-//		"avidemux.Avidemux"=>KDLTranscoders::AVIDEMUX,
-//		conversionEngineType::PDF2SWF=>KDLTranscoders::PDF2SWF,
-//		conversionEngineType::PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
 	);
 	
 	/* ------------------------------
@@ -62,6 +58,35 @@ class KDLWrap
 	}
 	
 	/* ------------------------------
+	 * function GenerateIntermediateSource
+	 */
+	public static function GenerateIntermediateSource(mediaInfo $cdlMediaInfo, $cdlFlavorList=null)
+	{
+		$mediaSet = new KDLMediaDataSet();
+		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
+		
+		KalturaLog::log( "...S-->".$mediaSet->ToString());
+
+		$profile = null;
+		if(isset($cdlFlavorList)) {
+			$profile = new KDLProfile();
+			foreach($cdlFlavorList as $cdlFlavor) {
+				$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
+				$profile->_flavors[] = $kdlFlavor;
+				KalturaLog::log( "...F-->".$kdlFlavor->ToString());
+			}
+		}
+		
+		$dlPrc = new KDLProcessor();
+		
+		$interSrc = $dlPrc->GenerateIntermediateSource($mediaSet, $profile);
+		if(!isset($interSrc))
+			return null;
+		
+		return self::ConvertFlavorKdl2Cdl($interSrc);
+	}
+	
+	/* ------------------------------
 	 * function generateTargetFlavors
 	 */
 	private function generateTargetFlavors(mediaInfo $cdlMediaInfo=null, $cdlFlavorList)
@@ -93,12 +118,12 @@ class KDLWrap
 		}
 			/*
 			 * For 'passthrough' quick&dirty
-			 */
+			 
 		if(isset($mediaSet->_container) && $mediaSet->_container->_id=="arf")
 			$isArf = true;
 		else
 			$isArf = false;
-		
+			*/
 		foreach ($trgList as $trg){
 			KalturaLog::log("...T-->".$trg->ToString());
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
@@ -106,11 +131,11 @@ class KDLWrap
 			/*
 			 * 'passthrough' temporal, quick&dirty implementation to support imitation of 
 			 * 'auto-inter-src' for webex/arf.
-			 */
+			 
 			if($isArf==false && isset($trg->_transcoders)
 			&& $trg->_transcoders[0]->_id=="webexNbrplayer.WebexNbrplayer"){
 				$cdlFlvrOut->_passthrough=true;
-			}
+			}*/
 			$this->_targetList[] = $cdlFlvrOut;
 		}
 		return $this;
@@ -493,6 +518,7 @@ class KDLWrap
 		$medSet->_container->_duration=$cdlMediaInfo->getContainerDuration();
 		$medSet->_container->_bitRate=$cdlMediaInfo->getContainerBitRate();
 		$medSet->_container->_fileSize=$cdlMediaInfo->getFileSize();
+//		$medSet->_container->_isFastStart=$cdlMediaInfo->getIsFastStart();
 		if($medSet->_container->IsDataSet()==false)
 			$medSet->_container = null;
 
