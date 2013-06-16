@@ -258,4 +258,14 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 			$this->addDescendingOrderByColumn($column);
 		}
 	}
+	
+	public function setGroupByColumn($name)
+	{
+		
+	}
+	
+	public function setSelectColumn($name)
+	{
+		
+	}
 }
