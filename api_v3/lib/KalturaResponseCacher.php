@@ -3,7 +3,7 @@
  * @package api
  * @subpackage cache
  */
-require_once(dirname(__FILE__) . '/../../server_infra/cache/kApiCache.php');
+require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/cache/kCacheManager.php');
 
 /**
  * @package api
@@ -141,7 +141,8 @@ class KalturaResponseCacher extends kApiCache
 		
 		if ($responseMetadata['class'])
 		{
-			require_once(dirname(__file__) . "/../../server_infra/renderers/{$responseMetadata['class']}.php");
+			require_once(dirname(__FILE__) . "/../../alpha/apps/kaltura/lib/renderers/{$responseMetadata['class']}.php");
+			
 			$response = unserialize($response);
 			$response->output();
 			die;

@@ -5,7 +5,7 @@
  */
 require_once ( "myContentStorage.class.php");
 require_once ( "myResponseUtils.class.php");
-require_once ( "myFlvStreamer.class.php");
+require_once ( "media/myFlvStreamer.class.php");
 
 /**
  * @package    Core

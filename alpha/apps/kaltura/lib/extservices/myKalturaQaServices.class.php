@@ -1,7 +1,4 @@
 <?php
-//define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
-//require_once(MODULES.'search/actions/entryFilter.class.php');
-
 /**
  * @package Core
  * @subpackage ExternalServices

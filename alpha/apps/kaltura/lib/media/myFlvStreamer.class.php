@@ -1,5 +1,5 @@
 <?php
-require_once ( "myContentStorage.class.php");
+require_once (__DIR__ . '/../myContentStorage.class.php');
 
 class myFlvStreamer
 {
