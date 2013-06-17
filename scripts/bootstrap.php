@@ -3,10 +3,9 @@ set_time_limit(0);
 
 ini_set("memory_limit","700M");
 
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../'));
-require_once(ROOT_DIR . '/server_infra/kConf.php');
-require_once(ROOT_DIR . '/server_infra/bootstrap_base.php');
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
+define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../'));
+require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
+require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
 $include_path = 
 	realpath(dirname(__FILE__).'/../vendor/ZendFramework/library') . PATH_SEPARATOR . 

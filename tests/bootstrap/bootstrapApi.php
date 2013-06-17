@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../../server_infra/bootstrap_base.php");
+define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../../'));
 require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
 
 define("KALTURA_TEST_BASE_PATH", KALTURA_ROOT_PATH . "/tests/base");

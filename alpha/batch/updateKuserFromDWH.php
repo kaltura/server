@@ -5,8 +5,9 @@ set_time_limit(0);
 ini_set("memory_limit","700M");
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
+define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../../'));
+
 require_once(ROOT_DIR . '/server_infra/kConf.php');
-require_once(ROOT_DIR . '/server_infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 require_once (SF_ROOT_DIR . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . SF_APP . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php');
 
