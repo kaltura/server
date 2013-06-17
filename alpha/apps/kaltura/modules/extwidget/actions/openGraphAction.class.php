@@ -60,7 +60,7 @@ class openGraphAction extends sfAction
 		$this->uiConf = $uiConf;
 
 		// Build SWF Path
-		$swfPath = "/index.php/kwidget/wid/_" . $widgetId . "/uiconf_id/" . $uiConfId . "/entry_id/" . $entryId;
+		$swfPath = "/index.php/kwidget/wid/" . $widgetId . "/uiconf_id/" . $uiConfId . "/entry_id/" . $entryId;
 		// Set SWF URLs
 		$this->swfUrl = 'http://' . $embed_host . $swfPath;
 		$this->swfSecureUrl = 'https://' . $embed_host_https . $swfPath;		
