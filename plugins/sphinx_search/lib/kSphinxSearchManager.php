@@ -6,9 +6,9 @@
 class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer, kObjectErasedEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura';
-	
+
 	const HAS_VALUE = 'HASVALUE';
-	
+
 	const HAS_NO_VALUE = 'HASNOVALUE';
 
 	/**
@@ -173,9 +173,14 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 * @param IIndexable $object
 	 * @param bool $isInsert
 	 * @param bool $force
+	 * @param array $options - an array of additional options
+	 *    e.g. array("format" => "xmlPipe2", "placeHolders" => array("plays" => "__PLAYS__", "views" => "__VIEWS__"))
+	 *    format = xmlPipe2 : produce an xml document for indexing using the Sphinx indexer tool
+	 *    placeHolders : replace given fields values with place holders instead of the actual field value
+ 	 *    used for caching entry sphinx sql when changing plays and views count
 	 * @return string|bool
 	 */
-	public function getSphinxSaveSql(IIndexable $object, $isInsert = false, $force = false)
+	public function getSphinxSaveSql(IIndexable $object, $isInsert = false, $force = false, $options = null)
 	{
 		$id = $object->getIntId();
 		if(!$id)
@@ -255,15 +260,16 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 
 		}
 
+		$xmlPipe2 = isset($options["format"]) ? $options["format"] == "xmlPipe2" : false;
+
 		foreach ($sphinxPluginsData as $key => $value){			
 			if (!is_numeric($value)){
-				$value = SphinxUtils::escapeString($value, SearchIndexFieldEscapeType::DEFAULT_ESCAPE, 1);
+				$value = $xmlPipe2 ? $value : SphinxUtils::escapeString($value, SearchIndexFieldEscapeType::DEFAULT_ESCAPE, 1);
 				$search = array("\0", 	"\n",	"\r",	"\x1a");
 				$replace = array("\\0", "\\n",	"\\r",	"\\Z");
 				$value = str_replace($search, $replace, $value);
 				$data[$key] = "'$value'";
 			}else{
-//				$value = (int)$value;
 				$data[$key] = is_numeric($value) ? $value : 0;
 			}
 		}
@@ -272,7 +278,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		{
 			$escapeType = $object->getSearchIndexFieldsEscapeType($key);
 			
-			$value = SphinxUtils::escapeString($value, $escapeType, 1);
+			$value = $xmlPipe2 ? $value : SphinxUtils::escapeString($value, $escapeType, 1);
 			$search = array("\0", 	"\n",	"\r",	"\x1a");
 			$replace = array("\\0", "\\n",	"\\r",	"\\Z");
 			$value = str_replace($search, $replace, $value);
@@ -291,14 +297,56 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataTimes as $key => $value)
 		{
-//			$value = (int)$value;
 			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
+		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
+
+		$placeHolders = isset($options["placeHolders"]) ? $options["placeHolders"] : false;
+
+		if (is_array($placeHolders))
+		{
+			foreach($placeHolders as $placeHolderField => $placeHolderValue)
+			{
+				if (isset($data[$placeHolderField]))
+					$data[$placeHolderField] = $placeHolderValue;
+			}
+		}
+
+		if ($xmlPipe2)
+		{
+			$dom = new DomDocument('1.0');
+			$node = $dom->createElement('sphinx:document');
+			$node->setAttribute('id', $data["id"]);
+
+			unset($data["id"]);
+
+			foreach($data as $field => $value)
+			{
+				$tmp = $dom->createElement($field);
+				$tmp->appendChild($dom->createTextNode(utf8_encode(trim($value,"'"))));
+ 				$node->appendChild($tmp);
+			}
+
+			//$dom->appendChild($node);	
+			return $dom->saveXML($node);
+
+
+			$str = "<sphinx:document id=\"".$data["id"]."\">";
+
+			unset($data["id"]);
+
+			foreach($data as $field => $value)
+			{
+				$str .= "<$field><![CDATA[$value]]></$field>\n";
+			}
+			$str .= "</sphinx:document>";
+
+			return $str;
+		}
+	
 		$values = implode(',', $data);
 		$fields = implode(',', array_keys($data));
-		
-		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
 		
 		return "replace into $index ($fields) values($values)";
 	}
