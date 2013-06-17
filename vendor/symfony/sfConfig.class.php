@@ -19,17 +19,10 @@ class sfConfig
 		}
 	}
 	
-	
 	public static function get ( $param )
 	{
-//		return kConf::get( $param );
-		
 		self::init();
 		$res = @self::$map[$param];
 		return $res;
-	
 	}
-	
-	
 }
-?>
