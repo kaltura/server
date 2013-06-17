@@ -293,18 +293,6 @@ class infraRequestUtils
 			}
 		}
 		
-		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
-		if (!$remote_addr &&
-			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-		 	isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
-		 	kConf::hasParam('remote_addr_header_server') &&
-		 	$_SERVER['HTTP_X_FORWARDED_SERVER'] == kConf::get('remote_addr_header_server') )
-		{
-			// pick the last ip
-		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
-			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
-		}
-
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
 		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
 		if (!$remote_addr &&
@@ -332,6 +320,18 @@ class infraRequestUtils
 		 	}
 		}
 
+		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
+		if (!$remote_addr &&
+				isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+				isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
+				kConf::hasParam('remote_addr_header_server') &&
+				$_SERVER['HTTP_X_FORWARDED_SERVER'] == kConf::get('remote_addr_header_server') )
+		{
+			// pick the last ip
+			$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
+		}
+		
 		// if still empty ....
 		if (!$remote_addr)
 			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
