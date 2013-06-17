@@ -43,12 +43,7 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 * @filter eq
 	 */
 	public $uiConfId;
-	
-	/**
-	 * @var string
-	 */
-	private $customData;
-	
+		
 	/**
 	 * @var KalturaWidgetSecurityType
 	 */

@@ -7,6 +7,8 @@
  */
 class KalturaFilterPager extends KalturaObject
 {
+	const MIN_PAGE_INDEX = 1;
+	
 	/**
 	 * The number of objects to retrieve. (Default is 30, maximum page size is 500).
 	 * 
@@ -21,14 +23,12 @@ class KalturaFilterPager extends KalturaObject
 	 */
 	public $pageIndex = 1;	
 	
-	private $minPageIndex = 1;
-
 	public function attachToCriteria ( Criteria $c )
 	{
 		$this->pageSize = max(min($this->pageSize, baseObjectFilter::getMaxInValues()), 0);
 		$c->setLimit( $this->pageSize );
 		
-		$this->pageIndex = max($this->minPageIndex, $this->pageIndex);		
+		$this->pageIndex = max(self::MIN_PAGE_INDEX, $this->pageIndex);		
 		$offset = ($this->pageIndex - 1) * $this->pageSize;
 		$c->setOffset( $offset );
 	}

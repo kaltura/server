@@ -119,16 +119,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 */
-	private $shouldForceUniqueKshow;
-	
-	/**
-	 * @var int
-	 */
-	private $returnDuplicateKshow;
-	
-	/**
-	 * @var int
-	 */
 	public $allowQuickEdit;
 	
 	/**
