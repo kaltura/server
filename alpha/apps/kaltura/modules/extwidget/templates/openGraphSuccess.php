@@ -7,7 +7,6 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<?php if( $entry_id ) { ?>
 	<meta property="og:url" content="<?php echo $pageURL; ?>" />
 	<meta property="og:title" content="<?php echo htmlspecialchars($entry_name); ?>" />
 	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
@@ -19,12 +18,11 @@
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
 	<meta property="og:video:type" content="application/x-shockwave-flash" />
-	<?php if( isset($flavor_asset_id) ) { ?>
+	<?php if( isset($flavorUrl) ) { ?>
 	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
 	<meta property="og:video:type" content="video/mp4" />	
 	<?php } ?>
 	<meta property="og:site_name" content="Kaltura" />
-	<?php } ?>
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
 </head>
 <body>

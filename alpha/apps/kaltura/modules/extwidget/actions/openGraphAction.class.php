@@ -69,6 +69,7 @@ class openGraphAction extends sfAction
 		$this->html5Url = $protocol . "://" . $host . $port . "/p/".$partnerId."/sp/".$partnerId."00/embedIframeJs/uiconf_id/".$uiConfId."/partner_id/". $partnerId;
 		$this->pageURL = $protocol . '://' . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];
 
+		$this->flavorUrl = null;
 		if( isset($flavorId) ) {
 			$this->flavorUrl = 'https://' . $embed_host_https . '/p/'. $partnerId .'/sp/' . $partnerId . '00/playManifest/entryId/' . $entryId . '/flavorId/' . $flavorId . '/format/url/protocol/' . $protocol . '/a.mp4';
 		}
