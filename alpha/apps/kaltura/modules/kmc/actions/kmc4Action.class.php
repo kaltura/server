@@ -54,6 +54,7 @@ class kmc4Action extends kalturaAction
 		
 		/** Get array of allowed partners for the current user **/
 		$allowedPartners = array();
+		$this->full_name = "";
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
 		if($currentUser) {
 			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());
@@ -191,7 +192,7 @@ class kmc4Action extends kalturaAction
 			'language'					=> $language,
 			'logoutUrl'					=> $logoutUrl,
 			'allowFrame'				=> (bool) $allowFrame,
-			'clientIP'					=> requestUtils::getRemoteAddress(),
+			'akamaiEdgeServerIpURL'		=> kConf::get('akamai_edge_server_ip_url'),
 		);
 		
 		$this->kmcVars = $kmcVars;
