@@ -33,6 +33,10 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	 */
 	protected $doCount = true;
 
+	protected $selectColumn = null;
+	
+	protected $groupByColumn = null;
+	
 	/**
 	 * @return int
 	 */
@@ -261,11 +265,11 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	
 	public function setGroupByColumn($name)
 	{
-		
+		$this->groupByColumn = $name;
 	}
 	
 	public function setSelectColumn($name)
 	{
-		
+		$this->selectColumn = $name;
 	}
 }
