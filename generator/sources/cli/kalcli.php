@@ -126,7 +126,7 @@ if (!isset($options['no-stdin']))
 	fclose($f);
 }
 
-if (!isset($options['raw']))
+if (!isset($options['raw']) && !isset($options['curl']))
 	$params['format'] = '3';      # PHP
 	
 // renew all ks'es
@@ -164,6 +164,40 @@ if (strpos($serviceUrl, '://') === false)
 }
 
 $url = $serviceUrl . "/api_v3/index.php?service={$service}&action={$action}";
+
+if (isset($options['curl']))
+{
+	$commandLine = "curl";
+	
+	if (isset($options['header']))
+	{
+		$headers = $options['header'];
+		if (!is_array($headers))
+			$headers = array($headers);
+		foreach ($headers as $curHeader)
+			$commandLine .= ' "-H'.$curHeader.'"';
+	}
+	
+	if (isset($options['insecure']))
+		$commandLine .= ' -k';	
+	if (isset($options['include']))
+		$commandLine .= ' -i';
+	if (isset($options['head']))
+		$commandLine .= ' -I';
+		
+	if (!isset($options['get']))
+	{
+		$commandLine .= ' "-d'.http_build_query($params).'"';
+	}
+	else if ($params)
+	{
+		$url .= '&' . http_build_query($params);
+	}
+	$commandLine .= ' "'.$url.'"';
+	
+	die($commandLine . "\n");
+}
+
 
 // initialize the curl wrapper
 $curlWrapper = new KalturaCurlWrapper();
