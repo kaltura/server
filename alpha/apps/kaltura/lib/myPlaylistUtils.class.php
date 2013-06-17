@@ -251,7 +251,7 @@ class myPlaylistUtils
 			$entry_filter->attachToCriteria( $c );
 			
 			// add some hard-coded criteria
-			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX ) , Criteria::IN ); // search only for clips or roughcuts
+			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX, entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 
 			if ( $display_in_search >= 2 )
