@@ -1,73 +1,44 @@
-<?php
-	
-/* @var $entry entry */
-/* @var $widget widget */
-/* @var $uiConf uiConf */
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="lt-ie10 lt-ie9"> <![endif]-->
+<!--[if lt IE 10]>     <html class="lt-ie10"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<?php if( $entry_id ) { ?>
+	<meta property="og:url" content="<?php echo $pageURL; ?>" />
+	<meta property="og:title" content="<?php echo htmlspecialchars($entry_name); ?>" />
+	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
+	<meta property="og:type" content="video.other" />
+	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+	<meta property="og:image:seucre_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+	<meta property="og:video" content="<?php echo $swfUrl; ?>" />
+	<meta property="og:video:secure_url" content="<?php echo $swfSecureUrl; ?>" />
+	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
+	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
+	<meta property="og:video:type" content="application/x-shockwave-flash" />
+	<?php if( isset($flavor_asset_id) ) { ?>
+	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
+	<meta property="og:video:type" content="video/mp4" />	
+	<?php } ?>
+	<meta property="og:site_name" content="Kaltura" />
+	<?php } ?>
+	<title><?php echo htmlspecialchars($entry_name); ?></title>
+</head>
+<body>
 
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# video: http://ogp.me/ns/video#">
+<script src="<?php echo $html5Url; ?>"></script>
+<div id="kaltura_player" style="width: <?php echo $uiConf->getWidth(); ?>px; height: <?php echo $uiConf->getHeight(); ?>px;"></div>
+<script>
+kWidget.embed({
+  "targetId": "kaltura_player",
+  "wid": "<?php echo $widget->getId(); ?>",
+  "uiconf_id": <?php echo $uiConf->getId(); ?>,
+  "entry_id": "<?php echo $entry->getId(); ?>"
+});
+</script>
 
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<!-- Open Graph meta tags -->
-
-<meta property="og:type" content="video.movie"> 
-<meta property="og:title" content="<?php echo $entry->getName(); ?>" />
-<meta property="og:description" content="<?php echo $entry->getDescription(); ?>"  />
-<meta property="og:image" content="<?php echo $entryThumbUrl; ?>/width/<?php echo $uiConf->getWidth();?>" />
-<meta property="og:image:secure_url" content="<?php echo $entryThumbSecureUrl; ?>/width/<?php echo $uiConf->getWidth();?>" />
-<meta property="og:video" content="<?php echo $widgetUrl; ?>" />
-<meta property="og:video:secure_url" content="<?php echo $widgetSecureUrl; ?>" />
-<meta property="og:video:height" content="<?php echo $uiConf->getHeight(); ?>" />
-<meta property="og:video:width" content="<?php echo $uiConf->getWidth(); ?>" />
-<meta property="og:video:type" content="application/x-shockwave-flash" />
-<meta property="og:url" content="<?php echo $pageURL; ?>" />
-
-    </head>
-	<body>
-
-<div id="player_container" ></div> 
-<script src="/lib/js/flashembed.js"></script> 
-<script type="text/javascript"> 
-
-//Define Player Parameters
-  var playerConfig = {
-	'partnerId' : '<?php echo $widget->getPartnerId(); ?>', 
-	'uiconfId' : '<?php echo $uiConf->getId(); ?>', 
-	'entryId' : '<?php echo $entry->getId(); ?>', 
-	'playerWidth' : <?php echo $uiConf->getWidth(); ?>,
-	'playerHeight' : <?php echo $uiConf->getHeight(); ?>
-	
-  }
-
-//Include HTML5 library
-var includeUrl = "http://<?php echo kConf::get('www_host'); ?>/p/"+playerConfig['partnerId']+"/sp/"+playerConfig['partnerId']+"00/embedIframeJs/uiconf_id/"+playerConfig['uiconfId']+"/partner_id/"+playerConfig['partnerId'];
-document.write('<scr' + 'ipt src="'+includeUrl+'"></scr' + 'ipt>');
-//build embed code
-var embedCodeConfig = {
-	//This is the base config
-	'src' : "http://<?php echo kConf::get('www_host'); ?>/index.php/kwidget/cache_st/1322734888791/wid/_" + playerConfig.partnerId + "/uiconf_id/" + playerConfig.uiconfId + "/entry_id/"  + playerConfig.entryId, 
-	'flashvars' : {	
-		externalInterfaceDisabled : "false"
-		}
-};
-// No need to modify anything beyond this point
-</script> 
-<script type="text/javascript"> 
-		flashembed("player_container",
-				{	// attributes and params:
-					id :				"kaltura_player",
-					src : 				embedCodeConfig.src, 
-					height :			playerConfig.playerHeight,
-					width :				playerConfig.playerWidth,
-					bgcolor :			"#000000",
-					allowNetworking : 	"all",
-					version :			[10,0],
-					expressInstall :	"http://cdn.kaltura.org/apis/seo/expressinstall.swf"
-				},
-				embedCodeConfig.flashvars
-		);
-</script> 
 </body> 
 </html>
