@@ -126,6 +126,11 @@ class kmc4Action extends kalturaAction
 			$logoutUrl = $partner->getLogoutUrl();
 		
 		$this->kmc_swf_version = kConf::get('kmc_version');
+
+		$akamaiEdgeServerIpURL = null;
+		if( kConf::hasParam('akamai_edge_server_ip_url') ) {
+			$akamaiEdgeServerIpURL = kConf::get('akamai_edge_server_ip_url');
+		}
 		
 	/** uiconf listing work **/
 		/** fill $confs with all uiconf objects for all modules **/
@@ -192,7 +197,7 @@ class kmc4Action extends kalturaAction
 			'language'					=> $language,
 			'logoutUrl'					=> $logoutUrl,
 			'allowFrame'				=> (bool) $allowFrame,
-			'akamaiEdgeServerIpURL'		=> kConf::get('akamai_edge_server_ip_url'),
+			'akamaiEdgeServerIpURL'		=> $akamaiEdgeServerIpURL,
 		);
 		
 		$this->kmcVars = $kmcVars;
