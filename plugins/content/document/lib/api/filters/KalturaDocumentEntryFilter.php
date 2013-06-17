@@ -5,7 +5,7 @@
  */
 class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"assetParamsIdsMatchOr" => "_matchor_flavor_params_ids",
 		"assetParamsIdsMatchAnd" => "_matchand_flavor_params_ids",
@@ -13,6 +13,6 @@ class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 }

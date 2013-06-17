@@ -5,7 +5,7 @@
  */
 class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"freeText" => "_free_text",
 		"isRoot" => "_is_root",
@@ -13,19 +13,19 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		"categoryAncestorIdIn" => "_in_category_ancestor_id",
 	);
 	
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"recent" => "recent", // needed for backward compatibility
 	);
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 
 	/**

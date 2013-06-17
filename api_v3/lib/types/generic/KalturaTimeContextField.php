@@ -13,14 +13,14 @@ class KalturaTimeContextField extends KalturaIntegerField
 	 */
 	public $offset;
 
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		'offset',
 	);
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	/* (non-PHPdoc)

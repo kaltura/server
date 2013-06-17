@@ -36,7 +36,7 @@ class KalturaTagFilter extends KalturaFilter
 	 */
     public $instanceCountIn;
     
- 	private $map_between_objects = array
+ 	static private $map_between_objects = array
 	(
 		"objectTypeEqual" => "_eq_object_type",
 		"tagEqual" => "_eq_tag",
@@ -45,7 +45,7 @@ class KalturaTagFilter extends KalturaFilter
 	    "instanceCountIn" => "_in_instance_count", 
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+instanceCount" => "+instance_count",
 	    "-instanceCount" => "-instance_count",
@@ -53,12 +53,12 @@ class KalturaTagFilter extends KalturaFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 
 	public function validate()

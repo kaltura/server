@@ -14,14 +14,14 @@ class KalturaEvalBooleanField extends KalturaBooleanField
 	 */
 	public $code;
 
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		'code',
 	);
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	/* (non-PHPdoc)

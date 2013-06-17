@@ -60,7 +60,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 	 * @var string
 	 * @readonly
 	 */
-	private $executeUrl;
+	public $executeUrl;
 	
 	private static $map_between_objects = array
 	(

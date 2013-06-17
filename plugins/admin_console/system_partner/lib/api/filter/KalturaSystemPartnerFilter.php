@@ -5,7 +5,7 @@
  */
 class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"partnerParentIdEqual" => "_eq_partner_parent_id",
 		"partnerParentIdIn" => "_in_partner_parent_id",
@@ -13,7 +13,7 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	/**

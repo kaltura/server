@@ -24,9 +24,6 @@ class KalturaFilter extends KalturaObject
 	const MATCH_AND = "matchand";
 	const NOT_CONTAINS = "notcontains";
 
-	private $operator_map = array ( 
-		);
-	
 	protected function getMapBetweenObjects ( )
 	{
 		return array_merge(parent::getMapBetweenObjects(), array("orderBy" => "_order_by"));

@@ -5,7 +5,7 @@
  */
 class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"freeText" => "_free_text",
 		"membersIn" => "_in_members",
@@ -19,7 +19,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	/**

@@ -5,7 +5,7 @@
  */
 class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"freeText" => "_mlikeor_screen_name-puser_id",
 		"categoryDirectMembers" => "_category_direct_members",
@@ -24,7 +24,7 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 	
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	

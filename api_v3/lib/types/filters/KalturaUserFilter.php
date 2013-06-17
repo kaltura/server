@@ -6,7 +6,7 @@
 class KalturaUserFilter extends KalturaUserBaseFilter
 {
 	
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"idOrScreenNameStartsWith" => "_likex_puser_id_or_screen_name",
 		'firstNameOrLastNameStartsWith' => "_likex_first_name_or_last_name",
@@ -18,7 +18,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 		"permissionNamesMultiLikeOr" => "_mlikeor_permission_names",
 	);
 
-	private $order_by_map = array
+	static private $order_by_map = array
 	(
 		"+id" => "+puser_id",
 		"-id" => "-puser_id",
@@ -26,12 +26,12 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
 	public function getOrderByMap()
 	{
-		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
 	
 	public function toObject ( $object_to_fill = null, $props_to_skip = array() )

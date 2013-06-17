@@ -5,7 +5,7 @@
  */
 class KalturaCodeCuePointFilter extends KalturaCodeCuePointBaseFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"codeLike" => "_like_name",
 		"codeMultiLikeOr" => "_mlikeor_name",
@@ -19,6 +19,6 @@ class KalturaCodeCuePointFilter extends KalturaCodeCuePointBaseFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 }

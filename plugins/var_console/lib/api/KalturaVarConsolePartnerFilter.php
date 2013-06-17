@@ -24,7 +24,7 @@ class KalturaVarConsolePartnerFilter extends KalturaPartnerFilter
      */
     public $partnerPermissionsExist;
     
-    private $map_between_objects = array
+    static private $map_between_objects = array
     (
     	"groupTypeEq" => "_eq_partner_group_type",
         "groupTypeIn" => "_in_partner_group_type",
@@ -33,6 +33,6 @@ class KalturaVarConsolePartnerFilter extends KalturaPartnerFilter
     
     public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 }

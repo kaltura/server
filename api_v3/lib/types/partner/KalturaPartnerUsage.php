@@ -55,7 +55,7 @@ class KalturaPartnerUsage extends KalturaObject
 	 */
 	public $usageGraph;
 	
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"hostingGB" , "Percent" , "packageBW" => "package_bw" , "reachedLimitDate" => "reached_limit_date" ,
 	);

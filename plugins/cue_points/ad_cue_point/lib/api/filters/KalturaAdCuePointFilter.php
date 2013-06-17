@@ -5,7 +5,7 @@
  */
 class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 {
-	private $map_between_objects = array
+	static private $map_between_objects = array
 	(
 		"protocolTypeEqual" => "_eq_sub_type",
 		"protocolTypeIn" => "_in_sub_type",
@@ -16,6 +16,6 @@ class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 }

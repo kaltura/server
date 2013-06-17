@@ -107,7 +107,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	 * Mapping between the API object properties and te core object properties.
 	 * @var unknown_type
 	 */
-	private $map_between_objects = array(
+	static private $map_between_objects = array(
 	    "id" => "jobId",
 	    "uploadedOn" => "createdAt",
 	    "status",
@@ -119,7 +119,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	
     public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	public function fromObject($batchJobObject)
