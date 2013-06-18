@@ -1,5 +1,5 @@
 <?php
-require_once (dirname ( __FILE__ ) . '/bootstrap.php');
+require_once (dirname ( __FILE__ ) . '/bootstrapSphinxSearchTest.php');
 
 class SphinxSerach extends PHPUnit_Framework_TestCase 
 {
