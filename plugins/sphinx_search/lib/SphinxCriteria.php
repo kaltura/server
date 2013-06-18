@@ -208,8 +208,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 
 		//debug query
-
-		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 2);
+		$rows = $pdo->queryAndFetchAll($sql, PDO::FETCH_ASSOC);
+		$ids = array_map(array($this, "fetchIds"), $rows);
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
@@ -262,6 +262,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$c->setOffset(null);
 			$this->recordsCount = $this->doCountOnPeer($c);
 		}
+	}
+	
+	protected function fetchIds($row) {
+		$idField = $this->getSphinxIdField();
+		return $row[$idField];
 	}
 	
 	/**
