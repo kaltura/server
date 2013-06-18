@@ -1,7 +1,7 @@
 <?php
 
 //Require the PS 2 bootstrap
-require_once (dirname(__FILE__) . "/../bootstrap/bootstrapPS2.php");
+require_once (dirname(__FILE__) . "/../bootstrap.php");
 
 /**
  * 

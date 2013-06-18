@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../bootstrap/bootstrapClient.php");
+require_once(dirname(__FILE__) . "/../bootstrap.php");
 
 class testPermissionServiceTest extends KalturaApiTestCase
 {
