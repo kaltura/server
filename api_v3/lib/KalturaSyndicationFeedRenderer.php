@@ -398,11 +398,11 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->staticPlaylist)
 		{
-			$c->setLimit(self::STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY);
+			$c->setLimit(min(self::STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY, $this->limit));
 		}
 		else 
 		{
-			$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
+			$c->setLimit(min(self::ENTRY_PEER_LIMIT_QUERY, $this->limit));
 		}
 
 		if(!count($this->entryFilters))
