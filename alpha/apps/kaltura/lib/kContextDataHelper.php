@@ -332,9 +332,12 @@ class kContextDataHelper
 	private function selectDeliveryTypeForAuto()
 	{
 		$enabledDeliveryTypes = $this->partner->getDeliveryTypes();
+		$deliveryType = null;
 		foreach ($enabledDeliveryTypes as $enabledDeliveryTypeKey => $values){
-		if ($enabledDeliveryTypeKey == PlaybackProtocol::AUTO)
-				unset($enabledDeliveryTypes[$enabledDeliveryTypeKey]);					
+			if ($enabledDeliveryTypeKey == PlaybackProtocol::AUTO)
+				unset($enabledDeliveryTypes[$enabledDeliveryTypeKey]);
+			else if ($this->asset && $enabledDeliveryTypeKey == PlaybackProtocol::HTTP)	
+				$deliveryType = $enabledDeliveryTypes[$enabledDeliveryTypeKey];
 		}
 				
 		if (!count($enabledDeliveryTypes))
@@ -342,26 +345,28 @@ class kContextDataHelper
 			KalturaLog::err('At least one non auto delivery type must be specified');
 			return array();
 		}
-				
-		$deliveryTypeKeys = array();
-		$deliveryTypeName = null; 
-		if($this->isSecured)
-			$deliveryTypeKeys[] = 'secured_default_delivery_type';
-		if($this->entry->getDuration() <= kConf::get('short_entries_max_duration'))
-			$deliveryTypeKeys[] = 'short_entries_default_delivery_type';
-		$deliveryTypeKeys[] = 'default_delivery_type';
 
-		reset($enabledDeliveryTypes);
-		$deliveryTypeName = key($enabledDeliveryTypes);
-		foreach ($deliveryTypeKeys as $deliveryTypeKey){
-			$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
-            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
-            {
-             	$deliveryTypeName = $deliveryTypeToValidate;
-                break;
-			}
-		}		
-		$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
+		if (is_null($deliveryType)){
+			$deliveryTypeKeys = array();
+			$deliveryTypeName = null; 
+			if($this->isSecured)
+				$deliveryTypeKeys[] = 'secured_default_delivery_type';
+			if($this->entry->getDuration() <= kConf::get('short_entries_max_duration'))
+				$deliveryTypeKeys[] = 'short_entries_default_delivery_type';
+			$deliveryTypeKeys[] = 'default_delivery_type';
+	
+			reset($enabledDeliveryTypes);
+			$deliveryTypeName = key($enabledDeliveryTypes);
+			foreach ($deliveryTypeKeys as $deliveryTypeKey){
+				$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
+	            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
+	            {
+	             	$deliveryTypeName = $deliveryTypeToValidate;
+	                break;
+				}
+			}		
+			$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
+		}
 		return $deliveryType;
 	}
 }
