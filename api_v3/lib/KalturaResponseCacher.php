@@ -3,7 +3,7 @@
  * @package api
  * @subpackage cache
  */
-require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/cache/kApiCache.php');
 
 /**
  * @package api
