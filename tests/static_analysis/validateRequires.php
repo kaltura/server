@@ -55,6 +55,9 @@ foreach ($allRequires as $curRequire)
 	if (strpos($reqStatement, '//') === 0)
 		continue;		// comment
 
+	if (strpos($reqStatement, 'if (') === 0)
+		continue;		// optional
+		
 	if (strpos($filePath, $codeRoot . '/alpha/web/api_v3/') === 0 ||
 		strpos($filePath, $codeRoot . '/alpha/web/ma_console/') === 0)
 		continue;		// don't process folders links
@@ -63,7 +66,8 @@ foreach ($allRequires as $curRequire)
 		continue;		// don't process client sources (may require files that don't exist)
 		
 	if (strpos($reqStatement, '$this->appendLine') !== false || 
-		strpos($reqStatement, '$this->writeTest') !== false)
+		strpos($reqStatement, '$this->writeTest') !== false || 
+		strpos($reqStatement, '$this->echoLine') !== false)
 		continue;		// generator code
 	
 	foreach ($reqStatements as $curStatement)
@@ -98,9 +102,12 @@ foreach ($allRequires as $curRequire)
 	$reqFile = str_replace('SF_ROOT_DIR', '"'.$codeRoot.'/alpha/"', $reqFile);
 	$reqFile = str_replace('ROOT_DIR', '"'.$codeRoot.'/"', $reqFile);
 	$reqFile = str_replace('KALTURA_ROOT_PATH', '"'.$codeRoot.'"', $reqFile);
+	$reqFile = str_replace('"$sf_symfony_lib_dir', '"'.$codeRoot.'/symfony/', $reqFile);
 	$reqFile = str_replace('$sf_symfony_lib_dir', '"'.$codeRoot.'/symfony/"', $reqFile);
+	$reqFile = str_replace('$sf_app_config_dir_name', '"'.$codeRoot.'/alpha/apps/kaltura/config/"', $reqFile);
 	$reqFile = str_replace('KALTURA_API_PATH', '"'.$codeRoot.'/api_v3/"', $reqFile);
 	$reqFile = str_replace('MODULES', '"'.$codeRoot.'/alpha/apps/kaltura/modules/"', $reqFile);	
+	$reqFile = str_replace('$infaFolder', '"'.$codeRoot.'/infra/"', $reqFile);	
 	$reqFile = str_replace('\'', '"', $reqFile);
 	$reqFile = trim(performStringConcats($reqFile));
 	
