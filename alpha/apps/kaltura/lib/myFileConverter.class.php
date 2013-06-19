@@ -1,5 +1,4 @@
 <?php
-require_once ( "lib/model/conversion.php");
 
 class myFileConverter
 {

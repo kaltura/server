@@ -4,7 +4,6 @@
  * @subpackage system
  * @deprecated
  */
-require_once ( "model/genericObjectWrapper.class.php" );
 require_once ( "kalturaSystemAction.class.php" );
 
 /**

@@ -4,13 +4,6 @@
  * @subpackage system
  * @deprecated
  */
-require_once ( "kalturaAction.class.php" );
-
-/**
- * @package    Core
- * @subpackage system
- * @deprecated
- */
 abstract class kalturaSystemAction extends kalturaAction
 {
 	const COOKIE_NAME = "kalsysauth";

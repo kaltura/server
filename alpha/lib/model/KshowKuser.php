@@ -1,5 +1,4 @@
 <?php
-require_once ( "myStatisticsMgr.class.php");
 /**
  * Subclass for representing a row from the 'kshow_kuser' table.
  *

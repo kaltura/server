@@ -3,7 +3,6 @@
  * @package    Core
  * @subpackage KMC
  */
-require_once ( "kalturaAction.class.php" );
 
 /**
  * @package    Core

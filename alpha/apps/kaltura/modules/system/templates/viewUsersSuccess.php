@@ -1,7 +1,5 @@
 <?php
 
-require_once ( "mySmartPagerRenderer.class.php" );
-
 function addRow($kuser, $even_row )
 {
 	

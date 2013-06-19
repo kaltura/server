@@ -3,14 +3,6 @@
  * @package    Core
  * @subpackage kEditorServices
  */
-require_once ( "myContentStorage.class.php");
-require_once ( "myResponseUtils.class.php");
-require_once ( "media/myFlvStreamer.class.php");
-
-/**
- * @package    Core
- * @subpackage kEditorServices
- */
 class flvproviderAction extends sfAction
 {
 	public function execute()

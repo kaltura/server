@@ -3,8 +3,6 @@
  * @package    Core
  * @subpackage kEditorServices
  */
-require_once ( "myKshowMetadataCreator.class.php");
-require_once ( "myContentStorage.class.php");
 require_once ( "defKeditorservicesAction.class.php");
 
 /**

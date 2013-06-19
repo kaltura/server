@@ -3,12 +3,6 @@
  * @package Core
  * @subpackage ExternalServices
  */
-require_once ("extservices/IMediaSource.class.php");
-
-/**
- * @package Core
- * @subpackage ExternalServices
- */
 class myMediaSourceFactory
 {
 	/*

@@ -1,7 +1,5 @@
 <?php
 
-require_once ( "mySmartPagerRenderer.class.php" );
-
 function addRow($widget_log, $kshow_data, $entry_data, $even_row )
 {
 	if ( $widget_log instanceof WidgetLog )

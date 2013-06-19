@@ -4,7 +4,6 @@
  * @subpackage system
  * @deprecated
  */
-require_once ( "viewDashboardAction.class.php" );
 
 /**
  * @package    Core

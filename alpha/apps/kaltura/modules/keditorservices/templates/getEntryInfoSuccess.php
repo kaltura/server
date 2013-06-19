@@ -1,5 +1,4 @@
 <?php
-require_once ( "baseObjectUtils.class.php" );
 
 if (!$kuser)
 	die;

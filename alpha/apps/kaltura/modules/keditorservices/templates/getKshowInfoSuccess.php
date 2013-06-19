@@ -1,5 +1,4 @@
 <?php
-require_once ( "baseObjectUtils.class.php" );
 
 // create xml for each entry is entry_list
 if ( $debug ) { echo "Result<br><textarea cols=100 rows=50>"; }

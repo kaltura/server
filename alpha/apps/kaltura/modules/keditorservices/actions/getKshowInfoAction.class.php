@@ -3,7 +3,6 @@
  * @package    Core
  * @subpackage kEditorServices
  */
-require_once ( "defKeditorservicesAction.class.php");
 require_once ( "myKshowUtils.class.php");
 
 /**
