@@ -1,6 +1,6 @@
 <?php
 
-require_once("model/ktagword.class.php");
+require_once(__DIR__ . "/model/ktagword.class.php");
 
 	/**
 	 * Tag Cloud

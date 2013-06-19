@@ -35,7 +35,7 @@
 	</script>
 </head>
 <?php 
-	require_once("../../bootstrap.php");
+	require_once(__DIR__ . "/../../bootstrap.php");
 	
 	//Get the generated clients summary
 	$root = myContentStorage::getFSContentRootPath();

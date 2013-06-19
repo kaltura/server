@@ -1,5 +1,5 @@
 <?php
-require_once("../../bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 KalturaLog::setContext("TESTME");
 
 if (!isset($_GET["service"]))

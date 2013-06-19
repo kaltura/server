@@ -1,5 +1,5 @@
 <?php
-require_once ( "requestUtils.class.php");
+require_once ( __DIR__ . "/requestUtils.class.php");
 
 
 class extendedEntryMediaType

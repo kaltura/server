@@ -9,7 +9,7 @@
  */
 
 chdir(__DIR__);
-require_once('../../bootstrap.php');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 $dirPath = realpath(__DIR__ . '/../../') . '/permissions';
 $scriptPath = realpath(__DIR__ . '/../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';

@@ -1,5 +1,5 @@
 <?php
-require_once( '../myConfigWrapper.class.php');
+require_once( __DIR__ . '/../myConfigWrapper.class.php');
 ini_set( "memory_limit" , "256M" );
 
 $g_context = "";

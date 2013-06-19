@@ -1,7 +1,7 @@
 <?php 
 ini_set("memory_limit","256M");
-require_once("../../bootstrap.php"); 
-require_once("helpers.php");
+require_once(__DIR__ . "/../../bootstrap.php"); 
+require_once(__DIR__ . "/helpers.php");
 
 $INPUT_PATTERN = "/^[a-zA-Z0-9_]*$/";
 
@@ -46,7 +46,7 @@ $cacheLeftPaneFilePath = "$cachePath/leftpane.cache";
 $cacheFilePath = "$cachePath/$cacheKey.cache";
 
 // Html headers + scripts
-require_once("header.php");
+require_once(__DIR__ . "/header.php");
 
 // display left pane
 if (file_exists($cacheLeftPaneFilePath))
@@ -57,7 +57,7 @@ else
 {
 	ob_start();
 	
-	require_once("left_pane.php");
+	require_once(__DIR__ . "/left_pane.php");
 		
 	$out = ob_get_contents();
 	ob_end_clean();
@@ -70,7 +70,7 @@ else
 if (file_exists($cacheFilePath))
 {
 	print file_get_contents($cacheFilePath);
-	require_once("footer.php");
+	require_once(__DIR__ . "/footer.php");
 
 	die;
 }
@@ -86,7 +86,7 @@ ob_start();
 if ($inputPage)
 {
 	if (in_array($inputPage, array("inout", "notifications", "overview", "terminology", "multirequest")))
-		require_once("static_doc/".$inputPage.".php");
+		require_once(__DIR__ . "/static_doc/".$inputPage.".php");
 	else
 		die('Page "'.$inputPage.'" not found');
 }
@@ -94,17 +94,17 @@ else if ($inputService && $inputAction)
 {
 	$service = $inputService;
 	$action = $inputAction;
-	require_once("service_action_info.php");
+	require_once(__DIR__ . "/service_action_info.php");
 }
 else if ($inputService)
 {
 	$service = $inputService;
-	require_once("service_info.php");
+	require_once(__DIR__ . "/service_info.php");
 }
 else if ($inputObject)
 {
 	$object = $inputObject;
-	require_once("object_info.php");
+	require_once(__DIR__ . "/object_info.php");
 }
 
 ?>
@@ -118,4 +118,4 @@ print $out;
 
 kFile::setFileContent($cacheFilePath, $out);
 
-require_once("footer.php");
+require_once(__DIR__ . "/footer.php");

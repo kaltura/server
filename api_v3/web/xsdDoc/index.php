@@ -27,32 +27,32 @@ $cacheFilePath = "$cachePath/$cacheKey.cache";
 // Html headers + scripts
 if (file_exists($cacheFilePath))
 {
-	require_once("header.php");
+	require_once(__DIR__ . "/header.php");
 	print file_get_contents($cacheFilePath);
 	die;
 }
 
-require_once("../../bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 
 ActKeyUtils::checkCurrent();
 KalturaLog::setContext("XSD-DOC");
 
 KalturaLog::debug(">------------------------------------- xsd doc -------------------------------------");
 
-require_once("header.php");
+require_once(__DIR__ . "/header.php");
 
 ob_start();
 
-require_once("left_pane.php");
+require_once(__DIR__ . "/left_pane.php");
 
 ?>
 	<div class="right">
 		<div id="doc" >
 			<?php 
 				if($inputPage)
-					require_once("$inputPage.php");
+					require_once(__DIR__ . "/$inputPage.php");
 				else if ($schemaType)
-					require_once("schema_info.php"); 
+					require_once(__DIR__ . "/schema_info.php"); 
 			?>
 		</div>
 	</div>
@@ -64,6 +64,6 @@ print $out;
 
 kFile::setFileContent($cacheFilePath, $out);
 
-require_once("footer.php");
+require_once(__DIR__ . "/footer.php");
 
 KalturaLog::debug("<------------------------------------- xsd doc -------------------------------------");

@@ -14,7 +14,7 @@ if(!file_exists($dirName) || !is_dir($dirName))
 $dirName = realpath($dirName);
 
 chdir(__DIR__);
-require_once('../../bootstrap.php');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_MASTER;
 $con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);

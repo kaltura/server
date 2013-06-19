@@ -1,5 +1,5 @@
 <?php
-require_once( 'myBatchBase.class.php');
+require_once( __DIR__ . '/myBatchBase.class.php');
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'lib/model/BatchJob.php');
 
 class myBatchFlattenClient

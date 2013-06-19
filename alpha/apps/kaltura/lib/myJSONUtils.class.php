@@ -1,7 +1,7 @@
 <?php
 if (!function_exists('json_encode')) 
 {
-	require('Services_JSON.class.php');
+	require(__DIR__ . '/Services_JSON.class.php');
 }
 
 

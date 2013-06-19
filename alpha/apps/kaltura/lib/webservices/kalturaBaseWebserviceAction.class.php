@@ -1,5 +1,5 @@
 <?php
-require_once ( "kalturaWebserviceRenderer.class.php" );
+require_once ( __DIR__ . "/kalturaWebserviceRenderer.class.php" );
 /**
  * This class will make common tasks in the action classes much easier.
  *

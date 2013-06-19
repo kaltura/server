@@ -1,5 +1,5 @@
 <?php
-require_once('myBatchBase.class.php');
+require_once(__DIR__ . '/myBatchBase.class.php');
 //define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
 
 class myNewBatchPartnerUsage extends myBatchBase
