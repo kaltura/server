@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../server_infra/request/kSessionBase.class.php');
+require_once(dirname(__FILE__) . '/../apps/kaltura/lib/request/kSessionBase.class.php');
 
 ini_set("memory_limit", "2048M");
 

@@ -3,7 +3,7 @@ set_time_limit(0);
 
 ini_set("memory_limit","700M");
 
-define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../'));
+define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../../'));
 require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
