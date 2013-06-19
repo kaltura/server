@@ -69,10 +69,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	protected $sphinxSkipped = false;
 	
-	protected $selectColumn = null;
-	
-	protected $groupByColumn = null;
-	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
