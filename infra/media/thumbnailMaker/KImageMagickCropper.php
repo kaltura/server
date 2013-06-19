@@ -28,26 +28,9 @@ class KImageMagickCropper extends KBaseCropper
 	 */
 	public function __construct($srcPath, $targetPath, $cmdPath = null, $forceJpeg = false)
 	{
-		if (is_null($cmdPath)) {
-			$cmdPath = kConf::get('bin_path_imagemagick');
-		}
-		
 		$this->cmdPath = $cmdPath;
 		
 		list($this->srcWidth, $this->srcHeight, $type, $attr) = getimagesize($srcPath);
-
-		// forceJpeg var is not used.
-		// there is no return of the new target file (as string) after the extension change
-//		if ($type == IMAGETYPE_BMP) // convert bmp to jpeg
-//			$type = IMAGETYPE_JPEG;
-//		
-//		$ext = '';
-//		if ($this->forceJpeg)
-//			$ext = 'jpg';
-//		elseif(isset(self::$imageExtByType[$type]))
-//			$ext = self::$imageExtByType[$type];
-//			
-//		$targetPath = kFile::replaceExt($targetPath, $ext);
 		
 		parent::__construct($srcPath, $targetPath);
 	}

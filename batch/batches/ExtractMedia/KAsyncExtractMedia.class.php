@@ -62,20 +62,6 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 	}
 	
 	/**
-	 * extractFfmpegInfo extract the file info using FFmpeg and parse the returned data
-	 *  
-	 * @param string $mediaFile file full path
-	 * @return KalturaMediaInfo or null for failure
-	 */
-	private function extractFfmpegInfo($mediaFile)
-	{
-		KalturaLog::debug("extractFfmpegInfo($mediaFile)");
-		
-		$mediaParser = new KFFMpegMediaParser($mediaFile, $this->taskConfig->params->FFMpegCmd);
-		return $mediaParser->getMediaInfo();
-	}
-	
-	/**
 	 * Will take a single KalturaBatchJob and extract the media info for the given file 
 	 */
 	private function extract(KalturaBatchJob $job, KalturaExtractMediaJobData $data)

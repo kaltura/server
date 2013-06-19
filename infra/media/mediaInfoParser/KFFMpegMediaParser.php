@@ -11,7 +11,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param string $filePath
 	 * @param string $cmdPath
 	 */
-	public function __construct($filePath, $cmdPath = 'ffmpeg')
+	public function __construct($filePath, $cmdPath)
 	{
 		$this->cmdPath = $cmdPath;
 		parent::__construct($filePath);
