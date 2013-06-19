@@ -8,10 +8,7 @@ if (count($argv) == 1)
 
 $partnerId = $argv[1];
 
-require_once '../bootstrap.php';
-$dbConf = kConf::getDB();
-DbManager::setConfig ( $dbConf );
-DbManager::initialize ();
+require_once(__DIR__ . '/../bootstrap.php');
 
 if (!PartnerPeer::retrieveByPK($partnerId))
 {

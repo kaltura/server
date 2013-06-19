@@ -1,6 +1,6 @@
 <?php
-chdir('/opt/kaltura/app/scripts');
-require_once('bootstrap.php');
+chdir(__DIR__ . '/../');
+require_once(__DIR__ . '/../bootstrap.php');
 
 
 $dropFoldersCriteria = new Criteria();

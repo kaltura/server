@@ -1,6 +1,6 @@
 <?php
 chdir(dirname(__FILE__));
-require_once(dirname(__FILE__) . '/../bootstrap.php');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 $c = KalturaCriteria::create(TagPeer::OM_CLASS);
 $filter = new TagFilter();

@@ -8,19 +8,7 @@ if($argc != 2)
 } 
 $partnerId = $argv[1];
 
-set_time_limit(0);
-ini_set("memory_limit","1024M");
-
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "metadata", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/' . basename(__FILE__) . '.cache');
-KAutoloader::register();
-
-error_reporting(E_ALL);
-KalturaLog::setLogger(new KalturaStdoutLogger());
+require_once(__DIR__ . '/../bootstrap.php');
 
 $typesToDelete = array(
 //	entryType::AUTOMATIC,
@@ -34,10 +22,6 @@ $typesToDelete = array(
 	entryType::DOCUMENT,
 //	entryType::DVD,
 	);
-
-$dbConf = kConf::getDB();
-DbManager::setConfig($dbConf);
-DbManager::initialize();
 
 $c = new Criteria();
 $c->add(entryPeer::PARTNER_ID, $partnerId);

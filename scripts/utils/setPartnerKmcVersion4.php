@@ -1,7 +1,7 @@
 <?php
 define ('DEBUG', false);
 chdir(__DIR__.'/../');
-require_once 'bootstrap.php';
+require_once(__DIR__ . '/../bootstrap.php');
 
 $partner_id = $argv[1];
 $should_do_flavors_to_web = @$argv[2];

@@ -10,7 +10,7 @@ $entriesFilePath = $argv[1];
 $entries = file ( $entriesFilePath ) or die ( 'Could not read file!' );
 
 chdir(__DIR__.'/../');
-require_once 'bootstrap.php';
+require_once(__DIR__ . '/../bootstrap.php');
 
 foreach ($entries as $deletedEntryId){
 	$deletedEntryId = trim($deletedEntryId);

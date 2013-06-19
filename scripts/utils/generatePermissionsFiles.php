@@ -1,9 +1,8 @@
 <?php
 
 $dir = __DIR__ . '/permissions';
-chdir('/opt/kaltura/app/scripts');
-//chdir(__DIR__ . '/../');
-require_once 'bootstrap.php';
+chdir(__DIR__ . '/../');
+require_once(__DIR__ . '/../bootstrap.php');
 
 if(!file_exists($dir))
 	mkdir($dir, 0750);

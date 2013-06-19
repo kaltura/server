@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL);
 
-require_once(dirname(__FILE__).'/../server_infra/kConf.php');
+require_once(__DIR__ . '/bootstrap.php');
 
 $interactive = true;
 if ($argc == 2 && $argv[1] == '-y')

@@ -4,25 +4,7 @@ $partnerId = null;
 if($argc > 1)
 	$partnerId = $argv[1];
 
-set_time_limit(0);
-ini_set("memory_limit","1024M");
-
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "metadata", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/' . basename(__FILE__) . '.cache');
-KAutoloader::register();
-
-error_reporting(E_ALL);
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
-date_default_timezone_set(kConf::get('date_default_timezone'));
-
-$dbConf = kConf::getDB();
-DbManager::setConfig($dbConf);
-DbManager::initialize();
+require_once(__DIR__ . '/../bootstrap.php');
 
 $entryCriteria = new Criteria();
 $entryCriteria->add(entryPeer::STATUS, entry::ENTRY_STATUS_READY);

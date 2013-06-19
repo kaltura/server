@@ -25,33 +25,8 @@ $flatten = null;
  * DON'T TOUCH THE FOLLOWING CODE
  ***************************************************/
 
-error_reporting(E_ALL);
 chdir(dirname(__FILE__));
-
-require_once(realpath(dirname(__FILE__)).'/../../../alpha/config/sfrootdir.php');
-define('SF_APP',         'kaltura');
-define('SF_ENVIRONMENT', 'prod');
-define('SF_DEBUG',       false);
-
-define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
-
-require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
-
-
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
-require_once(ROOT_DIR . '/infra/KAutoloader.php');
-
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "document", "*"));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/' . basename(__FILE__) . '.cache');
-KAutoloader::register();
-
-date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
-
-KalturaLog::setLogger(new KalturaStdoutLogger());
-
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
+require_once(__DIR__ . '/../../bootstrap.php');
 
 $flavorParams = null;
 

@@ -7,9 +7,8 @@ $objectType = $argv[2];
 $dryRun = (!isset($argv[3]) || strtolower($argv[3]) != 'realrun');
 $startId = (isset($argv[4]) ? $argv[4] : null);
 
-chdir('/opt/kaltura/app/scripts');
-//chdir(__DIR__ . '/../');
-require_once 'bootstrap.php';
+chdir(__DIR__ . '/../');
+require_once(__DIR__ . '/../bootstrap.php');
 
 function deleteObject(FileSync $fileSync)
 {
