@@ -10,16 +10,29 @@ class KPhysicalDropFolderUtils
 	/**
 	* @var KalturaDropFolder
 	*/
-	private $folder = null;
+	protected $folder = null;
 	
 	/**
 	 * @var string
 	 */
-	private $tempDirectory = null;
+	protected $tempDirectory = null;
 	
-	public function __construct(KalturaDropFolder $folder)
+	/**
+	 * @var KSchedularTaskConfig
+	 */
+	protected $taskConfig = null;
+	
+	public function __construct(KalturaDropFolder $folder, KSchedularTaskConfig $taskConfig)
 	{
+		$this->tempDirectory = isset($taskConfig->tempDirectoryPath) ? $taskConfig->tempDirectoryPath : sys_get_temp_dir();
+		if (!is_dir($this->tempDirectory)) 
+		{
+			KalturaLog::err('Missing temporary directory');
+			throw new Exception('Missing temporary directory');
+		}
+		
 		$this->folder = $folder;
+		$this->taskConfig = $taskConfig;
 		$this->fileTransferMgr = self::getFileTransferManager($folder);
 	}
 
@@ -43,15 +56,6 @@ class KPhysicalDropFolderUtils
 	    else
 	    {
 	    	// remote drop folder	
-	    	if($this->tempDirectory == null)
-	    	{
-	    		$this->tempDirectory = sys_get_temp_dir();
-				if (!is_dir($this->tempDirectory)) 
-				{
-					KalturaLog::err('Missing temporary directory');
-					throw new Exception('Missing temporary directory');
-				}
-	    	}    
 			$tempFilePath = tempnam($this->tempDirectory, 'parse_dropFolderFileId_'.$fileId.'_');		
 			$this->fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
 			return $tempFilePath;
@@ -67,7 +71,8 @@ class KPhysicalDropFolderUtils
      */
 	private static function getFileTransferManager(KalturaDropFolder $folder)
 	{
-	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($folder->type));
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($folder->type), $engineOptions);
 	    
 	    $host =null; $username=null; $password=null; $port=null;
 	    $privateKey = null; $publicKey = null;

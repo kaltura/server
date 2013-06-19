@@ -74,7 +74,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		file_put_contents($srcFile, $providerData->xml);
 		KalturaLog::log("XML written to file [$srcFile]");
 		
-		$engineOptions = array(); // Should be passed from worker configuration
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $distributionProfileAction->ftpPassiveMode;
 		$engineOptions['fieldName'] = $distributionProfileAction->httpFieldName;
 		$engineOptions['fileName'] = $distributionProfileAction->httpFileName;

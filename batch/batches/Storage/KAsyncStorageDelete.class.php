@@ -72,7 +72,7 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 
 		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $data->ftpPassiveMode;
-		$engine = kFileTransferMgr::getInstance($job->jobSubType);
+		$engine = kFileTransferMgr::getInstance($job->jobSubType, $engineOptions);
 		
 		try{
 			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword);

@@ -14,14 +14,19 @@ class asperaMgr extends kFileTransferMgr
 	private $server;
 	private $pass;
 	private $port;
-	private $ascpCmd = 'ascp'; 
-	const TEMP_DIRECTORY = 'aspera_upload';
+	private $ascpCmd = 'ascp';
+	private $asperaTempFolder = null; 
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
 		parent::__construct($options);
-		if($options && isset($options['ascpCmd']))
+		
+		if(!$options || !isset($options['asperaTempFolder']))
+			throw new kFileTransferMgrException("Option attribute [asperaTempFolder] is missing.", kFileTransferMgrException::attributeMissing);
+		$this->asperaTempFolder = $options['asperaTempFolder'];
+		
+		if(isset($options['ascpCmd']))
 			$this->ascpCmd = $options['ascpCmd'];
 	}
 	
@@ -29,7 +34,7 @@ class asperaMgr extends kFileTransferMgr
 		$remote_file = ltrim($remote_file,'/');
 		$remoteFileName = basename ( $remote_file ) ;
 		$remotePath = dirname ( $remote_file );
-		$linkPath =  kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/' .$remoteFileName;
+		$linkPath =  $this->asperaTempFolder . '/' .$remoteFileName;
 		if (!file_exists(dirname( $linkPath )))
 			mkdir(dirname( $linkPath ), 0750, true);
 		symlink($local_file, $linkPath);

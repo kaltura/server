@@ -42,6 +42,7 @@ class kFileTransferMgrException extends Exception
 	const remotePathNotValid = 5; // remote file / path string is not valid
 	const remoteFileExists   = 6; // trying to putFile that already exists with $overwrite == false
 	const extensionMissing   = 7; // php extension is not installed
+	const attributeMissing   = 8; // option attribute is missing
 	const otherError         = 99; // other - exception's getMessage() will provide more details
 }
 

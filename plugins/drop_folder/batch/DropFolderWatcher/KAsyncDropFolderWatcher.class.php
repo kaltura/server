@@ -104,7 +104,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		KalturaLog::debug('Watching folder ['.$folder->id.']');
 						    										
-		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder);		
+		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder, $this->taskConfig);		
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder($folder);
 		if(count($physicalFiles) > 0)
 			$dropFolderFilesMap = $this->loadDropFolderFiles($folder);

@@ -64,6 +64,8 @@ enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 
 [Worker]
 maximumExecutionTime	= 300
+engineOptions.asperaTempFolder = @TMP_DIR@/aspera_upload
+
 
 [JobHandlerWorker : Worker]
 fileExistReties			= 3
