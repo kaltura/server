@@ -3,7 +3,7 @@
 $newDir = $argv[1];
 $oldDir = $argv[2];
 
-require_once("bootstrap.php");
+require_once(__DIR__ . "/bootstrap.php");
 
 $hosts = array(
 	'ny-batch1',

@@ -32,7 +32,7 @@ if(!file_exists($iniDir))
 	die("Configuration file [$iniDir] not found.");
 }
 
-require_once("bootstrap.php");
+require_once(__DIR__ . "/bootstrap.php");
 
 $kscheduler = new KGenericScheduler($phpPath, $iniDir);
 $kscheduler->run();

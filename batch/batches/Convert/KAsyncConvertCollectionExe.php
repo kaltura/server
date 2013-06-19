@@ -5,7 +5,7 @@
  * @package Scheduler
  * @subpackage Conversion
  */
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 
 $instance = new KAsyncConvertCollection();
 $instance->run(); 

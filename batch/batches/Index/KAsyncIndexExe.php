@@ -5,7 +5,7 @@
  * @package Scheduler
  * @subpackage Index
  */
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 
 $instance = new KAsyncIndex();
 $instance->run(); 

@@ -6,7 +6,7 @@
  * @package Scheduler
  * @subpackage Post-Convert
  */
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 
 $instance = new KAsyncPostConvert();
 $instance->run(); 

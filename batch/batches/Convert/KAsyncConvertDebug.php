@@ -5,7 +5,7 @@
  */
 
 chdir(dirname( __FILE__ ) . "/../../");
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 
 $iniDir = "../configurations/batch";	// should be the full file path
 
