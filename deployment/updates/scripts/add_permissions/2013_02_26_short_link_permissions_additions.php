@@ -7,6 +7,6 @@
  * No need to re-run after server code deploy
  */
 
-$script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
+$script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.shortlink.shortlink.ini';
 passthru("php $script $config");

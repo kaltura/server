@@ -12,7 +12,7 @@ chdir(__DIR__);
 require_once('../../bootstrap.php');
 
 $dirPath = realpath(__DIR__ . '/../../') . '/permissions';
-$scriptPath = realpath(__DIR__ . '/../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
+$scriptPath = realpath(__DIR__ . '/../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
 
 $options = getopt('d:');
 if(isset($options['d']))
