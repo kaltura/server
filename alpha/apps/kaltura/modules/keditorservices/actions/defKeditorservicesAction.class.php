@@ -3,12 +3,6 @@
  * @package    Core
  * @subpackage kEditorServices
  */
-require_once ( "kalturaAction.class.php");
-
-/**
- * @package    Core
- * @subpackage kEditorServices
- */
 class defKeditorservicesAction extends kalturaAction
 {
 	//	protected $kshow_id;
