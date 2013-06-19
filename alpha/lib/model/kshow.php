@@ -1,9 +1,4 @@
 <?php
-require_once( 'myContentStorage.class.php');
-require_once( 'dateUtils.class.php');
-include_once( 'model/skinContainer.class.php');
-require_once( 'model/ktagword.class.php');
-require_once ( "myStatisticsMgr.class.php");
 // TODO - add the skinContainer !
 /**
  * Subclass for representing a row from the 'kshow' table.

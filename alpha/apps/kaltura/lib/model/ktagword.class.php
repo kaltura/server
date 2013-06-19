@@ -3,7 +3,6 @@
  * @package Core
  * @subpackage model.data
  */
-require_once("myContentStorage.class.php");
 
 /**
  * @package Core

@@ -1,10 +1,5 @@
 <?php
 
-require_once( 'myContentStorage.class.php');
-require_once( 'dateUtils.class.php');
-require_once( 'model/ktagword.class.php');
-require_once ( "myStatisticsMgr.class.php");
-
 /**
  * Subclass for representing a row from the 'kuser' table.
  *

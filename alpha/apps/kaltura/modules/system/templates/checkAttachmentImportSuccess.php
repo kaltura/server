@@ -41,9 +41,6 @@ function onMobileInsertComplete( responseText )
 
 <?php
 
-
-require_once('myMailAttachmentImporter.class.php');
-
 $host="mail.kaltura.com"; //  imap host
 $login="mobile@kaltura.com"; //imap  login
 $password="passme"; //imap password

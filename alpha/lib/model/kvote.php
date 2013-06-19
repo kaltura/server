@@ -1,6 +1,4 @@
 <?php
-require_once( 'dateUtils.class.php');
-require_once ( "myStatisticsMgr.class.php");
 /**
  * Subclass for representing a row from the 'kvote' table.
  *

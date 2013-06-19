@@ -3,9 +3,6 @@
  * @package Core
  * @subpackage ajax
  */ 
-require_once( 'mySearchUtils.class.php');
-require_once( 'mySmartPager.class.php');
-require_once( 'baseObjectUtils.class.php');
 
 // TODO - Clean up the old code !!
 /**
