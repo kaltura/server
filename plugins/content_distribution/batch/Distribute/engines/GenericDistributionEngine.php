@@ -117,7 +117,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 				$xsl->loadXML($resultParseData);
 				
 				$proc = new XSLTProcessor;
-				$proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
+				$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 				$proc->importStyleSheet($xsl);
 				
 				$data = $proc->transformToDoc($xml);

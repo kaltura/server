@@ -1260,7 +1260,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		}
 	    		
 		$proc = new XSLTProcessor;
-		$proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		$proc->importStyleSheet($xslObj);
 		
 		$resultXmlObj = $proc->transformToDoc($xmlObj);

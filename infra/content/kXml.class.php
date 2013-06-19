@@ -33,6 +33,10 @@ class XSLTErrorCollector
  */
 class kXml
 {
+	public static function getXslEnabledPhpFunctions()
+	{
+		return array('date', 'gmdate');
+	}
 	
 	//check if the prop's value is valid for xml encoding.
 	public static function isXMLValidContent($value) {
@@ -350,7 +354,7 @@ class kXml
 		{
 			$proc->setParameter( '', $key, $value);
 		}		
-	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
+	    $proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		@$proc->importStyleSheet($xsl);
 		
 		$errorHandler = new XSLTErrorCollector();
