@@ -23,7 +23,7 @@ else
 fi
 
 # Source function library.
-. $APP_DIR/scripts/functions.rc
+. $APP_DIR/infra/scripts/functions.rc
 
 MONIT="$BASE_DIR/bin/monit -c $APP_DIR/configurations/monit/monit.rc -l $LOG_DIR/kaltura_monit.log"
 

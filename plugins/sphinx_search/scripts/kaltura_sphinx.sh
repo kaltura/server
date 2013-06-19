@@ -18,7 +18,7 @@
 . /etc/kaltura.d/system.ini
 
 # Source function library.
-. $APP_DIR/scripts/functions.rc
+. $APP_DIR/infra/scripts/functions.rc
 prog="searchd"
 config="$APP_DIR/configurations/sphinx/kaltura.conf"
 exec="$BASE_DIR/bin/sphinx/searchd"
