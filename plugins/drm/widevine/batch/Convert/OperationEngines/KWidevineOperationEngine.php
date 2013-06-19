@@ -166,7 +166,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		$outputFileName = basename($this->data->destFileSyncLocalPath);
 		$targetFolder = dirname($this->data->destFileSyncLocalPath);
 		
-		$requestInput = new WidevinePackageNotifyRequest($this->packageName, $this->sourceFolder, $targetFolder, $outputFileName, $this->packageFiles);
+		$requestInput = new WidevinePackageNotifyRequest($this->packageName, $this->sourceFolder, $targetFolder, $outputFileName, $this->packageFiles, $this->params->portal);
 		
 		if($this->operator->params)
 		{

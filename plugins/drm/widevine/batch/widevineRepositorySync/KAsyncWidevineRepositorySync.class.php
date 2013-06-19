@@ -70,7 +70,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	
 	private function prepareAssetNotifyGetRequestXml($assetId)
 	{		
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET);
+		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, $this->taskConfig->params->portal);
 		
 		$requestInput->setAssetId($assetId);
 		$requestXml = $requestInput->createAssetNotifyRequestXml();
@@ -82,7 +82,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	
 	private function prepareAssetNotifyRegisterRequestXml(WidevineAssetNotifyResponse $assetGetResponse, $licenseStartDate, $licenseEndDate)
 	{
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_REGISTER);
+		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_REGISTER, $this->taskConfig->params->portal);
 		$requestInput->setAssetName($assetGetResponse->getName());
 		$requestInput->setPolicy($assetGetResponse->getPolicy());
 		$requestInput->setLicenseStartDate($licenseStartDate);

@@ -10,11 +10,12 @@ abstract class WidevineVodBaseRequest
 	private $licenseStartDate = null;
 	private $licenseEndDate = null;
 	
-	public function __construct()
+	public function __construct($portal = null)
 	{
 		$this->policy = WidevinePlugin::DEFAULT_POLICY;
-		$this->portal = WidevinePlugin::getWidevineConfigParam('portal');
-		if(!$this->portal)
+		if($portal)
+			$this->portal = $portal;
+		else
 			$this->portal = WidevinePlugin::KALTURA_PROVIDER;
 		$this->setLicenseStartDate(null);
 		$this->setLicenseEndDate(null);

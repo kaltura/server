@@ -90,7 +90,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 	
 	private function prepareAssetNotifyGetRequestXml($assetId)
 	{		
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET);
+		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, $this->taskConfig->params->portal);
 		
 		$requestInput->setAssetId($assetId);
 		$requestXml = $requestInput->createAssetNotifyRequestXml();

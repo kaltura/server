@@ -31,9 +31,9 @@ class WidevineAssetNotifyRequest extends WidevineVodBaseRequest
 	private $requestType;
 	private $assetId;
 	
-	public function __construct($requestType)
+	public function __construct($requestType, $portal = null)
 	{
-		parent::__construct();
+		parent::__construct($portal);
 		$this->requestType = $requestType;
 	}
 	

@@ -25,9 +25,9 @@ class WidevinePackageNotifyRequest extends WidevineVodBaseRequest
 	private $outputFileName;
 	private $files; 
 	
-	public function __construct($packageName, $sourceFolder, $targetFolder, $outputFileName, array $files)
+	public function __construct($packageName, $sourceFolder, $targetFolder, $outputFileName, array $files, $portal = null)
 	{
-		parent::__construct();
+		parent::__construct($portal);
 		$this->setPackageName($packageName);
 		$this->setSourceUrl($sourceFolder);
 		$this->setTargetUrl($targetFolder);
