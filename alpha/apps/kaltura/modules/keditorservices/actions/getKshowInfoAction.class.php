@@ -1,9 +1,4 @@
 <?php
-/**
- * @package    Core
- * @subpackage kEditorServices
- */
-require_once ( "myKshowUtils.class.php");
 
 /**
  * @package    Core

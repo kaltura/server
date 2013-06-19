@@ -4,8 +4,8 @@
  * @subpackage system
  * @deprecated
  */
-require_once ( "kalturaSystemAction.class.php" );
-require_once ( "viewPartnersAAction.class.php" );
+require_once ( __DIR__ . "/kalturaSystemAction.class.php" );
+require_once ( __DIR__ . "/viewPartnersAAction.class.php" );
 
 /**
  * @package    Core
