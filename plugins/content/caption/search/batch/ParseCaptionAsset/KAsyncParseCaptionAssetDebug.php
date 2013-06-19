@@ -8,7 +8,7 @@
 // /opt/kaltura/app/batch
 chdir(dirname( __FILE__ ) . "/../../../../../batch");
 
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../../../../batch/bootstrap.php");
 
 $iniFile = "batch_config.ini";		// should be the full file path
 

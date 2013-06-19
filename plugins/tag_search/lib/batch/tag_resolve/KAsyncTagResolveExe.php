@@ -5,7 +5,7 @@
  * @package Scheduler
  * @subpackage Cleanup
  */
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../../../../batch/bootstrap.php");
 
 $instance = new KAsyncTagResolve ();
 $instance->run(); 

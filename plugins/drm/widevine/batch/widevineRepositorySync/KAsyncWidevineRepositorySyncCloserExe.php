@@ -5,7 +5,7 @@
  * @package plugins.widevine
  * @subpackage Scheduler
  */
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../../../../batch/bootstrap.php");
 
 $instance = new KAsyncWidevineRepositorySyncCloser();
 $instance->run(); 

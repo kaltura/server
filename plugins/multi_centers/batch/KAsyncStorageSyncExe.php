@@ -1,5 +1,5 @@
 <?php
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../../batch/bootstrap.php");
 /**
  * Will run KAsyncStorageSync.class.php 
  * 
