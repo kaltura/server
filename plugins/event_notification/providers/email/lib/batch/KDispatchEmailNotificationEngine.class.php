@@ -281,9 +281,8 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 				self::$emailFooterTemplate = $file_content;
 			}
 		}
-		$forumsLink = kConf::get('forum_url');
 		
-		$footer = vsprintf( self::$emailFooterTemplate, array( $forumsLink) );	
+		$footer = vsprintf(self::$emailFooterTemplate, array($this->taskConfig->params->forumUrl));	
 		return $footer;
 	} 
 	

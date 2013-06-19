@@ -238,8 +238,8 @@ class KAsyncMailer extends KJobHandlerWorker
 		$body = isset($languageTexts['bodies'][$type]) ? $languageTexts['bodies'][$type] : $defaultLanguageTexts['bodies'][$type];
 		
 		// TODO - move to batch config
-		$forumsLink = kConf::get('forum_url');
-		$unsubscribeLink = kConf::get('unsubscribe_mail_url').self::createBlockEmailStr($recipientemail);
+		$forumsLink = $this->getAdditionalParams('forumUrl');
+		$unsubscribeLink = $this->getAdditionalParams('unsubscribeUrl') . self::createBlockEmailStr($recipientemail);
 		
 		$footer = vsprintf($footer, array($forumsLink, $unsubscribeLink) );
 

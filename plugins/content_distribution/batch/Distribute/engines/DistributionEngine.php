@@ -21,6 +21,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	protected $partnerId;
 	
 	/**
+	 * @var string
+	 */
+	protected $tempDirectory = null;
+	
+	/**
 	 * @param string $interface
 	 * @param KalturaDistributionProviderType $providerType
 	 * @param KSchedularTaskConfig $taskConfig
@@ -65,6 +70,10 @@ abstract class DistributionEngine implements IDistributionEngine
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
 		$this->taskConfig = $taskConfig;
+	
+		$this->tempDirectory = isset($taskConfig->params->tempDirectoryPath) ? $taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
+		if (!is_dir($this->tempDirectory)) 
+			kFile::fullMkfileDir($this->tempDirectory, 0700, true);
 	}
 	
 	public function unimpersonate()

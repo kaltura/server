@@ -24,12 +24,9 @@ class KPhysicalDropFolderUtils
 	
 	public function __construct(KalturaDropFolder $folder, KSchedularTaskConfig $taskConfig)
 	{
-		$this->tempDirectory = isset($taskConfig->tempDirectoryPath) ? $taskConfig->tempDirectoryPath : sys_get_temp_dir();
+		$this->tempDirectory = isset($taskConfig->params->tempDirectoryPath) ? $taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
 		if (!is_dir($this->tempDirectory)) 
-		{
-			KalturaLog::err('Missing temporary directory');
-			throw new Exception('Missing temporary directory');
-		}
+			kFile::fullMkfileDir($this->tempDirectory, 0700, true);
 		
 		$this->folder = $folder;
 		$this->taskConfig = $taskConfig;

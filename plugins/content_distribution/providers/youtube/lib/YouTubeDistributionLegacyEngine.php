@@ -375,7 +375,7 @@ class YouTubeDistributionLegacyEngine extends DistributionEngine implements
 	 */
 	protected function getTempDirectoryForProfile($distributionProfileId)
 	{
-		$metadataTempFilePath = kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
+		$metadataTempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
 		if (!file_exists($metadataTempFilePath))
 			mkdir($metadataTempFilePath, 0777, true);
 		return $metadataTempFilePath;

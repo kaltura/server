@@ -25,7 +25,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "
 KAutoloader::setIncludePath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "ZendFramework", "library"),
 ));
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/batch/classMap.cache');
+KAutoloader::setClassMapFilePath(kEnvironment::get("cache_root_path") . '/batch/classMap.cache');
 KAutoloader::register();
 
 // Logger

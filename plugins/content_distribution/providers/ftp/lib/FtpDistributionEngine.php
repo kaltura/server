@@ -327,7 +327,7 @@ class FtpDistributionEngine extends DistributionEngine implements
     
 	private function getTempDirectoryForProfile($distributionProfileId)
 	{
-		$tempFilePath = kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/' . $distributionProfileId . '/';
+		$tempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/' . $distributionProfileId . '/';
 		if (!file_exists($tempFilePath))
 			mkdir($tempFilePath, 0777, true);
 		return $tempFilePath;

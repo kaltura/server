@@ -40,5 +40,63 @@ class kEnvironment
 		
 		throw new Exception("Cannot find [$paramName] in config"); 
 	}
+	
+	/**
+	 * @param array $srcConfig
+	 * @param array $newConfig
+	 * @param bool $valuesOnly
+	 * @param bool $overwrite
+	 * @return array
+	 */
+	public static function mergeConfigItem(array $srcConfig, array $newConfig, $valuesOnly = false, $overwrite = true)
+	{
+		$returnedConfig = $srcConfig;
+		
+		if($valuesOnly)
+		{
+			foreach($srcConfig as $key => $value)
+			{
+				if(!isset($newConfig[$key])) // nothing to append
+					continue;
+				elseif(is_array($value))
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
+				elseif($overwrite)
+					$returnedConfig[$key] = $newConfig[$key];
+				else
+					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+			}
+		}
+		else
+		{
+			foreach($newConfig as $key => $value)
+			{
+				if(is_numeric($key))
+				{
+					$returnedConfig[] = $newConfig[$key];
+				}
+				elseif(!isset($srcConfig[$key]))
+				{
+					$returnedConfig[$key] = $newConfig[$key];
+				}
+				elseif(is_array($value))
+				{
+					if(!isset($srcConfig[$key]))
+						$srcConfig[$key] = array();
+						
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly, $overwrite);
+				}
+				elseif($overwrite)
+				{
+					$returnedConfig[$key] = $newConfig[$key];
+				}
+				else
+				{
+					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+				}
+			}
+		}
+		
+		return $returnedConfig;
+	}
 }
 

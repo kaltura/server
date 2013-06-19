@@ -51,7 +51,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 		if(is_dir($this->configFileName))
 		{
-			$configFileName = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
+			$configFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config.ini';
 			$this->implodeDirectoryFiles($configFileName);
 		}
 
@@ -143,7 +143,7 @@ class KSchedulerConfig extends Zend_Config_Ini
         	if(!isset($iniArray[$section]))
         		throw new Zend_Config_Exception("Section '$section' cannot be found in $filename, '$extensionName' is invalid extension name");
         		
-        	$iniArray[$section] = kConf::mergeConfigItem($iniArray[$section], $extension, false, false);
+        	$iniArray[$section] = kEnvironment::mergeConfigItem($iniArray[$section], $extension, false, false);
         }
 
         return $iniArray;

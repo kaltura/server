@@ -128,9 +128,6 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		
 		$xmlElement = new SimpleXMLElement('<mrss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>');
 		$xmlElement->addAttribute('version', '2.0');
-//		$xmlElement->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
-//		$xmlElement->addAttribute('xmlns', 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION);
-//		$xmlElement->addAttribute('xsi:noNamespaceSchemaLocation', 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION);
 		
 		$channel = $xmlElement->addChild('channel');
 		

@@ -63,8 +63,9 @@ enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 
 [Worker]
-maximumExecutionTime	= 300
-engineOptions.asperaTempFolder = @TMP_DIR@/aspera_upload
+maximumExecutionTime			= 300
+params.tempDirectoryPath		= @TMP_DIR@
+engineOptions.asperaTempFolder	= @TMP_DIR@/aspera_upload
 
 
 [JobHandlerWorker : Worker]
@@ -166,7 +167,8 @@ friendlyName										= Mailer
 type												= KAsyncMailer
 maxJobsEachRun										= 10	
 scriptPath											= batches/Mailer/KAsyncMailerExe.php
-
+params.forumUrl										= @FORUMS_URLS@
+params.unsubscribeUrl								= "@UNSUBSCRIBE_EMAIL_URL@"
 
 [KAsyncExtractMedia : JobHandlerWorker]
 id													= 60
@@ -539,6 +541,7 @@ friendlyName										= Dispatch Event Notification
 type												= KAsyncDispatchEventNotification
 maxJobsEachRun										= 10
 scriptPath											= ../plugins/event_notification/batch/DispatchEventNotification/KAsyncDispatchEventNotificationExe.php
+params.forumUrl										= @FORUMS_URLS@
 
 [KAsyncIndex : JobHandlerWorker]
 id													= 420

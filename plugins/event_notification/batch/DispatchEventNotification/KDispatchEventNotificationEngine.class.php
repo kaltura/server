@@ -11,12 +11,18 @@ abstract class KDispatchEventNotificationEngine
 	protected $client;
 	
 	/**
+	 * @var KSchedularTaskConfig
+	 */
+	protected $taskConfig;
+	
+	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 * @param KalturaClient $client
 	 */
 	public function __construct(KSchedularTaskConfig $taskConfig, KalturaClient $client)
 	{
 		$this->client = $client;
+		$this->taskConfig = $taskConfig;
 	}
 	
 	/**
