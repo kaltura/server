@@ -1,7 +1,5 @@
 <?php
 
-//grep -r -e require\( -e require_once\( -e include\( -e include_once\( /opt/kaltura/app/* | grep -v svn | grep \.php: > /tmp/allRequires.txt
-
 function performStringConcats($str)
 {
 	for (;;)
@@ -35,7 +33,16 @@ $reqStatements = array(
 	'require',
 );
 
-$allRequires = file_get_contents('/tmp/allRequires.txt');
+$codeRoot = realpath(dirname(__file__).'/../..');
+$tempFile = '/tmp/requires-'.md5($codeRoot).'.txt';
+
+if (!file_exists($tempFile))
+{
+	$generateRequiresCmd = "grep -r -e 'require *(' -e 'require_once *(' -e 'include *(' -e 'include_once *(' {$codeRoot}/* | grep -v svn | grep \.php: > {$tempFile}";
+	exec($generateRequiresCmd);
+}
+
+$allRequires = file_get_contents($tempFile);
 $allRequires = explode("\n", $allRequires);
 foreach ($allRequires as $curRequire)
 {
@@ -48,11 +55,11 @@ foreach ($allRequires as $curRequire)
 	if (strpos($reqStatement, '//') === 0)
 		continue;		// comment
 
-	if (strpos($filePath, '/opt/kaltura/app/alpha/web/api_v3/') === 0 ||
-		strpos($filePath, '/opt/kaltura/app/alpha/web/ma_console/') === 0)
+	if (strpos($filePath, $codeRoot . '/alpha/web/api_v3/') === 0 ||
+		strpos($filePath, $codeRoot . '/alpha/web/ma_console/') === 0)
 		continue;		// don't process folders links
 		
-	if (strpos($filePath, '/opt/kaltura/app/generator/sources/') === 0)
+	if (strpos($filePath, $codeRoot . '/generator/sources/') === 0)
 		continue;		// don't process client sources (may require files that don't exist)
 		
 	if (strpos($reqStatement, '$this->appendLine') !== false || 
@@ -74,20 +81,26 @@ foreach ($allRequires as $curRequire)
 		continue;
 		
 	$reqFile = substr($reqStatement, $openParent + 1, $closeParent - $openParent - 1);
+
+	$dirNameAliases = array(	
+		'realpath(dirname(__FILE__))',
+		'dirname(__FILE__)',
+		'dirname(__file__)',
+		'dirname( __FILE__ )',
+		'__DIR__',
+		);
 	
-	$reqFile = str_replace('realpath(dirname(__FILE__))', '"'.dirname($filePath).'"', $reqFile);
-	$reqFile = str_replace('dirname(__FILE__)', '"'.dirname($filePath).'"', $reqFile);
-	$reqFile = str_replace('dirname(__file__)', '"'.dirname($filePath).'"', $reqFile);
-	$reqFile = str_replace('dirname( __FILE__ )', '"'.dirname($filePath).'"', $reqFile);
-	$reqFile = str_replace('__DIR__', '"'.dirname($filePath).'"', $reqFile);
+	foreach ($dirNameAliases as $dirNameAlias)
+		$reqFile = str_replace($dirNameAlias, '"'.dirname($filePath).'"', $reqFile);
+	
 	$reqFile = str_replace('DIRECTORY_SEPARATOR', '"/"', $reqFile);
-	$reqFile = str_replace('SF_ROOT_DIR', '"/opt/kaltura/app/alpha/"', $reqFile);
-	$reqFile = str_replace('ROOT_DIR', '"/opt/kaltura/app/"', $reqFile);
-	$reqFile = str_replace('KALTURA_ROOT_PATH', '"/opt/kaltura/app/"', $reqFile);
 	$reqFile = str_replace('SF_APP', '"kaltura"', $reqFile);
-	$reqFile = str_replace('$sf_symfony_lib_dir', '"/opt/kaltura/app/symfony/"', $reqFile);
-	$reqFile = str_replace('KALTURA_API_PATH', '"/opt/kaltura/app/api_v3/"', $reqFile);
-	$reqFile = str_replace('MODULES', '"/opt/kaltura/app/alpha/apps/kaltura/modules/"', $reqFile);	
+	$reqFile = str_replace('SF_ROOT_DIR', '"'.$codeRoot.'/alpha/"', $reqFile);
+	$reqFile = str_replace('ROOT_DIR', '"'.$codeRoot.'/"', $reqFile);
+	$reqFile = str_replace('KALTURA_ROOT_PATH', '"'.$codeRoot.'"', $reqFile);
+	$reqFile = str_replace('$sf_symfony_lib_dir', '"'.$codeRoot.'/symfony/"', $reqFile);
+	$reqFile = str_replace('KALTURA_API_PATH', '"'.$codeRoot.'/api_v3/"', $reqFile);
+	$reqFile = str_replace('MODULES', '"'.$codeRoot.'/alpha/apps/kaltura/modules/"', $reqFile);	
 	$reqFile = str_replace('\'', '"', $reqFile);
 	$reqFile = trim(performStringConcats($reqFile));
 	
@@ -106,7 +119,7 @@ foreach ($allRequires as $curRequire)
 		continue;		// all workers find bootstrap.php since they start from that folder
 		
 	if (strpos($reqFile, 'Zend/') === 0)
-		$reqFile = '/opt/kaltura/app/vendor/ZendFramework/library/' . $reqFile;
+		$reqFile = $codeRoot . '/vendor/ZendFramework/library/' . $reqFile;
 	
 	if (realpath($reqFile))
 		continue;		// absolute require
@@ -115,18 +128,4 @@ foreach ($allRequires as $curRequire)
 		continue;		// relative require
 		
 	echo "Failed {$reqFile} in {$curRequire}\n";
-
-	//echo $curRequire."\n";
-	//echo $reqFile."\n";
-
-/*	if (strpos($curRequire, '$') !== false)
-	{
-		echo
-	}
-/opt/kaltura/app/alpha/web/testkConf.php:require_once('/opt/kaltura/app/server_infra/kConf.php');
-require_once("..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."bootstrap.php");
-require_once("$inputPage.php");
-require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kPlayManifestCacher.php");
-*/
-	
 }
