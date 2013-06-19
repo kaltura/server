@@ -1,7 +1,7 @@
 <?php
-include_once("StringTokenizer.php");
-include_once("KDLMediaDataSet.php");
-include_once 'KDLUtils.php';
+include_once(__DIR__ . "/StringTokenizer.php");
+include_once(__DIR__ . "/KDLMediaDataSet.php");
+include_once(__DIR__ . "/KDLUtils.php");
 
 	/* ---------------------------
 	 * KDLMediaInfoLoader

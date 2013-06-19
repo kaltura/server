@@ -2,11 +2,11 @@
 
 define('CONFIG_FILE', 'config.ini');
 
-require_once('TestsAutoloader.php');
+require_once(dirname(__FILE__).'/TestsAutoloader.php');
 TestsAutoloader::register();
 
-require_once('SampleLoggerImplementation.php');
-require_once('Test/ZendClientTester.php');
+require_once(dirname(__FILE__).'/SampleLoggerImplementation.php');
+require_once(dirname(__FILE__).'/Test/ZendClientTester.php');
 
 $testerConfig = parse_ini_file(dirname(__FILE__).'/'.CONFIG_FILE);
 

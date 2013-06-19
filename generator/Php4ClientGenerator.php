@@ -25,7 +25,7 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		$xpath = new DOMXPath($this->_doc);
 		
 		$this->appendLine('<?php');
-		$this->appendLine('require_once("KalturaClientBase.php");');
+		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
 		$this->appendLine('');
 	    
 		// enumes

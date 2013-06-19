@@ -38,7 +38,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once("KalturaClientBase.php");');
+		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
 		$this->appendLine('');
 	    
 		$enumNodes = $xpath->query("/xml/enums/enum");
@@ -62,7 +62,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once("KalturaClientBase.php");');
+		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
 		$this->appendLine('');
 		
 		$classNodes = $xpath->query("/xml/classes/class");
@@ -86,9 +86,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		$this->appendLine('require_once("KalturaClientBase.php");');
-		$this->appendLine('require_once("KalturaEnums.php");');
-		$this->appendLine('require_once("KalturaTypes.php");');
+		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaClientBase.php");');
+		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaEnums.php");');
+		$this->appendLine('require_once(dirname(__FILE__) . "/KalturaTypes.php");');
 		$this->appendLine('');
 		
 		$serviceNodes = $xpath->query("/xml/services/service");

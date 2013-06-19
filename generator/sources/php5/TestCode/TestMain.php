@@ -26,7 +26,7 @@
 //
 // @ignore
 // ===================================================================================================
-require_once('../KalturaClient.php');
+require_once(dirname(__FILE__) . '/../KalturaClient.php');
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'KalturaTestConfiguration.php');
 
 class TestMain implements IKalturaLogger

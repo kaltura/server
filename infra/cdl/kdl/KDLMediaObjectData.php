@@ -1,6 +1,6 @@
 <?php
 
-include_once("KDLCommon.php");
+include_once(__DIR__ . "/KDLCommon.php");
 
 	/* ---------------------------
 	 * KDLBaseMediaData

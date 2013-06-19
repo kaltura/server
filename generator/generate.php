@@ -46,7 +46,7 @@ ini_set( "memory_limit","512M" );
 chdir(__DIR__);
 
 //bootstrap connects the generator to the rest of Kaltura system
-require_once("bootstrap.php");
+require_once(dirname(__FILE__) . "/bootstrap.php");
 
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
