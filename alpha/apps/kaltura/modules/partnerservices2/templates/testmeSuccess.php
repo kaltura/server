@@ -309,7 +309,7 @@ function createInputs ( $arr , $context_id )
 $limited = getLimited();
 ?>
 
-<?php require_once ( "testme_js.php" ) ?>
+<?php require_once ( __DIR__ . "/testme_js.php" ) ?>
 
 <span style="font-family:arial; font-size:13px;">
 <form id="theform" method="post" action="<?php echo $SERVICE_URL ?>" target="target_frame">
@@ -521,17 +521,17 @@ $limited = getLimited();
 <?php 
 $multi_request_2 = null;
 if ( !@$limited ) { 
-require_once ( "testme_multirequest.php" );
+require_once ( __DIR__ . "/testme_multirequest.php" );
 ?>
 	<optgroup label="multi">
 		<option value="multirequest">multi request</option>
 	</optgroup>
 <?php } 
-require_once ( "testme_dvdentries.php" );
-require_once ( "testme_playlists.php" );
-require_once ( "testme_conversionprofiles.php" );
-require_once ( "testme_uiconf.php" );
-require_once ( "testme_dataentries.php" );
+require_once ( __DIR__ . "/testme_dvdentries.php" );
+require_once ( __DIR__ . "/testme_playlists.php" );
+require_once ( __DIR__ . "/testme_conversionprofiles.php" );
+require_once ( __DIR__ . "/testme_uiconf.php" );
+require_once ( __DIR__ . "/testme_dataentries.php" );
 ?>
 
 
