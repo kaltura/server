@@ -1,5 +1,5 @@
 <?php
-require_once("..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 KalturaLog::setContext("CLIENTS");
 KalturaLog::debug(__FILE__ . " start");
 $requestedName = isset($_GET["name"]) ? $_GET['name'] : null;
