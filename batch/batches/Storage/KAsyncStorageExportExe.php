@@ -6,7 +6,7 @@
  * @package Scheduler
  * @subpackage Storage
  */
-require_once("bootstrap.php");
+require_once(__DIR__ . "/../../bootstrap.php");
 
 $instance = new KAsyncStorageExport();
 $instance->run(); 
