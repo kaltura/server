@@ -187,7 +187,7 @@ status:
 </div>
 
 <div id='dynamic'>
-<? require_once ( 'galleryPartialSuccess.php' ) ?>
+<? require_once ( __DIR__ . '/galleryPartialSuccess.php' ) ?>
 </div id='dynamic'>
 </form>
 <div id='widget' style='position: absolute; left: 1200px; top: 200px'>

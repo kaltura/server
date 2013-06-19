@@ -119,7 +119,7 @@ if($includeCode)
 
 function getClient($partner_id, $admin_secret, $host)
 {
-  require_once('KalturaClient.php');  
+  require_once(__DIR__ . '/KalturaClient.php');  
   
   $kconf = new KalturaConfiguration($partner_id);
   $kconf->serviceUrl = $host;

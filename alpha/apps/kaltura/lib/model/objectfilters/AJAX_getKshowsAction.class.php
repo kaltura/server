@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage ajax
  */ 
-require_once( 'AJAX_getObjectsAction.class.php');
+require_once( __DIR__ . '/AJAX_getObjectsAction.class.php');
 
 /**
  * @package Core

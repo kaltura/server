@@ -4,7 +4,7 @@
  * @subpackage system
  * @deprecated
  */
-require_once ( "kalturaSystemActions.class.php");
+require_once ( __DIR__ . "/kalturaSystemActions.class.php");
 
 /**
  * system actions.

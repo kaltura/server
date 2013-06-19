@@ -15,7 +15,7 @@ $cache = new KalturaResponseCacher(null, kCacheManager::CACHE_TYPE_API_V3_FEED, 
 $cache->checkOrStart();
 ob_start();
 
-require_once("../bootstrap.php");
+require_once(__DIR__ . "/../bootstrap.php");
 
 // Database
 DbManager::setConfig(kConf::getDB());

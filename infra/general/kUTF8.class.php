@@ -89,7 +89,7 @@ class kUTF8
 	public static function str2int64 ( $s )
 	{
 		global $kUTF8Codes;
-		require_once("kUTF8Codes.php");
+		require_once(__DIR__ . "/kUTF8Codes.php");
 
 		// get 4 letters prefix (add trailing spaces chars in case we are missing characters)
 		$s = iconv_substr($s."    ", 0, 4, "UTF-8");

@@ -1,5 +1,5 @@
 <?php
-include_once ( "_header.php" );
+include_once ( __DIR__ . "/_header.php" );
 ?>
 Edit forum posts <br>
 <?php if ( $error )  echo $error ;?>  

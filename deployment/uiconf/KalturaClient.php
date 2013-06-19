@@ -1,5 +1,5 @@
 <?php
-require_once("KalturaClientBase.php");
+require_once(__DIR__ . "/KalturaClientBase.php");
 
 class KalturaAccessControlOrderBy
 {
