@@ -9,8 +9,8 @@ define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../../'));
 require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
-$sf_symfony_lib_dir = realpath(dirname(__FILE__).'/../../symfony');
-$sf_symfony_data_dir = realpath(dirname(__FILE__).'/../../symfony-data');
+$sf_symfony_lib_dir = realpath(dirname(__FILE__).'/../../vendor/symfony');
+$sf_symfony_data_dir = realpath(dirname(__FILE__).'/../../vendor/symfony-data');
 
 $include_path = realpath(dirname(__FILE__).'/../../vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
 set_include_path($include_path);

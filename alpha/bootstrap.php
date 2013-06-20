@@ -7,8 +7,8 @@ define('SF_ROOT_DIR',					KALTURA_ROOT_PATH . '/alpha');
 define('MODULES', 						SF_ROOT_DIR . '/apps/kaltura/modules/');
 
 
-$sf_symfony_lib_dir = KALTURA_ROOT_PATH . '/symfony';
-$sf_symfony_data_dir = KALTURA_ROOT_PATH . '/symfony-data';
+$sf_symfony_lib_dir = KALTURA_ROOT_PATH . '/vendor/symfony';
+$sf_symfony_data_dir = KALTURA_ROOT_PATH . '/vendor/symfony-data';
 
 // symfony bootstraping
 require_once("$sf_symfony_lib_dir/util/sfCore.class.php");
