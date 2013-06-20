@@ -93,19 +93,5 @@ RewriteRule ^tracker$ /tracker.php [L]
 # rewrite rule for an errornous url from myspace - fetch a 1-pixel.gif
 RewriteRule ^(.*)entry/widget/(.*) /images/blank_one_pixel.gif [L]
 
-# rewrite rules for old links
-RewriteRule ^swf/(.*)$ OLD_PATHS/web/swf/$1 [L]
-RewriteRule ^simpleswf/(.*)$ OLD_PATHS/web/simpleswf/$1 [L]
-RewriteRule ^images/(.*)$ OLD_PATHS/web/images/$1 [L]
-RewriteRule ^js/(.*)$ OLD_PATHS/web/js/$1 [L]
-RewriteRule ^css/(.*)$ OLD_PATHS/web/css/$1 [L]
-RewriteRule ^projects/(.*)$ OLD_PATHS/web/projects/$1 [L]
-RewriteRule ^groupalbum(.*)$ OLD_PATHS/web/groupalbum/index.php [L]
-RewriteRule ^fb_greetings(.*)$ OLD_PATHS/web/fb_greetings/index.php [L]
-RewriteRule ^yedda/(.*)$ OLD_PATHS/web/yedda/$1 [L]
-RewriteRule ^makeover(.*)$ OLD_PATHS/web/makeover/index.php [L]
-RewriteRule ^sampleImplementation/(.*)$ OLD_PATHS/web/sampleImplementation/$1 [L]
-RewriteRule ^survey$ http://www.surveymonkey.com/s.aspx?sm=h8ApKtLNiRQw51Jo_2fClOPA_3d_3d
-
 RewriteCond %{QUERY_STRING}  service=stats&action=collect
 RewriteRule api_v3/index.php /alive.html [L]

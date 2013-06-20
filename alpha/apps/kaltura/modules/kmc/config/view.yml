@@ -28,11 +28,6 @@ varpartnerlistSuccess:
   javascripts:    [ -*, jqkaltura.js, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
   stylesheets:  [ -*, /lib/css/kmc1modal, /lib/css/kmc1 ]
 
-
-#	jqkaltura.js:
-#  * jQuery 1.2.1 + Macromedia(r) Flash(r) JavaScript Integration Kit
-#  * kaltura/OLD_PATHS/web/js
-
 supportSuccess:
   has_layout:     off
   layout:         kmc1layout

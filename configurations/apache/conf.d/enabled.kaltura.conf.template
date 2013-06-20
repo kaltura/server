@@ -133,13 +133,6 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	# rewrite rule for an errornous url from myspace - fetch a 1-pixel.gif
 	RewriteRule ^(.*)entry/widget/(.*) /images/blank_one_pixel.gif [L]
 	
-	# rewrite rules for old links
-	RewriteRule ^swf/(.*)$ OLD_PATHS/web/swf/$1 [L]
-	RewriteRule ^simpleswf/(.*)$ OLD_PATHS/web/simpleswf/$1 [L]
-	RewriteRule ^images/(.*)$ OLD_PATHS/web/images/$1 [L]
-	RewriteRule ^js/(.*)$ OLD_PATHS/web/js/$1 [L]
-	RewriteRule ^css/(.*)$ OLD_PATHS/web/css/$1 [L]
-	
 	RewriteCond %{QUERY_STRING}  service=stats&action=collect
 	RewriteRule api_v3/index.php /alive.html [L]
 					
@@ -161,29 +154,6 @@ Alias /start "@APP_DIR@/start"
 	Order allow,deny
 	Allow from all
 </Directory>
-
-
-
-############# OLD_PATHS #########################
-Alias /OLD_PATHS "@APP_DIR@/OLD_PATHS"
-<Directory "@APP_DIR@/OLD_PATHS">
-	DirectoryIndex index.php
-	ExpiresActive On
-	ExpiresDefault "access plus 1 week"
-	Header unset ETag
-	FileETag None
-	Header unset Vary
-        AllowOverride None
-        Allow from all
-</Directory>
-
-<Directory "@APP_DIR@/OLD_PATHS/web/css">
-    SetOutputFilter DEFLATE
-    AllowOverride None
-    Allow from all
-</Directory>
-
-##########################
 
 Alias /content/uiconf "@WEB_DIR@/content/uiconf"
 <Directory "@WEB_DIR@/content/uiconf">
