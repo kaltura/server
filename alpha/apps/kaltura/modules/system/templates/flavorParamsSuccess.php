@@ -96,8 +96,10 @@ and "" that are placed arround editFlavorParam->getMultiStream
 			<br />
 			<br />
 			<label for="conversion-engines"><b>Conversion engines:</b></label> <label>(Delimited with ",")</label>
-			<span style="color: white; background:white;><label for="name">.....................................</label><span style="color: black; background:white;>
-			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label><br />
+			<span style="color: white; background:white;><label for="name">.....................................</label>
+			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label>
+			</span>
+			<br />
 			 
 			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/>
 			<input type="text" id="conversion-engines-extra-params" name="conversion-engines-extra-params" value="<?php echo $editFlavorParam->getConversionEnginesExtraParams(); ?>" size="60" <?php echo $disabled; ?>/>
