@@ -5,24 +5,16 @@ autoload:
 #    prefix:         1
     recursive:      on   
     
-  server_infra:
-    name:           server_infra
-    path:           %SF_MODEL_LIB_DIR%/../../../server_infra
-#    prefix:         1
-    recursive:      on   
-    
   plugins:
     name:           plugins
     path:           %SF_MODEL_LIB_DIR%/../../../plugins
     recursive:      on   
-    
     
   propel:
     name:           propel
     path:           %SF_MODEL_LIB_DIR%/../../../vendor/propel
 #    prefix:         1
     recursive:      on   
-    
     
   zend:
     name:           zend
