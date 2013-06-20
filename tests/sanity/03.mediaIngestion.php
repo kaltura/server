@@ -76,7 +76,7 @@ if(!$createdEntry)
 	echo "Entry not found\n";
 	exit(-1);
 }
-echo "Session ready\n";
+echo "Entry ready\n";
 
 
 
