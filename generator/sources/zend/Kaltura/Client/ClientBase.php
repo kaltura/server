@@ -458,7 +458,7 @@ class Kaltura_Client_ClientBase
 				  ));
 
         if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
-			throw new KalturaClientException("Cannot use SOCKS5 without curl installed.", KalturaClientException::ERROR_CONNECTION_FAILED);
+			throw new Kaltura_Client_ClientException("Cannot use SOCKS5 without curl installed.", Kaltura_Client_ClientException::ERROR_CONNECTION_FAILED);
 		}
 		if (isset($this->config->proxyHost)) {
 			$proxyhost = 'tcp://' . $this->config->proxyHost;
