@@ -527,9 +527,14 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		$flashUrl = myContentStorage::getFSFlashRootPath();
 		$swfName = $this->getSwfNameFromType();
 		$dir = $this->getDirectoryFromType();
-		
+	
 		if($version)
-			$this->setSwfUrl("$flashUrl/$dir/v{$version}/$swfName");
+		{
+			if (strpos($this->swf_url, "kdp3") !== false)
+				$this->setSwfUrl("$flashUrl/kdp3/v{$version}/kdp3.swf");
+			else
+				$this->setSwfUrl("$flashUrl/$dir/v{$version}/$swfName");
+		}
 	}
 
 	public function getSwfUrlVersion ()
