@@ -6,6 +6,9 @@
 setlocale(LC_ALL, 'en_US.UTF-8');
 libxml_disable_entity_loader(true);
 
+$include_path = realpath(__DIR__ . '/../../vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
+set_include_path($include_path);
+
 require_once __DIR__ . '/../../infra/kEnvironment.php';
 
 /**
@@ -133,11 +136,8 @@ class kConf extends kEnvironment
 		// load zend config classes
 		if(!class_exists('Zend_Config_Ini'))
 		{
-			$oldIncludePath = get_include_path();
-			set_include_path(dirname(__file__) . '/../vendor/ZendFramework/library');
 			require_once 'Zend/Config/Exception.php';
 			require_once 'Zend/Config/Ini.php';
-			set_include_path($oldIncludePath);
 		}
 		
 		// load and merge the configurations

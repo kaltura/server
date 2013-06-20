@@ -7,12 +7,6 @@ define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../../'));
 require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
-$include_path = 
-	realpath(dirname(__FILE__).'/../vendor/ZendFramework/library') . PATH_SEPARATOR . 
-	get_include_path();
-	
-set_include_path($include_path);
-
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "server_infra", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"));
