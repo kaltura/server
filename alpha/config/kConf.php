@@ -77,7 +77,7 @@ class kConf extends kEnvironment
 		if(isset(self::$map[$mapName]))
 			return true;
 		
-		$configDir = realpath(dirname(__file__) . '/../configurations');
+		$configDir = self::getConfigDir();
 		return file_exists("$configDir/$mapName.ini");
 	}
 		
@@ -103,7 +103,7 @@ class kConf extends kEnvironment
 		}
 		
 		// get the list of ini files
-		$configDir = realpath(dirname(__file__) . '/../configurations');
+		$configDir = self::getConfigDir();
 		$iniFiles = array();
 		if ($mapName == 'local')
 			$iniFiles[] = "$configDir/base.ini";
