@@ -301,7 +301,7 @@ echo "Reports OK\n";
 /**
  * Syncyng plays and view from the dwh to the operational db
  */
-$cmd = "su $kalturaUser -c $appDir/scripts/dwh/dwh_plays_views_sync.sh";
+$cmd = "su $kalturaUser -c $appDir/alpha/scripts/dwh/dwh_plays_views_sync.sh";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
