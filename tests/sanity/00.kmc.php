@@ -1,5 +1,5 @@
 <?php
-
+$config = null;
 $clientConfig = null;
 /* @var $clientConfig KalturaConfiguration */
 
@@ -14,8 +14,8 @@ if(!$kmcHtmlContent)
 }
 
 $swfPaths = array(
-	'/flash/kmc/login/' . kConf::get('kmc_login_version') . '/login.swf',
-	'/flash/kmc/' . kConf::get('kmc_version') . '/kmc.swf',
+	'/flash/kmc/login/' . $config['kmc']['login_version'] . '/login.swf',
+	'/flash/kmc/' . $config['kmc']['version'] . '/kmc.swf',
 );
 
 foreach($swfPaths as $swfPath)
