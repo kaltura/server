@@ -1,5 +1,10 @@
 <?php
-require_once (dirname ( __FILE__ ) . '/bootstrapSphinxSearchTest.php');
+require_once(__DIR__ . '/../../../api_v3/bootstrap.php');
+
+define ( 'ARRAY_SIZE', 3 );
+define ( 'SELECT_INDEX', 2 );
+define ( 'SPHINX_SEARCH_API_SESSION', 'testsData/SphinxSearchApiSession.csv' );
+define ( 'KALTURA_API_LOGGER_FILE_PATH', KALTURA_ROOT_PATH . "/api_v3/config/logger.ini");
 
 class SphinxSerach extends PHPUnit_Framework_TestCase 
 {
