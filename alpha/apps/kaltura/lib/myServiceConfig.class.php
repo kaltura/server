@@ -87,7 +87,7 @@ class myServiceConfig
 		
 	protected function getDefaultPath ()
 	{
-		return SF_ROOT_DIR."/../service_config/";
+		return SF_ROOT_DIR."/apps/kaltura/modules/partnerservices2/service_config/";
 	}
 		
 	protected function getPath ()
