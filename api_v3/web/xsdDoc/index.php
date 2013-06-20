@@ -1,6 +1,6 @@
 <?php 
 
-require_once(dirname(__FILE__) . '/../../../server_infra/kConf.php');
+require_once(dirname(__FILE__) . '/../../../alpha/config/kConf.php');
 
 $INPUT_PATTERN = "/^[a-zA-Z0-9_]*$/";
 $SCHEME_PATTERN = "/^[a-zA-Z0-9_.]*$/";

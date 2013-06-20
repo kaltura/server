@@ -6,7 +6,7 @@
 
 chdir(__DIR__);
 define('KALTURA_ROOT_PATH', realpath(__DIR__ . '/../'));
-require_once(KALTURA_ROOT_PATH . '/server_infra/kConf.php');
+require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 
 define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH . "/batch");
 

@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../server_infra/kConf.php');
+require_once(dirname(__FILE__) . '/../../../alpha/config/kConf.php');
 
 if($argc != 2)
 {

@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../server_infra/kConf.php');
+require_once(dirname(__FILE__).'/../config/kConf.php');
 
 define('KALTURA_LOG', 		'ps2_dev');
 define('SF_ENVIRONMENT',	'dev');
