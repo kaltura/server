@@ -392,8 +392,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		$batchJob->setObjectId($categoryId);
 		$batchJob->setObjectType(BatchJobObjectType::CATEGORY);
 		if (!$partnerId)
-			$batchJob->setPartnerId(kCurrentContext::getCurrentPartnerId());
-			
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+		
+		$batchJob->setPartnerId($partnerId);
 		KalturaLog::log("Creating tag re-index job for categoryId [" . $data->getChangedCategoryId() . "] ");
 		return kJobsManager::addJob($batchJob, $data, $jobType);
 	}
