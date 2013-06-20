@@ -30,14 +30,14 @@ class KAsyncTagIndex extends KJobHandlerWorker
 		return KalturaBatchJobType::INDEX_TAGS;
 	}
 	
-	protected static function reIndexTags (KalturaBatchJob $job)
+	protected function reIndexTags (KalturaBatchJob $job)
 	{
 		KalturaLog::info("Re-indexing tags according to privacy contexts");
 		$tagPlugin = KalturaTagSearchClientPlugin::get($this->kClient);
 		$this->impersonate($job->partnerId);
 		try 
 		{
-			$tagPlugin->tag->indexCategoryEntryTags($job->data->changedCategoryId, $job->data->deletedPrivacyContexts, $job->data->changedCategoryId);
+			$tagPlugin->tag->indexCategoryEntryTags($job->data->changedCategoryId, $job->data->deletedPrivacyContexts, $job->data->addedPrivacyContexts);
 		}
 		catch (Exception $e)
 		{
