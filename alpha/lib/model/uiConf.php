@@ -230,6 +230,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_TYPE_ADVANCED_EDITOR => true,
 				self::UI_CONF_TYPE_PLAYLIST => true,
 				self::UI_CONF_TYPE_KMC_APP_STUDIO => true,
+				self::UI_CONF_TYPE_KRECORD => false,
 				self::UI_CONF_TYPE_KDP3 => true,
 				self::UI_CONF_TYPE_KMC_ACCOUNT => true,
 				self::UI_CONF_TYPE_KMC_ANALYTICS => true,
