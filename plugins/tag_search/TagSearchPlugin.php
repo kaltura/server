@@ -2,7 +2,7 @@
 /**
  * @package plugins.tagSearch
  */
-class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
+class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader
 {
     const PLUGIN_NAME = "tagSearch";
     
@@ -100,6 +100,47 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * @param unknown_type $baseClass
+	 * @param unknown_type $enumValue
+	 * @param array $constructorArgs
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'kJobData' && $enumValue == self::getBatchJobTypeCoreValue(IndexTagsByPrivacyContextJobType::INDEX_TAGS))
+			return new kIndexTagsByPrivacyContextJobData();
+	
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(IndexTagsByPrivacyContextJobType::INDEX_TAGS))
+			return new KalturaIndexTagsByPrivacyContextJobData();
+		
+		return null;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * @param unknown_type $baseClass
+	 * @param unknown_type $enumValue
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if($baseClass == 'kJobData' && $enumValue == self::getBatchJobTypeCoreValue(IndexTagsByPrivacyContextJobType::INDEX_TAGS))
+			return new kIndexTagsByPrivacyContextJobData();
+	
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(IndexTagsByPrivacyContextJobType::INDEX_TAGS))
+			return new KalturaIndexTagsByPrivacyContextJobData();
+		
+		return null;
 	}
 	
 }

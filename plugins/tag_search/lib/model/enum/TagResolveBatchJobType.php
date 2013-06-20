@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.tag_search
+ *  @subpackage model.enum
+ */
 class TagResolveBatchJobType implements IKalturaPluginEnum, BatchJobType
 {
 	const TAG_RESOLVE = 'TagResolve';
