@@ -1258,12 +1258,9 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 	}
 	
-	/***************
-	 * $sourceFlavor - might be null, for cases when the conversion profile does not contain source.
-	 */
-	private static function decideSourceFlavorConvert($entryId, $sourceFlavor, flavorAsset $originalFlavorAsset, $conversionProfileId, $flavors, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
+	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor = null, flavorAsset $originalFlavorAsset, $conversionProfileId, $flavors, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
 	{
-		if(isset($sourceFlavor) && ($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()))
+		if($sourceFlavor && ($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()))
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				
@@ -1286,7 +1283,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				return false;
 			}
 		}
-		else {
+		elseif($mediaInfo) 
+		{
 			/*
 			 * Check whether there is a need for an intermediate source pre-processing
 			 */
@@ -1296,13 +1294,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			
 			$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$errDescription = null;
-				/*
-				 * Save the original source asset in another asset, in order 
-				 * to prevent its liquidated by the inter-source asset.
-				 * But, do it only if the conversion profile contains source flavor
-				 */
-			if(isset($sourceFlavor)) {
-				
+			
+			/*
+			 * Save the original source asset in another asset, in order 
+			 * to prevent its liquidated by the inter-source asset.
+			 * But, do it only if the conversion profile contains source flavor
+			 */
+			if($sourceFlavor) 
+			{
 				$sourceAsset = assetPeer::retrieveById($mediaInfo->getFlavorAssetId());
 				$copyFlavorParams = assetParamsPeer::retrieveBySystemName(self::SAVE_ORIGINAL_SOURCE_FLAVOR_PARAM_SYS_NAME);
 				if (!$copyFlavorParams)
@@ -1372,7 +1371,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
 		}
 				
-//			$originalFlavorAsset->incrementVersion();
 		$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
 		if(isset($sourceFlavor)) {
 			$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
