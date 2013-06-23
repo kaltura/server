@@ -36,6 +36,7 @@ require_once(dirname(__file__) . '/kalcliSwitches.php');
 $DATE_FIELD_SUFFIXES = array('At', 'Date', 'On');
 define('MIN_TIME_STAMP', 946677600);		// 2000
 define('MAX_TIME_STAMP', 2147483647);		// 2038
+define('API_LOG_FILENAME', '/var/log/kaltura_api_v3.log');
 
 function formatResponse($resp, $indent = '', $varName = null)
 {
@@ -80,6 +81,32 @@ function formatResponse($resp, $indent = '', $varName = null)
 			$result .= "\n{$indent}\t{$name}\t{$value}";
 		}
 		return $result;
+	}
+}
+
+function isLineLogStart($curLine)
+{
+	if (strlen($curLine) < 20)
+		return false;
+	if ($curLine[4] == '-' && $curLine[7] == '-' && $curLine[10] == ' ' && $curLine[13] == ':' && $curLine[16] == ':')
+		return true;
+	return false;
+}
+
+function printLogFiltered($logPortion, $sessionId)
+{
+	$curSession = null;
+	$logLines = explode("\n", $logPortion);
+	foreach ($logLines as $logLine)
+	{
+		if (isLineLogStart($logLine))
+		{
+			$explodedLine = explode(' ', $logLine, 6);
+			$curSession = substr($explodedLine[4], 1, -1);
+		}
+		
+		if ($curSession == $sessionId)
+			echo $logLine . "\n";
 	}
 }
 
@@ -212,8 +239,28 @@ if (isset($options['header']))
 $curlWrapper->useGet = isset($options['get']);
 $curlWrapper->ignoreCertErrors = isset($options['insecure']);
 
+if (isset($options['log']))
+{
+	$initialLogSize = filesize(API_LOG_FILENAME);
+}
+
 // issue the request
 $result = $curlWrapper->getUrl($url, $params);
+
+if (isset($options['log']))
+{
+	clearstatcache();
+	$currentLogSize = filesize(API_LOG_FILENAME);
+	
+	$logPortion = file_get_contents(API_LOG_FILENAME, false, null, $initialLogSize, $currentLogSize - $initialLogSize);
+	
+	if (preg_match('/X-Kaltura-Session: (\d+)/', $curlWrapper->responseHeaders, $matches))
+	{
+		$sessionId = $matches[1];
+		printLogFiltered($logPortion, $sessionId);
+	}
+	die;
+}
 
 // output the response
 if (isset($options['include']) || isset($options['head']))

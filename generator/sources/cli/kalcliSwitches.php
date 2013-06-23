@@ -33,6 +33,7 @@ require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 $commandLineSwitches = array(
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'i', 'include', 'Include output headers as well as the response body'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'I', 'head', 'Output only response headers'),
+	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'l', 'log', 'Output only the API execution log'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 's', 'https', 'Use https transport'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 't', 'time', 'Output request execution time'),
 	array(KalturaCommandLineParser::SWITCH_NO_VALUE, 'g', 'get', 'Use GET instead of POST'),
