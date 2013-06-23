@@ -171,10 +171,10 @@ class BulkUploadResultEntry extends BulkUploadResult
 	public function getCategory()	{return $this->getFromCustomData(self::CATEGORY, null, parent::getCategory());}
 	public function setCategory($v)	{$this->putInCustomData(self::CATEGORY, $v);}
 	
-	public function getScheduleStartDate()	{return $this->getFromCustomData(self::SCHEDULE_START_DATE, null, parent::getScheduleStartDate());}
+	public function getScheduleStartDate($format = 'Y-m-d H:i:s')	{return $this->getFromCustomData(self::SCHEDULE_START_DATE, null, parent::getScheduleStartDate());}
 	public function setScheduleStartDate($v)	{$this->putInCustomData(self::SCHEDULE_START_DATE, $v);}
 	
-	public function getScheduleEndDate()	{return $this->getFromCustomData(self::SCHEDULE_END_DATE, null, parent::getScheduleEndDate());}
+	public function getScheduleEndDate($format = 'Y-m-d H:i:s')	{return $this->getFromCustomData(self::SCHEDULE_END_DATE, null, parent::getScheduleEndDate());}
 	public function setScheduleEndDate($v)	{$this->putInCustomData(self::SCHEDULE_END_DATE, $v);}
 	
 	public function getThumbnailUrl()	{return $this->getFromCustomData(self::THUMBNAIL_URL, null, parent::getThumbnailUrl());}
