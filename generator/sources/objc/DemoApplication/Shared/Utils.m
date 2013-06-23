@@ -17,8 +17,10 @@
 }
 
 + (NSString *)getStrBitrate:(id)bitrate {
+//    NSString *sBitrate = [[NSString alloc]];
     
-    NSString *sBitrate = [bitrate stringValue];
+    NSString *sBitrate = bitrate;//[[NSString alloc]initWithString:bitrate];
+//bitrate;//[bitrate stringValue];
     
     if ([sBitrate intValue] == 0) {
         

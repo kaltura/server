@@ -8,6 +8,7 @@
 
 #import "AppDelegate_iPad.h"
 #import "HomeViewController_iPad.h"
+#import "SettingsViewController_iPad.h"
 #import <dlfcn.h>
 #import <AudioToolbox/AudioToolbox.h>
 
@@ -59,11 +60,20 @@
     }
     
     HomeViewController_iPad *homeController = [[HomeViewController_iPad alloc] initWithNibName:@"HomeViewController_iPad" bundle:nil];
+    SettingsViewController_iPad *settingsController = [[SettingsViewController_iPad alloc] initWithNibName:@"SettingsViewController_iPad" bundle:nil];
     
-    self.navigation = [[UINavigationController alloc] initWithRootViewController:homeController];
+    if (![[Client instance] login]){
+        
+        self.navigation = [[UINavigationController alloc] initWithRootViewController:settingsController];
+    }
+    else{
+        
+        self.navigation = [[UINavigationController alloc] initWithRootViewController:homeController];
+    }
     [self.navigation setNavigationBarHidden:YES];
     
     [homeController release];
+    [settingsController release];
     
     [self.window addSubview:self.navigation.view];
     

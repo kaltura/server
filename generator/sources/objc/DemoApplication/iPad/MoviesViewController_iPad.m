@@ -123,7 +123,7 @@
     if ([self.media count] > 0) {
         
         KalturaMediaEntry *mediaEntry = [self.media objectAtIndex:0];
-        
+        NSLog(@"@", mediaEntry);
         PlayerViewController_iPad *controller = [[PlayerViewController_iPad alloc] initWithNibName:@"PlayerViewController_iPad" bundle:nil];
         controller.mediaEntry = mediaEntry;
         [self.navigationController pushViewController:controller animated:YES];

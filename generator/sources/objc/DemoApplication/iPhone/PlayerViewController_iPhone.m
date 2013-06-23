@@ -14,6 +14,10 @@
 @synthesize mediaEntry;
 @synthesize bitrates;
 @synthesize moviePlayerViewController;
+@synthesize flavorType;
+
+static NSString* flavorID = @"";
++ (NSString*) getFlavorID { return flavorID; }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -127,16 +131,60 @@
     NSDictionary *dic = [self.bitrates objectAtIndex:ind];
     
     [buttonBitrate setTitle:[Utils getStrBitrate:[dic objectForKey:@"bitrate"]] forState:UIControlStateNormal];
-    
-    NSString *strURL = [[Client instance] getVideoURL:self.mediaEntry forFlavor:[dic objectForKey:@"id"]];
+
+    if ([flavorType isEqual:@"wv"])
+    {
+        //There will be initialize of WV only if the flavor id will be chenged
+        if([dic objectForKey:@"id"] != flavorID){
+            flavorID = [dic objectForKey:@"id"];
+            [[Client instance] initializeWVDictionary:[dic objectForKey:@"id"]];
+            [Client instance].delegate = self;
+        }
+        else{
+            [[Client instance] selectBitrate:ind];
+        }
         
+        NSString *strURL = [[Client instance] getVideoURL:self.mediaEntry forMediaEntryDuration: self.mediaEntry.duration forFlavor:[dic objectForKey:@"id"] forFlavorType: flavorType];
+        [[Client instance] playMovieFromUrl:strURL];
+    }
+    else
+    {
+        [self playVideo:dic];
+    }
+    
+}
+
+-(void) videoStop
+{
+    [self.moviePlayerViewController.moviePlayer stop];
+}
+
+-(void) videoPlay:(NSURL*) url
+{
+    NSTimeInterval interval = self.moviePlayerViewController.moviePlayer.currentPlaybackTime;
+    [self.moviePlayerViewController.moviePlayer stop];
+    [self.moviePlayerViewController.moviePlayer setContentURL:url];
+    [self.moviePlayerViewController.moviePlayer prepareToPlay];
+    self.moviePlayerViewController.moviePlayer.initialPlaybackTime = interval;
+    [self.moviePlayerViewController.moviePlayer play];
+}
+
+-(void) callbackWV:(NSNotification *)notification
+{
+    NSDictionary* userInfo = [notification userInfo];
+    [self performSelector:@selector(playVideo:) withObject:userInfo afterDelay:5];
+}
+
+-(void) playVideo:(NSDictionary*)dic
+{
+    NSString *strURL = [[Client instance] getVideoURL:self.mediaEntry forMediaEntryDuration: self.mediaEntry.duration forFlavor:[dic objectForKey:@"id"] forFlavorType: flavorType];
+    
     NSTimeInterval interval = self.moviePlayerViewController.moviePlayer.currentPlaybackTime;
     [self.moviePlayerViewController.moviePlayer stop];
     [self.moviePlayerViewController.moviePlayer setContentURL:[NSURL URLWithString:strURL]];
     [self.moviePlayerViewController.moviePlayer prepareToPlay];
     self.moviePlayerViewController.moviePlayer.initialPlaybackTime = interval;
     [self.moviePlayerViewController.moviePlayer play];
-    
 }
 
 - (void)bitrateButtonPressed:(UIButton *)button {
@@ -211,11 +259,30 @@
     }
 }
 
+-(void) loadWVBitratesList:(NSArray*)wvBitrates{
+    self.bitrates = wvBitrates;
+    NSLog(@"%@", self.bitrates);
+    [self crerateBitratesList];
+}
+
 - (void)updateBitrates {
 
     totalTimeLabel.text = [NSString stringWithFormat:@"/ %@", [Utils getTimeStr:self.mediaEntry.duration]];
+
+    self.bitrates = [[Client instance] getBitratesList:mediaEntry withFilter:@"widevine"];
     
-    self.bitrates = [[Client instance] getBitratesList:mediaEntry withFilter:@"iphonenew"];
+    if (self.bitrates.count < 1)
+    {
+        flavorType = @"ipadnew";
+        buttonBitrate.enabled = YES;
+        self.bitrates = [[Client instance] getBitratesList:mediaEntry withFilter:@"iphonenew"];
+    }
+    else
+    {
+        flavorType = @"wv";
+        buttonBitrate.enabled = NO;
+        [buttonBitrate setTitle:@"auto" forState:UIControlStateDisabled];
+    }
     
     if ([self.bitrates count] > 0) {
         
@@ -292,6 +359,44 @@
     
 }
 
+-(void) crerateBitratesList{
+    
+    for (int i = 0; i < [self.bitrates count]; i++) {
+        
+        NSArray *nib_objects = [[NSBundle mainBundle] loadNibNamed:@"Bitrates" owner:self options:nil];
+        
+        int index = i;
+        if (i > 0) index = 1;
+        if (i == [self.bitrates count] - 1) index = 2;
+        
+        UIButton *button = [nib_objects objectAtIndex:index];
+        
+        button.frame = CGRectMake(10, 6 + i * 32, button.frame.size.width, button.frame.size.height);
+        button.tag = i + 100;
+        NSMutableDictionary *dic = [self.bitrates objectAtIndex:i];
+        
+        [button setTitle:[Utils getStrBitrate:[dic objectForKey:@"bitrate"]] forState:UIControlStateNormal];
+        
+        [button addTarget:self action:@selector(bitrateButtonPressed:)forControlEvents:UIControlEventTouchUpInside];
+        [viewBitrates insertSubview:button belowSubview:imageBitrateCheck];
+    }
+    
+    viewBitratesMiddle.frame = CGRectMake(viewBitratesMiddle.frame.origin.x,
+                                          viewBitratesMiddle.frame.origin.y,
+                                          viewBitratesMiddle.frame.size.width,
+                                          32 * [self.bitrates count]);
+    
+    viewBitratesBottom.frame = CGRectMake(viewBitratesBottom.frame.origin.x,
+                                          viewBitratesMiddle.frame.origin.y + viewBitratesMiddle.frame.size.height,
+                                          viewBitratesBottom.frame.size.width,
+                                          viewBitratesBottom.frame.size.height);
+    
+    viewBitrates.frame = CGRectMake(viewBitrates.frame.origin.x,
+                                    viewBitrates.frame.origin.y,
+                                    viewBitrates.frame.size.width,
+                                    viewBitratesBottom.frame.origin.y + viewBitratesBottom.frame.size.height);
+}
+
 - (void)updateCurrentTime {
 
     if (self.moviePlayerViewController.moviePlayer.playbackState == MPMoviePlaybackStatePlaying) {
@@ -348,17 +453,20 @@
         return;
     }
     
+    //The animation for toolsView that fades it out or in
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:1.0];
+    
     if (toolsView.alpha == 0.0) {
         
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:1.0];
+        toolsView.alpha = 1.0; 
+    }
+    else {
         
-        toolsView.alpha = 1.0;
-        
-        [UIView commitAnimations];
-        
+        toolsView.alpha = 0.0;
     }
     
+    [UIView commitAnimations];
 }
 
 - (IBAction)playPressed {
@@ -379,10 +487,13 @@
 
 - (IBAction)donePressed {
     
-    if (self.moviePlayerViewController) {
-     
+    if (self.moviePlayerViewController && [flavorType isEqualToString:@"wv"])
+    {
+        [[Client instance] donePlayingMovieWithWV];
+    }
+    else
+    {
         [self.moviePlayerViewController.moviePlayer stop];
-        
     }
     
     [self.navigationController popViewControllerAnimated:YES];

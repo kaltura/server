@@ -8,6 +8,13 @@
 
 #import "Client.h"
 
+#ifdef widevine
+#import "WViPhoneAPI.h"
+#import "WVSettings.h"
+
+static NSArray *sBitRates;
+#endif
+
 @implementation Client
 
 @synthesize client;
@@ -17,6 +24,12 @@
 
 @synthesize uploadFileTokenId;
 @synthesize uploadFilePath;
+
+@synthesize path, wvUrl, mBitrates;
+
+@synthesize delegate = _delegate;
+
+@synthesize mutableArray, dict;
 
 + (Client *)instance {
 	static Client *sharedSingleton = nil;
@@ -45,7 +58,7 @@
     
     NSString *userEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"userEmail"];
     NSString *userPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"userPassword"];
-
+    
     
     self.client.ks = [service loginByLoginIdWithLoginId:userEmail withPassword:userPassword];
     
@@ -60,6 +73,9 @@
     self.categories = [[NSMutableArray alloc] init];
     self.media = [[NSMutableArray alloc] init];
     
+    #ifdef widevine
+    wvSettings = [[WVSettings alloc] init];
+    #endif
     return self;
 }
 
@@ -92,7 +108,7 @@
     for (KalturaUser *user in [response objects]) {
         self.partnerId = user.partnerId;
     }
-
+    
     [self.categories removeAllObjects];
     [self.media removeAllObjects];
     
@@ -114,13 +130,12 @@
         
     }
     
-    
     return self.categories;
     
 }
 
 - (NSArray *)getMedia:(KalturaCategory *)category {
-
+    
     if ([self.media count] == 0) {
         
         KalturaMediaEntryFilter *filter = [[KalturaMediaEntryFilter alloc] init];
@@ -133,7 +148,7 @@
         for (KalturaMediaEntry *mediaEntry in response.objects) {
             
             [self.media addObject:mediaEntry];
-           
+            
         }
         
         [filter release];
@@ -144,6 +159,7 @@
     return self.media;
     
 }
+
 - (NSString *)getThumbPath:(NSString *)fileName {
     
     NSError *error;
@@ -184,12 +200,13 @@
 }
 
 - (BOOL)isThumbExist:(KalturaMediaEntry *)mediaEntry width:(int)width height:(int)height {
-
+    
     NSString *thumbPath = [NSString stringWithFormat:@"%@_%d_%d", mediaEntry.id, width, height];
     thumbPath = [self getThumbPath:thumbPath];
     if ([[NSFileManager defaultManager] fileExistsAtPath:thumbPath]) {
         
         return YES;
+        
     }
     
     return NO;
@@ -200,7 +217,7 @@
     
     NSString *thumbPath = [self getThumbPath:mediaEntry.id];
     if (![[NSFileManager defaultManager] fileExistsAtPath:thumbPath]) {
-    
+        
         NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:mediaEntry.thumbnailUrl]];
         [data writeToFile:thumbPath atomically:NO];
         
@@ -208,7 +225,7 @@
     }
     
     return [NSData dataWithContentsOfFile:thumbPath];
-
+    
 }
 
 - (NSString *)getThumbURL:(NSString *)fileName width:(int)width height:(int)height {
@@ -227,7 +244,7 @@
     
     NSString *strURL = [NSString stringWithFormat:@"https://www.facebook.com/sharer/sharer.php?u=%@", [self getShareURL:mediaEntry]];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:strURL]];
-
+    
 }
 
 - (void)shareTwitter:(KalturaMediaEntry *)mediaEntry {
@@ -241,7 +258,6 @@
 #pragma upload process
 
 - (void)endUploading {
-    
     [Utils deleteBufferFile];
     
     if (token) {
@@ -251,9 +267,7 @@
     }
     
     client.delegate = nil;
-    client.uploadProgressDelegate = nil;
-    
-    
+    client.uploadProgressDelegate = nil; 
 }
 
 - (void)cancelUploading {
@@ -264,20 +278,20 @@
 }
 
 - (BOOL)uploadingInProgress {
-
-    return (uploadedSize > 0);
     
+    return (uploadedSize > 0);  
 }
 
 - (void)uploadTry {
     
     uploadTryCount++;
     
-    if (fileSize < CHUNK_SIZE) {
+    if (fileSize < CHUNK_SIZE)
+    {
         uploadedSize = 0;
         token = [client.uploadToken uploadWithUploadTokenId:token.id withFileData:self.uploadFilePath];
-    } else {
-        
+    } else
+    {
         uploadedSize = currentChunk * CHUNK_SIZE;
         
         token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:(uploadedSize >= CHUNK_SIZE) withFinalChunk:(fileSize - uploadedSize <= CHUNK_SIZE) withResumeAt: uploadedSize];
@@ -292,8 +306,8 @@
     uploadedSize = currentChunk * CHUNK_SIZE;
     uploadTryCount = 0;
     
-    if (uploadedSize < fileSize) {
-        
+    if (uploadedSize < fileSize)
+    {      
         [Utils createBuffer:uploadFilePath offset:uploadedSize];
         
         token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:YES withFinalChunk:(fileSize - uploadedSize <= CHUNK_SIZE) withResumeAt: uploadedSize];
@@ -306,28 +320,24 @@
     [uploadDelegateController performSelector:@selector(uploadFinished)];
 }
 
-- (void)requestFailed:(KalturaClientBase*)aClient {
-    
+- (void)requestFailed:(KalturaClientBase*)aClient
+{
     if (uploadTryCount < 4) {
         
-        [self performSelector:@selector(uploadTry) withObject:nil afterDelay:2.0];
-        
-        
-    } else {
-        
+        [self performSelector:@selector(uploadTry) withObject:nil afterDelay:2.0]; 
+    }
+    else
+    {
         [self endUploading];
         
         [uploadDelegateController performSelector:@selector(uploadFailed)];
-
     }
 }
 
 - (void)request:(ASIHTTPRequest *)request didSendBytes:(long long)bytes {
-    
     uploadedSize += bytes;
     
     [uploadDelegateController performSelector:@selector(updateProgress:) withObject:[NSNumber numberWithFloat:((float)(uploadedSize * 300 / fileSize) / 300.0)]];
-    
 }
 
 - (void)uploadProcess:(NSDictionary *)data withDelegate:(UIViewController *)delegateController {
@@ -367,15 +377,16 @@
     
     self.uploadFileTokenId = token.id;
     
-    if (fileSize < CHUNK_SIZE) {
+    if (fileSize < CHUNK_SIZE)
+    {
         token = [client.uploadToken uploadWithUploadTokenId:token.id withFileData:self.uploadFilePath];
-    } else {
-        
+    }
+    else
+    {   
         [Utils createBuffer:[data objectForKey:@"path"] offset:0];
         
         token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:NO withFinalChunk:NO];
     }
-    
 }
 
 NSInteger bitratesSort(id media1, id media2, void *reverse)
@@ -392,12 +403,11 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
 }
 
 - (NSArray *)getBitratesList:(KalturaMediaEntry *)mediaEntry withFilter:(NSString *)filter {
-
+    
     NSMutableArray *bitrates = [[[NSMutableArray alloc] init] autorelease];
     
     KalturaAssetFilter *_filter = [[KalturaAssetFilter alloc] init];
     _filter.entryIdEqual = mediaEntry.id;
-    
     KalturaFlavorAssetListResponse* _response = [client.flavorAsset listWithFilter:_filter];
     [_filter release];
     
@@ -413,9 +423,7 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
             
             [bitrates addObject:dictionary];
             [dictionary release];
-            
-        }
-        
+        } 
     }
     
     [bitrates sortUsingFunction:bitratesSort context:nil];
@@ -423,11 +431,193 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
     return bitrates;
 }
 
-- (NSString *)getVideoURL:(KalturaMediaEntry *)mediaEntry forFlavor:(NSString *)flavorId {
+- (NSString *)getVideoURL:(KalturaMediaEntry *)mediaEntry forMediaEntryDuration:(int)EntryDuration forFlavor:(NSString *)flavorId forFlavorType: (NSString*)flavorType;
+{
+    NSString *urlString;
+    int minimumEntryDuration = 10;
     
-    return [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.mp4", partnerId, partnerId, mediaEntry.id, flavorId];
+    if([flavorType isEqual: @"wv"]){
+        
+        urlString = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/serveFlavor/entryId/%@/v/2/flavorId/%@/name/a.wvm", partnerId, partnerId, mediaEntry.id, flavorId];
+    }
+    else if(EntryDuration > minimumEntryDuration){
+        
+        urlString = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.m3u8", partnerId, partnerId, mediaEntry.id, flavorId];
+    }
+    else{
+        urlString = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.mp4", partnerId, partnerId, mediaEntry.id, flavorId];
+    }
+    
+    return urlString;
+}
+
+#pragma widevine support methods
+
+#ifdef widevine
+- (void)donePlayingMovieWithWV
+{
+    [self.delegate videoStop];
+    WViOsApiStatus* wvStopStatus = WV_Stop();
+    
+    if (wvStopStatus == WViOsApiStatus_OK ) {
+        NSLog(@"widevine was stopped");
+    }
+}
+
+- (void)playMovieFromUrl:(NSString *)videoUrlString
+{
+    [path release];
+    path = [videoUrlString retain];
+    
+    [[NSRunLoop mainRunLoop] addTimer:[NSTimer timerWithTimeInterval:0.1 target:self selector:@selector(playMovieFromUrlLater) userInfo:nil repeats:NO] forMode:NSDefaultRunLoopMode];
     
 }
 
+- (void)playMovieFromUrlLater
+{
+    
+    NSMutableString *responseUrl = [NSMutableString string];
+    WViOsApiStatus status = WV_Play(path, responseUrl, 0 );
+    
+    if (status != WViOsApiStatus_OK) {
+        NSLog(@"%u",status);
+        return;
+    }
+    
+    wvUrl = [NSURL URLWithString:responseUrl];
+    [wvUrl retain];
+    NSLog(@"play later");
+    
+//    [self.delegate videoPlay:wvUrl];
+}
+
+- (void) initializeWVDictionary:(NSString *)flavorId{
+    [self terminateWV];
+    WViOsApiStatus *wvInitStatus = WV_Initialize(WVCallback, [wvSettings initializeDictionary:flavorId andKS:self.client.ks]);
+    
+    if (wvInitStatus == WViOsApiStatus_OK) {
+        NSLog(@"widevine was inited");
+    }
+    
+//    mBitrates.enabled = ![wvSettings isNativeAdapting];
+}
+
+- (void) terminateWV{
+    WViOsApiStatus *wvTerminateStatus = WV_Terminate();
+    
+    if (wvTerminateStatus == WViOsApiStatus_OK) {
+        NSLog(@"widevine was terminated");
+    }
+}
+
+WViOsApiStatus WVCallback( WViOsApiEvent event, NSDictionary *attributes ){
+    NSLog( @"callback %d %@\n", event, NSStringFromWViOsApiEvent( event ) );
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; SEL selector = 0;
+    switch ( event ) {
+        case WViOsApiEvent_SetCurrentBitrate:
+            selector = NSSelectorFromString(@"HandleCurrentBitrate:");
+            break;
+        case WViOsApiEvent_Bitrates:
+            selector = NSSelectorFromString(@"HandleBitrates:");
+            break;
+        case WViOsApiEvent_ChapterTitle:
+            selector = NSSelectorFromString(@"HandleChapterTitle:");
+            break;
+        case WViOsApiEvent_ChapterImage:
+            selector = NSSelectorFromString(@"HandleChapterImage:");
+            break;
+        case WViOsApiEvent_ChapterSetup:
+            selector = NSSelectorFromString(@"HandleChapterSetup:");
+            break;
+    }
+    
+    if ( selector ) {
+        [attributes retain];
+        [[Client instance] performSelectorOnMainThread:selector withObject:attributes waitUntilDone:NO];
+    }
+    
+    [pool release];
+    NSLog(@"widvine callback");
+    
+    return WViOsApiStatus_OK;
+}
+
+-(void)selectBitrate:(int)ind
+{
+    NSLog( @"Selecting track %d", ind );
+    if( WV_SelectBitrateTrack( ind ) == WViOsApiStatus_OK )
+    {
+        NSLog(@"WV_SelectBitrateTrack was ok");
+    }
+}
+
+-(void)HandleCurrentBitrate:(NSDictionary *)attributes{
+    if (sBitRates == nil) {
+		[attributes release];
+        return;
+    }
+    NSNumber *number = [attributes objectForKey:WVCurrentBitrateKey];
+    if ( number == nil) {
+		[attributes release];
+        return;
+    }
+    
+    mSettingBitRateButton = true;
+    long curBitRate = [number longValue];
+    
+    int idx, end;
+    end = [sBitRates count];
+    for ( idx = 0; idx < end; ++idx ) {
+        if ( [[sBitRates objectAtIndex:idx] longValue] >= curBitRate) {
+            mBitrates.selectedSegmentIndex = idx;
+            break;
+        }
+    }
+    
+    mBitrates.selectedSegmentIndex = [number intValue];
+    mSettingBitRateButton = false;
+    [attributes release];
+}
+
+-(void)HandleBitrates:(NSDictionary *)attributes{
+    NSArray *bitrates = [attributes objectForKey:WVBitratesKey];
+    [mBitrates removeAllSegments];
+    if ( bitrates ) {
+        [sBitRates release];
+        sBitRates = [bitrates retain];
+        int count, end;
+        end = [bitrates count];
+        for ( count = 0; count < end; ++count ) {
+            NSString *label;
+            long bps = [[bitrates objectAtIndex:count] longLongValue] * 8;
+            if ( bps < 1000 ) {
+                label = [NSString stringWithFormat:@"%ldbps",bps,NULL];
+            } else if ( bps < 1000000 ) {
+                label = [NSString stringWithFormat:@"%2.1fkbs",(float)bps/1000,NULL];
+			} else {
+                label = [NSString stringWithFormat:@"%2.1fmbs",(float)bps/1000000,NULL];
+			}
+            
+			[mBitrates insertSegmentWithTitle:label atIndex:count animated:NO];
+        }        
+    }
+    
+    self.mutableArray = [[NSMutableArray alloc]init];
+    
+    for (int i = 0; i < sBitRates.count; i++) {
+        int value = [[NSString stringWithFormat:@"%@", [sBitRates objectAtIndex:i]] intValue];
+        self.dict = [[NSDictionary alloc] initWithObjectsAndKeys:@"58613", @"id", [NSString stringWithFormat:@"%d", (value * 8)/1024], @"bitrate", nil];
+        [mutableArray addObject:dict];
+    }
+    
+    [self.delegate loadWVBitratesList:mutableArray];
+
+    [self.delegate videoPlay:wvUrl];
+    
+    [attributes release];
+}
+
+#endif
 
 @end
+

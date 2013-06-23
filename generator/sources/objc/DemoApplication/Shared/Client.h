@@ -13,11 +13,28 @@
 
 @class KalturaClient;
 
+#ifdef widevine
+@class WVSettings;
+#endif
+
+@protocol ClientDelegate <NSObject>
+-(void) videoStop;
+-(void) videoPlay:(NSURL*) url;
+-(void) loadWVBitratesList:(NSArray*)wvBitrates;
+@end
+
 @interface Client : NSObject <KalturaClientDelegate, ASIProgressDelegate> {
+    
+    NSMutableArray* mutableArray;
+    NSDictionary* dict;
     
     KalturaClient *client;
     NSMutableArray *categories;
     NSMutableArray *media;
+    
+    #ifdef widevine
+    WVSettings* wvSettings;
+    #endif
     
     int partnerId;
     
@@ -29,8 +46,13 @@
     int currentChunk;
     int uploadTryCount;
     
+    NSString *path;
+    NSURL *wvUrl;
     NSString *uploadFileTokenId;
     NSString *uploadFilePath;
+    
+    UISegmentedControl *mBitrates;
+    bool mSettingBitRateButton;
     
     UIViewController *uploadDelegateController;
 }
@@ -55,7 +77,17 @@
 - (BOOL)uploadingInProgress;
 - (void)uploadProcess:(NSDictionary *)data withDelegate:(UIViewController *)delegateController;
 - (NSArray *)getBitratesList:(KalturaMediaEntry *)mediaEntry withFilter:(NSString *)filter;
-- (NSString *)getVideoURL:(KalturaMediaEntry *)mediaEntry forFlavor:(NSString *)flavorId;
+- (NSString *)getVideoURL:(KalturaMediaEntry *)mediaEntry forMediaEntryDuration:(int)EntryDuration forFlavor:(NSString *)flavorId forFlavorType: (NSString*)flavorType;
+-(void)HandleCurrentBitrate:(NSDictionary *)attributes;
+-(void)HandleBitrates:(NSDictionary *)attributes;
+
+- (void)donePlayingMovieWithWV;
+- (void)playMovieFromUrl:(NSString *)path2;
+
+- (void) initializeWVDictionary: (NSString *)flavorId;
+- (void) terminateWV;
+- (void)selectBitrate:(int)ind;
+
 
 @property (nonatomic, retain) KalturaClient *client;
 @property (nonatomic, retain) NSMutableArray *categories;
@@ -64,5 +96,13 @@
 
 @property (nonatomic, retain) NSString *uploadFileTokenId;
 @property (nonatomic, retain) NSString *uploadFilePath;
+@property (nonatomic, retain) NSString *path;
+@property (nonatomic, retain) NSURL *wvUrl;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *mBitrates;
+
+@property (nonatomic, assign) id<ClientDelegate> delegate;
+
+@property (nonatomic, assign)NSMutableArray* mutableArray;
+@property (nonatomic, assign)NSDictionary* dict;
 
 @end

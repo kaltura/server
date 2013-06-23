@@ -8,6 +8,7 @@
 
 #import "AppDelegate_iPhone.h"
 #import "HomeViewController_iPhone.h"
+#import "SettingsViewController_iPhone.h"
 #import <dlfcn.h>
 #import <AudioToolbox/AudioToolbox.h>
 
@@ -61,10 +62,21 @@
     
     HomeViewController_iPhone *homeController = [[HomeViewController_iPhone alloc] initWithNibName:@"HomeViewController_iPhone" bundle:nil];
     
-    self.navigation = [[UINavigationController alloc] initWithRootViewController:homeController];
+    SettingsViewController_iPhone *settingsController = [[SettingsViewController_iPhone alloc] initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
+    
+    if (![[Client instance] login]){
+        
+       self.navigation = [[UINavigationController alloc] initWithRootViewController:settingsController];
+    }
+   else{
+        
+       self.navigation = [[UINavigationController alloc] initWithRootViewController:homeController];
+    }
+    
     [self.navigation setNavigationBarHidden:YES];
     
     [homeController release];
+    [settingsController release];
     
     [self.window addSubview:self.navigation.view];
     

@@ -10,7 +10,7 @@
 
 @class AppDelegate_iPhone;
 
-@interface PlayerViewController_iPhone : UIViewController {
+@interface PlayerViewController_iPhone : UIViewController<ClientDelegate> {
 
     AppDelegate_iPhone *app;
     
@@ -47,8 +47,11 @@
     IBOutlet UIView *viewVolume;
     
     BOOL noVolume;
+    NSString *flavorType;
     
 }
+
++(NSString*) getFlavorID;
 
 - (IBAction)donePressed;
 - (IBAction)playPressed;
@@ -59,5 +62,6 @@
 @property (nonatomic, retain) KalturaMediaEntry *mediaEntry;
 @property (nonatomic, retain) NSArray *bitrates;
 @property (nonatomic, retain) MPMoviePlayerViewController *moviePlayerViewController;
+@property (nonatomic, retain) NSString *flavorType;
 
 @end
