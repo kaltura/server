@@ -157,8 +157,6 @@ class kOldContentCleaner
 		
 		if(!self::$purgeStartUpdatedAt)
 		{
-			self::$purgeStartUpdatedAt = 0;
-			
 			$criteria = new Criteria();
 			$criteria->add(FileSyncPeer::UPDATED_AT, 0, Criteria::GREATER_THAN);
 			$criteria->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
@@ -169,6 +167,9 @@ class kOldContentCleaner
 			if(count($mins))
 				self::$purgeStartUpdatedAt = reset($mins);
 		}
+		if(is_null(self::$purgeStartUpdatedAt))
+			self::$purgeStartUpdatedAt = 0;
+			
 		self::$purgeNextStartUpdatedAt = self::$purgeStartUpdatedAt;
 		
 		$oldVersionsUpdatedAtPeriod = 30; // days
@@ -457,7 +458,11 @@ class kOldContentCleaner
 			$stmt = FileSyncPeer::doSelectStmt($nextCriteria);
 			$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 			if(count($mins))
-				self::$purgeNextStartUpdatedAt = reset($mins);
+			{
+				$purgeNextStartUpdatedAt = reset($mins);
+				if(!is_null($purgeNextStartUpdatedAt))
+					self::$purgeNextStartUpdatedAt = $purgeNextStartUpdatedAt;
+			}
 			
 		}
 		return $fileSyncs;
@@ -510,6 +515,9 @@ class kOldContentCleaner
 			return;
 			
 		$errObjectsUpdatedAtStart = reset($mins);
+		if(is_null($errObjectsUpdatedAtStart))
+			return;
+			
 		$errObjectsUpdatedAtEnd = min(self::$errObjectsUpdatedAt, $errObjectsUpdatedAtStart + (60 * 60 * 24 * 30)); // month
 			
 		$criteria = new Criteria();
@@ -552,6 +560,9 @@ class kOldContentCleaner
 			return;
 			
 		$errObjectsUpdatedAtStart = reset($mins);
+		if(is_null($errObjectsUpdatedAtStart))
+			return;
+			
 		$errObjectsUpdatedAtEnd = min(self::$errObjectsUpdatedAt, $errObjectsUpdatedAtStart + (60 * 60 * 24 * 30)); // month
 			
 		$criteria = new Criteria();
@@ -719,14 +730,18 @@ class kOldContentCleaner
 		}
 		else 
 		{
+			self::$oldVersionsNextStartUpdatedAt[$objectType] = self::$oldVersionsStartUpdatedAt[$objectType];
+			
 			$nextCriteria->add(FileSyncPeer::UPDATED_AT, self::$oldVersionsStartUpdatedAt[$objectType], Criteria::GREATER_THAN);
 			$nextCriteria->addSelectColumn('UNIX_TIMESTAMP(MIN(' . FileSyncPeer::UPDATED_AT . '))');
 			$stmt = FileSyncPeer::doSelectStmt($nextCriteria);
 			$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 			if(count($mins))
-				self::$oldVersionsNextStartUpdatedAt[$objectType] = reset($mins);
-			else
-				self::$oldVersionsNextStartUpdatedAt[$objectType] = self::$oldVersionsStartUpdatedAt[$objectType];
+			{
+				$oldVersionsNextStartUpdatedAt = reset($mins);
+				if(!is_null($oldVersionsNextStartUpdatedAt))
+					self::$oldVersionsNextStartUpdatedAt[$objectType] = $oldVersionsNextStartUpdatedAt;
+			}
 		}
 		kMemoryManager::clearMemory();
 	}
