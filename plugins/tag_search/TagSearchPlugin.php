@@ -110,11 +110,8 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * @param unknown_type $baseClass
-	 * @param unknown_type $enumValue
-	 * @param array $constructorArgs
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
@@ -127,10 +124,9 @@ class TagSearchPlugin extends KalturaPlugin implements  IKalturaCriteriaFactory,
 		return null;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * @param unknown_type $baseClass
-	 * @param unknown_type $enumValue
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
