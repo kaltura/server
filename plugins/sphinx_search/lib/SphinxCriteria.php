@@ -205,7 +205,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 		//debug query
 		$rows = $pdo->queryAndFetchAll($sql, PDO::FETCH_ASSOC);
-		$ids = array_map(array($this, "fetchIds"), $rows);
+		$ids = false;
+		if(is_array($rows))
+			$ids = array_map(array($this, "fetchIds"), $rows);
+			
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
