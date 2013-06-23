@@ -23,7 +23,7 @@ class kApiCache extends kApiCacheBase
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '3';
+	const CACHE_VERSION = '4';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
@@ -374,11 +374,22 @@ class kApiCache extends kApiCacheBase
 
 	protected function validateSqlQueries($sqlConditions)
 	{
-		foreach ($sqlConditions as $dsn => $queries)
+		if (!$sqlConditions)
+			return true;
+		
+		$dataSources = kConf::get('datasources', 'db', null);
+		if (!$dataSources)
+			return false;
+		
+		foreach ($sqlConditions as $configKey => $queries)
 		{
+			if (!isset($dataSources[$configKey]['connection']['dsn']))
+				return false;
+			
 			try
 			{
-				$pdo = new PDO($dsn, null, null, array(PDO::ATTR_TIMEOUT => 1));
+				$pdo = new PDO(
+					$dataSources[$configKey]['connection']['dsn'], null, null, array(PDO::ATTR_TIMEOUT => 1));
 			}
 			catch(PDOException $e)
 			{

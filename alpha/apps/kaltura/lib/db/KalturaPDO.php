@@ -17,16 +17,16 @@ class KalturaPDO extends PropelPDO
 	const KALTURA_ATTR_NO_TRANSACTION = 'noTransaction';
 	
 	protected static $comment = null;
-	protected $dsn = null;
 	protected $kalturaOptions = array();
 	protected $connectionName = null;
 	protected $hostName = null;
 	protected $enableComments = true;
+	protected $configKey = null;
 
 	/* (non-PHPdoc)
 	 * @see PDO::__construct()
 	 */
-	public function __construct($dsn, $username = null, $password = null, $driver_options = array())
+	public function __construct($dsn, $username = null, $password = null, $driver_options = array(), $config_key = null)
 	{
 		if(isset($driver_options[KalturaPDO::KALTURA_ATTR_NAME]))
 		{
@@ -45,8 +45,8 @@ class KalturaPDO extends PropelPDO
 				break;
 			}
 		}
-		$this->dsn = $dsn;
-			
+		$this->configKey = $config_key;
+					
 		$connStart = microtime(true);
 
 		parent::__construct($dsn, $username, $password, $driver_options);
@@ -148,7 +148,7 @@ class KalturaPDO extends PropelPDO
 		
 		$filteredResult = kApiCache::filterQueryResult($result, $filter);
 		
-		kApiCache::addSqlQueryCondition($this->dsn, $sql, $fetchStyle, $columnIndex, $filter, $filteredResult);
+		kApiCache::addSqlQueryCondition($this->configKey, $sql, $fetchStyle, $columnIndex, $filter, $filteredResult);
 		
 		return $filteredResult;
 	}

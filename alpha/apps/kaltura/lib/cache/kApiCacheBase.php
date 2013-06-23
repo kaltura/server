@@ -30,8 +30,8 @@ class kApiCacheBase
 
 	// conditional cache constants
 	const MAX_INVALIDATION_KEYS = 250;
-	const MAX_SQL_CONDITION_DSNS = 1;			// max number of connections required to verify the SQL conditions
-	const MAX_SQL_CONDITION_QUERIES = 4;		// max number of queries per dsn required to verify the SQL conditions
+	const MAX_SQL_CONDITION_CONNS = 1;			// max number of connections required to verify the SQL conditions
+	const MAX_SQL_CONDITION_QUERIES = 4;		// max number of queries per connection required to verify the SQL conditions
 		
 	// cache instances
 	protected $_instanceId = 0;
@@ -156,31 +156,31 @@ class kApiCacheBase
 		}
 	}
 	
-	public static function addSqlQueryCondition($dsn, $sql, $fetchStyle, $columnIndex, $filter, $result)
+	public static function addSqlQueryCondition($configKey, $sql, $fetchStyle, $columnIndex, $filter, $result)
 	{
 		foreach (self::$_activeInstances as $curInstance)
 		{
 			if ($curInstance->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
 				continue;
 			
-			if (!isset($curInstance->_sqlConditions[$dsn]))
+			if (!isset($curInstance->_sqlConditions[$configKey]))
 			{
-				if (count($curInstance->_sqlConditions) >= self::MAX_SQL_CONDITION_DSNS)
+				if (count($curInstance->_sqlConditions) >= self::MAX_SQL_CONDITION_CONNS)
 				{
 					$curInstance->disableConditionalCacheInternal();
 					continue;
 				}
 
-				$curInstance->_sqlConditions[$dsn] = array();
+				$curInstance->_sqlConditions[$configKey] = array();
 			}
 
-			if (count($curInstance->_sqlConditions[$dsn]) >= self::MAX_SQL_CONDITION_QUERIES)
+			if (count($curInstance->_sqlConditions[$configKey]) >= self::MAX_SQL_CONDITION_QUERIES)
 			{
 				$curInstance->disableConditionalCacheInternal();
 				continue;
 			}
 					
-			$curInstance->_sqlConditions[$dsn][] = array(
+			$curInstance->_sqlConditions[$configKey][] = array(
 					'sql' => $sql, 
 					'fetchStyle' => $fetchStyle, 
 					'columnIndex' => $columnIndex, 
@@ -191,12 +191,12 @@ class kApiCacheBase
 
 	protected static function addSqlQueryConditions($sqlConditions)
 	{
-		foreach ($sqlConditions as $dsn => $queries)
+		foreach ($sqlConditions as $configKey => $queries)
 		{
 			foreach ($queries as $query)
 			{
 				self::addSqlQueryCondition(
-					$dsn,
+					$configKey,
 					$query['sql'],
 					$query['fetchStyle'],
 					$query['columnIndex'],
