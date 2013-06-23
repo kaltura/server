@@ -34,6 +34,7 @@ using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.XPath;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace Kaltura
 {
@@ -176,7 +177,14 @@ namespace Kaltura
 
             // build request
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
-            request.Timeout = _Config.Timeout;
+            if (kfiles.Count == 0)
+            {
+                request.Timeout = _Config.Timeout;
+            }
+            else
+            {
+                request.Timeout = Timeout.Infinite;
+            }
             request.Method = "POST";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.Headers = _Config.RequestHeaders;
