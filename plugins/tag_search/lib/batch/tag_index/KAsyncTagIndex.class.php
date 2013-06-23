@@ -41,6 +41,7 @@ class KAsyncTagIndex extends KJobHandlerWorker
 		}
 		catch (Exception $e)
 		{
+			$this->unimpersonate();
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		$this->unimpersonate();
