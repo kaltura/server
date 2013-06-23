@@ -1685,7 +1685,6 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	public static $sphinxFieldsEscapeType = array(
-		'full_name' => SearchIndexFieldEscapeType::NO_ESCAPE,
 		'full_ids' => SearchIndexFieldEscapeType::NO_ESCAPE,
 	);
 	
