@@ -10,7 +10,10 @@ import android.util.Log;
 
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaClient;
+import com.kaltura.client.services.KalturaBaseEntryService;
 import com.kaltura.client.services.KalturaFlavorAssetService;
+import com.kaltura.client.types.KalturaEntryContextDataParams;
+import com.kaltura.client.types.KalturaEntryContextDataResult;
 import com.kaltura.client.types.KalturaFilterPager;
 import com.kaltura.client.types.KalturaFlavorAsset;
 import com.kaltura.client.types.KalturaFlavorAssetFilter;
@@ -73,5 +76,24 @@ public class FlavorAsset {
         String url = mediaService.getUrl(id);
         Log.w(TAG, "URL for the asset: " + url);
         return url;
+    }
+    
+    /**
+     * Return flavorAsset lists from getContextData call
+     * @param TAG
+     * @param entryId
+     * @param flavorTags
+     * @return
+     * @throws KalturaApiException
+     */
+    public static List<KalturaFlavorAsset> listAllFlavorsFromContext(String TAG, String entryId, String flavorTags) throws KalturaApiException {
+    	 // create a new ADMIN-session client
+        KalturaClient client = AdminUser.getClient();//RequestsKaltura.getKalturaClient();
+
+        KalturaEntryContextDataParams params = new KalturaEntryContextDataParams();
+        params.flavorTags = flavorTags;
+        KalturaBaseEntryService baseEntryService = client.getBaseEntryService();
+        KalturaEntryContextDataResult res = baseEntryService.getContextData(entryId, params);
+        return res.flavorAssets;
     }
 }

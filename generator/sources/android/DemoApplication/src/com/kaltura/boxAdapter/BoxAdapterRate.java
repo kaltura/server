@@ -79,7 +79,8 @@ public class BoxAdapterRate extends BaseAdapter {
             convertView.setBackgroundColor(Color.BLACK);
             holder.iv_rate_select.setVisibility(View.INVISIBLE);
         }
-        holder.text.setText(Utils.roundBitrate(list.get(position).bitrate));
+   
+        holder.text.setText(getFlavorBitrate(position));
         return convertView;
     }
 
@@ -111,7 +112,15 @@ public class BoxAdapterRate extends BaseAdapter {
     }
 
     public StringBuffer getFlavorBitrate(int position) {
-        return Utils.roundBitrate(list.get(position).bitrate);
+    	KalturaFlavorAsset flavor = getFlavor(position);
+    	if (flavor.tags!=null && flavor.tags.contains("widevine_mbr"))
+    		return new StringBuffer("auto");
+    	else 
+    		return Utils.roundBitrate(flavor.bitrate);
+    }
+    
+    public KalturaFlavorAsset getFlavor(int position) {
+    	return list.get(position);
     }
 
     public String getListFlavors() {

@@ -316,7 +316,10 @@ public class Player extends Observable implements MediaPlayer.OnErrorListener,
 
     public void setStart() {
         if (!getStateDataSource()) {
-            setDataSource(url);
+        	if (url==null)
+        		onError(player, 1, -1);
+        	else 
+        		setDataSource(url);
         } else {
             Log.w(TAG, "set data sourse set");
         }

@@ -69,12 +69,13 @@ public class TemplateActivityMediator extends ActivityMediator {
         startActivity(Player.class);
     }
 
-    public void showPlayer(String entryId, String dataUrl, int duration, String url) {
+    public void showPlayer(String entryId, String dataUrl, int duration, String url, int partnerId) {
         Bundle bundle = new Bundle();
         bundle.putString("entryId", entryId);
         bundle.putString("dataUrl", dataUrl);
         bundle.putInt("duration", duration);
         bundle.putString("url", url);
+        bundle.putInt("partnerId", partnerId);
         startActivity(Player.class, bundle);
     }
 

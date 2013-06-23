@@ -1,6 +1,7 @@
 package com.kaltura.player;
 
 import java.util.ArrayList;
+import com.kaltura.client.types.KalturaWidevineFlavorAsset;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -32,6 +33,7 @@ import com.kaltura.boxAdapter.BoxAdapterRate;
 import com.kaltura.client.types.KalturaFlavorAsset;
 import com.kaltura.services.AdminUser;
 import com.kaltura.utils.Utils;
+import com.kaltura.widevine.WidevineHandler;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -65,6 +67,7 @@ public class ViewPlayer implements Observer, OnClickListener, SeekBar.OnSeekBarC
     private float levelVolume;
     private Player player;
     private String entryId;
+    private int partnerId;
     private SeekBar vsb_volume;
     private TextView tv_done;
     private ImageView iv_thumb;
@@ -84,12 +87,14 @@ public class ViewPlayer implements Observer, OnClickListener, SeekBar.OnSeekBarC
      * @param duration The duration of the video. Used to display the duration
      * of the video player on the control panel
      * @param entryId Used to generate links to the video
+     * @param partnerId used to build the playback URL
      */
-    public ViewPlayer(String TAG, Activity activity, SurfaceHolder holder, int duration, String entryId) {
+    public ViewPlayer(String TAG, Activity activity, SurfaceHolder holder, int duration, String entryId, int partnerId) {
         this.TAG = TAG;
         this.activity = activity;
         this.duration = duration;
         this.entryId = entryId;
+        this.partnerId = partnerId;
         /**
          * Set type font
          */
@@ -320,7 +325,7 @@ public class ViewPlayer implements Observer, OnClickListener, SeekBar.OnSeekBarC
         list_rates.setAdapter(boxAdapterRate);
 
         if (listRates.size() != 0) {
-            selectBitrate(1, -1);
+            selectBitrate(0, -1);
         }
     }
 
@@ -436,7 +441,8 @@ public class ViewPlayer implements Observer, OnClickListener, SeekBar.OnSeekBarC
     }
 
     public void selectBitrate(int position, int state) {
-        flavorId = boxAdapterRate.getFlavorId(position);
+    	KalturaFlavorAsset flavor = boxAdapterRate.getFlavor(position);
+        flavorId = flavor.id;
         Log.w(TAG, flavorId);
         tv_rate.setText(boxAdapterRate.getFlavorBitrate(position));
         rates.setVisibility(View.INVISIBLE);
@@ -445,24 +451,31 @@ public class ViewPlayer implements Observer, OnClickListener, SeekBar.OnSeekBarC
         Log.w(TAG, "size(KB): " + this.mediaSizeKb);
 
         String url;
+        String host = (AdminUser.cdnHost != null ) ? AdminUser.cdnHost : AdminUser.host;
         String appName64 = new String(Base64.encodeBase64(activity.getString(R.string.app_name).getBytes()));
-        String pathnerId = "805402";
         Log.w(TAG, "versionName: " + VERSION.SDK_INT);
-        if (VERSION.SDK_INT < 13) {
-            url = "http://cdnbakmi.kaltura.com/p/" + pathnerId + "/sp/" + pathnerId + "00/playManifest/entryId/" + entryId + "/flavorId/" + flavorId + "/format/url/protocol/http/a.mp4?ks=" + AdminUser.ks + "&referrer=" + appName64;
-        } else {
-            url = createLinkForM3u8(appName64, pathnerId, entryId, AdminUser.ks, boxAdapterRate.getListFlavors());
+        if (flavor instanceof KalturaWidevineFlavorAsset) {
+        	WidevineHandler wvHandler = new WidevineHandler(activity, partnerId, entryId, flavorId);
+        	url = wvHandler.url;
         }
-
+        else {
+        	if (VERSION.SDK_INT < 13) {
+        		 url = "/p/" + partnerId + "/sp/" + partnerId + "00/playManifest/entryId/" + entryId + "/flavorId/" + flavorId + "/format/url/protocol/http/a.mp4";
+            } else {
+                url = createLinkForM3u8(partnerId , entryId, boxAdapterRate.getListFlavors());
+            }
+            url = host + url + "?ks=" + AdminUser.ks + "&referrer=" + appName64;
+        }
+           
         player.setUrl(url);
         if (state != -1) {
             player.selectBitrate();
         }
     }
 
-    private String createLinkForM3u8(String appName64, String pathnerId, String entryId, String ks, String flavorIds) {
+    private String createLinkForM3u8(int pid, String entryId, String flavorIds) {
         String url = null;
-        url = "http://cdnbakmi.kaltura.com/p/" + pathnerId + "/sp/" + pathnerId + "00/playManifest/entryId/" + entryId + "/flavorIds/" + flavorIds + "/format/applehttp/protocol/http/a.m3u8?ks=" + ks + "&referrer=" + appName64;
+        url = "/p/" + pid + "/sp/" + pid + "00/playManifest/entryId/" + entryId + "/flavorIds/" + flavorIds + "/format/applehttp/protocol/http/a.m3u8";
         Log.w(TAG, "url: " + url);
         return url;
     }

@@ -22,6 +22,13 @@ public class AdminUser {
      * Contains the session if the user has successfully logged
      */
     public static String ks;
+    /**
+     * 
+     * api host
+     */
+    public static String host;
+    
+    public static String cdnHost;
 
     /**
      *
@@ -56,7 +63,7 @@ public class AdminUser {
                     // set a new configuration object
                     KalturaConfiguration config = new KalturaConfiguration();
                     config.setTimeout(10000);
-                    config.setEndpoint("http://www.kaltura.com");
+                    config.setEndpoint(host);
 
                     client = new KalturaClient(config);
 

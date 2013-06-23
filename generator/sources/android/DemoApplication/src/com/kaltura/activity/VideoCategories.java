@@ -795,7 +795,7 @@ public class VideoCategories extends TemplateActivity implements Observer, ListV
                 public void onClick(View v) {
                     String url = entry.thumbnailUrl + "/width/" + new Integer(display.getWidth()).toString() + "/height/" + new Integer(display.getHeight() / 2).toString();
                     countShowDialog = 0;
-                    getActivityMediator().showPlayer(entry.id, entry.downloadUrl, entry.duration, url);
+                    getActivityMediator().showPlayer(entry.id, entry.downloadUrl, entry.duration, url, entry.partnerId);
                     dialogUpload.cancel();
                 }
             });

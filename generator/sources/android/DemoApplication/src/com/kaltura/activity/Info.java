@@ -187,7 +187,7 @@ public class Info extends TemplateActivity {
             case R.id.iv_button_play:
                 Log.w(TAG, "test play button");
                 String url = entry.thumbnailUrl + "/width/" + new Integer(display.getWidth()).toString() + "/height/" + new Integer(display.getHeight() / 2).toString();
-                getActivityMediator().showPlayer(entry.id, entry.downloadUrl, entry.duration, url);
+                getActivityMediator().showPlayer(entry.id, entry.downloadUrl, entry.duration, url, entry.partnerId);
                 break;
             case R.id.iv_button_facebook:
                 Log.w(TAG, "test facebook button");
