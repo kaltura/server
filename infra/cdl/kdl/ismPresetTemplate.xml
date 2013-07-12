@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!--Created with Kaltura Decision Layer module-->
+<Preset
+  Version="3.0">
+  <Job
+    OutputDirectory="C:\Tmp\Prod"
+    DefaultMediaOutputFileName="{OriginalFilename}.{DefaultExtension}" />
+  <MediaFile
+    VideoResizeMode="Letterbox"
+	ThumbnailCodec="Jpeg" 
+	ThumbnailTime="00:00:03"
+    ThumbnailMode="Custom">
+    <OutputFormat>
+      <WindowsMediaOutputFormat>
+        <AudioProfile>
+          <WmaAudioProfile
+            Codec="Wma"
+            Channels="2"
+            BitsPerSample="16"
+            SamplesPerSecond="44100">
+            <Bitrate>
+              <ConstantBitrate
+                Bitrate="96"
+		IsTwoPass="False" 
+                BufferWindow="00:00:00" />
+            </Bitrate>
+          </WmaAudioProfile>
+          <AacAudioProfile
+            Codec="AAC"
+            Channels="2"
+            BitsPerSample="16"
+            SamplesPerSecond="44100">
+            <Bitrate>
+              <ConstantBitrate
+                Bitrate="96"
+		IsTwoPass="False"
+                BufferWindow="00:00:00" />
+            </Bitrate>
+          </AacAudioProfile>
+        </AudioProfile>
+        <VideoProfile>
+          <AdvancedVC1VideoProfile
+            SmoothStreaming="True"
+            ClosedGop="True"
+            OutputMode="ElementaryStreamSequenceHeader"
+            DifferentialQuantization="Off"
+            InLoopFilter="True"
+            MotionSearchRange="MacroblockAdaptive"
+            BFrameCount="1"
+            AdaptiveDeadZone="Conservative"
+            AdaptiveGop="True"
+            DenoiseFilter="False"
+            KeyFrameDistance="00:00:02"
+            MotionChromaSearch="LumaOnly"
+            MotionMatchMethod="SAD"
+            NoiseEdgeRemovalFilter="False"
+            OverlapSmoothingFilter="True"
+            AutoFit="True"
+            Force16Pixels="False"
+            Complexity="Normal"
+            FrameRate="0"
+            SeparateFilesPerStream="True"
+            NumberOfEncoderThreads="0">
+            <Streams
+              AutoSize="False"
+              FreezeSort="False">
+              <StreamInfo
+                Size="640, 480">
+                <Bitrate>
+                  <VariableConstrainedBitrate
+                    PeakBitrate="1050"
+                    PeakBufferWindow="00:00:04"
+                    AverageBitrate="700" />
+                </Bitrate>
+              </StreamInfo>
+            </Streams>
+          </AdvancedVC1VideoProfile>
+          <MainH264VideoProfile
+            BFrameCount="1"
+            EntropyMode="Cabac"
+            RDOptimization="False"
+            KeyFrameDistance="00:00:05"
+            InLoopFilter="True"
+            MEPartitionLevel="EightByEight"
+            NumberOfReferenceFrames="4"
+            SearchRange="32"
+            AutoFit="True"
+            Force16Pixels="False"
+            Complexity="Normal"
+            FrameRate="0"
+            SeparateFilesPerStream="True"
+            SmoothStreaming="False"
+            NumberOfEncoderThreads="0">
+            <Streams
+              AutoSize="False"
+              FreezeSort="False">
+              <StreamInfo
+                Size="640, 480">
+                <Bitrate>
+                  <VariableConstrainedBitrate
+                    PeakBitrate="1050"
+                    PeakBufferWindow="00:00:04"
+                    AverageBitrate="700" />
+                </Bitrate>
+              </StreamInfo>
+         </Streams>
+          </MainH264VideoProfile>
+        </VideoProfile>
+      </WindowsMediaOutputFormat>
+    </OutputFormat>
+  </MediaFile>
+</Preset>

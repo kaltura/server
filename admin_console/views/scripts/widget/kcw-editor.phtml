@@ -1,0 +1,44 @@
+<?php 
+	$this->headScript()	->setIndent("	")
+						->appendFile($this->baseUrl('js/swfobject.js'));
+?>
+
+<div id="kcwEditor"></div>
+<script type="text/javascript">
+	var flashvars = {
+		baseXmlUrl: "<?php echo $this->kcwBaseUrl . $this->kcwEditorVersion ?>/assets/base.xml"
+	};
+	var params = {};
+	params.quality = "high";
+	params.bgcolor = "#ffffff";
+	params.allowscriptaccess = "sameDomain";
+	params.allowfullscreen = "true";
+	var attributes = {};
+	attributes.id = "KCWEditor";
+	attributes.name = "KCWEditor";
+	attributes.align = "middle";
+
+	swfobject.embedSWF("<?php echo $this->kcwBaseUrl . $this->kcwEditorVersion ?>/KCWEditor.swf", "kcwEditor", "100%", "100%", "9.0", false, flashvars, params, attributes);
+	var confFile = "";
+	var shouldSave = false;
+	  	
+	function KCWEditor_ReadyHandler() {
+		var confFile = window.parent.jQuery('#conf_file').val();
+		if (jQuery.trim(confFile).length > 0) {
+			var f = document.getElementById("KCWEditor");
+			f.setConfXML(confFile);
+		}
+	}
+	
+	function KCWEditor_publishXML(xml) {
+		confFile = unescape(xml);
+		shouldSave = true;
+	}
+	
+	function KCWEditor_close() {
+		if (shouldSave)
+			window.parent.jQuery('#conf_file').val(confFile);
+			
+		window.parent.jQuery('#kcw-editor').dialog('close');
+	}	
+</script>

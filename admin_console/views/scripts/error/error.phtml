@@ -1,0 +1,35 @@
+<?php
+	$this->headLink()	->setIndent("	")
+						->appendStylesheet($this->baseUrl('css/style.css'));
+?>
+<?php echo $this->doctype().PHP_EOL; ?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Kaltura Admin Console</title>
+	<?php echo $this->headLink()->toString(); ?>
+	<?php echo $this->headScript()->toString();?>
+</head>
+<body id="<?php echo $this->cssId(); ?>">
+	<div id="wrapper">
+
+		<h1>An error occurred</h1>
+		<?php echo (isset($this->code) ? "(error code: $this->code)" : (isset($this->exception) ? '(error code: ' . $this->exception->getCode() . ')' : '')); ?>
+
+		<p>
+			<b>Message:</b> <?php echo $this->exception->getMessage() ?>
+		</p>
+
+
+		<?php if ('development' == APPLICATION_ENV): ?>
+			<h3>Stack trace:</h3>
+			<pre><?php echo $this->exception->getTraceAsString() ?></pre>
+
+			<h3>Request Parameters:</h3>
+			<pre><?php echo $this->request ? var_export($this->request->getParams(), true) : '' ?></pre>
+		<?php endif ?>
+
+	</div>
+	<div id='loader'></div>
+</body>
+</html>
