@@ -524,4 +524,38 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		if($this->currentQuery)
 			$this->currentQuery->addOrderBy($column, $orderByType);
 	}
+	
+	public function getPossibleValues($recursive = true) {
+		
+		// In case we have an or inside the criterion - we can't handle it.
+		if (in_array ( Criterion::ODER, $this->getConjunctions () ))
+			return null;
+		
+		if ($this->getComparison () == Criteria::EQUAL) {
+			$res = array ();
+			$res [] = $this->getValue ();
+			return $res;
+		}
+		
+		if ($this->getComparison () == Criteria::IN) {
+			$value = $this->getValue ();
+			if (is_string ( $value ))
+				return explode ( ",", $value );
+			return $value;
+		}
+		
+		if ($recursive) {
+			$res = array ();
+			foreach ( $this->getClauses () as $criterions ) {
+				$values = $criterions->getPossibleValues ( false );
+				if (! is_null ( $values )) {
+					$res = array_merge ( $res, $values );
+				}
+			}
+			return $res;
+		} else {
+			return null;
+		}
+	}
+	
 }

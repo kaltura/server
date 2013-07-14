@@ -66,7 +66,11 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
  		{
  			$newMetadata = $metadata->copy();
  			$newMetadata->setObjectId($toObject->getId());
- 			$newMetadata->setPartnerId($toObject->getPartnerId());
+ 			
+ 			if($toObject instanceof Partner)
+ 				$newMetadata->setPartnerId($toObject->getId());
+ 			else
+ 				$newMetadata->setPartnerId($toObject->getPartnerId());
  			
 			$metadataProfileId = kObjectCopyHandler::getMappedId('MetadataProfile', $metadata->getMetadataProfileId());
 			if($metadataProfileId)

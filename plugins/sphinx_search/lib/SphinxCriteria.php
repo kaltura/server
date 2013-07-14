@@ -243,7 +243,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			else
 			{
-				$metaItems = $pdo->queryAndFetchAll("show meta", PDO::FETCH_NAMED, 0, array('Variable_name' => 'total_found'));
+				$metaItems = $pdo->queryAndFetchAll("show meta like '%total_found%'", PDO::FETCH_ASSOC);
 				if ($metaItems)
 				{
 					$metaItem = reset($metaItems);
@@ -362,25 +362,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			return null;
 		
 		$criterion = $criterionsMap[$fieldName];
-		
-		// In case we have an or inside the criterion - we can't handle it.
-		if($criterion->getConjunction() ==  Criterion::ODER)
-			return null;
-		
-		if($criterion->getComparison() == Criteria::EQUAL) {
-			$res = array();
-			$res[] = $criterion->getValue();
-			return $res;
-		}
-			
-		if ($criterion->getComparison() == Criteria::IN) {
-			$value = $criterion->getValue();
-			if(is_string($value))
-				return explode(",", $value);
-			return $value;
-		}
-		
-		return null;
+		return $criterion->getPossibleValues();
 	}
 	
 	protected function addSphinxOptimizationMatches(array $criterionsMap) 

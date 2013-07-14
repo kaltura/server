@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock` (
   `start_at` datetime DEFAULT NULL,
   `batch_job_id` bigint(20) NOT NULL,
   `custom_data` text,
+  `batch_version` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `lock_index` (`scheduler_id`,`worker_id`,`batch_index`),
   KEY `partner_urgency_type_index` (`partner_id`,`job_type`,`worker_id`,`urgency`),

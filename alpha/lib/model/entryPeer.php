@@ -382,7 +382,9 @@ class entryPeer extends BaseentryPeer
 			}
 
 			//user should be able to get all entries s\he uploaded - outside the privacy context
-			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::getCurrentKsKuserId(), Criteria::EQUAL);
+			$kuser = kCurrentContext::getCurrentKsKuserId();
+			if($kuser !== 0)
+				$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , $kuser , Criteria::EQUAL);
 			$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			$critEntitled->addOr($critKuser);
 		}
