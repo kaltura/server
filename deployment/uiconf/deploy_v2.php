@@ -63,6 +63,7 @@ if($includeCode)
 	echo implode(PHP_EOL, $code);
 }
 
+echo "Deployed successfully\n";
 exit(0);
 
 /**
