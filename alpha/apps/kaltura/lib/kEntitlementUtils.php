@@ -14,6 +14,7 @@ class kEntitlementUtils
 	
 	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
+	protected static $entitlementForced = null;
 	protected static $privacyContextSearch = null;
 	protected static $categoryModeration = false;
 	
@@ -51,6 +52,12 @@ class kEntitlementUtils
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		
+		if(self::$entitlementForced === false)
+		{
+			KalturaLog::debug('Entitlement forced to be disabled');
+			return true;
+		}
 		
 		// entry is entitled when entitlement is disable
 		// for actions with no ks - need to check if partner have default entitlement feature enable.
@@ -189,6 +196,7 @@ class kEntitlementUtils
 	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{
 		self::$initialized = true;
+		self::$entitlementForced = $enableEntit;
 		
 		if(is_null($partnerId))
 			$partnerId = kCurrentContext::getCurrentPartnerId();
