@@ -1162,14 +1162,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$existingCategoryNames = array();
 				foreach($categoryListResponse->objects as $category)
 				{
-					$existingCategoryNames[] = $category->fullName;
+					$existingCategoryNames[] = strtolower($category->fullName);
 					$requiredCategoryIds[] = $category->id;
 				}
 				
 				$categoryNamesArr = explode(',', $categories);
 				foreach($categoryNamesArr as $categoryName)
 				{
-					if(!in_array($categoryName, $existingCategoryNames)) //Category does not exis
+					if(!in_array(strtolower($categoryName), $existingCategoryNames)) //Category does not exis
 					{
 						KalturaLog::debug("Creating a new category by the name [$categoryName]");
 						$createdCategories[] = $this->createCategoryByPath($categoryName);
