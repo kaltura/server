@@ -174,7 +174,6 @@ class kBusinessPostConvertDL
 			return $dbBatchJob;
 		}
 		
-		$inheritedFlavorParamsIds = array();
 		$requiredFlavorParamsIds = array();
 		$flavorParamsConversionProfileItems = array();
 		if($profile)
@@ -184,17 +183,8 @@ class kBusinessPostConvertDL
 		{
 			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 				$requiredFlavorParamsIds[$flavorParamsConversionProfile->getFlavorParamsId()] = true;
-			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
-				$inheritedFlavorParamsIds[] = $flavorParamsConversionProfile->getFlavorParamsId();
-		}
-		$flavorParamsItems = assetParamsPeer::retrieveByPKs($inheritedFlavorParamsIds);
-		foreach($flavorParamsItems as $flavorParams)
-		{
-			if($flavorParams->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
-				$requiredFlavorParamsIds[$flavorParamsConversionProfile->getFlavorParamsId()] = true;			
 		}
 		KalturaLog::debug("required flavor params ids [" . print_r($requiredFlavorParamsIds, true) . "]");
-		
 		
 		// go over all the flavor assets of the entry
 		$inCompleteFlavorIds = array();

@@ -77,6 +77,14 @@ function parseInputObject(SimpleXMLElement $input)
 		$type = strval($input['objectType']);
 
 	$value = strval($input);
+	
+	$matches = null;
+	if(preg_match('/\{prompt:([^}]+)\}/', $value, $matches))
+	{
+		$userInput = askForUserParameter($matches[1]);
+		$value = preg_replace('/\{prompt:[^}]+\}/', $userInput, $value);
+	}
+	
 	if(isset($input['path']))
 	{
 		$path = $input['path'];
@@ -165,10 +173,10 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 	foreach($inputs as $input)
 		$arguments[$input->getName()] = parseInputObject($input);
 
-	$serviceName = strval($request['service']);
-	$actionName = strval($request['action']);
-	$impersonatePartner = isset($request['partnerId']) ? strval($request['partnerId']) : null;
-	$pluginName = ucfirst(strval($request['plugin']));
+	$serviceName = parseInputObject($request['service']);
+	$actionName = parseInputObject($request['action']);
+	$impersonatePartner = isset($request['partnerId']) ? parseInputObject($request['partnerId']) : null;
+	$pluginName = ucfirst(parseInputObject($request['plugin']));
 
 	if(isset($pluginName) && $pluginName != '') //get plugin service
 	{
@@ -259,12 +267,12 @@ if(isset($inXml->config))
 $client = new KalturaClient($config);
 if(isset($inXml->session))
 {
-	$partnerId = intval($inXml->session->partnerId);
-	$secret = strval($inXml->session->secret);
-	$sessionType = intval($inXml->session->sessionType);
-	$userId = isset($inXml->session->userId) ? strval($inXml->session->userId) : '';
-	$expiry = isset($inXml->session->expiry) ? intval($inXml->session->expiry) : 86400;
-	$privileges = isset($inXml->session->privileges) ? strval($inXml->session->privileges) : '';
+	$partnerId = parseInputObject($inXml->session->partnerId);
+	$secret = parseInputObject($inXml->session->secret);
+	$sessionType = parseInputObject($inXml->session->sessionType);
+	$userId = isset($inXml->session->userId) ? parseInputObject($inXml->session->userId) : '';
+	$expiry = isset($inXml->session->expiry) ? parseInputObject($inXml->session->expiry) : 86400;
+	$privileges = isset($inXml->session->privileges) ? parseInputObject($inXml->session->privileges) : '';
 	$email = isset($inXml->session->email) ? $inXml->session->email : null;
 	$password = isset($inXml->session->password) ? $inXml->session->password : null;
 
