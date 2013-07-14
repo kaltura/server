@@ -486,8 +486,6 @@ class myPartnerRegistration
 			$entry->save();
 		}
 		
-		kEventsManager::flushEvents();
-		
 		// restore the original partner id in the default category criteria filter
 		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerIdCategory);
