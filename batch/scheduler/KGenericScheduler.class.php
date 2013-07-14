@@ -46,7 +46,7 @@ class KGenericScheduler
 	 * @var array
 	 */
 	private $nextRunIndex = array();
-
+	
 	/**
 	 * Stores the size of the queue on the server of each task type
 	 * @var array
@@ -67,33 +67,12 @@ class KGenericScheduler
 	{
 		$this->_cleanup();
 	}
-
-	private function initSingleWorker(KSchedularTaskConfig $taskConfig)
-	{
-		$tmpConfig = clone $taskConfig;
-		$tmpConfig->setInitOnly(true);
-		
-		KalturaLog::info('Initilizing ' . $tmpConfig->name);
-		$tasksetPath = $this->schedulerConfig->getTasksetPath();
-		$proc = new KProcessWrapper(0, $this->logDir, $this->phpPath, $tasksetPath, $tmpConfig);
-		
-		$this->runningTasks[$taskConfig->name][0] = &$proc;
-	}
 	
-	private function initAllWorkers()
-	{
-		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
-
-		foreach($taskConfigs as $taskConfig)
-		{
-			if(!$taskConfig->type)
-				continue;
-
-			$this->initSingleWorker($taskConfig);
-			sleep(1);
-		}
-	}
-
+	/**
+	 * Loads the configuration file and initializes the scheduler accordingly.
+	 * Inits all workers
+	 * @param string $configFileName
+	 */
 	private function loadConfig($configFileName = null)
 	{
 		$firstLoad = is_null($this->schedulerConfig);
@@ -111,6 +90,8 @@ class KGenericScheduler
 			file_put_contents($pid, getmypid());
 
 			KalturaLog::info(file_get_contents('VERSION.txt'));
+			
+			$this->loadRunningTasks();
 		}
 		else
 		{
@@ -134,7 +115,7 @@ class KGenericScheduler
 		$this->schedulerStatusInterval = $this->schedulerConfig->getSchedulerStatusInterval();
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
-
+		
 		$taskConfigsValidations = array();
 		foreach($taskConfigs as $taskConfig)
 		{
@@ -163,10 +144,35 @@ class KGenericScheduler
 		}
 		KalturaLog::info("sending configuration to the server");
 		KScheduleHelperManager::saveConfigItems($configItems);
-
-		$this->initAllWorkers();
 	}
+	
+	/**
+	 * Initializes a single worker, and register it in runningTasks
+	 * @param KSchedularTaskConfig $taskConfig
+	 */
+	private function initSingleWorker(KSchedularTaskConfig $taskConfig)
+	{
+		$taskIndex = $this->getNextAvailableIndex($taskConfig->name, $taskConfig->maxInstances);
+		if(is_null($taskIndex))
+			return;
+		
+		$taskIndex = intval($taskIndex);
+		$this->nextRunIndex[$taskConfig->name] = $taskIndex + 1;
+		
+		$tmpConfig = clone $taskConfig;
+		$tmpConfig->setInitOnly(true);
+	
+		KalturaLog::info('Initilizing ' . $tmpConfig->name);
+		$tasksetPath = $this->schedulerConfig->getTasksetPath();
+		$proc = new KProcessWrapper($tmpConfig, $taskIndex);
+		$proc->init($this->logDir, $this->phpPath, $tasksetPath);
 
+		$this->runningTasks[$taskConfig->name][$taskIndex] = &$proc;
+		
+		// We'd like to sleep between process initialization
+		sleep(1);
+	}
+	
 	public function sendStatusNow()
 	{
 		$this->nextStatusTime = 0;
@@ -180,105 +186,131 @@ class KGenericScheduler
 
 		while($this->keepRunning)
 		{
-			$this->loadConfig();
-			$this->loadCommands();
-
-			$fullCycle = false;
-			$sendSchedulerStatus = false;
-			if($this->nextStatusTime < time())
-			{
-				$fullCycle = true;
-
-				$this->nextStatusTime = time() + $this->statusInterval;
-				KalturaLog::debug("Next Status Time: " . date('H:i:s', $this->nextStatusTime));
-			}
-
-			if($this->nextSchedulerStatusTime < time())
-			{
-				$sendSchedulerStatus = true;
-
-				$this->nextSchedulerStatusTime = time() + $this->schedulerStatusInterval;
-				KalturaLog::debug("Next Scheduler Status Time: " . date('H:i:s', $this->nextSchedulerStatusTime));
-			}
-
-			$statuses = array();
-			$taskConfigs = $this->schedulerConfig->getTaskConfigList();
-			$indexedTaskConfigs = array();
-			foreach($taskConfigs as $taskConfig)
-			{
-				$indexedTaskConfigs[$taskConfig->name] = $taskConfig;
-				if(!$taskConfig->type)
-					continue;
-				
-				if(!$this->isInitialized($taskConfig)) 
-					$this->initSingleWorker($taskConfig);
-
-				$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
-				if($fullCycle)
-					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_COUNT, $runningTasksCount);
-
-				if($fullCycle)
-					$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
-
-				if($this->shouldExecute($taskConfig))
-					$this->spawn($taskConfig);
-			}
-
-			if($sendSchedulerStatus)
-				$statuses[] = $this->createSchedulerStatus(KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
-
-			if(count($statuses))
-				KScheduleHelperManager::saveStatuses($statuses);
-
-			$runningBatches = KScheduleHelperManager::loadRunningBatches();
-			foreach($this->runningTasks as $taskName => &$tasks)
-			{
-				if(! count($tasks))
-					continue;
-
-				foreach($tasks as $index => &$proc)
-				{
-					/* @var $proc KProcessWrapper */
-					if($proc->isRunning())
-					{
-						if(isset($runningBatches[$proc->getName()][$proc->getIndex()]))
-						{
-							$processId = $runningBatches[$proc->getName()][$proc->getIndex()];
-							$proc->setProcessId($processId);
-							unset($runningBatches[$proc->getName()][$proc->getIndex()]);
-						}
-
-						continue;
-					}
-
-					$proc->_cleanup();
-					unset($tasks[$index]);
-
-					if(!isset($indexedTaskConfigs[$taskName]))
-						continue;
-
-					$taskConfig = $indexedTaskConfigs[$taskName];
-					self::onRunningInstancesEvent($taskConfig, count($tasks));
-				}
-			}
-
-			foreach($runningBatches as $workerName => $indexes)
-			{
-				if(!is_array($indexes))
-					continue;
-
-				$keys = array_keys($indexes);
-				$index = intval(reset($keys));
-				$this->nextRunIndex[$workerName] = $index;
-			}
-
-			sleep(1);
+			$this->loop();
 		}
 
 		KalturaLog::info("-- Done --");
 		KalturaLog::debug("ended after [" . (time() - $startTime) . "] seconds");
 	}
 
+	public function loop()
+	{
+		$this->loadConfig();
+		$this->loadCommands();
+
+		$fullCycle = false;
+		$sendSchedulerStatus = false;
+		if($this->nextStatusTime < time())
+		{
+			$fullCycle = true;
+
+			$this->nextStatusTime = time() + $this->statusInterval;
+			KalturaLog::debug("Next Status Time: " . date('H:i:s', $this->nextStatusTime));
+		}
+
+		if($this->nextSchedulerStatusTime < time())
+		{
+			$sendSchedulerStatus = true;
+
+			$this->nextSchedulerStatusTime = time() + $this->schedulerStatusInterval;
+			KalturaLog::debug("Next Scheduler Status Time: " . date('H:i:s', $this->nextSchedulerStatusTime));
+		}
+
+		$indexedTaskConfigs = $this->handleConfigurations($fullCycle, $sendSchedulerStatus);
+		$this->handleRunningBatches ( $indexedTaskConfigs );
+
+		sleep(1);
+
+	}
+	
+	
+	/**
+	 * Loop over running batches.
+	 * In case the batch is still running - Update its process id.
+	 * Otherwise - Cleanup the process. 
+	 */
+	private function handleRunningBatches($indexedTaskConfigs) {
+		$runningBatches = KScheduleHelperManager::loadRunningBatches();
+		
+		foreach($this->runningTasks as $taskName => &$tasks)
+		{
+			if(! count($tasks))
+				continue;
+
+			foreach($tasks as $index => &$proc)
+			{
+				/* @var $proc KProcessWrapper */
+				if($proc->isRunning())
+				{
+					if(isset($runningBatches[$proc->getName()][$proc->getIndex()]))
+					{
+						$processId = $runningBatches[$proc->getName()][$proc->getIndex()];
+						$proc->setProcessId($processId);
+						unset($runningBatches[$proc->getName()][$proc->getIndex()]);
+					}
+
+					continue;
+				}
+
+				$proc->_cleanup();
+				unset($tasks[$index]);
+
+				if(!isset($indexedTaskConfigs[$taskName]))
+					continue;
+
+				$taskConfig = $indexedTaskConfigs[$taskName];
+				self::onRunningInstancesEvent($taskConfig, count($tasks));
+			}
+		}
+
+		// Reset next run index
+		foreach($runningBatches as $workerName => $indexes)
+		{
+			if(!is_array($indexes))
+				continue;
+
+			$keys = array_keys($indexes);
+			$index = intval(reset($keys));
+			$this->nextRunIndex[$workerName] = $index;
+		}
+	}
+
+	/**
+	 * Go over all configurations and check for their status.
+	 * Execute new instances if needed.
+	 */
+	private function handleConfigurations($fullCycle, $sendSchedulerStatus) {
+		$indexedTaskConfigs = array();
+		$statuses = array();
+		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
+		foreach($taskConfigs as $taskConfig)
+		{
+			$indexedTaskConfigs[$taskConfig->name] = $taskConfig;
+			if(!$taskConfig->type)
+				continue;
+		
+			if(!$this->isInitialized($taskConfig))
+				$this->initSingleWorker($taskConfig);
+		
+			$runningTasksCount = $this->numberOfRunningTasks($taskConfig->name);
+			if($fullCycle) {
+				$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_COUNT, $runningTasksCount);
+				$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
+			}
+		
+			if($this->shouldExecute($taskConfig))
+				$this->spawn($taskConfig);
+		}
+		
+		if($sendSchedulerStatus)
+			$statuses[] = $this->createSchedulerStatus(KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
+		
+		if(count($statuses))
+			KScheduleHelperManager::saveStatuses($statuses);
+		
+		return $indexedTaskConfigs;
+	}
+	
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 * @return boolean
@@ -331,15 +363,15 @@ class KGenericScheduler
 		
 		return KScheduleHelperManager::checkForFilter($taskConfig->name);
 	}
-
+	
 	private function spawn(KSchedularTaskConfig $taskConfig)
 	{
 		$taskIndex = $this->getNextAvailableIndex($taskConfig->name, $taskConfig->maxInstances);
 		$taskIndex = intval($taskIndex);
-
-		$this->lastRunTime[$taskConfig->name] = time();
 		$this->nextRunIndex[$taskConfig->name] = $taskIndex + 1;
-
+		
+		$this->lastRunTime[$taskConfig->name] = time();
+		
 		KalturaLog::info("Executing $taskConfig->name [$taskIndex]");
 		$tasksetPath = $this->schedulerConfig->getTasksetPath();
 		$taskConf = clone $taskConfig;
@@ -348,7 +380,8 @@ class KGenericScheduler
 		else 
 			$taskConf->setQueueSize(0);
 		
-		$proc = new KProcessWrapper($taskIndex, $this->logDir, $this->phpPath, $tasksetPath, $taskConf);
+		$proc = new KProcessWrapper($taskConfig, $taskIndex);
+		$proc ->init($this->logDir, $this->phpPath, $tasksetPath);
 
 		$this->runningTasks[$taskConfig->name][$taskIndex] = &$proc;
 		self::onRunningInstancesEvent($taskConfig, count($this->runningTasks[$taskConfig->name]));
@@ -479,6 +512,8 @@ class KGenericScheduler
 		for($index = 0; $index < $nextIndex; $index++)
 			if(!isset($tasks[$index]))
 				return $index;
+		
+		return null;
 	}
 
 	private function _cleanup()
@@ -489,15 +524,39 @@ class KGenericScheduler
 				continue;
 
 			$taskConfig = null;
+			
 			foreach($tasks as $index => &$proc)
 			{
 				$taskConfig = $proc->taskConfig;
 				$proc->_cleanup();
 			}
+			
 			self::onRunningInstancesEvent($taskConfig, 0);
 		}
 
 		$this->runningTasks = array();
+	}
+	
+	private function loadRunningTasks() {
+		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
+		$runningBatches = KScheduleHelperManager::loadRunningBatches();
+		
+		foreach($runningBatches as $workerName => $indexes)
+		{
+			if(!is_array($indexes))
+				continue;
+			
+			foreach ($indexes as $taskIndex => $procId) {
+
+				$proc = new KProcessWrapper($taskConfigs[$workerName], $taskIndex);
+				$proc->initMockedProcess($procId);
+				if($proc->isRunning()) {
+					$this->runningTasks[$workerName][$taskIndex] = &$proc;
+					$this->lastRunTime[$workerName] = time();
+				} 
+			}
+		}
+		
 	}
 
 	private function loadCommands()

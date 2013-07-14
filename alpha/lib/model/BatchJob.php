@@ -362,17 +362,21 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		} else {
 			$c = new Criteria();
 		}
-			
-		$crit = $c->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id);
-		$crit->addOr($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
-		$c->addAnd($crit);
 		
-		// remove partner id filter in order to force an optimized query. Otherwise mysql may use the partner id key which is
-		// far from optimal for this direct query using ROOT_JOB_ID and PARENT_JOB_ID keys.
 		BatchJobPeer::setUseCriteriaFilter(false);
-		$result = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+		// Get by root
+		$c1 = clone $c;
+		$c1->addAnd($c1->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id));
+		$c1->addAnd($c1->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id, Criteria::NOT_EQUAL));
+		$result1 = BatchJobPeer::doSelect($c1, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+		
+		// Get by parent
+		$c->addAnd($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
+		$result2 = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+		
+		// Unite
 		BatchJobPeer::setUseCriteriaFilter(true);
-		return $result;
+		return array_merge($result1, $result2);
 	}
 	
 	public function getDirectChildJobs()

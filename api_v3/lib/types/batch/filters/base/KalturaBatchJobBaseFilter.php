@@ -44,6 +44,9 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 		"bulkJobIdEqual" => "_eq_bulk_job_id",
 		"bulkJobIdIn" => "_in_bulk_job_id",
 		"bulkJobIdNotIn" => "_notin_bulk_job_id",
+		"batchVersionGreaterThanOrEqual" => "_gte_batch_version",
+		"batchVersionLessThanOrEqual" => "_lte_batch_version",
+		"batchVersionEqual" => "_eq_batch_version",
 		"parentJobIdEqual" => "_eq_parent_job_id",
 		"parentJobIdIn" => "_in_parent_job_id",
 		"parentJobIdNotIn" => "_notin_parent_job_id",
@@ -62,6 +65,8 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 		"errNumberNotIn" => "_notin_err_number",
 		"estimatedEffortLessThan" => "_lt_estimated_effort",
 		"estimatedEffortGreaterThan" => "_gt_estimated_effort",
+		"urgencyLessThanOrEqual" => "_lte_urgency",
+		"urgencyGreaterThanOrEqual" => "_gte_urgency",
 		"schedulerIdEqual" => "_eq_scheduler_id",
 		"schedulerIdIn" => "_in_scheduler_id",
 		"schedulerIdNotIn" => "_notin_scheduler_id",
@@ -303,6 +308,21 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	/**
 	 * @var int
 	 */
+	public $batchVersionGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $batchVersionLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $batchVersionEqual;
+
+	/**
+	 * @var int
+	 */
 	public $parentJobIdEqual;
 
 	/**
@@ -389,6 +409,16 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $estimatedEffortGreaterThan;
+
+	/**
+	 * @var int
+	 */
+	public $urgencyLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	public $urgencyGreaterThanOrEqual;
 
 	/**
 	 * @var int
