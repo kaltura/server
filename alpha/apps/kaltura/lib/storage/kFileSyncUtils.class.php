@@ -1125,6 +1125,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$newStatus = FileSync::FILE_SYNC_STATUS_DELETED;
 			}
+			elseif($file->getLinkCount() > 100)
+			{
+				KalturaLog::notice("The file sync [$key] is associated with [" . $file->getLinkCount() . "] links and won't be deleted");
+				return null;
+			}
 			else
 			{
 				$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
