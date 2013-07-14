@@ -48,7 +48,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	{
 		if(is_null(self::$metadataProfiles))
 		{
-			$metadataPlugin = KalturaMetadataClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+			$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 			$metadataProfileListResponse = $metadataPlugin->metadataProfile->listAction();
 			if(!is_array($metadataProfileListResponse->objects))
 				return null;
@@ -97,7 +97,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 			
 		KalturaLog::debug("Handles custom metadata for object type [$this->objectType] class [$this->objectClass] id [$object->id] partner id [$object->partnerId]");
 			
-		$this->xmlBulkUploadEngine->impersonate();
+		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 		$pluginsErrorResults = array();
 		foreach($metadataItems->$nodeName as $customData)
 		{			
@@ -113,7 +113,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 			
-		$this->xmlBulkUploadEngine->unimpersonate();
+		KBatchBase::unimpersonate();
 	}
 
 	public function handleCustomData($objectId, SimpleXMLElement $customData)
@@ -132,7 +132,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		if(!$metadataProfileId)
 			throw new KalturaBatchException("Missing custom data metadataProfile attribute", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
-		$metadataPlugin = KalturaMetadataClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 		
 		$metadataFilter = new KalturaMetadataFilter();
 		$metadataFilter->metadataObjectTypeEqual = $this->objectType;

@@ -149,6 +149,7 @@ class CategoryUserService extends KalturaBaseService
 		}
 			
 		$dbCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndKuserId($categoryId, $kuser->getId());
+		/* @var $dbCategoryKuser categoryKuser */
 		if (!$dbCategoryKuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_CATEGORY_USER_ID, $categoryId, $userId);
 			
@@ -172,7 +173,8 @@ class CategoryUserService extends KalturaBaseService
 			kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER_OWNER);
 			
-		$dbCategoryKuser->delete();		
+		$dbCategoryKuser->setStatus(CategoryKuserStatus::DELETED);
+		$dbCategoryKuser->save();
 	} 
 	
 	/**

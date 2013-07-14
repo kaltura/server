@@ -62,8 +62,8 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		//Gets the engine (only for clients)
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && $enumValue == KalturaBulkUploadType::XML)
 		{
-			list($taskConfig, $kClient, $job) = $constructorArgs;
-			return new BulkUploadEngineXml($taskConfig, $kClient, $job);
+			list($job) = $constructorArgs;
+			return new BulkUploadEngineXml($job);
 		}
 	}
 	

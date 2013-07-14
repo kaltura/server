@@ -30,7 +30,7 @@ class KAsyncFileSyncImportCloser extends KJobCloserWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		
 		return $this->moveFile($job, $job->data->tmpFilePath, $job->data->destFilePath);
@@ -87,14 +87,14 @@ class KAsyncFileSyncImportCloser extends KJobCloserWorker
 	private function setAndCheck($path)
 	{
 		// change path owner
-		$chown_name = $this->taskConfig->params->fileOwner;
+		$chown_name = self::$taskConfig->params->fileOwner;
 		if ($chown_name) {
 			KalturaLog::debug("Changing owner of file [$path] to [$chown_name]");
 			@chown($path, $chown_name);
 		}
 		
 		// change path mode
-		$chmod_perm = octdec($this->taskConfig->params->fileChmod);
+		$chmod_perm = octdec(self::$taskConfig->params->fileChmod);
 		if (!$chmod_perm) {
 			$chmod_perm = 0644;
 		}

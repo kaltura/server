@@ -15,13 +15,13 @@ class FtpDistributionEngine extends DistributionEngine implements
 	/**
 	 * @see IDistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		parent::configure($taskConfig);
+		parent::configure();
 		
-		if($taskConfig->params->tempFilePath)
+		if(KBatchBase::$taskConfig->params->tempFilePath)
 		{
-			$this->tempFilePath = $taskConfig->params->tempFilePath;
+			$this->tempFilePath = KBatchBase::$taskConfig->params->tempFilePath;
 			if(!is_dir($this->tempFilePath))
 				kFile::fullMkfileDir($this->tempFilePath, 0777, true);
 		}
@@ -271,7 +271,7 @@ class FtpDistributionEngine extends DistributionEngine implements
 		}
         
         $passphrase = $distributionProfile->passphrase ? $distributionProfile->passphrase : null;
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$fileTransferManager = kFileTransferMgr::getInstance($protocol, $engineOptions);
         if (trim($privateKey))
         {

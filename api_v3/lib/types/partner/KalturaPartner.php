@@ -355,7 +355,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public function toPartner()
 	{
-		
 		if($this->adminName && $this->firstName === null && $this->lastName === null)
 		{
 			$this->firstName = $this->adminName;

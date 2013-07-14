@@ -6,10 +6,6 @@
  */
 class KDropFolderServicesHelper
 {	
-	/**
-	 * @var KalturaClient
-	 */
-	protected $kClient;
 	
 	/**
 	* @var KalturaDropFolderFileService
@@ -17,10 +13,9 @@ class KDropFolderServicesHelper
 	protected $dropFolderFileService = null;
 	
 	
-	public function __construct(KalturaClient $client)
+	public function __construct()
 	{
-		$this->kClient = $client;
-		$dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
+		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
 		$this->dropFolderFileService = $dropFolderPlugin->dropFolderFile;
 	}
 	

@@ -85,9 +85,9 @@ class YouTubeDistributionEngineSelector extends DistributionEngine implements
 		else
 			$engine = new YouTubeDistributionLegacyEngine();
 
-		if ($this->taskConfig)
-			$engine->configure($this->taskConfig);
-		$engine->setClient($this->kalturaClient);
+		if (KBatchBase::$taskConfig)
+			$engine->configure();
+		$engine->setClient();
 
 		return $engine;
 	}
