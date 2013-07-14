@@ -1,4 +1,4 @@
-<?php
+<?php
 ?>
 <table cellpadding="3px" border="0px">
 	<tr>

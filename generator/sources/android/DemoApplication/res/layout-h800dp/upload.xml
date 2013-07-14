@@ -71,7 +71,7 @@
                 android:textColor="@color/white"
                 android:textSize="20sp" />
         </RelativeLayout>
-
+
    
         <RelativeLayout
             android:id="@+id/rl_pick_from_gallery"
