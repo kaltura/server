@@ -516,6 +516,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$orderByColumns = $this->getOrderByColumns();
 		$orderByColumns = array_unique($orderByColumns);
 		
+		$usesWeight = false;
 		$setLimit = true;
 		$orders = array();
 		if(count($orderByColumns))
@@ -535,6 +536,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if($replace[$orderField] == self::WEIGHT) {
 						$replace[$orderField] = "w";
 						$conditions .= ",weight() as w";
+						$usesWeight = true;
 					}
 					
 					KalturaLog::debug("Add sort field[$orderField] copy from [$orderByColumn]");
@@ -575,7 +577,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$this->ranker = self::RANKER_NONE;
-		if (strpos($orderBy, self::WEIGHT) !== false)
+		if ($usesWeight)
 		{
 			$this->ranker = self::RANKER_SPH04;
 		}
@@ -613,7 +615,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	{
 		foreach($filter->fields as $field => $val)
 		{
-			if(is_null($val) || !strlen($val) || $field == '_order_by') 
+			if(is_null($val) || $val === '' || $field == '_order_by') 
 				continue;
 			
 			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
@@ -718,9 +720,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						if($this->isNullableField($fieldName))
-							$val = '((^' . implode(" $notEmpty$) | (^", $vals) . " $notEmpty$))";
+							$val = "((\\\"^" . implode(" $notEmpty$\\\") | (\\\"^", $vals) . " $notEmpty$\\\"))";
 						else
-							$val = '((^' . implode("$) | (^", $vals) . "$))";
+							$val = "((\\\"^" . implode("$\\\") | (\\\"^", $vals) . "$\\\"))";
 							
 						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
@@ -732,9 +734,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);	
 						if($this->isNullableField($fieldName))
-							$this->addMatch("@$sphinxField ^$val $notEmpty$");
+							$this->addMatch("@$sphinxField \\\"^$val $notEmpty$\\\"");
 						else							
-							$this->addMatch("@$sphinxField ^$val$");
+							$this->addMatch("@$sphinxField \\\"^$val$\\\"");
 						$filter->unsetByName($field);
 					}
 					break;
