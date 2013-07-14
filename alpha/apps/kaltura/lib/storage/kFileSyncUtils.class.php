@@ -156,6 +156,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		$fullPath = self::getLocalFilePathForKey($key);
+		$fullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $fullPath);
 
 		if ( !file_exists( dirname( $fullPath )))
 		{
@@ -198,6 +199,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function fullMkdir($filePath)
 	{
+		$filePath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $filePath);
+	
+		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
+			return kFile::fullMkdir($filePath, 0750);
+			
 		$contentGroup = kConf::get('content_group');
 		if(is_numeric($contentGroup))
 			$contentGroup = intval($contentGroup);
@@ -220,6 +226,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function moveToFile ( FileSyncKey $source_key , $target_file_path, $delete_source = true , $overwrite = true)
 	{
+		$target_file_path = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $target_file_path);
+	
 		try
 		{
 			list ($fileSync, $local) = self::getReadyFileSyncForKey ( $source_key, false , true );
@@ -317,6 +325,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$targetFullPath = kPathManager::getFilePath($target_key);
 			KalturaLog::log("Generated new path [$targetFullPath]");
 		}
+		
+		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
 
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
