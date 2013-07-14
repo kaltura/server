@@ -20,4 +20,13 @@ class PermissionToPermissionItemPeer extends BasePermissionToPermissionItemPeer
 	{
 		return array(array("permissionToPermissionItem:permissionId=%s", self::PERMISSION_ID));		
 	}
+	
+	public static function retrieveByPermissionId($permisionId)
+	{
+		$c = new Criteria();
+		$c->add ( self::PERMISSION_ID , $permisionId );
+		
+		return self::doSelect( $c );
+	}
+	
 } // PermissionToPermissionItemPeer

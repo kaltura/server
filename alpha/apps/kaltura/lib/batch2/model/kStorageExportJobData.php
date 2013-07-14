@@ -32,6 +32,14 @@ class kStorageExportJobData extends kStorageJobData
 		$this->setForce($force);
 		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 	}
+	
+	function calculateEstimatedEffort(BatchJob $batchJob) {
+		$fileSize = filesize($this->getSrcFileSyncLocalPath());
+		if($fileSize !== False)
+			return $fileSize;
+		
+		return self::MAX_ESTIMATED_EFFORT;
+	}
         
 	/**
 	 * @return the $force

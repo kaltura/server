@@ -41,9 +41,17 @@ class Permission extends BasePermission
 	{
 		if ($this->permissionItemIdsChanged)
 		{
-			$this->deleteAllPermissionItems();
-						
-			foreach ($this->permissionItemIds as $itemId)
+
+			$currentPermissions = PermissionToPermissionItemPeer::retrieveByPermissionId($this->getId());
+			$currentPermissionsIds = array_map(function ($element) { return $element->getPermissionItemId(); }, $currentPermissions);
+			
+			// Remove old permissions
+			$permissionsToRemove = array_diff($currentPermissionsIds, $this->permissionItemIds);
+			$this->deletePermissionItems($permissionsToRemove);
+			
+			// Add new permissions
+			$permissionsToAdd = array_diff($this->permissionItemIds, $currentPermissionsIds);
+			foreach ($permissionsToAdd as $itemId)
 			{
 				if (!is_null($itemId) && $itemId !== '')
 				{
@@ -159,10 +167,13 @@ class Permission extends BasePermission
 	/**
 	 * Delete all permission items related from current pemission.
 	 */
-	private function deleteAllPermissionItems()
+	private function deletePermissionItems(array $permissionsToRemove)
 	{
+		if(!count($permissionsToRemove))
+			return;
+		
 		$c = new Criteria();
-		$c->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->getId(), Criteria::EQUAL);
+		$c->add(PermissionToPermissionItemPeer::PERMISSION_ID, $permissionsToRemove, Criteria::IN);
 		PermissionToPermissionItemPeer::doDelete($c);
 	}
 	
