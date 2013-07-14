@@ -31,6 +31,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"categoriesIdsMatchAnd" => "_matchand_categories_ids",
 		"categoriesIdsMatchOr" => "_matchor_categories_ids",
 		"categoriesIdsNotContains" => "_notcontains_categories_ids",
+		"categoriesIdsEmpty" => "_empty_categories_ids",
 		"statusEqual" => "_eq_status",
 		"statusNotEqual" => "_not_status",
 		"statusIn" => "_in_status",
@@ -265,6 +266,11 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $categoriesIdsNotContains;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $categoriesIdsEmpty;
 
 	/**
 	 * This filter should be in use for retrieving only entries, at a specific {@link ?object=KalturaEntryStatus KalturaEntryStatus}.

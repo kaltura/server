@@ -7,7 +7,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 {
 	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
 	const CACHE_KEY_PREFIX = 'fileSyncContent_';
-	const FILE_SYNC_CACHE_EXPIRY = 0;			// never expires
+	const FILE_SYNC_CACHE_EXPIRY = 2592000;		// 30 days
 
 	protected static $uncachedObjectTypes = array(
 		FileSyncObjectType::ASSET,				// should not cache conversion logs since they can change (batch.logConversion)

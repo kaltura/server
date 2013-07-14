@@ -35,7 +35,6 @@ package com.kaltura.delegates {
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.net.KalturaCall;
-	import com.kaltura.types.KalturaResponseType;
 	
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
@@ -181,7 +180,6 @@ package com.kaltura.delegates {
 
 			_call.setRequestArgument("ignoreNull", _config.ignoreNull);
 			_call.setRequestArgument("apiVersion", KalturaClient.API_VERSION);
-			_call.setRequestArgument("format", KalturaResponseType.RESPONSE_TYPE_XML);
 
 			//Create signature hash.
 			//call.setRequestArgument("kalsig", getMD5Checksum(call));
