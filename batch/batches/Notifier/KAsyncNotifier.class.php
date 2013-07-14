@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage Notifier
  */
-require_once(__DIR__ . "/../../bootstrap.php");
 
 /**
  * Will run periodically and cleanup directories from old files that have a specific pattern (older than x days) 

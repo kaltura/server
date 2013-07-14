@@ -10,9 +10,11 @@ class KalturaFeatureStatusArray extends KalturaTypedArray
 		$newArr = new KalturaFeatureStatusArray();
 		foreach($arr as $obj)
 		{
-			$nObj = new KalturaFeatureStatus();
-			$nObj->fromObject($obj);
-			$newArr[] = $nObj;
+			if ($obj){
+				$nObj = new KalturaFeatureStatus();
+				$nObj->fromObject($obj);
+				$newArr[] = $nObj;
+			}
 		}
 		
 		return $newArr;
