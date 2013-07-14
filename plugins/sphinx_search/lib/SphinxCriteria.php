@@ -243,7 +243,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			else
 			{
-				$metaItems = $pdo->queryAndFetchAll("show meta", PDO::FETCH_NAMED, 0, array('Variable_name' => 'total_found'));
+				$metaItems = $pdo->queryAndFetchAll("show meta like '%total_found%'", PDO::FETCH_ASSOC);
 				if ($metaItems)
 				{
 					$metaItem = reset($metaItems);
