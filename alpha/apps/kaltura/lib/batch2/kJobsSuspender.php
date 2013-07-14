@@ -132,7 +132,7 @@ class kJobsSuspender {
 			$jobIds[] = $row['ID'];
 	
 		// Suspend chosen ids
-		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_PENDING, false);
+		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, BatchJob::BATCHJOB_STATUS_PENDING, true);
 		self::moveToSuspendedJobsTable($jobIds);
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were suspended");
 	}
@@ -167,7 +167,7 @@ class kJobsSuspender {
 		// Return the jobs from batch_job_lock_suspend table
 		self::moveFromSuspendedJobsTable($jobIds);
 		// Update the jobs status to pending
-		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, true);
+		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_DONT_PROCESS, false);
 		KalturaLog::info("$res jobs of partner ($partnerId) job type ($jobType / $jobSubType) on DC ($dc) were unsuspended");
 	}
 	
