@@ -1,6 +1,6 @@
 <?php
 
-require_once ( "myEntryUtils.class.php");
+require_once ( __DIR__ . "/myEntryUtils.class.php");
 
 class myKshowUtils
 {
