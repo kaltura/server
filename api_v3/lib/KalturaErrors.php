@@ -276,6 +276,8 @@ class KalturaErrors extends APIErrors
 	const CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set owner field when privacy context is not set on the categroy";
 
 	const CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set user join policy field when privacy context is not set on the categroy";
+	
+	const CANNOT_SET_OWNER_FIELD_WITH_USER_ID = "CANNOT_SET_OWNER_FIELD_WITH_USER_ID, Cannot set owner field with user id \"%s\", user id is invalid";
 
 	const CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set contribution policy field when privacy context is not set on the categroy";
 
