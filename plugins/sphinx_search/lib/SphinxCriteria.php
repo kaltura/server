@@ -362,25 +362,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			return null;
 		
 		$criterion = $criterionsMap[$fieldName];
-		
-		// In case we have an or inside the criterion - we can't handle it.
-		if($criterion->getConjunction() ==  Criterion::ODER)
-			return null;
-		
-		if($criterion->getComparison() == Criteria::EQUAL) {
-			$res = array();
-			$res[] = $criterion->getValue();
-			return $res;
-		}
-			
-		if ($criterion->getComparison() == Criteria::IN) {
-			$value = $criterion->getValue();
-			if(is_string($value))
-				return explode(",", $value);
-			return $value;
-		}
-		
-		return null;
+		return $criterion->getPossibleValues();
 	}
 	
 	protected function addSphinxOptimizationMatches(array $criterionsMap) 
