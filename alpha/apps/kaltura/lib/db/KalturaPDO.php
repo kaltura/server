@@ -16,6 +16,11 @@ class KalturaPDO extends PropelPDO
 	 */
 	const KALTURA_ATTR_NO_TRANSACTION = 'noTransaction';
 	
+	/**
+	 * Sets the number of retries of doSave()
+	 */
+	const SAVE_MAX_RETRIES = 4; 
+	
 	protected static $comment = null;
 	protected $kalturaOptions = array();
 	protected $connectionName = null;
