@@ -409,7 +409,7 @@ class myInsertEntryHelper
 		$entry->setLicenseType($this->getParam('entry_license'));
 		$entry->setCredit($this->getParam('entry_credit'));
 		$entry->setStatus($entry_status);
-		if($entry->getCalculateDuration())
+		if ($duration !== null )
 			$entry->setLengthInMsecs($duration);
 		
 		if ($this->entry_id == 0) // new entry

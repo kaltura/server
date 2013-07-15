@@ -595,7 +595,6 @@ CREATE TABLE `batch_job_lock`
 	`dc` INTEGER,
 	`batch_job_id` INTEGER,
 	`custom_data` TEXT,
-	`batch_version` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `status_job_type_index`(`status`, `job_type`),
 	KEY `entry_id_index_id`(`entry_id`, `id`),

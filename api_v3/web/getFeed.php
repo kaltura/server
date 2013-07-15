@@ -1,19 +1,5 @@
 <?php
-
-function getRequestParameter($paramName)
-{
-	if (isset($_GET[$paramName]))
-		return $_GET[$paramName];
-
-	// try lowercase
-	$paramName = strtolower($paramName);
-	if (isset($_GET[$paramName]))
-		return $_GET[$paramName];
-	
-	return null;
-}
-
-if(!getRequestParameter('feedId'))
+if(!isset($_GET['feedId']))
 	die('feedId not supplied');
 	
 ini_set( "memory_limit" , "256M" );
@@ -45,10 +31,10 @@ kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : n
 kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 kCurrentContext::$ps_vesion = "ps3";
 
-$feedId = getRequestParameter('feedId');
-$entryId = getRequestParameter('entryId');
-$limit = getRequestParameter('limit');
-$ks = getRequestParameter('ks');
+$feedId = $_GET['feedId'];
+$entryId = (isset($_GET['entryId']) ? $_GET['entryId'] : null);
+$limit = (isset($_GET['limit']) ? $_GET['limit'] : null);
+$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
 if (function_exists('apc_fetch'))

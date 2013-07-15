@@ -75,25 +75,8 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 		"duration" => "durationInt"
 	);
 	
-	/* (non-PHPdoc)
-	 * @see KalturaBaseEntry::getMapBetweenObjects()
-	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaBaseEntry::toObject()
-	 */
-	public function toObject($dbObject = null, $skip = array())
-	{
-		/* @var $dbObject entry */
-		parent::toObject($dbObject, $skip);
-		
-		if($this->msDuration)
-			$dbObject->setCalculateDuration(false);
-			
-		return $dbObject;
 	}
 }

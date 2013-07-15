@@ -49,19 +49,19 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		//Gets the engine (only for clients)
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && (!$enumValue || $enumValue == KalturaBulkUploadType::CSV))
 		{
-			list($taskConfig, $kClient, $job) = $constructorArgs;
+			list($job) = $constructorArgs;
 			/* @var $job KalturaBatchJob */
 			//KalturaLog::debug(get_class_vars('KalturaBulkUploadObjectType'));
 			switch ($job->data->bulkUploadObjectType)
 			{
 			    case KalturaBulkUploadObjectType::ENTRY:
-			        return new BulkUploadEntryEngineCsv($taskConfig, $kClient, $job);
+			        return new BulkUploadEntryEngineCsv($job);
 			    case KalturaBulkUploadObjectType::CATEGORY:
-			        return new BulkUploadCategoryEngineCsv($taskConfig, $kClient, $job);
+			        return new BulkUploadCategoryEngineCsv($job);
 			    case KalturaBulkUploadObjectType::USER:
-			        return new BulkUploadUserEngineCsv($taskConfig, $kClient, $job);
+			        return new BulkUploadUserEngineCsv($job);
 			    case KalturaBulkUploadObjectType::CATEGORY_USER:
-			        return new BulkUploadCategoryUserEngineCsv($taskConfig, $kClient, $job);
+			        return new BulkUploadCategoryUserEngineCsv($job);
 			    default:
 			        throw new KalturaException("Bulk upload object type [{$job->data->bulkUploadObjectType}] not found", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND);
 			        break;

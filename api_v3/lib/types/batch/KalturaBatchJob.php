@@ -137,12 +137,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	 */    
     public $bulkJobId;
     
-    /**
-     * @var int
-     * @filter gte,lte,eq
-     */
-    public $batchVersion;
-    
     
     /**
      * When one job creates another - the parent should set this parentJobId to be its own id.
@@ -196,11 +190,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	 */    
     public $estimatedEffort;
     
-    /**
-     * @var int
-     * @filter lte,gte
-     */
-    public $urgency;
     
     /**
 	 * @var int

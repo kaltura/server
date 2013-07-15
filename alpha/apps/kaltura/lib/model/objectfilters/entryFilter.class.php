@@ -89,7 +89,6 @@ class entryFilter extends baseObjectFilter
 			"_matchand_categories_ids", // see alias
 			"_matchor_categories_ids", // see alias
 			"_notcontains_categories_ids",
-			"_empty_categories_ids",
 			"_matchand_flavor_params_ids",
 			"_matchor_flavor_params_ids",
 			"_matchor_duration_type", // see alias

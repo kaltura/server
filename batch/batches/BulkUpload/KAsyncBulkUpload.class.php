@@ -3,6 +3,7 @@
  * @package Scheduler
  * @subpackage Bulk-Upload
  */
+require_once(__DIR__ . "/../../bootstrap.php");
 
 setlocale ( LC_ALL, 'en_US.UTF-8' );
 

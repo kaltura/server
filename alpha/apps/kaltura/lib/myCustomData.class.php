@@ -25,21 +25,7 @@ class myCustomData
 			if ( $this->data == null )
 			{
 				$this->data = array();
-			}	
-			else 
-			{
-				foreach($this->data as $name => $value)
-				{
-					if(strpos($name, ':') > 0)
-					{
-						list($namespace, $subName) = explode(':', $name, 2);
-						unset($this->data[$name]);
-						if(!isset($this->data[$namespace]))
-							$this->data[$namespace] = array();
-						$this->data[$namespace][$subName] = $value;
-					}	
-				}
-			}		
+			}			
 		}
 		catch ( Exception $ex )
 		{
@@ -80,29 +66,14 @@ class myCustomData
 	 */
 	public function put ( $name , $value , $namespace = null  , $remove_if_empty=false )
 	{
-	if ( $namespace )
+		if ( $namespace ) $name = $namespace . ":" . $name;
+		if ( $remove_if_empty && empty ( $value ) )
 		{
-			if ( $remove_if_empty && empty ( $value ) )
-			{
-				unset ($this->data [$name]);
-			}
-			else
-			{
-				if(!isset($this->data[$namespace]))
-					$this->data[$namespace] = array();
-				$this->data[$namespace][$name] = $value;
-			}
+			unset ($this->data [$name]);
 		}
 		else
 		{
-			if ( $remove_if_empty && empty ( $value ) )
-			{
-				unset ($this->data [$name]);
-			}
-			else
-			{
-				$this->data [$name] = $value;
-			}
+			$this->data [$name] = $value;
 		}
 		
 		return @$this->data [$name] ;
@@ -115,25 +86,10 @@ class myCustomData
 	 */
 	public function get ( $name , $namespace = null  )
 	{
-		if($namespace)
-		{
-			if ($name)
-			{
-				if (isset($this->data[$namespace][$name]))
-					return $this->data[$namespace][$name];
-			}
-			else
-			{
-				if(isset($this->data[$namespace]))
-					return $this->data[$namespace];
-			}
-		}
-		elseif(isset($this->data[$name]))
-		{ 	
-			return $this->data[$name];
-		}
-			
-		return null;
+		if ( $namespace ) $name = $namespace . ":" . $name;
+		$res = null;
+		if ( isset ($this->data[$name] ) ) 	$res =  @$this->data[$name];
+		return $res;
 	}
 	
 	/**
@@ -142,14 +98,8 @@ class myCustomData
 	 */
 	public function remove ( $name , $namespace = null )
 	{
-		if($namespace)
-		{
-			unset($this->data[$namespace][$name]);
-		}
-		else
-		{
-			unset ($this->data [$name]);
-		}
+		if ( $namespace ) $name = $namespace . ":" . $name;
+		unset ($this->data [$name]);
 	}
 	
 	/**

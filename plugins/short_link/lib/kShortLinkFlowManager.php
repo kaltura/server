@@ -17,7 +17,7 @@ class kShortLinkFlowManager implements kObjectDeletedEventConsumer
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$shortLinks = ShortLinkPeer::retrieveByKuserId($object->getId(), $object->getPartnerId());
+		$shortLinks = ShortLinkPeer::retrieveByKuserId($object->getId());
 		foreach($shortLinks as $shortLink)
 		{
 			$shortLink->setStatus(ShortLinkStatus::DELETED);

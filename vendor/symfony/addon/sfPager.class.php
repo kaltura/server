@@ -49,7 +49,7 @@ abstract class sfPager
   }
 
   // function to be called after parameters have been set
-  abstract public function init( $cached_count = NULL );
+  abstract public function init();
 
   // main method: returns an array of result on the given page
   abstract public function getResults();

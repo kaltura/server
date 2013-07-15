@@ -1191,9 +1191,7 @@ class kFlowHelper
 				{
 					KalturaLog::debug("Set duration to: " . $mediaInfo->getContainerDuration());
 					$entry->setDimensions($mediaInfo->getVideoWidth(), $mediaInfo->getVideoHeight());
-					
-					if($entry->getCalculateDuration())
-						$entry->setLengthInMsecs($mediaInfo->getContainerDuration());
+					$entry->setLengthInMsecs($mediaInfo->getContainerDuration());
 				}
 			}
 

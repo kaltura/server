@@ -454,8 +454,14 @@ class Partner extends BasePartner
 	
 	public function getFeaturesStatus()	
 	{		
-		return $this->getFromCustomData(null, "featuresStatus");
+		$featuresStatus = unserialize($this->getFromCustomData("featuresStatus"));
+		if(!$featuresStatus)
+			return array();
+
+		return $featuresStatus;
 	}
+	
+	public function setFeaturesStatus(array $v ) {		return $this->putInCustomData("featuresStatus", serialize($v) );	}	
 	
 	public function getJobTypeQuota($jobType, $jobSubType) {
 		$jobTypeQuota = $this->getFromCustomData("jobTypeQuota");
@@ -481,19 +487,31 @@ class Partner extends BasePartner
 		$newFeatureStatus->setType($type);
 		$newFeatureStatus->setValue($value);
 		
-		$this->putInCustomData($type, $newFeatureStatus, 'featuresStatus');
+		$featuresStatus = $this->getFeaturesStatus();
+		$featuresStatus[$newFeatureStatus->getType()] = $newFeatureStatus;
+		
+		$this->setFeaturesStatus($featuresStatus);
 		$this->save();
 	}
 	
 	public function removeFeaturesStatus($type)
 	{
-		$this->removeFromCustomData($type, 'featuresStatus');
+		$featuresStatus = $this->getFeaturesStatus();
+		if(isset($featuresStatus[$type]))
+			unset($featuresStatus[$type]);
+		
+		$this->setFeaturesStatus($featuresStatus);
 		$this->save();
 	}
 	
 	public function getFeaturesStatusByType($type)
 	{
-		return $this->getFromCustomData($type, 'featuresStatus');
+		$featuresStatus = $this->getFeaturesStatus();
+		
+		if(isset($featuresStatus[$type]))
+			return $featuresStatus[$type];
+			
+		return null;
 	}
 	
 	public function resetFeaturesStatusByType($type)
@@ -515,14 +533,24 @@ class Partner extends BasePartner
 		
 		$batchJob = BatchJobPeer::doSelectOne($criteria);
 		
+		$featuresStatuses = $this->getFeaturesStatus();
+
 		if($batchJob)
 		{
-			$this->addFeaturesStatus($type);
+			$newFeatureStatus = new kFeatureStatus();
+			$newFeatureStatus->setType($type);
+			$newFeatureStatus->setValue(1);
+		
+			$featuresStatuses[$type] = $newFeatureStatus;
 		}
-		else
+		elseif(isset($featuresStatuses[$type]))
 		{
-			$this->removeFeaturesStatus($type);
+			unset($featuresStatuses[$type]);
 		}
+		
+		$this->setFeaturesStatus($featuresStatuses);
+		$this->setUpdatedAt(time());
+		$this->save();
 	}
 	
 	/**
@@ -1206,6 +1234,15 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('role_cache_dirty_at');
 	}
 	
+	public function setI18nTemplatePartnerId ($v)
+	{
+		$this->putInCustomData('i18n_template_partner_id', $v);
+	}
+	
+	public function getI18nTemplatePartnerId ()
+	{
+		$this->getFromCustomData('i18n_template_partner_id');
+	}
 	
 	// -------------------------------------------------
 	// -- start of account owner kuser related functions

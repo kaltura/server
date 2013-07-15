@@ -43,6 +43,14 @@ abstract class objectWrapperBase implements Iterator
 		self::$s_should_wrap = $v;
 	}
 
+	public static function classForName ( $clazz_name )
+	{
+		echo __METHOD__ . " $clazz_name";
+		require_once  ( "lib/model/" . $clazz_name . ".php" );
+		$clazz = get_class( $clazz_name );
+		return  new $clazz();
+	}
+
 	// will return the proper object wrapper
 	public static function getWrapperClass ( $obj , $detail_level = self::DETAIL_LEVEL_REGULAR ,
 		$detail_policy_velocity = -3 , $recursion_depth = 0 , $extra_fields = null)

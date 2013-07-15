@@ -223,7 +223,10 @@ class myPartnerRegistration
 	 	if (!$fromPartner)
 	 		KalturaLog::log("Template content partner was not found!");
  		else
+ 		{
+ 			$newPartner->setI18nTemplatePartnerId($templatePartnerId);
 	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner, true);
+ 		}
 	 		
 	 	if ($newPartner->getType() == Partner::PARTNER_TYPE_WORDPRESS)
 	 		kPermissionManager::setPs2Permission($newPartner);
@@ -485,6 +488,8 @@ class myPartnerRegistration
 			$entry->setCreatorKuserId($kuserId);
 			$entry->save();
 		}
+		
+		kEventsManager::flushEvents();
 		
 		// restore the original partner id in the default category criteria filter
 		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);

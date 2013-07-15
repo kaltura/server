@@ -22,12 +22,10 @@ class ShortLinkPeer extends BaseShortLinkPeer {
 	 * @param      PropelPDO $con the connection to use
 	 * @return     array<ShortLink>
 	 */
-	public static function retrieveByKuserId($kuserId, $partnerId = null, PropelPDO $con = null)
+	public static function retrieveByKuserId($kuserId, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(ShortLinkPeer::KUSER_ID, $kuserId);
-		if ($partnerId)
-			$criteria->add(ShortLinkPeer::PARTNER_ID, $partnerId);
 
 		return ShortLinkPeer::doSelect($criteria, $con);
 	}

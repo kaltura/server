@@ -1160,17 +1160,6 @@ abstract class BasecategoryKuser extends BaseObject  implements Persistent {
 		parent::postUpdate($con);
 	}
 	/**
-	 * Code to be run after deleting the object from database
-	 * @param PropelPDO $con
-	 */
-	public function postDelete(PropelPDO $con = null)
-	{
-		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
-		
-		parent::postDelete($con);
-	}
-	
-	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
 	 */

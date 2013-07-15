@@ -1638,13 +1638,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 	
-	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v )		{	$this->putInCustomData ( "createThumb" , (bool) $v );	}
 	public function getCreateThumb (  )			{	return (bool) $this->getFromCustomData( "createThumb" ,null, true );	}
-	
-	// indicates that duration shouldn't be auto calculated, because it already supplied by the user
-	public function setCalculateDuration ( $v )		{	$this->putInCustomData ( "calculateDuration" , (bool) $v );	}
-	public function getCalculateDuration (  )			{	return (bool) $this->getFromCustomData( "calculateDuration" ,null, true );	}
 	
 	public function setThumbBitrate ( $v )		{	$this->putInCustomData ( "thumbBitrate" , $v );	}
 	public function getThumbBitrate (  )			{	return $this->getFromCustomData( "thumbBitrate", null, 0 );	}
@@ -1917,9 +1912,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function updateVideoDimensions ( )
 	{
 		$asset = assetPeer::retrieveHighestBitrateByEntryId($this->getId());
-		if(!$asset)
-			return array($this->getFromCustomData('width'), $this->getFromCustomData('height'));
-			
 		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$dataPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		list ( $width , $height ) = $arr = myFileConverter::getVideoDimensions( $dataPath );

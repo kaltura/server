@@ -389,11 +389,11 @@ class categoryPeer extends BasecategoryPeer
 				
 		$c->addAnd ( $crit );
 		
-		$c->applyFilters();
-			
-		$categoryIds = $c->getFetchedIds();
-					
-		return $categoryIds;
+		categoryPeer::setUseCriteriaFilter(false);
+		$categories = self::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		return $categories;
 	}
 	
 	/**

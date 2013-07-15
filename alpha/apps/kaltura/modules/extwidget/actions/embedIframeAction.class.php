@@ -114,7 +114,7 @@ class embedIframeAction extends sfAction
 			header("Pragma: no-cache");
 			header("Location:$cachedResponse");
 				
-			KExternalErrors::dieGracefully();
+			die;
 		}
 
 		$uiconf_id = $this->getRequestParameter('uiconf_id');
@@ -159,7 +159,6 @@ class embedIframeAction extends sfAction
 		if ($allowCache)
 			$cache->put($requestKey, $url);
 
-		KExternalErrors::terminateDispatch();
 		$this->redirect($url);
 	}
 }

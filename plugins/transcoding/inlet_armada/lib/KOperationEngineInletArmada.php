@@ -46,15 +46,15 @@ $trgPrefixWindows = null;
 
 			// ---------------------------------
 			// Evaluate and set various Inlet Armada session params
-		if($this->taskConfig->params->InletStorageRootWindows) $srcPrefixWindows = $this->taskConfig->params->InletStorageRootWindows;
-		if($this->taskConfig->params->InletStorageRootLinux)   $srcPrefixLinux = $this->taskConfig->params->InletStorageRootLinux;
-		if($this->taskConfig->params->InletTmpStorageWindows)  $trgPrefixWindows = $this->taskConfig->params->InletTmpStorageWindows;
+		if(KBatchBase::$taskConfig->params->InletStorageRootWindows) $srcPrefixWindows = KBatchBase::$taskConfig->params->InletStorageRootWindows;
+		if(KBatchBase::$taskConfig->params->InletStorageRootLinux)   $srcPrefixLinux = KBatchBase::$taskConfig->params->InletStorageRootLinux;
+		if(KBatchBase::$taskConfig->params->InletTmpStorageWindows)  $trgPrefixWindows = KBatchBase::$taskConfig->params->InletTmpStorageWindows;
 
-		$url = $this->taskConfig->params->InletArmadaUrl;
-		$login = $this->taskConfig->params->InletArmadaLogin;
-		$passw = $this->taskConfig->params->InletArmadaPassword;
-		if($this->taskConfig->params->InletArmadaPriority)
-			$priority = $this->taskConfig->params->InletArmadaPriority;
+		$url = KBatchBase::$taskConfig->params->InletArmadaUrl;
+		$login = KBatchBase::$taskConfig->params->InletArmadaLogin;
+		$passw = KBatchBase::$taskConfig->params->InletArmadaPassword;
+		if(KBatchBase::$taskConfig->params->InletArmadaPriority)
+			$priority = KBatchBase::$taskConfig->params->InletArmadaPriority;
 		else
 			$priority = 5;
 			// ----------------------------------
@@ -101,7 +101,7 @@ $trgPrefixWindows = null;
 			$srcFileWindows  = $inFilePath;
 			
 		if(isset($trgPrefixWindows)){
-			$trgPrefixLinux = $this->addLastSlashInFolderPath($this->taskConfig->params->localTempPath, "/");
+			$trgPrefixLinux = $this->addLastSlashInFolderPath(KBatchBase::$taskConfig->params->localTempPath, "/");
 			$trgPrefixWindows = $this->addLastSlashInFolderPath($trgPrefixWindows, "\\");
 			$outFileWindows = str_replace($trgPrefixLinux, $trgPrefixWindows, $this->outFilePath);
 		}
@@ -143,11 +143,11 @@ $trgPrefixWindows = null;
 			}
 			$attemptCnt++;
 		}
-//KalturaLog::debug("XXX taskConfig=>".print_r($this->taskConfig,1));
+//KalturaLog::debug("XXX taskConfig=>".print_r(KBatchBase::$taskConfig,1));
 		KalturaLog::debug("Job completed successfully - ".print_r($rvObj,1));
 
 		if($trgPrefixWindows) {
-			$trgPrefixLinux = $this->addLastSlashInFolderPath($this->taskConfig->params->sharedTempPath, "/");
+			$trgPrefixLinux = $this->addLastSlashInFolderPath(KBatchBase::$taskConfig->params->sharedTempPath, "/");
 			$outFileLinux = str_replace($trgPrefixWindows, $trgPrefixLinux, $rvObj->job_list[0]->job_output_file);
 //KalturaLog::debug("XXX str_replace($trgPrefixWindows, ".$trgPrefixLinux.", ".$rvObj->job_list[0]->job_output_file.")==>$outFileLinux");
 		}
@@ -166,20 +166,20 @@ $trgPrefixWindows = null;
 	/*************************************
 	 * 
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
+	public function configure(KalturaConvartableJobData $data, KalturaBatchJob $job)
 	{
-		parent::configure($taskConfig, $data, $job, $client, $clientConfig);
+		parent::configure($data, $job);
 		
 		$errStr=null;
-		if(!$taskConfig->params->InletArmadaUrl)
+		if(!KBatchBase::$taskConfig->params->InletArmadaUrl)
 			$errStr="InletArmadaUrl";
-		if(!$taskConfig->params->InletArmadaLogin){
+		if(!KBatchBase::$taskConfig->params->InletArmadaLogin){
 			if($errStr) 
 				$errStr.=",InletArmadaLogin";
 			else
 				$errStr="InletArmadaLogin";
 		}
-		if(!$taskConfig->params->InletArmadaPassword){
+		if(!KBatchBase::$taskConfig->params->InletArmadaPassword){
 			if($errStr) 
 				$errStr.=",InletArmadaPassword";
 			else

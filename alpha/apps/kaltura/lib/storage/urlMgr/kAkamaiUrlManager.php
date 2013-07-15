@@ -113,7 +113,7 @@ class kAkamaiUrlManager extends kUrlManager
 			if($this->clipTo)
 				$url .= "/clipTo/$this->clipTo";
 
-			if($this->protocol == "hdnetworksmil" && isset($this->params["hd_flash"]))
+			if($this->protocol == "hdnetworksmil")
 			{
 				$url = "http://".$this->params["hd_flash"].$url.'/forceproxy/true';
 			}

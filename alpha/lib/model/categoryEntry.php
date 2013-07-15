@@ -38,15 +38,11 @@ class categoryEntry extends BasecategoryEntry {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		if ($this->getStatus() != CategoryEntryStatus::DELETED)
-		{
-			$category = categoryPeer::retrieveByPK($this->getCategoryId());
-			if(!$category)
-				return false;
+		$category = categoryPeer::retrieveByPK($this->getCategoryId());
+		if(!$category)
+			return false;
 			
-			$this->setCategoryFullIds($category->getFullIds());
-		}
-			
+		$this->setCategoryFullIds($category->getFullIds());
 		return parent::preSave();
 	}
 	

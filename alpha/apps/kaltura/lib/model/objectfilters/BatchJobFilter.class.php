@@ -28,12 +28,7 @@ class BatchJobFilter extends baseObjectFilter
 			"_gte_lock_version",
 			"_lte_lock_version",
 			"_lt_estimated_effort",
-			"_gt_estimated_effort",
-	 		"_gte_urgency",
-	 		"_lte_urgency",
-	 		"_gte_batch_version",
-	 		"_lte_batch_version",
-	 		"_eq_batch_version");
+			"_gt_estimated_effort",);
 	
 	protected $BATCH_JOB_COMMON_FIELDS = array(
 			"_eq_id",

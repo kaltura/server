@@ -33,7 +33,7 @@ class KAsyncTagIndex extends KJobHandlerWorker
 	protected function reIndexTags (KalturaBatchJob $job)
 	{
 		KalturaLog::info("Re-indexing tags according to privacy contexts");
-		$tagPlugin = KalturaTagSearchClientPlugin::get($this->kClient);
+		$tagPlugin = KalturaTagSearchClientPlugin::get(self::$kClient);
 		$this->impersonate($job->partnerId);
 		try 
 		{

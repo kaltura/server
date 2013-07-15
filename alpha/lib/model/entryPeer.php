@@ -367,9 +367,12 @@ class entryPeer extends BaseentryPeer
 				$critEntitledKusers->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 
 				$categoriesIds = array();
-				$categoriesIds = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kCurrentContext::getCurrentKsKuserId(), kConf::get('category_search_limit'));
-				if(count($categoriesIds) >= kConf::get('category_search_limit'))
+				$categories = categoryPeer::retrieveEntitledAndNonIndexedByKuser(kCurrentContext::getCurrentKsKuserId(), kConf::get('category_search_limit'));
+				if(count($categories) >= kConf::get('category_search_limit'))
 					self::$kuserBlongToMoreThanMaxCategoriesForSearch = true;
+
+				foreach($categories as $category)
+					$categoriesIds[] = $category->getId();
 
 				if (count($categoriesIds))
 				{
@@ -382,9 +385,7 @@ class entryPeer extends BaseentryPeer
 			}
 
 			//user should be able to get all entries s\he uploaded - outside the privacy context
-			$kuser = kCurrentContext::getCurrentKsKuserId();
-			if($kuser !== 0)
-				$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , $kuser , Criteria::EQUAL);
+			$critKuser = $c->getNewCriterion(entryPeer::KUSER_ID , kCurrentContext::getCurrentKsKuserId(), Criteria::EQUAL);
 			$critKuser->addTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
 			$critEntitled->addOr($critKuser);
 		}

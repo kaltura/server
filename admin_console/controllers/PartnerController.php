@@ -26,7 +26,12 @@ class PartnerController extends Zend_Controller_Action
 		$systemPartnerPlugin->systemPartner->getPackages();
 		$systemPartnerPlugin->systemPartner->getPackagesVertical();
 		$systemPartnerPlugin->systemPartner->getPackagesClassOfService();
-		list($packages, $packagesVertical, $packagesClassOfService) = $client->doMultiRequest();
+		//Retrieve partner 0 template partners.
+		$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
+		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
+		$partnerFilter->partnerParentIdEqual = 0;
+		$systemPartnerPlugin->systemPartner->listAction($partnerFilter);
+		list($packages, $packagesVertical, $packagesClassOfService, $templatePartners) = $client->doMultiRequest();
 		
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service-paid')))
 		{
@@ -38,13 +43,7 @@ class PartnerController extends Zend_Controller_Action
 		Form_PackageHelper::addPackagesToForm($form, $packages,					'partner_package', $allowNonePackage);
 		Form_PackageHelper::addPackagesToForm($form, $packagesVertical,			'vertical_clasiffication');
 		Form_PackageHelper::addPackagesToForm($form, $packagesClassOfService,	'partner_package_class_of_service');
-		
-		//Retrieve partner 0 template partners.
-		$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
-		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
-		$partnerFilter->partnerParentIdEqual = 0;
-		$result = $systemPartnerPlugin->systemPartner->listAction($partnerFilter);
-		Form_PackageHelper::addOptionsToForm($form, $result->objects, 'template_partner_id', 'name');
+		Form_PackageHelper::addOptionsToForm($form, $templatePartners->objects, 'partner_template_id', 'name');
 		
 		//Add languages
 		$languages = Zend_Registry::get('config')->languages;

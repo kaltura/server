@@ -4,7 +4,7 @@
 		<serviceUrl>@SERVICE_URL@</serviceUrl>
 		<partnerId>-4</partnerId>
 		<clientTag>Stand alone php 1.0.0</clientTag>
-		<curlTimeout>120</curlTimeout>
+		<curlTimeout>30</curlTimeout>
 		<userAgent>Stand alone php 1.0.0</userAgent>
 		<verifySSL objectType="bool">0</verifySSL>
 	</config>

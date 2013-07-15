@@ -63,7 +63,6 @@ if($includeCode)
 	echo implode(PHP_EOL, $code);
 }
 
-echo "Deployed successfully\n";
 exit(0);
 
 /**
@@ -357,19 +356,20 @@ class uiConfDeployment
 		
 		$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
-		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
 		
 		$ret = null;
-		chmod($localPath, 0640);
+		passthru("chmod 640 $localPath", $ret);
+		if($ret !== 0)
+		{
+			KalturaLog::debug("chmod [640] failed on path [$localPath]");
+			exit(1);
+		}
 	
-		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
-			return $pe_conf->getId();
-		
 		$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
 		passthru("chown $user_group $localPath", $ret);
-		if($ret !== 0 && $ret !== 127)
+		if($ret !== 0)
 		{
-			KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
+			KalturaLog::debug("chown [$user_group] failed on path [$localPath]");
 			exit(1);
 		}
 
@@ -459,12 +459,14 @@ class uiConfDeployment
 		
 		$sync_key = $uiconf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
-		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
 	
-		chmod($localPath, 0640);
-	
-		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
-			return;
+		$ret = null;
+		passthru("chmod 640 $localPath", $ret);
+		if($ret !== 0)
+		{
+			KalturaLog::debug("chmod [640] failed on path [$localPath]");
+			exit(1);
+		}
 	
 		$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
 		passthru("chown $user_group $localPath", $ret);

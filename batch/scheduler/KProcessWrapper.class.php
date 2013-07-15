@@ -37,60 +37,48 @@ class KProcessWrapper
 	private $processId;
 	
 	/**
-	 * Whether the process wrapper is mocked.
-	 * @var boolean
-	 */
-	private $isMockedProcess;
-	
-	public function __construct(KSchedularTaskConfig $taskConfig, $taskIndex) {
-		$taskConfig->setTaskIndex($taskIndex);
-		$this->taskConfig = $taskConfig;
-		
-		$this->dieTime = time() + $taskConfig->maximumExecutionTime + 5;
-	}
-	
-	public function initMockedProcess($procId) 
-	{
-		$this->processId = $procId;
-		$this->isMockedProcess = true;
-	}
-	
-	/**
 	 * @param int $taskIndex
 	 * @param string $logDir
 	 * @param string $phpPath
 	 * @param string $tasksetPath
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function init($logDir, $phpPath, $tasksetPath)
+	public function __construct($taskIndex, $logDir, $phpPath, $tasksetPath, KSchedularTaskConfig $taskConfig) // , $cwd, $env , $other_options  = null )
 	{
-		$idx = $this->taskConfig->getTaskIndex();
-		$logName = str_replace('kasync', '', strtolower($this->taskConfig->name));
+		$taskConfig->setTaskIndex($taskIndex);
+		$logName = str_replace('kasync', '', strtolower($taskConfig->name));
 		$logDate = date('Y-m-d');
-		$logFile = "$logDir/$logName-$idx-$logDate.log";
-	
-		$taskConfigStr = base64_encode(gzcompress(serialize($this->taskConfig)));
+		$logFile = "$logDir/$logName-$taskIndex-$logDate.log";
+		$sysLogFile = "$taskConfig->name.$taskIndex";
+		
+		$this->taskConfig = $taskConfig;
+		
+		$taskConfigStr = base64_encode(gzcompress(serialize($taskConfig)));
 		
 		$cmdLine = '';
-		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-			// Set the process as its own session leader
-			$cmdLine = 'setsid ';
-		}
-		$cmdLine .= "$phpPath ";
-		$cmdLine .= realpath(__DIR__ . '/../') . '/' . $this->taskConfig->scriptPath . ' ';
+		$cmdLine .= (is_null($taskConfig->affinity) ? '' : "$tasksetPath -c " . ($taskConfig->affinity + $taskIndex) . ' ');
+		$cmdLine = "$phpPath ";
+		$cmdLine .= "$taskConfig->scriptPath ";
 		$cmdLine .= "$taskConfigStr ";
 		$cmdLine .= "'[" . mt_rand() . "]' ";
 		$cmdLine .= ">> $logFile 2>&1";
 		
 		
 		$descriptorspec = array(); // stdin is a pipe that the child will read from
+//		$descriptorspec = array(0 => array("pipe", "r")); // stdin is a pipe that the child will read from
+//			1 => array ( "file" ,$logFile , "a"  ) ,
+//			2 => array ( "file" ,$logFile , "a"  ) ,
+//			1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+//			2 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+//			2 => array("file", "{$work_dir}/error-output.txt", "a") // stderr is a file to write to
+		
 		$other_options = array('suppress_errors' => FALSE, 'bypass_shell' => FALSE);
 		
 		KalturaLog::debug("Now executing [$cmdLine], [$other_options]");
 		$process = proc_open($cmdLine, $descriptorspec, $pipes, null, null, $other_options);
 		$this->pipes = $pipes;
 		$this->handle = $process;
-		$this->isMockedProcess = false;
+		$this->dieTime = time() + $taskConfig->maximumExecutionTime + 5;
 	}
 	
 	public function __destruct()
@@ -122,14 +110,7 @@ class KProcessWrapper
 		if($this->dieTime < time())
 			return false;
 		
-		if($this->isMockedProcess) {
-			$res = $this->checkMockedProcessRunning();	
-			if(!$res)
-				$this->processId = null;
-			return $res;
-		}
-		
-		if(!is_resource($this->handle))
+		if(! is_resource($this->handle))
 			return false;
 		
 		$status = proc_get_status($this->handle);
@@ -150,19 +131,21 @@ class KProcessWrapper
 			$this->pipes = null;
 		}
 		
-		if($this->isMockedProcess) {
-			$this->killProcess();
-			KScheduleHelperManager::unlinkRunningBatch($this->taskConfig->name, $this->taskConfig->getTaskIndex());
-			return;
-		}
-		
 		if($this->handle && is_resource ($this->handle))
 		{
 			$status = proc_get_status ( $this->handle );
 			if(!$status ['running'])
 				return;
 			
-			$this->killProcess();
+			KalturaLog::notice("About to kill process " . $this->processId);
+			if ($this->processId) {
+				if(function_exists ( 'posix_kill' )){
+					posix_kill ( $this->processId, 9 );
+				} else {
+					// Make sure we kill the child process (the PHP)
+					system ( "kill " . $this->processId, $rc );
+				}
+			}
 			
 			proc_terminate ( $this->handle );
 			proc_close ( $this->handle );
@@ -170,19 +153,6 @@ class KProcessWrapper
 			$this->handle = null;
 		}
 	}
-	
-	private function killProcess() {
-		KalturaLog::notice("About to kill process " . $this->processId);
-		if ($this->processId) {
-			if(function_exists ( 'posix_kill' )){
-				posix_kill ( $this->processId, 9 );
-			} else {
-				// Make sure we kill the child process (the PHP)
-				system ( "kill " . $this->processId, $rc );
-			}
-		}
-	}
-
 	
 	/**
 	 * @param int $processId
@@ -192,14 +162,5 @@ class KProcessWrapper
 		$this->processId = $processId;
 	}
 
-	
-	public function checkMockedProcessRunning() {
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			exec ( "tasklist /FI \"PID eq " . $this->processId . "\"", $rc);
-			return (strpos($rc[0], "No tasks are running which match the specified criteria") === FALSE);
-		} else {
-		    system('kill -0 ' . $this->processId, $rc);
-		    return ($rc == 0);
-		}
-	}
+
 }

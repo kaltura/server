@@ -9,12 +9,9 @@ require_once(dirname(__file__) . '/kRendererBase.php');
  */
 class kRendererDumpFile implements kRendererBase
 {
-	const CACHE_FILE_CONTENTS_MAX_SIZE = 262144;	// 256K
-	
 	protected $filePath;
 	protected $fileExt;
 	protected $fileSize;
-	protected $fileData;
 	protected $mimeType;
 	protected $maxAge;
 	protected $xSendFileAllowed;
@@ -35,18 +32,13 @@ class kRendererDumpFile implements kRendererBase
 			$this->fileSize = kFile::fileSize($filePath);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
-		
-		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
-		{
-			$this->fileData = file_get_contents($this->filePath);
-		}
 	}
 	
 	public function output()
 	{
 		$useXsendFile = false;
 		$rangeLength = null;
-		if (!$this->fileData && $this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
+		if ($this->xSendFileAllowed && in_array('mod_xsendfile', apache_get_modules()))
 			$useXsendFile = true;
 		else
 			list($rangeFrom, $rangeTo, $rangeLength) = infraRequestUtils::handleRangeRequest($this->fileSize);
@@ -58,11 +50,7 @@ class kRendererDumpFile implements kRendererBase
 		header("Accept-Ranges: bytes");
 		header("Access-Control-Allow-Origin:*");		
 
-		if ($this->fileData)
-		{
-			echo substr($this->fileData, $rangeFrom, $rangeLength);
-		}
-		else if ($useXsendFile)
+		if ($useXsendFile)
 		{
 			header('X-Kaltura-Sendfile:');
 			header("X-Sendfile: {$this->filePath}");

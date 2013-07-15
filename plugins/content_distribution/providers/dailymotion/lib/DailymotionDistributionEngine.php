@@ -29,13 +29,13 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		parent::configure($taskConfig);
+		parent::configure();
 		
-		if($taskConfig->params->tempXmlPath)
+		if(KBatchBase::$taskConfig->params->tempXmlPath)
 		{
-			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
+			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
 				mkdir($this->tempXmlPath, 0777, true);
 		}
@@ -45,13 +45,13 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 			$this->tempXmlPath = sys_get_temp_dir();
 		}
 		
-		if (isset($taskConfig->params->dailymotion))
+		if (isset(KBatchBase::$taskConfig->params->dailymotion))
 		{
-			if (isset($taskConfig->params->dailymotion->requestTimeout))
-				$this->requestTimeout = $taskConfig->params->dailymotion->requestTimeout;
+			if (isset(KBatchBase::$taskConfig->params->dailymotion->requestTimeout))
+				$this->requestTimeout = KBatchBase::$taskConfig->params->dailymotion->requestTimeout;
 				
-			if (isset($taskConfig->params->dailymotion->connectTimeout))
-				$this->connectTimeout = $taskConfig->params->dailymotion->connectTimeout;
+			if (isset(KBatchBase::$taskConfig->params->dailymotion->connectTimeout))
+				$this->connectTimeout = KBatchBase::$taskConfig->params->dailymotion->connectTimeout;
 		}
 	}
 

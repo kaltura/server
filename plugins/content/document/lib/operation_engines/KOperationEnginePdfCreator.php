@@ -105,12 +105,12 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			@unlink($tmpUniqInFilePath);
 		}
 		
-		$sleepTimes = $this->taskConfig->fileExistReties;
+		$sleepTimes = kBatchBase::$taskConfig->fileExistReties;
 		if (!$sleepTimes){
 			$sleepTimes = self::DEFAULT_SLEEP_TIMES;
 		}
 		
-		$sleepSeconds = $this->taskConfig->fileExistInterval;
+		$sleepSeconds = kBatchBase::$taskConfig->fileExistInterval;
 		if (!$sleepSeconds){
 			$sleepSeconds = self::DEFAULT_SLEEP_SECONDS;
 		}
@@ -141,11 +141,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		// $this->validateOutput($inFilePath, $tmpFile);
 		
-		$fileUnlockRetries = $this->taskConfig->params->fileUnlockRetries ;
+		$fileUnlockRetries = kBatchBase::$taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
 			$fileUnlockRetries = self::DEFAULT_FILE_UNLOCK_RETRIES;
 		}
-		$fileUnlockInterval = $this->taskConfig->params->fileUnlockInterval;
+		$fileUnlockInterval = kBatchBase::$taskConfig->params->fileUnlockInterval;
 		if(!$fileUnlockInterval){
 			$fileUnlockInterval = self::DEFAULT_FILE_UNLOCK_INTERVAL; 
 		}
@@ -170,7 +170,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	
 	private function validateOutput($inFilePath, $outFilePath)
 	{
-		$pdfInfo = $this->taskConfig->params->pdfInfo;
+		$pdfInfo = kBatchBase::$taskConfig->params->pdfInfo;
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
 			$inputNum = $this->getNumberOfPages($pdfInfo, $inFilePath);
@@ -193,7 +193,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 	private function getKillPopupsPath() 
 	{
-		$killPopupsPath = $this->taskConfig->params->killPopupsPath;
+		$killPopupsPath = kBatchBase::$taskConfig->params->killPopupsPath;
 		if(!$killPopupsPath){
 			$killPopupsPath = self::DEFAULT_KILL_POPUPS_PATH;
 		}
