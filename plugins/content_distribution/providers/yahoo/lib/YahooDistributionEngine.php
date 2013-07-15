@@ -22,9 +22,9 @@ class YahooDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		parent::configure($taskConfig);
+		parent::configure();
 		
 		$this->tempXmlPath = sys_get_temp_dir();
 	}
@@ -218,7 +218,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$ftpHost = $distributionProfile->ftpHost;
 		$ftpUsername = $distributionProfile->ftpUsername;
 		$ftpPassword = $distributionProfile->ftpPassword;
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = true;
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$ftpManager){
@@ -235,12 +235,12 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$flavorAssetFilter->idIn = $entryDistribution->flavorAssetIds;
 		
 		try {
-			$this->impersonate($entryDistribution->partnerId);
-			$flavorAssets = $this->kalturaClient->flavorAsset->listAction($flavorAssetFilter);
-			$this->unimpersonate();
+			KBatchBase::impersonate($entryDistribution->partnerId);
+			$flavorAssets = KBatchBase::$kClient->flavorAsset->listAction($flavorAssetFilter);
+			KBatchBase::unimpersonate();
 		}
 		catch (Exception $e) {
-			$this->unimpersonate();
+			KBatchBase::unimpersonate();
 			throw $e;
 		}
 		
@@ -254,12 +254,12 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$thumbAssetFilter->idIn = $entryDistribution->thumbAssetIds;
 		
 		try {
-			$this->impersonate($entryDistribution->partnerId);
-			$thumbAssets = $this->kalturaClient->thumbAsset->listAction($thumbAssetFilter);
-			$this->unimpersonate();
+			KBatchBase::impersonate($entryDistribution->partnerId);
+			$thumbAssets = KBatchBase::$kClient->thumbAsset->listAction($thumbAssetFilter);
+			KBatchBase::unimpersonate();
 		}
 		catch (Exception $e) {
-			$this->unimpersonate();
+			KBatchBase::unimpersonate();
 			throw $e;
 		}
 		

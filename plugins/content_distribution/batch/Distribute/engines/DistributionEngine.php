@@ -4,17 +4,7 @@
  * @subpackage Scheduler.Distribute
  */
 abstract class DistributionEngine implements IDistributionEngine
-{
-	/**
-	 * @var KalturaClient
-	 */
-	protected $kalturaClient = null;
-	
-	/**
-	 * @var KSchedularTaskConfig
-	 */
-	protected $taskConfig = null;
-	
+{	
 	/**
 	 * @var int
 	 */
@@ -28,11 +18,10 @@ abstract class DistributionEngine implements IDistributionEngine
 	/**
 	 * @param string $interface
 	 * @param KalturaDistributionProviderType $providerType
-	 * @param KSchedularTaskConfig $taskConfig
 	 * @param KalturaDistributionJobData $data
 	 * @return DistributionEngine
 	 */
-	public static function getEngine($interface, $providerType, KalturaClient $kalturaClient, KSchedularTaskConfig $taskConfig, KalturaDistributionJobData $data)
+	public static function getEngine($interface, $providerType, KalturaDistributionJobData $data)
 	{
 		$engine = null;
 		if($providerType == KalturaDistributionProviderType::GENERIC)
@@ -46,8 +35,8 @@ abstract class DistributionEngine implements IDistributionEngine
 		
 		if($engine)
 		{
-			$engine->setClient($kalturaClient);
-			$engine->configure($taskConfig, $data);
+			$engine->setClient();
+			$engine->configure($data);
 		}
 		
 		return $engine;
@@ -56,38 +45,20 @@ abstract class DistributionEngine implements IDistributionEngine
 	/* (non-PHPdoc)
 	 * @see IDistributionEngine::setClient()
 	 */
-	public function setClient(KalturaClient $kalturaClient)
+	public function setClient()
 	{
-		$this->kalturaClient = $kalturaClient;
-		
-		$config = $this->kalturaClient->getConfig();
+		$config = KBatchBase::$kClient->getConfig();
 		$this->partnerId = $config->partnerId;
 	}
 	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngine::setClient()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		$this->taskConfig = $taskConfig;
-	
-		$this->tempDirectory = isset($taskConfig->params->tempDirectoryPath) ? $taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
+		$this->tempDirectory = isset(KBatchBase::$taskConfig->params->tempDirectoryPath) ? KBatchBase::$taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
 		if (!is_dir($this->tempDirectory)) 
 			kFile::fullMkfileDir($this->tempDirectory, 0700, true);
-	}
-	
-	public function unimpersonate()
-	{
-		$config = $this->kalturaClient->getConfig();
-		$config->partnerId = $this->partnerId;
-		$this->kalturaClient->setConfig($config);
-	}
-	
-	public function impersonate($partnerId)
-	{
-		$config = $this->kalturaClient->getConfig();
-		$config->partnerId = $partnerId;
-		$this->kalturaClient->setConfig($config);
 	}
 
 	/**
@@ -96,9 +67,9 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getEntry($partnerId, $entryId)
 	{
-		$this->impersonate($partnerId);
-		$entry = $this->kalturaClient->baseEntry->get($entryId);
-		$this->unimpersonate();
+		KBatchBase::impersonate($partnerId);
+		$entry = KBatchBase::$kClient->baseEntry->get($entryId);
+		KBatchBase::unimpersonate();
 		
 		return $entry;
 	}
@@ -109,11 +80,12 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getFlavorAssets($partnerId, $flavorAssetIds)
 	{
-		$this->impersonate($partnerId);
+		KBatchBase::impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $flavorAssetIds;
-		$flavorAssetsList = $this->kalturaClient->flavorAsset->listAction($filter);
-		$this->unimpersonate();
+		$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($filter);
+		KBatchBase::unimpersonate();
+		
 		return $flavorAssetsList->objects;
 	}
 
@@ -123,11 +95,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getThumbAssets($partnerId, $thumbAssetIds)
 	{
-		$this->impersonate($partnerId);
+		KBatchBase::impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $thumbAssetIds;
-		$thumbAssetsList = $this->kalturaClient->thumbAsset->listAction($filter);
-		$this->unimpersonate();
+		$thumbAssetsList = KBatchBase::$kClient->thumbAsset->listAction($filter);
+		KBatchBase::unimpersonate();
 		return $thumbAssetsList->objects;
 	}
 
@@ -137,7 +109,7 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getThumbAssetUrl($thumbAssetId)
 	{
-		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($this->kalturaClient);
+		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get(KBatchBase::$kClient);
 		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($thumbAssetId);
 	
 //		$domain = $this->kalturaClient->getConfig()->serviceUrl;
@@ -150,7 +122,7 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getFlavorAssetUrl($flavorAssetId)
 	{
-		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($this->kalturaClient);
+		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get(KBatchBase::$kClient);
 		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($flavorAssetId);
 	}
 
@@ -193,7 +165,7 @@ abstract class DistributionEngine implements IDistributionEngine
 		if(!class_exists('KalturaMetadata'))
 			return null;
 			
-		$this->impersonate($partnerId);
+		KBatchBase::impersonate($partnerId);
 		
 		$metadataFilter = new KalturaMetadataFilter();
 		$metadataFilter->objectIdEqual = $objectId;
@@ -205,9 +177,9 @@ abstract class DistributionEngine implements IDistributionEngine
 		
 		$metadataPager = new KalturaFilterPager();
 		$metadataPager->pageSize = 1;
-		$metadataListResponse = $this->kalturaClient->metadata->listAction($metadataFilter, $metadataPager);
+		$metadataListResponse = KBatchBase::$kClient->metadata->listAction($metadataFilter, $metadataPager);
 		
-		$this->unimpersonate();
+		KBatchBase::unimpersonate();
 		
 		if(!$metadataListResponse->totalCount)
 			throw new Exception("No metadata objects found");
