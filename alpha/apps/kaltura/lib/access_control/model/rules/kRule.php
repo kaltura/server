@@ -156,8 +156,12 @@ class kRule
 		{
 			$context->addAccessControlMessage($this->message);
 		}
-		foreach($this->actions as $action)
-			$context->addAccessControlAction($action);
+		
+		if(is_array($this->actions))
+		{
+			foreach($this->actions as $action)
+				$context->addAccessControlAction($action);
+		}
 				
 		return true;
 	}

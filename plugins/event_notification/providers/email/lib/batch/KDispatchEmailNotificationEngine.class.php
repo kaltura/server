@@ -35,13 +35,13 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::__construct()
 	 */
-	public function __construct()
+	public function __construct(KSchedularTaskConfig $taskConfig, KalturaClient $client)
 	{
-		if(isset(KBatchBase::$taskConfig->params->defaultFromMail) && KBatchBase::$taskConfig->params->defaultFromMail)
-			$this->defaultFromMail = KBatchBase::$taskConfig->params->defaultFromMail;
+		if(isset($taskConfig->params->defaultFromMail) && $taskConfig->params->defaultFromMail)
+			$this->defaultFromMail = $taskConfig->params->defaultFromMail;
 			
-		if(isset(KBatchBase::$taskConfig->params->defaultFromName) && KBatchBase::$taskConfig->params->defaultFromName)
-			$this->defaultFromName = KBatchBase::$taskConfig->params->defaultFromName;
+		if(isset($taskConfig->params->defaultFromName) && $taskConfig->params->defaultFromName)
+			$this->defaultFromName = $taskConfig->params->defaultFromName;
 
 		if($this::$mailer)
 		{
@@ -56,65 +56,65 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$this::$mailer->CharSet = 'utf-8';
 			$this::$mailer->SMTPKeepAlive = true;
 		
-			if(isset(KBatchBase::$taskConfig->params->mailPriority) && KBatchBase::$taskConfig->params->mailPriority)
-				$this::$mailer->Priority = 	KBatchBase::$taskConfig->params->mailPriority;
+			if(isset($taskConfig->params->mailPriority) && $taskConfig->params->mailPriority)
+				$this::$mailer->Priority = 	$taskConfig->params->mailPriority;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailCharSet) && KBatchBase::$taskConfig->params->mailCharSet)
-				$this::$mailer->CharSet = KBatchBase::$taskConfig->params->mailCharSet;
+			if(isset($taskConfig->params->mailCharSet) && $taskConfig->params->mailCharSet)
+				$this::$mailer->CharSet = 	$taskConfig->params->mailCharSet;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailContentType) && KBatchBase::$taskConfig->params->mailContentType)
-				$this::$mailer->ContentType = KBatchBase::$taskConfig->params->mailContentType;
+			if(isset($taskConfig->params->mailContentType) && $taskConfig->params->mailContentType)
+				$this::$mailer->ContentType = 	$taskConfig->params->mailContentType;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailEncoding) && KBatchBase::$taskConfig->params->mailEncoding)
-				$this::$mailer->Encoding = 	KBatchBase::$taskConfig->params->mailEncoding;
+			if(isset($taskConfig->params->mailEncoding) && $taskConfig->params->mailEncoding)
+				$this::$mailer->Encoding = 	$taskConfig->params->mailEncoding;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailWordWrap) && KBatchBase::$taskConfig->params->mailWordWrap)
-				$this::$mailer->WordWrap = 	KBatchBase::$taskConfig->params->mailWordWrap;
+			if(isset($taskConfig->params->mailWordWrap) && $taskConfig->params->mailWordWrap)
+				$this::$mailer->WordWrap = 	$taskConfig->params->mailWordWrap;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailMailer) && KBatchBase::$taskConfig->params->mailMailer)
-				$this::$mailer->Mailer = 	KBatchBase::$taskConfig->params->mailMailer;
+			if(isset($taskConfig->params->mailMailer) && $taskConfig->params->mailMailer)
+				$this::$mailer->Mailer = 	$taskConfig->params->mailMailer;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSendmail) && KBatchBase::$taskConfig->params->mailSendmail)
-				$this::$mailer->Sendmail = 	KBatchBase::$taskConfig->params->mailSendmail;
+			if(isset($taskConfig->params->mailSendmail) && $taskConfig->params->mailSendmail)
+				$this::$mailer->Sendmail = 	$taskConfig->params->mailSendmail;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpHost) && KBatchBase::$taskConfig->params->mailSmtpHost)
-				$this::$mailer->Host = 	KBatchBase::$taskConfig->params->mailSmtpHost;
+			if(isset($taskConfig->params->mailSmtpHost) && $taskConfig->params->mailSmtpHost)
+				$this::$mailer->Host = 	$taskConfig->params->mailSmtpHost;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpPort) && KBatchBase::$taskConfig->params->mailSmtpPort)
-				$this::$mailer->Port = 	KBatchBase::$taskConfig->params->mailSmtpPort;
+			if(isset($taskConfig->params->mailSmtpPort) && $taskConfig->params->mailSmtpPort)
+				$this::$mailer->Port = 	$taskConfig->params->mailSmtpPort;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpHeloMessage) && KBatchBase::$taskConfig->params->mailSmtpHeloMessage)
-				$this::$mailer->Helo = 	KBatchBase::$taskConfig->params->mailSmtpHeloMessage;
+			if(isset($taskConfig->params->mailSmtpHeloMessage) && $taskConfig->params->mailSmtpHeloMessage)
+				$this::$mailer->Helo = 	$taskConfig->params->mailSmtpHeloMessage;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpSecure) && KBatchBase::$taskConfig->params->mailSmtpSecure)
-				$this::$mailer->SMTPSecure = 	KBatchBase::$taskConfig->params->mailSmtpSecure;
+			if(isset($taskConfig->params->mailSmtpSecure) && $taskConfig->params->mailSmtpSecure)
+				$this::$mailer->SMTPSecure = 	$taskConfig->params->mailSmtpSecure;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpAuth) && KBatchBase::$taskConfig->params->mailSmtpAuth)
-				$this::$mailer->SMTPAuth = 	KBatchBase::$taskConfig->params->mailSmtpAuth;
+			if(isset($taskConfig->params->mailSmtpAuth) && $taskConfig->params->mailSmtpAuth)
+				$this::$mailer->SMTPAuth = 	$taskConfig->params->mailSmtpAuth;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpUsername) && KBatchBase::$taskConfig->params->mailSmtpUsername)
-				$this::$mailer->Username = 	KBatchBase::$taskConfig->params->mailSmtpUsername;
+			if(isset($taskConfig->params->mailSmtpUsername) && $taskConfig->params->mailSmtpUsername)
+				$this::$mailer->Username = 	$taskConfig->params->mailSmtpUsername;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpPassword) && KBatchBase::$taskConfig->params->mailSmtpPassword)
-				$this::$mailer->Password = 	KBatchBase::$taskConfig->params->mailSmtpPassword;
+			if(isset($taskConfig->params->mailSmtpPassword) && $taskConfig->params->mailSmtpPassword)
+				$this::$mailer->Password = 	$taskConfig->params->mailSmtpPassword;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpTimeout) && KBatchBase::$taskConfig->params->mailSmtpTimeout)
-				$this::$mailer->Timeout = 	KBatchBase::$taskConfig->params->mailSmtpTimeout;
+			if(isset($taskConfig->params->mailSmtpTimeout) && $taskConfig->params->mailSmtpTimeout)
+				$this::$mailer->Timeout = 	$taskConfig->params->mailSmtpTimeout;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpTimeout) && KBatchBase::$taskConfig->params->mailSmtpTimeout)
-				$this::$mailer->Timeout = 	KBatchBase::$taskConfig->params->mailSmtpTimeout;
+			if(isset($taskConfig->params->mailSmtpTimeout) && $taskConfig->params->mailSmtpTimeout)
+				$this::$mailer->Timeout = 	$taskConfig->params->mailSmtpTimeout;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailSmtpKeepAlive) && KBatchBase::$taskConfig->params->mailSmtpKeepAlive)
-				$this::$mailer->SMTPKeepAlive = 	KBatchBase::$taskConfig->params->mailSmtpKeepAlive;
+			if(isset($taskConfig->params->mailSmtpKeepAlive) && $taskConfig->params->mailSmtpKeepAlive)
+				$this::$mailer->SMTPKeepAlive = 	$taskConfig->params->mailSmtpKeepAlive;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailXMailerHeader) && KBatchBase::$taskConfig->params->mailXMailerHeader)
-				$this::$mailer->XMailer = 	KBatchBase::$taskConfig->params->mailXMailerHeader;
+			if(isset($taskConfig->params->mailXMailerHeader) && $taskConfig->params->mailXMailerHeader)
+				$this::$mailer->XMailer = 	$taskConfig->params->mailXMailerHeader;
 				
-			if(isset(KBatchBase::$taskConfig->params->mailErrorMessageLanguage) && KBatchBase::$taskConfig->params->mailErrorMessageLanguage)
-				$this::$mailer->SetLanguage(KBatchBase::$taskConfig->params->mailErrorMessageLanguage);
+			if(isset($taskConfig->params->mailErrorMessageLanguage) && $taskConfig->params->mailErrorMessageLanguage)
+				$this::$mailer->SetLanguage($taskConfig->params->mailErrorMessageLanguage);
 		}
 		
-		parent::__construct();
+		parent::__construct($taskConfig, $client);
 	}
 	
 	/* (non-PHPdoc)
@@ -282,7 +282,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			}
 		}
 		
-		$footer = vsprintf(self::$emailFooterTemplate, array(KBatchBase::$taskConfig->params->forumUrl));	
+		$footer = vsprintf(self::$emailFooterTemplate, array($this->taskConfig->params->forumUrl));	
 		return $footer;
 	} 
 	
@@ -294,7 +294,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 */
 	protected function getRecipientArray (KalturaEmailNotificationRecipientJobData $recipientJobData, array $contentParameters)
 	{
-		$recipientEngine = KEmailNotificationRecipientEngine::getEmailNotificationRecipientEngine($recipientJobData);
+		$recipientEngine = KEmailNotificationRecipientEngine::getEmailNotificationRecipientEngine($recipientJobData, $this->client);
 		$recipients = $recipientEngine->getRecipients($contentParameters);
 		
 		return $recipients;

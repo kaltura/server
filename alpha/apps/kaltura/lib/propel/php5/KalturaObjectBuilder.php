@@ -220,6 +220,155 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	}
 	
 	/* (non-PHPdoc)
+	 * @see PHP5ObjectBuilder::addSaveBody($script)
+	 */
+	protected function addSaveBody(&$script) {
+		$table = $this->getTable();
+		if (!$table->containsColumn(self::KALTURA_COLUMN_CUSTOM_DATA))
+			return parent::addSaveBody($script);
+		$reloadOnUpdate = $table->isReloadOnUpdate();
+		$reloadOnInsert = $table->isReloadOnInsert();
+
+		$script .= "
+		if (\$this->isDeleted()) {
+			throw new PropelException(\"You cannot save an object that has been deleted.\");
+		}
+
+		if (\$con === null) {
+			\$con = Propel::getConnection(".$this->getPeerClassname()."::DATABASE_NAME, Propel::CONNECTION_WRITE);
+		}
+		
+		\$con->beginTransaction();
+		\$isInsert = \$this->isNew();
+		try {";
+		
+		if($this->getGeneratorConfig()->getBuildProperty('addHooks')) {
+			// save with runtime hools
+			$script .= "
+			\$ret = \$this->preSave(\$con);";
+			$this->applyBehaviorModifier('preSave', $script, "			");
+			$script .= "
+			if (\$isInsert) {
+				\$ret = \$ret && \$this->preInsert(\$con);";
+			$this->applyBehaviorModifier('preInsert', $script, "				");
+			$script .= "
+			} else {
+				\$ret = \$ret && \$this->preUpdate(\$con);";
+			$this->applyBehaviorModifier('preUpdate', $script, "				");
+			$script .= "
+			}
+			
+			if (!\$ret || !\$this->isModified()) {
+				\$con->commit();
+				return 0;
+			}
+			
+			for (\$retries = 1; \$retries < KalturaPDO::SAVE_MAX_RETRIES; \$retries++)
+			{
+               \$affectedRows = \$this->doSave(\$con);
+                if (\$affectedRows || !\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug(\"was unable to save! retrying for the \$retries time\");
+                \$criteria = \$this->buildPkeyCriteria();
+				\$criteria->addSelectColumn(".$this->getPeerClassname()."::CUSTOM_DATA);
+                \$stmt = ".$this->getPeerClassname()."::doSelectStmt(\$criteria, \$con);
+                \$cutsomDataArr = \$stmt->fetchAll(PDO::FETCH_COLUMN);
+                \$newCustomData = \$cutsomDataArr[0];
+                
+                \$this->custom_data_md5 = md5(\$newCustomData);
+
+                \$valuesToChangeTo = \$this->m_custom_data->toArray();
+				\$this->m_custom_data = myCustomData::fromString(\$newCustomData); 
+
+				//set custom data column values we wanted to change to
+			 	foreach (\$this->oldCustomDataValues as \$namespace => \$namespaceValues){
+                	foreach(\$namespaceValues as \$name => \$oldValue)
+					{
+						if (\$namespace)
+						{
+							\$newValue = \$valuesToChangeTo[\$namespace][\$name];
+						}
+						else
+						{ 
+							\$newValue = \$valuesToChangeTo[\$name];
+						}
+					 
+						\$this->putInCustomData(\$name, \$newValue, \$namespace);
+					}
+                   }
+                   
+				\$this->setCustomData(\$this->m_custom_data->toString());
+			}
+
+			if (\$isInsert) {
+				\$this->postInsert(\$con);";
+			$this->applyBehaviorModifier('postInsert', $script, "					");
+			$script .= "
+			} else {
+				\$this->postUpdate(\$con);";
+			$this->applyBehaviorModifier('postUpdate', $script, "					");
+			$script .= "
+			}
+			\$this->postSave(\$con);";
+			$this->applyBehaviorModifier('postSave', $script, "				");
+			$script .= "
+			".$this->getPeerClassname()."::addInstanceToPool(\$this);
+			
+			\$con->commit();
+			return \$affectedRows;";
+		} else {
+			// save without runtime hooks
+	    $this->applyBehaviorModifier('preSave', $script, "			");
+			if ($this->hasBehaviorModifier('preUpdate'))
+			{
+			  $script .= "
+			if(!\$isInsert) {";
+	      $this->applyBehaviorModifier('preUpdate', $script, "				");
+	      $script .= "
+			}";
+			}
+			if ($this->hasBehaviorModifier('preInsert'))
+			{
+			  $script .= "
+			if(\$isInsert) {";
+	    	$this->applyBehaviorModifier('preInsert', $script, "				");
+	      $script .= "
+			}";
+			}
+			$script .= "
+			\$affectedRows = \$this->doSave(\$con".($reloadOnUpdate || $reloadOnInsert ? ", \$skipReload" : "").");";
+	    $this->applyBehaviorModifier('postSave', $script, "			");
+			if ($this->hasBehaviorModifier('postUpdate'))
+			{
+			  $script .= "
+			if(!\$isInsert) {";
+	      $this->applyBehaviorModifier('postUpdate', $script, "				");
+	      $script .= "
+			}";
+			}
+			if ($this->hasBehaviorModifier('postInsert'))
+			{
+			  $script .= "
+			if(\$isInsert) {";
+	      $this->applyBehaviorModifier('postInsert', $script, "				");
+	      $script .= "
+			}";
+			}
+			$script .= "
+			\$con->commit();
+			".$this->getPeerClassname()."::addInstanceToPool(\$this);
+			return \$affectedRows;";
+		}
+		
+		$script .= "
+		} catch (PropelException \$e) {
+			\$con->rollBack();
+			throw \$e;
+		}";
+	}
+	
+	/* (non-PHPdoc)
 	 * @see PHP5ObjectBuilder::addDoSave($script)
 	 */
 	protected function addDoSave(&$script)
@@ -571,6 +720,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	private \$tempModifiedColumns = array();
 	
 	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected \$custom_data_md5;
+	
+	/**
 	 * Returns whether the object has been modified.
 	 *
 	 * @return     boolean True if the object has been modified.
@@ -868,8 +1023,17 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function removeFromCustomData ( \$name , \$namespace = null)
 	{
-
-		\$customData = \$this->getCustomDataObj( );
+		\$customData = \$this->getCustomDataObj();
+		
+		\$currentNamespace = '';
+		if(\$namespace)
+			\$currentNamespace = \$namespace;
+			
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace]))
+			\$this->oldCustomDataValues[\$currentNamespace] = array();
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
+			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
+		
 		return \$customData->remove ( \$name , \$namespace );
 	}
 
@@ -916,6 +1080,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{
 		if ( \$this->m_custom_data != null )
 		{
+			\$this->custom_data_md5 = md5(\$this->custom_data);
 			\$this->setCustomData( \$this->m_custom_data->toString() );
 		}
 	}
@@ -936,16 +1101,27 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			
 		$script .= "
 		
-		if(\$this->alreadyInSave && count(\$this->modifiedColumns) == 2 && \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))
+		if(\$this->alreadyInSave)
 		{
-			\$theModifiedColumn = null;
-			foreach(\$this->modifiedColumns as \$modifiedColumn)
-				if(\$modifiedColumn != ".$this->getPeerClassname()."::UPDATED_AT)
-					\$theModifiedColumn = \$modifiedColumn;
-					
-			\$atomicColumns = ".$this->getPeerClassname()."::getAtomicColumns();
-			if(in_array(\$theModifiedColumn, \$atomicColumns))
-				\$criteria->add(\$theModifiedColumn, \$this->getByName(\$theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			if (\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA))
+			{
+				if (!is_null(\$this->custom_data))
+					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \") = '\$this->custom_data_md5'\", Criteria::CUSTOM);
+				else 
+					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, NULL, Criteria::IS_NULL);
+			}
+			
+			if (count(\$this->modifiedColumns) == 2 && \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))
+			{
+				\$theModifiedColumn = null;
+				foreach(\$this->modifiedColumns as \$modifiedColumn)
+					if(\$modifiedColumn != ".$this->getPeerClassname()."::UPDATED_AT)
+						\$theModifiedColumn = \$modifiedColumn;
+						
+				\$atomicColumns = ".$this->getPeerClassname()."::getAtomicColumns();
+				if(in_array(\$theModifiedColumn, \$atomicColumns))
+					\$criteria->add(\$theModifiedColumn, \$this->getByName(\$theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
 		}
 
 		return \$criteria;

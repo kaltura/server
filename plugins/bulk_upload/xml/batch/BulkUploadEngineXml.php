@@ -70,14 +70,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected $conversionProfileXsl = null;
 
 	/**
+	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KalturaClient $kClient
 	 * @param KalturaBatchJob $job
 	 */
-	public function __construct(KalturaBatchJob $job)
+	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
 	{
-		parent::__construct($job);
+		parent::__construct($taskConfig, $kClient, $job);
 		
-		if(KBatchBase::$taskConfig->params->allowServerResource)
-			$this->allowServerResource = (bool) KBatchBase::$taskConfig->params->allowServerResource;
+		if($taskConfig->params->allowServerResource)
+			$this->allowServerResource = (bool) $taskConfig->params->allowServerResource;
 	}
 	
 	/* (non-PHPdoc)
@@ -120,8 +122,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		//Validate the XML file against the schema
 		libxml_clear_errors();
-		KBatchBase::$kClient->setReturnServedResult(true);
-		$xsd = KBatchBase::$kClient->schema->serve($this->getSchemaType());
+		$this->kClient->setReturnServedResult(true);
+		$xsd = $this->kClient->schema->serve($this->getSchemaType());
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
@@ -143,9 +145,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
         if(!$conversionProfileId)
            throw new KalturaBatchException("Conversion profile not defined", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$conversionProfile = KBatchBase::$kClient->conversionProfile->get($conversionProfileId);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$conversionProfile = $this->kClient->conversionProfile->get($conversionProfileId);
+		$this->unimpersonate();
 		if(!$conversionProfile || !$conversionProfile->xslTransformation)
 			return false;
 		$this->conversionProfileXsl = $conversionProfile->xslTransformation;
@@ -241,17 +243,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 1;
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
+		$this->impersonate();
 		$entries = null;
 		try
 		{
-			$entries = KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+			$entries = $this->kClient->baseEntry->listAction($filter, $pager);
 		}
 		catch (KalturaException $e)
 		{
 			KalturaLog::err($e->getMessage());
 		}
-		KBatchBase::unimpersonate();
+		$this->unimpersonate();
 		
 		/* @var $entries KalturaBaseEntryListResponse */
 		if(!$entries || !$entries->totalCount)
@@ -267,16 +269,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getEntry($entryId)
 	{
 		$entry = null;
-		KBatchBase::impersonate($this->currentPartnerId);;
+		$this->impersonate();
 		try
 		{
-			$entry = KBatchBase::$kClient->baseEntry->get($entryId);
+			$entry = $this->kClient->baseEntry->get($entryId);
 		}
 		catch (KalturaException $e)
 		{
 			KalturaLog::err($e->getMessage());
 		}
-		KBatchBase::unimpersonate();
+		$this->unimpersonate();
 		
 		return $entry;
 	}
@@ -348,7 +350,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			catch (Exception $e)
 			{
 				//in case an exception was thrown we need to change back to batch user in order to addBulkResult
-				KBatchBase::unimpersonate();
+				$this->unimpersonate();
 				KalturaLog::err('Item failed (' . get_class($e) . '): ' . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item, $action);
 				if ($this->exceededMaxRecordsEachRun){
@@ -677,41 +679,41 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
+		$this->impersonate();
 		$updateEntry = $this->removeNonUpdatbleFields($entry);
-		$updatedEntry = KBatchBase::$kClient->baseEntry->get($entryId);
+		$updatedEntry = $this->kClient->baseEntry->get($entryId);
 		
-		KBatchBase::$kClient->startMultiRequest();
+		$this->kClient->startMultiRequest();
 		
 		$updatedEntryId = $updatedEntry->id;
 		if(!is_null($updatedEntry->replacingEntryId))
 			$updatedEntryId = $updatedEntry->replacingEntryId;
 					
 		if($resource)
-			KBatchBase::$kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId); //to create a temporery entry.
+			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource, $entry->conversionProfileId); //to create a temporery entry.
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$flavor = KBatchBase::$kClient->flavorAsset->add($updatedEntryId, $flavorAsset);
-			KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorResource);		// TODO: use flavor instead of getMultiRequestResult
+			$flavor = $this->kClient->flavorAsset->add($updatedEntryId, $flavorAsset);
+			$this->kClient->flavorAsset->setContent($this->kClient->getMultiRequestResult()->id, $flavorResource);		// TODO: use flavor instead of getMultiRequestResult
 		}
 		
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
-			$thumb = KBatchBase::$kClient->thumbAsset->add($updatedEntryId, $thumbAsset);
-			KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
+			$thumb = $this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset);
+			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
 			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
-				KBatchBase::$kClient->thumbAsset->setAsDefault($thumb->id);
+				$this->kClient->thumbAsset->setAsDefault($thumb->id);
 		}
 		
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
+		$requestResults = $this->kClient->doMultiRequest();
 		
 		//update is after add content since in case entry replacement we want the duration to be set on the new entry.
-		$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $updateEntry);
+		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
 		
-		KBatchBase::unimpersonate();
+		$this->unimpersonate();
 		
 		if(is_array($requestResults))
 			foreach($requestResults as $requestResult)
@@ -749,9 +751,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		}
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$result = KBatchBase::$kClient->baseEntry->delete($entryId);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$result = $this->kClient->baseEntry->delete($entryId);
+		$this->unimpersonate();
 		
 		$bulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::DELETE);
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
@@ -881,7 +883,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$pluginsInstance->handleItemAdded($createdEntry, $item);
 			}catch (Exception $e)
 			{
-			    KBatchBase::unimpersonate();
+			    $this->unimpersonate();
 				KalturaLog::err($pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage());
 				$pluginsErrorResults[] = $pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage();
 			}
@@ -904,36 +906,36 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaResource $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
-		KBatchBase::impersonate($this->currentPartnerId);;
-		KBatchBase::$kClient->startMultiRequest();
+		$this->impersonate();
+		$this->kClient->startMultiRequest();
 		
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
-		KBatchBase::$kClient->baseEntry->add($entry); //Adds the entry
-		$newEntryId = KBatchBase::$kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
+		$this->kClient->baseEntry->add($entry); //Adds the entry
+		$newEntryId = $this->kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
 		
 		if($resource)
-			KBatchBase::$kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
+			$this->kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$flavor = KBatchBase::$kClient->flavorAsset->add($newEntryId, $flavorAsset);
-			KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorResource);			// TODO: use flavor instead of getMultiRequestResult
+			$flavor = $this->kClient->flavorAsset->add($newEntryId, $flavorAsset);
+			$this->kClient->flavorAsset->setContent($this->kClient->getMultiRequestResult()->id, $flavorResource);			// TODO: use flavor instead of getMultiRequestResult
 		}
 		
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			
 			$thumbResource = $noParamsThumbResources[$index];
-			$thumb = KBatchBase::$kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
-			KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
+			$thumb = $this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
+			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
 			if (strpos($thumbAsset->tags, self::DEFAULT_THUMB_TAG) !== false)
-				KBatchBase::$kClient->thumbAsset->setAsDefault($thumb->id);
+				$this->kClient->thumbAsset->setAsDefault($thumb->id);
 		}
 							
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
-		KBatchBase::unimpersonate();
+		$requestResults = $this->kClient->doMultiRequest();
+		$this->unimpersonate();
 		
 		foreach($requestResults as $requestResult)
 		{
@@ -962,11 +964,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
-		KBatchBase::impersonate($this->currentPartnerId);;
-		KBatchBase::$kClient->startMultiRequest();
-		KBatchBase::$kClient->flavorAsset->getByEntryId($createdEntryId);
-		KBatchBase::$kClient->thumbAsset->getByEntryId($createdEntryId);
-		$result = KBatchBase::$kClient->doMultiRequest();
+		$this->impersonate();
+		$this->kClient->startMultiRequest();
+		$this->kClient->flavorAsset->getByEntryId($createdEntryId);
+		$this->kClient->thumbAsset->getByEntryId($createdEntryId);
+		$result = $this->kClient->doMultiRequest();
 		
 		foreach($result as $requestResult)
 		{
@@ -980,7 +982,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$createdFlavorAssets = $result[0];
 		$createdThumbAssets =  $result[1];
 				
-		KBatchBase::$kClient->startMultiRequest();
+		$this->kClient->startMultiRequest();
 		///For each flavor asset that we just added without his data then we need to update his additional data
 		foreach($createdFlavorAssets as $createdFlavorAsset)
 		{
@@ -991,7 +993,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				continue;
 			
 			$flavorAsset = $flavorAssets[$createdFlavorAsset->flavorParamsId];
-			KBatchBase::$kClient->flavorAsset->update($createdFlavorAsset->id, $flavorAsset);
+			$this->kClient->flavorAsset->update($createdFlavorAsset->id, $flavorAsset);
 		}
 		
 		foreach($createdThumbAssets as $createdThumbAsset)
@@ -1003,11 +1005,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				continue;
 				
 			$thumbAsset = $thumbAssets[$createdThumbAsset->thumbParamsId];
-			KBatchBase::$kClient->thumbAsset->update($createdThumbAsset->id, $thumbAsset);
+			$this->kClient->thumbAsset->update($createdThumbAsset->id, $thumbAsset);
 		}
 		
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
-		KBatchBase::unimpersonate();
+		$requestResults = $this->kClient->doMultiRequest();
+		$this->unimpersonate();
 
 		if(is_array($requestResults))
 			foreach($requestResults as $requestResult)
@@ -1033,14 +1035,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function sendItemUpdateData($entryId, $entry, array $flavorAssets, array $flavorAssetsResources, array $thumbAssets, array $thumbAssetsResources)
 	{
-		KBatchBase::impersonate($this->currentPartnerId);;
+		$this->impersonate();
 		$updateEntry = $this->removeNonUpdatbleFields($entry);
-		$updatedEntry = KBatchBase::$kClient->baseEntry->update($entryId, $updateEntry);
+		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
 		
-		KBatchBase::$kClient->startMultiRequest();
-		KBatchBase::$kClient->flavorAsset->getByEntryId($entryId);
-		KBatchBase::$kClient->thumbAsset->getByEntryId($entryId);
-		$result = KBatchBase::$kClient->doMultiRequest();
+		$this->kClient->startMultiRequest();
+		$this->kClient->flavorAsset->getByEntryId($entryId);
+		$this->kClient->thumbAsset->getByEntryId($entryId);
+		$result = $this->kClient->doMultiRequest();
 		
 		foreach($result as $requestResult)
 		{
@@ -1064,16 +1066,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$existingflavorAssets[$createdFlavorAsset->flavorParamsId] = $createdFlavorAsset->id;
 		}
 		
-		KBatchBase::$kClient->startMultiRequest();
+		$this->kClient->startMultiRequest();
 		foreach ($flavorAssetsResources as $flavorParamsId => $flavorAssetsResource)
 		{
 			if(!isset($existingflavorAssets[$flavorParamsId]))
 			{
-				KBatchBase::$kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $flavorAssetsResource);
+				$this->kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
+				$this->kClient->flavorAsset->setContent($this->kClient->getMultiRequestResult()->id, $flavorAssetsResource);
 			}else{
-				KBatchBase::$kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
-				KBatchBase::$kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
+				$this->kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
+				$this->kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
 			}
 		}
 		
@@ -1090,18 +1092,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(!isset($existingthumbAssets[$thumbParamsId]))
 			{
-				$thumbsAsset = KBatchBase::$kClient->thumbAsset->add($entryId, $thumbAssets[$thumbParamsId]);
-				KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $thumbAssetsResource);
+				$thumbsAsset = $this->kClient->thumbAsset->add($entryId, $thumbAssets[$thumbParamsId]);
+				$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbAssetsResource);
 			}else{
-				$thumbsAsset = KBatchBase::$kClient->thumbAsset->update($existingthumbAssets[$thumbParamsId], $thumbAssets[$thumbParamsId]);
-				KBatchBase::$kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId], $thumbAssetsResource);
+				$thumbsAsset = $this->kClient->thumbAsset->update($existingthumbAssets[$thumbParamsId], $thumbAssets[$thumbParamsId]);
+				$this->kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId], $thumbAssetsResource);
 			}
 			if (strpos($thumbAssetsResource->tags, self::DEFAULT_THUMB_TAG) !== false)
-				KBatchBase::$kClient->thumbAsset->setAsDefault($thumAsset->id);
+				$this->kClient->thumbAsset->setAsDefault($thumAsset->id);
 		}
 		
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
-		KBatchBase::unimpersonate();
+		$requestResults = $this->kClient->doMultiRequest();
+		$this->unimpersonate();
 		
 		return $updatedEntry;
 	}
@@ -1118,7 +1120,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(is_null($categories))
 			return $bulkuploadResult;
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
+		$this->impersonate();
 		
 		$existingCategoryIds = array(); // category ids that already associated with the entry - current list
 		$requiredCategoryIds = array(); // category ids that should be associated with the entry - final list
@@ -1126,20 +1128,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		try
 		{
-			KBatchBase::$kClient->startMultiRequest();
+			$this->kClient->startMultiRequest();
 			if($update)
 			{
 				$categoryEntryFilter = new KalturaCategoryEntryFilter();
 				$categoryEntryFilter->entryIdEqual = $entryId;
-				KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter);
+				$this->kClient->categoryEntry->listAction($categoryEntryFilter);
 			}
 			if($categories)
 			{
 				$categoryFilter = new KalturaCategoryFilter();
 				$categoryFilter->fullNameIn = $categories;
-				KBatchBase::$kClient->category->listAction($categoryFilter);
+				$this->kClient->category->listAction($categoryFilter);
 			}
-			$responses = KBatchBase::$kClient->doMultiRequest();
+			$responses = $this->kClient->doMultiRequest();
 			if($update)
 			{
 				$categoryEntryListResponse = array_shift($responses);
@@ -1183,7 +1185,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 			}
 			
-			KBatchBase::$kClient->startMultiRequest();
+			$this->kClient->startMultiRequest();
 			
 			if($update) // Remove existing categories and associations
 			{
@@ -1191,7 +1193,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				foreach($categoryIdsToRemove as $categoryIdToRemove)
 				{
 					KalturaLog::debug("Removing category ID [$categoryIdToRemove] from entry [$entryId]");
-					KBatchBase::$kClient->categoryEntry->delete($entryId, $categoryIdToRemove);
+					$this->kClient->categoryEntry->delete($entryId, $categoryIdToRemove);
 				}
 			}
 			
@@ -1203,10 +1205,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$categoryEntryToAdd->categoryId = $categoryIdToAdd;
 				$categoryEntryToAdd->entryId = $entryId;
 				KalturaLog::debug("Adding category ID [$categoryIdToAdd] to entry [$entryId]");
-				KBatchBase::$kClient->categoryEntry->add($categoryEntryToAdd);
+				$this->kClient->categoryEntry->add($categoryEntryToAdd);
 			}
 			
-			KBatchBase::$kClient->doMultiRequest();
+			$this->kClient->doMultiRequest();
 		
 		}
 		catch(KalturaException $ex)
@@ -1214,7 +1216,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$bulkuploadResult->errorDescription .= $ex->getMessage();
 		}
 		
-		KBatchBase::unimpersonate();
+		$this->unimpersonate();
 		return $bulkuploadResult;
 	}
 	
@@ -1236,7 +1238,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
             	
             try
             {
-                $category = KBatchBase::$kClient->category->add($category);
+                $category = $this->kClient->category->add($category);
             }
             catch (Exception $e)
             {
@@ -1245,7 +1247,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
                 	KalturaLog::debug("Categroy [$fullNameEq] already exist");
                     $catFilter = new KalturaCategoryFilter();
                     $catFilter->fullNameEqual = $fullNameEq;
-                    $res = KBatchBase::$kClient->category->listAction($catFilter);
+                    $res = $this->kClient->category->listAction($catFilter);
                     $category = $res->objects[0];
                 }
                 else
@@ -1550,9 +1552,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			//Gets the user default conversion
 			if(!isset($this->defaultConversionProfileId))
 			{
-				KBatchBase::impersonate($this->currentPartnerId);;
-				$conversionProfile = KBatchBase::$kClient->conversionProfile->getDefault();
-				KBatchBase::unimpersonate();
+				$this->impersonate();
+				$conversionProfile = $this->kClient->conversionProfile->getDefault();
+				$this->unimpersonate();
 				$this->defaultConversionProfileId = $conversionProfile->id;
 			}
 			
@@ -1722,9 +1724,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$allFlavorParams = KBatchBase::$kClient->conversionProfileAssetParams->listAction($conversionProfileFilter, $pager);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$allFlavorParams = $this->kClient->conversionProfileAssetParams->listAction($conversionProfileFilter, $pager);
+		$this->unimpersonate();
 		$allFlavorParams = $allFlavorParams->objects;
 		
 //		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
@@ -1748,9 +1750,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$allAccessControl = KBatchBase::$kClient->accessControl->listAction(null, $pager);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$allAccessControl = $this->kClient->accessControl->listAction(null, $pager);
+		$this->unimpersonate();
 		$allAccessControl = $allAccessControl->objects;
 		
 //		KalturaLog::debug("allAccessControl [" . print_r($allAccessControl, true). "]");
@@ -1773,10 +1775,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function initAssetIdToAssetParamsId($entryId)
 	{
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$allFlavorAssets = KBatchBase::$kClient->flavorAsset->getByEntryId($entryId);
-		$allThumbAssets = KBatchBase::$kClient->thumbAsset->getByEntryId($entryId);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$allFlavorAssets = $this->kClient->flavorAsset->getByEntryId($entryId);
+		$allThumbAssets = $this->kClient->thumbAsset->getByEntryId($entryId);
+		$this->unimpersonate();
 						
 //		KalturaLog::debug("allFlavorAssets [" . print_r($allFlavorAssets, true). "]");
 //		KalturaLog::debug("allThumbAssets [" . print_r($allThumbAssets, true). "]");
@@ -1804,9 +1806,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$allConversionProfile = KBatchBase::$kClient->conversionProfile->listAction(null, $pager);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$allConversionProfile = $this->kClient->conversionProfile->listAction(null, $pager);
+		$this->unimpersonate();
 		$allConversionProfile = $allConversionProfile->objects;
 		
 //		KalturaLog::debug("allConversionProfile [" . print_r($allConversionProfile,true) ." ]");
@@ -1831,9 +1833,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
-		$allStorageProfiles = KBatchBase::$kClient->storageProfile->listAction(null, $pager);
-		KBatchBase::unimpersonate();
+		$this->impersonate();
+		$allStorageProfiles = $this->kClient->storageProfile->listAction(null, $pager);
+		$this->unimpersonate();
 		$allStorageProfiles = $allStorageProfiles->objects;
 		
 //		KalturaLog::debug("allStorageProfiles [" . print_r($allStorageProfiles,true) ." ]");
@@ -2205,7 +2207,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
-	    KBatchBase::$kClient->startMultiRequest();
+	    $this->kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
 		// checking the created entries
@@ -2249,7 +2251,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
-		KBatchBase::$kClient->doMultiRequest();
+		$this->kClient->doMultiRequest();
 	}
 	
 	public function getObjectTypeTitle()

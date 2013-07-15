@@ -55,10 +55,6 @@ $tmpXmlFileName = tempnam(sys_get_temp_dir(), 'kaltura.generator.');
 //pass the name of the generator as the first argument of the command line to
 //generate a single library. if this argument is empty or 'all', generator will create all libs.
 $generateSingle = isset($argv[1]) ? $argv[1] : null;
-if (strtolower($generateSingle) == 'all')
-{
-	$generateSingle = null;
-}
 
 //second command line argument specifies the output path, if not specified will default to 
 //<content root>/content/clientlibs
@@ -75,8 +71,20 @@ else
 kFile::fullMkdir($outputPathBase);
 
 //pull the generator config ini
-$config = new Zend_Config_Ini("../configurations/generator.ini", null, array('allowModifications' => true));
+$config = new Zend_Config_Ini(__DIR__ . '/../configurations/generator.ini', null, array('allowModifications' => true));
 $config = KalturaPluginManager::mergeConfigs($config, 'generator', false);
+
+$defaults = null;
+if (strtolower($generateSingle) == 'all')
+{
+	$generateSingle = null;
+}
+elseif(!$generateSingle)
+{
+	$defaults = file(__DIR__ . '/../configurations/generator.defaults.ini');
+	foreach($defaults as $key => &$default)
+		$default = strtolower(trim($default, " \t\r\n"));
+}
 
 //if we got specific generator request, tes if this requested generator does exist
 if ($generateSingle != null)
@@ -97,9 +105,6 @@ $apiVersion = KALTURA_API_VERSION;
 //get the generation date in string (we'll use that for the client tgz file name)
 $generatedDate = date('d-m-Y', time());
 $schemaGenDateOverride = null;
-
-// Clear the output folder -
-exec ("rm -rf $outputPathBase/*");
 
 $generatedClients = array(
 	'generatedDate' => $generatedDate,
@@ -129,6 +134,9 @@ foreach($config as $name => $item)
 	
 	// when generating a single client, skip the generators not relvant
 	if ($generateSingle && strtolower($name) !== strtolower($generateSingle)) 
+		continue;
+	
+	if($defaults && !in_array(strtolower($name), $defaults))
 		continue;
 
 	//check if this client should be internal or public (on the UI)
@@ -235,49 +243,82 @@ foreach($config as $name => $item)
 		throw new Exception("Invalid generator [$generator], can't determine if this is XML or PHP based");
 	}
 	
+	$copyPath = null;
+	if($item->get("copyPath"))
+		$copyPath = $item->get("copyPath");
+	
+	if ($mainOutput)
+	{ 
+		$outputPath = $outputPathBase;
+	}
+	else
+	{
+		$outputPath = "$outputPathBase/$name";
+		$clearPath = null;
+		if($item->get("clearPath"))
+			$clearPath = $item->get("clearPath");
+		else
+			$clearPath = $copyPath;
+		
+		if(!file_exists($clearPath))
+			$clearPath = null;
+			
+		if($clearPath || file_exists($outputPath))
+		{
+			KalturaLog::info("Delete old files [$outputPath" . ($clearPath ? ", $clearPath" : "") . "]");
+			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+			{
+				passthru("rmdir /Q /S $outputPath $clearPath");
+			}
+			else
+			{
+				passthru("rm -fr $outputPath $clearPath");
+			}
+		}
+	}
+		
 	KalturaLog::info("Generate client library [$name]");
 	$instance->generate();
 	
-	if ($mainOutput) 
-		$outputPath = $outputPathBase;
-	else
-		$outputPath = $outputPathBase."/".$name;
 	KalturaLog::info("Saving client library to [$outputPath]");
-	if (realpath($outputPath) === false)
-	{
-		$oldMask = umask();
-		umask(0);
-		mkdir($outputPath, 0777, true);
-		umask($oldMask);
-	}
+	
+	$oldMask = umask();
+	umask(0);
+		
 	$files = $instance->getOutputFiles();
 	foreach($files as $file => $data)
 	{
-		$filePath = realpath($outputPath)."/".$file;
-		$dirName = pathinfo($filePath, PATHINFO_DIRNAME);
+		$file = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $file);
+		$filePath = $outputPath . DIRECTORY_SEPARATOR . $file;
+		$dirName = dirname($filePath);
 		if (!file_exists($dirName))
-		{
-			$oldMask = umask();
-			umask(0);
 			mkdir($dirName, 0777, true);
-			umask($oldMask);
-		}
 
 		file_put_contents($filePath, $data);
+		
+		if($copyPath)
+		{
+			$copyFilePath = $copyPath . DIRECTORY_SEPARATOR . $file;
+			$dirName = dirname($copyFilePath);
+			if (!file_exists($dirName))
+				mkdir($dirName, 0777, true);
+				
+			copy($filePath, $copyFilePath);
+		}
 
 		if ($file == "KalturaClient.xml")
 		{
 			# save the schema also in a filename containing the generation date
 			# KalturaClient.xml will always contain the most recent schema so that it can be served by api_schema.php
-			$filePath = realpath($outputPath)."/"."KalturaClient_$generatedDate.xml";
+			$filePath = "$outputPath/KalturaClient_$generatedDate.xml";
 			file_put_contents($filePath, $data);
 		}
 	}
+	umask($oldMask);
 	
 	//delete the api services xml schema file
-	if ($fromXml)
+	if ($fromXml && file_exists($tmpXmlFileName))
 		unlink($tmpXmlFileName);
-		
 
 	if (count($files) == 0)
 	{
@@ -296,6 +337,9 @@ foreach($config as $name => $item)
 
 //write the summary file (will be used by the generator UI)
 file_put_contents($outputPathBase."/".$summaryFileName, serialize($generatedClients));
+
+exit(0);
+
 
 /**
  * Build a packaged tarball for the client library.

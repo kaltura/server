@@ -108,12 +108,18 @@ stop() {
 	echo -n $"Shutting down:"
 	KP=$(pgrep -P 1 -f $BATCHEXE)
 	if [ -n "$KP" ]; then
-		PIDS=$(pstree -p $KP | grep -o '[0-9]\{2,5\}')
-		# hack, returnds the PIDS as string and tells kill to kill all at once
-		for pid in "$PIDS"
-		do
-			kill -9 $pid
-		done
+		if [ -f $BASE_DIR/keepAlive ]; then
+			echo "Server is on Keep Alive mode - workers won't be killed!"
+			kill -9 $KP
+		else
+			echo "Killing batchMgr and workers"
+			PIDS=$(pstree -p $KP | grep -o '[0-9]\{2,5\}')
+			# hack, returnds the PIDS as string and tells kill to kill all at once
+			for pid in "$PIDS"
+			do
+				kill -9 $pid
+			done
+		fi
 		echo_success
 		echo
 		RC=0

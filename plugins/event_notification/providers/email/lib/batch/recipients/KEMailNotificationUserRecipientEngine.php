@@ -12,7 +12,7 @@ class KEmailNotificationUserRecipientEngine extends  KEmailNotificationRecipient
 	 */
 	function getRecipients(array $contentParameters) {
 		//list users
-		$userList = KBatchBase::$kClient->user->listAction($this->recipientJobData->filter, new KalturaFilterPager());
+		$userList = $this->client->user->listAction($this->recipientJobData->filter, new KalturaFilterPager());
 		
 		$recipients = array();
 		foreach ($userList->objects as $user)

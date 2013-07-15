@@ -1,0 +1,1 @@
+ALTER TABLE batch_job_lock ADD batch_version INTEGER;

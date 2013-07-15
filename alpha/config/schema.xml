@@ -590,6 +590,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="expiration" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
@@ -1504,7 +1505,7 @@
 			<index-column name="updated_at" />
 		</index>
 	</table>	
-	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser">
+	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser" deletable="true">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="category_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
@@ -1634,13 +1635,13 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="31" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="desciption" type="varchar" size="127" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="protocol" type="integer" inheritance="single" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="protocol" type="tinyint" inheritance="single" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_url" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_base_dir" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_username" type="varchar" size="31" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_password" type="varchar" size="31" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_ftp_passive_mode" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_ftp_passive_mode" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_http_base_url" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_rmp_base_url" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_iis_base_url" type="varchar" size="127" />
@@ -1652,7 +1653,7 @@
 		<column primaryKey="false" lazyLoad="false" name="path_manager_class" type="varchar" required="false" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="url_manager_class" type="varchar" required="false" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_priority" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="tinyint" />
 	</table>
 	<table skipSql="false" abstract="false" name="email_ingestion_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />

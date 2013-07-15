@@ -306,35 +306,53 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	private function hlsUrlExistsRecursive ($url)
 	{
-		$data = $this->urlExists($url, self::HLS_LIVE_STREAM_CONTENT_TYPE);
+		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
 		if(!$data)
 		{
 			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
 			return $data;
 		}
-		
+
 		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
-		
+
 		foreach ($lines as $line)
 		{
-			if(!preg_match("/http.*/", array_shift($lines), $matches))
+			if(!preg_match('/.+\.m3u8/', array_shift($lines), $matches))
 				continue;
 			$streamUrl = $matches[0];
+			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
 			
-			$data = $this->urlExists($streamUrl, self::HLS_LIVE_STREAM_CONTENT_TYPE);
+			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
 			if (!$data)
 				continue;
 				
 			$segments = explode("#EXTINF:", $data);
-			if(!preg_match("/http.*/", array_pop($segments), $matches))
+			if(!preg_match('/.+\.ts.*/', array_pop($segments), $matches))
 				continue;
 			
 			$tsUrl = $matches[0];
-			if ($this->urlExists($tsUrl ,self::HLS_LIVE_STREAM_CONTENT_TYPE))
+			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type")))
 				return true;
 		}
 			
 		return false;
+	}
+	
+	/**
+	 * Function check if URL provided is a valid one if not returns fixed url with the parent url relative path
+	 * @param string $urlToCheck
+	 * @param string $parentURL
+	 * @return fixed url path 
+	 */
+	private function checkIfValidUrl($urlToCheck, $parentURL)
+	{
+		if(!filter_var($urlToCheck, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED))
+		{
+			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
+		}
+		
+		return $urlToCheck;
 	}
 	
 	/**
@@ -344,7 +362,7 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	private function hdsUrlExists ($url) 
 	{
-		$data = $this->urlExists($url, 'video/f4m');
+		$data = $this->urlExists($url, array('video/f4m'));
 		if (is_bool($data))
 			return $data;
 		

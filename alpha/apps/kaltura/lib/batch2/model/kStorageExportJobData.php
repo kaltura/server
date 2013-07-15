@@ -12,18 +12,13 @@ class kStorageExportJobData extends kStorageJobData
     
 	public static function getInstance($protocol)
 	{
-		$data = null;
 		switch($protocol)
 		{
 			case StorageProfile::STORAGE_PROTOCOL_S3:
-				$data = new kAmazonS3StorageExportJobData();
+				return new kAmazonS3StorageExportJobData();
 			default:
-				$data = KalturaPluginManager::loadObject('kStorageExportJobData', $protocol);
+				return new kStorageExportJobData();
 		}
-		if (!$data)
-			$data = new kStorageExportJobData();
-		
-		return $data;
 	}
 	
 	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)

@@ -50,8 +50,8 @@ class KWidevineOperationEngine extends KOperationEngine
 	 */
 	protected function doOperation()
 	{
-		KBatchBase::impersonate($this->job->partnerId);
-		$entry = KBatchBase::$kClient->baseEntry->get($this->job->entryId);
+		$this->impersonate($this->job->partnerId);
+		$entry = $this->client->baseEntry->get($this->job->entryId);
 		$this->buildPackageName($entry);
 		$vodPackagerHost = $this->calcVodPackagerHost();
 		KalturaLog::debug('start Widevine packaging: '.$this->packageName.' on '.$vodPackagerHost);
@@ -64,8 +64,8 @@ class KWidevineOperationEngine extends KOperationEngine
 
 		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);
-		KBatchBase::$kClient->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
-		KBatchBase::unimpersonate();	
+		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
+		$this->unimpersonate();	
 		
 		while(($this->job->queueTime + $this->params->maxTimeBeforeFail)>= time())
 		{
@@ -90,9 +90,9 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug("Package status: ".$response->getStatus());
 		if($response->isSuccess())
 		{
-			KBatchBase::impersonate($this->job->partnerId);			
+			$this->impersonate($this->job->partnerId);			
 			$this->updateFlavorAsset($response->getAssetid());
-			KBatchBase::unimpersonate();
+			$this->unimpersonate();
 			return true;
 		}
 		else 
@@ -114,7 +114,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		$filter = new KalturaAssetFilter();
 		$filter->entryIdEqual = $this->job->entryId;
 		$filter->idIn = $srcAssetIds;
-		$flavorAssetList = KBatchBase::$kClient->flavorAsset->listAction($filter);	
+		$flavorAssetList = $this->client->flavorAsset->listAction($filter);	
 
 		$redundantAssets = array();
 		if(count($flavorAssetList->objects) > 0)
@@ -194,7 +194,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		KalturaLog::debug('Response status: '. $response->getStatus());
 		if($response->isError())
 		{
-			KBatchBase::unimpersonate();
+			$this->unimpersonate();
 			$logMessage = 'Package Notify request failed, package name: '.$response->getName().' error: '.$response->getErrorText();
 			KalturaLog::err($logMessage);
 			throw new KOperationEngineException($logMessage);
@@ -212,7 +212,7 @@ class KWidevineOperationEngine extends KOperationEngine
 			$filter = new KalturaAssetFilter();
 			$filter->entryIdEqual = $entry->replacedEntryId;
 			$filter->tagsLike = 'widevine'; 
-			$flavorAssetList = KBatchBase::$kClient->flavorAsset->listAction($filter);
+			$flavorAssetList = $this->client->flavorAsset->listAction($filter);
 			
 			if(count($flavorAssetList->objects) > 0)
 			{
@@ -241,7 +241,7 @@ class KWidevineOperationEngine extends KOperationEngine
 		$wvDistributionEndDate = $this->data->flavorParamsOutput->widevineDistributionEndDate;
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
 		$updatedFlavorAsset->widevineDistributionEndDate = $wvDistributionEndDate;
-		KBatchBase::$kClient->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
+		$this->client->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
 	}
 	
 	private function calcVodPackagerHost()

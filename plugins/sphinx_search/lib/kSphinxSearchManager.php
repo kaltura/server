@@ -359,19 +359,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	public function execSphinx($sql, IIndexable $object)
 	{
 		KalturaLog::debug($sql);
-		
-		$sphinxConnection = null;
-		$sphinxConnectionId = null;
-		if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
-		{
-			$sphinxConnection = DbManager::getSphinxConnection(false);
-			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($sphinxConnection->getHostName());
-			if($sphinxServer)
-				$sphinxConnectionId = $sphinxServer->getId();
-		}
-		
+				
 		$sphinxLog = new SphinxLog();
-		$sphinxLog->setExecutedServerId($sphinxConnectionId);
 		$sphinxLog->setObjectId($object->getId());
 		$sphinxLog->setObjectType(get_class($object));
 		$sphinxLog->setEntryId($object->getEntryId());
@@ -379,9 +368,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$sphinxLog->setSql($sql);
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
-		if(!$sphinxConnection)
+		if(!kConf::get('exec_sphinx', 'local', 0))
 			return true;
-			
+					
 		$sphinxConnection = DbManager::getSphinxConnection(false);
 		$ret = $sphinxConnection->exec($sql);
 		if($ret)

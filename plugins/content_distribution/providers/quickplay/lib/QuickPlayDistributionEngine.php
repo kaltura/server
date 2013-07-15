@@ -114,7 +114,7 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->sftpHost;
 		$login = $distributionProfile->sftpLogin;
 		$pass = $distributionProfile->sftpPass;
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->login($host, $login, $pass);
 		return $sftpManager;

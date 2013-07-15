@@ -145,7 +145,9 @@ class kBusinessConvertDL
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
-		
+
+		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry));
+
 		myEntryUtils::deleteEntry($tempEntry,null,true);
 
 		$te = new TrackEntry();
@@ -314,8 +316,8 @@ class kBusinessConvertDL
 		{
 			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 			return -1;
-		}		
-		
+		}
+
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT && $b->getReadyBehavior() > flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)
 		{
 			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
@@ -349,12 +351,12 @@ class kBusinessConvertDL
 		KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 		return -1;
 	}
-	
+
 	private static function isSourceFlavor(flavorParamsOutput $a, flavorParamsOutput $b)
 	{
 		$aSources = explode(',', $a->getSourceAssetParamsIds());
 		$bSources = explode(',',$b->getSourceAssetParamsIds());
-		
+
 		if(in_array($a->getFlavorParamsId(), $bSources))
 		{
 			KalturaLog::debug('Flavor '.$a->getId().' is source of flavor '.$b->getId());
@@ -365,7 +367,7 @@ class kBusinessConvertDL
 			KalturaLog::debug('Flavor '.$b->getId().' is source of flavor '.$a->getId());
 			return 1;
 		}
-			
+
 		return 0;
 	}
 }

@@ -51,13 +51,13 @@ class KAsyncStorageExport extends KJobHandlerWorker
 	{
 		$filter = parent::getFilter();
 		
-		if(KBatchBase::$taskConfig->params)
+		if($this->taskConfig->params)
 		{
-			if(KBatchBase::$taskConfig->params->minFileSize && is_numeric(KBatchBase::$taskConfig->params->minFileSize))
-				$filter->fileSizeGreaterThan = KBatchBase::$taskConfig->params->minFileSize;
+			if($this->taskConfig->params->minFileSize && is_numeric($this->taskConfig->params->minFileSize))
+				$filter->fileSizeGreaterThan = $this->taskConfig->params->minFileSize;
 			
-			if(KBatchBase::$taskConfig->params->maxFileSize && is_numeric(KBatchBase::$taskConfig->params->maxFileSize))
-				$filter->fileSizeLessThan = KBatchBase::$taskConfig->params->maxFileSize;
+			if($this->taskConfig->params->maxFileSize && is_numeric($this->taskConfig->params->maxFileSize))
+				$filter->fileSizeLessThan = $this->taskConfig->params->maxFileSize;
 		}
 			
 		return $filter;
@@ -72,14 +72,62 @@ class KAsyncStorageExport extends KJobHandlerWorker
 	 */
 	protected function export(KalturaBatchJob $job, KalturaStorageExportJobData $data)
 	{
-		$engine = KExportEngine::getInstance($job->jobSubType, $job->partnerId, $data);
-		if(!$engine)
-		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Engine not found", KalturaBatchJobStatus::FAILED);
-		}
-		$this->updateJob($job, $initResult->message, KalturaBatchJobStatus::QUEUED);
-		$exportResult = $engine->export();
+		KalturaLog::debug("export($job->id)");
+		
+		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
+		
+		if(!$this->pollingFileExists($srcFile))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile does not exist", KalturaBatchJobStatus::RETRY);
+					
+		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
+		$this->updateJob($job, "Exporting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED);
 
-		return $this->closeJob($job, null , null, null, $exportResult ? KalturaBatchJobStatus::FINISHED : KalturaBatchJobStatus::ALMOST_DONE, $data );
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions['passiveMode'] = $data->ftpPassiveMode;
+		if($data instanceof KalturaAmazonS3StorageExportJobData)
+			$engineOptions['filesAcl'] = $data->filesPermissionInS3;
+			
+		$engine = kFileTransferMgr::getInstance($job->jobSubType, $engineOptions);
+		
+		try{
+			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword);
+		}
+		catch(Exception $e)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::RETRY);
+		}
+	
+		try{
+			if (is_file($srcFile)){
+				$engine->putFile($destFile, $srcFile, $data->force);
+			}
+			else if (is_dir($srcFile)){
+				$filesPaths = kFile::dirList($srcFile);
+				$destDir = $destFile;
+				foreach ($filesPaths as $filePath){
+					$destFile = $destDir.DIRECTORY_SEPARATOR.basename($filePath);
+					$engine->putFile($destFile, $filePath, $data->force);
+				}
+			}
+		}
+		catch(kFileTransferMgrException $e){
+			if($e->getCode() == kFileTransferMgrException::remoteFileExists)
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::FILE_ALREADY_EXISTS,$e->getMessage(),KalturaBatchJobStatus::FAILED);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		catch(Exception $e)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+	
+		if($this->taskConfig->params->chmod)
+		{
+			try{
+				$engine->chmod($destFile, $this->taskConfig->params->chmod);
+			}
+			catch(Exception $e){}
+		}
+		
+		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 	}
 }

@@ -328,7 +328,7 @@ class KalturaFrontController
 					break;
 				
 				case kCoreException::SEARCH_TOO_GENERAL:
-					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
+					$object = new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
 					break;
 					
 				case kCoreException::SOURCE_FILE_NOT_FOUND:

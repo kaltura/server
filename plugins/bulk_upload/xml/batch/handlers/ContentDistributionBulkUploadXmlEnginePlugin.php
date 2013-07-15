@@ -62,7 +62,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 	{
 		if(is_null($this->distributionProfilesNames))
 		{
-			$distributionPlugin = KalturaContentDistributionClientPlugin::get(KBatchBase::$kClient);
+			$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 			$distributionProfileListResponse = $distributionPlugin->distributionProfile->listAction();
 			if(!is_array($distributionProfileListResponse->objects))
 				return null;
@@ -108,10 +108,10 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if(empty($item->distributions))
 			return;
 			
-		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+		$this->xmlBulkUploadEngine->impersonate();
 		foreach($item->distributions->distribution as $distribution)
 			$this->handleDistribution($object->id, $distribution);
-		KBatchBase::unimpersonate();
+		$this->xmlBulkUploadEngine->unimpersonate();
 	}
 	
 	protected function handleDistribution($entryId, SimpleXMLElement $distribution)
@@ -126,7 +126,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if(!$distributionProfileId)
 			throw new KalturaBatchException("Unable to retrieve distributionProfileId value", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
-		$distributionPlugin = KalturaContentDistributionClientPlugin::get(KBatchBase::$kClient);
+		$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
 		$entryDistributionFilter = new KalturaEntryDistributionFilter();
 		$entryDistributionFilter->distributionProfileIdEqual = $distributionProfileId;
@@ -166,7 +166,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if($distribution['submitWhenReady'])
 			$submitWhenReady = true;
 			
-		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+		$this->xmlBulkUploadEngine->impersonate();
 		if($entryDistributionId)
 		{
 			$updatedEntryDistribution = $distributionPlugin->entryDistribution->update($entryDistributionId, $entryDistribution);
@@ -178,7 +178,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			$createdEntryDistribution = $distributionPlugin->entryDistribution->add($entryDistribution);
 			$distributionPlugin->entryDistribution->submitAdd($createdEntryDistribution->id, $submitWhenReady);
 		}
-		KBatchBase::unimpersonate();
+		$this->xmlBulkUploadEngine->unimpersonate();
 	}
 
 	/* (non-PHPdoc)

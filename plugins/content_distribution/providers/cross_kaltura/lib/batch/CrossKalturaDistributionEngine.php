@@ -128,9 +128,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    // init source client
 	    KalturaLog::debug('Initializing source kaltura client');	    
 	    $sourceClientConfig = new KalturaConfiguration($distributionProfile->partnerId);
-        $sourceClientConfig->serviceUrl = KBatchBase::$kClient->getConfig()->serviceUrl; // copy from static batch client
+        $sourceClientConfig->serviceUrl = $this->kalturaClient->getConfig()->serviceUrl; // copy from batch client
         $this->sourceClient = new KalturaClient($sourceClientConfig);
-        $this->sourceClient->setKs(KBatchBase::$kClient->getKs()); // copy from static batch client
+        $this->sourceClient->setKs($this->kalturaClient->getKs()); // copy from batch client
 	    
 	    
 	    // init target client

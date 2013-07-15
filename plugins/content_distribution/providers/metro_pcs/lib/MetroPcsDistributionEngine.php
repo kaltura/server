@@ -220,7 +220,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->ftpHost;
 		$login = $distributionProfile->ftpLogin;
 		$pass = $distributionProfile->ftpPass;
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login($host, $login, $pass);
 		return $ftpManager;
@@ -264,7 +264,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$login = $distributionProfile->ftpLogin;
 		$pass = $distributionProfile->ftpPass;
 		
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
@@ -280,12 +280,12 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$thumbAssetFilter->idIn = $entryDistribution->thumbAssetIds;
 		
 		try {
-			KBatchBase::impersonate($entryDistribution->partnerId);
-			$thumbAssets = KBatchBase::$kClient->thumbAsset->listAction($thumbAssetFilter);
-			KBatchBase::unimpersonate();
+			$this->impersonate($entryDistribution->partnerId);
+			$thumbAssets = $this->kalturaClient->thumbAsset->listAction($thumbAssetFilter);
+			$this->unimpersonate();
 		}
 		catch (Exception $e) {
-			KBatchBase::unimpersonate();
+			$this->unimpersonate();
 			throw $e;
 		}		
 		return $thumbAssets->objects;		
@@ -298,12 +298,12 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$flavorAssetFilter->idIn = $flavorAssetId;
 		
 		try {
-			KBatchBase::impersonate($entryDistribution->partnerId);
-			$flavorAssets = KBatchBase::$kClient->flavorAsset->listAction($flavorAssetFilter);
-			KBatchBase::unimpersonate();
+			$this->impersonate($entryDistribution->partnerId);
+			$flavorAssets = $this->kalturaClient->flavorAsset->listAction($flavorAssetFilter);
+			$this->unimpersonate();
 		}
 		catch (Exception $e) {
-			KBatchBase::unimpersonate();
+			$this->unimpersonate();
 			throw $e;
 		}		
 		return $flavorAssets->objects;		
@@ -312,12 +312,12 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 	protected function getEntryDuration(KalturaEntryDistribution $entryDistribution)
 	{		
 		try {
-			KBatchBase::impersonate($entryDistribution->partnerId);
-			$entry = KBatchBase::$kClient->baseEntry->get($entryDistribution->entryId);
-			KBatchBase::unimpersonate();
+			$this->impersonate($entryDistribution->partnerId);
+			$entry = $this->kalturaClient->baseEntry->get($entryDistribution->entryId);
+			$this->unimpersonate();
 		}
 		catch (Exception $e) {
-			KBatchBase::unimpersonate();
+			$this->unimpersonate();
 			throw $e;
 		}
 		

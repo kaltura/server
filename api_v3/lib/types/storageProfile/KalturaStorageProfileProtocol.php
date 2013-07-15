@@ -3,22 +3,11 @@
  * @package api
  * @subpackage enum
  */
-class KalturaStorageProfileProtocol extends KalturaDynamicEnum implements StorageProfileProtocol
+class KalturaStorageProfileProtocol extends KalturaEnum
 {
-	/* (non-PHPdoc)
-	 * @see IKalturaDynamicEnum::getEnumClass()
-	 */
-	public static function getEnumClass() {
-		'StorageProfileProtocol';
-		
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaEnum::getDescriptions()
-	 */
-	public static function getDescriptions() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	const KALTURA_DC = 0;
+	const FTP = 1;
+	const SCP = 2;
+	const SFTP = 3;
+	const S3 = 6;
 }

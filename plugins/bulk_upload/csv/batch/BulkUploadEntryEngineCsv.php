@@ -44,9 +44,9 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    }
 			$resource->url = $url;
 
-			KBatchBase::impersonate($this->currentPartnerId);;
-			KBatchBase::$kClient->media->addContent($bulkUploadResult->entryId, $resource);
-			KBatchBase::unimpersonate();
+			$this->impersonate();
+			$this->kClient->media->addContent($bulkUploadResult->entryId, $resource);
+			$this->unimpersonate();
 		}
 	}
 
@@ -57,7 +57,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	protected function createObjects()
 	{
 		// start a multi request for add entries
-		KBatchBase::$kClient->startMultiRequest();
+		$this->kClient->startMultiRequest();
 
 		KalturaLog::info("job[{$this->job->id}] start creating entries [" . count($this->bulkUploadResults) . "]");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
@@ -72,18 +72,18 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 
         			$bulkUploadResultChunk[] = $bulkUploadResult;
 
-        			KBatchBase::impersonate($this->currentPartnerId);;
-        			KBatchBase::$kClient->media->add($mediaEntry);
-        			KBatchBase::unimpersonate();
+        			$this->impersonate();
+        			$this->kClient->media->add($mediaEntry);
+        			$this->unimpersonate();
 
-        			if(KBatchBase::$kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
+        			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
         			{
         				// make all the media->add as the partner
-        				$requestResults = KBatchBase::$kClient->doMultiRequest();
+        				$requestResults = $this->kClient->doMultiRequest();
 
         				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
         				$this->checkAborted();
-        				KBatchBase::$kClient->startMultiRequest();
+        				$this->kClient->startMultiRequest();
         				$bulkUploadResultChunk = array();
         			}
 		            break;
@@ -103,7 +103,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		}
 
 		// make all the media->add as the partner
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
+		$requestResults = $this->kClient->doMultiRequest();
 
 		if(count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
@@ -449,7 +449,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			KalturaLog::notice("No categories found for entry ID [$entryId], skipping association creating");
 			return;
 		}
-	    KBatchBase::impersonate($this->currentPartnerId);;
+	    $this->impersonate();
 
 	    $categoriesArr = explode(",", $categories);
 	    $ret = array();
@@ -457,7 +457,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    {
 	        $categoryFilter = new KalturaCategoryFilter();
 	        $categoryFilter->fullNameEqual = $categoryName;
-	        $res = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+	        $res = $this->kClient->category->listAction($categoryFilter, new KalturaFilterPager());
 	        if (!count($res->objects))
 	        {
 	           $res = $this->createCategoryByPath($categoryName);
@@ -477,7 +477,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	        $categoryEntry->categoryId = $category->id;
 	        $categoryEntry->entryId = $entryId;
 	        try {
-	            KBatchBase::$kClient->categoryEntry->add($categoryEntry);
+	            $this->kClient->categoryEntry->add($categoryEntry);
 	        }
 	        catch (Exception $e)
 	        {
@@ -485,7 +485,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	        }
 	    }
 
-	    KBatchBase::unimpersonate();
+	    $this->unimpersonate();
 	    return;
 	}
 
@@ -507,7 +507,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 
             try
             {
-                $category = KBatchBase::$kClient->category->add($category);
+                $category = $this->kClient->category->add($category);
             }
             catch (Exception $e)
             {
@@ -515,7 +515,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
                 {
                     $catFilter = new KalturaCategoryFilter();
                     $catFilter->fullNameEqual = $fullNameEq;
-                    $res = KBatchBase::$kClient->category->listAction($catFilter);
+                    $res = $this->kClient->category->listAction($catFilter);
                     $category = $res->objects[0];
                 }
                 else

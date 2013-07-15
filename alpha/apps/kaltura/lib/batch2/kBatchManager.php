@@ -267,7 +267,7 @@ class kBatchManager
 				$contentDuration = $mediaInfoDb->getAudioDuration();
 		}
 		
-		if ($contentDuration)
+		if ($contentDuration && $entry->getCalculateDuration())
 		{
 			$entry->setLengthInMsecs($contentDuration);
 		}
