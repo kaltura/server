@@ -19,6 +19,6 @@ class KConversionEngineFfmpegAux  extends KJobConversionEngine
 	
 	public function getCmd ()
 	{
-		return $this->engine_config->params->ffmpegAuxCmd;
+		return KBatchBase::$taskConfig->params->ffmpegAuxCmd;
 	}
 }

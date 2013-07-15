@@ -8,21 +8,15 @@
  */
 abstract class KProvisionEngine
 {
-	/**
-	 * @var KSchedularTaskConfig
-	 */
-	protected $taskConfig = null;
-	
 	
 	/**
 	 * Will return the proper engine depending on the type (KalturaSourceType)
 	 *
 	 * @param int $provider
-	 * @param KSchedularTaskConfig $taskConfig
 	 * @param KalturaProvisionJobData $data
 	 * @return KProvisionEngine
 	 */
-	public static function getInstance ( $provider , KSchedularTaskConfig $taskConfig , KalturaProvisionJobData $data = null)
+	public static function getInstance ( $provider , KalturaProvisionJobData $data = null)
 	{
 		$engine =  null;
 		
@@ -35,19 +29,12 @@ abstract class KProvisionEngine
 				$engine = new KProvisionEngineUniversalAkamai($taskConfig, $data);
 				break;
 			default:
-				$engine = KalturaPluginManager::loadObject('KProvisionEngine', $provider, array($taskConfig));
+				$engine = KalturaPluginManager::loadObject('KProvisionEngine', $provider);
 		}
 		
 		return $engine;
 	}
 
-	/**
-	 * @param KSchedularTaskConfig $taskConfig
-	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig )
-	{
-		$this->taskConfig = $taskConfig;
-	}
 	
 	/**
 	 * @return string

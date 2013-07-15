@@ -19,6 +19,6 @@ class KConversionEngineMencoder  extends KJobConversionEngine
 	
 	public function getCmd ()
 	{
-		return $this->engine_config->params->mencderCmd;
+		return KBatchBase::$taskConfig->params->mencderCmd;
 	}
 }

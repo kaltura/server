@@ -59,7 +59,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	private function postConvert(KalturaBatchJob $job, KalturaPostConvertJobData $data)
 	{
 		if($data->flavorParamsOutputId)
-			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+			$data->flavorParamsOutput = KBatchBase::$kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
 		try
 		{
@@ -88,7 +88,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$mediaInfo = null;
 		try
 		{
-			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig, $job);
+			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), KBatchBase::$taskConfig, $job);
 			if($engine)
 			{
 				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
@@ -125,7 +125,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 				return $this->closeJob($job, null, null, "Media info id $createdMediaInfo->id saved", KalturaBatchJobStatus::FINISHED, $data);
 			
 			// creates a temp file path
-			$rootPath = $this->taskConfig->params->localTempPath;
+			$rootPath = KBatchBase::$taskConfig->params->localTempPath;
 			$this->createDir($rootPath);
 				
 			// creates the path
@@ -142,7 +142,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 				$data->thumbBitrate = $mediaInfo->videoBitRate;
 					
 			// generates the thumbnail
-			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, $this->taskConfig->params->FFMpegCmd);
+			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, KBatchBase::$taskConfig->params->FFMpegCmd);
 			$created = $thumbMaker->createThumnail($data->thumbOffset, $mediaInfo->videoWidth, $mediaInfo->videoHeight, null, null, $mediaInfo->videoDar);
 			
 			if(!$created || !file_exists($thumbPath))
@@ -176,7 +176,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		KalturaLog::debug("moveFile($job->id, $data->thumbPath)");
 		
 		// creates a temp file path
-		$rootPath = $this->taskConfig->params->sharedTempPath;
+		$rootPath = KBatchBase::$taskConfig->params->sharedTempPath;
 		if(! is_dir($rootPath))
 		{
 			if(! file_exists($rootPath))

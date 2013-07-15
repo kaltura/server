@@ -34,6 +34,6 @@ class KAsyncPartnerLoadCleanup extends KPeriodicWorker
 	public function run($jobs = null)
 	{
 		KalturaLog::info("Partner load cleanup batch is running");
-		$this->kClient->batch->updatePartnerLoadTable();
+		self::$kClient->batch->updatePartnerLoadTable();
 	}
 }

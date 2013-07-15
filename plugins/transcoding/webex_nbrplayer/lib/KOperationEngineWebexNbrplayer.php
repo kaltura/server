@@ -16,8 +16,8 @@ inputfile=
 media=
 showui=0
 PCAudio=0
-[UI]
-;video=1
+;[UI]
+video=0
 chat=0
 qa=0
 notes=0
@@ -54,7 +54,7 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 		if(is_null($keyFramesInSec)) $keyFramesInSec=4;
 		if(is_null($bitrate)) $bitrate=2000;
 		if(is_null($videoCodec)) $videoCodec = "Windows Media Video 9";
-		if(is_null($audioCodec)) $audioCodec = "Windows Media Audio 10 Professional";
+		if(is_null($audioCodec)) $audioCodec = "Windows Media Audio 9.2";
 	}
 	else if($format=="MP4"){
 		
@@ -97,10 +97,10 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 		return $exeCmd;
 	}
 
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaBatchJob $job, KalturaClient $client, KalturaConfiguration $clientConfig)
+	public function configure(KalturaConvartableJobData $data, KalturaBatchJob $job)
 	{
-		parent::configure($taskConfig, $data, $job, $client, $clientConfig);
-		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
+		parent::configure($data, $job);
+		KalturaLog::info("taskConfig-->".print_r(KBatchBase::$taskConfig,true)."\ndata->".print_r($data,true));
 	}
 }
 

@@ -46,7 +46,7 @@ class KAsyncProvisionProvide extends KJobHandlerWorker
 		
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED);
 		
-		$engine = KProvisionEngine::getInstance( $job->jobSubType , $this->taskConfig , $data);
+		$engine = KProvisionEngine::getInstance( $job->jobSubType , $data);
 		
 		if ( $engine == null )
 		{

@@ -66,6 +66,7 @@ class Tag extends BaseTag implements IIndexable
            'partner_id' => 'partnerId',
            'object_type' => 'indexObjectType',
            'created_at' => 'createdAt',
+           'updated_at' => 'updatedAt',
            'instance_count' => 'instanceCount',
            'privacy_context' => 'indexPrivacyContext',
        );
@@ -78,6 +79,7 @@ class Tag extends BaseTag implements IIndexable
         'partner_id' => IIndexable::FIELD_TYPE_STRING,
         'object_type' => IIndexable::FIELD_TYPE_STRING,
         'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+    	'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
     	'instance_count' => IIndexable::FIELD_TYPE_INTEGER,
     	'privacy_context' => IIndexable::FIELD_TYPE_STRING,
 	);
@@ -133,15 +135,6 @@ class Tag extends BaseTag implements IIndexable
 	    $this->setInstanceCount(max(array (intval($this->getInstanceCount() - 1), 0)));
 	    $this->save();
 	}
-	
-	/* (non-PHPdoc)
-     * @see IIndexable::setUpdatedAt()
-     */
-    public function setUpdatedAt ($time)
-    {
-        // TODO Auto-generated method stub
-        
-    }
 	
 	/* (non-PHPdoc)
 	 * @see IIndexable::indexToSearchIndex()

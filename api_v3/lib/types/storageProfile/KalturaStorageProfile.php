@@ -331,4 +331,34 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	{
 		return array();
 	}
+    
+    /**
+     * Function returns KalturaStorageProfile sub-type according to protocol
+     * @var string $protocol
+     * 
+     * @return KalturaStorageProfile
+     */
+    public static function getInstanceByType ($protocol)
+    {
+        $obj = null;
+        switch ($protocol) {
+            case StorageProfileProtocol::FTP:
+            case StorageProfileProtocol::SFTP:
+            case StorageProfileProtocol::SCP:
+            case StorageProfileProtocol::KALTURA_DC:
+                $obj = new KalturaStorageProfile();                
+                break;
+            case StorageProfileProtocol::S3:
+                $obj = new KalturaAmazonS3StorageProfile();
+                break;
+            default:
+                $obj = KalturaPluginManager::loadObject('StorageProfile', $protocol);
+                break;
+        }
+        
+        if (!$obj)
+            $obj = new KalturaStorageProfile();
+        
+        return $obj;
+    }
 }

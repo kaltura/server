@@ -59,10 +59,10 @@ class KAsyncConvertCollection extends KAsyncConvert
 	
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{				
-			if($this->taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
+			if(self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
 			{
 				if(!strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))
-					$srcFileSyncDescriptor->actualFileSyncLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
+					$srcFileSyncDescriptor->actualFileSyncLocalPath = self::$taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
 					
 				$err = null;
 				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err))
@@ -91,10 +91,10 @@ class KAsyncConvertCollection extends KAsyncConvert
 		
 		$data->inputXmlLocalPath = $this->translateSharedPath2Local($data->inputXmlLocalPath);
 	
-		if($this->taskConfig->params->isRemoteInput || !strlen(trim($data->inputXmlLocalPath))) // for distributed conversion
+		if(self::$taskConfig->params->isRemoteInput || !strlen(trim($data->inputXmlLocalPath))) // for distributed conversion
 		{
 			if(!strlen(trim($data->inputXmlLocalPath)))
-				$data->inputXmlLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($data->inputXmlLocalPath);
+				$data->inputXmlLocalPath = self::$taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($data->inputXmlLocalPath);
 				
 			$err = null;
 			if(!$this->distributedFileManager->getLocalPath($data->inputXmlLocalPath, $data->inputXmlRemoteUrl, $err))
@@ -203,7 +203,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			$fileSize = kFile::fileSize($srcPath);
 			
 			$flavor->destFileSyncLocalPath = $sharedPath;
-			if($this->taskConfig->params->isRemoteOutput)
+			if(self::$taskConfig->params->isRemoteOutput)
 				$flavor->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($sharedPath);
 						
 			KalturaLog::debug("add to move list file[$srcPath] to[$destPath] size[$fileSize] shared path[$sharedPath]");
@@ -241,7 +241,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 		
 		$data->destDirLocalPath = $this->translateLocalPath2Shared($this->sharedTempPath);
-		if($this->taskConfig->params->isRemoteOutput) // for remote conversion
+		if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 		{
 			$data->destDirRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destDirLocalPath);
 			$job->status = KalturaBatchJobStatus::ALMOST_DONE;
@@ -268,6 +268,6 @@ class KAsyncConvertCollection extends KAsyncConvert
 			$flavors = $job->data->flavors;
 			$job->data->flavors = null;
 		}
-		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
+		return self::$kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
 	}
 }

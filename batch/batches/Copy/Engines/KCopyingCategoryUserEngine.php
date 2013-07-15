@@ -22,18 +22,18 @@ class KCopyingCategoryUserEngine extends KCopyingEngine
 	{
 		$filter->orderBy = KalturaCategoryUserOrderBy::CREATED_AT_ASC;
 		
-		$categoryUsersList = $this->client->categoryUser->listAction($filter, $this->pager);
+		$categoryUsersList = KBatchBase::$kClient->categoryUser->listAction($filter, $this->pager);
 		if(!count($categoryUsersList->objects))
 			return 0;
 			
-		$this->client->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($categoryUsersList->objects as $categoryUser)
 		{
 			$newCategoryUser = $this->getNewObject($categoryUser, $templateObject);
-			$this->client->categoryUser->add($newCategoryUser);
+			KBatchBase::$kClient->categoryUser->add($newCategoryUser);
 		}
 		
-		$results = $this->client->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
 			if(!is_int($result))
 				unset($results[$index]);

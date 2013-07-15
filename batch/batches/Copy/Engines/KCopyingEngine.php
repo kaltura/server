@@ -53,32 +53,18 @@ abstract class KCopyingEngine
 	 * @param KalturaClient $client
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function configure($partnerId, KalturaClient $client, KSchedularTaskConfig $taskConfig)
+	public function configure($partnerId)
 	{
 		$this->partnerId = $partnerId;
-		$this->batchPartnerId = $taskConfig->getPartnerId();
-		$this->client = $client;
+		$this->batchPartnerId = KBatchBase::$taskConfig->getPartnerId();
 
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
 		
-		if($taskConfig->params->pageSize)
-			$this->pager->pageSize = $taskConfig->params->pageSize;
+		if(KBatchBase::$taskConfig->params->pageSize)
+			$this->pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 	}
 	
-	protected function impersonate()
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = $this->partnerId;
-		$this->client->setConfig($clientConfig);
-	}
-	
-	protected function unimpersonate()
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = $this->batchPartnerId;
-		$this->client->setConfig($clientConfig);
-	}
 	
 	/**
 	 * @param KalturaFilter $filter The filter should return the list of objects that need to be copied
@@ -87,9 +73,9 @@ abstract class KCopyingEngine
 	 */
 	public function run(KalturaFilter $filter, KalturaObjectBase $templateObject)
 	{
-		$this->impersonate();
+		KBatchBase::impersonate($this->partnerId);
 		$ret = $this->copy($filter, $templateObject);
-		$this->unimpersonate();
+		KBatchBase::unimpersonate();
 		
 		return $ret;
 	}

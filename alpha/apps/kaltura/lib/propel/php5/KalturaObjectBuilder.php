@@ -263,10 +263,9 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 				return 0;
 			}
 			
-			for (\$retries = 1; \$retries < 4; \$retries++)
+			for (\$retries = 1; \$retries < KalturaPDO::SAVE_MAX_RETRIES; \$retries++)
 			{
                \$affectedRows = \$this->doSave(\$con);
-                KalturaLog::debug(\"affectedRows: \" . \$affectedRows);
                 if (\$affectedRows || !\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 

@@ -17,18 +17,16 @@ class KIndexingKuserPermissionsEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
-		$this->impersonate();
-		$usersList = $this->client->user->listAction($filter, $this->pager);
+		$usersList = KBatchBase::$kClient->user->listAction($filter, $this->pager);
 		if(!count($usersList->objects))
 			return 0;
 			
-		$this->client->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($usersList->objects as $user)
 		{
-			$this->client->user->index($user->id, $shouldUpdate);
+			KBatchBase::$kClient->user->index($user->id, $shouldUpdate);
 		}
-		$results = $this->client->doMultiRequest();
-		$this->unimpersonate();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
 			if(!is_int($result))
 				unset($results[$index]);

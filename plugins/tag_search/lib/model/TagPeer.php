@@ -35,6 +35,7 @@ class TagPeer extends BaseTagPeer
 		{
 			$c->addAnd(self::PRIVACY_CONTEXT, kTagFlowManager::NULL_PC);
 		}
+		$c->addAnd(self::INSTANCE_COUNT, 0, Criteria::GREATER_THAN);
 		
 		self::$s_criteria_filter->setFilter($c);
 	}

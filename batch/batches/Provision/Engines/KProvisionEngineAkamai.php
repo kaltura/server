@@ -21,10 +21,9 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	}
 	
 	/**
-	 * @param KSchedularTaskConfig $taskConfig
 	 * @param KalturaProvisionJobData $data
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig , KalturaProvisionJobData $data = null)
+	protected function __construct(KalturaProvisionJobData $data = null)
 	{
 		parent::__construct($taskConfig);
 		
@@ -43,8 +42,8 @@ class KProvisionEngineAkamai extends KProvisionEngine
 		//if one of the params was not set, use the taskConfig data	
 		if (!$username || !$password )
 		{
-			$username = $this->taskConfig->params->wsdlUsername;
-			$password = $this->taskConfig->params->wsdlPassword;
+			$username = KBatchBase::$taskConfig->params->wsdlUsername;
+			$password = KBatchBase::$taskConfig->params->wsdlPassword;
 		}
 		
 		KalturaLog::debug("Connecting to Akamai(username: $username, password: $password)");
@@ -74,10 +73,10 @@ class KProvisionEngineAkamai extends KProvisionEngine
 		//if one of the params was not set, use the taskConfig data		
 		if (!$cpcode || !$emailId || !$primaryContact || !$secondaryContact)
 		{
-			$cpcode = $this->taskConfig->params->cpcode;
-			$emailId = $this->taskConfig->params->emailId;
-			$primaryContact = $this->taskConfig->params->primaryContact;
-			$secondaryContact = $this->taskConfig->params->secondaryContact;
+			$cpcode = KBatchBase::$taskConfig->params->cpcode;
+			$emailId = KBatchBase::$taskConfig->params->emailId;
+			$primaryContact = KBatchBase::$taskConfig->params->primaryContact;
+			$secondaryContact = KBatchBase::$taskConfig->params->secondaryContact;
 		}
 		
 		$name = $job->entryId;
@@ -173,7 +172,7 @@ class KProvisionEngineAkamai extends KProvisionEngine
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Missing one or both entry points");
 		}
 		
-		$pingTimeout = $this->taskConfig->params->pingTimeout;
+		$pingTimeout = KBatchBase::$taskConfig->params->pingTimeout;
 		@exec("ping -w $pingTimeout $primaryEntryPoint", $output, $return);
 		if ($return)
 		{

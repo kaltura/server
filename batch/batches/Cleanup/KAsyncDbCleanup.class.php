@@ -35,6 +35,6 @@ class KAsyncDbCleanup extends KPeriodicWorker
 	{
 		KalturaLog::info("DB cleanup batch is running");
 		
-		$this->kClient->batch->cleanExclusiveJobs();
+		self::$kClient->batch->cleanExclusiveJobs();
 	}
 }

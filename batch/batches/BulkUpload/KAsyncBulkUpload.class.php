@@ -45,27 +45,27 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		}
 		catch (KalturaBulkUploadAbortedException $abortedException)
 		{
-			$this->unimpersonate();
+			self::unimpersonate();
 			$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ABORTED);
 		}
 		catch(KalturaBatchException $kbex)
 		{
-			$this->unimpersonate();
+			self::unimpersonate();
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kbex->getCode(), "Error: " . $kbex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		catch(KalturaException $kex)
 		{
-			$this->unimpersonate();
+			self::unimpersonate();
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		catch(KalturaClientException $kcex)
 		{
-			$this->unimpersonate();
+			self::unimpersonate();
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
 		}
 		catch(Exception $ex)
 		{
-			$this->unimpersonate();
+			self::unimpersonate();
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		ini_set('auto_detect_line_endings', false);
@@ -91,7 +91,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		KalturaLog::debug( "startBulkUpload($job->id)" );
 		
 		//Gets the right Engine instance 
-		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $this->taskConfig, $this->kClient, $job);
+		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $job);
 		if (is_null ( $engine )) {
 			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND );
 		}
@@ -109,7 +109,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		if($engine->shouldRetry())
 		{
 			KalturaLog::debug("Set the job to retry");
-			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+			self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 			return $this->closeJob($job, null, null, "Retrying: ".$countHandledObjects." ".$engine->getObjectTypeTitle()." objects were handled untill now", KalturaBatchJobStatus::RETRY);
 		}
 			
@@ -123,7 +123,7 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	 */
 	protected function countCreatedObjects($jobId, $bulkuploadObjectType) 
 	{
-		return $this->kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
+		return self::$kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
 	}
 	
 }

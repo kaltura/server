@@ -41,7 +41,7 @@ class KScheduleHelper extends KPeriodicWorker
 		
 		try
 		{
-			$systemReady = $this->kClient->system->ping();
+			$systemReady = self::$kClient->system->ping();
 			if (!$systemReady) {
 				KalturaLog::err("System is not yet ready - ping failed");
 				return;
@@ -80,7 +80,7 @@ class KScheduleHelper extends KPeriodicWorker
 		KalturaLog::info(count($statuses) . " status records sent from the scheduler");
 		
 		// send status to the server
-		$statusResponse = $this->kClient->batchcontrol->reportStatus($scheduler, (array)$statuses, (array)$filters);
+		$statusResponse = self::$kClient->batchcontrol->reportStatus($scheduler, (array)$statuses, (array)$filters);
 		KalturaLog::info(count($statusResponse->queuesStatus) . " queue status records returned from the server");
 		KalturaLog::info(count($statusResponse->controlPanelCommands) . " control commands returned from the server");
 		KalturaLog::info(count($statusResponse->schedulerConfigs) . " config items returned from the server");
@@ -103,7 +103,7 @@ class KScheduleHelper extends KPeriodicWorker
 		
 		foreach($configItemsArr as $configItems)
 		{
-			$this->kClient->startMultiRequest();
+			self::$kClient->startMultiRequest();
 			
 			foreach($configItems as $configItem)
 			{
@@ -112,11 +112,11 @@ class KScheduleHelper extends KPeriodicWorker
 					if(is_null($configItem->value))
 						$configItem->value = '';
 						
-					$this->kClient->batchcontrol->configLoaded($scheduler, $configItem->variable, $configItem->value, $configItem->variablePart, $configItem->workerConfiguredId, $configItem->workerName);
+					self::$kClient->batchcontrol->configLoaded($scheduler, $configItem->variable, $configItem->value, $configItem->variablePart, $configItem->workerConfiguredId, $configItem->workerName);
 				}
 			}
 			
-			$this->kClient->doMultiRequest();
+			self::$kClient->doMultiRequest();
 		}
 	}
 	
@@ -127,19 +127,19 @@ class KScheduleHelper extends KPeriodicWorker
 	{
 		KalturaLog::debug("sendCommandResults(" . count($commandResults) . ")");
 		
-		$this->kClient->startMultiRequest();
+		self::$kClient->startMultiRequest();
 		
 		foreach($commandResults as $commandResult)
 		{
 			if($commandResult instanceof KalturaSchedulerConfig)
 			{
 				KalturaLog::info("Handling config id[$commandResult->id], with command id[$commandResult->commandId]");
-				$this->kClient->batchcontrol->setCommandResult($commandResult->commandId, $commandResult->commandStatus);
+				self::$kClient->batchcontrol->setCommandResult($commandResult->commandId, $commandResult->commandStatus);
 			}
 			elseif($commandResult instanceof KalturaControlPanelCommand)
 			{
 				KalturaLog::info("Handling command id[$commandResult->id]");
-				$this->kClient->batchcontrol->setCommandResult($commandResult->id, $commandResult->status, $commandResult->errorDescription);
+				self::$kClient->batchcontrol->setCommandResult($commandResult->id, $commandResult->status, $commandResult->errorDescription);
 			}
 			else
 			{
@@ -147,6 +147,6 @@ class KScheduleHelper extends KPeriodicWorker
 			}
 		}
 		
-		$this->kClient->doMultiRequest();
+		self::$kClient->doMultiRequest();
 	}
 }

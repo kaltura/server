@@ -44,10 +44,10 @@ class KAsyncBulkUploadCloser extends KJobCloserWorker
 	{
 		KalturaLog::debug("fetchStatus($job->id)");
 		
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 			
-		$openedEntries = $this->kClient->batch->updateBulkUploadResults($job->id);
+		$openedEntries = self::$kClient->batch->updateBulkUploadResults($job->id);
 		$job = $this->updateJob($job, "Unclosed entries remaining: $openedEntries" , KalturaBatchJobStatus::ALMOST_DONE);
 		if(!$openedEntries)
 		{

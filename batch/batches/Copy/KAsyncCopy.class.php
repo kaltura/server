@@ -45,7 +45,7 @@ class KAsyncCopy extends KJobHandlerWorker
 		KalturaLog::debug("Copy objects job id [$job->id]");
 		
 		$engine = KCopyingEngine::getInstance($job->jobSubType);
-		$engine->configure($job->partnerId, $this->kClient, $this->taskConfig);
+		$engine->configure($job->partnerId);
 	
 		$filter = clone $data->filter;
 		$advancedFilter = new KalturaIndexAdvancedFilter();

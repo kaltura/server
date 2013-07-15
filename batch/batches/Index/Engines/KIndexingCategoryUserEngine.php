@@ -22,16 +22,16 @@ class KIndexingCategoryUserEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaCategoryUserOrderBy::CREATED_AT_ASC;
 		
-		$categoryUsersList = $this->client->categoryUser->listAction($filter, $this->pager);
+		$categoryUsersList = KBatchBase::$kClient->categoryUser->listAction($filter, $this->pager);
 		if(!count($categoryUsersList->objects))
 			return 0;
 			
-		$this->client->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($categoryUsersList->objects as $categoryUser)
 		{
-			$this->client->categoryUser->index($categoryUser->userId, $categoryUser->categoryId, $shouldUpdate);
+			KBatchBase::$kClient->categoryUser->index($categoryUser->userId, $categoryUser->categoryId, $shouldUpdate);
 		}
-		$results = $this->client->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
 			if(!is_int($result))
 				unset($results[$index]);

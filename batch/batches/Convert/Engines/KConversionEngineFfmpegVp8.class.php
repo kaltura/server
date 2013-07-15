@@ -19,6 +19,6 @@ class KConversionEngineFfmpegVp8  extends KJobConversionEngine
 	
 	public function getCmd ()
 	{
-		return $this->engine_config->params->ffmpegVp8Cmd;
+		return KBatchBase::$taskConfig->params->ffmpegVp8Cmd;
 	}
 }

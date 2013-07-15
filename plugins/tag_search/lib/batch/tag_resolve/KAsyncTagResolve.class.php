@@ -19,7 +19,7 @@ class KAsyncTagResolve extends KPeriodicWorker
 	public function run($jobs = null) 
 	{
 		KalturaLog::info("Running tag resolver");
-		$tagPlugin = KalturaTagSearchClientPlugin::get($this->kClient);
+		$tagPlugin = KalturaTagSearchClientPlugin::get(self::$kClient);
 		$deletedTags = $tagPlugin->tag->deletePending();
 		
 		KalturaLog::info("Finished resolving tags: $deletedTags tags removed from DB");

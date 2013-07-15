@@ -19,7 +19,7 @@ class KConversionEngineFlix  extends KJobConversionEngine
 
 	public function getCmd ()
 	{
-		return $this->engine_config->params->on2Cmd;
+		return KBatchBase::$taskConfig->params->on2Cmd;
 	}
 
 }

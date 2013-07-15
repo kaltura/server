@@ -58,8 +58,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		parent::__construct($taskConfig);
 		
 		// creates a temp file path
-		$this->localTempPath = $this->taskConfig->params->localTempPath;
-		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
+		$this->localTempPath = self::$taskConfig->params->localTempPath;
+		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 		
 	}
 	
@@ -86,13 +86,13 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	{
 		KalturaLog::debug("fetchStatus($job->id)");
 		
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 		
 		if(isset($data->flavorParamsOutputId))
-			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+			$data->flavorParamsOutput = self::$kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 			
-		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient, $this->kClientConfig);
+		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $data, $job);
 		try 
 		{
 			$isDone = $this->operationEngine->closeOperation();
@@ -110,7 +110,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);			
 		}
 			
-		if($this->taskConfig->params->isRemoteOutput)
+		if(self::$taskConfig->params->isRemoteOutput)
 		{
 			return $this->handleRemoteOutput($job, $data);
 		}

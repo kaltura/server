@@ -84,7 +84,7 @@ class myCustomData
 		{
 			if ( $remove_if_empty && empty ( $value ) )
 			{
-				unset ($this->data [$name]);
+				unset ($this->data [$namespace][$name]);
 			}
 			else
 			{

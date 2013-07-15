@@ -46,7 +46,7 @@ class KAsyncVirusScan extends KJobHandlerWorker
 			}
 						
 			// configure engine
-			if (!$engine->config($this->taskConfig->params))
+			if (!$engine->config(self::$taskConfig->params))
 			{
 				KalturaLog::err('Cannot configure VirusScanEngine of type ['.$job->jobSubType.']');
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, 'Error: Cannot configure VirusScanEngine of type ['.$job->jobSubType.']', KalturaBatchJobStatus::FAILED);
@@ -67,7 +67,7 @@ class KAsyncVirusScan extends KJobHandlerWorker
 		
 			try
 			{
-				$this->kClient->batch->logConversion($data->flavorAssetId, $output);
+				self::$kClient->batch->logConversion($data->flavorAssetId, $output);
 			}
 			catch(Exception $e)
 			{

@@ -40,7 +40,7 @@ class KAsyncDelete extends KJobHandlerWorker
 		KalturaLog::debug("Delete objects job id [$job->id]");
 		
 		$engine = KDeletingEngine::getInstance($job->jobSubType);
-		$engine->configure($job->partnerId, $this->kClient, $this->taskConfig);
+		$engine->configure($job->partnerId);
 	
 		$filter = clone $data->filter;
 		

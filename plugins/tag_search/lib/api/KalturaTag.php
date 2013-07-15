@@ -41,6 +41,12 @@ class KalturaTag extends KalturaObject
      */
     public $createdAt;
     
+    /**
+     * @var int
+     * @readonly
+     */
+    public $updatedAt;
+    
     private static $map_between_objects = array
 	(
 		"id",
@@ -49,6 +55,7 @@ class KalturaTag extends KalturaObject
 	    "partnerId",
 	    "instanceCount",
 	    "createdAt",
+		"updatedAt",
 	);
 	
 	public function getMapBetweenObjects()

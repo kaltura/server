@@ -19,7 +19,7 @@ class KConversionEngineExpressionEncoder3 extends KCollectionConversionEngine
 	
 	public function getCmd ()
 	{
-		return $this->engine_config->params->expEncoderCmd;
+		return KBatchBase::$taskConfig->params->expEncoderCmd;
 	}
 	
 	protected function convertCollection ( KalturaConvertCollectionJobData &$data )

@@ -22,16 +22,16 @@ class KIndexingEntryEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
-		$entriesList = $this->client->baseEntry->listAction($filter, $this->pager);
+		$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
 		if(!count($entriesList->objects))
 			return 0;
 			
-		$this->client->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($entriesList->objects as $entry)
 		{
-			$this->client->baseEntry->index($entry->id, $shouldUpdate);
+			KBatchBase::$kClient->baseEntry->index($entry->id, $shouldUpdate);
 		}
-		$results = $this->client->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
 			if(!is_int($result))
 				unset($results[$index]);

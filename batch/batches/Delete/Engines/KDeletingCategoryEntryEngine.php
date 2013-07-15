@@ -21,17 +21,17 @@ class KDeletingCategoryEntryEngine extends KDeletingEngine
 	{
 		$filter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
 		
-		$categoryEntriesList = $this->client->categoryEntry->listAction($filter, $this->pager);
+		$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($filter, $this->pager);
 		if(!count($categoryEntriesList->objects))
 			return 0;
 			
-		$this->client->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($categoryEntriesList->objects as $categoryEntry)
 		{
 			/* @var $categoryEntry KalturaCategoryEntry */
-			$this->client->categoryEntry->delete($categoryEntry->entryId, $categoryEntry->categoryId);
+			KBatchBase::$kClient->categoryEntry->delete($categoryEntry->entryId, $categoryEntry->categoryId);
 		}
-		$results = $this->client->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
 			if(is_array($result) && isset($result['code']))
 				unset($results[$index]);

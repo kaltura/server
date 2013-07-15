@@ -33,17 +33,17 @@ class KConversionEngineEncodingCom  extends KJobConversionEngine
 
 	protected function getUserId()
 	{
-		return $this->engine_config->params->EncodingComUserId;
+		return KBatchBase::$taskConfig->params->EncodingComUserId;
 	}
 
 	protected function getUserKey()
 	{
-		return $this->engine_config->params->EncodingComUserKey;
+		return KBatchBase::$taskConfig->params->EncodingComUserKey;
 	}
 
 	protected function getUrl()
 	{
-		return $this->engine_config->params->EncodingComUrl;
+		return KBatchBase::$taskConfig->params->EncodingComUrl;
 	}
 	
 	/* (non-PHPdoc)
