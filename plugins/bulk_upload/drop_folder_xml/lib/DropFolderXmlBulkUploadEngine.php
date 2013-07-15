@@ -41,17 +41,17 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		KalturaLog::debug("Starting BulkUpload for XML drop folder file with id [".$this->job->jobObjectId.']');
 		
-		$this->impersonate();
-		$dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
-		$this->kClient->startMultiRequest();
+		KBatchBase::impersonate($this->currentPartnerId);;
+		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::$kClient->startMultiRequest();
 		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
 		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
-		list($this->xmlDropFolderFile, $this->dropFolder) = $this->kClient->doMultiRequest();
+		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
 				
-		$this->physicalFileUtils = new KPhysicalDropFolderUtils($this->dropFolder, $this->taskConfig);
+		$this->physicalFileUtils = new KPhysicalDropFolderUtils($this->dropFolder);
 		$this->data->filePath = $this->physicalFileUtils->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
 		$this->setContentResourceFilesMap($dropFolderPlugin);
-		$this->unimpersonate();
+		KBatchBase::unimpersonate();
 		parent::handleBulkUpload();
 	}
 	
