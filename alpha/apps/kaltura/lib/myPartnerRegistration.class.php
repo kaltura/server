@@ -223,7 +223,10 @@ class myPartnerRegistration
 	 	if (!$fromPartner)
 	 		KalturaLog::log("Template content partner was not found!");
  		else
+ 		{
+ 			$newPartner->setI18nTemplatePartnerId($templatePartnerId);
 	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner, true);
+ 		}
 	 		
 	 	if ($newPartner->getType() == Partner::PARTNER_TYPE_WORDPRESS)
 	 		kPermissionManager::setPs2Permission($newPartner);
