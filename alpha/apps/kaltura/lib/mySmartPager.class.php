@@ -114,7 +114,7 @@ added the count to init
 public function init(  $cached_count = NULL ) 
 
 just under the require_once:
-    require_once($classPath);
+//  require_once($classPath);
     if ( $cached_count != NULL )
     {
         $count = $cached_count;

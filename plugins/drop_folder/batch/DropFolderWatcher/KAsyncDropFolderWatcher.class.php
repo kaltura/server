@@ -47,10 +47,10 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		KalturaLog::info("Drop folder watcher batch is running");
 		
-		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get(self::$kClient);
-		$this->dropFolderServicesHelper = new KDropFolderServicesHelper();	
+		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
+		$this->dropFolderServicesHelper = new KDropFolderServicesHelper($this->kClient);	
 		
-		if(self::$taskConfig->isInitOnly())
+		if($this->taskConfig->isInitOnly())
 			return $this->init();
 		
 		$dropFolders = $this->getDropFoldersList();
@@ -104,7 +104,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		KalturaLog::debug('Watching folder ['.$folder->id.']');
 						    										
-		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder, self::$taskConfig);		
+		$this->physicalDropFolderUtils = new KPhysicalDropFolderUtils($folder, $this->taskConfig);		
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder($folder);
 		if(count($physicalFiles) > 0)
 			$dropFolderFilesMap = $this->loadDropFolderFiles($folder);
@@ -232,8 +232,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		if(self::$taskConfig->params->pageSize)
-			$pager->pageSize = self::$taskConfig->params->pageSize;	
+		if($this->taskConfig->params->pageSize)
+			$pager->pageSize = $this->taskConfig->params->pageSize;	
 
 		do
 		{
@@ -351,7 +351,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		
 	private function getDropFoldersList() 
 	{
-		$folderTags = self::$taskConfig->params->tags;
+		$folderTags = $this->taskConfig->params->tags;
 		
 		if (strlen($folderTags) == 0) {		
 			KalturaLog::err('Tags configuration is empty - cannot continue');			
@@ -370,8 +370,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		if(self::$taskConfig->params->pageSize)
-			$pager->pageSize = self::$taskConfig->params->pageSize;	
+		if($this->taskConfig->params->pageSize)
+			$pager->pageSize = $this->taskConfig->params->pageSize;	
 		
 		
 		try 

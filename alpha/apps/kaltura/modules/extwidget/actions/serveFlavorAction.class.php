@@ -136,6 +136,7 @@ class serveFlavorAction extends kalturaAction
 			{
 				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
 				apc_store('dumpFile-'.$host.$_SERVER["REQUEST_URI"], $renderer, 86400);
+				header("X-Kaltura:cache-key");
 			}
 
 			$renderer->output();

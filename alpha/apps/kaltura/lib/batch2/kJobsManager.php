@@ -1208,7 +1208,6 @@ class kJobsManager
 		
 		$batchJob->setObjectId($fileSync->getId());
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
-		$batchJob->setJobSubType($externalStorage->getProtocol());
 		$batchJob->setDc($dc);
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
@@ -1247,9 +1246,14 @@ class kJobsManager
 	
 	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
-		$netStorageDeleteData = kStorageDeleteJobData::getInstance($storage->getProtocol());
-        	$netStorageDeleteData->setJobData($storage, $filesync);
-        
+		$netStorageDeleteData = new kStorageDeleteJobData();
+	    $netStorageDeleteData->setServerUrl($storage->getStorageUrl()); 
+	    $netStorageDeleteData->setServerUsername($storage->getStorageUsername()); 
+	    $netStorageDeleteData->setServerPassword($storage->getStoragePassword());
+	    $netStorageDeleteData->setFtpPassiveMode($storage->getStorageFtpPassiveMode());
+
+	    $netStorageDeleteData->setSrcFileSyncId($fileSync->getId());
+		$netStorageDeleteData->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		if ($parentJob)
 		{
 			$batchJob = $parentJob->createChild(BatchJobType::STORAGE_DELETE, $storage->getProtocol(), false);

@@ -21,12 +21,12 @@ class KAsyncStorageSync extends KAsyncStorageExport
 		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
 		$this->updateJob($job, "Syncing $srcFile, id: $data->srcFileSyncId", KalturaBatchJobStatus::QUEUED);
 
-		$remoteClientConfig = clone self::$kClient->getConfig();
+		$remoteClientConfig = clone $this->kClient->getConfig();
 		$remoteClientConfig->serviceUrl = $data->serverUrl;
-		$remoteClientConfig->curlTimeout = self::$taskConfig->maximumExecutionTime;
+		$remoteClientConfig->curlTimeout = $this->taskConfig->maximumExecutionTime;
 		
 		$remoteClient = new KalturaClient($remoteClientConfig);
-		$remoteClient->setKs(self::$kClient->getKs());
+		$remoteClient->setKs($this->kClient->getKs());
 		
 		try{
 			$fileSync = $remoteClient->fileSync->sync($data->srcFileSyncId, realpath($srcFile));

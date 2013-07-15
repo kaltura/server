@@ -190,23 +190,26 @@ class KCurlWrapper
 				
 			if(!$curlHeaderResponse->isGoodCode())
 				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
+					
+			$curlWrapper->close();
 			
 			if(isset($curlHeaderResponse->headers['content-length']))
-					$fileSize = $curlHeaderResponse->headers['content-length'];
-			else
-				throw new Exception("File With Unknown File Size Dropping request");
-			
-			if($fileSize > $maxFileSize)
-				throw new Exception("File size [$fileSize] Excedded Max Siae Allowed [$maxFileSize]");
-				
-			$curlWrapper->close();
+			{
+				$fileSize = $curlHeaderResponse->headers['content-length'];
+				if($fileSize > $maxFileSize)
+					throw new Exception("File size [$fileSize] Excedded Max Siae Allowed [$maxFileSize]");
+					
+				KalturaLog::debug("File size [$fileSize] validated");
+			}
+			else 
+			{
+				KalturaLog::debug("File size validation skipped");
+			}
 		}
 		
 		$curlWrapper = new KCurlWrapper($url);
-		KalturaLog::debug("Executing curl");
 		$res = $curlWrapper->exec($destFilePath);
 		$curlWrapper->close();
-		KalturaLog::debug("Done Curl Executing");
 		
 		return $res;
 	}

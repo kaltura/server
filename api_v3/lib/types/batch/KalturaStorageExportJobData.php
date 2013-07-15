@@ -37,16 +37,8 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	 */
 	public function toSubType($subType)
 	{
-		switch ($subType) {
-			case KalturaStorageProfileProtocol::FTP:
-            case KalturaStorageProfileProtocol::SFTP:
-            case KalturaStorageProfileProtocol::SCP:
-            case KalturaStorageProfileProtocol::S3:
-            case KalturaStorageProfileProtocol::KALTURA_DC:
-                return $subType;                  	
-			default:
-				return kPluginableEnumsManager::apiToCore('KalturaStorageProfileProtocol', $subType);
-		}
+		// TODO - change to pluginable enum to support more file export protocols
+		return $subType;
 	}
 	
 	/**
@@ -55,15 +47,7 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	 */
 	public function fromSubType($subType)
 	{
-		switch ($subType) {
-            case StorageProfileProtocol::FTP:
-            case StorageProfileProtocol::SFTP:
-            case StorageProfileProtocol::SCP:
-            case StorageProfileProtocol::S3:
-            case StorageProfileProtocol::KALTURA_DC:
-                return $subType;                    
-            default:
-                return kPluginableEnumsManager::coreToApi('StorageProfileProtocol', $subType);
-        }
+		// TODO - change to pluginable enum to support more file export protocols
+		return $subType;
 	}
 }

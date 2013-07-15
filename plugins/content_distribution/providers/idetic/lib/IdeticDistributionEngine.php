@@ -34,13 +34,13 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure()
+	public function configure(KSchedularTaskConfig $taskConfig)
 	{
-		parent::configure();
+		parent::configure($taskConfig);
 		
 		$this->tempXmlPath = sys_get_temp_dir();
-		if(KBatchBase::$taskConfig->params->ideticFetchReportPath)
-			$this->fetchReportPath = KBatchBase::$taskConfig->params->ideticFetchReportPath;
+		if($taskConfig->params->ideticFetchReportPath)
+			$this->fetchReportPath = $taskConfig->params->ideticFetchReportPath;
 	}
 
 	/* (non-PHPdoc)
@@ -87,7 +87,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$destFile = "{$path}/{$fileName}";
 			
 		
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
@@ -148,7 +148,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		file_put_contents($srcFile, $feedHelper->getXmlString());
 		KalturaLog::debug("XML written to file [$srcFile]");
 		
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
@@ -261,7 +261,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		
 		KalturaLog::debug("Listing content for [$this->path]");
 		
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
@@ -424,7 +424,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		$loginName = $distributionProfile->sftpLogin;
 		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
 		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
 		return $sftpManager;

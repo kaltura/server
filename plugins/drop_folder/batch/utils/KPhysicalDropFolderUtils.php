@@ -18,15 +18,18 @@ class KPhysicalDropFolderUtils
 	protected $tempDirectory = null;
 	
 	/**
-	 * @param KalturaDropFolder $folder
+	 * @var KSchedularTaskConfig
 	 */
-	public function __construct(KalturaDropFolder $folder)
+	protected $taskConfig = null;
+	
+	public function __construct(KalturaDropFolder $folder, KSchedularTaskConfig $taskConfig)
 	{
-		$this->tempDirectory = isset(KBatchBase::$taskConfig->params->tempDirectoryPath) ? KBatchBase::$taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
+		$this->tempDirectory = isset($taskConfig->params->tempDirectoryPath) ? $taskConfig->params->tempDirectoryPath : sys_get_temp_dir();
 		if (!is_dir($this->tempDirectory)) 
 			kFile::fullMkfileDir($this->tempDirectory, 0700, true);
 		
 		$this->folder = $folder;
+		$this->taskConfig = $taskConfig;
 		$this->fileTransferMgr = self::getFileTransferManager($folder);
 	}
 
@@ -65,7 +68,7 @@ class KPhysicalDropFolderUtils
      */
 	private static function getFileTransferManager(KalturaDropFolder $folder)
 	{
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
 	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($folder->type), $engineOptions);
 	    
 	    $host =null; $username=null; $password=null; $port=null;

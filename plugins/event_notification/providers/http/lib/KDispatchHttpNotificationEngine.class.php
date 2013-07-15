@@ -15,14 +15,14 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::__construct()
 	 */
-	public function __construct()
+	public function __construct(KSchedularTaskConfig $taskConfig, KalturaClient $client)
 	{
 		$this->tempFolderPath = sys_get_temp_dir();
 		
-		if(isset(KBatchBase::$taskConfig->params->tempFolderPath) && KBatchBase::$taskConfig->params->tempFolderPath)
-			$this->tempFolderPath = KBatchBase::$taskConfig->params->tempFolderPath;
+		if(isset($taskConfig->params->tempFolderPath) && $taskConfig->params->tempFolderPath)
+			$this->tempFolderPath = $taskConfig->params->tempFolderPath;
 		
-		parent::__construct();
+		parent::__construct($taskConfig, $client);
 	}
 	
 	/* (non-PHPdoc)

@@ -29,16 +29,8 @@ class KalturaStorageDeleteJobData extends KalturaStorageJobData
 	 */
 	public function toSubType($subType)
 	{
-		switch ($subType) {
-			case KalturaStorageProfileProtocol::SFTP:
-            case KalturaStorageProfileProtocol::FTP:
-            case KalturaStorageProfileProtocol::SCP:
-            case KalturaStorageProfileProtocol::S3:
-            case KalturaStorageProfileProtocol::KALTURA_DC:
-                return $subType;	
-			default:
-				return kPluginableEnumsManager::apiToCore('StorageProfileProtocol', $subType);
-		}
+		// TODO - change to pluginable enum to support more file export protocols
+		return $subType;
 	}
 	
 	/**
@@ -47,15 +39,8 @@ class KalturaStorageDeleteJobData extends KalturaStorageJobData
 	 */
 	public function fromSubType($subType)
 	{
-		switch ($subType) {
-            case StorageProfileProtocol::SFTP:
-            case StorageProfileProtocol::FTP:
-            case StorageProfileProtocol::SCP:
-            case StorageProfileProtocol::S3:
-            case StorageProfileProtocol::KALTURA_DC:
-                return $subType;    
-            default:
-                return kPluginableEnumsManager::coreToApi('KalturaStorageProfileProtocol', $subType);
-        }
+		// TODO - change to pluginable enum to support more file export protocols
+		return $subType;
 	}
 }
+

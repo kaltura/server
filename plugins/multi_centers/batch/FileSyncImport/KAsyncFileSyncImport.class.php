@@ -32,8 +32,8 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	 */
 	protected function getJobs()
 	{
-		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
-		return $multiCentersPlugin->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
+		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get($this->kClient);
+		return $multiCentersPlugin->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
 	}
 	
 	/* (non-PHPdoc)
@@ -260,7 +260,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// get http body
 		$curlWrapper = new KCurlWrapper($sourceUrl);
-		$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
+		$curlWrapper->setTimeout($this->taskConfig->params->curlTimeout);
 
 		if($resumeOffset)
 		{
@@ -336,7 +336,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			{
 				// part of file was downloaded - will resume in next run
 				KalturaLog::debug('File partialy downloaded - will resumt in next run');
-				self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+				$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 				$this->closeJob($job, null, null, "Downloaded size: $actualFileSize", KalturaBatchJobStatus::RETRY);
 				return false;
 			}
@@ -387,14 +387,14 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 			
 		// set file owner
-		$chown_name = self::$taskConfig->params->fileOwner;
+		$chown_name = $this->taskConfig->params->fileOwner;
 		if ($chown_name) {
 			KalturaLog::debug("Changing owner of file [$destFile] to [$chown_name]");
 			@chown($destFile, $chown_name);
 		}
 		
 		// set file mode
-		$chmod_perm = octdec(self::$taskConfig->params->fileChmod);
+		$chmod_perm = octdec($this->taskConfig->params->fileChmod);
 		if (!$chmod_perm) {
 			$chmod_perm = 0644;
 		}
@@ -517,14 +517,14 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 				
 		// set directory owner
-		$chown_name = self::$taskConfig->params->fileOwner;
+		$chown_name = $this->taskConfig->params->fileOwner;
 		if ($chown_name) {
 			KalturaLog::debug("Changing owner of directory [$dirPath] to [$chown_name]");
 			@chown($dirPath, $chown_name);
 		}
 		
 		// set directory mode
-		$chmod_perm = octdec(self::$taskConfig->params->fileChmod);
+		$chmod_perm = octdec($this->taskConfig->params->fileChmod);
 		if (!$chmod_perm) {
 			$chmod_perm = 0644;
 		}
@@ -573,7 +573,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	private function getTmpPath($sourceUrl)
 	{
 		// create a temporary file path 
-		$rootPath = self::$taskConfig->params->localTempPath;
+		$rootPath = $this->taskConfig->params->localTempPath;
 		
 		$res = self::createDir( $rootPath );
 		if ( !$res ) 

@@ -8,13 +8,22 @@
 abstract class KEmailNotificationRecipientEngine
 {
 	/**
+	 * Engine's client
+	 * @var KalturaClient
+	 */
+	protected $client;
+	
+	
+	
+	/**
 	 * Job data for the email notification recipients
 	 * @var KalturaEmailNotificationRecipientJobData
 	 */
 	protected $recipientJobData;
 	
-	public function __construct(KalturaEmailNotificationRecipientJobData $recipientJobData)
+	public function __construct(KalturaEmailNotificationRecipientJobData $recipientJobData, $kClient)
 	{
+		$this->client = $kClient;
 		$this->recipientJobData = $recipientJobData;
 		
 	}
@@ -25,9 +34,9 @@ abstract class KEmailNotificationRecipientEngine
 	 * @param KalturaClient $kClient
 	 * @return KEmailNotificationRecipientEngine
 	 */
-	public static function getEmailNotificationRecipientEngine(KalturaEmailNotificationRecipientJobData $recipientJobData)
+	public static function getEmailNotificationRecipientEngine(KalturaEmailNotificationRecipientJobData $recipientJobData, $kClient)
 	{
-		return KalturaPluginManager::loadObject('KEmailNotificationRecipientEngine', $recipientJobData->providerType, array($recipientJobData));
+		return KalturaPluginManager::loadObject('KEmailNotificationRecipientEngine', $recipientJobData->providerType, array($recipientJobData, $kClient));
 	}
 
 	

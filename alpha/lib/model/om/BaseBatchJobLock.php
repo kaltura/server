@@ -155,6 +155,12 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the batch_version field.
+	 * @var        int
+	 */
+	protected $batch_version;
+
+	/**
 	 * @var        BatchJob
 	 */
 	protected $aBatchJob;
@@ -545,6 +551,16 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [batch_version] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getBatchVersion()
+	{
+		return $this->batch_version;
 	}
 
 	/**
@@ -1139,6 +1155,29 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [batch_version] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BatchJobLock The current object (for fluent API support)
+	 */
+	public function setBatchVersion($v)
+	{
+		if(!isset($this->oldColumnsValues[BatchJobLockPeer::BATCH_VERSION]))
+			$this->oldColumnsValues[BatchJobLockPeer::BATCH_VERSION] = $this->batch_version;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->batch_version !== $v) {
+			$this->batch_version = $v;
+			$this->modifiedColumns[] = BatchJobLockPeer::BATCH_VERSION;
+		}
+
+		return $this;
+	} // setBatchVersion()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1204,6 +1243,7 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			$this->dc = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->batch_job_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
 			$this->custom_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->batch_version = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1213,7 +1253,7 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 22; // 22 = BatchJobLockPeer::NUM_COLUMNS - BatchJobLockPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 23; // 23 = BatchJobLockPeer::NUM_COLUMNS - BatchJobLockPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BatchJobLock object", $e);
@@ -1707,6 +1747,9 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			case 21:
 				return $this->getCustomData();
 				break;
+			case 22:
+				return $this->getBatchVersion();
+				break;
 			default:
 				return null;
 				break;
@@ -1750,6 +1793,7 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			$keys[19] => $this->getDc(),
 			$keys[20] => $this->getBatchJobId(),
 			$keys[21] => $this->getCustomData(),
+			$keys[22] => $this->getBatchVersion(),
 		);
 		return $result;
 	}
@@ -1847,6 +1891,9 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 			case 21:
 				$this->setCustomData($value);
 				break;
+			case 22:
+				$this->setBatchVersion($value);
+				break;
 		} // switch()
 	}
 
@@ -1893,6 +1940,7 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[19], $arr)) $this->setDc($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setBatchJobId($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setCustomData($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setBatchVersion($arr[$keys[22]]);
 	}
 
 	/**
@@ -1926,6 +1974,7 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BatchJobLockPeer::DC)) $criteria->add(BatchJobLockPeer::DC, $this->dc);
 		if ($this->isColumnModified(BatchJobLockPeer::BATCH_JOB_ID)) $criteria->add(BatchJobLockPeer::BATCH_JOB_ID, $this->batch_job_id);
 		if ($this->isColumnModified(BatchJobLockPeer::CUSTOM_DATA)) $criteria->add(BatchJobLockPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(BatchJobLockPeer::BATCH_VERSION)) $criteria->add(BatchJobLockPeer::BATCH_VERSION, $this->batch_version);
 
 		return $criteria;
 	}
@@ -2023,6 +2072,8 @@ abstract class BaseBatchJobLock extends BaseObject  implements Persistent {
 		$copyObj->setBatchJobId($this->batch_job_id);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setBatchVersion($this->batch_version);
 
 
 		if ($deepCopy) {

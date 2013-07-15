@@ -1,0 +1,70 @@
+config/autoload.yml:
+  class:    sfAutoloadConfigHandler
+
+config/php.yml:
+  class:    sfPhpConfigHandler
+
+config/databases.yml:
+  class:    sfDatabaseConfigHandler
+
+config/settings.yml:
+  class:    sfDefineEnvironmentConfigHandler
+  param:
+    prefix: sf_
+
+config/app.yml:
+  class:    sfDefineEnvironmentConfigHandler
+  param:
+    prefix: app_
+
+config/factories.yml:
+  class:    sfFactoryConfigHandler
+
+config/bootstrap_compile.yml:
+  class:    sfCompileConfigHandler
+
+config/core_compile.yml:
+  class:    sfCompileConfigHandler
+
+config/filters.yml:
+  class:    sfFilterConfigHandler
+
+config/logging.yml:
+  class:    sfLoggingConfigHandler
+  param:
+    prefix: sf_logging_
+
+config/routing.yml:
+  class:    sfRoutingConfigHandler
+
+config/i18n.yml:
+  class:    sfDefineEnvironmentConfigHandler
+  param:
+    prefix: sf_i18n_
+
+modules/*/config/generator.yml:
+  class:    sfGeneratorConfigHandler
+
+modules/*/config/view.yml:
+  class:    sfViewConfigHandler
+
+modules/*/config/mailer.yml:
+  class:    sfDefineEnvironmentConfigHandler
+  param:
+    prefix: sf_mailer_
+    module: yes
+
+modules/*/config/security.yml:
+  class:    sfSecurityConfigHandler
+
+modules/*/config/cache.yml:
+  class:    sfCacheConfigHandler
+
+modules/*/validate/*.yml:
+  class:    sfValidatorConfigHandler
+
+modules/*/config/module.yml:
+  class:    sfDefineEnvironmentConfigHandler
+  param:
+    prefix: mod_
+    module: yes

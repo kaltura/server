@@ -9,7 +9,7 @@
 class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 {
     const OBJECT_TYPE_TITLE = 'user';
-     
+    
     /**
      * (non-PHPdoc)
      * @see BulkUploadGeneralEngineCsv::createUploadResult()
@@ -105,10 +105,10 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		
 	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
-		    KBatchBase::impersonate($this->currentPartnerId);;
+		    $this->impersonate();
 		    try 
 		    {
-		        $user = KBatchBase::$kClient->user->get($bulkUploadResult->userId);
+		        $user = $this->kClient->user->get($bulkUploadResult->userId);
     		    if ( $user )
     		    {
     		        $bulkUploadResult->action = KalturaBulkUploadAction::UPDATE;
@@ -118,7 +118,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	        {
 	            $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
 		    }
-		    KBatchBase::unimpersonate();
+		    $this->unimpersonate();
 		}
 		
 
@@ -153,7 +153,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	protected function createObjects()
 	{
 		// start a multi request for add entries
-		KBatchBase::$kClient->startMultiRequest();
+		$this->kClient->startMultiRequest();
 		
 		KalturaLog::info("job[{$this->job->id}] start creating users");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
@@ -170,9 +170,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
-        			KBatchBase::impersonate($this->currentPartnerId);;
-        			KBatchBase::$kClient->user->add($user);
-        			KBatchBase::unimpersonate();
+        			$this->impersonate();
+        			$this->kClient->user->add($user);
+        			$this->unimpersonate();
         			
 		            break;
 		        
@@ -181,9 +181,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
         			
-        			KBatchBase::impersonate($this->currentPartnerId);;
-        			KBatchBase::$kClient->user->update($bulkUploadResult->userId, $category);
-        			KBatchBase::unimpersonate();
+        			$this->impersonate();
+        			$this->kClient->user->update($bulkUploadResult->userId, $category);
+        			$this->unimpersonate();
         			
         			
 		            break;
@@ -191,9 +191,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		        case KalturaBulkUploadAction::DELETE:
 		            $bulkUploadResultChunk[] = $bulkUploadResult;
         			
-        			KBatchBase::impersonate($this->currentPartnerId);;
-        			KBatchBase::$kClient->user->delete($bulkUploadResult->userId);
-        			KBatchBase::unimpersonate();
+        			$this->impersonate();
+        			$this->kClient->user->delete($bulkUploadResult->userId);
+        			$this->unimpersonate();
         			
 		            break;
 		        
@@ -203,20 +203,20 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		            break;
 		    }
 		    
-		    if(KBatchBase::$kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
+		    if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
 				// make all the media->add as the partner
-				$requestResults = KBatchBase::$kClient->doMultiRequest();
+				$requestResults = $this->kClient->doMultiRequest();
 				
 				$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
-				KBatchBase::$kClient->startMultiRequest();
+				$this->kClient->startMultiRequest();
 				$bulkUploadResultChunk = array();
 			}
 		}
 		
 		// make all the category actions as the partner
-		$requestResults = KBatchBase::$kClient->doMultiRequest();
+		$requestResults = $this->kClient->doMultiRequest();
 		
 		if(count($requestResults))
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
@@ -301,7 +301,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	
     protected function updateObjectsResults($requestResults, $bulkUploadResults)
 	{
-	    KBatchBase::$kClient->startMultiRequest();
+	    $this->kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
 		// checking the created entries
@@ -331,7 +331,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
-		KBatchBase::$kClient->doMultiRequest();
+		$this->kClient->doMultiRequest();
 	}
 	
 	protected function getUploadResultInstance ()

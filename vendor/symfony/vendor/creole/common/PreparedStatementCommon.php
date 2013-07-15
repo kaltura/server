@@ -554,10 +554,6 @@ abstract class PreparedStatementCommon {
         if ($value === null) {
             $this->setNull($paramIndex);
         } else {
-			if ( is_object ( $value ) )
-			{
-				echo ( debugUtils::st ( true , "<br>") );
-			}
             $this->boundInVars[$paramIndex] = (int) $value;
         }
     } 
