@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage Notifier
  */
-require_once(__DIR__ . "/../../bootstrap.php");
 
 /**
  * Will run periodically and cleanup directories from old files that have a specific pattern (older than x days) 
@@ -49,11 +48,11 @@ class KAsyncNotifier extends KJobHandlerWorker
 	{
 		KalturaLog::info("Notification batch is running");
 		
-		if($this->taskConfig->isInitOnly())
+		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 		
 		// of type KalturaBatchGetExclusiveNotificationJobsResponse
-		$notificationResponse = $this->kClient->batch->getExclusiveNotificationJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->taskConfig->maxJobsEachRun, $this->getFilter());
+		$notificationResponse = KBatchBase::$kClient->batch->getExclusiveNotificationJobs($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, KBatchBase::$taskConfig->maxJobsEachRun, $this->getFilter());
 		
 		$jobs = $notificationResponse->notifications;
 		$partners = $notificationResponse->partners;
@@ -119,7 +118,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 		
 		}
 		
-		$this->kClient->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($notificationJobs as $job)
 		{
 			KalturaLog::info("Free job[$job->id]");
@@ -127,7 +126,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 			$this->onFree($job);
 		}
 
-		$freeExclusiveResults = $this->kClient->doMultiRequest();
+		$freeExclusiveResults = KBatchBase::$kClient->doMultiRequest();
 		$freeExclusiveResults = array_pop($freeExclusiveResults);
 		KalturaLog::info("Queue size: {$freeExclusiveResults->queueSize} sent to scheduler");
 		$this->saveSchedulerQueue($this->getJobType(), $freeExclusiveResults->queueSize);
@@ -236,10 +235,10 @@ class KAsyncNotifier extends KJobHandlerWorker
 	{
 		KalturaLog::debug("updateMultiNotificationStatus(" . count($not_list) . ", $http_code, $res)");
 		
-		$this->kClient->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($not_list as $not)
 			$this->updateNotificationStatus($not, $http_code, $res);
-		$this->kClient->doMultiRequest();
+		KBatchBase::$kClient->doMultiRequest();
 	}
 	
 	/**

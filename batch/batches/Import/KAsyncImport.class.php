@@ -80,7 +80,7 @@ class KAsyncImport extends KJobHandlerWorker
 			$resumeOffset = 0;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 			{
-    			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params);
+    			$curlWrapper = new KCurlWrapper($sourceUrl, self::$taskConfig->params);
     			$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
     			$curlHeaderResponse = $curlWrapper->getHeader($useNoBody);
     			if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
@@ -95,7 +95,7 @@ class KAsyncImport extends KJobHandlerWorker
     				KalturaLog::err("Headers error number: " . $curlWrapper->getErrorNumber());
     				$curlWrapper->close();
 
-    				$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params);
+    				$curlWrapper = new KCurlWrapper($sourceUrl, self::$taskConfig->params);
     			}
 
     			if(!$curlHeaderResponse->isGoodCode())
@@ -123,8 +123,8 @@ class KAsyncImport extends KJobHandlerWorker
     			}
 			}
 
-			$curlWrapper = new KCurlWrapper($sourceUrl, $this->taskConfig->params);
-			$curlWrapper->setTimeout($this->taskConfig->params->curlTimeout);
+			$curlWrapper = new KCurlWrapper($sourceUrl, self::$taskConfig->params);
+			$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 
 			if(is_null($fileSize)) {
 				// Read file size
@@ -196,7 +196,7 @@ class KAsyncImport extends KJobHandlerWorker
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
 					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
-					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+					self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 //					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Expected file size[$fileSize] actual file size[$actualFileSize]", KalturaBatchJobStatus::RETRY);
 					return $job;
 				}
@@ -263,7 +263,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 			// create suitable file transfer manager object
 			$subType = $job->jobSubType;
-			$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+			$engineOptions = isset(self::$taskConfig->engineOptions) ? self::$taskConfig->engineOptions->toArray() : array();
 			$fileTransferMgr = kFileTransferMgr::getInstance($subType, $engineOptions);
 
 			if (!$fileTransferMgr) {
@@ -325,7 +325,7 @@ class KAsyncImport extends KJobHandlerWorker
 				{
 					$percent = floor($actualFileSize * 100 / $fileSize);
 					$job = $this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $data);
-					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+					self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 					return $job;
 				}
 			}
@@ -354,7 +354,7 @@ class KAsyncImport extends KJobHandlerWorker
 		try
 		{
 			// creates a shared file path
-			$rootPath = $this->taskConfig->params->sharedTempPath;
+			$rootPath = self::$taskConfig->params->sharedTempPath;
 
 			$res = self::createDir( $rootPath );
 			if ( !$res )
@@ -418,7 +418,7 @@ class KAsyncImport extends KJobHandlerWorker
 	protected function getTempFilePath($remotePath)
 	{
 	    // create a temp file path
-		$rootPath = $this->taskConfig->params->localTempPath;
+		$rootPath = self::$taskConfig->params->localTempPath;
 
 		$res = self::createDir( $rootPath );
 		if ( !$res )

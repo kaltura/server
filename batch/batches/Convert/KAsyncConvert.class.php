@@ -69,11 +69,11 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		$filter = parent::getFilter();
 		
-		if($this->taskConfig->params->minFileSize && is_numeric($this->taskConfig->params->minFileSize))
-			$filter->fileSizeGreaterThan = $this->taskConfig->params->minFileSize;
+		if(self::$taskConfig->params->minFileSize && is_numeric(self::$taskConfig->params->minFileSize))
+			$filter->fileSizeGreaterThan = self::$taskConfig->params->minFileSize;
 		
-		if($this->taskConfig->params->maxFileSize && is_numeric($this->taskConfig->params->maxFileSize))
-			$filter->fileSizeLessThan = $this->taskConfig->params->maxFileSize;
+		if(self::$taskConfig->params->maxFileSize && is_numeric(self::$taskConfig->params->maxFileSize))
+			$filter->fileSizeLessThan = self::$taskConfig->params->maxFileSize;
 			
 		return $filter;
 	}
@@ -84,8 +84,8 @@ class KAsyncConvert extends KJobHandlerWorker
 	public function run($jobs = null)
 	{
 		// creates a temp file path
-		$this->localTempPath = $this->taskConfig->params->localTempPath;
-		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
+		$this->localTempPath = self::$taskConfig->params->localTempPath;
+		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 	
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -100,8 +100,8 @@ class KAsyncConvert extends KJobHandlerWorker
 			return null;
 		}
 		
-		$remoteFileRoot = $this->taskConfig->getRemoteServerUrl() . $this->taskConfig->params->remoteUrlDirectory;
-		$this->distributedFileManager = new KDistributedFileManager($this->taskConfig->params->localFileRoot, $remoteFileRoot, $this->taskConfig->params->fileCacheExpire);
+		$remoteFileRoot = self::$taskConfig->getRemoteServerUrl() . self::$taskConfig->params->remoteUrlDirectory;
+		$this->distributedFileManager = new KDistributedFileManager(self::$taskConfig->params->localFileRoot, $remoteFileRoot, self::$taskConfig->params->fileCacheExpire);
 		
 		return parent::run($jobs);
 	}
@@ -113,7 +113,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			 * It is set in the 'flavors' array, but for collections the 'flavorParamsOutput' it is unrequired.
 			 */
 		if(isset($data->flavorParamsOutputId))
-			$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+			$data->flavorParamsOutput = self::$kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
@@ -129,7 +129,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
 		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		
-		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $this->taskConfig, $data, $job, $this->kClient, $this->kClientConfig);
+		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $data, $job);
 		
 		if ( $this->operationEngine == null )
 		{
@@ -170,10 +170,10 @@ class KAsyncConvert extends KJobHandlerWorker
 
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{		
-			if($this->taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
+			if(self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
 			{
 				if(!strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))
-					$srcFileSyncDescriptor->actualFileSyncLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
+					$srcFileSyncDescriptor->actualFileSyncLocalPath = self::$taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
 					
 				$err = null;
 				if(!$this->distributedFileManager->getLocalPath($srcFileSyncDescriptor->actualFileSyncLocalPath, $srcFileSyncDescriptor->fileSyncRemoteUrl, $err))
@@ -237,7 +237,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			{
 				try
 				{
-					$this->kClient->batch->logConversion($data->flavorAssetId, $log);
+					self::$kClient->batch->logConversion($data->flavorAssetId, $log);
 				}
 				catch(Exception $ee)
 				{
@@ -288,7 +288,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			
 			$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 			
-			if($this->taskConfig->params->isRemoteOutput) // for remote conversion
+			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 			{
 				$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
 				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
@@ -317,7 +317,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			$this->setFilePermissions("$sharedFile.log");
 			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
 		
-			if($this->taskConfig->params->isRemoteOutput) // for remote conversion
+			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
 		}
 		else

@@ -19,22 +19,22 @@ abstract class KJobHandlerWorker extends KBatchBase
 	
 	protected function getMaxJobsEachRun()
 	{
-		if(!$this->taskConfig->maxJobsEachRun)
+		if(!KBatchBase::$taskConfig->maxJobsEachRun)
 			return 1;
 		
-		return $this->taskConfig->maxJobsEachRun;
+		return KBatchBase::$taskConfig->maxJobsEachRun;
 	}
 	
 	protected function getJobs()
 	{
-		$maxOffset = min($this->getMaxOffset(), $this->taskConfig->getQueueSize());
-		return $this->kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 
+		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
+		return KBatchBase::$kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, 
 				$this->getMaxJobsEachRun(), $this->getFilter(), $this->getJobType(), $maxOffset);
 	}
 	
 	public function run($jobs = null)
 	{
-		if($this->taskConfig->isInitOnly())
+		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 		
 		if(is_null($jobs))
@@ -75,9 +75,9 @@ abstract class KJobHandlerWorker extends KBatchBase
 			}
 			catch(kTemporaryException $ktex)
 			{
-				$this->unimpersonate();
+				self::unimpersonate();
 				if($ktex->getResetJobExecutionAttempts())
-					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+					KBatchBase::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 				
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ktex, KalturaBatchJobStatus::RETRY);
 			}
@@ -98,7 +98,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 	{
 		try
 		{
-			$this->unimpersonate();
+			self::unimpersonate();
 			$job = $this->closeJob($job, $error, $ex->getCode(), "Error: " . $ex->getMessage(), $status);
 		} 
 		catch(Exception $ex)
@@ -115,7 +115,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 	 */
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveJob($jobId, $this->getExclusiveLockKey(), $job);
+		return KBatchBase::$kClient->batch->updateExclusiveJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	/**
@@ -128,7 +128,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE)
 			$resetExecutionAttempts = true;
 		
-		$response = $this->kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType(), $resetExecutionAttempts);
+		$response = KBatchBase::$kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType(), $resetExecutionAttempts);
 		
 		if(is_numeric($response->queueSize)) {
 			KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
@@ -144,12 +144,12 @@ abstract class KJobHandlerWorker extends KBatchBase
 	protected function getFilter()
 	{
 		$filter = new KalturaBatchJobFilter();
-		if($this->taskConfig->filter)
-			$filter = $this->taskConfig->filter;
+		if(KBatchBase::$taskConfig->filter)
+			$filter = KBatchBase::$taskConfig->filter;
 		
-		if ($this->taskConfig->minCreatedAtMinutes && is_numeric($this->taskConfig->minCreatedAtMinutes))
+		if (KBatchBase::$taskConfig->minCreatedAtMinutes && is_numeric(KBatchBase::$taskConfig->minCreatedAtMinutes))
 		{
-			$minCreatedAt = time() - ($this->taskConfig->minCreatedAtMinutes * 60);
+			$minCreatedAt = time() - (KBatchBase::$taskConfig->minCreatedAtMinutes * 60);
 			$filter->createdAtLessThanOrEqual = $minCreatedAt;
 		}
 		
@@ -158,7 +158,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 	
 	protected function getMaxOffset() 
 	{
-		$maxOffset = $this->taskConfig->maxOffset;
+		$maxOffset = KBatchBase::$taskConfig->maxOffset;
 		if(!is_null($maxOffset))
 			return $maxOffset;
 		return 0;
@@ -249,7 +249,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 	{
 		$filter = $this->getQueueFilter($jobType);
 		
-		$type = $this->taskConfig->name;
+		$type = KBatchBase::$taskConfig->name;
 		$file = "$type.flt";
 		KalturaLog::debug("Saving filter to $file: " . print_r($filter, true));
 		
@@ -265,7 +265,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 		if(is_null($size))
 		{
 			$workerQueueFilter = $this->getQueueFilter($jobType);
-			$size = $this->kClient->batch->getQueueSize($workerQueueFilter);
+			$size = KBatchBase::$kClient->batch->getQueueSize($workerQueueFilter);
 		}
 		
 		$queueStatus = new KalturaBatchQueuesStatus();

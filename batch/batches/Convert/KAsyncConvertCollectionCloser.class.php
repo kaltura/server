@@ -48,8 +48,8 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	public function run($jobs = null)
 	{
 		// creates a temp file path
-		$this->localTempPath = $this->taskConfig->params->localTempPath;
-		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
+		$this->localTempPath = self::$taskConfig->params->localTempPath;
+		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 	
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -72,7 +72,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	{
 		KalturaLog::debug("closeConvertCollection($job->id)");
 	
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 
 		$filesToDownload = array(
@@ -144,7 +144,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			$fileSize = kFile::fileSize($srcPath);
 			
 			$flavor->destFileSyncLocalPath = $sharedPath;
-			if($this->taskConfig->params->isRemote)
+			if(self::$taskConfig->params->isRemote)
 				$flavor->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($sharedPath);
 			
 			$files2move[] = array(
@@ -285,6 +285,6 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 			$flavors = $job->data->flavors;
 			$job->data->flavors = null;
 		}
-		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
+		return self::$kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
 	}
 }

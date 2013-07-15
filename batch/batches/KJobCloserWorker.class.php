@@ -8,11 +8,11 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 {
 	public function run($jobs = null)
 	{
-		if($this->taskConfig->isInitOnly())
+		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 		
 		if(is_null($jobs))
-			$jobs = $this->kClient->batch->getExclusiveAlmostDone($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter(), $this->getJobType());
+			$jobs = KBatchBase::$kClient->batch->getExclusiveAlmostDone($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter(), $this->getJobType());
 		
 		KalturaLog::info(count($jobs) . " jobs to close");
 		
@@ -31,17 +31,17 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 			}
 			catch(KalturaException $kex)
 			{
-				$this->unimpersonate();
+				KBatchBase::unimpersonate();
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 			catch(KalturaClientException $kcex)
 			{
-				$this->unimpersonate();
+				KBatchBase::unimpersonate();
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
 			}
 			catch(Exception $ex)
 			{
-				$this->unimpersonate();
+				KBatchBase::unimpersonate();
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 		}

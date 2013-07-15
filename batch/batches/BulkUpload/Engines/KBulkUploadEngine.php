@@ -19,10 +19,6 @@ abstract class KBulkUploadEngine
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%d';
 	const BULK_UPLOAD_TIME_FORMAT = 'T%H:%i:%s';
 
-	/**
-	 * @var KSchedularTaskConfig
-	 */
-	protected $taskConfig;
 	
 	/**
 	 * 
@@ -31,10 +27,6 @@ abstract class KBulkUploadEngine
 	 */
 	protected $currentPartnerId;
 	
-	/**
-	 * @var KalturaConfiguration
-	 */
-	protected $kClientConfig = null;
 		
 	/**
 	 * @var int
@@ -61,12 +53,6 @@ abstract class KBulkUploadEngine
 	 */
 	protected $exceededMaxRecordsEachRun = false;
 
-	/**
-	 * 
-	 * The Engine client
-	 * @var KalturaClient
-	 */
-	protected $kClient; 
 	
 	/**
 	 * 
@@ -237,21 +223,18 @@ abstract class KBulkUploadEngine
 		return preg_match($regex, $str);
 	}
 	
+
 	/**
-	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KalturaBatchJob $job
 	 */
-	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
+	public function __construct(KalturaBatchJob $job)
 	{
-		if($taskConfig->params->multiRequestSize)
-			$this->multiRequestSize = $taskConfig->params->multiRequestSize;
+		if(KBatchBase::$taskConfig->params->multiRequestSize)
+			$this->multiRequestSize = KBatchBase::$taskConfig->params->multiRequestSize;
 		if($taskConfig->params->maxRecords)
-			$this->maxRecords = $taskConfig->params->maxRecords;
+			$this->maxRecords = KBatchBase::$taskConfig->params->maxRecords;
 		if($taskConfig->params->maxRecordsEachRun)
-			$this->maxRecordsEachRun = $taskConfig->params->maxRecordsEachRun;
-		
-		$this->kClient = $kClient;
-		$this->kClientConfig = $kClient->getConfig();
-		$this->taskConfig = $taskConfig;
+			$this->maxRecordsEachRun = KBatchBase::$taskConfig->params->maxRecordsEachRun;
 		
 		$this->job = $job;
 		$this->data = $job->data;
@@ -263,14 +246,12 @@ abstract class KBulkUploadEngine
 	 * Will return the proper engine depending on the type (KalturaBulkUploadType)
 	 *
 	 * @param int $provider
-	 * @param KSchedularTaskConfig $taskConfig - for the engine
-	 * @param KalturaClient kClient - the client for the engine to use
 	 * @return KBulkUploadEngine
 	 */
-	public static function getEngine($batchJobSubType, KSchedularTaskConfig $taskConfig, $kClient, KalturaBatchJob $job)
+	public static function getEngine($batchJobSubType, KalturaBatchJob $job)
 	{
 		//Gets the engine from the plugin (as we moved all engines to the plugin)
-		return KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $job));
+		return KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($job));
 	}
 	
 	/**
@@ -281,13 +262,6 @@ abstract class KBulkUploadEngine
 		return get_class($this);
 	}
 	
-	/**
-	 * @return KalturaClient
-	 */
-	public function getClient()
-	{
-		return $this->kClient;
-	}
 	
 	/**
 	 * @return KalturaBatchJob
@@ -313,21 +287,6 @@ abstract class KBulkUploadEngine
 		return $this->exceededMaxRecordsEachRun;
 	}
 
-	/**
-	 * 
-	 * Impersonates into the current partner (overrides the batch partner) 
-	 */
-	public function impersonate()
-	{
-		$this->kClientConfig->partnerId = $this->currentPartnerId;
-		$this->kClient->setConfig($this->kClientConfig);
-	}
-	
-	public function unimpersonate()
-	{
-		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
-		$this->kClient->setConfig($this->kClientConfig);
-	}
 		
 	/**
 	 * 
@@ -344,7 +303,7 @@ abstract class KBulkUploadEngine
 	{
 		$pluginsData = $bulkUploadResult->pluginsData;
 		$bulkUploadResult->pluginsData = null;
-		$this->kClient->batch->addBulkUploadResult($bulkUploadResult, $pluginsData);
+		KBatchBase::$kClient->batch->addBulkUploadResult($bulkUploadResult, $pluginsData);
 	}
 
 	/**
@@ -355,7 +314,7 @@ abstract class KBulkUploadEngine
 	protected function getStartIndex()
 	{
 		try{
-			$result = $this->kClient->batch->getBulkUploadLastResult($this->job->id);
+			$result = KBatchBase::$kClient->batch->getBulkUploadLastResult($this->job->id);
 			if($result)
 				return $result->lineIndex;
 		}
@@ -383,10 +342,10 @@ abstract class KBulkUploadEngine
 	 */
 	protected function checkAborted()
 	{
-		if($this->kClient->isMultiRequest())
+		if(KBatchBase::$kClient->isMultiRequest())
 			return false;
 			
-		$batchJobResponse = $this->kClient->jobs->getBulkUploadStatus($this->job->id);
+		$batchJobResponse = KBatchBase::$kClient->jobs->getBulkUploadStatus($this->job->id);
 		$updatedJob = $batchJobResponse->batchJob;
 		if($updatedJob->abort)
 		{
@@ -403,4 +362,9 @@ abstract class KBulkUploadEngine
 	 * Get object type title for messaging purposes
 	 */
 	abstract public function getObjectTypeTitle();
+	
+	public function getCurrentPartnerId()
+	{
+		return $this->currentPartnerId;
+	}
 }

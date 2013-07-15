@@ -45,7 +45,7 @@ class KAsyncIndex extends KJobHandlerWorker
 		KalturaLog::debug("Index objects job id [$job->id]");
 		
 		$engine = KIndexingEngine::getInstance($job->jobSubType);
-		$engine->configure($job->partnerId, $this->kClient, $this->taskConfig);
+		$engine->configure($job->partnerId);
 	
 		$filter = clone $data->filter;
 		$advancedFilter = new KalturaIndexAdvancedFilter();

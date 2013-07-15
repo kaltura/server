@@ -3,8 +3,6 @@
  * @package Scheduler
  * @subpackage Capture-Thumbnail
  */
-require_once(__DIR__ . "/../../bootstrap.php");
-
 
 /**
  * Will convert a single flavor and store it in the file system.
@@ -57,7 +55,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 	{
 		KalturaLog::debug("captureThumb($job->id)");
 		
-		$thumbParamsOutput = $this->kClient->thumbParamsOutput->get($data->thumbParamsOutputId);
+		$thumbParamsOutput = self::$kClient->thumbParamsOutput->get($data->thumbParamsOutputId);
 		
 		try
 		{
@@ -82,7 +80,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$data->thumbPath = null;
 			
 			// creates a temp file path
-			$rootPath = $this->taskConfig->params->localTempPath;
+			$rootPath = self::$taskConfig->params->localTempPath;
 			if(! is_dir($rootPath))
 			{
 				if(! file_exists($rootPath))
@@ -111,7 +109,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				$mediaInfoFilter = new KalturaMediaInfoFilter();
 				$mediaInfoFilter->flavorAssetIdEqual = $data->srcAssetId;
 				$this->impersonate($job->partnerId);
-				$mediaInfoList = $this->kClient->mediaInfo->listAction($mediaInfoFilter);
+				$mediaInfoList = self::$kClient->mediaInfo->listAction($mediaInfoFilter);
 				$this->unimpersonate();
 				if(count($mediaInfoList->objects))
 				{
@@ -123,7 +121,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				}
 				
 				// generates the thumbnail
-				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, $this->taskConfig->params->FFMpegCmd);
+				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, self::$taskConfig->params->FFMpegCmd);
 				$created = $thumbMaker->createThumnail($thumbParamsOutput->videoOffset, $mediaInfoWidth, $mediaInfoHeight, null ,null, $mediaInfoDar);
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
@@ -152,7 +150,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$density = $thumbParamsOutput->density;
 			$rotate = $thumbParamsOutput->rotate;
 			
-			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
+			$cropper = new KImageMagickCropper($capturePath, $thumbPath, self::$taskConfig->params->ImageMagickCmd, true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $rotate);
 			if(!$cropped || !file_exists($thumbPath))
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not cropped", KalturaBatchJobStatus::FAILED);
@@ -186,7 +184,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		KalturaLog::debug("moveFile($job->id, $data->thumbPath)");
 		
 		// creates a temp file path
-		$rootPath = $this->taskConfig->params->sharedTempPath;
+		$rootPath = self::$taskConfig->params->sharedTempPath;
 		if(! is_dir($rootPath))
 		{
 			if(! file_exists($rootPath))

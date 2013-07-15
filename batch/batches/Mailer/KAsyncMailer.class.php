@@ -56,12 +56,12 @@ class KAsyncMailer extends KJobHandlerWorker
 	{
 		KalturaLog::info("Mail batch is running");
 		
-		if($this->taskConfig->isInitOnly())
+		if(KBatchBase::$taskConfig->isInitOnly())
 			return $this->init();
 		
-		$jobs = $this->kClient->batch->getExclusiveJobs( 
+		$jobs = KBatchBase::$kClient->batch->getExclusiveJobs( 
 			$this->getExclusiveLockKey() , 
-			$this->taskConfig->maximumExecutionTime , 
+			KBatchBase::$taskConfig->maximumExecutionTime , 
 			$this->getMaxJobsEachRun() , 
 			$this->getFilter(),
 			$this->getJobType()
@@ -77,20 +77,20 @@ class KAsyncMailer extends KJobHandlerWorker
 		}
 				
 		$this->initConfig();
-		$this->kClient->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($jobs as $job)
 			$this->send($job, $job->data);
-		$this->kClient->doMultiRequest();		
+		KBatchBase::$kClient->doMultiRequest();		
 			
 			
-		$this->kClient->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($jobs as $job)
 		{
 			KalturaLog::info("Free job[$job->id]");
 			$this->onFree($job);
-	 		$this->kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType());
+	 		KBatchBase::$kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType());
 		}
-		$responses = $this->kClient->doMultiRequest();
+		$responses = KBatchBase::$kClient->doMultiRequest();
 		$response = end($responses);
 		
 		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
@@ -139,7 +139,7 @@ class KAsyncMailer extends KJobHandlerWorker
 			
 			$updateJob = new KalturaBatchJob();
 			$updateJob->status = $job->status;
-	 		$this->kClient->batch->updateExclusiveJob($job->id, $this->getExclusiveLockKey(), $updateJob);			
+	 		KBatchBase::$kClient->batch->updateExclusiveJob($job->id, $this->getExclusiveLockKey(), $updateJob);			
 		}
 		catch ( Exception $ex )
 		{

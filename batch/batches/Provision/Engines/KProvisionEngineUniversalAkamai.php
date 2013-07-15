@@ -7,8 +7,6 @@
  */
 class KProvisionEngineUniversalAkamai extends KProvisionEngine
 {
-	public $taskConfig;
-	
 	public $systemUser;
 	
 	public $systemPassword;
@@ -26,13 +24,13 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 	 */
 	protected $streamClient;
 	
-	protected function __construct($taskConfig, KalturaAkamaiUniversalProvisionJobData $data)
+	protected function __construct(KalturaAkamaiUniversalProvisionJobData $data)
 	{
-		if (!$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl)
+		if (!KBatchBase::$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: akamaiRestApiBaseServiceUrl is missing from worker configuration. Cannot provision stream"); 
 		
-		self::$baseServiceUrl = $taskConfig->params->restapi->akamaiRestApiBaseServiceUrl;
-		parent::__construct($taskConfig);
+		self::$baseServiceUrl = KBatchBase::$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl;
+		parent::__construct(KBatchBase::$taskConfig);
 		
 		$username = null;
 		$password = null;
@@ -50,12 +48,12 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		//if one of the params was not set, use the taskConfig data	
 		if (!$username || !$password )
 		{
-			$this->systemUser = $taskConfig->params->restapi->systemUserName;
-			$this->systemPassword = $taskConfig->params->restapi->systemPassword;
-			$this->domainName = $taskConfig->params->restapi->domainName;
-			$data->primaryContact = $taskConfig->params->restapi->primaryContact;
-			$data->secondaryContact = $taskConfig->params->restapi->secondaryContact;
-			$data->notificationEmail = $taskConfig->params->restapi->notificationEmail;
+			$this->systemUser = KBatchBase::$taskConfig->params->restapi->systemUserName;
+			$this->systemPassword = KBatchBase::$taskConfig->params->restapi->systemPassword;
+			$this->domainName = KBatchBase::$taskConfig->params->restapi->domainName;
+			$data->primaryContact = KBatchBase::$taskConfig->params->restapi->primaryContact;
+			$data->secondaryContact = KBatchBase::$taskConfig->params->restapi->secondaryContact;
+			$data->notificationEmail = KBatchBase::$taskConfig->params->restapi->notificationEmail;
 		}
 	}
 	

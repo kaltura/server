@@ -6,11 +6,6 @@
 abstract class KIndexingEngine
 {
 	/**
-	 * @var KalturaClient
-	 */
-	protected $client;
-	
-	/**
 	 * @var KalturaFilterPager
 	 */
 	protected $pager;
@@ -65,34 +60,17 @@ abstract class KIndexingEngine
 	
 	/**
 	 * @param int $partnerId
-	 * @param KalturaClient $client
-	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function configure($partnerId, KalturaClient $client, KSchedularTaskConfig $taskConfig)
+	public function configure($partnerId)
 	{
 		$this->partnerId = $partnerId;
 		$this->batchPartnerId = $taskConfig->getPartnerId();
-		$this->client = $client;
 
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
 		
 		if($taskConfig->params && $taskConfig->params->pageSize)
 			$this->pager->pageSize = $taskConfig->params->pageSize;
-	}
-	
-	protected function impersonate()
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = $this->partnerId;
-		$this->client->setConfig($clientConfig);
-	}
-	
-	protected function unimpersonate()
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = $this->batchPartnerId;
-		$this->client->setConfig($clientConfig);
 	}
 	
 	/**
@@ -102,9 +80,9 @@ abstract class KIndexingEngine
 	 */
 	public function run(KalturaFilter $filter, $shouldUpdate)
 	{
-		$this->impersonate();
+		KBatchBase::impersonate($this->partnerId);
 		$ret = $this->index($filter, $shouldUpdate);
-		$this->unimpersonate();
+		KBatchBase::unimpersonate();
 		
 		return $ret;
 	}

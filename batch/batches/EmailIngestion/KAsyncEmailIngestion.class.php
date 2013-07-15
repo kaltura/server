@@ -73,13 +73,13 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 	{
 		KalturaLog::info("Email ingestion batch is running");
 
-		if($this->taskConfig->isInitOnly()) {
+		if(self::$taskConfig->isInitOnly()) {
 			return $this->init();
 		}
 
 		// get parameters from ini file
 		try {
-			$this->TEMP_FILE_DIR = $this->taskConfig->params->localTempPath;
+			$this->TEMP_FILE_DIR = self::$taskConfig->params->localTempPath;
 		}
 		catch (Exception $e) {
 			KalturaLog::crit("Cannot find all required parameters from config file");
@@ -99,13 +99,13 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 
 		$mailboxNumber = 0;	
 
-		while ( isset($this->taskConfig->params->{'mailbox'.($mailboxNumber+1)}) ) {
+		while ( isset(self::$taskConfig->params->{'mailbox'.($mailboxNumber+1)}) ) {
 
 			$mailboxNumber++;
 			$mailesProcessed = 0;
 			$keepCurMailbox = true;
 
-			$params = $this->taskConfig->params->{'mailbox'.$mailboxNumber};
+			$params = self::$taskConfig->params->{'mailbox'.$mailboxNumber};
 
 			// get parameters
 			try {
@@ -304,8 +304,8 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 		$problems_happened = false;
 		$entry_name = $mediaEntry->name;
 		
-		$this->kClientConfig->partnerId = $profile->partnerId;
-		$this->kClient->setConfig($this->kClientConfig);
+		self::$kClientConfig->partnerId = $profile->partnerId;
+		self::$kClient->setConfig(self::$kClientConfig);
 		// loop through all attachments
 		// ----------------------------
 		$num = 1;
@@ -434,7 +434,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
      */
     private function createUploadTokenAndUpload ($profile, $filename)
     {
-        $this->impersonate($profile->partnerId);
+        self::impersonate($profile->partnerId);
 			    
 	    $this->getClient()->startMultiRequest();
 	    

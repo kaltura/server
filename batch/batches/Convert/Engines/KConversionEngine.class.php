@@ -14,11 +14,6 @@ abstract class KConversionEngine
 	const FAST_START_SIGN = 'FS';
 	
 	
-	/*
-	 * @var KSchedularTaskConfig
-	 */
-	protected $engine_config;
-	
 	/**
 	 * @var string
 	 */
@@ -50,35 +45,34 @@ abstract class KConversionEngine
 	 * Will return the proper engine depending on the type (KalturaConversionEngineType)
 	 *
 	 * @param int $type
-	 * @param KSchedularTaskConfig $engine_config
 	 * @return KConversionEngine
 	 */
-	public static function getInstance($type, KSchedularTaskConfig $engine_config)
+	public static function getInstance($type)
 	{
 		$engine =  null;
 		
 		switch ($type )
 		{
 			case KalturaConversionEngineType::FFMPEG:
-				$engine = new KConversionEngineFfmpeg( $engine_config );
+				$engine = new KConversionEngineFfmpeg();
 				break;
 			case KalturaConversionEngineType::MENCODER:
-				$engine = new KConversionEngineMencoder( $engine_config );
+				$engine = new KConversionEngineMencoder();
 				break;
 			case KalturaConversionEngineType::ON2:
-				$engine = new KConversionEngineFlix( $engine_config );
+				$engine = new KConversionEngineFlix();
 				break;
 			case KalturaConversionEngineType::ENCODING_COM :
-				$engine = new KConversionEngineEncodingCom( $engine_config );
+				$engine = new KConversionEngineEncodingCom();
 				break;
 			case KalturaConversionEngineType::FFMPEG_AUX:
-				$engine = new KConversionEngineFfmpegAux( $engine_config );
+				$engine = new KConversionEngineFfmpegAux();
 				break;
 			case KalturaConversionEngineType::EXPRESSION_ENCODER3:
-				$engine = new KConversionEngineExpressionEncoder3( $engine_config );
+				$engine = new KConversionEngineExpressionEncoder3();
 				break;
 			case KalturaConversionEngineType::FFMPEG_VP8:
-				$engine = new KConversionEngineFfmpegVp8( $engine_config );
+				$engine = new KConversionEngineFfmpegVp8();
 				break;
 				
 			default:
@@ -88,13 +82,6 @@ abstract class KConversionEngine
 		return $engine;
 	}
 
-	/**
-	 * @param KSchedularTaskConfig $engine_config
-	 */
-	protected function __construct( KSchedularTaskConfig $engine_config )
-	{
-		$this->engine_config = $engine_config;
-	}
 	
 	abstract public function getCmd();
 	abstract public function getName();
@@ -149,16 +136,16 @@ abstract class KConversionEngine
 		 * If there is 'fastStartWithMp4box' set in ini- use MP4Box for mp4 faststart adjustment. 
 		 * The mp4box removes unrequired menu metadata from the file, that caused rtmp streaming problems 
 		 */
-		if(isset($this->engine_config->params->mp4boxCmd) 
-		&& isset($this->engine_config->params->fastStartWithMp4box) && $this->engine_config->params->fastStartWithMp4box==1) {
+		if(isset(KBatchBase::$taskConfig->params->mp4boxCmd) 
+		&& isset(KBatchBase::$taskConfig->params->fastStartWithMp4box) && KBatchBase::$taskConfig->params->fastStartWithMp4box==1) {
 			$inFile = $this->inFilePath;
 			$tmpFile = "$inFile.tmp";
 			$cmd_line = "-add $tmpFile ".$this->outFilePath." && mv $tmpFile $inFile";
-			$exe = "mv $inFile $tmpFile && ".$this->engine_config->params->mp4boxCmd;
+			$exe = "mv $inFile $tmpFile && ".KBatchBase::$taskConfig->params->mp4boxCmd;
 		}
 		else {
 			$cmd_line = "__inFileName__ __outFileName__";
-			$exe = $this->engine_config->params->fastStartCmd;
+			$exe = KBatchBase::$taskConfig->params->fastStartCmd;
 		}
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
 		$exec_cmd = "$exe " . 

@@ -32,10 +32,10 @@ class KAsyncProvisionProvideCloser extends KJobCloserWorker
 
 	protected function closeProvisionProvide (KalturaBatchJob $job)
 	{
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return new KProvisionEngineResult(KalturaBatchJobStatus::CLOSER_TIMEOUT, "Timed out");
 			
-		$engine = KProvisionEngine::getInstance( $job->jobSubType , $this->taskConfig , $job->data);
+		$engine = KProvisionEngine::getInstance( $job->jobSubType, $job->data);
 		if ( $engine == null )
 		{
 			$err = "Cannot find provision engine [{$job->jobSubType}] for job id [{$job->id}]";

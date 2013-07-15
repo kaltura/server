@@ -22,17 +22,17 @@ class KIndexingCategoryEngine extends KIndexingEngine
 	{
 		$filter->orderBy = KalturaCategoryOrderBy::DEPTH_ASC . ',' . KalturaCategoryOrderBy::CREATED_AT_ASC;
 		
-		$categoriesList = $this->client->category->listAction($filter, $this->pager);
+		$categoriesList = KBatchBase::$kClient->category->listAction($filter, $this->pager);
 		if(!count($categoriesList->objects))
 			return 0;
 			
-		$this->client->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		foreach($categoriesList->objects as $category)
 		{
-			$this->client->category->index($category->id, $shouldUpdate);
+			KBatchBase::$kClient->category->index($category->id, $shouldUpdate);
 		}
 		
-		$results = $this->client->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		foreach($results as $index => $result)
 			if(!is_int($result))
 				unset($results[$index]);

@@ -19,7 +19,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 	
 	public function getCmd ()
 	{
-		return $this->engine_config->params->ffmpegCmd;
+		return KBatchBase::$taskConfig->params->ffmpegCmd;
 	}
 	
 	protected function getExecutionCommandAndConversionString ( KalturaConvertJobData $data )
