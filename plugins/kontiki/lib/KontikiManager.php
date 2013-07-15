@@ -2,7 +2,7 @@
 /**
  * Event consumer which finishes up the export process to Kontiki
  */
-class KontikiFlowManager implements kObjectChangedEventConsumer
+class KontikiFlowManager implements kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
