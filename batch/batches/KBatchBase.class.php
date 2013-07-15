@@ -9,7 +9,7 @@ abstract class KBatchBase implements IKalturaLogger
 	/**
 	 * @var KSchedularTaskConfig
 	 */
-	protected $taskConfig;
+	public static $taskConfig;
 
 	/**
 	 * @var string
@@ -24,12 +24,12 @@ abstract class KBatchBase implements IKalturaLogger
 	/**
 	 * @var KalturaClient
 	 */
-	protected $kClient = null;
+	public static $kClient = null;
 
 	/**
 	 * @var KalturaConfiguration
 	 */
-	protected $kClientConfig = null;
+	public static $kClientConfig = null;
 
 	/**
 	 * @var boolean
@@ -102,50 +102,50 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	protected function getClient()
 	{
-		return $this->kClient;
+		return self::$kClient;
 	}
 
 
-	protected function impersonate($partnerId)
+	static public function impersonate($partnerId)
 	{
-		$this->kClientConfig->partnerId = $partnerId;
-		$this->kClient->setConfig($this->kClientConfig);
+		self::$kClientConfig->partnerId = $partnerId;
+		self::$kClient->setConfig(self::$kClientConfig);
 	}
 
-	protected function unimpersonate()
+	static public function unimpersonate()
 	{
-		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
-		$this->kClient->setConfig($this->kClientConfig);
+		self::$kClientConfig->partnerId = self::$taskConfig->getPartnerId();
+		self::$kClient->setConfig(self::$kClientConfig);
 	}
 
 	protected function getSchedulerId()
 	{
-		return $this->taskConfig->getSchedulerId();
+		return self::$taskConfig->getSchedulerId();
 	}
 
 	protected function getSchedulerName()
 	{
-		return $this->taskConfig->getSchedulerName();
+		return self::$taskConfig->getSchedulerName();
 	}
 
 	protected function getId()
 	{
-		return $this->taskConfig->id;
+		return self::$taskConfig->id;
 	}
 
 	protected function getIndex()
 	{
-		return $this->taskConfig->getTaskIndex();
+		return self::$taskConfig->getTaskIndex();
 	}
 
 	protected function getName()
 	{
-		return $this->taskConfig->name;
+		return self::$taskConfig->name;
 	}
 
 	protected function getConfigHostName()
 	{
-		return $this->taskConfig->getHostName();
+		return self::$taskConfig->getHostName();
 	}
 
 	/**
@@ -219,54 +219,54 @@ abstract class KBatchBase implements IKalturaLogger
 		if(is_null($taskConfig))
 		{
 			$data = gzuncompress(base64_decode($argv[1]));
-			$this->taskConfig = unserialize($data);
+			self::$taskConfig = unserialize($data);
 		}
 		else
 		{
-			$this->taskConfig = $taskConfig;
+			self::$taskConfig = $taskConfig;
 		}
 
-		if(!$this->taskConfig)
+		if(!self::$taskConfig)
 			die("Task config not supplied");
 
-		date_default_timezone_set($this->taskConfig->getTimezone());
+		date_default_timezone_set(self::$taskConfig->getTimezone());
 
 		// clear seperator between executions
 		KalturaLog::debug('___________________________________________________________________________________');
 		KalturaLog::info(file_get_contents(dirname( __FILE__ ) . "/../VERSION.txt"));
 
-		if(! ($this->taskConfig instanceof KSchedularTaskConfig))
+		if(! (self::$taskConfig instanceof KSchedularTaskConfig))
 		{
 			KalturaLog::err('config is not a KSchedularTaskConfig');
 			die;
 		}
 
-		KalturaLog::debug("set_time_limit({$this->taskConfig->maximumExecutionTime})");
-		set_time_limit($this->taskConfig->maximumExecutionTime);
+		KalturaLog::debug("set_time_limit({".self::$taskConfig->maximumExecutionTime."})");
+		set_time_limit(self::$taskConfig->maximumExecutionTime);
 
 
 		KalturaLog::debug('This batch index: ' . $this->getIndex());
 		KalturaLog::debug('This session key: ' . $this->sessionKey);
 
-		$this->kClientConfig = new KalturaConfiguration($this->taskConfig->getPartnerId());
-		$this->kClientConfig->setLogger($this);
-		$this->kClientConfig->serviceUrl = $this->taskConfig->getServiceUrl();
-		$this->kClientConfig->curlTimeout = $this->taskConfig->getCurlTimeout();
-		$this->kClientConfig->clientTag = 'batch: ' . $this->taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::get();
+		self::$kClientConfig = new KalturaConfiguration(self::$taskConfig->getPartnerId());
+		self::$kClientConfig->setLogger($this);
+		self::$kClientConfig->serviceUrl = self::$taskConfig->getServiceUrl();
+		self::$kClientConfig->curlTimeout = self::$taskConfig->getCurlTimeout();
+		self::$kClientConfig->clientTag = 'batch: ' . self::$taskConfig->getSchedulerName() . ' ' . get_class($this) . " index: {$this->getIndex()} sessionId: " . UniqueId::get();
 
-		if(isset($this->taskConfig->clientConfig))
+		if(isset(self::$taskConfig->clientConfig))
 		{
-			foreach($this->taskConfig->clientConfig as $attr => $value)
-				$this->kClientConfig->$attr = $value;
+			foreach(self::$taskConfig->clientConfig as $attr => $value)
+				self::$kClientConfig->$attr = $value;
 		}
 
-		$this->kClient = new KalturaClient($this->kClientConfig);
-		//$ks = $this->kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
+		self::$kClient = new KalturaClient(self::$kClientConfig);
+		//$ks = self::$kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
 		$ks = $this->createKS();
-		$this->kClient->setKs($ks);
+		self::$kClient->setKs($ks);
 
-		KDwhClient::setEnabled($this->taskConfig->getDwhEnabled());
-		KDwhClient::setFileName($this->taskConfig->getDwhPath());
+		KDwhClient::setEnabled(self::$taskConfig->getDwhEnabled());
+		KDwhClient::setFileName(self::$taskConfig->getDwhPath());
 		$this->onBatchUp();
 
 		KScheduleHelperManager::saveRunningBatch($this->getName(), $this->getIndex());
@@ -274,13 +274,13 @@ abstract class KBatchBase implements IKalturaLogger
 
 	protected function getParams($name)
 	{
-		return  $this->taskConfig->$name;
+		return  self::$taskConfig->$name;
 	}
 
 	protected function getAdditionalParams($name)
 	{
-		if(isset($this->taskConfig->params) && isset($this->taskConfig->params->$name))
-			return $this->taskConfig->params->$name;
+		if(isset(self::$taskConfig->params) && isset(self::$taskConfig->params->$name))
+			return self::$taskConfig->params->$name;
 
 		return null;
 	}
@@ -290,18 +290,18 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	private function createKS()
 	{
-		$partnerId = $this->taskConfig->getPartnerId();
+		$partnerId = self::$taskConfig->getPartnerId();
 		$sessionType = KalturaSessionType::ADMIN;
 		$puserId = 'batchUser';
 		$privileges = 'disableentitlement';
-		$adminSecret = $this->taskConfig->getSecret();
+		$adminSecret = self::$taskConfig->getSecret();
 		$expiry = 60 * 60 * 24 * 30; // 30 days
 
 
 		$rand = rand(0, 32000);
 		$rand = microtime(true);
 		$expiry = time() + $expiry;
-		$masterPartnerId = $this->taskConfig->getPartnerId();
+		$masterPartnerId = self::$taskConfig->getPartnerId();
 		$additionalData = null;
 
 		$fields = array($partnerId, '', $expiry, $sessionType, $rand, $puserId, $privileges, $masterPartnerId, $additionalData);
@@ -333,15 +333,15 @@ abstract class KBatchBase implements IKalturaLogger
 		$search = array();
 		$replace = array();
 
-		if(!is_null($this->taskConfig->baseLocalPath) || !is_null($this->taskConfig->baseSharedPath))
+		if(!is_null(self::$taskConfig->baseLocalPath) || !is_null(self::$taskConfig->baseSharedPath))
 		{
-			$search[] = $this->taskConfig->baseLocalPath;
-			$replace[] = $this->taskConfig->baseSharedPath;
+			$search[] = self::$taskConfig->baseLocalPath;
+			$replace[] = self::$taskConfig->baseSharedPath;
 		}
-		if(!is_null($this->taskConfig->baseTempLocalPath) || !is_null($this->taskConfig->baseTempSharedPath))
+		if(!is_null(self::$taskConfig->baseTempLocalPath) || !is_null(self::$taskConfig->baseTempSharedPath))
 		{
-			$search[] = $this->taskConfig->baseTempLocalPath;
-			$replace[] = $this->taskConfig->baseTempSharedPath;
+			$search[] = self::$taskConfig->baseTempLocalPath;
+			$replace[] = self::$taskConfig->baseTempSharedPath;
 		}
 
 		$search[] = '\\';
@@ -361,8 +361,8 @@ abstract class KBatchBase implements IKalturaLogger
 
 		if(!is_null($search) || !is_null($replace))
 		{
-			$search = $this->taskConfig->baseSharedPath;
-			$replace = $this->taskConfig->baseLocalPath;
+			$search = self::$taskConfig->baseSharedPath;
+			$replace = self::$taskConfig->baseLocalPath;
 		}
 
 		return str_replace($search, $replace, $sharedPath);
@@ -396,8 +396,8 @@ abstract class KBatchBase implements IKalturaLogger
 		if(is_dir($filePath))
 		{
 			$chmod = 0750;
-			if($this->taskConfig->getDirectoryChmod())
-				$chmod = octdec($this->taskConfig->getDirectoryChmod());
+			if(self::$taskConfig->getDirectoryChmod())
+				$chmod = octdec(self::$taskConfig->getDirectoryChmod());
 				
 			KalturaLog::debug("chmod($filePath, $chmod)");
 			@chmod($filePath, $chmod);
@@ -412,8 +412,8 @@ abstract class KBatchBase implements IKalturaLogger
 		else
 		{
 			$chmod = 0640;
-			if($this->taskConfig->getChmod())
-				$chmod = octdec($this->taskConfig->getChmod());
+			if(self::$taskConfig->getChmod())
+				$chmod = octdec(self::$taskConfig->getChmod());
 		
 			KalturaLog::debug("chmod($filePath, $chmod)");
 			@chmod($filePath, $chmod);
@@ -455,12 +455,12 @@ abstract class KBatchBase implements IKalturaLogger
 			}
 		}
 
-		$retries = ($this->taskConfig->fileExistReties ? $this->taskConfig->fileExistReties : 1);
-		$interval = ($this->taskConfig->fileExistInterval ? $this->taskConfig->fileExistInterval : 5);
+		$retries = (self::$taskConfig->fileExistReties ? self::$taskConfig->fileExistReties : 1);
+		$interval = (self::$taskConfig->fileExistInterval ? self::$taskConfig->fileExistInterval : 5);
 
 		while($retries > 0)
 		{
-			$check = $this->kClient->batch->checkFileExists($file, $size);
+			$check = self::$kClient->batch->checkFileExists($file, $size);
 				// In case of directorySync - do not check client sizeOk - to be revised
 			if($check->exists && ($check->sizeOk || $directorySync))
 			{
@@ -488,7 +488,7 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public function saveSchedulerCommands(array $commands)
 	{
-		$type = $this->taskConfig->type;
+		$type = self::$taskConfig->type;
 		$file = "$type.cmd";
 		KScheduleHelperManager::saveCommand($file, $commands);
 	}
@@ -531,8 +531,8 @@ abstract class KBatchBase implements IKalturaLogger
 		$killConfig = new KBatchKillerConfig();
 
 		$killConfig->pid = getmypid();
-		$killConfig->maxIdleTime = $this->taskConfig->getMaxIdleTime();
-		$killConfig->sleepTime = $this->taskConfig->getMaxIdleTime() / 2;
+		$killConfig->maxIdleTime = self::$taskConfig->getMaxIdleTime();
+		$killConfig->sleepTime = self::$taskConfig->getMaxIdleTime() / 2;
 			/*
 			Do not run killer process w/out set config->maxIdle
 			*/
@@ -549,8 +549,8 @@ abstract class KBatchBase implements IKalturaLogger
 		$killConfig->workerType = $this->getType();
 		$killConfig->schedulerId = $this->getSchedulerId();
 		$killConfig->schedulerName = $this->getSchedulerName();
-		$killConfig->dwhPath = $this->taskConfig->getDwhPath();
-		$killConfig->dwhEnabled = $this->taskConfig->getDwhEnabled();
+		$killConfig->dwhPath = self::$taskConfig->getDwhPath();
+		$killConfig->dwhEnabled = self::$taskConfig->getDwhEnabled();
 
 		$phpPath = 'php'; // TODO - get it from somewhere
 		$killerPath = $this->getMonitorPath();
@@ -602,10 +602,10 @@ abstract class KBatchBase implements IKalturaLogger
 	 * @param string $fileName
 	 * @return boolean
 	 */
-	protected function pollingFileExists($fileName)
+	public static function pollingFileExists($fileName)
 	{
-		$retries = ($this->taskConfig->inputFileExistRetries ? $this->taskConfig->inputFileExistRetries : 10);
-		$interval = ($this->taskConfig->inputFileExistInterval ? $this->taskConfig->inputFileExistInterval : 5);
+		$retries = (self::$taskConfig->inputFileExistRetries ? self::$taskConfig->inputFileExistRetries : 10);
+		$interval = (self::$taskConfig->inputFileExistInterval ? self::$taskConfig->inputFileExistInterval : 5);
 
 		for ($retry = 0; $retry < $retries; $retry++)
 		{
