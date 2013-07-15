@@ -1263,6 +1263,7 @@ class kJobsManager
 		
 		$batchJob->setObjectId($fileSync->getId());
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
+		$batchJob->setJobSubType($storage->getProtocol());
 		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
