@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaStorageProfileProtocol extends KalturaEnum
+class KalturaStorageProfileProtocol extends KalturaDynamicEnum implements StorageProfileProtocol
 {
 	const KALTURA_DC = 0;
 	const FTP = 1;
