@@ -23,11 +23,11 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 			$captionsStr = null;
 			{
 					// impersonite
-				$preImpersoniteId = $this->client->getConfig()->partnerId;
+				$preImpersoniteId = KBatchBase::$kClient->getConfig()->partnerId;
 				
-				$captionsStr = $this->buildSubTitleCommandParam($this->data, $this->client);
+				$captionsStr = $this->buildSubTitleCommandParam($this->data);
 					// un-impersonite
-				$this->client->getConfig()->partnerId = $preImpersoniteId;
+				KBatchBase::$kClient->getConfig()->partnerId = $preImpersoniteId;
 			}
 			if(isset($captionsStr)){
 				$exeCmd = str_replace(
@@ -50,16 +50,15 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 	 * buildSubTitleCommandParam
 	 *
 	 * @param KalturaConvartableJobData $data
-	 * @param KalturaClient $client
 	 * @return 
 	 */
-	private function buildSubTitleCommandParam(KalturaConvartableJobData $data, KalturaClient $client)
+	private function buildSubTitleCommandParam(KalturaConvartableJobData $data)
 	{//		$cmdStr.= " -add ".KDLCmdlinePlaceholders::OutFileName.".temp.srt:hdlr=sbtl:lang=$lang:group=0:layer=-1";
 	
 		try {
-			$client->getConfig()->partnerId = $data->flavorParamsOutput->partnerId;
+			KBatchBase::$kClient->getConfig()->partnerId = $data->flavorParamsOutput->partnerId;
 			
-			$flrAsst = $client->flavorAsset->get($data->flavorAssetId);
+			$flrAsst = KBatchBase::$kClient->flavorAsset->get($data->flavorAssetId);
 			if(!isset($flrAsst)){
 				$this->message = ("Failed to retrieve the flavor asset object (".$data->flavorAssetId.")");
 KalturaLog::log("ERROR:".$this->message);
@@ -67,7 +66,7 @@ KalturaLog::log("ERROR:".$this->message);
 			}
 			$filter = new KalturaAssetFilter();
 			$filter->entryIdEqual = $flrAsst->entryId;
-			$captionsList = $client->captionAsset->listAction($filter, null); 
+			$captionsList = KBatchBase::$kClient->captionAsset->listAction($filter, null); 
 			if(!isset($captionsList) || count($captionsList->objects)==0){
 				$this->message = ("No caption assets for entry (".$flrAsst->entryId.")");
 KalturaLog::log("ERROR:".$this->message);
@@ -82,7 +81,7 @@ KalturaLog::log("ERROR:".$this->message);
 		$addedSubs=0;
 		foreach($captionsList->objects as $captionObj) {
 			try{
-				$cptUrl = $client->captionAsset->getUrl($captionObj->id, null);
+				$cptUrl = KBatchBase::$kClient->captionAsset->getUrl($captionObj->id, null);
 			}
 			catch ( Exception $ex ) {
 				$cptUrl = null;

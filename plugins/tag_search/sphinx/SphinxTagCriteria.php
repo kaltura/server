@@ -8,10 +8,12 @@ class SphinxTagCriteria extends SphinxCriteria
            TagPeer::PRIVACY_CONTEXT => 'privacy_context',
            TagPeer::INSTANCE_COUNT => 'instance_count',
            TagPeer::CREATED_AT => 'created_at',
+           TagPeer::UPDATED_AT => 'updated_at',
        );
        
     public static $sphinxOrderFields = array(
 		TagPeer::CREATED_AT => 'created_at',
+		TagPeer::UPDATED_AT => 'updated_at',
 		TagPeer::INSTANCE_COUNT => 'instance_count',
 	);
 	
