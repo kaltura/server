@@ -10,7 +10,8 @@ class KalturaStorageProfileArray extends KalturaTypedArray
 		$newArr = new KalturaStorageProfileArray();
 		foreach($arr as $obj)
 		{
-			$nObj = new KalturaStorageProfile();
+		    /* @var $obj StorageProfile */
+			$nObj = KalturaStorageProfile::getInstanceByType($obj->getProtocol());
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
