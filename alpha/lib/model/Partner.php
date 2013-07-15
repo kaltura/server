@@ -1206,6 +1206,15 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('role_cache_dirty_at');
 	}
 	
+	public function setI18nTemplatePartnerId ($v)
+	{
+		$this->putInCustomData('i18n_template_partner_id', $v);
+	}
+	
+	public function getI18nTemplatePartnerId ()
+	{
+		$this->getFromCustomData('i18n_template_partner_id');
+	}
 	
 	// -------------------------------------------------
 	// -- start of account owner kuser related functions
