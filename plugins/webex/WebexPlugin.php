@@ -2,7 +2,7 @@
 /**
  * @package plugins.webex
  */
-class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler, IKalturaEventConsumers
+class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 {
 	const PLUGIN_NAME = 'webex';
 	
@@ -136,14 +136,6 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler, IKaltu
 		
 		return $importData;
 
-	}
-
-	/* (non-PHPdoc)
-	 * @see IKalturaEventConsumers::getEventConsumers()
-	 */
-	public static function getEventConsumers() {
-		return array('kWebexManager');
-		
 	}
 
 }
