@@ -199,7 +199,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$glue = $this->type == self::SEARCH_AND ? ' ' : ' | ';
 			$this->condition = implode($glue, $matchClause);
 			
-			if($this->type == self::SEARCH_OR)
+			if(($this->type == self::SEARCH_OR) && ($this->condition))
 				$this->condition = "( {$this->condition} )";
 		}
 
