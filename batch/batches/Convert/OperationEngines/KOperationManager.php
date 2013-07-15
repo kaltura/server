@@ -23,7 +23,6 @@ class KOperationManager
 	
 	/**
 	 * @param int $type
-	 * @param KSchedularTaskConfig $taskConfig
 	 * @param KalturaConvartableJobData $data
 	 * @return KOperationEngine
 	 */
@@ -57,9 +56,9 @@ class KOperationManager
 				
 			case KalturaConversionEngineType::ENCODING_COM :
 				return new KOperationEngineEncodingCom(
-					$taskConfig->params->EncodingComUserId, 
-					$taskConfig->params->EncodingComUserKey, 
-					$taskConfig->params->EncodingComUrl);
+					KBatchBase::$taskConfig->params->EncodingComUserId, 
+					KBatchBase::$taskConfig->params->EncodingComUserKey, 
+					KBatchBase::$taskConfig->params->EncodingComUrl);
 		}
 		
 		if($data instanceof KalturaConvertCollectionJobData)
