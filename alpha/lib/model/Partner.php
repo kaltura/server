@@ -454,7 +454,11 @@ class Partner extends BasePartner
 	
 	public function getFeaturesStatus()	
 	{		
-		return $this->getFromCustomData(null, "featuresStatus");
+		$featuresStatus = $this->getFromCustomData(null, "featuresStatus");
+		if (!is_array($featuresStatus)){
+			$featuresStatus = unserialize($featuresStatus);
+		}
+		return $featuresStatus;
 	}
 	
 	public function getJobTypeQuota($jobType, $jobSubType) {
