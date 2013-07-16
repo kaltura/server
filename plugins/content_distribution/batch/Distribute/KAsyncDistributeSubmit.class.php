@@ -28,7 +28,7 @@ class KAsyncDistributeSubmit extends KAsyncDistribute
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineSubmit', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineSubmit', $providerType, $data);
 	}
 	
 	/* (non-PHPdoc)

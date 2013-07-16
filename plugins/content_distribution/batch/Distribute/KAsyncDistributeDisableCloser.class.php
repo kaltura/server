@@ -28,7 +28,7 @@ class KAsyncDistributeDisableCloser extends KAsyncDistributeCloser
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineCloseUpdate', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineCloseUpdate', $providerType, $data);
 	}
 	
 	/* (non-PHPdoc)
