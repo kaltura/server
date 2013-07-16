@@ -73,11 +73,11 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 			if($this->exceededMaxRecordsEachRun)
 				break;
 				    		    
-			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
+			if(KBatchBase::$kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
-				$this->kClient->doMultiRequest();
+				KBatchBase::$kClient->doMultiRequest();
 				$this->checkAborted();
-				$this->kClient->startMultiRequest();
+				KBatchBase::$kClient->startMultiRequest();
 			}
 			
 			$values = fgetcsv($fileHandle);
@@ -96,7 +96,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		fclose($fileHandle);
 		
 		// send all invalid results
-		$this->kClient->doMultiRequest();
+		KBatchBase::$kClient->doMultiRequest();
 		
 		KalturaLog::info("CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($this->bulkUploadResults)) . ' invalid records');
 		

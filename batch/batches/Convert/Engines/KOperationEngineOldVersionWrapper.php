@@ -14,7 +14,7 @@ class KOperationEngineOldVersionWrapper extends KOperationEngine
 	
 	public function __construct($type, KalturaConvartableJobData $data)
 	{
-		$this->convertor = KConversionEngine::getInstance($type, $taskConfig);
+		$this->convertor = KConversionEngine::getInstance($type, KBatchBase::$taskConfig);
 		$this->logFilePath = $data->destFileSyncLocalPath . ".log";
 	}
 

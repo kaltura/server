@@ -1,6 +1,6 @@
 <?php
 
-include_once(__DIR__ . "/KDLCommon.php");
+//include_once("KDLCommon.php");
 
 	/* ---------------------------
 	 * KDLBaseMediaData
@@ -138,6 +138,7 @@ include_once(__DIR__ . "/KDLCommon.php");
 		 */
 		public $_fileSize=0;
 		public $_fileName=0;
+		public $_isFastStart=0;
 		
 		public function GetSectionEnum() { return KDLConstants::ContainerIndex; }
 		

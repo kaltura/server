@@ -1,6 +1,6 @@
 <?php
-include_once(__DIR__ . "/KDLCommon.php");
-include_once(__DIR__ . "/KDLMediaDataSet.php");
+//include_once("KDLCommon.php");
+//include_once("KDLMediaDataSet.php");
 
 /* ===========================
  * KDLFlavor
@@ -745,14 +745,14 @@ $plannedDur = 0;
 				 */
 				if($shrinkToSource){
 					if($darTrgFrame>$darSrcFrame){
-						$target->_height = $hgtSrc;
+						if($target->_height>$hgtSrc) $target->_height = $hgtSrc;
 						$target->_width = $target->_height*$darTrgFrame;
 					}
 					/*
 					 * The target AR is narrower than the source
 					 */
 					else {
-						$target->_width  = $widSrc;
+						if($target->_width>$widSrc) $target->_width  = $widSrc;
 						$target->_height = $target->_width/$darTrgFrame;
 					}
 				}

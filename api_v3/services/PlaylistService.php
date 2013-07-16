@@ -294,14 +294,12 @@ class PlaylistService extends KalturaEntryService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 		
-		$extraFilters = array();
-		if ($filter)
-		{
-			$coreFilter = new entryFilter();
-			$filter->toObject($coreFilter);
-			$extraFilters[1] = $coreFilter;
+		$coreFilter = new entryFilter();
+        if ($filter)
+        {
+        	$filter->toObject($coreFilter);
 		}
-		
+        $extraFilters = array(1 => $coreFilter);
 			
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);

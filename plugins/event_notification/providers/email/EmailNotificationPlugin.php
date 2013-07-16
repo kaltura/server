@@ -64,17 +64,17 @@ class EmailNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 			
 		if ($baseClass == 'KEmailNotificationRecipientEngine')
 		{
-			list($recipientJobData, $kClient) = $constructorArgs;
+			list($recipientJobData) = $constructorArgs;
 			switch ($enumValue)	
 			{
 				case KalturaEmailNotificationRecipientProviderType::CATEGORY:
-					return new KEmailNotificationCategoryRecipientEngine($recipientJobData, $kClient);
+					return new KEmailNotificationCategoryRecipientEngine($recipientJobData);
 					break;
 				case KalturaEmailNotificationRecipientProviderType::STATIC_LIST:
-					return new KEmailNotificationStaticRecipientEngine($recipientJobData, $kClient);
+					return new KEmailNotificationStaticRecipientEngine($recipientJobData);
 					break;
 				case KalturaEmailNotificationRecipientProviderType::USER:
-					return new KEmailNotificationUserRecipientEngine($recipientJobData, $kClient);
+					return new KEmailNotificationUserRecipientEngine($recipientJobData);
 					break;
 			}
 		}

@@ -125,42 +125,88 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 		 */
 		public function GenerateIntermediateSource(KDLMediaDataSet $mediaSet, KDLProfile $profile=null)
 		{
+			/*
+			 * Check minimal source validity, else get out
+			 */
 			if($mediaSet==null || !$mediaSet->IsDataSet()){
 				return null;
 			}
+			/*
+			 * Source is invlalid if Initialize() fails, unless it is an ARF
+			 */
 			if(!((isset($mediaSet->_container) && $mediaSet->_container->_format=="arf")
 			|| $mediaSet->Initialize())){
 				return null;			
 			}
+							
 			$interSrcProfile = null;
-			if($mediaSet->_container->IsFormatOf(array("arf"))) {
+			/*
+			 * For ARF ==> webex plaugin 
+			 */
+			if(isset($mediaSet->_container) && $mediaSet->_container->IsFormatOf(array("arf"))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::COPY,
 						KDLVideoTarget::WVC1A, 4000, 1080,
 						KDLAudioTarget::WMA, 128, 0,
 						1, "webexNbrplayer.WebexNbrplayer");
 			}
-			else if($mediaSet->_video->IsFormatOf(array("g2m3","g2m4","gotomeeting3","gotomeeting3","gotomeeting"))) {
+			/*
+			 * For GotoMeeting ==> EE plaugin 
+			 */
+			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("g2m3","g2m4","gotomeeting3","gotomeeting3","gotomeeting"))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::WMV,
 						KDLVideoTarget::WVC1A, 4000, 1080,
 						KDLAudioTarget::WMA, 128, 0,
 						1, "expressionEncoder.ExpressionEncoder");
 			}
-			else if($mediaSet->_video->IsFormatOf(array("icod","intermediate codec"))
-				 || ( $mediaSet->_container->IsFormatOf(array("qt","mov")) 
-				   && $mediaSet->_video->IsFormatOf(array("wmv","wmv3","wvc1","vc1","vc-1")) 
-				   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","windows media audio","windows media audio 10 professional"))  )){
-				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
+			/*
+			 * For MAC native (icod, qt/wmv/wma ==> MAC plaugin 
+			 */
+			else if(isset($mediaSet->_video) 
+				 && (
+				 	$mediaSet->_video->IsFormatOf(array("icod","intermediate codec"))
+					||($mediaSet->_container->IsFormatOf(array("qt","mov")) 
+					   && $mediaSet->_video->IsFormatOf(array("wmv","wmv3","wvc1","vc1","vc-1")) 
+					   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","windows media audio","windows media audio 10 professional"))
+					  ) 
+				    )
+				   )
+				{
+					$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
 						KDLVideoTarget::H264H, 4000, 1080, 
 						KDLAudioTarget::AAC, 128, 0, 
 						1, "quickTimeTools.QuickTimeTools");
 			}
+			/*
+			 * For "red strip" on On2 ==> ffmpeg intermedite reconversion 
+			 */
+			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("xdvd","xdva","xdvb","xdvc","xdve","xdvf","xdv4"))) {
+				foreach($profile->_flavors as $flvr){
+					foreach ($flvr->_transcoders as $trans) {
+						if($trans->_id==KDLTranscoders::ON2){
+							$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
+								KDLVideoTarget::H264H, 4000, 1080, 
+								KDLAudioTarget::AAC, 128, 0, 
+								0, KDLTranscoders::FFMPEG);
+							break;
+						}
+					}
+					if(isset($interSrcProfile)){
+						break;
+					}
+				}
+			}
+			/*
 			else if($mediaSet->_video->IsFormatOf(array("tscc","tsc2"))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
 						KDLVideoTarget::H264H, 4000, 1080, 
 						KDLAudioTarget::AAC, 128, 0, 
 						0, KDLTranscoders::FFMPEG);
 			}
+			*/
 			
+			/*
+			 * If no "inter-src" cases ==> get out
+			 */
 			if(!isset($interSrcProfile))
 				return null;
 

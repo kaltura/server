@@ -97,7 +97,7 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->ftpHost;
 		$login = $distributionProfile->ftpUsername;
 		$password = $distributionProfile->ftpPassword;
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login($host, $login, $password);
 		return $ftpManager;

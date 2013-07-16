@@ -57,9 +57,9 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		
 		$durLimit=3600000;
 		if(get_class($this)=='KMediaInfoMediaParser'
-		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>$durLimit) 
-			|| (isset($kMi->videoDuration) && $kMi->videoDuration>$durLimit)
-			|| (isset($kMi->audioDuration) && $kMi->audioDuration>$durLimit))) {
+		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>=$durLimit) 
+			|| (isset($kMi->videoDuration) && $kMi->videoDuration>=$durLimit)
+			|| (isset($kMi->audioDuration) && $kMi->audioDuration>=$durLimit))) {
 			$cmd = "{$this->cmdPath} \"--Inform=General;done %Duration%\" \"{$this->filePath}\"";
 			$output=0;
 			$output = shell_exec($cmd);

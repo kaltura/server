@@ -18,13 +18,13 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		parent::configure($taskConfig);
+		parent::configure();
 		
-		if($taskConfig->params->tempXmlPath)
+		if(KBatchBase::$taskConfig->params->tempXmlPath)
 		{
-			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
+			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
 				kFile::fullMkfileDir($this->tempXmlPath, 0777, true);
 		}
@@ -74,7 +74,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		file_put_contents($srcFile, $providerData->xml);
 		KalturaLog::log("XML written to file [$srcFile]");
 		
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $distributionProfileAction->ftpPassiveMode;
 		$engineOptions['fieldName'] = $distributionProfileAction->httpFieldName;
 		$engineOptions['fileName'] = $distributionProfileAction->httpFileName;

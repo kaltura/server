@@ -49,7 +49,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 	protected function process(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
 		$job = $this->updateJob($job, "Start processing drop folder files [$data->dropFolderFileIds]", KalturaBatchJobStatus::QUEUED);
-		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
+		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get(self::$kClient);
 		
 		$this->impersonate($job->partnerId);
 		
@@ -89,8 +89,8 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->referenceId = $data->parsedSlug;
 			
-		$addedEntry = $this->kClient->baseEntry->add($newEntry, null);
-		$addedEntry = $this->kClient->baseEntry->addContent($addedEntry->id, $resource);	
+		$addedEntry = self::$kClient->baseEntry->add($newEntry, null);
+		$addedEntry = self::$kClient->baseEntry->addContent($addedEntry->id, $resource);	
 	}
 
 	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)
@@ -104,7 +104,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 			$entryPager = new KalturaFilterPager();
 			$entryPager->pageSize = 1;
 			$entryPager->pageIndex = 1;
-			$entryList = $this->kClient->baseEntry->listAction($entryFilter, $entryPager);
+			$entryList = self::$kClient->baseEntry->listAction($entryFilter, $entryPager);
 			
 			if (is_array($entryList->objects) && isset($entryList->objects[0]) ) 
 			{
@@ -136,7 +136,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 			if(!$matchedEntry)
 			{
 				$e = new kTemporaryException('No matching entry found', KalturaDropFolderFileErrorCode::FILE_NO_MATCH);
-				if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) >= time())	
+				if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) >= time())	
 				{
 					$e->setResetJobExecutionAttempts(true);
 				}	
@@ -144,8 +144,8 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 			}
 		}	
 		$resource = $this->getIngestionResource($job, $data);
-		$this->kClient->media->cancelReplace($matchedEntry->id);
-		$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
+		self::$kClient->media->cancelReplace($matchedEntry->id);
+		$updatedEntry = self::$kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
 	}
 	
 	/**
@@ -178,7 +178,7 @@ class KAsyncDropFolderContentProcessor extends KJobHandlerWorker
 		
 			$assetParamsFilter = new KalturaConversionProfileAssetParamsFilter();
 			$assetParamsFilter->conversionProfileIdEqual = $data->conversionProfileId;
-			$assetParamsList = $this->kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
+			$assetParamsList = self::$kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
 			foreach ($assetParamsList->objects as $assetParams)
 			{
 				if(array_key_exists($assetParams->systemName, $fileToFlavorMap))

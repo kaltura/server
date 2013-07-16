@@ -22,16 +22,16 @@ class ExampleDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		parent::configure($taskConfig);
+		parent::configure();
 		
 		// set default value
 		$this->updateXmlTemplate = dirname(__FILE__) . '/../xml/update.template.xml';
 		
 		// load value from batch configuration
-		if($taskConfig->params->updateXmlTemplate)
-			$this->updateXmlTemplate = $taskConfig->params->updateXmlTemplate;
+		if(KBatchBase::$taskConfig->params->updateXmlTemplate)
+			$this->updateXmlTemplate = KBatchBase::$taskConfig->params->updateXmlTemplate;
 	}
 
 	/* (non-PHPdoc)
@@ -131,7 +131,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$exampleExternalApiMediaItem->height = $entry->height;
 				
 		// loads ftp manager
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login(self::FTP_SERVER_URL, $distributionProfile->username, $distributionProfile->password);
 		
@@ -203,7 +203,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$videosElement = reset($videosElements);
 	
 		$flavorAssets = $this->getFlavorAssets($partnerId, $data->entryDistribution->flavorAssetIds);
-		$this->impersonate($partnerId);
+		KBatchBase::impersonate($partnerId);
 		foreach($flavorAssets as $flavorAsset)
 		{
 			$url = $this->getFlavorAssetUrl($flavorAsset->id);
@@ -212,14 +212,14 @@ class ExampleDistributionEngine extends DistributionEngine implements
 			$videoElement->textContent = $url;
 			$videosElement->appendChild($videoElement);
 		}
-		$this->unimpersonate();
+		KBatchBase::unimpersonate();
 			
 			
 		$localFile = tempnam(sys_get_temp_dir(), 'example-update-');
 		$feed->save($localFile);
 		
 		// loads ftp manager
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(kBatchBase::$taskConfig->engineOptions) ? kBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login(self::FTP_SERVER_URL, $distributionProfile->username, $distributionProfile->password);
 		

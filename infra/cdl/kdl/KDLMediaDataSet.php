@@ -1,7 +1,7 @@
 <?php
 
-include_once(__DIR__ . "/KDLCommon.php");
-include_once(__DIR__ . "/KDLMediaObjectData.php");
+//include_once("KDLCommon.php");
+//include_once("KDLMediaObjectData.php");
 
 	/* ---------------------------
 	 * KDLMediaDataSet

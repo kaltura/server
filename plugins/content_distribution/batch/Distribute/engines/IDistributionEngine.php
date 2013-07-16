@@ -8,10 +8,10 @@ interface IDistributionEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig);
+	public function configure();
 	
 	/**
 	 * @param KalturaClient $kalturaClient
 	 */
-	public function setClient(KalturaClient $kalturaClient);
+	public function setClient();
 }

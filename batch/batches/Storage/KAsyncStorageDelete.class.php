@@ -1,11 +1,6 @@
 <?php
 /**
- * @package Scheduler
- * @subpackage Storage
- */
-
-/**
- * Will delete a single file to ftp or scp server 
+ * Will perform a single deletion of external asset
  *
  * @package Scheduler
  * @subpackage Storage
@@ -43,14 +38,11 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 	{
 		$filter = parent::getFilter();
 		
-		if(is_null($filter->jobSubTypeIn))
-			$filter->jobSubTypeIn = $this->getSupportedProtocols();
+		if(KBatchBase::$taskConfig->params->minFileSize && is_numeric(KBatchBase::$taskConfig->params->minFileSize))
+			$filter->fileSizeGreaterThan = KBatchBase::$taskConfig->params->minFileSize;
 		
-		if($this->taskConfig->params->minFileSize && is_numeric($this->taskConfig->params->minFileSize))
-			$filter->fileSizeGreaterThan = $this->taskConfig->params->minFileSize;
-		
-		if($this->taskConfig->params->maxFileSize && is_numeric($this->taskConfig->params->maxFileSize))
-			$filter->fileSizeLessThan = $this->taskConfig->params->maxFileSize;
+		if(KBatchBase::$taskConfig->params->maxFileSize && is_numeric(KBatchBase::$taskConfig->params->maxFileSize))
+			$filter->fileSizeLessThan = KBatchBase::$taskConfig->params->maxFileSize;
 			
 		return $filter;
 	}
@@ -66,40 +58,12 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 	{
 		KalturaLog::debug("delete($job->id)");
 		
-		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
-		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
+        $exportEngine = KExportEngine::getInstance($job->jobSubType, $job->partnerId, $data);
 		$this->updateJob($job, "Deleting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED);
-
-		$engineOptions = isset($this->taskConfig->engineOptions) ? $this->taskConfig->engineOptions->toArray() : array();
-		$engineOptions['passiveMode'] = $data->ftpPassiveMode;
-		$engine = kFileTransferMgr::getInstance($job->jobSubType, $engineOptions);
-		
-		try{
-			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword);
-			$engine->delFile($destFile);
-		}
-		catch(kFileTransferMgrException $ke)
-		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $ke->getCode(), $ke->getMessage(), KalturaBatchJobStatus::FAILED);
-		}
-		catch(Exception $e)
-		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::FAILED);
-		}
+        
+        $exportEngine->delete();
 		
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 	}
 	
-	/*
-	 * @return string
-	 */
-	protected function getSupportedProtocols()
-	{ 
-		$supported_engines_arr = array();
-		if  ( $this->taskConfig->params->useFTP ) $supported_engines_arr[] = KalturaStorageProfileProtocol::FTP;
-		if  ( $this->taskConfig->params->useSCP ) $supported_engines_arr[] = KalturaStorageProfileProtocol::SCP;
-		if  ( $this->taskConfig->params->useSFTP ) $supported_engines_arr[] = KalturaStorageProfileProtocol::SFTP;
-		
-		return join(',', $supported_engines_arr);
-	}
 }

@@ -158,4 +158,18 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		return categoryKuserPeer::doSelect($criteria, $con);
 	}
 	
+	
+	public static function setDefaultCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+		
+		$c =  new Criteria(); 
+		$c->addAnd ( categoryKuserPeer::STATUS, CategoryKuserStatus::DELETED, Criteria::NOT_EQUAL);
+
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 } // categoryKuserPeer

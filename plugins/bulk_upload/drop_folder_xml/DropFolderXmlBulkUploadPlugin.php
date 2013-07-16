@@ -84,8 +84,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		//Gets the engine (only for clients)
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && $enumValue == KalturaBulkUploadType::DROP_FOLDER_XML)
 		{
-			list($taskConfig, $kClient, $job) = $constructorArgs;
-			return new DropFolderXmlBulkUploadEngine($taskConfig, $kClient, $job);
+			list($job) = $constructorArgs;
+			return new DropFolderXmlBulkUploadEngine($job);
 		}
 		
 		if ($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
