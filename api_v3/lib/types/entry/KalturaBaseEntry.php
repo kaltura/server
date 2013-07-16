@@ -5,6 +5,8 @@
  */
 class KalturaBaseEntry extends KalturaObject implements IFilterable 
 {
+	//test commit to branch
+	
 	/**
 	 * Auto generated 10 characters alphanumeric string
 	 * 
