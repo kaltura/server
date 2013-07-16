@@ -133,6 +133,6 @@ KalturaLog::info("upload result headers: " . print_r($resultHeader, true));
             KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
         
         $resultAsXml = new SimpleXMLElement($result);
-        return strval($resultAsXml->urn);
+        return strval($resultAsXml->urn) . ";realmId:" . strval($resultAsXml->realmId) . ";realmTicket:" .strval($resultAsXml->realmTicket);
 	}
 }
