@@ -264,7 +264,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	}
 	
 	protected function fetchIds($row) {
-		$idField = $this->selectColumn ? $this->selectColumn: getSphinxIdField();
+		$idField = $this->selectColumn ? $this->selectColumn: $this->getSphinxIdField();
 		return $row[$idField];
 	}
 	
