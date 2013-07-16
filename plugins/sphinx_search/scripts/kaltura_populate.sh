@@ -12,14 +12,13 @@ echo `date`
 # Source function library.
 #. /etc/rc.d/init.d/functions
 
-# Directory containing the populate php files
-SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
+# Directory containing the populate php files SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
 
 SCRIPTEXE=populateFromLog.php
 
-if [ $# != 1 ]; then
+if [ $# -ne 1 ]; then
 	echo "Usage: $0 [start|stop|restart|status]"
-	exit 0 	
+	exit 1 	
 fi
 
 LOCKFILE="$LOG_DIR/populate.pid"
@@ -104,11 +103,10 @@ show_status() {
 
 stop() {
 	echo -n $"Shutting down:"
-	KP=$(pgrep -P 1 -f $SCRIPTEXE)
+	KP=`pgrep -P 1 -f $SCRIPTEXE|xargs`
 	if [ -n "$KP" ]; then
-		PIDS=$(pstree -p $KP | grep -o '[0-9]\{2,5\}')
 		# hack, returnds the PIDS as string and tells kill to kill all at once
-		for pid in "$PIDS"
+		for pid in "$KP"
 		do
 			kill -9 $pid
 		done
@@ -145,3 +143,4 @@ case "$1" in
 		;;
 esac
 exit 0
+
