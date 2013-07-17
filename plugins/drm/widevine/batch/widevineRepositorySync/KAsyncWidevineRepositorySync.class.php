@@ -55,7 +55,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	{
 		KalturaLog::debug("Starting sendModifyRequest");
 		
-		$cgiUrl = $this->taskConfig->params->vodPackagerHost . WidevinePlugin::ASSET_NOTIFY_CGI;
+		$cgiUrl = self::$taskConfig->params->vodPackagerHost . WidevinePlugin::ASSET_NOTIFY_CGI;
 		
 		$dataWrap = new WidevineRepositorySyncJobDataWrap($data);		
 		$widevineAssets = $dataWrap->getWidevineAssetIds();
@@ -70,7 +70,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	
 	private function prepareAssetNotifyGetRequestXml($assetId)
 	{		
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, $this->taskConfig->params->portal);
+		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, self::$taskConfig->params->portal);
 		
 		$requestInput->setAssetId($assetId);
 		$requestXml = $requestInput->createAssetNotifyRequestXml();
@@ -82,7 +82,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	
 	private function prepareAssetNotifyRegisterRequestXml(WidevineAssetNotifyResponse $assetGetResponse, $licenseStartDate, $licenseEndDate)
 	{
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_REGISTER, $this->taskConfig->params->portal);
+		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_REGISTER, self::$taskConfig->params->portal);
 		$requestInput->setAssetName($assetGetResponse->getName());
 		$requestInput->setPolicy($assetGetResponse->getPolicy());
 		$requestInput->setLicenseStartDate($licenseStartDate);
