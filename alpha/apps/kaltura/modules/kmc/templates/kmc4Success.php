@@ -111,7 +111,7 @@ var kmc = {
 					<label class="control-label">Embed Code: </label>
 				</div>
 				<div class="input-append">
-				  <textarea class="span2" id="embedCode">{{embedCode}}</textarea>
+				  <textarea class="span2" id="embedCode" readonly>{{embedCode}}</textarea>
 				  <button class="btn copy-code" data-clipboard-target="embedCode">Copy</button>
 				</div>
 			</div>
@@ -123,7 +123,7 @@ var kmc = {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/kmc-full-6.0.5.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
+<script src="/lib/js/kmc/6.0.7/kmc.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?>
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } ?>
