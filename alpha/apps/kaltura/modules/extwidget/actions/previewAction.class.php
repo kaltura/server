@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Core
- * @subpackage KMC
+ * @subpackage externalWidgets
  */
 class previewAction extends kalturaAction
 {
