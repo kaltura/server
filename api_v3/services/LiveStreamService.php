@@ -293,7 +293,7 @@ class LiveStreamService extends KalturaEntryService
 	    curl_close($ch);  
 	    if($data && $httpcode>=200 && $httpcode<300)
 	    {
-	        return $contentType == $contentTypeToReturn ? $data : true;
+	        return in_array($contentType, $contentTypeToReturn) ? $data : true;
 	    }  
 	    else 
 	        return false;  

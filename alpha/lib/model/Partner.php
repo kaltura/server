@@ -455,7 +455,7 @@ class Partner extends BasePartner
 	public function getFeaturesStatus()	
 	{		
 		$featuresStatus = $this->getFromCustomData(null, "featuresStatus");
-		if (!is_array($featuresStatus)){
+		if (!is_null($featuresStatus) && (!is_array($featuresStatus))){
 			$featuresStatus = unserialize($featuresStatus);
 		}
 		return $featuresStatus;

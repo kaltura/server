@@ -25,7 +25,7 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	 */
 	protected function __construct(KalturaProvisionJobData $data = null)
 	{
-		parent::__construct($taskConfig);
+		parent::__construct();
 		
 		$username = null;
 		$password = null;

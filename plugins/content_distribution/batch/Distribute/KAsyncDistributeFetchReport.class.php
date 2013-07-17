@@ -28,7 +28,7 @@ class KAsyncDistributeFetchReport extends KAsyncDistribute
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineFetchReport', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineFetchReport', $providerType, $data);
 	}
 	
 	/* (non-PHPdoc)

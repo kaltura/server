@@ -28,7 +28,7 @@ class KAsyncDistributeDelete extends KAsyncDistribute
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineDelete', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineDelete', $providerType, $data);
 	}
 	
 	/* (non-PHPdoc)
