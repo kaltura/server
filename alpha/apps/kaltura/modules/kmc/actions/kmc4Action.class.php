@@ -69,7 +69,6 @@ class kmc4Action extends kalturaAction
 		
 		kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
 		$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
-		$ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 		$ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 		$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
 		$deliveryTypes = $partner->getDeliveryTypes();
@@ -100,6 +99,9 @@ class kmc4Action extends kalturaAction
 		if($partner && $partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE)
 		{
 			$this->payingPartner = 'true';
+			$ignoreSeoLinks = true;
+		} else {
+			$ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 		}
 
 		/** get partner languae **/

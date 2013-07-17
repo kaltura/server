@@ -94,7 +94,7 @@ if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {
 				</div>
 <?php if(!$framed) { ?>				
 			</div>
-
+<br /><p>This page is for preview only. Not for production use.</p>
 			</div><!-- end contwrap -->
 		</div><!-- end content -->
 	</div><!-- end #main -->
