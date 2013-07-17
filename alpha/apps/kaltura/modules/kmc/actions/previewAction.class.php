@@ -14,5 +14,6 @@ class previewAction extends kalturaAction
 			$url .= '?' . $_SERVER['QUERY_STRING'];
 		}
 		header("location: $url");
+		die();
 	}
 }
