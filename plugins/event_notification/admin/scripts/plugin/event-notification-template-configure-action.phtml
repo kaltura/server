@@ -5,11 +5,6 @@
 
 <?php echo $this->form ?>
 
-<?php 
-	foreach($this->plugins as $phtml => $pluginData)
-		echo $this->partial($phtml, $pluginData);
-?>
-
 <script type="text/javascript">
 
 var newConditionIndex = 0;
@@ -175,3 +170,8 @@ jQuery(document).ready(function() {
 });
 
 </script>
+
+<?php 
+	foreach($this->plugins as $phtml => $pluginData)
+		echo $this->partial($phtml, $pluginData);
+?>
