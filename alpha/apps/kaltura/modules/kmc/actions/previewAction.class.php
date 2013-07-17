@@ -10,7 +10,9 @@ class previewAction extends kalturaAction
 		// Preview page moved into /extwidget/preview
 		$url = '/index.php';
 		$url .= str_replace('/kmc', '/extwidget', $_SERVER['PATH_INFO']);
-		$url .= '?' . $_SERVER['QUERY_STRING'];
+		if( isset($_SERVER['QUERY_STRING']) ) {
+			$url .= '?' . $_SERVER['QUERY_STRING'];
+		}
 		header("location: $url");
 	}
 }
