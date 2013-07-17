@@ -68,10 +68,13 @@ function parseInputArray(SimpleXMLElement $items)
 	return $array;
 }
 
-function parseInputObject(SimpleXMLElement $input)
+function parseInputObject(SimpleXMLElement $input = null)
 {
 	global $inFile;
 
+	if(is_null($input))
+		return null;
+		
 	$type = 'string';
 	if(isset($input['objectType']))
 		$type = strval($input['objectType']);
