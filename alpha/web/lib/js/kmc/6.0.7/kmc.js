@@ -1,4 +1,4 @@
-/*! KMC - v6.0.7 - 2013-07-14
+/*! KMC - v6.0.7 - 2013-07-17
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2909,7 +2909,7 @@ if ( window.XDomainRequest ) {
 		}
 
 		var protocol = this.getEmbedProtocol(previewService, framed);
-		var url = protocol + '://' + kmc.vars.api_host + '/index.php/kmc/preview';
+		var url = protocol + '://' + kmc.vars.api_host + '/index.php/extwidget/preview';
 		//var url = protocol + '://' + window.location.host + '/KMC_V2/preview.php';
 		url += '/partner_id/' + kmc.vars.partner_id;
 		url += '/uiconf_id/' + player.id;
