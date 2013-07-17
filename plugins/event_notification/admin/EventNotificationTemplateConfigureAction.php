@@ -76,12 +76,17 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 				return;
 			}
 			
-			$form->setAction($action->view->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateConfigureAction')));
+			$urlParams = array(
+				'controller' => 'plugin', 
+				'action' => 'EventNotificationTemplateConfigureAction',
+				'clone_template_id' => null,
+			);
+			if($templateId)
+				$urlParams['template_id'] = $templateId;
+				
+			$form->setAction($action->view->url($urlParams));
 			
-			$pager = new Kaltura_Client_Type_FilterPager();
-			$pager->pageSize = 100;
-			
-			if($templateId) // update
+			if($templateId) // update or clone
 			{
 				if ($request->isPost())
 				{
