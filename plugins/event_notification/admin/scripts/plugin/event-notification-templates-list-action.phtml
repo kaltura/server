@@ -51,6 +51,7 @@
 <script type="text/javascript">
 $(function(){
 	addSubTitle('Event notification templates');
+	switchTemplatesBox();
 });
 
 
@@ -186,6 +187,60 @@ function updateStatus(partnerId, templateId, status, callback)
 			alert('<?php echo $this->translate('An error occured'); ?>: ' + result);
 		}
 	});
+}
+
+function cloneEventNotificationTemplate() {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateConfigureAction', 'partner_id' => 'PARTNER_ID', 'clone_template_id' => '')); ?>' + jQuery('#cloneTemplateId').val();
+	url = url.replace('PARTNER_ID', jQuery('#newPartnerId').val());
+	
+	jQuery('#configure-dialog').remove();
+	dialogDiv = jQuery('<div id="configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 600,
+		height: 600,
+		title: '<?php echo $this->translate('Template Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmEventNotificationTemplateConfig').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery(this).dialog('destroy').remove();
+		}
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmEventNotificationTemplateConfig').ajaxForm({
+				success: newEventNotificationTemplateSuccess,
+				iframe: true
+			});
+		}
+	);
+}
+
+var templates = <?php echo json_encode($this->templates); ?>;
+function switchTemplatesBox() {
+
+	jQuery('#cloneTemplateId').find('option').remove();
+
+	var templateType = jQuery('#cloneTemplateType').val();	
+	if(templateType == null)
+		return;
+	
+	for(var i = 0; i < templates.length; i++){
+		if(templates[i].type == templateType)
+			jQuery('#cloneTemplateId').append('<option value="' + templates[i].id + '">' + templates[i].name + '</option>');
+	}
 }
 
 function newEventNotificationTemplate(partnerId, type) {

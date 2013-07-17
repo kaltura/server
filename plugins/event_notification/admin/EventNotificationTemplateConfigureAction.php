@@ -37,10 +37,10 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			$partnerId = 0;
 			
 		$templateId = $this->_getParam('template_id');
+		$cloneTemplateId = $this->_getParam('clone_template_id');
 		$type = null;
 		$eventNotificationTemplate = null;
 		
-		$action->view->templateId = $templateId;
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -48,7 +48,14 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		try
 		{
 			Infra_ClientHelper::impersonate($partnerId);
-			if ($templateId)
+			
+			if($cloneTemplateId)
+			{
+				$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->cloneAction($cloneTemplateId);
+				$templateId = $eventNotificationTemplate->id;
+				$type = $eventNotificationTemplate->type;
+			}
+			elseif ($templateId)
 			{
 				$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->get($templateId);
 				$type = $eventNotificationTemplate->type;
@@ -130,9 +137,11 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			}
 		}
 		Infra_ClientHelper::unimpersonate();
+		
 		$action->view->form = $form;
-	
+		$action->view->templateId = $templateId;
 		$action->view->plugins = array();
+		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
 		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)
