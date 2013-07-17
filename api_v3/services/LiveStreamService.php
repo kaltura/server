@@ -273,7 +273,7 @@ class LiveStreamService extends KalturaEntryService
 	 * @param string $url
 	 * @return string
 	 */
-	private function urlExists ($url, $contentTypeToReturn)
+	private function urlExists ($url, array $contentTypeToReturn)
 	{
 		if (is_null($url)) 
 			return false;  
