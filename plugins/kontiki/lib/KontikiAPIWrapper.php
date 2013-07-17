@@ -130,7 +130,7 @@ KalturaLog::info("upload result headers: " . print_r($resultHeader, true));
         $curlWrapper = new KCurlWrapper($url);
         $result = $curlWrapper->exec();
         if (!$result)
-            KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
+            return;
         
         $resultAsXml = new SimpleXMLElement($result);
         return strval($resultAsXml->urn) . ";realmId:" . strval($resultAsXml->realmId) . ";realmTicket:" .strval($resultAsXml->realmTicket);
