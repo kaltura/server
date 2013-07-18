@@ -1,4 +1,4 @@
-/*! KMC - v6.0.7 - 2013-07-17
+/*! KMC - v6.0.7 - 2013-07-18
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -2632,7 +2632,7 @@ if ( window.XDomainRequest ) {
 	Preview.iframeContainer = 'previewIframe';
 
 	// We use this flag to ignore all change evnets when we initilize the preview ( on page start up )
-	// We will set that to true once Preview is opened.
+	// We will set that to false once Preview is opened.
 	Preview.ignoreChangeEvents = true;
 
 	// Set generator
@@ -2760,12 +2760,14 @@ if ( window.XDomainRequest ) {
 		};
 
 		options = $.extend({}, defaults, options);
+		previewService.disableEvents();
 		// In case of live entry preview, set delivery type to auto
 		if( options.liveBitrates ) {
 			previewService.setDeliveryType('auto');
 		}
 		// Update our players
 		previewService.updatePlayers(options);
+		previewService.enableEvents();
 		// Set options
 		previewService.set(options);
 
@@ -2948,6 +2950,7 @@ if ( window.XDomainRequest ) {
 var kmcApp = angular.module('kmcApp', []);
 kmcApp.factory('previewService', ['$rootScope', function($rootScope) {
 	var previewProps = {};
+	var disableCount = 0;
 	return {
 		get: function(key) {
 			if(key === undefined) return previewProps;
@@ -2959,9 +2962,15 @@ kmcApp.factory('previewService', ['$rootScope', function($rootScope) {
 			} else {
 				previewProps[key] = value;
 			}
-			if(!quiet) {
+			if( !quiet && disableCount === 0 ) {
 				$rootScope.$broadcast('previewChanged');
 			}
+		},
+		enableEvents: function(){
+			disableCount--;
+		},
+		disableEvents: function(){
+			disableCount++
 		},
 		updatePlayers: function(options) {
 			$rootScope.$broadcast('playersUpdated', options);
@@ -2970,7 +2979,7 @@ kmcApp.factory('previewService', ['$rootScope', function($rootScope) {
 			$rootScope.$broadcast('changePlayer', playerId);
 		},
 		setDeliveryType: function( deliveryTypeId ) {
-			$rootScope.$broadcast('changeDelivery', deliveryTypeId);
+			$rootScope.$broadcast('changeDelivery', deliveryTypeId );
 		}
 	};
 }]);
@@ -3023,12 +3032,14 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 				if(!Preview.playlistMode) {
 					Preview.playlistMode = true;
 					$scope.$broadcast('changePlayer', playerId);
+					return;
 				}
 			} else {
 				$scope.players = kmc.vars.players_list;
 				if(Preview.playlistMode || !$scope.player) {
 					Preview.playlistMode = false;
 					$scope.$broadcast('changePlayer', playerId);
+					return;
 				}
 			}
 			if(playerId){
@@ -3134,12 +3145,17 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 	$scope.$watch('player', function() {
 		var player = Preview.getObjectById($scope.player, $scope.players);
 		if(!player) { return ; }
+		previewService.disableEvents();
 		setDeliveryTypes(player);
 		setEmbedTypes(player);
-		previewService.set('player', player);
+		setTimeout(function(){
+			previewService.enableEvents();
+			previewService.set('player', player);
+		},0);
 	});
 	$scope.$watch('deliveryType', function() {
-		previewService.set('deliveryType', Preview.getObjectById($scope.deliveryType, $scope.deliveryTypes));
+		var deliveryType = Preview.getObjectById($scope.deliveryType, $scope.deliveryTypes);
+		previewService.set('deliveryType', deliveryType);
 	});
 	$scope.$watch('embedType', function() {
 		previewService.set('embedType', $scope.embedType);
