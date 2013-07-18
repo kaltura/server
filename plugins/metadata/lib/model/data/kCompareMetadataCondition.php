@@ -20,6 +20,11 @@ class kCompareMetadataCondition extends kCompareCondition
 	 */
 	private $profileId;
 	
+	/**
+	 * @var string
+	 */
+	private $profileSystemName;
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -34,17 +39,29 @@ class kCompareMetadataCondition extends kCompareCondition
 	 */
 	public function getFieldValue(kScope $scope)
 	{
-		$metadata = null;
+		$profileId = $this->profileId;
+		if(!$profileId)
+		{
+			if(!$this->profileSystemName)
+				return null;
+				
+			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
+			if(!$profile)
+				return null;
+				
+			$profileId = $profile->getId();
+		}
 		
+		$metadata = null;
 		if($scope instanceof accessControlScope)
 		{
-			$metadata = MetadataPeer::retrieveByObject($this->profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+			$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
 		}
 		elseif($scope instanceof kEventScope && $scope->getEvent() instanceof kApplicativeEvent)
 		{
 			$object = $scope->getEvent()->getObject();
 			if($object instanceof IMetadataObject)
-				$metadata = MetadataPeer::retrieveByObject($this->profileId, $object->getMetadataObjectType(), $object->getId());
+				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
 		}
 			
 		if(!$metadata)
@@ -87,6 +104,22 @@ class kCompareMetadataCondition extends kCompareCondition
 	public function setProfileId($profileId)
 	{
 		$this->profileId = $profileId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProfileSystemName() 
+	{
+		return $this->profileSystemName;
+	}
+
+	/**
+	 * @param string $profileSystemName
+	 */
+	public function setProfileSystemName($profileSystemName) 
+	{
+		$this->profileSystemName = $profileSystemName;
 	}
 
 	/* (non-PHPdoc)
