@@ -174,6 +174,7 @@ class kWidevineEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	{
 		$entryFilter = new entryFilter();
 		$entryFilter->fields['_like_plugins_data'] = WidevinePlugin::getWidevineAssetIdSearchData($wvAssetId);
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);				
 		$entryFilter->attachToCriteria($c);	
 		$c->add(entryPeer::ID, $entryId, Criteria::NOT_EQUAL);
