@@ -454,10 +454,11 @@ class Partner extends BasePartner
 	
 	public function getFeaturesStatus()	
 	{		
-		$featuresStatus = $this->getFromCustomData(null, "featuresStatus");
-		if (!is_null($featuresStatus) && (!is_array($featuresStatus))){
-			$featuresStatus = unserialize($featuresStatus);
+		$featuresStatus = $this->getFromCustomData(null, 'featuresStatuses');
+		if (is_null($featuresStatus)){
+			$featuresStatus = array();
 		}
+		
 		return $featuresStatus;
 	}
 	
@@ -485,19 +486,19 @@ class Partner extends BasePartner
 		$newFeatureStatus->setType($type);
 		$newFeatureStatus->setValue($value);
 		
-		$this->putInCustomData($type, $newFeatureStatus, 'featuresStatus');
+		$this->putInCustomData($type, $newFeatureStatus, 'featuresStatuses');
 		$this->save();
 	}
 	
 	public function removeFeaturesStatus($type)
 	{
-		$this->removeFromCustomData($type, 'featuresStatus');
+		$this->removeFromCustomData($type, 'featuresStatuses');
 		$this->save();
 	}
 	
 	public function getFeaturesStatusByType($type)
 	{
-		return $this->getFromCustomData($type, 'featuresStatus');
+		return $this->getFromCustomData($type, 'featuresStatuses');
 	}
 	
 	public function resetFeaturesStatusByType($type)

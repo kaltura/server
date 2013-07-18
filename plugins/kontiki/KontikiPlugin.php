@@ -65,8 +65,8 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue) {
-		if($baseClass == 'StorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
-            return 'KontikiStorageProfile';
+		if($baseClass == 'KalturaStorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
+            return 'KalturaKontikiStorageProfile';
 
 	}
 
