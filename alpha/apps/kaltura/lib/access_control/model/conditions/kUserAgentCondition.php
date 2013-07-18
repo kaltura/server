@@ -17,9 +17,8 @@ class kUserAgentCondition extends kRegexCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	public function getFieldValue(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
 		kApiCache::addExtraField(kApiCache::ECF_USER_AGENT, kApiCache::COND_REGEX, $this->getStringValues($scope));
 		return $scope->getUserAgent();
 	}

@@ -22,18 +22,18 @@ abstract class kCondition
 	}
 	
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return bool
 	 */
-	abstract protected function internalFulfilled(accessControl $accessControl);
+	abstract protected function internalFulfilled(kScope $scope);
 	
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return bool
 	 */
-	final public function fulfilled(accessControl $accessControl)
+	final public function fulfilled(kScope $scope)
 	{
-		return $this->calcNot($this->internalFulfilled($accessControl));
+		return $this->calcNot($this->internalFulfilled($scope));
 	}
 	
 	/**

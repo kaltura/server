@@ -63,10 +63,10 @@ abstract class kMatchCondition extends kCondition
 	}
 	
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return string the field content
 	 */
-	abstract public function getFieldValue(accessControl $accessControl);
+	abstract public function getFieldValue(kScope $scope);
 	
 	/**
 	 * @param string $field
@@ -106,10 +106,10 @@ abstract class kMatchCondition extends kCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	protected function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(kScope $scope)
 	{
-		$field = $this->getFieldValue($accessControl);
-		$values = $this->getStringValues($accessControl->getScope());
+		$field = $this->getFieldValue($scope);
+		$values = $this->getStringValues($scope);
 		
 		KalturaLog::debug("Matches field [$field] to values [" . print_r($values, true) . "]");
 		if (!count($values))

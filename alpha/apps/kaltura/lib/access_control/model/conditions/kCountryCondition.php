@@ -41,9 +41,8 @@ class kCountryCondition extends kMatchCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	public function getFieldValue(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
 		kApiCache::addExtraField(kApiCache::ECF_COUNTRY, kApiCache::COND_MATCH, $this->getStringValues($scope));
 
 		$ip = $scope->getIp();

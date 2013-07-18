@@ -32,10 +32,21 @@ class kMatchMetadataCondition extends kMatchCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	public function getFieldValue(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
-		$metadata = MetadataPeer::retrieveByObject($this->profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+		$metadata = null;
+		
+		if($scope instanceof accessControlScope)
+		{
+			$metadata = MetadataPeer::retrieveByObject($this->profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+		}
+		elseif($scope instanceof kEventScope && $scope->getEvent() instanceof kApplicativeEvent)
+		{
+			$object = $scope->getEvent()->getObject();
+			if($object instanceof IMetadataObject)
+				$metadata = MetadataPeer::retrieveByObject($this->profileId, $object->getMetadataObjectType(), $object->getId());
+		}
+			
 		if($metadata)
 			return kMetadataManager::parseMetadataValues($metadata, $this->xPath);
 			
