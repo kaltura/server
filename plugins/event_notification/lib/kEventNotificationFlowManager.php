@@ -132,7 +132,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		
 		foreach($eventConditions as $eventCondition)
 		{
-			/* @var $eventCondition kEventCondition */
+			/* @var $eventCondition kCondition */
 			if(!$eventCondition->fulfilled($scope))
 				return false;
 		}

@@ -231,9 +231,9 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 	}
 	
 	/**
-	 * @param Kaltura_Client_EventNotification_Type_EventCondition $condition
+	 * @param Kaltura_Client_Type_Condition $condition
 	 */
-	protected function addCondition(Kaltura_Client_EventNotification_Type_EventCondition $condition)
+	protected function addCondition(Kaltura_Client_Type_Condition $condition)
 	{
 		if($condition instanceof Kaltura_Client_EventNotification_Type_EventFieldCondition && $condition->field instanceof Kaltura_Client_Type_EvalBooleanField)
 		{

@@ -3,7 +3,7 @@
  * @package plugins.eventNotification
  * @subpackage api.objects
  */
-class KalturaEventFieldCondition extends KalturaEventCondition
+class KalturaEventFieldCondition extends KalturaCondition
 {	
 	/**
 	 * The field to be evaluated at runtime

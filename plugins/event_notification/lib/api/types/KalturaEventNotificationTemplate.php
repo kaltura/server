@@ -99,7 +99,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 
 	/**
 	 * Define the conditions that cause this notification to be triggered
-	 * @var KalturaEventConditionArray
+	 * @var KalturaConditionArray
 	 * @requiresPermission update
 	 */
 	public $eventConditions;
