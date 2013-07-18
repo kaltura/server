@@ -131,12 +131,6 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 	 */
 	public $customHeaders;
 	
-	/**
-	 * Define the content dynamic parameters
-	 * @var KalturaEventNotificationParameterArray
-	 */
-	public $contentParameters;
-	
 	private static $map_between_objects = array
 	(
 		'url',
@@ -157,7 +151,6 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 		'sslKey',
 		'sslKeyPassword',
 		'customHeaders',
-		'contentParameters',
 	);
 	
 	public function __construct()

@@ -23,7 +23,6 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	const CUSTOM_DATA_SSL_KEY = 'sslKey';
 	const CUSTOM_DATA_SSL_KEY_PASSWORD = 'sslKeyPassword';
 	const CUSTOM_DATA_CUSTOM_HEADERS = 'customHeaders';
-	const CUSTOM_DATA_CONTENT_PARAMETERS = 'contentParameters';
 	const CUSTOM_DATA_POST_FILE_VERSION = 'postFileVersion';
 	
 	const FILE_SYNC_POST = 1;
@@ -268,7 +267,6 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	public function getSslKey()									{return $this->getFromCustomData(self::CUSTOM_DATA_SSL_KEY);}
 	public function getSslKeyPassword()							{return $this->getFromCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD);}
 	public function getCustomHeaders()							{return $this->getFromCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, null, array());}
-	public function getContentParameters()						{return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, null, array());}
 
 	public function incrementPostFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_POST_FILE_VERSION);}
 	public function resetPostFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_POST_FILE_VERSION, 1);}
@@ -291,5 +289,4 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	public function setSslKey($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY, $v);}
 	public function setSslKeyPassword($v)						{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD, $v);}
 	public function setCustomHeaders(array $v)					{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
-	public function setContentParameters(array $v)				{return $this->putInCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, $v);}
 }

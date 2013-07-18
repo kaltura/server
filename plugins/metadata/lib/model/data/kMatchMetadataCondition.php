@@ -35,6 +35,23 @@ class kMatchMetadataCondition extends kMatchCondition
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kCondition::applyDynamicValues()
+	 */
+	protected function applyDynamicValues(kScope $scope)
+	{
+		parent::applyDynamicValues($scope);
+		
+		$dynamicValues = $scope->getDynamicValues('{', '}');
+		
+		if(is_array($dynamicValues) && count($dynamicValues))
+		{
+			$this->xPath = str_replace(array_keys($dynamicValues), $dynamicValues, $this->xPath);
+			if($this->profileSystemName)
+				$this->profileSystemName = str_replace(array_keys($dynamicValues), $dynamicValues, $this->profileSystemName);
+		}
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
 	public function getFieldValue(kScope $scope)

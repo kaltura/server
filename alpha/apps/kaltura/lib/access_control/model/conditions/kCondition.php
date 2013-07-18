@@ -22,6 +22,13 @@ abstract class kCondition
 	}
 	
 	/**
+	 * Enable changing the condition attributes according to additional data in the scope
+	 */
+	protected function applyDynamicValues(kScope $scope)
+	{
+	}
+	
+	/**
 	 * @param kScope $scope
 	 * @return bool
 	 */
@@ -33,6 +40,7 @@ abstract class kCondition
 	 */
 	final public function fulfilled(kScope $scope)
 	{
+		$this->applyDynamicValues($scope);
 		return $this->calcNot($this->internalFulfilled($scope));
 	}
 	
