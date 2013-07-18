@@ -58,6 +58,14 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
                 return new KalturaKontikiStorageDeleteJobData();
             }
         }
+		
+		if ($baseClass == 'KalturaStorageProfile')
+        {
+            if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
+            {
+                return new KalturaKontikiStorageProfile();
+            }
+        }
 
 	}
 
@@ -65,9 +73,8 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue) {
-		if($baseClass == 'KalturaStorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
-            return 'KalturaKontikiStorageProfile';
-
+		if($baseClass == 'StorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
+            return 'KontikiStorageProfile';
 	}
 
 	/* (non-PHPdoc)
