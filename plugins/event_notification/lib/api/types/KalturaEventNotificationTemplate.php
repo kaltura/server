@@ -112,6 +112,12 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	public $contentParameters;
 	
 	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaEventNotificationParameterArray
+	 */
+	public $userParameters;
+	
+	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
@@ -128,6 +134,8 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		'eventType',
 		'eventObjectType' => 'objectType',
 		'eventConditions',
+		'contentParameters',
+		'userParameters',
 	);
 		 
 	/* (non-PHPdoc)
