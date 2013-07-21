@@ -11,7 +11,13 @@ class kKontikiUrlManager extends kUrlManager
     {
         $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
 		/* @var $storageProfile KontikiStorageProfile */
-        KontikiAPIWrapper::$entryPoint = $storageProfile->getApiEntryPoint();
-        return KontikiAPIWrapper::getPlaybackUrn("srv-".base64_encode($this->storageProfile->getServiceToken()), $fileSync->getFilePath());
+		$kontikiAPIWrapper = new KontikiAPIWrapper($storageProfile->getApiEntryPoint());
+        $urn = $kontikiAPIWrapper->getPlaybackUrn("srv-".base64_encode($storageProfile->getServiceToken()), $fileSync->getFilePath());
+		if (!$urn) 
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
+		}
+		
+		return $urn;
     }
 }

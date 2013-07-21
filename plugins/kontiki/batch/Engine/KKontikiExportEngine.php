@@ -5,6 +5,11 @@ class KKontikiExportEngine extends KExportEngine
 {
     protected $partnerId;
     
+	/**
+	 * @var KontikiAPWrapper
+	 */
+	protected $kontikiAPIWrapper;
+	
     protected static $pending_statuses = array ("PENDING_RESTART","RESTARTING","PENDING","PROCESSING","TRANSCODE_QUEUED","TRANSCODE_DONE","TRANSCODING","UPLOADING","SCANNING","ENCRYPTING","ENCRYPT_DONE","SIGNING","SIGN_DONE","RESIZING_THUMBNAILS","RESIZING_THUMBNAILS_DONE","PUBLISHING","PENDING_APPROVAL");
     
     protected static $failed_statuses = array("RESTART_FAILED","UNPROCESSABLE","TRANSCODE_FAILED","TRANSCODE_ERROR","TRANSCODE_CANCELLED","TRANSCODE_INTERRUPTED","UPLOAD_FAILED","SCAN_FAILED","SCAN_ERROR","ENCRYPT_FAILED","SIGN_FAILED","RESIZING_THUMBNAILS_FAILED","SMIL_FILE_GENERATION_FAILED","PUBLISHING_FAILED","PENDING_APPROVAL_FAIL","READY_FAIL" );
@@ -15,8 +20,7 @@ class KKontikiExportEngine extends KExportEngine
 	{
 		parent::__construct($data, $jobSubType);
         $this->partnerId = $partnerId;
-        /* @var $data KalturaKontikiStorageExportJobData */
-	    KontikiAPIWrapper::$entryPoint = $data->entryPoint;
+		$this->kontikiAPIWrapper = new KontikiAPIWrapper($data->entryPoint);
     }
 	
 	/* (non-PHPdoc)
@@ -27,7 +31,7 @@ class KKontikiExportEngine extends KExportEngine
 		KBatchBase::impersonate($this->partnerId);
 		$url = KBatchBase::$kClient->flavorAsset->getUrl($this->data->flavorAssetId);
 		KBatchBase::unimpersonate();
-		$result = KontikiAPIWrapper::addKontikiUploadResource('srv-' . base64_encode($this->data->serviceToken), $url);
+		$result = $this->kontikiAPIWrapper->addKontikiUploadResource('srv-' . base64_encode($this->data->serviceToken), $url);
 		KalturaLog::info("Upload result: $result");
         
         $kontikiResult = new SimpleXMLElement($result);
@@ -42,7 +46,7 @@ class KKontikiExportEngine extends KExportEngine
         $entry = KBatchBase::$kClient->baseEntry->get($flavorAsset->entryId);
         $result = KBatchBase::$kClient->doMultiRequest();
         KBatchBase::unimpersonate();
-        $contentResourceResult = KontikiAPIWrapper::addKontikiVideoContentResource('srv-' . base64_encode($this->data->serviceToken), $uploadMoid, $result[1], $result[0]);
+        $contentResourceResult = $this->kontikiAPIWrapper->addKontikiVideoContentResource('srv-' . base64_encode($this->data->serviceToken), $uploadMoid, $result[1], $result[0]);
         KalturaLog::info("Content resource result: " . $contentResourceResult);
         $resultAsXml = new SimpleXMLElement($contentResourceResult);
         
@@ -56,7 +60,7 @@ class KKontikiExportEngine extends KExportEngine
 	 */
 	public function verifyExportedResource()
     {
-		$contentResource = KontikiAPIWrapper::getKontikiContentResource('srv-' . base64_encode($this->data->serviceToken), $this->data->contentMoid);
+		$contentResource = $this->kontikiAPIWrapper->getKontikiContentResource('srv-' . base64_encode($this->data->serviceToken), $this->data->contentMoid);
         if (!$contentResource)
         {
             throw new kKontikiApplicativeException(kKontikiApplicativeException::KONTIKI_API_EXCEPTION, "Failed to retrieve content resource");
@@ -88,7 +92,7 @@ class KKontikiExportEngine extends KExportEngine
      */
 	public function delete ()
 	{
-	    $deleteResult = KontikiAPIWrapper::deleteKontikiContentResource('srv-' . base64_encode($this->data->serviceToken), $this->data->contentMoid);
+	    $deleteResult = $this->kontikiAPIWrapper->deleteKontikiContentResource('srv-' . base64_encode($this->data->serviceToken), $this->data->contentMoid);
         if (!$deleteResult)
         {
             throw new kKontikiApplicativeException(kKontikiApplicativeException::KONTIKI_API_EXCEPTION, "Failed to delete content resource");
