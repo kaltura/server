@@ -2995,7 +2995,8 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			if ($this->isColumnModified(PartnerPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data))
-					$criteria->add(PartnerPeer::CUSTOM_DATA, "MD5(" . PartnerPeer::CUSTOM_DATA . ") = '$this->custom_data_md5'", Criteria::CUSTOM);
+					$criteria->add(PartnerPeer::CUSTOM_DATA, "MD5(cast(" . PartnerPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
 				else 
 					$criteria->add(PartnerPeer::CUSTOM_DATA, NULL, Criteria::IS_NULL);
 			}
