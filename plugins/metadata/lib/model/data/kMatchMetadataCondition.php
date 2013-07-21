@@ -52,7 +52,7 @@ class kMatchMetadataCondition extends kMatchCondition
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::getFieldValue()
+	 * @see kMatchCondition::getFieldValue()
 	 */
 	public function getFieldValue(kScope $scope)
 	{
