@@ -35,14 +35,17 @@ class KalturaTypeReflectorCacher
 				mkdir($cachedDir);
 				chmod($cachedDir, 0755);
 			}
-				
+			
 			$cachedFilePath = $cachedDir.DIRECTORY_SEPARATOR.$type.".cache";
+			
+			$typeReflector = null;
 			if (file_exists($cachedFilePath))
 			{
 				$cachedData = file_get_contents($cachedFilePath);
 				$typeReflector = unserialize($cachedData);
 			}
-			else
+			
+			if (!$typeReflector)
 			{
 				$typeReflector = new KalturaTypeReflector($type);
 				$cachedData = serialize($typeReflector);
