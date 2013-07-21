@@ -51,7 +51,7 @@ class KontikiAPIWrapper
         $data = base64_encode($data);
         $data = urlencode($data);
         
-        $url = self::$entryPoint."/metadata/content?_method=POST&_ctype=xml&_data=$data&auth=$serviceToken";
+        $url = $this->entryPoint."/metadata/content?_method=POST&_ctype=xml&_data=$data&auth=$serviceToken";
 		
 		return $this->execAPICall($url);
         
@@ -65,7 +65,7 @@ class KontikiAPIWrapper
      */
 	public function getKontikiContentResource ($serviceToken, $contentMoid)
 	{
-		$url = self::$entryPoint."/metadata/content/$contentMoid;uploads=true?auth=$serviceToken";
+		$url = $this->entryPoint."/metadata/content/$contentMoid;uploads=true?auth=$serviceToken";
 
         return $this->execAPICall($url);
 	}
@@ -84,7 +84,7 @@ class KontikiAPIWrapper
 		$data = base64_encode($data);
 		$data = urlencode($data);
 
-		$url = self::$entryPoint."/upload/init/pull?_method=POST&_ctype=xml&_data={$data}&auth=$serviceToken";
+		$url = $this->entryPoint."/upload/init/pull?_method=POST&_ctype=xml&_data={$data}&auth=$serviceToken";
 		$curlWrapper = new KCurlWrapper($url);
 		
 		return $curlWrapper->exec();
@@ -98,7 +98,7 @@ class KontikiAPIWrapper
      */
     public function deleteKontikiContentResource ($serviceToken, $contentMoid)
     {
-        $url = self::$entryPoint . "/metadata/content/$contentMoid?grid=true&_method=DELETE&auth=$serviceToken";
+        $url = $this->entryPoint . "/metadata/content/$contentMoid?grid=true&_method=DELETE&auth=$serviceToken";
         return $this->execAPICall($url);
     }
 
@@ -111,7 +111,7 @@ class KontikiAPIWrapper
      */
 	public function getPlaybackUrn ($serviceToken, $contentMoid, $timeout = null)
 	{
-	    $url = self::$entryPoint . "/playback/video/$contentMoid?". ($timeout ? "timeout=$timeout" : "" ) . "&auth=$serviceToken";
+	    $url = $this->entryPoint . "/playback/video/$contentMoid?". ($timeout ? "timeout=$timeout" : "" ) . "&auth=$serviceToken";
         $result = $this->execAPICall($url);
         if (!$result)
             return;
