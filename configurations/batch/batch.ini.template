@@ -391,7 +391,7 @@ scriptPath											= batches/Storage/KAsyncStorageExportExe.php
 params.chmod										= 755
 	
 [KAsyncStorageExportCloser : JobCloserWorker]
-id													= 161
+id													= 181
 friendlyName										= storage export closer
 type												= KAsyncStorageExportCloser
 scriptPath											= batches/Storage/KAsyncStorageExportCloserExe.php
