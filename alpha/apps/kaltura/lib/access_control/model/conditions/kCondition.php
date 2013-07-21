@@ -12,6 +12,11 @@ abstract class kCondition
 	protected $type;
 	
 	/**
+	 * @var string
+	 */
+	protected $description;
+	
+	/**
 	 * @var bool
 	 */
 	protected $not = false;
@@ -58,6 +63,22 @@ abstract class kCondition
 	protected function setType($type) 
 	{
 		$this->type = $type;
+	}
+
+	/**
+	 * @return string $description
+	 */
+	public function getDescription() 
+	{
+		return $this->description;
+	}
+
+	/**
+	 * @param string $description
+	 */
+	public function setDescription($description) 
+	{
+		$this->description = $description;
 	}
 	
 	/**
