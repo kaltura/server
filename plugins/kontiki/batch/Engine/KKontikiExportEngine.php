@@ -21,7 +21,7 @@ class KKontikiExportEngine extends KExportEngine
 	{
 		parent::__construct($data);
         $this->partnerId = $partnerId;
-		$this->kontikiAPIWrapper = new KontikiAPIWrapper($data->entryPoint);
+		$this->kontikiAPIWrapper = new KontikiAPIWrapper($data->serverUrl);
     }
 	
 	/* (non-PHPdoc)
