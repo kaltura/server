@@ -20,8 +20,8 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		{
 			if ($enumValue == KalturaStorageProfileProtocol::KONTIKI)
 			{
-				list($partnerId, $data) = $constructorArgs;
-				return new KKontikiExportEngine($data, $partnerId, $enumValue);
+				list($data, $partnerId) = $constructorArgs;
+				return new KKontikiExportEngine($data, $partnerId);
 			}
 		}
 		if ($baseClass == 'kStorageExportJobData')

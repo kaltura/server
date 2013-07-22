@@ -17,9 +17,9 @@ class KKontikiExportEngine extends KExportEngine
     const FINISHED_STATUS = 'READY';
 	
 	
-	function __construct($data, $partnerId, $jobSubType)
+	function __construct($data, $partnerId)
 	{
-		parent::__construct($data, $jobSubType);
+		parent::__construct($data);
         $this->partnerId = $partnerId;
 		$this->kontikiAPIWrapper = new KontikiAPIWrapper($data->entryPoint);
     }

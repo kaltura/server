@@ -13,7 +13,7 @@ abstract class KExportEngine
 	 * @param KalturaStorageExportJobData $data
 	 * @param int $jobSubType
 	 */
-	public function __construct(KalturaStorageExportJobData $data, $jobSubType)
+	public function __construct(KalturaStorageExportJobData $data)
 	{
 		$this->data = $data;
 	}
@@ -50,7 +50,7 @@ abstract class KExportEngine
 			case KalturaStorageProfileProtocol::SFTP:
 				return new KFileTransferExportEngine($data, $protocol);
 			default:
-				return KalturaPluginManager::loadObject('KExportEngine', $protocol, array($partnerId, $data));
+				return KalturaPluginManager::loadObject('KExportEngine', $protocol, array($data, $partnerId));
 		}
 	}
 }
