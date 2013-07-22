@@ -18,6 +18,7 @@ class KontikiFlowManager implements kBatchJobStatusEventConsumer
                 //Get Kontiki file sync and set the external URL
                 $filesyncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
                 $kontikiFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($filesyncKey);
+				$kontikiFileSync->setFileRoot("");
                 $kontikiFileSync->setFilePath($data->getContentMoid());      
                 $kontikiFileSync->save();         
 				break;

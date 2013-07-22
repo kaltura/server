@@ -16,18 +16,11 @@ class KontikiAPIWrapper
     
     const FORMAT_TYPE_IOS = 'IOS';
     
-    public static $entryPoint;
+    public  $entryPoint;
     
-	public static function createKontikiToken ($serviceToken, $actAsUser)
+	public function __construct($entryPoint)
 	{
-        // $url = self::$entryPoint."/auth/login?serviceTokenId=$serviceToken&actAsUser=$actAsUser";
-        // $curlWrapper = new KCurlWrapper($url);
-        // $authResponse = $curlWrapper->exec();
-//         
-        // if (!$authResponse)
-        // {
-            // throw new kCoreException();
-        // }
+		$this->entryPoint = $entryPoint;
 	}
 
     /**
@@ -38,7 +31,7 @@ class KontikiAPIWrapper
      * 
      * @return string
      */
-	public static function addKontikiVideoContentResource ($serviceToken, $uploadMoid, KalturaBaseEntry $entry, KalturaFlavorAsset $asset)
+	public function addKontikiVideoContentResource ($serviceToken, $uploadMoid, KalturaBaseEntry $entry, KalturaFlavorAsset $asset)
 	{
         $data = "<ns:content xmlns:ns='http://api.kontiki.com'>
         <contentType>". self::CONTENT_TYPE_VOD ."</contentType>
@@ -58,11 +51,10 @@ class KontikiAPIWrapper
         $data = base64_encode($data);
         $data = urlencode($data);
         
-        $url = self::$entryPoint."/metadata/content?_method=POST&_ctype=xml&_data=$data&auth=$serviceToken";
-        $curlWrapper = new KCurlWrapper($url);
-        $resultHeader = $curlWrapper->getHeader();
-
-        return $curlWrapper->exec();
+        $url = $this->entryPoint."/metadata/content?_method=POST&_ctype=xml&_data=$data&auth=$serviceToken";
+		
+		return $this->execAPICall($url);
+        
 	}
 
 	/**
@@ -71,13 +63,11 @@ class KontikiAPIWrapper
      * 
      * @return string
      */
-	public static function getKontikiContentResource ($serviceToken, $contentMoid)
+	public function getKontikiContentResource ($serviceToken, $contentMoid)
 	{
-		$url = self::$entryPoint."/metadata/content/$contentMoid;uploads=true?auth=$serviceToken";
-		$curlWrapper = new KCurlWrapper($url);
-        $resultHeader = $curlWrapper->getHeader();
+		$url = $this->entryPoint."/metadata/content/$contentMoid;uploads=true?auth=$serviceToken";
 
-        return $curlWrapper->exec();
+        return $this->execAPICall($url);
 	}
 
 	/**
@@ -86,7 +76,7 @@ class KontikiAPIWrapper
      * 
      * @return string
      */
-	public static function addKontikiUploadResource ($serviceToken, $contentUrl)
+	public function addKontikiUploadResource ($serviceToken, $contentUrl)
 	{
 	    //hard-coded temporary value - testing environments inaccessible to Kontiki for pull
 	    //$contentUrl = 'http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv';
@@ -94,10 +84,8 @@ class KontikiAPIWrapper
 		$data = base64_encode($data);
 		$data = urlencode($data);
 
-		$url = self::$entryPoint."/upload/init/pull?_method=POST&_ctype=xml&_data={$data}&auth=$serviceToken";
+		$url = $this->entryPoint."/upload/init/pull?_method=POST&_ctype=xml&_data={$data}&auth=$serviceToken";
 		$curlWrapper = new KCurlWrapper($url);
-		$resultHeader = $curlWrapper->getHeader();
-KalturaLog::info("upload result headers: " . print_r($resultHeader, true));
 		
 		return $curlWrapper->exec();
 	}
@@ -108,13 +96,10 @@ KalturaLog::info("upload result headers: " . print_r($resultHeader, true));
      * 
      * @return string
      */
-    public static function deleteKontikiContentResource ($serviceToken, $contentMoid)
+    public function deleteKontikiContentResource ($serviceToken, $contentMoid)
     {
-        $url = self::$entryPoint . "/metadata/content/$contentMoid?grid=true&_method=DELETE&auth=$serviceToken";
-        $curlWrapper = new KCurlWrapper($url);
-        $resultHeader = $curlWrapper->getHeader();
-
-        return $curlWrapper->exec();
+        $url = $this->entryPoint . "/metadata/content/$contentMoid?grid=true&_method=DELETE&auth=$serviceToken";
+        return $this->execAPICall($url);
     }
 
     /**
@@ -124,15 +109,28 @@ KalturaLog::info("upload result headers: " . print_r($resultHeader, true));
      * 
      * @return string
      */
-	public static function getPlaybackUrn ($serviceToken, $contentMoid, $timeout = null)
+	public function getPlaybackUrn ($serviceToken, $contentMoid, $timeout = null)
 	{
-	    $url = self::$entryPoint . "/playback/video/$contentMoid?timeout=$timeout&auth=$serviceToken";
-        $curlWrapper = new KCurlWrapper($url);
-        $result = $curlWrapper->exec();
+	    $url = $this->entryPoint . "/playback/video/$contentMoid?". ($timeout ? "timeout=$timeout" : "" ) . "&auth=$serviceToken";
+        $result = $this->execAPICall($url);
         if (!$result)
             return;
         
         $resultAsXml = new SimpleXMLElement($result);
         return strval($resultAsXml->urn) . ";realmId:" . strval($resultAsXml->realmId) . ";realmTicket:" .strval($resultAsXml->realmTicket);
+	}
+	
+	protected function execAPICall($url)
+	{
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        $res = curl_exec($ch);
+		
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		if (!$res || ($httpcode < 200 || $httpcode >300))
+			return null;
+		
+		return $res;
 	}
 }

@@ -1106,7 +1106,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			if (\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA))
 			{
 				if (!is_null(\$this->custom_data))
-					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \") = '\$this->custom_data_md5'\", Criteria::CUSTOM);
+					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(cast(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \" as char character set latin1)) = '\$this->custom_data_md5'\", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
 				else 
 					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, NULL, Criteria::IS_NULL);
 			}

@@ -31,6 +31,7 @@ enabledWorkers.KAsyncProvisionProvide				= 1
 enabledWorkers.KAsyncProvisionDelete				= 1
 enabledWorkers.KAsyncProvisionProvideCloser			= 1
 enabledWorkers.KAsyncStorageExport					= 3
+enabledWorkers.KAsyncStorageExportCloser			= 1
 enabledWorkers.KAsyncStorageDelete					= 1
 enabledWorkers.KAsyncCaptureThumb					= 1
 enabledWorkers.KAsyncDistributeSubmit				= 1
@@ -388,7 +389,12 @@ type												= KAsyncStorageExport
 maximumExecutionTime								= 1800
 scriptPath											= batches/Storage/KAsyncStorageExportExe.php
 params.chmod										= 755
-		
+	
+[KAsyncStorageExportCloser : JobCloserWorker]
+id													= 181
+friendlyName										= storage export closer
+type												= KAsyncStorageExportCloser
+scriptPath											= batches/Storage/KAsyncStorageExportCloserExe.php
 		
 [KAsyncStorageDelete : JobHandlerWorker]
 id													= 380

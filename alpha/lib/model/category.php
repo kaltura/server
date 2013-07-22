@@ -130,8 +130,8 @@ class category extends Basecategory implements IIndexable
 			if ($this->inheritance_type == InheritanceType::MANUAL &&
 				$this->old_inheritance_type == InheritanceType::INHERIT)
 			{
-				if($this->old_parent_id)
-					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->old_parent_id);
+				if($this->parent_id)
+					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->parent_id);
 				if($categoryToCopyInheritedFields)
 					$this->copyInheritedFields($categoryToCopyInheritedFields);
 					
