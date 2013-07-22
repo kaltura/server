@@ -1,55 +1,22 @@
 <?php
 class KontikiStorageProfile extends StorageProfile
 {
-    /**
-     * @return string
-     */
-	public function getApiEntryPoint ()
-	{
-		return $this->getFromCustomData('kontiki_api_entry_point');
-	}
-	
-	public function setApiEntryPoint ($v)
-	{
-		$this->putInCustomData('kontiki_api_entry_point', $v);
-	}
+	const KONTIKI_SERVICE_TOKEN = 'kontiki_service_token';
 	
     /**
      * @return string
      */
 	public function getServiceToken ()
 	{
-		return $this->getFromCustomData('kontiki_service_token');
+		return $this->getFromCustomData(self::KONTIKI_SERVICE_TOKEN);
 	}
 	
+	/**
+	 * @var string $v
+	 */
 	public function setServiceToken ($v)
 	{
-		$this->putInCustomData('kontiki_service_token', $v);
+		$this->putInCustomData(self::KONTIKI_SERVICE_TOKEN, $v);
 	}
 	
-    /**
-     * @return string
-     */
-	public function getUserName ()
-	{
-		return $this->getFromCustomData('kontiki_user_name');
-	}
-	
-	public function setUserName ($v)
-	{
-		$this->putInCustomData('kontiki_user_name', $v);
-	}
-	
-    /**
-     * @return string
-     */
-	public function getPassword ()
-	{
-		return $this->getFromCustomData('kontiki_password');
-	}
-	
-	public function setPassword ($v)
-	{
-		$this->putInCustomData('kontiki_password', $v);
-	}
 }

@@ -29,7 +29,7 @@ class KontikiAPIWrapper
      * @var KalturaBaseEntry $entry
      * @var KalturaFlavorAsset $flavorAsset
      * 
-     * @return string
+     * @return SimpleXMLElement
      */
 	public function addKontikiVideoContentResource ($serviceToken, $uploadMoid, KalturaBaseEntry $entry, KalturaFlavorAsset $asset)
 	{
@@ -54,14 +54,13 @@ class KontikiAPIWrapper
         $url = $this->entryPoint."/metadata/content?_method=POST&_ctype=xml&_data=$data&auth=$serviceToken";
 		
 		return $this->execAPICall($url);
-        
 	}
 
 	/**
      * @var string $serviceToken
      * @var string $contentMoid
      * 
-     * @return string
+     * @return SimpleXMLElement
      */
 	public function getKontikiContentResource ($serviceToken, $contentMoid)
 	{
@@ -74,7 +73,7 @@ class KontikiAPIWrapper
      * @var string $serviceToken
      * @var string $contentMoid
      * 
-     * @return string
+     * @return SimpleXMLElement
      */
 	public function addKontikiUploadResource ($serviceToken, $contentUrl)
 	{
@@ -85,16 +84,14 @@ class KontikiAPIWrapper
 		$data = urlencode($data);
 
 		$url = $this->entryPoint."/upload/init/pull?_method=POST&_ctype=xml&_data={$data}&auth=$serviceToken";
-		$curlWrapper = new KCurlWrapper($url);
-		
-		return $curlWrapper->exec();
+		return  $this->execAPICall($url);
 	}
 
     /**
      * @var string $serviceToken
      * @var string $contentMoid
      * 
-     * @return string
+     * @return SimpleXMLElement
      */
     public function deleteKontikiContentResource ($serviceToken, $contentMoid)
     {
@@ -107,19 +104,19 @@ class KontikiAPIWrapper
      * @var string $contentMoid
      * @var int $timeout
      * 
-     * @return string
+     * @return SimpleXMLElement
      */
-	public function getPlaybackUrn ($serviceToken, $contentMoid, $timeout = null)
+	public function getPlaybackResource ($serviceToken, $contentMoid, $timeout = null)
 	{
 	    $url = $this->entryPoint . "/playback/video/$contentMoid?". ($timeout ? "timeout=$timeout" : "" ) . "&auth=$serviceToken";
-        $result = $this->execAPICall($url);
-        if (!$result)
-            return;
-        
-        $resultAsXml = new SimpleXMLElement($result);
-        return strval($resultAsXml->urn) . ";realmId:" . strval($resultAsXml->realmId) . ";realmTicket:" .strval($resultAsXml->realmTicket);
+        return  $this->execAPICall($url);
 	}
 	
+	/**
+	 * @var string $url
+	 * 
+	 * @return string
+	 */
 	protected function execAPICall($url)
 	{
 		$ch = curl_init($url);
@@ -131,6 +128,6 @@ class KontikiAPIWrapper
 		if (!$res || ($httpcode < 200 || $httpcode >300))
 			return null;
 		
-		return $res;
+		return new SimpleXMLElement($res);
 	}
 }

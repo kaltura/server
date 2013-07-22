@@ -8,6 +8,8 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	const PLUGIN_NAME = 'kontiki';
     
     const KONTIKI_ASSET_TAG = 'kontiki';
+	
+	const SERVICE_TOKEN_PREFIX = 'srv-';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::loadObject()
@@ -24,10 +26,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		}
 		if ($baseClass == 'kStorageExportJobData')
 		{
-			if ($enumValue == BatchJobType::STORAGE_EXPORT)
-			{
-				return new kKontikiStorageExportJobData();
-			}
             if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             {
                 return new kKontikiStorageExportJobData();
@@ -35,10 +33,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		}
         if ($baseClass == 'kStorageDeleteJobData')
         {
-            if ($enumValue == BatchJobType::STORAGE_DELETE)
-            {
-                return new kKontikiStorageDeleteJobData();
-            }
             if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             {
                 return new kKontikiStorageDeleteJobData();
@@ -131,6 +125,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 
 	public static function getEventConsumers()
 	{
-        return array ('KontikiFlowManager');
+        return array ('kKontikiManager');
 	}
 }
