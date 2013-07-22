@@ -7,8 +7,6 @@ class previewAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
-		// Prevent the page fron being embeded in an iframe
-		header( 'X-Frame-Options: SAMEORIGIN' );
 
 		$this->uiconf_id = intval($this->getRequestParameter('uiconf_id'));
 		if(!$this->uiconf_id)
