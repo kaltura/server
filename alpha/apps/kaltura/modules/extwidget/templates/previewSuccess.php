@@ -60,11 +60,6 @@
 	<?php } ?>
 				<div id="framePlayerContainer">
 <script>
-// Prevent the page to be framed
-if(top != window && top.location.hostname != window.location.hostname ) { 
-	top.location = window.location; 
-}
-
 var scriptToEval = '';
 var code = new kEmbedCodeGenerator(<?php echo json_encode($embedParams); ?>).getCode();
 var embedType = '<?php echo $embedType;?>';
