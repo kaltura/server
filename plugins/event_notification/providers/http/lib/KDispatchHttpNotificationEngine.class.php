@@ -22,7 +22,6 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		if(isset(KBatchBase::$taskConfig->params->tempFolderPath) && KBatchBase::$taskConfig->params->tempFolderPath)
 			$this->tempFolderPath = KBatchBase::$taskConfig->params->tempFolderPath;
 		
-		parent::__construct();
 	}
 	
 	/* (non-PHPdoc)
