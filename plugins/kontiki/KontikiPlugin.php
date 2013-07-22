@@ -40,17 +40,18 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
         }
 		if ($baseClass == 'KalturaJobData')
 		{
-			if ($enumValue == BatchJobType::STORAGE_EXPORT)
+			$jobSubType = $constructorArgs["coreJobSubType"];
+			if ($jobSubType == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
 			{
-				return new KalturaKontikiStorageExportJobData();
+				if ($enumValue == BatchJobType::STORAGE_EXPORT)
+				{
+					return new KalturaKontikiStorageExportJobData();
+				}
+			 	if ($enumValue == BatchJobType::STORAGE_DELETE)
+	            {
+	                return new KalturaKontikiStorageDeleteJobData();
+	            }
 			}
-		}
-        if ($baseClass == 'KalturaJobData')
-        {
-            if ($enumValue == BatchJobType::STORAGE_DELETE)
-            {
-                return new KalturaKontikiStorageDeleteJobData();
-            }
         }
 		
 		if ($baseClass == 'KalturaStorageProfile')
