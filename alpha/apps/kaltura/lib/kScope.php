@@ -159,7 +159,11 @@ class kScope
 			if($value instanceof IScopeField)
 				$value->setScope($this);
 				
-			$values[$keyPrefix . $key . $keySuffix] = $value->getValue();
+			$dynamicValue = $value->getValue();
+			if(is_null($dynamicValue))
+				$dynamicValue = '';
+				
+			$values[$keyPrefix . $key . $keySuffix] = $dynamicValue;
 		}
 		
 		return $values;
