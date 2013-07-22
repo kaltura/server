@@ -18,7 +18,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 	/**
 	 * @var int
 	 */
-	protected $conditionsCount = 0;
+	protected $userParametersCount = 0;
 	
 	public function __construct($partnerId, $templateType)
 	{
@@ -29,6 +29,48 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 	}
 	
 	abstract protected function addTypeElements();
+
+	protected function getDescriptionHtml($description)
+	{
+		$description = preg_replace('/See:([^:]+):([^\s.]+)/', 'See <a target="_tab" href="$2">$1</a>', $description);
+		
+		return $description;
+	}
+	
+	/**
+	 * @param Kaltura_Client_Type_StringValue|Kaltura_Client_Type_BooleanValue $field
+	 * @return string
+	 */
+	protected function getValueDescription($field)
+	{
+		if($field instanceof Kaltura_Client_Type_EvalStringField || $field instanceof Kaltura_Client_Type_EvalBooleanField)
+			return 'Code: ' . $field->code;
+	
+		if($field->value)
+			return $this->getDescriptionHtml($field->value);
+		
+		return $field->getKalturaObjectType();
+	}
+	
+	protected function getParameterDescription(Kaltura_Client_EventNotification_Type_EventNotificationParameter $parameter)
+	{
+		$html = "<b>$parameter->key</b> - ";
+		if($parameter->description)
+			return $this->getDescriptionHtml($html . $parameter->description);
+			
+		return $this->getDescriptionHtml($html . $this->getValueDescription($parameter->value));
+	}
+	
+	protected function getConditionDescription(Kaltura_Client_Type_Condition $condition)
+	{
+		if($condition->description)
+			return $this->getDescriptionHtml($condition->description);
+			
+		if($condition instanceof Kaltura_Client_EventNotification_Type_EventFieldCondition)
+			return $this->getDescriptionHtml($this->getValueDescription($condition->field));
+			
+		return $condition->getKalturaObjectType();
+	}
 	
 	/* (non-PHPdoc)
 	 * @see Infra_Form::populateFromObject()
@@ -40,9 +82,68 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			
 		parent::populateFromObject($object, $add_underscore);
 		
-		foreach($object->eventConditions as $condition)
-			$this->addCondition($condition);
+		if($object->contentParameters && count($object->contentParameters))
+		{
+			$contentParameters = array();		
+			foreach($object->contentParameters as $index => $parameter)
+				$contentParameters[] = $this->getParameterDescription($parameter);
+				
+			$contentParametersList = new Infra_Form_HtmlList('contentParameters', array(
+				'legend'		=> 'Content Parameters',
+				'list'			=> $contentParameters,
+			));
+			$this->addElements(array($contentParametersList));
+		}
+		
+		if($object->eventConditions && count($object->eventConditions))
+		{
+			$eventConditions = array();
+			foreach($object->eventConditions as $condition)
+				$eventConditions[] = $this->getConditionDescription($condition);
+				
+			$eventConditionsList = new Infra_Form_HtmlList('eventConditions', array(
+				'legend'		=> 'Conditions',
+				'list'			=> $eventConditions,
+			));
+			$this->addElements(array($eventConditionsList));
+		}
 			
+		foreach($object->userParameters as $parameter)
+			$this->addUserParameter($parameter);
+			
+		$this->addElement('button', 'addUserParameterButton', array(
+			'label'			=> 'Add User Parameter',
+			'onclick'		=> "newUserParameter()",
+			'decorators'	=> array('ViewHelper'),
+		));
+		
+		$this->addElement('text', 'userParameterKey', array(
+			'label'			=> 'Key:',
+			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+		));
+		
+		$this->addElement('text', 'userParameterValue', array(
+			'label'			=> 'Value:',
+			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+		));
+		
+		$this->addElement('button', 'removeUserParameterButton', array(
+			'label'			=> 'Remove',
+			'decorators'	=> array('ViewHelper'),
+		));
+		
+		$this->addDisplayGroup(array('userParameterKey', 'userParameterValue', 'removeUserParameterButton'), 
+			'frmUserParameter', 
+			array(
+				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmUserParameter'))),
+		));
+			
+		$this->addDisplayGroup(array('addUserParameterButton'), 
+			'frmParameters', 
+			array(
+				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => 'frmParameters'))),
+		));
+		
 		$this->finit();
 		
 		parent::populateFromObject($object, $add_underscore);
@@ -60,40 +161,44 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		{
 			KalturaLog::debug("Search properties [" . print_r($properties, true) . "]");
 			
-			$conditions = $object->eventConditions;
-			if(!$conditions || !is_array($conditions))
-				$conditions = array();
+			$userParameters = $object->userParameters;
+			if(!$userParameters || !is_array($userParameters))
+				$userParameters = array();
 				
 			foreach($properties as $property => $value)
 			{
-				if(preg_match('/condition_(\d+)$/', $property))
+				$matches = null;
+				if(preg_match('/userParameterKey_(\d+)$/', $property, $matches))
 				{
-					$field = new Kaltura_Client_Type_EvalBooleanField();
-					$field->code = $value;
+					$index = $matches[1];
+					$field = new Kaltura_Client_Type_StringValue();
+					$field->value = $properties["userParameterValue_{$index}"];
 					
-					$condition = new Kaltura_Client_EventNotification_Type_EventFieldCondition();
-					$condition->field = $field;
+					$userParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
+					$userParameter->key = $value;
+					$userParameter->value = $field;
 					
-					$conditions[] = $condition;
+					$userParameters[] = $userParameter;
 				}
 			}
 			
-			if(isset($properties['condition']) && is_array($properties['condition']))
+			if(isset($properties['userParameterKey']) && is_array($properties['userParameterKey']))
 			{
-				foreach($properties['condition'] as $value)
+				foreach($properties['userParameterKey'] as $index => $value)
 				{
-					$field = new Kaltura_Client_Type_EvalBooleanField();
-					$field->code = $value;
+					$field = new Kaltura_Client_Type_StringValue();
+					$field->value = $properties['userParameterValue'][$index];
 					
-					$condition = new Kaltura_Client_EventNotification_Type_EventFieldCondition();
-					$condition->field = $field;
+					$userParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
+					$userParameter->key = $value;
+					$userParameter->value = $field;
 					
-					$conditions[] = $condition;
+					$userParameters[] = $userParameter;
 				}
 				
-				KalturaLog::debug("Set conditions [" . print_r($conditions, true) . "]");
-				if(count($conditions))
-					$object->eventConditions = $conditions;
+				KalturaLog::debug("Set user parameters [" . print_r($userParameters, true) . "]");
+				if(count($userParameters))
+					$object->userParameters = $userParameters;
 			}
 		}
 		
@@ -160,108 +265,84 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		
 		$this->addElement('checkbox', 'manual_dispatch_enabled', array(
 			'label'			=> 'Manual dispatch enabled:',
+			'disabled'		=> true,
 			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt'))),
 		));
 		
 		$this->addElement('checkbox', 'automatic_dispatch_enabled', array(
 			'label'			=> 'Automatic dispatch enabled:',
+			'disabled'		=> true,
 			'decorators' 	=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt'))),
 			'onclick'		=> 'automaticEnabled(this.checked)',
 		));
 		
-		$this->addElement('select', 'event_type', array(
+		$eventType = new Kaltura_Form_Element_EnumSelect('event_type', array(
+			'enum' => 'Kaltura_Client_EventNotification_Enum_EventNotificationEventType',
+			'disabled'		=> true,
 			'label'			=> 'Event type:',
 		));
 		
-		$this->addElement('select', 'event_object_type', array(
+		$eventObjectType = new Kaltura_Form_Element_EnumSelect('event_object_type', array(
+			'enum' => 'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType',
+			'disabled'		=> true,
 			'label'			=> 'Event object type:',
 		));
 		
-		$this->addElement('button', 'addConditionButton', array(
-			'label'			=> 'Add Condition',
-			'onclick'		=> "newCondition()",
-			'decorators'	=> array('ViewHelper'),
-		));
+		$this->addElements(array($eventType, $eventObjectType));
 		
-		$this->addDisplayGroup(array('event_type', 'event_object_type', 'addConditionButton'), 
+		$this->addDisplayGroup(array('event_type', 'event_object_type'), 
 			'automatic_config', 
 			array(
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => 'frmAutomaticConfig'))),
 				'legend'		=> 'Automatic dispatch configuration',
 		));
-		
-		$this->addElement('text', 'condition', array(
-			'label'			=> 'Condition:',
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-		
-		$this->addElement('button', 'removeConditionButton', array(
-			'label'			=> 'Remove',
-			'decorators'	=> array('ViewHelper'),
-		));
-			
-		$this->addDisplayGroup(array('condition', 'removeConditionButton'), 
-			'frmCondition', 
-			array(
-				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmCondition'))),
-				'legend'		=> 'New condition',
-		));
-		
+				
 		$this->addElement('hidden', 'type', array(
 			'value'			=> $this->templateType,
 		));
-	
-		$element = $this->getElement('event_type');
-		$reflect = new ReflectionClass('Kaltura_Client_EventNotification_Enum_EventNotificationEventType');
-		$types = $reflect->getConstants();
-		foreach($types as $constName => $value)
-		{
-			$name = ucfirst(str_replace('_', ' ', strtolower($constName)));
-			$element->addMultiOption($value, $name);
-		}
-	
-		$element = $this->getElement('event_object_type');
-		$reflect = new ReflectionClass('Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType');
-		$types = $reflect->getConstants();
-		foreach($types as $constName => $value)
-		{
-			$name = ucfirst(str_replace('_', ' ', strtolower($constName)));
-			$element->addMultiOption($value, $name);
-		}
 	}
 	
 	/**
-	 * @param Kaltura_Client_Type_Condition $condition
+	 * @param Kaltura_Client_HttpNotification_Type_EventNotificationParameter $parameter
 	 */
-	protected function addCondition(Kaltura_Client_Type_Condition $condition)
+	protected function addUserParameter(Kaltura_Client_EventNotification_Type_EventNotificationParameter $parameter)
 	{
-		if($condition instanceof Kaltura_Client_EventNotification_Type_EventFieldCondition && $condition->field instanceof Kaltura_Client_Type_EvalBooleanField)
+		$this->addElement('text', "userParameterKey_{$this->userParametersCount}", array(
+			'label'			=> 'Key:',
+			'readonly'		=> true,
+			'value'			=> $parameter->key,
+			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+		));
+	
+		$this->addElement('text', "userParameterValue_{$this->userParametersCount}", array(
+			'label'			=> 'Value:',
+			'value'			=> $parameter->value->value,
+			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+		));
+		
+		$elements = array();
+		
+		if($parameter->description)
 		{
-			$this->addElement('text', "condition_{$this->conditionsCount}", array(
-				'label'			=> 'Condition:',
-				'value'			=> $condition->field->code,
-				'readonly'		=> true,
-				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+			$element = new Infra_Form_Html("userParameterDesciption_{$this->userParametersCount}", array(
+				'content' => '<div>' . $this->getDescriptionHtml($parameter->description) . '</div>',
 			));
+			$this->addElements(array($element));
 			
-			$this->addElement('button', "removeConditionButton_{$this->conditionsCount}", array(
-				'label'			=> 'Remove',
-				'onclick'			=> "removeCondition({$this->conditionsCount})",
-				'decorators'	=> array('ViewHelper'),
-			));
-				
-			$this->addDisplayGroup(array("condition_{$this->conditionsCount}", "removeConditionButton_{$this->conditionsCount}"), 
-				"frmCondition_{$this->conditionsCount}", 
-				array(
-					'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => "frmCondition_{$this->conditionsCount}"))),
-					'legend'		=> 'Code Field Condition',
-			));
-			
-			$this->conditionsCount++;
+			$elements[] = "userParameterDesciption_{$this->userParametersCount}";
 		}
-		else
-		{
-			$this->addError("Unable to load condition type [" . get_class($condition) . "]");
-		}
+		
+		$elements[] = "userParameterKey_{$this->userParametersCount}";
+		$elements[] = "userParameterValue_{$this->userParametersCount}"; 
+		$elements[] = "removeUserParameterButton_{$this->userParametersCount}";
+		
+		$this->addDisplayGroup($elements, 
+			"frmUserParameter_{$this->userParametersCount}", 
+			array(
+				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => "frmUserParameter_{$this->userParametersCount}"))),
+				'legend'		=> 'User Parameter',
+		));
+		
+		$this->userParametersCount++;
 	}
 }

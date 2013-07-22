@@ -117,7 +117,13 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	{
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER) && isset($constructorArgs['coreJobSubType']))
 			return KalturaPluginManager::loadObject('KalturaEventNotificationDispatchJobData', $constructorArgs['coreJobSubType']);
-			
+	
+		if($baseClass == 'KalturaCondition')
+		{
+			if($enumValue == EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD))
+				return new KalturaEventFieldCondition();
+		}
+		
 		return null;
 	}
 		
@@ -232,12 +238,6 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 				case EventNotificationEventObjectType::CATEGORYENTRY:
 					return 'categoryEntry';
 			}
-		}
-	
-		if($baseClass == 'KalturaCondition')
-		{
-			if($enumValue == EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD))
-				return 'KalturaEventFieldCondition';
 		}
 		
 		return null;
