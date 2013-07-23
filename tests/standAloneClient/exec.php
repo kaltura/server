@@ -72,6 +72,9 @@ function parseInputObject(SimpleXMLElement $input)
 {
 	global $inFile;
 
+	if(isset($input['null']) && $input['null'])
+		return KalturaClient::getKalturaNullValue();
+	
 	$type = 'string';
 	if(isset($input['objectType']))
 		$type = strval($input['objectType']);
@@ -235,11 +238,8 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 
 function askForUserParameter($message)
 {
-	echo $message." ";
-	$handle = fopen("php://stdin","r");
-	$line = fgets($handle);
-	fclose($handle);
-	return trim($line);
+	fwrite(STDERR, "$message ");
+	return trim(fgets(STDIN));
 }
 
 require_once realpath(__DIR__ . '/../') . '/lib/KalturaClient.php';
