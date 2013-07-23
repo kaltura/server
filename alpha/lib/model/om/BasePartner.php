@@ -1434,10 +1434,13 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setCustomData($v)
 	{
+		if (is_null($this->custom_data))
+			$this->oldCustomDataValueWasNull = true;
+			
 		if ($v !== null) {
 			$v = (string) $v;
 		}
-
+			
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
 			$this->modifiedColumns[] = PartnerPeer::CUSTOM_DATA;
@@ -2293,6 +2296,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
+		$this->oldCustomDataValueWasNull = false; 
     	 
 		parent::postSave($con);
 	}
@@ -2352,12 +2356,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-	
-	/**
-	 * The md5 value for the custom_data field.
-	 * @var        string
-	 */
-	protected $custom_data_md5;
 	
 	/**
 	 * Returns whether the object has been modified.
@@ -2994,11 +2992,11 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		{
 			if ($this->isColumnModified(PartnerPeer::CUSTOM_DATA))
 			{
-				if (!is_null($this->custom_data))
+				if (!is_null($this->custom_data) && !$this->oldCustomDataValueWasNull)
 					$criteria->add(PartnerPeer::CUSTOM_DATA, "MD5(cast(" . PartnerPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
-					$criteria->add(PartnerPeer::CUSTOM_DATA, NULL, Criteria::IS_NULL);
+					$criteria->add(PartnerPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
 			
 			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(PartnerPeer::UPDATED_AT))
@@ -3012,6 +3010,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
+			
 		}
 
 		return $criteria;
@@ -3265,12 +3264,24 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
 	 * @var        array
 	 */
 	protected $oldCustomDataValues = array();
+	
+	/**
+	 * Flag to indicate if old custom_data value was null
+	 * @var 	   boolean
+	 */
+	protected $oldCustomDataValueWasNull = false;
 	
 	/**
 	 * @return array
