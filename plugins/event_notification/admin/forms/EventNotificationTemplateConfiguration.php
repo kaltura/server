@@ -81,6 +81,19 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			return;
 			
 		parent::populateFromObject($object, $add_underscore);
+	
+		if($object->eventConditions && count($object->eventConditions))
+		{
+			$eventConditions = array();
+			foreach($object->eventConditions as $condition)
+				$eventConditions[] = $this->getConditionDescription($condition);
+				
+			$eventConditionsList = new Infra_Form_HtmlList('eventConditions', array(
+				'legend'		=> 'Conditions',
+				'list'			=> $eventConditions,
+			));
+			$this->addElements(array($eventConditionsList));
+		}
 		
 		if($object->contentParameters && count($object->contentParameters))
 		{
@@ -94,55 +107,42 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			));
 			$this->addElements(array($contentParametersList));
 		}
-		
-		if($object->eventConditions && count($object->eventConditions))
-		{
-			$eventConditions = array();
-			foreach($object->eventConditions as $condition)
-				$eventConditions[] = $this->getConditionDescription($condition);
-				
-			$eventConditionsList = new Infra_Form_HtmlList('eventConditions', array(
-				'legend'		=> 'Conditions',
-				'list'			=> $eventConditions,
-			));
-			$this->addElements(array($eventConditionsList));
-		}
 			
 		foreach($object->userParameters as $parameter)
 			$this->addUserParameter($parameter);
 			
-		$this->addElement('button', 'addUserParameterButton', array(
-			'label'			=> 'Add User Parameter',
-			'onclick'		=> "newUserParameter()",
-			'decorators'	=> array('ViewHelper'),
-		));
-		
-		$this->addElement('text', 'userParameterKey', array(
-			'label'			=> 'Key:',
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-		
-		$this->addElement('text', 'userParameterValue', array(
-			'label'			=> 'Value:',
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-		
-		$this->addElement('button', 'removeUserParameterButton', array(
-			'label'			=> 'Remove',
-			'decorators'	=> array('ViewHelper'),
-		));
-		
-		$this->addDisplayGroup(array('userParameterKey', 'userParameterValue', 'removeUserParameterButton'), 
-			'frmUserParameter', 
-			array(
-				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmUserParameter'))),
-		));
-			
-		$this->addDisplayGroup(array('addUserParameterButton'), 
-			'frmParameters', 
-			array(
-				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => 'frmParameters'))),
-		));
+//		$this->addElement('button', 'addUserParameterButton', array(
+//			'label'			=> 'Add User Parameter',
+//			'onclick'		=> "newUserParameter()",
+//			'decorators'	=> array('ViewHelper'),
+//		));
+//		
+//		$this->addElement('text', 'userParameterKey', array(
+//			'label'			=> 'Key:',
+//			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+//		));
+//		
+//		$this->addElement('text', 'userParameterValue', array(
+//			'label'			=> 'Value:',
+//			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+//		));
+//		
+//		$this->addElement('button', 'removeUserParameterButton', array(
+//			'label'			=> 'Remove',
+//			'decorators'	=> array('ViewHelper'),
+//		));
+//		
+//		$this->addDisplayGroup(array('userParameterKey', 'userParameterValue', 'removeUserParameterButton'), 
+//			'frmUserParameter', 
+//			array(
+//				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmUserParameter'))),
+//		));
+//			
+//		$this->addDisplayGroup(array('addUserParameterButton'), 
+//			'frmParameters', 
+//			array(
+//				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => 'frmParameters'))),
+//		));
 		
 		$this->finit();
 		
