@@ -1165,6 +1165,8 @@ class myPartnerUtils
  			if(!in_array($customDataName, $excludeCustomDataFields))
  				$toPartner->putInCustomData($customDataName, $customDataValue);
 		
+		$toPartner->setCrmId(null);
+		$toPartner->setCrmLink(null);
 		$toPartner->save();
 		
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
