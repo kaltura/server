@@ -101,7 +101,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				if(count($vals))
 				{
 					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-					$val = $this->criteria->getPositiveMatch($sphinxField) .  ' !' . implode(' !', $vals);
+					$val = $this->criteria->getFieldPrefix($sphinxField) .  ' !' . implode(' !', $vals);
 					return "@$sphinxField $val";
 				}
 				break;
