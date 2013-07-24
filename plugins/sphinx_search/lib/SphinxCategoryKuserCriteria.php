@@ -269,7 +269,17 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			else
 				$partnerId = kCurrentContext::getCurrentPartnerId();
 			
-			$value = categoryKuser::getSearchIndexFieldValue($fieldName, $value, $partnerId);
+			if (is_array($value))
+			{
+				foreach ($value as &$singleValue)
+				{
+					$singleValue = 	categoryKuser::getSearchIndexFieldValue($fieldName, $value, $partnerId);
+				}
+			}
+			else 
+			{
+				$value = categoryKuser::getSearchIndexFieldValue($fieldName, $value, $partnerId);
+			}
 		}
 
 		return array($field, $crit->getComparison(), $value);
