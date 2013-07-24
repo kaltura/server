@@ -113,8 +113,6 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			if(isset(KBatchBase::$taskConfig->params->mailErrorMessageLanguage) && KBatchBase::$taskConfig->params->mailErrorMessageLanguage)
 				$this::$mailer->SetLanguage(KBatchBase::$taskConfig->params->mailErrorMessageLanguage);
 		}
-		
-		parent::__construct();
 	}
 	
 	/* (non-PHPdoc)
