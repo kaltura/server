@@ -353,7 +353,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getSearchIndexStatus ()
 	{
-		return self::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $this->getStatus(), $this->getPartnerId());
+		return self::STATUS_FIELD_PREFIX ." ". self::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $this->getStatus(), $this->getPartnerId());
 	}
 	
 	/**
@@ -401,7 +401,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		switch ($fieldName)
 		{
 			case categoryKuserPeer::STATUS:
-				return self::STATUS_FIELD_PREFIX. " " . $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
+				return $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
 				break;
 			case categoryKuserPeer::UPDATE_METHOD:
 				return $partnerId . self::UPDATE_METHOD_INDEX_PREFIX . $fieldValue;

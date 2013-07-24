@@ -128,6 +128,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	 */
 	public function getFieldPrefix ($fieldName)
 	{
+		KalturaLog::info('fieldname is: $fieldName');
 		switch ($fieldName)
 		{
 			case 'permission_names':
@@ -273,7 +274,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			{
 				foreach ($value as &$singleValue)
 				{
-					$singleValue = 	categoryKuser::getSearchIndexFieldValue($fieldName, $value, $partnerId);
+					$singleValue = 	categoryKuser::getSearchIndexFieldValue($fieldName, $singleValue, $partnerId);
 				}
 			}
 			else 
