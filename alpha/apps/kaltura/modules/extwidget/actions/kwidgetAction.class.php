@@ -404,9 +404,11 @@ class kwidgetAction extends sfAction
 				// patch wrapper with flashvars and dump to browser
 				if (version_compare($uiConf->getSwfUrlVersion(), "2.6.6", ">="))
 				{
+					$startTime = microtime(true);
 					$patcher = new kPatchSwf( $swf_data, "KALTURA_FLASHVARS_DATA");
 					$wrapper_data = $patcher->patch($dynamic_date."&referer=".urlencode($referer));
-	
+					KalturaLog::log('Patching took '. (microtime(true) - $startTime));
+						
 					requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0, null, true, time());
 					echo $wrapper_data;
 					
