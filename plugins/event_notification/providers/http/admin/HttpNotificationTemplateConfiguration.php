@@ -23,13 +23,10 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			switch ($properties['dataType'])
 			{
 				case 'object':
-					$objectField = new Kaltura_Client_HttpNotification_Type_HttpNotificationObjectField();
-					$objectField->apiObjectType = $properties['objectType'];
-					$objectField->format = $properties['objectFormat'];
-					$objectField->code = $properties['object'];
-					
-					$object->data = new Kaltura_Client_HttpNotification_Type_HttpNotificationDataText();
-					$object->data->content = $objectField;
+					$object->data = new Kaltura_Client_HttpNotification_Type_HttpNotificationObjectData();
+					$object->data->apiObjectType = $properties['objectType'];
+					$object->data->format = $properties['objectFormat'];
+					$object->data->code = $properties['object'];
 					break;
 					
 				case 'map':
@@ -66,21 +63,17 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		{
 			$this->getElement('dataType')->setValue('map');
 		}
-				
-		if($object->data instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationDataText)
+		elseif($object->data instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationDataText)
 		{
-			if($object->data->content && $object->data->content instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationObjectField)
-			{
-				$this->getElement('dataType')->setValue('object');
-				$this->getElement('objectType')->setValue($object->data->content->apiObjectType);
-				$this->getElement('objectFormat')->setValue($object->data->content->format);
-				$this->getElement('object')->setValue($object->data->content->code);
-			}
-			else
-			{
-				$this->getElement('dataType')->setValue('text');
-				$this->getElement('freeText')->setValue($object->data->content->value);
-			}
+			$this->getElement('dataType')->setValue('text');
+			$this->getElement('freeText')->setValue($object->data->content->value);
+		}
+		elseif($object->data instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationObjectData)
+		{
+			$this->getElement('dataType')->setValue('object');
+			$this->getElement('objectType')->setValue($object->data->apiObjectType);
+			$this->getElement('objectFormat')->setValue($object->data->format);
+			$this->getElement('object')->setValue($object->data->code);
 		}
 	}
 	

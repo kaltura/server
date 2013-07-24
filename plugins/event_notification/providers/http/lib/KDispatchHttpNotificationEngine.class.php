@@ -21,8 +21,6 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		
 		if(isset(KBatchBase::$taskConfig->params->tempFolderPath) && KBatchBase::$taskConfig->params->tempFolderPath)
 			$this->tempFolderPath = KBatchBase::$taskConfig->params->tempFolderPath;
-		
-		parent::__construct();
 	}
 	
 	/* (non-PHPdoc)
@@ -77,19 +75,6 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			}
 		}
 		
-		$requestData = null;
-		if($data->data)
-		{
-			if($data->data instanceof KalturaHttpNotificationDataText && isset($data->data->content) && $data->data->content instanceof KalturaStringValue)
-			{
-				$requestData = array('data' => $data->data->content->value);
-			}
-			if($data->data instanceof KalturaHttpNotificationDataFields)
-			{
-				$requestData = $postParameters;
-			}
-			$requestData = http_build_query($requestData);
-		}
 		
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_VERBOSE, true);
@@ -103,17 +88,17 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			case KalturaHttpNotificationMethod::POST:
 				curl_setopt($ch, CURLOPT_POST, true);
 				
-				if($requestData)
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $requestData);
+				if($data->data)
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $data->data);
 				break;
 				
 			case KalturaHttpNotificationMethod::PUT:
 				curl_setopt($ch, CURLOPT_PUT, true);
 				
-				if($requestData)
+				if($data->data)
 				{
 					$filename = tempnam($this->tempFolderPath, 'httpPut_');
-					file_put_contents($filename, $requestData) ;
+					file_put_contents($filename, $data->data) ;
 					curl_setopt($ch, CURLOPT_INFILE, $filename);
 				}
 				break;
@@ -121,13 +106,14 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			case KalturaHttpNotificationMethod::DELETE:
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 				
-				if($requestData)
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $requestData);
+				if($data->data)
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $data->data);
 				break;
 				
-			default: // GET or null
-				if($requestData)
-					$url .= '?' . $requestData;
+			case KalturaHttpNotificationMethod::GET:
+			default:
+				if($data->data)
+					$url .= '?' . $data->data;
 		}
 
 		curl_setopt($ch, CURLOPT_URL, $url);

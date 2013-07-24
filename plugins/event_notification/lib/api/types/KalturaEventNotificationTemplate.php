@@ -21,19 +21,17 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	
 	/**
 	 * @var string
-	 * @requiresPermission update
 	 */
 	public $name;
 	
 	/**
 	 * @var string
-	 * @requiresPermission update
+	 * @filter eq,in
 	 */
 	public $systemName;
 	
 	/**
 	 * @var string
-	 * @requiresPermission update
 	 */
 	public $description;
 	

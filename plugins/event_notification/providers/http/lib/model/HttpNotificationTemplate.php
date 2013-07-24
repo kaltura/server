@@ -38,6 +38,34 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	 */
 	public function getJobData(kScope $scope = null)
 	{
+		$contentParametersValues = array();
+		
+		$userParameters = $this->getUserParameters();
+		foreach($userParameters as $userParameter)
+		{
+			/* @var $userParameter kEventNotificationParameter */
+			$value = $userParameter->getValue();
+			if($scope && $value instanceof kStringField)
+				$value->setScope($scope);
+				
+			$key = $userParameter->getKey();
+			$contentParametersValues[$key] = $value->getValue();
+			$scope->addDynamicValue($key, $value);
+		}
+		
+		$contentParameters = $this->getContentParameters();
+		foreach($contentParameters as $contentParameter)
+		{
+			/* @var $contentParameter kEventNotificationParameter */
+			$value = $contentParameter->getValue();
+			if($scope && $value instanceof kStringField)
+				$value->setScope($scope);
+				
+			$key = $contentParameter->getKey();
+			$contentParametersValues[$key] = $value->getValue();
+			$scope->addDynamicValue($key, $value);
+		}
+	
 		$data = $this->getData();
 		if($data)
 			$data->setScope($scope);
@@ -45,7 +73,7 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 		$jobData = new kHttpNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
 		$jobData->setUrl($this->getUrl());
-		$jobData->setData($data);
+		$jobData->setDataObject($data);
 		$jobData->setMethod($this->getMethod());
 		$jobData->setTimeout($this->getTimeout());
 		$jobData->setConnectTimeout($this->getConnectTimeout());
@@ -62,18 +90,6 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 		$jobData->setSslKey($this->getsslKey());
 		$jobData->setSslKeyPassword($this->getsslKeyPassword());
 		$jobData->setCustomHeaders($this->getCustomHeaders());
-		
-		$contentParametersValues = array();
-		$contentParameters = $this->getContentParameters();
-		foreach($contentParameters as $contentParameter)
-		{
-			/* @var $contentParameter kEventNotificationParameter */
-			$value = $contentParameter->getValue();
-			if($scope && $value instanceof kStringField)
-				$value->setScope($scope);
-				
-			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
-		}
 		$jobData->setContentParameters($contentParametersValues);
 		
 		return $jobData;
