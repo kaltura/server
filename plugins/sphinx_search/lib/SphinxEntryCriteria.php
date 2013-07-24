@@ -4,7 +4,7 @@
  * @subpackage model.filters
  */
 class SphinxEntryCriteria extends SphinxCriteria
-{
+{ 
 	public static $sphinxFields = array(
 		entryPeer::ID => 'int_entry_id',
 		'entry.ENTRY_ID' => 'entry_id',
