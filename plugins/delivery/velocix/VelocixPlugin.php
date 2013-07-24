@@ -71,7 +71,7 @@ class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 			return new kVelocixProvisionJobData();  
 		
 		if ($baseClass == 'KProvisionEngine' && $enumValue == KalturaSourceType::VELOCIX_LIVE)
-			return new KProvisionEngineVelocix($constructorArgs[0]);
+			return new KProvisionEngineVelocix();
 		
 	}
 

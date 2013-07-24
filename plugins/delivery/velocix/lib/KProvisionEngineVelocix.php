@@ -23,11 +23,10 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	
 	public function __construct($taskConfig)
 	{
-		if (! $taskConfig->params->restapi->velocixApiBaseServiceUrl)
+		if (! KBatchBase::$taskConfig->params->restapi->velocixApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: velocixApiBaseServiceUrl is missing from worker configuration. Cannot provision stream");
 		
-		$this->baseServiceUrl = $taskConfig->params->restapi->velocixApiBaseServiceUrl;
-		parent::__construct($taskConfig);
+		$this->baseServiceUrl = KBatchBase::$taskConfig->params->restapi->velocixApiBaseServiceUrl;
 	}
 	
 	/* (non-PHPdoc)
@@ -42,10 +41,10 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	 */
 	public function provide(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
-		if (! $this->taskConfig->params->restapi->velocixPlaybackHost)
+		if (! KBatchBase::$taskConfig->params->restapi->velocixPlaybackHost)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: velocixPlaybackHost is missing from worker configuration. Cannot provision stream"); 
 		
-		if (! $this->taskConfig->params->restapi->velocixPublishHost)
+		if (! KBatchBase::$taskConfig->params->restapi->velocixPublishHost)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: velocixPublish is missing from worker configuration. Cannot provision stream");  
 		
 		$this->password = $data->password;
@@ -64,9 +63,9 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	}
 	
 	private function updateDataWithUrls( $provisioningParams){
-		$playbackHost = $this->taskConfig->params->restapi->velocixPlaybackHost;
-		$publishHost = $this->taskConfig->params->restapi->velocixPublishHost;
-		$hdsPlaybackHost = $this->taskConfig->params->restapi->velocixHDSPlaybackHost;
+		$playbackHost = KBatchBase::$taskConfig->params->restapi->velocixPlaybackHost;
+		$publishHost = KBatchBase::$taskConfig->params->restapi->velocixPublishHost;
+		$hdsPlaybackHost = KBatchBase::$taskConfig->params->restapi->velocixHDSPlaybackHost;
 		foreach ($provisioningParams as $provisioningParam){
 			switch ($provisioningParam->key){
 				case KalturaPlaybackProtocol::HDS:
