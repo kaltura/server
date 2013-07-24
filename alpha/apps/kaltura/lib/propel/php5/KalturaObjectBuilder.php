@@ -605,7 +605,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		if($customDataColumn)
 		$script .= "
 		\$this->oldCustomDataValues = array();
-		\$this->oldCustomDataValueWasNull = false; 
     	";
 				
 		$script .= " 
@@ -854,13 +853,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		
 		$clo = strtolower($col->getName());
 		
-		if ($clo === self::KALTURA_COLUMN_CUSTOM_DATA){
-			$script .= "
-		if (is_null(\$this->custom_data))
-			\$this->oldCustomDataValueWasNull = true;
-		";
-		}
-			
 		if(in_array($clo, self::$systemColumns))
 			return;
 			
@@ -983,12 +975,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	protected \$oldCustomDataValues = array();
 	
 	/**
-	 * Flag to indicate if old custom_data value was null
-	 * @var 	   boolean
-	 */
-	protected \$oldCustomDataValueWasNull = false;
-	
-	/**
 	 * @return array
 	 */
 	public function getCustomDataOldValues()
@@ -1095,7 +1081,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{
 		if ( \$this->m_custom_data != null )
 		{
-			\$this->custom_data_md5 = md5(\$this->custom_data);
+			\$this->custom_data_md5 = is_null(\$this->custom_data) ? null : md5(\$this->custom_data);
 			\$this->setCustomData( \$this->m_custom_data->toString() );
 		}
 	}
@@ -1122,7 +1108,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			$script .= "
 			if (\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA))
 			{
-				if (!is_null(\$this->custom_data) && !\$this->oldCustomDataValueWasNull)
+				if (!is_null(\$this->custom_data_md5))
 					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(cast(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \" as char character set latin1)) = '\$this->custom_data_md5'\", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 

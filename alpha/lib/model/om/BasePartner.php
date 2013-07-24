@@ -1434,9 +1434,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setCustomData($v)
 	{
-		if (is_null($this->custom_data))
-			$this->oldCustomDataValueWasNull = true;
-			
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2296,7 +2294,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
-		$this->oldCustomDataValueWasNull = false; 
     	 
 		parent::postSave($con);
 	}
@@ -2992,7 +2989,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		{
 			if ($this->isColumnModified(PartnerPeer::CUSTOM_DATA))
 			{
-				if (!is_null($this->custom_data) && !$this->oldCustomDataValueWasNull)
+				if (!is_null($this->custom_data_md5)) 
 					$criteria->add(PartnerPeer::CUSTOM_DATA, "MD5(cast(" . PartnerPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
@@ -3278,12 +3275,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	protected $oldCustomDataValues = array();
 	
 	/**
-	 * Flag to indicate if old custom_data value was null
-	 * @var 	   boolean
-	 */
-	protected $oldCustomDataValueWasNull = false;
-	
-	/**
 	 * @return array
 	 */
 	public function getCustomDataOldValues()
@@ -3390,7 +3381,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
-			$this->custom_data_md5 = md5($this->custom_data);
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
