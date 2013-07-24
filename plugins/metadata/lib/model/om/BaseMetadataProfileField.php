@@ -960,12 +960,6 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	private $tempModifiedColumns = array();
 	
 	/**
-	 * The md5 value for the custom_data field.
-	 * @var        string
-	 */
-	protected $custom_data_md5;
-	
-	/**
 	 * Returns whether the object has been modified.
 	 *
 	 * @return     boolean True if the object has been modified.
@@ -1314,27 +1308,16 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 
 		$criteria->add(MetadataProfileFieldPeer::ID, $this->id);
 		
-		if($this->alreadyInSave)
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(MetadataProfileFieldPeer::UPDATED_AT))
 		{
-// 			if ($this->isColumnModified(MetadataProfileFieldPeer::CUSTOM_DATA))
-// 			{
-// 				if (!is_null($this->custom_data))
-// 					$criteria->add(MetadataProfileFieldPeer::CUSTOM_DATA, "MD5(" . MetadataProfileFieldPeer::CUSTOM_DATA . ") = '$this->custom_data_md5'", Criteria::CUSTOM);
-// 				else 
-// 					$criteria->add(MetadataProfileFieldPeer::CUSTOM_DATA, NULL, Criteria::IS_NULL);
-// 			}
-			
-			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(MetadataProfileFieldPeer::UPDATED_AT))
-			{
-				$theModifiedColumn = null;
-				foreach($this->modifiedColumns as $modifiedColumn)
-					if($modifiedColumn != MetadataProfileFieldPeer::UPDATED_AT)
-						$theModifiedColumn = $modifiedColumn;
-						
-				$atomicColumns = MetadataProfileFieldPeer::getAtomicColumns();
-				if(in_array($theModifiedColumn, $atomicColumns))
-					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-			}
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != MetadataProfileFieldPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = MetadataProfileFieldPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 		}
 
 		return $criteria;
