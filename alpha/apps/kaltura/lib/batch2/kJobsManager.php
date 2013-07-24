@@ -205,25 +205,29 @@ class kJobsManager
 	
 	public static function addProvisionDeleteJob(BatchJob $parentJob = null, entry $entry)
 	{
- 		$jobData = kProvisionJobData::getInstance($entry->getSource());
- 		$jobData->setStreamID($entry->getStreamRemoteId());
- 		$subType = $entry->getSource();
- 		
-		$batchJob = null;
-		if($parentJob)
-		{
-			$batchJob = $parentJob->createChild(BatchJobType::PROVISION_DELETE, $subType);
+		$jobData = kProvisionJobData::getInstance($entry->getSource());
+		if ($jobData){
+			$jobData->setStreamID($entry->getStreamRemoteId());
+			$subType = $entry->getSource();
+			$jobData->populateFromPartner($entry->getPartner());
+			$jobData->populateFromEntry($entry);
+			$batchJob = null;
+			if($parentJob)
+			{
+				$batchJob = $parentJob->createChild(BatchJobType::PROVISION_DELETE, $subType);
+			}
+			else
+			{
+				$batchJob = new BatchJob();
+				$batchJob->setEntryId($entry->getId());
+				$batchJob->setPartnerId($entry->getPartnerId());
+			}
+			
+			$batchJob->setObjectId($entry->getId());
+			$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+			return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_DELETE, $subType);
 		}
-		else
-		{
-			$batchJob = new BatchJob();
-			$batchJob->setEntryId($entry->getId());
-			$batchJob->setPartnerId($entry->getPartnerId());
-		}
-		
-		$batchJob->setObjectId($entry->getId());
-		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_DELETE, $subType);
+		return false;
 	}
 	
 	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry, kProvisionJobData $jobData)
