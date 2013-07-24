@@ -265,13 +265,11 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		
 		$this->addElement('checkbox', 'manual_dispatch_enabled', array(
 			'label'			=> 'Manual dispatch enabled:',
-			'disabled'		=> true,
 			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt'))),
 		));
 		
 		$this->addElement('checkbox', 'automatic_dispatch_enabled', array(
 			'label'			=> 'Automatic dispatch enabled:',
-			'disabled'		=> true,
 			'decorators' 	=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt'))),
 			'onclick'		=> 'automaticEnabled(this.checked)',
 		));
