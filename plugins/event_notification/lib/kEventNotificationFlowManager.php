@@ -75,8 +75,13 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		
 		$batchJob->setObjectId($entryId);
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
-		return kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
+		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
+		$jobData->setJobId($batchJob->getId());
+		$batchJob->setData($jobData);
+		
+		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 
 	/**
