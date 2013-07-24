@@ -450,6 +450,7 @@ class MetadataService extends KalturaBaseService
 			
 		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
 		$count = BasePeer::doUpdate($c, $update, $con);
+		MetadataPeer::setUseCriteriaFilter(true);
 		return $count;
 	}	
 	
