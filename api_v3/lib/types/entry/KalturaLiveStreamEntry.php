@@ -195,7 +195,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		$this->validatePropertyNotNull("mediaType");
 		$this->validatePropertyNotNull("sourceType");
 		$this->validatePropertyNotNull("streamPassword");
-		if ($this->sourceType != KalturaSourceType::MANUAL_LIVE_STREAM)
+		if (in_array($this->sourceType, array(KalturaSourceType::AKAMAI_LIVE,KalturaSourceType::AKAMAI_UNIVERSAL_LIVE)))
 		{
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
