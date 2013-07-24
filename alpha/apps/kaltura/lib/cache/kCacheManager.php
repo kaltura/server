@@ -20,6 +20,7 @@ class kCacheManager
 	const CACHE_TYPE_SPHINX_STICKY_SESSIONS = 'sphinxStickySessions';
 	const CACHE_TYPE_LOCK_KEYS = 'lockKeys';
 	const CACHE_TYPE_API_WARMUP = 'apiWarmup';
+	const CACHE_TYPE_KWIDGET_SWF = 'kwidgetSwf';
 	
 	protected static $caches = array();
 	
