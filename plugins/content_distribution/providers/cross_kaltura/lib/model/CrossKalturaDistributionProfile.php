@@ -117,7 +117,7 @@ class CrossKalturaDistributionProfile extends ConfigurableDistributionProfile
 		{
 		    $c = new Criteria();
 		    $c->addAnd(assetPeer::ID, $flavorAssetIds, Criteria::IN);
-    		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+    		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
     		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
     		$flavorAssets = assetPeer::doSelect($c);
 		

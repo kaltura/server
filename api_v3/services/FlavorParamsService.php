@@ -155,7 +155,7 @@ class FlavorParamsService extends KalturaBaseService
 		
 		$pager->attachToCriteria($c);
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetParamsPeer::retrieveAllFlavorParamsTypes();
 		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$dbList = assetParamsPeer::doSelect($c);

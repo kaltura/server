@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * Will provision new live stream.
  *
