@@ -399,7 +399,7 @@ class kwidgetAction extends sfAction
 					"&kdpUrl=".urlencode($swf_url).
 					"&host=" . $partner_host .
 					"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
-					(($protocol == "https") ? "&statistics.statsDomain=$stats_host" : "").
+					"&statistics.statsDomain=$stats_host".
 					( $show_version ? "&entryVersion=$show_version" : "" ) .
 					( $kshow_id ? "&kshowId=$kshow_id" : "" ).
 					( $entry_id ? "&$entryVarName=$entry_id" : "" ) .
