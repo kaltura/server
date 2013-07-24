@@ -132,9 +132,11 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		{
 			case 'permission_names':
 				return categoryKuser::PERMISSION_NAME_FIELD_INDEX_PREFIX. kCurrentContext::getCurrentPartnerId();
+			case 'category_kuser_status':
+				return categoryKuser::STATUS_FIELD_PREFIX;
 		}
 
-		return null;
+		return parent::getFieldPrefix($fieldName);
 	}
 	
 	/* (non-PHPdoc)
@@ -248,14 +250,6 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		}
 		
 		return parent::applyFilterFields($filter);
-	}
-	
-	public function getFieldPrefix ($fieldName)
-	{
-		if ($fieldName == 'category_kuser_status')
-			return categoryKuser::STATUS_FIELD_PREFIX;
-			
-		return parent::getFieldPrefix($fieldName);
 	}
 	
 	public function translateSphinxCriterion (SphinxCriterion $crit)
