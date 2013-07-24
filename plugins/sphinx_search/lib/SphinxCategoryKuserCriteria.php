@@ -249,5 +249,36 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		
 		return parent::applyFilterFields($filter);
 	}
+	
+	public function getFieldPrefix ($fieldName)
+	{
+		if ($fieldName == 'category_kuser_status')
+			return categoryKuser::STATUS_FIELD_PREFIX;
+			
+		return parent::getFieldPrefix($fieldName);
+	}
+	
+	public function translateSphinxCriterion (SphinxCriterion $crit)
+	{
+		$field = $crit->getTable() . '.' . $crit->getColumn();
+		$value = $crit->getValue();
+		
+		$fieldName = null;
+		if ($field == categoryKuserPeer::STATUS)
+			$fieldName = categoryKuserPeer::STATUS;
 
+		if ($fieldName)
+		{
+			$partnerIdCrit = $this->getCriterion(categoryKuserPeer::PARTNER_ID);
+			if ($partnerIdCrit && $partnerIdCrit->getComparison() == Criteria::EQUAL)
+				$partnerId = $partnerIdCrit->getValue();
+			else
+				$partnerId = kCurrentContext::getCurrentPartnerId();
+			
+			$value = categoryKuser::getSearchIndexFieldValue($fieldName, $value, $partnerId);
+		}
+
+		return array($field, $crit->getComparison(), $value);
+	}
+	
 }

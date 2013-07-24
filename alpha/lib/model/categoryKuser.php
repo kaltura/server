@@ -33,6 +33,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		
 	private static $indexFieldsMap = null;
 	
+	const STATUS_FIELD_PREFIX = "status";
+	
 	
 	
 	/**
@@ -399,7 +401,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		switch ($fieldName)
 		{
 			case categoryKuserPeer::STATUS:
-				return $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
+				return self::STATUS_FIELD_PREFIX. " " . $partnerId . self::STATUS_INDEX_PREFIX . $fieldValue;
 				break;
 			case categoryKuserPeer::UPDATE_METHOD:
 				return $partnerId . self::UPDATE_METHOD_INDEX_PREFIX . $fieldValue;
