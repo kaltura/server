@@ -198,7 +198,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$dataStrings = array();
 		$dataInts = array();
 		$dataTimes = array();
-		$dataJason = array();
+		$dataJson = array();
 		
 		$fields = $object->getIndexFieldsMap();
 		$nullableFields = $object->getIndexNullableFields();
@@ -229,7 +229,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 					break;
 					
 				case IIndexable::FIELD_TYPE_JSON:
-					$dataJason[$field] = $object->$getter();
+					$dataJson[$field] = $object->$getter();
 					break;
 					
 			}
@@ -310,7 +310,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$data[$key] = is_numeric($value) ? $value : 0;
 		}
 		
-		foreach($dataJason as $key => $value)
+		foreach($dataJson as $key => $value)
 		{
 			$valueStr = json_encode($value);
 			$escapedString = SphinxUtils::escapeString($valueStr);
