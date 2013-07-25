@@ -65,13 +65,13 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	private function updateDataWithUrls( $provisioningParams){
 		$playbackHost = KBatchBase::$taskConfig->params->restapi->velocixPlaybackHost;
 		$publishHost = KBatchBase::$taskConfig->params->restapi->velocixPublishHost;
-		$hdsPlaybackHost = KBatchBase::$taskConfig->params->restapi->velocixHDSPlaybackHost;
+		$hdsPlaybackPrefix = KBatchBase::$taskConfig->params->restapi->velocixHDSPlaybackPrefix;
 		foreach ($provisioningParams as $provisioningParam){
 			switch ($provisioningParam->key){
 				case KalturaPlaybackProtocol::HDS:
 					$keyValUrls = new KalturaKeyValue();
 					$keyValUrls->key = self::HDS_URLS;
-					$urls = array(self::PLAYBACK => 'http://'.$hdsPlaybackHost.'/os/live/'.$this->streamName.'/hds/'.$this->streamName.'.f4m',
+					$urls = array(self::PLAYBACK => 'http://'.$hdsPlaybackPrefix.'/'.$this->streamName.'/hds/'.$this->streamName.'.f4m',
 								self::PUBLISH =>'rtmp://'.$publishHost.'/livepkgr/'.$this->streamName.'/%i?adbe-live-event=liveevent');
 					$keyValUrls->value= serialize($urls);
 					$provisioningParams[] = $keyValUrls;
@@ -159,6 +159,8 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	 */
 	public function delete(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
+		$this->password = $data->password;
+		$this->userName = $data->userName;
 		$url = $this->baseServiceUrl . "/vxoa/assets/".$data->streamName;
 		$res = $this->doCurl($url, null, true);
 		KalturaLog::info('Velocix asset delete response:'.$res);

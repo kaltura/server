@@ -74,15 +74,12 @@ class kPatchSwf
 		89 => "StartSound2"
 	);
 	
-	public $filename;
 	private $header;
 	private $swfdata;
 	private $pos;
 	
-	public function kPatchSwf($filename, $signature = self::KALTURA_EMBED_SIGNATURE)
+	public function kPatchSwf($swf, $signature = self::KALTURA_EMBED_SIGNATURE)
 	{
-		$this->filename = $filename;
-		$swf = file_get_contents($this->filename);
 		$this->header = substr($swf, 0, 8);
 		$zdata = substr($swf, 8, strlen($swf) - 8);
 		$this->swfdata = @gzuncompress($zdata);
@@ -95,7 +92,7 @@ class kPatchSwf
 		$this->pos = 0xd;
 	}
 	
-	public function patch($data, $dest_filename = null)
+	public function patch($data)
 	{
 		$this->reset();
 		$swfdata = $this->swfdata;
@@ -129,17 +126,7 @@ class kPatchSwf
 				$header = substr($this->header, 0, 4).pack("V1", 8 + strlen($new_swfdata));
 				$zdata = gzcompress($new_swfdata, 9);
 
-				if ($dest_filename)
-				{
-					file_put_contents($dest_filename, $header.$zdata); // sync - OK
-				}
-				else
-				{
-					echo $header;
-					echo $zdata;
-				}
-				
-				return;
+				return $header . $zdata;
 			}
 		}
 	}
