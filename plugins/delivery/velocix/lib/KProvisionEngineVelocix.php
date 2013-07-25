@@ -159,6 +159,8 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	 */
 	public function delete(KalturaBatchJob $job, KalturaProvisionJobData $data) 
 	{
+		$this->password = $data->password;
+		$this->userName = $data->userName;
 		$url = $this->baseServiceUrl . "/vxoa/assets/".$data->streamName;
 		$res = $this->doCurl($url, null, true);
 		KalturaLog::info('Velocix asset delete response:'.$res);
