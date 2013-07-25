@@ -222,6 +222,7 @@ class SystemPartnerService extends KalturaBaseService
 	 */
 	public function updateConfigurationAction($partnerId, KalturaSystemPartnerConfiguration $configuration)
 	{
+		// Partner Is required and can't be 0!
 		if(!$partnerId) 
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 		
