@@ -135,19 +135,28 @@ class KalturaResponseCacher extends kApiCache
 		}
 		
 		$responseMetadata = unserialize($this->_responseMetadata);
-
-		foreach ($responseMetadata['headers'] as $curHeader)
-			header($curHeader, true);
 		
 		if ($responseMetadata['class'])
 		{
 			require_once(dirname(__FILE__) . "/../../alpha/apps/kaltura/lib/renderers/{$responseMetadata['class']}.php");
 			
 			$response = unserialize($response);
+			if (!$response->validate())
+			{
+				$this->sendCachingHeaders(false);
+				return;
+			}
+			
+			foreach ($responseMetadata['headers'] as $curHeader)
+				header($curHeader, true);
+			
 			$response->output();
 			die;
 		}
 
+		foreach ($responseMetadata['headers'] as $curHeader)
+			header($curHeader, true);
+		
 		$this->sendCachingHeaders(true);
 
 		// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);

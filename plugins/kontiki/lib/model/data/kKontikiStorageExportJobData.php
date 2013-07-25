@@ -22,11 +22,6 @@ class kKontikiStorageExportJobData extends kStorageExportJobData
 	 * @var string
 	 */
 	protected $serviceToken;
-	
-	/**
-	 * @var string
-	 */
-	protected $entryPoint;
 
 
     public function setContentMoid($contentMoid) 
@@ -49,16 +44,6 @@ class kKontikiStorageExportJobData extends kStorageExportJobData
         return $this->flavorAssetId;
     }
 	
-	public function setEntryPoint($v) 
-    {
-        $this->entryPoint = $v;
-    }
-
-    public function getEntryPoint() 
-    {
-        return $this->entryPoint;
-    }
-	
 	public function setServiceToken($v) 
     {
         $this->serviceToken = $v;
@@ -72,7 +57,7 @@ class kKontikiStorageExportJobData extends kStorageExportJobData
     public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
     {
         /* @var $externalStorage KontikiStorageProfile */
-        $this->setEntryPoint($externalStorage->getApiEntryPoint()); 
+        $this->setServerUrl($externalStorage->getStorageUrl());
         $this->setServiceToken($externalStorage->getServiceToken()); 
         $this->setSrcFileSyncId($fileSync->getId());
         if ($fileSync->getObjectType() != FileSyncObjectType::ASSET)

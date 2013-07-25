@@ -8,6 +8,8 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	const PLUGIN_NAME = 'kontiki';
     
     const KONTIKI_ASSET_TAG = 'kontiki';
+	
+	const SERVICE_TOKEN_PREFIX = 'srv-';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::loadObject()
@@ -18,16 +20,12 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		{
 			if ($enumValue == KalturaStorageProfileProtocol::KONTIKI)
 			{
-				list($partnerId, $data) = $constructorArgs;
-				return new KKontikiExportEngine($data, $partnerId, $enumValue);
+				list($data, $partnerId) = $constructorArgs;
+				return new KKontikiExportEngine($data, $partnerId);
 			}
 		}
 		if ($baseClass == 'kStorageExportJobData')
 		{
-			if ($enumValue == BatchJobType::STORAGE_EXPORT)
-			{
-				return new kKontikiStorageExportJobData();
-			}
             if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             {
                 return new kKontikiStorageExportJobData();
@@ -35,10 +33,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		}
         if ($baseClass == 'kStorageDeleteJobData')
         {
-            if ($enumValue == BatchJobType::STORAGE_DELETE)
-            {
-                return new kKontikiStorageDeleteJobData();
-            }
             if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             {
                 return new kKontikiStorageDeleteJobData();
@@ -46,16 +40,25 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
         }
 		if ($baseClass == 'KalturaJobData')
 		{
-			if ($enumValue == BatchJobType::STORAGE_EXPORT)
+			$jobSubType = $constructorArgs["coreJobSubType"];
+			if ($jobSubType == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
 			{
-				return new KalturaKontikiStorageExportJobData();
+				if ($enumValue == BatchJobType::STORAGE_EXPORT)
+				{
+					return new KalturaKontikiStorageExportJobData();
+				}
+			 	if ($enumValue == BatchJobType::STORAGE_DELETE)
+	            {
+	                return new KalturaKontikiStorageDeleteJobData();
+	            }
 			}
-		}
-        if ($baseClass == 'KalturaJobData')
+        }
+		
+		if ($baseClass == 'KalturaStorageProfile')
         {
-            if ($enumValue == BatchJobType::STORAGE_DELETE)
+            if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             {
-                return new KalturaKontikiStorageDeleteJobData();
+                return new KalturaKontikiStorageProfile();
             }
         }
 
@@ -67,7 +70,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	public static function getObjectClass($baseClass, $enumValue) {
 		if($baseClass == 'StorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             return 'KontikiStorageProfile';
-
 	}
 
 	/* (non-PHPdoc)
@@ -124,6 +126,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 
 	public static function getEventConsumers()
 	{
-        return array ('KontikiFlowManager');
+        return array ('kKontikiManager');
 	}
 }

@@ -18,7 +18,6 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	const CUSTOM_DATA_HOSTNAME = 'hostname';
 	const CUSTOM_DATA_MESSAGE_ID = 'messageID';
 	const CUSTOM_DATA_CUSTOM_HEADERS = 'customHeaders';
-	const CUSTOM_DATA_CONTENT_PARAMETERS = 'contentParameters';
 	const CUSTOM_DATA_BODY_FILE_VERSION = 'bodyFileVersion';
 	
 	const FILE_SYNC_BODY = 1;
@@ -67,7 +66,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$contentParameters = $this->getContentParameters();
 		foreach($contentParameters as $contentParameter)
 		{
-			/* @var $contentParameter kEmailNotificationParameter */
+			/* @var $contentParameter kEventNotificationParameter */
 			$value = $contentParameter->getValue();
 			if($scope && $value instanceof kStringField)
 				$value->setScope($scope);
@@ -287,8 +286,6 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	 */
 	public function getReplyTo()								{return $this->getFromCustomData(self::CUSTOM_DATA_REPLY_TO);}
 	
-	public function getContentParameters()						{return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, null, array());}
-
 	public function incrementBodyFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION);}
 	public function resetBodyFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, 1);}
 	public function setFormat($v)								{return $this->putInCustomData(self::CUSTOM_DATA_FORMAT, $v);}
@@ -300,9 +297,8 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function setHostname($v)								{return $this->putInCustomData(self::CUSTOM_DATA_HOSTNAME, $v);}
 	public function setMessageID($v)							{return $this->putInCustomData(self::CUSTOM_DATA_MESSAGE_ID, $v);}
 	public function setCustomHeaders($v)						{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
-	public function setTo(kEmailNotificationRecipientProvider $v)								{return $this->putInCustomData(self::CUSTOM_DATA_TO, $v);}
-	public function setCc(kEmailNotificationRecipientProvider $v)								{return $this->putInCustomData(self::CUSTOM_DATA_CC, $v);}
-	public function setBcc(kEmailNotificationRecipientProvider $v)							{return $this->putInCustomData(self::CUSTOM_DATA_BCC, $v);}
-	public function setReplyTo(kEmailNotificationRecipientProvider $v)						{return $this->putInCustomData(self::CUSTOM_DATA_REPLY_TO, $v);}
-	public function setContentParameters(array $v)				{return $this->putInCustomData(self::CUSTOM_DATA_CONTENT_PARAMETERS, $v);}
+	public function setTo(kEmailNotificationRecipientProvider $v = null)							{return $this->putInCustomData(self::CUSTOM_DATA_TO, $v);}
+	public function setCc(kEmailNotificationRecipientProvider $v = null)							{return $this->putInCustomData(self::CUSTOM_DATA_CC, $v);}
+	public function setBcc(kEmailNotificationRecipientProvider $v = null)							{return $this->putInCustomData(self::CUSTOM_DATA_BCC, $v);}
+	public function setReplyTo(kEmailNotificationRecipientProvider $v = null)						{return $this->putInCustomData(self::CUSTOM_DATA_REPLY_TO, $v);}
 }

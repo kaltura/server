@@ -75,8 +75,13 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		
 		$batchJob->setObjectId($entryId);
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
-		return kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
+		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
+		$jobData->setJobId($batchJob->getId());
+		$batchJob->setData($jobData);
+		
+		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 
 	/**
@@ -132,7 +137,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		
 		foreach($eventConditions as $eventCondition)
 		{
-			/* @var $eventCondition kEventCondition */
+			/* @var $eventCondition kCondition */
 			if(!$eventCondition->fulfilled($scope))
 				return false;
 		}
@@ -194,6 +199,23 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		foreach($notificationTemplates as $notificationTemplate)
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
+			
+			$scope->resetDynamicValues();
+			
+			$notificationParameters = $notificationTemplate->getContentParameters();
+			foreach($notificationParameters as $notificationParameter)
+			{
+				/* @var $notificationParameter kEventNotificationParameter */
+				$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+			}
+			
+			$notificationParameters = $notificationTemplate->getUserParameters();
+			foreach($notificationParameters as $notificationParameter)
+			{
+				/* @var $notificationParameter kEventNotificationParameter */
+				$scope->addDynamicValue($notificationParameter->getKey(), $notificationParameter->getValue());
+			}
+			
 			if($this->notificationTemplatesConditionsFulfilled($notificationTemplate, $scope))
 				$this->notificationTemplates[] = $notificationTemplate;
 		}

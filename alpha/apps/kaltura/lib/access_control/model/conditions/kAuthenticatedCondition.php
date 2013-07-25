@@ -40,9 +40,11 @@ class kAuthenticatedCondition extends kCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	protected function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
+		if(!($scope instanceof accessControlScope))
+			return false;
+		
 		if (!$scope->getKs() || (!$scope->getKs() instanceof ks))
 			return false;
 		

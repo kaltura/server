@@ -45,9 +45,6 @@ class serveFlavorAction extends kalturaAction
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
 		myPartnerUtils::enforceDelivery($flavorAsset->getPartnerId());
 		
-		//disabled enforce cdn because of rtmp delivery
-		//requestUtils::enforceCdnDelivery($flavorAsset->getPartnerId());
-			
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{

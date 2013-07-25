@@ -5,10 +5,6 @@
  */
 class KalturaKontikiStorageProfile extends KalturaStorageProfile
 {
-	/**
-	 * @var string
-	 */
-	public $apiEntryPoint;
 	
 	/**
 	 * @var string
@@ -34,7 +30,6 @@ class KalturaKontikiStorageProfile extends KalturaStorageProfile
 	
 	private static $map_between_objects = array
 	(
-		'apiEntryPoint',
 		'serviceToken',
 		'userName',
 		'password',

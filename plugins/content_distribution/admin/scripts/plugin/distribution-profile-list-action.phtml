@@ -14,6 +14,7 @@
 				<th><?php echo $this->translate('Provider'); ?></th>
 				<th><?php echo $this->translate('Name'); ?></th>
 				<th><?php echo $this->translate('Creation Date'); ?></th>
+				<th><?php echo $this->translate('Updated At'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
 		</thead>
@@ -31,6 +32,7 @@
 				<td><?php echo ($profile->providerType == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::GENERIC ? 'Generic ' . (isset($this->genericProviders[$profile->genericProviderId]) ? '(' . $this->genericProviders[$profile->genericProviderId] . ')' : '') : $this->providers[$profile->providerType]); ?></td>
 				<td><?php echo $profile->name; ?></td>
 				<td><?php $d = (new Zend_Date($profile->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
+				<td><?php $du = (new Zend_Date($profile->updatedAt)); echo $du->toString(Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $profile->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>

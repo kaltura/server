@@ -14,6 +14,9 @@ class kLoggerCache
 	 */
 	static public function InitLogger($configName, $context = null)
 	{
+		if (KalturaLog::getLogger())	// already initialized
+			return;
+		
 		if (function_exists('apc_fetch'))
 		{
 			$cacheKey = self::LOGGER_APC_CACHE_KEY_PREFIX . $configName;

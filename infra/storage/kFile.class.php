@@ -338,30 +338,66 @@ class kFile
 		return self::fullMkfileDir(dirname($path), $rights, $recursive);
 	}
 	
-	private static function rename_wrap($src, $trg)
-	{
-		if(!file_exists($src))
-		{
-			KalturaLog::err("Source file doesn't exist [$src]");
-			return false;
-		}
-		
-		if(strpos($trg,'\"') !== false)
-		{
-			KalturaLog::err("Illegal destination file [$trg]");
-			return false;
-		}
+	/**
+	 * copies src to destination.
+	 * Doesn't support non-flat directories!
+	 * One can't use rename because rename isn't supported between partitions.
+	 */
+	private static function copyRecursively($src, $dest, $deleteSrc = false) {
+		if (is_dir($src)) {
 			
-		if(rename($src, $trg)) 
-			return true;
-		
-		$out_arr = array();
-		$rv = 0;
-		
-		// We use this case for folders
-		exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
-
-		return ($rv==0);
+			// Generate target directory
+			if (file_exists ($dest)) {
+				if (! is_dir($dest)) {
+					KalturaLog::err("Can't override a file with a directory [$dest]");
+					return false;
+				}
+			} else {
+				if (! mkdir($dest)) {
+					KalturaLog::err("Failed to create directory [$dest]");
+					return false;
+				}
+			}
+			
+			// Copy files
+			$dir = dir($src);
+			while ( false !== $entry = $dir->read () ) {
+				if ($entry == '.' || $entry == '..') {
+					continue;
+				}
+				
+				$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
+				if(is_dir($newSrc)) {
+					KalturaLog::err("Copying of non-flat directroeis is illegal");
+					return false;
+				}
+				
+				$res =  self::copySingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
+				if (! $res)
+					return false;
+			}
+			
+			// Delete source
+			if ($deleteSrc && (! rmdir($src))) {
+				KalturaLog::err("Failed to delete source directory : [$src]");
+				return false;
+			}
+		} else {
+			self::copySingleFile($src, $dest, $deleteSrc);
+		}
+		return true;
+	}
+	
+	private static function copySingleFile($src, $dest, $deleteSrc) {
+		if (!copy($src,$dest)) {
+			KalturaLog::err("Failed to copy file : [$src]");
+			return false;
+		}
+		if ($deleteSrc && (!unlink($src))) {
+			KalturaLog::err("Failed to delete source file : [$src]");
+			return false;
+		}
+		return true;
 	}
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -369,6 +405,20 @@ class kFile
 		$from = str_replace("\\", "/", $from);
 		$to = str_replace("\\", "/", $to);
 		
+		// Validation
+		if(!file_exists($from))
+		{
+			KalturaLog::err("Source doesn't exist [$from]");
+			return false;
+		}
+		
+		if(strpos($to,'\"') !== false)
+		{
+			KalturaLog::err("Illegal destination file [$to]");
+			return false;
+		}
+		
+		// Preperation
 		if($override_if_exists && is_file($to))
 		{
 			self::deleteFile($to);
@@ -379,10 +429,8 @@ class kFile
 			self::fullMkdir($to);
 		}
 		
-		if($copy)
-			return copy($from, $to);
-		else
-			return self::rename_wrap($from, $to);
+		// Copy
+		return self::copyRecursively($from,$to, !$copy);
 	}
 	
 	public static function linkFile($from, $to, $overrideIfExists = false, $copyIfLinkFailed = true)

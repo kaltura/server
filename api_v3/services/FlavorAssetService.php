@@ -495,7 +495,7 @@ class FlavorAssetService extends KalturaAssetService
 		$c = new Criteria();
 		$flavorAssetFilter->attachToCriteria($c);
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$totalCount = assetPeer::doCount($c);
@@ -760,7 +760,7 @@ class FlavorAssetService extends KalturaAssetService
 		
 		// get all the flavor params of partner 0 and the current partner (note that partner 0 is defined as partner group in service.ct)
 		$c = new Criteria();
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetParamsPeer::retrieveAllFlavorParamsTypes();
 		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$flavorParamsDb = assetParamsPeer::doSelect($c);
@@ -768,7 +768,7 @@ class FlavorAssetService extends KalturaAssetService
 		// get the flavor assets for this entry
 		$c = new Criteria();
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$c->add(assetPeer::ENTRY_ID, $entryId);

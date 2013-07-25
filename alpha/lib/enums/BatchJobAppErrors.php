@@ -39,4 +39,6 @@ interface BatchJobAppErrors extends BaseEnum
 	const THUMBNAIL_NOT_CREATED = 91;
 	
 	const MISSING_PARAMETERS = 92;
+	
+	const EXTERNAL_ENGINE_ERROR = 93;
 }

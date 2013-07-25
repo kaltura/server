@@ -26,6 +26,7 @@
 	<meta property="og:site_name" content="Kaltura" />
 	<?php } ?>
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
+	<link type="text/css" rel="stylesheet" href="/lib/css/kmc.css" />
 	<?php if($framed)  { ?>
 	<style>
 	html, body {margin: 0; padding: 0; width: 100%; height: 100%; } 
@@ -59,11 +60,6 @@
 	<?php } ?>
 				<div id="framePlayerContainer">
 <script>
-// Prevent the page to be framed
-if(top != window && top.location.hostname != window.location.hostname ) { 
-	top.location = window.location; 
-}
-
 var scriptToEval = '';
 var code = new kEmbedCodeGenerator(<?php echo json_encode($embedParams); ?>).getCode();
 var embedType = '<?php echo $embedType;?>';
@@ -94,7 +90,7 @@ if( ltIE10 && (embedType == 'dynamic' || embedType == 'thumb') ) {
 				</div>
 <?php if(!$framed) { ?>				
 			</div>
-
+<br /><p>This page is for preview only. Not for production use.</p>
 			</div><!-- end contwrap -->
 		</div><!-- end content -->
 	</div><!-- end #main -->
