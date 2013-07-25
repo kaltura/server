@@ -44,8 +44,8 @@ class kwidgetAction extends sfAction
 		$requestKey = $protocol.$_SERVER["REQUEST_URI"];
 		
 		// check if we cached the redirect url
-		$cache = new myCache("kwidget", 10 * 60); // 10 minutes
-		$cachedResponse  = $cache->get($requestKey);
+		$cache_redirect = new myCache("kwidget", 10 * 60); // 10 minutes
+		$cachedResponse  = $cache_redirect->get($requestKey);
 		if ($allowCache && $cachedResponse) // dont use cache if we want to force no caching
 		{
 			header("X-Kaltura:cached-action");
@@ -420,7 +420,8 @@ class kwidgetAction extends sfAction
 				}
 
 				$md5 = md5($swf_key);
-				$wrapper_swf = "$root/content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$swf_key;				
+				$wrapper_swf_path = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$swf_key;
+				$wrapper_swf = "$root/$wrapper_swf_path";				
 				if (!file_exists($wrapper_swf))
 				{
 					kFile::fullMkdir($wrapper_swf);
@@ -428,7 +429,7 @@ class kwidgetAction extends sfAction
 				}
 				
 				// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
-				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
+				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf_path?$dynamic_date";
 			}
 		}
 		else
@@ -454,7 +455,7 @@ class kwidgetAction extends sfAction
 		}
 
 		if ($allowCache)
-			$cache->put($requestKey, $url);
+			$cache_redirect->put($requestKey, $url);
 
 		if (strpos($url, "/swfparams/") > 0)
 			$url = substr($url, 0, -4).urlencode($noncached_params).".swf";
