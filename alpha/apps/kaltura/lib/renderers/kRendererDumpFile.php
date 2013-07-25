@@ -42,6 +42,11 @@ class kRendererDumpFile implements kRendererBase
 		}
 	}
 	
+	public function validate()
+	{
+		return $this->fileData || file_exists($this->filePath);
+	}
+	
 	public function output()
 	{
 		$useXsendFile = false;
