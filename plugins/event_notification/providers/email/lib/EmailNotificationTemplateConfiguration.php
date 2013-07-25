@@ -1,11 +1,6 @@
 <?php 
 class Form_EmailNotificationTemplateConfiguration extends Form_EventNotificationTemplateConfiguration
 {
-	/**
-	 * @var int
-	 */
-	protected $contentParametersCount = 0;
-
 	/* (non-PHPdoc)
 	 * @see Infra_Form::getObject()
 	 */
@@ -40,46 +35,6 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				
 				$object->to = $recipientProvider;
 			}
-			
-			$contentParameters = $object->contentParameters;
-			if(!$contentParameters || !is_array($contentParameters))
-				$contentParameters = array();
-				
-			foreach($properties as $property => $value)
-			{
-				$matches = null;
-				if(preg_match('/contentParameterKey_(\d+)$/', $property, $matches))
-				{
-					$index = $matches[1];
-					$field = new Kaltura_Client_Type_EvalStringField();
-					$field->code = $properties["contentParameterValue_{$index}"];
-					
-					$contentParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
-					$contentParameter->key = $value;
-					$contentParameter->value = $field;
-					
-					$contentParameters[] = $contentParameter;
-				}
-			}
-			
-			if(isset($properties['contentParameterKey']) && is_array($properties['contentParameterKey']))
-			{
-				foreach($properties['contentParameterKey'] as $index => $value)
-				{
-					$field = new Kaltura_Client_Type_EvalStringField();
-					$field->code = $properties['contentParameterValue'][$index];
-					
-					$contentParameter = new Kaltura_Client_EmailNotification_Type_EmailNotificationParameter();
-					$contentParameter->key = $value;
-					$contentParameter->value = $field;
-					
-					$contentParameters[] = $contentParameter;
-				}
-				
-				KalturaLog::debug("Set content parameters [" . print_r($contentParameters, true) . "]");
-				if(count($contentParameters))
-					$object->contentParameters = $contentParameters;
-			}
 		}
 		
 		return $object;
@@ -95,9 +50,6 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if(!($object instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate))
 			return;
 		
-		foreach($object->contentParameters as $parameter)
-			$this->addContentParameter($parameter);
-			
 		if($object->to && count($object->to->emailRecipients) > 1)
 			$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
 			
@@ -116,11 +68,13 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 	 */
 	protected function addTypeElements()
 	{
-		$this->addElement('select', 'format', array(
+		$format = new Kaltura_Form_Element_EnumSelect('format', array(
+			'enum' => 'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat',
 			'label'			=> 'Format:',
 			'filters'		=> array('StringTrim'),
 			'required'		=> true,
 		));
+		$this->addElements(array($format));
 		
 		$this->addElement('text', 'subject', array(
 			'label'			=> 'Subject:',
@@ -153,80 +107,5 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			'label'			=> 'Recipient name:',
 			'filters'		=> array('StringTrim'),
 		));
-		
-		$element = $this->getElement('format');
-		$reflect = new ReflectionClass('Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat');
-		$types = $reflect->getConstants();
-		foreach($types as $constName => $value)
-		{
-			$name = ucfirst(str_replace('_', ' ', $constName));
-			$element->addMultiOption($value, $name);
-		}
-		
-		$this->addElement('button', 'addContentParameterButton', array(
-			'label'			=> 'Add Content Parameter',
-			'onclick'		=> "newContentParameter()",
-			'decorators'	=> array('ViewHelper'),
-		));
-		
-		$this->addElement('text', 'contentParameterKey', array(
-			'label'			=> 'Key:',
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-		
-		$this->addElement('text', 'contentParameterValue', array(
-			'label'			=> 'Value:',
-			'readonly'		=> true,
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-		
-		$this->addElement('button', 'removeContentParameterButton', array(
-			'label'			=> 'Remove',
-			'decorators'	=> array('ViewHelper'),
-		));
-			
-		$this->addDisplayGroup(array('contentParameterKey', 'contentParameterValue', 'removeContentParameterButton'), 
-			'frmContentParameter', 
-			array(
-				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmContentParameter'))),
-				'legend'		=> 'New content parameter',
-		));
-	}
-	
-	/**
-	 * @param Kaltura_Client_EmailNotification_Type_EmailNotificationParameter $parameter
-	 */
-	protected function addContentParameter(Kaltura_Client_EventNotification_Type_EventNotificationParameter $parameter)
-	{
-		if($parameter->value instanceof Kaltura_Client_Type_EvalStringField)
-		{
-			$this->addElement('text', "contentParameterKey_{$this->contentParametersCount}", array(
-				'label'			=> 'Key:',
-				'value'			=> $parameter->key,
-				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-			));
-		
-			$this->addElement('text', "contentParameterValue_{$this->contentParametersCount}", array(
-				'label'			=> 'Value:',
-				'readonly'		=> true,
-				'value'			=> $parameter->value->code,
-				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-			));
-			
-			$this->addElement('button', "removeContentParameterButton_{$this->contentParametersCount}", array(
-				'label'			=> 'Remove',
-				'onclick'			=> "removeContentParameter({$this->contentParametersCount})",
-				'decorators'	=> array('ViewHelper'),
-			));
-				
-			$this->addDisplayGroup(array("contentParameterKey_{$this->contentParametersCount}", "contentParameterValue_{$this->contentParametersCount}", "removeContentParameterButton_{$this->contentParametersCount}"), 
-				"frmContentParameter_{$this->contentParametersCount}", 
-				array(
-					'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => "frmContentParameter_{$this->contentParametersCount}"))),
-					'legend'		=> 'Content Parameter',
-			));
-			
-			$this->contentParametersCount++;
-		}
 	}
 }

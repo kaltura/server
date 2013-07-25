@@ -5,7 +5,7 @@
  * @package Core
  * @subpackage model.data
  */
-abstract class kBooleanField extends kBooleanValue
+abstract class kBooleanField extends kBooleanValue implements IScopeField
 {
 	/**
 	 * @var kScope
