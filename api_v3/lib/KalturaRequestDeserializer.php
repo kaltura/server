@@ -299,9 +299,6 @@ class KalturaRequestDeserializer
 	
 	private function castSimpleType($type, $var)
 	{
-		if(is_null($var))
-			return null;
-		
 		switch($type)
 		{
 			case "int":
