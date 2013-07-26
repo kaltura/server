@@ -170,22 +170,7 @@ function KalturaServiceActionCall(service, action, params, files)
   this.params = this.parseParams(params);
   this.files = files;
 }
-/**
- * @param string  service    The Kaltura service to use.
- */
-KalturaServiceActionCall.prototype.service = null;
-/**
- * @param string  action      The service action to execute.
- */
-KalturaServiceActionCall.prototype.action = null;
-/**
- * @param array    params      The parameters to pass to the service action.
- */
-KalturaServiceActionCall.prototype.params = null;
-/**
- * @param array   files      Files to upload or manipulate.
- */
-KalturaServiceActionCall.prototype.files = null;
+
 /**
  * Parse params array and sub arrays (clone objects)
  * @param array params  the object to clone.
@@ -260,45 +245,24 @@ var KalturaClientBase = module.exports.KalturaClientBase = function() {};
  */
 KalturaClientBase.prototype.init = function(config)
 {
-    this.config = config;
-    var logger = this.config.getLogger();
+  this.config = config;
+
+  this.apiVersion = null;
+  this.ks = null;
+  this.shouldLog = false;
+  this.useMultiRequest = false;
+  this.callsQueue = [];
+
+  var logger = this.config.getLogger();
   if (logger) {
-    this.shouldLog = true;  
+    this.shouldLog = true;
   }
 };
 
-KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSON = 1;
-KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_XML = 2;
-KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_PHP = 3;
-KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSONP = 9;
-/**
- * @param string
- */
-KalturaClientBase.prototype.apiVersion = null;
-/**
- * @param KalturaConfiguration The Kaltura Client - this is the facade through which all service actions should be called.
- */
-KalturaClientBase.prototype.config = null;
-  
-/**
- * @param string  the Kaltura session to use.
- */
-KalturaClientBase.prototype.ks = null;
-  
-/**
- * @param boolean  should the client log all actions.
- */
-KalturaClientBase.prototype.shouldLog = false;
-  
-/**
- * @param boolean  should the call be multirequest (set to true when creating multirequest calls).
- */
-KalturaClientBase.prototype.useMultiRequest = false;
-  
-/**
- * @param Array   queue of service action calls.
- */
-KalturaClientBase.prototype.callsQueue = [];
+KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON = 1;
+KalturaClientBase.KALTURA_SERVICE_FORMAT_XML = 2;
+KalturaClientBase.KALTURA_SERVICE_FORMAT_PHP = 3;
+KalturaClientBase.KALTURA_SERVICE_FORMAT_JSONP = 9;
 
 /**
  * prepare a call for service action (queue the call and wait for doQueue).
@@ -392,16 +356,17 @@ KalturaClientBase.prototype.signature = function(params)
 KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url, params, files)
 {
   url += "&" + http_build_query(params);
-  var res = http.get(url);
-  var data = "";
-  res.on("data", function(chunk) {
-      data += chunk;
-  });
-  res.on("end", function() {
-      callCompletedCallback(JSON.parse(data));
-  });
-  res.on("error", function(e) {
-    callCompletedCallback(null, e); 
+  http.get(url, function(res){
+      var data = "";
+      res.on("data", function(chunk) {
+          data += chunk;
+      });
+      res.on("end", function() {
+          callCompletedCallback(JSON.parse(data));
+      });
+      res.on("error", function() {
+          console.log("Got error: " + e.message);
+      });
   });
 };
 
@@ -552,14 +517,13 @@ var KalturaConfiguration = module.exports.KalturaConfiguration = function (partn
     throw "Invalid partner id - partnerId must be numeric!";
   }
   this.partnerId = partnerId;
-};
 
-KalturaConfiguration.prototype.logger    = null;
-KalturaConfiguration.prototype.serviceUrl  = "http://www.kaltura.com";
-KalturaConfiguration.prototype.serviceBase   = "/api_v3/index.php?service=";
-KalturaConfiguration.prototype.partnerId  = null;
-KalturaConfiguration.prototype.format    = KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSON;
-KalturaConfiguration.prototype.clientTag  = "node";
+  this.logger = null;
+  this.serviceUrl = "http://www.kaltura.com";
+  this.serviceBase = "/api_v3/index.php?service=";
+  this.format = KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON;
+  this.clientTag = "node";
+};
 
 /**
  * Set logger to get kaltura client debug logs.
