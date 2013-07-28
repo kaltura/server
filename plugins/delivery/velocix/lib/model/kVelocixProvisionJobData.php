@@ -21,11 +21,6 @@ class kVelocixProvisionJobData extends kProvisionJobData
 	 */
 	private $password;
 	
-	/**
-	 * @var string
-	 */
-	private $streamName;
-	
 	//same constants as in the engine.
 	const APPLE_HTTP_URLS = 'applehttp_urls';
 	const HDS_URLS = 'hds_urls';
@@ -75,20 +70,6 @@ class kVelocixProvisionJobData extends kProvisionJobData
 		$this->password = $password;
 	}
 	
-	/**
-	 * @return string $streamName
-	 */
-	public function getStreamName(){
-		return $this->streamName;
-	}
-	
-	/**
-	 * @param string $streamName
-	 */
-	public function setStreamName($streamName){
-		$this->streamName = $streamName;
-	}
-
 	/* (non-PHPdoc)
 	 * @see kProvisionJobData::populateFromPartner()
 	 */
