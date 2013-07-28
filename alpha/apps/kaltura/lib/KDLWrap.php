@@ -505,7 +505,7 @@ class KDLWrap
 		if(is_null($kdlFlavor->_container))
 		{
 			KalturaLog::log("No Container Found On Flavor Convert Will Fail");
-			$kdlFlavor->_errors[KDLConstants::ContainerIndex][] = KDLErrors::ToString(KDLErrors::NoValidTranscoders);
+			$kdlFlavor->_errors[KDLConstants::ContainerIndex][] = KDLErrors::ToString(KDLErrors::InvalidFlavorParamConfiguration);
 		}
 		return $kdlFlavor;
 	}
