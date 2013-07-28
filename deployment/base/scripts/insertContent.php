@@ -21,7 +21,7 @@ if($templateEntries)
 }
 
 $dirPath = __DIR__ . '/init_content';
-$scriptPath = realpath(__DIR__ . '/../../../') . '/tests/standAloneClient/test.php';
+$scriptPath = realpath(__DIR__ . '/../../../') . '/tests/standAloneClient/exec.php';
 
 KalturaLog::info("Adding content from directory [$dirPath]");
 $dir = dir($dirPath);

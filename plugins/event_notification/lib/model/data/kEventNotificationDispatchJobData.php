@@ -8,8 +8,29 @@ class kEventNotificationDispatchJobData extends kJobData
 	/**
 	 * @var int
 	 */
-	private $templateId;
+	protected $templateId;
 	
+	/**
+	 * @var int
+	 */
+	protected $jobId;
+	
+	/**
+	 * @return int $jobId
+	 */
+	public function getJobId() 
+	{
+		return $this->jobId;
+	}
+
+	/**
+	 * @param int $jobId
+	 */
+	public function setJobId($jobId) 
+	{
+		$this->jobId = $jobId;
+	}
+
 	/**
 	 * @return int $templateId
 	 */

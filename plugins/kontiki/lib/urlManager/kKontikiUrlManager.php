@@ -11,7 +11,7 @@ class kKontikiUrlManager extends kUrlManager
     {
         $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
 		/* @var $storageProfile KontikiStorageProfile */
-		$kontikiAPIWrapper = new KontikiAPIWrapper($storageProfile->getApiEntryPoint());
+		$kontikiAPIWrapper = new KontikiAPIWrapper($storageProfile->getStorageUrl());
         $playbackResource = $kontikiAPIWrapper->getPlaybackResource(KontikiPlugin::SERVICE_TOKEN_PREFIX.base64_encode($storageProfile->getServiceToken()), $fileSync->getFilePath());
 		if (!$playbackResource) 
 		{

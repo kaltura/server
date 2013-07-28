@@ -15,6 +15,11 @@ class kRendererRedirect implements kRendererBase
 		$this->url = $url;
 	}
 	
+	public function validate()
+	{
+		return true;
+	}
+	
 	public function output()
 	{
 		header("Location: {$this->url}");

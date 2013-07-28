@@ -505,13 +505,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return self::$sphinxTypes[$fieldName];
 	}
 	
-	public function getPositiveMatch($field)
-	{
-		if($field == 'roots')
-			return entry::ROOTS_FIELD_PREFIX;
-			
-		return parent::getPositiveMatch($field);
-	}
 	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::isNullableField()
@@ -569,9 +562,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 	public function getFieldPrefix ($fieldName)
 	{
+		if($fieldName == 'roots')
+			return entry::ROOTS_FIELD_PREFIX;
+		
 		if ($fieldName == 'categories')
 			return entry::CATEGORIES_INDEXED_FIELD_PREFIX.kCurrentContext::getCurrentPartnerId();	
 			
-		return null;
+		return parent::getFieldPrefix($fieldName);
 	}
 }

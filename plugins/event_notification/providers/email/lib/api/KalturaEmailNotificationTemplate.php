@@ -102,13 +102,6 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 	public $customHeaders;
 	
 	/**
-	 * Define the content dynamic parameters
-	 * @var KalturaEventNotificationParameterArray
-	 * @requiresPermission update
-	 */
-	public $contentParameters;
-	
-	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
@@ -126,7 +119,6 @@ class KalturaEmailNotificationTemplate extends KalturaEventNotificationTemplate
 		'hostname',
 		'messageID',
 		'customHeaders',
-		'contentParameters',
 	);
 		 
 	public function __construct()

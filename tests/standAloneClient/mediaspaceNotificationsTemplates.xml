@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
 	<config>
-		<serviceUrl>http://@WWW_HOST@/</serviceUrl>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
 		<partnerId>-2</partnerId>
 		<clientTag>Stand alone php 1.0.0</clientTag>
 		<curlTimeout>30</curlTimeout>
@@ -22,6 +22,7 @@
 				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status is pending, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::PENDING</code>
 						</field>
@@ -32,47 +33,53 @@
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
 					<categoryId objectType="KalturaEvalStringField">
 						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 					</categoryId>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
 						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
 					</categoryUserFilter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_id</key>
+						<description>Category ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name_encoded</key>
+						<description>Encoded category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>urlencode(!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : '')</code>
 						</value>
@@ -97,6 +104,7 @@
 				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status changed to pending, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::PENDING</code>
 						</field>
@@ -107,47 +115,53 @@
 				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
 					<categoryId objectType="KalturaEvalStringField">
 						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 					</categoryId>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
 						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
 					</categoryUserFilter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_id</key>
+						<description>Category ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name_encoded</key>
+						<description>Encoded category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>urlencode(!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : '')</code>
 						</value>
@@ -172,6 +186,7 @@
 				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status changed to active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
 						</field>
@@ -182,7 +197,7 @@
 				<body>Your media {entry_name} [AppEntryUrl]{entry_id} has been approved to be published in {category_name}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -193,34 +208,39 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
@@ -245,6 +265,7 @@
 				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status changed to rejected, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::REJECTED</code>
 						</field>
@@ -255,7 +276,7 @@
 				<body>Your media {entry_name} [AppEntryUrl]{entry_id} has been rejected to be published in {category_name}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -266,34 +287,39 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
@@ -318,6 +344,7 @@
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Moderation status changed to rejected, See:KalturaEntryModerationStatus:/api_v3/testmeDoc/?object=KalturaEntryModerationStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_REJECTED</code>
 						</field>
@@ -328,7 +355,7 @@
 				<body>Your media {entry_name} has been rejected</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -339,22 +366,25 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getName()</code>
 						</value>
@@ -379,6 +409,7 @@
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Moderation status changed to approved, See:KalturaEntryModerationStatus:/api_v3/testmeDoc/?object=KalturaEntryModerationStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof entry &amp;&amp; in_array(entryPeer::MODERATION_STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED</code>
 						</field>
@@ -389,7 +420,7 @@
 				<body>Your media {entry_name} has been approved</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -400,22 +431,25 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getName()</code>
 						</value>
@@ -440,6 +474,7 @@
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status changed to ready, See:KalturaEntryStatus:/api_v3/testmeDoc/?object=KalturaEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof entry &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == entryStatus::READY</code>
 						</field>
@@ -450,7 +485,7 @@
 				<body>Your recently uploaded media: {entry_name} is ready to play: [AppEntryUrl]{entry_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -461,28 +496,32 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getName()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getId()</code>
 						</value>
@@ -507,11 +546,13 @@
 				<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status is active, See:KalturaCategoryUserStatus:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryKuser &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryKuserStatus::ACTIVE</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>User has role, See:KalturaCategoryUserPermissionLevel:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryKuser &amp;&amp; category::getPermissionLevelName($scope->getEvent()->getObject()->getPermissionLevel())</code>
 						</field>
@@ -522,7 +563,7 @@
 				<body>You have been added as {role} to {category_name}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -533,28 +574,32 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>($scope->getEvent()->getObject()->getcategory()) ? $scope->getEvent()->getObject()->getcategory()->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>role</key>
+						<description>Role</description>
 						<value objectType="KalturaEvalStringField">
 							<code>ucfirst(strtolower(category::getPermissionLevelName($scope->getEvent()->getObject()->getPermissionLevel())))</code>
 						</value>
@@ -579,6 +624,7 @@
 				<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Permission level change, See:KalturaCategoryUserPermissionLevel:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus, and status is active, See:KalturaCategoryUserStatus:/api_v3/testmeDoc/?object=KalturaCategoryUserStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryKuser &amp;&amp; in_array(categoryKuserPeer::PERMISSION_LEVEL, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryKuserStatus::ACTIVE</code>
 						</field>
@@ -589,7 +635,7 @@
 				<body>Your role in {category_name} has changed and is now {role}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -600,28 +646,32 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>($scope->getEvent()->getObject()->getcategory()) ? $scope->getEvent()->getObject()->getcategory()->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>role</key>
+						<description>Role</description>
 						<value objectType="KalturaEvalStringField">
 							<code>ucfirst(strtolower(category::getPermissionLevelName($scope->getEvent()->getObject()->getPermissionLevel())))</code>
 						</value>
@@ -646,6 +696,7 @@
 				<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Object type verified</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryKuser</code>
 						</field>
@@ -656,7 +707,7 @@
 				<body>You have been removed from {category_name}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -667,22 +718,25 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>($scope->getEvent()->getObject()->getcategory()) ? $scope->getEvent()->getObject()->getcategory()->getName() : ''</code>
 						</value>
@@ -707,6 +761,7 @@
 				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Status is active, See:KalturaCategoryEntryStatus:/api_v3/testmeDoc/?object=KalturaCategoryEntryStatus</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
 						</field>
@@ -717,41 +772,46 @@
 				<body>Media {entry_name} was added to {category_name}. You can see the media here: [AppEntryUrl]{entry_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
 					<categoryId objectType="KalturaEvalStringField">
 						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 					</categoryId>
 					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
 						<permissionNamesMatchOr>CATEGORY_SUBSCRIBE</permissionNamesMatchOr>
 					</categoryUserFilter>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_name</key>
+						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>
@@ -776,6 +836,7 @@
 				<eventObjectType>annotationEventNotifications.Annotation</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Object type verified</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getObject() instanceof Annotation</code>
 						</field>
@@ -786,7 +847,7 @@
 				<body>A new comment was added to your video {entry_name}. You access the video page here: [AppEntryUrl]{entry_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
-				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
@@ -797,28 +858,32 @@
 							</name>
 						</item>
 					</emailRecipients>
-				</to>
+				</bcc>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_name</key>
+						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
 						</value>

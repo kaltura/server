@@ -85,10 +85,25 @@ class EventNotificationTemplatesListAction extends KalturaApplicationPlugin impl
 		if ($partnerFilter)
 		    $newForm->getElement('newPartnerId')->setValue($partnerFilter->idIn);
 		
+		$listTemplatespager = new Kaltura_Client_Type_FilterPager();
+		$listTemplatespager->pageSize = 500;
+		$templatesList = $eventNotificationPlugin->eventNotificationTemplate->listTemplates(null, $listTemplatespager);
+		
+		$templates = array();
+		foreach($templatesList->objects as $template)
+		{
+			$obj = new stdClass();
+			$obj->id = $template->id;
+			$obj->type = $template->type;
+			$obj->name = $template->name;
+			$templates[] = $obj;
+		}
+			
 		// set view
 		$action->view->form = $form;
 		$action->view->newForm = $newForm;
 		$action->view->paginator = $paginator;
+		$action->view->templates = $templates;
 	}
 	
 	/* (non-PHPdoc)

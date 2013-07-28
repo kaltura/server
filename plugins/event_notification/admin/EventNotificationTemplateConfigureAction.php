@@ -37,10 +37,10 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			$partnerId = 0;
 			
 		$templateId = $this->_getParam('template_id');
+		$cloneTemplateId = $this->_getParam('clone_template_id');
 		$type = null;
 		$eventNotificationTemplate = null;
 		
-		$action->view->templateId = $templateId;
 		$action->view->errMessage = null;
 		$action->view->form = '';
 		$form = null;
@@ -48,7 +48,14 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		try
 		{
 			Infra_ClientHelper::impersonate($partnerId);
-			if ($templateId)
+			
+			if($cloneTemplateId)
+			{
+				$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->cloneAction($cloneTemplateId);
+				$templateId = $eventNotificationTemplate->id;
+				$type = $eventNotificationTemplate->type;
+			}
+			elseif ($templateId)
 			{
 				$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->get($templateId);
 				$type = $eventNotificationTemplate->type;
@@ -69,12 +76,17 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 				return;
 			}
 			
-			$form->setAction($action->view->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateConfigureAction')));
+			$urlParams = array(
+				'controller' => 'plugin', 
+				'action' => 'EventNotificationTemplateConfigureAction',
+				'clone_template_id' => null,
+			);
+			if($templateId)
+				$urlParams['template_id'] = $templateId;
+				
+			$form->setAction($action->view->url($urlParams));
 			
-			$pager = new Kaltura_Client_Type_FilterPager();
-			$pager->pageSize = 100;
-			
-			if($templateId) // update
+			if($templateId) // update or clone
 			{
 				if ($request->isPost())
 				{
@@ -130,9 +142,11 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			}
 		}
 		Infra_ClientHelper::unimpersonate();
+		
 		$action->view->form = $form;
-	
+		$action->view->templateId = $templateId;
 		$action->view->plugins = array();
+		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
 		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)

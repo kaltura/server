@@ -51,6 +51,7 @@
 <script type="text/javascript">
 $(function(){
 	addSubTitle('Event notification templates');
+	switchTemplatesBox();
 });
 
 
@@ -92,7 +93,7 @@ function configure(partnerId, templateId) {
 		bgiframe: true,
 		modal: true,
 		resizable: false,
-		width: 600,
+		width: 900,
 		height: 600,
 		title: '<?php echo $this->translate('Template Setup Configuration'); ?>',
 		buttons: {
@@ -188,6 +189,68 @@ function updateStatus(partnerId, templateId, status, callback)
 	});
 }
 
+function cloneEventNotificationTemplate() {
+	var partnerId = jQuery('#newPartnerId').val();
+	if(isNaN(partnerId)){
+		alert("Partner ID is required");
+		return;
+	}
+	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplateConfigureAction', 'partner_id' => 'PARTNER_ID', 'clone_template_id' => '')); ?>' + jQuery('#cloneTemplateId').val();
+	url = url.replace('PARTNER_ID', partnerId);
+	
+	jQuery('#clone-dialog').remove();
+	dialogDiv = jQuery('<div id="clone-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 900,
+		height: 600,
+		title: '<?php echo $this->translate('Template Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery('.ui-widget-overlay').css('z-index', 1003 );
+				jQuery('#loader').show();
+				jQuery(this).find('#frmEventNotificationTemplateConfig').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery(this).dialog('destroy').remove();
+		}
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery('#frmEventNotificationTemplateConfig').ajaxForm({
+				success: newEventNotificationTemplateSuccess,
+				iframe: true
+			});
+		}
+	);
+}
+
+var templates = <?php echo json_encode($this->templates); ?>;
+function switchTemplatesBox() {
+
+	jQuery('#cloneTemplateId').find('option').remove();
+
+	var templateType = jQuery('#cloneTemplateType').val();	
+	if(templateType == null)
+		return;
+	
+	for(var i = 0; i < templates.length; i++){
+		if(templates[i].type == templateType)
+			jQuery('#cloneTemplateId').append('<option value="' + templates[i].id + '">' + templates[i].name + '</option>');
+	}
+}
+
 function newEventNotificationTemplate(partnerId, type) {
 	if(!partnerId.length || isNaN(partnerId)){
 		alert('<?php echo $this->translate('Partner id not supplied'); ?>');
@@ -198,18 +261,20 @@ function newEventNotificationTemplate(partnerId, type) {
 	url = url.replace('PARTNERID', partnerId);
 	url = url.replace('TYPE', type);
 	
-	jQuery('#partner-configure-dialog').remove();
+	jQuery('#template-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="template-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
 		bgiframe: true,
 		modal: true,
 		resizable: false,
-		width: 600,
+		width: 900,
 		height: 600,
 		title: '<?php echo $this->translate('Template Setup Configuration'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery('.ui-widget-overlay').css('z-index', 1003 );
+				jQuery('#loader').show();
 				jQuery(this).find('#frmEventNotificationTemplateConfig').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
@@ -224,7 +289,7 @@ function newEventNotificationTemplate(partnerId, type) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmEventNotificationTemplateConfig').ajaxForm({
+			jQuery('#frmEventNotificationTemplateConfig').ajaxForm({
 				success: newEventNotificationTemplateSuccess,
 				iframe: true
 			});
@@ -233,19 +298,13 @@ function newEventNotificationTemplate(partnerId, type) {
 }
 
 function newEventNotificationTemplateSuccess(html) {
-	if (jQuery(html).filter('#frmEventNotificationTemplateConfig').hasClass('valid')) 
-	{
-		dialogDiv.dialog('close');
-		jQuery('#frmPaginator1').submit();
-	}
-	else
-	{
-		jQuery('#frmEventNotificationTemplateConfig').parent().empty().append(html);
-		jQuery('#frmEventNotificationTemplateConfig').ajaxForm({
-			success: newEventNotificationTemplateSuccess,
-			iframe: true
-		});
-	}
+	jQuery('.ui-widget-overlay').css('z-index', 1000 );
+	jQuery('#loader').hide();
+	jQuery('#frmEventNotificationTemplateConfig').replaceWith(html);
+	jQuery('#frmEventNotificationTemplateConfig').ajaxForm({
+		success: newEventNotificationTemplateSuccess,
+		iframe: true
+	});
 }
 
 </script>

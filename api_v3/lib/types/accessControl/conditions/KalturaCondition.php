@@ -15,12 +15,18 @@ abstract class KalturaCondition extends KalturaObject
 	public $type;
 	
 	/**
+	 * @var string
+	 */
+	public $description;
+	
+	/**
 	 * @var bool
 	 */
 	public $not;
 	
 	private static $mapBetweenObjects = array
 	(
+		'description',
 		'not',
 	);
 	

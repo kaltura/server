@@ -206,11 +206,11 @@ class LiveStreamService extends KalturaEntryService
 		$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE" );
 		TrackEntry::addTrackEntry( $te );
 		
+		$dbEntry->save();
 		//If a jobData can be created for entry sourceType, add provision job. Otherwise, just save the entry.
 		$jobData = kProvisionJobData::getInstance($dbEntry->getSource());
 		if ($jobData)
 		{
-			$dbEntry->save();
 			/* @var $data kProvisionJobData */
 			$jobData->populateFromPartner($dbEntry->getPartner());
 			$jobData->populateFromEntry($dbEntry);
@@ -248,7 +248,12 @@ class LiveStreamService extends KalturaEntryService
 			{
 				case KalturaPlaybackProtocol::HLS:
 					KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
-					return $this->hlsUrlExistsRecursive($liveStreamEntry->getHlsStreamUrl());
+					$url = $liveStreamEntry->getHlsStreamUrl();
+					$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, 'protocol', $protocol);
+					if ($config)
+						$url = $config->getUrl();
+					$url = $this->getTokenizedUrl($id, $url, $protocol);
+					return $this->hlsUrlExistsRecursive($url);
 					break;
 					
 				case KalturaPlaybackProtocol::HDS:
@@ -256,8 +261,12 @@ class LiveStreamService extends KalturaEntryService
 					$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, "protocol", $protocol);
 					if ($config)
 					{
-						KalturaLog::info('Determining status of live stream URL [' .$config->getUrl() . ']');
-						return $this->hdsUrlExists($config->getUrl(). '?hdcore=' . kConf::get('hd_core_version'));
+						$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
+						if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
+							$url .= '?hdcore='.kConf::get('hd_core_version');
+						}
+						KalturaLog::info('Determining status of live stream URL [' .$url . ']');
+						return $this->hdsUrlExists($url);
 					}
 					break;
 			}
@@ -266,6 +275,28 @@ class LiveStreamService extends KalturaEntryService
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
 	}
 	
+	/**
+	 * 
+	 * get tokenized url if exists
+	 * @param string $entryId
+	 * @param string $url
+	 * @param string $protocol
+	 */
+	private function getTokenizedUrl($entryId, $url, $protocol){
+		$urlPath = parse_url($url, PHP_URL_PATH);
+		if (!$urlPath || substr($url, -strlen($urlPath)) != $urlPath)
+			return $url;
+		$urlPrefix = substr($url, 0, -strlen($urlPath));
+		$cdnHost = parse_url($url, PHP_URL_HOST);		
+		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $entryId);
+		if ($urlManager){
+			$urlManager->setProtocol($protocol);
+			$tokenizer = $urlManager->getTokenizer();
+			if ($tokenizer)
+				return $urlPrefix.$tokenizer->tokenizeSingleUrl($urlPath);
+		}
+		return $url;
+	}
 	
 	
 	/**
