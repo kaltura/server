@@ -262,7 +262,7 @@ class LiveStreamService extends KalturaEntryService
 					if ($config)
 					{
 						$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
-						if (in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
+						if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
 							$url .= '?hdcore='.kConf::get('hd_core_version');
 						}
 						KalturaLog::info('Determining status of live stream URL [' .$url . ']');
