@@ -1621,8 +1621,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
-			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC)
-				self::addEntryDistribution($entry, $distributionProfile, true);
+			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC) {
+				// Verify that an entry distribution doesn’t already exist
+				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
+				if(is_null($entryDistribution))
+					self::addEntryDistribution($entry, $distributionProfile, true);
+			}
 		
 		return true;
 	}
