@@ -190,7 +190,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		/* @var $srcObj kHttpNotificationDispatchJobData */
 		parent::fromObject($srcObj);
 		
-		if(is_null($this->data))
+		if(is_null($this->data) && $srcObj->getDataObject())
 		{
 			$dataObject = KalturaHttpNotificationData::getInstance($srcObj->getDataObject());
 			if($dataObject)
