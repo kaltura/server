@@ -130,7 +130,10 @@ class previewAction extends kalturaAction
 				$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
 			}
 		}
-		$embedParams['flashVars'] = $flashVars;
+		// Don't include flashvars if empty array
+		if( count($flashVars) ) {
+			$embedParams['flashVars'] = $flashVars;
+		}
 
 		// Export embedParams to our view
 		$this->embedParams = $embedParams;
