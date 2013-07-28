@@ -20,18 +20,12 @@ class KalturaVelocixProvisionJobData extends KalturaProvisionJobData
 	 */
 	public $password;
 	
-	/**
-	 * @var string
-	 */
-	public $streamName;
-	
 	
 	private static $map_between_objects = array
 	(
 		"provisioningParams",
 		"userName",
 		"password",
-		"streamName",
 	);
 
 	/* (non-PHPdoc)
