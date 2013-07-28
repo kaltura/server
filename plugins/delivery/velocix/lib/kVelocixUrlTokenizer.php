@@ -35,6 +35,8 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	}
 
 	private function getToken($path) {
+		$path_parts = pathinfo($path);
+		$path  = preg_replace('/'.$path_parts['basename'].'/', '*', $path);
 		// work out the expiry in Unix epoch seconds
 		$t_expiry = time() + $this->window;
 		// URL encode the parameters
@@ -45,6 +47,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 			$message.= "&pathURI=" . rawurlencode($hdsPath);
 		}
 		$message .= "&expiry=" . rawurlencode($t_expiry);
+		$message .= "&random=" . uniqid();
 		// Get the HMAC in hex using the default hash function (SHA-256)
 		$hmac = hash_hmac("sha256", $message, $this->secret, false);
 		// Concatenate the HMAC to the end of the path and Base64 encode.
