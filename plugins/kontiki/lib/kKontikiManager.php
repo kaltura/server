@@ -31,6 +31,8 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 				
 				break;
 		}
+
+		return true;
 		
 	}
 
