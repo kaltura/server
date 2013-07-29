@@ -1191,6 +1191,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$links = FileSyncPeer::doSelect($c);
 			$linkToatlCount += count($links);
 			
+			//check if any links were returned in the do select if not no need to continue
+			if(!$linkToatlCount)
+				continue;
+			
 			// choose the first link and convert it to file
 			$firstLink = array_shift($links);
 			/* @var $firstLink FileSync */
