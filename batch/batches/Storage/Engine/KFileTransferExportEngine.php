@@ -26,8 +26,8 @@ class KFileTransferExportEngine extends KExportEngine
 	/* (non-PHPdoc)
 	 * @see KExportEngine::export()
 	 */
-	function export() {
-
+	function export() 
+	{
 		KalturaLog::debug("starting export process");
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
@@ -36,7 +36,8 @@ class KFileTransferExportEngine extends KExportEngine
 			
 		$engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
 		
-		try{
+		try
+		{
 			$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
 		}
 		catch(Exception $e)
@@ -44,37 +45,33 @@ class KFileTransferExportEngine extends KExportEngine
 			throw new kTemporaryException($e->getMessage());
 		}
 	
-		try{
-			if (is_file($this->srcFile)){
+		try
+		{
+			if (is_file($this->srcFile))
+			{
 				$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
+				if(KBatchBase::$taskConfig->params->chmod)
+					$engine->chmod($this->destFile, KBatchBase::$taskConfig->params->chmod);
 			}
-			else if (is_dir($this->srcFile)){
+			else if (is_dir($this->srcFile))
+			{
 				$filesPaths = kFile::dirList($this->srcFile);
 				$destDir = $this->destFile;
-				foreach ($filesPaths as $filePath){
-					$destFile = $destDir.DIRECTORY_SEPARATOR.basename($filePath);
-					$engine->putFile($this->destFile, $filePath, $this->data->force);
+				foreach ($filesPaths as $filePath)
+				{
+					$destFile = $destDir . '/' . basename($filePath);
+					$engine->putFile($destFile, $filePath, $this->data->force);
+					if(KBatchBase::$taskConfig->params->chmod)
+						$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
 				}
 			}
 		}
-		
-		catch(kFileTransferMgrException $e){
+		catch(kFileTransferMgrException $e)
+		{
 			if($e->getCode() == kFileTransferMgrException::remoteFileExists)
 				throw new kApplicativeException(KalturaBatchJobAppErrors::FILE_ALREADY_EXISTS, $e->getMessage());
 			
 			throw new Exception($e->getMessage(), $e->getCode());
-		}
-		catch(Exception $e)
-		{
-			throw new Exception($e->getMessage(), $e->getCode());
-		}
-	
-		if(KBatchBase::$taskConfig->params->chmod)
-		{
-			try{
-				$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
-			}
-			catch(Exception $e){}
 		}
 		
 		return true;
