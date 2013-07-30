@@ -1439,7 +1439,7 @@ class category extends Basecategory implements IIndexable
 		if ($this->getParentId())
 		{	
 			$parent = $this->getParentCategory();
-			if(!$parent)
+			if($parent)
 				return $parent->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
 		}
 		return $this->getName();
