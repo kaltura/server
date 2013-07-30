@@ -440,9 +440,13 @@ class kMrssManager
 	 */
 	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
 	{
+		$instanceKey = $entry->getId();
+		if(!is_null($mrssParams))
+			$instanceKey .= md5(serialize($mrssParams));
+		
 		if(is_null($mrss))
 		{
-			$mrss = self::getInstanceFromPool($entry->getId());
+			$mrss = self::getInstanceFromPool($instanceKey);
 			if($mrss)
 				return $mrss;
 				
@@ -524,7 +528,7 @@ class kMrssManager
 				break;
 		}
 			
-		$assets = assetPeer::retrieveReadyByEntryId($entry->getId());
+		$assets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, $mrssParams->getStatuses());
 		foreach($assets as $asset)
 		{
 			if ($mrssParams &&
@@ -572,7 +576,7 @@ class kMrssManager
 		{
 			self::addExtendingItemsToMrss($mrss, $mrssParams);
 		}
-		self::addInstanceToPool($entry->getId(), $mrss);
+		self::addInstanceToPool($instanceKey, $mrss);
 		return $mrss;
 	}
 	
@@ -618,9 +622,13 @@ class kMrssManager
 	 */
 	public static function getCategoryMrssXml (category $category, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null, $features = null)
 	{
+		$instanceKey = $category->getId();
+		if(!is_null($mrssParams))
+			$instanceKey .= md5(serialize($mrssParams));
+		
 		if(is_null($mrss))
 		{
-			$mrss = self::getInstanceFromPool($category->getId());
+			$mrss = self::getInstanceFromPool($instanceKey);
 			if($mrss)
 				return $mrss;
 				
@@ -678,7 +686,7 @@ class kMrssManager
 			self::addExtendingItemsToMrss($mrss, $mrssParams);
 		}
 		
-		
+		self::addInstanceToPool($instanceKey, $mrss);
 		return $mrss;
 	}
 	
