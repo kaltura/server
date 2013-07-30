@@ -17,11 +17,6 @@ class kKontikiStorageDeleteJobData extends kStorageDeleteJobData
      */
     protected $serviceToken;
     
-    /**
-     * @var string
-     */
-    protected $entryPoint;
-
 
     public function setContentMoid($contentMoid) 
     {
@@ -31,16 +26,6 @@ class kKontikiStorageDeleteJobData extends kStorageDeleteJobData
     public function getContentMoid() 
     {
         return $this->contentMoid;
-    }
-    
-    public function setEntryPoint($v) 
-    {
-        $this->entryPoint = $v;
-    }
-
-    public function getEntryPoint() 
-    {
-        return $this->entryPoint;
     }
     
     public function setServiceToken($v) 
@@ -56,7 +41,7 @@ class kKontikiStorageDeleteJobData extends kStorageDeleteJobData
     public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
     {
         /* @var $externalStorage KontikiStorageProfile */
-        $this->setEntryPoint($externalStorage->getApiEntryPoint()); 
+        $this->setServerUrl($externalStorage->getStorageUrl()); 
         $this->setServiceToken($externalStorage->getServiceToken()); 
         if ($fileSync->getObjectType() != FileSyncObjectType::ASSET)
             throw new kCoreException("Incompatible filesync type", kCoreException::INTERNAL_SERVER_ERROR);

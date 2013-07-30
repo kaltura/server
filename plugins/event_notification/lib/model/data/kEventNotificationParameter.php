@@ -10,6 +10,11 @@ class kEventNotificationParameter
 	 * @var string
 	 */
 	protected $key;
+
+	/**
+	 * @var string
+	 */
+	protected $description;
 	
 	/**
 	 * The value that replace the key 
@@ -31,6 +36,22 @@ class kEventNotificationParameter
 	public function getValue()
 	{
 		return $this->value;
+	}
+
+	/**
+	 * @return string $description
+	 */
+	public function getDescription() 
+	{
+		return $this->description;
+	}
+
+	/**
+	 * @param string $description
+	 */
+	public function setDescription($description) 
+	{
+		$this->description = $description;
 	}
 
 	/**

@@ -5,7 +5,7 @@
  * @package plugins.httpNotification
  * @subpackage model.data
  */
-class kHttpNotificationObjectField extends kStringField
+class kHttpNotificationObjectData extends kHttpNotificationData
 {
 	/**
 	 * Kaltura API object type
@@ -30,42 +30,34 @@ class kHttpNotificationObjectField extends kStringField
 	 * @var string
 	 */
 	protected $code;
+	
+	/**
+	 * Serialized object
+	 * @var string
+	 */
+	protected $coreObject;
 
 	/* (non-PHPdoc)
-	 * @see kStringField::setScope()
+	 * @see kHttpNotificationData::setScope()
 	 */
 	public function setScope(kScope $scope) 
 	{
-		parent::setScope($scope);
-			
-		$object = $this->getFieldValue($scope);
-		if(is_object($object))
-			$this->value = serialize($object);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see kStringField::getFieldValue()
-	 */
-	protected function getFieldValue(kScope $scope = null) 
-	{
-		if(!$scope)
-			return null;
-		
 		if(strpos($this->code, ';') !== false)
 			throw new kCoreException("Evaluated code may be simple value only");
 			
-		return eval("return {$this->code};");
+		$object = eval("return {$this->code};");
+		if(is_object($object))
+			$this->coreObject = serialize($object);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see kStringValue::getValue()
+	/**
+	 * @return string
 	 */
-	public function getValue() 
+	public function getCoreObject() 
 	{
-		if($this->value)
-			return $this->value;
+		return $this->coreObject;
 	}
-	
+
 	/**
 	 * @return string $objectType
 	 */

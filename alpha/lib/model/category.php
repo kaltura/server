@@ -130,8 +130,8 @@ class category extends Basecategory implements IIndexable
 			if ($this->inheritance_type == InheritanceType::MANUAL &&
 				$this->old_inheritance_type == InheritanceType::INHERIT)
 			{
-				if($this->old_parent_id)
-					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->old_parent_id);
+				if($this->parent_id)
+					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->parent_id);
 				if($categoryToCopyInheritedFields)
 					$this->copyInheritedFields($categoryToCopyInheritedFields);
 					
@@ -728,7 +728,9 @@ class category extends Basecategory implements IIndexable
 		$parentsIds = array();
 		if ($this->getParentId()){
 			$parentsIds[] = $this->getParentId();
-			$parentsIds = array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
+			$parent = $this->getParentCategory();
+			if($parent)
+				$parentsIds = array_merge($parentsIds, $parent->getAllParentsIds());
 		}
 
 		return $parentsIds;
@@ -1434,11 +1436,13 @@ class category extends Basecategory implements IIndexable
 	
 	private function getActuallFullName()
 	{
-		if (!$this->getParentId())
-			return $this->getName();
-			
-			
-		return $this->getParentCategory()->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
+		if ($this->getParentId())
+		{	
+			$parent = $this->getParentCategory();
+			if(!$parent)
+				return $this->getParentCategory()->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
+		}
+		return $this->getName();
 	}
 	
 	/**

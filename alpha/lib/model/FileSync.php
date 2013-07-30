@@ -73,9 +73,11 @@ class FileSync extends BaseFileSync
 		$url = $urlManager->getFileSyncUrl($this);
 		
 		if ($format == PlaybackProtocol::RTMP)
-			return $storage->getDeliveryRmpBaseUrl() . '/' . $url;
-			
-		return $storage->getDeliveryHttpBaseUrl() . '/' . $url;
+			$baseUrl = $storage->getDeliveryRmpBaseUrl();
+		else 
+			$baseUrl = $storage->getDeliveryHttpBaseUrl();
+		
+		return rtrim($baseUrl, '/') . '/' . ltrim($url, '/');
 	}
 	
 	public function getSmoothStreamUrl()

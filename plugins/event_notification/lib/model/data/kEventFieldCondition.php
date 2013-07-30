@@ -3,8 +3,25 @@
  * @package plugins.eventNotification
  * @subpackage model.data
  */
-class kEventFieldCondition extends kEventCondition
+class kEventFieldCondition extends kCondition
 {
+	/* (non-PHPdoc)
+	 * @see kCondition::__construct()
+	 */
+	public function __construct($not = false)
+	{
+		$this->setType(EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD));
+		parent::__construct($not);
+	}
+
+	/**
+	 * Needed in order to migrate old kEventFieldCondition that serialized before kCondition defined as parent class
+	 */
+	public function __wakeup()
+	{
+		$this->setType(EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD));
+	}
+	
 	/**
 	 * The field to evaluate against the values
 	 * @var kBooleanField
@@ -12,9 +29,9 @@ class kEventFieldCondition extends kEventCondition
 	private $field;
 
 	/* (non-PHPdoc)
-	 * @see kEventCondition::fulfilled()
+	 * @see kCondition::internalFulfilled()
 	 */
-	public function fulfilled(kEventScope $scope)
+	protected function internalFulfilled(kScope $scope)
 	{
 		$this->field->setScope($scope);
 		return $this->field->getValue();

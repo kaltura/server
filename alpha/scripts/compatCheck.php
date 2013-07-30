@@ -525,9 +525,36 @@ function countDifferences($buffer1, $buffer2)
 	}
 	return $result;
 }
-function uncompressWidget($buffer)
+
+
+define('KWIDGET_API_START', '<xml><result>');
+define('KWIDGET_API_END', '</result></xml>');
+define('KWIDGET_PARAMS_START', 'widgetId=');
+
+function parseWidget($buffer)
 {
-	return gzuncompress(substr($buffer, 8));
+	$uncomp = gzuncompress(substr($buffer, 8));
+	
+	$apiResponseStart = strpos($uncomp, KWIDGET_API_START);
+	$apiResponseEnd = strrpos($uncomp, KWIDGET_API_END);
+	$apiResponse = null;
+	if ($apiResponseStart !== false && $apiResponseEnd !== false)
+	{
+		$apiResponse = substr($uncomp, $apiResponseStart, $apiResponseEnd + strlen(KWIDGET_API_END) - $apiResponseStart);
+		$uncomp = str_replace($apiResponse, '', $uncomp);
+	}
+		
+	$paramsStart = strpos($uncomp, KWIDGET_PARAMS_START);
+	$params = null;
+	if ($paramsStart !== false)
+	{ 
+		$paramsLen = unpack('V', substr($uncomp, $paramsStart - 10, 4));
+		$params = substr($uncomp, $paramsStart, $paramsLen[1]);
+		$uncomp = str_replace($params, '', $uncomp);
+		$params = normalizeResultBuffer($params);
+	}
+	
+	return array($uncomp, $apiResponse, $params);
 }
 
 function compareResults($resultNew, $resultOld)
@@ -675,9 +702,15 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 		switch ($compareMode)
 		{
 		case CM_WIDGET:
-			$resultOld = uncompressWidget($resultOld);
-			$resultNew = uncompressWidget($resultNew);
-
+			list($uncompOld, $apiResponseOld, $paramsOld) = parseWidget($resultOld);
+			list($uncompNew, $apiResponseNew, $paramsNew) = parseWidget($resultNew);
+			$errors = compareResults($apiResponseNew, $apiResponseOld);
+			if (countDifferences($uncompNew, $uncompOld) > MAX_BINARY_DIFFS)
+				$errors[] = 'Data does not match - size='.strlen($uncompNew);
+			if ($paramsOld != $paramsNew)
+				$errors[] = 'Params dont match - new='.$paramsNew.' old='.$paramsOld;
+			break;
+				
 		case CM_BINARY:
 			$resultOld = normalizeResultBuffer($resultOld);
 			$resultNew = normalizeResultBuffer($resultNew);

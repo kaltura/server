@@ -21,10 +21,17 @@ class KalturaMatchMetadataCondition extends KalturaMatchCondition
 	 */
 	public $profileId;
 	
+	/**
+	 * Metadata profile system name
+	 * @var string
+	 */
+	public $profileSystemName;
+	
 	private static $mapBetweenObjects = array
 	(
 		'xPath',
 		'profileId',
+		'profileSystemName',
 	);
 
 	/**
@@ -35,9 +42,23 @@ class KalturaMatchMetadataCondition extends KalturaMatchCondition
 		$this->type = MetadataPlugin::getApiValue(MetadataConditionType::METADATA_FIELD_MATCH);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaMatchCondition::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage()
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+		
+		$this->validatePropertyNotNull('xPath');
+		$this->validatePropertyNotNull(array('profileId', 'profileSystemName'));
 	}
 	
 	/* (non-PHPdoc)
@@ -45,9 +66,6 @@ class KalturaMatchMetadataCondition extends KalturaMatchCondition
 	 */
 	public function toObject($dbObject = null, $skip = array())
 	{
-		$this->validatePropertyNotNull('xPath');
-		$this->validatePropertyNotNull('profileId');
-		
 		if(!$dbObject)
 			$dbObject = new kMatchMetadataCondition();
 			

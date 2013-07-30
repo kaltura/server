@@ -19,13 +19,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig)
+	public function configure()
 	{
-		parent::configure($taskConfig);
+		parent::configure();
 		
-		if($taskConfig->params->tempXmlPath)
+		if(KBatchBase::$taskConfig->params->tempXmlPath)
 		{
-			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
+			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
 				mkdir($this->tempXmlPath, 0777, true);
 		}
@@ -35,10 +35,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$this->tempXmlPath = sys_get_temp_dir();
 		}
 		
-		if (isset($taskConfig->params->youtubeApi))
+		if (isset(KBatchBase::$taskConfig->params->youtubeApi))
 		{
-			if (isset($taskConfig->params->youtubeApi->timeout))
-				$this->timeout = $taskConfig->params->youtubeApi->timeout;
+			if (isset(KBatchBase::$taskConfig->params->youtubeApi->timeout))
+				$this->timeout = KBatchBase::$taskConfig->params->youtubeApi->timeout;
 		}
 		
 		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');

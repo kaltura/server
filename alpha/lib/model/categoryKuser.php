@@ -33,6 +33,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		
 	private static $indexFieldsMap = null;
 	
+	const STATUS_FIELD_PREFIX = "status";
+	
 	
 	
 	/**
@@ -351,7 +353,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getSearchIndexStatus ()
 	{
-		return self::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $this->getStatus(), $this->getPartnerId());
+		return self::STATUS_FIELD_PREFIX ." ". self::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $this->getStatus(), $this->getPartnerId());
 	}
 	
 	/**

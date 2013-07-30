@@ -21,8 +21,9 @@ $c->setLimit(10000);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 //$sphinxCon = DbManager::getSphinxConnection();
-
+categoryKuserPeer::setUseCriteriaFilter(false);
 $categoryKusers = categoryKuserPeer::doSelect($c, $con);
+categoryKuserPeer::setUseCriteriaFilter(true);
 $sphinx = new kSphinxSearchManager();
 while(count($categoryKusers))
 {

@@ -18,6 +18,12 @@ class kLiveStreamConfiguration
 	 */
 	protected $url;
 	
+	
+	/**
+	 * @var string
+	 */
+	protected $publishUrl;
+	
 	/**
 	 * @return string $protocol
 	 */
@@ -45,7 +51,21 @@ class kLiveStreamConfiguration
 	public function setUrl($url) {
 		$this->url = $url;
 	}
-	
+
+	/**
+	 * @return string $publishUrl
+	 */
+	public function getPublishUrl() {
+		return $this->publishUrl;
+	}
+
+	/**
+	 * @param string $publishUrl
+	 */
+	public function setPublishUrl($publishUrl) {
+		$this->publishUrl = $publishUrl;
+	}
+
 	/**
 	 * Function extracts the first item in the array where the property $propertyName has the value $propertyValue
 	 * @param entry $liveStreamEntry

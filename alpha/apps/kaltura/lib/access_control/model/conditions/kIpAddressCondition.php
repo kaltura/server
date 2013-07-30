@@ -17,9 +17,8 @@ class kIpAddressCondition extends kMatchCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	public function getFieldValue(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
 		kApiCache::addExtraField(kApiCache::ECF_IP, kApiCache::COND_IP_RANGE, $this->getStringValues($scope));
 		return $scope->getIp();	
 	}
