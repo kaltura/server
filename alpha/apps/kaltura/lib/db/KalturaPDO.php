@@ -152,7 +152,7 @@ class KalturaPDO extends PropelPDO
 			$result = $stmt->fetchAll($fetchStyle);
 		
 		if(!$result)
-			return array();
+			$result = array();
 			
 		$filteredResult = kApiCache::filterQueryResult($result, $filter);
 		
