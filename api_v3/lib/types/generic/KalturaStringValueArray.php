@@ -18,11 +18,17 @@ class KalturaStringValueArray extends KalturaTypedArray
 		{
 			foreach($strings as $string)
 			{
-				if($string instanceof kStringValue)
-					$string = $string->getValue();
-					
 				$stringObject = new KalturaStringValue();
-				$stringObject->value = $string;
+				
+				if($string instanceof kValue)
+				{
+					$stringObject->fromObject($string);
+				}
+				else
+				{					
+					$stringObject->value = $string;
+				}
+				
 				$stringArray[] = $stringObject;
 			}
 		}
