@@ -131,7 +131,7 @@ class category extends Basecategory implements IIndexable
 				$this->old_inheritance_type == InheritanceType::INHERIT)
 			{
 				if($this->parent_id)
-					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->parent_id);
+					$categoryToCopyInheritedFields = $this->getInheritParent();
 				if($categoryToCopyInheritedFields)
 					$this->copyInheritedFields($categoryToCopyInheritedFields);
 					
