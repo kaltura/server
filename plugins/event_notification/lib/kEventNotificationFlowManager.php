@@ -41,9 +41,8 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 			$type = $notificationTemplate->getType();
 			$jobData = $notificationTemplate->getJobData($scope);
 			self::addEventNotificationDispatchJob($type, $jobData, $scope->getPartnerId(), $entryId, $parentJob);
-			
-			return true;
 		}
+		return true;
 	}
 
 	/**
