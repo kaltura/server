@@ -1177,6 +1177,7 @@ class category extends Basecategory implements IIndexable
 		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
 		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
 		$this->setKuserId($oldParentCategory->getKuserId());
+		$this->setPuserId($oldParentCategory->getPuserId());
 		$this->reSetMembersCount(); //removing all members from this category
 		$this->reSetPendingMembersCount();
 	}
