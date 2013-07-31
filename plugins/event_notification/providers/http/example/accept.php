@@ -2,7 +2,7 @@
 $serverRoot = realpath(__DIR__ . '/../../../../../');
 
 require_once($serverRoot . '/tests/lib/KalturaClient.php');
-require_once($serverRoot . '/tests/lib/KalturaPlugins/KalturaEventNotificationClientPlugin.php');
+require_once($serverRoot . '/tests/lib/KalturaPlugins/KalturaHttpNotificationClientPlugin.php');
 
 if(!isset($_GET['type']))
 {

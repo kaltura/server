@@ -168,38 +168,61 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			foreach($properties as $property => $value)
 			{
 				$matches = null;
-				if(preg_match('/userParameterKey_(\d+)$/', $property, $matches))
+				$subMatches = null;
+				if(preg_match('/^userParameterKey_(\d+)$/', $property, $matches))
 				{
 					$index = $matches[1];
-					$field = new Kaltura_Client_Type_StringValue();
-					$field->value = $properties["userParameterValue_{$index}"];
 					
-					$userParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
+					$userParameter = null;
+					if(isset($properties["userParameterValue_{$index}"]))
+					{
+						$field = new Kaltura_Client_Type_StringValue();
+						$field->value = $properties["userParameterValue_{$index}"];
+						
+						$userParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
+						$userParameter->value = $field;
+					}
+					else
+					{
+						$userParameter = new Kaltura_Client_EventNotification_Type_EventNotificationArrayParameter();
+						$userParameter->allowedValues = array();
+						$userParameter->values = array();
+						
+						foreach($properties as $subProperty => $subValue)
+						{
+							if($subValue && preg_match("/^userParameterItem_{$index}_(\d+)$/", $subProperty))
+							{
+								$string = new Kaltura_Client_Type_String();
+								$string->value = $subValue;
+								$userParameter->values[] = $string;
+							}
+							elseif(preg_match("/^userParameterAllowedValue_{$index}_(\d+)$/", $subProperty, $subMatches))
+							{
+								$subIndex = $subMatches[1];
+								
+								$description = null;
+								if(isset($properties["userParameterAllowedDescription_{$index}_$subIndex"]))
+									$description = $properties["userParameterAllowedDescription_{$index}_$subIndex"];
+									
+								$string = new Kaltura_Client_Type_StringValue();
+								$string->value = $subValue;
+								$string->description = $description;
+								$userParameter->allowedValues[] = $string;
+							}
+						}
+					}
+					
+					$description = null;
+					if(isset($properties["userParameterDescription_{$index}"]))
+						$description = $properties["userParameterDescription_{$index}"];
+						
 					$userParameter->key = $value;
-					$userParameter->value = $field;
-					
+					$userParameter->description = $description;
 					$userParameters[] = $userParameter;
 				}
 			}
 			
-			if(isset($properties['userParameterKey']) && is_array($properties['userParameterKey']))
-			{
-				foreach($properties['userParameterKey'] as $index => $value)
-				{
-					$field = new Kaltura_Client_Type_StringValue();
-					$field->value = $properties['userParameterValue'][$index];
-					
-					$userParameter = new Kaltura_Client_EventNotification_Type_EventNotificationParameter();
-					$userParameter->key = $value;
-					$userParameter->value = $field;
-					
-					$userParameters[] = $userParameter;
-				}
-				
-				KalturaLog::debug("Set user parameters [" . print_r($userParameters, true) . "]");
-				if(count($userParameters))
-					$object->userParameters = $userParameters;
-			}
+			$object->userParameters = $userParameters;
 		}
 		
 		return $object;
@@ -297,6 +320,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 				
 		$this->addElement('hidden', 'type', array(
 			'value'			=> $this->templateType,
+			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		));
 	}
 	
@@ -305,21 +329,8 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 	 */
 	protected function addUserParameter(Kaltura_Client_EventNotification_Type_EventNotificationParameter $parameter)
 	{
-		$this->addElement('text', "userParameterKey_{$this->userParametersCount}", array(
-			'label'			=> 'Key:',
-			'readonly'		=> true,
-			'value'			=> $parameter->key,
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-	
-		$this->addElement('text', "userParameterValue_{$this->userParametersCount}", array(
-			'label'			=> 'Value:',
-			'value'			=> $parameter->value->value,
-			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-		));
-		
 		$elements = array();
-		
+	
 		if($parameter->description)
 		{
 			$element = new Infra_Form_Html("userParameterDesciption_{$this->userParametersCount}", array(
@@ -330,9 +341,59 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 			$elements[] = "userParameterDesciption_{$this->userParametersCount}";
 		}
 		
+		$this->addElement('hidden', "userParameterDescription_{$this->userParametersCount}", array(
+			'value'			=> $parameter->description,
+			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
+		));
+		
+		$this->addElement('text', "userParameterKey_{$this->userParametersCount}", array(
+			'label'			=> 'Key:',
+			'readonly'		=> true,
+			'value'			=> $parameter->key,
+			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+		));
 		$elements[] = "userParameterKey_{$this->userParametersCount}";
-		$elements[] = "userParameterValue_{$this->userParametersCount}"; 
-		$elements[] = "removeUserParameterButton_{$this->userParametersCount}";
+	
+		if($parameter instanceof Kaltura_Client_EventNotification_Type_EventNotificationArrayParameter)
+		{
+			$values = array();
+			foreach($parameter->values as $value)
+			{
+				/* @var $value Kaltura_Client_Type_String */
+				$values[] = $value->value;
+			}
+			
+			foreach($parameter->allowedValues as $index => $allowedValue)
+			{
+				/* @var $allowedValue Kaltura_Client_Type_StringValue */
+				
+				$this->addElement('checkbox', "userParameterItem_{$this->userParametersCount}_$index", array(
+					'label'			=> $allowedValue->description,
+					'checkedValue'	=> $allowedValue->value,
+					'checked'		=> in_array($allowedValue->value, $values),
+					'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt'))),
+				));
+				$elements[] = "userParameterItem_{$this->userParametersCount}_$index";
+				
+				$this->addElement('hidden', "userParameterAllowedValue_{$this->userParametersCount}_$index", array(
+					'value'	=> $allowedValue->value,
+					'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
+				));
+				$this->addElement('hidden', "userParameterAllowedDescription_{$this->userParametersCount}_$index", array(
+					'value'	=> $allowedValue->description,
+					'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
+				));
+			}
+		}
+		else
+		{
+			$this->addElement('text', "userParameterValue_{$this->userParametersCount}", array(
+				'label'			=> 'Value:',
+				'value'			=> $parameter->value->value,
+				'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
+			));
+			$elements[] = "userParameterValue_{$this->userParametersCount}"; 
+		}
 		
 		$this->addDisplayGroup($elements, 
 			"frmUserParameter_{$this->userParametersCount}", 

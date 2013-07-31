@@ -13,6 +13,11 @@ abstract class kValue
 	protected $value;
 	
 	/**
+	 * @var string
+	 */
+    protected $description;
+	
+	/**
 	 * @return int|string
 	 */
 	abstract public function getValue();
@@ -21,4 +26,20 @@ abstract class kValue
 	 * @param int|string $value
 	 */
 	abstract public function setValue($value);
+	
+	/**
+	 * @return string $description
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
+
+	/**
+	 * @param string $description
+	 */
+	public function setDescription($description)
+	{
+		$this->description = $description;
+	}
 }

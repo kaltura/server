@@ -8,11 +8,20 @@
  */
 abstract class KalturaValue extends KalturaObject
 {
+	/**
+	 * @var string
+	 */
+    public $description;
+    
 	private static $mapBetweenObjects = array
 	(
 		"value",
+		"description",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);

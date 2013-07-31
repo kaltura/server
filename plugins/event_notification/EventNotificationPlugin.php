@@ -122,6 +122,9 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 		{
 			if($enumValue == EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD))
 				return new KalturaEventFieldCondition();
+				
+			if($enumValue == EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_OBJECT_CHANGED))
+				return new KalturaEventObjectChangedCondition();
 		}
 		
 		return null;
