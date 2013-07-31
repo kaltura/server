@@ -651,6 +651,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * @action getUrl
 	 * @param string $id
 	 * @param int $storageId
+	 * @param bool $forceDump
 	 * @return string
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
