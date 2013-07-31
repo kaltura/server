@@ -890,12 +890,22 @@ class category extends Basecategory implements IIndexable
 				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
 		}
 		
+		//Add indexed permission_names
+		$permissionNamesByMembers = array();
+		foreach ($members as $member)
+		{
+			/* @var $member kuser */
+			$permissionNames = explode(",", $member->getPermissionNames());
+			$permissionNamesByMembers[] = implode(" ".$member->getId()."_", $permissionNames);
+		}
+		
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
 		{
 			$permissionLevelByName = self::getPermissionLevelName($permissionLevel);
 			$membersIds[] = $permissionLevelByName . '_' . implode(' ' . $permissionLevelByName . '_', $membersIdByPermission);
 			$membersIds[] = implode(' ', $membersIdByPermission);
+			$memberIds[] = implode(' ', $permissionNamesByMembers);
 		}
 		
 		return implode(' ', $membersIds);
