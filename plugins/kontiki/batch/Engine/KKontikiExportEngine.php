@@ -30,7 +30,7 @@ class KKontikiExportEngine extends KExportEngine
 	public function export() 
 	{
 		KBatchBase::impersonate($this->partnerId);
-		$url = KBatchBase::$kClient->flavorAsset->getUrl($this->data->flavorAssetId);
+		$url = KBatchBase::$kClient->flavorAsset->getUrl($this->data->flavorAssetId, null, true);
 		$kontikiResult = $this->kontikiAPIWrapper->addKontikiUploadResource(KontikiPlugin::SERVICE_TOKEN_PREFIX . base64_encode($this->data->serviceToken), $url);
 		KalturaLog::info("Upload result: $result");
         
