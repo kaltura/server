@@ -6,7 +6,7 @@
 abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQuery
 {
 	const RANKER_NONE = 'none';
-	const RANKER_SPH04 = 'sph04';
+	const RANKER_BM25 = 'BM25';
 	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
 	
@@ -552,7 +552,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$this->ranker = self::RANKER_NONE;
 		if ($usesWeight)
 		{
-			$this->ranker = self::RANKER_SPH04;
+			$this->ranker = self::RANKER_BM25;
 		}
 		
 		$index = $this->getSphinxIndexName();
