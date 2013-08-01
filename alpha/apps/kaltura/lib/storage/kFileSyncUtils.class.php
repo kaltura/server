@@ -1175,7 +1175,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSyncList = FileSyncPeer::doSelect($c);
 		foreach($fileSyncList as $fileSync)
 		{
-			$linkToatlCount = 0;
+			$linkTotalCount = 0;
 			/* @var $fileSync FileSync */
 
 			// for each source, find its links and fix them
@@ -1189,10 +1189,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->setLimit(100);
 
 			$links = FileSyncPeer::doSelect($c);
-			$linkToatlCount += count($links);
 			
 			//check if any links were returned in the do select if not no need to continue
-			if(!$linkToatlCount)
+			if(!count($links))
 				continue;
 			
 			// choose the first link and convert it to file
@@ -1211,6 +1210,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 			while(count($links))
 			{
+				$linkTotalCount += count($links);
 				// change all the rest of the links to point on the new file sync
 				foreach($links as $link)
 				{
@@ -1226,7 +1226,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 			if($firstLink)
 			{
-				$firstLink->setLinkCount($linkToatlCount);
+				$firstLink->setLinkCount($linkTotalCount);
 			}
 		}
 	}
