@@ -13,7 +13,7 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 				$data = $dbBatchJob->getData();
                 /* @var $data kKontikiStorageExportJobData */
                 $asset = assetPeer::retrieveById($data->getFlavorAssetId());
-                $asset->addTags(KontikiPlugin::KONTIKI_ASSET_TAG);
+                $asset->addTags(array(KontikiPlugin::KONTIKI_ASSET_TAG));
                 $asset->save();
                 //Get Kontiki file sync and set the external URL
                 $filesyncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
