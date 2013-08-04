@@ -31,11 +31,11 @@ ob_start();
 
 require_once(__DIR__ . "/../bootstrap.php");
 
+KalturaLog::setContext("syndicationFeedRenderer");
+
 // Database
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
-
-KalturaLog::setContext("syndicationFeedRenderer");
 
 KalturaLog::debug(">------------------------------------- syndicationFeedRenderer -------------------------------------");
 KalturaLog::info("syndicationFeedRenderer-start ");
