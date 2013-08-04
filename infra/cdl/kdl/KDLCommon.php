@@ -312,6 +312,7 @@
 		const PackageMovOnly = 1106;
 		const DnxhdUnsupportedParams = 1107;
 		const InvalidRequest = 1108;
+		const InvalidFlavorParamConfiguration = 1109;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -349,6 +350,9 @@
 					break;
 				case self::InvalidRequest:
 					$str = $err."#Invalid request ($param1).";
+					break;
+				case self::InvalidFlavorParamConfiguration:
+					$str = "#Invalid configured flavor param - Empty container";
 					break;
 				case self::Other:
 				default:
