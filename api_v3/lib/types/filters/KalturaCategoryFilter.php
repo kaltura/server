@@ -59,6 +59,11 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	 */
 	public $ancestorIdIn;
 	
+	/**
+	 * @var string
+	 */
+	public $idOrInheritedParentIdIn;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
