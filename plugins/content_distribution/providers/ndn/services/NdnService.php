@@ -6,7 +6,7 @@
  * @package plugins.ndnDistribution
  * @subpackage api.services
  */
-class NdnService extends KalturaBaseService
+class NdnService extends ContentDistributionServiceBase
 {
 	/**
 	 * @action getFeed
@@ -17,67 +17,38 @@ class NdnService extends KalturaBaseService
 	 */
 	public function getFeedAction($distributionProfileId, $hash)
 	{
-		if (!$this->getPartnerId() || !$this->getPartner())
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId());
-			
-		$profile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if (!$profile || !$profile instanceof NdnDistributionProfile)
-			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-
-		if ($profile->getStatus() != KalturaDistributionProfileStatus::ENABLED)
-			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);
-
-		if ($profile->getUniqueHashForFeedUrl() != $hash)
-			throw new KalturaAPIException(NdnDistributionErrors::INVALID_FEED_URL);
-
-		// "Creates advanced filter on distribution profile
-		$distributionAdvancedSearch = new ContentDistributionSearchFilter();
-		$distributionAdvancedSearch->setDistributionProfileId($profile->getId());
-		$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
-		$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
-		$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
-		$distributionAdvancedSearch->setHasEntryDistributionValidationErrors(false);
-			
-		//Creates entry filter with advanced filter
-		$entryFilter = new entryFilter();
-		$entryFilter->setStatusEquel(entryStatus::READY);
-		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerSearchScope($this->getPartnerId());
-		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
-		
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-		$entryFilter->attachToCriteria($baseCriteria);
-		$entries = entryPeer::doSelect($baseCriteria);
+		$this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash);
+	}
+	
+	public function getProfileClass() {
+		return new NdnDistributionProfile();
+	}
+	
+	protected function createFeedGenerator($context) {
+		$context->lastBuildDate = $this->profile->getUpdatedAt(null);
 		
 		$feed = new NdnFeed('ndn_template.xml');
-		$feed->setDistributionProfile($profile);		
+		$feed->setDistributionProfile($this->profile);		
 		$feed->setChannelFields();
-		$lastBuildDate = $profile->getUpdatedAt(null);
-		foreach($entries as $entry)
-		{
-			/* @var $entry entry */
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
-			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
-				continue;
-			}
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));								
-			$feed->addItem($fields, $flavorAssets, $thumbAssets, $entry);				
-			//getting last build date
-			if ($entry->getUpdatedAt(null) > $lastBuildDate)
-			{
-				$lastBuildDate = $entry->getUpdatedAt(null);
-			}
+		return $feed;
+	}
+	
+	protected function handleEntry($context, $feed, entry $entry, Entrydistribution $entryDistribution)
+	{
+		$fields = $this->profile->getAllFieldValues($entryDistribution);
+		$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
+		$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));				
+		$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $entry);	
+		
+		if ($entry->getUpdatedAt(null) > $this->lastBuildDate) {
+			$context->lastBuildDate = $entry->getUpdatedAt(null);
 		}
-		//updating last build date
-		$feed->setChannelLastBuildDate($lastBuildDate);		
-		header('Content-Type: text/xml');
-		echo $feed->getXml();
-		die;
+
+		return $xml;
 	}	
 	
+	protected function doneFeedGeneration ($context, $feed) {
+		$feed->setChannelLastBuildDate($context->lastBuildDate);
+		parent::doneFeedGeneration($context, $feed);
+	}
 }

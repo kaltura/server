@@ -6,7 +6,7 @@
  * @package plugins.uverseClickToOrderDistribution
  * @subpackage api.services
  */
-class UverseClickToOrderService extends KalturaBaseService
+class UverseClickToOrderService extends ContentDistributionServiceBase
 {
 	/**
 	 * @action getFeed
@@ -17,67 +17,48 @@ class UverseClickToOrderService extends KalturaBaseService
 	 */
 	public function getFeedAction($distributionProfileId, $hash)
 	{
-		if (!$this->getPartnerId() || !$this->getPartner())
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId());
-			
-		$profile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if (!$profile || !$profile instanceof UverseClickToOrderDistributionProfile)
-			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-
-		if ($profile->getStatus() != KalturaDistributionProfileStatus::ENABLED)
-			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);
-
-		if ($profile->getUniqueHashForFeedUrl() != $hash)
-			throw new KalturaAPIException(UverseClickToOrderDistributionErrors::INVALID_FEED_URL);
-		
-		// "Creates advanced filter on distribution profile
-		$distributionAdvancedSearch = new ContentDistributionSearchFilter();
-		$distributionAdvancedSearch->setDistributionProfileId($profile->getId());
-		$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
-		$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
-		$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
-		$distributionAdvancedSearch->setHasEntryDistributionValidationErrors(false);
-			
-		//Creates entry filter with advanced filter
-		$entryFilter = new entryFilter();
-		$entryFilter->setStatusEquel(entryStatus::READY);
-		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerSearchScope($this->getPartnerId());
-		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
-		
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-		$entryFilter->attachToCriteria($baseCriteria);
-		$baseCriteria->addDescendingOrderByColumn(entryPeer::UPDATED_AT);
-		$entries = entryPeer::doSelect($baseCriteria);
-
+		$this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash);
+	}
+	
+	public function getProfileClass() {
+		return new UverseClickToOrderDistributionProfile();
+	}
+	
+	protected function createFeedGenerator($context) {
 		$feed = new UverseClickToOrderFeed('feed_template.xml');
-		$feed->setDistributionProfile($profile);
-		
+		$feed->setDistributionProfile($this->profile);
+		$this->initFeedGeneration($feed);
+		return $feed;
+	}
+	
+	protected function initFeedGeneration ($feed) {
 		//setting background images
-		$wideBackgroundImageEntryId = $profile->getBackgroundImageWide();
-		$standardBackgroundImageEntryId = $profile->getBackgroundImageStandard();	
+		$wideBackgroundImageEntryId = $this->profile->getBackgroundImageWide();
+		$standardBackgroundImageEntryId = $this->profile->getBackgroundImageStandard();
 		$widedBackgroundImageUrl = $this->getImageUrl($wideBackgroundImageEntryId, '854', '480');
-		$standardBackgroundImageUrl = $this->getImageUrl($standardBackgroundImageEntryId, '640', '480');		
+		$standardBackgroundImageUrl = $this->getImageUrl($standardBackgroundImageEntryId, '640', '480');
 		$feed->setBackgroudImage($widedBackgroundImageUrl,$standardBackgroundImageUrl);
-		
+	}
+	
+	protected function handleEntries($context, $feed, array $entries)
+	{
 		//getting array of all related entries (categories that will appear in the xml)
 		$relatedEntriesArray = array();
 		//going through all entries and preparing an array with all related entries (categories) directing to the entires 
 		foreach($entries as $entry)
 		{
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
+			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $this->profile->getId());
 			if (!$entryDistribution)
 			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
+				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $this->profile->getId() . ']');
 				continue;
 			}					
-			$fields = $profile->getAllFieldValues($entryDistribution);
+			$fields = $this->profile->getAllFieldValues($entryDistribution);
 			$relatedEntryId = $fields[UverseClickToOrderDistributionField::CATEGORY_ENTRY_ID];
 			
 			if (!isset($relatedEntriesArray[$relatedEntryId])) {
 				$relatedEntry = entryPeer::retrieveByPK($relatedEntryId);
-				$relatedEntrySortValue = $this->getRelatedEntrySortValue($profile, $relatedEntryId);
+				$relatedEntrySortValue = $this->getRelatedEntrySortValue($this->profile, $relatedEntryId);
 				$relatedEntriesArray[$relatedEntryId] = array();
 				$relatedEntriesArray[$relatedEntryId]['sortValue'] = $relatedEntrySortValue;
 				$relatedEntriesArray[$relatedEntryId]['updatedAt'] = $relatedEntry->getUpdatedAt(); 
@@ -99,7 +80,7 @@ class UverseClickToOrderService extends KalturaBaseService
 				'thumbnailUrl' => $thumbUrl,
 				'downloadUrl' => $flavorUrl,
 				'updatedAt' =>  $entry->getUpdatedAt(),
-				'sortValue' => $profile->getFieldValue($entryDistribution, UverseClickToOrderDistributionField::SORT_ITEMS_BY_FIELD),
+				'sortValue' => $this->profile->getFieldValue($entryDistribution, UverseClickToOrderDistributionField::SORT_ITEMS_BY_FIELD),
 			);
 			
 		}
@@ -138,16 +119,17 @@ class UverseClickToOrderService extends KalturaBaseService
 				$thumbnailFile = $entryInfo['thumbnailUrl'];
 				$flavorFile =  $entryInfo['downloadUrl'];
 				//getting entry's fileds array
-				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entryId, $profile->getId());									
-				$fields = $profile->getAllFieldValues($entryDistribution);
+				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entryId, $this->profile->getId());									
+				$fields = $this->profile->getAllFieldValues($entryDistribution);
 				$feed->addItem($fields, $categoryNode, $thumbnailFile, $flavorFile);
 			}
 		}		
-		header('Content-Type: text/xml');
-		echo $feed->getXml();
-		die;
-	}
+	}	
 	
+	protected function handleEntry($context, $feed, entry $entry, Entrydistribution $entryDistribution) {
+		// Empty implementation;
+	}
+		
 	private function getRelatedEntrySortValue($profile , $relatedEntryId){
 		$relatedEntrydistribution = new EntryDistribution();
 		$relatedEntrydistribution->setEntryId($relatedEntryId);

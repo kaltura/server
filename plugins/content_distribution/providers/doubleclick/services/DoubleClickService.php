@@ -6,7 +6,7 @@
  * @package plugins.doubleClickDistribution
  * @subpackage api.services
  */
-class DoubleClickService extends KalturaBaseService
+class DoubleClickService extends ContentDistributionServiceBase
 {
 	/**
 	 * @action getFeed
@@ -21,140 +21,105 @@ class DoubleClickService extends KalturaBaseService
 	 */
 	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false)
 	{
-		if (!$this->getPartnerId() || !$this->getPartner())
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId());
-			
-		$profile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		/* @var $profile DoubleClickDistributionProfile */
-		if (!$profile || !$profile instanceof DoubleClickDistributionProfile)
-			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-
-		if ($profile->getStatus() != KalturaDistributionProfileStatus::ENABLED)
-			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);
-
-		if ($profile->getUniqueHashForFeedUrl() != $hash)
-			throw new KalturaAPIException(DoubleClickDistributionErrors::INVALID_FEED_URL);
-
-		if (!$page || $page < 1)
-			$page = 1;
-
-		$stateLastEntryCreatedAt = null;
-		$stateLastEntryIds = array();
-		if ($state) 
+		$context = new ContentDistributionServiceContext();
+		$context->page = (!$page || $page < 1) ? 1 : $page;
+		$context->period = $period;
+		$context->state = $state;
+		$context->ignoreScheduling = $ignoreScheduling;
+		$this->generateFeed($context, $distributionProfileId, $hash);
+	}
+	
+	public function getProfileClass() {
+		return new DoubleClickDistributionProfile();
+	}
+	
+	protected function fillStateDependentFields($context) {
+		if ($context->state)
 		{
-			$stateDecoded = base64_decode($state);
-			if (strpos($stateDecoded, '|') !== false) 
+			$stateDecoded = base64_decode($context->state);
+			if (strpos($stateDecoded, '|') !== false)
 			{
 				$stateExploded = explode('|', $stateDecoded);
-				$stateLastEntryCreatedAt = $stateExploded[0];
+				$context->stateLastEntryCreatedAt = $stateExploded[0];
 				$stateLastEntryIdsStr =  $stateExploded[1];
-				$stateLastEntryIds = explode(',', $stateLastEntryIdsStr);
+				$context->stateLastEntryIds = explode(',', $stateLastEntryIdsStr);
 			}
 		}
-
-		// "Creates advanced filter on distribution profile
-		$distributionAdvancedSearch = new ContentDistributionSearchFilter();
-		$distributionAdvancedSearch->setDistributionProfileId($profile->getId());
-		if ($ignoreScheduling !== true && $profile->getIgnoreSchedulingInFeed() !== true)
-			$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
-		$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
-		$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
-		$distributionAdvancedSearch->setHasEntryDistributionValidationErrors(false);
-			
-		// Creates entry filter with advanced filter
-		$entryFilter = new entryFilter();
-		$entryFilter->setStatusEquel(entryStatus::READY);
-		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setPartnerSearchScope($this->getPartnerId());
-		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
+	}
+	protected function fillnextStateDependentFields ($context, $entries) {
+		// Find the new state
+		$context->nextPageStateLastEntryCreatedAt = $context->stateLastEntryCreatedAt;
+		$context->nextPageStateLastEntryIds = $context->stateLastEntryIds;
+		foreach($entries as $entry)
+		{
+			if ($context->nextPageStateLastEntryCreatedAt > $entry->getCreatedAt(null))
+				$context->nextPageStateLastEntryIds = array();
+	
+			$context->nextPageStateLastEntryIds[] = $entry->getId();
+			$context->nextPageStateLastEntryCreatedAt = $entry->getCreatedAt(null);
+		}
+	}
+	
+	protected function getEntryFilter($context, $keepScheduling = true)
+	{
+		$keepScheduling = ($keepScheduling !== true && $this->profile->getIgnoreSchedulingInFeed() !== true);
+		$entryFilter = parent::getEntryFilter($context, $keepScheduling);
 		$entryFilter->set('_order_by', '-created_at');
-		if ($period && $period > 0)
+		if ($this->period && $this->period > 0)
 			$entryFilter->set('_gte_updated_at', time() - 24*60*60); // last 24 hours
-			
+		
+		
 		// Dummy query to get the total count
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$baseCriteria->setLimit(1);
 		$entryFilter->attachToCriteria($baseCriteria);
-		$entries = entryPeer::doSelect($baseCriteria);
-		$totalCount = $baseCriteria->getRecordsCount();
+		$context->totalCount = entryPeer::doCount($baseCriteria);
 		
 		// Add the state data to proceed to next page
-		if ($stateLastEntryCreatedAt)
-			$entryFilter->set('_lte_created_at', $stateLastEntryCreatedAt);
-		if ($stateLastEntryIds)
-			$entryFilter->set('_notin_id', $stateLastEntryIds);
-
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
-		$baseCriteria->setLimit($profile->getItemsPerPage() + 1); // get +1 to check if we have next page
-		$entryFilter->attachToCriteria($baseCriteria);
-		$entries = entryPeer::doSelect($baseCriteria);
-
-		$hasNextPage = false;
-		if (count($entries) === ($profile->getItemsPerPage() + 1)) { // we tried to get (itemsPerPage + 1) entries, meaning we have another page
-			$hasNextPage = true;
+		$this->fillStateDependentFields();
+		
+		if ($context->stateLastEntryCreatedAt)
+			$entryFilter->set('_lte_created_at', $context->stateLastEntryCreatedAt);
+		if ($context->LastEntryIds)
+			$entryFilter->set('_notin_id', $context->stateLastEntryIds);
+		
+		return $entryFilter;
+	}
+	
+	protected function getEntries($context, $orderBy = null, $limit = null) {
+		$entries = parent::getEntries($context, null, $this->profile->getItemsPerPage() + 1); // get +1 to check if we have next page
+		if (count($entries) === ($this->profile->getItemsPerPage() + 1)) { // we tried to get (itemsPerPage + 1) entries, meaning we have another page
+			$this->hasNextPage = true;
 			unset($entries[$profile->getItemsPerPage()]);
 		}
-
-		// Find the state
-		$entryIds = array();
-		$nextPageStateLastEntryCreatedAt = $stateLastEntryCreatedAt;
-		$nextPageStateLastEntryIds = $stateLastEntryIds;
-		foreach($entries as $entry)
-		{
-			$entryIds[] = $entry->getId();
-			
-			if ($nextPageStateLastEntryCreatedAt > $entry->getCreatedAt(null))
-				$nextPageStateLastEntryIds = array();
-			
-			$nextPageStateLastEntryIds[] = $entry->getId();
-			$nextPageStateLastEntryCreatedAt = $entry->getCreatedAt(null);
-		}
 		
+		$this->fillnextStateDependentFields($context, $entries);
+		return $entries;
+	}
+	
+	protected function createFeedGenerator($context) 
+	{
 		// Construct the feed
-		$feed = new DoubleClickFeed('doubleclick_template.xml', $profile);
-		$feed->setTotalResult($totalCount);
-		$feed->setStartIndex(($page - 1) * $profile->getItemsPerPage() + 1);
-		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page, $period, $stateLastEntryCreatedAt, $stateLastEntryIds));
-		if ($hasNextPage)
-			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period, $nextPageStateLastEntryCreatedAt, $nextPageStateLastEntryIds));
-
-		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";	
-		foreach($entries as $entry)
-		{
-			// check cache
-			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
-			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
-			if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
-			{
-				$xml = file_get_contents($cacheFileName);
-			}
-			else
-			{
-			/* @var $entry entry */
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
-			{
-				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
-				continue;
-			}
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-			
-			$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
-			$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
-			mkdir(dirname($cacheFileName), 0750, true);
-			file_put_contents($cacheFileName, $xml);
-			}
-            $feed->addItemXml($xml);
-		}
+		$distributionProfileId = $this->profile->getId();
+		$feed = new DoubleClickFeed('doubleclick_template.xml', $this->profile);
+		$feed->setTotalResult($this->totalCount);
+		$feed->setStartIndex(($this->page - 1) * $this->profile->getItemsPerPage() + 1);
+		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds));
+		if ($context->hasNextPage)
+			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->$nextPageStateLastEntryCreatedAt, $context->$nextPageStateLastEntryIds));
 		
-		header('Content-Type: text/xml');
-		echo $feed->getXml();
-		die;
+		return $feed;
+	}
+	
+	protected function handleEntry($context, $feed,entry $entry, Entrydistribution $entryDistribution)
+	{
+		$fields = $this->profile->getAllFieldValues($entryDistribution);
+		$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
+		$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
+		
+		$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
+		return $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
 	}
 	
 	/**
@@ -167,18 +132,7 @@ class DoubleClickService extends KalturaBaseService
 	 */
 	public function getFeedByEntryIdAction($distributionProfileId, $hash, $entryId)
 	{
-		if (!$this->getPartnerId() || !$this->getPartner())
-			throw new KalturaAPIException (KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId());
-
-		$profile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if (!$profile || !$profile instanceof DoubleClickDistributionProfile)
-			throw new KalturaAPIException (ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-
-		if ($profile->getStatus() != KalturaDistributionProfileStatus::ENABLED)
-			throw new KalturaAPIException (ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);
-
-		if ($profile->getUniqueHashForFeedUrl() != $hash)
-			throw new KalturaAPIException (DoubleClickDistributionErrors::INVALID_FEED_URL);
+		$this->validateRequest($distributionProfileId, $hash);
 
 		// Creates entry filter with advanced filter
 		$entry = entryPeer::retrieveByPK($entryId);
@@ -186,40 +140,16 @@ class DoubleClickService extends KalturaBaseService
 			throw new KalturaAPIException (KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		// Construct the feed
-		$feed = new DoubleClickFeed ('doubleclick_template.xml', $profile);
+		$feed = new DoubleClickFeed ('doubleclick_template.xml', $this->profile);
 		$feed->setTotalResult(1);
 		$feed->setStartIndex(1);
-
-		$profileUpdatedAt = $profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir") . "feeds/dist_$distributionProfileId/";
-
-		// check cache
-		$cacheFileName = $cacheDir . myContentStorage::dirForId($entry->getIntId(), $entry->getId() . ".xml");
-		$updatedAt = max($profileUpdatedAt, $entry->getUpdatedAt(null));
-		if (file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
-		{
-			$xml = file_get_contents($cacheFileName);
-		}
-		else
-		{
-			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $profile->getId());
-			if (!$entryDistribution)
-				throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND, '');
-
-			$fields = $profile->getAllFieldValues($entryDistribution);
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
-			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
-
-			$cuePoints = $this->getCuePoints($entry->getPartnerId(), $entry->getId());
-			$xml = $feed->getItemXml($fields, $flavorAssets, $thumbAssets, $cuePoints);
-			mkdir(dirname($cacheFileName), 0777, true);
-			file_put_contents($cacheFileName, $xml);
-		}
-		$feed->addItemXml($xml);
-
-		header('Content-Type: text/xml');
-		echo $feed->getXml();
-		die();
+		
+		$entries = array();
+		$entries[] = $entry;
+		$context = new ContentDistributionServiceContext();
+		$this->handleEntries($context, $feed, $entries);
+		$this->doneFeedGeneration($context, $feed);
+		
 	}
 	
 	/**
