@@ -89,14 +89,20 @@ class kMetadataFieldChangedCondition extends kCondition
 		elseif($scope instanceof kEventScope && $scope->getEvent() instanceof kApplicativeEvent)
 		{
 			$object = $scope->getEvent()->getObject();
-			if($object instanceof IMetadataObject)
+			if($object instanceof Metadata)
+				$metadata = $object;
+			elseif($object instanceof IMetadataObject)
 				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
 		}
 			
 		if(!$metadata)
 			return false;
 			
-		return kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionA) != kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionB);
+		$valuesA = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionA);
+		$valuesB = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionB);
+		$changedValues = array_diff($valuesA, $valuesB);
+		
+		return count($changedValues) > 0;
 	}
 	
 	/**
@@ -145,6 +151,38 @@ class kMetadataFieldChangedCondition extends kCondition
 	public function setProfileSystemName($profileSystemName) 
 	{
 		$this->profileSystemName = $profileSystemName;
+	}
+	
+	/**
+	 * @return string $versionA
+	 */
+	public function getVersionA()
+	{
+		return $this->versionA;
+	}
+
+	/**
+	 * @return string $versionB
+	 */
+	public function getVersionB()
+	{
+		return $this->versionB;
+	}
+
+	/**
+	 * @param string $versionA
+	 */
+	public function setVersionA($versionA)
+	{
+		$this->versionA = $versionA;
+	}
+
+	/**
+	 * @param string $versionB
+	 */
+	public function setVersionB($versionB)
+	{
+		$this->versionB = $versionB;
 	}
 
 	/* (non-PHPdoc)
