@@ -23,6 +23,9 @@ class kMrssParameters
 	
 	private $storageId;
 	
+	//Statuses for asset retrieval by default will retrieve only ready assets 
+	private $statuses = array(flavorasset::ASSET_STATUS_READY);
+	
 	/**
 	 * @return the $itemXpathsToExtend
 	 */
@@ -87,5 +90,15 @@ class kMrssParameters
 	public function setStorageId($storageId)
 	{
 		$this->storageId = $storageId;
+	}
+	
+	public function getStatuses()
+	{
+		return $this->statuses;
+	}
+	
+	public function setStatuses(array $statuses)
+	{
+		$this->statuses = $statuses;
 	}
 }
