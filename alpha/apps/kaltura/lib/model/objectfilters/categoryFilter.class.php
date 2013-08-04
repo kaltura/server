@@ -62,6 +62,7 @@ class categoryFilter extends baseObjectFilter
 			'_matchor_privacy_context',
 			'_in_ancestor_id',
 		    '_eq_name',
+		    '_in_id-inherited_parent_id',
 			) , NULL );
 
 		$this->allowed_order_fields = array (
