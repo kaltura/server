@@ -14,7 +14,7 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 				$kontikiFileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
                 /* @var $data kStorageExportJobData */
                 $asset = assetPeer::retrieveByFileSync($kontikiFileSync);
-                $asset->addTags(array(KontikiPlugin::KONTIKI_ASSET_TAG));
+                $asset->setTags(KontikiPlugin::KONTIKI_ASSET_TAG);
                 $asset->save();
                 //Get Kontiki file sync and set the external URL
                 $kontikiFileSync->setFileRoot("");
