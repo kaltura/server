@@ -6,7 +6,18 @@
  */
 interface IKalturaContextDataHelper extends IKalturaBase
 {
-	public function getContextDataStreamerType ();
+	/**
+	 * @param accessControlScope $scope
+	 * @param string $flavorTags
+	 * @param string $streamerType
+	 */
+	public function getContextDataStreamerType (accessControlScope $scope, $flavorTags, $streamerType);
 	
-	public function getContextDataMediaProtocol ();
+	/**
+	 * @param accessControlScope $scope
+	 * @param string $flavorTags
+	 * @param string $streamerType
+	 * @param string $mediaProtocol
+	 */
+	public function getContextDataMediaProtocol (accessControlScope $scope, $flavorTags, $streamerType, $mediaProtocol);
 }
