@@ -97,8 +97,8 @@ class kMrssParameters
 		return $this->statuses;
 	}
 	
-	public function setStatuses(array $stasuses)
+	public function setStatuses(array $statuses)
 	{
-		$this->statuses = $stasuses;
+		$this->statuses = $statuses;
 	}
 }
