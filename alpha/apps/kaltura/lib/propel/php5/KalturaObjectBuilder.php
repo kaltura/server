@@ -718,13 +718,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 * @var array
 	 */
 	private \$tempModifiedColumns = array();
-	
-	/**
-	 * The md5 value for the custom_data field.
-	 * @var        string
-	 */
-	protected \$custom_data_md5;
-	
+		
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -858,6 +852,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		parent::addMutatorOpenBody($script, $col);
 		
 		$clo = strtolower($col->getName());
+		
 		if(in_array($clo, self::$systemColumns))
 			return;
 			
@@ -966,6 +961,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 * @var myCustomData
 	 */
 	protected \$m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected \$custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -1080,7 +1081,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	{
 		if ( \$this->m_custom_data != null )
 		{
-			\$this->custom_data_md5 = md5(\$this->custom_data);
+			\$this->custom_data_md5 = is_null(\$this->custom_data) ? null : md5(\$this->custom_data);
 			\$this->setCustomData( \$this->m_custom_data->toString() );
 		}
 	}
@@ -1102,15 +1103,20 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		
 		if(\$this->alreadyInSave)
-		{
+		{";
+		if ($table->containsColumn(self::KALTURA_COLUMN_CUSTOM_DATA)){	
+			$script .= "
 			if (\$this->isColumnModified(".$this->getPeerClassname()."::CUSTOM_DATA))
 			{
-				if (!is_null(\$this->custom_data))
-					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \") = '\$this->custom_data_md5'\", Criteria::CUSTOM);
+				if (!is_null(\$this->custom_data_md5))
+					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, \"MD5(cast(\" . ".$this->getPeerClassname()."::CUSTOM_DATA . \" as char character set latin1)) = '\$this->custom_data_md5'\", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
 				else 
-					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, NULL, Criteria::IS_NULL);
+					\$criteria->add(".$this->getPeerClassname()."::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
-			
+			";	
+		}
+		$script .= "
 			if (count(\$this->modifiedColumns) == 2 && \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))
 			{
 				\$theModifiedColumn = null;
@@ -1122,7 +1128,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 				if(in_array(\$theModifiedColumn, \$atomicColumns))
 					\$criteria->add(\$theModifiedColumn, \$this->getByName(\$theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
-		}
+		}		
 
 		return \$criteria;
 	}

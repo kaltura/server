@@ -18,11 +18,17 @@ class KalturaBooleanValueArray extends KalturaTypedArray
 		{
 			foreach($bools as $bool)
 			{
-				if($bool instanceof kBooleanValue)
-					$bool = $bool->getValue();
-					
-				$boolObject = new KalturaBooleanValue();
-				$boolObject->value = $bool;
+				$boolObject = new KalturaStringValue();
+				
+				if($bool instanceof kValue)
+				{
+					$boolObject->fromObject($bool);
+				}
+				else
+				{					
+					$boolObject->value = $bool;
+				}
+				
 				$boolArray[] = $boolObject;
 			}
 		}

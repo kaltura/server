@@ -117,20 +117,28 @@ class KalturaProvisionJobData extends KalturaJobData
 	 */
 	public function fromSubType($subType)
 	{
-		// TODO - change to pluginable enum to support more providers
-		return $subType;
+		switch ($subType)
+		{
+			case KalturaSourceType::AKAMAI_LIVE:
+			case KalturaSourceType::AKAMAI_UNIVERSAL_LIVE:
+				return $subType;
+				break;
+			default:
+				return kPluginableEnumsManager::coreToApi('EntrySourceType', $subType);
+				break;
+		}
 	}
 	
 
 	/**
 	 * Return instance of KalturaProvisionJobData according to job sub-type
-	 * @param int $jobSybType
+	 * @param int $jobSubType
 	 * @return KalturaProvisionJobData
 	 */
-	public static function getJobDataInstance ($jobSybType)
+	public static function getJobDataInstance ($jobSubType)
 	{
-		KalturaLog::info ("Determining correct job data based on jobSubType $jobSybType");
-		switch ($jobSybType)
+		KalturaLog::info ("Determining correct job data based on jobSubType $jobSubType");
+		switch ($jobSubType)
 		{
 			case KalturaSourceType::AKAMAI_LIVE:
 				return new KalturaAkamaiProvisionJobData();
@@ -139,7 +147,7 @@ class KalturaProvisionJobData extends KalturaJobData
 				return new KalturaAkamaiUniversalProvisionJobData();
 				break;
 			default:
-				return KalturaPluginManager::loadObject('KalturaProvisionJobData', $jobSybType);
+				return KalturaPluginManager::loadObject('KalturaProvisionJobData', $jobSubType);
 				break;
 		
 		}

@@ -23,10 +23,10 @@ abstract class KProvisionEngine
 		switch ($provider )
 		{
 			case KalturaSourceType::AKAMAI_LIVE:
-				$engine = new KProvisionEngineAkamai( $taskConfig , $data);
+				$engine = new KProvisionEngineAkamai($data);
 				break;
 			case KalturaSourceType::AKAMAI_UNIVERSAL_LIVE:
-				$engine = new KProvisionEngineUniversalAkamai($taskConfig, $data);
+				$engine = new KProvisionEngineUniversalAkamai($data);
 				break;
 			default:
 				$engine = KalturaPluginManager::loadObject('KProvisionEngine', $provider);

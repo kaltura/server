@@ -18,11 +18,17 @@ class KalturaIntegerValueArray extends KalturaTypedArray
 		{
 			foreach($ints as $int)
 			{
-				if($int instanceof kIntegerValue)
-					$int = $int->getValue();
-					
-				$intObject = new KalturaIntegerValue();
-				$intObject->value = $int;
+				$intObject = new KalturaStringValue();
+				
+				if($int instanceof kValue)
+				{
+					$intObject->fromObject($int);
+				}
+				else
+				{					
+					$intObject->value = $int;
+				}
+				
 				$intArray[] = $intObject;
 			}
 		}

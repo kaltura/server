@@ -322,7 +322,7 @@ class KSecureEntryHelper
 					KExternalErrors::dieError(KExternalErrors::INVALID_KS, "Invalid session [".$valid."]");
 				}
 				
-				if ($ks->partner_id != $this->entry->getPartnerId())
+				if ($ks->partner_id != $this->entry->getPartnerId() && $ks->partner_id != Partner::BATCH_PARTNER_ID)
 				{
 					return;
 				}

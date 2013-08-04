@@ -41,7 +41,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 	{
 		KalturaLog::debug("fetchStatus($job->id)");
 		
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if(($job->queueTime + self::$taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 
 		$dataWrap = new WidevineRepositorySyncJobDataWrap($data);
@@ -69,7 +69,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 	{
 		KalturaLog::debug("Starting isModificationCompleted");
 		
-		$cgiUrl = $this->taskConfig->params->vodPackagerHost . WidevinePlugin::ASSET_NOTIFY_CGI;
+		$cgiUrl = self::$taskConfig->params->vodPackagerHost . WidevinePlugin::ASSET_NOTIFY_CGI;
 		
 		$widevineAssets = $dataWrap->getWidevineAssetIds();		
 		$startDate = $dataWrap->getLicenseStartDate();
@@ -90,7 +90,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 	
 	private function prepareAssetNotifyGetRequestXml($assetId)
 	{		
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, $this->taskConfig->params->portal);
+		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, self::$taskConfig->params->portal);
 		
 		$requestInput->setAssetId($assetId);
 		$requestXml = $requestInput->createAssetNotifyRequestXml();
@@ -116,7 +116,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 		$filter = new KalturaAssetFilter();
 		$filter->entryIdEqual = $job->entryId;
 		$filter->tagsLike = 'widevine';
-		$flavorAssetsList = $this->kClient->flavorAsset->listAction($filter, new KalturaFilterPager());
+		$flavorAssetsList = self::$kClient->flavorAsset->listAction($filter, new KalturaFilterPager());
 		
 		foreach ($flavorAssetsList->objects as $flavorAsset) 
 		{
@@ -127,7 +127,7 @@ class KAsyncWidevineRepositorySyncCloser extends KJobCloserWorker
 				$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
 				$updatedFlavorAsset->widevineDistributionStartDate = $startDate;
 				$updatedFlavorAsset->widevineDistributionEndDate = $endDate;
-				$this->kClient->flavorAsset->update($flavorAsset->id, $updatedFlavorAsset);
+				self::$kClient->flavorAsset->update($flavorAsset->id, $updatedFlavorAsset);
 			}		
 		}		
 		$this->unimpersonate();

@@ -20,7 +20,8 @@ class kRule
 	protected $accessControl;
 	
 	/**
-	 * Message to be thrown to the player in case the rule fulfilled
+	 * Message to be thrown to the player in case the rule 
+
 	 * 
 	 * @var string
 	 */
@@ -107,7 +108,7 @@ class kRule
 			
 		foreach($this->conditions as $condition)
 		{
-			if(!$condition->fulfilled($this->accessControl))
+			if(!$condition->fulfilled($this->accessControl->getScope()))
 			{
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;

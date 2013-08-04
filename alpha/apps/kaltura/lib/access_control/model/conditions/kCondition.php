@@ -12,6 +12,11 @@ abstract class kCondition
 	protected $type;
 	
 	/**
+	 * @var string
+	 */
+	protected $description;
+	
+	/**
 	 * @var bool
 	 */
 	protected $not = false;
@@ -22,18 +27,26 @@ abstract class kCondition
 	}
 	
 	/**
-	 * @param accessControl $accessControl
-	 * @return bool
+	 * Enable changing the condition attributes according to additional data in the scope
 	 */
-	abstract protected function internalFulfilled(accessControl $accessControl);
+	protected function applyDynamicValues(kScope $scope)
+	{
+	}
 	
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return bool
 	 */
-	final public function fulfilled(accessControl $accessControl)
+	abstract protected function internalFulfilled(kScope $scope);
+	
+	/**
+	 * @param kScope $scope
+	 * @return bool
+	 */
+	final public function fulfilled(kScope $scope)
 	{
-		return $this->calcNot($this->internalFulfilled($accessControl));
+		$this->applyDynamicValues($scope);
+		return $this->calcNot($this->internalFulfilled($scope));
 	}
 	
 	/**
@@ -50,6 +63,22 @@ abstract class kCondition
 	protected function setType($type) 
 	{
 		$this->type = $type;
+	}
+
+	/**
+	 * @return string $description
+	 */
+	public function getDescription() 
+	{
+		return $this->description;
+	}
+
+	/**
+	 * @param string $description
+	 */
+	public function setDescription($description) 
+	{
+		$this->description = $description;
 	}
 	
 	/**

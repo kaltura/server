@@ -5,7 +5,9 @@
  */
 abstract class kHttpNotificationData
 {
-	public function setScope(kScope $scope = null)
-	{
-	}
+	/**
+	 * Applies scope upon creation
+	 * @param kScope $scope
+	 */
+	abstract public function setScope(kScope $scope);
 }
