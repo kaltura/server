@@ -84,6 +84,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 	{
 		$this->addElement('text', 'url', array(
 			'label'			=> 'URL:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 		
