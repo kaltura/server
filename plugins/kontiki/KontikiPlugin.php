@@ -53,7 +53,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	            }
 			}
         }
-		
 		if ($baseClass == 'KalturaStorageProfile')
         {
             if ($enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
@@ -61,7 +60,10 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
                 return new KalturaKontikiStorageProfile();
             }
         }
-
+		if ($baseClass =='Form_Partner_BaseStorageConfiguration' && $enumValue == Kaltura_Client_Enum_StorageProfileProtocol::KONTIKI)
+		{
+			return new Form_KontikiStorageConfiguration();
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -70,8 +72,9 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	public static function getObjectClass($baseClass, $enumValue) {
 		if($baseClass == 'StorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             return 'KontikiStorageProfile';
-		//if ($baseClass =='Form_StorageConfiguration' && $enumValue == self::getApiValue(KontikiStorageProfileProtocol::KONTIKI))
-			
+		
+		if ($baseClass == 'Kaltura_Client_Type_StorageProfile' && $enumValue == Kaltura_Client_Enum_StorageProfileProtocol::KONTIKI)
+			return 'Kaltura_Client_Kontiki_Type_KontikiStorageProfile';
 	}
 
 	/* (non-PHPdoc)
