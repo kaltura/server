@@ -42,3 +42,12 @@ To run the test script that accompanies this source:
  - Run "python PythonTester.py"
 
 Note: The library was tested under ActivePython 2.5.5
+
+== RELEASE NOTES ==
+
+Aug 2013 - the library was refactored to make it installable as a PyPI package.
+	This refactoring changed the way Kaltura client plugin modules are loaded -
+	before the change the metadata plugin (for example) was loaded by:
+		from KalturaMetadataClientPlugin import *
+	when upgrading the client, this will need to be changed to:
+		from KalturaClient.Plugins.Metadata import *
