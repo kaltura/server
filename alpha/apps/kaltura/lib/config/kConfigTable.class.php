@@ -35,7 +35,7 @@
  */
 class kConfigTable
 {
-	const LINE_SEPARATOR = "\r\n";
+	const LINE_SEPARATOR = "\n";
 	const SEPARATOR_LINE_PREFIX = "-----";
 	const COMMENT_PREFIX = "//";
 	
