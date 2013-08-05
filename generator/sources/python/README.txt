@@ -5,9 +5,9 @@ This source contains:
  - Python library test code and data files (TestCode/*)
  - The 'poster' python module (used by KalturaClient.py)
 
-== DEPENDENCIES ==
+== STANDARD DEPENDENCIES ==
 
-The API library depends on the following builtin python libraries:
+The API library depends on the following python modules (included with python by default):
  - email.header
  - hashlib
  - httplib
@@ -23,6 +23,18 @@ The API library depends on the following builtin python libraries:
  - xml.dom
  - xml.parsers.expat
  
+== EXTERNAL DEPENDENCIES ==
+
+The API library depends on the following python modules that are not included by default with python:
+ - setuptools - can be downloaded from https://pypi.python.org/pypi/setuptools
+ - poster - can be downloaded from https://pypi.python.org/pypi/poster/
+	installed by running: python setup.py install
+
+== INSTALLATION ==
+
+Make sure you have the modules listed under the 'external dependencies' installed.
+Install the Kaltura client by running 'python setup.py install' from the same folder as this README file.
+
 == TESTING THE CLIENT LIBRARY ==
   
 To run the test script that accompanies this source:
