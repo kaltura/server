@@ -766,6 +766,16 @@
 							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::ACTIVE</code>
 						</field>
 					</item>
+					<item objectType="KalturaMatchMetadataCondition">
+						<description>Custom metadata indicates that the notification is active on the channel</description>
+						<xPath>{metadata_field}</xPath>
+						<profileSystemName>{metadata_profile_system_name}</profileSystemName>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>1</value>
+							</item>
+						</values>
+					</item>
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - A new media was added to {category_name}</subject>
@@ -817,6 +827,22 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_field</key>
+						<description>Custom metadata field to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value>AllowSubscriptionsInChannel</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Custom metadata profile system name to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value>channelsubscription</value>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
