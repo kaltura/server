@@ -43,6 +43,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		
 		$action->view->errMessage = null;
 		$action->view->form = '';
+		$action->view->plugins = array();
 		$form = null;
 		
 		try
@@ -51,9 +52,19 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 			
 			if($cloneTemplateId)
 			{
-				$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->cloneAction($cloneTemplateId);
-				$templateId = $eventNotificationTemplate->id;
-				$type = $eventNotificationTemplate->type;
+				if($partnerId)
+				{
+					$eventNotificationTemplate = $eventNotificationPlugin->eventNotificationTemplate->cloneAction($cloneTemplateId);
+					$templateId = $eventNotificationTemplate->id;
+					$type = $eventNotificationTemplate->type;
+				}
+				else
+				{
+					$action->view->errMessage = "Partner ID must be defined.";
+					$templateId = null;
+					Infra_ClientHelper::unimpersonate();
+					return;
+				}
 			}
 			elseif ($templateId)
 			{
@@ -145,7 +156,6 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 		
 		$action->view->form = $form;
 		$action->view->templateId = $templateId;
-		$action->view->plugins = array();
 		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
 		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
