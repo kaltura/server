@@ -48,12 +48,31 @@ class kEventObjectChangedCondition extends kCondition
 			return false;
 			
 		$trigerColumns = explode(',', $this->modifiedColumns);
-		$modifiedColumns = array_intersect($event->getModifiedColumns(), $trigerColumns);
+		$modifiedColumns = $event->getModifiedColumns();
+		
+		$object = $event->getObject();
+		if(method_exists($object, 'getCustomDataOldValues'))
+		{
+			$customDataOldValues = $object->getCustomDataOldValues();
+			foreach($customDataOldValues as $customDataField => $customDataValue)
+			{
+				if($customDataField)
+					$modifiedColumns[] = $customDataField;
+			}
+			
+			if(isset($customDataOldValues['']))
+			{
+				foreach($customDataOldValues[''] as $customDataField => $customDataValue)
+					$modifiedColumns[] = $customDataField;
+			}
+		}
+		
+		$foundColumns = array_intersect($modifiedColumns, $trigerColumns);
 		
 		KalturaLog::debug("Triger columns [" . print_r($trigerColumns, true) . "]");
-		KalturaLog::debug("Found columns [" . print_r($modifiedColumns, true) . "]");
+		KalturaLog::debug("Found columns [" . print_r($foundColumns, true) . "]");
 		
-		return count($modifiedColumns) > 0;
+		return count($foundColumns) > 0;
 	}
 	
 	/**
