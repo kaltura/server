@@ -92,6 +92,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		$this->addElement('text', 'subject', array(
 			'label'			=> 'Subject:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -102,12 +103,14 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		$this->addElement('text', 'from_email', array(
 			'label'			=> 'Sender e-mail:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 			'validators'	=> array('EmailAddress'),
 		));
 		
 		$this->addElement('text', 'from_name', array(
 			'label'			=> 'Sender name:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 	}

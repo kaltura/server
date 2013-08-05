@@ -111,39 +111,6 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		foreach($object->userParameters as $parameter)
 			$this->addUserParameter($parameter);
 			
-//		$this->addElement('button', 'addUserParameterButton', array(
-//			'label'			=> 'Add User Parameter',
-//			'onclick'		=> "newUserParameter()",
-//			'decorators'	=> array('ViewHelper'),
-//		));
-//		
-//		$this->addElement('text', 'userParameterKey', array(
-//			'label'			=> 'Key:',
-//			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-//		));
-//		
-//		$this->addElement('text', 'userParameterValue', array(
-//			'label'			=> 'Value:',
-//			'decorators'	=> array('ViewHelper', array('Label', array('placement' => 'prepend'))),
-//		));
-//		
-//		$this->addElement('button', 'removeUserParameterButton', array(
-//			'label'			=> 'Remove',
-//			'decorators'	=> array('ViewHelper'),
-//		));
-//		
-//		$this->addDisplayGroup(array('userParameterKey', 'userParameterValue', 'removeUserParameterButton'), 
-//			'frmUserParameter', 
-//			array(
-//				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmUserParameter'))),
-//		));
-//			
-//		$this->addDisplayGroup(array('addUserParameterButton'), 
-//			'frmParameters', 
-//			array(
-//				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => 'frmParameters'))),
-//		));
-		
 		$this->finit();
 		
 		parent::populateFromObject($object, $add_underscore);
@@ -265,22 +232,26 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 
 		$this->addElement('text', 'name', array(
 			'label'			=> 'Name:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 			'required'		=> true,
 		));
 		
 		$this->addElement('text', 'system_name', array(
 			'label'			=> 'System name:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'description', array(
 			'label'			=> 'Description:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'partner_id', array(
 			'label'			=> 'Publisher ID:',
+			'size'			=> 60,
 			'value'			=> $this->partnerId,
 			'readonly'		=> true,
 			'filters'		=> array('StringTrim'),
