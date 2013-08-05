@@ -145,7 +145,9 @@ class kXslPathManager extends kPathManager
 		myPartnerUtils::addPartnerToCriteria('entry', $entry->getPartnerId(), true);
 		
 		$mrss = null;
-		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss);
+		$mrssParams = new kMrssParameters();
+		$mrssParams->setStatuses(array(flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_EXPORTING));
+		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
 		$mrssStr = $mrss->asXML();
 		
 		// restore the original criteria

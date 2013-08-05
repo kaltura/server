@@ -386,7 +386,7 @@ class asset extends Baseasset implements ISyncableFile
 		return $url;
 	}
 	
-	public function getDownloadUrl($useCdn = false)
+	public function getDownloadUrl($useCdn = false, $forceProxy = false)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
@@ -434,10 +434,10 @@ class asset extends Baseasset implements ISyncableFile
 		if($serveRemote && $fileSync)
 			return $fileSync->getExternalUrl($this->getEntryId());
 		
-		return $this->getDownloadUrlWithExpiry(86400, $useCdn);
+		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy);
 	}
 	
-	public function getDownloadUrlWithExpiry($expiry, $useCdn = false)
+	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false)
 	{
 		$ksStr = "";
 				
@@ -480,7 +480,9 @@ class asset extends Baseasset implements ISyncableFile
 		
 		if ($ksStr)
 			$finalPath .= "/ks/".$ksStr;
-			
+		
+		if ($forceProxy)
+			$finalPath .= "/relocate/".$this->getEntryId().".".$this->getFileExt();
 		// Gonen May 12 2010 - removing CDN URLs. see ticket 5135 in internal mantis
 		// in order to avoid conflicts with access_control (geo-location restriction), we always return the requestHost (www_host from kConf)
 		// and not the CDN host relevant for the partner.

@@ -3,7 +3,7 @@
  * Enable upload and playback of content to and from Kontiki ECDN
  * @package plugins.kontiki
  */
-class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader , IKalturaEventConsumers
+class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader , IKalturaEventConsumers, IKalturaContextDataHelper
 {
 	const PLUGIN_NAME = 'kontiki';
     
@@ -70,6 +70,8 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	public static function getObjectClass($baseClass, $enumValue) {
 		if($baseClass == 'StorageProfile' && $enumValue == self::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
             return 'KontikiStorageProfile';
+		//if ($baseClass =='Form_StorageConfiguration' && $enumValue == self::getApiValue(KontikiStorageProfileProtocol::KONTIKI))
+			
 	}
 
 	/* (non-PHPdoc)
@@ -124,8 +126,39 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		return kPluginableEnumsManager::apiToCore('StorageProfileProtocol', $value);
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
 	public static function getEventConsumers()
 	{
         return array ('kKontikiManager');
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaContextDataHelper::getContextDataStreamerType()
+	 */
+	public function getContextDataStreamerType (accessControlScope $scope, $flavorTags, $streamerType)
+	{
+		$tagsArray = explode(',', $flavorTags);
+		if ($tagsArray[0] == self::KONTIKI_ASSET_TAG)
+		{
+			return PlaybackProtocol::HTTP;
+		}
+		
+		return $streamerType;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaContextDataHelper::getContextDataMediaProtocol()
+	 */
+	public function getContextDataMediaProtocol (accessControlScope $scope, $flavorTags, $streamerType, $mediaProtocol)
+	{
+		$tagsArray = explode(',', $flavorTags);
+		if ($tagsArray[0] == self::KONTIKI_ASSET_TAG)
+		{
+			return PlaybackProtocol::HTTP;
+		}
+		
+		return $streamerType;
 	}
 }
