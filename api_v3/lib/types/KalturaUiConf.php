@@ -87,7 +87,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 */
-	public $confFileConfig;
+	public $config;
 	
 	/**
 	 * @var string
@@ -165,7 +165,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 		"createdAt" , 
 		"updatedAt", 
 		"html5Url",
-		"confFileConfig",
+		"config",
         
 	);
 
