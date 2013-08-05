@@ -25,8 +25,8 @@
 #
 # @ignore
 # ===================================================================================================
-from KalturaCoreClient import *
-from KalturaClientBase import *
+from Plugins.Core import *
+from Base import *
 from xml.parsers.expat import ExpatError
 from xml.dom import minidom
 from threading import Timer
@@ -38,7 +38,6 @@ import socket
 import urllib
 import gzip
 import time
-import sys
 import os
 
 from poster.streaminghttp import register_openers
@@ -53,10 +52,6 @@ except ImportError:
 
 # Register the streaming http handlers with urllib2
 register_openers()
-
-pluginsFolder = os.path.normpath(os.path.join(os.path.dirname(__file__), 'KalturaPlugins'))
-if not pluginsFolder in sys.path:
-    sys.path.append(pluginsFolder)
 
 class MultiRequestSubResult:
     def __init__(self, value):
@@ -104,22 +99,29 @@ class KalturaClient:
 
         self.loadPlugins()            
 
-    def loadPlugins(self):            
-        if not os.path.isdir(pluginsFolder):
-            return
+    def loadPlugins(self):
+        pluginFiles = ['Core']
+        pluginsFolder = os.path.normpath(os.path.join(os.path.dirname(__file__), 'Plugins'))
+        if os.path.isdir(pluginsFolder):
+            for fileName in os.listdir(pluginsFolder):
+                (pluginFile, fileExt) = os.path.splitext(fileName)
+                if fileExt.lower() != '.py':
+                    continue
+                pluginFiles.append(pluginFile)
 
-        pluginList = ['KalturaCoreClient']
-        for fileName in os.listdir(pluginsFolder):
-            (pluginClass, fileExt) = os.path.splitext(fileName)
-            if fileExt.lower() != '.py':
-                continue
-            pluginList.append(pluginClass)
+        for pluginFile in pluginFiles:
+            self.loadPlugin(pluginFile)
 
-        for pluginClass in pluginList:
-            self.loadPlugin(pluginClass)
+    def loadPlugin(self, pluginFile):
+        moduleHierarchy = ['KalturaClient', 'Plugins', pluginFile]
+        pluginModule = __import__('.'.join(moduleHierarchy))
+        for curModule in moduleHierarchy[1:]:
+            pluginModule = getattr(pluginModule, curModule)
 
-    def loadPlugin(self, pluginClass):
-        pluginModule = __import__(pluginClass)
+        if pluginFile == 'Core':
+            pluginClass = 'KalturaCoreClient'
+        else:
+            pluginClass = 'Kaltura%sClientPlugin' % pluginFile
         if not pluginClass in dir(pluginModule):
             return
         
