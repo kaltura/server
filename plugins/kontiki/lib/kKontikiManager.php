@@ -7,7 +7,8 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
-	public function updatedJob(BatchJob $dbBatchJob) {
+	public function updatedJob(BatchJob $dbBatchJob) 
+	{
 		switch ($dbBatchJob->getStatus()) {
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				$data = $dbBatchJob->getData();
@@ -21,14 +22,6 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
                 $kontikiFileSync->setFilePath($data->getContentMoid());
                 $kontikiFileSync->save();
             break;
-			case BatchJob::BATCHJOB_STATUS_FAILED:
-                $entry = entryPeer::retrieveByPK($dbBatchJob->getEntryId());
-                $entry->setStatus(entryStatus::ERROR_IMPORTING);
-				$entry->save();
-                break;
-			default:
-				
-				break;
 		}
 
 		return true;
