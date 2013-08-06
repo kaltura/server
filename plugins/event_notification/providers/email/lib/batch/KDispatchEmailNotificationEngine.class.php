@@ -53,6 +53,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		else
 		{
 			$this::$mailer = new PHPMailer();
+			$this::$mailer->Mailer = 'smtp';
 			$this::$mailer->CharSet = 'utf-8';
 			$this::$mailer->SMTPKeepAlive = true;
 		
