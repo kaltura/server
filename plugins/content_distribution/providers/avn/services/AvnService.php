@@ -24,8 +24,6 @@ class AvnService extends ContentDistributionServiceBase
 		return new AvnDistributionProfile();
 	}
 	
-	// TODO @_!! Don't add the header xml, look at Roman question at skype
-	
 	protected function createFeedGenerator($context) {
 		$feed = new AvnFeed('avn_template.xml');
 		$feed->setDistributionProfile($this->profile);
