@@ -274,7 +274,6 @@ class PartnerController extends Zend_Controller_Action
 		$form = KalturaPluginManager::loadObject('Form_Partner_BaseStorageConfiguration', $type, array($partnerId, $type));
 		/* @var $form Form_StorageConfiguration */
 		
-		KalturaLog::debug("template class [$templateClass]");
 		KalturaLog::debug("form class: ". get_class($form));
 		
 		if(!$form || !($form instanceof Form_Partner_BaseStorageConfiguration))
