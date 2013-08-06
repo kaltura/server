@@ -248,14 +248,40 @@ class PartnerController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$partnerId = $this->_getParam('partnerId');
 		$storageId = $this->_getParam('storageId');
+		$type = $this->_getParam('type');
 		
 		$editMode = false;
-		if ($storageId)
-			$editMode = true;
-			
-		$client = Infra_ClientHelper::getClient();
 		
-		$form = new Form_Partner_StorageConfiguration();
+		$client = Infra_ClientHelper::getClient();
+		$storage = null;
+		if ($storageId)
+		{
+			Infra_ClientHelper::impersonate($partnerId);
+			try
+			{
+				$storage = $client->storageProfile->get($storageId);
+			}
+			catch (Exception $e)
+			{
+				Infra_ClientHelper::unimpersonate();
+				throw $e;
+			}
+			Infra_ClientHelper::unimpersonate();
+			$type = $storage->protocol;
+		}
+				
+		
+		$form = KalturaPluginManager::loadObject('Form_Partner_BaseStorageConfiguration', $type, array($partnerId, $type));
+		/* @var $form Form_StorageConfiguration */
+		
+		KalturaLog::debug("form class: ". get_class($form));
+		
+		if(!$form || !($form instanceof Form_Partner_BaseStorageConfiguration))
+		{
+			$form = new Form_Partner_StorageConfiguration();
+		}
+			
+		//$form->setAction($action->view->url(array('controller' => 'partner', 'action' => 'configureStorageAction')));
 		$request = $this->getRequest();
 		$form->populate($request->getParams());
 		
@@ -263,7 +289,7 @@ class PartnerController extends Zend_Controller_Action
 		
 		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageSize = 500; 
-		if (!$editMode) //new
+		if (!$storageId) //new
 		{
 			$partnerId = $request->getParam('new_partner_id');
 			$form->getElement('partnerId')->setAttrib('readonly',true);
@@ -276,12 +302,10 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else  
 		{			
-			$storage = null;
 			$flavorParamsResponse = null;
 			Infra_ClientHelper::impersonate($partnerId);
 			try
 			{
-				$storage = $client->storageProfile->get($storageId);
 				$flavorParamsResponse = $client->flavorParams->listAction(null, $pager);
 			}
 			catch (Exception $e)
@@ -297,11 +321,6 @@ class PartnerController extends Zend_Controller_Action
 			
 			$form->getElement('partnerId')->setAttrib('readonly',true);
 
-			//to avoid changing an inherit class to its father 
-			if ($storage->protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
-				$form->getElement('protocol')->setAttrib('disabled',true);
-			}
-			
 			$form->addFlavorParamsFields($flavorParamsResponse, $flavorParamsIds);
 			
 			if (!$request->isPost())
@@ -318,21 +337,19 @@ class PartnerController extends Zend_Controller_Action
 			{
 				$this->view->formValid = true;
 				$form->populate($formData);
+				$storageProfileClass = KalturaPluginManager::getObjectClass('Kaltura_Client_Type_StorageProfile', $type);
 				
-				if (key_exists("protocol", $formData) && $formData["protocol"]){ //new storage
-					$protocol = $formData["protocol"];
+				if (!$storageProfileClass)
+				{
+					if( $protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
+						$storageProfileClass = 'Kaltura_Client_Type_AmazonS3StorageProfile';
+					}	
+					else{
+						$storageProfileClass = 'Kaltura_Client_Type_StorageProfile';	
+					}
 				}
 				
-				else if ($storage && $storage->protocol){ // edit mode
-					$protocol = $storage->protocol;
-				}		
-				
-				if( $protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
-					$storageFromForm = $form->getObject("Kaltura_Client_Type_AmazonS3StorageProfile", $formData, false, true);
-				}	
-				else{			
-					$storageFromForm = $form->getObject("Kaltura_Client_Type_StorageProfile", $formData, false, true);
-				}
+				$storageFromForm = $form->getObject($storageProfileClass, $formData, false, true);
 				
 				$flavorParams = array();
 				foreach($flavorParamsResponse->objects as $flavorParamsItem)
@@ -343,13 +360,15 @@ class PartnerController extends Zend_Controller_Action
 					$storageFromForm->flavorParamsIds = implode(',', $flavorParams);
 				else		
 					$storageFromForm->flavorParamsIds = '';
-
+				
+				if (!$editMode)
+					$storageFromForm->protocol = $type;
+				
 				KalturaLog::log('Storage: ' . print_r($storageFromForm, true));
 				
 				Infra_ClientHelper::impersonate($storageFromForm->partnerId);
 				$storageFromForm->partnerId = null;
-				
-				if (!$editMode)
+				if (!$storageId)
 				{
 					$client->storageProfile->add($storageFromForm);
 				}
@@ -365,7 +384,9 @@ class PartnerController extends Zend_Controller_Action
 			}
 		}
 		
+		KalturaLog::debug("storage protocol: $type");
 		$this->view->form = $form;
+		$this->view->protocol = $type;
 	}
 	
 	public function configureAction()

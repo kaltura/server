@@ -11,28 +11,10 @@ class KalturaKontikiStorageProfile extends KalturaStorageProfile
 	 */
 	public $serviceToken;
 	
-	/**
-	 * @var string
-	 */
-	public $userName;
-	
-	/**
-	 * @var string
-	 */
-	public $password;
-	
-	/**
-	 * @var KalturaStorageProfileProtocol
-	 * @readonly
-	 */
-	public $protocol;
-	
 	
 	private static $map_between_objects = array
 	(
 		'serviceToken',
-		'userName',
-		'password',
 		
 	);
 	

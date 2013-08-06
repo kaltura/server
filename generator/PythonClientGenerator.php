@@ -45,22 +45,17 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	function getPluginClassName($pluginName)
-	{
-		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
-	}
-	
 	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes)
 	{
 		if ($pluginName == '')
 		{
 			$pluginClassName = "KalturaCoreClient";
-			$outputFileName = "$pluginClassName.py";
+			$outputFileName = "KalturaClient/Plugins/Core.py";
 		}
 		else 
 		{
-			$pluginClassName = $this->getPluginClassName($pluginName);
-			$outputFileName = "KalturaPlugins/$pluginClassName.py";
+			$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+			$outputFileName = "KalturaClient/Plugins/".ucfirst($pluginName).".py";
 		}
 		
     	$this->startNewTextBlock();
@@ -73,23 +68,16 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		
 		if ($pluginName != '')
 		{
-			$this->appendLine('import os.path');
-			$this->appendLine('import sys');
-			$this->appendLine('');
-			$this->appendLine("clientRoot = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))");
-			$this->appendLine("if not clientRoot in sys.path:");
-			$this->appendLine("    sys.path.append(clientRoot)");
-			$this->appendLine('');
-			$this->appendLine('from KalturaCoreClient import *');
+			$this->appendLine('from Core import *');
 
 			$xpath = new DOMXPath($this->_doc);
 			$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
 			foreach($dependencyNodes as $dependencyNode)
 				$this->appendLine('from ' .
-					$this->getPluginClassName($dependencyNode->getAttribute("pluginName")) . 
+					ucfirst($dependencyNode->getAttribute("pluginName")) . 
 					' import *');
 		}
-		$this->appendLine('from KalturaClientBase import *');
+		$this->appendLine('from ..Base import *');
 		$this->appendLine('');
 
 		if ($pluginName == '')

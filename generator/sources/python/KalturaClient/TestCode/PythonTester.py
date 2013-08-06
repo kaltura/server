@@ -25,17 +25,14 @@
 #
 # @ignore
 # ===================================================================================================
-import sys
-import os
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
 from KalturaClient import *
-from KalturaMetadataClientPlugin import *
+from KalturaClient.Plugins.Metadata import *
 import logging
 import urllib
 import time
+import sys
 import re
+import os
 
 logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(levelname)s %(message)s',
