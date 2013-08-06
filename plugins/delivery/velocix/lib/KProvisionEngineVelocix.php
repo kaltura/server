@@ -80,7 +80,7 @@ class KProvisionEngineVelocix extends KProvisionEngine
 					$keyValUrls = new KalturaKeyValue();
 					$keyValUrls->key = self::APPLE_HTTP_URLS;
 					$urls = array(self::PLAYBACK => 'http://'.$playbackHost.'/'.$this->streamName.'/hls/'.$this->streamName.'.m3u8',
-								self::PUBLISH =>'http://'.$publishHost.'/'.$this->streamName.'/hls/'.$this->streamName.'.isml');
+								self::PUBLISH =>'http://'.$publishHost.'/'.$this->streamName.'/hls/'.$this->streamName);
 					$keyValUrls->value= serialize($urls);
 					$provisioningParams[] = $keyValUrls;
 					break;
