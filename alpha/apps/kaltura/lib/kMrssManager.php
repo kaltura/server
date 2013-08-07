@@ -548,7 +548,11 @@ class kMrssManager
 				break;
 		}
 			
-		$assets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, $mrssParams->getStatuses());
+		$assetsStatuses = array(asset::ASSET_STATUS_READY);
+		if($mrssParams && $mrssParams->getStatuses())
+			$assetsStatuses = $mrssParams->getStatuses();
+			
+		$assets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, $assetsStatuses);
 		foreach($assets as $asset)
 		{
 			if ($mrssParams &&
