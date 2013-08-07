@@ -171,7 +171,8 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				break;
 
 			case baseObjectFilter::MULTI_LIKE_AND:
-					$vals = is_array($value) ? $val : explode(',', $value);
+			case baseObjectFilter::MATCH_AND:
+					$vals = is_array($value) ? $value : explode(',', $value);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!strlen($valValue))
@@ -189,7 +190,8 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					}
 					break;	
 			case baseObjectFilter::MULTI_LIKE_OR:
-					$vals = is_array($value) ? $val : explode(',', $value);
+			case baseObjectFilter::MATCH_OR:
+					$vals = is_array($value) ? $value : explode(',', $value);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!strlen($valValue))
