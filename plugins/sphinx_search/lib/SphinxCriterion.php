@@ -186,7 +186,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					if(count($vals))
 					{
 						$val = implode(' ', $vals);
-						return "@$sphinxField $val";
+						return "(@$sphinxField $val)";
 					}
 					break;	
 			case baseObjectFilter::MULTI_LIKE_OR:
@@ -205,7 +205,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					if(count($vals))
 					{
 						$val = implode(' | ', $vals);
-						return "@$sphinxField $val";
+						return "(@$sphinxField $val)";
 					}
 					break;
 				
