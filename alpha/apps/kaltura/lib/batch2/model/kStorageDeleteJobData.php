@@ -30,8 +30,8 @@ class kStorageDeleteJobData extends kStorageJobData
         $this->setServerPassword($storage->getStoragePassword());
         $this->setFtpPassiveMode($storage->getStorageFtpPassiveMode());
 
-        $this->setSrcFileSyncId($fileSync->getId());
-        $this->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
+        $this->setSrcFileSyncId($filesync->getId());
+        $this->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $filesync->getFilePath());
     }
     
 }
