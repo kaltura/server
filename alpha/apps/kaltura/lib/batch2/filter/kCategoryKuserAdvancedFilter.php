@@ -113,7 +113,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 					}
 				}
 				
-				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_OR : baseObjectFilter::MATCH_AND);
+				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_AND : baseObjectFilter::MATCH_OR);
 				$query->addOr($criterion);
 			}
 			
