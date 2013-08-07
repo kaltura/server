@@ -894,9 +894,13 @@ class category extends Basecategory implements IIndexable
 		$permissionNamesByMembers = array();
 		foreach ($members as $member)
 		{
-			/* @var $member kuser */
+			/* @var $member categoryKuser */
 			$permissionNames = explode(",", $member->getPermissionNames());
-			$permissionNamesByMembers[] = $member->getId().implode(" ".$member->getId(), $permissionNames);
+			foreach ($permissionNames as &$permissionName)
+			{
+				$permissionName = str_replace('_', '', $permissionName);				
+			}
+			$permissionNamesByMembers[] = $member->getKuserId().implode(" ".$member->getKuserId(), $permissionNames);
 		}
 		
 		$membersIds = array();
@@ -910,6 +914,7 @@ class category extends Basecategory implements IIndexable
 		
 		return implode(' ', $membersIds);
 	}
+
 	
 	/**
 	 * Return kusers ids that are active members on this category.
