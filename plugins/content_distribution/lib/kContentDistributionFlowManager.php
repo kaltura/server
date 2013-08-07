@@ -92,6 +92,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		{
 			$entry->setUpdatedAt(time());
 			$entry->save();
+			$entry->indexToSearchIndex();
 		}
 		
 		return true;
