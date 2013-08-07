@@ -37,7 +37,7 @@ class KalturaStorageDeleteJobData extends KalturaStorageJobData
             case KalturaStorageProfileProtocol::KALTURA_DC:
                 return $subType;	
 			default:
-				return kPluginableEnumsManager::apiToCore('StorageProfileProtocol', $subType);
+				return kPluginableEnumsManager::apiToCore('KalturaStorageProfileProtocol', $subType);
 		}
 	}
 	
@@ -55,7 +55,7 @@ class KalturaStorageDeleteJobData extends KalturaStorageJobData
             case StorageProfileProtocol::KALTURA_DC:
                 return $subType;    
             default:
-                return kPluginableEnumsManager::coreToApi('KalturaStorageProfileProtocol', $subType);
+                return kPluginableEnumsManager::coreToApi('StorageProfileProtocol', $subType);
         }
 	}
 }
