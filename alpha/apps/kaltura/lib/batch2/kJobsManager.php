@@ -1252,7 +1252,7 @@ class kJobsManager
 	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
 		$netStorageDeleteData = kStorageDeleteJobData::getInstance($storage->getProtocol());
-        $netStorageDeleteData->setJobData($storage, $filesync);
+        $netStorageDeleteData->setJobData($storage, $fileSync);
         
 		if ($parentJob)
 		{
