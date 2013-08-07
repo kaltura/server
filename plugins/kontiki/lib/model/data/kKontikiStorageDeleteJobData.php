@@ -41,8 +41,8 @@ class kKontikiStorageDeleteJobData extends kStorageDeleteJobData
     public function setJobData(StorageProfile $storage, FileSync $filesync)
     {
         /* @var $externalStorage KontikiStorageProfile */
-        $this->setServerUrl($externalStorage->getStorageUrl()); 
-        $this->setServiceToken($externalStorage->getServiceToken()); 
+        $this->setServerUrl($storage->getStorageUrl()); 
+        $this->setServiceToken($storage->getServiceToken()); 
         if ($fileSync->getObjectType() != FileSyncObjectType::ASSET)
             throw new kCoreException("Incompatible filesync type", kCoreException::INTERNAL_SERVER_ERROR);
         
