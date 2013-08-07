@@ -231,9 +231,9 @@ abstract class KBulkUploadEngine
 	{
 		if(KBatchBase::$taskConfig->params->multiRequestSize)
 			$this->multiRequestSize = KBatchBase::$taskConfig->params->multiRequestSize;
-		if($taskConfig->params->maxRecords)
+		if(KBatchBase::$taskConfig->params->maxRecords)
 			$this->maxRecords = KBatchBase::$taskConfig->params->maxRecords;
-		if($taskConfig->params->maxRecordsEachRun)
+		if(KBatchBase::$taskConfig->params->maxRecordsEachRun)
 			$this->maxRecordsEachRun = KBatchBase::$taskConfig->params->maxRecordsEachRun;
 		
 		$this->job = $job;

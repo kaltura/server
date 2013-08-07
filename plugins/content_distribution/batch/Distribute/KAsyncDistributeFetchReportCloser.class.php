@@ -28,7 +28,7 @@ class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineCloseReport', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineCloseReport', $providerType, $data);
 	}
 	
 	/* (non-PHPdoc)

@@ -6,7 +6,8 @@
 class CrossKalturaDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineSubmit,
 	IDistributionEngineUpdate,
-	IDistributionEngineDelete
+	IDistributionEngineDelete,
+	IKalturaLogger
 {
     
     const DISTRIBUTED_INFO_SOURCE_ID = 'sourceId';
@@ -129,14 +130,15 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	    KalturaLog::debug('Initializing source kaltura client');	    
 	    $sourceClientConfig = new KalturaConfiguration($distributionProfile->partnerId);
         $sourceClientConfig->serviceUrl = KBatchBase::$kClient->getConfig()->serviceUrl; // copy from static batch client
+        $sourceClientConfig->setLogger($this);
         $this->sourceClient = new KalturaClient($sourceClientConfig);
         $this->sourceClient->setKs(KBatchBase::$kClient->getKs()); // copy from static batch client
-	    
 	    
 	    // init target client
 	    KalturaLog::debug('Initializing target kaltura client');
 	    $targetClientConfig = new KalturaConfiguration($distributionProfile->targetAccountId);
         $targetClientConfig->serviceUrl = $distributionProfile->targetServiceUrl;
+		$targetClientConfig->setLogger($this);
         $this->targetClient = new KalturaClient($targetClientConfig);
         $ks = $this->targetClient->user->loginByLoginId($distributionProfile->targetLoginId, $distributionProfile->targetLoginPassword, "", 86400, 'disableentitlement');
         $this->targetClient->setKs($ks);
@@ -1278,6 +1280,11 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		// KalturaLog::debug('result xml = '.$$resultXmlStr);
 		
 		return $resultXmlStr;
+	}
+	
+	function log($message)
+	{
+		KalturaLog::log($message);
 	}
 		    
 }

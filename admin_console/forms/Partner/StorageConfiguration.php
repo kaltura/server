@@ -3,73 +3,20 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_Partner_StorageConfiguration extends Infra_Form
+class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfiguration
 {
 	public function init()
 	{
-		// Set the method for the display form to POST
-		$this->setMethod('post');
-		$this->setAttrib('id', 'frmStorageConfig');
-
-		$this->addElement('text', 'partnerId', array(
-			'label' 		=> '*Related Publisher ID:',
-			'required'		=> true,
-			'filters' 		=> array('StringTrim'),
-			'validators' 	=> array()
+		parent::init();
 		
-		));
-		
-		$this->addElement('text', 'name', array(
-			'label' 		=> '*Remote Storage Name:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'systemName', array(
-			'label' 		=> 'System Name:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		 
-		$deliveryStatus = new Kaltura_Form_Element_EnumSelect('deliveryStatus', array('enum' => 'Kaltura_Client_Enum_StorageProfileDeliveryStatus'));
-		$deliveryStatus->setLabel('Delivery Status:');
-		$this->addElements(array($deliveryStatus));	
-		
-		$this->addElement('text', 'deliveryPriority', array(
-			'label' 		=> 'Delivery Priority:',
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('textarea', 'desciption', array(
-			'label'			=> 'Description:',
-			'cols'			=> 60,
-			'rows'			=> 3,
-			'filters'		=> array('StringTrim'),
-		));
-		 
-		$this->addElement('select', 'protocol', array(
-			'label'			=> 'Transfer Protocol:',
-			'filters'		=> array('StringTrim'),
-			'multiOptions'  => array(Kaltura_Client_Enum_StorageProfileProtocol::FTP => 'FTP',
-									Kaltura_Client_Enum_StorageProfileProtocol::SFTP => 'SFTP',
-									Kaltura_Client_Enum_StorageProfileProtocol::SCP => 'SCP',
-									Kaltura_Client_Enum_StorageProfileProtocol::S3 => 'Amazon S3'
-									),
-		
-		));
-		 
-		$this->addElement('text', 'storageUrl', array(
-			'label'			=> '*Storage URL:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-		));
-		 
 		$this->addElement('text', 'storageBaseDir', array(
 			'label'			=> 'Storage Base Directory:',
 			'filters'		=> array('StringTrim'),
 		
 		));
+		
+		$this->addElementToDisplayGroup('storage_info', 'storageBaseDir');
+		
 		 
 		$this->addElement('text', 'storageUsername', array(
 			'label'			=> '*Storage Username:',
@@ -77,6 +24,7 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		
 		));
+		$this->addElementToDisplayGroup('storage_info', 'storageUsername');
 		 
 		$this->addElement('text', 'storagePassword', array(
 			'label'			=> '*Storage Password:',
@@ -84,19 +32,16 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		
 		));
+		$this->addElementToDisplayGroup('storage_info', 'storagePassword');
+		 
 		 
 		$this->addElement('checkbox', 'storageFtpPassiveMode', array(
 			'label'			=> 'Storage FTP Passive Mode',
 			'filters'		=> array('StringTrim'),
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
+						
 		));
-		
-		$this->addElement('checkbox', 'allowAutoDelete', array(
-			'label'			=> 'Allow auto-deletion of files',
-			'filters'		=> array('StringTrim'),
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
-		));
-		 
+		$this->addElementToDisplayGroup('storage_info', 'storageFtpPassiveMode');
+		KalturaLog::debug('1');
 				
 		$this->addElement('select', 'filesPermissionInS3', array(
 			'label'			=> 'Files Permission In S3:',
@@ -106,41 +51,36 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 									),										
 		));
 		
+		$this->addElementToDisplayGroup('playback_info', 'filesPermissionInS3');
+		
 		$this->addElement('text', 'deliveryHttpBaseUrl', array(
 			'label'			=> '*HTTP Delivery Base URL:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			
 		));
-		 
+		$this->addElementToDisplayGroup('playback_info', 'deliveryHttpBaseUrl'); 
+
 		$this->addElement('text', 'deliveryRmpBaseUrl', array(
 			'label'			=> 'RTMP Delivery Base URL:',
 			'filters'		=> array('StringTrim'),
 			
 		));
+		$this->addElementToDisplayGroup('playback_info', 'deliveryRmpBaseUrl'); 
 		
 		$this->addElement('text', 'rtmpPrefix', array(
 		    'label'        =>  'RTMP stream URL prefix:',
 		    'filters'      =>   array('StringTrim'),
 		));
+		$this->addElementToDisplayGroup('playback_info', 'rtmpPrefix'); 
+		
 		 
 		$this->addElement('text', 'deliveryIisBaseUrl', array(
 			'label'			=> 'IIS Delivery Base URL:',
 			'filters'		=> array('StringTrim'),
 			
 		));
-		 
-		$this->addElement('text', 'minFileSize', array(
-			'label'			=> 'Export only files bigger than:',
-			'filters'		=> array('Digits'),
-			
-		));
-		 
-		$this->addElement('text', 'maxFileSize', array(
-			'label'			=> 'Export only files smaller than:',
-			'filters'		=> array('Digits'),
-			
-		));
+		$this->addElementToDisplayGroup('playback_info', 'deliveryIisBaseUrl'); 
 		 
 		$this->addElement('select', 'pathManagerClass', array(
 			'label'			=> 'Path Manager:',
@@ -151,63 +91,19 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 									),					
 		));
 		$this->getElement('pathManagerClass')->setRegisterInArrayValidator(false);
+		$this->addElementToDisplayGroup('storage_info', 'pathManagerClass'); 
 		 
-		
-		$this->addElement('select', 'urlManagerClass', array(
-			'label'			=> 'Delivery URL format :',
-			'filters'		=> array('StringTrim'),
-			'multiOptions'  => array('' => 'Kaltura Delivery URL Format',
-									'kLocalPathUrlManager' => 'QA FMS Server',
-									'kLimeLightUrlManager' => 'Lime Light CDN',
-									'kAkamaiUrlManager' => 'Akamai CDN',
-									'kLevel3UrlManager' => 'Level 3 CDN',
-		    						'kMirrorImageUrlManager' => 'Mirror Image CDN',
-									),		
-			
-		));
-		$this->getElement('urlManagerClass')->setRegisterInArrayValidator(false);
-		 
-		
-		$this->addElement('select', 'trigger', array(
-			'label'			=> 'Trigger:',
-			'filters'		=> array('StringTrim'),
-			'multiOptions'  => array(3 => 'Flavor Ready',
-									2 => 'Moderation Approved',
-							  ),	
-		));
-		
-		$readyBehavior = new Kaltura_Form_Element_EnumSelect('readyBehavior', array('enum' => 'Kaltura_Client_Enum_StorageProfileReadyBehavior'));
-		$readyBehavior->setLabel('Ready Behavior:');
-		$this->addElements(array($readyBehavior));
-		
-		$this->addElement('textarea', 'urlManagerParamsJson', array(
-			'label'			=> 'URL Manager Params (JSON):',
-			'cols'			=> 48,
-			'rows'			=> 2,
-			'filters'		=> array('StringTrim'),
-		));
-		
 		$this->addElement('textarea', 'pathManagerParamsJson', array(
 			'label'			=> 'Path Manager Params (JSON):',
 			'cols'			=> 48,
 			'rows'			=> 2,
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElementToDisplayGroup('advanced', 'pathManagerParamsJson'); 
+
 	}
 	
-	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())
-	{
-		foreach($flavorParams->objects as $index => $flavorParamsItem)
-		{
-			$checked = in_array($flavorParamsItem->id, $selectedFlavorParams);
-			$this->addElement('checkbox', 'flavorParamsId_' . $flavorParamsItem->id, array(
-				'label'			=> "Flavor Params {$flavorParamsItem->name} ({$flavorParamsItem->id})",
-				'checked'		=> $checked,
-			    'indicator'		=> 'dynamic',
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),
-			));
-		}
-	}
 	
 	public function populateFromObject($object, $add_underscore = true)
 	{

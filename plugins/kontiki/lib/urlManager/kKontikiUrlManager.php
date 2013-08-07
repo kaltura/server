@@ -9,8 +9,15 @@ class kKontikiUrlManager extends kUrlManager
     
     protected function doGetFileSyncUrl(FileSync $fileSync)
     {
-        $storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-        KontikiAPIWrapper::$entryPoint = $this->storageProfileId->getApiEntryPoint();
-        return KontikiAPIWrapper::getPlaybackUrn("srv-".base64_encode($this->storageProfile->getServiceToken()), $fileSync->getFilePath());
+        $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+		/* @var $storageProfile KontikiStorageProfile */
+		$kontikiAPIWrapper = new KontikiAPIWrapper($storageProfile->getStorageUrl());
+        $playbackResource = $kontikiAPIWrapper->getPlaybackResource(KontikiPlugin::SERVICE_TOKEN_PREFIX.base64_encode($storageProfile->getServiceToken()), $fileSync->getFilePath());
+		if (!$playbackResource) 
+		{
+			return null;
+		}
+		
+		return strval($playbackResource->urn) . ";realmId:" . strval($playbackResource->realmId) . ";realmTicket:" .strval($playbackResource->realmTicket);
     }
 }

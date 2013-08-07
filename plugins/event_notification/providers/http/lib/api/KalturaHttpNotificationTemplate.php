@@ -131,12 +131,6 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 	 */
 	public $customHeaders;
 	
-	/**
-	 * Define the content dynamic parameters
-	 * @var KalturaEventNotificationParameterArray
-	 */
-	public $contentParameters;
-	
 	private static $map_between_objects = array
 	(
 		'url',
@@ -157,7 +151,6 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 		'sslKey',
 		'sslKeyPassword',
 		'customHeaders',
-		'contentParameters',
 	);
 	
 	public function __construct()
@@ -211,24 +204,7 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 		/* @var $dbObject HttpNotificationTemplate */
 		parent::fromObject($dbObject);
 		
-		$dataType = get_class($dbObject->getData());
-		KalturaLog::debug("Loading KalturaHttpNotificationData from type [$dataType]");
-		switch ($dataType)
-		{
-			case 'kHttpNotificationDataFields':
-				$this->data = new KalturaHttpNotificationDataFields();
-				break;
-				
-			case 'kHttpNotificationDataText':
-				$this->data = new KalturaHttpNotificationDataText();
-				break;
-				
-			default:
-				$this->data = KalturaPluginManager::loadObject('KalturaHttpNotificationData', $dataType);
-				break;
-		}
-		
-		if($this->data)
-			$this->data->fromObject($dbObject->getData());
+		if($dbObject->getData())
+			$this->data = KalturaHttpNotificationData::getInstance($dbObject->getData());
 	}
 }

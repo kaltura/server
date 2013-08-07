@@ -10,6 +10,13 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	 */
 	public $content;
 	
+	/**
+	 * It's protected on purpose, used by getData
+	 * @see KalturaHttpNotificationDataText::getData()
+	 * @var string
+	 */
+	protected $data;
+	
 	private static $map_between_objects = array
 	(
 		'content',
@@ -65,5 +72,15 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 		
 		if($this->content)
 			$this->content->fromObject($dbObject->getContent());
+			
+		$this->data = $dbObject->getData();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaHttpNotificationData::getData()
+	 */
+	public function getData(kHttpNotificationDispatchJobData $jobData = null)
+	{
+		return $this->data;
 	}
 }

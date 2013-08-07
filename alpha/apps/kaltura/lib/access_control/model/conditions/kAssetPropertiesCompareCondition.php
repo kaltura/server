@@ -20,16 +20,18 @@ class kAssetPropertiesCompareCondition extends kCondition
 	}
 
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return bool
 	 */
-	protected function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(kScope $scope)
 	{
 		// no properties defined, the condition is fulfilled
 		if (count($this->getProperties()) == 0)
 			return true;
 
-		$scope = $accessControl->getScope();
+		if(!($scope instanceof accessControlScope))
+			return false;
+			
 		$entryId = $scope->getEntryId();
 		$entryAssets = assetPeer::retrieveReadyByEntryId($scope->getEntryId());
 		foreach($entryAssets as $asset)

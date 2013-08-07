@@ -16,17 +16,10 @@ class KalturaKontikiStorageDeleteJobData extends KalturaStorageDeleteJobData
      */
     public $serviceToken;
     
-    /**
-     * @var string
-     */
-    public $entryPoint;
-    
     private static $map_between_objects = array
     (
         'serviceToken',
         'contentMoid',
-        'entryPoint',
-        
     );
     
     /* (non-PHPdoc)

@@ -102,22 +102,25 @@ class kDataCenterMgr
 		KalturaLog::log("File Sync [{$file_sync->getId()}]");
 		$dc_id = $file_sync->getDc();		
 		$dc = self::getDcById ( $dc_id );
-		$external_url = $dc["external_url"];
-		return $external_url;
+		$url = $dc["url"];
+		return $url;
 	}
 
 	public static function getRemoteDcExternalUrlByDcId ( $dc_id )
 	{
 		KalturaLog::log("DC id [{$dc_id}]");
 		$dc = self::getDcById ( $dc_id );
-		$external_url = $dc["external_url"];
-		return $external_url;
+		$url = $dc["url"];
+		return $url;
 	}
 	
 	public static function getRedirectExternalUrl ( FileSync $file_sync , $additional_url = null )
 	{
-		$remote_external_url = self::getRemoteDcExternalUrl ( $file_sync );
-		$remote_url =  $remote_external_url . $_SERVER['REQUEST_URI'];
+		$remote_url = self::getRemoteDcExternalUrl ( $file_sync );
+		$remote_url =  $remote_url . $_SERVER['REQUEST_URI'];
+		$remote_url = preg_replace('/^https?:\/\//', '', $remote_url);
+		$remote_url = infraRequestUtils::getProtocol() . '://' . $remote_url;
+		
 		KalturaLog::log ("URL to redirect to [$remote_url]" );
 		
 		return $remote_url;

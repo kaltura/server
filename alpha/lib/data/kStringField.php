@@ -5,7 +5,7 @@
  * @package Core
  * @subpackage model.data
  */
-abstract class kStringField extends kStringValue
+abstract class kStringField extends kStringValue implements IScopeField
 {
 	/**
 	 * @var kScope

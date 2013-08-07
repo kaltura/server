@@ -9,3 +9,5 @@ configurations/logger.ini
 configurations/plugins.ini
 configurations/system.ini
 configurations/url_managers.ini
+plugins/.buildpath
+plugins/.settings/*

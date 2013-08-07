@@ -139,7 +139,7 @@ class kContextDataHelper
 		$this->applyAccessControlOnContextData($scope);
 		$this->setContextDataFlavorAssets($flavorTags);
 		$this->setContextDataStorageProfilesXml();	
-		$this->setContextDataStreamerTypeAndMediaProtocol();
+		$this->setContextDataStreamerTypeAndMediaProtocol($scope, $flavorTags);
 		
 	}
 	
@@ -281,7 +281,7 @@ class kContextDataHelper
 	}
 	
 	
-	private function setContextDataStreamerTypeAndMediaProtocol()
+	private function setContextDataStreamerTypeAndMediaProtocol(accessControlScope $scope, $flavorTags)
 	{
 		if($this->streamerType && $this->streamerType != PlaybackProtocol::AUTO)
 		{
@@ -327,6 +327,16 @@ class kContextDataHelper
 		
 		if ($this->streamerType == PlaybackProtocol::AKAMAI_HD || $this->streamerType == PlaybackProtocol::AKAMAI_HDS)
 			$this->mediaProtocol = PlaybackProtocol::HTTP;
+		
+		//If a plugin can determine the streamerType and mediaProtocol, prefer plugin result
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaContextDataHelper');
+		foreach ($pluginInstances as $pluginInstance)
+		{
+			/* @var $pluginInstance IKalturaContextDataHelper */
+			$this->streamerType = $pluginInstance->getContextDataStreamerType($scope, $flavorTags, $this->streamerType);
+			$this->mediaProtocol = $pluginInstance->getContextDataMediaProtocol($scope, $flavorTags, $this->streamerType, $this->mediaProtocol);
+		}
+		
 	}
 	
 	private function selectDeliveryTypeForAuto()

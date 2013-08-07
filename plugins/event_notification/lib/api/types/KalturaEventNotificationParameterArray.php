@@ -13,9 +13,26 @@ class KalturaEventNotificationParameterArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaEventNotificationParameter();
-			$nObj->fromObject($obj);
-			$newArr[] = $nObj;
+			$parameterType = get_class($obj);
+			switch ($parameterType)
+			{
+				case 'kEventNotificationParameter':
+    				$nObj = new KalturaEventNotificationParameter();
+					break;
+					
+				case 'kEventNotificationArrayParameter':
+    				$nObj = new KalturaEventNotificationArrayParameter();
+					break;
+					
+				default:
+    				$nObj = KalturaPluginManager::loadObject('KalturaEventNotificationParameter', $parameterType);
+			}
+			
+			if($nObj)
+			{
+				$nObj->fromObject($obj);
+				$newArr[] = $nObj;
+			}
 		}
 		
 		return $newArr;

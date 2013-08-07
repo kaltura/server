@@ -8,15 +8,10 @@
  * @package infra
  * @subpackage Storage
  */
-class kFileTransferMgrType
+interface kFileTransferMgrType extends StorageProfileProtocol
 {
-    const UNKNOWN = 0;
-	const FTP  = 1; // FTP Protocol
-	const SCP  = 2; // SCP Protocol
-	const SFTP = 3; // SFTP Protocol
 	const HTTP = 4;
 	const HTTPS = 5;
-	const S3 = 6;
 	const LOCAL = 7;
 	const ASPERA = 10;
 }

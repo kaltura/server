@@ -325,22 +325,23 @@ class kApiCache extends kApiCacheBase
 	protected function storeExtraFields()
 	{
 		if (!$this->_cacheKeyDirty)
-			return;			// no extra fields were added to the cache
+			return true;			// no extra fields were added to the cache
 
 		$extraFieldsCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_EXTRA_FIELDS);
 		if (!$extraFieldsCache)
 		{
 			self::disableCache();
-			return;
+			return false;
 		}
 
 		if ($extraFieldsCache->set(self::EXTRA_KEYS_PREFIX . $this->_originalCacheKey, $this->_extraFields, self::EXTRA_FIELDS_EXPIRY) === false)
 		{
 			self::disableCache();
-			return;
+			return false;
 		}
 
 		$this->finalizeCacheKey();			// update the cache key to include the extra fields
+		return true;
 	}
 
 	protected function finalizeCacheKey()
@@ -727,7 +728,8 @@ class kApiCache extends kApiCacheBase
 		if ($serializeResponse)
 			$response = serialize($response);
 
-		$this->storeExtraFields();
+		if (!$this->storeExtraFields())
+			return;
 
 		// set the X-Kaltura header only if it does not exist or contains 'cache-key'
 		// the header is overwritten for cache-key so that for a multirequest we'll get the key of

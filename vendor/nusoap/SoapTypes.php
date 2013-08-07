@@ -11,6 +11,12 @@ class SoapObject
 		return null;
 	}
 	
+	public function __construct(array $result = null)
+	{
+		if($result)
+			$this->fromArray($result);
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		return null;

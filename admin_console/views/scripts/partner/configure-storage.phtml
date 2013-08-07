@@ -2,88 +2,9 @@
 	action="<?php echo $this->url ( array ('controller' => 'partner', 'action' => 'configure-storage' )); ?>"
 	method="post" enctype="application/x-www-form-urlencoded"
 	id="frmStorageConfig" class="<?php echo ($this->formValid) ? 'valid' : 'invalid'; ?>">
-<div class="clear"></div>
-<div class="newStorageDiv">
-	<div class="rightcolumn">
-	<p align="right"> <font size="-2"> *Mandatory Fields </font></p>
-	</div>
-<div><b>General</b></div>
-		<div class="leftcolumn">
-		<dl>
-		<?php echo $this->form->partnerId;?>
-		<?php echo $this->form->name;?>
-		<?php echo $this->form->systemName;?>
-		<?php echo $this->form->deliveryStatus;?>
-		<?php echo $this->form->deliveryPriority;?>
-		</dl>
-		</div>
-		<div class="rightcolumn">
-		<dl>		
-		<?php echo $this->form->desciption;?>
-		</dl>
-		</div>
-		<div class="clear"></div>		
-</div>
-<hr></hr>
-<div class="newStorageDiv">
-	<div class="leftBottomColumn">
-		<div>
-		<div><b>Export Details</b></div>
-		<?php echo $this->form->storageUrl;?>	
-		<?php echo $this->form->storageBaseDir;?>
-		
-		<?php echo $this->form->pathManagerClass;?>
-		<?php echo $this->form->protocol;?>
-		<?php echo $this->form->allowAutoDelete;?>
-		<div style="display: inline; visibility: hidden;">
-			<?php echo $this->form->storageFtpPassiveMode;?>
-		</div>
-		<div style="visibility: hidden;">
-			<?php echo $this->form->filesPermissionInS3;?>
-		</div>
-		<?php echo $this->form->storageUsername;?>
-		<?php echo $this->form->storagePassword;?>
-		</div>
-		<hr id="crossLine"></hr>
-		<div>
-		<div><b>Delivery Details</b></div>
-		<?php echo $this->form->deliveryHttpBaseUrl;?>
-		<?php echo $this->form->deliveryRmpBaseUrl;?>
-		<?php echo $this->form->rtmpPrefix;?>
-		<?php echo $this->form->deliveryIisBaseUrl;?>
-		<?php echo $this->form->urlManagerClass;?>
-		
-	
-		</div>
-	</div>
-	<div class="rightcolumn">
-	<div><b>Export Policy</b></div>
-		<?php echo $this->form->minFileSize;?>
-		<?php echo $this->form->maxFileSize;?>
-		<?php echo $this->form->trigger;?>
-		<?php echo $this->form->readyBehavior;?>
-		
-		<hr></hr>
-		<div><a id="toggleLink" onclick="jQuery('[class=commentForm]').toggle();"><b>Advanced >> </b></a></div>
-		<div class="commentForm">
-		Check/Uncheck transcoding flavors for selective export:
-		<div class="commentFormObjects">
-		<?php 		
-		foreach($this->form as $name => $obj)
-		{
-			if(isset($obj->indicator)) 
-			{
-				echo '<div>'.$obj.'</div>';	
-			}
-		} 
-		?>
-		<?php echo $this->form->urlManagerParamsJson;?>
-		<?php echo $this->form->pathManagerParamsJson;?>
-		</div>
-		</div>
-	</div>
+
+<?php echo $this->form; ?>
 			
-</div>
 
 
 <script type="text/javascript">
@@ -96,28 +17,28 @@ jQuery(document).ready(function() {
 		switch ( protocol )
 		{
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::S3?>":				
-			jQuery('#filesPermissionInS3-label').parent().css('visibility', 'visible');
-			jQuery('#filesPermissionInS3').parent().css('visibility', 'visible');
-			jQuery('#storageFtpPassiveMode').parent().css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3-label').css('visibility', 'visible');
+			jQuery('#filesPermissionInS3').css('visibility', 'visible');
+			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
+			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;
 		case "<?php echo Kaltura_Client_Enum_StorageProfileProtocol::FTP?>":
-			jQuery('#storageFtpPassiveMode').parent().css('visibility', 'visible');
-			jQuery('#filesPermissionInS3-label').parent().css('visibility', 'hidden');
-			jQuery('#filesPermissionInS3').parent().css('visibility', 'hidden');			
+			jQuery('#storageFtpPassiveMode').css('visibility', 'visible');
+			jQuery('#storageFtpPassiveMode-label').css('visibility', 'visible');
+			jQuery('#filesPermissionInS3-label').css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3').css('visibility', 'hidden');			
 			break;
 		default:
-			jQuery('#filesPermissionInS3').parent().css('visibility', 'hidden');
-			jQuery('#filesPermissionInS3-label').parent().css('visibility', 'hidden');
-			jQuery('#storageFtpPassiveMode').parent().css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3').css('visibility', 'hidden');
+			jQuery('#filesPermissionInS3-label').css('visibility', 'hidden');
+			jQuery('#storageFtpPassiveMode').css('visibility', 'hidden');
+			jQuery('#storageFtpPassiveMode-label').css('visibility', 'hidden');
 			break;
 		}
 	};
 
-	protocolUpdateView(jQuery('#protocol').val());
-	jQuery('#protocol').change(function() {
-		protocolUpdateView($(this).val());
-	});
-		
+	protocolUpdateView(<?php echo "'".$this->protocol."'"?>);
+
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPartnerFilter').submit();
