@@ -4,13 +4,87 @@
 <?php require_once __DIR__ . '/js/kObjects.js'; ?>
 
 
+function getVariables(kSelection, value, variables) {
+
+	var variable =  'value';
+	if(kSelection.variable)
+		variable = kSelection.variable;
+
+	variables[variable] = value;
+	
+	for(var variable in kSelection)
+		variables[variable] = kSelection[variable];
+	
+	return variables;
+}
+
+function addSelections(label, kSelections, selectCallback) {
+	var jqSelection = jQuery('<select><option value="">' + label + '</option></select>');
+	var jqWrap = null;
+	
+	for(var value in kSelections){
+		var kSelection = kSelections[value];
+		jqSelection.append('<option value="' + value + '">' + kSelection.label + '</option>');
+	}
+
+	jqSelection.change(function(){
+
+		if(jqWrap){
+			jqWrap.empty();
+		}
+		else{
+			jqWrap = jQuery('<div/>');
+			jqSelection.after(jqWrap);
+		}
+
+		var value =  jqSelection.val();
+		var kSelection = kSelections[value];
+		if(kSelection != null && kSelection.subSelections == null && kSelection.fieldType == null){
+
+			var variablesObject = getVariables(kSelection, value, {});
+			selectCallback.apply(jqSelection, [null, variablesObject]);
+			return;
+		}
+
+		var jqSubField = null;
+		switch(kSelection.fieldType)
+		{
+			case 'text':
+				jqSubField = jQuery('<input>');
+				jqSubField.keyup(function(){
+					selectCallback.apply(jqSelection, [null, {value: "'" + jqSubField.val() + "'"}]);
+				});
+				break;
+	
+			case 'checkbox':
+				jqSubField = jQuery('<input type="checkbox">');
+				jqSubField.change(function(){
+					selectCallback.apply(jqSelection, [null, {value: (jqSubField.attr('checked') ? 'true' : 'false')}]);
+				});
+				break;
+			
+			default:
+				jqSubField = addSelections(kSelection.subLabel, kSelection.subSelections, function(subData, variables){
+					variables = getVariables(kSelection, jqSubField.val(), variables);
+		
+					var data = subData;
+					if(kSelection.getData)
+						var data = kSelection.getData.apply(jqSelection, [subData, variables]);
+					
+					selectCallback.apply(jqSelection, [data, variables]);
+				});
+		}
+		jqWrap.append(jqSubField);
+	});
+	
+	return jqSelection;
+};
+
 jQuery(document).ready(function() {
 	jQuery('#dataType').change(function(){
 
 		jQuery('#frmObject').hide();
-		jQuery('#frmParameters').hide();
 		jQuery('#frmFreeText').hide();
-		jQuery('.content-parameter').hide();
 		
 		switch(jQuery(this).val()){
 			case 'object':
@@ -20,15 +94,18 @@ jQuery(document).ready(function() {
 			case 'text':
 				jQuery('#frmFreeText').show();
 			case 'map':
-				jQuery('#frmParameters').show();
-				jQuery('.content-parameter').show();
 				break;
 		}
 	});
 	jQuery('#dataType').change();
 
-	var jqObject = jQuery('#object')
-	var jqSelection = addSelections(jqObject, 'Select Object', kObjects);
+	var jqObject = jQuery('#object');
+	var jqObjectApiName = jQuery('#objectType');
+	
+	var jqSelection = addSelections('Select Object', kObjects, function(data, variables){
+		jqObject.val(data.code);
+		jqObjectApiName.val(data.apiName);
+	});
 	jqObject.before(jqSelection);
 });
 

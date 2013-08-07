@@ -21,19 +21,17 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	
 	/**
 	 * @var string
-	 * @requiresPermission update
 	 */
 	public $name;
 	
 	/**
 	 * @var string
-	 * @requiresPermission update
+	 * @filter eq,in
 	 */
 	public $systemName;
 	
 	/**
 	 * @var string
-	 * @requiresPermission update
 	 */
 	public $description;
 	
@@ -99,10 +97,23 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 
 	/**
 	 * Define the conditions that cause this notification to be triggered
-	 * @var KalturaEventConditionArray
+	 * @var KalturaConditionArray
 	 * @requiresPermission update
 	 */
 	public $eventConditions;
+	
+	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaEventNotificationParameterArray
+	 * @requiresPermission update
+	 */
+	public $contentParameters;
+	
+	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaEventNotificationParameterArray
+	 */
+	public $userParameters;
 	
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -121,6 +132,8 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		'eventType',
 		'eventObjectType' => 'objectType',
 		'eventConditions',
+		'contentParameters',
+		'userParameters',
 	);
 		 
 	/* (non-PHPdoc)

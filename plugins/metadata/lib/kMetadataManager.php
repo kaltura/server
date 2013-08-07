@@ -65,9 +65,9 @@ class kMetadataManager
 	 * @param string $xPathPattern
 	 * @return array
 	 */
-	public static function parseMetadataValues(Metadata $metadata, $xPathPattern)
+	public static function parseMetadataValues(Metadata $metadata, $xPathPattern, $version = null)
 	{
-		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $version);
 		$source = kFileSyncUtils::file_get_contents($key, true, false);
 		if(!$source)
 			return null;

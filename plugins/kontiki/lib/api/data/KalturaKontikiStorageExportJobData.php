@@ -22,18 +22,12 @@
 	 */
 	public $serviceToken;
 	
-	/**
-	 * @var string
-	 */
-	public $entryPoint;
     
     private static $map_between_objects = array
     (
         'flavorAssetId',
         'serviceToken',
         'contentMoid',
-        'entryPoint',
-        
     );
 	
     /* (non-PHPdoc)

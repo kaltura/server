@@ -20,7 +20,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 	/**
 	 * Data to send.
 	 * 
-	 * @var KalturaHttpNotificationData
+	 * @var string
 	 */
 	public $data;
 	
@@ -174,31 +174,27 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		'contentParameters',
 	);
 
+	/* (non-PHPdoc)
+	 * @see KalturaEventNotificationDispatchJobData::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::fromObject()
+	 * @see KalturaObject::fromObject($srcObj)
 	 */
-	public function fromObject($dbObject)
+	public function fromObject($srcObj)
 	{
-		/* @var $dbObject kHttpNotificationDispatchJobData */
-		parent::fromObject($dbObject);
+		/* @var $srcObj kHttpNotificationDispatchJobData */
+		parent::fromObject($srcObj);
 		
-		$this->customHeaders = KalturaKeyValueArray::fromKeyValueArray($dbObject->getCustomHeaders());
-		$this->contentParameters = KalturaKeyValueArray::fromKeyValueArray($dbObject->getContentParameters());
-		
-		$data = $dbObject->getData();
-		if($data)
-		{	
-			if($data instanceof kHttpNotificationDataFields)
-				$this->data = new KalturaHttpNotificationDataFields();
-			else
-				$this->data = new KalturaHttpNotificationDataText();
-			
-			$this->data->fromObject($data);
+		if(is_null($this->data) && $srcObj->getDataObject())
+		{
+			$dataObject = KalturaHttpNotificationData::getInstance($srcObj->getDataObject());
+			if($dataObject)
+				$this->data = $dataObject->getData($srcObj);
 		}
 	}
 }

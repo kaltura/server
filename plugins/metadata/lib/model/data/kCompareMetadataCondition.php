@@ -20,6 +20,11 @@ class kCompareMetadataCondition extends kCompareCondition
 	 */
 	private $profileId;
 	
+	/**
+	 * @var string
+	 */
+	private $profileSystemName;
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -30,12 +35,52 @@ class kCompareMetadataCondition extends kCompareCondition
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kCondition::applyDynamicValues()
+	 */
+	protected function applyDynamicValues(kScope $scope)
+	{
+		parent::applyDynamicValues($scope);
+	
+		$dynamicValues = $scope->getDynamicValues('{', '}');
+		
+		if(is_array($dynamicValues) && count($dynamicValues))
+		{
+			$this->xPath = str_replace(array_keys($dynamicValues), $dynamicValues, $this->xPath);
+			if($this->profileSystemName)
+				$this->profileSystemName = str_replace(array_keys($dynamicValues), $dynamicValues, $this->profileSystemName);
+		}
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	public function getFieldValue(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
-		$metadata = MetadataPeer::retrieveByObject($this->profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+		$profileId = $this->profileId;
+		if(!$profileId)
+		{
+			if(!$this->profileSystemName)
+				return null;
+				
+			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
+			if(!$profile)
+				return null;
+				
+			$profileId = $profile->getId();
+		}
+		
+		$metadata = null;
+		if($scope instanceof accessControlScope)
+		{
+			$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+		}
+		elseif($scope instanceof kEventScope && $scope->getEvent() instanceof kApplicativeEvent)
+		{
+			$object = $scope->getEvent()->getObject();
+			if($object instanceof IMetadataObject)
+				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
+		}
+			
 		if(!$metadata)
 			return null;
 			
@@ -76,6 +121,22 @@ class kCompareMetadataCondition extends kCompareCondition
 	public function setProfileId($profileId)
 	{
 		$this->profileId = $profileId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProfileSystemName() 
+	{
+		return $this->profileSystemName;
+	}
+
+	/**
+	 * @param string $profileSystemName
+	 */
+	public function setProfileSystemName($profileSystemName) 
+	{
+		$this->profileSystemName = $profileSystemName;
 	}
 
 	/* (non-PHPdoc)

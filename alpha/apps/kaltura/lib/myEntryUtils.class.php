@@ -373,8 +373,7 @@ class myEntryUtils
 				break;
 		}
 
-		$sourceType = $entry->getSource();
-		if ($sourceType == EntrySourceType::AKAMAI_LIVE || $sourceType == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
+		if ($entry->getType() == entryType::LIVE_STREAM)
 			kJobsManager::addProvisionDeleteJob(null, $entry);
 			
 		// in this case we'll need some batch job to fix all related roughcuts for this entry

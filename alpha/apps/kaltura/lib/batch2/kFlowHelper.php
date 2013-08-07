@@ -1604,6 +1604,12 @@ class kFlowHelper
 			return $dbBatchJob;
 
 		$data->populateEntryFromData($entry);
+		$liveAssets = assetPeer::retrieveByEntryId($entry->getId(),array(assetType::LIVE));
+		foreach ($liveAssets as $liveAsset){
+			/* @var $liveAsset liveAsset */
+			$liveAsset->setStatus(asset::ASSET_STATUS_READY);
+			$liveAsset->save();
+		}
 		$entry->save();
 		return $dbBatchJob;
 	}

@@ -144,7 +144,10 @@ class myCustomData
 	{
 		if($namespace)
 		{
-			unset($this->data[$namespace][$name]);
+			if ($name)
+				unset($this->data[$namespace][$name]);
+			else
+				unset($this->data[$namespace]);
 		}
 		else
 		{

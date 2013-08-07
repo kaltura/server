@@ -12,6 +12,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 {
 	const FLAVOR_OM_CLASS = 'flavorParams';
 	const THUMBNAIL_OM_CLASS = 'thumbParams';
+	const LIVE_OM_CLASS = 'liveParams';
 	
 	static protected $filterPartner = null;
 	
@@ -40,6 +41,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => assetParamsPeer::FLAVOR_OM_CLASS,
 		assetType::THUMBNAIL => assetParamsPeer::THUMBNAIL_OM_CLASS,
+		assetType::LIVE => assetParamsPeer::LIVE_OM_CLASS,
 	);
 
 	public static function excludeId($id)
@@ -255,7 +257,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 		$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
 		$criteria->add(assetParamsPeer::ID, $pks, Criteria::IN);
 		
-		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$types = self::retrieveAllFlavorParamsTypes();
 		$criteria->add(assetParamsPeer::TYPE, $types, Criteria::IN);
 		
 		return assetParamsPeer::doSelect($criteria, $con);
@@ -306,5 +308,12 @@ class assetParamsPeer extends BaseassetParamsPeer
 		$c->addAnd(assetParamsPeer::SYSTEM_NAME, $v);
 		
 		return self::doSelectOne($c, $con);
+	}
+
+	public static function retrieveAllFlavorParamsTypes(){
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes[] = assetType::LIVE;
+		return $flavorTypes;
+		
 	}
 }

@@ -31,6 +31,12 @@ class kScope
 	 */
 	protected $time;
 	
+	/**
+	 * Unix timestamp (In seconds) to be used to test entry scheduling, keep null to use now.
+	 * @var array<kValue>
+	 */
+	protected $dynamicValues = array();
+	
 	public function __construct()
 	{
 		$this->setIp(requestUtils::getRemoteAddress());
@@ -125,5 +131,41 @@ class kScope
 	public function setTime($time) 
 	{
 		$this->time = $time;
+	}
+
+	public function resetDynamicValues() 
+	{
+		$this->dynamicValues= array();
+	}
+
+	/**
+	 * @param string $key
+	 * @param kValue $value
+	 */
+	public function addDynamicValue($key, kValue $value) 
+	{
+		$this->dynamicValues[$key] = $value;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getDynamicValues($keyPrefix = '', $keySuffix = '')
+	{
+		$values = array();
+		foreach($this->dynamicValues as $key => $value)
+		{
+			/* @var $value kValue */
+			if($value instanceof IScopeField)
+				$value->setScope($this);
+				
+			$dynamicValue = $value->getValue();
+			if(is_null($dynamicValue))
+				$dynamicValue = '';
+				
+			$values[$keyPrefix . $key . $keySuffix] = $dynamicValue;
+		}
+		
+		return $values;
 	}
 }

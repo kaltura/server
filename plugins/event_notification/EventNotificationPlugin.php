@@ -52,13 +52,16 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('EventNotificationBatchType', 'EventNotificationPermissionName');
+			return array('EventNotificationBatchType', 'EventNotificationPermissionName', 'EventNotificationConditionType');
 	
 		if($baseEnumName == 'BatchJobType')
 			return array('EventNotificationBatchType');
 			
 		if($baseEnumName == 'PermissionName')
 			return array('EventNotificationPermissionName');
+			
+		if($baseEnumName == 'ConditionType')
+			return array('EventNotificationConditionType');
 			
 		return array();
 	}
@@ -114,7 +117,16 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	{
 		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER) && isset($constructorArgs['coreJobSubType']))
 			return KalturaPluginManager::loadObject('KalturaEventNotificationDispatchJobData', $constructorArgs['coreJobSubType']);
-			
+	
+		if($baseClass == 'KalturaCondition')
+		{
+			if($enumValue == EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD))
+				return new KalturaEventFieldCondition();
+				
+			if($enumValue == EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_OBJECT_CHANGED))
+				return new KalturaEventObjectChangedCondition();
+		}
+		
 		return null;
 	}
 		
@@ -230,7 +242,7 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 					return 'categoryEntry';
 			}
 		}
-			
+		
 		return null;
 	}
 	
@@ -241,6 +253,15 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConditionTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ConditionType', $value);
 	}
 	
 	/**

@@ -54,10 +54,10 @@ abstract class kCompareCondition extends kCondition
 
 	/**
 	 * Return single integer or array of integers
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return int|array<int> the field content
 	 */
-	abstract public function getFieldValue(accessControl $accessControl);
+	abstract public function getFieldValue(kScope $scope);
 	
 	/**
 	 * @return int
@@ -110,10 +110,10 @@ abstract class kCompareCondition extends kCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	protected function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(kScope $scope)
 	{
-		$field = $this->getFieldValue($accessControl);
-		$value = $this->getIntegerValue($accessControl->getScope());
+		$field = $this->getFieldValue($scope);
+		$value = $this->getIntegerValue($scope);
 		
 		KalturaLog::debug("Copares field [$field] to value [$value]");
 		if (is_null($value))

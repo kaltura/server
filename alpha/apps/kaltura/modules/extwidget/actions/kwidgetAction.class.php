@@ -44,8 +44,8 @@ class kwidgetAction extends sfAction
 		$requestKey = $protocol.$_SERVER["REQUEST_URI"];
 		
 		// check if we cached the redirect url
-		$cache = new myCache("kwidget", 10 * 60); // 10 minutes
-		$cachedResponse  = $cache->get($requestKey);
+		$cache_redirect = new myCache("kwidget", 10 * 60); // 10 minutes
+		$cachedResponse  = $cache_redirect->get($requestKey);
 		if ($allowCache && $cachedResponse) // dont use cache if we want to force no caching
 		{
 			header("X-Kaltura:cached-action");
@@ -288,18 +288,18 @@ class kwidgetAction extends sfAction
 					
 		
 					// patch kdpwrapper with getwidget and getuiconf
-
 					$root = myContentStorage::getFSContentRootPath();
 					$confFile_mtime = $uiConf->getUpdatedAt(null);
-					$new_swf_path = "widget_{$widget_id}_{$widget_type}_{$confFile_mtime}_".md5($base_wrapper_swf.$swf_url).".swf";
-					$md5 = md5($new_swf_path);
-					$new_swf_path = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$new_swf_path;
+					$swf_key = "widget_{$widget_id}_{$widget_type}_{$confFile_mtime}_".md5($base_wrapper_swf.$swf_url).".swf";
 					
-					$cached_swf = "$root/$new_swf_path";
+					$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_KWIDGET_SWF);
+					
+					$swf_data = null;
+					if ($cache)
+						$swf_data = $cache->get($swf_key);
 
-					if (!file_exists($cached_swf) || filemtime($cached_swf) < $confFile_mtime)
+					if (!$swf_data)
 					{
-						kFile::fullMkdir($cached_swf);
 						require_once(SF_ROOT_DIR . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "api_v3" . DIRECTORY_SEPARATOR . "bootstrap.php");
 						$dispatcher = KalturaDispatcher::getInstance();
 						try
@@ -315,26 +315,19 @@ class kwidgetAction extends sfAction
 						if (!$ui_conf_result->confFile)
 							KExternalErrors::dieGracefully();
 							
-						ob_start();
 						$serializer = new KalturaXmlSerializer(false);
-						$serializer->serialize($widget_result);
-						$widget_xml = ob_get_contents();
-						ob_end_clean();
+						$widget_xml = $serializer->getSerializedData($widget_result);
 
-						ob_start();
 						$serializer = new KalturaXmlSerializer(false);
-						$serializer->serialize($ui_conf_result);
-						$ui_conf_xml = ob_get_contents();
-						ob_end_clean();
+						$ui_conf_xml = $serializer->getSerializedData($ui_conf_result);
 
-						$patcher = new kPatchSwf( $root . $base_wrapper_swf);
 						$result = "<xml><result>$widget_xml</result><result>$ui_conf_xml</result></xml>";
-						$patcher->patch($result, $cached_swf);
-					}
-
-					if (file_exists($cached_swf))
-					{
-						$wrapper_swf = $new_swf_path;
+						
+						$patcher = new kPatchSwf( file_get_contents($root . $base_wrapper_swf));
+						$swf_data = $patcher->patch($result);
+						
+						if ($cache)
+							$cache->set($swf_key, $swf_data);
 					}
 				}
 				
@@ -399,7 +392,7 @@ class kwidgetAction extends sfAction
 					"&kdpUrl=".urlencode($swf_url).
 					"&host=" . $partner_host .
 					"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
-					(($protocol == "https") ? "&statistics.statsDomain=$stats_host" : "").
+					"&statistics.statsDomain=$stats_host".
 					( $show_version ? "&entryVersion=$show_version" : "" ) .
 					( $kshow_id ? "&kshowId=$kshow_id" : "" ).
 					( $entry_id ? "&$entryVarName=$entry_id" : "" ) .
@@ -408,18 +401,14 @@ class kwidgetAction extends sfAction
 					($cache_st ? "&clientTag=cache_st:$cache_st" : "").
 					$conf_vars;
 					
-					// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
-					$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
-				
 				// patch wrapper with flashvars and dump to browser
 				if (version_compare($uiConf->getSwfUrlVersion(), "2.6.6", ">="))
 				{
-					$patcher = new kPatchSwf( $root . $wrapper_swf, "KALTURA_FLASHVARS_DATA");
-					ob_start();
-					$patcher->patch($dynamic_date."&referer=".urlencode($referer));
-					$wrapper_data = ob_get_contents();
-					ob_end_clean();
-	
+					$startTime = microtime(true);
+					$patcher = new kPatchSwf( $swf_data, "KALTURA_FLASHVARS_DATA");
+					$wrapper_data = $patcher->patch($dynamic_date."&referer=".urlencode($referer));
+					KalturaLog::log('Patching took '. (microtime(true) - $startTime));
+						
 					requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0, null, true, time());
 					echo $wrapper_data;
 					
@@ -429,6 +418,18 @@ class kwidgetAction extends sfAction
 					}
 					KExternalErrors::dieGracefully();
 				}
+
+				$md5 = md5($swf_key);
+				$wrapper_swf_path = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$swf_key;
+				$wrapper_swf = "$root/$wrapper_swf_path";				
+				if (!file_exists($wrapper_swf))
+				{
+					kFile::fullMkdir($wrapper_swf);
+					file_put_contents($wrapper_swf, $swf_data);
+				}
+				
+				// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
+				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf_path?$dynamic_date";
 			}
 		}
 		else
@@ -454,7 +455,7 @@ class kwidgetAction extends sfAction
 		}
 
 		if ($allowCache)
-			$cache->put($requestKey, $url);
+			$cache_redirect->put($requestKey, $url);
 
 		if (strpos($url, "/swfparams/") > 0)
 			$url = substr($url, 0, -4).urlencode($noncached_params).".swf";

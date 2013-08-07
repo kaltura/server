@@ -228,7 +228,7 @@ class KalturaRequestDeserializer
 			/* @var $property KalturaPropertyInfo */
 			$type = $property->getType();
 			
-			if ($isNull && ($property->isSimpleType() || $property->isEnum() || $property->isStringEnum()))
+			if ($isNull && !$property->isArray())
 			{
 				$obj->$name = new KalturaNullField();
 				continue;

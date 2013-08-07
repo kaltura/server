@@ -251,6 +251,8 @@ class ComcastMrssFeed
 			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 			$mediaGroup->appendChild($content);
 			$url = $this->getAssetUrl($flavorAsset);
+			//replace the default file name (a) with the entryId
+			$url = preg_replace('/\/a\./','/'.$flavorAsset->getEntryId().'.',$url); 
 			
 			// we don't have a way to identify the mime type of the file
 			// as there is no guarantee that the file exists in the current data center

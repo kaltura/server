@@ -495,7 +495,7 @@ class FlavorAssetService extends KalturaAssetService
 		$c = new Criteria();
 		$flavorAssetFilter->attachToCriteria($c);
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$totalCount = assetPeer::doCount($c);
@@ -651,11 +651,12 @@ class FlavorAssetService extends KalturaAssetService
 	 * @action getUrl
 	 * @param string $id
 	 * @param int $storageId
+	 * @param bool $forceProxy
 	 * @return string
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
 	 */
-	public function getUrlAction($id, $storageId = null)
+	public function getUrlAction($id, $storageId = null, $forceProxy = false)
 	{
 		$assetDb = assetPeer::retrieveById($id);
 		if (!$assetDb || !($assetDb instanceof flavorAsset))
@@ -684,7 +685,7 @@ class FlavorAssetService extends KalturaAssetService
 		$useCdn = true;
 		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
 			$useCdn = false;
-		return $assetDb->getDownloadUrl($useCdn);
+		return $assetDb->getDownloadUrl($useCdn, $forceProxy);
 	}
 	
 	/**
@@ -760,7 +761,7 @@ class FlavorAssetService extends KalturaAssetService
 		
 		// get all the flavor params of partner 0 and the current partner (note that partner 0 is defined as partner group in service.ct)
 		$c = new Criteria();
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetParamsPeer::retrieveAllFlavorParamsTypes();
 		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$flavorParamsDb = assetParamsPeer::doSelect($c);
@@ -768,7 +769,7 @@ class FlavorAssetService extends KalturaAssetService
 		// get the flavor assets for this entry
 		$c = new Criteria();
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$c->add(assetPeer::ENTRY_ID, $entryId);

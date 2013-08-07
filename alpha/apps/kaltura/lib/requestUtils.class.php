@@ -280,28 +280,4 @@ class requestUtils extends infraRequestUtils
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
 	
-	//
-	// allow access only via cdn or via proxy from secondary datacenter
-	//
-	public static function enforceCdnDelivery($partnerId)
-	{
-		$host = requestUtils::getHost();
-		$cdnHost = myPartnerUtils::getCdnHost($partnerId);
-
-		$dc = kDataCenterMgr::getCurrentDc();
-		$external_url = $dc["external_url"];
-
-		// allow access only via cdn or via proxy from secondary datacenter
-		if ($host != $cdnHost && $host != $external_url)
-		{
-			$uri = $_SERVER["REQUEST_URI"];
-			if (strpos($uri, "/forceproxy/true") === false)
-				$uri .= "/forceproxy/true/";
-			
-			header('Location:'.$cdnHost.$uri);
-			header("X-Kaltura:enforce-cdn");
-			
-			die;
-		}
-	}	
 }
