@@ -14,11 +14,26 @@ abstract class SyndicationFeedRenderer {
 		$this->mimeType = $mimeType;
 	}
 	
-	
 	public abstract function handleHeader();
 	public abstract function handleBody($entry, $e = null, $flavorAssetUrl = null);
 	public abstract function handleFooter();
-	public abstract function finalize($entryMrss, $moreItems);
+	
+	/**
+	 * @return the HTTP header
+	 */
+	public function handleHttpHeader() {
+		return "content-type: text/xml; charset=utf-8";
+	}
+	
+	/**
+	 * Finalizes the object and format it to printable version
+	 * @param string $entryMrss Current mrss format
+	 * @param boolean $moreItems Whether this is the last entry
+	 * @return The formatted mrss
+	 */
+	public function finalize($entryMrss, $moreItems) {
+		return $entryMrss;
+	}
 	
 	protected function getPlayerUrl($entryId)
 	{
@@ -42,10 +57,12 @@ abstract class SyndicationFeedRenderer {
 	
 	protected function writeFullXmlNode($nodeName, $value, $level, $attributes = array())
 	{
-		$this->writeOpenXmlNode($nodeName, $level, $attributes, false);
-		echo kString::xmlEncode(kString::xmlDecode("$value")); //to create a valid XML (without unescaped special chars)
+		$res = '';
+		$res .= $this->writeOpenXmlNode($nodeName, $level, $attributes, false);
+		$res .= kString::xmlEncode(kString::xmlDecode("$value")); //to create a valid XML (without unescaped special chars)
 		//we decode before encoding to avoid breaking an xml which its special chars had already been escaped
-		$this->writeClosingXmlNode($nodeName, 0);
+		$res .= $this->writeClosingXmlNode($nodeName, 0);
+		return $res;
 	}
 	
 	protected function writeOpenXmlNode($nodeName, $level, $attributes = array(), $eol = true)
@@ -63,12 +80,12 @@ abstract class SyndicationFeedRenderer {
 		if($eol)
 			$tag .= PHP_EOL;
 	
-		echo $tag;
+		return $tag;
 	}
 	
 	protected function writeClosingXmlNode($nodeName, $level = 0)
 	{
-		echo $this->getSpacesForLevel($level)."</$nodeName>".PHP_EOL;
+		return $this->getSpacesForLevel($level)."</$nodeName>".PHP_EOL;
 	}
 	
 	protected function getSpacesForLevel($level)

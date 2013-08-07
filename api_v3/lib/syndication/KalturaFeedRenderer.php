@@ -19,7 +19,6 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	}
 
 	public function handleHeader() {
-		header ("content-type: text/xml; charset=utf-8");
 		
 		$mrss = $this->getKalturaMrssXml($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
 		if($this->kalturaXslt)
@@ -33,7 +32,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		if (is_null($addXmlHeader) || $addXmlHeader == false)
 			$mrss = $this->removeXmlHeader($mrss);
 		
-		echo $mrss;
+		return $mrss;
 	}
 
 	public function handleBody($entry, $e = null, $flavorAssetUrl = null) {
@@ -59,7 +58,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			$entryMrss = $this->removeNamespaces($entryMrss);
 		}
 		$entryMrss = $this->removeXmlHeader($entryMrss);
-		echo $entryMrss;
+		return $entryMrss;
 	}
 	
 	public function handleFooter() {
@@ -71,7 +70,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
 		$mrss = substr($mrss,$divideHeaderFromFooter);
 	
-		echo $mrss;
+		return $mrss;
 	}
 
 	private function getKalturaMrssXml($title, $link = null, $description = null)

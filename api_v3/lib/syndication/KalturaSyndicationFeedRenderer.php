@@ -445,9 +445,11 @@ class KalturaSyndicationFeedRenderer
 		
 		$renderer = KalturaSyndicationFeedFactory::getRendererByType($this->syndicationFeed->type);
 		$renderer->init($this->syndicationFeed, $this->syndicationFeedDB, $this->mimeType);
-		$renderer->handleHeader();
 		
-		$cacheStore = null;	// kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
+		header($renderer->handleHttpHeader());
+		echo $renderer->handleHeader();
+		
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
 		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry-";
 		$feedUpdatedAt = $this->syndicationFeedDB->getUpdatedAt(null);
 
@@ -491,11 +493,7 @@ class KalturaSyndicationFeedRenderer
 			if ($xml === false)
 			{	
 				$flavorAssetUrl = is_null($e) ? null : $this->getFlavorAssetUrl($e);
-				ob_start();
 				$xml = $renderer->handleBody($entry, $e, $flavorAssetUrl);
-				$output = ob_get_flush();
-				if(is_null($xml))
-					$xml = $output;
 			} 
 
 			if ($cacheStore)
@@ -505,11 +503,11 @@ class KalturaSyndicationFeedRenderer
 			}
 			
 			if($xml !== false) {
-				$xml = $renderer->finalize($xml, $nextEntry !== false);
+				echo $renderer->finalize($xml, $nextEntry !== false);
 			} 
 		}
 		
-		$renderer->handleFooter();
+		echo $renderer->handleFooter();
 		
 		if ($this->feedProcessingKey && function_exists('apc_delete'))
 			apc_delete($this->feedProcessingKey);
@@ -594,5 +592,9 @@ class KalturaSyndicationFeedRenderer
 			return $entry->getAvailableFrom(null);
 
 		return $entry->getCreatedAt(null); // the default
+	}
+	
+	public function getSyndicationFeedDb() {
+		return $this->syndicationFeedDb;
 	}
 }

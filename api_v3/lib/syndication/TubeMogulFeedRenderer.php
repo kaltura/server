@@ -3,9 +3,9 @@
 class TubeMogulFeedRenderer extends SyndicationFeedRenderer{
 
 	public function handleHeader() {
-		header ("content-type: text/xml; charset=utf-8");
-		$this->writeOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
-		$this->writeOpenXmlNode('channel',1);
+		$res = $this->writeOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
+		$res .= $this->writeOpenXmlNode('channel',1);
+		return $res;
 	}
 
 	public function handleBody($entry, $e = null, $flavorAssetUrl = null) {
@@ -16,34 +16,33 @@ class TubeMogulFeedRenderer extends SyndicationFeedRenderer{
 		if(!$entryTags) 
 			$entryTags = $this->stringToSafeXml(str_replace(' ', ', ', $e->name));
 		
-		$this->writeOpenXmlNode('item',2);
-		$this->writeFullXmlNode('pubDate',date('Y-m-d',$e->createdAt).'T'.date('H:i:sO',$e->createdAt),3);
-		$this->writeFullXmlNode('media:title', $this->stringToSafeXml($e->name), 3);
-		$this->writeFullXmlNode('media:description', $entryDescription,3);
-		$this->writeFullXmlNode('media:keywords', $entryTags, 3);
+		$res = '';
+		$res .= $this->writeOpenXmlNode('item',2);
+		$res .= $this->writeFullXmlNode('pubDate',date('Y-m-d',$e->createdAt).'T'.date('H:i:sO',$e->createdAt),3);
+		$res .= $this->writeFullXmlNode('media:title', $this->stringToSafeXml($e->name), 3);
+		$res .= $this->writeFullXmlNode('media:description', $entryDescription,3);
+		$res .= $this->writeFullXmlNode('media:keywords', $entryTags, 3);
 		
 		$categories = explode(',', $this->syndicationFeed->categories);
 		foreach($categories as $category)
 		{
 			$categoryId = KalturaTubeMogulSyndicationFeed::getCategoryId($category);
-			$this->writeFullXmlNode('media:category', $categoryId, 3, array( 'scheme'=>"http://www.tubemogul.com"));
+			$res .= $this->writeFullXmlNode('media:category', $categoryId, 3, array( 'scheme'=>"http://www.tubemogul.com"));
 			break;
 		}
 		
-		$this->writeFullXmlNode('media:content', '', 3, array('url'=> $flavorAssetUrl));
-		$this->writeClosingXmlNode('item',1);
+		$res .= $this->writeFullXmlNode('media:content', '', 3, array('url'=> $flavorAssetUrl));
+		$res .= $this->writeClosingXmlNode('item',1);
 		
-		return null;
+		return $res;
 	}
 
 	public function handleFooter() {
-		$this->writeClosingXmlNode('channel',1);
-		$this->writeClosingXmlNode('rss');
+		$res = $this->writeClosingXmlNode('channel',1);
+		$res .= $this->writeClosingXmlNode('rss');
+		return $res;
 	}
 
-	public function finalize($entryMrss, $moreItems) {
-		return;		
-	}
 }
 
 ?>
