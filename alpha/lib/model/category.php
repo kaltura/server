@@ -896,7 +896,7 @@ class category extends Basecategory implements IIndexable
 		{
 			/* @var $member kuser */
 			$permissionNames = explode(",", $member->getPermissionNames());
-			$permissionNamesByMembers[] = $member->getId()."_".implode(" ".$member->getId()."_", $permissionNames);
+			$permissionNamesByMembers[] = $member->getId().implode(" ".$member->getId(), $permissionNames);
 		}
 		
 		$membersIds = array();
