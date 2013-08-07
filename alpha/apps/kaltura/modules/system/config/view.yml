@@ -3,78 +3,78 @@ default:
   layout: systemlayout
   
   stylesheets: 
-  javascripts: [ jqkaltura.packed.js, utils.js ]
+  javascripts: 
  
 defSystemSuccess:
   layout: emptylayout
-  stylesheets:  [ dashboard.css ]
+  stylesheets: 
  
 newDashboardSuccess:
-  stylesheets:  [ dashboard.css ]
-  javascripts: [ dashboardmedia.js ]
+  stylesheets: 
+  javascripts: 
   
 viewShowsSuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 viewUsersSuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 viewWidgetsSuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 viewPartnersSuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 viewPartnersASuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 viewUiconfSuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
   
 editUiconfSuccess:
-  stylesheets: [pages.css, layout.css, kcms.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
   
 kcwUiConfEditorSuccess:
-  stylesheets: [pages.css, layout.css, kcms.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
   
 addUiconfSuccess:
-  stylesheets: [pages.css, layout.css, kcms.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
   
 createWidgetsFromUiConfSuccess:
-  stylesheets: [pages.css, layout.css, kcms.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
   
 viewUiconfWidgetsSuccess:
-  stylesheets: [pages.css, layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 showtimeSuccess:
   has_layout: off
 
 
 editPrNewsSuccess:
-  stylesheets: [layout.css, kcms.css]
-  javascripts: [dashboardmedia.js, interface.js]
+  stylesheets: 
+  javascripts: 
 
 emailCampaignMgrSuccess:
-  stylesheets: [layout.css]
-  javascripts: [dashboardmedia.js]
+  stylesheets: 
+  javascripts: 
 
 editPartnershipSuccess:
-  stylesheets: [layout.css, kcms.css]
-  javascripts: [dashboardmedia.js, interface.js]
+  stylesheets: 
+  javascripts: 
 
 uploadSuccess: 
-  stylesheets: [layout.css, kcms.css]
+  stylesheets: 
   
 conversionProfileSuccess:
   has_layout: on
