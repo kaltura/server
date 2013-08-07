@@ -79,7 +79,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 				{
 					$permissionName = $this->memberIdEq.str_replace('_', '', $permissionName);
 				}
-				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeAndArr, baseObjectFilter::MULTI_LIKE_AND);
+				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeAndArr, baseObjectFilter::MATCH_AND);
 			}
 			elseif ($this->memberPermissionsMatchOr)
 			{
@@ -88,7 +88,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 				{
 					$permissionName = $this->memberIdEq.str_replace('_', '', $permissionName);
 				}
-				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeOrArr, baseObjectFilter::MULTI_LIKE_OR);
+				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeOrArr, baseObjectFilter::MATCH_OR);
 			}
 		}
 		elseif ($this->memberIdIn)
@@ -101,7 +101,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 					$permissionsMultiLikeAndArr = explode(',', $this->memberPermissionsMatchAnd);
 					foreach($permissionsMultiLikeAndArr as &$permissionName)
 					{
-						$memberPermissionsArr[] = $this->memberIdEq.str_replace('_', '', $permissionName);
+						$memberPermissionsArr[] = $memberId.str_replace('_', '', $permissionName);
 					}
 				}
 				elseif ($this->memberPermissionsMatchOr)
@@ -109,11 +109,11 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 					$permissionsMultiLikeOrArr = explode(',', $this->memberPermissionsMatchOr);
 					foreach($permissionsMultiLikeOrArr as &$permissionName)
 					{
-						$memberPermissionsArr[] = $this->memberIdEq.str_replace('_', '', $permissionName);
+						$memberPermissionsArr[] = $memberId.str_replace('_', '', $permissionName);
 					}
 				}
 				
-				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MULTI_LIKE_AND : baseObjectFilter::MULTI_LIKE_OR);
+				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_OR : baseObjectFilter::MATCH_AND);
 				$query->addOr($criterion);
 			}
 			
