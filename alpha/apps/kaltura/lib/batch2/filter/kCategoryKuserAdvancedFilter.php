@@ -11,26 +11,26 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 	protected $memberIdEq;
 	
 	/**
-	 * @var string
+	 * @var array
 	 */
 	protected $memberIdIn;
 	
 	/**
 	 * @var string
 	 */
-	protected $memberPermissionsMultiLikeOr;
+	protected $memberPermissionsMatchOr;
 	
 	/**
 	 * @var string
 	 */
-	protected $memberPermissionsMultiLikeAnd;
+	protected $memberPermissionsMatchAnd;
 	
 	public function getMemberIdIn ()
 	{
 		return $this->memberIdIn;
 	}
 	
-	public function setMemberIdIn ($v)
+	public function setMemberIdIn (array $v)
 	{
 		$this->memberIdIn = $v;
 	}
@@ -45,24 +45,24 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 		$this->memberIdEq = $v;
 	}
 	
-	public function getMemberPermissionsMultiLikeOr ()
+	public function getMemberPermissionsMatchOr ()
 	{
-		return $this->memberPermissionsMultiLikeOr;
+		return $this->memberPermissionsMatchOr;
 	}
 	
-	public function setMemberPermissionsMultiLikeOr ($v)
+	public function setMemberPermissionsMatchOr ($v)
 	{
-		$this->memberPermissionsMultiLikeOr = $v;
+		$this->memberPermissionsMatchOr = $v;
 	}
 	
-	public function getMemberPermissionsMultiLikeAnd ()
+	public function getMemberPermissionsMatchAnd ()
 	{
-		return $this->memberPermissionsMultiLikeAnd;
+		return $this->memberPermissionsMatchAnd;
 	}
 	
-	public function setMemberPermissionsMultiLikeAnd ($v)
+	public function setMemberPermissionsMatchAnd ($v)
 	{
-		$this->memberPermissionsMultiLikeAnd = $v;
+		$this->memberPermissionsMatchAnd = $v;
 	}
 	
 	/* (non-PHPdoc)
@@ -72,12 +72,52 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 	{
 		if ($this->memberIdEq)
 		{
-			if ($this->memberPermissionsMultiLikeAnd)
+			if ($this->memberPermissionsMatchAnd)
 			{
-				$permissionsMultiLikeAndArr = explode(',', $this->memberPermissionsMultiLikeAnd);
-				$memberPermissions = $this->memberIdEq.implode(' '.$this->memberIdEq, $permissionsMultiLikeAndArr);
-				$query->addColumnWhere('category.MEMBERS', $memberPermissions, baseObjectFilter::MULTI_LIKE_AND);
+				$permissionsMultiLikeAndArr = explode(',', $this->memberPermissionsMatchAnd);
+				foreach($permissionsMultiLikeAndArr as &$permissionName)
+				{
+					$permissionName = $this->memberIdEq.str_replace('_', '', $permissionName);
+				}
+				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeAndArr, baseObjectFilter::MULTI_LIKE_AND);
+			}
+			elseif ($this->memberPermissionsMatchOr)
+			{
+				$permissionsMultiLikeOrArr = explode(',', $this->memberPermissionsMatchOr);
+				foreach($permissionsMultiLikeOrArr as &$permissionName)
+				{
+					$permissionName = $this->memberIdEq.str_replace('_', '', $permissionName);
+				}
+				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeOrArr, baseObjectFilter::MULTI_LIKE_OR);
 			}
 		}
+		elseif ($this->memberIdIn)
+		{
+			foreach($this->memberIdIn as $memberId)
+			{
+				$memberPermissionsArr = array();
+				if ($this->memberPermissionsMatchAnd)
+				{
+					$permissionsMultiLikeAndArr = explode(',', $this->memberPermissionsMatchAnd);
+					foreach($permissionsMultiLikeAndArr as &$permissionName)
+					{
+						$memberPermissionsArr[] = $this->memberIdEq.str_replace('_', '', $permissionName);
+					}
+				}
+				elseif ($this->memberPermissionsMatchOr)
+				{
+					$permissionsMultiLikeOrArr = explode(',', $this->memberPermissionsMatchOr);
+					foreach($permissionsMultiLikeOrArr as &$permissionName)
+					{
+						$memberPermissionsArr[] = $this->memberIdEq.str_replace('_', '', $permissionName);
+					}
+				}
+				
+				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MULTI_LIKE_AND : baseObjectFilter::MULTI_LIKE_OR);
+				$query->addOr($criterion);
+			}
+			
+		} 
+		
 	}
 }

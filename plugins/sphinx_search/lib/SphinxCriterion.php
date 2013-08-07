@@ -170,8 +170,42 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				}
 				break;
 
-			
-			
+			case baseObjectFilter::MULTI_LIKE_AND:
+					$vals = is_array($value) ? $val : explode(',', $value);
+					foreach($vals as $valIndex => $valValue)
+					{
+						if(!strlen($valValue))
+							unset($vals[$valIndex]);
+						elseif(preg_match('/[\s\t]/', $valValue)) //if there are spaces or tabs - should add "<VALUE>"
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
+						else
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
+					}
+							
+					if(count($vals))
+					{
+						$val = implode(' ', $vals);
+						return "@$sphinxField $val";
+					}
+					break;	
+			case baseObjectFilter::MULTI_LIKE_OR:
+					$vals = is_array($value) ? $val : explode(',', $value);
+					foreach($vals as $valIndex => $valValue)
+					{
+						if(!strlen($valValue))
+							unset($vals[$valIndex]);
+						elseif(preg_match('/[\s\t]/', $valValue))
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
+						else
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue, $fieldsEscapeType);
+					}
+					
+					if(count($vals))
+					{
+						$val = implode(' | ', $vals);
+						return "@$sphinxField $val";
+					}
+					break;
 				
 			default:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
