@@ -938,6 +938,15 @@ return array(
     'storage was manualed' => 'Remote storage status is now "manual".',
     'storage was autoed' => 'Remote storage status is now "auto".',
     'storage was disabled' => 'Remote storage has been disabled.',
+	'kLocalPathUrlManager' => 'QA FMS Server',
+	'kLimeLightUrlManager' => 'Lime Light CDN',
+	'kAkamaiUrlManager' => 'Akamai CDN',
+	'kLevel3UrlManager' => 'Level 3 CDN',
+	'default_url_manager'	=> 'Kaltura WWW',
+	'default_path_manager' => 'Kaltura Path',
+		'kPathManager' => 'Kaltura Path',
+		'kExternalPathManager' => 'External Path',
+	    'kXslPathManager' => 'XSL Path',
 
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this storage.',

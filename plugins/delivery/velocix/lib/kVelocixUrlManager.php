@@ -16,10 +16,12 @@ class kVelocixUrlManager extends kUrlManager
 		if (substr($liveEntry->getStreamName(), 0, 4) == 'auth'){
 			$secret = $this->params['shared_secret'];
 			$window = $this->params['access_window_seconds'];
-			$hdsPath = $this->params['hdsPath'];
+			$hdsPaths = array();
+			$hdsPaths[] = $this->params['hdsBitratesManifestPath'];
+			$hdsPaths[] = $this->params['hdsSegmentsPath'];
 			$tokenParamName = $this->params['tokenParamName'];
 			$protocol = $this->protocol;
-			return new kVelocixUrlTokenizer($window, $secret, $protocol, $liveEntry->getStreamName(), $hdsPath, $tokenParamName);
+			return new kVelocixUrlTokenizer($window, $secret, $protocol, $liveEntry->getStreamName(), $hdsPaths, $tokenParamName);
 		}
 		
 		return null;

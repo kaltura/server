@@ -35,7 +35,8 @@ class kKontikiManager implements kBatchJobStatusEventConsumer
 		if ($dbBatchJob->getJobType() == BatchJobType::STORAGE_EXPORT
             && $dbBatchJob->getJobSubType() == KontikiPlugin::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI))
 		{
-		    return true;
+			if (KontikiPlugin::isAllowedPartner($dbBatchJob->getPartnerId()))
+		    	return true;
 		}
         
         return false;
