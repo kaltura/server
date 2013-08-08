@@ -134,6 +134,12 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	protected $file_size;
 
 	/**
+	 * The value for the deleted_id field.
+	 * @var        string
+	 */
+	protected $deleted_id;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -456,6 +462,16 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function getFileSize()
 	{
 		return $this->file_size;
+	}
+
+	/**
+	 * Get the [deleted_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getDeletedId()
+	{
+		return $this->deleted_id;
 	}
 
 	/**
@@ -977,6 +993,29 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	} // setFileSize()
 
 	/**
+	 * Set the value of [deleted_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     FileSync The current object (for fluent API support)
+	 */
+	public function setDeletedId($v)
+	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::DELETED_ID]))
+			$this->oldColumnsValues[FileSyncPeer::DELETED_ID] = $this->deleted_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->deleted_id !== $v) {
+			$this->deleted_id = $v;
+			$this->modifiedColumns[] = FileSyncPeer::DELETED_ID;
+		}
+
+		return $this;
+	} // setDeletedId()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1027,6 +1066,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			$this->file_root = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->file_path = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
 			$this->file_size = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->deleted_id = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1036,7 +1076,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 19; // 19 = FileSyncPeer::NUM_COLUMNS - FileSyncPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 20; // 20 = FileSyncPeer::NUM_COLUMNS - FileSyncPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating FileSync object", $e);
@@ -1337,7 +1377,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-	
+		
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1540,6 +1580,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			case 18:
 				return $this->getFileSize();
 				break;
+			case 19:
+				return $this->getDeletedId();
+				break;
 			default:
 				return null;
 				break;
@@ -1580,6 +1623,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			$keys[16] => $this->getFileRoot(),
 			$keys[17] => $this->getFilePath(),
 			$keys[18] => $this->getFileSize(),
+			$keys[19] => $this->getDeletedId(),
 		);
 		return $result;
 	}
@@ -1668,6 +1712,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 			case 18:
 				$this->setFileSize($value);
 				break;
+			case 19:
+				$this->setDeletedId($value);
+				break;
 		} // switch()
 	}
 
@@ -1711,6 +1758,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[16], $arr)) $this->setFileRoot($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setFilePath($arr[$keys[17]]);
 		if (array_key_exists($keys[18], $arr)) $this->setFileSize($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setDeletedId($arr[$keys[19]]);
 	}
 
 	/**
@@ -1741,6 +1789,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(FileSyncPeer::FILE_ROOT)) $criteria->add(FileSyncPeer::FILE_ROOT, $this->file_root);
 		if ($this->isColumnModified(FileSyncPeer::FILE_PATH)) $criteria->add(FileSyncPeer::FILE_PATH, $this->file_path);
 		if ($this->isColumnModified(FileSyncPeer::FILE_SIZE)) $criteria->add(FileSyncPeer::FILE_SIZE, $this->file_size);
+		if ($this->isColumnModified(FileSyncPeer::DELETED_ID)) $criteria->add(FileSyncPeer::DELETED_ID, $this->deleted_id);
 
 		return $criteria;
 	}
@@ -1759,17 +1808,20 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 
 		$criteria->add(FileSyncPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(FileSyncPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != FileSyncPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = FileSyncPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(FileSyncPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != FileSyncPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = FileSyncPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1842,6 +1894,8 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		$copyObj->setFilePath($this->file_path);
 
 		$copyObj->setFileSize($this->file_size);
+
+		$copyObj->setDeletedId($this->deleted_id);
 
 
 		$copyObj->setNew(true);

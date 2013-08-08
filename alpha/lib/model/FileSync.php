@@ -85,6 +85,19 @@ class FileSync extends BaseFileSync
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		return $storage->getDeliveryIisBaseUrl() . '/' . $this->getFilePath();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseFileSync::preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(FileSyncPeer::STATUS) && $this->getStatus() == self::FILE_SYNC_STATUS_DELETED)
+		{
+			$this->setDeletedId($this->getId());
+		}
+		
+		return parent::preUpdate($con);
+	 }
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseFileSync#postUpdate()
