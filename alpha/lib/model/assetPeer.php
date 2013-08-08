@@ -399,11 +399,14 @@ class assetPeer extends BaseassetPeer
 		return self::doSelectOne($c);
 	}
 	
-	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds, $notIn = false)
+	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds, $notIn = false, array $statuses = null)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		if(!is_null($statuses))
+			$c->add(assetPeer::STATUS, $statuses, Criteria::IN);
+		else
+			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		if($notIn)
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::NOT_IN);
 		else
