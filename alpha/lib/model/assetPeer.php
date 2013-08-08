@@ -309,11 +309,14 @@ class assetPeer extends BaseassetPeer
 		return self::countByEntryId($entryId, $types);
 	}
 
-	public static function retrieveReadyByEntryId($entryId, $ids = null)
+	public static function retrieveReadyByEntryId($entryId, $ids = null, array $statuses = null)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		if(count($statuses))
+		    $c->add(assetPeer::STATUS, $statuses, Criteria::IN);
+		else 
+			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		if (!is_null($ids))
 			$c->add(assetPeer::ID, $ids, Criteria::IN);	
 		return self::doSelectAscendingBitrate($c);
