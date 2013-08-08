@@ -70,28 +70,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
-		if ($this->memberIdEq)
-		{
-			if ($this->memberPermissionsMatchAnd)
-			{
-				$permissionsMultiLikeAndArr = explode(',', $this->memberPermissionsMatchAnd);
-				foreach($permissionsMultiLikeAndArr as &$permissionName)
-				{
-					$permissionName = $this->memberIdEq.str_replace('_', '', $permissionName);
-				}
-				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeAndArr, baseObjectFilter::MATCH_AND);
-			}
-			elseif ($this->memberPermissionsMatchOr)
-			{
-				$permissionsMultiLikeOrArr = explode(',', $this->memberPermissionsMatchOr);
-				foreach($permissionsMultiLikeOrArr as &$permissionName)
-				{
-					$permissionName = $this->memberIdEq.str_replace('_', '', $permissionName);
-				}
-				$query->addColumnWhere('category.MEMBERS', $permissionsMultiLikeOrArr, baseObjectFilter::MATCH_OR);
-			}
-		}
-		elseif ($this->memberIdIn)
+		if ($this->memberIdIn)
 		{
 			foreach($this->memberIdIn as $memberId)
 			{

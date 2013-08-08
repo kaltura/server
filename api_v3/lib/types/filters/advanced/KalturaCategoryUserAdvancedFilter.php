@@ -58,7 +58,7 @@ class KalturaCategoryUserAdvancedFilter extends KalturaSearchItem
 			{
 				throw new KalturaAPIException (KalturaErrors::USER_NOT_FOUND);
 			}
-			$obj->setMemberIdEq($kuser->getId());
+			$obj->setMemberIdIn(array($kuser->getId()));
 		}
 		
 		if ($this->memberIdIn)
