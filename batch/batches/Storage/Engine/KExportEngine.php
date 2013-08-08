@@ -39,7 +39,7 @@ abstract class KExportEngine
 	 * @param KalturaStorageExportJobData $data
 	 * @return KExportEngine
 	 */
-	public static function getInstance ($protocol, $partnerId, KalturaStorageExportJobData $data)
+	public static function getInstance ($protocol, $partnerId, KalturaStorageJobData $data)
 	{
 		switch ($protocol)
 		{
