@@ -1,9 +1,16 @@
 <?php
-define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../'));
-define('SF_ROOT_DIR', KALTURA_ROOT_PATH . '/alpha');
-define("KALTURA_API_V3", true); // used for different logic in alpha libs
+if(!defined('KALTURA_ROOT_PATH'))
+	define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../'));
+	
+if(!defined('SF_ROOT_DIR'))
+	define('SF_ROOT_DIR', KALTURA_ROOT_PATH . '/alpha');
+	
+if(!defined('KALTURA_API_V3'))
+	define("KALTURA_API_V3", true); // used for different logic in alpha libs
 
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
+if(!defined('KALTURA_API_PATH'))
+	define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
+
 require_once(KALTURA_API_PATH.DIRECTORY_SEPARATOR.'VERSION.php'); //defines KALTURA_API_VERSION
 require_once (KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR.'alpha'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'kConf.php');
 
