@@ -2,7 +2,8 @@
 
 abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
-	protected $CACHE_SIZE = 100;
+	const CACHE_CREATION_TIME_SUFFIX = ".time";
+	const CACHE_SIZE = 100;
 	
 	/** Holds the distribution profile instance */
 	protected $profile;
@@ -110,23 +111,31 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
 	protected function handleEntries($context, $feed, array $entries) {
 		
-		$distributionProfileId = $this->profile->getId();
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY) ;
+		$cachePrefix = "dist_" . ($this->profile->getId()) . "/entry_";
+		$profileUpdatedAt = $this->profile->getUpdatedAt(null);
+		
 		$extendItems = $this->profile->getItemXpathsToExtend();
 		$enableCache = empty($extendItems);
-		$profileUpdatedAt = $this->profile->getUpdatedAt(null);
-		$cacheDir = kConf::get("global_cache_dir")."/feeds/dist_$distributionProfileId/";
+		if ($enableCache)
+			$cacheStore = null;
+		
 		$counter = 0;
 		
 		foreach($entries as $entry)
 		{
-			// check cache
-			$cacheFileName = $cacheDir.myContentStorage::dirForId($entry->getIntId(), $entry->getId().".xml");
-			$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
-			if ($enableCache && file_exists($cacheFileName) && $updatedAt < filemtime($cacheFileName))
-			{
-				$xml = file_get_contents($cacheFileName);
+			$xml = null;
+			$cacheFileName = $cachePrefix . str_replace("_", "-",  $entry->getId()); // replace _ with - so cache folders will be created with random entry id and not 0_/1_
+			
+			if($enableCache) {
+				$cacheTime = $cacheStore->get($cacheFileName . self::CACHE_CREATION_TIME_SUFFIX);
+				$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
+				if ($updatedAt < $cacheTime) {
+					$xml = $cacheStore->get($enableCache);
+				}
 			}
-			else
+			
+			if(is_null($xml))
 			{
 				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $this->profile->getId());
 				if (!$entryDistribution)
@@ -136,18 +145,16 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 				}
 		
 				$xml = $this->handleEntry($context, $feed, $entry, $entryDistribution);
-				if(is_null($xml)) {
-					continue;
-				} else if ($enableCache) {
-					mkdir(dirname($cacheFileName), 0750, true);
-					file_put_contents($cacheFileName, $xml);
+				if(!is_null($xml) && $enableCache) {
+					$cacheStore->set($cacheFileName . self::CACHE_CREATION_TIME_SUFFIX, time());
+					$cacheStore->set($cacheFileName, $xml);
 				}
 			}
 				
 			$feed->addItemXml($xml);
 				
 			//to avoid the cache exceeding the memory size
-			if ($enableCache && $counter % CACHE_SIZE == 0){
+			if ($counter % self::CACHE_SIZE == 0){
 				kMemoryManager::clearMemory();
 				$counter++;
 			}
