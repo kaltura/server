@@ -892,16 +892,31 @@ class category extends Basecategory implements IIndexable
 				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
 		}
 		
+		//Add indexed permission_names
+		$permissionNamesByMembers = array();
+		foreach ($members as $member)
+		{
+			/* @var $member categoryKuser */
+			$permissionNames = explode(",", $member->getPermissionNames());
+			foreach ($permissionNames as &$permissionName)
+			{
+				$permissionName = str_replace('_', '', $permissionName);				
+			}
+			$permissionNamesByMembers[] = $member->getKuserId().implode(" ".$member->getKuserId(), $permissionNames);
+		}
+		
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
 		{
 			$permissionLevelByName = self::getPermissionLevelName($permissionLevel);
 			$membersIds[] = $permissionLevelByName . '_' . implode(' ' . $permissionLevelByName . '_', $membersIdByPermission);
 			$membersIds[] = implode(' ', $membersIdByPermission);
+			$membersIds[] = implode(' ', $permissionNamesByMembers);
 		}
 		
 		return implode(' ', $membersIds);
 	}
+
 	
 	/**
 	 * Return kusers ids that are active members on this category.
