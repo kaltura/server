@@ -124,6 +124,7 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
+		$kuserChanged = false;
 		if (!$this->isNew() &&
 			$this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
 		{
@@ -131,10 +132,12 @@ class category extends Basecategory implements IIndexable
 				$this->old_inheritance_type == InheritanceType::INHERIT)
 			{
 				if($this->parent_id)
-					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->parent_id);
+					$categoryToCopyInheritedFields = $this->getInheritParent();
 				if($categoryToCopyInheritedFields)
+				{
 					$this->copyInheritedFields($categoryToCopyInheritedFields);
-					
+					$kuserChanged = true;
+				}	
 				$this->reSetMembersCount();
 			}
 			elseif ($this->inheritance_type == InheritanceType::INHERIT &&
@@ -144,7 +147,6 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
-		$kuserChanged = false;
 		if ($this->isColumnModified(categoryPeer::KUSER_ID))
 			$kuserChanged = true;
 
@@ -1192,6 +1194,7 @@ class category extends Basecategory implements IIndexable
 		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
 		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
 		$this->setKuserId($oldParentCategory->getKuserId());
+		$this->setPuserId($oldParentCategory->getPuserId());
 		$this->reSetMembersCount(); //removing all members from this category
 		$this->reSetPendingMembersCount();
 	}

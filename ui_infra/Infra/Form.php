@@ -105,4 +105,19 @@ class Infra_Form extends Zend_Form
 		$object = new $objectType;
 		return $this->loadObject($object, $properties, $add_underscore, $include_empty_fields);
 	}
+	
+	/**
+	 * @var string $displayGroupName
+	 * @var string $elementName
+	 */
+	public function addElementToDisplayGroup ($displayGroupName, $elementName)
+	{
+		$displayGroup = $this->_displayGroups[$displayGroupName];
+		$element = $this->getElement($elementName);
+		/* @var $displayGroup Zend_Form_DisplayGroup */
+		$displayGroup->addElement($element);
+		unset($this->_order[$elementName]);
+		$this->_orderUpdated = true;
+        return $this;
+	}
 }

@@ -13,7 +13,7 @@ kmcSuccess:
 kmc1Success:
   has_layout:     on
   layout:         kmc1layout
-  javascripts:    [ -*, jqkaltura.js, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
+  javascripts:    [ -*, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
   stylesheets:  [ -*, /lib/css/kmc1modal, /lib/css/kmc1 ]
 
 kmc4Success:
@@ -25,7 +25,7 @@ kmc4Success:
 varpartnerlistSuccess:
   has_layout:     on
   layout:         kmc1layout
-  javascripts:    [ -*, jqkaltura.js, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
+  javascripts:    [ -*, /lib/js/kmc1modal , /lib/js/common , /lib/js/functions.js , http://ajax.googleapis.com/ajax/libs/swfobject/2.1/swfobject.js ]
   stylesheets:  [ -*, /lib/css/kmc1modal, /lib/css/kmc1 ]
 
 supportSuccess:

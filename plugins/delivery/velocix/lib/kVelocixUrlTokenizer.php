@@ -6,7 +6,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	protected $secret;
 	protected $protocol;
 	protected $streamName;
-	protected $hdsPath;
+	protected $hdsPaths;
 	protected $tokenParamName;
 	
 	/**
@@ -14,13 +14,13 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	 * @param string $secret
 	 * @param array $protocol
 	 */
-	public function __construct($window, $secret, $protocol, $streamName, $hdsPath, $tokenParamName)
+	public function __construct($window, $secret, $protocol, $streamName, $hdsPaths, $tokenParamName)
 	{
 		$this->window = $window;
 		$this->secret = $secret;
 		$this->protocol = $protocol == 'applehttp' ? 'hls' : $protocol;
 		$this->streamName = $streamName;
-		$this->hdsPath = $hdsPath;
+		$this->hdsPaths = $hdsPaths;
 		$this->tokenParamName = $tokenParamName;
 	}
 	
@@ -43,8 +43,10 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$message = "pathURI=" . rawurlencode($path);
 		if ($this->protocol == 'hds')
 		{
-			$hdsPath =  preg_replace('/@STREAM_NAME@/', $this->streamName, $this->hdsPath);
-			$message.= "&pathURI=" . rawurlencode($hdsPath);
+			foreach ($this->hdsPaths as $path){
+				$path =  preg_replace('/@STREAM_NAME@/', $this->streamName, $path);
+				$message.= "&pathURI=" . rawurlencode($path);
+			}
 		}
 		$message .= "&expiry=" . rawurlencode($t_expiry);
 		$message .= "&random=" . uniqid();

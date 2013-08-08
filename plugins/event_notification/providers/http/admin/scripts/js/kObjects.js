@@ -66,23 +66,5 @@ var kObjects = {
 								
 							return ret;
 		}
-	},
-	scope: {
-		label: 			'Scope',
-		subSelections:	{
-			ParentRaisedJob:		{label: 'Raised Batch Job', coreType: 'BatchJob', apiType: 'KalturaBatchJob'},
-		},
-		subLabel:		'Select Object Type',
-		getData:		function(subCode, variables){
-							var ret = {
-								code: '$scope->get' + variables.value + '()',
-								coreType: variables.coreType
-							};
-							
-							if(variables.apiType != null)
-								ret.apiName = variables.apiType;
-								
-							return ret;
-		}
 	}
 };

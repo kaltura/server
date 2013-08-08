@@ -82,8 +82,14 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 	 */
 	protected function addTypeElements()
 	{
+		$element = new Infra_Form_Html('http_title', array(
+			'content' => '<b>Notification Handler Service  Details</b>',
+		));
+		$this->addElements(array($element));
+		
 		$this->addElement('text', 'url', array(
 			'label'			=> 'URL:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 		

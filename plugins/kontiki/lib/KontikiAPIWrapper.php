@@ -128,6 +128,6 @@ class KontikiAPIWrapper
 		if (!$res || ($httpcode < 200 || $httpcode >300))
 			return null;
 		
-		return new SimpleXMLElement($res);
+		return  $res ? new SimpleXMLElement($res) : true;
 	}
 }

@@ -50,16 +50,30 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if(!($object instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate))
 			return;
 		
-		if($object->to && count($object->to->emailRecipients) > 1)
-			$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
-			
-		if($object->to && count($object->to->emailRecipients))
+		if($object->to && $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
-			$to = reset($object->to->emailRecipients);
-			/* @var $to KalturaEmailNotificationRecipient */
-			
-			$this->setDefault('to_email', $to->email->value);
-			$this->setDefault('to_name', $to->name->value);
+			if(count($object->to->emailRecipients) > 1)
+			{
+				$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
+			}
+			elseif(count($object->to->emailRecipients))
+			{
+				$to = reset($object->to->emailRecipients);
+				/* @var $to Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient */
+				
+				$this->addElement('text', 'to_email', array(
+					'label'			=> 'Recipient e-mail:',
+					'value'			=> $to->email->value,
+					'filters'		=> array('StringTrim'),
+					'validators'	=> array('EmailAddress'),
+				));
+				
+				$this->addElement('text', 'to_name', array(
+					'label'			=> 'Recipient name:',
+					'value'			=> $to->name->value,
+					'filters'		=> array('StringTrim'),
+				));
+			}
 		}
 	}
 	
@@ -78,6 +92,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		$this->addElement('text', 'subject', array(
 			'label'			=> 'Subject:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -88,23 +103,14 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		$this->addElement('text', 'from_email', array(
 			'label'			=> 'Sender e-mail:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 			'validators'	=> array('EmailAddress'),
 		));
 		
 		$this->addElement('text', 'from_name', array(
 			'label'			=> 'Sender name:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'to_email', array(
-			'label'			=> 'Recipient e-mail:',
-			'filters'		=> array('StringTrim'),
-			'validators'	=> array('EmailAddress'),
-		));
-		
-		$this->addElement('text', 'to_name', array(
-			'label'			=> 'Recipient name:',
+			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
 	}
