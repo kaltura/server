@@ -162,6 +162,6 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 			return PlaybackProtocol::HTTP;
 		}
 		
-		return $streamerType;
+		return $mediaProtocol;
 	}
 }
