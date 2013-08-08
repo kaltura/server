@@ -645,6 +645,7 @@ CREATE TABLE `batch_job_lock_suspend`
 	`dc` INTEGER,
 	`batch_job_id` INTEGER,
 	`custom_data` TEXT,
+	`batch_version` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
 	INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
