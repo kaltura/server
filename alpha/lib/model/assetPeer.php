@@ -309,11 +309,14 @@ class assetPeer extends BaseassetPeer
 		return self::countByEntryId($entryId, $types);
 	}
 
-	public static function retrieveReadyByEntryId($entryId, $ids = null)
+	public static function retrieveReadyByEntryId($entryId, $ids = null, array $statuses = null)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		if(count($statuses))
+		    $c->add(assetPeer::STATUS, $statuses, Criteria::IN);
+		else 
+			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		if (!is_null($ids))
 			$c->add(assetPeer::ID, $ids, Criteria::IN);	
 		return self::doSelectAscendingBitrate($c);
@@ -399,14 +402,11 @@ class assetPeer extends BaseassetPeer
 		return self::doSelectOne($c);
 	}
 	
-	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds, $notIn = false, array $statuses = null)
+	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds, $notIn = false)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		if(!is_null($statuses))
-			$c->add(assetPeer::STATUS, $statuses, Criteria::IN);
-		else
-			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		if($notIn)
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::NOT_IN);
 		else
