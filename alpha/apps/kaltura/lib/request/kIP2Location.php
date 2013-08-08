@@ -3,7 +3,7 @@
  * @package server-infra
  * @subpackage request
  */
-include(__DIR__ . "/../../vendor/IP2Location/IP2Location.inc.php");
+include(__DIR__ . "/../../../../../vendor/IP2Location/IP2Location.inc.php");
 
 /**
  * @package server-infra
@@ -13,7 +13,7 @@ class kIP2Location
 {
 	public static function ipToCountry($ip)
 	{
-		$ip2LocationBinFilePath = dirname(__FILE__).'/../../../data'."/geoip/IP-COUNTRY-ISP.BIN";
+		$ip2LocationBinFilePath = __DIR__ . '/../../../../../../data'."/geoip/IP-COUNTRY-ISP.BIN";
 		if (function_exists("IP2Location_open") && file_exists($ip2LocationBinFilePath))
 		{
 			$ip2Location = IP2Location_open($ip2LocationBinFilePath, IP2LOCATION_STANDARD);
@@ -32,7 +32,7 @@ class kIP2Location
 		ini_set('memory_limit', '128M'); // ip_files are large array files, sometimes it might break if doesn't have enough memory
 		$country = "";
 		$numbers = preg_split( '/\./', $ip);
-		$ipFile = __DIR__ . "/../../vendor/IP2Location/ip_files/".$numbers[0].".php";
+		$ipFile = __DIR__ . "/../../../../../vendor/IP2Location/ip_files/".$numbers[0].".php";
 		
 		$included = false;
 		$ranges = array();
@@ -58,7 +58,7 @@ class kIP2Location
 	{
 		$country = "";
 		$numbers = preg_split( '/\./', $ip);
-		$ipFile = __DIR__ . "/../../vendor/IP2Location/ip_files/".$numbers[0].".php";
+		$ipFile = __DIR__ . "/../../../../../vendor/IP2Location/ip_files/".$numbers[0].".php";
 		
 	    $included = false;
 		$ranges = array();
