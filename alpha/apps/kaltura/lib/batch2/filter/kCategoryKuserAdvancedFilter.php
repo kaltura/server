@@ -6,11 +6,6 @@
 class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 {
 	/**
-	 * @var string
-	 */
-	protected $memberIdEq;
-	
-	/**
 	 * @var array
 	 */
 	protected $memberIdIn;
