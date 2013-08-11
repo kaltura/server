@@ -261,6 +261,8 @@ class kwidgetAction extends sfAction
 			}
 			else
 			{
+				$swf_data = null;
+				
 				// if kdp version >= 2.5
 				if (version_compare($uiConf->getSwfUrlVersion(), "2.5", ">="))
 				{
@@ -294,7 +296,6 @@ class kwidgetAction extends sfAction
 					
 					$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_KWIDGET_SWF);
 					
-					$swf_data = null;
 					if ($cache)
 						$swf_data = $cache->get($swf_key);
 
@@ -419,17 +420,20 @@ class kwidgetAction extends sfAction
 					KExternalErrors::dieGracefully();
 				}
 
-				$md5 = md5($swf_key);
-				$wrapper_swf_path = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$swf_key;
-				$wrapper_swf = "$root/$wrapper_swf_path";				
-				if (!file_exists($wrapper_swf))
-				{
-					kFile::fullMkdir($wrapper_swf);
-					file_put_contents($wrapper_swf, $swf_data);
+				if ($swf_data)
+				{				
+					$md5 = md5($swf_key);
+					$wrapper_swf = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$swf_key;
+					$wrapper_swf_path = "$root/$wrapper_swf";				
+					if (!file_exists($wrapper_swf_path))
+					{
+						kFile::fullMkdir($wrapper_swf_path);
+						file_put_contents($wrapper_swf_path, $swf_data);
+					}
 				}
 				
 				// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
-				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf_path?$dynamic_date";
+				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
 			}
 		}
 		else
