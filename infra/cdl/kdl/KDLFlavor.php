@@ -212,7 +212,10 @@ KalturaLog::log("==>\n");
 	 */
 	public function ValidateProduct(KDLMediaDataSet $source, KDLFlavor $product)
 	{
+		KalturaLog::log( ".SRC-->".$source->ToString());
 		KalturaLog::log( ".TRG-->".$this->ToString());
+		KalturaLog::log( ".PRD-->".$product->ToString());
+		
 		$rv = $product->ValidateFlavor();
 
 		if($source){
@@ -229,7 +232,8 @@ KalturaLog::log("==>\n");
 		/*
 		 * ARF (webex) sources don't have proper mediaInfo - thus can not validate the product, skip it
 		 */
-		if(isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') {
+//		if(isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') {
+		if((isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') || strcmp($source->ToString(),$product->ToString())==0) {
 			KalturaLog::log("ARF (webex) sources don't have proper mediaInfo - thus can not validate the product");
 			return true;
 		}
