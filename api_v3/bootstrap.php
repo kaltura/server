@@ -1,6 +1,9 @@
 <?php
-define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../'));
-define('SF_ROOT_DIR', KALTURA_ROOT_PATH . '/alpha');
+
+if (!defined("KALTURA_ROOT_PATH"))			// may already be defined when invoked through kwidgetAction
+	define("KALTURA_ROOT_PATH", realpath(__DIR__ . '/../'));
+if (!defined("SF_ROOT_DIR"))				// may already be defined when invoked through kwidgetAction
+	define('SF_ROOT_DIR', KALTURA_ROOT_PATH . '/alpha');
 define("KALTURA_API_V3", true); // used for different logic in alpha libs
 
 define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
