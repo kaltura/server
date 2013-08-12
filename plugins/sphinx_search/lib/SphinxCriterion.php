@@ -545,17 +545,14 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		}
 		
 		if ($recursive) {
-			$res = array ();
 			foreach ( $this->getClauses () as $criterions ) {
 				$values = $criterions->getPossibleValues ( false );
 				if (! is_null ( $values )) {
-					$res = array_merge ( $res, $values );
+					return $values;	
 				}
 			}
-			return $res;
-		} else {
-			return null;
 		}
+		return null;
 	}
 	
 }
