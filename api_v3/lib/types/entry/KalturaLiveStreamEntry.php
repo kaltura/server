@@ -199,8 +199,6 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		{
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
-			$this->validateEncodingIP($this->encodingIP1);
-			$this->validateEncodingIP($this->encodingIP2);
 		}
 	}
 	

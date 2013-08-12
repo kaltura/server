@@ -119,6 +119,7 @@ class KontikiAPIWrapper
 	 */
 	protected function execAPICall($url)
 	{
+		KalturaLog::info("Executing CURL request with URL: $url");
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);

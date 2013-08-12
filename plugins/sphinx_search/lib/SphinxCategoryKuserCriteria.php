@@ -134,7 +134,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			case 'permission_names':
 				return categoryKuser::PERMISSION_NAME_FIELD_INDEX_PREFIX. kCurrentContext::getCurrentPartnerId();
 			case 'category_kuser_status':
-				return categoryKuser::STATUS_FIELD_PREFIX;
+				return categoryKuser::STATUS_FIELD_PREFIX . kCurrentContext::getCurrentPartnerId();
 		}
 
 		return parent::getFieldPrefix($fieldName);
