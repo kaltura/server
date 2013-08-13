@@ -133,6 +133,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		YouTubeDistributionField::CLAIM_TYPE,
 		YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP,
 		YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD,
+		YouTubeDistributionField::DISABLE_FINGERPRINTING,
 	);
 
 	/* (non-PHPdoc)
@@ -653,6 +654,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_TYPE, 'Claim type', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/claim_type" />');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP, 'Video block outside ownership', '<xsl:text></xsl:text>');
 		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD, 'Instream standard', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/instream_standard" />');
+
+		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::DISABLE_FINGERPRINTING, 'Disable fingerprinting/claiming', '<xsl:text></xsl:text>');
 
 		if ($this->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_2)
 			$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV1OnlyFields);
