@@ -94,9 +94,9 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 
 		$this->addElement('text', 'api_authorize_url', array(
 			'label'			=> 'Authorize API Access:',
-			'decorators' => array(array('ViewHelper'), array('ViewScript', array(
+			'decorators' => array(array('ViewScript', array(
 				'viewScript' => 'youtube-distribution-api-authorize-field.phtml',
-				'placement' => 'WRAP',
+
 			)))
 		));
 
