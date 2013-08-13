@@ -282,8 +282,10 @@ $plannedDur = 0;
 				if($plannedDur>0){
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
-						$product->_errors[KDLConstants::VideoIndex][] = // Invalid product duration
-							KDLErrors::ToString(KDLErrors::InvalidDuration, $prdVid->_duration/1000, $plannedDur/1000);
+						if($aDur!=0 && !in_array (strtolower($this->_container->GetIdOrFormat()), array("ogg", "ogv")) && $this->_audio!=null) {
+							$product->_errors[KDLConstants::VideoIndex][] = // Invalid product duration
+								KDLErrors::ToString(KDLErrors::InvalidDuration, $prdVid->_duration/1000, $plannedDur/1000);
+						}
 						$rv=false;
 					}
 					else if($prdVid->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
