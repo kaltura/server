@@ -21,11 +21,15 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     	}
     	else 
     	{
+    		categoryPeer::setUseCriteriaFilter(false);
     		$category = categoryPeer::retrieveByPK($object->getCategoryId());
+			categoryPeer::setUseCriteriaFilter(true);
     		$privacyContexts = $category->getPrivacyContexts() != "" ? explode(",", $category->getPrivacyContexts()) : array();
     		if (!count($privacyContexts))
     				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
+			entryPeer::setUseCriteriaFilter(false);
     		$entry = entryPeer::retrieveByPK($object->getEntryId());
+			entryPeer::setUseCriteriaFilter(true);
     		self::decrementExistingTagsInstanceCount($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
     	}  
         return true;
@@ -47,7 +51,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         
         if ($object instanceof categoryEntry)
         {
+        	entryPeer::setUseCriteriaFilter(false);
         	$entry = entryPeer::retrieveByPK($object->getEntryId());
+			entryPeer::setUseCriteriaFilter(true);
         	if ($entry && $entry->getTags())
         		return true;
         }
@@ -72,11 +78,15 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     		else
     		{
     			/* @var $object categoryEntry */
+    			categoryPeer::setUseCriteriaFilter(false);
     			$category = categoryPeer::retrieveByPK($object->getCategoryId());
+				categoryPeer::setUseCriteriaFilter(true);
     			$privacyContexts = $category->getPrivacyContexts() != "" ? self::trimObjectTags($category->getPrivacyContexts()) : array();
     			if (!count($privacyContexts))
     				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
+				entryPeer::setUseCriteriaFilter(false);
     			$entry = entryPeer::retrieveByPK($object->getEntryId());
+				entryPeer::setUseCriteriaFilter(true);
     			self::addOrIncrementTags($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
     		}
     	}
@@ -102,7 +112,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         
         if ($object instanceof categoryEntry)
         {
+        	entryPeer::setUseCriteriaFilter(false);
         	$entry = entryPeer::retrieveByPK($object->getEntryId());
+			entryPeer::setUseCriteriaFilter(true);
         	if ($entry && $entry->getTags())
         		return true;
         }
@@ -121,13 +133,15 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         	$criteria = new Criteria();
         	$criteria->add(categoryEntryPeer::ENTRY_ID,$object->getId());
         	$categoryEntries = categoryEntryPeer::doSelect($criteria);
+    		$privacyContexts = array(self::NULL_PC);
         	if (count($categoryEntries))
         	{
-        		$privacyContexts = array();
 	        	foreach ($categoryEntries as $categoryEntry)
 	        	{
 	        		/* @var $categoryEntry categoryEntry */
+	        		categoryPeer::setUseCriteriaFilter(false);
 	        		$category = categoryPeer::retrieveByPK($categoryEntry->getCategoryId());
+					categoryPeer::setUseCriteriaFilter(true);
 	        		if ($category->getPrivacyContexts() != "")
 	        		{
 	        			$privacyContexts = array_merge($privacyContexts, self::trimObjectTags($category->getPrivacyContexts()));
@@ -137,7 +151,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        			$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT; 
 	        		}
 	        	}
-	        	$privacyContexts[] = self::NULL_PC;
 	        	$privacyContexts = array_unique($privacyContexts);
         	}
         }        
