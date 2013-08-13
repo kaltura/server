@@ -730,7 +730,9 @@ class category extends Basecategory implements IIndexable
 		$parentsIds = array();
 		if ($this->getParentId()){
 			$parentsIds[] = $this->getParentId();
-			$parentsIds = array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
+			$parentCategory = $this->getParentCategory();
+			if ($parentCategory)
+				$parentsIds = array_merge($parentsIds, $parentCategory->getAllParentsIds());
 		}
 
 		return $parentsIds;
@@ -1440,8 +1442,11 @@ class category extends Basecategory implements IIndexable
 		if (!$this->getParentId())
 			return $this->getName();
 			
-			
-		return $this->getParentCategory()->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
+		$parentCategory = $this->getParentCategory();
+		if (!$parentCategory)
+			return $this->getName();
+		
+		return $parentCategory->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
 	}
 	
 	/**
