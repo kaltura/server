@@ -113,6 +113,8 @@ class googleoauth2Action extends sfAction
 
 		$client->setState($state);
 		$client->setScopes($appConfig['scopes']);
+		$client->setApprovalPrompt('force');
+		$client->setAccessType('offline');
 		$this->oauth2Url = $client->createAuthUrl();
 	}
 
@@ -171,12 +173,20 @@ class googleoauth2Action extends sfAction
 		$tokenArray = get_object_vars($tokenObject);
 		$customDataKey = $appId;
 		if ($subId)
-			$customDataKey .= '_' . $subId;
+			$customDataKey .= '_' . intval($subId);
 
 		$partner->putInCustomData($customDataKey, $tokenArray, 'googleAuth');
 		$partner->save();
 
-		$this->redirect('extservices/googleoauth2?ytid='.$appId.'&status=1&ks='.$limitedKsStr);
+		$params = array(
+			'ytid' => $appId,
+			'status' => 1,
+			'ks' => $limitedKsStr
+		);
+		if ($subId)
+			$params['subid'] = $subId;
+
+		$this->redirect('extservices/googleoauth2?'.http_build_query($params, null, '&'));
 	}
 
 	protected function executeStatus()
@@ -185,6 +195,7 @@ class googleoauth2Action extends sfAction
 		$this->tokenError = null;
 		$ksStr = $this->getRequestParameter('ks');
 		$appId = $this->getRequestParameter('ytid');
+		$subId = $this->getRequestParameter('subid');
 		$appConfig = $this->getFromGoogleAuthConfig($appId);
 		$ks = $this->parseKs($ksStr);
 
@@ -196,7 +207,11 @@ class googleoauth2Action extends sfAction
 
 		$partnerId = $ks->partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$tokenData = $partner->getFromCustomData($appId, 'googleAuth');
+		$customDataKey = $appId;
+		if ($subId)
+			$customDataKey .= '_' . $subId;
+
+		$tokenData = $partner->getFromCustomData($customDataKey, 'googleAuth');
 		$client = $this->getGoogleClient($appId);
 		try
 		{
