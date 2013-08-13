@@ -1375,7 +1375,6 @@ CREATE TABLE IF NOT EXISTS `metadata_profile_field` (
   `type` varchar(127) DEFAULT NULL,
   `xpath` varchar(255) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
-  `search_index` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`),
   KEY `profile_id_and_version` (`metadata_profile_id`,`metadata_profile_version`)
