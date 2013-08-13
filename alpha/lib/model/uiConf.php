@@ -119,7 +119,8 @@ class uiConf extends BaseuiConf implements ISyncableFile
 							&& $this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD) 
 							|| $subType != self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES)
 						{
-							$this->setConfFileBySuffix($contentItem->suffix, '');
+							$suffix = $this->getSuffixBySubType($subType);
+							$this->setConfFileBySuffix($suffix, '');
 						}
 				}
 			}
