@@ -198,10 +198,6 @@ index kaltura_entry:kaltura_base
 	rt_attr_timestamp	 = end_date
 	rt_attr_timestamp	 = available_from
 	rt_attr_string	 = str_entry_id
-	rt_attr_timestamp	 = metadata_date_0
-	rt_attr_timestamp	 = metadata_date_1
-	rt_attr_timestamp	 = metadata_date_2
-	rt_attr_timestamp	 = metadata_date_3
 	rt_field	 = creator_kuser_id
 	rt_field	 = creator_puser_id
 	rt_field	 = entitled_kusers_publish
@@ -209,6 +205,7 @@ index kaltura_entry:kaltura_base
 	rt_field	 = entitled_kusers
 	rt_field	 = privacy_by_contexts
     rt_field     = sphinx_match_optimizations
+	rt_attr_json = dynamic_attributes
 }
 
 index kaltura_category
