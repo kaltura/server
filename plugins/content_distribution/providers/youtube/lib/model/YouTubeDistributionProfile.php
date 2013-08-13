@@ -86,7 +86,6 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		YouTubeDistributionField::TV_METADATA_NOTES,
 		YouTubeDistributionField::TV_METADATA_SEASON,
 		YouTubeDistributionField::TV_METADATA_TMS_ID,
-		YouTubeDistributionField::PLAYLISTS,
 	);
 
 	protected $specV2OnlyFields = array(
