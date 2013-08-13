@@ -554,7 +554,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 
 			// in case of Akamai HDN1.0 increase the reported bitrate due to mpeg2-ts overhead
 			if (strpos($flavor['url'], "index_0_av.m3u8"))
-				$bitrate += 40;
+				$bitrate += 40 * 1024;
 
 			$resolution = '';
 			$width = $flavor['width'];
