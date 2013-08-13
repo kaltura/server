@@ -146,6 +146,17 @@ class KalturaStdoutLogger
  * @package infra
  * @subpackage log
  */
+class KalturaNullLogger
+{
+        public function log($message, $priority = KalturaLog::NOTICE)
+        {
+        }
+}
+
+/**
+ * @package infra
+ * @subpackage log
+ */
 class LogTime 
 {
 	public function __toString()
