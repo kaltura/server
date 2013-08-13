@@ -37,6 +37,10 @@ class EventNotificationTemplateUpdateStatusAction extends KalturaApplicationPlug
 		$client = Infra_ClientHelper::getClient();
 		$eventNotificationPlugin = Kaltura_Client_EventNotification_Plugin::get($client);
 		
+		$partnerId = $this->_getParam('partner_id');
+		if($partnerId)
+			Infra_ClientHelper::impersonate($partnerId);
+		
 		try
 		{
 			$eventNotificationPlugin->eventNotificationTemplate->updateStatus($templateId, $status);
