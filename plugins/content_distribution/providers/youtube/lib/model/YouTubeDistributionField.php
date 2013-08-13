@@ -142,4 +142,9 @@ interface YouTubeDistributionField extends BaseEnum
 	 * New spec- new elements for 'ad_policy'
 	 */
 	const ADVERTISING_INSTREAM_STANDARD = 'ADVERTISING_INSTREAM_STANDARD';
+
+	/**
+	 * General control
+	 */
+	const DISABLE_FINGERPRINTING = 'DISABLE_FINGERPRINTING';
 }
