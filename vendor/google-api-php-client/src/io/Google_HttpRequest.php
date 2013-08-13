@@ -50,11 +50,11 @@ class Google_HttpRequest {
     $this->setRequestHeaders($headers);
     $this->setPostBody($postBody);
 
-    global $apiConfig;
-    if (empty($apiConfig['application_name'])) {
+    global $googleApiConfig;
+    if (empty($googleApiConfig['application_name'])) {
       $this->userAgent = self::USER_AGENT_SUFFIX;
     } else {
-      $this->userAgent = $apiConfig['application_name'] . " " . self::USER_AGENT_SUFFIX;
+      $this->userAgent = $googleApiConfig['application_name'] . " " . self::USER_AGENT_SUFFIX;
     }
   }
 
@@ -196,8 +196,8 @@ class Google_HttpRequest {
       if (substr($url, 0, 1) !== '/') {
         $url = '/' . $url;
       }
-      global $apiConfig;
-      $this->url = $apiConfig['basePath'] . $url;
+      global $googleApiConfig;
+      $this->url = $googleApiConfig['basePath'] . $url;
     }
   }
 

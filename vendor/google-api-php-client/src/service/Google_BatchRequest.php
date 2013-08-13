@@ -50,8 +50,8 @@ class Google_BatchRequest {
     $body = rtrim($body);
     $body .= "\n--{$this->boundary}--";
 
-    global $apiConfig;
-    $url = $apiConfig['basePath'] . '/batch';
+    global $googleApiConfig;
+    $url = $googleApiConfig['basePath'] . '/batch';
     $httpRequest = new Google_HttpRequest($url, 'POST');
     $httpRequest->setRequestHeaders(array(
         'Content-Type' => 'multipart/mixed; boundary=' . $this->boundary));

@@ -53,30 +53,30 @@ class Google_OAuth2 extends Google_Auth {
    * to the discretion of the caller (which is done by calling authenticate()).
    */
   public function __construct() {
-    global $apiConfig;
+    global $googleApiConfig;
 
-    if (! empty($apiConfig['developer_key'])) {
-      $this->developerKey = $apiConfig['developer_key'];
+    if (! empty($googleApiConfig['developer_key'])) {
+      $this->developerKey = $googleApiConfig['developer_key'];
     }
 
-    if (! empty($apiConfig['oauth2_client_id'])) {
-      $this->clientId = $apiConfig['oauth2_client_id'];
+    if (! empty($googleApiConfig['oauth2_client_id'])) {
+      $this->clientId = $googleApiConfig['oauth2_client_id'];
     }
 
-    if (! empty($apiConfig['oauth2_client_secret'])) {
-      $this->clientSecret = $apiConfig['oauth2_client_secret'];
+    if (! empty($googleApiConfig['oauth2_client_secret'])) {
+      $this->clientSecret = $googleApiConfig['oauth2_client_secret'];
     }
 
-    if (! empty($apiConfig['oauth2_redirect_uri'])) {
-      $this->redirectUri = $apiConfig['oauth2_redirect_uri'];
+    if (! empty($googleApiConfig['oauth2_redirect_uri'])) {
+      $this->redirectUri = $googleApiConfig['oauth2_redirect_uri'];
     }
 
-    if (! empty($apiConfig['oauth2_access_type'])) {
-      $this->accessType = $apiConfig['oauth2_access_type'];
+    if (! empty($googleApiConfig['oauth2_access_type'])) {
+      $this->accessType = $googleApiConfig['oauth2_access_type'];
     }
 
-    if (! empty($apiConfig['oauth2_approval_prompt'])) {
-      $this->approvalPrompt = $apiConfig['oauth2_approval_prompt'];
+    if (! empty($googleApiConfig['oauth2_approval_prompt'])) {
+      $this->approvalPrompt = $googleApiConfig['oauth2_approval_prompt'];
     }
 
   }

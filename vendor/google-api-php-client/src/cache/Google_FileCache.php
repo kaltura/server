@@ -28,8 +28,8 @@ class Google_FileCache extends Google_Cache {
   private $path;
 
   public function __construct() {
-    global $apiConfig;
-    $this->path = $apiConfig['ioFileCache_directory'];
+    global $googleApiConfig;
+    $this->path = $googleApiConfig['ioFileCache_directory'];
   }
 
   private function isLocked($storageFile) {

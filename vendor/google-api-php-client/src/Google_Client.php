@@ -99,25 +99,25 @@ class Google_Client {
   private $authenticated = false;
 
   public function __construct($config = array()) {
-    global $apiConfig;
-    $apiConfig = array_merge($apiConfig, $config);
-    self::$cache = new $apiConfig['cacheClass']();
-    self::$auth = new $apiConfig['authClass']();
-    self::$io = new $apiConfig['ioClass']();
+    global $googleApiConfig;
+    $googleApiConfig = array_merge($googleApiConfig, $config);
+    self::$cache = new $googleApiConfig['cacheClass']();
+    self::$auth = new $googleApiConfig['authClass']();
+    self::$io = new $googleApiConfig['ioClass']();
   }
 
   /**
    * Add a service
    */
   public function addService($service, $version = false) {
-    global $apiConfig;
+    global $googleApiConfig;
     if ($this->authenticated) {
       throw new Google_Exception('Cant add services after having authenticated');
     }
     $this->services[$service] = array();
-    if (isset($apiConfig['services'][$service])) {
+    if (isset($googleApiConfig['services'][$service])) {
       // Merge the service descriptor with the default values
-      $this->services[$service] = array_merge($this->services[$service], $apiConfig['services'][$service]);
+      $this->services[$service] = array_merge($this->services[$service], $googleApiConfig['services'][$service]);
     }
   }
 
@@ -247,8 +247,8 @@ class Google_Client {
    * @param string $applicationName
    */
   public function setApplicationName($applicationName) {
-    global $apiConfig;
-    $apiConfig['application_name'] = $applicationName;
+    global $googleApiConfig;
+    $googleApiConfig['application_name'] = $applicationName;
   }
 
   /**
@@ -256,8 +256,8 @@ class Google_Client {
    * @param string $clientId
    */
   public function setClientId($clientId) {
-    global $apiConfig;
-    $apiConfig['oauth2_client_id'] = $clientId;
+    global $googleApiConfig;
+    $googleApiConfig['oauth2_client_id'] = $clientId;
     self::$auth->clientId = $clientId;
   }
 
@@ -273,8 +273,8 @@ class Google_Client {
    * @param string $clientSecret
    */
   public function setClientSecret($clientSecret) {
-    global $apiConfig;
-    $apiConfig['oauth2_client_secret'] = $clientSecret;
+    global $googleApiConfig;
+    $googleApiConfig['oauth2_client_secret'] = $clientSecret;
     self::$auth->clientSecret = $clientSecret;
   }
 
@@ -290,8 +290,8 @@ class Google_Client {
    * @param string $redirectUri
    */
   public function setRedirectUri($redirectUri) {
-    global $apiConfig;
-    $apiConfig['oauth2_redirect_uri'] = $redirectUri;
+    global $googleApiConfig;
+    $googleApiConfig['oauth2_redirect_uri'] = $redirectUri;
     self::$auth->redirectUri = $redirectUri;
   }
 
@@ -382,8 +382,8 @@ class Google_Client {
    * @experimental
    */
   public function setUseObjects($useObjects) {
-    global $apiConfig;
-    $apiConfig['use_objects'] = $useObjects;
+    global $googleApiConfig;
+    $googleApiConfig['use_objects'] = $useObjects;
   }
 
   /**

@@ -27,12 +27,12 @@ class Google_MemcacheCache extends Google_Cache {
   private $connection = false;
 
   public function __construct() {
-    global $apiConfig;
+    global $googleApiConfig;
     if (! function_exists('memcache_connect')) {
       throw new Google_CacheException("Memcache functions not available");
     }
-    $this->host = $apiConfig['ioMemCacheCache_host'];
-    $this->port = $apiConfig['ioMemCacheCache_port'];
+    $this->host = $googleApiConfig['ioMemCacheCache_host'];
+    $this->port = $googleApiConfig['ioMemCacheCache_port'];
     if (empty($this->host) || empty($this->port)) {
       throw new Google_CacheException("You need to supply a valid memcache host and port");
     }

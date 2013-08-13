@@ -24,9 +24,9 @@ class Google_AuthNone extends Google_Auth {
   public $key = null;
 
   public function __construct() {
-    global $apiConfig;
-    if (!empty($apiConfig['developer_key'])) {
-      $this->setDeveloperKey($apiConfig['developer_key']);
+    global $googleApiConfig;
+    if (!empty($googleApiConfig['developer_key'])) {
+      $this->setDeveloperKey($googleApiConfig['developer_key']);
     }
   }
 

@@ -187,8 +187,8 @@ class Google_ServiceResource {
   }
 
   public  function useObjects() {
-    global $apiConfig;
-    return (isset($apiConfig['use_objects']) && $apiConfig['use_objects']);
+    global $googleApiConfig;
+    return (isset($googleApiConfig['use_objects']) && $googleApiConfig['use_objects']);
   }
 
   protected function stripNull(&$o) {
