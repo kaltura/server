@@ -46,6 +46,9 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	// validations
 	const MEDIA_TITLE_MAXIMUM_LENGTH = 100;
 	const MEDIA_DESCRIPTION_MAXIMUM_LENGTH = 5000;
+	const MEDIA_KEYWORDS_MAXIMUM_TOTAL_LENGTH = 500;
+	const MEDIA_KEYWORDS_MINIMUM_LENGTH_EACH_KEYWORD = 2;
+	const MEDIA_KEYWORDS_MAXIMUM_LENGTH_EACH_KEYWORD = 30;
 	const METADATA_CUSTOM_ID_MAXIMUM_LENGTH = 64;
 	const TV_METADATA_EPISODE_MAXIMUM_LENGTH = 16;
 	const TV_METADATA_SEASON_MAXIMUM_LENGTH = 16;
@@ -152,6 +155,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$maxLengthFields = array (
 		    YouTubeDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::MEDIA_TITLE => self::MEDIA_TITLE_MAXIMUM_LENGTH,
+			YouTubeDistributionField::MEDIA_KEYWORDS => self::MEDIA_KEYWORDS_MAXIMUM_TOTAL_LENGTH,
 		    YouTubeDistributionField::WEB_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::TV_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
@@ -199,6 +203,34 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 				$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
 				$validationError->setValidationErrorParam($errorMsg);
 				$validationErrors[] = $validationError;
+			}
+		}
+
+		$fieldName = YouTubeDistributionField::MEDIA_KEYWORDS;
+		$keywordStr = $allFieldValues[$fieldName];
+		if ($keywordStr)
+		{
+			$keywordsArray = explode(',',$keywordStr);
+			foreach($keywordsArray as $keyword)
+			{
+				if (!$keyword)
+				{
+					$errorMsg = 'Keyword cannot be empty';
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
+					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+					$validationError->setValidationErrorParam($errorMsg);
+					$validationErrors[] = $validationError;
+					continue;
+				}
+				if (strlen($keyword) < self::MEDIA_KEYWORDS_MINIMUM_LENGTH_EACH_KEYWORD
+					|| strlen($keyword) > self::MEDIA_KEYWORDS_MAXIMUM_LENGTH_EACH_KEYWORD)
+				{
+					$errorMsg = 'Keyword "'.$keyword.'" must be at least two characters long and may not be longer than 30 characters';
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
+					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+					$validationError->setValidationErrorParam($errorMsg);
+					$validationErrors[] = $validationError;
+				}
 			}
 		}
 		
