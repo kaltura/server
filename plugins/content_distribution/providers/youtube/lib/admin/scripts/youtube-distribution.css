@@ -9,4 +9,4 @@
 
 #frmDistributionProfileConfig dt#delete_reference-label,
 #frmDistributionProfileConfig dt#release_claims-label { width: 310px; }
-#frmDistributionProfileConfig #feed_spec_version-element .description { width: 300px; line-height: 16px; }
+#frmDistributionProfileConfig dd p.description { width: 300px; line-height: 16px; }

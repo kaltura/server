@@ -67,6 +67,10 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			$this->setV1Mode($order++);
 
 		parent::populateFromObject($object, $add_underscore);
+
+		$serviceUrl = Infra_ClientHelper::getServiceUrl();
+		$url = $serviceUrl . '/index.php/extservices/googleoauth2/ytid/youtubepartner/subid/'.$object->id;
+		$this->setDefault('api_authorize_url', $url);
 	}
 
 	protected function addProviderElements()
@@ -86,6 +90,14 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 				'2' => 'Version 2 (YouTube Rights Feeds)',
 			),
 			'description' => 'Save to see specific spec configurations',
+		));
+
+		$this->addElement('text', 'api_authorize_url', array(
+			'label'			=> 'Authorize API Access:',
+			'decorators' => array(array('ViewHelper'), array('ViewScript', array(
+				'viewScript' => 'youtube-distribution-api-authorize-field.phtml',
+				'placement' => 'WRAP',
+			)))
 		));
 
 		$this->addDisplayGroup(
