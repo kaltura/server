@@ -303,6 +303,15 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$fieldValues = unserialize($providerData->fieldValues);
 		$youtubeChannel = isset($fieldValues[KalturaYouTubeDistributionField::VIDEO_CHANNEL]) ? $fieldValues[KalturaYouTubeDistributionField::VIDEO_CHANNEL] : null;
 		$newVideoPlaylists = isset($fieldValues[KalturaYouTubeDistributionField::PLAYLISTS]) ? $fieldValues[KalturaYouTubeDistributionField::PLAYLISTS] : null;
+		$clientId = $providerData->googleClientId;
+		$clientSecret   = $providerData->googleClientSecret;
+		$tokenData = $providerData->googleTokenData;
+
+		if (!$newVideoPlaylists && !$tokenData)
+		{
+			// no playlists and token was not setup, do nothing
+			return $providerData->currentPlaylists;
+		}
 		if (!$youtubeChannel)
 		{
 			KalturaLog::err('YouTube channel was not found');
@@ -313,9 +322,6 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			KalturaLog::err('No video id');
 			return $providerData->currentPlaylists;
 		}
-		$clientId = $providerData->googleClientId;
-		$clientSecret   = $providerData->googleClientSecret;
-		$tokenData = $providerData->googleTokenData;
 		$youtubeService = YouTubeDistributionGoogleClientHelper::getYouTubeService($clientId, $clientSecret, $tokenData);
 
 		$playlistSync = new YouTubeDistributionPlaylistsSync($youtubeService);
