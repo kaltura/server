@@ -508,9 +508,9 @@ class ks extends kSessionBase
 	public function isUserIPAllowed()
 	{
 		$allowedIPRestriction = $this->isSetIPRestriction();
-		if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
+		if ($allowedIPRestriction && $allowedIPRestriction != infraRequestUtils::getRemoteAddress())
 		{
-			KalturaLog::err("IP Restriction; allowed IP: [$allowedIPRestriction], user ip [". kCurrentContext::$user_ip ."] is not in range");
+			KalturaLog::err("IP Restriction; allowed IP: [$allowedIPRestriction], user ip [". infraRequestUtils::getRemoteAddress() ."] is not in range");
 			return false; 
 		}
 		return true; 
