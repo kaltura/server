@@ -166,7 +166,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(entryPeer::getOMClass(false));
+		return kSphinxSearchManager::getSphinxIndexName(entryPeer::OM_CLASS);
 	}
 	
 	/* (non-PHPdoc)
