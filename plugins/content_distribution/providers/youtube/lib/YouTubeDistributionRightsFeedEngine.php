@@ -56,6 +56,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Submit reference');
 
+		// maybe we didn't submit a reference, so let's check the file status
+		if (!$status)
+			$status = $statusParser->getStatusForAction('Process file');
+
 		if ($status != 'Success')
 		{
 			$errors = $statusParser->getErrorsSummary();
@@ -71,6 +75,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$remoteIdHandler->setAssetId($assetId);
 		$remoteIdHandler->setReferenceId($referenceId);
 		$data->remoteId = $remoteIdHandler->getSerialized();
+
+		$providerData = $data->providerData;
+		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
+		$providerData->currentPlaylists = $newPlaylists;
 			
 		return true;
 	}
@@ -145,7 +153,14 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		
 		if ($status != 'Success')
 			throw new Exception('Update failed with status ['.$status.']');
-			
+
+		$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($data->remoteId);
+		$videoId = $remoteIdHandler->getVideoId();
+
+		$providerData = $data->providerData;
+		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
+		$providerData->currentPlaylists = implode(',',$newPlaylists);
+
 		return true;
 	}
 
@@ -229,7 +244,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
-	
+
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaYouTubeDistributionProfile $distributionProfile
@@ -281,6 +296,32 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			KalturaLog::info('File doesn\'t exist yet, so no internal failure was found till now');
 			return false;
 		}
+	}
+
+	protected function syncPlaylists($videoId, KalturaYouTubeDistributionJobProviderData $providerData)
+	{
+		$fieldValues = unserialize($providerData->fieldValues);
+		$youtubeChannel = isset($fieldValues[KalturaYouTubeDistributionField::VIDEO_CHANNEL]) ? $fieldValues[KalturaYouTubeDistributionField::VIDEO_CHANNEL] : null;
+		$newVideoPlaylists = isset($fieldValues[KalturaYouTubeDistributionField::PLAYLISTS]) ? $fieldValues[KalturaYouTubeDistributionField::PLAYLISTS] : null;
+		if (!$youtubeChannel)
+		{
+			KalturaLog::err('YouTube channel was not found');
+			return $providerData->currentPlaylists;
+		}
+		if (!$videoId)
+		{
+			KalturaLog::err('No video id');
+			return $providerData->currentPlaylists;
+		}
+		$clientId = $providerData->googleClientId;
+		$clientSecret   = $providerData->googleClientSecret;
+		$tokenData = $providerData->googleTokenData;
+		$youtubeService = YouTubeDistributionGoogleClientHelper::getYouTubeService($clientId, $clientSecret, $tokenData);
+
+		$playlistSync = new YouTubeDistributionPlaylistsSync($youtubeService);
+
+		$currentPlaylists = $playlistSync->sync($youtubeChannel, $videoId, $providerData->currentPlaylists, $newVideoPlaylists);
+		return $currentPlaylists;
 	}
 
 	/**

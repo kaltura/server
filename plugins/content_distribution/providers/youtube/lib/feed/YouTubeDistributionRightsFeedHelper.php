@@ -65,7 +65,7 @@ class YouTubeDistributionRightsFeedHelper
 			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
 		}
 
-		$feed->appendVideoAssetFileRelationship($videoTag);
+		$feed->appendVideoAssetFileRelationship($fieldValues, $videoTag);
 		$feed->setAdParamsByFieldValues($fieldValues, $videoTag, $distributionProfile->enableAdServer);
 		$feed->appendRightsAdminByFieldValues($fieldValues, $videoTag);
 
@@ -281,16 +281,19 @@ class YouTubeDistributionRightsFeedHelper
 		$this->setByXpath('video/artwork/@path', "/feed/file[@tag='$fileTag']");
 	}
 
-	public function appendVideoAssetFileRelationship($fileTag)
+	public function appendVideoAssetFileRelationship(array $fieldValues, $fileTag)
 	{
 		$itemsPaths = array(
 			"/feed/file[@tag='$fileTag']",
 		);
 
-		$relatedItemsPaths = array(
-			"/feed/asset[@tag='$fileTag']",
-			"/feed/video[@tag='$fileTag']"
-		);
+		$disableFingerprinting = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::DISABLE_FINGERPRINTING);
+		$relatedItemsPaths = array();
+		// when fingerprinting is disabled on the cms account, we shouldn't add the asset to the video / file relationship
+		if (!$disableFingerprinting)
+			$relatedItemsPaths[] = "/feed/asset[@tag='$fileTag']";
+
+		$relatedItemsPaths[] = "/feed/video[@tag='$fileTag']";
 
 		return $this->appendRelationship($itemsPaths, $relatedItemsPaths);
 	}
@@ -403,11 +406,14 @@ class YouTubeDistributionRightsFeedHelper
 	{
 		$commercialPolicy = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::POLICY_COMMERCIAL);
 		$ugcPolicy = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::POLICY_UGC);
+		$disableFingerprinting = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::DISABLE_FINGERPRINTING);
+
 		$rightsAdminType = null;
 		if ($commercialPolicy)
 		{
 			$this->appendRightsAdmin('usage', 'true');
-			$this->appendClaimElement($fieldValues, $videoTag, 'usage', $commercialPolicy);
+			if (!$disableFingerprinting)
+				$this->appendClaimElement($fieldValues, $videoTag, 'usage', $commercialPolicy);
 		}
 
 		if($ugcPolicy)
@@ -420,7 +426,8 @@ class YouTubeDistributionRightsFeedHelper
 			$relatedItemsPaths = array(
 				"/feed/asset[@tag='$videoTag']"
 			);
-			$this->appendRelationship($itemsPaths, $relatedItemsPaths);
+			if (!$disableFingerprinting)
+				$this->appendRelationship($itemsPaths, $relatedItemsPaths);
 		}
 	}
 
