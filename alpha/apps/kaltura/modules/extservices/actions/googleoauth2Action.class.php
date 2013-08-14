@@ -90,24 +90,26 @@ class googleoauth2Action extends sfAction
 		$appConfig = $this->getFromGoogleAuthConfig($appId);
 		$client = $this->getGoogleClient();
 		$this->ksError = null;
-		$ks = $this->parseKs($ksStr);
-		if ($ks === null)
+		$ksValid = $this->processKs($ksStr);
+		if (!$ksValid)
 		{
 			$this->ksError = true;
 			return;
 		}
 
+		/** @var ks $ks */
+		$ks = kCurrentContext::$ks_object;
 		$partnerId = $ks->partner_id;
 
- 		// let's create a limited ks and pass it as a state parameter to google
-		$limitedKs = $this->generateLimitedKs($partnerId);
-
 		$state = array(
-			'lks' => $limitedKs,
 			'ytid' => $appId,
 			'subid' => $subId,
 		);
-		$state = base64_encode(json_encode($state));
+
+ 		// let's create a limited ks and pass it as a state parameter to google
+		$limitedKs = $this->generateLimitedKs($partnerId, $state);
+
+		$state = $limitedKs;
 		$redirect = $this->getController()->genUrl('extservices/googleoauth2', true);
 		$client->setRedirectUri($redirect);
 
@@ -126,32 +128,25 @@ class googleoauth2Action extends sfAction
 		$this->ksError = null;
 		$this->tokenError = null;
 
-		$stateStr = $this->getRequestParameter('state');
-		$stateJsonStr = base64_decode($stateStr);
-		if (!$stateJsonStr)
+		$limitedKsStr = $this->getRequestParameter('state');
+		$ksValid = $this->processKs($limitedKsStr);
+		if (!$ksValid)
 		{
 			$this->ksError = true;
 			return;
 		}
-
-		$stateArray = json_decode($stateJsonStr);
-		if (!$stateArray)
+		$limitedKs = kCurrentContext::$ks_object;
+		$additionalData = $limitedKs->additional_data;
+		$stateObject = json_decode($additionalData);
+		if (!$stateObject)
 		{
 			$this->ksError = true;
 			return;
 		}
-		$limitedKsStr = isset($stateArray->lks) ? $stateArray->lks : null;
-		$appId = isset($stateArray->ytid) ? $stateArray->ytid : null;
-		$subId = isset($stateArray->subid) ? $stateArray->subid : null;
-		$limitedKs = $this->parseKs($limitedKsStr);
+		$appId = isset($stateObject->ytid) ? $stateObject->ytid : null;
+		$subId = isset($stateObject->subid) ? $stateObject->subid : null;
 
-		if ($limitedKs === null)
-		{
-			$this->ksError = true;
-			return;
-		}
-
-		$partner = PartnerPeer::retrieveByPK($limitedKs->partner_id);
+		$partner = $this->getPartner($limitedKs->partner_id);
 
 		$client = $this->getGoogleClient($appId);
 		$redirect = $this->getController()->genUrl('extservices/googleoauth2', true);
@@ -197,8 +192,14 @@ class googleoauth2Action extends sfAction
 		$appId = $this->getRequestParameter('ytid');
 		$subId = $this->getRequestParameter('subid');
 		$appConfig = $this->getFromGoogleAuthConfig($appId);
-		$ks = $this->parseKs($ksStr);
+		$ksValid = $this->processKs($ksStr);
+		if (!$ksValid)
+		{
+			$this->ksError = true;
+			return;
+		}
 
+		$ks = kCurrentContext::$ks_object;
 		if ($ks == null || $appConfig == null)
 		{
 			$this->paramsError = true;
@@ -206,7 +207,7 @@ class googleoauth2Action extends sfAction
 		}
 
 		$partnerId = $ks->partner_id;
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partner = $this->getPartner($partnerId);
 		$customDataKey = $appId;
 		if ($subId)
 			$customDataKey .= '_' . $subId;
@@ -262,37 +263,68 @@ class googleoauth2Action extends sfAction
 		return $client;
 	}
 
-	protected function parseKs($ksStr)
+	protected function generateLimitedKs($partnerId, $stateData)
 	{
-		$ks = null;
-		try
-		{
-			$ks = kSessionUtils::crackKs($ksStr);
-		}
-		catch(Exception $ex)
-		{
-			KalturaLog::err($ex);
-			return null;
-		}
-
-		if (!$ks instanceof ks)
-		{
-			return null;
-		}
-
-		return $ks;
-	}
-
-	protected function generateLimitedKs($partnerId)
-	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partner = $this->getPartner($partnerId);
 		$limitedKs = '';
 		$expiry = 30 * 60; // 30 minutes
 		$privileges = kSessionBase::PRIVILEGE_ACTIONS_LIMIT.':0';
-		$result = kSessionUtils::startKSession($partnerId, $partner->getSecret(), '', $limitedKs, $expiry, kSessionBase::SESSION_TYPE_USER, '', $privileges);
+		$additionalData = json_encode($stateData);
+		$result = kSessionUtils::startKSession($partnerId, $partner->getAdminSecret(), '', $limitedKs, $expiry, kSessionBase::SESSION_TYPE_ADMIN, '', $privileges, null, $additionalData);
 		if ($result < 0)
 			throw new Exception('Failed to create limited session for partner '.$partnerId);
 
 		return $limitedKs;
+	}
+
+	protected function getPartner($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (is_null($partner))
+			throw new Exception('Partner id '. $partnerId.' not found');
+
+		return $partner;
+	}
+
+	protected function processKs($ksStr, $requiredPermission = null)
+	{
+		try
+		{
+			kCurrentContext::initKsPartnerUser($ksStr);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err($ex);
+			return false;
+		}
+
+		if (kCurrentContext::$ks_object->type != ks::SESSION_TYPE_ADMIN)
+		{
+			KalturaLog::err('Ks is not admin');
+			return false;
+		}
+
+		try
+		{
+			kPermissionManager::init(kConf::get('enable_cache'));
+		}
+		catch(Exception $ex)
+		{
+			if (strpos($ex->getCode(), 'INVALID_ACTIONS_LIMIT') === false) // allow using limited ks
+			{
+				KalturaLog::err($ex);
+				return false;
+			}
+		}
+		if ($requiredPermission)
+		{
+			if (!kPermissionManager::isPermitted(PermissionName::ADMIN_PUBLISHER_MANAGE))
+			{
+				KalturaLog::err('Ks is missing "ADMIN_PUBLISHER_MANAGE" permission');
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
