@@ -139,7 +139,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject($object_to_fill, $props_to_skip)
 	 */
-	public function toInsertableObject($sourceObject = null, $propsToSkip = null) 
+	public function toInsertableObject($sourceObject = null, $propsToSkip = array()) 
 	{
 		/* @var $sourceObject entry */
 		if ($this->sourceType === KalturaSourceType::SEARCH_PROVIDER)
