@@ -160,7 +160,7 @@ class rawAction extends sfAction
 					$reloc_ext = pathinfo ( $relocate , PATHINFO_EXTENSION );
 					$name = str_replace(".$reloc_ext", '', $name);
 				}
-				$name = kString::removeNewLine($name.$ext);
+				$name = kString::removeNewLine($name. '.' .$ext);
 				header("Content-Disposition: attachment; filename=\"$name\"");
 			}
 			kFileUtils::dumpFile($file_sync->getFullPath());
