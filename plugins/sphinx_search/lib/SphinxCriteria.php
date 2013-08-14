@@ -604,12 +604,21 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(count($fieldNamesArr) > 1)
 			{
 				$sphinxFieldNames = array();
+				$skip = false;
 				foreach($fieldNamesArr as $fieldName)
 				{
+					if (!$this->hasMatchableField($fieldName))
+					{
+						KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
+						$skip = true;
+						break;
+					}	
 					$sphinxField = $this->getSphinxFieldName($fieldName);
 					$type = $this->getSphinxFieldType($sphinxField);
 					$sphinxFieldNames[] = $sphinxField;
 				}
+				if ($skip)
+					continue;
 				$sphinxField = '(' . implode(',', $sphinxFieldNames) . ')';
 				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
@@ -651,7 +660,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$val = implode(' | ', $vals);
-						$this->addMatch("@$sphinxField $val");
+						$this->addMatch("(@$sphinxField $val)");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -743,7 +752,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$val = implode(' ', $vals);
-						$this->addMatch("@$sphinxField $val");
+						$this->addMatch("(@$sphinxField $val)");
 						$filter->unsetByName($field);
 					}
 					break;		
