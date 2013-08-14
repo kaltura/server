@@ -87,6 +87,11 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 */
+	public $config;
+	
+	/**
+	 * @var string
+	 */
 	public $confVars;
 	
 	
@@ -140,9 +145,27 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	private static $map_between_objects = array
 	(
 		"id" ,
-		"creationMode" , "partnerId" ,
-	 	"objType" , "objTypeAsString" , "name" , "description" , "width" , "height" ,
-		"htmlParams", "swfUrl" , "confFilePath" , "confFile" , "confFileFeatures" , "confVars" , "useCdn" , "tags" , "swfUrlVersion" , "createdAt" , "updatedAt", "html5Url"
+		"creationMode" , 
+		"partnerId" ,
+	 	"objType" , 
+	 	"objTypeAsString" , 
+	 	"name" , 
+	 	"description" , 
+	 	"width" , 
+	 	"height" ,
+		"htmlParams", 
+		"swfUrl" , 
+		"confFilePath" , 
+		"confFile" , 
+		"confFileFeatures" , 
+		"confVars" , 
+		"useCdn" , 
+		"tags" , 
+		"swfUrlVersion" , 
+		"createdAt" , 
+		"updatedAt", 
+		"html5Url",
+		"config",
         
 	);
 
