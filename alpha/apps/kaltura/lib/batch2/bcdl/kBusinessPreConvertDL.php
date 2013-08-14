@@ -1382,7 +1382,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
 		$sourceFlavorOutput->save();
 			
-		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfo->getId(), $parentJob);
+		$mediaInfoId = null;
+		if($mediaInfo)
+			$mediaInfoId = $mediaInfo->getId();
+		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob);
 		return false;
 	}
 
