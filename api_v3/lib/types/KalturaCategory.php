@@ -540,4 +540,13 @@ class KalturaCategory extends KalturaObject implements IFilterable
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
+ 	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
+		$this->trimStringProperties(array("name"));
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}	
 }
