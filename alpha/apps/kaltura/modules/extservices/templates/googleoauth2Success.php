@@ -31,7 +31,7 @@
 		Invalid token
 	<?php endif; ?>
 <?php elseif ($subAction == googleoauth2Action::SUB_ACTION_STATUS): ?>
-	<?php if ($paramsError): ?>
+	<?php if ($paramsError || $ksError): ?>
 		Invalid parameter(s)
 	<?php elseif ($tokenError): ?>
 		Failed to verify access token
