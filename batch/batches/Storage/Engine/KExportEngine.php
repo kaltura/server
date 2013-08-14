@@ -13,7 +13,7 @@ abstract class KExportEngine
 	 * @param KalturaStorageExportJobData $data
 	 * @param int $jobSubType
 	 */
-	public function __construct(KalturaStorageExportJobData $data)
+	public function __construct(KalturaStorageJobData $data)
 	{
 		$this->data = $data;
 	}
