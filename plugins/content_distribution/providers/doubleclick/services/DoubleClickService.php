@@ -26,6 +26,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$context->period = $period;
 		$context->state = $state;
 		$context->ignoreScheduling = $ignoreScheduling;
+		$context->hash = $hash;
 		$this->generateFeed($context, $distributionProfileId, $hash);
 	}
 	
@@ -34,6 +35,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 	}
 	
 	protected function fillStateDependentFields($context) {
+		$context->stateLastEntryCreatedAt = null;
+		$context->stateLastEntryIds = array();
 		if ($context->state)
 		{
 			$stateDecoded = base64_decode($context->state);
@@ -88,10 +91,11 @@ class DoubleClickService extends ContentDistributionServiceBase
 	}
 	
 	protected function getEntries($context, $orderBy = null, $limit = null) {
+		$context->hasNextPage = false;
 		$entries = parent::getEntries($context, null, $this->profile->getItemsPerPage() + 1); // get +1 to check if we have next page
 		if (count($entries) === ($this->profile->getItemsPerPage() + 1)) { // we tried to get (itemsPerPage + 1) entries, meaning we have another page
-			$this->hasNextPage = true;
-			unset($entries[$profile->getItemsPerPage()]);
+			$context->hasNextPage = true;
+			unset($entries[$this->profile->getItemsPerPage()]);
 		}
 		
 		$this->fillnextStateDependentFields($context, $entries);
@@ -103,8 +107,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 		// Construct the feed
 		$distributionProfileId = $this->profile->getId();
 		$feed = new DoubleClickFeed('doubleclick_template.xml', $this->profile);
-		$feed->setTotalResult($this->totalCount);
-		$feed->setStartIndex(($this->page - 1) * $this->profile->getItemsPerPage() + 1);
+		$feed->setTotalResult($context->totalCount);
+		$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds));
 		if ($context->hasNextPage)
 			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->$nextPageStateLastEntryCreatedAt, $context->$nextPageStateLastEntryIds));
