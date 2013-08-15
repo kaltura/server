@@ -111,14 +111,18 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
 	protected function handleEntries($context, $feed, array $entries) {
 		
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY) ;
 		$cachePrefix = "dist_" . ($this->profile->getId()) . "/entry_";
 		$profileUpdatedAt = $this->profile->getUpdatedAt(null);
 		
 		$extendItems = $this->profile->getItemXpathsToExtend();
 		$enableCache = empty($extendItems);
-		if ($enableCache)
-			$cacheStore = null;
+		$cacheStore = null;
+		
+		if ($enableCache) {
+			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
+			if(is_null($cacheStore))
+				$enableCache = false;
+		}
 		
 		$counter = 0;
 		
