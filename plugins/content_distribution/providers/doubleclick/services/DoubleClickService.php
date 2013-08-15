@@ -76,11 +76,11 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$context->totalCount = $baseCriteria->getRecordsCount();
 		
 		// Add the state data to proceed to next page
-		$this->fillStateDependentFields();
+		$this->fillStateDependentFields($context);
 		
 		if ($context->stateLastEntryCreatedAt)
 			$entryFilter->set('_lte_created_at', $context->stateLastEntryCreatedAt);
-		if ($context->LastEntryIds)
+		if ($context->stateLastEntryIds)
 			$entryFilter->set('_notin_id', $context->stateLastEntryIds);
 		
 		return $entryFilter;

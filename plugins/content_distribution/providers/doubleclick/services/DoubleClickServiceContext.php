@@ -17,7 +17,7 @@ class DoubleClickServiceContext extends ContentDistributionServiceContext
 	
 	public function __construct($hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false) 
 	{
-		if((!$page || $page < 1))
+		if($page && $page >= 1)
 			$this->page =  $page;
 		$this->period = $period;
 		$this->state = $state;
