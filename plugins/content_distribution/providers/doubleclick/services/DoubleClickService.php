@@ -21,12 +21,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 	 */
 	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1, $state = '', $ignoreScheduling = false)
 	{
-		$context = new ContentDistributionServiceContext();
-		$context->page = (!$page || $page < 1) ? 1 : $page;
-		$context->period = $period;
-		$context->state = $state;
-		$context->ignoreScheduling = $ignoreScheduling;
-		$context->hash = $hash;
+		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling);
+		$context->keepScheduling = !$ignoreScheduling;
 		$this->generateFeed($context, $distributionProfileId, $hash);
 	}
 	
@@ -35,8 +31,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	}
 	
 	protected function fillStateDependentFields($context) {
-		$context->stateLastEntryCreatedAt = null;
-		$context->stateLastEntryIds = array();
+	
 		if ($context->state)
 		{
 			$stateDecoded = base64_decode($context->state);
@@ -65,10 +60,10 @@ class DoubleClickService extends ContentDistributionServiceBase
 	
 	protected function getEntryFilter($context, $keepScheduling = true)
 	{
-		$keepScheduling = ($keepScheduling !== true && $this->profile->getIgnoreSchedulingInFeed() !== true);
+		$keepScheduling = ($keepScheduling === true && $this->profile->getIgnoreSchedulingInFeed() !== true);
 		$entryFilter = parent::getEntryFilter($context, $keepScheduling);
 		$entryFilter->set('_order_by', '-created_at');
-		if ($this->period && $this->period > 0)
+		if ($context->period && $context->period > 0)
 			$entryFilter->set('_gte_updated_at', time() - 24*60*60); // last 24 hours
 		
 		
@@ -77,7 +72,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$baseCriteria->setLimit(1);
 		$entryFilter->attachToCriteria($baseCriteria);
-		$context->totalCount = entryPeer::doCount($baseCriteria);
+		$entries = entryPeer::doSelect($baseCriteria);
+		$context->totalCount = $baseCriteria->getRecordsCount();
 		
 		// Add the state data to proceed to next page
 		$this->fillStateDependentFields();
@@ -111,7 +107,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$feed->setStartIndex(($context->page - 1) * $this->profile->getItemsPerPage() + 1);
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $context->hash, $context->page, $context->period, $context->stateLastEntryCreatedAt, $context->stateLastEntryIds));
 		if ($context->hasNextPage)
-			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->$nextPageStateLastEntryCreatedAt, $context->$nextPageStateLastEntryIds));
+			$feed->setNextLink($this->getUrl($distributionProfileId, $context->hash, $context->page + 1, $context->period, $context->nextPageStateLastEntryCreatedAt, $context->nextPageStateLastEntryIds));
 		
 		return $feed;
 	}
@@ -150,7 +146,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 		
 		$entries = array();
 		$entries[] = $entry;
-		$context = new ContentDistributionServiceContext();
+		$context = new DoubleClickServiceContext($hash);
 		$this->handleEntries($context, $feed, $entries);
 		$this->doneFeedGeneration($context, $feed);
 		
