@@ -14,7 +14,7 @@ class KalturaEntryIdentifier extends KalturaObjectIdentifier
 	/* (non-PHPdoc)
 	 * @see KalturaObjectIdentifier::toObject()
 	 */
-	public function toObject ($dbObject = null, $propsToSkip = null)
+	public function toObject ($dbObject = null, $propsToSkip = array())
 	{
 		if (!$dbObject)
 			$dbObject = new kEntryIdentifier();
