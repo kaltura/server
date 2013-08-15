@@ -59,7 +59,7 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 		KalturaLog::debug("delete($job->id)");
 		
         $exportEngine = KExportEngine::getInstance($job->jobSubType, $job->partnerId, $data);
-		$this->updateJob($job, "Deleting $destFile from remote storage", KalturaBatchJobStatus::QUEUED);
+		$this->updateJob($job, "Deleting {$data->srcFileSyncLocalPath} to {$data->destFileSyncStoredPath}", KalturaBatchJobStatus::QUEUED);
         
         $exportEngine->delete();
 		
