@@ -160,8 +160,9 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 			//to avoid the cache exceeding the memory size
 			if ($counter % self::CACHE_SIZE == 0){
 				kMemoryManager::clearMemory();
-				$counter++;
 			}
+			
+			$counter++;
 		}
 	}
 	
