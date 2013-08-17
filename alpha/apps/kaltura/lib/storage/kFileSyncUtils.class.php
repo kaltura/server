@@ -93,7 +93,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
-	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true )
+	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true , $max_file_size = 0 )
 	{
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FILE_SYNC);
 		if ($cacheStore)
@@ -116,6 +116,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if($file_sync)
 		{
+			if ($max_file_size && $file_sync->getFileSize() > $max_file_size)
+			{
+				KalturaLog::err('FileSync size [' . $file_sync->getFileSize() . '] exceeds the limit [' . $max_file_size . ']');
+				return null;
+			}
+			
 			$result = self::getContentsByFileSync ( $file_sync , $local , $fetch_from_remote_if_no_local , $strict );
 			if ($cacheStore && $result && strlen($result) < self::MAX_CACHED_FILE_SIZE &&
 				!in_array($key->object_type, self::$uncachedObjectTypes))
