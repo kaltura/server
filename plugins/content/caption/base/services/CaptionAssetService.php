@@ -9,6 +9,8 @@
  */
 class CaptionAssetService extends KalturaAssetService
 {
+	const MAX_SERVE_WEBVTT_FILE_SIZE = 1048576;
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -476,32 +478,28 @@ class CaptionAssetService extends KalturaAssetService
 		$listResponse->totalCount = count($listResponse->objects);
 		return $listResponse;
 	}
-
+	
 	/**
-	 * Serves caption by its id
-	 *  
-	 * @action serve
 	 * @param string $captionAssetId
-	 * @return file
-	 *  
-	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 * @throws KalturaAPIException
+	 * @return CaptionAsset
 	 */
-	public function serveAction($captionAssetId)
+	protected function validateForDownload($captionAssetId)
 	{
 		$captionAsset = null;
 		if (!kCurrentContext::$ks)
-		{	
+		{
 			$captionAsset = kCurrentContext::initPartnerByAssetId($captionAssetId);
-			
+				
 			if (!$captionAsset || $captionAsset->getStatus() == asset::ASSET_STATUS_DELETED)
 				throw new KalturaAPIException(KalturaErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-				
+		
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 			kEntitlementUtils::initEntitlementEnforcement();
 		}
-		else 
-		{	
+		else
+		{
 			$captionAsset = assetPeer::retrieveById($captionAssetId);
 		}
 		
@@ -518,6 +516,21 @@ class CaptionAssetService extends KalturaAssetService
 		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
 		
+		return $captionAsset;
+	}
+
+	/**
+	 * Serves caption by its id
+	 *  
+	 * @action serve
+	 * @param string $captionAssetId
+	 * @return file
+	 *  
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 */
+	public function serveAction($captionAssetId)
+	{
+		$captionAsset = $this->validateForDownload($captionAssetId);
 
 		$ext = $captionAsset->getFileExt();
 		if(is_null($ext))
@@ -526,6 +539,45 @@ class CaptionAssetService extends KalturaAssetService
 		$fileName = $captionAsset->getEntryId()."_" . $captionAsset->getId() . ".$ext";
 		
 		return $this->serveAsset($captionAsset, $fileName);
+	}	
+	
+	/**
+	 * Serves caption by its id
+	 *
+	 * @action serveWebVTT
+	 * @param string $captionAssetId
+	 * @param int $segmentDuration
+	 * @param int $segmentIndex
+	 * @param int $localTimestamp
+	 * @return file
+	 *
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 */
+	public function serveWebVTTAction($captionAssetId, $segmentDuration = 30, $segmentIndex = null, $localTimestamp = 10000)
+	{
+		$captionAsset = $this->validateForDownload($captionAssetId);	
+		
+		if (!$segmentIndex)
+		{
+			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());		// no need to check for null, the entry was already loaded in validateForDownload
+			
+			return new kRendererString(kWebVTTGenerator::buildWebVTTM3U8File($segmentDuration, (int)$entry->getDuration()), 'application/x-mpegurl');
+		}
+		
+		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
+		if(!$content)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
+		
+		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
+		if(!$captionsContentManager)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
+		
+		$parsedCaption = $captionsContentManager->parse($content);
+		if(!$parsedCaption)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARSING_FAILED, $captionAssetId);
+		
+		return new kRendererString(kWebVTTGenerator::buildWebVTTSegment($parsedCaption, $segmentIndex, $segmentDuration, $localTimestamp), 'text/vtt');
 	}
 	
 	/**

@@ -34,7 +34,7 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 			$itemsData[] = array(
 				'startTime' => $this->makeTime($startHours, $startMinutes, $startSeconds, $startMilliseconds),
 				'endTime' => $this->makeTime($endHours, $endMinutes, $endSeconds, $endMilliseconds), 
-				'content' => $content,
+				'content' => array(array('text' => $content)),
 			);
 		}
 		return $itemsData;
