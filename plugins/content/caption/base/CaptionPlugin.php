@@ -6,6 +6,7 @@
 class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor
 {
 	const PLUGIN_NAME = 'caption';
+	const KS_PRIVILEGE_CAPTION = 'caption';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -403,8 +404,25 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return self::getObjectFeatureTypeCoreValue(CaptionObjectFeatureType::CAPTIONS);
 	}
-	
-	
+
+	/**
+	 * @param CaptionAsset $captionAsset
+	 * @param int $expiry
+	 * @return string
+	 */
+	static protected function generateKsForCaptionServe($captionAsset, $expiry = 86400)
+	{
+		$partnerId = $captionAsset->getPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$secret = $partner->getSecret();
+		$privilege = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
+		$ksStr = '';
+		
+		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
+		
+		return $ksStr;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlayManifestContributor::getManifestEditors()
 	 */
@@ -444,10 +462,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$versionStr = '/version/' . $captionAsset->getVersion();
 
 						$ksStr = '';
-						if (kCurrentContext::$ks && $captionAsset->isKsNeededForDownload())
+						if ($captionAsset->isKsNeededForDownload())
 						{
-							kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
-							$ksStr = '/ks/' . kCurrentContext::$ks;
+							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
 						}
 
 						$captionAssetObj['url'] = $cdnHost . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT'.

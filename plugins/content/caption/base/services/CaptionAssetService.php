@@ -505,7 +505,11 @@ class CaptionAssetService extends KalturaAssetService
 		
 		if (!$captionAsset || !($captionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-			
+
+		if (kCurrentContext::$ks_object && 
+			kCurrentContext::$ks_object->verifyPrivileges(CaptionPlugin::KS_PRIVILEGE_CAPTION, $captionAsset->getEntryId()))
+			return $captionAsset;
+		
 		$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());
 		if(!$entry)
 		{
@@ -542,7 +546,7 @@ class CaptionAssetService extends KalturaAssetService
 	}	
 	
 	/**
-	 * Serves caption by its id
+	 * Serves caption by its id converting it to segmented WebVTT
 	 *
 	 * @action serveWebVTT
 	 * @param string $captionAssetId
@@ -559,8 +563,10 @@ class CaptionAssetService extends KalturaAssetService
 		
 		if (!$segmentIndex)
 		{
+			entryPeer::setUseCriteriaFilter(false);
 			$entry = entryPeer::retrieveByPK($captionAsset->getEntryId());		// no need to check for null, the entry was already loaded in validateForDownload
-			
+			entryPeer::setUseCriteriaFilter(true);
+
 			return new kRendererString(kWebVTTGenerator::buildWebVTTM3U8File($segmentDuration, (int)$entry->getDuration()), 'application/x-mpegurl');
 		}
 		
