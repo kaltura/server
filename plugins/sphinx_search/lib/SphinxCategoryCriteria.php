@@ -549,4 +549,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 
 		return parent::translateSphinxCriterion($crit);
 	}
+	
+	protected function applyIds(array $ids)
+	{
+		return $ids;
+	}
 }
