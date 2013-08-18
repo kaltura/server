@@ -21,7 +21,7 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	const PLAYBACK = 'playback';
 	const PUBLISH = 'publish';
 	
-	public function __construct($taskConfig)
+	public function __construct()
 	{
 		if (! KBatchBase::$taskConfig->params->restapi->velocixApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: velocixApiBaseServiceUrl is missing from worker configuration. Cannot provision stream");
