@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 
 <?php
-include_once(__DIR__ . '/../server_infra/kConf.php');
+include_once(__DIR__ . '/../alpha/config/kConf.php');
 ?>
 
 
