@@ -222,7 +222,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(empty($item->subTitles->subTitle))
 			return;
 		
-		$this->xmlBulkUploadEngine->impersonate();
+		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 		$this->getCurrentCaptionAssets($object->id);
 		
 		$pluginsErrorResults = array();
@@ -241,7 +241,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 		
-		$this->xmlBulkUploadEngine->unimpersonate();		
+		KBatchBase::unimpersonate();
 	}
 
 	private function handleCaptionAsset($entryId, $conversionProfileId, SimpleXMLElement $caption)
@@ -250,8 +250,6 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
-		
-		$this->xmlBulkUploadEngine->impersonate(); //needed since $this->xmlBulkUploadEngine->getAssetParamsId calles to unimpersonate
 		
 		if(isset($caption->captionAssetId))
 			$captionAsset->id = $caption->captionAssetId;
