@@ -317,6 +317,10 @@ class KSecureEntryHelper
 					if ($this->hasRules()) // TODO - for now if the entry doesnt have restrictions any way disregard a partner group check
 						KExternalErrors::dieError(KExternalErrors::INVALID_PARTNER, "Invalid session [".$valid."]");
 				}
+				else if ($valid === ks::EXCEEDED_RESTRICTED_IP)
+				{
+					KExternalErrors::dieError(KExternalErrors::EXCEEDED_RESTRICTED_IP);
+				}
 				else if ($valid !== ks::OK)
 				{
 					KExternalErrors::dieError(KExternalErrors::INVALID_KS, "Invalid session [".$valid."]");
