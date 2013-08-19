@@ -281,12 +281,19 @@ $plannedDur = 0;
 
 				if($plannedDur>0){
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
-					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
-						if($aDur!=0 && !in_array (strtolower($this->_container->GetIdOrFormat()), array("ogg", "ogv")) && $this->_audio!=null) {
+					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) 
+					{
+						//This check was added to filter out files that have no duration set on their metadata (SUP 546)
+						if($aDur==0 && in_array (strtolower($this->_container->GetIdOrFormat()), array("ogg", "ogv")))
+						{
+							//Do Nothing
+						}
+						else 
+						{
 							$product->_errors[KDLConstants::VideoIndex][] = // Invalid product duration
 								KDLErrors::ToString(KDLErrors::InvalidDuration, $prdVid->_duration/1000, $plannedDur/1000);
+							$rv=false;
 						}
-						$rv=false;
 					}
 					else if($prdVid->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
 						$product->_warnings[KDLConstants::VideoIndex][] =
