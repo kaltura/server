@@ -35,9 +35,9 @@ class DbManager
 	protected static  $stickySessionKey = null;
 	
 	/**
-	 * @param kBaseCacheWrapper
+	 * @param bool
 	 */
-	protected  static $preferredIndex = false;
+	protected static $sphinxKeySet = false;
 	
 	/**
 	 * @param int
@@ -165,40 +165,45 @@ class DbManager
 	 */
 	public static function getSphinxConnection($read = true)
 	{
-		if(self::$sphinxConnection && $read)
+		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
+		
+		if(self::$sphinxConnection){
+			if (!$read && !self::$sphinxKeySet && self::$sphinxCache){
+				self::$sphinxCache->set(self::$stickySessionKey, self::$connIndex, $stickySessionExpiry);
+				self::$sphinxKeySet = true;
+			}
 			return self::$sphinxConnection;
+		}		
 
 		$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
 		$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 300;
 		$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
-		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
 		
+		$preferredIndex = false;
 		self::$sphinxCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 		if (self::$sphinxCache)
 		{
 			self::$stickySessionKey = 'StickySessionIndex:'.infraRequestUtils::getRemoteAddress();
-			self::$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);	// returns false in case of error / not found
+			$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);	// returns false in case of error / not found
 		}
 		
-		if (!self::$sphinxConnection){
-			list($connection, self::$connIndex) = self::connectFallbackLogic(
-					array('DbManager', 'getSphinxConnectionInternal'), 
-					array($connectTimeout), 
-					$sphinxDS, 
-					self::$preferredIndex, 
-					$cacheExpiry);
-			if (!$connection)
-			{
-				KalturaLog::debug("getSphinxConnection: Failed to connect to any Sphinx config");
-				throw new Exception('Failed to connect to any Sphinx config');
-			}
-		}
-		else {
-			$connection = self::$sphinxConnection;
+		list($connection, self::$connIndex) = self::connectFallbackLogic(
+			array('DbManager', 'getSphinxConnectionInternal'), 
+			array($connectTimeout), 
+			$sphinxDS, 
+			$preferredIndex, 
+			$cacheExpiry);
+		if (!$connection)
+		{
+			KalturaLog::debug("getSphinxConnection: Failed to connect to any Sphinx config");
+			throw new Exception('Failed to connect to any Sphinx config');
 		}
 		
-		if (!$read && self::$sphinxCache)
+		if (!$read && self::$sphinxCache){
 			self::$sphinxCache->set(self::$stickySessionKey, self::$connIndex, $stickySessionExpiry);
+			self::$sphinxKeySet = true;
+		}
+		
 		return $connection;
 	}
 	
