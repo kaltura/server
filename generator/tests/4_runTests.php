@@ -112,7 +112,8 @@ executeCommandFrom("{$rootDir}/php53/tests", $config['php']['php_bin'], 'run.php
 
 // Python
 echo "Python\n==================\n";
-executeCommandFrom("{$rootDir}/python/TestCode", $config['python']['python_bin'], 'PythonTester.py');
+executeCommandFrom("{$rootDir}/python", $config['python']['python_bin'], 'setup.py install');
+executeCommandFrom("{$rootDir}/python/KalturaClient/TestCode", $config['python']['python_bin'], 'PythonTester.py');
 
 // Ruby
 echo "Ruby\n==================\n";
@@ -121,3 +122,4 @@ executeCommandFrom("{$rootDir}/ruby", null, 'echo y | ' . $config['ruby']['rake_
 // Flex3.5 (test compilation only)
 echo "Flex3.5\n==================\n";
 executeCommandFrom("{$rootDir}/flex35", $config['flex35']['mxmlc_bin'], "-sp tests . -- tests/KalturaClientSample.as");
+
