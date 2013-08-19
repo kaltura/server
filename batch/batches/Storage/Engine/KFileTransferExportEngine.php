@@ -16,10 +16,6 @@ class KFileTransferExportEngine extends KExportEngine
 		
 		$this->protocol = $jobSubType;
 		$this->srcFile = str_replace('//', '/', trim($this->data->srcFileSyncLocalPath));
-		
-		if(!KBatchBase::pollingFileExists($this->srcFile))
-			throw new kTemporaryException("Source file {$this->srcFile} does not exist");
-					
 		$this->destFile = str_replace('//', '/', trim($this->data->destFileSyncStoredPath));
 	}
 	
@@ -29,6 +25,10 @@ class KFileTransferExportEngine extends KExportEngine
 	function export() 
 	{
 		KalturaLog::debug("starting export process");
+		
+		if(!KBatchBase::pollingFileExists($this->srcFile))
+			throw new kTemporaryException("Source file {$this->srcFile} does not exist");
+							
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
 		if($this->data instanceof KalturaAmazonS3StorageExportJobData)
@@ -100,17 +100,13 @@ class KFileTransferExportEngine extends KExportEngine
      */
     function delete()
     {
-        $srcFile = str_replace('//', '/', trim($this->data->srcFileSyncLocalPath));
-        $destFile = str_replace('//', '/', trim($this->data->destFileSyncStoredPath));
-        
-
         $engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
         $engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
         $engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
         
         try{
             $engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
-            $engine->delFile($destFile);
+            $engine->delFile($this->destFile);
         }
         catch(kFileTransferMgrException $ke)
         {
