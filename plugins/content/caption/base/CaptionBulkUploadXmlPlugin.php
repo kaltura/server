@@ -246,7 +246,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 
 	private function handleCaptionAsset($entryId, $conversionProfileId, SimpleXMLElement $caption)
 	{
-		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$captionAssetPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
@@ -327,7 +327,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$captionAssetPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 		$captions = $captionAssetPlugin->captionAsset->listAction($filter, $pager);
 		
 		$this->currentCaptionAssets = array();
