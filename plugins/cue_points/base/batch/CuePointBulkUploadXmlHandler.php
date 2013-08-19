@@ -60,17 +60,17 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			return;
 			
 		$this->entryId = $object->id;
-		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$this->cuePointPlugin = KalturaCuePointClientPlugin::get(KBatchBase::$kClient);
 		
 		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
-		$this->xmlBulkUploadEngine->getClient()->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 	
 		$items = array();
 		foreach($item->scenes->children() as $scene)
 			if($this->addCuePoint($scene))
 				$items[] = $scene;
 			
-		$results = $this->xmlBulkUploadEngine->getClient()->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		KBatchBase::unimpersonate();
 		
 		if(is_array($results) && is_array($items))
@@ -101,12 +101,12 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		}
 			
 		$this->entryId = $object->id;
-		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$this->cuePointPlugin = KalturaCuePointClientPlugin::get(KBatchBase::$kClient);
 		
 		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 		
 		$this->getExistingCuePointsBySystemName($this->entryId);
-		$this->xmlBulkUploadEngine->getClient()->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		
 		$items = array();
 		foreach($item->scenes->children() as $scene)
@@ -115,7 +115,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 				$items[] = $scene;
 		}
 			
-		$results = $this->xmlBulkUploadEngine->getClient()->doMultiRequest();
+		$results = KBatchBase::$kClient->doMultiRequest();
 		KBatchBase::unimpersonate();
 
 		if(is_array($results) && is_array($items))
