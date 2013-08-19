@@ -521,7 +521,7 @@ abstract class ClientGeneratorFromPhp
 			$tempList = explode(",", str_replace(" ", "", $excludePaths));
 			foreach($tempList as $item)
 			{
-				$this->_excludePathList[] = realpath(dirname(__FILE__)."/../$item");
+				$this->_excludePathList[] = realpath(dirname(__FILE__)."/../../$item");
 			}
 		}
 		
