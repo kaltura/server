@@ -233,7 +233,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 
 	private function handleAttachmentAsset($entryId, SimpleXMLElement $attachment)
 	{
-		$attachmentPlugin = KalturaAttachmentClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient);
 		
 		$attachmentAsset = new KalturaAttachmentAsset();
 		$attachmentAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($attachment->tags);

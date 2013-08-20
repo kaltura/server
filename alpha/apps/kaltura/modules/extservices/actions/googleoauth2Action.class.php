@@ -188,6 +188,7 @@ class googleoauth2Action extends sfAction
 	{
 		$this->paramsError = null;
 		$this->tokenError = null;
+		$this->ksError = null;
 		$ksStr = $this->getRequestParameter('ks');
 		$appId = $this->getRequestParameter('ytid');
 		$subId = $this->getRequestParameter('subid');
