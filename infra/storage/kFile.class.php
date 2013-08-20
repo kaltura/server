@@ -391,7 +391,7 @@ class kFile
 	private static function copySingleFile($src, $dest, $deleteSrc) {
 		if($deleteSrc) {
 			// In case of move, first try to move the file before copy & unlink.
-			if(rename($src, $trg)) 
+			if(rename($src, $dest)) 
 				return true;
 		}
 		
