@@ -135,7 +135,7 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 				$cacheTime = $cacheStore->get($cacheFileName . self::CACHE_CREATION_TIME_SUFFIX);
 				$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
 				if ($updatedAt < $cacheTime) {
-					$xml = $cacheStore->get($enableCache);
+					$xml = $cacheStore->get($cacheFileName);
 				}
 			}
 			
