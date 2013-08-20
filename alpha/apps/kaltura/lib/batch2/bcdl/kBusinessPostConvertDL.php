@@ -133,6 +133,12 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::err($e->getMessage());
 		}
+		
+		$flavorSize = $currentFlavorAsset->getSize();
+		if($dbBatchJob) {
+			$dbBatchJob->putInCustomData("flavor_size", $flavorSize);
+			$dbBatchJob->save();
+		}
 				
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
