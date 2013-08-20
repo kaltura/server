@@ -199,7 +199,7 @@ class DbManager
 			throw new Exception('Failed to connect to any Sphinx config');
 		}
 		
-		if (!$read && self::$sphinxCache){
+		if (!$read && !self::$sphinxKeySet && self::$sphinxCache){
 			self::$sphinxCache->set(self::$stickySessionKey, self::$connIndex, $stickySessionExpiry);
 			self::$sphinxKeySet = true;
 		}
