@@ -72,10 +72,11 @@ class KProcessWrapper
 		$taskConfigStr = base64_encode(gzcompress(serialize($this->taskConfig)));
 		
 		$cmdLine = '';
-		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && PHP_OS !== 'Darwin') {
 			// Set the process as its own session leader
 			$cmdLine = 'setsid ';
 		}
+		
 		$cmdLine .= "$phpPath ";
 		$cmdLine .= realpath(__DIR__ . '/../') . '/' . $this->taskConfig->scriptPath . ' ';
 		$cmdLine .= "$taskConfigStr ";
