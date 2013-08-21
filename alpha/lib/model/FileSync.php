@@ -91,9 +91,16 @@ class FileSync extends BaseFileSync
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if($this->isColumnModified(FileSyncPeer::STATUS) && $this->getStatus() == self::FILE_SYNC_STATUS_DELETED)
+		if($this->isColumnModified(FileSyncPeer::STATUS) 
+			&& in_array($this->getStatus(), array(self::FILE_SYNC_STATUS_DELETED, self::FILE_SYNC_STATUS_PURGED)))
 		{
 			$this->setDeletedId($this->getId());
+			
+			if ($this->getStatus() == self::FILE_SYNC_STATUS_DELETED){
+				$oldFilePath = $this->getFilePath(); 
+				$this->setFilePath($oldFilePath . $this->getId());
+				kFile::moveFile($oldFilePath, $this->getFilePath()); 
+			}
 		}
 		
 		return parent::preUpdate($con);
