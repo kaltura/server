@@ -4,7 +4,13 @@ var kmc = {
 };
 </script>
 	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>
-	 <div id="logo"></div>
+	 <?php 
+	 if(isset($kmcVars['logoUrl'])) {
+	 	echo '<div id="logo" style="background: transparent; overflow:hidden;"><img src="' . $kmcVars['logoUrl'] . '" /></div>';
+	 } else {
+	 	echo '<div id="logo"></div>';
+	 }
+	 ?>
 	 <ul id="hTabs">
 	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
@@ -22,7 +28,17 @@ var kmc = {
 	  </span>
 	    <?php if (!$templatePartnerId) { ?>
 	    <span> <span class="sep">|</span> &nbsp; <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a> &nbsp; <span class="sep">|</span> &nbsp;
-	      <a id="Support" href="/index.php/kmc/support?type=<?php echo md5($payingPartner); ?>&pid=<?php echo $partner_id; ?>" target="_blank">Support</a></span>
+	      <?php 
+	      if( isset($kmcVars['supportUrl']) ){
+	      	$supportUrl = $kmcVars['supportUrl'];
+	      	$supportId = "";
+	      }
+	      else {
+	      	$supportUrl = "/index.php/kmc/support?type=" . md5($payingPartner) . "&pid=" . $partner_id;
+	      	$supportId = 'id="Support"';
+	      }
+	      ?>
+	      <a <?php echo $supportId; ?> href="<?php echo $supportUrl; ?>" target="_blank">Support</a></span>
 	    <?php } ?>
 	 </div>
 	</div><!-- kmcHeader -->
@@ -123,7 +139,7 @@ var kmc = {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/kmc/6.0.7/kmc.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
+<script src="/lib/js/kmc/6.0.8/kmc.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?>
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } ?>
