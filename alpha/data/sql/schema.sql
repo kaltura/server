@@ -1310,7 +1310,6 @@ CREATE TABLE `file_sync`
 	`deleted_id` BIGINT,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `object_id-object_type-version-object_sub_type-dc-deleted_id` (`object_id`, `object_type`, `version`, `object_sub_type`, `dc`, `deleted_id`),
-	KEY `object_id_object_type_version_subtype_index`(`object_id`, `object_type`, `version`, `object_sub_type`),
 	KEY `partner_id_object_id_object_type_index`(`partner_id`, `object_id`, `object_type`),
 	KEY `dc_status_index`(`dc`, `status`),
 	KEY `linked_index`(`linked_id`)

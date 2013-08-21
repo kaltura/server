@@ -1209,12 +1209,6 @@
 			<unique-column name="dc" />
 			<unique-column name="deleted_id" />
 		</unique>
-		<index name="object_id_object_type_version_subtype_index">
-			<index-column name="object_id" />
-			<index-column name="object_type" />
-			<index-column name="version" />
-			<index-column name="object_sub_type" />
-		</index>
 		<index name="partner_id_object_id_object_type_index">
 			<index-column name="partner_id" />
 			<index-column name="object_id" />
