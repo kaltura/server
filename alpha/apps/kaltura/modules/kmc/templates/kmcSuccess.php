@@ -4,7 +4,11 @@ div#login { width:500px; margin: 0 auto; text-align:center;}
 </style>
 
 <div id="kmcHeader">
+	<?php if( $logoUrl ) { ?>
+	<img src="<?php echo $logoUrl; ?>" />
+	<?php } else { ?>
 	<img src="/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
+	<?php } ?>
 	<div id="user_links">
     	<a href="/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
 	</div> 
