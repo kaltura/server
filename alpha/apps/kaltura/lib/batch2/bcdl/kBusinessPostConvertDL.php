@@ -136,7 +136,8 @@ class kBusinessPostConvertDL
 		
 		$flavorSize = $currentFlavorAsset->getSize();
 		if($dbBatchJob) {
-			$dbBatchJob->putInCustomData("flavor_size", $flavorSize);
+			// Multiply by 1024 to get the file size in bytes.
+			$dbBatchJob->putInCustomData("flavor_size", $flavorSize * 1024);
 			$dbBatchJob->save();
 		}
 				
