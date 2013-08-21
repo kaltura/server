@@ -33,7 +33,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	const UI_CONF_CLIPPER = 18;
 	const UI_CONF_TYPE_KSR = 19;
 	const UI_CONF_TYPE_KUPLOAD = 20;
-	const UI_CONF_TYPE_HTML5 = 21;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
@@ -80,7 +79,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_TYPE_KSR => "ScreencastOMaticRun-1.0.32.jar",
 										self::UI_CONF_TYPE_KRECORD => "KRecord.swf",
 										self::UI_CONF_TYPE_KUPLOAD => "KUpload.swf",
-										self::UI_CONF_TYPE_HTML5 => "kdp3.swf",
 									);
 
 	private static $swf_directory_map = array (
@@ -104,7 +102,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_TYPE_KSR => "ksr",
 		self::UI_CONF_TYPE_KRECORD => 'krecord',
 		self::UI_CONF_TYPE_KUPLOAD => "kupload",
-		self::UI_CONF_TYPE_HTML5 => "kdp3",
 	);
 
 	public function save(PropelPDO $con = null, $isClone = false)
@@ -206,7 +203,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_CLIPPER => "Kaltura Clipper",
 				self::UI_CONF_TYPE_KSR => "Kaltura Screen Recorder",
 				self::UI_CONF_TYPE_KUPLOAD => "Kaltura Simple Uploader",
-				self::UI_CONF_TYPE_HTML5 => "HTML5",
 			);
 		}
 	}
@@ -598,15 +594,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			$version = "_" . ($version ? $version : $this->getVersion());
 		else
 			$version = "";
-
-		// html5 player uses JSON instead of XML
-		$ext = "xml";
-		if( $this->getType() === self::UI_CONF_TYPE_HTML5 ) {
-			$ext = "json";
-		}
-
+		
 		$dir = (intval($this->getId() / 1000000)).'/'.	(intval($this->getId() / 1000) % 1000);
-		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.$ext";
+		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
 		return $file_name;
 	}
 

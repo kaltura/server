@@ -23,6 +23,15 @@ class kmcAction extends kalturaAction
 		$swfUrl .= $this->www_host . myContentStorage::getFSFlashRootPath ();
 		$swfUrl .= '/kmc/login/' . kConf::get('kmc_login_version') . '/login.swf';
 		$this->swfUrl = $swfUrl;
+
+		$this->partner_id = $this->getRequestParameter( "partner_id" );
+		$this->logoUrl = null;
+		if ( $this->partner_id ) {
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if( $partner ){
+				$this->logoUrl = kmcUtils::getWhitelabelData( $partner, 'logo_url' );
+			}
+		}
 		
 		$this->beta = $this->getRequestParameter( "beta" );
 		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );

@@ -21,7 +21,7 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	const PLAYBACK = 'playback';
 	const PUBLISH = 'publish';
 	
-	public function __construct($taskConfig)
+	public function __construct()
 	{
 		if (! KBatchBase::$taskConfig->params->restapi->velocixApiBaseServiceUrl)
 			return new KProvisionEngineResult(KalturaBatchJobStatus::FAILED, "Error: velocixApiBaseServiceUrl is missing from worker configuration. Cannot provision stream");
@@ -179,6 +179,8 @@ class KProvisionEngineVelocix extends KProvisionEngine
 	}
 	
 	private function doCurl($url, $data = null, $isDelete = false){
+		KalturaLog::info("curl url:[$url] user:[$this->userName] password:[$this->password]");
+		KalturaLog::info("Sent data:".$data);
 		$ch = curl_init($url);
 		if ($isDelete)
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
@@ -188,7 +190,6 @@ class KProvisionEngineVelocix extends KProvisionEngine
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt($ch, CURLOPT_USERPWD, "$this->userName:$this->password");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json','Accept: application/json'));
-		KalturaLog::info("Sent data:".$data);
 		if ($data)
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 		return curl_exec($ch);

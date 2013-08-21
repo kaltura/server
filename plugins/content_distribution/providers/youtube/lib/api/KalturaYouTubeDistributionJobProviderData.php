@@ -33,6 +33,11 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	/**
 	 * @var string
 	 */
+	public $newPlaylists;
+
+	/**
+	 * @var string
+	 */
 	public $submitXml;
 
 	/**
@@ -44,6 +49,21 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	 * @var string
 	 */
 	public $deleteXml;
+
+	/**
+	 * @var string
+	 */
+	public $googleClientId;
+
+	/**
+	 * @var string
+	 */
+	public $googleClientSecret;
+
+	/**
+	 * @var string
+	 */
+	public $googleTokenData;
 
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -94,29 +114,35 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		$thumbnailFilePath = $this->thumbAssetFilePath;
 
 		$feed = null;
+		$fieldValues = unserialize($this->fieldValues);
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, unserialize($this->fieldValues), $videoFilePath, $thumbnailFilePath);
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath);
 			$this->submitXml = $feed->getXml();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 		{
 			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, unserialize($this->fieldValues), $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
 			$this->updateXml = $feed->getXml();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
 		{
 			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, unserialize($this->fieldValues), $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
 			$this->deleteXml = $feed->getXml();
 		}
 
+		$this->newPlaylists = isset($fieldValues[KalturaYouTubeDistributionField::PLAYLISTS]) ? $fieldValues[KalturaYouTubeDistributionField::PLAYLISTS] : null;
 		if ($feed)
 		{
 			$this->sftpDirectory = $feed->getDirectoryName();
 			$this->sftpMetadataFilename = $feed->getMetadataTempFileName();
 		}
+
+		$partnerId = $distributionJobData->distributionProfile->partnerId;
+		$distributionProfileId = $distributionJobData->distributionProfile->id;
+		$this->loadGoogleConfig($partnerId, $distributionProfileId);
 	}
 		
 	private static $map_between_objects = array
@@ -132,5 +158,39 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
+	/**
+	 * @param $partnerId
+	 * @param $distributionProfileId
+	 * @return void
+	 */
+	protected function loadGoogleConfig($partnerId, $distributionProfileId)
+	{
+		$appConfigId = 'youtubepartner'; // config section for configuration/google_auth.ini
+		$tokenSubId = $distributionProfileId;
+		$authConfig = kConf::get($appConfigId, 'google_auth', null);
+
+		$this->googleClientId = isset($authConfig['clientId']) ? $authConfig['clientId'] : null;
+		$this->googleClientSecret = isset($authConfig['clientSecret']) ? $authConfig['clientSecret'] : null;
+
+		/** @var Partner $partner */
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+
+		// try to load based on the sub id,
+		// it means that we have a custom auth config for the distribution profile
+		$tokenData = $partner->getFromCustomData($appConfigId.'_'.$tokenSubId, 'googleAuth');
+		if ($tokenData)
+		{
+			$this->googleTokenData = json_encode($tokenData);
+			return;
+		}
+
+		// now try to load base on the app config id
+		$tokenData = $partner->getFromCustomData($appConfigId, 'googleAuth');
+		if ($tokenData)
+		{
+			$this->googleTokenData = serialize($tokenData);
+			return;
+		}
+	}
 }
