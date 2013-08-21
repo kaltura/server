@@ -694,7 +694,8 @@ class kContentDistributionManager
 		$entryDistributionStatus = $entryDistribution->getStatus(); 
 		if(!$returnValue && $submitWhenReady && in_array($entryDistributionStatus, $validStatus))
 		{
-			if ($entryDistributionStatus != EntryDistributionStatus::IMPORT_SUBMITTING && $entryDistributionStatus != EntryDistributionStatus::IMPORT_UPDATING){
+			if (!in_array($entryDistributionStatus, array(EntryDistributionStatus::IMPORT_SUBMITTING, EntryDistributionStatus::IMPORT_UPDATING))) //a submit job will be created on import job finish 
+			{
 				$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 				$entryDistribution->save();
 			}
