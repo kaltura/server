@@ -33,7 +33,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	const UI_CONF_CLIPPER = 18;
 	const UI_CONF_TYPE_KSR = 19;
 	const UI_CONF_TYPE_KUPLOAD = 20;
-	const UI_CONF_TYPE_HTML5 = 21;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
@@ -46,18 +45,17 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	const UI_CONF_STATUS_DELETED = 3;
 
 	const FILE_NAME_FEATURES = "features";
+	const FILE_NAME_CONFIG = "config";
 
 	const FILE_SYNC_UICONF_SUB_TYPE_DATA = 1;
 	const FILE_SYNC_UICONF_SUB_TYPE_FEATURES = 2;
-
+	const FILE_SYNC_UICONF_SUB_TYPE_CONFIG = 3;
 
 	private static $UI_CONF_OBJ_TYPE_MAP = null;
 	private static $REQUIRE_UI_CONF_FILE_FOR_TYPE = null;
-
-	private $should_call_set_data_content = false;
-	private $should_call_set_data_content2 = false;
-	private $data_content = null;
-	private $data_content_2 = null;
+	
+	private static $validSubTypes = array(self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG, self::FILE_SYNC_UICONF_SUB_TYPE_DATA, self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES);
+	private $content = array();
 
 	private $swf_url_version = null;
 
@@ -81,7 +79,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_TYPE_KSR => "ScreencastOMaticRun-1.0.32.jar",
 										self::UI_CONF_TYPE_KRECORD => "KRecord.swf",
 										self::UI_CONF_TYPE_KUPLOAD => "KUpload.swf",
-										self::UI_CONF_TYPE_HTML5 => "kdp3.swf",
 									);
 
 	private static $swf_directory_map = array (
@@ -105,12 +102,26 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_TYPE_KSR => "ksr",
 		self::UI_CONF_TYPE_KRECORD => 'krecord',
 		self::UI_CONF_TYPE_KUPLOAD => "kupload",
-		self::UI_CONF_TYPE_HTML5 => "kdp3",
 	);
 
 	public function save(PropelPDO $con = null, $isClone = false)
 	{
-		$this->validateConfFilesExistance();
+		if($this->requireFileForUiConfType() && $this->isNew())
+		{
+			foreach (self::$validSubTypes as $subType) 
+			{
+				if(!$this->isUiConfContentSet($subType))
+				{
+					if(($subType == self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES 
+							&& $this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD) 
+							|| $subType != self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES)
+						{
+							$suffix = $this->getSuffixBySubType($subType);
+							$this->setConfFileBySuffix($suffix, '');
+						}
+				}
+			}
+		}
 			
 		try
 		{
@@ -127,11 +138,8 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				$res = parent::save( $con );
 		}
 		
-		if($this->should_call_set_data_content2 || $this->should_call_set_data_content)
+		if($this->shouldSetContent())
 		{
-			$confFile = $this->getConfFile();
-			$confFile2 = $this->getConfFile2();
-
 			if($isClone)
 			{
 				$this->setVersion(1);
@@ -142,19 +150,29 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				if ( ! is_numeric( $version ) ) $this->setVersion(1);
 				else $this->setVersion($version+1);
 			}
-
-			if ($confFile)
-				$this->saveConfFileToDisk($confFile, null, $isClone); // save uiConf.xml
-
-			if ($confFile2)
-				$this->saveConfFileToDisk($confFile2, self::FILE_NAME_FEATURES, $isClone); // save uiConf.xml.features
-
-			$this->should_call_set_data_content = false; // clear dirty flag
-			$this->should_call_set_data_content2 = false; // clear dirty flag
+			foreach ($this->content as $contentItem) 
+			{
+				$confFile = $this->getConfFileBySuffix($contentItem['suffix']);
+				if ($confFile)
+					$this->saveConfFileToDisk($confFile, $contentItem['suffix'], $isClone); 
+				$contentItem['shouldSet'] = false;
+				
+			}
 			$res = parent::save( $con );
 		}
 		$this->getConfFilePath();
 		return $res;
+	}
+	
+	private function isUiConfContentSet($subType)
+	{
+		if(!array_key_exists($subType, $this->content))
+			return false;
+		$contentItem = $this->content[$subType];
+		if(!$contentItem || !$contentItem['data'])
+			return false;
+			
+		return true;		
 	}
 
 	/* (non-PHPdoc)
@@ -175,17 +193,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 
 		return $ret;
-	}
-
-	private function validateConfFilesExistance()
-	{
-		if($this->requireFileForUiConfType() && $this->isNew())
-		{
-			if(!$this->data_content)
-				$this->setConfFile('');
-			if($this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD && !$this->data_content_2)
-				$this->setConfFileFeatures('');
-		}
 	}
 
 	private static function initUiConfTypeMap()
@@ -213,7 +220,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_CLIPPER => "Kaltura Clipper",
 				self::UI_CONF_TYPE_KSR => "Kaltura Screen Recorder",
 				self::UI_CONF_TYPE_KUPLOAD => "Kaltura Simple Uploader",
-				self::UI_CONF_TYPE_HTML5 => "HTML5",
 			);
 		}
 	}
@@ -244,7 +250,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_CLIPPER => false,
 				self::UI_CONF_TYPE_KSR => true,
 				self::UI_CONF_TYPE_KUPLOAD => false,
-				self::UI_CONF_TYPE_HTML5 => true,
 			);
 		}
 	}
@@ -253,10 +258,18 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	{
 		if($this->requireFileForUiConfType())
 		{
-			try{
-				$content = $this->getConfFile(true);
-				if($this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD)
-					$content2 = $this->getConfFile2(true);
+			try
+			{
+				foreach (self::$validSubTypes as $subType) 
+				{
+					if(($subType == self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES 
+						&& $this->getCreationMode() == self::UI_CONF_CREATION_MODE_WIZARD) 
+						|| $subType != self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES)
+						{
+							$suffix = $this->getSuffixBySubType($subType);
+							$content = $this->getConfFileBySuffix($suffix, true);
+						}
+				}
 			}
 			catch(Exception $ex)
 			{
@@ -319,11 +332,11 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	{
 		self::validateFileSyncSubType ( $sub_type );
 
-		if ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA )
+		$suffix = $this->getSuffixBySubType($sub_type);
+		if($suffix == null)
 			return "ui_conf{$version}.xml";
-
-		if ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES )
-			return "ui_conf.features{$version}.xml";
+		else 
+			return "ui_conf.".$suffix.$version.".xml";
 
 		return null;
 	}
@@ -336,11 +349,13 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	{
 		// TODO - implement field version
 		self::validateFileSyncSubType ( $sub_type );
-		if ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA )
-			$res =$this->getConfFilePathImpl( null , true , $version);
-		elseif ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES )
-			$res =$this->getConfFilePathImpl( self::FILE_NAME_FEATURES, false, $version );
-
+		$suffix = $this->getSuffixBySubType($sub_type);
+		$incVersion = false;
+		if($sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA)
+			$incVersion = true;
+			
+		$res = $this->getConfFilePathImpl( $suffix , $incVersion , $version);
+		
 		$file_root = myContentStorage::getFSContentRootPath( );
 		$file_path = str_replace ( myContentStorage::getFSContentRootPath( ) , "" , $res );
 		return array ( $file_root , $file_path )	;
@@ -369,35 +384,20 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	private static function validateFileSyncSubType ( $sub_type )
 	{
-		if ( $sub_type != self::FILE_SYNC_UICONF_SUB_TYPE_DATA && $sub_type != self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES )
-			throw new FileSyncException ( FileSyncObjectType::UICONF ,
-				 $sub_type , array ( self::FILE_SYNC_UICONF_SUB_TYPE_DATA ,  self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES ) );
+		if ( !in_array($sub_type, self::$validSubTypes))
+			throw new FileSyncException ( FileSyncObjectType::UICONF ,$sub_type , $validSubTypes );
 	}
 
 	private function saveConfFileToDisk($v , $file_suffix = null , $isClone = false)
 	{
-		$this->setConfFileImpl($v, $file_suffix, $isClone);
-	}
-
-	private function setConfFileImpl ( $v , $file_suffix = null , $isClone = false )
-	{
-//		$file_name = $this->getConfFilePath($file_suffix );
 		if ( $this->getCreationMode() == self::UI_CONF_CREATION_MODE_MANUAL )
 		{
 			throw new Exception ( "Should not edit MANUAL ui_confs via the API!! Only via the SVN" );
 		}
-
-		if ( $file_suffix )
-		{
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES );
-		}
-		else
-		{
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_UICONF_SUB_TYPE_DATA );
-		}
-
+		$subType = $this->getSubTypeBySuffix($file_suffix);
+		$sync_key = $this->getSyncKey( $subType );
+		
 		$this->setUpdatedAt( time() ); // make sure will be updated in the DB
-
 		if (version_compare($this->getSwfUrlVersion(), "2.5", ">="))
 		{
 			$v = str_replace('.entryName}', '.name}', $v);
@@ -407,91 +407,84 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		kFileSyncUtils::file_put_contents( $sync_key , $v ); //replaced__setFileContent
 	}
 
-	public function setConfFile ( $v /*, $increment_version = true */ )
+	private function setConfFileBySuffix($suffix = null, $v)
 	{
+		$subType = $this->getSubTypeBySuffix($suffix);
+		$contentItem = array();
+		$contentItem['suffix'] = $suffix;
+		$contentItem['shouldSet'] = true;
+		$contentItem['subType'] = $subType;
+		
 		if ( $v !== null )
 		{
-			$this->data_content = $v;
-			$this->should_call_set_data_content = true;
+			$contentItem['data'] = $v;
+			$this->content[$subType] = $contentItem;
 		}
 		elseif($this->isNew() && $this->requireFileForUiConfType())
 		{
-			$this->data_content = "";
-			$this->should_call_set_data_content = true;
+			$contentItem['data'] = "";
+			$this->content[$subType] = $contentItem;
 		}
 	}
-
-	private function getContentFileImpl ( $file_suffix = null , $strict = true)
+	
+	private function getConfFileBySuffix($suffix = null, $force_fetch = false , $strict = true )
 	{
-		if ( $file_suffix )
+		$subType = $this->getSubTypeBySuffix($suffix);
+		$contents = "";
+		if($this->isUiConfContentSet($subType) && ! $force_fetch )
+			return $this->content[$subType]['data'];
+		
+		if(!$this->requireFileForUiConfType())
+			$strict = false;
+			
+		$sync_key = $this->getSyncKey( $subType );
+		if ( $suffix )
 		{
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES );
 			$strict = false; // this file is optional
 		}
-		else
+		else 
 		{
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_UICONF_SUB_TYPE_DATA );
 			if(!$this->getId() || !$strict) // when doing autoFillObjectFromObject, ID might be missing, and in that case file is probably not mandatory
 				$strict = false; // object has no ID or requested not to be strict at all
 			else
 				$strict = true; // object has ID or strict specified, so no file will be found for incomplete key
-		}
-
-		return kFileSyncUtils::file_get_contents( $sync_key , true , $strict );
+		}		
+		$contents = kFileSyncUtils::file_get_contents( $sync_key , true , $strict );
+		return $contents;
+	}
+	
+	public function setConfFile ( $v /*, $increment_version = true */ )
+	{
+		$this->setConfFileBySuffix(null, $v);
 	}
 
 	public function getConfFile( $force_fetch = false , $strict = true )
 	{
-		$contents = "";
-
-		if ( $this->data_content !== null && ! $force_fetch ) return $this->data_content;
-		if(!$this->requireFileForUiConfType())
-			$strict = false;
-
-		$contents = $this->getContentFileImpl( null , $strict );
-		return $contents;
-	}
-
-	public function setConfFile2 ( $v /*, $increment_version = true */ )
-	{
-		if ( $v !== null )
-		{
-			$this->data_content_2 = $v;
-			$this->should_call_set_data_content2 = true;
-		}
-		elseif($this->isNew() && $this->requireFileForUiConfType())
-		{
-			$this->data_content_2 = "";
-			$this->should_call_set_data_content2 = true;
-		}
-	}
-
-	// will fetch
-	public function getConfFile2 ( $force_fetch = false , $strict = true )
-	{
-		$contents = "";
-
-		if ( $this->data_content_2 !== null  && ! $force_fetch ) return $this->data_content_2;
-
-		if(!$this->requireFileForUiConfType())
-			$strict = false;
-
-		$contents = $this->getContentFileImpl( self::FILE_NAME_FEATURES , $strict);
-		return $contents;
+		return $this->getConfFileBySuffix( null, $force_fetch, $strict);
 	}
 
 	public function setConfFileFeatures ( $v )
 	{
-		return $this->setConfFile2( $v );
+		$this->setConfFileBySuffix(self::FILE_NAME_FEATURES, $v);
 	}
-
 
 	// check this !
 	public function getConfFileFeatures ( $force_fetch = false , $strict = true )
 	{
-		return $this->getConfFile2( $force_fetch = false , $strict = true );
+		return $this->getConfFileBySuffix( self::FILE_NAME_FEATURES, $force_fetch, $strict);
 	}
 
+	public function setConfig ( $v /*, $increment_version = true */ )
+	{
+		$this->setConfFileBySuffix(self::FILE_NAME_CONFIG, $v);
+	}
+
+	// will fetch
+	public function getConfig ( $force_fetch = false , $strict = true )
+	{
+		return $this->getConfFileBySuffix( self::FILE_NAME_CONFIG, $force_fetch, $strict);
+	}
+	
 	private $m_file_time;
 	private function getFileTime()
 	{
@@ -687,15 +680,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			$version = "_" . ($version ? $version : $this->getVersion());
 		else
 			$version = "";
-
-		// html5 player uses JSON instead of XML
-		$ext = "xml";
-		if( $this->getType() === self::UI_CONF_TYPE_HTML5 ) {
-			$ext = "json";
-		}
-
+		
 		$dir = (intval($this->getId() / 1000000)).'/'.	(intval($this->getId() / 1000) % 1000);
-		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.$ext";
+		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
 		return $file_name;
 	}
 
@@ -734,8 +721,12 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		if ($new_name) {
 			$cloned->setName( $new_name );
 		}
-		$cloned->setConfFile( $this->getConfFile());
-		$cloned->setConfFile2( $this->getConfFile2());
+		foreach (self::$validSubTypes as $subType) 
+		{
+			$suffix = $this->getSuffixBySubType($subType);
+			$content = $this->getConfFileBySuffix($suffix);
+			$cloned->setConfFileBySuffix($suffix, $content);			
+		}
 		$cloned->save(null, true);
 
 		return $cloned;
@@ -778,5 +769,35 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	public function getCacheInvalidationKeys()
 	{
 		return array("uiConf:id=".$this->getId(), "uiConf:partnerId=".$this->getPartnerId());
+	}
+	
+	private function shouldSetContent()
+	{
+		foreach ($this->content as $contentItem) 
+		{
+			if($contentItem['shouldSet'])
+				return true;
+		}
+		return false;
+	}
+	
+	private function getSubTypeBySuffix($suffix = null)
+	{
+		if($suffix == null)
+			return self::FILE_SYNC_UICONF_SUB_TYPE_DATA;
+		if($suffix == self::FILE_NAME_FEATURES)
+			return self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES;
+		if($suffix == self::FILE_NAME_CONFIG)
+			return self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG;			
+	}
+	
+	private function getSuffixBySubType($subType)
+	{
+		if($subType == self::FILE_SYNC_UICONF_SUB_TYPE_DATA)
+			return null;
+		if($subType == self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES)
+			return self::FILE_NAME_FEATURES;
+		if($subType == self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG)
+			return self::FILE_NAME_CONFIG;			
 	}
 }

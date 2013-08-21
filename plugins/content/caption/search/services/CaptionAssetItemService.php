@@ -73,7 +73,10 @@ class CaptionAssetItemService extends KalturaBaseService
     		$item->setPartnerId($captionAsset->getPartnerId());
     		$item->setStartTime($itemData['startTime']);
     		$item->setEndTime($itemData['endTime']);
-    		$item->setContent($itemData['content']);
+    		$content = '';
+    		foreach ($itemData['content'] as $curChunk)
+    			$content .= $curChunk['text'];
+    		$item->setContent($content);
     		$item->save();
     	}
     }

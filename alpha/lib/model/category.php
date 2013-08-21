@@ -730,7 +730,9 @@ class category extends Basecategory implements IIndexable
 		$parentsIds = array();
 		if ($this->getParentId()){
 			$parentsIds[] = $this->getParentId();
-			$parentsIds = array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
+			$parentCategory = $this->getParentCategory();
+			if ($parentCategory)
+				$parentsIds = array_merge($parentsIds, $parentCategory->getAllParentsIds());
 		}
 
 		return $parentsIds;
@@ -892,16 +894,31 @@ class category extends Basecategory implements IIndexable
 				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
 		}
 		
+		//Add indexed permission_names
+		$permissionNamesByMembers = array();
+		foreach ($members as $member)
+		{
+			/* @var $member categoryKuser */
+			$permissionNames = explode(",", $member->getPermissionNames());
+			foreach ($permissionNames as &$permissionName)
+			{
+				$permissionName = str_replace('_', '', $permissionName);				
+			}
+			$permissionNamesByMembers[] = $member->getKuserId().implode(" ".$member->getKuserId(), $permissionNames);
+		}
+		
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
 		{
 			$permissionLevelByName = self::getPermissionLevelName($permissionLevel);
 			$membersIds[] = $permissionLevelByName . '_' . implode(' ' . $permissionLevelByName . '_', $membersIdByPermission);
 			$membersIds[] = implode(' ', $membersIdByPermission);
+			$membersIds[] = implode(' ', $permissionNamesByMembers);
 		}
 		
 		return implode(' ', $membersIds);
 	}
+
 	
 	/**
 	 * Return kusers ids that are active members on this category.
@@ -1440,8 +1457,11 @@ class category extends Basecategory implements IIndexable
 		if (!$this->getParentId())
 			return $this->getName();
 			
-			
-		return $this->getParentCategory()->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
+		$parentCategory = $this->getParentCategory();
+		if (!$parentCategory)
+			return $this->getName();
+		
+		return $parentCategory->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
 	}
 	
 	/**

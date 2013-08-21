@@ -38,6 +38,7 @@ class KExternalErrors
 	const KS_EXPIRED = 31;
 	const INVALID_PARTNER = 32;
 	const ILLEGAL_UI_CONF = 33;
+	const EXCEEDED_RESTRICTED_IP = 34;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -73,6 +74,7 @@ class KExternalErrors
 			self::KS_EXPIRED => "The given KS has expired",
 			self::INVALID_PARTNER => "The given partner isn't vaild for the request",
 			self::ILLEGAL_UI_CONF => "The given UI conf is illegal",
+			self::EXCEEDED_RESTRICTED_IP => "ip address is out of the restricted ip range",
 	);
 	
 	public static function dieError($errorCode, $message = null)

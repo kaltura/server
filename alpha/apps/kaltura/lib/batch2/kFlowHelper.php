@@ -167,7 +167,8 @@ class kFlowHelper
 		if(!$flavorAsset->getVersion())
 			$flavorAsset->incrementVersion();
 
-		$flavorAsset->setFileExt($ext);
+		if($ext)
+			$flavorAsset->setFileExt($ext);
 		$flavorAsset->save();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());

@@ -4,7 +4,7 @@
  * @subpackage model.filters
  */
 class SphinxEntryCriteria extends SphinxCriteria
-{
+{ 
 	public static $sphinxFields = array(
 		entryPeer::ID => 'int_entry_id',
 		'entry.ENTRY_ID' => 'entry_id',
@@ -18,6 +18,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::DESCRIPTION => 'description',
 		entryPeer::ADMIN_TAGS => 'admin_tags',
 		'entry.PLUGINS_DATA' => 'plugins_data',
+		'entry.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
 		'entry.DURATION_TYPE' => 'duration_type',
 		'entry.REFERENCE_ID' => 'reference_id',
 		'entry.REPLACING_ENTRY_ID' => 'replacing_entry_id',
@@ -109,6 +110,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'description' => IIndexable::FIELD_TYPE_STRING,
 		'admin_tags' => IIndexable::FIELD_TYPE_STRING,
 		'plugins_data' => IIndexable::FIELD_TYPE_STRING,
+		'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
 		'sphinx_match_optimizations'=> IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -164,18 +166,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		if (!is_null(kCurrentContext::$partner_id) && kCurrentContext::$partner_id !== '') 
-			$partnerId = kCurrentContext::$partner_id;
-		else
-			$partnerId = kCurrentContext::$ks_partner_id;
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if (!$partner)
-			return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);
-		
-		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME, entryPeer::TABLE_NAME);
-		
-		return kSphinxSearchManager::getSphinxIndexName($partnerSearchIndex);
+		return kSphinxSearchManager::getSphinxIndexName(entryPeer::OM_CLASS);
 	}
 	
 	/* (non-PHPdoc)
@@ -530,6 +521,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			"replaced_entry_id",
 			"roots",
 			"plugins_data",
+			"dynamic_attributes",
 		));
 	}
 

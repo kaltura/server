@@ -119,6 +119,7 @@ class KontikiAPIWrapper
 	 */
 	protected function execAPICall($url)
 	{
+		KalturaLog::info("Executing CURL request with URL: $url");
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -128,6 +129,6 @@ class KontikiAPIWrapper
 		if (!$res || ($httpcode < 200 || $httpcode >300))
 			return null;
 		
-		return new $res ? SimpleXMLElement($res) : true;
+		return  $res ? new SimpleXMLElement($res) : true;
 	}
 }

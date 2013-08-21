@@ -210,7 +210,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		if(empty($item->attachments->attachment))
 			return;
 		
-		$this->xmlBulkUploadEngine->impersonate();
+		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 				
 		$pluginsErrorResults = array();
 		foreach($item->attachments->attachment as $attachment)
@@ -228,17 +228,15 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 		
-		$this->xmlBulkUploadEngine->unimpersonate();		
+		KBatchBase::unimpersonate(); 		
 	}
 
 	private function handleAttachmentAsset($entryId, SimpleXMLElement $attachment)
 	{
-		$attachmentPlugin = KalturaAttachmentClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient);
 		
 		$attachmentAsset = new KalturaAttachmentAsset();
 		$attachmentAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($attachment->tags);
-		
-		$this->xmlBulkUploadEngine->impersonate(); //needed since $this->xmlBulkUploadEngine->getAssetParamsId calles to unimpersonate
 		
 		if(isset($attachment->fileExt))
 			$attachmentAsset->fileExt = $attachment->fileExt;

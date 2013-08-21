@@ -84,8 +84,11 @@ class BulkUploadResultEntry extends BulkUploadResult
 			
 		try 
 		{
-		    $entry = entryPeer::retrieveByPKNoFilter($this->getObjectId());
-			myEntryUtils::createThumbnailAssetFromFile($entry, $this->getThumbnailUrl());
+		    $entry = entryPeer::retrieveByPK($this->getObjectId());
+		    if ($entry){
+				myEntryUtils::createThumbnailAssetFromFile($entry, $this->getThumbnailUrl());
+				$this->setThumbnailSaved(true);
+		    }
 		}
 		catch (Exception $e)
 		{
@@ -93,7 +96,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 			return;
 		}
 		
-		$this->setThumbnailSaved(true);
+		
 	}
 	
 	/* (non-PHPdoc)

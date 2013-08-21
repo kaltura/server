@@ -590,10 +590,10 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="expiration" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="execution_attempts" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>
@@ -668,6 +668,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>

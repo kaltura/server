@@ -2613,7 +2613,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getCategoriesEntryIds()
 	{
-		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($this->getId());
+		$allCategoriesEntry = categoryEntryPeer::selectByEntryId($this->getId());
 		
 		$categoriesEntryStringIndex = array();
 		foreach($allCategoriesEntry as $categoryEntry)
@@ -2682,10 +2682,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getObjectIndexName()
 	{
-		$partner = $this->getPartner();
-		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME, entryPeer::TABLE_NAME);
-		
-		return $partnerSearchIndex;
+		return entryPeer::OM_CLASS;
 	}
 	
 	/* (non-PHPdoc)

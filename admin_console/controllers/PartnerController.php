@@ -341,7 +341,7 @@ class PartnerController extends Zend_Controller_Action
 				
 				if (!$storageProfileClass)
 				{
-					if( $protocol == Kaltura_Client_Enum_StorageProfileProtocol::S3){
+					if( $type == Kaltura_Client_Enum_StorageProfileProtocol::S3){
 						$storageProfileClass = 'Kaltura_Client_Type_AmazonS3StorageProfile';
 					}	
 					else{

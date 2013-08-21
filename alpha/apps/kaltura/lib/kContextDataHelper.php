@@ -6,6 +6,8 @@
  */
 class kContextDataHelper
 {
+	const ALL_TAGS = 'all';
+	
 	/**
 	 * 
 	 * @var array
@@ -222,6 +224,11 @@ class kContextDataHelper
 	
 	private function filterFlavorAssetsByTags($flavorAssets, $flavorTags)
 	{
+		if($flavorTags == self::ALL_TAGS)
+		{
+			$this->allowedFlavorAssets = $flavorAssets;
+			return;
+		}
 		if(!$flavorTags)
 			$flavorTags = flavorParams::TAG_MBR.','.flavorParams::TAG_WEB;
 			
