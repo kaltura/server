@@ -194,9 +194,45 @@ class kmc4Action extends kalturaAction
 			'logoutUrl'					=> $logoutUrl,
 			'allowFrame'				=> (bool) $allowFrame,
 			'akamaiEdgeServerIpURL'		=> $akamaiEdgeServerIpURL,
+			'logoUrl' 					=> $this->getWhitelabelData('logo_url'),
+			'supportUrl' 				=> $this->getWhitelabelData('support_url'),
 		);
 		
 		$this->kmcVars = $kmcVars;
+	}
+
+	private function getWhitelabelData( $param = null )
+	{
+		// no param, return null
+		if( !$param ){
+			return null;
+		}
+
+		if (kConf::hasMap("whitelabel"))
+		{
+			$whitelabel = kConf::getMap("whitelabel");
+			$params = array();
+
+			// Search for partner Id
+			if (array_key_exists($this->partner_id, $whitelabel))
+			{
+				$params = $whitelabel[$this->partner_id];			
+			} 
+			// Search for parent partner id
+			else if (array_key_exists($this->partner->getPartnerParentId(), $whitelabel))
+			{
+				$params = $whitelabel[$this->partner->getPartnerParentId()];
+			}
+
+			// If we have params, find out param
+			if( is_array($params) && array_key_exists($param, $params) )
+			{
+				return $params[ $param ];
+			}
+
+			return null;
+		}
+		return null;
 	}
 
 	private function stripProtocol( $url )
