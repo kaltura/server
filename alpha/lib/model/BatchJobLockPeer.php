@@ -129,6 +129,12 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		return false;
 	}
 	
+	/**
+	 * Creates a new Batch job lock object and saves it.
+	 * Pay attention that as part of the save, the batch job sep object is saved as well.
+	 * @param BatchJob $batchJob The matching batch job sep object.
+	 * @param PropelPDO $con
+	 */
 	public static function createLockObject(BatchJob $batchJob, PropelPDO $con = null)
 	{
 		$batchJobLock = new BatchJobLock();
@@ -145,8 +151,8 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		
 		self::commonLockObjectUpdate($batchJob, $batchJobLock);
 		
-		// Don't add save batch job lock, it's done automatically by the save of the batch job!
-		return $batchJobLock;
+		$batchJob->setBatchJobLock($batchJobLock);
+		return $batchJobLock->save($con);
 	}
 	
 	public static function updateLockObject(BatchJob $batchJob, PropelPDO $con = null)
