@@ -492,7 +492,7 @@ class CaptionAssetService extends KalturaAssetService
 			$captionAsset = kCurrentContext::initPartnerByAssetId($captionAssetId);
 				
 			if (!$captionAsset || $captionAsset->getStatus() == asset::ASSET_STATUS_DELETED)
-				throw new KalturaAPIException(KalturaErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
