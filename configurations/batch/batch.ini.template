@@ -31,6 +31,7 @@ enabledWorkers.KAsyncProvisionProvide				= 1
 enabledWorkers.KAsyncProvisionDelete				= 1
 enabledWorkers.KAsyncProvisionProvideCloser			= 1
 enabledWorkers.KAsyncStorageExport					= 3
+enabledWorkers.KAsyncStorageExportCloser			= 1
 enabledWorkers.KAsyncStorageDelete					= 1
 enabledWorkers.KAsyncCaptureThumb					= 1
 enabledWorkers.KAsyncDistributeSubmit				= 1
@@ -353,6 +354,9 @@ params.emailId										= @PROVISION_PROVIDE_EMAIL_ID@
 params.primaryContact								= @PROVISION_PROVIDE_PRIMARY_CONTACT@
 params.secondaryContact								= @PROVISION_PROVIDE_SECONDARY_CONTACT@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
+params.restapi.velocixApiBaseServiceUrl				= "http://cmin.live.cdn.antel.net.uy:82"
+params.restapi.velocixPlaybackHost					= "live.cdn.antel.net.uy"
+params.restapi.velocixPublishHost					= "cmin.live.cdn.antel.net.uy"
 params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
@@ -370,6 +374,7 @@ minCreatedAtMinutes									= 10080
 params.wsdlUsername									= @PROVISION_PROVIDE_USER@
 params.wsdlPassword									= @PROVISION_PROVIDE_PASS@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
+params.restapi.velocixApiBaseServiceUrl				= "http://cmin.live.cdn.antel.net.uy:82"
 params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
@@ -388,7 +393,12 @@ type												= KAsyncStorageExport
 maximumExecutionTime								= 1800
 scriptPath											= batches/Storage/KAsyncStorageExportExe.php
 params.chmod										= 755
-		
+	
+[KAsyncStorageExportCloser : JobCloserWorker]
+id													= 181
+friendlyName										= storage export closer
+type												= KAsyncStorageExportCloser
+scriptPath											= batches/Storage/KAsyncStorageExportCloserExe.php
 		
 [KAsyncStorageDelete : JobHandlerWorker]
 id													= 380

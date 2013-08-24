@@ -20,6 +20,11 @@ class kMatchMetadataCondition extends kMatchCondition
 	 */
 	private $profileId;
 	
+	/**
+	 * @var string
+	 */
+	private $profileSystemName;
+	
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
 	 */
@@ -30,12 +35,52 @@ class kMatchMetadataCondition extends kMatchCondition
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kCondition::getFieldValue()
+	 * @see kCondition::applyDynamicValues()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	protected function applyDynamicValues(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
-		$metadata = MetadataPeer::retrieveByObject($this->profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+		parent::applyDynamicValues($scope);
+		
+		$dynamicValues = $scope->getDynamicValues('{', '}');
+		
+		if(is_array($dynamicValues) && count($dynamicValues))
+		{
+			$this->xPath = str_replace(array_keys($dynamicValues), $dynamicValues, $this->xPath);
+			if($this->profileSystemName)
+				$this->profileSystemName = str_replace(array_keys($dynamicValues), $dynamicValues, $this->profileSystemName);
+		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kMatchCondition::getFieldValue()
+	 */
+	public function getFieldValue(kScope $scope)
+	{
+		$profileId = $this->profileId;
+		if(!$profileId)
+		{
+			if(!$this->profileSystemName)
+				return null;
+				
+			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
+			if(!$profile)
+				return null;
+				
+			$profileId = $profile->getId();
+		}
+		
+		$metadata = null;
+		if($scope instanceof accessControlScope)
+		{
+			$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
+		}
+		elseif($scope instanceof kEventScope && $scope->getEvent() instanceof kApplicativeEvent)
+		{
+			$object = $scope->getEvent()->getObject();
+			if($object instanceof IMetadataObject)
+				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
+		}
+			
 		if($metadata)
 			return kMetadataManager::parseMetadataValues($metadata, $this->xPath);
 			
@@ -72,6 +117,22 @@ class kMatchMetadataCondition extends kMatchCondition
 	public function setProfileId($profileId) 
 	{
 		$this->profileId = $profileId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProfileSystemName() 
+	{
+		return $this->profileSystemName;
+	}
+
+	/**
+	 * @param string $profileSystemName
+	 */
+	public function setProfileSystemName($profileSystemName) 
+	{
+		$this->profileSystemName = $profileSystemName;
 	}
 
 	/* (non-PHPdoc)

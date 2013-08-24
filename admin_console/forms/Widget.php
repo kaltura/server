@@ -113,6 +113,12 @@ class Form_Widget extends Infra_Form
 		));
 		$this->getElement('conf_file_features')->getDecorator('Description')->setEscape(false);
 		
+		$this->addElement('textarea', 'config', array(
+			'label'			=> 'Config:',
+			'validators' 	=> array()
+		));
+		$this->getElement('config')->getDecorator('Description')->setEscape(false);
+		
 		$this->addElement('text', 'tags', array(
 			'label'			=> 'Tags:',
 			'required'		=> false,
@@ -190,9 +196,13 @@ class Form_Widget extends Infra_Form
 			$confFileButtons[] = $openVisualEditorButton;
 		$confFileFeaturesButtons = array();
 		$confFileFeaturesButtons[] = $openEditorButton;
+		$configButtons = array();
+		$configButtons[] = $openEditorButton;
+		
 		
 		$this->getElement('conf_file')->setDescription(implode($confFileButtons, ' | '));
 		$this->getElement('conf_file_features')->setDescription(implode($confFileFeaturesButtons, ' | '));
+		$this->getElement('config')->setDescription(implode($configButtons, ' | '));
 	}
 	
 	public function setObjTypes($array)

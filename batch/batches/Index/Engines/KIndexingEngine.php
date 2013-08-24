@@ -64,13 +64,13 @@ abstract class KIndexingEngine
 	public function configure($partnerId)
 	{
 		$this->partnerId = $partnerId;
-		$this->batchPartnerId = $taskConfig->getPartnerId();
+		$this->batchPartnerId = KBatchBase::$taskConfig->getPartnerId();
 
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
 		
-		if($taskConfig->params && $taskConfig->params->pageSize)
-			$this->pager->pageSize = $taskConfig->params->pageSize;
+		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->pageSize)
+			$this->pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 	}
 	
 	/**

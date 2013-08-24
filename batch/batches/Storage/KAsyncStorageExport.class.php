@@ -77,7 +77,7 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Engine not found", KalturaBatchJobStatus::FAILED);
 		}
-		$this->updateJob($job, $initResult->message, KalturaBatchJobStatus::QUEUED);
+		$this->updateJob($job, null, KalturaBatchJobStatus::QUEUED);
 		$exportResult = $engine->export();
 
 		return $this->closeJob($job, null , null, null, $exportResult ? KalturaBatchJobStatus::FINISHED : KalturaBatchJobStatus::ALMOST_DONE, $data );

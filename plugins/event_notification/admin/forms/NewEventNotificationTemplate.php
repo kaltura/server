@@ -18,27 +18,29 @@ class Form_NewEventNotificationTemplate extends Infra_Form
 			'label'			=> 'Publisher ID:',
 			'onkeypress'	=> "return supressFormSubmit(event)",
 			'filters'		=> array('StringTrim'),
+			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		));
 		
-		$element = $this->addElement('select', 'newType', array(
+		$newType = new Kaltura_Form_Element_EnumSelect('cloneTemplateType', array(
+			'enum' => 'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType',
 			'label'			=> 'Type:',
+			'onchange'		=> "switchTemplatesBox()",
 			'filters'		=> array('StringTrim'),
+			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
+		));
+		$this->addElements(array($newType));
+		
+		$element = $this->addElement('select', 'cloneTemplateId', array(
+			'label'			=> 'Template:',
+			'filters'		=> array('StringTrim'),
+			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		));
 				
 		// submit button
 		$this->addElement('button', 'newEventNotificationTemplate', array(
-			'label'		=> 'Create New',
-			'onclick'		=> "doAction('newEventNotificationTemplate', $('#newPartnerId').val(), $('#newType').val())",
-			'decorators'	=> array('ViewHelper'),
+			'label'		=> 'Add from template',
+			'onclick'		=> "cloneEventNotificationTemplate()",
+			'decorators'	=> array('ViewHelper', array('HtmlTag',  array('tag' => 'span'))),
 		));
-		
-		$element = $this->getElement('newType');
-		$reflect = new ReflectionClass('Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType');
-		$types = $reflect->getConstants();
-		foreach($types as $constName => $value)
-		{
-			$name = ucfirst(str_replace('_', ' ', $constName));
-			$element->addMultiOption($value, $name);
-		}
 	}
 }

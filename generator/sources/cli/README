@@ -27,6 +27,8 @@ All the utilities display usage information incl. all available switches when ex
 
 Installation instructions
 ==========================
+Linux
+------
 1. Unzip the package contents
 2. Replace the @BASEDIR@ token with the path to kalcliAutoComplete.php in:
 	kalcliAliases.sh
@@ -34,14 +36,14 @@ Installation instructions
 	logToCli
 	(e.g. if kalcliAutoComplete was copied to /a/b/kalcliAutoComplete @BASEDIR@ should be set to /a/b)
 3. Create a link to kalcliAutoComplete in /etc/bash_completion.d/
-	cd /etc/bash_completion.d/
-	ln -s @BASEDIR@/kalcliAutoComplete kalcliAutoComplete
+	ln -s @BASEDIR@/kalcliAutoComplete /etc/bash_completion.d/kalcliAutoComplete
 4. Register the auto completion: 
 	source /etc/bash_completion.d/kalcliAutoComplete
 5. Create a link to kalcliAliases.sh in /etc/profile.d/
-	cd /etc/profile.d/
-	ln -s @BASEDIR@/kalcliAliases.sh kalcliAliases.sh
-6. Copy config/config.template.ini to config/config.ini and fill out the parameters:
+	ln -s @BASEDIR@/kalcliAliases.sh /etc/profile.d/kalcliAliases.sh
+6. Enable the aliases
+	source /etc/profile.d/kalcliAliases.sh
+7. Copy config/config.template.ini to config/config.ini and fill out the parameters:
 	a. Secret repositories - required for the extractKs / generateKs / renewKs utilities.
 		Two types of repositories can be configured:
 		1. Preset repositories - contain a fixed list of (partner id, admin secret) pairs
@@ -50,6 +52,20 @@ Installation instructions
 	b. IP address salt - required for the genIpHeader utility.
 		The salt has to match the parameter 'remote_addr_header_salt' that is configured in
 		configuration/local.ini on the Kaltura server.
+
+Windows
+--------
+To use kalcli on Windows you'll need to install:
+1. Cygwin - make sure to include the bash-completion package (not included by default)
+2. Xampp (for PHP)
+
+Installation is the same as for Linux, but note the following:
+1. Perform the steps from the Cygwin bash
+2. The meaning of BASEDIR in step 2 is different than steps 3 & 5 - in step 2 you need to use a
+	path relative to the drive root while in steps 3 & 5 you need to use a path relative to Cygwin root. 
+	For example:
+	a. If you install kalcli in C:\Cygwin\cli, you'll need to use /cygwin/cli in step 2, and use /cli in 3 & 5.
+	a. If you install kalcli in C:\cli, you'll need to use /cli in step 2, and use /cygdrive/c/cli in 3 & 5.
 
 Examples
 =========

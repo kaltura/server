@@ -44,6 +44,7 @@ class categoryFilter extends baseObjectFilter
 			'_eq_full_ids',
 			'_likex_full_ids',
 			'_eq_inherited_parent_id',
+			'_in_inherited_parent_id',
 			'_eq_privacy_context',
 			'_eq_manager',
 			'_eq_member',
@@ -61,6 +62,7 @@ class categoryFilter extends baseObjectFilter
 			'_matchor_privacy_context',
 			'_in_ancestor_id',
 		    '_eq_name',
+		    '_in_id-inherited_parent_id',
 			) , NULL );
 
 		$this->allowed_order_fields = array (

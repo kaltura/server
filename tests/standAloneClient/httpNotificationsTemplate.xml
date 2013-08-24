@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<!-- script will ask for username / password interactively -->
+	</session>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry Status Changed</name>
+				<systemName>HTTP_ENTRY_STATUS_CHANGED</systemName>
+				<description>HTTP notification template to be sent when an entry status changed.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_status</key>
+						<description>Entry status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_reference_id</key>
+						<description>Entry reference ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getReferenceID()</code>
+						</value>
+					</item>
+				</contentParameters>
+				
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry Status Equals</name>
+				<systemName>HTTP_ENTRY_STATUS_EQUALS</systemName>
+				<description>HTTP notification template to be sent when an entry status changed to specific value.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_status</key>
+						<description>Entry status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_reference_id</key>
+						<description>Entry reference ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getReferenceID()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Entry status that triggers the event, See:KalturaEntryStatus:/api_v3/testmeDoc/?object=KalturaEntryStatus</description>
+						<value objectType="KalturaStringValue">
+							<value>2</value>
+						</value>
+					</item>
+				</userParameters>
+				
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry Changed</name>
+				<systemName>HTTP_ENTRY_CHANGED</systemName>
+				<description>HTTP notification template to be sent when an entry metadata changed.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventObjectChangedCondition">
+						<description>Entry metadata changed, columns defined in modified_columns parameter</description>
+						<modifiedColumns>{modified_columns}</modifiedColumns>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_status</key>
+						<description>Entry status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_reference_id</key>
+						<description>Entry reference ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getReferenceID()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationArrayParameter">
+						<key>modified_columns</key>
+						<description>Entry metadata columns that will trigger the event</description>
+						<allowedValues objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>entry.NAME</value>
+								<description>name</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.DATA</value>
+								<description>content</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.THUMBNAIL</value>
+								<description>thumbnail</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.RANK</value>
+								<description>rank</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.TAGS</value>
+								<description>tags</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.STATUS</value>
+								<description>status</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.LENGTH_IN_MSECS</value>
+								<description>duration</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.PARTNER_DATA</value>
+								<description>partner data</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.DESCRIPTION</value>
+								<description>description</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.MODERATION_STATUS</value>
+								<description>moderation status</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.PUSER_ID</value>
+								<description>owner id</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.ACCESS_CONTROL_ID</value>
+								<description>access control profile id</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.START_DATE</value>
+								<description>start date</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.END_DATE</value>
+								<description>end date</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entry.FLAVOR_PARAMS_IDS</value>
+								<description>flavor params ids</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>referenceID</value>
+								<description>reference id</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>partnerSortValue</value>
+								<description>partner sort value</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>replacementStatus</value>
+								<description>replacement status</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>replacingEntryId</value>
+								<description>replacing entry id</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entitledUserPuserEdit</value>
+								<description>entitled users - edit</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>entitledUserPuserPublish</value>
+								<description>entitled users - publish</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>width</value>
+								<description>width</description>
+							</item>
+							<item objectType="KalturaStringValue">
+								<value>height</value>
+								<description>height</description>
+							</item>
+						</allowedValues>
+					</item>
+				</userParameters>
+				
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Metadata Field Changed</name>
+				<systemName>HTTP_METADATA_FIELD_CHANGED</systemName>
+				<description>HTTP notification template to be sent when a custom metadata field changed.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaMetadataFieldChangedCondition">
+						<description>Metadata field changed</description>
+						<xPath>{metadata_field}</xPath>
+						<profileSystemName>{metadata_profile_system_name}</profileSystemName>
+						<versionA>{metadata_old_version}</versionA>
+						<versionB>{metadata_version}</versionB>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_id</key>
+						<description>Metadata ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_version</key>
+						<description>Metadata version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_old_version</key>
+						<description>Metadata previous version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getPreviousVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>object_id</key>
+						<description>Object ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getObjectId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>object_type</key>
+						<description>Object type</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getObjectType()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_field</key>
+						<description>Custom metadata field to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Custom metadata profile system name to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+				
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Metadata Field Equals</name>
+				<systemName>HTTP_METADATA_FIELD_EQUALS</systemName>
+				<description>HTTP notification template to be sent when a custom metadata field changed to specific value.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaMetadataFieldChangedCondition">
+						<description>Metadata field changed</description>
+						<xPath>{metadata_field}</xPath>
+						<profileSystemName>{metadata_profile_system_name}</profileSystemName>
+						<versionA>{metadata_old_version}</versionA>
+						<versionB>{metadata_version}</versionB>
+					</item>
+					<item objectType="KalturaMatchMetadataCondition">
+						<description>Metadata field equals</description>
+						<xPath>{metadata_field}</xPath>
+						<profileSystemName>{metadata_profile_system_name}</profileSystemName>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{metadata_value}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_id</key>
+						<description>Metadata ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_version</key>
+						<description>Metadata version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_old_version</key>
+						<description>Metadata previous version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getPreviousVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>object_id</key>
+						<description>Object ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getObjectId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>object_type</key>
+						<description>Object type</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getObjectType()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_field</key>
+						<description>Custom metadata field to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Custom metadata profile system name to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_value</key>
+						<description>Custom metadata field value that triggers the event</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+				
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry-Distribution Created</name>
+				<systemName>HTTP_ENTRY_DISTRIBUTION_CREATED</systemName>
+				<description>HTTP notification template to be sent when a entry-distribution object created.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+				<eventObjectType>contentDistributionEventNotifications.EntryDistribution</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_DISTRIBUTION -->
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_distribution_id</key>
+						<description>Entry-Distribution ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>distribution_profile_id</key>
+						<description>Distribution profile ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getDistributionProfileId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_distribution_status</key>
+						<description>Entry-Distribution status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry-Distribution Status Changed</name>
+				<systemName>HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED</systemName>
+				<description>HTTP notification template to be sent when a entry-distribution object status field changed.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>contentDistributionEventNotifications.EntryDistribution</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_DISTRIBUTION -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(EntryDistributionPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_distribution_id</key>
+						<description>Entry-Distribution ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>distribution_profile_id</key>
+						<description>Distribution profile ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getDistributionProfileId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_distribution_status</key>
+						<description>Entry-Distribution status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry Added to Category</name>
+				<systemName>HTTP_ENTRY_ADDED_TO_CATEGORY</systemName>
+				<description>HTTP notification template to be sent when a entry associated with category.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_id</key>
+						<description>Category ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_name</key>
+						<description>Category name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+						</value>
+					</item>
+				</contentParameters>
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaHttpNotificationTemplate">
+				<name>Entry-Category Status Changed</name>
+				<systemName>HTTP_ENTRY_CATEGORY_STATUS_CHANGED</systemName>
+				<description>HTTP notification template to be sent when a entry status in category changed.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_id</key>
+						<description>Category ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_name</key>
+						<description>Category name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+						</value>
+					</item>
+				</contentParameters>
+				<method>2</method> <!-- KalturaHttpNotificationMethod::POST -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+	
+</xml>

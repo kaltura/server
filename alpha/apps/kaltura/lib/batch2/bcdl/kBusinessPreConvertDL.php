@@ -1327,7 +1327,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			 * is a source flavor that contains transcoder settings.
 			 * Looks for a '_passthrough' flag on the source's flavor params output.
 			 */
-		if($sourceFlavorOutput->_passthrough==true)
+		if(!$sourceFlavorOutput || $sourceFlavorOutput->_passthrough==true)
 			return true;
 		
 		// save flavor params
@@ -1382,7 +1382,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
 		$sourceFlavorOutput->save();
 			
-		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfo->getId(), $parentJob);
+		$mediaInfoId = null;
+		if($mediaInfo)
+			$mediaInfoId = $mediaInfo->getId();
+		kJobsManager::addFlavorConvertJob(array($srcSyncKey), $sourceFlavorOutput, $originalFlavorAsset->getId(), $conversionProfileId, $mediaInfoId, $parentJob);
 		return false;
 	}
 

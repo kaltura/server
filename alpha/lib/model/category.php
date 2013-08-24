@@ -124,17 +124,20 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
+		$kuserChanged = false;
 		if (!$this->isNew() &&
 			$this->isColumnModified(categoryPeer::INHERITANCE_TYPE))
 		{
 			if ($this->inheritance_type == InheritanceType::MANUAL &&
 				$this->old_inheritance_type == InheritanceType::INHERIT)
 			{
-				if($this->old_parent_id)
-					$categoryToCopyInheritedFields = categoryPeer::retrieveByPK($this->old_parent_id);
+				if($this->parent_id)
+					$categoryToCopyInheritedFields = $this->getInheritParent();
 				if($categoryToCopyInheritedFields)
+				{
 					$this->copyInheritedFields($categoryToCopyInheritedFields);
-					
+					$kuserChanged = true;
+				}	
 				$this->reSetMembersCount();
 			}
 			elseif ($this->inheritance_type == InheritanceType::INHERIT &&
@@ -144,7 +147,6 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
-		$kuserChanged = false;
 		if ($this->isColumnModified(categoryPeer::KUSER_ID))
 			$kuserChanged = true;
 
@@ -728,7 +730,9 @@ class category extends Basecategory implements IIndexable
 		$parentsIds = array();
 		if ($this->getParentId()){
 			$parentsIds[] = $this->getParentId();
-			$parentsIds = array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
+			$parentCategory = $this->getParentCategory();
+			if ($parentCategory)
+				$parentsIds = array_merge($parentsIds, $parentCategory->getAllParentsIds());
 		}
 
 		return $parentsIds;
@@ -890,16 +894,31 @@ class category extends Basecategory implements IIndexable
 				$membersIdsByPermission[$member->getPermissionLevel()] = array ($member->getKuserId());
 		}
 		
+		//Add indexed permission_names
+		$permissionNamesByMembers = array();
+		foreach ($members as $member)
+		{
+			/* @var $member categoryKuser */
+			$permissionNames = explode(",", $member->getPermissionNames());
+			foreach ($permissionNames as &$permissionName)
+			{
+				$permissionName = str_replace('_', '', $permissionName);				
+			}
+			$permissionNamesByMembers[] = $member->getKuserId().implode(" ".$member->getKuserId(), $permissionNames);
+		}
+		
 		$membersIds = array();
 		foreach ($membersIdsByPermission as $permissionLevel => $membersIdByPermission)
 		{
 			$permissionLevelByName = self::getPermissionLevelName($permissionLevel);
 			$membersIds[] = $permissionLevelByName . '_' . implode(' ' . $permissionLevelByName . '_', $membersIdByPermission);
 			$membersIds[] = implode(' ', $membersIdByPermission);
+			$membersIds[] = implode(' ', $permissionNamesByMembers);
 		}
 		
 		return implode(' ', $membersIds);
 	}
+
 	
 	/**
 	 * Return kusers ids that are active members on this category.
@@ -1177,6 +1196,7 @@ class category extends Basecategory implements IIndexable
 		$this->setUserJoinPolicy($oldParentCategory->getUserJoinPolicy());
 		$this->setDefaultPermissionLevel($oldParentCategory->getDefaultPermissionLevel());
 		$this->setKuserId($oldParentCategory->getKuserId());
+		$this->setPuserId($oldParentCategory->getPuserId());
 		$this->reSetMembersCount(); //removing all members from this category
 		$this->reSetPendingMembersCount();
 	}
@@ -1437,8 +1457,11 @@ class category extends Basecategory implements IIndexable
 		if (!$this->getParentId())
 			return $this->getName();
 			
-			
-		return $this->getParentCategory()->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
+		$parentCategory = $this->getParentCategory();
+		if (!$parentCategory)
+			return $this->getName();
+		
+		return $parentCategory->getActuallFullName() . categoryPeer::CATEGORY_SEPARATOR . $this->getName();
 	}
 	
 	/**

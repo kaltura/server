@@ -211,6 +211,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 				
 			if($enumValue == MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_MATCH))
 				return new KalturaMatchMetadataCondition();
+				
+			if($enumValue == MetadataPlugin::getConditionTypeCoreValue(MetadataConditionType::METADATA_FIELD_CHANGED))
+				return new KalturaMetadataFieldChangedCondition();
 		}
 		
 		return null;

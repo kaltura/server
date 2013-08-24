@@ -22,6 +22,13 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	 * 
 	 * @var kHttpNotificationData
 	 */
+	protected $dataObject;
+	
+	/**
+	 * Data to send.
+	 * 
+	 * @var string
+	 */
 	protected $data;
 	
 	/**
@@ -154,7 +161,15 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	}
 
 	/**
-	 * @return kHttpNotificationData $data
+	 * @return kHttpNotificationData $dataObject
+	 */
+	public function getDataObject()
+	{
+		return $this->dataObject;
+	}
+	
+	/**
+	 * @return string $data
 	 */
 	public function getData()
 	{
@@ -306,9 +321,18 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	}
 
 	/**
-	 * @param kHttpNotificationData $data
+	 * @param kHttpNotificationData $dataObject
 	 */
-	public function setData(kHttpNotificationData $data = null)
+	public function setDataObject(kHttpNotificationData $dataObject = null)
+	{
+		$this->data = null;
+		$this->dataObject = $dataObject;
+	}
+	
+	/**
+	 * @param string $data
+	 */
+	public function setData($data = null)
 	{
 		$this->data = $data;
 	}
@@ -440,7 +464,4 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	{
 		$this->contentParameters = $contentParameters;
 	}
-
-	
-	
 }

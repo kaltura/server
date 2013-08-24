@@ -100,6 +100,11 @@ class KDLWrap
 		$profile = new KDLProfile();
 		foreach($cdlFlavorList as $cdlFlavor) {
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
+			if ($kdlFlavor->_errors)
+			{
+				$this->_rv = false;
+				return $this;
+			}
 			$profile->_flavors[] = $kdlFlavor;
 			KalturaLog::log( "...F-->".$kdlFlavor->ToString());
 		}
@@ -497,6 +502,11 @@ class KDLWrap
 		
 		
 		//KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
+		if(is_null($kdlFlavor->_container))
+		{
+			KalturaLog::log("No Container Found On Flavor Convert Will Fail");
+			$kdlFlavor->_errors[KDLConstants::ContainerIndex][] = KDLErrors::ToString(KDLErrors::InvalidFlavorParamConfiguration);
+		}
 		return $kdlFlavor;
 	}
 	

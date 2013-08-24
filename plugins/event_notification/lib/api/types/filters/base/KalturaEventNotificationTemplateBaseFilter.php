@@ -12,6 +12,8 @@ abstract class KalturaEventNotificationTemplateBaseFilter extends KalturaFilter
 		"idIn" => "_in_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 		"typeEqual" => "_eq_type",
 		"typeIn" => "_in_type",
 		"statusEqual" => "_eq_status",
@@ -61,6 +63,16 @@ abstract class KalturaEventNotificationTemplateBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerIdIn;
+
+	/**
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * @var string
+	 */
+	public $systemNameIn;
 
 	/**
 	 * @var KalturaEventNotificationTemplateType

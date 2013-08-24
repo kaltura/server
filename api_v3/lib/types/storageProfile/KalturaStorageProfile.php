@@ -352,7 +352,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
                 $obj = new KalturaAmazonS3StorageProfile();
                 break;
             default:
-                $obj = KalturaPluginManager::loadObject('StorageProfile', $protocol);
+                $obj = KalturaPluginManager::loadObject('KalturaStorageProfile', $protocol);
                 break;
         }
         

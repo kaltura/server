@@ -5,9 +5,6 @@
  */
 class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 {
-	/* (non-PHPdoc)
-	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
-	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
 		$jobTypes = array(
@@ -41,6 +38,8 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 		{
 			case BatchJob::BATCHJOB_STATUS_ALMOST_DONE:
 				return self::onDistributionJobUpdatedAlmostDone($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return self::onDistributionJobFinished($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -59,16 +58,62 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+
+		$distributionProfileId = $data->getDistributionProfileId();
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+
+		// only feed spec v1 (legacy) is setting the playlists on submit action
+		if ($distributionProfile &&
+			$distributionProfile instanceof YouTubeDistributionProfile &&
+			$distributionProfile->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_1)
+		{
+			self::saveCurrentPlaylistsToCustomData($data, $entryDistribution);
+		}
 		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionJobData $data
+	 * @return BatchJob
+	 */
+	public static function onDistributionJobFinished(BatchJob $dbBatchJob, kDistributionJobData $data)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+
+		$distributionProfileId = $data->getDistributionProfileId();
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+
+		// only feed spec v2 (rights feed) is setting the playlists on submit close action
+		if ($distributionProfile &&
+			$distributionProfile instanceof YouTubeDistributionProfile &&
+			$distributionProfile->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_2)
+		{
+			self::saveCurrentPlaylistsToCustomData($data, $entryDistribution);
+		}
+
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param kDistributionJobData $data
+	 * @param $entryDistribution
+	 */
+	protected static function saveCurrentPlaylistsToCustomData(kDistributionJobData $data, $entryDistribution)
+	{
 		$providerData = $data->getProviderData();
-		KalturaLog::crit('provider data type' . get_class($providerData));
-		if($providerData instanceof kYouTubeDistributionJobProviderData)
+		KalturaLog::debug('provider data type' . get_class($providerData));
+		if ($providerData instanceof kYouTubeDistributionJobProviderData)
 		{
 			KalturaLog::debug('setting currentPlaylists to entryDistribution custom data');
 			$entryDistribution->putInCustomData('currentPlaylists', $providerData->getCurrentPlaylists());
 			$entryDistribution->save();
 		}
-		
-		return $dbBatchJob;
 	}
 }

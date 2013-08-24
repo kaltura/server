@@ -645,6 +645,7 @@ CREATE TABLE `batch_job_lock_suspend`
 	`dc` INTEGER,
 	`batch_job_id` INTEGER,
 	`custom_data` TEXT,
+	`batch_version` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
 	INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
@@ -1837,13 +1838,13 @@ CREATE TABLE `storage_profile`
 	`name` VARCHAR(31),
 	`system_name` VARCHAR(128),
 	`desciption` VARCHAR(127),
-	`status` TINYINT,
-	`protocol` TINYINT,
+	`status` INTEGER,
+	`protocol` INTEGER,
 	`storage_url` VARCHAR(127),
 	`storage_base_dir` VARCHAR(127),
 	`storage_username` VARCHAR(31),
 	`storage_password` VARCHAR(31),
-	`storage_ftp_passive_mode` TINYINT,
+	`storage_ftp_passive_mode` INTEGER,
 	`delivery_http_base_url` VARCHAR(127),
 	`delivery_rmp_base_url` VARCHAR(127),
 	`delivery_iis_base_url` VARCHAR(127),
@@ -1855,7 +1856,7 @@ CREATE TABLE `storage_profile`
 	`path_manager_class` VARCHAR(127),
 	`url_manager_class` VARCHAR(127),
 	`delivery_priority` INTEGER,
-	`delivery_status` TINYINT,
+	`delivery_status` INTEGER,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 

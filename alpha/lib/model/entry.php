@@ -2500,6 +2500,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+			
+		if ($this->type == entryType::LIVE_STREAM && $this->conversion_profile_id)
+			kBusinessConvertDL::decideLiveProfile($this);
+		
 	}
 	
 	/*************** Bulk download functions - start ******************/
@@ -2609,7 +2613,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getCategoriesEntryIds()
 	{
-		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($this->getId());
+		$allCategoriesEntry = categoryEntryPeer::selectByEntryId($this->getId());
 		
 		$categoriesEntryStringIndex = array();
 		foreach($allCategoriesEntry as $categoryEntry)

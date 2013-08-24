@@ -65,7 +65,7 @@ class downloadAction extends sfAction
 		{
 			// get flavor asset
 			$flavorAsset = assetPeer::retrieveById($flavorId);
-			if (is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			if (is_null($flavorAsset) || !$flavorAsset->isLocalReadyStatus())
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			
 			// the request flavor should belong to the requested entry
@@ -229,10 +229,7 @@ class downloadAction extends sfAction
 			
 		if (!$local)
 		{
-			$dc = kDataCenterMgr::getDcById($fileSync->getDc());
-			$url = $dc["url"] . $_SERVER['REQUEST_URI'];
-			$url = preg_replace('/^https?:\/\//', '', $url);
-			$url = infraRequestUtils::getProtocol() . '://' . $url;
+			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			$this->redirect($url);
 		}
 	}

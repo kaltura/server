@@ -10,9 +10,9 @@ default:
     language:     en
     verify-v1:    JIjZEB+ZCdDyAw49II0fIpcLfFc40M9EzXEY5/Tva68=
 
-  stylesheets:    [wizards]
+  stylesheets:
 
-  javascripts:    [ jqkaltura.js, utils ]
+  javascripts:
 
   has_layout:     off
   layout:         layout2

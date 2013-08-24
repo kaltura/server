@@ -1165,8 +1165,6 @@ class myPartnerUtils
  			if(!in_array($customDataName, $excludeCustomDataFields))
  				$toPartner->putInCustomData($customDataName, $customDataValue);
 		
-		$toPartner->save();
-		
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
  		self::copyPermissions($fromPartner, $toPartner);
 		self::copyUserRoles($fromPartner, $toPartner);

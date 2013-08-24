@@ -511,7 +511,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
             }
             catch (Exception $e)
             {
-                if ($e->getCode() == DUPLICATE_CATEGORY)
+                if ($e->getCode() == 'DUPLICATE_CATEGORY')
                 {
                     $catFilter = new KalturaCategoryFilter();
                     $catFilter->fullNameEqual = $fullNameEq;

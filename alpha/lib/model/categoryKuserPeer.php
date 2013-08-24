@@ -166,8 +166,8 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
 		
-		$c =  new Criteria(); 
-		$c->addAnd ( categoryKuserPeer::STATUS, CategoryKuserStatus::DELETED, Criteria::NOT_EQUAL);
+		$c =  KalturaCriteria::create(categoryKuserPeer::OM_CLASS); 
+		$c->addAnd ( categoryKuserPeer::STATUS, array(CategoryKuserStatus::DELETED), Criteria::NOT_IN);
 
 		self::$s_criteria_filter->setFilter($c);
 	}

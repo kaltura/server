@@ -15,6 +15,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		"memberEqual" => "_eq_member",
 		"fullNameStartsWithIn" => '_matchor_likex_full_name',
 		"ancestorIdIn" => "_in_ancestor_id",
+		"idOrInheritedParentIdIn" => "_in_id-inherited_parent_id",
 	);
 
 	public function getMapBetweenObjects()
@@ -57,6 +58,11 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 	 * @var string
 	 */
 	public $ancestorIdIn;
+	
+	/**
+	 * @var string
+	 */
+	public $idOrInheritedParentIdIn;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
