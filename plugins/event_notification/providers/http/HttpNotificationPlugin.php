@@ -2,7 +2,7 @@
 /**
  * @package plugins.httpNotification
  */
-class HttpNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaApplicationPartialView
+class HttpNotificationPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaPending, IKalturaObjectLoader, IKalturaEnumerator, IKalturaApplicationPartialView, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'httpNotification';
 	
@@ -125,6 +125,17 @@ class HttpNotificationPlugin extends KalturaPlugin implements IKalturaPermission
 		$dependency = new KalturaDependency(self::EVENT_NOTIFICATION_PLUGIN_NAME, $minVersion);
 		
 		return array($dependency);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName) 
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(__DIR__ . '/config/generator.ini');
+			
+		return null;
 	}
 
 	/**

@@ -258,6 +258,9 @@ class Kaltura_Client_ClientBase
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				$result = $this->unmarshal($postResult);
+				
+				if ($result instanceof Kaltura_Client_Exception)
+					throw $result;
 
 				if (is_null($result))
 					throw new Kaltura_Client_ClientException("failed to unserialize server result\n$postResult", Kaltura_Client_ClientException::ERROR_UNSERIALIZE_FAILED);
@@ -301,7 +304,7 @@ class Kaltura_Client_ClientBase
 			{
 				$code = "{$xml->error->code}";
 				$message = "{$xml->error->message}";
-				throw new Kaltura_Client_Exception($message, $code);
+				return new Kaltura_Client_Exception($message, $code);
 			}
 
 			return "$xml";

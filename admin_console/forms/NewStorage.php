@@ -20,11 +20,26 @@ class Form_NewStorage extends Infra_Form
 			'value'         => $this->filer_input,
 		));
 		
+		$this->addElement('select', 'newProtocolType', array(
+			'label'			=> 'Protocol:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		// submit button
 		$this->addElement('button', 'newStorage', array(
 			'label'		=> 'Create New',
-			'onclick'		=> "doAction('newStorage', $('#newPartnerId').val())",
+			'onclick'		=> "doAction('newStorage', $('#newPartnerId').val(), $('#newProtocolType').val())",
 			'decorators'	=> array('ViewHelper'),
 		));
+		
+		$element = $this->getElement('newProtocolType');
+		$reflect = new ReflectionClass('Kaltura_Client_Enum_StorageProfileProtocol');
+		$types = $reflect->getConstants();
+		foreach($types as $constName => $value)
+		{
+			$name = ucfirst(str_replace('_', ' ', $constName));
+			$element->addMultiOption($value, $name);
+		}
 	}
+	
 }

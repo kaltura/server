@@ -130,6 +130,9 @@ class infraRequestUtils
 		{
 			switch ($ext)
 			{
+				case "css":
+					$content_type ="text/css";
+					break;
 				case "flv":
 					$content_type ="video/x-flv";
 					break;

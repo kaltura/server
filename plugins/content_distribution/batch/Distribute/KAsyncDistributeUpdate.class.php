@@ -28,7 +28,7 @@ class KAsyncDistributeUpdate extends KAsyncDistribute
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineUpdate', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineUpdate', $providerType, $data);
 	}
 	
 	/* (non-PHPdoc)

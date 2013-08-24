@@ -6,7 +6,7 @@
 abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQuery
 {
 	const RANKER_NONE = 'none';
-	const RANKER_SPH04 = 'sph04';
+	const RANKER_BM25 = 'BM25';
 	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
 	
@@ -204,11 +204,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 
 		//debug query
-		$rows = $pdo->queryAndFetchAll($sql, PDO::FETCH_ASSOC);
-		$ids = false;
-		if(is_array($rows))
-			$ids = array_map(array($this, "fetchIds"), $rows);
-			
+		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, 0);
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
@@ -261,11 +257,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$c->setOffset(null);
 			$this->recordsCount = $this->doCountOnPeer($c);
 		}
-	}
-	
-	protected function fetchIds($row) {
-		$idField = $this->selectColumn ? $this->selectColumn: $this->getSphinxIdField();
-		return $row[$idField];
 	}
 	
 	/**
@@ -561,7 +552,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$this->ranker = self::RANKER_NONE;
 		if ($usesWeight)
 		{
-			$this->ranker = self::RANKER_SPH04;
+			$this->ranker = self::RANKER_BM25;
 		}
 		
 		$index = $this->getSphinxIndexName();
@@ -613,12 +604,21 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			if(count($fieldNamesArr) > 1)
 			{
 				$sphinxFieldNames = array();
+				$skip = false;
 				foreach($fieldNamesArr as $fieldName)
 				{
+					if (!$this->hasMatchableField($fieldName))
+					{
+						KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
+						$skip = true;
+						break;
+					}	
 					$sphinxField = $this->getSphinxFieldName($fieldName);
 					$type = $this->getSphinxFieldType($sphinxField);
 					$sphinxFieldNames[] = $sphinxField;
 				}
+				if ($skip)
+					continue;
 				$sphinxField = '(' . implode(',', $sphinxFieldNames) . ')';
 				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
@@ -681,7 +681,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = $this->getPositiveMatch($sphinxField) . ' !' . implode(' !', $vals);
+						$val = $this->getFieldPrefix($sphinxField) . ' !' . implode(' !', $vals);
 						$this->addMatch("@$sphinxField $val");
 						$filter->unsetByName($field);
 					}

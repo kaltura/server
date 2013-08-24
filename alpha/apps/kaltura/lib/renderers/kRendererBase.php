@@ -6,5 +6,7 @@
  */
 interface kRendererBase
 {
+	public function validate();
+	
 	public function output();
 }

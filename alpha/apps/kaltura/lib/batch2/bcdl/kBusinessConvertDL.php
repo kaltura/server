@@ -370,4 +370,17 @@ class kBusinessConvertDL
 
 		return 0;
 	}
+	
+	public static function decideLiveProfile(entry $entry){
+		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
+		foreach ($liveParamsArray as $liveParams){
+			/* @var $liveParams liveParams */
+			$liveAsset = new liveAsset(); 
+			$liveAsset->setType(assetType::LIVE);
+			$liveAsset->setFromAssetParams($liveParams);
+			$liveAsset->setEntryId($entry->getId());
+			$liveAsset->setStatus(asset::ASSET_STATUS_IMPORTING);
+			$liveAsset->save();
+		}
+	}
 }

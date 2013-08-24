@@ -5,39 +5,16 @@
  */
 class KalturaKontikiStorageProfile extends KalturaStorageProfile
 {
-	/**
-	 * @var string
-	 */
-	public $apiEntryPoint;
 	
 	/**
 	 * @var string
 	 */
 	public $serviceToken;
 	
-	/**
-	 * @var string
-	 */
-	public $userName;
-	
-	/**
-	 * @var string
-	 */
-	public $password;
-	
-	/**
-	 * @var KalturaStorageProfileProtocol
-	 * @readonly
-	 */
-	public $protocol;
-	
 	
 	private static $map_between_objects = array
 	(
-		'apiEntryPoint',
 		'serviceToken',
-		'userName',
-		'password',
 		
 	);
 	
@@ -73,5 +50,16 @@ class KalturaKontikiStorageProfile extends KalturaStorageProfile
             
         return parent::toInsertableObject($object_to_fill, $props_to_skip);
     }
+	
+	/* (non-PHPdoc)
+     * @see KalturaObject::validateForInsert()
+     */
+	public function validateForInsert ($propertiesToSkip = array())
+	{
+		if (!KontikiPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::PERMISSION_NOT_FOUND, 'Kontiki permission not found for partner');
+		}
+	}
 
 }

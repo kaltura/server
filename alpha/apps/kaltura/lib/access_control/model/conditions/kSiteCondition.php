@@ -23,9 +23,8 @@ class kSiteCondition extends kMatchCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::getFieldValue()
 	 */
-	public function getFieldValue(accessControl $accessControl)
+	public function getFieldValue(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
 		$referrer = $scope->getReferrer();
 		return requestUtils::parseUrlHost($referrer);
 	}
@@ -33,9 +32,8 @@ class kSiteCondition extends kMatchCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	protected function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(kScope $scope)
 	{
-		$scope = $accessControl->getScope();
 		$referrer = $scope->getReferrer();
 
 		if ($this->getNot()===true && !$this->globalWhitelistDomainsAppended && strpos($referrer, "kwidget") === false && kConf::hasParam("global_whitelisted_domains"))
@@ -56,7 +54,7 @@ class kSiteCondition extends kMatchCondition
 
 		kApiCache::addExtraField(kApiCache::ECF_REFERRER, kApiCache::COND_SITE_MATCH, $this->getStringValues($scope));
 		
-		return parent::internalFulfilled($accessControl);
+		return parent::internalFulfilled($scope);
 	}
 	
 	/* (non-PHPdoc)

@@ -12,6 +12,7 @@ class assetPeer extends BaseassetPeer
 {
 	const FLAVOR_OM_CLASS = 'flavorAsset';
 	const THUMBNAIL_OM_CLASS = 'thumbAsset';
+	const LIVE_OM_CLASS = 'liveAsset';
 	
 	/**
 	 * Map that holds the assets according to their ids
@@ -23,6 +24,7 @@ class assetPeer extends BaseassetPeer
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => self::FLAVOR_OM_CLASS,
 		assetType::THUMBNAIL => self::THUMBNAIL_OM_CLASS,
+		assetType::LIVE => self::LIVE_OM_CLASS,
 	);
 
 	public static function addInstanceToPool(asset $obj, $key = null)
@@ -246,6 +248,14 @@ class assetPeer extends BaseassetPeer
 		return self::doSelect($c);
 	}
 	
+	public static function retrieveAllFlavorsTypes()
+	{
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes[] = assetType::LIVE;
+		return $flavorTypes;
+	}
+	
+	
 	/**
 	 * 
 	 * @param string $entryId
@@ -256,7 +266,7 @@ class assetPeer extends BaseassetPeer
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		return self::doSelect($c);
@@ -299,11 +309,14 @@ class assetPeer extends BaseassetPeer
 		return self::countByEntryId($entryId, $types);
 	}
 
-	public static function retrieveReadyByEntryId($entryId, $ids = null)
+	public static function retrieveReadyByEntryId($entryId, $ids = null, array $statuses = null)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		if(count($statuses))
+		    $c->add(assetPeer::STATUS, $statuses, Criteria::IN);
+		else 
+			$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		if (!is_null($ids))
 			$c->add(assetPeer::ID, $ids, Criteria::IN);	
 		return self::doSelectAscendingBitrate($c);
@@ -318,7 +331,7 @@ class assetPeer extends BaseassetPeer
 		if(count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		return self::doSelectAscendingBitrate($c);
@@ -337,7 +350,7 @@ class assetPeer extends BaseassetPeer
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		}
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		return self::doSelect($c);
@@ -353,7 +366,7 @@ class assetPeer extends BaseassetPeer
 		if(count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 
 		$stmt = assetPeer::doSelectStmt($c, null);
@@ -495,7 +508,7 @@ class assetPeer extends BaseassetPeer
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
 		$flavorAssets = self::doSelect($c);

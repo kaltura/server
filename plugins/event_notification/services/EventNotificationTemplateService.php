@@ -64,7 +64,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		// init new Kaltura object
 		$newEventNotificationTemplate = KalturaEventNotificationTemplate::getInstanceByType($newDbEventNotificationTemplate->getType());
 		$templateClass = get_class($newEventNotificationTemplate);
-		if(get_class($eventNotificationTemplate) != $templateClass && !is_subclass_of($eventNotificationTemplate, $templateClass))
+		if($eventNotificationTemplate && get_class($eventNotificationTemplate) != $templateClass && !is_subclass_of($eventNotificationTemplate, $templateClass))
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_WRONG_TYPE, $id, kPluginableEnumsManager::coreToApi('EventNotificationTemplateType', $dbEventNotificationTemplate->getType()));
 		
 		if ($eventNotificationTemplate)
@@ -154,6 +154,14 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$dbEventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($id);
 		if (!$dbEventNotificationTemplate)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $id);
+
+		if($status == EventNotificationTemplateStatus::ACTIVE)
+		{
+			//Check uniqueness of new object's system name
+			$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($dbEventNotificationTemplate->getSystemName());
+			if (count($systemNameTemplates))
+				throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $dbEventNotificationTemplate->getSystemName());
+		}	
 		
 		// save the object
 		$dbEventNotificationTemplate->setStatus($status);

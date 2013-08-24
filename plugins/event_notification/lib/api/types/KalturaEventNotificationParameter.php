@@ -5,11 +5,16 @@
  */
 class KalturaEventNotificationParameter extends KalturaObject
 {
-/**
+	/**
 	 * The key in the subject and body to be replaced with the dynamic value
 	 * @var string
 	 */
 	public $key;
+
+	/**
+	 * @var string
+	 */
+	public $description;
 	
 	/**
 	 * The dynamic value to be placed in the final output
@@ -20,6 +25,7 @@ class KalturaEventNotificationParameter extends KalturaObject
 	private static $map_between_objects = array
 	(
 		'key',
+		'description',
 		'value',
 	);
 

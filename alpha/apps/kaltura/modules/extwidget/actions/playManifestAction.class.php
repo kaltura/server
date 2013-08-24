@@ -1292,6 +1292,10 @@ class playManifestAction extends kalturaAction
 	
 	private function getLiveEntryBaseUrl()
 	{
+		$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $this->format);
+		if ($liveStreamConfig)
+			return $liveStreamConfig->getUrl();
+		
 		switch($this->format)
 		{
 			case PlaybackProtocol::RTMP:
@@ -1303,14 +1307,6 @@ class playManifestAction extends kalturaAction
 					
 			case PlaybackProtocol::APPLE_HTTP:
 				return $this->entry->getHlsStreamUrl();
-		
-			case PlaybackProtocol::HDS:
-			case PlaybackProtocol::AKAMAI_HDS:
-				$liveStreamConfig = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $this->format);
-				if (!$liveStreamConfig)
-					return null;
-		
-				return $liveStreamConfig->getUrl();
 		}
 		return null;
 	}

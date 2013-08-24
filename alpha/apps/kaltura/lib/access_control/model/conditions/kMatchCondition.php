@@ -10,7 +10,12 @@ abstract class kMatchCondition extends kCondition
 	 * @var array<kStringValue>
 	 */
 	protected $values;
-
+	
+	/**
+	 * @var array
+	 */
+	protected $dynamicValues;
+	
 	/**
 	 * @param array $values
 	 */
@@ -31,6 +36,15 @@ abstract class kMatchCondition extends kCondition
 	{
 		return $this->values;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kCondition::applyDynamicValues()
+	 */
+	protected function applyDynamicValues(kScope $scope)
+	{
+		parent::applyDynamicValues($scope);
+		$this->dynamicValues = $scope->getDynamicValues('{', '}');
+	}
 	
 	/**
 	 * @param kScope $scope
@@ -42,31 +56,40 @@ abstract class kMatchCondition extends kCondition
 			return array();
 			
 		$values = array();
+		$dynamicValuesKeys = null;
+		if(is_array($this->dynamicValues) && count($this->dynamicValues))
+			$dynamicValuesKeys = array_keys($this->dynamicValues);
 		
 		foreach($this->values as $value)
 		{
 			/* @var $value kStringValue */
+			$calculatedValue = null;
 			if(is_object($value))
 			{
 				if($scope && $value instanceof kStringField)
 					$value->setScope($scope);
-					
-				$values[] = $value->getValue();
+				
+				$calculatedValue = $value->getValue();
 			}
 			else
 			{
-				$values[] = strval($value);
+				$calculatedValue = strval($value);
 			}
+			
+			if($dynamicValuesKeys)
+				$calculatedValue = str_replace($dynamicValuesKeys, $this->dynamicValues, $calculatedValue);
+		
+			$values[] = $calculatedValue;
 		}
 		
 		return $values;
 	}
 	
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 * @return string the field content
 	 */
-	abstract public function getFieldValue(accessControl $accessControl);
+	abstract public function getFieldValue(kScope $scope);
 	
 	/**
 	 * @param string $field
@@ -106,10 +129,10 @@ abstract class kMatchCondition extends kCondition
 	/* (non-PHPdoc)
 	 * @see kCondition::internalFulfilled()
 	 */
-	protected function internalFulfilled(accessControl $accessControl)
+	protected function internalFulfilled(kScope $scope)
 	{
-		$field = $this->getFieldValue($accessControl);
-		$values = $this->getStringValues($accessControl->getScope());
+		$field = $this->getFieldValue($scope);
+		$values = $this->getStringValues($scope);
 		
 		KalturaLog::debug("Matches field [$field] to values [" . print_r($values, true) . "]");
 		if (!count($values))

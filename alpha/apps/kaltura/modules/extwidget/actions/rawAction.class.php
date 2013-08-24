@@ -67,13 +67,6 @@ class rawAction extends sfAction
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
 
-//		Rmoved by Tan-Tan - asked by Eran
-//		// allow access only via cdn unless these are documents (due to the current implementation of convert ppt2swf)
-//		if ($entry->getType() != entryType::DOCUMENT && $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
-//		{
-//			requestUtils::enforceCdnDelivery($entry->getPartnerId());
-//		}
-		
 		// relocate = did we use the redirect and added the extension to the name
 		$relocate = $this->getRequestParameter ( "relocate" );
 		
@@ -167,7 +160,7 @@ class rawAction extends sfAction
 					$reloc_ext = pathinfo ( $relocate , PATHINFO_EXTENSION );
 					$name = str_replace(".$reloc_ext", '', $name);
 				}
-				$name = kString::removeNewLine($name.$ext);
+				$name = kString::removeNewLine($name. '.' .$ext);
 				header("Content-Disposition: attachment; filename=\"$name\"");
 			}
 			kFileUtils::dumpFile($file_sync->getFullPath());
@@ -182,7 +175,8 @@ class rawAction extends sfAction
 			else
 			{
 				$path = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-				KalturaLog::info("Redirecting to [$path]");
+				header("Location: $path");
+				KExternalErrors::dieGracefully();
 			}
 			if (!$path)
 			{

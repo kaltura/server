@@ -222,7 +222,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(empty($item->subTitles->subTitle))
 			return;
 		
-		$this->xmlBulkUploadEngine->impersonate();
+		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 		$this->getCurrentCaptionAssets($object->id);
 		
 		$pluginsErrorResults = array();
@@ -241,17 +241,15 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 		
-		$this->xmlBulkUploadEngine->unimpersonate();		
+		KBatchBase::unimpersonate();
 	}
 
 	private function handleCaptionAsset($entryId, $conversionProfileId, SimpleXMLElement $caption)
 	{
-		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$captionAssetPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
-		
-		$this->xmlBulkUploadEngine->impersonate(); //needed since $this->xmlBulkUploadEngine->getAssetParamsId calles to unimpersonate
 		
 		if(isset($caption->captionAssetId))
 			$captionAsset->id = $caption->captionAssetId;
@@ -329,7 +327,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
-		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$captionAssetPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 		$captions = $captionAssetPlugin->captionAsset->listAction($filter, $pager);
 		
 		$this->currentCaptionAssets = array();

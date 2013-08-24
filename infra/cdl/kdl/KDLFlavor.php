@@ -212,7 +212,10 @@ KalturaLog::log("==>\n");
 	 */
 	public function ValidateProduct(KDLMediaDataSet $source, KDLFlavor $product)
 	{
+		KalturaLog::log( ".SRC-->".$source->ToString());
 		KalturaLog::log( ".TRG-->".$this->ToString());
+		KalturaLog::log( ".PRD-->".$product->ToString());
+		
 		$rv = $product->ValidateFlavor();
 
 		if($source){
@@ -228,8 +231,13 @@ KalturaLog::log("==>\n");
 		
 		/*
 		 * ARF (webex) sources don't have proper mediaInfo - thus can not validate the product, skip it
+		 * 
+		 * - The second portion of the 'if condition' is a workaround to handle invalidly passed inter-src 
+		 * asset both as a source and as a product. 
+		 * It is 'strstr' rather than 'strcmp', because call to 'product->ValidateFlavor' might add warnings to the ToString
 		 */
-		if(isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') {
+//		if(isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') {
+		if((isset($srcCont) && $srcCont->GetIdOrFormat()=='arf') || strstr($product->ToString(),$source->ToString())!=false) {
 			KalturaLog::log("ARF (webex) sources don't have proper mediaInfo - thus can not validate the product");
 			return true;
 		}

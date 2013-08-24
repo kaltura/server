@@ -1220,7 +1220,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$links = FileSyncPeer::doSelect($c);
 			}
 			
-			$firstLink->setLinkCount($linkToatlCount);
+			if($firstLink)
+			{
+				$firstLink->setLinkCount($linkToatlCount);
+			}
 		}
 	}
 

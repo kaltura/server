@@ -59,6 +59,7 @@ class BatchJobLockSuspendTableMap extends TableMap {
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
 		$this->addForeignKey('BATCH_JOB_ID', 'BatchJobId', 'INTEGER', 'batch_job_sep', 'ID', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('BATCH_VERSION', 'BatchVersion', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
