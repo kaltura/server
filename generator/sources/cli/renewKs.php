@@ -46,14 +46,26 @@ if (!$arguments)
 	die($usage);
 }
 
-$ks = $arguments[0];
+$input = $arguments[0];
+$ks = $input; 
+
+$patterns = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
+foreach ($patterns as $pattern)
+{
+	preg_match_all($pattern, $input, $matches);
+	if ($matches[1])
+	{
+		$ks = reset($matches[1]);
+		break;
+	}
+}
 
 KalturaSecretRepository::init();
 
 if (!isset($options['bare']))
 	echo "ks\t";
 
-echo KalturaSession::extendKs($ks);
+echo str_replace($ks, KalturaSession::extendKs($ks), $input);
 
 if (!isset($options['bare']))
 	echo "\n";
