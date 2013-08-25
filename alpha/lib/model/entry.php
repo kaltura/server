@@ -2682,7 +2682,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getObjectIndexName()
 	{
-		return entryPeer::OM_CLASS;
+		$partner = $this->getPartner();
+		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME, entryPeer::TABLE_NAME);
+		
+		return $partnerSearchIndex;
 	}
 	
 	/* (non-PHPdoc)

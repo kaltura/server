@@ -26,7 +26,7 @@ abstract class BaseMetadataProfileFieldPeer {
 	const TM_CLASS = 'MetadataProfileFieldTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 12;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -64,6 +64,9 @@ abstract class BaseMetadataProfileFieldPeer {
 	/** the column name for the STATUS field */
 	const STATUS = 'metadata_profile_field.STATUS';
 
+	/** the column name for the SEARCH_INDEX field */
+	const SEARCH_INDEX = 'metadata_profile_field.SEARCH_INDEX';
+
 	/**
 	 * An identiy map to hold any loaded instances of MetadataProfileField objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -80,11 +83,11 @@ abstract class BaseMetadataProfileFieldPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'MetadataProfileId', 'MetadataProfileVersion', 'PartnerId', 'Label', 'Key', 'Type', 'Xpath', 'Status', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'metadataProfileId', 'metadataProfileVersion', 'partnerId', 'label', 'key', 'type', 'xpath', 'status', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::METADATA_PROFILE_ID, self::METADATA_PROFILE_VERSION, self::PARTNER_ID, self::LABEL, self::KEY, self::TYPE, self::XPATH, self::STATUS, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'metadata_profile_id', 'metadata_profile_version', 'partner_id', 'label', 'key', 'type', 'xpath', 'status', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'MetadataProfileId', 'MetadataProfileVersion', 'PartnerId', 'Label', 'Key', 'Type', 'Xpath', 'Status', 'SearchIndex', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'metadataProfileId', 'metadataProfileVersion', 'partnerId', 'label', 'key', 'type', 'xpath', 'status', 'searchIndex', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::METADATA_PROFILE_ID, self::METADATA_PROFILE_VERSION, self::PARTNER_ID, self::LABEL, self::KEY, self::TYPE, self::XPATH, self::STATUS, self::SEARCH_INDEX, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'metadata_profile_id', 'metadata_profile_version', 'partner_id', 'label', 'key', 'type', 'xpath', 'status', 'search_index', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -94,11 +97,11 @@ abstract class BaseMetadataProfileFieldPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'MetadataProfileId' => 3, 'MetadataProfileVersion' => 4, 'PartnerId' => 5, 'Label' => 6, 'Key' => 7, 'Type' => 8, 'Xpath' => 9, 'Status' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'metadataProfileId' => 3, 'metadataProfileVersion' => 4, 'partnerId' => 5, 'label' => 6, 'key' => 7, 'type' => 8, 'xpath' => 9, 'status' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::METADATA_PROFILE_ID => 3, self::METADATA_PROFILE_VERSION => 4, self::PARTNER_ID => 5, self::LABEL => 6, self::KEY => 7, self::TYPE => 8, self::XPATH => 9, self::STATUS => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'metadata_profile_id' => 3, 'metadata_profile_version' => 4, 'partner_id' => 5, 'label' => 6, 'key' => 7, 'type' => 8, 'xpath' => 9, 'status' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'MetadataProfileId' => 3, 'MetadataProfileVersion' => 4, 'PartnerId' => 5, 'Label' => 6, 'Key' => 7, 'Type' => 8, 'Xpath' => 9, 'Status' => 10, 'SearchIndex' => 11, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'metadataProfileId' => 3, 'metadataProfileVersion' => 4, 'partnerId' => 5, 'label' => 6, 'key' => 7, 'type' => 8, 'xpath' => 9, 'status' => 10, 'searchIndex' => 11, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::METADATA_PROFILE_ID => 3, self::METADATA_PROFILE_VERSION => 4, self::PARTNER_ID => 5, self::LABEL => 6, self::KEY => 7, self::TYPE => 8, self::XPATH => 9, self::STATUS => 10, self::SEARCH_INDEX => 11, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'metadata_profile_id' => 3, 'metadata_profile_version' => 4, 'partner_id' => 5, 'label' => 6, 'key' => 7, 'type' => 8, 'xpath' => 9, 'status' => 10, 'search_index' => 11, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -179,6 +182,7 @@ abstract class BaseMetadataProfileFieldPeer {
 		$criteria->addSelectColumn(MetadataProfileFieldPeer::TYPE);
 		$criteria->addSelectColumn(MetadataProfileFieldPeer::XPATH);
 		$criteria->addSelectColumn(MetadataProfileFieldPeer::STATUS);
+		$criteria->addSelectColumn(MetadataProfileFieldPeer::SEARCH_INDEX);
 	}
 
 	/**
