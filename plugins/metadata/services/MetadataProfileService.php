@@ -45,6 +45,7 @@ class MetadataProfileService extends KalturaBaseService
 		
 		// must be validatebefore checking available searchable fields count
 		$metadataProfile->validatePropertyNotNull('metadataObjectType');
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $metadataProfile->metadataObjectType);
 		
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
@@ -99,6 +100,7 @@ class MetadataProfileService extends KalturaBaseService
 		
 		// must be validatebefore checking available searchable fields count
 		$metadataProfile->validatePropertyNotNull('metadataObjectType');
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdFile, false, $metadataProfile->metadataObjectType);
 		
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
@@ -170,6 +172,8 @@ class MetadataProfileService extends KalturaBaseService
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
 
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $dbMetadataProfile->getObjectType(), $id);
+		
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);

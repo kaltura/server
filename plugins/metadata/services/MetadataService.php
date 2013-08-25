@@ -442,8 +442,6 @@ class MetadataService extends KalturaBaseService
 		
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
-		MetadataPeer::setUseCriteriaFilter(true);
-		
 		foreach($metadatas as $metadata)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
 		
@@ -452,7 +450,6 @@ class MetadataService extends KalturaBaseService
 			
 		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
 		$count = BasePeer::doUpdate($c, $update, $con);
-		
 		return $count;
 	}	
 	
