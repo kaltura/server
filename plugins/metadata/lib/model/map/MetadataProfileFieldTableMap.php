@@ -48,6 +48,7 @@ class MetadataProfileFieldTableMap extends TableMap {
 		$this->addColumn('TYPE', 'Type', 'VARCHAR', false, 127, null);
 		$this->addColumn('XPATH', 'Xpath', 'VARCHAR', false, 255, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
+		$this->addColumn('SEARCH_INDEX', 'SearchIndex', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
