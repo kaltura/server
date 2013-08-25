@@ -12,7 +12,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const PLUGIN_NAME = 'metadata';
 	
 	const SPHINX_EXPANDER_FIELD_DATA = 'data';
-	const SPHINX_DYNAMIC_ATTRIBUTES = 'dynamic_attributes';
+	const SPHINX_EXPENDER_FIELD_INT = 'date_'; //for backward compatibility, all partners in production are using int field for date.
 	
 	const PLUGIN_VERSION_MAJOR = 2;
 	const PLUGIN_VERSION_MINOR = 1;
@@ -831,7 +831,53 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 */
 	public static function getSphinxSchema()
 	{
-		return array();
+		$kalturaEntryFields = Array ();
+		$searchIndexes = kConf::get('search_indexes');
+		
+		foreach ($searchIndexes as $indexName => $indexLimit)
+		{
+			for ($i=0; $i < $indexLimit; $i++)
+				$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_UINT;
+		
+			$sphinxSchema[kSphinxSearchManager::getSphinxIndexName($indexName)]['fields'] = $kalturaEntryFields;
+		}
+		
+		return $sphinxSchema;
+	}
+
+	/**
+	 * return number of fields in kaltura_entry index (in sphinx) for given type
+	 * @param int $type
+	 */
+	public static function getAdditionalSearchableFieldsLimit($partnerId, $obejctType)
+	{
+		$partner = PartnerPeer::retrieveByPK ( $partnerId );
+		if (!$partner)
+			throw new APIException(APIErrors::INVALID_PARTNER_ID, $partnerId);
+		
+		If ($obejctType == MetadataObjectType::ENTRY)
+		{
+			$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME, entryPeer::TABLE_NAME);
+		}
+		elseif ($obejctType == MetadataObjectType::CATEGORY)
+		{
+			$partnerSearchIndex = $partner->getSearchIndex(categoryPeer::TABLE_NAME, categoryPeer::TABLE_NAME);
+		}
+		elseif ($obejctType == MetadataObjectType::USER)
+		{
+			$partnerSearchIndex = $partner->getSearchIndex(kuserPeer::TABLE_NAME, kuserPeer::TABLE_NAME);
+		}
+		else
+		{
+			return 0;
+		}
+		
+		$searchIndexes = kConf::get('search_indexes');
+		
+		if(!isset($searchIndexes[$partnerSearchIndex]))
+			throw new Exception('could not find partner\'s search index ' . $partnerSearchIndex);
+			
+		return $searchIndexes[$partnerSearchIndex];
 	}
 
 	/* (non-PHPdoc)
