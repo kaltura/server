@@ -180,7 +180,7 @@ class DbManager
 		$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);
 		if ($preferredIndex === false)
 			return false;
-		self::$cachedConnIndex = (int) $preferredIndex;
+		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
 		return $preferredIndex;
 	}
 	
