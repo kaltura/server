@@ -61,9 +61,9 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 	}
 	
 	/* (non-PHPdoc)
-	 * @see AdvancedSearchFilterItem::apply()
+	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
+	public function applyCondition(IKalturaIndexQuery $query)
 	{
 		if ($this->memberIdIn)
 		{
