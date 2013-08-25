@@ -60,7 +60,11 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				$xPaths = array();
 				$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($this->metadataProfileId);
 				foreach($profileFields as $profileField)
+				{
+					/* @var $profileField MetadataProfileField */
 					$xPaths[$profileField->getXpath()] = $profileField;
+					$xPaths[$profileField->getKey()] = $profileField;
+				}
 			}
 	
 			$dataConditions = array();
