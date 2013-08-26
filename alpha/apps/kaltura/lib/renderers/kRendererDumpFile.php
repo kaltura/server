@@ -32,6 +32,7 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
+			clearstatcache();
 			$this->fileSize = kFile::fileSize($filePath);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
