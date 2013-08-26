@@ -84,7 +84,7 @@ start() {
 start_scheduler() {
 	echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &"
 	cd $BATCHDIR
-	su $OS_KALTURA_USER -c "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &" 
+	su $OS_KALTURA_USER -c "nohup $PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &" 
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
