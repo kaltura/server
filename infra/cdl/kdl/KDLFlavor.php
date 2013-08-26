@@ -283,8 +283,8 @@ $plannedDur = 0;
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) 
 					{
-						//This check was added to filter out files that have no duration set on their metadata (SUP 546)
-						if($aDur==0 && in_array (strtolower($this->_container->GetIdOrFormat()), array("ogg", "ogv")))
+						//This check was added to filter out files that have no duration set on their metadata and are of type ogg or ogv to avoid failure on product validation (SUP 546)
+						if($aDur==0 && in_array(strtolower($this->_container->GetIdOrFormat()), array("ogg", "ogv")))
 						{
 							//Do Nothing
 						}
