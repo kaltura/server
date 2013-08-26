@@ -1109,6 +1109,22 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSync->setLinkCount($current_count);
 		$fileSync->save();
 	}
+	
+	/**
+	 * decrement the link_count field on a source file_sync record
+	 *
+	 * @param FileSync $fileSync
+	 * @return void
+	 */
+	private static function decrementLinkCountForFileSync(FileSync $fileSync)
+	{
+		if(!$fileSync)
+			return;
+		
+		$current_count = (((int)$fileSync->getLinkCount()) ? $fileSync->getLinkCount()-1 : 0);
+		$fileSync->setLinkCount($current_count);
+		$fileSync->save();
+	}
 
 	/**
 	 * mark file as deleted, return deleted version
@@ -1134,6 +1150,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if($file->getLinkedId())
 		{
 			$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
+			self::decrementLinkCountForFileSync(FileSyncPeer::retrieveByPK($file->getLinkedId()));
 		}
 		else
 		{
@@ -1181,7 +1198,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSyncList = FileSyncPeer::doSelect($c);
 		foreach($fileSyncList as $fileSync)
 		{
-			$linkToatlCount = 0;
+			$linkTotalCount = 0;
 			/* @var $fileSync FileSync */
 
 			// for each source, find its links and fix them
@@ -1195,7 +1212,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->setLimit(100);
 
 			$links = FileSyncPeer::doSelect($c);
-			$linkToatlCount += count($links);
+			
+			//check if any links were returned in the do select if not no need to continue
+			if(!count($links))
+				continue;
 			
 			// choose the first link and convert it to file
 			$firstLink = array_shift($links);
@@ -1216,6 +1236,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				// change all the rest of the links to point on the new file sync
 				foreach($links as $link)
 				{
+					$linkTotalCount += count($links);
 					/* @var $link FileSync */
 					$link->setStatus($fileSync->getStatus());
 					$link->setLinkedId($firstLink->getId());
@@ -1228,7 +1249,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 			if($firstLink)
 			{
-				$firstLink->setLinkCount($linkToatlCount);
+				$firstLink->setLinkCount($linkTotalCount);
+				$firstLink->save();
 			}
 		}
 	}
