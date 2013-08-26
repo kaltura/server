@@ -779,7 +779,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>[AppTitle] - A new media was added to {category_name}</subject>
-				<body>Media {entry_name} was added to {category_name}. You can see the media here: [AppEntryUrl]{entry_id}</body>
+				<body>Media {entry_name} was added to {category_name}. You can see the media here: [AppEntryUrl]{entry_id}/{category_id}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
@@ -810,6 +810,13 @@
 						<description>Category name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_id</key>
+						<description>Category I</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
