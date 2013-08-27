@@ -22,6 +22,7 @@ class kRendererDumpFile implements kRendererBase
 
 	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0)
 	{
+		clearstatcache();
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
 		$this->maxAge = $maxAge;
@@ -34,7 +35,6 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			clearstatcache();
 			$this->fileSize = kFile::fileSize($filePath);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
