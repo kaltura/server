@@ -522,11 +522,12 @@ class sftpMgr extends kFileTransferMgr
 			
 		$cliCommand .= " {$this->username}@{$this->host}";
 		
-		$cmd = "(echo '$command' && echo 'quit') | $cliCommand";
+		$cmd = "(echo '$command' && echo 'quit') | $cliCommand 2>&1";
 		KalturaLog::info("Command [$cmd]");
 		$returnValue = null;
 		exec($cmd, $output, $returnValue);
 		if ($returnValue){ //any non-zero return value is an error
+			KalturaLog::err("An error while running exec - " . print_r($output, true));
 			@trigger_error($output[count($output)-2] ."; ". $output[count($output)-1]); //in order to populate the correct error to error_get_last() in kFileTransferMgr
 			return false; 
 		}
