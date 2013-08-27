@@ -43,7 +43,7 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	 */
 	protected function getJobs()
 	{
-		return $this->kClient->metadataBatch->getExclusiveTransformMetadataJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
+		return self::$kClient->metadataBatch->getExclusiveTransformMetadataJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 1, $this->getFilter());
 	}
 	
 	/* (non-PHPdoc)
@@ -56,14 +56,14 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	
 	private function invalidateFailedMetadatas($results, $transformObjectIds = array())
 	{
-		$this->kClient->startMultiRequest();
+		self::$kClient->startMultiRequest();
 		foreach($results as $index => $result){
         	if(is_array($result) && isset($result['code']) && isset($result['message'])){
               	KalturaLog::err('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
-              	$this->kClient->metadata->invalidate($transformObjectIds[$index]);
+              	self::$kClient->metadata->invalidate($transformObjectIds[$index]);
         	}
         }
-        $resultsOfInvalidating = $this->kClient->doMultiRequest();	
+        $resultsOfInvalidating = self::$kClient->doMultiRequest();	
 		foreach($resultsOfInvalidating as $index => $resultOfInvalidating){
         	if(is_array($resultOfInvalidating) && isset($resultOfInvalidating['code']) && isset($resultOfInvalidating['message'])){
               	KalturaLog::err('error while invalidating object id['.$transformObjectIds[$index] .'] with code: '. $resultOfInvalidating['code']."\n".$resultOfInvalidating['message']);        	
@@ -75,15 +75,15 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	{
 		KalturaLog::debug("transform($job->id)");
 		
-		if($this->taskConfig->params->multiRequestSize)
-			$this->multiRequestSize = $this->taskConfig->params->multiRequestSize;
+		if(self::$taskConfig->params->multiRequestSize)
+			$this->multiRequestSize = self::$taskConfig->params->multiRequestSize;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 40;
-		if($this->taskConfig->params && $this->taskConfig->params->maxObjectsEachRun)
-			$pager->pageSize = $this->taskConfig->params->maxObjectsEachRun;
+		if(self::$taskConfig->params && self::$taskConfig->params->maxObjectsEachRun)
+			$pager->pageSize = self::$taskConfig->params->maxObjectsEachRun;
 		
-		$transformList = $this->kClient->metadataBatch->getTransformMetadataObjects(
+		$transformList = self::$kClient->metadataBatch->getTransformMetadataObjects(
 			$data->metadataProfileId,
 			$data->srcVersion,
 			$data->destVersion,
@@ -104,10 +104,10 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		
 		if($transformList->lowerVersionCount || $transformList->totalCount) // another retry will be needed later
 		{
-			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+			self::$kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 		}
 			
-		$this->kClient->startMultiRequest();
+		self::$kClient->startMultiRequest();
 		$transformObjectIds = array();
 		foreach($transformList->objects as $object)
 		{
@@ -115,25 +115,25 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			$xml = kXsd::transformXmlData($object->xml, $data->destXsdPath, $data->srcXslPath);
 			if($xml)
 			{
-				$this->kClient->metadata->update($object->id, $xml, $object->version);
+				self::$kClient->metadata->update($object->id, $xml, $object->version);
 			}
 			else 
 			{			
-				$this->kClient->metadata->invalidate($object->id, $object->version);
+				self::$kClient->metadata->invalidate($object->id, $object->version);
 			}
 			
 			$transformObjectIds[] = $object->id;
 				    
-			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
+			if(self::$kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
-				$results = $this->kClient->doMultiRequest();
+				$results = self::$kClient->doMultiRequest();
 				$this->invalidateFailedMetadatas($results, $transformObjectIds);
 				$transformObjectIds = array();
-				$this->kClient->startMultiRequest();
+				self::$kClient->startMultiRequest();
 			}
 			
 		}
-		$results = $this->kClient->doMultiRequest();
+		$results = self::$kClient->doMultiRequest();
 		$this->invalidateFailedMetadatas($results, $transformObjectIds);
 		
 		$this->closeJob($job, null, null, "Metadata objects [" . count($transformList->objects) . "] transformed", KalturaBatchJobStatus::RETRY);
