@@ -524,7 +524,14 @@ class sftpMgr extends kFileTransferMgr
 		
 		$cmd = "(echo '$command' && echo 'quit') | $cliCommand";
 		KalturaLog::info("Command [$cmd]");
-		return system($cmd, $returnValue);
+		$returnValue = null;
+		exec($cmd, $output, $returnValue);
+		if ($returnValue){ //any non-zero return value is an error
+			@trigger_error($output[count($output)-2] ."; ". $output[count($output)-1]); //in order to populate the correct error to error_get_last() in kFileTransferMgr
+			return false; 
+		}
+		
+		return true;
 	}
 	
 	/**
