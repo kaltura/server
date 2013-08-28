@@ -3,31 +3,8 @@
  * @package Core
  * @subpackage utils
  */
-class kLock
+class kLock extends kLockBase
 {
-	const LOCK_KEY_PREFIX = '__LOCK';
-	const LOCK_GRAB_TRY_INTERVAL = 20000;
-	
-	/**
-	 * @var kBaseCacheWrapper
-	 */
-	protected $store;
-	
-	/**
-	 * @var string
-	 */
-	protected $key;
-
-	/**
-	 * @param kBaseCacheWrapper $store
-	 * @param string $key
-	 */
-	protected function __construct($store, $key)
-	{
-		$this->store = $store;
-		$this->key = self::LOCK_KEY_PREFIX . $key;
-	}
-	
 	/**
 	 * @param string $key
 	 * @return NULL|kLock
@@ -40,40 +17,7 @@ class kLock
 		
 		return new kLock($store, $key);
 	}
-	
-	/**
-	 * @param float $lockGrabTimeout
-	 * @param int $lockHoldTimeout
-	 * @return boolean
-	 */
-	public function lock($lockGrabTimeout = 2, $lockHoldTimeout = 5)
-	{
-		KalturaLog::log("Grabbing lock [{$this->key}]");
-
-		$retryTimeout = microtime(true) + $lockGrabTimeout;
-		while (microtime(true) < $retryTimeout)
-		{
-			if (!$this->store->add($this->key, true, $lockHoldTimeout))
-			{
-				usleep(self::LOCK_GRAB_TRY_INTERVAL);
-				continue;
-			}
-			
-			KalturaLog::log("Lock grabbed [{$this->key}]");
-			return true;
-		}
-
-		KalturaLog::log("Lock grab timed out [{$this->key}]");
-		return false;
-	}
-	
-	public function unlock()
-	{
-		KalturaLog::log("Releasing lock [{$this->key}]");
-		$this->store->delete($this->key);
-		KalturaLog::log("Lock released [{$this->key}]");
-	}
-	
+		
 	/**
 	 * @param callback $callback
 	 * @param array $params
