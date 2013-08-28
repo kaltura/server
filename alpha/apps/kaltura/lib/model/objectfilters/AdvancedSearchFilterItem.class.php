@@ -10,7 +10,7 @@ class AdvancedSearchFilterItem
 	 */
 	protected $kalturaClass;
 
-	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
+	final public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
 		if($query instanceof IKalturaIndexQuery)
 			$this->applyCondition($query);
