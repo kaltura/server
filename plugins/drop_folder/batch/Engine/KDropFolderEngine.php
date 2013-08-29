@@ -45,6 +45,7 @@ abstract class KDropFolderEngine
 		
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
+		$dropFolderFileFilter->statusNotIn(KalturaDropFolderFileStatus::PARSED,KalturaDropFolderFileStatus::DETECTED);
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
@@ -57,13 +58,6 @@ abstract class KDropFolderEngine
 			KalturaLog::debug('getting page ['.$pager->pageIndex. '] from Drop Folder File ');
 			$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
 			$dropFolderFiles = $dropFolderFiles->objects;
-			foreach ($dropFolderFiles as $dropFolderFile) 
-			{
-				if($dropFolderFile->status != KalturaDropFolderFileStatus::PARSED && $dropFolderFile->status != KalturaDropFolderFileStatus::DETECTED)
-				{
-					$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
-				}
-			}
 		}while (count($dropFolderFiles) >= $pager->pageSize);
 			
 		return $dropFolderFilesMap;

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ * This engine handles the basiC use-cases of drop folders- local, and remote FTP, SFTP.
  */
 class KDropFolderFileTransferEngine extends KDropFolderEngine
 {
@@ -203,11 +203,6 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		}
 		return $isValid;
 	}
-
-	public function getPhysicalFileName ($physicalFile)
-	{
-		return $physicalFile;
-	}
 	
 	/** 
      * Init a kFileTransferManager acccording to folder type and login to the server
@@ -385,6 +380,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		else 
 		{
 			throw new kFileTransferMgrException('Drop folder path not valid ['.$this->dropFolder->path.']', kFileTransferMgrException::remotePathNotValid);
+		}
+		
+		if ($this->dropFolder->incremental)
+		{
+			
 		}
 				
 		return $physicalFiles;
