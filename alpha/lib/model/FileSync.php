@@ -95,14 +95,8 @@ class FileSync extends BaseFileSync
 			&& in_array($this->getStatus(), array(self::FILE_SYNC_STATUS_DELETED, self::FILE_SYNC_STATUS_PURGED)))
 		{
 			$this->setDeletedId($this->getId());
-			
-			if ($this->getStatus() == self::FILE_SYNC_STATUS_DELETED){
-				$destFilePath = $this->getFileRoot().$this->getFilePath().$this->getId();
-				kFile::moveFile($this->getFullPath(), $destFilePath); 
-				$this->setFilePath($this->getFilePath() . $this->getId());
-			}
 		}
-		
+					
 		return parent::preUpdate($con);
 	 }
 
