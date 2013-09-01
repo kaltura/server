@@ -51,6 +51,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	 */
 	public function applyCondition(IKalturaDbQuery $query, $xPaths = null)
 	{
+		if (!($query instanceof IKalturaIndexQuery))
+			return;  
 		$this->parentQuery = $query;
 		
 		if(!$this->condition)
@@ -203,7 +205,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				$this->condition = "( {$this->condition} )";
 		}
 
-		if($this->condition && $query instanceof IKalturaIndexQuery)
+		if($this->condition)
 			$query->addMatch($this->condition);
 			
 		if (isset($this->orderBy))
