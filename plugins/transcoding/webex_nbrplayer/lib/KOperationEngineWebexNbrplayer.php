@@ -54,7 +54,7 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 		if(is_null($keyFramesInSec)) $keyFramesInSec=4;
 		if(is_null($bitrate)) $bitrate=2000;
 		if(is_null($videoCodec)) $videoCodec = "Windows Media Video 9";
-		if(is_null($audioCodec)) $audioCodec = "Windows Media Audio 9.2";
+		if(is_null($audioCodec)) $audioCodec = "Windows Media Audio 10 Professional";
 	}
 	else if($format=="MP4"){
 		

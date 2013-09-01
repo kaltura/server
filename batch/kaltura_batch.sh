@@ -56,12 +56,13 @@ start() {
 	fi
 	
 	echo -n $"Starting:"
-	KP=$(pgrep -P 1 -f $BATCHEXE)
+	KP_PARENT=`ps -eo pid,args|grep $BATCHEXE -m1|grep -v grep|awk -F " " '{print $1}'|xargs`
+	KP=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
 	if ! kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then 
 		echo_failure
 		echo
-		if [ "X$KP" != "X" ]; then
-			echo "Service batch already running"
+		if [ "X$KP_PARENT" != "X" ]; then
+			echo "Service batch already running [$KP_PARENT]"
 			return 0
 		else
 			echo "Service batch isn't running but stale lock file exists"
@@ -83,7 +84,7 @@ start() {
 start_scheduler() {
 	echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &"
 	cd $BATCHDIR
-	su $OS_KALTURA_USER -c "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &"
+	su $OS_KALTURA_USER -c "nohup $PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> $LOG_DIR/kaltura_batch.log 2>&1 &" 
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
@@ -94,7 +95,7 @@ start_scheduler() {
 }
 
 show_status() {
-		KP=$(pgrep -P 1 -f $BATCHEXE) 
+		KP=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
 		if [ "X$KP" != "X" ]; then
 		echo "Batch is running as $KP ..."
 		return 0
@@ -106,19 +107,15 @@ show_status() {
 
 stop() {
 	echo -n $"Shutting down:"
-	KP=$(pgrep -P 1 -f $BATCHEXE)
+	KP_PARENT=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
+	KP=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
 	if [ -n "$KP" ]; then
 		if [ -f $BASE_DIR/keepAlive ]; then
 			echo "Server is on Keep Alive mode - workers won't be killed!"
-			kill -9 $KP
+			kill -9 $KP_PARENT
 		else
 			echo "Killing batchMgr and workers"
-			PIDS=$(pstree -p $KP | grep -o '[0-9]\{2,5\}')
-			# hack, returnds the PIDS as string and tells kill to kill all at once
-			for pid in "$PIDS"
-			do
-				kill -9 $pid
-			done
+			kill -9 $KP
 		fi
 		echo_success
 		echo

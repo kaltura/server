@@ -256,4 +256,38 @@ class kmcUtils
 	    return $arr;
 	}
 
+	public static function getWhitelabelData( Partner $partner,  $param = null )
+	{
+		// no param, return null
+		if( !$param ){
+			return null;
+		}
+
+		if (kConf::hasMap("whitelabel"))
+		{
+			$whitelabel = kConf::getMap("whitelabel");
+			$params = array();
+
+			// Search for partner Id
+			if (array_key_exists($partner->getId(), $whitelabel))
+			{
+				$params = $whitelabel[$partner->getId()];			
+			} 
+			// Search for parent partner id
+			else if (array_key_exists($partner->getPartnerParentId(), $whitelabel))
+			{
+				$params = $whitelabel[$partner->getPartnerParentId()];
+			}
+
+			// If we have params, find out param
+			if( is_array($params) && array_key_exists($param, $params) )
+			{
+				return $params[ $param ];
+			}
+
+			return null;
+		}
+		return null;
+	}
+
 }

@@ -481,17 +481,18 @@ class kJobsManager
 		if($parentJob)
 		{
 			$dbConvertFlavorJob = $parentJob->createChild( BatchJobType::CONVERT, $dbCurrentConversionEngine, $sameRoot);
-			KalturaLog::log("Created from parent convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
+			KalturaLog::log("Created from parent job");
 		}
 		else
 		{
 			$dbConvertFlavorJob = new BatchJob();
-			$dbConvertFlavorJob->setEntryId($flavor->getEntryId());
 			$dbConvertFlavorJob->setPartnerId($flavor->getPartnerId());
 			$dbConvertFlavorJob->setJobType(BatchJobType::CONVERT);
 			$dbConvertFlavorJob->setJobSubType($dbCurrentConversionEngine);
-			KalturaLog::log("Created from flavor convert job with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
+			KalturaLog::log("Created from flavor convert job");
 		}
+		$dbConvertFlavorJob->setEntryId($flavor->getEntryId());
+		KalturaLog::log("Job created with entry id [" . $dbConvertFlavorJob->getEntryId() . "]");
 		
 		$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		if($mediaInfo === NULL) {

@@ -17,10 +17,10 @@ class kStorageExportJobData extends kStorageJobData
 		{
 			case StorageProfile::STORAGE_PROTOCOL_S3:
 				$data = new kAmazonS3StorageExportJobData();
-				break; 
+				break;
 			default:
 				$data = KalturaPluginManager::loadObject('kStorageExportJobData', $protocol);
-				break; 
+				break;
 		}
 		if (!$data)
 			$data = new kStorageExportJobData();

@@ -6,6 +6,7 @@
 class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaPlayManifestContributor
 {
 	const PLUGIN_NAME = 'caption';
+	const KS_PRIVILEGE_CAPTION = 'caption';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -403,8 +404,25 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return self::getObjectFeatureTypeCoreValue(CaptionObjectFeatureType::CAPTIONS);
 	}
-	
-	
+
+	/**
+	 * @param CaptionAsset $captionAsset
+	 * @param int $expiry
+	 * @return string
+	 */
+	static protected function generateKsForCaptionServe($captionAsset, $expiry = 86400)
+	{
+		$partnerId = $captionAsset->getPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$secret = $partner->getSecret();
+		$privilege = self::KS_PRIVILEGE_CAPTION.":".$captionAsset->getEntryId();
+		$ksStr = '';
+		
+		kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
+		
+		return $ksStr;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlayManifestContributor::getManifestEditors()
 	 */
@@ -421,7 +439,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				$c = new Criteria();
 				$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-				$c->addAnd(assetPeer::CONTAINER_FORMAT, CaptionType::WEBVTT);
 				$captionAssets = assetPeer::doSelect($c);
 				if (!count($captionAssets))
 					return array();
@@ -430,23 +447,44 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				{
 					/* @var $captionAsset CaptionAsset */
 					$captionsAssetObj = array();
-					$captionAssetObj['label'] =  $captionAsset->getLabel();
-					$captionAssetObj['default'] =  $captionAsset->getDefault() ? "YES" : "NO";
-					$captionAssetObj['language'] =  self::$captionsFormatMap[$captionAsset->getLanguage()];
-					//Currently only external caption assets are supported
-					$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);
+					
+					if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)						
+						$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);	// Currently only external caption assets are supported
+					else
+					{
+						if (!PermissionPeer::isValidForPartner(CaptionPermissionName::FEATURE_GENERATE_WEBVTT_CAPTIONS, $captionAsset->getPartnerId()))
+							continue;
+						
+						$cdnHost = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
+						
+						$versionStr = '';
+						if ($captionAsset->getVersion() > 1)
+							$versionStr = '/version/' . $captionAsset->getVersion();
+
+						$ksStr = '';
+						if ($captionAsset->isKsNeededForDownload())
+						{
+							$ksStr = '/ks/' . self::generateKsForCaptionServe($captionAsset);
+						}
+
+						$captionAssetObj['url'] = $cdnHost . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT'.
+							'/captionAssetId/'.$captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
+					}
+					$captionAssetObj['label'] = $captionAsset->getLabel();
+					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
+					$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
+					
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;
 				}
 				
 				KalturaLog::debug("contributor captions :" . print_r($contributor->captions, true));
-				$contributors[] = $contributor;
+				if ($contributor->captions)
+					$contributors[] = $contributor;
 				
 				break;
 		}
 		
 		return $contributors;
 	}
-	
-	
 }
