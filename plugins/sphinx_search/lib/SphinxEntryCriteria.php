@@ -253,7 +253,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$categoriesIds = $filter->get("_notcontains_categories_ids");
 		if ($categoriesIds !== null)
 		{
-			$categoriesParsed = $filter->categoryIdsToAllSubCategoriesIdsParsed($categoriesIds,CategoryEntryStatus::ACTIVE.','.CategoryEntryStatus::PENDING.','.CategoryEntryStatus::REJECTED);
+			$categoriesParsed = $filter->categoryIdsToAllSubCategoriesIdsParsed($categoriesIds, CategoryEntryStatus::ACTIVE.','.CategoryEntryStatus::PENDING.','.CategoryEntryStatus::REJECTED);
 			if ( $categoriesParsed !=='' || $categoriesIds =='')
 				$filter->set ( "_notcontains_categories_ids", $categoriesParsed);
 			else
