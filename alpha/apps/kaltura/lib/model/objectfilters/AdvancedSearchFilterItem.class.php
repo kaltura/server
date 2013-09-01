@@ -12,8 +12,7 @@ class AdvancedSearchFilterItem
 
 	final public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
 	{
-		if($query instanceof IKalturaIndexQuery)
-			$this->applyCondition($query);
+		$this->applyCondition($query);
 	}
 	
 	public function getFreeTextConditions($partnerScope, $freeTexts)
