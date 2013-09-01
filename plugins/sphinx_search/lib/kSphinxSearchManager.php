@@ -198,6 +198,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$dataStrings = array();
 		$dataInts = array();
 		$dataTimes = array();
+		$dataJson = array();
 		
 		$fields = $object->getIndexFieldsMap();
 		$nullableFields = $object->getIndexNullableFields();
@@ -226,6 +227,11 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				case IIndexable::FIELD_TYPE_DATETIME:
 					$dataTimes[$field] = $object->$getter(null);
 					break;
+					
+				case IIndexable::FIELD_TYPE_JSON:
+					$dataJson[$field] = $object->$getter();
+					break;
+					
 			}
 		}
 		
@@ -262,15 +268,19 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 
 		$xmlPipe2 = isset($options["format"]) ? $options["format"] == "xmlPipe2" : false;
 
-		foreach ($sphinxPluginsData as $key => $value){			
-			if (!is_numeric($value)){
+		foreach ($sphinxPluginsData as $key => $value){		
+			if(is_array($value)) {
+				$valueStr = json_encode($value);
+				$escapedString = SphinxUtils::escapeString($valueStr);
+				$data[$key] = "'" . $escapedString . "'";
+			} else if (is_numeric($value)) {
+				$data[$key] = $value;
+			} else {
 				$value = $xmlPipe2 ? $value : SphinxUtils::escapeString($value, SearchIndexFieldEscapeType::DEFAULT_ESCAPE, 1);
 				$search = array("\0", 	"\n",	"\r",	"\x1a");
 				$replace = array("\\0", "\\n",	"\\r",	"\\Z");
 				$value = str_replace($search, $replace, $value);
 				$data[$key] = "'$value'";
-			}else{
-				$data[$key] = is_numeric($value) ? $value : 0;
 			}
 		}
 		
@@ -298,6 +308,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach($dataTimes as $key => $value)
 		{
 			$data[$key] = is_numeric($value) ? $value : 0;
+		}
+		
+		foreach($dataJson as $key => $value)
+		{
+			$valueStr = json_encode($value);
+			$escapedString = SphinxUtils::escapeString($valueStr);
+			$data[$key] = "'" . $escapedString . "'";
 		}
 		
 		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
