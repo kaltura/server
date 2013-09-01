@@ -38,7 +38,7 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
-	public function toObject($dbObject = null, $propsToSkip = null)
+	public function toObject($dbObject = null, $propsToSkip = array())
 	{
 		if (!$dbObject)
 		{

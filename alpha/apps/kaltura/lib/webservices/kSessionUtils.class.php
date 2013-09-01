@@ -324,12 +324,7 @@ class ks extends kSessionBase
 		}
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 
-		$allowedIPRestriction = $this->isSetIPRestriction();
-		if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
-		{
-			KalturaLog::err("ipRestriction: EXCEEDED_RESTRICTED_IP");
-			return self::EXCEEDED_RESTRICTED_IP;
-		}
+		if (!$this->isUserIPAllowed()) return self::EXCEEDED_RESTRICTED_IP;
 		
 		if($this->original_str &&
 			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
@@ -402,7 +397,7 @@ class ks extends kSessionBase
 		if ( ! $this->valid_string ) return self::INVALID_STR;
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
 		if ( $this->expired ( ) ) return self::EXPIRED ;
-
+		if (!$this->isUserIPAllowed()) return  self::EXCEEDED_RESTRICTED_IP;
 		return self::OK;
 	}
 
@@ -508,6 +503,17 @@ class ks extends kSessionBase
 		}
 		
 		return false;
+	}
+	
+	public function isUserIPAllowed()
+	{
+		$allowedIPRestriction = $this->isSetIPRestriction();
+		if ($allowedIPRestriction && $allowedIPRestriction != infraRequestUtils::getRemoteAddress())
+		{
+			KalturaLog::err("IP Restriction; allowed IP: [$allowedIPRestriction], user ip [". infraRequestUtils::getRemoteAddress() ."] is not in range");
+			return false; 
+		}
+		return true; 
 	}
 	
 	public function getEnableEntitlement()

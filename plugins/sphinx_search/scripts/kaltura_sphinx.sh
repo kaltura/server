@@ -52,7 +52,7 @@ force_stop() {
  	#$exec --config $config --stopwait
  	PID=`cat $pid_file 2>/dev/null`
  	if kill -0 $PID 2> /dev/null;then
- 		echo "kill -9 $PID"
+ 		kill -9 $PID
  	fi
  	retval=$?
  	echo

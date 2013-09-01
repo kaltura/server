@@ -42,6 +42,8 @@ namespace Kaltura
         private int _Timeout = 120000;
         private string _ClientTag = "dotnet:@DATE@";
 		private string _ProxyAddress = "";
+		private string _ProxyUser = null;
+        private string _ProxyPassword = null;
         private WebHeaderCollection _RequestHeaders; 
 
         #endregion
@@ -89,6 +91,16 @@ namespace Kaltura
 			get { return _ProxyAddress; }
 		}
 
+        public string ProxyUser
+        {
+            set { _ProxyUser = value; }
+            get { return _ProxyUser; }
+        }
+        public string ProxyPassword
+        {
+            set { _ProxyPassword = value; }
+            get { return _ProxyPassword; }
+        }
         public WebHeaderCollection RequestHeaders
         {
             set { _RequestHeaders = value; }

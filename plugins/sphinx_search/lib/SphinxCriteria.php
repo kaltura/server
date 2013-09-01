@@ -212,7 +212,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$idsCount = count($ids);
-		$ids = $this->applyIds($ids);
 		$this->setFetchedIds($ids);
 		KalturaLog::debug("Found $idsCount ids");
 		
@@ -660,7 +659,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$val = implode(' | ', $vals);
-						$this->addMatch("@$sphinxField $val");
+						$this->addMatch("(@$sphinxField $val)");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -752,7 +751,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$val = implode(' ', $vals);
-						$this->addMatch("@$sphinxField $val");
+						$this->addMatch("(@$sphinxField $val)");
 						$filter->unsetByName($field);
 					}
 					break;		

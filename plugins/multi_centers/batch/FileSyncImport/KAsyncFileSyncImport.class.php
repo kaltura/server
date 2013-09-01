@@ -144,6 +144,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		// get directory contents
 		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');
 		$curlWrapper = new KCurlWrapper($sourceUrl);	
+		$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 		$contents = $curlWrapper->exec();
 		$curlError = $curlWrapper->getError();
 		$curlErrorNumber = $curlWrapper->getErrorNumber();
@@ -431,6 +432,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// fetch the http headers
 		$curlWrapper = new KCurlWrapper($url);
+		$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 		$curlHeaderResponse = $curlWrapper->getHeader();
 		$curlError = $curlWrapper->getError();
 		$curlErrorNumber = $curlWrapper->getErrorNumber();
