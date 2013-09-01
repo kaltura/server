@@ -659,7 +659,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$val = implode(' | ', $vals);
-						$this->addMatch("@$sphinxField $val");
+						$this->addMatch("(@$sphinxField $val)");
 						$filter->unsetByName($field);
 					}
 					break;
@@ -751,7 +751,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$val = implode(' ', $vals);
-						$this->addMatch("@$sphinxField $val");
+						$this->addMatch("(@$sphinxField $val)");
 						$filter->unsetByName($field);
 					}
 					break;		
