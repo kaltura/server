@@ -2,6 +2,7 @@
 /**
  * @package Core
  * @subpackage ExternalServices
+ * @deprecated
  */
 class myMediaSourceFactory
 {
