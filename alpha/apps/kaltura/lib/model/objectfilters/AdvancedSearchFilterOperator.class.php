@@ -77,7 +77,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function applyCondition(IKalturaDbQuery $query)
 	{
 		$this->parentQuery = $query;
 		
@@ -106,7 +106,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 			}
 		}
 	
-		if($this->condition)
+		if($this->condition && $query instanceof IKalturaIndexQuery)
 			$query->addMatch($this->condition);
 	}
 	

@@ -63,7 +63,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function applyCondition(IKalturaDbQuery $query)
 	{
 		if ($this->memberIdIn)
 		{

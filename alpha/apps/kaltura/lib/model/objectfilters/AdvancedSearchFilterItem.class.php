@@ -25,7 +25,7 @@ class AdvancedSearchFilterItem
 	 * Adds conditions, matches and where clauses to the query
 	 * @param IKalturaIndexQuery $query
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function applyCondition(IKalturaDbQuery $query)
 	{
 	}
 	
