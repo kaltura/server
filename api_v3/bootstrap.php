@@ -31,3 +31,4 @@ date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_Y
 
 // Logger
 kLoggerCache::InitLogger('api_v3');
+KalturaLog::setContext("API");
