@@ -28,20 +28,25 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		else 
 			$dropFolderFilesMap = array();
 
-		foreach ($physicalFiles as $physicalFileName) 
-		{	
+		$maxModificationTime = 0;
+		foreach ($physicalFiles as $physicalFile) 
+		{
+			/* @var $physicalFile FileObject */	
+			$physicalFileName = $physicalFile->filename;
+			if ($this->dropFolder->incremental && $physicalFile->modificationTime < $this->dropFolder->lastFileTimestamp)
+				continue;
+			
 			if($this->validatePhysicalFile($physicalFileName))
 			{
+				$maxModificationTime = ($physicalFile->modificationTime > $maxModificationTime) ? $physicalFile->modificationTime : $maxModificationTime;
 				KalturaLog::debug('Watch file ['.$physicalFileName.']');
 				if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 				{
 					try 
 					{
-						$fullPath = $this->dropFolder->path.'/'.$physicalFileName;
-						$lastModificationTime = $this->fileTransferMgr->modificationTime($fullPath);
-						$fileSize = $this->fileTransferMgr->fileSize($fullPath);
+						$lastModificationTime = $physicalFile->modificationTime;
+						$fileSize = $physicalFile->fileSize;
 						$this->handleFileAdded($physicalFileName, $fileSize, $lastModificationTime);
-							
 					}
 					catch (Exception $e)
 					{
@@ -61,6 +66,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		foreach ($dropFolderFilesMap as $dropFolderFile) 
 		{
 			$this->handleFilePurged($dropFolderFile->id);
+		}
+		
+		if ($this->dropFolder->incremental)
+		{
+			$updateDropFolder = new KalturaDropFolder();
+			$updateDropFolder->lastFileTimestamp = $maxModificationTime;
+			$this->dropFolderPlugin->dropFolder->update($this->dropFolder, $updateDropFolder);
 		}
 	}
 	
@@ -366,7 +378,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		
 		if($this->fileTransferMgr->fileExists($this->dropFolder->path))
 		{
-			$physicalFiles = $this->fileTransferMgr->listDir($this->dropFolder->path);
+			$physicalFiles = $this->fileTransferMgr->listFileObjects($this->dropFolder->path);
 			if ($physicalFiles) 
 			{
 				KalturaLog::log('Found ['.count($physicalFiles).'] in the folder');			
@@ -381,12 +393,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			throw new kFileTransferMgrException('Drop folder path not valid ['.$this->dropFolder->path.']', kFileTransferMgrException::remotePathNotValid);
 		}
-		
-		if ($this->dropFolder->incremental)
-		{
 			
-		}
-				
 		return $physicalFiles;
 	}
 }

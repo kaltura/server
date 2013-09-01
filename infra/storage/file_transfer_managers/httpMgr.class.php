@@ -261,6 +261,11 @@ class httpMgr extends kFileTransferMgr
 		return false; // not supported
 	}
 	
+	protected function doListFileObjects ($remoteDir)
+	{
+		return false; // not supported
+	}
+	
 	protected function doFileSize($remote_file)
 	{
 	    return false; // not supported
