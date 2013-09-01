@@ -437,32 +437,36 @@ class asset extends Baseasset implements ISyncableFile
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy);
 	}
 	
+	public function isKsNeededForDownload()
+	{
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getPartnerId()))
+			return true;
+
+		$invalidModerationStatuses = array(
+			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
+			entry::ENTRY_MODERATION_STATUS_REJECTED
+		);
+		
+		$entry = $this->getentry();
+		if (!$entry ||
+			in_array($entry->getModerationStatus(), $invalidModerationStatuses) ||
+			($entry->getStartDate() !== null && $entry->getStartDate(null) >= time()) ||
+			($entry->getEndDate() !== null && $entry->getEndDate(null) <= time() + 86400))
+			return true;
+		
+		$accessControl = $entry->getaccessControl();
+		if (!$accessControl || $accessControl->getRulesArray())
+			return true;
+
+		return false;
+	}
+	
 	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false)
 	{
 		$ksStr = "";
-				
-		$ksNeeded = true;
 		$partnerId = $this->getPartnerId();
-		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId))
-		{
-			$invalidModerationStatuses = array(
-				entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
-				entry::ENTRY_MODERATION_STATUS_REJECTED
-			);
-			
-			$entry = $this->getentry();
-			if ($entry &&
-				!in_array($entry->getModerationStatus(), $invalidModerationStatuses) &&
-				($entry->getStartDate() === null || $entry->getStartDate(null) < time()) &&
-				($entry->getEndDate() === null || $entry->getEndDate(null) > time() + 86400))
-			{
-				$accessControl = $entry->getaccessControl();
-				if ($accessControl && !$accessControl->getRulesArray())
-					$ksNeeded = false;
-			}
-		}
 		
-		if ($ksNeeded)
+		if ($this->isKsNeededForDownload())
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$secret = $partner->getSecret();

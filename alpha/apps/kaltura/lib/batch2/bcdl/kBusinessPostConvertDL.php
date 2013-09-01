@@ -133,7 +133,7 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::err($e->getMessage());
 		}
-				
+		
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
 		if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)

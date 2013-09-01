@@ -32,7 +32,7 @@ class KalturaBatchService extends KalturaBaseService
 	}
 
 	protected function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, 
-			KalturaBatchJobFilter $filter = null, $jobType, $maxOffset)
+			KalturaBatchJobFilter $filter = null, $jobType, $maxOffset = null)
 	{
 		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 

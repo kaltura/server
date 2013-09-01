@@ -212,7 +212,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$idsCount = count($ids);
-		$ids = $this->applyIds($ids);
 		$this->setFetchedIds($ids);
 		KalturaLog::debug("Found $idsCount ids");
 		

@@ -194,6 +194,8 @@ class kmc4Action extends kalturaAction
 			'logoutUrl'					=> $logoutUrl,
 			'allowFrame'				=> (bool) $allowFrame,
 			'akamaiEdgeServerIpURL'		=> $akamaiEdgeServerIpURL,
+			'logoUrl' 					=> kmcUtils::getWhitelabelData( $partner, 'logo_url'),
+			'supportUrl' 				=> kmcUtils::getWhitelabelData( $partner, 'support_url'),
 		);
 		
 		$this->kmcVars = $kmcVars;

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildpath>
+	<buildpathentry kind="src" path=""/>
+	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/vendor"/>
+	<buildpathentry kind="con" path="org.eclipse.dltk.USER_LIBRARY/VENDOR"/>
+</buildpath>
