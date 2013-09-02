@@ -210,6 +210,11 @@ class asperaMgr extends kFileTransferMgr
 		// TODO Auto-generated method stub
 		
 	}
+	
+	protected function doListFileObjects ($remoteDir) {
+		// TODO Auto-generated method stub
+		
+	}
 
 /* (non-PHPdoc)
 	 * @see kFileTransferMgr::doFileSize()

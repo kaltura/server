@@ -19,6 +19,7 @@ class DropFolderFileFilter extends baseObjectFilter
 			"_in_file_name",
 			"_eq_status",
 			"_in_status",
+			"_notin_status",
 			"_like_parsed_slug",
 			"_eq_parsed_slug",
 			"_in_parsed_slug",
