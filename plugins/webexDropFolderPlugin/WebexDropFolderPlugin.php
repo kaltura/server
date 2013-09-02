@@ -1,0 +1,85 @@
+<?php
+/**
+ * @package plugins.webexDropFolder
+ */
+class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator
+{
+	const PLUGIN_NAME = 'WebexDropFolder';
+	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
+	const METADATA_PLUGIN_NAME = 'metadata';
+		
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
+	public static function dependsOn()
+	{
+		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
+		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME);
+		
+		return array($dropFolderDependency,$metadataDependency);
+	}
+	
+	public static function isAllowedPartner($partnerId)
+	{
+		if (in_array($partnerId, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID)))
+			return true;
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+	}
+	
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		switch ($baseClass)
+		{
+			case 'KDropFolderEngine':
+				if ($enumValue == KalturaDropFolderType::WEBEX)
+				{
+					return new KWebexDropFolderEngine();
+				}
+				break;
+			
+		}
+	}
+	
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		switch ($baseClass) {
+			case DropFolderPeer::OM_CLASS:
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
+				return 'WebexDropFolder';				
+				break;
+
+		}
+	}
+	
+	public static function getEnums($baseEnumName = null)
+	{
+		if (!$baseEnumName)
+		{
+			return array('WebexDropFolderType');
+		}
+		if ($baseEnumName == 'DropFolderType')
+		{
+			return array('WebexDropFolderType');
+		}
+
+		return array();
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	public static function getDropFolderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('DropFolderType', $value);
+	}
+}
