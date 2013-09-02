@@ -35,7 +35,7 @@ class SphinxKuserCriteria extends SphinxCriteria
         'kuserPeer.FIRST_NAME_OR_LAST_NAME' => '(full_name,last_name)',
         'kuser.PERMISSION_NAMES' => 'permission_names',
         'kuser.ROLE_IDS' => 'role_ids',
-		
+    	'kuser.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -70,6 +70,7 @@ class SphinxKuserCriteria extends SphinxCriteria
                 "indexed_partner_data_string" => IIndexable::FIELD_TYPE_STRING,
 				"permission_names" => IIndexable::FIELD_TYPE_STRING,
 				"role_ids"	=> IIndexable::FIELD_TYPE_STRING,
+				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
         );
     
 	/* (non-PHPdoc)

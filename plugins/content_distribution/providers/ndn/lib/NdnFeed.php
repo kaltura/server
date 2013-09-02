@@ -126,16 +126,30 @@ class NdnFeed
 		kXml::setNodeValue($this->xpath,'/rss/channel/lastBuildDate', date('r', $lastBuildDate));
 	}
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+	
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+	
+	public function getItemXml(array $values, array $flavorAssets = null, array $thumbAssets = null, $entry)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets, $entry);
+		return $this->doc->saveXML($item);
+	}
+	
 	/**
 	 * @param array $values
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	public function addItem(array $values, array $flavorAssets = null, array $thumbAssets = null, $entry)
+	public function getItem(array $values, array $flavorAssets = null, array $thumbAssets = null, $entry)
 	{		
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);		
 		//if no thumbnail exists take the default one
 		$thumbnailUrl = '';
 		if (!$thumbAssets)
@@ -171,6 +185,8 @@ class NdnFeed
 		$this->addCategory($item,$values[NdnDistributionField::ITEM_MEDIA_CATEGORY]);
 		kXml::setNodeValue($this->xpath,'media:copyright', $values[NdnDistributionField::ITEM_MEDIA_COPYRIGHT], $item);	
 		kXml::setNodeValue($this->xpath,'media:copyright/@url', $values[NdnDistributionField::ITEM_MEDIA_COPYRIGHT_URL], $item);			
+		
+		return $item;
 	}
 	
 	private function getMediaTypeString($mediaType)

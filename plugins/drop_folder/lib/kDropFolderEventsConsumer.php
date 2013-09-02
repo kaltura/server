@@ -333,7 +333,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$jobData->setContentMatchPolicy($folder->getFileHandlerConfig()->getContentMatchPolicy());
 		$jobData->setDropFolderFileIds($dropFolderFileIds);
 		
-		return kJobsManager::addJob($batchJob, $jobData, $batchJobType);		
+		return kJobsManager::addJob($batchJob, $jobData, $batchJobType, $folder->getType());		
 	}
 	
 	private function setFileProcessing(DropFolderFile $file, array $relatedFiles)

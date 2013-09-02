@@ -48,7 +48,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaDropFolderFileStatus
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 * @readonly
 	 */
 	public $status;
@@ -140,6 +140,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $batchJobId;
+
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  

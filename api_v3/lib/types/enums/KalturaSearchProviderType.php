@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage enum
+ * @deprecated
  */
 class KalturaSearchProviderType extends KalturaEnum
 {

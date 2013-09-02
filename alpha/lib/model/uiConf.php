@@ -515,8 +515,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		{
 			if( ! $conf_file_path || $inc_version || $version)
 			{
-				$subType = $this->getSubTypeBySuffix($file_suffix);
-				if ( ! $this->getId() || !$this->isUiConfContentSet($subType)) 
+				if ( ! $this->getId() ) 
 					return null;
 
 				$conf_file_path = $this->createConfFilePath($version);

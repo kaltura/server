@@ -102,6 +102,7 @@ class myServiceConfig
 	public function myServiceConfig ( $file_name , $service_name = null, $useDefualt = true )
 	{
 		$path = $this->getPath();
+		KalturaLog::debug("Path [$path] File [$file_name] Service [$service_name]");
 		
 		$config_table_list = array ( );
 		

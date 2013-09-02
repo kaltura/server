@@ -411,7 +411,11 @@ class kwidgetAction extends sfAction
 					KalturaLog::log('Patching took '. (microtime(true) - $startTime));
 						
 					requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0, null, true, time());
-					echo $wrapper_data;
+					
+					if ($_SERVER["REQUEST_METHOD"] == "HEAD")
+						header('Content-Length: '.strlen($wrapper_data));
+					else
+						echo $wrapper_data;
 					
 					if ($allowCache)
 					{

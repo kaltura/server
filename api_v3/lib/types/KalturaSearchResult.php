@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated
  */
 class KalturaSearchResult extends KalturaSearch
 {

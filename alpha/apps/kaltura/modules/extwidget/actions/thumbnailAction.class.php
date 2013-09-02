@@ -65,6 +65,8 @@ class thumbnailAction extends sfAction
 	 */
 	public function execute()
 	{
+		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		
 		requestUtils::handleConditionalGet();
