@@ -6,6 +6,7 @@
  * @service search
  * @package api
  * @subpackage services
+ * @deprecated
  */
 class SearchService extends KalturaBaseService 
 {

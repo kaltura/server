@@ -104,6 +104,26 @@ class localMgr extends kFileTransferMgr
 	    clearstatcache();
 		return @scandir($remoteDir, 0);
 	}
+
+	protected function doListFileObjects ($remoteDir)
+	{
+		clearstatcache();
+		$files = $this->doList($remoteDir);
+		
+		$res = array();
+		foreach($files as $file)
+		{
+			$filepath = $remoteDir."/".$file;
+			$fileObject = new FileObject();
+			$fileObject->filename = $file;
+			$fileObject->fileSize = $this->doFileSize($filepath);
+			$fileObject->modificationTime = $this->doModificationTime($filepath);
+			$res[] = $fileObject;
+		}
+		
+		return $res;
+		
+	}
 	
 	protected function doFileSize($remote_file)
 	{

@@ -12,7 +12,6 @@ DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
 ActKeyUtils::checkCurrent();
-KalturaLog::setContext("API");
 
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
 KalturaLog::info("API-start pid:".getmypid());
