@@ -39,6 +39,7 @@ class KExternalErrors
 	const INVALID_PARTNER = 32;
 	const ILLEGAL_UI_CONF = 33;
 	const EXCEEDED_RESTRICTED_IP = 34;
+	const INVALID_FEED_ID = 35;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -75,6 +76,7 @@ class KExternalErrors
 			self::INVALID_PARTNER => "The given partner isn't vaild for the request",
 			self::ILLEGAL_UI_CONF => "The given UI conf is illegal",
 			self::EXCEEDED_RESTRICTED_IP => "ip address is out of the restricted ip range",
+			self::INVALID_FEED_ID => "The given feed id is illegal",
 	);
 	
 	public static function dieError($errorCode, $message = null)
@@ -101,7 +103,7 @@ class KExternalErrors
 			$errorCode != self::IP_COUNTRY_BLOCKED)
 			requestUtils::sendCachingHeaders(60);
 		
-		die();
+		die($message);
 	}
 	
 	public static function dieGracefully($message = null)
