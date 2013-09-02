@@ -22,7 +22,7 @@ abstract class KDropFolderEngine
 			case KalturaDropFolderType::FTP:
 			case KalturaDropFolderType::SFTP:
 			case KalturaDropFolderType::LOCAL:
-				return new KDropFolderFileTransferEngine ($dropFolder);
+				return new KDropFolderFileTransferEngine ();
 				break;
 			
 			default:

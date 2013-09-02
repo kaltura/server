@@ -10,17 +10,12 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	 * @var kFileTransferMgr
 	 */	
 	protected $fileTransferMgr;
-	
-	public function __construct (KalturaDropFolder $dropFolder)
-	{
-		parent::__construct($dropFolder);
-		
-		$this->getFileTransferManager();
-	}
+
 	
 	public function watchFolder (KalturaDropFolder $folder)
 	{
 		$this->dropFolder = $folder;
+		$this->getFileTransferManager();
 		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
 						    										
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder();
@@ -400,7 +395,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	
 	public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
-		$this->impersonate($job->partnerId);
+		KBatchBase::impersonate($job->partnerId);
 		
 		switch ($data->contentMatchPolicy)
 		{
@@ -425,7 +420,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				break;
 		}
 		
-		$this->unimpersonate();
+		KBatchBase::unimpersonate();
 	}
 	
 	private function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
