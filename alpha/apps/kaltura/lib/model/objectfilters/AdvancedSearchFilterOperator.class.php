@@ -201,7 +201,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 	 */
 	public function addCondition($condition)
 	{
-		if($this->parentQuery)
+		if($this->parentQuery && $this->parentQuery instanceof IKalturaIndexQuery)
 			$this->parentQuery->addCondition($condition);
 	}
 

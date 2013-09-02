@@ -86,9 +86,10 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 						$memberPermissionsArr[] = $memberId.str_replace('_', '', $permissionName);
 					}
 				}
-				
-				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_AND : baseObjectFilter::MATCH_OR);
-				$query->addOr($criterion);
+				if ($query instanceof Criteria){
+					$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_AND : baseObjectFilter::MATCH_OR);
+					$query->addOr($criterion);
+				}
 			}
 			
 		} 
