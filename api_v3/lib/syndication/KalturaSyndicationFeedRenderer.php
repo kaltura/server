@@ -401,7 +401,7 @@ class KalturaSyndicationFeedRenderer
 		}
 		else 
 		{
-			$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
+			$c->setLimit(min(self::ENTRY_PEER_LIMIT_QUERY, $this->limit));
 		}
 
 		if(!count($this->entryFilters))
