@@ -51,16 +51,12 @@ class KFileTransferExportEngine extends KExportEngine
 			{
 				$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
 				if(KBatchBase::$taskConfig->params->chmod)
-<<<<<<< HEAD
 				{
 					try {
 					$engine->chmod($this->destFile, KBatchBase::$taskConfig->params->chmod);
 					}
 					catch(Exception $e){}
 				}
-=======
-					$engine->chmod($this->destFile, KBatchBase::$taskConfig->params->chmod);
->>>>>>> IX-9.0.0-tan-tan
 			}
 			else if (is_dir($this->srcFile))
 			{
@@ -71,16 +67,12 @@ class KFileTransferExportEngine extends KExportEngine
 					$destFile = $destDir . '/' . basename($filePath);
 					$engine->putFile($destFile, $filePath, $this->data->force);
 					if(KBatchBase::$taskConfig->params->chmod)
-<<<<<<< HEAD
 					{
 						try {
 						$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
 						}
 						catch(Exception $e){}
 					}
-=======
-						$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
->>>>>>> IX-9.0.0-tan-tan
 				}
 			}
 		}
