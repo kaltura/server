@@ -49,11 +49,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			
 			foreach ($dropFolders as $folder)
 			{
+				/* @var $folder KalturaDropFolder */
 			    try 
 			    {	
 			    	$this->impersonate($folder->partnerId);	
-					$engine = KDropFolderEngine::getInstance($folder);			    	
-				    $engine->watchFolder();					    
+					$engine = KDropFolderEngine::getInstance($folder->type);			    	
+				    $engine->watchFolder($folder);					    
 				    $this->setDropFolderOK($folder);		
 					$this->unimpersonate();					    
 			    }

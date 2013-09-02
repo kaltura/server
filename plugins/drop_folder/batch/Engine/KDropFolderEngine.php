@@ -10,16 +10,15 @@ abstract class KDropFolderEngine
 	
 	protected $dropFolderFileService;
 	
-	public function __construct (KalturaDropFolder $dropFolder)
+	public function __construct ()
 	{
-		$this->dropFolder = $dropFolder;
 		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
 		$this->dropFolderFileService = $this->dropFolderPlugin->dropFolderFile;
 	}
 	
-	public static function getInstance (KalturaDropFolder $dropFolder)
+	public static function getInstance ($dropFolderType)
 	{
-		switch ($dropFolder->type) {
+		switch ($dropFolderType) {
 			case KalturaDropFolderType::FTP:
 			case KalturaDropFolderType::SFTP:
 			case KalturaDropFolderType::LOCAL:
@@ -27,12 +26,14 @@ abstract class KDropFolderEngine
 				break;
 			
 			default:
-				return KalturaPluginManager::loadObject('KDropFolderFileTransferEngine', $dropFolder->type, $dropFolder);
+				return KalturaPluginManager::loadObject('KDropFolderEngine', $dropFolderType);
 				break;
 		}
 	}
 	
-	abstract public function watchFolder ();
+	abstract public function watchFolder (KalturaDropFolder $dropFolder);
+	
+	abstract public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data);
 	
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
@@ -45,7 +46,7 @@ abstract class KDropFolderEngine
 		
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
-		$dropFolderFileFilter->statusNotIn(KalturaDropFolderFileStatus::PARSED,KalturaDropFolderFileStatus::DETECTED);
+		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
@@ -56,8 +57,13 @@ abstract class KDropFolderEngine
 		{
 			$pager->pageIndex++;
 			KalturaLog::debug('getting page ['.$pager->pageIndex. '] from Drop Folder File ');
-			$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter, $pager);
+			$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
+			KalturaLog::debug('response: '. print_r($dropFolderFiles, true));
 			$dropFolderFiles = $dropFolderFiles->objects;
+			foreach ($dropFolderFiles as $dropFolderFile) 
+			{
+				$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
+			}
 		}while (count($dropFolderFiles) >= $pager->pageSize);
 			
 		return $dropFolderFilesMap;
