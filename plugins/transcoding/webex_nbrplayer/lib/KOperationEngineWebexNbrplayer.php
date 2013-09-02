@@ -16,13 +16,13 @@ inputfile=
 media=
 showui=0
 PCAudio=0
-;[UI]
-video=0
-chat=0
-qa=0
-notes=0
-polling=0
-ft=0
+[UI]
+video=1
+chat=1
+qa=1
+notes=1
+polling=1
+ft=1
 largeroutline=1
 [__webexTargetFormat__]
 outputfile=
@@ -54,7 +54,7 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 		if(is_null($keyFramesInSec)) $keyFramesInSec=4;
 		if(is_null($bitrate)) $bitrate=2000;
 		if(is_null($videoCodec)) $videoCodec = "Windows Media Video 9";
-		if(is_null($audioCodec)) $audioCodec = "Windows Media Audio 9.2";
+		if(is_null($audioCodec)) $audioCodec = "Windows Media Audio 10 Professional";
 	}
 	else if($format=="MP4"){
 		

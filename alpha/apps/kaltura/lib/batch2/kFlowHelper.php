@@ -354,7 +354,7 @@ class kFlowHelper
 				kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $storageProfile);
 			}
 		}
-
+		
 		// creats the file sync
 		if(file_exists($data->getLogFileSyncLocalPath()))
 		{
@@ -370,7 +370,7 @@ class kFlowHelper
 				$dbBatchJob->getDescription($desc);
 			}
 		}
-
+		
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
 			$data->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
@@ -465,6 +465,12 @@ class kFlowHelper
 					kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);
 				}
 			}
+		}
+		
+		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
+		if($fileSync) {
+			$dbBatchJob->putInCustomData("flavor_size", $fileSync->getFileSize());
+			$dbBatchJob->save();
 		}
 
 		// this logic decide when a thumbnail should be created

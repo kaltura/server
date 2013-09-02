@@ -15,6 +15,8 @@ class kContentDistributionManager
 	public static function addEntryDistribution(entry $entry, DistributionProfile $distributionProfile, $submit = false)
 	{
 		$entryDistribution = self::createEntryDistribution($entry, $distributionProfile);
+		if(is_null($entryDistribution))
+			return null;
 		$entryDistribution->save();
 		
 		if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC)
@@ -959,11 +961,29 @@ class kContentDistributionManager
 	/**
 	 * @param entry $entry
 	 * @param DistributionProfile $distributionProfile
-	 * @return EntryDistribution
+	 * @return EntryDistribution or null if failed to create.
 	 */
 	public static function createEntryDistribution(entry $entry, DistributionProfile $distributionProfile)
 	{
-		$entryDistribution = new EntryDistribution();
+		$illegalEntryDistributionStatus = array(
+				EntryDistributionStatus::SUBMITTING,
+				EntryDistributionStatus::UPDATING,
+				EntryDistributionStatus::DELETING,
+				EntryDistributionStatus::IMPORT_SUBMITTING,
+				EntryDistributionStatus::IMPORT_UPDATING
+		);
+		
+		$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
+		
+		if((!$entryDistribution) || ($entryDistribution->getStatus() == EntryDistributionStatus::DELETED)) 
+		{
+			$entryDistribution = new EntryDistribution();
+		} else if(in_array($entryDistribution->getStatus(), $illegalEntryDistributionStatus)) {
+			KalturaLog::err("Entry distribution already exist. entry [" . $entry->getId() . "] distribution profile [" 
+					. $distributionProfile->getId() . "] status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
 		$entryDistribution->setEntryId($entry->getId());
 		$entryDistribution->setPartnerId($entry->getPartnerId());
 		$entryDistribution->setDistributionProfileId($distributionProfile->getId());

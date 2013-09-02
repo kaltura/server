@@ -19,7 +19,9 @@ class DropFolder extends BaseDropFolder
 	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 0;
 	const FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
 	const FILE_NAME_PATTERNS_DEFAULT_VALUE = '*';
-	
+	const INCREMENTAL = 'incremental';
+	const LAST_FILE_TIMESTAMP = 'last_file_timestamp'; 
+	const METADATA_PROFILE_ID = 'metadata_profile_id';
 	
 	// -------------------------------------
 	// -- Default values -------------------
@@ -162,6 +164,54 @@ class DropFolder extends BaseDropFolder
 	public function setLastAccessedAt($date)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_LAST_ACCESSED_AT, $date);
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getIncremental()
+	{
+		return $this->getFromCustomData(self::INCREMENTAL);
+	}
+	
+	/**
+	 * @param bool $v
+	 */
+	public function setIncremental($v)
+	{
+		$this->putInCustomData(self::INCREMENTAL, $v);
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getLastFileTimestamp()
+	{
+		return $this->getFromCustomData(self::LAST_FILE_TIMESTAMP);
+	}
+	
+	/**
+	 * @param bool $v
+	 */
+	public function setLastFileTimestamp($v)
+	{
+		$this->putInCustomData(self::LAST_FILE_TIMESTAMP, $v);
+	}
+	
+	/**
+	 * @param int $v
+	 */
+	public function setMetadataProfileId ($v)
+	{
+		$this->putInCustomData(self::METADATA_PROFILE_ID, $v);
+	}
+	
+	/**
+	 * return int
+	 */
+	public function getMetadataProfileId ()
+	{
+		return $this->getFromCustomData(self::METADATA_PROFILE_ID);
 	}
 	
 	public function getCacheInvalidationKeys()

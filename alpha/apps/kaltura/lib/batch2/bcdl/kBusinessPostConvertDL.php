@@ -134,13 +134,6 @@ class kBusinessPostConvertDL
 			KalturaLog::err($e->getMessage());
 		}
 		
-		$flavorSize = $currentFlavorAsset->getSize();
-		if($dbBatchJob) {
-			// Multiply by 1024 to get the file size in bytes.
-			$dbBatchJob->putInCustomData("flavor_size", $flavorSize * 1024);
-			$dbBatchJob->save();
-		}
-				
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
 		if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)

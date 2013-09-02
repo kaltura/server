@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated
  */
 class KalturaSearchAuthData extends KalturaObject
 {
