@@ -34,4 +34,29 @@ class KalturaSyndicationFeedFactory
 		
 		return $obj;
 	}
+	
+	static function getRendererByType($type)
+	{
+		switch ($type)
+		{
+			case KalturaSyndicationFeedType::GOOGLE_VIDEO:
+				$obj = new GoogleVideoFeedRenderer();
+				break;
+			case KalturaSyndicationFeedType::YAHOO:
+				$obj = new YahooFeedRenderer();
+				break;
+			case KalturaSyndicationFeedType::ITUNES:
+				$obj = new ITunesFeedRenderer();
+				break;
+			case KalturaSyndicationFeedType::TUBE_MOGUL:
+				$obj = new TubeMogulFeedRenderer();
+				break;
+			case KalturaSyndicationFeedType::KALTURA:
+			case KalturaSyndicationFeedType::KALTURA_XSLT:
+			default:
+				return new KalturaFeedRenderer();
+				break;
+		}
+		return $obj;
+	}
 }
