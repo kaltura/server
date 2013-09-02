@@ -17,13 +17,16 @@ class kRendererDumpFile implements kRendererBase
 	protected $fileData;
 	protected $mimeType;
 	protected $maxAge;
+	protected $lastModified;
 	protected $xSendFileAllowed;
 
 	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0)
 	{
+		clearstatcache();
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
 		$this->maxAge = $maxAge;
+		$this->lastModified = filemtime($filePath);
 		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
 		if ($limitFileSize)
 		{
@@ -32,7 +35,6 @@ class kRendererDumpFile implements kRendererBase
 		}
 		else
 		{
-			clearstatcache();
 			$this->fileSize = kFile::fileSize($filePath);
 			$this->xSendFileAllowed = $xSendFileAllowed;
 		}
@@ -57,7 +59,7 @@ class kRendererDumpFile implements kRendererBase
 		else
 			list($rangeFrom, $rangeTo, $rangeLength) = infraRequestUtils::handleRangeRequest($this->fileSize);
 
-		infraRequestUtils::sendCdnHeaders($this->fileExt, $rangeLength, $this->maxAge, $this->mimeType);
+		infraRequestUtils::sendCdnHeaders($this->fileExt, $rangeLength, $this->maxAge, $this->mimeType, false, $this->lastModified);
 
 		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
 		// upon detecting this header it cancels its original request and starts sending byte range requests
