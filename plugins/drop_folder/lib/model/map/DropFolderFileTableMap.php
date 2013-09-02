@@ -41,7 +41,6 @@ class DropFolderFileTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('DROP_FOLDER_ID', 'DropFolderId', 'INTEGER', true, null, null);
 		$this->addColumn('FILE_NAME', 'FileName', 'VARCHAR', true, 500, null);
-		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 500, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', true, null, null);
 		$this->addColumn('FILE_SIZE', 'FileSize', 'INTEGER', true, null, null);
 		$this->addColumn('FILE_SIZE_LAST_SET_AT', 'FileSizeLastSetAt', 'TIMESTAMP', false, null, null);
