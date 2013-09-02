@@ -13,8 +13,10 @@ function getRequestParameter($paramName)
 	return null;
 }
 
+require_once(__DIR__ . "/../bootstrap.php");
+
 if(!getRequestParameter('feedId'))
-	die('feedId not supplied');
+	KExternalErrors::dieError(KExternalErrors::INVALID_FEED_ID, 'feedId not supplied');
 	
 ini_set( "memory_limit" , "256M" );
 $start = microtime(true);
@@ -26,10 +28,6 @@ $expiry = kConf::hasParam("v3cache_getfeed_default_expiry") ? kConf::get("v3cach
 $cache = new KalturaResponseCacher(null, kCacheManager::CACHE_TYPE_API_V3_FEED, $expiry);
 $cache->checkOrStart();
 ob_start();
-
-require_once(__DIR__ . "/../bootstrap.php");
-
-KalturaLog::setContext("syndicationFeedRenderer");
 
 // Database
 DbManager::setConfig(kConf::getDB());
@@ -72,21 +70,13 @@ try
 catch(PropelException $pex)
 {
 	KalturaLog::alert($pex->getMessage());
-	header('KalturaSyndication: Database error');
-	die;
+	KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST, 'KalturaSyndication: Database error');
 }
 catch(Exception $ex)
 {
 	KalturaLog::err($ex->getMessage());
-	header('KalturaSyndication: ' . str_replace(array("\n", "\r"), array("\t", ''), $ex->getMessage()));
-	die;
-}
-
-$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
-if( !$syndicationFeedDB )
-{
-	header('KalturaSyndication: Feed Id not found');
-	die;
+	$msg = 'KalturaSyndication: ' . str_replace(array("\n", "\r"), array("\t", ''), $ex->getMessage());
+	KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST, $msg);
 }
 
 // small feeds will have a short 
@@ -99,11 +89,10 @@ if ($limit)
 	}
 }
 
-$partnerId = $syndicationFeedDB->getPartnerId();
 $expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();
 foreach($expiryArr as $item)
 {
-	if ($item["key"] == "partnerId" && $item["value"] == $partnerId ||
+	if ($item["key"] == "partnerId" && $item["value"] == kCurrentContext::$partner_id ||
 		$item["key"] == "feedId" && $item["value"] == $feedId)
 	{
 		KalturaResponseCacher::setExpiry($item["expiry"]);
