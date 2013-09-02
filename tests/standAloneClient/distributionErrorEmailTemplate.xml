@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<!-- script will ask for username / password interactively -->
+	</session>
+	<multirequest>
+		<!-- Entry Distribution Error -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>Entry Distribution Error</name>
+				<systemName>Entry_Distribution_Error</systemName>
+				<description>Email notification template to be sent when an entry failed to distribute.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>contentDistributionEventNotifications.EntryDistribution</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_DISTRIBUTION -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified to ERROR_SUBMITTING</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(EntryDistributionPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == EntryDistributionStatus::ERROR_SUBMITTING</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>[Kaltura] - Entry {entry_id} failed to distribute to {distribution_profile_name} on {updated_at_rfc850}</subject>
+				<body>Entry {entry_id} failed to distribute to {distribution_profile_name} on {updated_at_rfc850}</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationUserRecipientProvider">
+					<filter objectType="KalturaUserFilter">
+						<permissionNamesMultiLikeAnd>CONTENT_MANAGE_DISTRIBUTION_BASE,CONTENT_MANAGE_DISTRIBUTION_SEND</permissionNamesMultiLikeAnd>
+					</filter>
+				</to>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_distribution_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>updated_at</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getUpdatedAt()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>updated_at_rfc850</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getUpdatedAt(DateTime::RFC850)</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>distribution_profile_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(DistributionProfilePeer::retrieveByPk($scope->getEvent()->getObject()->getDistributionProfileId())) ? DistributionProfilePeer::retrieveByPk($scope->getEvent()->getObject()->getDistributionProfileId())->getName() : ''</code>
+						</value>
+					</item>
+				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>
