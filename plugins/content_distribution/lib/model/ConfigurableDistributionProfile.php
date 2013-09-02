@@ -228,7 +228,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($entryDistribution->getEntryId());
         if (!$entry) {
-            KalturaLog::err('Entry not found with ID ['.$entry->getId().']');
+            KalturaLog::err('Entry not found with ID ['. $entryDistribution->getEntryId() .']');
             return null;
         }
 		

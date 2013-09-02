@@ -120,14 +120,28 @@ class AvnFeed
 		}
 	} 
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+	
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+	
+	public function getItemXml(array $values, flavorAsset $flavorAssets = null, thumbAsset $thumbAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAssets, $thumbAssets);
+		return $this->doc->saveXML($item);
+	}
+	
 	/**
 	 * @param array $values
 	 */
-	public function addItem(array $values, flavorAsset $flavorAsset = null, thumbAsset $thumbAsset = null)
+	public function getItem(array $values, flavorAsset $flavorAsset = null, thumbAsset $thumbAsset = null)
 	{
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);
 		
 		kXml::setNodeValue($this->xpath,'guid', $values[AvnDistributionField::GUID], $item);
 		kXml::setNodeValue($this->xpath,'pubDate', $values[AvnDistributionField::PUB_DATE], $item);
@@ -155,6 +169,8 @@ class AvnFeed
 		{
 			kXml::setNodeValue($this->xpath,'media:thumbnail/@url', $this->getAssetUrl($thumbAsset), $item);
 		}
+		
+		return $item;
 	}
 	
 	/**
