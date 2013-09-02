@@ -462,7 +462,8 @@ class kBusinessPostConvertDL
 			// found child flavor asset that hasn't failed, no need to fail the root job
 			$siblingFlavorAssetId = $jobData->getFlavorAssetId();
 			$siblingFlavorAsset = assetPeer::retrieveById($siblingFlavorAssetId);
-			if ($siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
+			if ($siblingFlavorAsset &&
+				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
 				{

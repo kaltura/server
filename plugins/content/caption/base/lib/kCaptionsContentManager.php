@@ -22,12 +22,6 @@ abstract class kCaptionsContentManager
 	 */
 	public abstract function getContent($content);
 	
-	
-	/**
-	 * @return kCaptionsContentManager
-	 */
-	public abstract static function get();
-	
 	/**
 	 * @param CaptionType $type
 	 * @return kCaptionsContentManager
