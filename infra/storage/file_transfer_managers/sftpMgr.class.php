@@ -419,25 +419,15 @@ class sftpMgr extends kFileTransferMgr
 	
 	protected function doListFileObjects ($remote_path)
 	{
-		$lsDirCmd = "ls -l $remote_path";
-		$filesInfo = $this->execSftpCommand($lsDirCmd);
-		KalturaLog::info("sftp rawlist " . print_r($filesInfo, true));
-		$regexUnix = "^(?P<permissions>[-drwx]{10})\+?\s+(?P<number>\d{1,2})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w\s]+)\s+(?P<fileSize>\d*)\s+(?P<date>(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})|(\w{3}\s+\d{1,2}\s+(\d{2}:\d{2}|\d{4})))\s+(?P<file>.+)\s*$";
+		$files = $this->listDir($remote_path);
 		
 		$res = array(); 
-		foreach($filesInfo as $fileInfo)
+		foreach($files as $file)
 		{
-			$matches = null;
-			if(!preg_match("/$regexUnix/", $fileInfo, $matches))
-			{
-				KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
-				continue;
-			}
-			
 			$fileObject = new FileObject();
-			$fileObject->filename = $matches['file'];
-			$fileObject->fileSize = $matches['fileSize'];
-			$fileObject->modificationTime = strtotime($matches['date']);
+			$fileObject->filename = $file;
+			$fileObject->fileSize = $this->fileSize($remote_path. "/$file");
+			$fileObject->modificationTime = $this->modificationTime($remote_path. "/$file");
 			$res[] = $fileObject;
 		}
 

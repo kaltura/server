@@ -35,6 +35,7 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="drop_folder_id" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="file_name" type="varchar" size="500" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="type" type="integer" inheritance="single" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="file_size" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_size_last_set_at" type="timestamp" />
