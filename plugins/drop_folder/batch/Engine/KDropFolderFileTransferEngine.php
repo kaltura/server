@@ -153,7 +153,6 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$newDropFolderFile = new KalturaDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
 	    	$newDropFolderFile->fileName = $fileName;
-			$newDropFolderFile->name = $fileName;
 	    	$newDropFolderFile->fileSize = $fileSize;
 	    	$newDropFolderFile->lastModificationTime = $lastModificationTime; 
 	    	$newDropFolderFile->uploadStartDetectedAt = time();

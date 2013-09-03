@@ -43,8 +43,8 @@ abstract class BaseDropFolderFilePeer {
 	/** the column name for the FILE_NAME field */
 	const FILE_NAME = 'drop_folder_file.FILE_NAME';
 
-	/** the column name for the NAME field */
-	const NAME = 'drop_folder_file.NAME';
+	/** the column name for the TYPE field */
+	const TYPE = 'drop_folder_file.TYPE';
 
 	/** the column name for the STATUS field */
 	const STATUS = 'drop_folder_file.STATUS';
@@ -116,10 +116,10 @@ abstract class BaseDropFolderFilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'DropFolderId', 'FileName', 'Name', 'Status', 'FileSize', 'FileSizeLastSetAt', 'ErrorCode', 'ErrorDescription', 'ParsedSlug', 'ParsedFlavor', 'LeadDropFolderFileId', 'DeletedDropFolderFileId', 'Md5FileName', 'EntryId', 'CreatedAt', 'UpdatedAt', 'UploadStartDetectedAt', 'UploadEndDetectedAt', 'ImportStartedAt', 'ImportEndedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'dropFolderId', 'fileName', 'name', 'status', 'fileSize', 'fileSizeLastSetAt', 'errorCode', 'errorDescription', 'parsedSlug', 'parsedFlavor', 'leadDropFolderFileId', 'deletedDropFolderFileId', 'md5FileName', 'entryId', 'createdAt', 'updatedAt', 'uploadStartDetectedAt', 'uploadEndDetectedAt', 'importStartedAt', 'importEndedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::DROP_FOLDER_ID, self::FILE_NAME, self::NAME, self::STATUS, self::FILE_SIZE, self::FILE_SIZE_LAST_SET_AT, self::ERROR_CODE, self::ERROR_DESCRIPTION, self::PARSED_SLUG, self::PARSED_FLAVOR, self::LEAD_DROP_FOLDER_FILE_ID, self::DELETED_DROP_FOLDER_FILE_ID, self::MD5_FILE_NAME, self::ENTRY_ID, self::CREATED_AT, self::UPDATED_AT, self::UPLOAD_START_DETECTED_AT, self::UPLOAD_END_DETECTED_AT, self::IMPORT_STARTED_AT, self::IMPORT_ENDED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'drop_folder_id', 'file_name', 'name', 'status', 'file_size', 'file_size_last_set_at', 'error_code', 'error_description', 'parsed_slug', 'parsed_flavor', 'lead_drop_folder_file_id', 'deleted_drop_folder_file_id', 'md5_file_name', 'entry_id', 'created_at', 'updated_at', 'upload_start_detected_at', 'upload_end_detected_at', 'import_started_at', 'import_ended_at', 'custom_data', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'DropFolderId', 'FileName', 'Type', 'Status', 'FileSize', 'FileSizeLastSetAt', 'ErrorCode', 'ErrorDescription', 'ParsedSlug', 'ParsedFlavor', 'LeadDropFolderFileId', 'DeletedDropFolderFileId', 'Md5FileName', 'EntryId', 'CreatedAt', 'UpdatedAt', 'UploadStartDetectedAt', 'UploadEndDetectedAt', 'ImportStartedAt', 'ImportEndedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'dropFolderId', 'fileName', 'type', 'status', 'fileSize', 'fileSizeLastSetAt', 'errorCode', 'errorDescription', 'parsedSlug', 'parsedFlavor', 'leadDropFolderFileId', 'deletedDropFolderFileId', 'md5FileName', 'entryId', 'createdAt', 'updatedAt', 'uploadStartDetectedAt', 'uploadEndDetectedAt', 'importStartedAt', 'importEndedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::DROP_FOLDER_ID, self::FILE_NAME, self::TYPE, self::STATUS, self::FILE_SIZE, self::FILE_SIZE_LAST_SET_AT, self::ERROR_CODE, self::ERROR_DESCRIPTION, self::PARSED_SLUG, self::PARSED_FLAVOR, self::LEAD_DROP_FOLDER_FILE_ID, self::DELETED_DROP_FOLDER_FILE_ID, self::MD5_FILE_NAME, self::ENTRY_ID, self::CREATED_AT, self::UPDATED_AT, self::UPLOAD_START_DETECTED_AT, self::UPLOAD_END_DETECTED_AT, self::IMPORT_STARTED_AT, self::IMPORT_ENDED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'drop_folder_id', 'file_name', 'type', 'status', 'file_size', 'file_size_last_set_at', 'error_code', 'error_description', 'parsed_slug', 'parsed_flavor', 'lead_drop_folder_file_id', 'deleted_drop_folder_file_id', 'md5_file_name', 'entry_id', 'created_at', 'updated_at', 'upload_start_detected_at', 'upload_end_detected_at', 'import_started_at', 'import_ended_at', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
 	);
 
@@ -130,10 +130,10 @@ abstract class BaseDropFolderFilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'DropFolderId' => 2, 'FileName' => 3, 'Name' => 4, 'Status' => 5, 'FileSize' => 6, 'FileSizeLastSetAt' => 7, 'ErrorCode' => 8, 'ErrorDescription' => 9, 'ParsedSlug' => 10, 'ParsedFlavor' => 11, 'LeadDropFolderFileId' => 12, 'DeletedDropFolderFileId' => 13, 'Md5FileName' => 14, 'EntryId' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, 'UploadStartDetectedAt' => 18, 'UploadEndDetectedAt' => 19, 'ImportStartedAt' => 20, 'ImportEndedAt' => 21, 'CustomData' => 22, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'dropFolderId' => 2, 'fileName' => 3, 'name' => 4, 'status' => 5, 'fileSize' => 6, 'fileSizeLastSetAt' => 7, 'errorCode' => 8, 'errorDescription' => 9, 'parsedSlug' => 10, 'parsedFlavor' => 11, 'leadDropFolderFileId' => 12, 'deletedDropFolderFileId' => 13, 'md5FileName' => 14, 'entryId' => 15, 'createdAt' => 16, 'updatedAt' => 17, 'uploadStartDetectedAt' => 18, 'uploadEndDetectedAt' => 19, 'importStartedAt' => 20, 'importEndedAt' => 21, 'customData' => 22, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::DROP_FOLDER_ID => 2, self::FILE_NAME => 3, self::NAME => 4, self::STATUS => 5, self::FILE_SIZE => 6, self::FILE_SIZE_LAST_SET_AT => 7, self::ERROR_CODE => 8, self::ERROR_DESCRIPTION => 9, self::PARSED_SLUG => 10, self::PARSED_FLAVOR => 11, self::LEAD_DROP_FOLDER_FILE_ID => 12, self::DELETED_DROP_FOLDER_FILE_ID => 13, self::MD5_FILE_NAME => 14, self::ENTRY_ID => 15, self::CREATED_AT => 16, self::UPDATED_AT => 17, self::UPLOAD_START_DETECTED_AT => 18, self::UPLOAD_END_DETECTED_AT => 19, self::IMPORT_STARTED_AT => 20, self::IMPORT_ENDED_AT => 21, self::CUSTOM_DATA => 22, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'drop_folder_id' => 2, 'file_name' => 3, 'name' => 4, 'status' => 5, 'file_size' => 6, 'file_size_last_set_at' => 7, 'error_code' => 8, 'error_description' => 9, 'parsed_slug' => 10, 'parsed_flavor' => 11, 'lead_drop_folder_file_id' => 12, 'deleted_drop_folder_file_id' => 13, 'md5_file_name' => 14, 'entry_id' => 15, 'created_at' => 16, 'updated_at' => 17, 'upload_start_detected_at' => 18, 'upload_end_detected_at' => 19, 'import_started_at' => 20, 'import_ended_at' => 21, 'custom_data' => 22, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'DropFolderId' => 2, 'FileName' => 3, 'Type' => 4, 'Status' => 5, 'FileSize' => 6, 'FileSizeLastSetAt' => 7, 'ErrorCode' => 8, 'ErrorDescription' => 9, 'ParsedSlug' => 10, 'ParsedFlavor' => 11, 'LeadDropFolderFileId' => 12, 'DeletedDropFolderFileId' => 13, 'Md5FileName' => 14, 'EntryId' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, 'UploadStartDetectedAt' => 18, 'UploadEndDetectedAt' => 19, 'ImportStartedAt' => 20, 'ImportEndedAt' => 21, 'CustomData' => 22, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'dropFolderId' => 2, 'fileName' => 3, 'type' => 4, 'status' => 5, 'fileSize' => 6, 'fileSizeLastSetAt' => 7, 'errorCode' => 8, 'errorDescription' => 9, 'parsedSlug' => 10, 'parsedFlavor' => 11, 'leadDropFolderFileId' => 12, 'deletedDropFolderFileId' => 13, 'md5FileName' => 14, 'entryId' => 15, 'createdAt' => 16, 'updatedAt' => 17, 'uploadStartDetectedAt' => 18, 'uploadEndDetectedAt' => 19, 'importStartedAt' => 20, 'importEndedAt' => 21, 'customData' => 22, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::DROP_FOLDER_ID => 2, self::FILE_NAME => 3, self::TYPE => 4, self::STATUS => 5, self::FILE_SIZE => 6, self::FILE_SIZE_LAST_SET_AT => 7, self::ERROR_CODE => 8, self::ERROR_DESCRIPTION => 9, self::PARSED_SLUG => 10, self::PARSED_FLAVOR => 11, self::LEAD_DROP_FOLDER_FILE_ID => 12, self::DELETED_DROP_FOLDER_FILE_ID => 13, self::MD5_FILE_NAME => 14, self::ENTRY_ID => 15, self::CREATED_AT => 16, self::UPDATED_AT => 17, self::UPLOAD_START_DETECTED_AT => 18, self::UPLOAD_END_DETECTED_AT => 19, self::IMPORT_STARTED_AT => 20, self::IMPORT_ENDED_AT => 21, self::CUSTOM_DATA => 22, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'drop_folder_id' => 2, 'file_name' => 3, 'type' => 4, 'status' => 5, 'file_size' => 6, 'file_size_last_set_at' => 7, 'error_code' => 8, 'error_description' => 9, 'parsed_slug' => 10, 'parsed_flavor' => 11, 'lead_drop_folder_file_id' => 12, 'deleted_drop_folder_file_id' => 13, 'md5_file_name' => 14, 'entry_id' => 15, 'created_at' => 16, 'updated_at' => 17, 'upload_start_detected_at' => 18, 'upload_end_detected_at' => 19, 'import_started_at' => 20, 'import_ended_at' => 21, 'custom_data' => 22, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
 	);
 
@@ -208,7 +208,7 @@ abstract class BaseDropFolderFilePeer {
 		$criteria->addSelectColumn(DropFolderFilePeer::PARTNER_ID);
 		$criteria->addSelectColumn(DropFolderFilePeer::DROP_FOLDER_ID);
 		$criteria->addSelectColumn(DropFolderFilePeer::FILE_NAME);
-		$criteria->addSelectColumn(DropFolderFilePeer::NAME);
+		$criteria->addSelectColumn(DropFolderFilePeer::TYPE);
 		$criteria->addSelectColumn(DropFolderFilePeer::STATUS);
 		$criteria->addSelectColumn(DropFolderFilePeer::FILE_SIZE);
 		$criteria->addSelectColumn(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT);

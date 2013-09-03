@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class WebexDropFolder extends DropFolder
+class WebexDropFolder extends RemoteDropFolder
 {
 	const WEBEX_USER_ID = 'webex_user_id';
 	
@@ -12,6 +12,12 @@ class WebexDropFolder extends DropFolder
 	const WEBEX_SITE_ID = 'webex_site_id';
 	
 	const WEBEX_PARTNER_ID = 'webex_partner_id';
+	
+	const WEBEX_SERVICE_URL = 'webex_service_url';
+
+	const WEBEX_HOST_ID_METADATA_FIELD_NAME = 'webex_host_id_metadata_field_name';
+
+	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
 	
 	/**
 	 * @var string
@@ -32,6 +38,21 @@ class WebexDropFolder extends DropFolder
 	 * @var string
 	 */	
 	protected $webexPartnerId;
+	
+	/**
+	* @var string
+	*/
+	protected $webexServiceUrl;
+	
+	/**
+	 * @var string
+	 */
+	protected $webexHostIdMetadataFieldName;
+	
+	/**
+	 * @var string
+	 */
+	protected $categoriesMetadataFieldName;
 	
 	/**
 	 * return string
@@ -95,6 +116,64 @@ class WebexDropFolder extends DropFolder
 	public function setWebexPartnerId ($v)
 	{
 		$this->putInCustomData(self::WEBEX_PARTNER_ID, $v);
+	}
+	
+	/**
+	 * return string
+	 */
+	public function getWebexServiceUrl ()
+	{
+		return $this->getFromCustomData(self::WEBEX_SERVICE_URL);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setWebexServiceUrl ($v)
+	{
+		$this->putInCustomData(self::WEBEX_SERVICE_URL, $v);
+	}
+	
+	/**
+	 * return string
+	 */
+	public function getWebexHostIdMetadataFieldName ()
+	{
+		return $this->getFromCustomData(self::WEBEX_HOST_ID_METADATA_FIELD_NAME);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setWebexHostIdMetadataFieldName ($v)
+	{
+		$this->putInCustomData(self::WEBEX_HOST_ID_METADATA_FIELD_NAME, $v);
+	}
+	
+	/**
+	 * return string
+	 */
+	public function getCategoriesMetadataFieldName ()
+	{
+		return $this->getFromCustomData(self::CATEGORIES_METADATA_FIELD_NAME);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setCategoriesMetadataFieldName ($v)
+	{
+		$this->putInCustomData(self::CATEGORIES_METADATA_FIELD_NAME, $v);
+	}
+	
+	public function getImportJobData()
+	{
+		return null;
+	}
+	
+	public function getFolderUrl()
+	{
+		$this->webexServiceUrl . "/" . $this->getPath();
 	}
 	
 }

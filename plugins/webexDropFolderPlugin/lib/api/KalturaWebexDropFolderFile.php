@@ -25,6 +25,11 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 	 */
 	public $confId;
 	
+	/**
+	 * @var string
+	 */
+	public $contentUrl;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */

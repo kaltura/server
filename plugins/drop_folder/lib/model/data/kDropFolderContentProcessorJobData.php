@@ -87,7 +87,26 @@ class kDropFolderContentProcessorJobData extends kJobData
 	}
 
 
-    
+    public static function getInstance ($dropFolderType)
+	{
+		$res = null;
+		switch ($dropFolderType)
+		{
+			case DropFolderType::FTP:
+			case DropFolderType::LOCAL:
+			case DropFolderType::SFTP:
+			case DropFolderType::SCP:
+			case DropFolderType::S3:
+				$res = new kDropFolderContentProcessorJobData();
+			default:
+				$res = KalturaPluginManager::loadObject('kDropFolderContentProcessorJobData', $dropFolderType);
+		}
+		
+		if (!$res)
+			$res = new kDropFolderContentProcessorJobData();
+		
+		return $res;
+	}
     
   
 }

@@ -40,7 +40,26 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 					return new KWebexDropFolderEngine();
 				}
 				break;
-			
+			case ('KalturaDropFolder'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX) )
+				{
+					return new KalturaWebexDropFolder();
+				}
+				break;
+			case 'kDropFolderContentProcessorJobData':
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
+				{
+					return new kWebexDropFolderContentProcessorJobData();
+				}
+				break;
+			case 'KalturaJobData':
+				$jobSubType = $constructorArgs["coreJobSubType"];
+			    if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
+					$jobSubType == self::getApiValue(WebexDropFolderType::WEBEX) )
+				{
+					return new KalturaWebexDropFolderContentProcessorJobData();
+				}
+				break;
 		}
 	}
 	
@@ -50,6 +69,10 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 			case DropFolderPeer::OM_CLASS:
 				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
 				return 'WebexDropFolder';				
+				break;
+			case DropFolderFilePeer::OM_CLASS:
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
+				return 'WebexDropFolderFile';				
 				break;
 
 		}

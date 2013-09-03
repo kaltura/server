@@ -35,7 +35,6 @@ class kDropFolderFileResource extends kLocalFileResource
 	public function attachCreatedObject(BaseObject $object)
 	{
 	    $dropFolderFile = DropFolderFilePeer::retrieveByPK($this->getDropFolderFileId());
-    	$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
     	$entryId = $asset = null;
 	    
     	// create import job for remote drop folder files
@@ -56,8 +55,7 @@ class kDropFolderFileResource extends kLocalFileResource
     	        return;
     	    }    	    
 	    
-	        $importUrl = $dropFolder->getFolderUrl();
-	        $importUrl .= '/'.$dropFolderFile->getFileName();
+	        $importUrl = $dropFolderFile->getFileUrl();
 	    
     	    $jobData = $dropFolder->getImportJobData();
     	    $jobData->setDropFolderFileId($this->getDropFolderFileId());

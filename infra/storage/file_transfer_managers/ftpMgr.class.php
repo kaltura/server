@@ -203,8 +203,7 @@ class ftpMgr extends kFileTransferMgr
 					continue;
 				}
 				$date = DateTime::createFromFormat('j-m-y h:ia', $matches['date']);
-				$matches['date'] = $date->format();
-				$dateobj->format('Y-m-d H:i');
+				$matches['date'] = $date->format('Y-m-d H:i');
 	    	}
 			
 			KalturaLog::debug('info: ' . print_r($matches, true));

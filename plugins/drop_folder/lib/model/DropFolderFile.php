@@ -97,5 +97,10 @@ class DropFolderFile extends BaseDropFolderFile
 	}
 
 	
+	public function getFileUrl ()
+	{
+		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+		return $dropFolder->getFolderUrl() . '/' .$this->getFileName();
+	} 
 	
 } // DropFolderFile

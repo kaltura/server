@@ -53,7 +53,7 @@ class DropFolderFileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFileId);
 		}
 			
-		$dropFolderFile = new KalturaDropFolderFile();
+		$dropFolderFile = KalturaDropFolderFile::getInstanceByType($dbDropFolderFile->getType());
 		$dropFolderFile->fromObject($dbDropFolderFile);
 		
 		return $dropFolderFile;
@@ -140,7 +140,7 @@ class DropFolderFileService extends KalturaBaseService
 		$dbDropFolderFile->setStatus(DropFolderFileStatus::DELETED);
 		$dbDropFolderFile->save();
 			
-		$dropFolderFile = new KalturaDropFolderFile();
+		$dropFolderFile = KalturaDropFolderFile::getInstanceByType($dbDropFolderFile->getType());
 		$dropFolderFile->fromObject($dbDropFolderFile);
 		
 		return $dropFolderFile;
@@ -220,10 +220,10 @@ class DropFolderFileService extends KalturaBaseService
 		// save in database
 		$dropFolderFile->status = null;		
 		$dbDropFolderFile = $dropFolderFile->toInsertableObject();
-		/* @var $dbDropFolderFile DropFolderFile */
+		/* @var $dbDropFolderFile DropFolderFile  */
 		$dbDropFolderFile->setPartnerId($dropFolder->getPartnerId());
 		$dbDropFolderFile->setStatus($fileStatus);
-		
+		$dbDropFolderFile->setType($dropFolder->getType());
 		try 
 		{
 			$dbDropFolderFile->save();	
@@ -283,7 +283,7 @@ class DropFolderFileService extends KalturaBaseService
 			}
 		}	
 		// return the saved object
-		$dropFolderFile = new KalturaDropFolderFile();
+		$dropFolderFile = KalturaDropFolderFile::getInstanceByType($dbDropFolderFile->getType());
 		$dropFolderFile->fromObject($dbDropFolderFile);
 		return $dropFolderFile;		
 		

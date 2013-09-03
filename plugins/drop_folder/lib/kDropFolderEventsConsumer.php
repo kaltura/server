@@ -327,7 +327,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$batchJob->setObjectId($dropFolderFileForObject->getId());
 		$batchJob->setObjectType(DropFolderPlugin::getCoreValue('BatchJobObjectType',DropFolderBatchJobObjectType::DROP_FOLDER_FILE));
 		
-		$jobData = new kDropFolderContentProcessorJobData();
+		$jobData = kDropFolderContentProcessorJobData::getInstance($folder->getType());
 		$jobData->setConversionProfileId($folder->getConversionProfileId());
 		$jobData->setParsedSlug($dropFolderFileForObject->getParsedSlug());
 		$jobData->setContentMatchPolicy($folder->getFileHandlerConfig()->getContentMatchPolicy());
@@ -371,7 +371,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	{
 		$parsedSlug = null;
 		$parsedFlavor = null;
-		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getName(), $parsedSlug, $parsedFlavor);
+		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getFileName(), $parsedSlug, $parsedFlavor);
  		if($isMatch)
  		{
  			$file->setParsedSlug($parsedSlug);

@@ -13,6 +13,8 @@ class WebexDropFolderFile extends DropFolderFile
 	
 	const WEBEX_CONF_IF = 'webex_conf_id';
 	
+	const CONTENT_URL = 'content_url';
+	
 	/**
 	 * @var int
 	 */
@@ -32,6 +34,11 @@ class WebexDropFolderFile extends DropFolderFile
 	 * @var string
 	 */
 	protected $confId;
+	
+	/**
+	 * @var string
+	 */
+	protected $contentUrl;
 	
 	/**
 	 * return int
@@ -95,5 +102,22 @@ class WebexDropFolderFile extends DropFolderFile
 	public function setWebexHostId ($v)
 	{
 		$this->putInCustomData(self::WEBEX_HOST_ID, $v);
+	}
+	
+	
+	/**
+	 * return string
+	 */
+	public function getContentUrl ()
+	{
+		return $this->getFromCustomData(self::CONTENT_URL);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setContentUrl ($v)
+	{
+		$this->putInCustomData(self::CONTENT_URL, $v);
 	}
 }

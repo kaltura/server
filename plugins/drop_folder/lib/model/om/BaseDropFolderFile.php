@@ -44,10 +44,10 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	protected $file_name;
 
 	/**
-	 * The value for the name field.
-	 * @var        string
+	 * The value for the type field.
+	 * @var        int
 	 */
-	protected $name;
+	protected $type;
 
 	/**
 	 * The value for the status field.
@@ -243,13 +243,13 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [name] column value.
+	 * Get the [type] column value.
 	 * 
-	 * @return     string
+	 * @return     int
 	 */
-	public function getName()
+	public function getType()
 	{
-		return $this->name;
+		return $this->type;
 	}
 
 	/**
@@ -735,27 +735,27 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	} // setFileName()
 
 	/**
-	 * Set the value of [name] column.
+	 * Set the value of [type] column.
 	 * 
-	 * @param      string $v new value
+	 * @param      int $v new value
 	 * @return     DropFolderFile The current object (for fluent API support)
 	 */
-	public function setName($v)
+	public function setType($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderFilePeer::NAME]))
-			$this->oldColumnsValues[DropFolderFilePeer::NAME] = $this->name;
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::TYPE]))
+			$this->oldColumnsValues[DropFolderFilePeer::TYPE] = $this->type;
 
 		if ($v !== null) {
-			$v = (string) $v;
+			$v = (int) $v;
 		}
 
-		if ($this->name !== $v) {
-			$this->name = $v;
-			$this->modifiedColumns[] = DropFolderFilePeer::NAME;
+		if ($this->type !== $v) {
+			$this->type = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::TYPE;
 		}
 
 		return $this;
-	} // setName()
+	} // setType()
 
 	/**
 	 * Set the value of [status] column.
@@ -1401,7 +1401,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->drop_folder_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->file_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->file_size = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->file_size_last_set_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
@@ -1933,7 +1933,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				return $this->getFileName();
 				break;
 			case 4:
-				return $this->getName();
+				return $this->getType();
 				break;
 			case 5:
 				return $this->getStatus();
@@ -2014,7 +2014,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$keys[1] => $this->getPartnerId(),
 			$keys[2] => $this->getDropFolderId(),
 			$keys[3] => $this->getFileName(),
-			$keys[4] => $this->getName(),
+			$keys[4] => $this->getType(),
 			$keys[5] => $this->getStatus(),
 			$keys[6] => $this->getFileSize(),
 			$keys[7] => $this->getFileSizeLastSetAt(),
@@ -2077,7 +2077,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$this->setFileName($value);
 				break;
 			case 4:
-				$this->setName($value);
+				$this->setType($value);
 				break;
 			case 5:
 				$this->setStatus($value);
@@ -2161,7 +2161,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setDropFolderId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setFileName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setName($arr[$keys[4]]);
+		if (array_key_exists($keys[4], $arr)) $this->setType($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setFileSize($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setFileSizeLastSetAt($arr[$keys[7]]);
@@ -2195,7 +2195,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderFilePeer::PARTNER_ID)) $criteria->add(DropFolderFilePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(DropFolderFilePeer::DROP_FOLDER_ID)) $criteria->add(DropFolderFilePeer::DROP_FOLDER_ID, $this->drop_folder_id);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_NAME)) $criteria->add(DropFolderFilePeer::FILE_NAME, $this->file_name);
-		if ($this->isColumnModified(DropFolderFilePeer::NAME)) $criteria->add(DropFolderFilePeer::NAME, $this->name);
+		if ($this->isColumnModified(DropFolderFilePeer::TYPE)) $criteria->add(DropFolderFilePeer::TYPE, $this->type);
 		if ($this->isColumnModified(DropFolderFilePeer::STATUS)) $criteria->add(DropFolderFilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE)) $criteria->add(DropFolderFilePeer::FILE_SIZE, $this->file_size);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT)) $criteria->add(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT, $this->file_size_last_set_at);
@@ -2298,7 +2298,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 
 		$copyObj->setFileName($this->file_name);
 
-		$copyObj->setName($this->name);
+		$copyObj->setType($this->type);
 
 		$copyObj->setStatus($this->status);
 
