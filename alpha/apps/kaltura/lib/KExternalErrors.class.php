@@ -114,7 +114,7 @@ class KExternalErrors
 			$errorCode != self::IP_COUNTRY_BLOCKED)
 			requestUtils::sendCachingHeaders(60);
 		
-		die($message);
+		die();
 	}
 	
 	public static function dieGracefully($message = null)

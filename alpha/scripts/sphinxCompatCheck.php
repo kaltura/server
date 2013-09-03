@@ -25,7 +25,7 @@ function issueQuery($pdo, $sql)
 		return "Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]";
 	}
 	
-	$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
+	$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 	return $ids;
 }
 

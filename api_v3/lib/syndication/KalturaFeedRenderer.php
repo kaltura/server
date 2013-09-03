@@ -14,7 +14,6 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		if (($syndicationFeedDB->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null($xslt))) {
 			$this->kalturaXslt = $this->createKalturaMrssXslt($xslt);
 			$this->kalturaXsltItem = $this->createKalturaItemXslt($xslt);
-				
 		}
 	}
 
@@ -198,4 +197,3 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 	}
 }
 
-?>

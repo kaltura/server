@@ -129,4 +129,3 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 
 }
 
-?>
