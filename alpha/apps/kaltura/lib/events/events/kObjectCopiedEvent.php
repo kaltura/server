@@ -58,8 +58,10 @@ class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent, 
 		if(method_exists($this->toObject, 'getId'))
 			$additionalLog2 .= 'id [' . $this->toObject->getId() . ']';
 			
-		KalturaLog::debug(get_class($this) . " event consumed by " . get_class($consumer) . " from object type [" . get_class($this->fromObject) . "] $additionalLog1 to object type [" . get_class($this->toObject) . "] $additionalLog2");
-		return $consumer->objectCopied($this->fromObject, $this->toObject);
+		KalturaLog::debug('consumer [' . get_class($consumer) . '] started handling [' . get_class($this) . '] from object type [' . get_class($this->fromObject) . "] $additionalLog1 to object type [" . get_class($this->toObject) . "] $additionalLog2");
+		$result = $consumer->objectCopied($this->fromObject, $this->toObject);
+		KalturaLog::debug('consumer [' . get_class($consumer) . '] finished handling [' . get_class($this) . '] from object type [' . get_class($this->fromObject) . "] $additionalLog1 to object type [" . get_class($this->toObject) . "] $additionalLog2");
+		return $result;
 	}
 	
 	public function getKey()
