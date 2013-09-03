@@ -1,1 +1,1 @@
-ALTER TABLE `drop_folder_file` ADD `name` VARCHAR(100) NOT NULL AFTER `file_name`;
+ALTER TABLE `type` ADD `name` INTEGER AFTER `file_name`;
