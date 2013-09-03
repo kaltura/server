@@ -215,6 +215,10 @@ class myPartnerRegistration
 		}
 		
 		$newPartner->save();
+		
+		// remove the default criteria from all peers and recreate it with the right partner id 
+		myPartnerUtils::resetAllFilters();
+		myPartnerUtils::applyPartnerFilters($newPartner->getId(), true);
 
 		$partner_id = $newPartner->getId();
 		widget::createDefaultWidgetForPartner( $partner_id , $this->createNewSubPartner ( $newPartner ) );
@@ -333,7 +337,7 @@ class myPartnerRegistration
 			// create the new partner
 			$newPartner = $this->createNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password , $partner , $templatePartnerId);
 
-			// create the sub partner
+		    // create the sub partner
 			// TODO: when ready, add here the saving of this value, currently it will be only
 			// a random value, being passed to the user, and never saved
 			$newSubPartnerId = $this->createNewSubPartner($newPartner);
@@ -468,33 +472,13 @@ class myPartnerRegistration
 		entryPeer::setUseCriteriaFilter(false);
 		$allEntries = entryPeer::doSelect($c);
 		entryPeer::setUseCriteriaFilter(true);
-		
-		
-		// set the new partner id into the default category criteria filter
- 		$defaultCategoryFilter = categoryPeer::getCriteriaFilter()->getFilter();
- 		$oldPartnerIdCategory = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
- 		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
- 		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $partnerId);
- 		
- 		// set the new partner id into the default category criteria filter
- 		$defaultCategoryEntryFilter = categoryEntryPeer::getCriteriaFilter()->getFilter();
- 		$oldPartnerIdCategoryEntry = $defaultCategoryFilter->get(categoryEntryPeer::PARTNER_ID);
- 		$defaultCategoryEntryFilter->remove(categoryEntryPeer::PARTNER_ID);
- 		$defaultCategoryEntryFilter->addAnd(categoryEntryPeer::PARTNER_ID, $partnerId);
-
+			
 		foreach ($allEntries as $entry)
 		{
 			$entry->setKuserId($kuserId);
 			$entry->setCreatorKuserId($kuserId);
 			$entry->save();
 		}
-		
-		// restore the original partner id in the default category criteria filter
-		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
- 		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerIdCategory);
- 		
- 		$defaultCategoryEntryFilter->remove(categoryEntryPeer::PARTNER_ID);
- 		$defaultCategoryEntryFilter->addAnd(categoryEntryPeer::PARTNER_ID, $oldPartnerIdCategoryEntry);
 	}
 }
 
