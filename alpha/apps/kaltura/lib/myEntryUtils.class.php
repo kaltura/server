@@ -1183,7 +1183,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
 		$c->addAnd(categoryEntryPeer::PARTNER_ID, $entry->getPartnerId());
 		
+ 		categoryEntryPeer::setUseCriteriaFilter(false);
 		$categoryEntries = categoryEntryPeer::doSelect($c);
+		categoryEntryPeer::setUseCriteriaFilter(true);
+		
 		foreach($categoryEntries as $categoryEntry)
 		{
 			/* @var $categoryEntry categoryEntry */
