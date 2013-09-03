@@ -3,6 +3,7 @@
 abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
+	const CACHE_CREATION_MARGIN = 30;
 	const CACHE_SIZE = 100;
 	
 	/** Holds the distribution profile instance */
@@ -129,17 +130,17 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 		foreach($entries as $entry)
 		{
 			$xml = null;
-			$cacheFileName = $cachePrefix . str_replace("_", "-",  $entry->getId()); // replace _ with - so cache folders will be created with random entry id and not 0_/1_
+			$cacheKey = $cachePrefix . str_replace("_", "-",  $entry->getId()); // replace _ with - so cache folders will be created with random entry id and not 0_/1_
 			
 			if($enableCache) {
-				$cacheTime = $cacheStore->get($cacheFileName . self::CACHE_CREATION_TIME_SUFFIX);
+				$cacheTime = $cacheStore->get($cacheKey . self::CACHE_CREATION_TIME_SUFFIX);
 				$updatedAt = max($profileUpdatedAt,  $entry->getUpdatedAt(null));
-				if ($updatedAt < $cacheTime) {
-					$xml = $cacheStore->get($cacheFileName);
+				if ($updatedAt + self::CACHE_CREATION_MARGIN < $cacheTime) {
+					$xml = $cacheStore->get($cacheKey);
 				}
 			}
 			
-			if(is_null($xml))
+			if(!$xml)
 			{
 				$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $this->profile->getId());
 				if (!$entryDistribution)
@@ -150,19 +151,18 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 		
 				$xml = $this->handleEntry($context, $feed, $entry, $entryDistribution);
 				if(!is_null($xml) && $enableCache) {
-					$cacheStore->set($cacheFileName . self::CACHE_CREATION_TIME_SUFFIX, time());
-					$cacheStore->set($cacheFileName, $xml);
+					$cacheStore->set($cacheKey . self::CACHE_CREATION_TIME_SUFFIX, time());
+					$cacheStore->set($cacheKey, $xml);
 				}
 			}
 				
 			$feed->addItemXml($xml);
+			$counter++;
 				
 			//to avoid the cache exceeding the memory size
 			if ($counter % self::CACHE_SIZE == 0){
 				kMemoryManager::clearMemory();
 			}
-			
-			$counter++;
 		}
 	}
 	
