@@ -271,7 +271,7 @@ class StorageProfile extends BaseStorageProfile
 		
 		if(array_key_exists($scope->getEntryId(), kStorageExporter::$entryContextDataResult[$this->getId()]))
 		{
-			KalturaLog::debug("Getting context result from cache");
+			KalturaLog::debug("Found rule->applyContext result in cache");
 			$context = kStorageExporter::$entryContextDataResult[$this->getId()][$scope->getEntryId()];
 		}
 		else
