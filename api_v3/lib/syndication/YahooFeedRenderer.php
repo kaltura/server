@@ -48,4 +48,3 @@ class YahooFeedRenderer extends SyndicationFeedRenderer {
 	}
 }
 
-?>

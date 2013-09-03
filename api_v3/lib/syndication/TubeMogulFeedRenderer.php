@@ -45,4 +45,3 @@ class TubeMogulFeedRenderer extends SyndicationFeedRenderer{
 
 }
 
-?>

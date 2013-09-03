@@ -10,10 +10,6 @@ class KalturaSyndicationFeedRenderer
 	const STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY = 500;
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
 	const CACHE_CREATION_MARGIN = 30;
-	
-	const STATE_HEADER = 1;
-	const STATE_BODY = 2;
-	const STATE_FOOTER = 3;
 
 	/**
 	 * Maximum number of items to list
@@ -479,21 +475,21 @@ class KalturaSyndicationFeedRenderer
 					$xml = $cacheStore->get($cacheKey);
 			}
 
-			$e = null;
-			if (!$kalturaFeed) // non kaltura feed use the KalturaMediaEntry
-			{
-				$e = new KalturaMediaEntry();
-				$e->fromObject($entry);
-				// non kaltura feeds require a flavor asset url
-				if (!$kalturaFeed && $entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null)
-					$xml = ""; // cache empty result to avoid checking getFlavorAssetUrl next time
-					
-			}
-	
 			if ($xml === false)
 			{	
+				$e = null;
+				if(!$kalturaFeed) {
+					$e = new KalturaMediaEntry();
+					$e->fromObject($entry);
+				}
+				
 				$flavorAssetUrl = is_null($e) ? null : $this->getFlavorAssetUrl($e);
-				$xml = $renderer->handleBody($entry, $e, $flavorAssetUrl);
+				
+				if(!$kalturaFeed && $entry->getType() !== entryType::MIX && is_null($flavorAssetUrl)) {
+					$xml = ""; // cache empty result to avoid checking getFlavorAssetUrl next time
+				} else {
+					$xml = $renderer->handleBody($entry, $e, $flavorAssetUrl);
+				}
 			} 
 
 			if ($cacheStore)
@@ -502,9 +498,7 @@ class KalturaSyndicationFeedRenderer
 				$cacheStore->set($cacheKey, $xml);
 			}
 			
-			if($xml !== false) {
-				echo $renderer->finalize($xml, $nextEntry !== false);
-			} 
+			echo $renderer->finalize($xml, $nextEntry !== false);
 		}
 		
 		echo $renderer->handleFooter();
