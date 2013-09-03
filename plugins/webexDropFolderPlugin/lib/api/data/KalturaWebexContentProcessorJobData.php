@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.webexDropFolder
+ * @subpackage api.objects
+ */
 class KalturaWebexDropFolderContentProcessorJobData extends KalturaDropFolderContentProcessorJobData
 {
 	/**
