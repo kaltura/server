@@ -5,6 +5,12 @@
  */
 class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer
 {
+	/**
+	 * per session cache of kRule->fulfilled result per storage profile and entry id
+	 * @var array of kContextDataResult per storage profile and entry id
+	 */
+	public static $entryContextDataResult = array();
+	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
@@ -72,45 +78,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	
 	/**
 	 * @param entry $entry
-	 * @return array<FileSyncKey>
-	 */
-	static protected function getEntrySyncKeys(entry $entry, StorageProfile $externalStorage)
-	{
-		$exportFileSyncsKeys = array();
-		
-		$exportFileSyncsKeys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-		$exportFileSyncsKeys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		$exportFileSyncsKeys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
-		
-		$flavorAssets = array();
-		$flavorParamsIds = $externalStorage->getFlavorParamsIds();
-		KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIds]");
-		$relevantStatuses = array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING);
-		if(is_null($flavorParamsIds) || !strlen(trim($flavorParamsIds)))
-		{
-			$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, $relevantStatuses);
-		}
-		else
-		{
-			$flavorParamsArr = explode(',', $flavorParamsIds);
-			KalturaLog::log(__METHOD__ . " flavorParamsIds count [" . count($flavorParamsArr) . "]");
-			$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), $flavorParamsArr, $relevantStatuses);
-		}
-		
-		foreach($flavorAssets as $flavorAsset) {
-			if ($externalStorage->shouldExportFlavorAsset($flavorAsset)) {
-				$exportFileSyncsKeys[] = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			}
-			else {
-				KalturaLog::log('Flavor asset id ['.$flavorAsset->getId().'] should not be exported');
-			}
-		}
-		
-		return $exportFileSyncsKeys;
-	}
-	
-	/**
-	 * @param entry $entry
 	 * @param FileSyncKey $key
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
@@ -129,67 +96,43 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	}
 	
 	/**
-	 * @param FileSyncKey $key
-	 * @return bool
-	 */
-	static public function shouldExport(FileSyncKey $key, StorageProfile $externalStorage)
-	{
-		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $externalStorage->getId() . "]");
-		
-		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
-		if(!$kalturaFileSync) // no local copy to export from
-		{
-			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
-			return false;
-		}
-		
-		KalturaLog::log(__METHOD__ . " validating file size [" . $kalturaFileSync->getFileSize() . "] is between min [" . $externalStorage->getMinFileSize() . "] and max [" . $externalStorage->getMaxFileSize() . "]");
-		if($externalStorage->getMaxFileSize() && $kalturaFileSync->getFileSize() > $externalStorage->getMaxFileSize()) // too big
-		{
-			KalturaLog::log(__METHOD__ . " key [$key] file too big");
-			return false;
-		}
-			
-		if($externalStorage->getMinFileSize() && $kalturaFileSync->getFileSize() < $externalStorage->getMinFileSize()) // too small
-		{
-			KalturaLog::log(__METHOD__ . " key [$key] file too small");
-			return false;
-		}
-		
-		$storageFileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($key, $externalStorage->getId());
-
-		if($storageFileSync) // already exported or currently being exported
-		{
-			KalturaLog::log(__METHOD__ . " key [$key] already exported or being exported");
-			return false;
-		}
-			
-		return true;
-	}
-	
-	/**
 	 * @param entry $entry
 	 * @param StorageProfile $externalStorage
 	 */
-	public static function exportEntry(entry $entry, StorageProfile $externalStorage, &$exportedKeys = array(), &$nonExportedKeys = array())
+	public static function exportEntry(entry $entry, StorageProfile $externalStorage)
 	{
-		$checkFileSyncsKeys = self::getEntrySyncKeys($entry, $externalStorage);
-		foreach($checkFileSyncsKeys as $key)
+		$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+		foreach ($flavorAssets as $flavorAsset) 
 		{
-    		if (self::shouldExport($key, $externalStorage)) {
-    			$exported = self::export($entry, $externalStorage, $key);
-    			if ($exported) {
-    			    $exportedKeys[] = $key;
-    			}
-    			else {
-    			    $nonExportedKeys[] = $key;
-    			}
-    		}
-    		else {
-    		    $nonExportedKeys[] = $key;
-    		    KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
-    		}
-			
+			self::exportFlavorAsset($flavorAsset, $externalStorage);
+		}
+		self::exportAdditionalEntryFiles($entry, $externalStorage);		
+	}
+	
+	/**
+	 * for each storage profile check if it still fulfills the export rules and decide if it should be exported or deleted
+	 * 
+	 * @param entry $entry
+	 * 
+	 */
+	public static function reExportEntry(entry $entry)
+	{
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_RULE, $entry->getPartnerId()))
+			return;
+		if($entry->getStatus() == entryStatus::NO_CONTENT)
+			return;
+				
+		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($entry->getPartnerId());
+		foreach ($storageProfiles as $profile) 
+		{			
+			/* @var $profile StorageProfile */
+			KalturaLog::debug('Checking entry ['.$entry->getId().']re-export to storage ['.$profile->getId().']');
+			$scope = $profile->getScope();
+			$scope->setEntryId($entry->getId());
+			if($profile->triggerFitsReadyAsset($entry->getId()) && $profile->fulfillsRules($scope))
+				self::exportEntry($entry, $profile);
+			else 
+				self::deleteExportedEntry($entry, $profile);
 		}
 	}
 	
@@ -346,5 +289,103 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * export ISM, ISMC and Data files on the entry
+	 * 
+	 * @param entry $entry
+	 * @param StorageProfile $profile
+	 */
+	protected static function exportAdditionalEntryFiles(entry $entry, StorageProfile $profile)
+	{
+		$additionalFileSyncKeys = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		foreach ($additionalFileSyncKeys as $subType) 
+		{
+			$key = $entry->getSyncKey($subType);
+			if($profile->isValidFileSync($key))
+			{
+				self::export($entry, $profile, $key);
+			}
+		}	
+	}
+	
+	/**
+	 * delete ISM, ISMC and Data files on the entry from remote storage
+	 * 
+	 * @param entry $entry
+	 * @param StorageProfile $profile
+	 */
+	protected static function deleteAdditionalEntryFilesFromStorage(entry $entry, StorageProfile $profile)
+	{
+		$additionalFileSyncKeys = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		foreach ($additionalFileSyncKeys as $subType) 
+		{
+			$key = $entry->getSyncKey($subType);
+			if($profile->isExported($key))
+			{
+				self::delete($entry, $profile, $key);
+			}
+		}	
+	}
+	
+	/**
+	 * 
+	 * add DeleteStorage job for key
+	 * 
+	 * @param entry $entry
+	 * @param StorageProfile $profile
+	 * @param FileSyncKey $key
+	 */
+	protected static function delete(entry $entry, StorageProfile $profile, FileSyncKey $key)
+	{
+		KalturaLog::debug('Start delete storage export');
+		
+		$externalFileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($key, $profile->getId());
+		if(!$externalFileSync)
+			return;
+			
+		$c = new Criteria();
+		$c->add ( BatchJobPeer::OBJECT_ID , $externalFileSync->getId() );
+		$c->add ( BatchJobPeer::OBJECT_TYPE , BatchJobObjectType::FILE_SYNC );
+		$c->add ( BatchJobPeer::JOB_TYPE , BatchJobType::STORAGE_EXPORT );
+		$c->add ( BatchJobPeer::JOB_SUB_TYPE , $profile->getProtocol() );
+		$c->add ( BatchJobPeer::ENTRY_ID , $entry->getId());
+		$c->add (BatchJobPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_PENDING), Criteria::IN);		
+		$exportJobs = BatchJobPeer::doSelect( $c );
+
+		if(!$exportJobs)
+		{
+			kJobsManager::addStorageDeleteJob(null, $entry->getId(), $profile, $externalFileSync);
+		}
+		else
+		{
+			foreach ($exportJobs as $exportJob) 
+			{
+				kJobsManager::abortDbBatchJob($exportJob);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * for each one of the assets and additional entry files check if it was exported to the external storage
+	 * and add DeleteStorage job
+	 * 
+	 * @param entry $entry
+	 * @param StorageProfile $profile
+	 */
+	public static function deleteExportedEntry(entry $entry, StorageProfile $profile)
+	{
+		$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($entry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+		foreach ($flavorAssets as $flavorAsset) 
+		{
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			if($profile->isExported($key))
+			{
+				self::delete($entry, $profile, $key);
+			}
+		}
+		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
 }

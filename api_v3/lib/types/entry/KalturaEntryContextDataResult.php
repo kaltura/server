@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaEntryContextDataResult extends KalturaObject
+class KalturaEntryContextDataResult extends KalturaContextDataResult
 {
 	/**
 	 * @var bool
@@ -71,12 +71,14 @@ class KalturaEntryContextDataResult extends KalturaObject
 	/**
 	 * Array of messages as received from the access control rules that invalidated
 	 * @var KalturaStringArray
+	 * @deprecated
 	 */
 	public $accessControlMessages;
 	
 	/**
 	 * Array of actions as received from the access control rules that invalidated
 	 * @var KalturaAccessControlActionArray
+	 * @deprecated
 	 */
 	public $accessControlActions;
 	
@@ -95,8 +97,6 @@ class KalturaEntryContextDataResult extends KalturaObject
 		'isIpAddressRestricted',
 		'isUserAgentRestricted',
 		'previewLength',
-		'accessControlMessages',
-		'accessControlActions',
 	);
 	
 	/* (non-PHPdoc)

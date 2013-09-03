@@ -64,7 +64,7 @@ class rawAction extends sfAction
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
 
 		// relocate = did we use the redirect and added the extension to the name

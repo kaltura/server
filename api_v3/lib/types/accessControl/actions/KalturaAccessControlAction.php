@@ -3,6 +3,7 @@
  * @package api
  * @subpackage objects
  * @abstract
+ * @deprecated use KalturaRuleAction
  */
 abstract class KalturaAccessControlAction extends KalturaObject
 {

@@ -56,7 +56,7 @@ class downloadAction extends sfAction
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 			
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
 		
 		$flavorAsset = null;

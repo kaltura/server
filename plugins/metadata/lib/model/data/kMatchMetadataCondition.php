@@ -70,7 +70,7 @@ class kMatchMetadataCondition extends kMatchCondition
 		}
 		
 		$metadata = null;
-		if($scope instanceof accessControlScope)
+		if($scope instanceof accessControlScope || $scope instanceof kStorageProfileScope)
 		{
 			$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $scope->getEntryId());
 		}

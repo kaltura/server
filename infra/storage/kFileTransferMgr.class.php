@@ -12,7 +12,6 @@ interface kFileTransferMgrType extends StorageProfileProtocol
 {
 	const HTTP = 4;
 	const HTTPS = 5;
-	const LOCAL = 7;
 	const ASPERA = 10;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file

@@ -1437,24 +1437,24 @@ class Partner extends BasePartner
 		
 		$scope = new accessControlScope();
 		$scope->setKs(kCurrentContext::$ks);
-		$scope->setContexts(array(accessControlContextType::PLAY));
+		$scope->setContexts(array(ContextType::PLAY));
 		
 		$disableCache = $accessControl->applyContext($context, $scope);
 		if ($disableCache)
 			kApiCache::disableCache();
 
-		if(count($context->getAccessControlMessages()))
+		if(count($context->getMessages()))
 		{
-			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getAccessControlMessages()));
+			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getMessages()));
 		}
 
-		if(count($context->getAccessControlActions()))
+		if(count($context->getActions()))
 		{
-			$actions = $context->getAccessControlActions();
+			$actions = $context->getActions();
 			foreach($actions as $action)
 			{
 				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
+				if($action->getType() == RuleActionType::BLOCK)
 				{
 					KalturaLog::err('Action was blocked by API access control');
 					return false;

@@ -34,7 +34,7 @@ class KSecureEntryHelper
 	 * Indicates what contexts should be tested 
 	 * No contexts means any context
 	 * 
-	 * @var array of accessControlContextType
+	 * @var array of ContextType
 	 */
 	private $contexts;
 	
@@ -131,7 +131,7 @@ class KSecureEntryHelper
 		$preview = null;
 		if ($this->contextResult && $this->hasPreviewAction)
 		{			
-			$actions = $this->contextResult->getAccessControlActions();
+			$actions = $this->contextResult->getActions();
 			foreach($actions as $action)
 			{
 				if($action instanceof kAccessControlPreviewAction)
@@ -150,7 +150,7 @@ class KSecureEntryHelper
 
 	public function validateForPlay($performApiAccessCheck = true)
 	{
-	    if ($this->contexts != array(accessControlContextType::THUMBNAIL))
+	    if ($this->contexts != array(ContextType::THUMBNAIL))
 	    {
 		    $this->validateModeration();
 			$this->validateScheduling();
@@ -196,9 +196,9 @@ class KSecureEntryHelper
 		if(!$this->contextResult)
 			return;
 			
-		if(count($this->contextResult->getAccessControlMessages()))
+		if(count($this->contextResult->getMessages()))
 		{
-			foreach($this->contextResult->getAccessControlMessages() as $msg)
+			foreach($this->contextResult->getMessages() as $msg)
 				header("X-Kaltura: access-control: $msg");
 		}
 		
@@ -261,22 +261,22 @@ class KSecureEntryHelper
 		else
 			$this->disableCache = false;
 			
-		if(count($this->contextResult->getAccessControlActions()))
+		if(count($this->contextResult->getActions()))
 		{
-			$actions = $this->contextResult->getAccessControlActions();
+			$actions = $this->contextResult->getActions();
 			foreach($actions as $action)
 			{
 				/* @var $action kAccessControlAction */
 				switch ($action->getType())
 				{
-					case accessControlActionType::BLOCK:
+					case RuleActionType::BLOCK:
 						$this->hasBlockAction = true;
 						break;
-					case accessControlActionType::LIMIT_FLAVORS:
+					case RuleActionType::LIMIT_FLAVORS:
 						$this->hasLimitFlavorsAction = true;
 						$this->limitFlavorsAction = $action;
 						break;
-					case accessControlActionType::PREVIEW:
+					case RuleActionType::PREVIEW:
 						$this->hasPreviewAction = true;
 						break;					
 				}

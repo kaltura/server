@@ -179,14 +179,14 @@ class kContextDataHelper
 		$flavorParamsNotIn = false;
 		if(!$this->isAdmin)
 		{
-			foreach ($this->contextDataResult->getAccessControlActions() as $action) 
+			foreach ($this->contextDataResult->getActions() as $action) 
 			{	
-				if($action->getType() == accessControlActionType::BLOCK)
+				if($action->getType() == RuleActionType::BLOCK)
 				{
 					//in case of block action do not set the list of flavors
 					return;
 				}
-				if($action->getType() == accessControlActionType::LIMIT_FLAVORS)
+				if($action->getType() == RuleActionType::LIMIT_FLAVORS)
 				{
 					/* @var $action kAccessControlLimitFlavorsAction */
 					$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
