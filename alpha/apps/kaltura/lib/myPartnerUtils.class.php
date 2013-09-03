@@ -1175,11 +1175,9 @@ class myPartnerUtils
  		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
 		
-		categoryEntryPeer::setUseCriteriaFilter(false);
  		self::copyCategories($fromPartner, $toPartner);
  		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP, $dontCopyUsers);
  		self::copyEntriesByType($fromPartner, $toPartner, entryType::PLAYLIST, $dontCopyUsers);
-		categoryEntryPeer::setUseCriteriaFilter(true);
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
