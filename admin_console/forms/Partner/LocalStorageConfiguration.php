@@ -3,60 +3,39 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfiguration
+class Form_Partner_LocalStorageConfiguration extends Form_Partner_BaseStorageConfiguration
 {
 	public function init()
 	{
 		parent::init();
 		
+		$this->removeElement('storageUrl');
+		
 		$this->addElement('text', 'storageBaseDir', array(
 			'label'			=> 'Storage Base Directory:',
 			'filters'		=> array('StringTrim'),
+		
 		));
 		
-		$this->addElementToDisplayGroup('storage_info', 'storageBaseDir');
-		
+		$this->addElementToDisplayGroup('storage_info', 'storageBaseDir');		 
+
 		$this->addElement('select', 'pathManagerClass', array(
 			'label'			=> 'Path Manager:',
 			'filters'		=> array('StringTrim'),
 			'multiOptions'  => array('kPathManager' => 'Kaltura Path',
 									'kExternalPathManager' => 'External Path',
 		    						'kXslPathManager' => 'XSL Path',
-									),	
+									),
 		));
 		$this->getElement('pathManagerClass')->setRegisterInArrayValidator(false);
 		$this->addElementToDisplayGroup('storage_info', 'pathManagerClass'); 
-		
-		$this->addElement('text', 'storageUsername', array(
-			'label'			=> 'Storage Username*:',
-			'required'		=> true,
+				 
+		$this->addElement('checkbox', 'createFileLink', array(
+			'label'			=> 'Create as Link:',
 			'filters'		=> array('StringTrim'),
+						
 		));
-		$this->addElementToDisplayGroup('storage_info', 'storageUsername');
-		 
-		$this->addElement('text', 'storagePassword', array(
-			'label'			=> 'Storage Password*:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-		));
-		$this->addElementToDisplayGroup('storage_info', 'storagePassword');
-		 
-		 
-		$this->addElement('checkbox', 'storageFtpPassiveMode', array(
-			'label'			=> 'Storage FTP Passive Mode:',
-			'filters'		=> array('StringTrim'),
-		));
-		$this->addElementToDisplayGroup('storage_info', 'storageFtpPassiveMode');
-				
-		$this->addElement('select', 'filesPermissionInS3', array(
-			'label'			=> 'Files Permission In S3:',
-			'filters'		=> array('StringTrim'),
-			'multiOptions'  => array(Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PRIVATE => 'Private',
-									 Kaltura_Client_Enum_AmazonS3StorageProfileFilesPermissionLevel::ACL_PUBLIC_READ => 'Public Read',
-									),	
-		));
-		
-		$this->addElementToDisplayGroup('playback_info', 'filesPermissionInS3');
+		$this->addElementToDisplayGroup('storage_info', 'createFileLink');
 		
 		$this->addElement('text', 'deliveryHttpBaseUrl', array(
 			'label'			=> 'HTTP Delivery Base URL*:',
@@ -92,7 +71,6 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		
 		$this->addElementToDisplayGroup('advanced', 'pathManagerParamsJson'); 
-
 	}
 	
 	
