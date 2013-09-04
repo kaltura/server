@@ -272,13 +272,11 @@ class KAutoloader
 			return;
 
 		require_once(__DIR__ . '/general/kLockBase.php');
-		require_once(__DIR__ . '/cache/kApcCacheWrapper.php');
 		
-		$lock = new kLockBase(new kApcCacheWrapper(null), 'KAutoloader');
-		$lock->lock();
+		$lock = kLockBase::grabLocalLock('KAutoloader');
 		
 		// try loading again - some other instance may have created the cache while we waited for the lock
-		if (self::loadClassMapFromCache())
+		if ($lock && self::loadClassMapFromCache())
 		{
 			$lock->unlock();
 			return;
@@ -327,7 +325,8 @@ class KAutoloader
 			}
 		}
 		
-		$lock->unlock();
+		if ($lock)
+			$lock->unlock();
 	}
 
 	public static function loadClassMapFromCache()
