@@ -71,4 +71,22 @@ class kLockBase
 		if (class_exists('KalturaLog'))
 			KalturaLog::log($msg);
 	}
+
+	/**
+	 * @param string $key
+	 * @return kLockBase
+	 */
+	static public function grabLocalLock($key)
+	{ 
+		if (!function_exists('apc_add'))
+			return null;
+		
+		require_once(__DIR__ . '/../cache/kApcCacheWrapper.php');		// can be called before autoloader
+		
+		$lock = new kLockBase(new kApcCacheWrapper(), $key);
+		if (!$lock->lock())
+			return null;
+		
+		return $lock;
+	}
 }
