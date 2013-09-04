@@ -293,7 +293,7 @@ class kMetadataManager
 					$searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES] = array();
 				
 				$fieldName = MetadataPlugin::getSphinxFieldName($profileField->getId());
-				$searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES][$fieldName] = $node->nodeValue;
+				$searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES][$fieldName] = intval($node->nodeValue);
 					
 				continue;
 			}
