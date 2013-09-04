@@ -107,6 +107,14 @@ class kDropFolderContentProcessorJobData extends kJobData
 		
 		return $res;
 	}
+	
+	public function setContent (DropFolder $folder, DropFolderFile $dropFolderFileForObject, $dropFolderFileIds)
+	{
+		$this->setConversionProfileId($folder->getConversionProfileId());
+		$this->setParsedSlug($dropFolderFileForObject->getParsedSlug());
+		$this->setContentMatchPolicy($folder->getFileHandlerConfig()->getContentMatchPolicy());
+		$this->setDropFolderFileIds($dropFolderFileIds);
+	}
     
   
 }

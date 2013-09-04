@@ -120,4 +120,20 @@ class WebexDropFolderFile extends DropFolderFile
 	{
 		$this->putInCustomData(self::CONTENT_URL, $v);
 	}
+	
+	public function getFileUrl ()
+	{
+		return $this->getContentUrl();
+	} 
+	
+	public function getNameForParsing ()
+	{
+		return str_replace('_'.$this->getRecordingId(), '', $this->getFileName());
+	}
+	
+	public function setParsedSlug ($v)
+	{
+		$v .= '_'.$this->getRecordingId();
+		parent::setParsedSlug($v);
+	}
 }

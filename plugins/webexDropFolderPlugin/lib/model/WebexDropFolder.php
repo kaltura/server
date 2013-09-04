@@ -176,4 +176,9 @@ class WebexDropFolder extends RemoteDropFolder
 		$this->webexServiceUrl . "/" . $this->getPath();
 	}
 	
+	protected function getRemoteFileTransferMgrType()
+	{
+		return null;
+	}
+	
 }

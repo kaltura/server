@@ -114,7 +114,7 @@ class DropFolderFileService extends KalturaBaseService
 		$dbDropFolderFile->setStatus($status);
 		$dbDropFolderFile->save();
 	
-		$dropFolderFile = new KalturaDropFolderFile();
+		$dropFolderFile = KalturaDropFolderFile::getInstanceByType($dbDropFolderFile->getType());
 		$dropFolderFile->fromObject($dbDropFolderFile);
 		
 		return $dropFolderFile;

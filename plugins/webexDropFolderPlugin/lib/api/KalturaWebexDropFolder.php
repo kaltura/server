@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.webexDropFolder
+ * @package plugins.WebexDropFolder
  * @subpackage api.objects
  */
 class KalturaWebexDropFolder extends KalturaDropFolder
@@ -38,12 +38,12 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	/**
 	 * @var string
 	 */
-	protected $webexHostIdMetadataFieldName;
+	public $webexHostIdMetadataFieldName;
 	
 	/**
 	 * @var string
 	 */
-	protected $categoriesMetadataFieldName;
+	public $categoriesMetadataFieldName;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  

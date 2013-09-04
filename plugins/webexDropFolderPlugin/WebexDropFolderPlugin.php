@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.webexDropFolder
+ * @package plugins.WebexDropFolder
  */
 class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator
 {
@@ -46,6 +46,12 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 					return new KalturaWebexDropFolder();
 				}
 				break;
+			case ('KalturaDropFolderFile'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX) )
+				{
+					return new KalturaWebexDropFolderFile();
+				}
+				break;
 			case 'kDropFolderContentProcessorJobData':
 				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
 				{
@@ -55,7 +61,7 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 			case 'KalturaJobData':
 				$jobSubType = $constructorArgs["coreJobSubType"];
 			    if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
-					$jobSubType == self::getApiValue(WebexDropFolderType::WEBEX) )
+					$jobSubType == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX) )
 				{
 					return new KalturaWebexDropFolderContentProcessorJobData();
 				}

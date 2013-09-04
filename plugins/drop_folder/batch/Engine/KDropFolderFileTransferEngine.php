@@ -42,6 +42,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 					{
 						$lastModificationTime = $physicalFile->modificationTime;
 						$fileSize = $physicalFile->fileSize;
+						
 						$this->handleFileAdded($physicalFileName, $fileSize, $lastModificationTime);
 					}
 					catch (Exception $e)
@@ -389,6 +390,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			throw new kFileTransferMgrException('Drop folder path not valid ['.$this->dropFolder->path.']', kFileTransferMgrException::remotePathNotValid);
 		}
 			
+		KalturaLog::debug("physical files: ".print_r($physicalFiles, true));
 		return $physicalFiles;
 	}
 	
@@ -489,51 +491,4 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		$updatedEntry = KBatchBase::$kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
 	}
 	
-	/**
-	 * Retrieve all the relevant drop folder files according to the list of id's passed on the job data.
-	 * Create resource object based on the conversion profile as an input to the ingestion API
-	 * @param KalturaBatchJob $job
-	 * @param KalturaDropFolderContentProcessorJobData $data
-	 */
-	private function getIngestionResource(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
-	{
-		$filter = new KalturaDropFolderFileFilter();
-		$filter->idIn = $data->dropFolderFileIds;
-		$dropFolderFiles = $this->dropFolderFileService->listAction($filter); 
-		
-		$resource = null;
-		if($dropFolderFiles->totalCount == 1 && is_null($dropFolderFiles->objects[0]->parsedFlavor)) //only source is ingested
-		{
-			$resource = new KalturaDropFolderFileResource();
-			$resource->dropFolderFileId = $dropFolderFiles->objects[0]->id;			
-		}
-		else //ingest all the required flavors
-		{			
-			$fileToFlavorMap = array();
-			foreach ($dropFolderFiles->objects as $dropFolderFile) 
-			{
-				$fileToFlavorMap[$dropFolderFile->parsedFlavor] = $dropFolderFile->id;			
-			}
-			
-			$assetContainerArray = array();
-		
-			$assetParamsFilter = new KalturaConversionProfileAssetParamsFilter();
-			$assetParamsFilter->conversionProfileIdEqual = $data->conversionProfileId;
-			$assetParamsList = KBatchBase::$kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
-			foreach ($assetParamsList->objects as $assetParams)
-			{
-				if(array_key_exists($assetParams->systemName, $fileToFlavorMap))
-				{
-					$assetContainer = new KalturaAssetParamsResourceContainer();
-					$assetContainer->assetParamsId = $assetParams->assetParamsId;
-					$assetContainer->resource = new KalturaDropFolderFileResource();
-					$assetContainer->resource->dropFolderFileId = $fileToFlavorMap[$assetParams->systemName];
-					$assetContainerArray[] = $assetContainer;				
-				}			
-			}		
-			$resource = new KalturaAssetsParamsResourceContainers();
-			$resource->resources = $assetContainerArray;
-		}
-		return $resource;		
-	}
 }

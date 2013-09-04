@@ -328,10 +328,10 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$batchJob->setObjectType(DropFolderPlugin::getCoreValue('BatchJobObjectType',DropFolderBatchJobObjectType::DROP_FOLDER_FILE));
 		
 		$jobData = kDropFolderContentProcessorJobData::getInstance($folder->getType());
-		$jobData->setConversionProfileId($folder->getConversionProfileId());
-		$jobData->setParsedSlug($dropFolderFileForObject->getParsedSlug());
-		$jobData->setContentMatchPolicy($folder->getFileHandlerConfig()->getContentMatchPolicy());
-		$jobData->setDropFolderFileIds($dropFolderFileIds);
+		//Required for plugins which require data to be set on the created entry from the drop folder files.
+		$jobData->setContent($folder, $dropFolderFileForObject, $dropFolderFileIds) ;		
+		
+		KalturaLog::debug('created job data: ' . print_r($jobData, true));
 		
 		return kJobsManager::addJob($batchJob, $jobData, $batchJobType, $folder->getType());		
 	}
@@ -371,7 +371,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	{
 		$parsedSlug = null;
 		$parsedFlavor = null;
-		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getFileName(), $parsedSlug, $parsedFlavor);
+		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getNameForParsing(), $parsedSlug, $parsedFlavor);
  		if($isMatch)
  		{
  			$file->setParsedSlug($parsedSlug);
@@ -401,8 +401,8 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		{
 			$slugRegex = self::DEFAULT_SLUG_REGEX;
 		}
-		$matchFound = @preg_match($slugRegex, $fileName, $matches);
-		
+		$matchFound = preg_match($slugRegex, $fileName, $matches);
+		KalturaLog::debug('slug regex: ' . $slugRegex . ' file name:' . $fileName);
 		if ($matchFound) 
 		{
 			$parsedSlug   = isset($matches[self::REFERENCE_ID_WILDCARD]) ? $matches[self::REFERENCE_ID_WILDCARD] : null;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.webexDropFolder
+ * @package plugins.WebexDropFolder
  * @subpackage api.objects
  */
 class KalturaWebexDropFolderContentProcessorJobData extends KalturaDropFolderContentProcessorJobData
@@ -14,11 +14,29 @@ class KalturaWebexDropFolderContentProcessorJobData extends KalturaDropFolderCon
 	 * @var string
 	 */
 	public $webexHostId;
+
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
+	
+	/**
+	 * @var string
+	 */
+	public $webexHostIdMetadataFieldName;
+	
+	/**
+	 * @var string
+	 */
+	public $categoriesIdsMetadataFieldName;
 	
 	private static $map_between_objects = array
 	(
 		"description",
 		"webexHostId",
+		"metadataProfileId",
+		"webexHostIdMetadataFieldName",
+		"categoriesIdsMetadataFieldName",
 	);
 
 	public function getMapBetweenObjects ( )

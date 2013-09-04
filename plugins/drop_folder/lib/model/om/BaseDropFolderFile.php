@@ -792,7 +792,9 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[DropFolderFilePeer::FILE_SIZE] = $this->file_size;
 
 		if ($v !== null) {
+			KalturaLog::debug('value going in: ' . $v);
 			$v = (int) $v;
+			KalturaLog::debug('value going out: ' . $v);
 		}
 
 		if ($this->file_size !== $v) {

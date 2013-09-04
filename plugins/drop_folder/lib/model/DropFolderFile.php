@@ -21,10 +21,14 @@ class DropFolderFile extends BaseDropFolderFile
 	
 	public function setFileSize($size)
 	{
+		KalturaLog::debug('in file size setter');
 		if ($size !== $this->getFileSize()) {
 		    self::setFileSizeLastSetAt(time());
 		}
+		
+		KalturaLog::debug('calling parent setter- value '. $size);
 		parent::setFileSize($size);
+		KalturaLog::debug('result ' . $this->file_size);
 	}
 	
 	public function getFileSizeLastSetAt($format = null)
@@ -99,8 +103,13 @@ class DropFolderFile extends BaseDropFolderFile
 	
 	public function getFileUrl ()
 	{
-		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+		$dropFolder = DropFolderPeer::retrieveByPK($this->getDropFolderId());
 		return $dropFolder->getFolderUrl() . '/' .$this->getFileName();
 	} 
+	
+	public function getNameForParsing ()
+	{
+		return $this->getFileName();
+	}
 	
 } // DropFolderFile

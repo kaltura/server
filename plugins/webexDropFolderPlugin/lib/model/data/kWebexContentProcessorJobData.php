@@ -10,6 +10,21 @@ class kWebexDropFolderContentProcessorJobData extends kDropFolderContentProcesso
 	 * @var string
 	 */
 	protected $webexHostId;
+	
+	/**
+	 * @var int
+	 */
+	protected $metadataProfileId;
+	
+	/**
+	 * @var string
+	 */
+	protected $webexHostIdMetadataFieldName;
+	
+	/**
+	 * @var string
+	 */
+	protected $categoriesIdsMetadataFieldName;
 
 	
 	public function getDescription ()
@@ -32,4 +47,43 @@ class kWebexDropFolderContentProcessorJobData extends kDropFolderContentProcesso
 		$this->webexHostId = $v;
 	}
 	
+	public function getMetadataProfileId ()
+	{
+		return $this->metadataProfileId;
+	}
+	
+	public function setMetadataProfileId ($v)
+	{
+		$this->metadataProfileId = $v;
+	}
+	
+	public function setWebexHostIdMetadataFieldName ($v)
+	{
+		$this->webexHostIdMetadataFieldName = $v;
+	}
+	
+	public function getWebexHostIdMetadataFieldName ()
+	{
+		return $this->webexHostIdMetadataFieldName;
+	}
+	
+	public function setCategoriesIdsMetadataFieldName ($v)
+	{
+		$this->categoriesIdsMetadataFieldName = $v;
+	}
+	
+	public function getCategoriesIdsMetadataFieldName ()
+	{
+		return $this->categoriesIdsMetadataFieldName;
+	}
+	
+	public function setContent (DropFolder $folder, DropFolderFile $dropFolderFileForObject, $dropFolderFileIds)
+	{
+		parent::setContent($folder, $dropFolderFileForObject, $dropFolderFileIds);
+		$this->description = $dropFolderFileForObject->getDescription();
+		$this->webexHostId = $dropFolderFileForObject->getWebexHostId();
+		$this->metadataProfileId = $folder->getMetadataProfileId();
+		$this->webexHostIdMetadataFieldName = $folder->getWebexHostIdMetadataFieldName();
+		$this->categoriesIdsMetadataFieldName = $folder->getCategoriesMetadataFieldName();
+	}
 }
