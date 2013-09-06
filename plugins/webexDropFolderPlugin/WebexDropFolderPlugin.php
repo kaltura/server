@@ -66,6 +66,20 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 					return new KalturaWebexDropFolderContentProcessorJobData();
 				}
 				break;
+			case 'Form_DropFolderConfigureExtend_SubForm':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX)
+				{
+					return new Form_WebexDropFolderConfigureExtend_SubForm();
+				}
+				break;
+			case 'Kaltura_Client_DropFolder_Type_DropFolder':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX)
+				{
+					return new Kaltura_Client_WebexDropFolder_Type_WebexDropFolder();
+				}
+				break;
+				break;
+				
 		}
 	}
 	
