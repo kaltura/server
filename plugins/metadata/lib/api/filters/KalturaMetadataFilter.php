@@ -39,14 +39,14 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		{
 			if ($this->objectIdEqual)
 			{
-				$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->objectIdEqual);
+				$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->objectIdEqual);
 				if($kuser)				
 					$this->objectIdEqual = $kuser->getId();
 			}
 				
 			if ($this->objectIdIn)
 			{
-				$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::$ks_partner_id, explode(',', $this->objectIdIn));
+				$kusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), explode(',', $this->objectIdIn));
 				
 				$kusersIds = array();
 				foreach($kusers as $kuser)				

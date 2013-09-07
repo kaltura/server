@@ -44,6 +44,12 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	protected $file_name;
 
 	/**
+	 * The value for the type field.
+	 * @var        int
+	 */
+	protected $type;
+
+	/**
 	 * The value for the status field.
 	 * @var        int
 	 */
@@ -234,6 +240,16 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	public function getFileName()
 	{
 		return $this->file_name;
+	}
+
+	/**
+	 * Get the [type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getType()
+	{
+		return $this->type;
 	}
 
 	/**
@@ -717,6 +733,29 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setFileName()
+
+	/**
+	 * Set the value of [type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setType($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::TYPE]))
+			$this->oldColumnsValues[DropFolderFilePeer::TYPE] = $this->type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->type !== $v) {
+			$this->type = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::TYPE;
+		}
+
+		return $this;
+	} // setType()
 
 	/**
 	 * Set the value of [status] column.
@@ -1362,24 +1401,25 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->drop_folder_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->file_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->file_size = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->file_size_last_set_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->error_code = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->error_description = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->parsed_slug = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->parsed_flavor = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->lead_drop_folder_file_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->deleted_drop_folder_file_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->md5_file_name = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->entry_id = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->created_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->updated_at = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->upload_start_detected_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->upload_end_detected_at = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->import_started_at = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->import_ended_at = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->custom_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->file_size = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->file_size_last_set_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->error_code = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->error_description = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->parsed_slug = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->parsed_flavor = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->lead_drop_folder_file_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->deleted_drop_folder_file_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->md5_file_name = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->entry_id = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->created_at = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->updated_at = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->upload_start_detected_at = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->upload_end_detected_at = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->import_started_at = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->import_ended_at = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->custom_data = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1389,7 +1429,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 22; // 22 = DropFolderFilePeer::NUM_COLUMNS - DropFolderFilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 23; // 23 = DropFolderFilePeer::NUM_COLUMNS - DropFolderFilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolderFile object", $e);
@@ -1893,57 +1933,60 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				return $this->getFileName();
 				break;
 			case 4:
-				return $this->getStatus();
+				return $this->getType();
 				break;
 			case 5:
-				return $this->getFileSize();
+				return $this->getStatus();
 				break;
 			case 6:
-				return $this->getFileSizeLastSetAt();
+				return $this->getFileSize();
 				break;
 			case 7:
-				return $this->getErrorCode();
+				return $this->getFileSizeLastSetAt();
 				break;
 			case 8:
-				return $this->getErrorDescription();
+				return $this->getErrorCode();
 				break;
 			case 9:
-				return $this->getParsedSlug();
+				return $this->getErrorDescription();
 				break;
 			case 10:
-				return $this->getParsedFlavor();
+				return $this->getParsedSlug();
 				break;
 			case 11:
-				return $this->getLeadDropFolderFileId();
+				return $this->getParsedFlavor();
 				break;
 			case 12:
-				return $this->getDeletedDropFolderFileId();
+				return $this->getLeadDropFolderFileId();
 				break;
 			case 13:
-				return $this->getMd5FileName();
+				return $this->getDeletedDropFolderFileId();
 				break;
 			case 14:
-				return $this->getEntryId();
+				return $this->getMd5FileName();
 				break;
 			case 15:
-				return $this->getCreatedAt();
+				return $this->getEntryId();
 				break;
 			case 16:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 17:
-				return $this->getUploadStartDetectedAt();
+				return $this->getUpdatedAt();
 				break;
 			case 18:
-				return $this->getUploadEndDetectedAt();
+				return $this->getUploadStartDetectedAt();
 				break;
 			case 19:
-				return $this->getImportStartedAt();
+				return $this->getUploadEndDetectedAt();
 				break;
 			case 20:
-				return $this->getImportEndedAt();
+				return $this->getImportStartedAt();
 				break;
 			case 21:
+				return $this->getImportEndedAt();
+				break;
+			case 22:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1971,24 +2014,25 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$keys[1] => $this->getPartnerId(),
 			$keys[2] => $this->getDropFolderId(),
 			$keys[3] => $this->getFileName(),
-			$keys[4] => $this->getStatus(),
-			$keys[5] => $this->getFileSize(),
-			$keys[6] => $this->getFileSizeLastSetAt(),
-			$keys[7] => $this->getErrorCode(),
-			$keys[8] => $this->getErrorDescription(),
-			$keys[9] => $this->getParsedSlug(),
-			$keys[10] => $this->getParsedFlavor(),
-			$keys[11] => $this->getLeadDropFolderFileId(),
-			$keys[12] => $this->getDeletedDropFolderFileId(),
-			$keys[13] => $this->getMd5FileName(),
-			$keys[14] => $this->getEntryId(),
-			$keys[15] => $this->getCreatedAt(),
-			$keys[16] => $this->getUpdatedAt(),
-			$keys[17] => $this->getUploadStartDetectedAt(),
-			$keys[18] => $this->getUploadEndDetectedAt(),
-			$keys[19] => $this->getImportStartedAt(),
-			$keys[20] => $this->getImportEndedAt(),
-			$keys[21] => $this->getCustomData(),
+			$keys[4] => $this->getType(),
+			$keys[5] => $this->getStatus(),
+			$keys[6] => $this->getFileSize(),
+			$keys[7] => $this->getFileSizeLastSetAt(),
+			$keys[8] => $this->getErrorCode(),
+			$keys[9] => $this->getErrorDescription(),
+			$keys[10] => $this->getParsedSlug(),
+			$keys[11] => $this->getParsedFlavor(),
+			$keys[12] => $this->getLeadDropFolderFileId(),
+			$keys[13] => $this->getDeletedDropFolderFileId(),
+			$keys[14] => $this->getMd5FileName(),
+			$keys[15] => $this->getEntryId(),
+			$keys[16] => $this->getCreatedAt(),
+			$keys[17] => $this->getUpdatedAt(),
+			$keys[18] => $this->getUploadStartDetectedAt(),
+			$keys[19] => $this->getUploadEndDetectedAt(),
+			$keys[20] => $this->getImportStartedAt(),
+			$keys[21] => $this->getImportEndedAt(),
+			$keys[22] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -2033,57 +2077,60 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$this->setFileName($value);
 				break;
 			case 4:
-				$this->setStatus($value);
+				$this->setType($value);
 				break;
 			case 5:
-				$this->setFileSize($value);
+				$this->setStatus($value);
 				break;
 			case 6:
-				$this->setFileSizeLastSetAt($value);
+				$this->setFileSize($value);
 				break;
 			case 7:
-				$this->setErrorCode($value);
+				$this->setFileSizeLastSetAt($value);
 				break;
 			case 8:
-				$this->setErrorDescription($value);
+				$this->setErrorCode($value);
 				break;
 			case 9:
-				$this->setParsedSlug($value);
+				$this->setErrorDescription($value);
 				break;
 			case 10:
-				$this->setParsedFlavor($value);
+				$this->setParsedSlug($value);
 				break;
 			case 11:
-				$this->setLeadDropFolderFileId($value);
+				$this->setParsedFlavor($value);
 				break;
 			case 12:
-				$this->setDeletedDropFolderFileId($value);
+				$this->setLeadDropFolderFileId($value);
 				break;
 			case 13:
-				$this->setMd5FileName($value);
+				$this->setDeletedDropFolderFileId($value);
 				break;
 			case 14:
-				$this->setEntryId($value);
+				$this->setMd5FileName($value);
 				break;
 			case 15:
-				$this->setCreatedAt($value);
+				$this->setEntryId($value);
 				break;
 			case 16:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 17:
-				$this->setUploadStartDetectedAt($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 18:
-				$this->setUploadEndDetectedAt($value);
+				$this->setUploadStartDetectedAt($value);
 				break;
 			case 19:
-				$this->setImportStartedAt($value);
+				$this->setUploadEndDetectedAt($value);
 				break;
 			case 20:
-				$this->setImportEndedAt($value);
+				$this->setImportStartedAt($value);
 				break;
 			case 21:
+				$this->setImportEndedAt($value);
+				break;
+			case 22:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -2114,24 +2161,25 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setDropFolderId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setFileName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setFileSize($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setFileSizeLastSetAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setErrorCode($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setErrorDescription($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setParsedSlug($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setParsedFlavor($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setLeadDropFolderFileId($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setDeletedDropFolderFileId($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setMd5FileName($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setEntryId($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setUpdatedAt($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setUploadStartDetectedAt($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setUploadEndDetectedAt($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setImportStartedAt($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setImportEndedAt($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setCustomData($arr[$keys[21]]);
+		if (array_key_exists($keys[4], $arr)) $this->setType($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setFileSize($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setFileSizeLastSetAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setErrorCode($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setErrorDescription($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setParsedSlug($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setParsedFlavor($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setLeadDropFolderFileId($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setDeletedDropFolderFileId($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setMd5FileName($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setEntryId($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setUploadStartDetectedAt($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setUploadEndDetectedAt($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setImportStartedAt($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setImportEndedAt($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setCustomData($arr[$keys[22]]);
 	}
 
 	/**
@@ -2147,6 +2195,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderFilePeer::PARTNER_ID)) $criteria->add(DropFolderFilePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(DropFolderFilePeer::DROP_FOLDER_ID)) $criteria->add(DropFolderFilePeer::DROP_FOLDER_ID, $this->drop_folder_id);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_NAME)) $criteria->add(DropFolderFilePeer::FILE_NAME, $this->file_name);
+		if ($this->isColumnModified(DropFolderFilePeer::TYPE)) $criteria->add(DropFolderFilePeer::TYPE, $this->type);
 		if ($this->isColumnModified(DropFolderFilePeer::STATUS)) $criteria->add(DropFolderFilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE)) $criteria->add(DropFolderFilePeer::FILE_SIZE, $this->file_size);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT)) $criteria->add(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT, $this->file_size_last_set_at);
@@ -2248,6 +2297,8 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		$copyObj->setDropFolderId($this->drop_folder_id);
 
 		$copyObj->setFileName($this->file_name);
+
+		$copyObj->setType($this->type);
 
 		$copyObj->setStatus($this->status);
 
