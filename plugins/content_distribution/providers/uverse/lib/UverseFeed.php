@@ -131,17 +131,31 @@ class UverseFeed
 		kXml::setNodeValue($this->xpath,'/rss/channel/lastBuildDate', date('r', $lastBuildDate));
 	}
 	
+	public function addItemXml($xml)
+	{
+		$tempDoc = new DOMDocument('1.0', 'UTF-8');
+		$tempDoc->loadXML($xml);
+	
+		$importedItem = $this->doc->importNode($tempDoc->firstChild, true);
+		$channelNode = $this->xpath->query('/rss/channel')->item(0);
+		$channelNode->appendChild($importedItem);
+	}
+	
+	public function getItemXml(array $values, asset $flavorAsset, $flavorAssetRemoteUrl, array $thumbAssets = null)
+	{
+		$item = $this->getItem($values, $flavorAsset, $thumbAssets);
+		return $this->doc->saveXML($item);
+	}
+	
 	/**
 	 * @param array $values
 	 * @param asset $flavorAsset
 	 * @param array $thumbAssets
 	 * @param entry $entry
 	 */
-	public function addItem(array $values, asset $flavorAsset, $flavorAssetRemoteUrl, array $thumbAssets = null)
+	public function getItem(array $values, asset $flavorAsset, $flavorAssetRemoteUrl, array $thumbAssets = null)
 	{		
 		$item = $this->item->cloneNode(true);
-		$channelNode = $this->xpath->query('/rss/channel', $item)->item(0);
-		$channelNode->appendChild($item);
 		kXml::setNodeValue($this->xpath,'guid', $values[UverseDistributionField::ITEM_GUID], $item);
 		kXml::setNodeValue($this->xpath,'title', $values[UverseDistributionField::ITEM_TITLE], $item);
 		kXml::setNodeValue($this->xpath,'link', $values[UverseDistributionField::ITEM_LINK], $item);
@@ -165,7 +179,9 @@ class UverseFeed
 							
 		$this->addCategory($item,$values[UverseDistributionField::ITEM_MEDIA_CATEGORY]);
 		kXml::setNodeValue($this->xpath,'media:copyright', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT], $item);	
-		kXml::setNodeValue($this->xpath,'media:copyright/@url', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT_URL], $item);			
+		kXml::setNodeValue($this->xpath,'media:copyright/@url', $values[UverseDistributionField::ITEM_MEDIA_COPYRIGHT_URL], $item);
+		
+		return $item;			
 	}
 	
 	public function getAssetUrl(asset $asset)
