@@ -22,18 +22,18 @@ abstract class KBaseMediaParser
 	 * @param KSchedularTaskConfig $taskConfig
 	 * @return KBaseMediaParser
 	 */
-	public static function getParser($type, $filePath, KSchedularTaskConfig $taskConfig, KalturaBatchJob $job)
+	public static function getParser($type, $filePath, KalturaBatchJob $job)
 	{
 		switch($type)
 		{
 			case self::MEDIA_PARSER_TYPE_MEDIAINFO:
-				return new KMediaInfoMediaParser($filePath, $taskConfig->params->mediaInfoCmd);
+				return new KMediaInfoMediaParser($filePath, KBatchBase::$taskConfig->params->mediaInfoCmd);
 				
 			case self::MEDIA_PARSER_TYPE_FFMPEG:
-				return new KFFMpegMediaParser($filePath, $taskConfig->params->FFMpegCmd);
+				return new KFFMpegMediaParser($filePath, KBatchBase::$taskConfig->params->FFMpegCmd);
 				
 			default:
-				return KalturaPluginManager::loadObject('KBaseMediaParser', $type, array($job, $taskConfig));
+				return KalturaPluginManager::loadObject('KBaseMediaParser', $type, array($job));
 		}
 	}
 	

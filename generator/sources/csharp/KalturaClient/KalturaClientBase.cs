@@ -190,7 +190,9 @@ namespace Kaltura
             request.Headers = _Config.RequestHeaders;
 			
 			// Add proxy information if required
-            createProxy(request, _Config);
+			if( !_Config.ProxyAddress.Equals( "" ) && !_Config.ProxyAddress.Equals( null ) ) {
+				request.Proxy = new WebProxy( _Config.ProxyAddress );
+			}
             			
             if (kfiles.Count > 0)
             {
@@ -234,21 +236,6 @@ namespace Kaltura
             this.ThrowExceptionOnAPIError(result);
 
             return result;
-        }
-        private void createProxy(HttpWebRequest request, KalturaConfiguration _Config)
-        {
-            if (String.IsNullOrEmpty(_Config.ProxyAddress))
-                return;
-            Console.WriteLine("Create proxy");
-            if (!(String.IsNullOrEmpty(_Config.ProxyUser) || String.IsNullOrEmpty(_Config.ProxyPassword)))
-            {
-                ICredentials credentials = new NetworkCredential(_Config.ProxyUser, _Config.ProxyPassword);
-                request.Proxy = new WebProxy(_Config.ProxyAddress, false, null, credentials);
-            }
-            else
-            {
-                request.Proxy = new WebProxy(_Config.ProxyAddress);
-            }
         }
 
         public void StartMultiRequest()

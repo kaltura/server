@@ -814,7 +814,7 @@
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>category_id</key>
-						<description>Category I</description>
+						<description>Category Id</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
 						</value>

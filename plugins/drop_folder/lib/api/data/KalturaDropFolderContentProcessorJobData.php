@@ -47,4 +47,38 @@ class KalturaDropFolderContentProcessorJobData extends KalturaJobData
 			
 		return parent::toObject($dbData, $props_to_skip);
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		switch ($subType) {
+			case KalturaDropFolderType::FTP:
+            case KalturaDropFolderType::SFTP:
+            case KalturaDropFolderType::SCP:
+            case KalturaDropFolderType::S3:
+                return $subType;                  	
+			default:
+				return kPluginableEnumsManager::apiToCore('KalturaDropFolderType', $subType);
+		}
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		switch ($subType) {
+            case DropFolderType::FTP:
+            case DropFolderType::SFTP:
+            case DropFolderType::SCP:
+            case DropFolderType::S3:
+                return $subType;                    
+            default:
+                return kPluginableEnumsManager::coreToApi('DropFolderType', $subType);
+        }
+	}
 }

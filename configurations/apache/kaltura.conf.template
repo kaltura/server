@@ -1,6 +1,6 @@
-<VirtualHost @KALTURA_VIRTUAL_HOST_NAME@:@KALTURA_VIRTUAL_HOST_PORT@>
-	ErrorLog "@LOG_DIR@/kaltura_apache_errors.log"
-	CustomLog @LOG_DIR@/kaltura_apache_access.log vhost_kalt
+<VirtualHost kaltura.trunk:80>
+	ErrorLog "C:\opt\kaltura\log/kaltura_apache_errors.log"
+	CustomLog C:\opt\kaltura\log/kaltura_apache_access.log vhost_kalt
 	
-	Include "@APP_DIR@/configurations/apache/conf.d/enabled.*.conf"
+	Include "C:\opt\kaltura\app/configurations/apache/conf.d/enabled.*.conf"
 </VirtualHost>

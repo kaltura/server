@@ -14,3 +14,8 @@ plugins/.buildpath
 plugins/.settings/*
 alpha/.settings/
 .idea
+api_v3/lib/syndication
+deployment/updates/sql/2013_08_13_sphinx_json.php
+infra/general/kLockBase.php
+plugins/content_distribution
+plugins/content_distribution

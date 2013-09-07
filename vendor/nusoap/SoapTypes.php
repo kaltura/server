@@ -6,12 +6,6 @@
  */
 class SoapObject
 {
-	public function __construct(array $result = null)
-	{
-		if($result && is_array($result))
-			$this->fromArray($result);
-	}
-	
 	public function getType()
 	{
 		return null;
