@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.webexDropFolder
+ * @package plugins.WebexDropFolder
  * @subpackage api.objects
  */
 class KalturaWebexDropFolderFile extends KalturaDropFolderFile
@@ -25,6 +25,11 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 	 */
 	public $confId;
 	
+	/**
+	 * @var string
+	 */
+	public $contentUrl;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -33,6 +38,7 @@ class KalturaWebexDropFolderFile extends KalturaDropFolderFile
 		'webexHostId',
 		'description',
 		'confId',
+		'contentUrl',
 	 );
 		 
 	public function getMapBetweenObjects()

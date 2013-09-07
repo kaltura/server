@@ -151,8 +151,8 @@ function newDropFolder(partnerId, dropFolderType)
 		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
 		return;
 	}
-
-	if(!dropFolderType.length || isNaN(dropFolderType)){
+	
+	if(!dropFolderType.length){
 		alert('<?php echo $this->translate('Drop folder type not supplied'); ?>');
 		return;
 	}

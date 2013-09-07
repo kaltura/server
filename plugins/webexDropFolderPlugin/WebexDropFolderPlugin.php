@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.webexDropFolder
+ * @package plugins.WebexDropFolder
  */
 class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator
 {
@@ -40,7 +40,46 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 					return new KWebexDropFolderEngine();
 				}
 				break;
-			
+			case ('KalturaDropFolder'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX) )
+				{
+					return new KalturaWebexDropFolder();
+				}
+				break;
+			case ('KalturaDropFolderFile'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX) )
+				{
+					return new KalturaWebexDropFolderFile();
+				}
+				break;
+			case 'kDropFolderContentProcessorJobData':
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
+				{
+					return new kWebexDropFolderContentProcessorJobData();
+				}
+				break;
+			case 'KalturaJobData':
+				$jobSubType = $constructorArgs["coreJobSubType"];
+			    if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
+					$jobSubType == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX) )
+				{
+					return new KalturaWebexDropFolderContentProcessorJobData();
+				}
+				break;
+			case 'Form_DropFolderConfigureExtend_SubForm':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX)
+				{
+					return new Form_WebexDropFolderConfigureExtend_SubForm();
+				}
+				break;
+			case 'Kaltura_Client_DropFolder_Type_DropFolder':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX)
+				{
+					return new Kaltura_Client_WebexDropFolder_Type_WebexDropFolder();
+				}
+				break;
+				break;
+				
 		}
 	}
 	
@@ -50,6 +89,10 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 			case DropFolderPeer::OM_CLASS:
 				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
 				return 'WebexDropFolder';				
+				break;
+			case DropFolderFilePeer::OM_CLASS:
+				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
+				return 'WebexDropFolderFile';				
 				break;
 
 		}

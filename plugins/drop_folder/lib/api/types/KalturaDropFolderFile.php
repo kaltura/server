@@ -54,6 +54,13 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
+	 * @var KalturaDropFolderFileStatus
+	 * @filter eq,in,notin
+	 * @readonly
+	 */
+	public $type;
+	
+	/**
 	 * @var string
 	 * @filter eq,in,like,order
 	 */
@@ -152,6 +159,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		'fileName',
 		'fileSize',
 		'status',
+		'type',
 		'fileSizeLastSetAt',
 		'parsedSlug',
 		'parsedFlavor',
@@ -174,14 +182,16 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
 			$dbObject = new DropFolderFile();
+		
 			
 		parent::toObject($dbObject, $skip);
-		
+		KalturaLog::debug('file size in api: '. $this->fileSize);
+		KalturaLog::debug("dbObject: " . print_r($dbObject, true));
 		return $dbObject;
 	}
 	
@@ -205,4 +215,26 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		return array();
 	}
 	
+	/**
+	 * @param int $type
+	 * @return KalturaDropFolder
+	 */
+	static function getInstanceByType ($type)
+	{
+		switch ($type) {
+			case DropFolderType::FTP:
+			case DropFolderType::SFTP:
+			case DropFolderType::LOCAL:
+			case DropFolderType::SCP:
+			case DropFolderType::S3:
+				return new KalturaDropFolderFile();				
+				break;
+			
+			default:
+				return KalturaPluginManager::loadObject('KalturaDropFolderFile', $type);
+				break;
+		}
+		
+		return new KalturaDropFolderFile();
+	}
 }
