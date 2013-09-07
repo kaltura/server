@@ -11,26 +11,37 @@
 		<!-- script will ask for username / password interactively -->
 	</session>
 	<multirequest>
-		<!-- Entry Distribution Error -->
+		<!-- Entry Distribution Status Changed -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
-				<name>Entry Distribution Error</name>
-				<systemName>Entry_Distribution_Error</systemName>
-				<description>Email notification template to be sent when an entry failed to distribute.</description>
+				<name>Entry Distribution Status Changed</name>
+				<systemName>Entry_Distribution_Status_Changed</systemName>
+				<description>Email notification template to be sent when an entry distribution status is changed.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 				<eventObjectType>contentDistributionEventNotifications.EntryDistribution</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY_DISTRIBUTION -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
-						<description>Status field modified to ERROR_SUBMITTING</description>
+						<description>Status field modified</description>
 						<field objectType="KalturaEvalBooleanField">
-							<code>in_array(EntryDistributionPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == EntryDistributionStatus::ERROR_SUBMITTING</code>
+							<code>in_array(EntryDistributionPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
 						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
 					</item>
 				</eventConditions>
 				<format>1</format>
-				<subject>[Kaltura] - Entry {entry_id} failed to distribute to {distribution_profile_name} on {updated_at_rfc850}</subject>
-				<body>Entry {entry_id} failed to distribute to {distribution_profile_name} on {updated_at_rfc850}</body>
+				<subject>[Kaltura] - Entry distribution status changed for entry {entry_id} on distribution profile {distribution_profile_name}</subject>
+				<body>Entry distribution status for {entry_id} on connector {distribution_profile_name} was changed to {trigger_status} on {updated_at_rfc850}</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationUserRecipientProvider">
@@ -41,47 +52,70 @@
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_email</key>
+						<description>From email</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_email")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>from_name</key>
+						<description>From name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>kConf::get("partner_notification_name")</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_id</key>
+						<description>Entry ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getEntryId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
 						<key>entry_distribution_id</key>
+						<description>Entry distribution ID</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getId()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>updated_at</key>
+						<description>Updated at (Y-m-d H:i:s format)</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getUpdatedAt()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>updated_at_rfc850</key>
+						<description>Updated at (RFC850 format)</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getUpdatedAt(DateTime::RFC850)</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>distribution_profile_name</key>
+						<description>Distribution profile name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(DistributionProfilePeer::retrieveByPk($scope->getEvent()->getObject()->getDistributionProfileId())) ? DistributionProfilePeer::retrieveByPk($scope->getEvent()->getObject()->getDistributionProfileId())->getName() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Entry distribution status that triggers the event, See:KalturaEntryDistributionStatus:/api_v3/testmeDoc/?object=KalturaEntryDistributionStatus</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
