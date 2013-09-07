@@ -610,6 +610,7 @@ CREATE TABLE IF NOT EXISTS `drop_folder_file` (
   `partner_id` int(11) NOT NULL,
   `drop_folder_id` int(11) NOT NULL,
   `file_name` varchar(500) NOT NULL,
+  `type`  int(11),
   `status` int(11) NOT NULL,
   `file_size` bigint(20) NOT NULL,
   `file_size_last_set_at` datetime DEFAULT NULL,
