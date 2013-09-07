@@ -816,8 +816,7 @@ abstract class BaseDropFolderFilePeer {
 	public static function getOMClass($row, $colnum)
 	{
 		try {
-
-			$omClass = $row[$colnum + 2];
+			$omClass = $row[$colnum + 4];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {
