@@ -271,8 +271,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach ($sphinxPluginsData as $key => $value){		
 			if(is_array($value)) {
 				$valueStr = json_encode($value);
-				$escapedString = SphinxUtils::escapeString($valueStr);
-				$data[$key] = "'" . $escapedString . "'";
+				$data[$key] = "'" . $valueStr . "'";
 			} else if (is_numeric($value)) {
 				$data[$key] = $value;
 			} else {
@@ -313,8 +312,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach($dataJson as $key => $value)
 		{
 			$valueStr = json_encode($value);
-			$escapedString = SphinxUtils::escapeString($valueStr);
-			$data[$key] = "'" . $escapedString . "'";
+			$data[$key] = "'" . $valueStr . "'";
 		}
 		
 		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
