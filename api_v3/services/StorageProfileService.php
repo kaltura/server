@@ -34,6 +34,7 @@ class StorageProfileService extends KalturaBaseService
 		$dbStorageProfile = $storageProfile->toInsertableObject();
 		/* @var $dbStorageProfile StorageProfile */
 		$dbStorageProfile->setPartnerId($this->impersonatedPartnerId);
+		KalturaLog::debug('after to object in service: ' . print_r($dbStorageProfile, true));
 		$dbStorageProfile->save();
 		
 		$storageProfile = KalturaStorageProfile::getInstanceByType($dbStorageProfile->getProtocol());

@@ -77,11 +77,12 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'label'			=> 'Delivery URL format :',
 			'filters'		=> array('StringTrim'),
 			'multiOptions'  => array('' => 'Kaltura Delivery URL Format',
-									'kLocalPathUrlManager' => 'QA FMS Server',
+									'kLocalPathUrlManager' => 'Local FMS Server',
 									'kLimeLightUrlManager' => 'Lime Light CDN',
 									'kAkamaiUrlManager' => 'Akamai CDN',
 									'kLevel3UrlManager' => 'Level 3 CDN',
-		    						'kMirrorImageUrlManager' => 'Mirror Image CDN',
+									'kMirrorImageUrlManager' => 'Mirror Image CDN',
+									'kFmsUrlManager' => 'FMS Server',
 									),		
 			
 		));

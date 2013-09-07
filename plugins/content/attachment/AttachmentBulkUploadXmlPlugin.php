@@ -228,7 +228,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 		
-		KBatchBase::unimpersonate(); 		
+		KBatchBase::unimpersonate();		
 	}
 
 	private function handleAttachmentAsset($entryId, SimpleXMLElement $attachment)

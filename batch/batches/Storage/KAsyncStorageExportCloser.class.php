@@ -27,6 +27,6 @@ class KAsyncStorageExportCloser extends KJobCloserWorker
 		$storageExportEngine = KExportEngine::getInstance($job->jobSubType, $job->partnerId, $job->data);
 		
 		$closeResult = $storageExportEngine->verifyExportedResource();
-		$this->closeJob($job, null, null, null, $closeResult ? KalturaBatchJobStatus::FINISHED : KalturaBatchJobStatus::ALMOST_DONE);
+		return $this->closeJob($job, null, null, null, $closeResult ? KalturaBatchJobStatus::FINISHED : KalturaBatchJobStatus::ALMOST_DONE);
 	}
 }

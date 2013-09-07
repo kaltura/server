@@ -3,7 +3,7 @@
  * @package plugins.WebexDropFolder
  * @subpackage api.objects
  */
-class KalturaWebexDropFolder extends KalturaDropFolder
+class KalturaWebexDropFolder extends KalturaRemoteDropFolder
 {
 	/**
 	 * @var string

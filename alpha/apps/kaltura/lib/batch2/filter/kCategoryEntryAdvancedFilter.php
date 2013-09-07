@@ -16,9 +16,9 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	protected $categoryEntryStatusIn = null;
 
 	/* (non-PHPdoc)
-	 * @see AdvancedSearchFilterItem::apply()
+	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function apply(baseObjectFilter $filter, IKalturaDbQuery $query)
+	public function applyCondition(IKalturaIndexQuery $query)
 	{
 		if (is_null($this->categoriesMatchOr) || is_null($this->categoryEntryStatusIn))
 			return;

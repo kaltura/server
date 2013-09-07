@@ -108,9 +108,9 @@ class infraRequestUtils
 			// added max-stale=0 to fight evil proxies
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
 			if ($last_modified)
-				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . 'GMT');
+				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
 			else
 				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
 		}
