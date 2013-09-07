@@ -119,13 +119,19 @@ class kEventsManager
 	}
 	
 	public static function flushEvents()
-	{	
+	{
+		if (!self::$deferredEvents)
+			return;
+		
+		KalturaLog::debug("started flushing deferred events");
 		
 		while (count(self::$deferredEvents))
 		{
 			$deferredEvent = self::popNextDeferredEvent();
 			self::raiseEvent($deferredEvent);
 		}
+		
+		KalturaLog::debug("finished flushing deferred events");
 	}
 	
 	private static function popNextDeferredEvent()

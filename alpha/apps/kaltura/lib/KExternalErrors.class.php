@@ -5,6 +5,8 @@
  */
 class KExternalErrors
 {
+	private static $responseCode = null;
+	
 	const ENTRY_NOT_FOUND = 1;
 	const NOT_SCHEDULED_NOW = 2;
 	const ACCESS_CONTROL_RESTRICTED = 3;
@@ -39,6 +41,13 @@ class KExternalErrors
 	const INVALID_PARTNER = 32;
 	const ILLEGAL_UI_CONF = 33;
 	const EXCEEDED_RESTRICTED_IP = 34;
+	const INVALID_FEED_ID = 35;
+	
+	const HTTP_STATUS_NOT_FOUND = 404;
+	
+	private static $errorCodeMap = array(
+			self::HTTP_STATUS_NOT_FOUND => "HTTP/1.0 404 Not Found",
+	);
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -75,6 +84,7 @@ class KExternalErrors
 			self::INVALID_PARTNER => "The given partner isn't vaild for the request",
 			self::ILLEGAL_UI_CONF => "The given UI conf is illegal",
 			self::EXCEEDED_RESTRICTED_IP => "ip address is out of the restricted ip range",
+			self::INVALID_FEED_ID => "The given feed id is illegal",
 	);
 	
 	public static function dieError($errorCode, $message = null)
@@ -91,8 +101,11 @@ class KExternalErrors
 			$description .= ", $message";
 			
 		KalturaLog::err("exiting on error $errorCode - $description");
-		self::terminateDispatch();
 		
+		if(self::$responseCode)
+			header(self::$errorCodeMap[self::$responseCode]);
+		
+		self::terminateDispatch();
 		
 		header("X-Kaltura:error-$errorCode");
 		header("X-Kaltura-App: exiting on error $errorCode - $description");
@@ -117,5 +130,10 @@ class KExternalErrors
 	{
 		if (class_exists('KalturaLog') && isset($GLOBALS["start"])) 
 			KalturaLog::debug("Disptach took - " . (microtime(true) - $GLOBALS["start"]) . " seconds, memory: ".memory_get_peak_usage(true));
+	}
+	
+	public static function setResponseErrorCode($errorCode)
+	{
+		self::$responseCode = $errorCode;
 	}
 }	

@@ -241,7 +241,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 		
-		KBatchBase::unimpersonate();		
+		KBatchBase::unimpersonate();
 	}
 
 	private function handleCaptionAsset($entryId, $conversionProfileId, SimpleXMLElement $caption)

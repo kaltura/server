@@ -26,7 +26,7 @@ abstract class BaseDropFolderFilePeer {
 	const TM_CLASS = 'DropFolderFileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 23;
+	const NUM_COLUMNS = 22;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;

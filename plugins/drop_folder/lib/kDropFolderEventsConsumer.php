@@ -372,6 +372,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		$parsedSlug = null;
 		$parsedFlavor = null;
 		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getNameForParsing(), $parsedSlug, $parsedFlavor);
+
  		if($isMatch)
  		{
  			$file->setParsedSlug($parsedSlug);

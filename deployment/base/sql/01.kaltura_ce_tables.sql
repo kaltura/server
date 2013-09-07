@@ -610,7 +610,6 @@ CREATE TABLE IF NOT EXISTS `drop_folder_file` (
   `partner_id` int(11) NOT NULL,
   `drop_folder_id` int(11) NOT NULL,
   `file_name` varchar(500) NOT NULL,
-  `name` varchar(500) NOT NULL,
   `status` int(11) NOT NULL,
   `file_size` bigint(20) NOT NULL,
   `file_size_last_set_at` datetime DEFAULT NULL,
@@ -1376,7 +1375,6 @@ CREATE TABLE IF NOT EXISTS `metadata_profile_field` (
   `type` varchar(127) DEFAULT NULL,
   `xpath` varchar(255) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
-  `search_index` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `partner_id` (`partner_id`),
   KEY `profile_id_and_version` (`metadata_profile_id`,`metadata_profile_version`)

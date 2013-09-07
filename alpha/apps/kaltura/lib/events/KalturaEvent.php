@@ -25,9 +25,11 @@ abstract class KalturaEvent
 	{
 		if(!$consumer->shouldConsumeEvent($this))
 			return true;
-	
-		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer));
-		return $consumer->consumeEvent($this);
+
+		KalturaLog::debug('consumer [' . get_class($consumer) . '] started handling [' . get_class($this) . ']');
+		$result = $consumer->consumeEvent($this);
+		KalturaLog::debug('consumer [' . get_class($consumer) . '] finished handling [' . get_class($this) . ']');
+		return $result;
 	}
 	
 	/**

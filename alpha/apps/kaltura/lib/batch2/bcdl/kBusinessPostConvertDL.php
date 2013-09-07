@@ -134,13 +134,6 @@ class kBusinessPostConvertDL
 			KalturaLog::err($e->getMessage());
 		}
 		
-		$flavorSize = $currentFlavorAsset->getSize();
-		if($dbBatchJob) {
-			// Multiply by 1024 to get the file size in bytes.
-			$dbBatchJob->putInCustomData("flavor_size", $flavorSize * 1024);
-			$dbBatchJob->save();
-		}
-				
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
 		if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
@@ -469,7 +462,8 @@ class kBusinessPostConvertDL
 			// found child flavor asset that hasn't failed, no need to fail the root job
 			$siblingFlavorAssetId = $jobData->getFlavorAssetId();
 			$siblingFlavorAsset = assetPeer::retrieveById($siblingFlavorAssetId);
-			if ($siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
+			if ($siblingFlavorAsset &&
+				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
 				{

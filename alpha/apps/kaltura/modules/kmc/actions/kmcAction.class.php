@@ -27,7 +27,7 @@ class kmcAction extends kalturaAction
 		$this->partner_id = $this->getRequestParameter( "partner_id" );
 		$this->logoUrl = null;
 		if ( $this->partner_id ) {
-			$partner = PartnerPeer::retrieveByPK($partnerId);
+			$partner = PartnerPeer::retrieveByPK($this->partner_id);
 			if( $partner ){
 				$this->logoUrl = kmcUtils::getWhitelabelData( $partner, 'logo_url' );
 			}

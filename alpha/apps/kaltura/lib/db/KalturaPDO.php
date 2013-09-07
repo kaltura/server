@@ -151,6 +151,12 @@ class KalturaPDO extends PropelPDO
 		else
 			$result = $stmt->fetchAll($fetchStyle);
 		
+		if(is_null($result))
+			return false;
+			
+		if(!$result)
+			$result = array();
+			
 		$filteredResult = kApiCache::filterQueryResult($result, $filter);
 		
 		kApiCache::addSqlQueryCondition($this->configKey, $sql, $fetchStyle, $columnIndex, $filter, $filteredResult);
