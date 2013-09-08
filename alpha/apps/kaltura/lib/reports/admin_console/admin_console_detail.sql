@@ -17,7 +17,8 @@ SELECT
 	aggr_p.deleted_storage "deleted storage mb",
 	aggr_p.peak_storage "peak storage mb",
 	aggr_p.average_storage "average storage mb",
-	FLOOR(aggr_p.count_bandwidth / 1024) + aggr_p.average_storage "combined bandwidth storage"
+	FLOOR(aggr_p.count_bandwidth / 1024) + aggr_p.average_storage "combined bandwidth storage",
+	aggr_p.count_transcoding  "transcoding mb"
 FROM
 (
 	SELECT 	STATUS, 	
@@ -31,6 +32,7 @@ FROM
 	new_audios, 
 	new_images, 
 	count_bandwidth, 
+	count_transcoding,
 	added_storage,
 	deleted_storage,
 	peak_storage,
@@ -49,6 +51,7 @@ FROM
 		ORDER BY dim_partner.partner_id
 		LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */) media_usage,
 	(	SELECT dim_partner.partner_id partner_id, 	IFNULL(SUM(count_bandwidth_kb), 0) count_bandwidth,
+			IFNULL(SUM(count_transcoding_mb), 0) count_transcoding,
 			IFNULL(SUM(added_storage_mb), 0) added_storage,
 			IFNULL(SUM(deleted_storage_mb), 0) deleted_storage,
 			IFNULL(MAX(aggr_storage_mb), 0) peak_storage,

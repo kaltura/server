@@ -3,10 +3,12 @@ SELECT total_bandwidth.bandwidth/1024 bandwidth_consumption,
 	   total_storage.peak_storage peak_storage,
 	   total_storage.added_storage added_storage,
 	   total_storage.deleted_storage deleted_storage,
-	   total_bandwidth.bandwidth/1024 + total_storage.avg_storage combined_bandwidth_storage
+	   total_bandwidth.bandwidth/1024 + total_storage.avg_storage combined_bandwidth_storage,
+	   total_bandwidth.transcoding transcoding_consumption
 FROM	   
 (SELECT 
-	SUM(IFNULL(count_bandwidth_kb,0)) as bandwidth
+	SUM(IFNULL(count_bandwidth_kb,0)) as bandwidth,
+	SUM(IFNULL(count_transcoding_mb,0)) as transcoding
 FROM 
 	kalturadw.dwh_hourly_partner_usage
 WHERE
