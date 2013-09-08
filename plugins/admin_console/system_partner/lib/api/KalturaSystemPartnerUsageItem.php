@@ -142,6 +142,15 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
 	public $deletedStorage;
 	
 	/**
+	 * Amount of transcoding usage in MB
+	 * @var float
+	 */
+	public $transcodingUsage;
+	
+	
+	
+	
+	/**
 	 * Enter description here...
 	 * @param string $header - comma separated fields names	
 	 * @param string $str - comma separated fields
@@ -173,6 +182,7 @@ class KalturaSystemPartnerUsageItem extends KalturaObject
         $item->peakStorage              = ceil(@$arr[16]);
         $item->avgStorage               = ceil(@$arr[17]);
         $item->combinedBandwidthStorage = ceil(@$arr[18]);
+		$item->transcodingUsage = ceil(@$arr[19]);
 		
 		return $item;
 	}
