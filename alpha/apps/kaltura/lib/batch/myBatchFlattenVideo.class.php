@@ -177,11 +177,12 @@ class myBatchFlattenServer extends myBatchBase
 						
 						$job->setStatus(BatchJob::BATCHJOB_STATUS_FINISHED);
 						
-						$filePath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
-						if (file_exists($filePath))
+						list($rootPath, $filePath) = kFileSyncUtils::getLocalFilePathArrForKey($fileSyncKey);
+						$fileFullPath = $rootPath . $filePath; 
+						if (file_exists($fileFullPath))
 						{
 							try {
-								kFileSyncUtils::createSyncFileForKey($fileSyncKey);
+								kFileSyncUtils::createSyncFileForKey($rootPath, $filePath, $fileSyncKey);
 							}
 							catch(Exception $ex) // hack for the case where the file sync already exists and we re-flattened a mix
 							{
@@ -189,7 +190,7 @@ class myBatchFlattenServer extends myBatchBase
 							}
 						}							
 						else
-							KalturaLog::debug("The file [$filePath] doesn't exists, not creating FileSync");
+							KalturaLog::debug("The file [$fileFullPath] doesn't exists, not creating FileSync");
 					}
 					$job->save();
 				}
