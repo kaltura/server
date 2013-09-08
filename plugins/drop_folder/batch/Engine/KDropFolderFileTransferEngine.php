@@ -134,7 +134,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		else // file sizes are equal
 		{
 			$time = time();
-			$fileSizeLastSetAt = $dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
+			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
 			
 			KalturaLog::debug("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
 			
