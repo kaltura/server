@@ -80,6 +80,11 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$listControl->setStartFrom($startFrom);
 			$listRecordingRequest = new WebexXmlListRecordingRequest();
 			$listRecordingRequest->setListControl($listControl);
+			
+			$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
+			$servicesTypes[] = new WebexXmlComServiceTypeType(WebexXmlComServiceTypeType::_MEETINGCENTER);
+			$listRecordingRequest->setServiceTypes($servicesTypes);
+			
 			if($this->dropFolder->incremental)
 			{
 				$createTimeScope = new WebexXmlEpCreateTimeScopeType();
@@ -89,7 +94,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				KalturaLog::debug($createTimeScope->getCreateTimeEnd());
 				$listRecordingRequest->setCreateTimeScope($createTimeScope);
 			}
-				
+			
+							
 			$xmlClient = new WebexXmlClient($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $securityContext);
 			$listRecordingResponse = $xmlClient->send($listRecordingRequest);
 			

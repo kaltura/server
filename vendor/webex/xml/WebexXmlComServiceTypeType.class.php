@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__ . '/WebexXmlRequestType.class.php');
+require_once(__DIR__ . '/WebexXmlEnumerator.class.php');
 
-class WebexXmlComServiceTypeType extends WebexXmlRequestType
+class WebexXmlComServiceTypeType extends WebexXmlEnumerator
 {
 	const _MEETINGCENTER = 'MeetingCenter';
 					
@@ -48,7 +48,7 @@ class WebexXmlComServiceTypeType extends WebexXmlRequestType
 	 */
 	protected function getXmlNodeName()
 	{
-		return 'serviceTypeType';
+		return 'serviceType';
 	}
 	
 }
