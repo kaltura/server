@@ -221,20 +221,24 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	 */
 	static function getInstanceByType ($type)
 	{
+		$ret = null;
 		switch ($type) {
 			case DropFolderType::FTP:
 			case DropFolderType::SFTP:
 			case DropFolderType::LOCAL:
 			case DropFolderType::SCP:
 			case DropFolderType::S3:
-				return new KalturaDropFolderFile();				
+				$ret = new KalturaDropFolderFile();				
 				break;
 			
 			default:
-				return KalturaPluginManager::loadObject('KalturaDropFolderFile', $type);
+				$ret = KalturaPluginManager::loadObject('KalturaDropFolderFile', $type);
 				break;
 		}
 		
-		return new KalturaDropFolderFile();
+		if (!$ret)
+			$ret = new KalturaDropFolderFile();
+			
+		return $ret;
 	}
 }
