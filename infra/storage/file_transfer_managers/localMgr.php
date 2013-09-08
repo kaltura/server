@@ -103,7 +103,7 @@ class localMgr extends kFileTransferMgr
 	{
 		// if the file doesnt exist don't return an error. when using a local drop folder the files may be moved and not copied
 		// in this case the file won't exist anymore in the drop folder however the watcher will make sure orphan files are deleted.
-		return file_exists($remote_file) ? @unlink($remote_file) : true;
+		return $this->doFileExists($remote_file) ? @unlink($remote_file) : true;
 	}
 
 	// delete a directory and return true/false according to success
