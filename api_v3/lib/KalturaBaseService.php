@@ -99,7 +99,7 @@ abstract class KalturaBaseService
 		$this->ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
 		
 		// operating partner = partner from the request or the ks partner
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		
 		// if there is no session, assume it's partner 0 using actions that doesn't require ks
 		if(is_null($partnerId))

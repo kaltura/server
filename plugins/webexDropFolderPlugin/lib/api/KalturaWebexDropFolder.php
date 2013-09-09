@@ -45,6 +45,11 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	 */
 	public $categoriesMetadataFieldName;
 	
+	/**
+	* @var bool
+	*/
+	public $enforceEntitlement;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -56,6 +61,7 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 		'webexServiceUrl',
 		'webexHostIdMetadataFieldName',
 		'categoriesMetadataFieldName',
+		'enforceEntitlement',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -74,7 +80,7 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 	
 	protected function validate ()
 	{
-		if (!WebexDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()))
+		if (!WebexDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || WebexDropFolderPlugin::isAllowedPartner($this->partnerId))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the WebexDropFolder feature.');
 		}
