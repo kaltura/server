@@ -188,10 +188,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		if ($filter->get('_in_status'))
 		{
 			$statusList = explode(',', $filter->get('_in_status'));
-			foreach ($statusList as &$status)
-			{
-				$status = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::STATUS, $status, kCurrentContext::getCurrentPartnerId());
-			}
+			$statusList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::STATUS, $statusList);
 			$filter->set('_in_status', implode(',', $statusList));
 		}
 		
@@ -203,10 +200,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		if ($filter->get('_in_update_method'))
 		{
 			$updateMethodList = explode(',', $filter->get('_in_update_method'));
-			foreach ($updateMethodList as &$updateMethod)
-			{
-				$updateMethod = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $updateMethod, kCurrentContext::getCurrentPartnerId());
-			}
+			$updateMethodList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $updateMethodList);
 			$filter->set('_in_update_method', implode(',', $updateMethodList));
 		}
 		
@@ -222,10 +216,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			
 			if($filter->get('_matchand_permission_names'))
 			{
-				foreach ($permissionNamesList as &$permissionName)
-				{
-					$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
-				}
+				$permissionNamesList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList);				
 				$criterion = $this->getNewCriterion(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList, baseObjectFilter::MATCH_AND);
 				$this->addAnd($criterion);
 			}
@@ -242,10 +233,7 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			foreach ($permissionLevels as $permissionLevel)
 			{
 				$permissionNamesList = categoryKuser::getPermissionNamesByPermissionLevel($permissionLevel);
-				foreach ($permissionNamesList as &$permissionName)
-				{
-					$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
-				}
+				$permissionNamesList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList);
 				$criterion = $this->getNewCriterion(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList, baseObjectFilter::MATCH_AND);
 				$this->addOr($criterion);
 			}
@@ -256,30 +244,21 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		if ($filter->get('_matchor_permission_names'))
 		{
 			$permissionNamesList = explode(',', $filter->get('_matchor_permission_names'));
-			foreach ($permissionNamesList as &$permissionName)
-			{
-				$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
-			}
+			$permissionNamesList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList);
 			$filter->set('_matchor_permission_names', implode(',', $permissionNamesList));
 		}
 
 		if ($filter->get('_matchand_permission_names'))
 		{
 			$permissionNamesList = explode(',', $filter->get('_matchand_permission_names'));
-			foreach ($permissionNamesList as &$permissionName)
-			{
-				$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
-			}
+			$permissionNamesList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList);
 			$filter->set('_matchand_permission_names', implode(',', $permissionNamesList));
 		}
 		
 		if ($filter->get('_notcontains_permission_names'))
 		{
 			$permissionNamesList = explode(',', $filter->get('_notcontains_permission_names'));
-			foreach ($permissionNamesList as &$permissionName)
-			{
-				$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
-			}
+			$permissionNamesList = $this->translateToSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList);
 			$filter->set('_notcontains_permission_names', $permissionNamesList);
 		}
 		
@@ -289,6 +268,16 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		}
 		
 		return parent::applyFilterFields($filter);
+	}
+	
+	public function translateToSearchIndexFieldValue($fieldName, $toTranslate)
+	{
+		foreach ($toTranslate as &$translate)
+		{
+			$translate = categoryKuser::getSearchIndexFieldValue($fieldName, $translate, kCurrentContext::getCurrentPartnerId());
+		}
+		
+		return $toTranslate;
 	}
 	
 	public function translateSphinxCriterion (SphinxCriterion $crit)
