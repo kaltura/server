@@ -7,10 +7,10 @@ if ($argc !== 2)
 	die;
 }
 $partnerId = $argv[1];
-$class = new LikeReCalculator($partnerId);
+$class = new LikesReCalculator($partnerId);
 $class->run();
 
-class LikeReCalculator
+class LikesReCalculator
 {
 	/**
 	 * @var Partner
