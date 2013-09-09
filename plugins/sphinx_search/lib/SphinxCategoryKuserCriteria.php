@@ -215,6 +215,44 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$filter->set('_eq_update_method', categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $filter->get('_eq_update_method'), kCurrentContext::getCurrentPartnerId()));
 		}
 		
+		if ($filter->get('_eq_permission_level'))
+		{
+			$permissionLevel = $filter->get('_eq_permission_level');
+			$permissionNamesList = categoryKuser::getPermissionNamesByPermissionLevel($permissionLevel);
+			
+			if($filter->get('_matchand_permission_names'))
+			{
+				foreach ($permissionNamesList as &$permissionName)
+				{
+					$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
+				}
+				$criterion = $this->getNewCriterion(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList, baseObjectFilter::MATCH_AND);
+				$this->addAnd($criterion);
+			}
+			else 
+				$filter->set('_matchand_permission_names', $permissionNamesList);
+				
+			$filter->unsetByName('_eq_permission_level');
+		}
+		
+		if ($filter->get('_in_permission_level'))
+		{
+			$permissionLevels = $filter->get('_in_permission_level');
+			$permissionLevels = explode(',', $permissionLevels);
+			foreach ($permissionLevels as $permissionLevel)
+			{
+				$permissionNamesList = categoryKuser::getPermissionNamesByPermissionLevel($permissionLevel);
+				foreach ($permissionNamesList as &$permissionName)
+				{
+					$permissionName = categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::PERMISSION_NAMES, $permissionName, kCurrentContext::getCurrentPartnerId());
+				}
+				$criterion = $this->getNewCriterion(categoryKuserPeer::PERMISSION_NAMES, $permissionNamesList, baseObjectFilter::MATCH_AND);
+				$this->addOr($criterion);
+			}
+			
+			$filter->unsetByName('_in_permission_level');
+		}
+		
 		if ($filter->get('_matchor_permission_names'))
 		{
 			$permissionNamesList = explode(',', $filter->get('_matchor_permission_names'));
