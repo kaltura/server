@@ -63,7 +63,7 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function applyCondition(IKalturaDbQuery $query)
 	{
 		if ($this->memberIdIn)
 		{
@@ -86,9 +86,10 @@ class kCategoryKuserAdvancedFilter extends AdvancedSearchFilterItem
 						$memberPermissionsArr[] = $memberId.str_replace('_', '', $permissionName);
 					}
 				}
-				
-				$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_AND : baseObjectFilter::MATCH_OR);
-				$query->addOr($criterion);
+				if ($query instanceof Criteria){
+					$criterion = $query->getNewCriterion('category.MEMBERS', $memberPermissionsArr, $this->memberPermissionsMatchAnd ? baseObjectFilter::MATCH_AND : baseObjectFilter::MATCH_OR);
+					$query->addOr($criterion);
+				}
 			}
 			
 		} 
