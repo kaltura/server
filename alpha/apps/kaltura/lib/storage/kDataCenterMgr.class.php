@@ -292,5 +292,9 @@ class kDataCenterMgr
 		}
 		return !is_null($tempDc);
 	}
+	
+	public static function incrementVersion($version) 
+	{
+		return (ceil($version / 10) * 10) + 2 - self::getCurrentDcId();		
+	}
 }
-?>
