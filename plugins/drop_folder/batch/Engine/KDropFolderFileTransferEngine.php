@@ -30,7 +30,10 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			/* @var $physicalFile FileObject */	
 			$physicalFileName = $physicalFile->filename;
 			if ($this->dropFolder->incremental && $physicalFile->modificationTime < $this->dropFolder->lastFileTimestamp)
+			{
+				KalturaLog::info("File modification time [" . $physicalFile->modificationTime ."] predates drop folder last timestamp [". $this->dropFolder->lastFileTimestamp ."]. Skipping.");
 				continue;
+			}
 			
 			if($this->validatePhysicalFile($physicalFileName))
 			{
@@ -65,7 +68,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$this->handleFilePurged($dropFolderFile->id);
 		}
 		
-		if ($this->dropFolder->incremental)
+		if ($this->dropFolder->incremental && $maxModificationTime > $this->dropFolder->lastFileTimestamp)
 		{
 			$updateDropFolder = new KalturaDropFolder();
 			$updateDropFolder->lastFileTimestamp = $maxModificationTime;
