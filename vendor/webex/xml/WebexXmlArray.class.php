@@ -16,6 +16,15 @@ class WebexXmlArray implements ArrayAccess, Iterator
 		$this->class = $class;
 	}
 	
+	public function __toString()
+	{
+		$ret = '';
+		foreach($this->array as $item)
+			$ret .= strval($item);
+		
+		return $ret;
+	}
+	
 	public function offsetExists($offset) 
 	{
 		return array_key_exists($offset, $this->array);
