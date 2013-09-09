@@ -26,12 +26,12 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 			{
 				$this->handleFileAdded ($physicalFile);
-				$maxTime = strtotime($physicalFile->getCreateTime()) > $maxTime ? strtotime($physicalFile->getCreateTime()) : $maxTime;
-				KalturaLog::debug("new maxTime val: $maxTime");
+				$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
+				KalturaLog::info("maxTime updated: $maxTime");
 			}
 		}
 		
-		if ($this->dropFolder->incremental)
+		if ($this->dropFolder->incremental && $maxTime > $this->dropFolder->lastFileTimestamp)
 		{
 			$updateDropFolder = new KalturaDropFolder();
 			$updateDropFolder->lastFileTimestamp = $maxTime;
@@ -84,7 +84,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
 			$servicesTypes[] = new WebexXmlComServiceTypeType(WebexXmlComServiceTypeType::_MEETINGCENTER);
 			$listRecordingRequest->setServiceTypes($servicesTypes);
-			
+ 			
 			if($this->dropFolder->incremental)
 			{
 				$createTimeScope = new WebexXmlEpCreateTimeScopeType();
