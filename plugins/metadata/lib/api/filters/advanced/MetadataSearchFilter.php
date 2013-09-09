@@ -49,8 +49,10 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterOperator::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query, $xPaths = null)
+	public function applyCondition(IKalturaDbQuery $query, $xPaths = null)
 	{
+		if (!($query instanceof IKalturaIndexQuery))
+			return;  
 		$this->parentQuery = $query;
 		
 		if(!$this->condition)
