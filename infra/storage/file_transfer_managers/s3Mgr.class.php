@@ -169,6 +169,11 @@ class s3Mgr extends kFileTransferMgr
 		return false;
 	}
 
+	protected function doListFileObjects ($remoteDir)
+	{
+		return false;
+	}
+
 	protected function doFileSize($remote_file)
 	{
 		return false;

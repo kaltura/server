@@ -142,6 +142,12 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 	public $combinedStorageBandwidth;
 	
 	/**
+	 * Amount of transcoding usage in MB
+	 * @var float
+	 */
+	public $transcodingUsage;
+	
+	/**
 	 * TGhe date at which the report was taken - Unix Timestamp
 	 * @var string 
 	 */
@@ -165,13 +171,12 @@ class KalturaVarPartnerUsageItem extends KalturaObject
 		$this->partnerId  		= @$arr[3];
 		$this->partnerCreatedAt = @$arr[4];
 		$this->bandwidth 		= ceil(@$arr[5]);
-		//$item->totalStorage 	= @$arr[15];
         $this->avgStorage = ceil(@$arr[6]);
 		$this->peakStorage =  ceil(@$arr[7]);
 		$this->storage 		= ceil(@$arr[8]);
 		$this->deletedStorage = ceil(@$arr[9]);
         $this->combinedStorageBandwidth = ceil(@$arr[10]);
-			
+		$this->transcodingUsage = ceil(@$arr[11]);
 		//return $item;
 	}
 	

@@ -150,7 +150,10 @@ class KCurlWrapper
 
 		curl_setopt($this->ch, CURLOPT_NOSIGNAL, true);
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
-
+		
+		if($params && isset($params->curlTimeout) && $params->curlTimeout)
+			$this->setTimeout($params->curlTimeout);
+		
 		if($params && isset($params->curlVerbose) && $params->curlVerbose)
 			curl_setopt($this->ch, CURLOPT_VERBOSE, true);
 

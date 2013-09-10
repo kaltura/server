@@ -41,6 +41,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'category.UPDATED_AT' => 'updated_at',
 		'category.DELETED_AT' => 'deleted_at',	
 		'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
+		'category.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -97,6 +98,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 		'sphinx_match_optimizations'=> IIndexable::FIELD_TYPE_STRING,
+		'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
 	);
 	
 	public static $sphinxFieldsEscapeType = array(

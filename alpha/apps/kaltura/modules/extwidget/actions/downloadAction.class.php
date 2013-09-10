@@ -230,6 +230,7 @@ class downloadAction extends sfAction
 		if (!$local)
 		{
 			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KExternalErrors::terminateDispatch();
 			$this->redirect($url);
 		}
 	}

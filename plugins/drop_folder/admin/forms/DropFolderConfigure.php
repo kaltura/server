@@ -75,6 +75,11 @@ class Form_DropFolderConfigure extends Infra_Form
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('checkbox', 'incremental', array(
+			'label'	  => 'Incremental',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
+		));
 
 		$this->addElement('hidden', 'crossLine1', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))

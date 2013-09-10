@@ -12,4 +12,5 @@ configurations/url_managers.ini
 configurations/google_auth.ini
 plugins/.buildpath
 plugins/.settings/*
+alpha/.settings/
 .idea
