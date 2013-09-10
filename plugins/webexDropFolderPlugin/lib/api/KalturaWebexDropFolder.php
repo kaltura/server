@@ -78,12 +78,24 @@ class KalturaWebexDropFolder extends KalturaDropFolder
 		return parent::toObject($dbObject, $skip);
 	}
 	
-	protected function validate ()
+	public function validateForInsert($propertiesToSkip = array())
 	{
-		if (!WebexDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || WebexDropFolderPlugin::isAllowedPartner($this->partnerId))
+		if (!WebexDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !WebexDropFolderPlugin::isAllowedPartner($this->partnerId))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the WebexDropFolder feature.');
 		}
+	}
+	
+	public function validateForUpdate ($sourceObject, $propertiesToSkip = array())
+	{
+		if (!WebexDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !WebexDropFolderPlugin::isAllowedPartner($sourceObject->getPartnerId()))
+		{
+			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the WebexDropFolder feature.');
+		}
+	}
+	
+	protected function validate ()
+	{
 		
 		if (isset($this->fileHandlerType) && $this->fileHandlerType != DropFolderFileHandlerType::CONTENT) 
 		{

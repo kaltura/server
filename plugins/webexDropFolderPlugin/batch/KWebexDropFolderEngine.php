@@ -2,7 +2,7 @@
 /**
  * 
  */
-class KWebexDropFolderEngine extends KDropFolderEngine
+class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 {
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
@@ -44,15 +44,17 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	{
 		KBatchBase::impersonate ($job->partnerId);
 		
+		/* @var $data KalturaWebexDropFolderContentProcessorJobData */
+		$dropFolder = $this->dropFolderPlugin->dropFolder->get ($data->dropFolderId);
 		//In the case of the webex drop folder engine, the only possible contentMatch policy is ADD_AS_NEW.
 		//Any other policy should cause an error.
 		switch ($data->contentMatchPolicy)
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
-				$this->addAsNewContent($job, $data);
+				$this->addAsNewContent($job, $data, $dropFolder);
 				break;
 			default:
-				//throw error
+				throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, 'Content match policy not allowed for Webex drop folders');
 				break;
 		}
 		
@@ -61,10 +63,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	
 	protected function listRecordings ()
 	{
-		//1.ADD WHILE LOOP- GRAB ALL THE DROP FOLDER FILES (EVEN IF IT IS A LOT)
-		
-		//2. CALCUlate latest creation date
-		
 		KalturaLog::info('Fetching list of recordings from Webex');
 		$securityContext = new WebexXmlSecurityContext();
 		$securityContext->setUid($this->dropFolder->webexUserId); // webex username
@@ -137,7 +135,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
-	protected function addAsNewContent (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
+	protected function addAsNewContent (KalturaBatchJob $job, KalturaWebexDropFolderContentProcessorJobData $data, KalturaWebexDropFolder $folder)
 	{
 		/* @var $data KalturaWebexDropFolderContentProcessorJobData */
 		$resource = $this->getIngestionResource($job, $data);
@@ -146,7 +144,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		$newEntry->conversionProfileId = $data->conversionProfileId;
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->description = $data->description;
-		$newEntry->userId = $this->retrieveUserFromWebexHostId($data);
+		$newEntry->userId = $this->retrieveUserFromWebexHostId($data, $folder);
 		$newEntry->referenceId = $data->parsedSlug;
 			
 		KBatchBase::$kClient->startMultiRequest();
@@ -157,20 +155,20 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		if ($result [1] && $result[1] instanceof KalturaBaseEntry)
 		{
 			$entry = $result [1];
-			$this->createCategoryAssociations ($data, $entry->userId, $entry->id);
+			$this->createCategoryAssociations ($folder, $entry->userId, $entry->id);
 		}
 	}
 
 	
-	protected function retrieveUserFromWebexHostId (KalturaWebexDropFolderContentProcessorJobData $data)
+	protected function retrieveUserFromWebexHostId (KalturaWebexDropFolderContentProcessorJobData $data, KalturaWebexDropFolder $folder)
 	{
-		if ($data->metadataProfileId && $data->webexHostIdMetadataFieldName && $data->webexHostId)
+		if ($folder->metadataProfileId && $folder->webexHostIdMetadataFieldName && $data->webexHostId)
 		{
 			$filter = new KalturaUserFilter();
 			$filter->advancedSearch = new KalturaMetadataSearchItem();
-			$filter->advancedSearch->metadataProfileId = $data->metadataProfileId;
+			$filter->advancedSearch->metadataProfileId = $folder->metadataProfileId;
 			$webexHostIdSearchCondition = new KalturaSearchCondition();
-			$webexHostIdSearchCondition->field = $data->webexHostIdMetadataFieldName;
+			$webexHostIdSearchCondition->field = $folder->webexHostIdMetadataFieldName;
 			$webexHostIdSearchCondition->value = $data->webexHostId;
 			$filter->advancedSearch->items = array($webexHostIdSearchCondition);
 			try
@@ -189,15 +187,16 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			}
 
 		}
+		
 		return $data->webexHostId;
 	}
 	
-	protected function createCategoryAssociations (KalturaWebexDropFolderContentProcessorJobData $data, $userId, $entryId)
+	protected function createCategoryAssociations (KalturaWebexDropFolder $folder, $userId, $entryId)
 	{
-		if ($data->metadataProfileId && $data->categoriesIdsMetadataFieldName)
+		if ($folder->metadataProfileId && $folder->categoriesMetadataFieldName)
 		{
 			$filter = new KalturaMetadataFilter();
-			$filter->metadataProfileIdEqual = $data->metadataProfileId;
+			$filter->metadataProfileIdEqual = $folder->metadataProfileId;
 			$filter->objectIdEqual = $userId;
 			$filter->metadataObjectTypeEqual = KalturaMetadataObjectType::USER;
 			
@@ -208,7 +207,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$res = $metadataPlugin->metadata->listAction($filter, new KalturaFilterPager());
 				$metadataObj = $res->objects[0];
 				$xmlElem = new SimpleXMLElement($metadataObj->xml);
-				$categoriesXPathRes = $xmlElem->xpath($data->categoriesIdsMetadataFieldName);
+				$categoriesXPathRes = $xmlElem->xpath($folder->categoriesMetadataFieldName);
 				
 				$categories = strval($categoriesXPathRes[0]);
 				$categoryFilter = new KalturaCategoryFilter();
@@ -216,15 +215,15 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$categoryListResponse = KBatchBase::$kClient->category->listAction ($categoryFilter, new KalturaFilterPager());
 				if ($categoryListResponse->objects && count($categoryListResponse->objects))
 				{
-					KBatchBase::$kClient->startMultiRequest();
-					foreach ($categoryListResponse->objects as $category)
+					if (!$folder->enforceEntitlement)
 					{
-						$categoryEntry = new KalturaCategoryEntry();
-						$categoryEntry->entryId = $entryId;
-						$categoryEntry->categoryId = $category->id;
-						KBatchBase::$kClient->categoryEntry->add($categoryEntry);
+						//easy
+						$this->createCategoryEntriesNoEntitlement ($categoryListResponse->objects, $entryId);
 					}
-					KBatchBase::$kClient->doMultiRequest();
+					else {
+						//write your will
+						$this->createCategoryEntriesWithEntitlement ($categoryListResponse->objects, $entryId, $userId);
+					}
 				}
 			}
 			catch (Exception $e)
@@ -234,4 +233,41 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
+	private function createCategoryEntriesNoEntitlement (array $categoriesArr, $entryId)
+	{
+		KBatchBase::$kClient->startMultiRequest();
+		foreach ($categoriesArr as $category)
+		{
+			$categoryEntry = new KalturaCategoryEntry();
+			$categoryEntry->entryId = $entryId;
+			$categoryEntry->categoryId = $category->id;
+			KBatchBase::$kClient->categoryEntry->add($categoryEntry);
+		}
+		KBatchBase::$kClient->doMultiRequest();
+	}
+	
+	private function createCategoryEntriesWithEntitlement (array $categoriesArr, $entryId, $userId)
+	{
+		$partnerInfo = KBatchBase::$kClient->partner->get(KBatchBase::$kClientConfig->partnerId);
+		
+		$clientConfig = new KalturaConfiguration($partnerInfo->id);
+		$clientConfig->serviceUrl = KBatchBase::$kClient->getConfig()->serviceUrl;
+		$clientConfig->setLogger($this);
+		$client = new KalturaClient($clientConfig);
+		foreach ($categoriesArr as $category)
+		{
+			/* @var $category KalturaCategory */
+			$ks = $client->generateSessionV2($partnerInfo->adminSecret, $userId, KalturaSessionType::ADMIN, $partnerInfo->id, 86400, 'enableentitlement,privacycontext:'.$category->privacyContext);
+			$client->setKs($ks);
+			$categoryEntry = new KalturaCategoryEntry();
+			$categoryEntry->categoryId = $category->id;
+			$categoryEntry->entryId = $entryId;
+			$client->categoryEntry->add ($categoryEntry);
+		}
+	}
+	
+	function log($message)
+	{
+		KalturaLog::log($message);
+	}
 }
