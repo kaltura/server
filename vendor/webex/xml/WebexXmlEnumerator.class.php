@@ -18,7 +18,6 @@ abstract class WebexXmlEnumerator extends WebexXmlObject
 		$name = $this->getXmlNodeName();
 			
 		$xml = "<$name>{$this->value}</$name>";
-		var_dump('request so far '. $xml);
 		return $xml;
 	}
 	

@@ -19,6 +19,8 @@ class WebexDropFolder extends RemoteDropFolder
 
 	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
 	
+	const ENFORCE_ENTITLEMENT = 'enforce_entitlement';
+	
 	/**
 	 * @var string
 	 */
@@ -53,6 +55,11 @@ class WebexDropFolder extends RemoteDropFolder
 	 * @var string
 	 */
 	protected $categoriesMetadataFieldName;
+	
+	/**
+	 * @var bool
+	 */
+	protected $enforceEntitlement;
 	
 	/**
 	 * return string
@@ -166,9 +173,25 @@ class WebexDropFolder extends RemoteDropFolder
 		$this->putInCustomData(self::CATEGORIES_METADATA_FIELD_NAME, $v);
 	}
 	
+	/**
+	 * return bool
+	 */
+	public function getEnforceEntitlement ()
+	{
+		return $this->getFromCustomData(self::ENFORCE_ENTITLEMENT);
+	}
+	
+	/**
+	 * @param bool $v
+	 */
+	public function setEnforceEntitlement ($v)
+	{
+		$this->putInCustomData(self::ENFORCE_ENTITLEMENT, $v);
+	}
+	
 	public function getImportJobData()
 	{
-		return null;
+		return new kDropFolderImportJobData();
 	}
 	
 	public function getFolderUrl()
@@ -178,7 +201,7 @@ class WebexDropFolder extends RemoteDropFolder
 	
 	protected function getRemoteFileTransferMgrType()
 	{
-		return null;
+		return kFileTransferMgrType::HTTP;
 	}
 	
 }
