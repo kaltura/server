@@ -144,7 +144,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		$newEntry->conversionProfileId = $data->conversionProfileId;
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->description = $data->description;
-		$newEntry->userId = $this->retrieveUserFromWebexHostId($data);
+		$newEntry->userId = $this->retrieveUserFromWebexHostId($data, $folder);
 		$newEntry->referenceId = $data->parsedSlug;
 			
 		KBatchBase::$kClient->startMultiRequest();
@@ -160,15 +160,15 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 	}
 
 	
-	protected function retrieveUserFromWebexHostId (KalturaWebexDropFolderContentProcessorJobData $data)
+	protected function retrieveUserFromWebexHostId (KalturaWebexDropFolderContentProcessorJobData $data, KalturaWebexDropFolder $folder)
 	{
-		if ($data->metadataProfileId && $data->webexHostIdMetadataFieldName && $data->webexHostId)
+		if ($folder->metadataProfileId && $folder->webexHostIdMetadataFieldName && $data->webexHostId)
 		{
 			$filter = new KalturaUserFilter();
 			$filter->advancedSearch = new KalturaMetadataSearchItem();
-			$filter->advancedSearch->metadataProfileId = $data->metadataProfileId;
+			$filter->advancedSearch->metadataProfileId = $folder->metadataProfileId;
 			$webexHostIdSearchCondition = new KalturaSearchCondition();
-			$webexHostIdSearchCondition->field = $data->webexHostIdMetadataFieldName;
+			$webexHostIdSearchCondition->field = $folder->webexHostIdMetadataFieldName;
 			$webexHostIdSearchCondition->value = $data->webexHostId;
 			$filter->advancedSearch->items = array($webexHostIdSearchCondition);
 			try
@@ -187,12 +187,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 			}
 
 		}
+		
 		return $data->webexHostId;
 	}
 	
 	protected function createCategoryAssociations (KalturaWebexDropFolder $folder, $userId, $entryId)
 	{
-		if ($data->metadataProfileId && $data->categoriesIdsMetadataFieldName)
+		if ($folder->metadataProfileId && $folder->categoriesMetadataFieldName)
 		{
 			$filter = new KalturaMetadataFilter();
 			$filter->metadataProfileIdEqual = $folder->metadataProfileId;
@@ -232,7 +233,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		}
 	}
 
-	private function createCategoryEntriesWithEntitlement (array $categoriesArr, $entryId)
+	private function createCategoryEntriesNoEntitlement (array $categoriesArr, $entryId)
 	{
 		KBatchBase::$kClient->startMultiRequest();
 		foreach ($categoriesArr as $category)
@@ -245,17 +246,18 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		KBatchBase::$kClient->doMultiRequest();
 	}
 	
-	private function createCategoryEntriesNoEntitlement (array $categoriesArr, $entryId, $userId)
+	private function createCategoryEntriesWithEntitlement (array $categoriesArr, $entryId, $userId)
 	{
-		$partnerInfo = KBatchBase::$kClient->partner->get();
+		$partnerInfo = KBatchBase::$kClient->partner->get(KBatchBase::$kClientConfig->partnerId);
 		
 		$clientConfig = new KalturaConfiguration($partnerInfo->id);
+		$clientConfig->serviceUrl = KBatchBase::$kClient->getConfig()->serviceUrl;
 		$clientConfig->setLogger($this);
 		$client = new KalturaClient($clientConfig);
 		foreach ($categoriesArr as $category)
 		{
 			/* @var $category KalturaCategory */
-			$ks = $client->generateSessionV2($partnerInfo->adminSecret, $userId, KalturaSessionType::ADMIN, $partnerInfo->id, null, 'enableentitlement,privacycontext:'.$category->privacyContext);
+			$ks = $client->generateSessionV2($partnerInfo->adminSecret, $userId, KalturaSessionType::ADMIN, $partnerInfo->id, 86400, 'enableentitlement,privacycontext:'.$category->privacyContext);
 			$client->setKs($ks);
 			$categoryEntry = new KalturaCategoryEntry();
 			$categoryEntry->categoryId = $category->id;
