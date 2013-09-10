@@ -51,6 +51,11 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 			'label'			=> 'Categories Metadata Field Name:',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('checkbox', 'enforceEntitlement', array(
+			'label'	  => 'Enforce Entitlement',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
+		));
 	}
 	
 }
