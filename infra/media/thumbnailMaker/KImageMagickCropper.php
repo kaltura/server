@@ -276,7 +276,7 @@ class KImageMagickCropper extends KBaseCropper
 		}
 		else
 		{
-			return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
+			return "\"$this->cmdPath\" \"$this->srcPath\" \"$options\" \"$this->targetPath\"  2>&1";
 		}
 	}
 
