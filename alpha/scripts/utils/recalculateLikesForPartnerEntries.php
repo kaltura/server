@@ -30,6 +30,7 @@ class LikesReCalculator
 	{
 		$entryCriteria = new Criteria();
 		$entryCriteria->add(entryPeer::PARTNER_ID, $this->_partner->getId());
+		$entryCriteria->addDescendingOrderByColumn(entryPeer::INT_ID);
 
 		$entriesCount = entryPeer::doCount($entryCriteria);
 		$this->writeLine('--------------------------------');
