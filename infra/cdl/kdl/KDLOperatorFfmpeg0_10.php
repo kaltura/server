@@ -64,42 +64,25 @@ $nullDev ="/dev/null";
 
 $vid = $target->_video;
 $fltStr = null;
-
-			/*
-			 * The 'old' deinterlace failed to handle several HD sources. 
-			 * Switched to newer 'yadif'
-			 */
-		if(strstr($cmdStr, " -deinterlace")!=false) {
-			$cmdStr = str_replace(" -deinterlace", "", $cmdStr);
-			$fltStr = "yadif";
-		}
-		
 		if(isset($vid->_rotation)) {
 			if($vid->_rotation==180)
-				$rotStr = "vflip,hflip";
+				$fltStr.= " -vf vflip,hflip";
 			else if($vid->_rotation==90)
-				$rotStr = "transpose=1";
+				$fltStr.= " -vf transpose=1";
 			else if($vid->_rotation==270 || $vid->_rotation==-90)
-				$rotStr ="transpose=2";
-			if(isset($rotStr)) {
-				if(isset($fltStr))
-					$fltStr.= ",$rotStr";
-				else
-					$fltStr = " $rotStr";
-			}
+				$fltStr.=" -vf transpose=2";
 		}
 			// Letterboxing 
 		if(isset($vid->_arProcessingMode) && $vid->_arProcessingMode==2){
-			if(isset($fltStr)) 
+			if(!isset($fltStr)) 
+				$fltStr =" -vf ";
+			else
 				$fltStr.=",";
 			$fltStr.='"scale=iw*sar*min('.$vid->_width.'/(iw*sar)\,';
 			$fltStr.=$vid->_height.'/ih):ih*min('.$vid->_width.'/(iw*sar)\,';
 			$fltStr.=$vid->_height.'/ih),pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2"';
 		}
-		
-		if(isset($fltStr)) {
-			$cmdStr.= " -vf $fltStr";
-		}
+		$cmdStr.= $fltStr;
 		return $cmdStr;
 	}
 
@@ -137,11 +120,6 @@ $fltStr = null;
 		 * duration according to clipped dur
 		 */
     	$gopInSecs=($vidObj->_gop/$vidObj->_frameRate);
-    	
-    	//SUP 681 - If source frame rate is smaller than 1 or even 0 than do not use force key frames to avoid creation of unsmooth output video 
-    	if(!($gopInSecs>0))
-    		return null;
-    	
 		if(isset($target->_explicitClipDur) && $target->_explicitClipDur)
 			$dur=$target->_explicitClipDur/1000;
 		else if(isset($target->_clipDur) && $target->_clipDur)
