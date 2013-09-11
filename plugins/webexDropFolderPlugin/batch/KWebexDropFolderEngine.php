@@ -4,7 +4,7 @@
  */
 class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 {
-	const ZERO_DATE = '01/01/1971 00:00:00';
+	const ZERO_DATE = '12/31/1971 00:00:01';
 	
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
