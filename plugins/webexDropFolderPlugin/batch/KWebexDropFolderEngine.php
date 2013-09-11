@@ -8,6 +8,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
 		$this->dropFolder = $dropFolder;
+		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
 		$physicalFiles = $this->listRecordings();
 		KalturaLog::info('Recordings fetched: '.print_r($physicalFiles, true) );
 		$dropFolderFilesMap = $this->loadDropFolderFiles();
@@ -88,7 +89,8 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 				$createTimeScope = new WebexXmlEpCreateTimeScopeType();
 				$createTimeScope->setCreateTimeStart(date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp));
 				KalturaLog::debug($createTimeScope->getCreateTimeStart());
-				$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s'));
+				//24 hours forward, so as not to run into problems with different timezones.
+				$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s'), time()+86400);
 				KalturaLog::debug($createTimeScope->getCreateTimeEnd());
 				$listRecordingRequest->setCreateTimeScope($createTimeScope);
 			}
