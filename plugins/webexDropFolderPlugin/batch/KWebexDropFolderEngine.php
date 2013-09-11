@@ -4,6 +4,8 @@
  */
 class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 {
+	const ZERO_DATE = '12/31/1971 00:00:01';
+	
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
@@ -11,7 +13,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
 		$physicalFiles = $this->listRecordings();
 		KalturaLog::info('Recordings fetched: '.print_r($physicalFiles, true) );
-		$dropFolderFilesMap = $this->loadDropFolderFiles();
 		
 		if (!count($physicalFiles))
 		{
@@ -19,6 +20,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 			return;
 		}
 		
+		$dropFolderFilesMap = $this->loadDropFolderFiles();
 		$maxTime = $this->dropFolder->lastFileTimestamp;
 		foreach ($physicalFiles as $physicalFile)
 		{
@@ -73,35 +75,46 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		
 		$fileList = array();
 		$startFrom = 1;
-		do
-		{
-			$listControl = new WebexXmlEpListControlType();
-			$listControl->setStartFrom($startFrom);
-			$listRecordingRequest = new WebexXmlListRecordingRequest();
-			$listRecordingRequest->setListControl($listControl);
+		try{
 			
-			$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
-			$servicesTypes[] = new WebexXmlComServiceTypeType(WebexXmlComServiceTypeType::_MEETINGCENTER);
-			$listRecordingRequest->setServiceTypes($servicesTypes);
- 			
-			if($this->dropFolder->incremental)
+			do
 			{
-				$createTimeScope = new WebexXmlEpCreateTimeScopeType();
-				$createTimeScope->setCreateTimeStart(date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp));
-				KalturaLog::debug($createTimeScope->getCreateTimeStart());
-				//24 hours forward, so as not to run into problems with different timezones.
-				$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s'), time()+86400);
-				KalturaLog::debug($createTimeScope->getCreateTimeEnd());
-				$listRecordingRequest->setCreateTimeScope($createTimeScope);
+				$listControl = new WebexXmlEpListControlType();
+				$listControl->setStartFrom($startFrom);
+				$listRecordingRequest = new WebexXmlListRecordingRequest();
+				$listRecordingRequest->setListControl($listControl);
+				
+				$servicesTypes = new WebexXmlArray('WebexXmlComServiceTypeType');
+				$servicesTypes[] = new WebexXmlComServiceTypeType(WebexXmlComServiceTypeType::_MEETINGCENTER);
+				$listRecordingRequest->setServiceTypes($servicesTypes);
+	 			
+				if($this->dropFolder->incremental)
+				{
+					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
+					$createTimeScope->setCreateTimeStart($this->dropFolder->lastFileTimestamp ? date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp) :  self::ZERO_DATE);
+					KalturaLog::debug($createTimeScope->getCreateTimeStart());
+					//24 hours forward, so as not to run into problems with different timezones.
+					$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s'), time()+86400);
+					KalturaLog::debug($createTimeScope->getCreateTimeEnd());
+					$listRecordingRequest->setCreateTimeScope($createTimeScope);
+				}
+				
+								
+				$xmlClient = new WebexXmlClient($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $securityContext);
+				$listRecordingResponse = $xmlClient->send($listRecordingRequest);
+				
+				$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
+				$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom();
+			}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
+		}
+		catch (Exception $e)
+		{
+			if ($e->getCode() != 15 && $e->getMessage() != 'Status: FAILURE, Reason: Sorry, no record found')
+			{
+				throw $e;
 			}
-			
-							
-			$xmlClient = new WebexXmlClient($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $securityContext);
-			$listRecordingResponse = $xmlClient->send($listRecordingRequest);
-			
-			$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
-			$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom();
-		}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
+		}
+		
 		
 		return $fileList;
 	}
