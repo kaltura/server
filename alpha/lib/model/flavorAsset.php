@@ -181,14 +181,11 @@ class flavorAsset extends asset
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		$ret = parent::postUpdate($con);
-		
-		$syncFlavorParamsIds = false;
 		if($this->isColumnModified(assetPeer::STATUS)){ 
 			$this->syncEntryFlavorParamsIds();
 		}
-			
-		return $ret;
+		
+		return parent::postUpdate($con);	
 	}
 	
 	protected function syncEntryFlavorParamsIds()
