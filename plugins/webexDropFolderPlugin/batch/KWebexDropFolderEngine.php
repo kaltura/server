@@ -4,6 +4,8 @@
  */
 class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 {
+	const ZERO_DATE = '01/01/1971 00:00:00';
+	
 	public function watchFolder (KalturaDropFolder $dropFolder)
 	{
 		/* @var $dropFolder KalturaWebexDropFolder */
@@ -88,7 +90,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 				if($this->dropFolder->incremental)
 				{
 					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
-					$createTimeScope->setCreateTimeStart(date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp));
+					$createTimeScope->setCreateTimeStart($this->dropFolder->lastFileTimestamp ? date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp) :  self::ZERO_DATE);
 					KalturaLog::debug($createTimeScope->getCreateTimeStart());
 					$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s'));
 					KalturaLog::debug($createTimeScope->getCreateTimeEnd());
