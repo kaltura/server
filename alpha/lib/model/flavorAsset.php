@@ -160,36 +160,29 @@ class flavorAsset extends asset
 	    $this->setStatus($newStatus);
 	}
 
-	public function postUpdate(PropelPDO $con = null)
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null) 
 	{
-		if ($this->alreadyInSave)
-			return parent::postUpdate($con);
+		parent::postSave();
 		
-		$syncFlavorParamsIds = false;
-		if(	($this->isColumnModified(assetPeer::STATUS) &&
-			($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)))
+		if($this->isColumnModified(assetPeer::STATUS) && 
+			($this->getStatus() == self::ASSET_STATUS_READY || $this->getStatus() == self::ASSET_STATUS_DELETED))
 		{
 			$entry = $this->getentry();
-	    	if (!$entry)
+			if (!$entry)
 	    	{
 	        	KalturaLog::err('Cannot get entry object for flavor asset id ['.$this->getId().']');
 	    	}
-	    	elseif ($entry->getStatus() != entryStatus::DELETED)
+	    	else 
 	    	{
-	    		$syncFlavorParamsIds = true;
+				KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
+	        	$entry->syncFlavorParamsIds();
+	        	$entry->save();
 	    	}
 		}
-		
-		$ret = parent::postUpdate($con);
-		
-	    if($syncFlavorParamsIds)
-	    {
-        	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
-        	$entry->syncFlavorParamsIds();
-        	$entry->save();
-	    }
-		
-		return $ret;
 	}
 	
 	public function linkFromAsset(asset $fromAsset)
