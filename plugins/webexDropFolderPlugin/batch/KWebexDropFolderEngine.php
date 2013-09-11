@@ -126,7 +126,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 			$newDropFolderFile = new KalturaWebexDropFolderFile();
 	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
 	    	$newDropFolderFile->fileName = $webexFile->getName() . '_' . $webexFile->getRecordingID();
-	    	$newDropFolderFile->fileSize = $webexFile->getSize() * 1000000;
+	    	$newDropFolderFile->fileSize = $webexFile->getSize() * 1024*1024;
 	    	$newDropFolderFile->lastModificationTime = $webexFile->getCreateTime(); 
 			$newDropFolderFile->description = $webexFile->getDescription();
 			$newDropFolderFile->confId = $webexFile->getConfID();
