@@ -94,12 +94,11 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 					$createTimeScope->setCreateTimeStart($this->dropFolder->lastFileTimestamp ? date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp) :  self::ZERO_DATE);
 					KalturaLog::debug($createTimeScope->getCreateTimeStart());
 					//24 hours forward, so as not to run into problems with different timezones.
-					$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s'), time()+86400);
+					$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s', time()+86400));
 					KalturaLog::debug($createTimeScope->getCreateTimeEnd());
 					$listRecordingRequest->setCreateTimeScope($createTimeScope);
 				}
 				
-								
 				$xmlClient = new WebexXmlClient($this->dropFolder->webexServiceUrl . '/' . $this->dropFolder->path, $securityContext);
 				$listRecordingResponse = $xmlClient->send($listRecordingRequest);
 				
