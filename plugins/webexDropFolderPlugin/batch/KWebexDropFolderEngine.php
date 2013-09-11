@@ -222,10 +222,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 				$metadataObj = $res->objects[0];
 				$xmlElem = new SimpleXMLElement($metadataObj->xml);
 				$categoriesXPathRes = $xmlElem->xpath($folder->categoriesMetadataFieldName);
+				$categories = array();
+				foreach ($categoriesXPathRes as $catXPath)
+				{
+					$categories[] = strval($catXPath);
+				}
 				
-				$categories = strval($categoriesXPathRes[0]);
 				$categoryFilter = new KalturaCategoryFilter();
-				$categoryFilter->idIn = $categories;
+				$categoryFilter->idIn = implode(',', $categories);
 				$categoryListResponse = KBatchBase::$kClient->category->listAction ($categoryFilter, new KalturaFilterPager());
 				if ($categoryListResponse->objects && count($categoryListResponse->objects))
 				{
