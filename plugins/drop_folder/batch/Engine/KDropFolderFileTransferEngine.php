@@ -32,6 +32,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			if ($this->dropFolder->incremental && $physicalFile->modificationTime < $this->dropFolder->lastFileTimestamp)
 			{
 				KalturaLog::info("File modification time [" . $physicalFile->modificationTime ."] predates drop folder last timestamp [". $this->dropFolder->lastFileTimestamp ."]. Skipping.");
+				if (isset ($dropFolderFilesMap[$physicalFileName]))
+					unset($dropFolderFilesMap[$physicalFileName]);
 				continue;
 			}
 			
