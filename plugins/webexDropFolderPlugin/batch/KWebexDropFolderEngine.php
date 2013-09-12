@@ -103,7 +103,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 				$listRecordingResponse = $xmlClient->send($listRecordingRequest);
 				
 				$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
-				$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom();
+				$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom() + $listRecordingResponse->getMatchingRecords()->getReturned();
 			}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
 		}
 		catch (Exception $e)
