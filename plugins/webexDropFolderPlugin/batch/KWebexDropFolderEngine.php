@@ -159,6 +159,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->description = $data->description;
 		$newEntry->userId = $this->retrieveUserFromWebexHostId($data, $folder);
+		$newEntry->creatorId = $newEntry->userId;
 		$newEntry->referenceId = $data->parsedSlug;
 			
 		KBatchBase::$kClient->startMultiRequest();
