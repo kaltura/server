@@ -1784,7 +1784,7 @@ CREATE TABLE IF NOT EXISTS `short_link` (
   `kuser_id` int(11) DEFAULT NULL,
   `name` varchar(63) DEFAULT NULL,
   `system_name` varchar(63) DEFAULT NULL,
-  `full_url` varchar(255) DEFAULT NULL,
+  `full_url` text DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `int_id` (`int_id`),
