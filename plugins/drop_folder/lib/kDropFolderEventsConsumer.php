@@ -329,7 +329,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		
 		$jobData = kDropFolderContentProcessorJobData::getInstance($folder->getType());
 		//Required for plugins which require data to be set on the created entry from the drop folder files.
-		$jobData->setContent($folder, $dropFolderFileForObject, $dropFolderFileIds) ;		
+		$jobData->setData($folder, $dropFolderFileForObject, $dropFolderFileIds) ;		
 		
 		KalturaLog::debug('created job data: ' . print_r($jobData, true));
 		

@@ -26,9 +26,7 @@ class DropFolderFile extends BaseDropFolderFile
 		    self::setFileSizeLastSetAt(time());
 		}
 		
-		KalturaLog::debug('calling parent setter- value '. $size);
 		parent::setFileSize($size);
-		KalturaLog::debug('result ' . $this->file_size);
 	}
 	
 	public function getFileSizeLastSetAt($format = null)

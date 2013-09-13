@@ -132,22 +132,7 @@ class kuser extends Basekuser implements IIndexable
 		//update all categoryKuser object with kuser
 		
 		//TODO - need to check if kuser needs to add job
-		if ($this->getColumnsOldValue(kuserPeer::SCREEN_NAME) != $this->getScreenName() &&
-			categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
-		{
-			$featureStatusToRemoveIndex = new kFeatureStatus();
-			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
 			
-			$featureStatusesToRemove = array();
-			$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
-			
-			$filter = new categoryKuserFilter();
-			$filter->setUserIdEqual($this->getPuserId());
-	
-			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, true, $featureStatusesToRemove);
-		}
-			
-		
 		return parent::postSave();	
 	}
 	
@@ -180,6 +165,20 @@ class kuser extends Basekuser implements IIndexable
 			$partner = $this->getPartner();
 			$partner->setAccountOwnerKuserId($this->getId(), false);
 			$partner->save();
+		}
+		
+		if ($this->isColumnModified(kuserPeer::SCREEN_NAME) && categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
+		{
+			$featureStatusToRemoveIndex = new kFeatureStatus();
+			$featureStatusToRemoveIndex->setType(IndexObjectType::CATEGORY_USER);
+			
+			$featureStatusesToRemove = array();
+			$featureStatusesToRemove[] = $featureStatusToRemoveIndex;
+			
+			$filter = new categoryKuserFilter();
+			$filter->setUserIdEqual($this->getPuserId());
+	
+			kJobsManager::addIndexJob($this->getPartnerId(), IndexObjectType::CATEGORY_USER, $filter, true, $featureStatusesToRemove);
 		}
 				
 		$ret = parent::postUpdate($con);

@@ -186,12 +186,14 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function applyCondition(IKalturaDbQuery $query)
 	{
-		$condition = $this->getCondition();
-		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
-		$key = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA);
-		$query->addMatch("($key $condition)");
+		if ($query instanceof IKalturaIndexQuery){
+			$condition = $this->getCondition();
+			KalturaLog::debug("condition [" . print_r($condition, true) . "]");
+			$key = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA);
+			$query->addMatch("($key $condition)");
+		}
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
