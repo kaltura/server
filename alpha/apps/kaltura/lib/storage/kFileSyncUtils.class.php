@@ -1109,6 +1109,22 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSync->setLinkCount($current_count);
 		$fileSync->save();
 	}
+	
+	/**
+	 * decrement the link_count field on a source file_sync record
+	 *
+	 * @param FileSync $fileSync
+	 * @return void
+	 */
+	private static function decrementLinkCountForFileSync(FileSync $fileSync)
+	{
+		if(!$fileSync)
+			return;
+		
+		$current_count = (((int)$fileSync->getLinkCount()) ? $fileSync->getLinkCount()-1 : 0);
+		$fileSync->setLinkCount($current_count);
+		$fileSync->save();
+	}
 
 	/**
 	 * mark file as deleted, return deleted version
@@ -1126,41 +1142,39 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return null;
 		}
 
-		// first check if fileSync is source or link
-		$file = FileSyncPeer::retrieveByFileSyncKey($key);
-		if(!$file)
-			return null;
-
-		if($file->getLinkedId())
-		{
-			$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
-		}
-		else
-		{
-			if($file->getLinkCount() == 0)
-			{
-				$newStatus = FileSync::FILE_SYNC_STATUS_DELETED;
-			}
-			elseif($file->getLinkCount() > 100)
-			{
-				KalturaLog::notice("The file sync [$key] is associated with [" . $file->getLinkCount() . "] links and won't be deleted");
-				return null;
-			}
-			else
-			{
-				$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
-				self::convertLinksToFiles($key);
-			}
-		}
-
+		//Retrieve all file sync for key
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		if($fromKalturaDcsOnly)
 			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-
 		$file_sync_list = FileSyncPeer::doSelect( $c );
+		
 		foreach($file_sync_list as $file_sync)
 		{
+			/* @var $fileSync FileSync */
+			if($file_sync->getLinkedId())
+			{
+				$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
+				self::decrementLinkCountForFileSync(FileSyncPeer::retrieveByPK($file_sync->getLinkedId()));
+			}
+			else
+			{
+				if($file_sync->getLinkCount() == 0)
+				{
+					$newStatus = FileSync::FILE_SYNC_STATUS_DELETED;
+				}
+				elseif($file_sync->getLinkCount() > 100)
+				{
+					KalturaLog::notice("The file sync [" . $file_sync->getId() . "] is associated with [" . $file_sync->getLinkCount() . "] links and won't be deleted");
+					return null;
+				}
+				else
+				{
+					$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
+					self::convertLinksToFiles($file_sync);
+				}
+			}
+			
 			$file_sync->setStatus($newStatus);
 			$file_sync->save();
 		}
@@ -1173,63 +1187,61 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @return void
 	 */
-	protected static function convertLinksToFiles(FileSyncKey $key)
+	protected static function convertLinksToFiles(FileSync $fileSync)
 	{
-		// fetch sources from all DCs
+		$linkTotalCount = 0;
+		/* @var $fileSync FileSync */
+
+		// for each source, find its links and fix them
 		$c = new Criteria();
-		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
-		$fileSyncList = FileSyncPeer::doSelect($c);
-		foreach($fileSyncList as $fileSync)
+		$c->add(FileSyncPeer::DC, $fileSync->getDc());
+		$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
+		$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
+		$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
+
+		//relink the links into groups of 100 links
+		$c->setLimit(100);
+
+		$links = FileSyncPeer::doSelect($c);
+		
+		//check if any links were returned in the do select if not no need to continue
+		if(!count($links))
+			continue;
+		
+		// choose the first link and convert it to file
+		$firstLink = array_shift($links);
+		/* @var $firstLink FileSync */
+		if($firstLink)
 		{
-			$linkToatlCount = 0;
-			/* @var $fileSync FileSync */
-
-			// for each source, find its links and fix them
-			$c = new Criteria();
-			$c->add(FileSyncPeer::DC, $fileSync->getDc());
-			$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_LINK, FileSync::FILE_SYNC_FILE_TYPE_URL), Criteria::IN);
-			$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
-			$c->addAscendingOrderByColumn(FileSyncPeer::PARTNER_ID);
-
-			//relink the links into groups of 100 links
-			$c->setLimit(100);
-
+			$firstLink->setStatus($fileSync->getStatus());
+			$firstLink->setFileSize($fileSync->getFileSize());
+			$firstLink->setFileRoot($fileSync->getFileRoot());
+			$firstLink->setFilePath($fileSync->getFilePath());
+			$firstLink->setFileType($fileSync->getFileType());
+			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
+			$firstLink->save();
+		}
+		
+		while(count($links))
+		{
+			// change all the rest of the links to point on the new file sync
+			foreach($links as $link)
+			{
+				$linkTotalCount += count($links);
+				/* @var $link FileSync */
+				$link->setStatus($fileSync->getStatus());
+				$link->setLinkedId($firstLink->getId());
+				$link->save();
+			}
+			
+			FileSyncPeer::clearInstancePool();
 			$links = FileSyncPeer::doSelect($c);
-			$linkToatlCount += count($links);
-			
-			// choose the first link and convert it to file
-			$firstLink = array_shift($links);
-			/* @var $firstLink FileSync */
-			if($firstLink)
-			{
-				$firstLink->setStatus($fileSync->getStatus());
-				$firstLink->setFileSize($fileSync->getFileSize());
-				$firstLink->setFileRoot($fileSync->getFileRoot());
-				$firstLink->setFilePath($fileSync->getFilePath());
-				$firstLink->setFileType($fileSync->getFileType());
-				$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
-				$firstLink->save();
-			}
-			
-			while(count($links))
-			{
-				// change all the rest of the links to point on the new file sync
-				foreach($links as $link)
-				{
-					/* @var $link FileSync */
-					$link->setStatus($fileSync->getStatus());
-					$link->setLinkedId($firstLink->getId());
-					$link->save();
-				}
-				
-				FileSyncPeer::clearInstancePool();
-				$links = FileSyncPeer::doSelect($c);
-			}
-			
-			if($firstLink)
-			{
-				$firstLink->setLinkCount($linkToatlCount);
-			}
+		}
+		
+		if($firstLink)
+		{
+			$firstLink->setLinkCount($linkTotalCount);
+			$firstLink->save();
 		}
 	}
 
