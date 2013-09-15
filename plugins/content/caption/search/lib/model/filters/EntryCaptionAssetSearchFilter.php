@@ -114,11 +114,13 @@ class EntryCaptionAssetSearchFilter extends AdvancedSearchFilterItem
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterItem::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query)
+	public function applyCondition(IKalturaDbQuery $query)
 	{
-		$this->addCondition($this->getContentLike(), $query);
-		$this->addCondition($this->getContentMultiLikeAnd(), $query);
-		$this->addCondition($this->getContentMultiLikeOr(), $query);
+		if ($query instanceof IKalturaIndexQuery){
+			$this->addCondition($this->getContentLike(), $query);
+			$this->addCondition($this->getContentMultiLikeAnd(), $query);
+			$this->addCondition($this->getContentMultiLikeOr(), $query);
+		}
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)

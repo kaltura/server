@@ -10,7 +10,7 @@
  * @subpackage Conversion
  * @deprecated
  */
-abstract class kConversionClientBase extends myBatchBase
+class kConversionClientBase extends myBatchBase
 {
 	public $in_path ;//, $out_path;
 	protected $server_cmd_path , $server_res_path ;

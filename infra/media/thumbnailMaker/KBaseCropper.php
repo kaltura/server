@@ -60,10 +60,12 @@ abstract class KBaseCropper
 		{
 			KalturaLog::info("Executing: $cmd");
 			$returnValue = null;
-			$output = system($cmd, $returnValue);
-			KalturaLog::debug("Returned value: '$returnValue'");
+			exec($cmd, $output, $returnValue);
+			KalturaLog::debug("Returned value: $returnValue Output: " .  print_r($output, true));
 			
-			if($returnValue)
+			//Avoid certain images the image magic throws "no pixels defined in cache ... @ cache.c/OpenPixelCache/3789" exception but still generates the cropped image
+			$outputAsString = implode(" ", $output);
+			if($returnValue && strpos($outputAsString, "no pixels defined in cache") === false && strpos($outputAsString, "cache.c/OpenPixelCache") === false )
 				return false;
 
 			// Support animated gifs - KImageMagick generates multiple images with a postfix of '-<frame num>'

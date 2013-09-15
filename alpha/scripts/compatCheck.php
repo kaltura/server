@@ -69,6 +69,8 @@ $APIV3_TESTED_ACTIONS = array(
 
 $APIV3_BLOCKED_ACTIONS = array(
 		'*.getexclusive',
+		'report.geturlforreportascsv',
+		'aspera_aspera.getfaspurl',
 		);
 
 $KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
@@ -916,9 +918,9 @@ function isActionApproved($fullActionName, $action)
 	return false;
 }
 
-function generateKalcliCommand($service, $action, $parsedParams)
+function generateKalcliCommand($ipAddress, $service, $action, $parsedParams)
 {
-	$kalcliCmd = "kalcli -x {$service} {$action}";
+	$kalcliCmd = "kalcli -x -H`genipheader {$ipAddress}` {$service} {$action}";
 	foreach ($parsedParams as $key => $value)
 	{
 		if (in_array($key, array('action', 'service')))
@@ -1009,7 +1011,7 @@ function processMultiRequest($ipAddress, $parsedParams)
 		$curParams = $paramsByRequest[$reqIndex];
 		$service = $curParams['service'];
 		$action = $curParams['action'];
-		$kalcliCmds[] = generateKalcliCommand($service, $action, array_merge($curParams, $commonParams));
+		$kalcliCmds[] = generateKalcliCommand($ipAddress, $service, $action, array_merge($curParams, $commonParams));
 	}
 	
 	testAction($ipAddress, $fullActionName, $parsedParams, $uri, $parsedParams, CM_XML, $kalcliCmds);
@@ -1065,7 +1067,7 @@ function processRequest($ipAddress, $parsedParams)
 	
 	ksort($parsedParams);
 	
-	$kalcliCmd = generateKalcliCommand($service, $action, $parsedParams);
+	$kalcliCmd = generateKalcliCommand($ipAddress, $service, $action, $parsedParams);
 	
 	$uri = "/api_v3/index.php?service=$service&action=$action";
 	$compareMode = (beginsWith($action, 'serve') ? CM_BINARY : CM_XML);

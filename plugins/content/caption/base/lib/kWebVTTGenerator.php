@@ -61,7 +61,7 @@ class kWebVTTGenerator
 		foreach ($parsedCaption as $curCaption)
 		{
 			if (($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime) &&
-				($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] < $segmentEndTime))
+				($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime))
 				continue;
 
 			// calculate line-level styling

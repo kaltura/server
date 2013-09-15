@@ -339,6 +339,8 @@ class JobsService extends KalturaBaseService
 		$inputFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
 		$batchJob = kJobsManager::addConvertProfileJob(null, $entry, $flavorAsset->getId(), $inputFileSyncLocalPath);
+		if(!$batchJob)
+			throw new KalturaAPIException(APIErrors::UNABLE_TO_CONVERT_ENTRY);
 		
 		return $this->getStatusAction($batchJob->getId(), KalturaBatchJobType::CONVERT_PROFILE);
 	}

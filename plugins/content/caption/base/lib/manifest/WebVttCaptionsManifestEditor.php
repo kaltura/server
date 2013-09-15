@@ -23,9 +23,12 @@ class WebVttCaptionsManifestEditor extends BaseManifestEditor
 		foreach ($this->captions as $captionItem)
 		{
 			$manifestHeader .= "\n";
+			$language = '';
+			if (isset($captionItem["language"]))
+				$language = 'LANGUAGE="' . $captionItem["language"] . '",';
 			$manifestHeader .= '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="' . 
 				$captionItem["label"] . '",DEFAULT='.$captionItem["default"] . 
-				',AUTOSELECT=YES,FORCED=NO,LANGUAGE="' . $captionItem["language"]. '",URI="' . $captionItem["url"] . '"';
+				',AUTOSELECT=YES,FORCED=NO,' . $language. 'URI="' . $captionItem["url"] . '"';
 		}
 		
 		return $manifestHeader;

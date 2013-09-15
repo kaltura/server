@@ -29,6 +29,7 @@
 				<th title="<?php echo $this->translate('partner-usage table peakStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table peakStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table averageStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table averageStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table transcodingUsage tooltip'); ?>"><?php echo $this->translate('partner-usage table transcodingUsage'); ?></th>
 				<!--  
 				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
 				-->
@@ -61,6 +62,7 @@
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->peakStorage); ?> MB</td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->avgStorage); ?> MB</td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->combinedBandwidthStorage); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->transcodingUsage); ?> MB</td>
 				<!--  
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->storage); ?> MB</td>
 				-->

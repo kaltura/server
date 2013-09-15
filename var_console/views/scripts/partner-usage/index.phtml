@@ -16,6 +16,7 @@
 				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table storage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table deletedStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table deletedStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table transcodingUsage tooltip'); ?>"><?php echo $this->translate('partner-usage table transcodingUsage'); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -26,6 +27,7 @@
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->storage); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->deletedStorage); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->combinedStorageBandwidth); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$this->paginator->getTotal()->transcodingUsage); ?></td>
 			</tr>
 		</tbody>
 	</table>
@@ -46,6 +48,7 @@
 				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table storage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table deletedStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table deletedStorage'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table combinedBandwidthStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table combinedBandwidthStorage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table transcodingUsage tooltip'); ?>"><?php echo $this->translate('partner-usage table transcodingUsage'); ?></th>
 			</tr>
 		</thead>
 		<tfoot>
@@ -67,6 +70,7 @@
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->storage); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->deletedStorage); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->combinedStorageBandwidth); ?> </td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->transcodingUsage); ?></td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>

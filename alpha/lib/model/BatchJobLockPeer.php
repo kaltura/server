@@ -192,7 +192,7 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		}
 	}
 	
-	private static function getBatchVersion($job_type = null) {
+	public static function getBatchVersion($job_type = null) {
 		$batchVersions = kConf::get('batch_version_for_job');
 		if(isset($batchVersions[$job_type]))
 			return $batchVersions[$job_type];
