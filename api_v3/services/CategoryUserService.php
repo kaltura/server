@@ -363,12 +363,11 @@ class CategoryUserService extends KalturaBaseService
 		
 		$c = KalturaCriteria::create(categoryKuserPeer::OM_CLASS);
 		$categoryKuserFilter->attachToCriteria($c);
+		$pager->attachToCriteria($c);
 		$c->applyFilters();
 		
-		$totalCount = categoryKuserPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
 		$list = categoryKuserPeer::doSelect($c);
+		$totalCount = $c->getRecordsCount();
 		
 		$newList = KalturaCategoryUserArray::fromDbArray($list);
 		
