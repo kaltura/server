@@ -70,7 +70,7 @@ class KalturaITunesSyndicationFeed extends KalturaBaseSyndicationFeed
 		 * true in case you want to enfore the palylist order on the 
 		 * @var KalturaNullableBoolean
 		 */
-		public $enforceOrder = KalturaNullableBoolean::FALSE_VALUE;
+		public $enforceOrder;
         
         
 	function __construct()
