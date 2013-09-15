@@ -2,7 +2,7 @@
 
 class ITunesFeedRenderer extends SyndicationFeedRenderer {
 	
-  	const ENFORCE_ORDER_PLACE_ORDER = "ITEM_ORDER_IN_FEED";
+  	const ENFORCE_ORDER_PLACE_HOLDER = "ITEM_ORDER_IN_FEED";
   
   	/**
    	 * The index of the entry in the feed created
@@ -126,7 +126,7 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 			$res .= $this->writeFullXmlNode('itunes:author', $this->stringToSafeXml($kuser->getScreenName()), 3);
 			
 		if($this->enforceOrder)
-			$res .= $this->writeFullXmlNode('itunes:order', self::ENFORCE_ORDER_PLACE_ORDER, 3);
+			$res .= $this->writeFullXmlNode('itunes:order', self::ENFORCE_ORDER_PLACE_HOLDER, 3);
 			
 		if($e->description)
 		{
@@ -153,7 +153,7 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 	public function finalize($entryMrss, $moreItems) {
 		if($this->enforceOrder)
 		{
-			$entryMrss = str_replace(self::ENFORCE_ORDER_PLACE_ORDER, $this->feedItemOrderIndex, $entryMrss);
+			$entryMrss = str_replace(self::ENFORCE_ORDER_PLACE_HOLDER, $this->feedItemOrderIndex, $entryMrss);
 			$this->feedItemOrderIndex++;
 		} 
   
