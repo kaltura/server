@@ -884,6 +884,10 @@ $plannedDur = 0;
 			$target->_frameRate = max(20,$target->_frameRate);
 		}
 		
+		//Frame rate smaller than 1 causes Fatal Error so in this case set it to 1 (the && > 0 was added to avoid doing this work around on assets with frame rate 0)
+        if( $target->_frameRate > 0 && $target->_frameRate < 1)
+        	$target->_frameRate=1;
+		
 		return $target->_frameRate;
 	}
 
