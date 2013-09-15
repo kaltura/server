@@ -271,10 +271,21 @@ class KAutoloader
 		if (self::$_classMapFileLocation && !self::$_noCache && self::loadClassMapFromCache())
 			return;
 
+		require_once(__DIR__ . '/general/kLockBase.php');
+		
+		$lock = kLockBase::grabLocalLock('KAutoloader');
+		
+		// try loading again - some other instance may have created the cache while we waited for the lock
+		if ($lock && self::loadClassMapFromCache())
+		{
+			$lock->unlock();
+			return;
+		}
+		
+		// cached map doesn't exists, rebuild the cache map
 		if (self::$_classPath === null)
 			self::setDefaultClassPath();
 
-		// cached map doesn't exists, rebuild the cache map
 		foreach(self::$_classPath as $dir)
 		{
 			if (strpos($dir, DIRECTORY_SEPARATOR."*") == strlen($dir) - 2)
@@ -289,7 +300,7 @@ class KAutoloader
 
 			self::scanDirectory($dir, $recursive);
 		}
-
+		
 		if (self::$_noCache === false && self::$_classMapFileLocation)
 		{
 			if (function_exists('apc_store'))
@@ -313,6 +324,9 @@ class KAutoloader
 				die("PHP Class map could not be saved");
 			}
 		}
+		
+		if ($lock)
+			$lock->unlock();
 	}
 
 	public static function loadClassMapFromCache()

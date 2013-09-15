@@ -49,8 +49,10 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	/* (non-PHPdoc)
 	 * @see AdvancedSearchFilterOperator::applyCondition()
 	 */
-	public function applyCondition(IKalturaIndexQuery $query, $xPaths = null)
+	public function applyCondition(IKalturaDbQuery $query, $xPaths = null)
 	{
+		if (!($query instanceof IKalturaIndexQuery))
+			return;  
 		$this->parentQuery = $query;
 		
 		if(!$this->condition)
@@ -241,16 +243,10 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			return null;
 		}
 		
-		if(is_null($xPaths[$field]->getSearchIndex())){
-			KalturaLog::ERR("Missing field search index: " . $field);
-			return null;
-		}
-			
-			
 		switch ($xPaths[$field]->getType()){
 			case MetadataSearchFilter::KMC_FIELD_TYPE_DATE:
 			case MetadataSearchFilter::KMC_FIELD_TYPE_INT:
-				$metadataField = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $xPaths[$field]->getSearchIndex();
+				$metadataField = MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES . "." . MetadataPlugin::getSphinxFieldName($xPaths[$field]->getId());
 				break;
 			default:
 				KalturaLog::ERR("Missing field type: ". $xPaths[$field]->getType());

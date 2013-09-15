@@ -77,6 +77,15 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 		$criteria = new Criteria();
 		$criteria->add(EntryDistributionPeer::ENTRY_ID, $entryId);
 		$criteria->add(EntryDistributionPeer::STATUS, $statuses, Criteria::IN);
+	
+		return EntryDistributionPeer::doSelect($criteria, $con);
+	}
+	
+	public static function retrieveByEntryIdsAndProfileId(array $entryIds, $distributionProfileId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryDistributionPeer::ENTRY_ID, $entryIds, Criteria::IN);
+		$criteria->add(EntryDistributionPeer::DISTRIBUTION_PROFILE_ID, $distributionProfileId);
 
 		return EntryDistributionPeer::doSelect($criteria, $con);
 	}

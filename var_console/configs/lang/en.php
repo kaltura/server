@@ -846,6 +846,7 @@ return array(
 	'partner-usage table peakStorage' => 'Peak Storage (MB)',
     'partner-usage table averageStorage' => 'Average Storage (MB)',
     'partner-usage table combinedBandwidthStorage' => 'Combined Bandwidth and Storage Consumption (MB)',
+	'partner-usage table transcodingUsage' => 'Transcoding Consumption (MB)',
     'partner-usage table timeUnit' => 'Date',
 
 	'partner-usage table partnerStatus tooltip' => 'The status of the Publisher account can be either active or blocked',
@@ -868,6 +869,7 @@ return array(
 	'partner-usage table peakStorage tooltip' => 'The peak amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table averageStorage tooltip' => 'The average amount of storage consumption during the given date range for the specific publisher',
     'partner-usage table combinedBandwidthStorage tooltip' => 'The combined amount of bandwidth and storage consumed during the given date range for the specific publisher',
+	'partner-usage table transcodingUsage tooltip' => 'The amount of successful transcoding output (in MB) in a given timeframe',
     'partner-usage table timeUnit tooltip' => 'The time unit at which the report was taken',
     'partner-usage date-range filter type' => 'Date Range:',
     'partner-usage date-interval filter type' => 'Time Units:',

@@ -50,6 +50,7 @@ CREATE TABLE `drop_folder_file`
 	`partner_id` INTEGER  NOT NULL,
 	`drop_folder_id` INTEGER  NOT NULL,
 	`file_name` VARCHAR(500)  NOT NULL,
+	`type` INTEGER  NOT NULL,
 	`status` INTEGER  NOT NULL,
 	`file_size` INTEGER  NOT NULL,
 	`file_size_last_set_at` DATETIME,

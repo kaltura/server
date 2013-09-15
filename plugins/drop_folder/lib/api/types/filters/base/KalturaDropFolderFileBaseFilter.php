@@ -19,6 +19,7 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 		"fileNameLike" => "_like_file_name",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"statusNotIn" => "_notin_status",
 		"parsedSlugEqual" => "_eq_parsed_slug",
 		"parsedSlugIn" => "_in_parsed_slug",
 		"parsedSlugLike" => "_like_parsed_slug",
@@ -120,6 +121,11 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * @var string
+	 */
+	public $statusNotIn;
 
 	/**
 	 * @var string

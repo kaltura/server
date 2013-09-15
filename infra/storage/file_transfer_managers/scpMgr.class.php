@@ -128,6 +128,20 @@ class scpMgr extends kFileTransferMgr
         return array_map('trim', explode("\n", $exec_output));
 	}
 	
+	protected function doListFileObjects ($remoteDir)
+	{
+		$res = array();
+		$filesList = $this->listDir($remoteDir);
+		foreach ($filesList as $file)
+		{
+			$fileObject = new FileObject();
+			$fileObject->filename =  $file;
+			$res[] = $fileObject;
+		}
+		
+		return $res;
+	}		
+	
 	protected function doFileSize($remote_file)
 	{
 	    $remote_file = ltrim($remote_file, '/');

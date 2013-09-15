@@ -10,7 +10,7 @@ class KalturaDropFolderFileArray extends KalturaTypedArray
 		$newArr = new KalturaDropFolderFileArray();
 		foreach ( $arr as $obj )
 		{
-			$nObj = new KalturaDropFolderFile();
+			$nObj = KalturaDropFolderFile::getInstanceByType($obj->getType());
 			$nObj->fromObject( $obj );
 			$newArr[] = $nObj;
 		}

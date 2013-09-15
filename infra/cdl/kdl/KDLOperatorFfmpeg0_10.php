@@ -120,6 +120,11 @@ $fltStr = null;
 		 * duration according to clipped dur
 		 */
     	$gopInSecs=($vidObj->_gop/$vidObj->_frameRate);
+    	
+    	//SUP 681 - If source frame rate is smaller than 1 or even 0 than do not use force key frames to avoid creation of unsmooth output video 
+    	if(!($gopInSecs>0))
+    		return null;
+    	
 		if(isset($target->_explicitClipDur) && $target->_explicitClipDur)
 			$dur=$target->_explicitClipDur/1000;
 		else if(isset($target->_clipDur) && $target->_clipDur)

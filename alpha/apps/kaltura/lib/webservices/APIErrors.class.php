@@ -178,6 +178,8 @@ class APIErrors
 	
 	const INVALID_FILE_EXTENSION = "INVALID_FILE_EXTENSION,Invalid file extension";
 	
+	const UNABLE_TO_CONVERT_ENTRY = "UNABLE_TO_CONVERT_ENTRY,Unable to convert entry";
+	
 	const NO_FILES_RECEIVED = "NO_FILES_RECEIVED,No files recieved";
 	
 	const INVALID_FILE_FIELD = "INVALID_FILE_FIELD,The file was send on invalid field, expecting [%s]";

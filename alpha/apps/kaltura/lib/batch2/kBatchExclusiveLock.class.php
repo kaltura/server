@@ -116,6 +116,7 @@ class kBatchExclusiveLock
 		
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
 		$c->addAnd($c->getNewCriterion(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId()));
+		$c->add(BatchJobLockPeer::BATCH_VERSION, BatchJobLockPeer::getBatchVersion($jobType), Criteria::LESS_EQUAL);
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
 		$shouldUseJoin = (BatchJobLockPeer::getMaxJobsForPartner($jobType) != self::UNLIMITED_QUOTA);
@@ -246,6 +247,7 @@ class kBatchExclusiveLock
 		
 		$c->add ( BatchJobLockPeer::JOB_TYPE, $jobType );
 		$c->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
+		$c->add(BatchJobLockPeer::BATCH_VERSION, BatchJobLockPeer::getBatchVersion($jobType), Criteria::LESS_EQUAL);
 		
 		$prioritizers_ratio = BatchJobLockPeer::getPrioritizersRatio($jobType);
 		$shouldUseJoin = (BatchJobLockPeer::getMaxJobsForPartner($jobType) != self::UNLIMITED_QUOTA);

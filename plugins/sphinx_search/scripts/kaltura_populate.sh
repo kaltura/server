@@ -97,7 +97,7 @@ show_status() {
 	return 0
 	else
 		echo "Service populate isn't running"
-		return 0
+		return 3
 	fi
 }
 

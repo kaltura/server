@@ -412,9 +412,26 @@ class sftpMgr extends kFileTransferMgr
 	   	}
         	
 		$lsDirCmd = "ls $remotePath";
-		$execOutput = $this->execCommand($lsDirCmd);
+		$execOutput = $this->execSftpCommand($lsDirCmd);
 		KalturaLog::info("sftp rawlist [$execOutput]");
 		return array_filter(array_map('trim', explode("\n", $execOutput)), 'strlen');
+	}
+	
+	protected function doListFileObjects ($remote_path)
+	{
+		$files = $this->listDir($remote_path);
+		
+		$res = array(); 
+		foreach($files as $file)
+		{
+			$fileObject = new FileObject();
+			$fileObject->filename = $file;
+			$fileObject->fileSize = $this->fileSize($remote_path . "/$file");
+			$fileObject->modificationTime = $this->modificationTime($remote_path . "/$file");
+			$res[] = $fileObject;
+		}
+
+		return $res;
 	}
 	
 	/**
@@ -462,11 +479,9 @@ class sftpMgr extends kFileTransferMgr
 		
 		$remoteFolder = dirname($remoteFile);
 		$lsdirCmd = "ls -l $remoteFolder/*";
-		$execOutput = $this->execCommand($lsdirCmd);
+		$filesInfo = $this->execSftpCommand($lsdirCmd);
 		
-		KalturaLog::info("sftp rawlist [$execOutput]");
-		
-		$filesInfo = array_filter(array_map('trim', explode("\n", $execOutput)), 'strlen');
+		KalturaLog::info('sftp rawlist ['. print_r($execOutput, true) .']');
 		
 		$escapedRemoteFolder = str_replace('/', '\/', $remoteFolder);
 		// drwxrwxrwx 10 root root 4096 2010-11-24 23:45 file.ext
@@ -522,9 +537,18 @@ class sftpMgr extends kFileTransferMgr
 			
 		$cliCommand .= " {$this->username}@{$this->host}";
 		
-		$cmd = "(echo '$command' && echo 'quit') | $cliCommand";
+		$cmd = "(echo '$command' && echo 'quit') | $cliCommand 2>&1";
 		KalturaLog::info("Command [$cmd]");
-		return system($cmd, $returnValue);
+		$returnValue = null;
+		
+		exec($cmd, $output, $returnValue);
+		if ($returnValue){ //any non-zero return value is an error
+			KalturaLog::err("An error while running exec - " . print_r($output, true));
+			@trigger_error($output[count($output)-2] ."; ". $output[count($output)-1]); //in order to populate the correct error to error_get_last() in kFileTransferMgr
+			return false; 
+		}
+		
+		return $output;
 	}
 	
 	/**
