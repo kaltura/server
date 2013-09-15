@@ -79,12 +79,12 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
     protected function validateTags($tagsStr, $action)
 	{
 	    $validationErrors = array();
-	    if (!empty($tagsStr) && strlen($tagsStr) > 0)
+	    if (!empty($tagsStr) && mb_strlen($tagsStr, 'UTF-8') > 0)
 		{
 		    $userFriendlyTagsFieldName = $this->getUserFriendlyFieldName(YouTubeApiDistributionField::MEDIA_KEYWORDS);
 		    $tagsArray = array_map('trim', explode(',', $tagsStr));
             
-		    if(strlen($tagsStr) > self::MEDIA_KEYWORDS_MAXIMUM_LENGTH)
+		    if(mb_strlen($tagsStr, 'UTF-8') > self::MEDIA_KEYWORDS_MAXIMUM_LENGTH)
 			{
 			    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $userFriendlyTagsFieldName);
     			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
@@ -107,7 +107,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 			
 		    foreach($tagsArray as $tag)
 			{
-				if(strlen($tag) < self::MEDIA_EACH_KEYWORD_MINIMUM_LENGTH)
+				if(mb_strlen($tag, 'UTF-8') < self::MEDIA_EACH_KEYWORD_MINIMUM_LENGTH)
 				{
 				    $errorDescription = $userFriendlyTagsFieldName.' ['.$tag.'] must contain at least '.self::MEDIA_EACH_KEYWORD_MINIMUM_LENGTH.' characters';
 					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $userFriendlyTagsFieldName, $errorDescription);
@@ -115,7 +115,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 					$validationError->setValidationErrorParam($errorDescription);
 					$validationErrors[] = $validationError;
 				}
-			    if(strlen($tag) > self::MEDIA_EACH_KEYWORD_MAXIMUM_LENGTH)
+			    if(mb_strlen($tag, 'UTF-8') > self::MEDIA_EACH_KEYWORD_MAXIMUM_LENGTH)
 				{
 				    $errorDescription = $userFriendlyTagsFieldName.' ['.$tag.'] must contain less than '.self::MEDIA_EACH_KEYWORD_MAXIMUM_LENGTH.' characters';
 					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $userFriendlyTagsFieldName, $errorDescription);
