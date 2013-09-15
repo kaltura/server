@@ -137,6 +137,6 @@ class syndicationFeed extends BasesyndicationFeed
 	*/
 	public function getEnforceOrder()
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_ENFORCE_ORDER);
+		$this->getFromCustomData(self::CUSTOM_DATA_ENFORCE_ORDER);
 	}
 }
