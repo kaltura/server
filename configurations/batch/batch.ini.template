@@ -224,8 +224,7 @@ params.wvLicenseServerUrl							= http://@WIDEIVINE_LICENSE_SERVER_HOST@
 params.portal										= kaltura
 params.key											= @WIDEVINE_SIGN_KEY@
 params.iv											= @WIDEVINE_SIGN_IV@
-params.wvAssetExe									= @WIDEVINE_ASSET_EXE@
-params.wvPackagerExe								= @WIDEVINE_PACKAGER_EXE@
+params.widevineExe									= @WIDEVINE_EXE@
 params.retryInterval                                = 10
 params.maxTimeBeforeFail 							= 10000
 ;The path for local temporary generated product
@@ -613,6 +612,4 @@ maximumExecutionTime								= 3000
 scriptPath             								= ../plugins/drm/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
 params.wvLicenseServerUrl							= http://@WIDEIVINE_LICENSE_SERVER_HOST@
 params.portal										= kaltura
-params.key											= @WIDEVINE_SIGN_KEY@
-params.iv											= @WIDEVINE_SIGN_IV@
-params.wvAssetExe									= @WIDEVINE_ASSET_EXE@
+params.widevineExe									= @WIDEVINE_EXE@

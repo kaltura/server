@@ -57,8 +57,8 @@ class KWidevineOperationEngine extends KOperationEngine
 	private function registerAsset()
 	{
 		$wvAssetId = '';
-		$status = '';
-		$policy = '';
+		$policy = null;
+		$errorMessage = '';
 		
 		if($this->operator->params)
 		{
@@ -73,25 +73,20 @@ class KWidevineOperationEngine extends KOperationEngine
 			}
 		}
 		
-		$cmd = KWidevineBatchHelper::getRegisterAssetCmdLine(
-										$this->params->widevineExe, 
-										$this->params->wvLicenseServerUrl, 
-										$this->params->iv, 
-										$this->params->key, 
-										$this->packageName, 
+		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
+										$this->params->wvLicenseServerUrl,
+										$this->packageName,
 										null,
 										$this->params->portal,
 										$policy,
 										$this->data->flavorParamsOutput->widevineDistributionStartDate,
-										$this->data->flavorParamsOutput->widevineDistributionEndDate);
-										
-		$output = system($cmd, $returnValue);
-		
-		KWidevineBatchHelper::parseRegisterAssetCmdOutput($output, $wvAssetId, $status);
-		if($returnValue != 0)
+										$this->data->flavorParamsOutput->widevineDistributionEndDate,
+										$errorMessage);
+
+		if(!$wvAssetId)
 		{
 			KBatchBase::unimpersonate();
-			$logMessage = 'Asset registration failed, asset name: '.$this->packageName.' error: '.$status;
+			$logMessage = 'Asset registration failed, asset name: '.$this->packageName.' error: '.$errorMessage;
 			KalturaLog::err($logMessage);
 			throw new KOperationEngineException($logMessage);
 		}
@@ -103,6 +98,9 @@ class KWidevineOperationEngine extends KOperationEngine
 	
 	private function encryptPackage()
 	{
+		$returnValue = 0;
+		$output = array();
+		
 		$inputFiles = $this->getInputFilesList();
 		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
 				
@@ -116,12 +114,14 @@ class KWidevineOperationEngine extends KOperationEngine
 										$this->data->destFileSyncLocalPath,
 										$this->params->portal);
 										
-		$output = system($cmd, $returnValue);
+		exec($cmd, $output, $returnValue);
+		KalturaLog::debug('Command execution output: '.print_r($output));
+		
 		if($returnValue != 0)
 		{
 			KBatchBase::unimpersonate();
 			$errorMessage = '';
-			KWidevineBatchHelper::parseEncryptPackageCmdOutput($output, $returnValue, $errorMessage);
+			$errorMessage = KWidevineBatchHelper::getEncryptPackageErrorMessage($returnValue);
 			$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage;
 			KalturaLog::err($logMessage);
 			throw new KOperationEngineException($logMessage);

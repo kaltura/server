@@ -76,31 +76,26 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	private function updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate)
 	{
 		KalturaLog::debug("Update asset [".$assetId."] license start date [".$licenseStartDate.'] license end date ['.$licenseEndDate.']');
-			
-		$cmd = KWidevineBatchHelper::getRegisterAssetCmdLine(
-							self::$taskConfig->params->wvAssetExe, 
-							self::$taskConfig->params->wvLicenseServerUrl,
-							self::$taskConfig->params->iv, 
-							self::$taskConfig->params->key,
-							null,
-							$assetId,
-							self::$taskConfig->params->portal,
-							null,
-							$licenseStartDate,
-							$licenseEndDate);
-							
-		$output = system($cmd, $returnValue);
 		
+		$errorMessage = '';
 		
-		if($returnValue != 0)
+		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
+										self::$taskConfig->params->wvLicenseServerUrl,
+										null,
+										$assetId,
+										self::$taskConfig->params->portal,
+										null,
+										$licenseStartDate,
+										$licenseEndDate,
+										$errorMessage);				
+		
+		if(!$wvAssetId)
 		{
 			KBatchBase::unimpersonate();
-			$status = '';
-			KWidevineBatchHelper::parseRegisterAssetCmdOutput($output, $wvAssetId, $status);
 			
-			$logMessage = 'Asset update failed, asset id: '.$assetId.' error: '.$status;
+			$logMessage = 'Asset update failed, asset id: '.$assetId.' error: '.$errorMessage;
 			KalturaLog::err($logMessage);
-			throw new kApplicativeException($returnValue, $logMessage);
+			throw new kApplicativeException(null, $logMessage);
 		}			
 	}
 	
