@@ -91,7 +91,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 				if($this->dropFolder->incremental)
 				{
 					$createTimeScope = new WebexXmlEpCreateTimeScopeType();
-					$createTimeScope->setCreateTimeStart($this->dropFolder->lastFileTimestamp ? date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp) :  self::ZERO_DATE);
+					$createTimeScope->setCreateTimeStart($this->dropFolder->lastFileTimestamp ? date('m/j/Y H:i:s', $this->dropFolder->lastFileTimestamp - 3600) :  self::ZERO_DATE);
 					KalturaLog::debug($createTimeScope->getCreateTimeStart());
 					//24 hours forward, so as not to run into problems with different timezones.
 					$createTimeScope->setCreateTimeEnd(date('m/j/Y H:i:s', time()+86400));
@@ -103,7 +103,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 				$listRecordingResponse = $xmlClient->send($listRecordingRequest);
 				
 				$fileList = array_merge($fileList, $listRecordingResponse->getRecording());
-				$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom();
+				$startFrom = $listRecordingResponse->getMatchingRecords()->getStartFrom() + $listRecordingResponse->getMatchingRecords()->getReturned();
 			}while (count ($fileList) < $listRecordingResponse->getMatchingRecords()->getTotal());
 		}
 		catch (Exception $e)
@@ -159,6 +159,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->description = $data->description;
 		$newEntry->userId = $this->retrieveUserFromWebexHostId($data, $folder);
+		$newEntry->creatorId = $newEntry->userId;
 		$newEntry->referenceId = $data->parsedSlug;
 			
 		KBatchBase::$kClient->startMultiRequest();
