@@ -15,11 +15,6 @@ class kRule
 	protected $conditions;
 	
 	/**
-	 * @var accessControl
-	 */
-	protected $accessControl;
-	
-	/**
 	 * Message to be thrown to the player in case the rule 
 
 	 * 
@@ -30,7 +25,7 @@ class kRule
 	/**
 	 * Actions to be performed by the player in case the rule fulfilled
 	 * 
-	 * @var array<kAccessControlAction>
+	 * @var array<kRuleAction>
 	 */
 	protected $actions;
 	
@@ -38,7 +33,7 @@ class kRule
 	 * Indicates what contexts should be tested by this rule 
 	 * No contexts means any context
 	 * 
-	 * @var array of accessControlContextType
+	 * @var array of ContextType
 	 */
 	protected $contexts;
 	
@@ -50,11 +45,19 @@ class kRule
 	protected $stopProcessing;
 	
 	/**
-	 * @param accessControl $accessControl
+	 * Indicates the scope on which the rule is applied
+	 * 
+	 * @var kScope
 	 */
-	public function __construct(accessControl $accessControl = null)
+	
+	protected $scope;
+	
+	/**
+	 * @param kScope $scope
+	 */
+	public function __construct(kScope $scope = null)
 	{
-		$this->accessControl = $accessControl;
+		$this->scope = $scope;
 	}
 	
 	/**
@@ -81,9 +84,8 @@ class kRule
 		if(!is_array($this->contexts) || !count($this->contexts))
 			return true;
 			
-		$scope = $this->accessControl->getScope();
 		foreach($this->contexts as $context)
-			if($scope->isInContext($context))
+			if($this->scope->isInContext($context))
 				return true;
 				
 		return false;
@@ -108,7 +110,7 @@ class kRule
 			
 		foreach($this->conditions as $condition)
 		{
-			if(!$condition->fulfilled($this->accessControl->getScope()))
+			if(!$condition->fulfilled($this->scope))
 			{
 				KalturaLog::debug("Condition [" . get_class($condition) . "] not  fulfilled");
 				return false;
@@ -132,7 +134,7 @@ class kRule
 		
 		foreach ($this->conditions as $condition)
 		{
-			if ($condition->shouldDisableCache($this->accessControl->getScope()))
+			if ($condition->shouldDisableCache($this->scope))
 			{
 				return true;
 			}
@@ -141,10 +143,10 @@ class kRule
 	}
 	
 	/**
-	 * @param kEntryContextDataResult $context
+	 * @param kContextDataResult $context
 	 * @return boolean
 	 */
-	public function applyContext(kEntryContextDataResult $context)
+	public function applyContext(kContextDataResult $context)
 	{
 		if(!$this->fulfilled())
 		{
@@ -155,13 +157,13 @@ class kRule
 		KalturaLog::debug("Rule conditions fulfilled");
 		if ($this->message)
 		{
-			$context->addAccessControlMessage($this->message);
+			$context->addMessage($this->message);
 		}
 		
 		if(is_array($this->actions))
 		{
 			foreach($this->actions as $action)
-				$context->addAccessControlAction($action);
+				$context->addAction($action);
 		}
 				
 		return true;
@@ -176,7 +178,7 @@ class kRule
 	}
 
 	/**
-	 * @return array<kAccessControlAction>
+	 * @return array<kRuleAction>
 	 */
 	public function getActions() 
 	{
@@ -184,7 +186,7 @@ class kRule
 	}
 
 	/**
-	 * @return array of accessControlContextType
+	 * @return array of ContextType
 	 */
 	public function getContexts() 
 	{
@@ -208,7 +210,7 @@ class kRule
 	}
 
 	/**
-	 * @param array<kAccessControlAction> $actions
+	 * @param array<kRuleAction> $actions
 	 */
 	public function setActions(array $actions) 
 	{
@@ -216,7 +218,7 @@ class kRule
 	}
 
 	/**
-	 * @param array $contexts of accessControlContextType
+	 * @param array $contexts of ContextType
 	 */
 	public function setContexts(array $contexts) 
 	{
@@ -232,17 +234,17 @@ class kRule
 	}
 	
 	/**
-	 * @param accessControl $accessControl
+	 * @param kScope $scope
 	 */
-	public function setAccessControl($accessControl) 
+	public function setScope($scope) 
 	{
-		$this->accessControl = $accessControl;
+		$this->scope = $scope;
 	}
 	
 	public function __sleep()
 	{
 		$vars = get_class_vars('kRule');
-		unset($vars['accessControl']);
+		unset($vars['scope']);
 		return array_keys($vars);
 	}
 }

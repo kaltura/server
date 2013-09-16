@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kEntryContextDataResult 
+class kEntryContextDataResult extends kContextDataResult
 {
 	/**
 	 * @var bool
@@ -40,50 +40,6 @@ class kEntryContextDataResult
 	 * @deprecated
 	 */
 	private $previewLength = -1; //changed to -1 for backward compatibility
-	
-	/**
-	 * Array of messages as received from the access control rules that invalidated
-	 * @var array<string>
-	 */
-	private $accessControlMessages = array();
-	
-	/**
-	 * Array of actions as received from the access control rules that invalidated
-	 * @var array<kAccessControlAction>
-	 */
-	private $accessControlActions = array();
-	
-	/**
-	 * @return array<string>
-	 */
-	public function getAccessControlMessages() 
-	{
-		return $this->accessControlMessages;
-	}
-
-	/**
-	 * @return array<kAccessControlAction>
-	 */
-	public function getAccessControlActions() 
-	{
-		return $this->accessControlActions;
-	}
-
-	/**
-	 * @param string $accessControlMessage
-	 */
-	public function addAccessControlMessage($accessControlMessage) 
-	{
-		$this->accessControlMessages[] = $accessControlMessage;
-	}
-
-	/**
-	 * @param kAccessControlAction $accessControlAction
-	 */
-	public function addAccessControlAction(kAccessControlAction $accessControlAction) 
-	{
-		$this->accessControlActions[] = $accessControlAction;
-	}
 	
 	/**
 	 * @return bool

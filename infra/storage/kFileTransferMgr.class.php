@@ -12,7 +12,6 @@ interface kFileTransferMgrType extends StorageProfileProtocol
 {
 	const HTTP = 4;
 	const HTTPS = 5;
-	const LOCAL = 7;
 	const ASPERA = 10;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
@@ -213,13 +212,7 @@ abstract class kFileTransferMgr
 	 */
 	abstract protected function doFileSize($remote_file);
 	
-	/**
-	 * Function returns an array of fie objects which includes the filename, last modification time and filesize
-	 * @param string $remote_path
-	 * 
-	 * @return array
-	 */
-	abstract protected function doListFileObjects ($remote_path);
+
 
 	/********************/
 	/* Public Functions */
@@ -673,28 +666,6 @@ abstract class kFileTransferMgr
 
 		// list files in directory
 		$res = @($this->doList($remote_path));
-
-		return $res;
-	}
-	
-	/**
-	 * Lists all files and folders names
-	 * 
-	 * @return array
-	 */
-	public function listFileObjects ($remote_path)
-	{
-		KalturaLog::debug("Listing directory [$remote_path]");
-		
-		// parameter checks
-		if (!$this->connection_id) {
-			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
-		}
-
-		$remote_path = $this->fixPathString($remote_path);
-
-		// list files in directory
-		$res = @($this->doListFileObjects($remote_path));
 
 		return $res;
 	}

@@ -602,6 +602,9 @@ class Partner extends BasePartner
 	public function getAppStudioExamplePlayList1() { return $this->getFromCustomData("appStudioExamplePlayList1", null); }
 	public function setAppStudioExamplePlayList1( $v ) { $this->putInCustomData("appStudioExamplePlayList1", $v); }
 
+	public function getSearchIndex($searchIndex, $defaultSearchIndex) { return $this->getFromCustomData("SearchIndex", $searchIndex, $defaultSearchIndex); }
+	public function setSearchIndex($searchIndex, $v) { $this->putInCustomData("SearchIndex", $v, $searchIndex); }
+
 	/** Partner Packges and classification **/
 	public function getPartnerPackageClassOfService() { return $this->getFromCustomData("partnerPackageClassOfService", null); }
 	public function setPartnerPackageClassOfService( $v ) { $this->putInCustomData("partnerPackageClassOfService", $v); } 
@@ -1434,24 +1437,24 @@ class Partner extends BasePartner
 		
 		$scope = new accessControlScope();
 		$scope->setKs(kCurrentContext::$ks);
-		$scope->setContexts(array(accessControlContextType::PLAY));
+		$scope->setContexts(array(ContextType::PLAY));
 		
 		$disableCache = $accessControl->applyContext($context, $scope);
 		if ($disableCache)
 			kApiCache::disableCache();
 
-		if(count($context->getAccessControlMessages()))
+		if(count($context->getMessages()))
 		{
-			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getAccessControlMessages()));
+			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getMessages()));
 		}
 
-		if(count($context->getAccessControlActions()))
+		if(count($context->getActions()))
 		{
-			$actions = $context->getAccessControlActions();
+			$actions = $context->getActions();
 			foreach($actions as $action)
 			{
 				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
+				if($action->getType() == RuleActionType::BLOCK)
 				{
 					KalturaLog::err('Action was blocked by API access control');
 					return false;

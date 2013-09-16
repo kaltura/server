@@ -31,6 +31,13 @@ class StorageProfile extends BaseStorageProfile
 	const CUSTOM_DATA_URL_MANAGER_PARAMS = 'url_manager_params';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
+	const CUSTOM_DATA_RULES = 'rules';
+	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
+	
+	/**
+	 * @var kStorageProfileScope
+	 */
+	protected $scope;
 	
 	/**
 	 * @return kPathManager
@@ -90,6 +97,26 @@ class StorageProfile extends BaseStorageProfile
 	public function getRTMPPrefix ()
 	{
 	    return $this->getFromCustomData("rtmp_prefix");
+	}
+	
+    public function setRules ($v)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_RULES, $v);
+	}
+	
+	public function getRules ()
+	{
+	    return $this->getFromCustomData(self::CUSTOM_DATA_RULES);
+	}
+	
+	public function getCreateFileLink ()
+	{
+	    return $this->getFromCustomData(self::CUSTOM_DATA_CREATE_FILE_LINK);
+	}
+	
+    public function setCreateFileLink ($v)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_CREATE_FILE_LINK, $v);
 	}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
@@ -153,45 +180,42 @@ class StorageProfile extends BaseStorageProfile
 	 */
 	public function shouldExportFlavorAsset(flavorAsset $flavorAsset)
 	{
-	    $shouldExport = null;
-	    
-	    // check if flavor params id is in the list to export
-	    $flavorParamsIdsToExport = $this->getFlavorParamsIds();
-	    KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIdsToExport]");
-	    
-	    if (is_null($flavorParamsIdsToExport) || strlen(trim($flavorParamsIdsToExport)) == 0)
-	    {
-	        // all flavor assets should be exported
-	        $shouldExport = true;
-	    }
-	    else
-	    {
-	        $flavorParamsIdsToExport = array_map('trim', explode(',', $flavorParamsIdsToExport));
-	        if (in_array($flavorAsset->getFlavorParamsId(), $flavorParamsIdsToExport))
-	        {
-	            // flavor set to export
-	            $shouldExport = true;
-	        }
-	        else
-	        {
-	            // flavor not set to export
-	            $shouldExport = false;
-	        }
-	    }
-	    
-	    // check if flavor fits the export rules defined on the profile
-	    if ($shouldExport)
-	    {
-	        $key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-	        $shouldExport = kStorageExporter::shouldExport($key, $this);
-	        
-	        if (!$shouldExport)
-	        {
-	            KalturaLog::log("no need to export key [$key] to externalStorage id[" . $this->getId() . "]");
-	        }
-	    }
-	    
-	    return $shouldExport;
+		KalturaLog::debug('Checking if flavor asset ['.$flavorAsset->getId().'] should be exported to ['.$this->getId().']');
+		if(!$flavorAsset->isLocalReadyStatus())
+		{
+			KalturaLog::debug('Flavor is not ready for export');
+			return false;
+		}
+
+		$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		if($this->isExported($key))
+		{
+			KalturaLog::debug('Flavor was already exported');
+			return false;
+		}
+			
+		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
+		{
+			KalturaLog::debug('Flavor asset is not configured for export');
+			return false;
+		}
+
+		$scope = $this->getScope();
+		$scope->setEntryId($flavorAsset->getEntryId());
+		if(!$this->fulfillsRules($scope))
+		{
+			KalturaLog::debug('Storage profile export rules are not fulfilled');
+			return false;
+		}
+			
+		if(!$this->isValidFileSync($key))
+		{
+			KalturaLog::debug('File sync is not valid for export');
+			return false;
+		}
+
+		KalturaLog::debug('Flavor should be exported');
+		return true;	    
 	}
 	
 	/**
@@ -224,5 +248,165 @@ class StorageProfile extends BaseStorageProfile
 		    return false;
 		}
 		return ($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_PENDING);
+	}
+	
+	/**
+	 * Validate if the entry should be exported to the remote storage according to the defined export rules
+	 * 
+	 * @param kStorageProfileScope $scope
+	 */
+	public function fulfillsRules(kStorageProfileScope $scope)
+	{
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_RULE, $this->getPartnerId()))
+			return true;
+			
+		if(!is_array($this->getRules()) || !count($this->getRules())) 
+			return true;
+			
+		$context = null;
+		if(!array_key_exists($this->getId(), kStorageExporter::$entryContextDataResult))
+		{
+			kStorageExporter::$entryContextDataResult[$this->getId()] = array();
+		}
+		
+		if(array_key_exists($scope->getEntryId(), kStorageExporter::$entryContextDataResult[$this->getId()]))
+		{
+			KalturaLog::debug("Found rule->applyContext result in cache");
+			$context = kStorageExporter::$entryContextDataResult[$this->getId()][$scope->getEntryId()];
+		}
+		else
+		{	
+			KalturaLog::debug("Validating rules");						
+			$context = new kContextDataResult();	
+			foreach ($this->getRules() as $rule) 
+			{
+				/* @var $rule kRule */
+				$rule->setScope($scope);
+				$fulfilled = $rule->applyContext($context);
+				
+				if($fulfilled && $rule->getStopProcessing())
+					break;
+			}
+			kStorageExporter::$entryContextDataResult[$this->getId()][$scope->getEntryId()] = $context;
+		}
+		
+		foreach ($context->getActions() as $action) 
+		{
+			/* @var $action kRuleAction */
+			if($action->getType() == RuleActionType::ADD_TO_STORAGE)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Check if input key was already exported for this storage profile
+	 * 
+	 * @param FileSyncKey $key
+	 */
+	public function isExported(FileSyncKey $key)
+	{
+		$storageFileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($key, $this->getId());
+
+		if($storageFileSync) // already exported or currently being exported
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] already exported or being exported");
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if flavor asset id set for export on the storage profile
+	 * 
+	 * @param flavorAsset $flavorAsset
+	 */
+	protected function isFlavorAssetConfiguredForExport(flavorAsset $flavorAsset)
+	{
+		$configuredForExport = null;
+	    
+	    // check if flavor params id is in the list to export
+	    $flavorParamsIdsToExport = $this->getFlavorParamsIds();
+	    KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIdsToExport]");
+	    
+	    if (is_null($flavorParamsIdsToExport) || strlen(trim($flavorParamsIdsToExport)) == 0)
+	    {
+	        // all flavor assets should be exported
+	        $configuredForExport = true;
+	    }
+	    else
+	    {
+	        $flavorParamsIdsToExport = array_map('trim', explode(',', $flavorParamsIdsToExport));
+	        if (in_array($flavorAsset->getFlavorParamsId(), $flavorParamsIdsToExport))
+	        {
+	            // flavor set to export
+	            $configuredForExport = true;
+	        }
+	        else
+	        {
+	            // flavor not set to export
+	            $configuredForExport = false;
+	        }
+	    }
+
+	    return $configuredForExport;
+	}
+	
+	public function isValidFileSync(FileSyncKey $key)
+	{
+		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $this->getId() . "]");
+		
+		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
+		if(!$kalturaFileSync) // no local copy to export from
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
+			return false;
+		}
+		
+		KalturaLog::log(__METHOD__ . " validating file size [" . $kalturaFileSync->getFileSize() . "] is between min [" . $this->getMinFileSize() . "] and max [" . $this->getMaxFileSize() . "]");
+		if($this->getMaxFileSize() && $kalturaFileSync->getFileSize() > $this->getMaxFileSize()) // too big
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] file too big");
+			return false;
+		}
+			
+		if($this->getMinFileSize() && $kalturaFileSync->getFileSize() < $this->getMinFileSize()) // too small
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] file too small");
+			return false;
+		}
+			
+		return true;
+		
+	}
+	
+	/**
+	 * Get the storage profile scope
+	 * 
+	 * @return kStorageProfileScope
+	 */
+	public function &getScope()
+	{
+		if (!$this->scope)
+		{
+			$this->scope = new kStorageProfileScope();
+			$this->scope->setStorageProfileId($this->getId());
+		}
+			
+		return $this->scope;
+	}
+	
+	/**
+	 * Set the kStorageProfileScope, called internally only
+	 * 
+	 * @param $scope
+	 */
+	protected function setScope(kStorageProfileScope $scope)
+	{
+		$this->scope = $scope;
 	}
 }

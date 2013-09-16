@@ -179,6 +179,19 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $allowAutoDelete;
 	
+	/**
+	 * Indicates to the local file transfer manager to create a link to the file instead of copying it
+	 * @var bool
+	 */
+	public $createFileLink;
+	
+	/**
+	 * Holds storage profile export rules
+	 * 
+	 * @var KalturaRuleArray
+	 */
+	public $rules;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -211,6 +224,8 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"rtmpPrefix",
 		"readyBehavior",
 		"allowAutoDelete",
+		"createFileLink",
+		"rules",
 	);
 	
 	/* (non-PHPdoc)

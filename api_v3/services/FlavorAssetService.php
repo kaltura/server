@@ -677,7 +677,7 @@ class FlavorAssetService extends KalturaAssetService
 		
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
-		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, accessControlContextType::DOWNLOAD);
+		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
 
 		//files grater then 1.8GB can't be downloaded from cdn.

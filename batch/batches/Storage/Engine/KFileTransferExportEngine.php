@@ -31,6 +31,7 @@ class KFileTransferExportEngine extends KExportEngine
 							
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
+		$engineOptions['createLink'] = $this->data->createLink;
 		if($this->data instanceof KalturaAmazonS3StorageExportJobData)
 			$engineOptions['filesAcl'] = $this->data->filesPermissionInS3;
 			

@@ -2,11 +2,8 @@
 /**
  * @package api
  * @subpackage enum
+ * @deprecated use KalturaRuleActionType
  */
-class KalturaAccessControlActionType extends KalturaDynamicEnum implements accessControlActionType
+class KalturaAccessControlActionType extends KalturaRuleActionType
 {
-	public static function getEnumClass()
-	{
-		return 'accessControlActionType';
-	}
 }

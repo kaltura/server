@@ -37,6 +37,20 @@ class kScope
 	 */
 	protected $dynamicValues = array();
 	
+	/**
+	 * @var string
+	 */
+	protected $entryId;
+	
+	/**
+	 * Indicates what contexts should be tested 
+	 * No contexts means any context
+	 * 
+	 * @var array of ContextType
+	 */
+	protected $contexts = array();
+	
+	
 	public function __construct()
 	{
 		$this->setIp(requestUtils::getRemoteAddress());
@@ -167,5 +181,49 @@ class kScope
 		}
 		
 		return $values;
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setEntryId($v)
+	{
+		$this->entryId = $v;
+	}
+	
+	/**
+	 * @param array $contexts array of ContextType
+	 */
+	public function setContexts(array $contexts) 
+	{
+		$this->contexts = $contexts;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getEntryId()
+	{
+		return $this->entryId;
+	}	
+	
+	/**
+	 * @return array of ContextType
+	 */
+	public function getContexts() 
+	{
+		return $this->contexts;
+	}
+
+	/**
+	 * @param int $context enum of ContextType
+	 * @return bool
+	 */
+	public function isInContext($context)
+	{
+		if(!is_array($this->contexts) || !count($this->contexts))
+			return true;
+			
+		return in_array($context, $this->contexts);
 	}
 }

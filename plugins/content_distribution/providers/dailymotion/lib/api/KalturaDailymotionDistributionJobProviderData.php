@@ -95,7 +95,7 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 			foreach($rule->getActions() as $action)
 			{
 				/* @var $action kAccessControlAction */
-				if($action->getType() == accessControlActionType::BLOCK)
+				if($action->getType() == RuleActionType::BLOCK)
 				{
 					$hasBlockAction = true;
 					break;

@@ -12,15 +12,14 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$this->setAttrib('id', 'frmStorageConfig');
 
 		$this->addElement('text', 'partnerId', array(
-			'label' 		=> '*Related Publisher ID:',
+			'label' 		=> 'Related Publisher ID*:',
 			'required'		=> true,
 			'filters' 		=> array('StringTrim'),
-			'validators' 	=> array()
-		
+			'validators' 	=> array(),
 		));
 		
 		$this->addElement('text', 'name', array(
-			'label' 		=> '*Remote Storage Name:',
+			'label' 		=> 'Remote Storage Name*:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
@@ -50,15 +49,14 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		 
 		 
 		$this->addElement('text', 'storageUrl', array(
-			'label'			=> '*Storage URL:',
+			'label'			=> 'Storage URL*:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('checkbox', 'allowAutoDelete', array(
-			'label'			=> 'Allow auto-deletion of files',
+			'label'			=> 'Allow auto-deletion of files:',
 			'filters'		=> array('StringTrim'),
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),			
 		));
 		
 		$this->addElement('text', 'minFileSize', array(
@@ -70,7 +68,6 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$this->addElement('text', 'maxFileSize', array(
 			'label'			=> 'Export only files smaller than:',
 			'filters'		=> array('Digits'),
-			
 		));
 		
 		$this->addElement('select', 'urlManagerClass', array(
@@ -107,52 +104,72 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'rows'			=> 2,
 			'filters'		=> array('StringTrim'),
 		));
-		
-		
+				
 		$this->addDisplayGroup(array('partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'description'), 'general_info', array(
 			'legend' => 'General',
-			'decorators' => array(
-				'Description', 
-				'FormElements', 
-				array('Fieldset'),
-			)
 		));
+		
+		$this->addElement('hidden', 'crossLine1', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
+		
 		
 		$this->addDisplayGroup(array('storageUrl', 'allowAutoDelete'), 'storage_info', array(
 			'legend' => 'Export Details',
-			'decorators' => array(
-				'Description', 
-				'FormElements', 
-				array('Fieldset'),
-			)
+
+		));
+		
+		$this->addElement('hidden', 'crossLine2', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
+		
+		$this->addDisplayGroup(array('minFileSize', 'maxFileSize', 'trigger', 'readyBehavior'), 'export_policy', array(
+			'legend' => 'Export Policy',
+
+		));
+				
+		$this->addElement('hidden', 'crossLine3', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
 		$this->addDisplayGroup(array('urlManagerClass' ), 'playback_info', array(
 			'legend' => 'Delivery Details',
-			'decorators' => array(
-				'Description', 
-				'FormElements', 
-				array('Fieldset'),
-			)
+
 		));
 		
-		$this->addDisplayGroup(array('minFileSize', 'maxFileSize', 'trigger', 'readyBehavior'), 'export_policy', array(
-			'legend' => 'Delivery Details',
-			'decorators' => array(
-				'Description', 
-				'FormElements', 
-				array('Fieldset'),
-			)
+		$this->addElement('hidden', 'crossLine4', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
 		$this->addDisplayGroup(array('urlManagerParamsJson'), 'advanced', array(
-			'legend' => 'Advanced>>',
-			'decorators' => array(
-				'Description', 
-				'FormElements', 
-				array('Fieldset'),
-			)
+			'legend' => 'Advanced',
+
 		));
+		
+		$displayGroups = $this->getDisplayGroups();
+		foreach ($displayGroups as $displayGroup)
+		{
+			$displayGroup->removeDecorator ('label');
+	  		$displayGroup->removeDecorator('DtDdWrapper');
+		}
+		
+		$openLeftDisplayGroup = $this->getDisplayGroup('general_info');
+    	$openLeftDisplayGroup->setDecorators(array(
+             'FormElements',
+             'Fieldset',
+             array('HtmlTag',array('tag'=>'div','openOnly'=>true,'class'=> 'storageConfigureFormPanel'))
+    	 ));
+	
+    	$closeLeftDisplayGroup = $this->getDisplayGroup('advanced');
+    	$closeLeftDisplayGroup->setDecorators(array(
+             'FormElements',
+             'Fieldset',
+              array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
+     	));
 	}
 
 	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())
@@ -165,7 +182,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 				'label'			=> "Flavor Params {$flavorParamsItem->name} ({$flavorParamsItem->id})",
 				'checked'		=> $checked,
 			    'indicator'		=> 'dynamic',
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt'))),
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 			));
 			
 			$this->addElementToDisplayGroup('advanced', 'flavorParamsId_' . $flavorParamsItem->id);

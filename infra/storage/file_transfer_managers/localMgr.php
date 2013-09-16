@@ -8,11 +8,19 @@
  */
 class localMgr extends kFileTransferMgr
 {
-
+	//in case link should be created instead of copy set it on options array passed to the localMgr constructor
+	private $createLink;
+	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
 		parent::__construct($options);
+		if($options)
+		{
+			if(isset($options['createLink']))
+				$this->createLink = $options['createLink'];
+			
+		}	
 	}
 
 
@@ -44,15 +52,18 @@ class localMgr extends kFileTransferMgr
 	// upload a file to the server (ftp_mode is irrelevant
 	protected function doPutFile ($remote_file,  $local_file)
 	{
-		return @copy($remote_file, $local_file);
+		if($this->createLink)
+			return symlink($local_file, $remote_file);			
+		else		
+			return copy($local_file, $remote_file);
 	}
 
 
 	// download a file from the server (ftp_mode is irrelevant)
 	protected function doGetFile ($remote_file, $local_file = null)
 	{
-		if($local_file)
-			return @copy($remote_file, $local_file);
+		if($local_file && !$this->createLink)
+			return @copy($local_file, $remote_file);
 			
 		return file_get_contents($remote_file);
 	}
@@ -63,7 +74,6 @@ class localMgr extends kFileTransferMgr
 	{
 	    return mkdir($remote_path);
 	}
-
 
 	// chmod to the given remote file
 	protected function doChmod ($remote_file, $chmod_code)
@@ -76,7 +86,10 @@ class localMgr extends kFileTransferMgr
 	protected function doFileExists($remote_file)
 	{
 	    clearstatcache();
-	    return @file_exists($remote_file);
+	    if($this->createLink)
+			return is_link($remote_file);			
+		else	    
+	    	return @file_exists($remote_file);
 	}
 
 	// return the current working directory
@@ -90,7 +103,7 @@ class localMgr extends kFileTransferMgr
 	{
 		// if the file doesnt exist don't return an error. when using a local drop folder the files may be moved and not copied
 		// in this case the file won't exist anymore in the drop folder however the watcher will make sure orphan files are deleted.
-		return file_exists($remote_file) ? @unlink($remote_file) : true;
+		return $this->doFileExists($remote_file) ? @unlink($remote_file) : true;
 	}
 
 	// delete a directory and return true/false according to success
@@ -103,26 +116,6 @@ class localMgr extends kFileTransferMgr
 	{
 	    clearstatcache();
 		return @scandir($remoteDir, 0);
-	}
-
-	protected function doListFileObjects ($remoteDir)
-	{
-		clearstatcache();
-		$files = $this->doList($remoteDir);
-		
-		$res = array();
-		foreach($files as $file)
-		{
-			$filepath = $remoteDir."/".$file;
-			$fileObject = new FileObject();
-			$fileObject->filename = $file;
-			$fileObject->fileSize = $this->doFileSize($filepath);
-			$fileObject->modificationTime = $this->doModificationTime($filepath);
-			$res[] = $fileObject;
-		}
-		
-		return $res;
-		
 	}
 	
 	protected function doFileSize($remote_file)
