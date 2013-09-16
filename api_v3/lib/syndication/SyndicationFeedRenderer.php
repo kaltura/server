@@ -14,6 +14,10 @@ abstract class SyndicationFeedRenderer {
 		$this->mimeType = $mimeType;
 	}
 	
+	public function shouldEnableCache() {
+		return true;
+	}
+	
 	public abstract function handleHeader();
 	public abstract function handleBody($entry, $e = null, $flavorAssetUrl = null);
 	public abstract function handleFooter();
