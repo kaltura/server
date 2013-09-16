@@ -64,25 +64,42 @@ $nullDev ="/dev/null";
 
 $vid = $target->_video;
 $fltStr = null;
+
+			/*
+			 * The 'old' deinterlace failed to handle several HD sources. 
+			 * Switched to newer 'yadif'
+			 */
+		if(strstr($cmdStr, " -deinterlace")!=false) {
+			$cmdStr = str_replace(" -deinterlace", "", $cmdStr);
+			$fltStr = "yadif";
+		}
+		
 		if(isset($vid->_rotation)) {
 			if($vid->_rotation==180)
-				$fltStr.= " -vf vflip,hflip";
+				$rotStr = "vflip,hflip";
 			else if($vid->_rotation==90)
-				$fltStr.= " -vf transpose=1";
+				$rotStr = "transpose=1";
 			else if($vid->_rotation==270 || $vid->_rotation==-90)
-				$fltStr.=" -vf transpose=2";
+				$rotStr ="transpose=2";
+			if(isset($rotStr)) {
+				if(isset($fltStr))
+					$fltStr.= ",$rotStr";
+				else
+					$fltStr = " $rotStr";
+			}
 		}
 			// Letterboxing 
 		if(isset($vid->_arProcessingMode) && $vid->_arProcessingMode==2){
-			if(!isset($fltStr)) 
-				$fltStr =" -vf ";
-			else
+			if(isset($fltStr)) 
 				$fltStr.=",";
 			$fltStr.='"scale=iw*sar*min('.$vid->_width.'/(iw*sar)\,';
 			$fltStr.=$vid->_height.'/ih):ih*min('.$vid->_width.'/(iw*sar)\,';
 			$fltStr.=$vid->_height.'/ih),pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2"';
 		}
-		$cmdStr.= $fltStr;
+		
+		if(isset($fltStr)) {
+			$cmdStr.= " -vf $fltStr";
+		}
 		return $cmdStr;
 	}
 
