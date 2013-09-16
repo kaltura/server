@@ -17,7 +17,7 @@ class SynacorHboService extends ContentDistributionServiceBase
 	 */
 	public function getFeedAction($distributionProfileId, $hash)
 	{
-		$this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash); 
+		return $this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash); 
 	}
 	
 	public function getProfileClass() {

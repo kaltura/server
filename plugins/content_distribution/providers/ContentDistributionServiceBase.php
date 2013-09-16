@@ -21,7 +21,7 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 		$entries = $this->getEntries($context, null, null);
 		$feed = $this->createFeedGenerator($context);
 		$this->handleEntries($context, $feed, $entries);
-		$this->doneFeedGeneration($context, $feed);
+		return $this->doneFeedGeneration($context, $feed);
 	}
 
 	/**
@@ -171,9 +171,7 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	 * @param $feed
 	 */
 	protected function doneFeedGeneration ($context, $feed) {
-		header('Content-Type: text/xml');
-		echo $feed->getXml();
-		die;
+		return new kRendererString($feed->getXml(), 'text/xml');
 	}
 }
 
