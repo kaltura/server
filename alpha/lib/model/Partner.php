@@ -602,9 +602,6 @@ class Partner extends BasePartner
 	public function getAppStudioExamplePlayList1() { return $this->getFromCustomData("appStudioExamplePlayList1", null); }
 	public function setAppStudioExamplePlayList1( $v ) { $this->putInCustomData("appStudioExamplePlayList1", $v); }
 
-	public function getSearchIndex($searchIndex, $defaultSearchIndex) { return $this->getFromCustomData("SearchIndex", $searchIndex, $defaultSearchIndex); }
-	public function setSearchIndex($searchIndex, $v) { $this->putInCustomData("SearchIndex", $v, $searchIndex); }
-
 	/** Partner Packges and classification **/
 	public function getPartnerPackageClassOfService() { return $this->getFromCustomData("partnerPackageClassOfService", null); }
 	public function setPartnerPackageClassOfService( $v ) { $this->putInCustomData("partnerPackageClassOfService", $v); } 
