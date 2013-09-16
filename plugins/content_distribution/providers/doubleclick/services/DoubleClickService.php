@@ -23,7 +23,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 	{
 		$context = new DoubleClickServiceContext($hash, $page, $period, $state, $ignoreScheduling);
 		$context->keepScheduling = !$ignoreScheduling;
-		$this->generateFeed($context, $distributionProfileId, $hash);
+		return $this->generateFeed($context, $distributionProfileId, $hash);
 	}
 	
 	public function getProfileClass() {
@@ -148,7 +148,7 @@ class DoubleClickService extends ContentDistributionServiceBase
 		$entries[] = $entry;
 		$context = new DoubleClickServiceContext($hash);
 		$this->handleEntries($context, $feed, $entries);
-		$this->doneFeedGeneration($context, $feed);
+		return $this->doneFeedGeneration($context, $feed);
 		
 	}
 	
