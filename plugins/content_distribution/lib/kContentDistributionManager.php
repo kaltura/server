@@ -693,11 +693,14 @@ class kContentDistributionManager
 			if ($returnValue)
 				$returnValue = self::addSubmitAddJob($entryDistribution, $distributionProfile);
 		}
-		
-		if(!$returnValue && $submitWhenReady && in_array($entryDistribution->getStatus(), $validStatus))
+		$entryDistributionStatus = $entryDistribution->getStatus(); 
+		if(!$returnValue && $submitWhenReady && in_array($entryDistributionStatus, $validStatus))
 		{
-			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
-			$entryDistribution->save();
+			if (!in_array($entryDistributionStatus, array(EntryDistributionStatus::IMPORT_SUBMITTING, EntryDistributionStatus::IMPORT_UPDATING))) //a submit job will be created on import job finish 
+			{
+				$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
+				$entryDistribution->save();
+			}
 			KalturaLog::debug("Will be submitted when ready");
 		}
 		

@@ -46,7 +46,7 @@ class fixUiConfFileSyncAction extends kalturaSystemAction
 
 				if (file_exists($fullPath))
 				{
-					kFileSyncUtils::createSyncFileForKey($syncKey);
+					kFileSyncUtils::createSyncFileForKey($rootPath, $filePath, $syncKey);
 					echo("Created successfully.".PHP_EOL);
 				}
 				else

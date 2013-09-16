@@ -119,26 +119,8 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 			{
 				$permissionNamesArr = array();
 			}
-			switch ($this->permissionLevel)
-			{
-				case CategoryKuserPermissionLevel::MEMBER:
-					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
-					break;
-				case CategoryKuserPermissionLevel::CONTRIBUTOR:
-					$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
-					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
-					break;
-				case CategoryKuserPermissionLevel::MANAGER:
-					$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
-					$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
-					$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
-					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
-					break;
-				case CategoryKuserPermissionLevel::MODERATOR:
-					$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
-					$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
-					break;
-			}
+			
+			$permissionNamesArr = categoryKuser::getPermissionNamesByPermissionLevel($this->permissionLevel);
 			
 			$dbObject->setPermissionNames(implode(',', $permissionNamesArr));
 		}

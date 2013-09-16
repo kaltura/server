@@ -445,7 +445,10 @@ class KalturaSyndicationFeedRenderer
 		header($renderer->handleHttpHeader());
 		echo $renderer->handleHeader();
 		
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
+		$cacheStore = null;
+		if($renderer->shouldEnableCache())
+			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
+		
 		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry_";
 		$feedUpdatedAt = $this->syndicationFeedDB->getUpdatedAt(null);
 

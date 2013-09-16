@@ -446,7 +446,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				foreach ($captionAssets as $captionAsset)
 				{
 					/* @var $captionAsset CaptionAsset */
-					$captionsAssetObj = array();
+					$captionAssetObj = array();
 					
 					if ($captionAsset->getContainerFormat() == CaptionType::WEBVTT)						
 						$captionAssetObj['url'] =  $captionAsset->getExternalUrl($config->storageId);	// Currently only external caption assets are supported
@@ -470,9 +470,15 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$captionAssetObj['url'] = $cdnHost . '/api_v3/index.php/service/caption_captionasset/action/serveWebVTT'.
 							'/captionAssetId/'.$captionAsset->getId() . $ksStr . $versionStr . '/a.m3u8';
 					}
-					$captionAssetObj['label'] = $captionAsset->getLabel();
+					$label = $captionAsset->getLabel();
+					if (!$label)
+						$label = $captionAsset->getLanguage();
+					if (!$label)
+						$label = 'Track'.(count($contributor->captions) + 1);
+					$captionAssetObj['label'] = $label; 
 					$captionAssetObj['default'] = $captionAsset->getDefault() ? "YES" : "NO";
-					$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
+					if (isset(self::$captionsFormatMap[$captionAsset->getLanguage()]))
+						$captionAssetObj['language'] = self::$captionsFormatMap[$captionAsset->getLanguage()];
 					
 					KalturaLog::info("Object passed into editor: " . print_r($captionAssetObj, true));
 					$contributor->captions[] = $captionAssetObj;
