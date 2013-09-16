@@ -17,7 +17,7 @@ class AttUverseService extends ContentDistributionServiceBase
 	 * @return file
 	 */
 	public function getFeedAction($distributionProfileId, $hash) {
-		$this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash);
+		return $this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash);
 	}
 	
 	
@@ -52,6 +52,6 @@ class AttUverseService extends ContentDistributionServiceBase
 	protected function doneFeedGeneration ($context, $feed) {
 		$channelTitle = isset($context->channelTitle) ? $context->channelTitle : $this->profile->getChannelTitle();
 		$feed->setChannelTitle($channelTitle);
-		parent::doneFeedGeneration($context, $feed);
+		return parent::doneFeedGeneration($context, $feed);
 	}
 }
