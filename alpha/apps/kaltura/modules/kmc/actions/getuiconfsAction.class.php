@@ -73,7 +73,13 @@ class getuiconfsAction extends kalturaAction
 		$kdp508_uiconfs = array();
 		if($type == 'player' && $this->partner->getEnable508Players())
 		{
-			$kdp508_uiconfs = kmcUtils::getKdp508PlayerUiconfs();
+			$kdp508_uiconfs = kmcUtils::getPlayerUiconfsByTag('kdp508');
+		}
+
+		// Add HTML5 v2.0.0 Preview Player
+		$v2_preview_players = array();
+		if( $type == 'player'&& PermissionPeer::isValidForPartner(PermissionName::FEATURE_HTML5_V2_PLAYER_PREVIEW, $this->partner_id)){
+			$v2_preview_players = kmcUtils::getPlayerUiconfsByTag('html5_v2_preview');
 		}
 		
 		$merged_list = array();
@@ -83,6 +89,9 @@ class getuiconfsAction extends kalturaAction
 		if(count($kdp508_uiconfs))
 			foreach($kdp508_uiconfs as $uiconf)
 				$merged_list[] = $uiconf;
+		if(count($v2_preview_players))
+			foreach($v2_preview_players as $uiconf)
+				$merged_list[] = $uiconf;			
 		if(count($partner_uiconfs_array))
 			foreach($partner_uiconfs_array as $uiconf)
 				$merged_list[] = $uiconf;
