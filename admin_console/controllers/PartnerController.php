@@ -278,7 +278,10 @@ class PartnerController extends Zend_Controller_Action
 		
 		if(!$form || !($form instanceof Form_Partner_BaseStorageConfiguration))
 		{
-			$form = new Form_Partner_StorageConfiguration();
+			if($type == Kaltura_Client_Enum_StorageProfileProtocol::LOCAL)
+				$form = new Form_Partner_LocalStorageConfiguration();
+			else
+				$form = new Form_Partner_StorageConfiguration();
 		}
 			
 		//$form->setAction($action->view->url(array('controller' => 'partner', 'action' => 'configureStorageAction')));
