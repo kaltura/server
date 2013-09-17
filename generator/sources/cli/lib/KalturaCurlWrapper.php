@@ -48,10 +48,15 @@ class KalturaCurlWrapper
 		{
 			curl_setopt($ch, CURLOPT_POST, 1);
 			$hasFiles = false;
-			foreach($params as $key => $value)
+			foreach($params as $key => &$value)
 			{
-				if (strlen($value) > 1 && $value[0] == '@' && file_exists(substr($value, 1)))
-					$hasFiles = true;
+				if (strlen($value) > 1 && $value[0] == '@')
+				{
+					if (substr($value, 0, 2) == '@@' && file_exists(substr($value, 2)))
+						$value = file_get_contents(substr($value, 2));
+					else if (file_exists(substr($value, 1)))
+						$hasFiles = true;
+				}
 			}
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $hasFiles ? $params : http_build_query($params));
 		}
