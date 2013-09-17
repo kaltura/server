@@ -401,11 +401,7 @@ class kBatchExclusiveLock
 		
 		$db_lock_object = BatchJobLockPeer::doSelectOne($c);
 		if(!$db_lock_object) {
-			// If another lock exists
-			$db_lock_object = BatchJobLockPeer::retrieveByPk ( $id );
-			if($db_lock_object) {
-				throw new APIException ( APIErrors::UPDATE_EXCLUSIVE_JOB_FAILED , $id,$lockKey->getSchedulerId(), $lockKey->getWorkerId(), $lockKey->getBatchIndex(), print_r ( $db_lock_object , true ));
-			}
+			throw new APIException ( APIErrors::UPDATE_EXCLUSIVE_JOB_FAILED , $id,$lockKey->getSchedulerId(), $lockKey->getWorkerId(), $lockKey->getBatchIndex(), print_r ( $db_lock_object , true ));
 		}
 		
 		if($db_lock_object) {
