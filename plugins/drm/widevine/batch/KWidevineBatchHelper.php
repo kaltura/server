@@ -45,17 +45,17 @@ class KWidevineBatchHelper
 	 * 
 	 */
 	public static function getEncryptPackageCmdLine(
-							$widevineExe, $wvLicenseServerUrl, $iv, $key, $assetName, $inputFiles, $destinationFile, $portal = null)
+							$widevineExe, $wvLicenseServerUrl, $iv, $key, $assetName, $inputFiles, $destinationFile, $gop, $portal = null)
 	{
 		if(!$portal)
 			$portal = WidevinePlugin::KALTURA_PROVIDER;
 		
-		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvLicenseServerUrl.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile;
+		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvLicenseServerUrl.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop;
 		
 		KalturaLog::debug("Encrypt package command: ".$cmd);
 		
 		$cmd = $cmd.' -v '.$iv.' -k '.$key;
-		return cmd;
+		return $cmd;
 		
 	}
 
@@ -65,7 +65,7 @@ class KWidevineBatchHelper
 	 */
 	public static function getEncryptPackageErrorMessage($status)
 	{
-		return self::$encryptionErrorCodes($status);
+		return self::$encryptionErrorCodes[$status];
 	}
 	
 	/**

@@ -112,6 +112,7 @@ class KWidevineOperationEngine extends KOperationEngine
 										$this->packageName, 
 										$inputFiles, 
 										$this->data->destFileSyncLocalPath,
+										$this->params->gop,
 										$this->params->portal);
 										
 		exec($cmd, $output, $returnValue);

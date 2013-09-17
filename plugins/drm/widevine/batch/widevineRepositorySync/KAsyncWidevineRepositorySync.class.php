@@ -59,7 +59,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 
 		foreach ($widevineAssets as $assetId) 
 		{
-			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate, $cgiUrl);
+			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate);
 		}
 		
 		$this->updateFlavorAssets($job, $dataWrap);
