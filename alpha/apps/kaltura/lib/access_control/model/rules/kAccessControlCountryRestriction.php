@@ -45,7 +45,7 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	/**
 	 * @return kCountryCondition
 	 */
-	private function getCondition()
+	protected function getCondition()
 	{
 		$conditions = $this->getConditions();
 		if(!$this->condition && count($conditions))
