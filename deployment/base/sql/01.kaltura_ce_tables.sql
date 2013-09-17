@@ -157,9 +157,9 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock_suspend` (
   PRIMARY KEY (`id`),
   KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
   INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
-  CONSTRAINT `batch_job_lock_suspend_FK_1`
-  FOREIGN KEY (`batch_job_id`)
-  REFERENCES `batch_job_sep` (`id`)
+  CONSTRAINT `batch_job_lock_suspend_FK_1`,
+  FOREIGN KEY (`batch_job_id`),
+  REFERENCES `batch_job_sep` (`id`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `batch_job_log` */
