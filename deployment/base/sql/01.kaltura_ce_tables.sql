@@ -128,39 +128,6 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock` (
   KEY `dc_status` (`dc`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `batch_job_lock_suspend` */
-
-CREATE TABLE IF NOT EXISTS `batch_job_lock_suspend` (
-  `id` bigint(20) NOT NULL,
-  `entry_id` varchar(20) DEFAULT NULL,
-  `object_type` int(6) DEFAULT NULL,
-  `object_id` varchar(20) DEFAULT NULL,
-  `partner_id` int(11) DEFAULT NULL,
-  `dc` int(11) DEFAULT NULL,
-  `job_type` int(6) DEFAULT NULL,
-  `job_sub_type` int(6) NOT NULL DEFAULT '0',
-  `created_at` datetime DEFAULT NULL,
-  `priority` tinyint(4) NOT NULL,
-  `urgency` tinyint(4) NOT NULL,
-  `estimated_effort` bigint(20) DEFAULT NULL,
-  `status` int(11) DEFAULT NULL,
-  `version` int(11) DEFAULT NULL,
-  `execution_attempts` tinyint(4) DEFAULT NULL,
-  `scheduler_id` int(11) DEFAULT NULL,
-  `worker_id` int(11) DEFAULT NULL,
-  `batch_index` int(11) DEFAULT NULL,
-  `expiration` datetime DEFAULT NULL,
-  `start_at` datetime DEFAULT NULL,
-  `batch_job_id` bigint(20) NOT NULL,
-  `custom_data` text,
-  `batch_version` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
-  INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
-  CONSTRAINT `batch_job_lock_suspend_FK_1`,
-  FOREIGN KEY (`batch_job_id`),
-  REFERENCES `batch_job_sep` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `batch_job_log` */
 
@@ -261,6 +228,40 @@ CREATE TABLE IF NOT EXISTS `batch_job_sep` (
   KEY `partner_type_status_index` (`partner_id`,`job_type`,`status`),
   KEY `status_job_type_job_sub_type_created_at` (`status`,`job_type`,`job_sub_type`,`created_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+/*Table structure for table `batch_job_lock_suspend` */
+
+CREATE TABLE IF NOT EXISTS `batch_job_lock_suspend` (
+  `id` bigint(20) NOT NULL,
+  `entry_id` varchar(20) DEFAULT NULL,
+  `object_type` int(6) DEFAULT NULL,
+  `object_id` varchar(20) DEFAULT NULL,
+  `partner_id` int(11) DEFAULT NULL,
+  `dc` int(11) DEFAULT NULL,
+  `job_type` int(6) DEFAULT NULL,
+  `job_sub_type` int(6) NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT NULL,
+  `priority` tinyint(4) NOT NULL,
+  `urgency` tinyint(4) NOT NULL,
+  `estimated_effort` bigint(20) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `version` int(11) DEFAULT NULL,
+  `execution_attempts` tinyint(4) DEFAULT NULL,
+  `scheduler_id` int(11) DEFAULT NULL,
+  `worker_id` int(11) DEFAULT NULL,
+  `batch_index` int(11) DEFAULT NULL,
+  `expiration` datetime DEFAULT NULL,
+  `start_at` datetime DEFAULT NULL,
+  `batch_job_id` bigint(20) NOT NULL,
+  `custom_data` text,
+  `batch_version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
+  INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
+  CONSTRAINT `batch_job_lock_suspend_FK_1`
+  FOREIGN KEY (`batch_job_id`)
+  REFERENCES `batch_job_sep` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `blocked_email` */
 
