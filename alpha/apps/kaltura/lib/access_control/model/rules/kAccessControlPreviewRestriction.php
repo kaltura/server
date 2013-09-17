@@ -39,7 +39,7 @@ class kAccessControlPreviewRestriction extends kAccessControlRestriction
 	/* (non-PHPdoc)
 	 * @see kRule::applyContext()
 	 */
-	public function applyContext(kEntryContextDataResult $context)
+	public function applyContext(kContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
 		if($fulfilled)
