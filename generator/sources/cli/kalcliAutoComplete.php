@@ -271,12 +271,20 @@ function getParameterNameCompletions($serviceName, $actionName, $autoCompWord, &
 			}
 			else if ($assignPos + 1 < strlen($autoCompWord) && $autoCompWord[$assignPos + 1] == FILENAME_DELIMITER)
 			{
+				$prefix = $paramName.ASSIGN_DELIMITER.FILENAME_DELIMITER;
+				$fileStartPos = $assignPos + 2;
+				if ($assignPos + 2 < strlen($autoCompWord) && $autoCompWord[$assignPos + 2] == FILENAME_DELIMITER)
+				{
+					$prefix .= FILENAME_DELIMITER;
+					$fileStartPos++;
+				}
+					
 				// upload file name completion
-				$fileName = substr($autoCompWord, $assignPos + 2);
+				$fileName = substr($autoCompWord, $fileStartPos);
 				$completions = null;
 				exec("compgen -f -- '{$fileName}'", $completions);
 				$finalComp = true;
-				return addPrefix($completions, $paramName.ASSIGN_DELIMITER.FILENAME_DELIMITER);
+				return addPrefix($completions, $prefix);
 			}
 		}
 	}
