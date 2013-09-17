@@ -209,7 +209,7 @@ class kmc3Action extends kalturaAction
 		/** 508 uicinfs **/
 		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnable508Players())
 		{
-			$this->kdp508_players = kmcUtils::getKdp508PlayerUiconfs();
+			$this->kdp508_players = kmcUtils::getPlayerUiconfsByTag('kdp508');
 		}
 		
 		/** partner's preview&embed uiconfs **/
