@@ -233,7 +233,6 @@ class kMetadataManager
 		$dataFieldName = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA);
 		
 		$searchValues = array();
-		$searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES] = array();
 		
 		foreach($metadatas as $metadata)
 			$searchValues = self::getDataSearchValues($metadata, $searchValues);
