@@ -219,7 +219,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$feed->save($localFile);
 		
 		// loads ftp manager
-		$engineOptions = isset(kBatchBase::$taskConfig->engineOptions) ? kBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP, $engineOptions);
 		$ftpManager->login(self::FTP_SERVER_URL, $distributionProfile->username, $distributionProfile->password);
 		
