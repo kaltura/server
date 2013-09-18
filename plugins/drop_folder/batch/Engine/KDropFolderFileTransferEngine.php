@@ -15,7 +15,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	public function watchFolder (KalturaDropFolder $folder)
 	{
 		$this->dropFolder = $folder;
-		$this->getFileTransferManager();
+		$this->fileTransferMgr =  self::getFileTransferManager($this->dropFolder);
 		KalturaLog::debug('Watching folder ['.$this->dropFolder->id.']');
 						    										
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder();
@@ -83,7 +83,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		return $this->fileTransferMgr->fileExists($this->dropFolder->path);
 	}
 	
-	public function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
+	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
 		KalturaLog::debug('Handling existing drop folder file with id ['.$dropFolderFile->id.']');
 		try 
@@ -223,26 +223,26 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
      * 
      * @return kFileTransferMgr
      */
-	private function getFileTransferManager()
+	public static function getFileTransferManager(KalturaDropFolder $dropFolder)
 	{
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
-	    $this->fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($this->dropFolder->type), $engineOptions);
+	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
 	    
 	    $host =null; $username=null; $password=null; $port=null;
 	    $privateKey = null; $publicKey = null;
 	    
-	    if($this->dropFolder instanceof KalturaRemoteDropFolder)
+	    if($dropFolder instanceof KalturaRemoteDropFolder)
 	    {
-	   		$host = $this->dropFolder->host;
-	    	$port = $this->dropFolder->port;
-	    	$username = $this->dropFolder->username;
-	    	$password = $this->dropFolder->password;
+	   		$host = $dropFolder->host;
+	    	$port = $dropFolder->port;
+	    	$username = $dropFolder->username;
+	    	$password = $dropFolder->password;
 	    }  
-	    if($this->dropFolder instanceof KalturaSshDropFolder)
+	    if($dropFolder instanceof KalturaSshDropFolder)
 	    {
-	    	$privateKey = $this->dropFolder->privateKey;
-	    	$publicKey = $this->dropFolder->publicKey;
-	    	$passPhrase = $this->dropFolder->passPhrase;  	    	
+	    	$privateKey = $dropFolder->privateKey;
+	    	$publicKey = $dropFolder->publicKey;
+	    	$passPhrase = $dropFolder->passPhrase;  	    	
 	    }
 
         // login to server
@@ -250,20 +250,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
         {
 	       	$privateKeyFile = self::getTempFileWithContent($privateKey, 'privateKey');
         	$publicKeyFile = self::getTempFileWithContent($publicKey, 'publicKey');
-        	$this->fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);        	
+        	$fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);        	
         }
         else 
         {
-        	$this->fileTransferMgr->login($host, $username, $password, $port);        	
+        	$fileTransferMgr->login($host, $username, $password, $port);        	
         }
-		return $this->fileTransferMgr;		
+		
+		return $fileTransferMgr;		
 	}
 
 		/**
 	 * This mapping is required since the Enum values of the drop folder and file transfer manager are not the same
 	 * @param int $dropFolderType
 	 */
-	private static function getFileTransferMgrType($dropFolderType)
+	public static function getFileTransferMgrType($dropFolderType)
 	{
 		switch ($dropFolderType)
 		{
@@ -306,7 +307,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	 * @param int $lastModificationTime
 	 * @param int $uploadStartDetectedAt
 	 */
-	public function handleFileUploading($dropFolderFileId, $fileSize, $lastModificationTime, $uploadStartDetectedAt = null)
+	protected function handleFileUploading($dropFolderFileId, $fileSize, $lastModificationTime, $uploadStartDetectedAt = null)
 	{
 		KalturaLog::debug('Handling drop folder file uploading id ['.$dropFolderFileId.'] fileSize ['.$fileSize.'] last modification time ['.$lastModificationTime.']');
 		try 
@@ -495,5 +496,5 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		KBatchBase::$kClient->media->cancelReplace($matchedEntry->id);
 		$updatedEntry = KBatchBase::$kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
 	}
-	
+
 }
