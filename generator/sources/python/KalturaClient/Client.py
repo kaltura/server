@@ -53,7 +53,7 @@ except ImportError:
 # Register the streaming http handlers with urllib2
 register_openers()
 
-class MultiRequestSubResult:
+class MultiRequestSubResult(object):
     def __init__(self, value):
         self.value = value
     def __str__(self):
@@ -67,11 +67,11 @@ class MultiRequestSubResult:
     def __getitem__(self, key):
         return MultiRequestSubResult('%s:%s' % (self.value, key))
 
-class PluginServicesProxy:
+class PluginServicesProxy(object):
     def addService(self, serviceName, serviceClass):
         setattr(self, serviceName, serviceClass)
 
-class KalturaClient:
+class KalturaClient(object):
     METHOD_POST = 0
     METHOD_GET = 1
 
@@ -456,7 +456,7 @@ class KalturaClient:
         m.update(msg)
         return m.digest()
 
-class KalturaServiceActionCall:
+class KalturaServiceActionCall(object):
     def __init__(self, service, action, params = KalturaParams(), files = KalturaFiles()):
         self.service = service
         self.action = action
