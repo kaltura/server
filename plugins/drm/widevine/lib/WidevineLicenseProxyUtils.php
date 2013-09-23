@@ -58,12 +58,7 @@ class WidevineLicenseProxyUtils
 		$ch = curl_init();		
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		
-		//https options
-//		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-//		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-//		curl_setopt($ch, CURLOPT_CAINFO, getcwd() . "/CAcerts/BuiltinObjectToken-EquifaxSecureCA.crt");
-		
+	
 		$response = curl_exec($ch);		
 		$error = curl_error($ch);
 		curl_close($ch);
@@ -98,12 +93,26 @@ class WidevineLicenseProxyUtils
 			KalturaLog::debug("License response status Error with code: ".$response_status_dec);
 	}
 
+	private static function getKeyBytes()
+	{
+		$key = WidevinePlugin::getWidevineConfigParam('key');
+		$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		
+		$key = str_replace("0x", "", $key);
+		$key = str_replace(", ", "", $key);
+
+		$iv = str_replace("0x", "", $iv);
+		$iv = str_replace(", ", "", $iv);
+		
+		return $key.$iv;
+	}
+	
 	protected static function createRequestSignature($data)
 	{
 		KalturaLog::debug("sign input: ".$data);
 		
 		$digest = openssl_digest($data, "sha1", true);
-		$key_bytes = WidevinePlugin::getWidevineConfigParam('key_bytes');
+		$key_bytes = self::getKeyBytes();
 		if(!$key_bytes)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_KEY_NOT_SET);
 		$iv = pack("H*", substr($key_bytes, 0, 32));
