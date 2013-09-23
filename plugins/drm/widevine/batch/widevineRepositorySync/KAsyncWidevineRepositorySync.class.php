@@ -39,10 +39,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 				throw new kApplicativeException(null, "Unknown sync mode [".$data->syncMode. "]");
 		}
 
-		if($data->monitorSyncCompletion)
-			return $this->closeJob($job, null, null, "Sync request sent successfully", KalturaBatchJobStatus::ALMOST_DONE, $data); 
-		else 
-			return $this->closeJob($job, null, null, "Sync request sent successfully", KalturaBatchJobStatus::FINISHED, $data);
+		return $this->closeJob($job, null, null, "Sync request sent successfully", KalturaBatchJobStatus::FINISHED, $data);
 	}		
 
 	/**
@@ -55,8 +52,6 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 	{
 		KalturaLog::debug("Starting sendModifyRequest");
 		
-		$cgiUrl = self::$taskConfig->params->vodPackagerHost . WidevinePlugin::ASSET_NOTIFY_CGI;
-		
 		$dataWrap = new WidevineRepositorySyncJobDataWrap($data);		
 		$widevineAssets = $dataWrap->getWidevineAssetIds();
 		$licenseStartDate = $dataWrap->getLicenseStartDate();
@@ -64,58 +59,76 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 
 		foreach ($widevineAssets as $assetId) 
 		{
-			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate, $cgiUrl);
+			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate);
 		}
-	}
-	
-	private function prepareAssetNotifyGetRequestXml($assetId)
-	{		
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_GET, self::$taskConfig->params->portal);
 		
-		$requestInput->setAssetId($assetId);
-		$requestXml = $requestInput->createAssetNotifyRequestXml();
-			
-		KalturaLog::debug('Asset notify request: '.$requestXml);	
-													  
-		return $requestXml;
-	}
-	
-	private function prepareAssetNotifyRegisterRequestXml(WidevineAssetNotifyResponse $assetGetResponse, $licenseStartDate, $licenseEndDate)
-	{
-		$requestInput = new WidevineAssetNotifyRequest(WidevineAssetNotifyRequest::REQUEST_REGISTER, self::$taskConfig->params->portal);
-		$requestInput->setAssetName($assetGetResponse->getName());
-		$requestInput->setPolicy($assetGetResponse->getPolicy());
-		$requestInput->setLicenseStartDate($licenseStartDate);
-		$requestInput->setLicenseEndDate($licenseEndDate);
-		$requestXml = $requestInput->createAssetNotifyRequestXml();
-			
-		KalturaLog::debug('Asset notify request: '.$requestXml);	
-													  
-		return $requestXml;
+		$this->updateFlavorAssets($job, $dataWrap);
 	}
 	
 	/**
-	 * 1. Send get request to retrive widevine asset details
-	 * 2. Send register requester with override option to update widevine asset
+	 * Execute register asset with new details to update exisiting asset
 	 * 
 	 * @param int $assetId
 	 * @param string $licenseStartDate
 	 * @param string $licenseEndDate
-	 * @param string $cgiUrl
 	 * @throws kApplicativeException
 	 */
-	private function updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate, $cgiUrl)
+	private function updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate)
 	{
 		KalturaLog::debug("Update asset [".$assetId."] license start date [".$licenseStartDate.'] license end date ['.$licenseEndDate.']');
 		
-		$getAssetXml = $this->prepareAssetNotifyGetRequestXml($assetId);
-		$assetGetResponseXml = WidevineAssetNotifyRequest::sendPostRequest($cgiUrl, $getAssetXml);
-		$assetGetResponse = WidevineAssetNotifyResponse::createWidevineAssetNotifyResponse($assetGetResponseXml);
-		$registerAssetXml = $this->prepareAssetNotifyRegisterRequestXml($assetGetResponse, $licenseStartDate, $licenseEndDate);
+		$errorMessage = '';
+		
+		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
+										self::$taskConfig->params->wvLicenseServerUrl,
+										null,
+										$assetId,
+										self::$taskConfig->params->portal,
+										null,
+										$licenseStartDate,
+										$licenseEndDate,
+										$errorMessage);				
+		
+		if(!$wvAssetId)
+		{
+			KBatchBase::unimpersonate();
 			
-		$assetRegisterResponseXml = WidevineAssetNotifyRequest::sendPostRequest($cgiUrl, $registerAssetXml);
-		$assetRegisterResponse = WidevineAssetNotifyResponse::createWidevineAssetNotifyResponse($assetRegisterResponseXml);
-		if(!$assetRegisterResponse->isSuccess())
-			throw new kApplicativeException($assetRegisterResponse->getStatus(), "Failed to re-register asset: ".$assetRegisterResponse->getStatusText());
+			$logMessage = 'Asset update failed, asset id: '.$assetId.' error: '.$errorMessage;
+			KalturaLog::err($logMessage);
+			throw new kApplicativeException(null, $logMessage);
+		}			
+	}
+	
+	/**
+	 * Update flavorAsset in Kaltura after the distribution dates apllied to Wideivne asset
+	 * 
+	 * @param KalturaBatchJob $job
+	 * @param WidevineRepositorySyncJobDataWrap $dataWrap
+	 */
+	private function updateFlavorAssets(KalturaBatchJob $job, WidevineRepositorySyncJobDataWrap $dataWrap)
+	{
+		$this->impersonate($job->partnerId);
+		
+		$startDate = $dataWrap->getLicenseStartDate();
+		$endDate = $dataWrap->getLicenseEndDate();	
+		
+		$filter = new KalturaAssetFilter();
+		$filter->entryIdEqual = $job->entryId;
+		$filter->tagsLike = 'widevine';
+		$flavorAssetsList = self::$kClient->flavorAsset->listAction($filter, new KalturaFilterPager());
+		
+		foreach ($flavorAssetsList->objects as $flavorAsset) 
+		{
+			if($flavorAsset instanceof KalturaWidevineFlavorAsset && $dataWrap->hasAssetId($flavorAsset->widevineAssetId))
+			{
+				KalturaLog::debug('Updating flavor asset ['.$flavorAsset->id.']');	
+				
+				$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
+				$updatedFlavorAsset->widevineDistributionStartDate = $startDate;
+				$updatedFlavorAsset->widevineDistributionEndDate = $endDate;
+				self::$kClient->flavorAsset->update($flavorAsset->id, $updatedFlavorAsset);
+			}		
+		}		
+		$this->unimpersonate();
 	}
 }

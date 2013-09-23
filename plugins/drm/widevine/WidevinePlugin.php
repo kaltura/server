@@ -10,10 +10,8 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	const WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION = 'WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC';
 	const SEARCH_DATA_SUFFIX = 's';
 	
-	//Widevine API's
-	const PACKAGE_NOTIFY_CGI = '/widevine/voddealer/cgi-bin/packagenotify.cgi';
-	const PACKAGE_QUERY_CGI = '/widevine/voddealer/cgi-bin/packagequery.cgi';
-	const ASSET_NOTIFY_CGI = '/widevine/voddealer/cgi-bin/assetnotify.cgi';
+	const REGISTER_ASSET_CGI = '/widevine/cypherpc/sign/cgi-bin/RegisterAsset.cgi';
+	const GET_ASSET_CGI = '/widevine/cypherpc/cgi-bin/GetAsset.cgi';
 	
 	//Default values
 	const KALTURA_PROVIDER = 'kaltura';
