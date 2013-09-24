@@ -53,12 +53,14 @@
 						<contentParameters objectType="array">
 							<item objectType="KalturaEventNotificationParameter">
 								<key>from_email</key>
+								<description>Sender email</description>
 								<value objectType="KalturaEvalStringField">
 									<code>kConf::get("partner_notification_email")</code>
 								</value>
 							</item>
 							<item objectType="KalturaEventNotificationParameter">
 								<key>from_name</key>
+								<description>Sender name</description>
 								<value objectType="KalturaEvalStringField">
 									<code>kConf::get("partner_notification_name")</code>
 								</value>
