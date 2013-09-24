@@ -21,22 +21,26 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
+							<description>Category object uploaded</description>
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::CATEGORY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
 						<field objectType="KalturaEvalBooleanField">
+							<description>Bulk Upload finished successfully</description>
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED</code>
 						</field>
 					</item>
@@ -135,21 +139,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Category object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::CATEGORY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished with errors</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY</code>
 						</field>
@@ -249,21 +257,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Category object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::CATEGORY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload failed</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
 						</field>
@@ -363,21 +375,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>User object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::USER</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished successfully</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED</code>
 						</field>
@@ -477,21 +493,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>User object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::USER</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished with errors</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY</code>
 						</field>
@@ -591,21 +611,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>User object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::USER</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload failed</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
 						</field>
@@ -704,21 +728,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Category User object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::CATEGORY_USER</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished successfully</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED</code>
 						</field>
@@ -818,21 +846,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>User Entitlement object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::CATEGORY_USER</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished with errors</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY</code>
 						</field>
@@ -932,21 +964,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>User Entitlement object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::CATEGORY_USER</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload failed</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
 						</field>
@@ -1046,21 +1082,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Media object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished successfully</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED</code>
 						</field>
@@ -1160,21 +1200,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Media object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished with errors</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY</code>
 						</field>
@@ -1274,21 +1318,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadCsvPlugin::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Media object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload failed</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
 						</field>
@@ -1388,21 +1436,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description> 
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type XML</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadXmlPlugin::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Media object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished successfully</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED</code>
 						</field>
@@ -1502,21 +1554,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type XML</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadXmlPlugin::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Media object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload finished with errors</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY</code>
 						</field>
@@ -1616,21 +1672,25 @@
 				<eventObjectType>10</eventObjectType>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
+						<description>Batch job of type Bulk Upload</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobType() == BatchJobType::BULKUPLOAD</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload type CSV</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getJobSubType() == BulkUploadXmlPlugin::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML)</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Media object uploaded</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getData()->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY</code>
 						</field>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
+						<description>Bulk Upload failed</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
 						</field>
