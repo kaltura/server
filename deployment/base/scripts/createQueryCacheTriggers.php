@@ -264,7 +264,7 @@ if ($argc > 1)
 	$ACTION = $argv[1];
 
 if ($ACTION == 'help')
-	die("Usage:\n\tphp query_cache_triggers [<action> [<hostname> [<username> [<password>]]]]\n");
+	die("Usage:\n\tphp query_cache_triggers [<action> [<hostname> [<username> [<password>] [realrun]]]]\n");
 
 $ALLOWED_ACTIONS = array('create', 'remove', 'gencode');
 if (!in_array($ACTION, $ALLOWED_ACTIONS))
@@ -282,6 +282,8 @@ if ($argc > 3)
 	$USER_NAME = $argv[3];
 if ($argc > 4)
 	$PASSWORD = $argv[4];
+if ($argc > 5 && $argv[5] === 'realrun')
+	$dryRun = false;
 
 // Connect to database
 $link = mysql_connect($HOST_NAME, $USER_NAME, $PASSWORD)

@@ -268,10 +268,13 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 
 		$xmlPipe2 = isset($options["format"]) ? $options["format"] == "xmlPipe2" : false;
 
-		foreach ($sphinxPluginsData as $key => $value){		
+		foreach ($sphinxPluginsData as $key => $value){
+
 			if(is_array($value)) {
-				$valueStr = json_encode($value);
-				$data[$key] = "'" . $valueStr . "'";
+				if (array_key_exists($key, $dataJson)) {
+					$dataJson[$key] = array_merge($value, $dataJson[$key]);
+				}
+				$dataJson[$key] = $value;
 			} else if (is_numeric($value)) {
 				$data[$key] = $value;
 			} else {
@@ -311,6 +314,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataJson as $key => $value)
 		{
+			foreach($value as $jsonKey => $jsonValue) {
+				if(is_string($jsonValue))
+					$value[$jsonKey] = SphinxUtils::escapeString($jsonValue, SearchIndexFieldEscapeType::DEFAULT_ESCAPE, 1);
+			}
 			$valueStr = json_encode($value);
 			$data[$key] = "'" . $valueStr . "'";
 		}

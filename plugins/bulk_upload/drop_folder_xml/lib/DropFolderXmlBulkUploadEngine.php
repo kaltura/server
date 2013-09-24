@@ -16,9 +16,9 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	private $xmlDropFolderFile = null;
 	
 	/**
-	 * @var KPhysicalDropFolderUtils
+	 * @var kFileTransferMgr
 	 */
-	private $physicalFileUtils = null;
+	private $fileTransferMgr = null;
 	
 	/**
 	 *
@@ -41,15 +41,15 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		KalturaLog::debug("Starting BulkUpload for XML drop folder file with id [".$this->job->jobObjectId.']');
 		
-		KBatchBase::impersonate($this->currentPartnerId);;
+		KBatchBase::impersonate($this->currentPartnerId);
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
 		KBatchBase::$kClient->startMultiRequest();
 		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
 		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
 		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
 				
-		$this->physicalFileUtils = new KPhysicalDropFolderUtils($this->dropFolder);
-		$this->data->filePath = $this->physicalFileUtils->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
+		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
+		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
 		$this->setContentResourceFilesMap($dropFolderPlugin);
 		KBatchBase::unimpersonate();
 		parent::handleBulkUpload();
@@ -151,7 +151,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		if(isset($elementToSearchIn->dropFolderFileContentResource->fileSize))
 		{
 			KalturaLog::debug("Validating file size");
-			$fileSize = $this->physicalFileUtils->fileTransferMgr->fileSize($filePath);
+			$fileSize = $this->fileTransferMgr->fileSize($filePath);
 			$xmlFileSize = (int)$elementToSearchIn->dropFolderFileContentResource->fileSize;
 			if($xmlFileSize != $fileSize)
 				throw new KalturaBulkUploadXmlException("File size is invalid for file [$filePath], Xml size [$xmlFileSize], actual size [$fileSize]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
@@ -179,5 +179,31 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 			}
 			KalturaLog::debug("Checksum [$checksum] verified for local resource [$filePath]");
 		}
+	}
+	
+	/**
+	 * Local drop folder - constract full path
+	 * Remote drop folder - download file to a local temp directory and return the temp file path
+	 * @param string $fileName
+	 * @param int $fileId
+	 * @throws Exception
+	 */
+	protected function getLocalFilePath($fileName, $fileId)
+	{
+		$dropFolderFilePath = $this->dropFolder->path.'/'.$fileName;
+	    
+	    // local drop folder
+	    if ($this->dropFolder->type == KalturaDropFolderType::LOCAL) 
+	    {
+	        $dropFolderFilePath = realpath($dropFolderFilePath);
+	        return $dropFolderFilePath;
+	    }
+	    else
+	    {
+	    	// remote drop folder	
+			$tempFilePath = tempnam($this->tempDirectory, 'parse_dropFolderFileId_'.$fileId.'_');		
+			$this->fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
+			return $tempFilePath;
+	    }			    		
 	}
 }

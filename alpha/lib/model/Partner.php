@@ -1420,6 +1420,9 @@ class Partner extends BasePartner
 
 	public function validateApiAccessControl()
 	{
+		if (kIpAddressUtils::isInternalIp())
+			return true;
+
 		if ($this->getEnforceHttpsApi() && infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS)
 		{
 			KalturaLog::err('Action was accessed over HTTP while the partner is configured for HTTPS access only');
