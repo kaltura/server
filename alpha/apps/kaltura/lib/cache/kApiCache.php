@@ -36,7 +36,7 @@ class kApiCache extends kApiCacheBase
 	const EXPIRY_MARGIN = 300;
 
 	const CACHE_DELIMITER = "\r\n\r\n";
-
+	
 	// warm cache constants
 	// cache warming is used to maintain continous use of the request caching while preventing a load once the cache expires
 	// during WARM_CACHE_INTERVAL before the cache expiry a single request will be allowed to get through and renew the cache
@@ -50,6 +50,8 @@ class kApiCache extends kApiCacheBase
 
 	// time in which a warm cache request will block another request from warming the cache
 	const WARM_CACHE_TTL = 10;
+	
+	const MAX_CACHE_HEADER_COUNT = 30;
 
 	protected $_cacheStoreTypes = array();
 	protected $_cacheStores = array();
@@ -59,7 +61,8 @@ class kApiCache extends kApiCacheBase
 	protected $_cacheId = null;							// the cache id ensures that the conditions are in sync with the response buffer
 	protected $_cacheModes = null;
 	protected static $_cacheWarmupInitiated = false;
-
+	protected static $_cacheHeaderCount = 0;
+	
 	// cache key
 	protected $_params = array();
 	protected $_cacheKey = "";					// a hash of _params used as the key for caching
@@ -623,8 +626,10 @@ class kApiCache extends kApiCacheBase
 		$processingTime = microtime(true) - $startTime;
 		if (self::hasExtraFields() && $cacheHeaderName == 'X-Kaltura')
 			$cacheHeader = 'cached-with-extra-fields';
-		header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
-
+		if (self::$_cacheHeaderCount < self::MAX_CACHE_HEADER_COUNT)
+			header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
+		self::$_cacheHeaderCount++;
+		
 		// remove $this from the list of active instances - the request is complete
 		$this->removeFromActiveList();
 		
