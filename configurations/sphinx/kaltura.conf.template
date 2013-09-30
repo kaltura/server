@@ -182,7 +182,7 @@ index kaltura_entry:kaltura_base
 	rt_attr_bigint	 = partner_id
 	rt_attr_uint	 = moderation_status
 	rt_attr_bigint	 = display_in_search
-	rt_attr_uint	 = duration
+	rt_attr_uint	 = length_in_msecs
 	rt_attr_uint	 = access_control_id
 	rt_attr_uint	 = moderation_count
 	rt_attr_uint	 = rank
