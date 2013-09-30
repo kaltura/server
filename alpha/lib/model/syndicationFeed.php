@@ -13,6 +13,7 @@ class syndicationFeed extends BasesyndicationFeed
 	const CUSTOM_DATA_MRSS_PARAMETERS = 'mrss_parameters';
 	const CUSTOM_DATA_STORAGE_ID = 'storage_id';
 	const CUSTOM_DATA_ENTRIES_ORDER_BY = 'entries_order_by';
+	const CUSTOM_DATA_ENFORCE_ORDER = 'enforce_order';
 
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
@@ -121,5 +122,21 @@ class syndicationFeed extends BasesyndicationFeed
 	public function setEntriesOrderBy($entriesOrderBy)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ENTRIES_ORDER_BY, $entriesOrderBy);
+	}
+	
+/**
+	* @param boolean $enforceOrder
+	*/
+	public function setEnforceOrder($enforceOrder)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ENFORCE_ORDER, $enforceOrder);
+	}
+	
+	/**
+	* @return boolean
+	*/
+	public function getEnforceOrder()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENFORCE_ORDER);
 	}
 }
