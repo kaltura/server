@@ -361,6 +361,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
             case StorageProfileProtocol::SFTP:
             case StorageProfileProtocol::SCP:
             case StorageProfileProtocol::KALTURA_DC:
+            case StorageProfileProtocol::LOCAL:
                 $obj = new KalturaStorageProfile();                
                 break;
             case StorageProfileProtocol::S3:
