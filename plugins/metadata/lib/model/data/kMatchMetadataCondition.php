@@ -79,6 +79,8 @@ class kMatchMetadataCondition extends kMatchCondition
 			$object = $scope->getEvent()->getObject();
 			if($object instanceof IMetadataObject)
 				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
+			else if ($object instanceof Metadata)
+				$metadata = $object;
 		}
 			
 		if($metadata)
