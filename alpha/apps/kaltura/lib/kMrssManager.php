@@ -470,7 +470,14 @@ class kMrssManager
 			if($mrss)
 				return $mrss;
 				
-			$mrss = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>'.'<item/>');
+			$encoding = 'UTF-8';
+			if($mrssParams && !is_null($mrssParams->getEncoding()))
+				$encoding = $mrssParams->getEncoding();
+				
+			if($encoding)
+				$mrss = new SimpleXMLElement('<?xml version="1.0" encoding="' . $encoding . '"?><item/>');
+			else
+				$mrss = new SimpleXMLElement('<item/>');
 		}
 		
 		$mrss->addChild('entryId', $entry->getId());
