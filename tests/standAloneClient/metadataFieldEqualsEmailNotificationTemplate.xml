@@ -149,6 +149,20 @@
 							<code>$scope->getEvent()->getPreviousVersion()</code>
 						</value>
 					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_id</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getObjectId())) ? $scope->getEvent()->getObject()->getObjectId() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<description>Entry name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getObjectId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getObjectId())->getName() : ''</code>
+						</value>
+					</item>					
 				</contentParameters>
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
