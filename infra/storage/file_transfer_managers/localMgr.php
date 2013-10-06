@@ -78,6 +78,8 @@ class localMgr extends kFileTransferMgr
 	// chmod to the given remote file
 	protected function doChmod ($remote_file, $chmod_code)
 	{
+		if($this->createLink)
+			return true;
 		return chmod($remote_file, $chmod_code);
 	}
 
