@@ -255,13 +255,13 @@ class LiveStreamService extends KalturaEntryService
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			kEntitlementUtils::initEntitlementEnforcement();
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 		}
 		else
 		{
 			$liveStreamEntry = entryPeer::retrieveByPK($id);
 		}
-		if (!$liveStreamEntry)
+		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 		
 		switch ($protocol)
