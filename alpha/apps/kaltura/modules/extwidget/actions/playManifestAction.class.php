@@ -952,7 +952,8 @@ class playManifestAction extends kalturaAction
 		}
 
 		$originalFormat = $this->format;
-		$this->format = PlaybackProtocol::HTTP;	
+		if ($this->format == PlaybackProtocol::APPLE_HTTP)
+			$this->format = PlaybackProtocol::HTTP;	
 		$flavors = $this->buildHttpFlavorsArray();
 		$this->format = $originalFormat;
 
