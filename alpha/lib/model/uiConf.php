@@ -281,7 +281,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		if($sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA)
 			$incVersion = true;
 			
-		$res = $this->getConfFilePathImpl( $suffix , $incVersion , $version, true);
+		$res = $this->generateConfFilePath( $suffix , $incVersion , $version);
 		
 		$file_root = myContentStorage::getFSContentRootPath( );
 		$file_path = str_replace ( myContentStorage::getFSContentRootPath( ) , "" , $res );
@@ -504,16 +504,16 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function getConfFilePath( $file_suffix = null , $inc_version = false )
 	{
-		return $this->getConfFilePathImpl( $file_suffix ,$inc_version );
+		return "";
 	}
 
-	private function getConfFilePathImpl( $file_suffix = null , $inc_version = false, $version = null, $internalUse = false )
+	private function generateConfFilePath( $file_suffix = null , $inc_version = false, $version = null)
 	{
 		$conf_file_path = parent::getConfFilePath();
 
 		if ( $this->getCreationMode() != self::UI_CONF_CREATION_MODE_MANUAL )
 		{
-			if( ! $conf_file_path || $inc_version || $version)
+			if( !$conf_file_path || $inc_version || $version)
 			{
 				if ( ! $this->getId() ) 
 					return null;
@@ -522,10 +522,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				$this->setConfFilePath( $conf_file_path );
 			}
 		}
-		
-		if(!$internalUse)
-			return "";
-			
+
 		// will fix the current problem in the DB- we hold the root in the conf_file_path
 		$conf_file_path = myContentStorage::getFSContentRootPath( ).str_replace ( "/web/" , "" , $conf_file_path )  ;
 
