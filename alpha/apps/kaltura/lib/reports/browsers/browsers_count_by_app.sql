@@ -3,7 +3,7 @@ SELECT
 FROM (
 	SELECT b.id id
 	FROM 
-		(SELECT os_id
+		(SELECT browser_id
 		FROM dwh_hourly_events_context_app_devices ev, dwh_dim_applications ap
 			WHERE
 				{OBJ_ID_CLAUSE}
