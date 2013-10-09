@@ -49,9 +49,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	{
 		$c = clone $criteria;
 
-		// since we use advaned filter for this object, it must be kalturaCriteria.
 		if($c instanceof KalturaCriteria)
+		{
 			$c->applyFilters();
+			return $c->getRecordsCount();
+		}
 			
 		return parent::doCount($c, $con);
 	}
@@ -137,7 +139,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		
 		$allIds = array();
 		$allCats = array();
-		$allIdsWithParents = array ();
 		
 		$addedCats = array();
 		$removedCats = array();
@@ -186,14 +187,9 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 					$allCats[] = $category->getFullName();
 					$allIds [] = $category->getId ();
 				}
-					
-				$allIdsWithParents [] = $category->getId ();
-				$allIdsWithParents = array_merge ( $allIdsWithParents, $category->getAllParentsIds () );
 			}
 		}
 
-		$alreadyAddedCatIds = $allIdsWithParents;
-		
 		foreach ( $addedCats as $cat )
 		{
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
@@ -236,7 +232,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				$categoryEntry = new categoryEntry();
 				$categoryEntry->setEntryId($entry->getId());
 				$categoryEntry->setCategoryId($category->getId());
-				$categoryEntry->setEntryCategoriesAddedIds($alreadyAddedCatIds);
 				$categoryEntry->setPartnerId($entry->getPartnerId());
 				$categoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
 				$categoryEntry->save();
@@ -253,8 +248,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			$alreadyAddedCatIds = array_merge ( $alreadyAddedCatIds, $category->getAllParentsIds () );
 		}
 
-		$alreadyRemovedCatIds = $allIdsWithParents;
-		
 		foreach ( $removedCats as $cat ) 
 		{
 			$category = categoryPeer::getByFullNameExactMatch ( $cat );
@@ -273,14 +266,10 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 					}
 					else
 					{
-						$categoryEntryToDelete->setEntryCategoriesRemovedIds($alreadyRemovedCatIds);
 						$categoryEntryToDelete->setStatus(CategoryEntryStatus::DELETED);
 						$categoryEntryToDelete->save();
 					}
 				}
-				
-				$alreadyRemovedCatIds[] = $category->getId ();
-				$alreadyRemovedCatIds = array_merge ( $alreadyRemovedCatIds, $category->getAllParentsIds () );
 			}
 			else
 			{

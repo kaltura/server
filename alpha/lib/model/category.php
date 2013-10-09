@@ -384,29 +384,6 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * Increment entries count (will increment recursively the parent categories too)
-	 */
-	public function incrementEntriesCount($increase = 1, array $entryCategoriesAddedIds = null)
-	{
-		if($entryCategoriesAddedIds && $this->entryAlreadyBlongToCategory($entryCategoriesAddedIds))
-		{
-			KalturaLog::debug("Entry already blong to category");
-			return;
-		}
-		
-		$this->setEntriesCount($this->getEntriesCount() + $increase);
-		if($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if($parentCat)
-			{
-				$parentCat->incrementEntriesCount($increase, $entryCategoriesAddedIds);
-				$parentCat->save();
-			}
-		}
-	}
-      
-	/**
 	 * Increment direct entries count
 	 */
 	public function incrementDirectEntriesCount()
@@ -424,45 +401,11 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * Decrement entries count (will decrement recursively the parent categories too)
-	 */
-	public function decrementEntriesCount($decrease = 1, array $entryCategoriesRemovedIds = null)
-	{
-		if($this->entryAlreadyBlongToCategory($entryCategoriesRemovedIds))
-		{
-			KalturaLog::debug("Entry already blong to category");
-			return;
-		}
-		
-		if($this->getStatus() == CategoryStatus::PURGED)
-		{
-			KalturaLog::debug("Category already purged at [" . $this->getDeletedAt() . "]");
-			return;
-		}
-		
-		$newCount = $this->getEntriesCount() - $decrease;
-		
-		if($newCount < 0)
-			$newCount = 0;
-		$this->setEntriesCount($newCount);
-		
-		if($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if($parentCat)
-			{
-				$parentCat->decrementEntriesCount($decrease, $entryCategoriesRemovedIds);
-				$parentCat->save();
-			}
-		}
-	}
-	
-	/**
 	 * Decrement direct entries count (will decrement recursively the parent categories too)
 	 */
 	public function decrementDirectEntriesCount()
 	{
-		$this->setDirectEntriesCount($this->getDirectEntriesCount() - 1);
+		$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
 	}
       
 	/**
@@ -470,7 +413,7 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function decrementPendingEntriesCount()
 	{
-		$this->setPendingEntriesCount($this->getPendingEntriesCount() - 1);
+		$this->setPendingEntriesCount(max(0, $this->getPendingEntriesCount() - 1));
 	}
       
 	protected function validateFullNameIsUnique()
@@ -1490,13 +1433,23 @@ class category extends Basecategory implements IIndexable
 	/**
 	 * reset category's entriesCount by calculate it.
 	 */
-	public function reSetEntriesCount()
+	public function reSetEntriesCount($recursive = false)
 	{
 		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
 		$count = categoryEntryPeer::doCount($criteria);
 
 		$this->setEntriesCount($count);
+	
+		if($this->getParentId())
+		{
+			$parentCat = $this->getParentCategory();
+			if($parentCat)
+			{
+				$parentCat->reSetEntriesCount(true);
+				$parentCat->save();
+			}
+		}
 	}
 	
 	/**
