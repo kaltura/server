@@ -49,6 +49,7 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
             case KalturaStorageProfileProtocol::SCP:
             case KalturaStorageProfileProtocol::S3:
             case KalturaStorageProfileProtocol::KALTURA_DC:
+            case KalturaStorageProfileProtocol::LOCAL:
                 return $subType;                  	
 			default:
 				return kPluginableEnumsManager::apiToCore('KalturaStorageProfileProtocol', $subType);
@@ -67,6 +68,7 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
             case StorageProfileProtocol::SCP:
             case StorageProfileProtocol::S3:
             case StorageProfileProtocol::KALTURA_DC:
+          	case StorageProfileProtocol::LOCAL:
                 return $subType;                    
             default:
                 return kPluginableEnumsManager::coreToApi('StorageProfileProtocol', $subType);
