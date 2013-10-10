@@ -97,6 +97,8 @@ class KalturaEntryContextDataResult extends KalturaContextDataResult
 		'isIpAddressRestricted',
 		'isUserAgentRestricted',
 		'previewLength',
+		'accessControlMessages' => 'messages',
+		'accessControlActions' => 'actions',
 	);
 	
 	/* (non-PHPdoc)
