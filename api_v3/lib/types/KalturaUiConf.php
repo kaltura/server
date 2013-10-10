@@ -155,7 +155,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	 	"height" ,
 		"htmlParams", 
 		"swfUrl" , 
-		"confFilePath" , 
+		//"confFilePath" , 
 		"confFile" , 
 		"confFileFeatures" , 
 		"confVars" , 
