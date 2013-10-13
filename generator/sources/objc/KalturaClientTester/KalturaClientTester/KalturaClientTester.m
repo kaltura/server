@@ -891,7 +891,7 @@
     self->_client.config.serviceUrl = KALTURA_CLIENT_TEST_URL;
     [self->_client.params addIfDefinedKey:@"sleepTime" withString:@"10"];
     [self->_client.system ping];    
-    self->_client.config.requestTimeout = 120;
+    self->_client.config.requestTimeout = 10;
     
     NSError* error = self->_client.error;
     assert(error != nil);

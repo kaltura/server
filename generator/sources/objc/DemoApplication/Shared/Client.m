@@ -73,9 +73,9 @@ static NSArray *sBitRates;
     self.categories = [[NSMutableArray alloc] init];
     self.media = [[NSMutableArray alloc] init];
     
-    #ifdef widevine
+#ifdef widevine
     wvSettings = [[WVSettings alloc] init];
-    #endif
+#endif
     return self;
 }
 
@@ -267,7 +267,7 @@ static NSArray *sBitRates;
     }
     
     client.delegate = nil;
-    client.uploadProgressDelegate = nil; 
+    client.uploadProgressDelegate = nil;
 }
 
 - (void)cancelUploading {
@@ -279,7 +279,7 @@ static NSArray *sBitRates;
 
 - (BOOL)uploadingInProgress {
     
-    return (uploadedSize > 0);  
+    return (uploadedSize > 0);
 }
 
 - (void)uploadTry {
@@ -307,7 +307,7 @@ static NSArray *sBitRates;
     uploadTryCount = 0;
     
     if (uploadedSize < fileSize)
-    {      
+    {
         [Utils createBuffer:uploadFilePath offset:uploadedSize];
         
         token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:YES withFinalChunk:(fileSize - uploadedSize <= CHUNK_SIZE) withResumeAt: uploadedSize];
@@ -324,7 +324,7 @@ static NSArray *sBitRates;
 {
     if (uploadTryCount < 4) {
         
-        [self performSelector:@selector(uploadTry) withObject:nil afterDelay:2.0]; 
+        [self performSelector:@selector(uploadTry) withObject:nil afterDelay:2.0];
     }
     else
     {
@@ -382,7 +382,7 @@ static NSArray *sBitRates;
         token = [client.uploadToken uploadWithUploadTokenId:token.id withFileData:self.uploadFilePath];
     }
     else
-    {   
+    {
         [Utils createBuffer:[data objectForKey:@"path"] offset:0];
         
         token = [client.uploadToken uploadWithUploadTokenId:self.uploadFileTokenId withFileData:[Utils getDocPath:@"buffer.tmp"] withResume:NO withFinalChunk:NO];
@@ -423,7 +423,7 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
             
             [bitrates addObject:dictionary];
             [dictionary release];
-        } 
+        }
     }
     
     [bitrates sortUsingFunction:bitratesSort context:nil];
@@ -431,21 +431,42 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
     return bitrates;
 }
 
++ (NSDictionary *)getConfigDict {
+    static dispatch_once_t pred;
+    static NSDictionary *settingsDict = nil;
+    
+    dispatch_once(&pred, ^{
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"settings" ofType:@"plist"];
+        settingsDict = [[NSDictionary alloc ]initWithContentsOfFile:path];
+    });
+    
+    return settingsDict;
+}
+
+- (NSString *)getConfig:(NSString *)keyName{
+    
+    return [[Client getConfigDict] valueForKey: keyName];
+}
+
+- (NSString *)getBaseURL{
+    return [NSString stringWithFormat:@"%@://%@",[self getConfig: @"playbackProtocol"], [self getConfig: @"playbackHost"]];
+}
+
 - (NSString *)getVideoURL:(KalturaMediaEntry *)mediaEntry forMediaEntryDuration:(int)EntryDuration forFlavor:(NSString *)flavorId forFlavorType: (NSString*)flavorType;
 {
     NSString *urlString;
     int minimumEntryDuration = 10;
+    [self getBaseURL];
     
     if([flavorType isEqual: @"wv"]){
-        
-        urlString = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/serveFlavor/entryId/%@/v/2/flavorId/%@/name/a.wvm", partnerId, partnerId, mediaEntry.id, flavorId];
+//        TO:DO - add "?ks=" + AdminUser.ks;" at the end for access control
+        urlString = [NSString stringWithFormat:@"%@/p/%d/sp/%d00/playManifest/entryId/%@/flavorId/%@/format/url/protocol/http/a.wvm", [self getBaseURL], partnerId, partnerId, mediaEntry.id, flavorId];
     }
     else if(EntryDuration > minimumEntryDuration){
-        
-        urlString = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.m3u8", partnerId, partnerId, mediaEntry.id, flavorId];
+        urlString = [NSString stringWithFormat:@"%@/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.m3u8", [self getBaseURL], partnerId, partnerId, mediaEntry.id, flavorId];
     }
     else{
-        urlString = [NSString stringWithFormat:@"http://cdnbakmi.kaltura.com/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.mp4", partnerId, partnerId, mediaEntry.id, flavorId];
+        urlString = [NSString stringWithFormat:@"%@/p/%d/sp/%d00/playManifest/entryId/%@/flavorIds/%@/format/applehttp/protocol/http/a.mp4", [self getBaseURL], partnerId, partnerId, mediaEntry.id, flavorId];
     }
     
     return urlString;
@@ -488,7 +509,7 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
     [wvUrl retain];
     NSLog(@"play later");
     
-//    [self.delegate videoPlay:wvUrl];
+    //    [self.delegate videoPlay:wvUrl];
 }
 
 - (void) initializeWVDictionary:(NSString *)flavorId{
@@ -499,7 +520,7 @@ NSInteger bitratesSort(id media1, id media2, void *reverse)
         NSLog(@"widevine was inited");
     }
     
-//    mBitrates.enabled = ![wvSettings isNativeAdapting];
+    //    mBitrates.enabled = ![wvSettings isNativeAdapting];
 }
 
 - (void) terminateWV{
@@ -599,7 +620,7 @@ WViOsApiStatus WVCallback( WViOsApiEvent event, NSDictionary *attributes ){
 			}
             
 			[mBitrates insertSegmentWithTitle:label atIndex:count animated:NO];
-        }        
+        }
     }
     
     self.mutableArray = [[NSMutableArray alloc]init];
@@ -611,7 +632,7 @@ WViOsApiStatus WVCallback( WViOsApiEvent event, NSDictionary *attributes ){
     }
     
     [self.delegate loadWVBitratesList:mutableArray];
-
+    
     [self.delegate videoPlay:wvUrl];
     
     [attributes release];
