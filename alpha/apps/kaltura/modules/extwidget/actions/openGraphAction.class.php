@@ -51,7 +51,11 @@ class openGraphAction extends sfAction
 
 		$https_enabled = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;
 		$protocol = ($https_enabled) ? 'https' : 'http';
-		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';		
+		$host = ($https_enabled) ? $embed_host_https : $embed_host;
+		
+		if (is_null(parse_url($host, PHP_URL_PORT)))
+			$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';		
+
 
 		$partnerId = $widget->getPartnerId();
 		
@@ -65,7 +69,6 @@ class openGraphAction extends sfAction
 		$this->swfUrl = 'http://' . $embed_host . $swfPath;
 		$this->swfSecureUrl = 'https://' . $embed_host_https . $swfPath;		
 
-		$host = ($https_enabled) ? $embed_host_https : $embed_host;
 		$this->html5Url = $protocol . "://" . $host . $port . "/p/".$partnerId."/sp/".$partnerId."00/embedIframeJs/uiconf_id/".$uiConfId."/partner_id/". $partnerId;
 		$this->pageURL = $protocol . '://' . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];
 
