@@ -558,10 +558,10 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     if (self == nil)
         return nil;
 
-    self.clientTag = @"objCLib:13-04-09";
+    self.clientTag = @"objCLib:@DATE@";
     self.partnerId = -1;
     self.serviceUrl = @"http://www.kaltura.com";
-    self.requestTimeout = 10;
+    self.requestTimeout = 120;
 	self.requestHeaders = [[NSDictionary alloc] init];
     
     return self;
