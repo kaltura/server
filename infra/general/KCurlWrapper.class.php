@@ -103,8 +103,14 @@ class KCurlWrapper
 
 	private static function read_header($ch, $string) {
 		self::$headers .= $string;
-		if ($string == "\r\n") // mark when we get to the last header so we can abort the curl
-			self::$lastHeader = true;
+		if ($string == "\r\n")
+        {
+        	$curlInfo = curl_getinfo($ch);
+            $httpResponseCode = $curlInfo['http_code'];
+            if($httpResponseCode !== KCurlHeaderResponse::HTTP_STATUS_REDIRECT) // mark when we get to the last header so we can abort the cur
+            	self::$lastHeader = true;
+		}
+		
 		$length = strlen ( $string );
 		return $length;
 	}
