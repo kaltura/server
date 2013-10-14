@@ -19,6 +19,10 @@ class Tag extends BaseTag implements IIndexable
 	
 	const OBJECT_TYPE_INDEX_PREFIX = "ot";
 	
+	public function getIndexObjectName() {
+		return "TagIndex";
+	}
+	
 	/* (non-PHPdoc)
      * @see IIndexable::getIntId()
      */
@@ -38,62 +42,6 @@ class Tag extends BaseTag implements IIndexable
         
     }
 
-	/* (non-PHPdoc)
-     * @see IIndexable::getObjectIndexName()
-     */
-    public function getObjectIndexName ()
-    {
-        return TagSearchPlugin::INDEX_NAME;
-        
-    }
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexNullableFields()
-	 */
-	public static function getIndexNullableFields()
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-     * @see IIndexable::getIndexFieldsMap()
-     */
-    public function getIndexFieldsMap ()
-    {
-        return array(
-           'int_id' => 'intId',
-           'tag' => 'tag',
-           'partner_id' => 'partnerId',
-           'object_type' => 'indexObjectType',
-           'created_at' => 'createdAt',
-           'instance_count' => 'instanceCount',
-           'privacy_context' => 'indexPrivacyContext',
-       );
-        
-    }
-    
-    private static $indexFieldTypes = array(
-        'int_id' => IIndexable::FIELD_TYPE_INTEGER,
-        'tag' => IIndexable::FIELD_TYPE_STRING,
-        'partner_id' => IIndexable::FIELD_TYPE_STRING,
-        'object_type' => IIndexable::FIELD_TYPE_STRING,
-        'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-    	'instance_count' => IIndexable::FIELD_TYPE_INTEGER,
-    	'privacy_context' => IIndexable::FIELD_TYPE_STRING,
-	);
-
-	
-	/* (non-PHPdoc)
-     * @see IIndexable::getIndexFieldType()
-     */
-    public function getIndexFieldType ($field)
-    {
-        if(isset(self::$indexFieldTypes[$field]))
-			return self::$indexFieldTypes[$field];
-			
-		return null;
-    }
-    
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postInsert()
 	 */
@@ -142,14 +90,6 @@ class Tag extends BaseTag implements IIndexable
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
 	}
     
-	/* (non-PHPdoc)
-	 * @see IIndexable::getSearchIndexFieldsEscapeType()
-	 */
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
-	}
-
 	public function getIndexPrivacyContext ()
 	{
 		return $this->getPartnerId() . self::PRIVACY_CONTEXT_INDEX_PREFIX . $this->getPrivacyContext();

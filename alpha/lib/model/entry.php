@@ -16,10 +16,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	protected $is_categories_names_modified = false;
 	protected $creator_kuser_id = null;
 	
-	private static $indexFieldsMap = null;
-	private static $indexNullableFields = null;	
-	private static $indexFieldTypes = null;
-	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 	
 	const ROOTS_FIELD_PREFIX = 'K_Pref';
@@ -2677,177 +2673,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this->getId();
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getObjectIndexName()
-	 */
-	public function getObjectIndexName()
-	{
-		return entryPeer::OM_CLASS;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexNullableFields()
-	 */
-	public static function getIndexNullableFields()
-	{
-		if (!self::$indexNullableFields)
-		{
-			self::$indexNullableFields = array(
-				'tags',
-				'categories',
-				'flavor_params',
-				'kshow_id',
-				'group_id',
-				'description',
-				'admin_tags',
-				'reference_id',
-				'replacing_entry_id',
-				'replaced_entry_id',
-				'roots',
-				'entitled_kusers_publish',
-				'entitled_kusers_edit',
-				'entitled_kusers',
-				'privacy_by_contexts',
-			);
-		}
-		
-		return self::$indexNullableFields;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldsMap()
-	 */
-	public function getIndexFieldsMap()
-	{
-		if (!self::$indexFieldsMap)
-		{
-			self::$indexFieldsMap = array(
-				'entry_id' => 'id',
-				'str_entry_id' => 'id',
-				'int_entry_id' => 'indexedId',
-			
-				'name' => 'name',
-				'tags' => 'tags',
-				'categories' => 'categoriesEntryIds',
-				'flavor_params' => 'flavorParamsIds',
-				'source_link' => 'sourceLink',
-				'kshow_id' => 'kshowId',
-				'group_id' => 'groupId',
-				'description' => 'description',
-				'admin_tags' => 'adminTags',
-				'duration_type' => 'durationType',
-				'reference_id' => 'referenceId',
-				'replacing_entry_id' => 'replacingEntryId',
-				'replaced_entry_id' => 'replacedEntryId',
-				'roots' => 'roots',
-			
-				'kuser_id' => 'kuserId',
-				'puser_id' => 'puserId',
-				'entry_status' => 'status',
-				'type' => 'type',
-				'media_type' => 'mediaType',
-				'views' => 'views',
-				'partner_id' => 'partnerId',
-				'moderation_status' => 'moderationStatus',
-				'display_in_search' => 'displayInSearch',
-				'length_in_msecs' => 'lengthInMsecs',
-				'access_control_id' => 'accessControlId',
-				'moderation_count' => 'moderationCount',
-				'rank' => 'rank',
-				'total_rank' => 'totalRank',
-				'plays' => 'plays',
-				'partner_sort_value' => 'partnerSortValue',
-				'replacement_status' => 'replacementStatus',
-				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
-			
-				'created_at' => 'createdAt',
-				'updated_at' => 'updatedAt',
-				'modified_at' => 'modifiedAt',
-				'media_date' => 'mediaDate',
-				'start_date' => 'startDate',
-				'end_date' => 'endDate',
-				'available_from' => 'availableFrom',
-			
-				'entitled_kusers_publish' => 'entitledKusersPublish',
-				'entitled_kusers_edit' => 'entitledKusersEdit',
-				'entitled_kusers' => 'entitledKusers',
-				'privacy_by_contexts' => 'privacyByContexts',
-				'creator_kuser_id' => 'creatorKuserId',
-				'creator_puser_id' => 'creatorPuserId',
-			);
-		}
-		
-		return self::$indexFieldsMap;
-	}
-	
-	
-	
-	/**
-	 * @return string field type, string, int or timestamp
-	 */
-	public function getIndexFieldType($field)
-	{
-		if (!self::$indexFieldTypes)
-		{
-			self::$indexFieldTypes = array(
-			'entry_id' => IIndexable::FIELD_TYPE_STRING,
-			'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
-			'name' => IIndexable::FIELD_TYPE_STRING,
-			'tags' => IIndexable::FIELD_TYPE_STRING,
-			'categories' => IIndexable::FIELD_TYPE_STRING,
-			'flavor_params' => IIndexable::FIELD_TYPE_STRING,
-			'source_link' => IIndexable::FIELD_TYPE_STRING,
-			'kshow_id' => IIndexable::FIELD_TYPE_STRING,
-			'group_id' => IIndexable::FIELD_TYPE_STRING,
-			'description' => IIndexable::FIELD_TYPE_STRING,
-			'admin_tags' => IIndexable::FIELD_TYPE_STRING,
-			'duration_type' => IIndexable::FIELD_TYPE_STRING,
-			'reference_id' => IIndexable::FIELD_TYPE_STRING,
-			'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
-			'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
-			'roots' => IIndexable::FIELD_TYPE_STRING,
-			'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
-			
-			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
-			'puser_id' => IIndexable::FIELD_TYPE_STRING,
-			'entry_status' => IIndexable::FIELD_TYPE_INTEGER,
-			'type' => IIndexable::FIELD_TYPE_INTEGER,
-			'media_type' => IIndexable::FIELD_TYPE_INTEGER,
-			'views' => IIndexable::FIELD_TYPE_INTEGER,
-			'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'moderation_status' => IIndexable::FIELD_TYPE_INTEGER,
-			'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
-			'length_in_msecs' => IIndexable::FIELD_TYPE_INTEGER,
-			'access_control_id' => IIndexable::FIELD_TYPE_INTEGER,
-			'moderation_count' => IIndexable::FIELD_TYPE_INTEGER,
-			'rank' => IIndexable::FIELD_TYPE_INTEGER,
-			'total_rank' => IIndexable::FIELD_TYPE_INTEGER,
-			'plays' => IIndexable::FIELD_TYPE_INTEGER,
-			'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
-			'replacement_status' => IIndexable::FIELD_TYPE_INTEGER,
-		
-			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-			'modified_at' => IIndexable::FIELD_TYPE_DATETIME,
-			'media_date' => IIndexable::FIELD_TYPE_DATETIME,
-			'start_date' => IIndexable::FIELD_TYPE_DATETIME,
-			'end_date' => IIndexable::FIELD_TYPE_DATETIME,
-			'available_from' => IIndexable::FIELD_TYPE_DATETIME,
-	
-			'entitled_kusers_publish' => IIndexable::FIELD_TYPE_STRING,
-			'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
-			'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
-			'privacy_by_contexts' => IIndexable::FIELD_TYPE_STRING,
-			'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
-			'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
-			);
-		}
-		
-		if(isset(self::$indexFieldTypes[$field]))
-			return self::$indexFieldTypes[$field];
-			
-		return null;
+	public function getIndexObjectName() {
+		return "entryIndex";
 	}
 	
 	public function getCacheInvalidationKeys()
@@ -3024,11 +2851,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCategoriesWithNoSync()
 	{
 		
-	}
-	
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 	
 /**

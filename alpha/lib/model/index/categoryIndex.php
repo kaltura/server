@@ -1,0 +1,279 @@
+<?php
+
+/**
+ * Auto-generated index class for category
+*/
+class categoryIndex extends BaseIndexObject
+{
+	public static function getObjectIndexName()
+	{
+		return 'category';
+	}
+
+	public static function getSphinxIdField()
+	{
+		return 'id';
+	}
+
+	public static function getPropelIdField()
+	{
+		return categoryPeer::ID;
+	}
+
+	public static function getIdField()
+	{
+		return null;
+	}
+
+	public static function getDefaultCriteriaFilter()
+	{
+		return categoryPeer::getCriteriaFilter();
+	}
+
+	public static function getIndexFieldsMap()
+	{
+		if (!self::$fieldsMap)
+		{
+			self::$fieldsMap = array(
+				'category_id' => 'id',
+				'str_category_id' => 'id',
+				'parent_id' => 'parentId',
+				'partner_id' => 'partnerId',
+				'name' => 'name',
+				'full_name' => 'searchIndexfullName',
+				'full_ids' => 'searchIndexfullIds',
+				'description' => 'description',
+				'tags' => 'tags',
+				'category_status' => 'status',
+				'kuser_id' => 'kuserId',
+				'display_in_search' => 'displayInSearch',
+				'members' => 'membersByPermissionLevel',
+				'depth' => 'depth',
+				'reference_id' => 'referenceId',
+				'privacy_context' => 'searchIndexprivacyContext',
+				'privacy_contexts' => 'searchIndexPrivacyContexts',
+				'members_count' => 'membersCount',
+				'pending_members_count' => 'pendingMembersCount',
+				'entries_count' => 'entriesCount',
+				'direct_entries_count' => 'directEntriesCount',
+				'direct_sub_categories_count' => 'directSubCategoriesCount',
+				'privacy' => 'privacyPartnerIdx',
+				'inheritance_type' => 'inheritanceType',
+				'user_join_policy' => 'userJoinPolicy',
+				'default_permission_level' => 'defaultPermissionLevel',
+				'contribution_policy' => 'contributionPolicy',
+				'inherited_parent_id' => 'inheritedParentId',
+				'created_at' => 'createdAt',
+				'updated_at' => 'updatedAt',
+				'deleted_at' => 'deletedAt',
+				'partner_sort_value' => 'partnerSortValue',
+				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
+			);
+		}
+		return self::$fieldsMap;
+	}
+
+	public static function getIndexFieldTypesMap()
+	{
+		if (!self::$typesMap)
+		{
+			self::$typesMap = array(
+				'category_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'str_category_id' => IIndexable::FIELD_TYPE_STRING,
+				'parent_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'name' => IIndexable::FIELD_TYPE_STRING,
+				'full_name' => IIndexable::FIELD_TYPE_STRING,
+				'full_ids' => IIndexable::FIELD_TYPE_STRING,
+				'description' => IIndexable::FIELD_TYPE_STRING,
+				'tags' => IIndexable::FIELD_TYPE_STRING,
+				'category_status' => IIndexable::FIELD_TYPE_INTEGER,
+				'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'display_in_search' => IIndexable::FIELD_TYPE_STRING,
+				'members' => IIndexable::FIELD_TYPE_STRING,
+				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
+				'depth' => IIndexable::FIELD_TYPE_INTEGER,
+				'reference_id' => IIndexable::FIELD_TYPE_STRING,
+				'privacy_context' => IIndexable::FIELD_TYPE_STRING,
+				'privacy_contexts' => IIndexable::FIELD_TYPE_STRING,
+				'members_count' => IIndexable::FIELD_TYPE_INTEGER,
+				'pending_members_count' => IIndexable::FIELD_TYPE_INTEGER,
+				'entries_count' => IIndexable::FIELD_TYPE_INTEGER,
+				'direct_entries_count' => IIndexable::FIELD_TYPE_INTEGER,
+				'direct_sub_categories_count' => IIndexable::FIELD_TYPE_INTEGER,
+				'privacy' => IIndexable::FIELD_TYPE_STRING,
+				'inheritance_type' => IIndexable::FIELD_TYPE_INTEGER,
+				'user_join_policy' => IIndexable::FIELD_TYPE_INTEGER,
+				'default_permission_level' => IIndexable::FIELD_TYPE_INTEGER,
+				'contribution_policy' => IIndexable::FIELD_TYPE_INTEGER,
+				'inherited_parent_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+				'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
+				'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
+				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
+				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
+			);
+		}
+		return self::$typesMap;
+	}
+
+	public static function getIndexNullableList()
+	{
+		if (!self::$nullableFields)
+		{
+			self::$nullableFields = array(
+				'description',
+				'tags',
+				'members',
+				'reference_id',
+				'privacy_contexts',
+			);
+		}
+		return self::$nullableFields;
+	}
+
+	public static function getIndexSearchableFieldsMap()
+	{
+		if (!self::$searchableFieldsMap)
+		{
+			self::$searchableFieldsMap = array(
+				'category.ID' => 'category_id',
+				'category.CATEGORY_ID' => 'str_category_id',
+				'category.PARENT_ID' => 'parent_id',
+				'category.PARTNER_ID' => 'partner_id',
+				'category.NAME' => 'name',
+				'category.FULL_NAME' => 'full_name',
+				'category.FULL_IDS' => 'full_ids',
+				'category.DESCRIPTION' => 'description',
+				'category.TAGS' => 'tags',
+				'category.STATUS' => 'category_status',
+				'category.KUSER_ID' => 'kuser_id',
+				'category.DISPLAY_IN_SEARCH' => 'display_in_search',
+				'category.FREE_TEXT' => '(str_category_id,name,tags,description,reference_id)',
+				'category.NAME_REFERENCE_ID' => '(name,reference_id)',
+				'category.MEMBERS' => 'members',
+				'category.PLUGINS_DATA' => 'plugins_data',
+				'category.DEPTH' => 'depth',
+				'category.REFERENCE_ID' => 'reference_id',
+				'category.PRIVACY_CONTEXT' => 'privacy_context',
+				'category.PRIVACY_CONTEXTS' => 'privacy_contexts',
+				'category.MEMBERS_COUNT' => 'members_count',
+				'category.PENDING_MEMBERS_COUNT' => 'pending_members_count',
+				'category.ENTRIES_COUNT' => 'entries_count',
+				'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
+				'category.DIRECT_SUB_CATEGORIES_COUNT' => 'direct_sub_categories_count',
+				'category.PRIVACY' => 'privacy',
+				'category.INHERITANCE_TYPE' => 'inheritance_type',
+				'category.USER_JOIN_POLICY' => 'user_join_policy',
+				'category.DEFAULT_PERMISSION_LEVEL' => 'default_permission_level',
+				'category.CONTRIBUTION_POLICY' => 'contribution_policy',
+				'category.INHERITED_PARENT_ID' => 'inherited_parent_id',
+				'category.CREATED_AT' => 'created_at',
+				'category.UPDATED_AT' => 'updated_at',
+				'category.DELETED_AT' => 'deleted_at',
+				'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
+				'category.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
+				'category.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',
+			);
+		}
+		return self::$searchableFieldsMap;
+	}
+
+	public static function getSearchFieldsEscapeTypeList()
+	{
+		if (!self::$searchEscapeTypes)
+		{
+			self::$searchEscapeTypes = array(
+				'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+				'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+			);
+		}
+		return self::$searchEscapeTypes;
+	}
+
+	public static function getIndexFieldsEscapeTypeList()
+	{
+		if (!self::$indexEscapeTypes)
+		{
+			self::$indexEscapeTypes = array(
+				'category.FULL_IDS' => SearchIndexFieldEscapeType::NO_ESCAPE,
+			);
+		}
+		return self::$indexEscapeTypes;
+	}
+
+	public static function getIndexMatchableList()
+	{
+		if (!self::$matchableFields)
+		{
+			self::$matchableFields = array(
+				"name",
+				"full_name",
+				"full_ids",
+				"description",
+				"tags",
+				"free_text",
+				"members",
+				"privacy_context",
+			);
+		}
+		return self::$matchableFields;
+	}
+
+	public static function getIndexOrderList()
+	{
+		if (!self::$orderFields)
+		{
+			self::$orderFields = array(
+				'category.ID' => 'category_id',
+				'category.PARTNER_ID' => 'partner_id',
+				'category.NAME' => 'name',
+				'category.FULL_NAME' => 'full_name',
+				'category.STATUS' => 'category_status',
+				'category.KUSER_ID' => 'kuser_id',
+				'category.DISPLAY_IN_SEARCH' => 'display_in_search',
+				'category.DEPTH' => 'depth',
+				'category.MEMBERS_COUNT' => 'members_count',
+				'category.PENDING_MEMBERS_COUNT' => 'pending_members_count',
+				'category.ENTRIES_COUNT' => 'entries_count',
+				'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
+				'category.DIRECT_SUB_CATEGORIES_COUNT' => 'direct_sub_categories_count',
+				'category.CREATED_AT' => 'created_at',
+				'category.UPDATED_AT' => 'updated_at',
+				'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
+			);
+		}
+		return self::$orderFields;
+	}
+
+	public static function getIndexSkipFieldsList()
+	{
+		if (!self::$skipFields)
+		{
+			self::$skipFields = array(
+				'category.ID',
+				'category.FULL_NAME',
+			);
+		}
+		return self::$skipFields;
+	}
+
+	public static function getSphinxConditionsToKeep()
+	{
+		if (!self::$conditionToKeep)
+		{
+			self::$conditionToKeep = array(
+				'category.PARTNER_ID',
+			);
+		}
+		return self::$conditionToKeep;
+	}
+
+	public static function doCountOnPeer(Criteria $c)
+	{
+		return categoryPeer::doCount($c);
+	}
+
+}
+

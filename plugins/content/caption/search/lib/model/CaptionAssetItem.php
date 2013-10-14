@@ -25,6 +25,10 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	 */
 	protected $aEntry = null;
 	
+	public function getIndexObjectName() {
+		return "CaptionAssetIndex";
+	}
+	
 	/**
 	 * @return CaptionAsset
 	 */
@@ -166,93 +170,6 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	}
 
 	/* (non-PHPdoc)
-	 * @see IIndexable::getObjectIndexName()
-	 */
-	public function getObjectIndexName()
-	{
-		return CaptionSearchPlugin::INDEX_NAME;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexNullableFields()
-	 */
-	public static function getIndexNullableFields()
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldsMap()
-	 */
-	public function getIndexFieldsMap()
-	{
-		return array(
-			'entry_id' => 'entryId',
-			'caption_asset_id' => 'captionAssetId',
-			'tags' => 'tags',
-			'content' => 'content',
-			'partner_description' => 'partnerDescription',
-			'language' => 'language',
-			'label' => 'label',
-			'format' => 'format',
-			
-			'int_id' => 'intId',
-			'caption_params_id' => 'captionParamsId',
-			'partner_id' => 'partnerId',
-			'version' => 'version',
-			'caption_asset_status' => 'status',
-			'size' => 'size',
-			'is_default' => 'default',
-			'start_time' => 'startTime',
-			'end_time' => 'endTime',
-			
-			'created_at' => 'createdAt',
-			'updated_at' => 'updatedAt',
-			
-			'str_entry_id' => 'entryId',
-			'str_caption_asset_id' => 'id',
-		);
-	}
-
-	private static $indexFieldTypes = array(
-		'entry_id' => IIndexable::FIELD_TYPE_STRING,
-		'caption_asset_id' => IIndexable::FIELD_TYPE_STRING,
-		'tags' => IIndexable::FIELD_TYPE_STRING,
-		'content' => IIndexable::FIELD_TYPE_STRING,
-		'partner_description' => IIndexable::FIELD_TYPE_STRING,
-		'language' => IIndexable::FIELD_TYPE_STRING,
-		'label' => IIndexable::FIELD_TYPE_STRING,
-		'format' => IIndexable::FIELD_TYPE_STRING,
-		
-		'int_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'caption_params_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'version' => IIndexable::FIELD_TYPE_INTEGER,
-		'caption_asset_status' => IIndexable::FIELD_TYPE_INTEGER,
-		'size' => IIndexable::FIELD_TYPE_INTEGER,
-		'is_default' => IIndexable::FIELD_TYPE_INTEGER,
-		'start_time' => IIndexable::FIELD_TYPE_INTEGER,
-		'end_time' => IIndexable::FIELD_TYPE_INTEGER,
-		
-		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		
-		'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
-		'str_caption_asset_id' => IIndexable::FIELD_TYPE_STRING,
-	);
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldType()
-	 */
-	public function getIndexFieldType($field)
-	{
-		if(isset(self::$indexFieldTypes[$field]))
-			return self::$indexFieldTypes[$field];
-			
-		return null;
-	}
-
-	/* (non-PHPdoc)
 	 * @see IIndexable::setUpdatedAt()
 	 */
 	public function setUpdatedAt($time)
@@ -296,10 +213,5 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	{
 		kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 	}
-	
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
-	}
-	
+
 } // CaptionAssetItem

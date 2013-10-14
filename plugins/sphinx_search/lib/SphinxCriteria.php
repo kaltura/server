@@ -101,75 +101,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return '';
 	}
 	
-    protected function getEnableStar ()
-	{
-	    return false;
-	}
-	
 	/**
-	 * @return criteriaFilter
+	 * @return The index object class name
 	 */
-	abstract protected function getDefaultCriteriaFilter();
-	
-	/**
-	 * @return string
-	 */
-	abstract protected function getSphinxIndexName();
-	
-	/**
-	 * @return array
-	 */
-	abstract public function getSphinxOrderFields();
-	
-	/**
-	 * @param string $fieldName
-	 * @return bool
-	 */
-	abstract public function hasSphinxFieldName($fieldName);
-	
-	/**
-	 * @param string $fieldName
-	 * @return string
-	 */
-	abstract public function getSphinxFieldName($fieldName);
-	
-	/**
-	 * @param string $fieldName
-	 * @return string
-	 */
-	abstract public function getSphinxFieldType($fieldName);
-	
-	/**
-	 * @param string $fieldName
-	 * @return bool
-	 */
-	abstract public function hasMatchableField($fieldName);
-	
-	/**
-	 * @return string
-	 */
-	abstract protected function getSphinxIdField();
-	
-	/**
-	 * @return string
-	 */
-	abstract protected function getPropelIdField();
-	
-	/**
-	 * @param Criteria $c
-	 * @return int
-	 */
-	abstract protected function doCountOnPeer(Criteria $c);
-	
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
-	}
-	
-	public function isNullableField($fieldName)
-	{
-		return false;
-	}
+	abstract public function getIndexObjectName();
 	
 	/**
 	 * @param string $index index name
@@ -183,9 +118,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
 	{
 		$pdo = DbManager::getSphinxConnection();
+		$objectClass = $this->getIndexObjectName();
 		
 		if (!$this->selectColumn)
-			$this->selectColumn = $this->getSphinxIdField();
+			$this->selectColumn = $objectClass::getSphinxIdField();
 		
 		$sql = "SELECT {$this->selectColumn} $conditions FROM $index $wheres $orderBy " . ($this->groupByColumn ? "GROUP BY {$this->groupByColumn} " : "" ) . "LIMIT $limit OPTION ranker={$this->ranker}, max_matches=$maxMatches, comment='".kApiCache::KALTURA_COMMENT_MARKER."'";
 		
@@ -221,7 +157,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->remove($key);
 		}
 		
-		$this->addAnd($this->getPropelIdField(), $ids, Criteria::IN);
+		$propelIdField = $objectClass::getPropelIdField();
+		$this->addAnd($propelIdField, $ids, Criteria::IN);
 		
 		$this->recordsCount = 0;
 		
@@ -254,7 +191,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$c = clone $this;
 			$c->setLimit(null);
 			$c->setOffset(null);
-			$this->recordsCount = $this->doCountOnPeer($c);
+			$this->recordsCount = $objectClass::doCountOnPeer($c);
 		}
 	}
 	
@@ -400,6 +337,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	public function applyFilters()
 	{
+		$objectClass = $this->getIndexObjectName();
+		
 		if (KalturaLog::getEnableTests())
 			KalturaLog::debug('kaltura_entry_criteria ' . serialize($this));
 			
@@ -415,7 +354,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		// attach all default criteria from peer
-		$this->getDefaultCriteriaFilter()->applyFilter($this);
+		$objectClass::getDefaultCriteriaFilter()->applyFilter($this);
 		
 		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx())
 		{
@@ -424,7 +363,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			return;
 		}
 		
-		$fieldsToKeep = $this->getSphinxConditionsToKeep();
+		$fieldsToKeep = $objectClass::getSphinxConditionsToKeep();
 		$criterionsMap = $this->getMap();
 		uksort($criterionsMap, array('SphinxCriteria','sortFieldsByPriority'));
 		// go over all criterions and try to move them to the sphinx
@@ -493,19 +432,21 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		$orders = array();
 		if(count($orderByColumns))
 		{
-			$replace = $this->getSphinxOrderFields();
+			$replace = $objectClass::getIndexOrderList();
 			$search = array_keys($replace);
-			
 			
 			$this->clearOrderByColumns();
 			foreach($orderByColumns as $orderByColumn)
 			{
 				$arr = explode(' ', $orderByColumn);
 				$orderField = $arr[0];
+				$orderFieldParts = explode(".", $orderField);
+				$isWeight = (end($orderFieldParts) == "WEIGHT"); 
+					
 				
-				if(isset($replace[$orderField]))
+				if(isset($replace[$orderField]) || $isWeight)
 				{
-					if($replace[$orderField] == self::WEIGHT) {
+					if($isWeight) {
 						$replace[$orderField] = "w";
 						$conditions .= ",weight() as w";
 						$usesWeight = true;
@@ -513,8 +454,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					
 					KalturaLog::debug("Add sort field[$orderField] copy from [$orderByColumn]");
 					$orders[] = str_replace($search, $replace, $orderByColumn);
-				}
-				else
+				} else 
 				{
 					KalturaLog::debug("Skip sort field[$orderField] from [$orderByColumn] limit won't be used in sphinx query");
 					$setLimit = false;
@@ -554,7 +494,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->ranker = self::RANKER_BM25;
 		}
 		
-		$index = $this->getSphinxIndexName();
+		$index = kSphinxSearchManager::getSphinxIndexName($objectClass::getObjectIndexName());
 		$maxMatches = self::getMaxRecords();
 		$limit = $maxMatches;
 		
@@ -585,6 +525,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
+		$objectClass = $this->getIndexObjectName();
 		foreach($filter->fields as $field => $val)
 		{
 			if(is_null($val) || $val === '' || $field == '_order_by') 
@@ -606,14 +547,15 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$skip = false;
 				foreach($fieldNamesArr as $fieldName)
 				{
-					if (!$this->hasMatchableField($fieldName))
+					if (!$objectClass::hasMatchableField($fieldName))
 					{
-						KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
+						KalturaLog::debug("** Skip field[$field] has no matchable for name[$fieldName]");
 						$skip = true;
 						break;
 					}	
-					$sphinxField = $this->getSphinxFieldName($fieldName);
-					$type = $this->getSphinxFieldType($sphinxField);
+					
+					$sphinxField = $objectClass::getIndexFieldName($fieldName);
+					$type = $objectClass::getFieldType($sphinxField);
 					$sphinxFieldNames[] = $sphinxField;
 				}
 				if ($skip)
@@ -622,19 +564,20 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
 			}
-			elseif(!$this->hasMatchableField($fieldName))
+			elseif(!$objectClass::hasMatchableField($fieldName))
 			{
-				KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
+				KalturaLog::debug("* Skip field[$field] has no matchable for name[$fieldName]");
 				continue;
 			}
 			else
 			{
-				$sphinxField = $this->getSphinxFieldName($fieldName);
-				$type = $this->getSphinxFieldType($sphinxField);
+				$sphinxField = $objectClass::getIndexFieldName($fieldName);
+				$type = $objectClass::getFieldType($sphinxField);
 			}
 			
 			$valStr = print_r($val, true);
-			$fieldsEscapeType = $this->getSearchIndexFieldsEscapeType($fieldName);
+			
+			$fieldsEscapeType = $objectClass::getSearchFieldsEscapeType($fieldName);
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 
@@ -700,7 +643,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						if($this->isNullableField($fieldName))
+						if($objectClass::isNullableField($fieldName))
 							$val = "((\\\"^" . implode(" $notEmpty$\\\") | (\\\"^", $vals) . " $notEmpty$\\\"))";
 						else
 							$val = "((\\\"^" . implode("$\\\") | (\\\"^", $vals) . "$\\\"))";
@@ -714,7 +657,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(is_numeric($val) || strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);	
-						if($this->isNullableField($fieldName))
+						if($objectClass::isNullableField($fieldName))
 							$this->addMatch("@$sphinxField \\\"^$val $notEmpty$\\\"");
 						else							
 							$this->addMatch("@$sphinxField \\\"^$val$\\\"");
@@ -890,32 +833,10 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		return array();
 	}
 	
-	/**
-	 * This function returns a list of fields that indicates whether the query should skip sphinx and go
-	 * directly to the database. For example, if a query on 'entry' contains entry.ID IN (...) going
-	 * through sphinx does not help (unless there is some textual match as well). In this case the function
-	 * should include entry.ID in the returned array.
-	 * @return array
-	 */
-	public function getSkipFields()
-	{
-		return array();
-	}
-	
-	/**
-	 * This function returns a list of fields that indicates whether the query should keep the sphinx qeury condition
-	 * but use it as well when querying from the database. For example, if a query on 'entry' contains entry.partner_id,
-	 * we'd like to use the same condition on the database as well.
-	 * 
-	 * @return array
-	 */
-	public function getSphinxConditionsToKeep() {
-		return array();
-	}
-		
 	private function shouldSkipSphinx()
 	{
-		$skipFields = $this->getSkipFields();
+		$objectClass = $this->getIndexObjectName();
+		$skipFields = $objectClass::getIndexSkipFieldsList();
 		
 		$hasSkipField = false;
 		foreach ($skipFields as $skipField)
@@ -951,7 +872,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 								
 		foreach($fields as $field => $comparisons)
 		{	
-			$fieldName = $this->getSphinxFieldName($field);
+			$fieldName = $objectClass::getIndexFieldName($field);
 
 			if(in_array($field, $skipFields))
 			{
@@ -962,7 +883,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				KalturaLog::debug('Peer does not have the field [' . print_r($field,true) .']');
 				return false;
 			}
-			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING && 
+			elseif($objectClass::getFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING && 
 					array_diff($comparisons, array(Criteria::EQUAL, Criteria::IN)))
 			{
 				KalturaLog::debug('Field is textual [' . print_r($fieldName,true) .'] and using comparisons [' . implode(',', $comparisons), ']');
@@ -983,13 +904,14 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 */
 	public function getRecordsCount() 
 	{
+		$objectClass = $this->getIndexObjectName();
 		if (!$this->sphinxSkipped)
 			return $this->recordsCount;
 		
 		$c = clone $this;
 		$c->setLimit(null);
 		$c->setOffset(null);
-		$this->recordsCount = $this->doCountOnPeer($c);
+		$this->recordsCount = $objectClass::doCountOnPeer($c);
 		
 		$this->sphinxSkipped = false;
 
@@ -1066,13 +988,15 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 
 	public function setSelectColumn($name)
 	{
-		$sphinxColumnName = $this->getSphinxFieldName($name);
+		$objectClass = $this->getIndexObjectName();
+		$sphinxColumnName = $objectClass::getIndexFieldName($name);
 		$this->selectColumn = $sphinxColumnName;
 	}
 	
 	public function setGroupByColumn ($name)
 	{
-		$sphinxColumnName = $this->getSphinxFieldName($name);
+		$objectClass = $this->getIndexObjectName();
+		$sphinxColumnName = $objectClass::getIndexFieldName($name);
 		$this->groupByColumn = $sphinxColumnName;
 	}
 }

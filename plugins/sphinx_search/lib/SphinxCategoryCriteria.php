@@ -5,157 +5,15 @@
  */
 class SphinxCategoryCriteria extends SphinxCriteria
 {
-	public static $sphinxFields = array(
-		'category.ID' => 'category_id',
-		'category.CATEGORY_ID' => 'str_category_id',
-		'category.PARENT_ID' => 'parent_id',
-		'category.PARTNER_ID' => 'partner_id',
-		'category.NAME' => 'name',
-		'category.FULL_NAME' => 'full_name',
-		'category.FULL_IDS' => 'full_ids',
-		'category.DESCRIPTION' => 'description',
-		'category.TAGS' => 'tags',
-		'category.STATUS' => 'category_status',
-		'category.KUSER_ID' => 'kuser_id',
-		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
-		'category.FREE_TEXT' => '(str_category_id,name,tags,description,reference_id)',
-		'category.NAME_REFERNCE_ID' => '(name,reference_id)',
-		'category.MEMBERS' => 'members',
-		'plugins_data',
-		'category.DEPTH' => 'depth',
-		'category.REFERENCE_ID' => 'reference_id',
-		'category.PRIVACY_CONTEXT' => 'privacy_context',
-		'category.PRIVACY_CONTEXTS' => 'privacy_contexts',
-		'category.MEMBERS_COUNT' => 'members_count',
-		'category.PENDING_MEMBERS_COUNT' => 'pending_members_count',
-		'category.ENTRIES_COUNT' => 'entries_count',
-		'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
-		'category.DIRECT_SUB_CATEGORIES_COUNT' => 'direct_sub_categories_count',
-		'category.PRIVACY' => 'privacy',
-		'category.INHERITANCE_TYPE' => 'inheritance_type',
-		'category.USER_JOIN_POLICY' => 'user_join_policy',
-		'category.DEFAULT_PERMISSION_LEVEL' => 'default_permission_level' ,
-		'category.CONTRIBUTION_POLICY' => 'contribution_policy',
-		'category.INHERITED_PARENT_ID' => 'inherited_parent_id',
-		'category.CREATED_AT' => 'created_at',
-		'category.UPDATED_AT' => 'updated_at',
-		'category.DELETED_AT' => 'deleted_at',	
-		'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
-		'category.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
-	);
-	
-	public static $sphinxOrderFields = array(
-		'category.FULL_NAME' => 'full_name',
-		'category.NAME' => 'name',
-		'category.ID' => 'category_id',
-		'category.PARTNER_ID' => 'partner_id',
-		'category.STATUS' => 'category_status',
-		'category.KUSER_ID' => 'kuser_id',
-		'category.DISPLAY_IN_SEARCH' => 'display_in_search',	
-		'category.DEPTH' => 'depth',
-		'category.MEMBERS_COUNT' => 'members_count',
-		'category.PENDING_MEMBERS_COUNT' => 'pending_members_count',
-		'category.ENTRIES_COUNT' => 'entries_count',
-		'category.DIRECT_ENTRIES_COUNT' => 'direct_entries_count',
-		'category.DIRECT_SUB_CATEGORIES_COUNT' => 'direct_sub_categories_count',
-		'category.CREATED_AT' => 'created_at',
-		'category.UPDATED_AT' => 'updated_at',
-		'category.PARTNER_SORT_VALUE' => 'partner_sort_value',
-	);
-	
-	public static $sphinxTypes = array(
-		'category_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'str_category_id' => IIndexable::FIELD_TYPE_STRING,
-		'parent_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'name' => IIndexable::FIELD_TYPE_STRING,
-		'full_name' => IIndexable::FIELD_TYPE_STRING,
-		'full_ids' => IIndexable::FIELD_TYPE_STRING,
-		'description' => IIndexable::FIELD_TYPE_STRING,
-		'tags' => IIndexable::FIELD_TYPE_STRING,
-		'category_status' => IIndexable::FIELD_TYPE_INTEGER,
-		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'display_in_search' => IIndexable::FIELD_TYPE_STRING,
-		'members' => IIndexable::FIELD_TYPE_STRING,
-		'plugins_data' => IIndexable::FIELD_TYPE_STRING,
-		'depth' => IIndexable::FIELD_TYPE_INTEGER,
-		'reference_id' => IIndexable::FIELD_TYPE_STRING,
-		'privacy_context' => IIndexable::FIELD_TYPE_STRING,
-		'privacy_contexts' => IIndexable::FIELD_TYPE_STRING,
-		'privacy' => IIndexable::FIELD_TYPE_STRING,	
-		'members_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'pending_members_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'entries_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'direct_entries_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'direct_sub_categories_count' => IIndexable::FIELD_TYPE_INTEGER,
-		'inheritance_type' => IIndexable::FIELD_TYPE_INTEGER,
-		'user_join_policy' => IIndexable::FIELD_TYPE_INTEGER,
-		'default_permission_level' => IIndexable::FIELD_TYPE_INTEGER,
-		'contribution_policy' => IIndexable::FIELD_TYPE_INTEGER,
-		'inherited_parent_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
-		'sphinx_match_optimizations'=> IIndexable::FIELD_TYPE_STRING,
-		'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
-	);
-	
-	public static $sphinxFieldsEscapeType = array(
-		'category.FULL_NAME' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
-		'category.FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
-	);
+	public function getIndexObjectName() {
+		return "categoryIndex";
+	}
 	
 	public static $sphinxOptimizationMap = array(
 			// array(format, 'field1', 'field2',...)
 			array("%s", categoryPeer::ID),
 	);
 
-	/**
-	 * @return criteriaFilter
-	 */
-	protected function getDefaultCriteriaFilter()
-	{
-		return categoryPeer::getCriteriaFilter();
-	}
-	
-	protected function getEnableStar()
-	{
-		return true;
-	}
-	
-	/**
-	 * @return string
-	 */
-	protected function getSphinxIndexName()
-	{
-		return kSphinxSearchManager::getSphinxIndexName(categoryPeer::getOMClass(false));
-	}
-	
-	/* (non-PHPdoc)
-	 * @see SphinxCriteria::getSphinxIdField()
-	 */
-	protected function getSphinxIdField()
-	{
-		return 'id';
-	}
-	
-	/* (non-PHPdoc)
-	 * @see SphinxCriteria::getPropelIdField()
-	 */
-	protected function getPropelIdField()
-	{
-		return categoryPeer::ID;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see SphinxCriteria::doCountOnPeer()
-	 */
-	protected function doCountOnPeer(Criteria $c)
-	{
-		return categoryPeer::doCount($c);
-	}
-	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::applyFilterFields()
 	 */
@@ -417,93 +275,9 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return parent::applyFilterFields($filter);
 	}
 	
-	public function hasSphinxFieldName($fieldName)
-	{
-		if(strpos($fieldName, '.') === false)
-		{
-			$fieldName = strtoupper($fieldName);
-			$fieldName = "category.$fieldName";
-		}
-
-		return isset(self::$sphinxFields[$fieldName]);
-	}
-	
-	public function getSphinxOrderFields()
-	{			
-		return self::$sphinxOrderFields;
-	}
-	
 	public function getSphinxOptimizationMap()
 	{
 		return self::$sphinxOptimizationMap;
-	}
-	
-	public function getSphinxFieldName($fieldName)
-	{
-		if(strpos($fieldName, '.') === false)
-		{
-			$fieldName = strtoupper($fieldName);
-			$fieldName = "category.$fieldName";
-		}
-			
-		if(!isset(self::$sphinxFields[$fieldName]))
-			return $fieldName;
-			
-		return self::$sphinxFields[$fieldName];
-	}
-	
-	public function getSphinxFieldType($fieldName)
-	{
-		if(!isset(self::$sphinxTypes[$fieldName]))
-			return null;
-			
-		return self::$sphinxTypes[$fieldName];
-	}
-	
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		if(strpos($fieldName, '.') === false)
-		{
-			$fieldName = strtoupper($fieldName);
-			$fieldName = "category.$fieldName";
-		}
-		
-		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
-			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
-			
-		return self::$sphinxFieldsEscapeType[$fieldName];
-	}
-	
-	/* (non-PHPdoc)
-	 * @see SphinxCriteria::isNullableField()
-	 */
-	public function isNullableField($fieldName)
-	{
-		return in_array($fieldName, category::getIndexNullableFields());
-	}
-	
-	public function hasMatchableField ( $field_name )
-	{
-		return in_array($field_name, array(
-			"name", 
-			"full_name",
-			"full_ids",
-			"free_text",
-			"description", 
-			"tags", 
-			"members",
-			"privacy_context",
-		));
-	}
-
-	public function getIdField()
-	{
-		return categoryPeer::ID;
-	}
-
-	public function getSkipFields()
-	{
-		return array(categoryPeer::ID, categoryPeer::FULL_NAME);
 	}
 	
 	public function hasPeerFieldName($fieldName)
@@ -519,16 +293,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return in_array($fieldName, $categoryFields);
 	}
 	
-	public function getTranslateIndexId($id)
-	{
-		return $id;
-	}
-
-	public function getSphinxConditionsToKeep()
-	{
-		return array(categoryPeer::PARTNER_ID);
-	}
-
 	public function translateSphinxCriterion(SphinxCriterion $crit)
 	{
 		$field = $crit->getTable() . '.' . $crit->getColumn();

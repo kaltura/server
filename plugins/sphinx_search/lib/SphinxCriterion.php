@@ -66,7 +66,8 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	
 	protected function getStringMatchClause($sphinxField, $comparison, $value)
 	{
-		$fieldsEscapeType = $this->criteria->getSearchIndexFieldsEscapeType($sphinxField);
+		$obejctClass = $this->criteria->getIndexObjectName();
+		$fieldsEscapeType = $obejctClass::getSearchFieldsEscapeType($sphinxField);
 		
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$notEmpty = kSphinxSearchManager::HAS_VALUE . $partnerId;
@@ -75,7 +76,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		{
 			case Criteria::EQUAL:
 				$value = SphinxUtils::escapeString($value, $fieldsEscapeType);
-				if($this->criteria->isNullableField($sphinxField))
+				if($obejctClass::isNullableField($sphinxField))
 					return "@$sphinxField \\\"^$value $notEmpty$\\\"";
 				else
 					return "@$sphinxField \\\"^$value$\\\"";
@@ -120,7 +121,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				if(count($vals))
 				{
 					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-					if($this->criteria->isNullableField($sphinxField))
+					if($obejctClass::isNullableField($sphinxField))
 						$val = "((\\\"^" . implode(" $notEmpty$\\\") | (\\\"^", $vals) . " $notEmpty$\\\"))";
 					else
 						$val = "((\\\"^" . implode("$\\\") | (\\\"^", $vals) . "$\\\"))";
@@ -309,6 +310,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	 */
 	public function apply(IKalturaIndexQuery $query)
 	{
+		$objectClass = $this->criteria->getIndexObjectName();
 		$this->currentQuery = $query;
 		
 		list($field, $comparison, $value) = $this->criteria->translateSphinxCriterion($this);
@@ -322,17 +324,17 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 			return false;
 		}
 	
-		if(!$this->criteria->hasSphinxFieldName($field))
+		if(!$objectClass::hasIndexFieldName($field))
 		{
 			KalturaLog::debug("Skip criterion[$field] has no sphinx field");
 			return false;
 		}
 				
-		$sphinxField	= $this->criteria->getSphinxFieldName($field);
-		$type			= $this->criteria->getSphinxFieldType($sphinxField);
+		$sphinxField	= $objectClass::getIndexFieldName($field);
+		$type			= $objectClass::getFieldType($sphinxField);
 		
 		// Update value & comparison in case of id field
-		if($field == $this->criteria->getIdField())
+		if($field == $objectClass::getIdField())
 		{
 			if($comparison == Criteria::EQUAL)
 				$comparison = Criteria::IN;
@@ -493,22 +495,23 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 	 */
 	public function addOr(Criterion $criterion)
 	{
+		$objectClass = $this->criteria->getIndexObjectName();
 		$currentField = $this->getTable() . '.' . $this->getColumn();
 		$addedField = $this->getTable() . '.' . $this->getColumn();
 		KalturaLog::debug("Add OR criterion field [$addedField] to current field [$currentField]");
 	
 		// Validate that the added criterion and the current criterios are both attributes or both matches
-		if($this->criteria->hasSphinxFieldName($addedField))
+		if($objectClass::hasIndexFieldName($addedField))
 		{		
-			$currentSphinxField	= $this->criteria->getSphinxFieldName($currentField);
-			$addedSphinxField	= $this->criteria->getSphinxFieldName($addedField);
+			$currentSphinxField	= $objectClass::getIndexFieldName($currentField);
+			$addedSphinxField	= $objectClass::getIndexFieldName($addedField);
 			
 			if($currentSphinxField != $addedSphinxField)
 			{
 				KalturaLog::debug("Current sphinx field [$currentSphinxField] and added sphinx field [$addedField]");
 				
-				$currentType	= $this->criteria->getSphinxFieldType($currentSphinxField);
-				$addedType		= $this->criteria->getSphinxFieldType($addedField);
+				$currentType	= $objectClass::getFieldType($currentSphinxField);
+				$addedType		= $objectClass::getFieldType($addedField);
 				
 				if($currentType != $addedType)
 				{

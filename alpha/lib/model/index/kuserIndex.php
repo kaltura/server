@@ -1,0 +1,227 @@
+<?php
+
+/**
+ * Auto-generated index class for kuser
+*/
+class kuserIndex extends BaseIndexObject
+{
+	public static function getObjectIndexName()
+	{
+		return 'kuser';
+	}
+
+	public static function getSphinxIdField()
+	{
+		return 'id';
+	}
+
+	public static function getPropelIdField()
+	{
+		return kuserPeer::ID;
+	}
+
+	public static function getIdField()
+	{
+		return null;
+	}
+
+	public static function getDefaultCriteriaFilter()
+	{
+		return kuserPeer::getCriteriaFilter();
+	}
+
+	public static function getIndexFieldsMap()
+	{
+		if (!self::$fieldsMap)
+		{
+			self::$fieldsMap = array(
+				'login_data_id' => 'loginDataId',
+				'is_admin' => 'isAdmin',
+				'screen_name' => 'screenName',
+				'full_name' => 'fullName',
+				'first_name' => 'firstName',
+				'last_name' => 'lastName',
+				'email' => 'email',
+				'about_me' => 'aboutMe',
+				'tags' => 'tags',
+				'entries' => 'entries',
+				'storage_size' => 'storageSize',
+				'kuser_status' => 'status',
+				'created_at' => 'createdAt',
+				'updated_at' => 'updatedAt',
+				'partner_id' => 'partnerId',
+				'display_in_search' => 'displayInSearch',
+				'partner_data' => 'partnerData',
+				'puser_id' => 'puserId',
+				'indexed_partner_data_int' => 'indexedPartnerDataInt',
+				'indexed_partner_data_string' => 'indexedPartnerDataString',
+				'permission_names' => 'indexedPermissionNames',
+				'role_ids' => 'indexedRoleIds',
+			);
+		}
+		return self::$fieldsMap;
+	}
+
+	public static function getIndexFieldTypesMap()
+	{
+		if (!self::$typesMap)
+		{
+			self::$typesMap = array(
+				'login_data_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'is_admin' => IIndexable::FIELD_TYPE_INTEGER,
+				'screen_name' => IIndexable::FIELD_TYPE_STRING,
+				'full_name' => IIndexable::FIELD_TYPE_STRING,
+				'first_name' => IIndexable::FIELD_TYPE_STRING,
+				'last_name' => IIndexable::FIELD_TYPE_STRING,
+				'email' => IIndexable::FIELD_TYPE_STRING,
+				'about_me' => IIndexable::FIELD_TYPE_STRING,
+				'tags' => IIndexable::FIELD_TYPE_STRING,
+				'entries' => IIndexable::FIELD_TYPE_INTEGER,
+				'storage_size' => IIndexable::FIELD_TYPE_INTEGER,
+				'kuser_status' => IIndexable::FIELD_TYPE_INTEGER,
+				'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+				'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+				'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
+				'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
+				'partner_data' => IIndexable::FIELD_TYPE_STRING,
+				'puser_id' => IIndexable::FIELD_TYPE_STRING,
+				'indexed_partner_data_int' => IIndexable::FIELD_TYPE_INTEGER,
+				'indexed_partner_data_string' => IIndexable::FIELD_TYPE_STRING,
+				'permission_names' => IIndexable::FIELD_TYPE_STRING,
+				'role_ids' => IIndexable::FIELD_TYPE_STRING,
+				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
+			);
+		}
+		return self::$typesMap;
+	}
+
+	public static function getIndexNullableList()
+	{
+		if (!self::$nullableFields)
+		{
+			self::$nullableFields = array(
+			);
+		}
+		return self::$nullableFields;
+	}
+
+	public static function getIndexSearchableFieldsMap()
+	{
+		if (!self::$searchableFieldsMap)
+		{
+			self::$searchableFieldsMap = array(
+				'kuser.LOGIN_DATA_ID' => 'login_data_id',
+				'kuser.IS_ADMIN' => 'is_admin',
+				'kuser.SCREEN_NAME' => 'screen_name',
+				'kuser.FULL_NAME' => 'full_name',
+				'kuser.FIRST_NAME' => 'first_name',
+				'kuser.LAST_NAME' => 'last_name',
+				'kuser.EMAIL' => 'email',
+				'kuser.ABOUT_ME' => 'about_me',
+				'kuser.TAGS' => 'tags',
+				'kuser.ENTRIES' => 'entries',
+				'kuser.STORAGE_SIZE' => 'storage_size',
+				'kuser.STATUS' => 'kuser_status',
+				'kuser.CREATED_AT' => 'created_at',
+				'kuser.UPDATED_AT' => 'updated_at',
+				'kuser.PARTNER_ID' => 'partner_id',
+				'kuser.DISPLAY_IN_SEARCH' => 'display_in_search',
+				'kuser.PARTNER_DATA' => 'partner_data',
+				'kuser.PUSER_ID' => 'puser_id',
+				'kuser.INDEXED_PARTNER_DATA_INT' => 'indexed_partner_data_int',
+				'kuser.INDEXED_PARTNER_DATA_STRING' => 'indexed_partner_data_string',
+				'kuser.PERMISSION_NAMES' => 'permission_names',
+				'kuser.ROLE_IDS' => 'role_ids',
+				'kuser.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
+				'kuser.FIRST_NAME_OR_LAST_NAME' => '(full_name,last_name)',
+				'kuser.PUSER_ID_OR_SCREEN_NAME' => '(puser_id,screen_name)',
+			);
+		}
+		return self::$searchableFieldsMap;
+	}
+
+	public static function getSearchFieldsEscapeTypeList()
+	{
+		if (!self::$searchEscapeTypes)
+		{
+			self::$searchEscapeTypes = array(
+			);
+		}
+		return self::$searchEscapeTypes;
+	}
+
+	public static function getIndexFieldsEscapeTypeList()
+	{
+		if (!self::$indexEscapeTypes)
+		{
+			self::$indexEscapeTypes = array(
+			);
+		}
+		return self::$indexEscapeTypes;
+	}
+
+	public static function getIndexMatchableList()
+	{
+		if (!self::$matchableFields)
+		{
+			self::$matchableFields = array(
+				"screen_name",
+				"full_name",
+				"first_name",
+				"last_name",
+				"email",
+				"about_me",
+				"tags",
+				"partner_data",
+				"puser_id",
+				"indexed_partner_data_string",
+				"permission_names",
+				"role_ids",
+			);
+		}
+		return self::$matchableFields;
+	}
+
+	public static function getIndexOrderList()
+	{
+		if (!self::$orderFields)
+		{
+			self::$orderFields = array(
+				'kuser.LOGIN_DATA_ID' => 'login_data_id',
+				'kuser.IS_ADMIN' => 'is_admin',
+				'kuser.CREATED_AT' => 'created_at',
+				'kuser.UPDATED_AT' => 'updated_at',
+				'kuser.DISPLAY_IN_SEARCH' => 'display_in_search',
+				'kuser.INDEXED_PARTNER_DATA_INT' => 'indexed_partner_data_int',
+			);
+		}
+		return self::$orderFields;
+	}
+
+	public static function getIndexSkipFieldsList()
+	{
+		if (!self::$skipFields)
+		{
+			self::$skipFields = array(
+			);
+		}
+		return self::$skipFields;
+	}
+
+	public static function getSphinxConditionsToKeep()
+	{
+		if (!self::$conditionToKeep)
+		{
+			self::$conditionToKeep = array(
+			);
+		}
+		return self::$conditionToKeep;
+	}
+
+	public static function doCountOnPeer(Criteria $c)
+	{
+		return kuserPeer::doCount($c);
+	}
+
+}
+
