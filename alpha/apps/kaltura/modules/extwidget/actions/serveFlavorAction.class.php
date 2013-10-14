@@ -32,7 +32,7 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		
 		$clipTo = null;
-//		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, accessControlContextType::PLAY);
+//		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::PLAY);
 //		if ($securyEntryHelper->shouldPreview())
 //		{
 //			$clipTo = $securyEntryHelper->getPreviewLength() * 1000;

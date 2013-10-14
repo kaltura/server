@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kAccessControlLimitFlavorsAction extends kAccessControlAction 
+class kAccessControlLimitFlavorsAction extends kRuleAction 
 {
 	/**
 	 * @var array
@@ -18,7 +18,7 @@ class kAccessControlLimitFlavorsAction extends kAccessControlAction
 	
 	public function __construct() 
 	{
-		parent::__construct(accessControlActionType::LIMIT_FLAVORS);
+		parent::__construct(RuleActionType::LIMIT_FLAVORS);
 	}
 	
 	/**

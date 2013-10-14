@@ -159,15 +159,44 @@ class flavorAsset extends asset
         KalturaLog::debug('Setting status to ['.$newStatus.']');
 	    $this->setStatus($newStatus);
 	}
+	
 
+	/**
+	 * Code to be run after inserting to database
+	 * @param PropelPDO $con 
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		
+		$this->syncEntryFlavorParamsIds();		
+	}
+
+	/**
+	 * Code to be run after updating the object in database
+	 * @param PropelPDO $con
+	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
-		
+
 		$syncFlavorParamsIds = false;
-		if(	($this->isColumnModified(assetPeer::STATUS) &&
-			($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)))
+		if($this->isColumnModified(assetPeer::STATUS)){ 
+			$syncFlavorParamsIds = true;
+		}
+		
+		$ret = parent::postUpdate($con);
+		
+		if($syncFlavorParamsIds)
+        	$this->syncEntryFlavorParamsIds();	
+        	
+        return $ret;
+	}
+	
+	protected function syncEntryFlavorParamsIds()
+	{
+		if ($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)
 		{
 			$entry = $this->getentry();
 	    	if (!$entry)
@@ -176,20 +205,11 @@ class flavorAsset extends asset
 	    	}
 	    	elseif ($entry->getStatus() != entryStatus::DELETED)
 	    	{
-	    		$syncFlavorParamsIds = true;
+		    	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
+	        	$entry->syncFlavorParamsIds();
+	        	$entry->save();
 	    	}
 		}
-		
-		$ret = parent::postUpdate($con);
-		
-	    if($syncFlavorParamsIds)
-	    {
-        	KalturaLog::debug('Synchronizing flavor params ids for entry id ['.$entry->getId().']');
-        	$entry->syncFlavorParamsIds();
-        	$entry->save();
-	    }
-		
-		return $ret;
 	}
 	
 	public function linkFromAsset(asset $fromAsset)

@@ -115,6 +115,10 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 			$relatedObject->indexToSearchIndex();
 		}
 		
+		if($relatedObject instanceof entry)
+		{
+			kStorageExporter::reExportEntry($relatedObject);
+		}
 		return true;
 	}
 }

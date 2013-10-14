@@ -412,7 +412,7 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::THUMBNAIL);
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
 		$securyEntryHelper->validateAccessControl();
 		
 		$fileName = $entry->getId() . '.jpg';
@@ -467,7 +467,7 @@ class ThumbAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		}
 		
-		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, accessControlContextType::THUMBNAIL);
+		$securyEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
 		$securyEntryHelper->validateAccessControl();
 
 		$ext = $thumbAsset->getFileExt();

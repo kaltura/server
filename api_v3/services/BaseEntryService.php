@@ -754,6 +754,13 @@ class BaseEntryService extends KalturaEntryService
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
 	    
+	    $scope = $dbStorageProfile->getScope();
+	    $scope->setEntryId($entryId);
+	    if(!$dbStorageProfile->fulfillsRules($scope))
+	    {
+	    	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_RULES_NOT_FULFILLED, $storageProfileId);
+	    }
+	    
 	    kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
 	    
 	    //TODO: implement export errors

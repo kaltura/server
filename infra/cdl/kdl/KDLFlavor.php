@@ -884,6 +884,10 @@ $plannedDur = 0;
 			$target->_frameRate = max(20,$target->_frameRate);
 		}
 		
+		 //Frame rate s,aller than 1 causes Memory Fatal Erro so in this case set it to 1
+		if( $target->_frameRate > 0 &&  $target->_frameRate < 1)
+			$target->_frameRate=1;
+		
 		return $target->_frameRate;
 	}
 

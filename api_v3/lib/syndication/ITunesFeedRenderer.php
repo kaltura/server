@@ -1,6 +1,26 @@
 <?php
 
 class ITunesFeedRenderer extends SyndicationFeedRenderer {
+	
+  	const ENFORCE_ORDER_PLACE_HOLDER = "ITEM_ORDER_IN_FEED";
+  
+  	/**
+   	 * The index of the entry in the feed created
+   	 * @var int
+   	 */
+  	private $feedItemOrderIndex = 1;
+  
+  	/**
+   	 * True if keep order is needed
+   	 * @var bool
+   	 */
+  	private $enforceOrder = false;
+  
+  	public function init($syndicationFeed, $syndicationFeedDB, $mimeType) {
+    	parent::init($syndicationFeed, $syndicationFeedDB, $mimeType);
+    
+    	$this->enforceOrder = $syndicationFeed->enforceOrder;
+  	}
 
 	public function handleHeader() {
 		
@@ -105,6 +125,9 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		if($kuser && $kuser->getScreenName())
 			$res .= $this->writeFullXmlNode('itunes:author', $this->stringToSafeXml($kuser->getScreenName()), 3);
 			
+		if($this->enforceOrder)
+			$res .= $this->writeFullXmlNode('itunes:order', self::ENFORCE_ORDER_PLACE_HOLDER, 3);
+			
 		if($e->description)
 		{
 			$res .= $this->writeFullXmlNode('itunes:subtitle', $this->stringToSafeXml($e->description), 3);
@@ -125,6 +148,16 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		$res .= $this->writeClosingXmlNode('channel', 1);
 		$res .= $this->writeClosingXmlNode('rss');
 		return $res;
+	}
+	
+	public function finalize($entryMrss, $moreItems) {
+		if($this->enforceOrder)
+		{
+			$entryMrss = str_replace(self::ENFORCE_ORDER_PLACE_HOLDER, $this->feedItemOrderIndex, $entryMrss);
+			$this->feedItemOrderIndex++;
+		} 
+  
+		return $entryMrss;
 	}
 
 }

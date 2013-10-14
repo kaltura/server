@@ -3,14 +3,14 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAccessControlBlockAction extends KalturaAccessControlAction
+class KalturaAccessControlBlockAction extends KalturaRuleAction
 {
 	/**
 	 * Init object type
 	 */
 	public function __construct() 
 	{
-		$this->type = accessControlActionType::BLOCK;
+		$this->type = RuleActionType::BLOCK;
 	}
 	
 	/* (non-PHPdoc)
@@ -19,7 +19,7 @@ class KalturaAccessControlBlockAction extends KalturaAccessControlAction
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kAccessControlAction(accessControlActionType::BLOCK);
+			$dbObject = new kRuleAction(RuleActionType::BLOCK);
 			
 		return parent::toObject($dbObject, $skip);
 	}

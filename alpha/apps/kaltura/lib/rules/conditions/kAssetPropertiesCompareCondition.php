@@ -28,9 +28,6 @@ class kAssetPropertiesCompareCondition extends kCondition
 		// no properties defined, the condition is fulfilled
 		if (count($this->getProperties()) == 0)
 			return true;
-
-		if(!($scope instanceof accessControlScope))
-			return false;
 			
 		$entryId = $scope->getEntryId();
 		$entryAssets = assetPeer::retrieveReadyByEntryId($scope->getEntryId());

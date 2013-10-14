@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaRuleActionArray
  */
 class KalturaAccessControlActionArray extends KalturaTypedArray
 {
@@ -28,11 +29,11 @@ class KalturaAccessControlActionArray extends KalturaTypedArray
 	{
 		switch($dbObject->getType())
 		{
-			case accessControlActionType::BLOCK:
+			case RuleActionType::BLOCK:
 				return new KalturaAccessControlBlockAction();
-			case accessControlActionType::PREVIEW:
+			case RuleActionType::PREVIEW:
 				return new KalturaAccessControlPreviewAction();
-			case accessControlActionType::LIMIT_FLAVORS:
+			case RuleActionType::LIMIT_FLAVORS:
 				return new KalturaAccessControlLimitFlavorsAction();
 			default:
 				return KalturaPluginManager::loadObject('KalturaAccessControlAction', $dbObject->getType());

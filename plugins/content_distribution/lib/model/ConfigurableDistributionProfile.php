@@ -186,7 +186,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
     {
         $xsl = '<?xml version="1.0" encoding="UTF-8"?>
 		<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-			<xsl:output omit-xml-declaration="no" method="xml" />
+			<xsl:output omit-xml-declaration="no" method="xml" encoding="UTF-8"/>
 			<xsl:template match="item">
 				<distribution_values>
 		';
@@ -284,7 +284,10 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		$proc->importStyleSheet($xslObj);
 		
-		$resultXmlObj = $proc->transformToDoc($mrssObj);
+		$resultXml = $proc->transformToXml($mrssObj); //in order to keep the UTF-8 encoding we transformToXml http://www.php.net/manual/en/xsltprocessor.transformtodoc.php#69305 
+		$resultXmlObj = new DOMDocument();
+		$resultXmlObj->loadXML($resultXml);
+		
 		if (!$resultXmlObj) {
 		    KalturaLog::err('Error transforming XML for distribution profile ['.$this->getId().'] and entry id ['.$entry->getId().']');
 		    return null;

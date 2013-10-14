@@ -239,6 +239,7 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::SCP' => 'SCP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::S3' => 'Amazon S3',
+	'Kaltura_Client_Enum_StorageProfileProtocol::LOCAL' => 'Local',
 
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::BLOCKED' => 'Blocked',

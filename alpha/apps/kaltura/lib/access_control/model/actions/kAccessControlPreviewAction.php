@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kAccessControlPreviewAction extends kAccessControlAction 
+class kAccessControlPreviewAction extends kRuleAction 
 {
 	/**
 	 * @var int
@@ -12,7 +12,7 @@ class kAccessControlPreviewAction extends kAccessControlAction
 	
 	public function __construct() 
 	{
-		parent::__construct(accessControlActionType::PREVIEW);
+		parent::__construct(RuleActionType::PREVIEW);
 	}
 	
 	/**

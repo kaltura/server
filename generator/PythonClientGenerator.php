@@ -178,6 +178,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		$enumBase = "object";
 		
 		if($this->generateDocs)
 		{
@@ -185,7 +186,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("# @subpackage $this->subpackage");
 		}
 		
-	 	$this->appendLine("class $enumName:");
+	 	$this->appendLine("class $enumName($enumBase):");
 	 	foreach($enumNode->childNodes as $constNode)
 		{
 			if ($constNode->nodeType != XML_ELEMENT_NODE)

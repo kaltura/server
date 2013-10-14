@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAccessControlPreviewAction extends KalturaAccessControlAction
+class KalturaAccessControlPreviewAction extends KalturaRuleAction
 {
 	/**
 	 * @var int
@@ -20,7 +20,7 @@ class KalturaAccessControlPreviewAction extends KalturaAccessControlAction
 	 */
 	public function __construct() 
 	{
-		$this->type = accessControlActionType::PREVIEW;
+		$this->type = RuleActionType::PREVIEW;
 	}
 	
 	public function getMapBetweenObjects()

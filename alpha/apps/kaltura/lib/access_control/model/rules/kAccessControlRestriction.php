@@ -11,33 +11,53 @@ abstract class kAccessControlRestriction extends kRule
 {
 	const RESTRICTION_TYPE_RESTRICT_LIST = 0;
 	const RESTRICTION_TYPE_ALLOW_LIST = 1;
+	
+	/**
+	 * 
+	 * @var accessControl
+	 */
+	protected $accessControl;
 
 	/**
 	 * @param accessControl $accessControl
 	 */
 	public function __construct(accessControl $accessControl = null)
 	{
-		parent::__construct($accessControl);
+		$scope = null;
+		if($accessControl)
+		{
+			$this->accessControl = $accessControl;
+			$scope = $accessControl->getScope();
+		}
+		parent::__construct($scope);
 		$contexts = array(
-			accessControlContextType::PLAY, 
-			accessControlContextType::DOWNLOAD, 
+			ContextType::PLAY, 
+			ContextType::DOWNLOAD, 
 		);
 		$partnerId = $accessControl ? $accessControl->getPartnerId() : kCurrentContext::$ks_partner_id;
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if($partner) {
 			if($partner->getRestrictThumbnailByKs())
-				$contexts[] = accessControlContextType::THUMBNAIL;
+				$contexts[] = ContextType::THUMBNAIL;
 			if($partner->getShouldApplyAccessControlOnEntryMetadata())
-				$contexts[] = accessControlContextType::METADATA;
+				$contexts[] = ContextType::METADATA;
 		}
 			
 		$this->setContexts($contexts);
+	}
+	
+	/**
+	 * @param accessControl $accessControl
+	 */
+	public function setAccessControl(accessControl $accessControl)
+	{
+		$this->accessControl = $accessControl;
 	}
 
 	/* (non-PHPdoc)
 	 * @see kRule::applyContext()
 	 */
-	public function applyContext(kEntryContextDataResult $context)
+	public function applyContext(kContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
 
@@ -47,6 +67,13 @@ abstract class kAccessControlRestriction extends kRule
 					$context->setPreviewLength($action->getLimit());
 			
 		return $fulfilled;
+	}
+	
+	public function __sleep()
+	{
+		$vars = get_class_vars('kAccessControlRestriction');
+		unset($vars['accessControl']);
+		return array_keys($vars);
 	}
 }
 

@@ -2,11 +2,8 @@
 /**
  * @package api
  * @subpackage enum
+ * @deprecated use KalturaContextType
  */
-class KalturaAccessControlContextType extends KalturaDynamicEnum implements accessControlContextType
+class KalturaAccessControlContextType extends KalturaContextType
 {
-	public static function getEnumClass()
-	{
-		return 'accessControlContextType';
-	}
 }

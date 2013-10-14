@@ -461,6 +461,32 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 		
 		return $return;
 	}
+	
+	public static function getPermissionNamesByPermissionLevel($permissionLevel)
+	{
+		switch ($permissionLevel)
+		{
+			case CategoryKuserPermissionLevel::MANAGER:
+				$permissionNamesArr[] = PermissionName::CATEGORY_EDIT;
+				$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+				$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+				$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+				break;
+			case CategoryKuserPermissionLevel::MODERATOR:
+				$permissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+				$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+				break;
+			case CategoryKuserPermissionLevel::CONTRIBUTOR:
+				$permissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+				$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+				break;
+			case CategoryKuserPermissionLevel::MEMBER:
+				$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
+				break;
+		}
+		
+		return $permissionNamesArr;
+	}
 
 
 } // categoryKuser

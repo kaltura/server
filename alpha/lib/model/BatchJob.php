@@ -144,7 +144,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		{
 			//echo "sets the status to " . self::BATCHJOB_STATUS_PENDING . "\n";
 			$this->setStatus(self::BATCHJOB_STATUS_PENDING);
-		}
+		} 
 		
 		return parent::preInsert($con);
 	}
@@ -170,25 +170,18 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			$res = parent::save($con);
 		}
 	
-		if(BatchJobLockPeer::shouldCreateLockObject($this,true, $con)) {
-			$batchJobLock = BatchJobLockPeer::createLockObject($this);
-			$this->setBatchJobLock($batchJobLock);
-			parent::save($con);
-		}
+		if(BatchJobLockPeer::shouldCreateLockObject($this,true, $con)) 
+			BatchJobLockPeer::createLockObject($this);
 	
 		return parent::postInsert($con);
 	}
 	
 	public function postUpdate(PropelPDO $con = null) {
-		if(!$this->alreadyInSave && BatchJobLockPeer::shouldCreateLockObject($this,false, $con)) {
-			$batchJobLock = BatchJobLockPeer::createLockObject($this);
-			$this->setBatchJobLock($batchJobLock);
-			parent::save($con);
-		}
+		if(!$this->alreadyInSave && BatchJobLockPeer::shouldCreateLockObject($this,false, $con))
+			BatchJobLockPeer::createLockObject($this);
 	
 		return parent::postUpdate($con);
 	}
-	
 	
 	/**
 	 * @return Partner

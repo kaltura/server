@@ -646,10 +646,10 @@ class entryPeer extends BaseentryPeer
 		$accessControl = $entry->getAccessControl();
 		$accessControl->applyContext($context, self::$accessControlScope);
 
-		$actions = $context->getAccessControlActions();
+		$actions = $context->getActions();
 		foreach($actions as $action) {
 			/* @var $action kAccessControlAction */
-			if($action->getType() == accessControlActionType::BLOCK) {
+			if($action->getType() == RuleActionType::BLOCK) {
 				return false;
 			}
 		}
@@ -675,7 +675,7 @@ class entryPeer extends BaseentryPeer
 		if($partner && $partner->getShouldApplyAccessControlOnEntryMetadata() && !kCurrentContext::$is_admin_session) {
 			if(is_null(self::$accessControlScope)) {
 				self::$accessControlScope = new accessControlScope();
-				self::$accessControlScope->setContexts(array(accessControlContextType::METADATA));
+				self::$accessControlScope->setContexts(array(ContextType::METADATA));
 			}
 
 			$selectResults = array_filter($selectResults, array('entryPeer', 'filterByAccessControl'));

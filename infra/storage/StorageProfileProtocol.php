@@ -10,4 +10,5 @@ interface StorageProfileProtocol extends BaseEnum
 	const SCP = 2;
 	const SFTP = 3;
 	const S3 = 6;
+	const LOCAL = 7;
 }

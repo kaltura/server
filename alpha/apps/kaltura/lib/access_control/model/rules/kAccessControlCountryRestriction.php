@@ -18,7 +18,7 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	public function __construct(accessControl $accessControl = null)
 	{
 		parent::__construct($accessControl);
-		$this->setActions(array(new kAccessControlAction(accessControlActionType::BLOCK)));
+		$this->setActions(array(new kAccessControlAction(RuleActionType::BLOCK)));
 		
 		$this->condition = new kCountryCondition(true);
 		if($accessControl)
@@ -33,7 +33,7 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	/* (non-PHPdoc)
 	 * @see kRule::applyContext()
 	 */
-	public function applyContext(kEntryContextDataResult $context)
+	public function applyContext(kContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
 		if($fulfilled)
@@ -45,7 +45,7 @@ class kAccessControlCountryRestriction extends kAccessControlRestriction
 	/**
 	 * @return kCountryCondition
 	 */
-	private function getCondition()
+	protected function getCondition()
 	{
 		$conditions = $this->getConditions();
 		if(!$this->condition && count($conditions))

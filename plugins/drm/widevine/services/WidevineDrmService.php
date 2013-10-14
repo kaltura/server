@@ -92,7 +92,7 @@ class WidevineDrmService extends KalturaBaseService
 		$referrer = base64_decode(str_replace(" ", "+", $referrer64base));
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data		
-		$secureEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, $referrer, accessControlContextType::PLAY);
+		$secureEntryHelper = new KSecureEntryHelper($entry, kCurrentContext::$ks, $referrer, ContextType::PLAY);
 		if(!$secureEntryHelper->isKsAdmin())
 		{
 			if(!$entry->isScheduledNow())
