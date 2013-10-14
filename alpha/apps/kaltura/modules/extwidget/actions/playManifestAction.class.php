@@ -296,7 +296,7 @@ class playManifestAction extends kalturaAction
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
 			
-		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, accessControlContextType::PLAY);
+		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, ContextType::PLAY);
 		$this->secureEntryHelper->setHashes($keyValueHashes);
 		
 		if ($this->secureEntryHelper->shouldPreview())
@@ -952,7 +952,8 @@ class playManifestAction extends kalturaAction
 		}
 
 		$originalFormat = $this->format;
-		$this->format = PlaybackProtocol::HTTP;	
+		if ($this->format == PlaybackProtocol::APPLE_HTTP)
+			$this->format = PlaybackProtocol::HTTP;	
 		$flavors = $this->buildHttpFlavorsArray();
 		$this->format = $originalFormat;
 

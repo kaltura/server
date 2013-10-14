@@ -10,6 +10,11 @@ class kStorageExportJobData extends kStorageJobData
 	 */   	
     private $force; 
     
+    /**
+	 * @var bool
+	 */
+    private $createLink;
+    
 	public static function getInstance($protocol)
 	{
 		$data = null;
@@ -38,6 +43,7 @@ class kStorageExportJobData extends kStorageJobData
 		$this->setSrcFileSyncId($fileSync->getId());
 		$this->setForce($force);
 		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
+		$this->setCreateLink($externalStorage->getCreateFileLink());
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
@@ -64,5 +70,20 @@ class kStorageExportJobData extends kStorageJobData
 		$this->force = $force;
 	}
 	
+	/**
+	 * @return the $createLink
+	 */
+	public function getCreateLink()
+	{
+		return $this->createLink;
+	}
+
+	/**
+	 * @param createLink the $createLink to set
+	 */
+	public function setCreateLink($createLink)
+	{
+		$this->createLink = $createLink;
+	}
 	
 }

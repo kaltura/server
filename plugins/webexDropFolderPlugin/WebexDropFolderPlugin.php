@@ -86,11 +86,11 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		switch ($baseClass) {
-			case DropFolderPeer::OM_CLASS:
+			case 'DropFolder':
 				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
 				return 'WebexDropFolder';				
 				break;
-			case DropFolderFilePeer::OM_CLASS:
+			case 'DropFolderFile':
 				if ($enumValue == self::getDropFolderTypeCoreValue(WebexDropFolderType::WEBEX))
 				return 'WebexDropFolderFile';				
 				break;

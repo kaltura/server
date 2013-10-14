@@ -48,6 +48,7 @@ abstract class KExportEngine
 			case KalturaStorageProfileProtocol::S3:
 			case KalturaStorageProfileProtocol::SCP:
 			case KalturaStorageProfileProtocol::SFTP:
+			case KalturaStorageProfileProtocol::LOCAL:
 				return new KFileTransferExportEngine($data, $protocol);
 			default:
 				return KalturaPluginManager::loadObject('KExportEngine', $protocol, array($data, $partnerId));

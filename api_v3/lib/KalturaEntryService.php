@@ -1680,14 +1680,16 @@ class KalturaEntryService extends KalturaBaseService
 			if ($filter->durationGreaterThan !== null)
 				$filter->durationGreaterThan = $filter->durationGreaterThan * 1000;
 
+			//When translating from seconds to msec need to subtract 500 msec since entries greater than 5500 msec are considered as entries with 6 sec
 			if ($filter->durationGreaterThanOrEqual !== null)
-				$filter->durationGreaterThanOrEqual = $filter->durationGreaterThanOrEqual * 1000;
+				$filter->durationGreaterThanOrEqual = $filter->durationGreaterThanOrEqual * 1000 - 500;
 				
 			if ($filter->durationLessThan !== null)
 				$filter->durationLessThan = $filter->durationLessThan * 1000;
 				
+			//When translating from seconds to msec need to add 499 msec since entries less than 5499 msec are considered as entries with 5 sec
 			if ($filter->durationLessThanOrEqual !== null)
-				$filter->durationLessThanOrEqual = $filter->durationLessThanOrEqual * 1000;
+				$filter->durationLessThanOrEqual = $filter->durationLessThanOrEqual * 1000 + 499;
 		}
 	}
 	

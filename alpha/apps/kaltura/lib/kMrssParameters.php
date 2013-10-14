@@ -26,6 +26,8 @@ class kMrssParameters
 	//Statuses for asset retrieval by default will retrieve only ready assets 
 	private $statuses = array(flavorAsset::ASSET_STATUS_READY);
 	
+	private $encoding;
+	
 	/**
 	 * @return the $itemXpathsToExtend
 	 */
@@ -100,5 +102,21 @@ class kMrssParameters
 	public function setStatuses(array $statuses)
 	{
 		$this->statuses = $statuses;
+	}
+	
+	/**
+	 * @return string $encoding
+	 */
+	public function getEncoding()
+	{
+		return $this->encoding;
+	}
+
+	/**
+	 * @param string $encoding
+	 */
+	public function setEncoding($encoding)
+	{
+		$this->encoding = $encoding;
 	}
 }

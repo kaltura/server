@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @deprecated use KalturaContextTypeHolderArray
  */
 class KalturaAccessControlContextTypeHolderArray extends KalturaTypedArray
 {

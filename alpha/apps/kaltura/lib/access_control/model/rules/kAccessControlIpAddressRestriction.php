@@ -18,7 +18,7 @@ class kAccessControlIpAddressRestriction extends kAccessControlRestriction
 	public function __construct(accessControl $accessControl = null)
 	{
 		parent::__construct($accessControl);
-		$this->setActions(array(new kAccessControlAction(accessControlActionType::BLOCK)));
+		$this->setActions(array(new kAccessControlAction(RuleActionType::BLOCK)));
 		
 		$this->condition = new kIpAddressCondition(true);
 		if($accessControl)
@@ -34,7 +34,7 @@ class kAccessControlIpAddressRestriction extends kAccessControlRestriction
 	/* (non-PHPdoc)
 	 * @see kRule::applyContext()
 	 */
-	public function applyContext(kEntryContextDataResult $context)
+	public function applyContext(kContextDataResult $context)
 	{
 		$fulfilled = parent::applyContext($context);
 		if($fulfilled)

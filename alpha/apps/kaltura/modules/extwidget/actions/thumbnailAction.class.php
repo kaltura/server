@@ -262,7 +262,7 @@ class thumbnailAction extends sfAction
 		if (!$referrer)
 			$referrer = kApiCache::getHttpReferrer();
 		$ksStr = $this->getRequestParameter("ks");
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, accessControlContextType::THUMBNAIL);
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::THUMBNAIL);
 		$securyEntryHelper->validateForPlay();
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*

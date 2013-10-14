@@ -16,6 +16,14 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 			$this->kalturaXsltItem = $this->createKalturaItemXslt($xslt);
 		}
 	}
+	
+	public function shouldEnableCache() {
+		$mrssParams = $this->syndicationFeedDB->getMrssParameters();
+		if ($mrssParams && $mrssParams->getItemXpathsToExtend()) 
+			return false;
+		
+		return true;
+	}
 
 	public function handleHeader() {
 		

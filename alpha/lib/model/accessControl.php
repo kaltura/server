@@ -223,7 +223,7 @@ class accessControl extends BaseaccessControl
 		}
 		
 		foreach ($rules as &$rule)
-			$rule->setAccessControl($this);
+			$rule->setScope($this->getScope());
 			
 		return $rules;
 	}

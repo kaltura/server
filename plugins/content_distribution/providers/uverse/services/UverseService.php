@@ -17,7 +17,7 @@ class UverseService extends ContentDistributionServiceBase
 	 */
 	public function getFeedAction($distributionProfileId, $hash)
 	{
-		$this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash);
+		return $this->generateFeed(new ContentDistributionServiceContext(), $distributionProfileId, $hash);
 	}
 	
 	public function getProfileClass() {
@@ -71,6 +71,6 @@ class UverseService extends ContentDistributionServiceBase
 	
 	protected function doneFeedGeneration ($context, $feed) {
 		$feed->setChannelLastBuildDate($context->lastBuildDate);
-		parent::doneFeedGeneration($context, $feed);
+		return parent::doneFeedGeneration($context, $feed);
 	}
 }

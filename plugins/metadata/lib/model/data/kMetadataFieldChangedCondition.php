@@ -98,9 +98,14 @@ class kMetadataFieldChangedCondition extends kCondition
 		if(!$metadata)
 			return false;
 			
-		$valuesA = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionA);
+		if($this->versionA)
+			$valuesA = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionA);
 		$valuesB = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionB);
-		$changedValues = array_diff($valuesA, $valuesB);
+		
+		if(!$valuesA || !count($valuesA)) //previous MD version does not exist
+			$changedValues = $valuesB;
+		else
+			$changedValues = array_diff($valuesA, $valuesB);
 		
 		return count($changedValues) > 0;
 	}

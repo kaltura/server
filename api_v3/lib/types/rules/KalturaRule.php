@@ -15,7 +15,7 @@ class KalturaRule extends KalturaObject
 	/**
 	 * Actions to be performed by the player in case the rule is fulfilled
 	 * 
-	 * @var KalturaAccessControlActionArray
+	 * @var KalturaRuleActionArray
 	 */
 	public $actions;
 	
@@ -29,7 +29,7 @@ class KalturaRule extends KalturaObject
 	/**
 	 * Indicates what contexts should be tested by this rule 
 	 * 
-	 * @var KalturaAccessControlContextTypeHolderArray
+	 * @var KalturaContextTypeHolderArray
 	 */
 	public $contexts;
 	

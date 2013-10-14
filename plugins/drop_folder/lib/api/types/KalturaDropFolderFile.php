@@ -54,8 +54,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
-	 * @var KalturaDropFolderFileStatus
-	 * @filter eq,in,notin
+	 * @var KalturaDropFolderType
 	 * @readonly
 	 */
 	public $type;

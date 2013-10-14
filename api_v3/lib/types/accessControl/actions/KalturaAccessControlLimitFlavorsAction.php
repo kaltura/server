@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAccessControlLimitFlavorsAction extends KalturaAccessControlAction
+class KalturaAccessControlLimitFlavorsAction extends KalturaRuleAction
 {
 	/**
 	 * Comma separated list of flavor ids 
@@ -28,7 +28,7 @@ class KalturaAccessControlLimitFlavorsAction extends KalturaAccessControlAction
 	 */
 	public function __construct() 
 	{
-		$this->type = accessControlActionType::LIMIT_FLAVORS;
+		$this->type = RuleActionType::LIMIT_FLAVORS;
 	}
 	
 	public function getMapBetweenObjects()
