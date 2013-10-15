@@ -4,30 +4,7 @@
  * @subpackage objects
  * @deprecated use KalturaContextTypeHolder
  */
-class KalturaAccessControlContextTypeHolder extends KalturaObject
+class KalturaAccessControlContextTypeHolder extends KalturaContextTypeHolder
 {
-	/**
-	 * The type of the access control condition context
-	 * 
-	 * @var KalturaAccessControlContextType
-	 */
-	public $type;
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::toObject()
-	 */
-	public function toObject($dbObject = null, $skip = array())
-	{
-		return $this->type;
-	}
-	
-	private static $mapBetweenObjects = array
-	(
-		'type',
-	);
-	
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$mapBetweenObjects);
-	}
+
 }
