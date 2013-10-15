@@ -42,10 +42,15 @@ class kcwAction extends sfAction
 			$swf_url = 	$cdn_host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) .  $ui_conf_swf_url ; // relative to the current host 
 		}
 			
+		$conf_vars = $uiConf->getConfVars();
+		if ($conf_vars)
+			$conf_vars = "&".$conf_vars;
+			
 		$params = "contentUrl=".urlencode($swf_url).
 			"&host=" . str_replace("http://", "", str_replace("https://", "", $host)).
 			"&cdnHost=". str_replace("http://", "", str_replace("https://", "", myPartnerUtils::getCdnHost($partner_id))).
-			"&uiConfId=" . $ui_conf_id;
+			"&uiConfId=" . $ui_conf_id . 
+			$conf_vars;
 			
 		$wrapper_swf = myContentStorage::getFSFlashRootPath ()."/flexwrapper/".kConf::get('kcw_flex_wrapper_version')."/FlexWrapper.swf";
 		$this->redirect(  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "$wrapper_swf?$params");
