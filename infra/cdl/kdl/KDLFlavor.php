@@ -884,9 +884,10 @@ $plannedDur = 0;
 			$target->_frameRate = max(20,$target->_frameRate);
 		}
 		
-		 //Frame rate s,aller than 1 causes Memory Fatal Erro so in this case set it to 1
+		//Frame rate smaller than 1 causes Memory Fatal Error so in this case set it to 1
+		//Changed the setting to force the frame rate from 1 to 5 since we noticed in some cases this causes mp4 h264 assets to played unusually like in a fast forward mode    
 		if( $target->_frameRate > 0 &&  $target->_frameRate < 1)
-			$target->_frameRate=1;
+			$target->_frameRate=5;
 		
 		return $target->_frameRate;
 	}
