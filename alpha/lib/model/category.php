@@ -36,6 +36,18 @@ class category extends Basecategory implements IIndexable
 	private static $indexNullableFields = null;	
 	private static $indexFieldTypes = null;
 	
+	/**
+	 * Array of entries that decremented in the current session and maybe not indexed yet
+	 * @var array
+	 */
+	protected $decrementedEntryIds = array();
+	
+	/**
+	 * Array of entries that incremented in the current session and maybe not indexed yet
+	 * @var array
+	 */
+	protected $incrementedEntryIds = array();
+	
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isNew())
@@ -1447,9 +1459,13 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function decrementEntriesCount($entryId)
 	{
+		$this->decrementedEntryIds[$entryId] = $entryId;
+		if(isset($this->incrementedEntryIds[$entryId]))
+			unset($this->incrementedEntryIds[$entryId]);
+		
 		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
-		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $entryId, Criteria::NOT_EQUAL);
+		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $this->decrementedEntryIds, Criteria::NOT_IN);
 		$count = categoryEntryPeer::doCount($criteria);
 
 		$this->setEntriesCount($count);
@@ -1470,12 +1486,17 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function incrementEntriesCount($entryId)
 	{
+		$this->incrementedEntryIds[$entryId] = $entryId;
+		if(isset($this->decrementedEntryIds[$entryId]))
+			unset($this->decrementedEntryIds[$entryId]);
+		
 		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
-		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $entryId, Criteria::NOT_EQUAL);
+		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $this->incrementedEntryIds, Criteria::NOT_IN);
 		$count = categoryEntryPeer::doCount($criteria);
-
-		$this->setEntriesCount($count + 1);
+		
+		$count += count($this->incrementedEntryIds);
+		$this->setEntriesCount($count);
 	
 		if($this->getParentId())
 		{
