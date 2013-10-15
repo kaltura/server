@@ -84,7 +84,7 @@ class categoryEntry extends BasecategoryEntry {
 		{
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::ACTIVE)
 			{
-				$category->reSetEntriesCount(true);
+				$category->decrementEntriesCount($this->getEntryId());
 				$category->decrementDirectEntriesCount();
 		
 				if($entry && !categoryEntryPeer::getSkipSave()) //entry might be deleted - and delete job remove the categoryEntry object
@@ -131,7 +131,7 @@ class categoryEntry extends BasecategoryEntry {
 	
 	private function setEntryOnCategory(category $category, $entry = null)
 	{
-		$category->reSetEntriesCount(true);
+		$category->incrementEntriesCount($this->getEntryId());
 		$category->incrementDirectEntriesCount();
 		
 		//if was pending - decrease pending entries count!

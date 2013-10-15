@@ -1433,20 +1433,56 @@ class category extends Basecategory implements IIndexable
 	/**
 	 * reset category's entriesCount by calculate it.
 	 */
-	public function reSetEntriesCount($recursive = false)
+	public function reSetEntriesCount()
 	{
 		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
 		$count = categoryEntryPeer::doCount($criteria);
 
 		$this->setEntriesCount($count);
+	}
 	
-		if($recursive && $this->getParentId())
+	/**
+	 * Decrement category's entriesCount by calculate it.
+	 */
+	public function decrementEntriesCount($entryId)
+	{
+		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
+		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $entryId, Criteria::NOT_EQUAL);
+		$count = categoryEntryPeer::doCount($criteria);
+
+		$this->setEntriesCount($count);
+	
+		if($this->getParentId())
 		{
 			$parentCat = $this->getParentCategory();
 			if($parentCat)
 			{
-				$parentCat->reSetEntriesCount(true);
+				$parentCat->decrementEntriesCount($entryId);
+				$parentCat->save();
+			}
+		}
+	}
+	
+	/**
+	 * Decrement category's entriesCount by calculate it.
+	 */
+	public function incrementEntriesCount($entryId)
+	{
+		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
+		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
+		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $entryId, Criteria::NOT_EQUAL);
+		$count = categoryEntryPeer::doCount($criteria);
+
+		$this->setEntriesCount($count + 1);
+	
+		if($this->getParentId())
+		{
+			$parentCat = $this->getParentCategory();
+			if($parentCat)
+			{
+				$parentCat->incrementEntriesCount($entryId);
 				$parentCat->save();
 			}
 		}
