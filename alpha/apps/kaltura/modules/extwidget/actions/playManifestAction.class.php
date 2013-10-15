@@ -297,7 +297,6 @@ class playManifestAction extends kalturaAction
 			$referrer = ""; // base64_decode can return binary data
 			
 		$this->secureEntryHelper = new KSecureEntryHelper($this->entry, $ksStr, $referrer, ContextType::PLAY, $keyValueHashes);
-		$this->secureEntryHelper->setHashes($keyValueHashes);
 		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
