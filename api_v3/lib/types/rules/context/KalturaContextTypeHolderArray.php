@@ -13,12 +13,26 @@ class KalturaContextTypeHolderArray extends KalturaTypedArray
 
 		foreach ($arr as $type)
 		{
-    		$nObj = new KalturaContextTypeHolder();
+			$nObj = self::getInstanceByType($type);				
 			$nObj->type = $type;
 			$newArr[] = $nObj;
 		}
 		
 		return $newArr;
+	}
+
+	static function getInstanceByType($type)
+	{
+		switch($type)
+		{
+			case ContextType::DOWNLOAD:
+			case ContextType::PLAY:
+			case ContextType::THUMBNAIL:
+			case ContextType::METADATA:
+				return new KalturaAccessControlContextTypeHolder();
+			default:
+				return new KalturaContextTypeHolder();
+		}		
 	}
 	
 	public function __construct()
