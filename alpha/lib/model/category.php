@@ -1441,7 +1441,7 @@ class category extends Basecategory implements IIndexable
 
 		$this->setEntriesCount($count);
 	
-		if($this->getParentId())
+		if($recursive && $this->getParentId())
 		{
 			$parentCat = $this->getParentCategory();
 			if($parentCat)
