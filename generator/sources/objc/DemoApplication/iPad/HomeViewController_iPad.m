@@ -29,6 +29,10 @@
     return self;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 #pragma Upload
 
 - (IBAction)buttonUploadSelectClose {

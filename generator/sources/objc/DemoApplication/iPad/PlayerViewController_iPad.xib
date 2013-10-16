@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1552</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12F45</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.40</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -44,7 +44,6 @@
 						<int key="NSvFlags">301</int>
 						<string key="NSFrame">{{492, 356}, {37, 37}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSNextKeyView"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 						<bool key="IBUIAnimating">YES</bool>
@@ -159,8 +158,8 @@
 										<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 										<string key="IBUIText">00:00</string>
 										<object class="NSColor" key="IBUITextColor">
-											<int key="NSColorSpace">1</int>
-											<bytes key="NSRGB">MC4wMTE3NjQ3MDYxMSAwLjY4NjI3NDUyODUgMC43OTYwNzg0NDM1AA</bytes>
+											<int key="NSColorSpace">2</int>
+											<bytes key="NSRGB">MC43MDE5NjA4MDIxIDAuNDUwOTgwNDI0OSAwLjA1ODgyMzUzMzM2AA</bytes>
 										</object>
 										<nil key="IBUIHighlightedColor"/>
 										<int key="IBUIBaselineAdjustment">1</int>
@@ -213,6 +212,10 @@
 										<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 										<int key="IBUIContentHorizontalAlignment">0</int>
 										<int key="IBUIContentVerticalAlignment">0</int>
+										<object class="NSColor" key="IBUIMinimumTrackTintColor">
+											<int key="NSColorSpace">2</int>
+											<bytes key="NSRGB">MC45MTM3MjU1NTQ5IDAuNTM3MjU0OTI5NSAwAA</bytes>
+										</object>
 									</object>
 									<object class="IBUIView" id="361861439">
 										<reference key="NSNextResponder" ref="57014890"/>
@@ -307,7 +310,7 @@
 									<object class="IBUIButton" id="1058715078">
 										<reference key="NSNextResponder" ref="57014890"/>
 										<int key="NSvFlags">257</int>
-										<string key="NSFrame">{{864, 165}, {80, 55}}</string>
+										<string key="NSFrame">{{930, 164}, {80, 55}}</string>
 										<reference key="NSSuperview" ref="57014890"/>
 										<reference key="NSNextKeyView" ref="568941522"/>
 										<bool key="IBUIOpaque">NO</bool>
@@ -372,7 +375,7 @@
 									</object>
 									<object class="IBUIButton" id="568941522">
 										<reference key="NSNextResponder" ref="57014890"/>
-										<int key="NSvFlags">257</int>
+										<int key="NSvFlags">-2147483391</int>
 										<string key="NSFrame">{{955, 165}, {55, 55}}</string>
 										<reference key="NSSuperview" ref="57014890"/>
 										<reference key="NSNextKeyView" ref="18253677"/>
@@ -653,10 +656,10 @@
 							<reference ref="1043179861"/>
 							<reference ref="133457831"/>
 							<reference ref="627346092"/>
-							<reference ref="1058715078"/>
 							<reference ref="361861439"/>
 							<reference ref="201970910"/>
 							<reference ref="568941522"/>
+							<reference ref="1058715078"/>
 						</array>
 						<reference key="parent" ref="967740861"/>
 					</object>
