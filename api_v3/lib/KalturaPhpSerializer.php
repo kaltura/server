@@ -3,75 +3,12 @@
  * @package api
  * @subpackage v3
  */
-class KalturaPhpSerializer
+class KalturaPhpSerializer extends KalturaSerializer
 {
-	private $_serializedString = "";
-	private $_ignoreNull = false;
-	
-	function KalturaPhpSerializer($ignoreNull)
-	{
-		$this->_ignoreNull = (bool)$ignoreNull;
-	}
-	
 	function serialize($object)
 	{
-		$object = $this->convertTypedArraysToPhpArrays($object);
-		
-		$object = $this->convertExceptionsToPhpArrays($object);
-		
-		$this->_serializedString = serialize($object);	
-	}
-	
-	function convertTypedArraysToPhpArrays($object)
-	{
-	    if (is_object($object))
-    	{
-    		if ($object instanceof KalturaTypedArray)
-    			return $this->convertTypedArraysToPhpArrays($object->toArray());
-    			
-			foreach($object as $key => $value)
-				$object->$key = $this->convertTypedArraysToPhpArrays($value);
-				
-			return $object;
-    	}
-    	
-    	if (is_array($object))
-    	{
-    		$array = array();
-    		foreach($object as $item)
-    			$array[] = $this->convertTypedArraysToPhpArrays($item);
-    			
-    		return $array;
-    	}
-    	
-    	return $object;
-	}
-	
-	function convertExceptionsToPhpArrays($object)
-	{
-	    if (is_object($object) && $object instanceof Exception)
-    	{
-			$error = array(
-				"code" => $object->getCode(),
-				"message" => $object->getMessage()
-			);
-			$object = $error;
-    	}
-    	else if (is_array($object))
-    	{
-    		$array = array();
-    		foreach($object as $item)
-    		{
-    			$array[] = $this->convertExceptionsToPhpArrays($item);					
-    		}
-    		$object = $array;
-    	}
-    	
-    	return $object;
-	}
-	
-	function getSerializedData()
-	{
-		return $this->_serializedString;
+		$object = parent::prepareSerializedObject($object);
+		$result = serialize($object); // Let PHP's built-in serialize() function do the work
+		return $result;
 	}
 }

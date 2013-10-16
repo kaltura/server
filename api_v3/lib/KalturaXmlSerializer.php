@@ -3,7 +3,7 @@
  * @package api
  * @subpackage v3
  */
-class KalturaXmlSerializer
+class KalturaXmlSerializer extends KalturaSerializer
 {
 	private $_ignoreNull = false;
 	
@@ -12,19 +12,31 @@ class KalturaXmlSerializer
 		$this->_ignoreNull = (bool)$ignoreNull;
 	}
 	
-	function getSerializedData($object)
+	function setHttpHeaders()
 	{
-		if (function_exists('kaltura_serialize_xml'))
-			return kaltura_serialize_xml($object, $this->_ignoreNull);
-		
-		ob_start();
-		$this->serialize($object);
-		$result = ob_get_contents();
-		ob_end_clean();
-		return $result;
+		header("Content-Type: text/xml");
 	}
 	
 	function serialize($object)
+	{
+		$object = parent::prepareSerializedObject($object);
+		
+		if (function_exists('kaltura_serialize_xml'))
+		{
+			$serializedResult = kaltura_serialize_xml($object, $this->_ignoreNull);
+		}
+		else
+		{
+			ob_start();
+			$this->serializeByType($object);
+			$serializedResult = ob_get_contents();
+			ob_end_clean();
+		}
+		
+		return $serializedResult;
+	}
+	
+	function serializeByType($object)
 	{
 		$type = gettype($object);
 
@@ -74,7 +86,7 @@ class KalturaXmlSerializer
 		foreach($object as $val)
 		{
 			echo '<item>';
-			$this->serialize($val);
+			$this->serializeByType($val);
 			echo '</item>';
 		}
 	}
@@ -117,7 +129,7 @@ class KalturaXmlSerializer
 					continue;
 					
 				echo '<'.$name.'>';
-				$this->serialize($value);
+				$this->serializeByType($value);
 				echo '</'.$name.'>';
 			}
 		}
