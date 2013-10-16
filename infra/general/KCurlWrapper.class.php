@@ -107,7 +107,7 @@ class KCurlWrapper
         {
         	$curlInfo = curl_getinfo($ch);
             $httpResponseCode = $curlInfo['http_code'];
-            if($httpResponseCode !== KCurlHeaderResponse::HTTP_STATUS_REDIRECT) // mark when we get to the last header so we can abort the cur
+            if(!in_array($httpResponseCode, array(KCurlHeaderResponse::HTTP_STATUS_REDIRECT, KCurlHeaderResponse::HTTP_STATUS_MOVED))) // mark when we get to the last header so we can abort the cur
             	self::$lastHeader = true;
 		}
 		
