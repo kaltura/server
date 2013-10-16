@@ -82,11 +82,12 @@ xcuserdata
 #
 # NB: this is exclusive with OPTION 1 above
 #
-#xcuserdata/**/*
+xcuserdata/**/*
+DemoApplication/Kaltura.xcodeproj/project.xcworkspace/xcuserdata/**/*
  
 #     (requires option 2 above): Personal Schemes
 #
-#!xcuserdata/**/xcschemes/*
+!xcuserdata/**/xcschemes/*
  
 ####
 # XCode 4 workspaces - more detailed
@@ -95,31 +96,7 @@ xcuserdata
 #
 # Workspace layout is quite spammy. For reference:
 #
-# /(root)/
-#   /Kaltura.xcodeproj/
-#     project.pbxproj
-#     /project.xcworkspace/
-#       contents.xcworkspacedata
-#       /xcuserdata/
-#         /elizasapir/xcuserdatad/
-#           UserInterfaceState.xcuserstate
-#     /xcsshareddata/
-#       /xcschemes/
-#         (shared scheme name).xcscheme
-#     /xcuserdata/
-#       /elizasapir/xcuserdatad/
-#         Kaltura.xcscheme
-#         xcschememanagement.plist
-#     /xcuserdata/
-#       /elizasapir/xcuserdatad/
-#         Kaltura widevine.xcscheme
-#         xcschememanagement.plist
-#     /xcuserdata/
-#       /elizasapir/xcuserdatad/
-#         KalturaClient.xcscheme
-#         xcschememanagement.plist
-#
-#
+
  
 ####
 # Xcode 4 - Deprecated classes
