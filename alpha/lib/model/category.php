@@ -1447,9 +1447,14 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function reSetEntriesCount()
 	{
-		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
-		$count = categoryEntryPeer::doCount($criteria);
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
 
 		$this->setEntriesCount($count);
 	}
@@ -1463,10 +1468,15 @@ class category extends Basecategory implements IIndexable
 		if(isset($this->incrementedEntryIds[$entryId]))
 			unset($this->incrementedEntryIds[$entryId]);
 		
-		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
-		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $this->decrementedEntryIds, Criteria::NOT_IN);
-		$count = categoryEntryPeer::doCount($criteria);
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setIdNotIn($this->decrementedEntryIds);
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
 
 		$this->setEntriesCount($count);
 	
@@ -1490,12 +1500,17 @@ class category extends Basecategory implements IIndexable
 		if(isset($this->decrementedEntryIds[$entryId]))
 			unset($this->decrementedEntryIds[$entryId]);
 		
-		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
-		$criteria->addAnd(categoryEntryPeer::ENTRY_ID, $this->incrementedEntryIds, Criteria::NOT_IN);
-		$count = categoryEntryPeer::doCount($criteria);
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setIdNotIn($this->incrementedEntryIds);
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
 		
+		$count = $baseCriteria->getRecordsCount();
 		$count += count($this->incrementedEntryIds);
+		
 		$this->setEntriesCount($count);
 	
 		if($this->getParentId())
