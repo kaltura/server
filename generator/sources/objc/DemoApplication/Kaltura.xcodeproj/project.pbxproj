@@ -153,6 +153,8 @@
 		84FFFDD215042F0600204032 /* button_login@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FFFDCE15042F0600204032 /* button_login@2x.png */; };
 		BF17DF7A17FACF7000026F62 /* settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = BF17DF7917FACF7000026F62 /* settings.plist */; };
 		BF17DF7B17FACF7000026F62 /* settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = BF17DF7917FACF7000026F62 /* settings.plist */; };
+		BF774613180EB4D500CB92BF /* Kaltura widevine-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BF774612180EB4D500CB92BF /* Kaltura widevine-Info.plist */; };
+		BF774614180EB4D500CB92BF /* Kaltura widevine-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BF774612180EB4D500CB92BF /* Kaltura widevine-Info.plist */; };
 		BF7C4E59175DD1D300B48522 /* WVSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7C4E58175DD1D300B48522 /* WVSettings.m */; };
 		BF8D9BFD1752025D0096AA03 /* libWViPhoneAPI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF8D9BFB1752025D0096AA03 /* libWViPhoneAPI.a */; };
 		BF8D9C0017520D350096AA03 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF8D9BFF17520D350096AA03 /* libstdc++.dylib */; };
@@ -512,13 +514,13 @@
 		84FFFDCE15042F0600204032 /* button_login@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button_login@2x.png"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Kaltura-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Kaltura-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		BF17DF7917FACF7000026F62 /* settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = settings.plist; sourceTree = "<group>"; };
+		BF774612180EB4D500CB92BF /* Kaltura widevine-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Kaltura widevine-Info.plist"; sourceTree = "<group>"; };
 		BF7C4E57175DD1D300B48522 /* WVSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WVSettings.h; sourceTree = "<group>"; };
 		BF7C4E58175DD1D300B48522 /* WVSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WVSettings.m; sourceTree = "<group>"; };
 		BF8D9BFB1752025D0096AA03 /* libWViPhoneAPI.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWViPhoneAPI.a; sourceTree = "<group>"; };
 		BF8D9BFC1752025D0096AA03 /* WViPhoneAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WViPhoneAPI.h; sourceTree = "<group>"; };
 		BF8D9BFF17520D350096AA03 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		BF9A66B81770A0E300028D7D /* Kaltura widevine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Kaltura widevine.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF9A66B91770A0E300028D7D /* Kaltura widevine-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Kaltura widevine-Info.plist"; path = "/Users/elizasapir/Desktop/IOSReferenceApp/DemoApplication/Kaltura widevine-Info.plist"; sourceTree = "<absolute>"; };
 		BF9A7CD317CF973000220EFD /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		BF9A7CD517CF973F00220EFD /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		BF9A7CD717CF976700220EFD /* icon_ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_ipad.png; sourceTree = "<group>"; };
@@ -762,7 +764,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				BF17DF7917FACF7000026F62 /* settings.plist */,
-				BF9A66B91770A0E300028D7D /* Kaltura widevine-Info.plist */,
+				BF774612180EB4D500CB92BF /* Kaltura widevine-Info.plist */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -1373,6 +1375,7 @@
 				848D8DF31522224000DEF2E9 /* button_search.png in Resources */,
 				848D8DF41522224000DEF2E9 /* button_search@2x.png in Resources */,
 				BF17DF7A17FACF7000026F62 /* settings.plist in Resources */,
+				BF774613180EB4D500CB92BF /* Kaltura widevine-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1489,6 +1492,7 @@
 				BF9A7CD617CF973F00220EFD /* Icon.png in Resources */,
 				BF9A7CD817CF976700220EFD /* icon_ipad.png in Resources */,
 				BF17DF7B17FACF7000026F62 /* settings.plist in Resources */,
+				BF774614180EB4D500CB92BF /* Kaltura widevine-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
