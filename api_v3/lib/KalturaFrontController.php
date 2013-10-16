@@ -410,76 +410,75 @@ class KalturaFrontController
 		
 		$start = microtime(true);
 		KalturaLog::debug("Serialize start");
-				
+
+		// Determine the output format (or default to XML)
 		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
-	
-		if(isset($this->params['content-type']))
-		{
-			header('Content-Type: ' . $this->params['content-type']);
-		}
-		else
-		{
-			switch($format)
-			{
-				case KalturaResponseType::RESPONSE_TYPE_XML:
-					header("Content-Type: text/xml");
-					break;
-					
-				case KalturaResponseType::RESPONSE_TYPE_JSON:
-					header("Content-Type: application/json");
-					break;
-				    
-				case KalturaResponseType::RESPONSE_TYPE_JSONP:
-					header("Content-Type: application/javascript");
-					break;
-			}
-		}
 		
+		// Create a serializer according to the given format
 		switch($format)
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
 				$serializer = new KalturaXmlSerializer($ignoreNull);
-				$result = 
-					'<?xml version="1.0" encoding="utf-8"?>' .
-				 	'<xml>' .
-						'<result>' .
-						$serializer->getSerializedData($object) .
-						'</result>' .
-						'<executionTime>' . ($this->end - $this->start) . '</executionTime>' .
-					'</xml>';
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_PHP:
-				$serializer = new KalturaPhpSerializer($ignoreNull);
-				$serializer->serialize($object);
-				$result = $serializer->getSerializedData();
+				$serializer = new KalturaPhpSerializer();
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
-				$serializer = new KalturaJsonSerializer($ignoreNull);
-				$serializer->serialize($object);
-				$result = $serializer->getSerializedData();
+				$serializer = new KalturaJsonSerializer();
+				break;
+			
+			case KalturaResponseType::RESPONSE_TYPE_JSONP:
+				$serializer = new KalturaJsonProcSerializer();
 				break;
 			    
-			case KalturaResponseType::RESPONSE_TYPE_JSONP:
-				$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
-				if (is_null($callback))
-					die("Expecting \"callback\" parameter for jsonp format");
-				$serializer = new KalturaJsonSerializer($ignoreNull);
-				$serializer->serialize($object);
-				$response = array();
-				$result = $callback . "(" . $serializer->getSerializedData() . ");";
-				break;
-							
 			default:
 				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $format);
-				if($serializer)
-				{
-					$serializer->serialize($object);
-					$serializer->setHeaders();
-					$result = $serializer->getSerializedData();
-				}
 				break;
+		}
+
+		if ( ! empty( $serializer ) ) // Got a serializer for the given format?
+		{
+			// Set HTTP headers
+			if(isset($this->params['content-type']))
+			{
+				header('Content-Type: ' . $this->params['content-type']);
+			}
+			else
+			{
+				$serializer->setHttpHeaders();
+			}
+
+			// Serialize the object
+			$serializedObject = $serializer->serialize($object);
+			
+			// Post processing (handle special cases)
+			switch($format)
+			{
+				case KalturaResponseType::RESPONSE_TYPE_XML:
+					$result = 
+						'<?xml version="1.0" encoding="utf-8"?>' .
+						'<xml>' .
+							'<result>' .
+								$serializedObject .
+							'</result>' .
+							'<executionTime>' . ($this->end - $this->start) . '</executionTime>' .
+						'</xml>';
+					break;
+
+				case KalturaResponseType::RESPONSE_TYPE_JSONP:
+					$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
+					if (is_null($callback))
+						die("Expecting \"callback\" parameter for jsonp format");
+					$response = array();
+					$result = $callback . "(" . $serializedObject . ");";
+					break;
+					
+				default:
+					$result = $serializedObject;
+					break;
+			}
 		}
 		
 		KalturaLog::debug("Serialize took - " . (microtime(true) - $start));
