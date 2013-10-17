@@ -19,6 +19,9 @@ class kClipAttributes extends kOperationAttributes
 	 */
 	private $duration;
 	
+	/* (non-PHPdoc)
+	 * @see kOperationAttributes::toArray()
+	 */
 	public function toArray()
 	{
 		return array(
@@ -27,9 +30,20 @@ class kClipAttributes extends kOperationAttributes
 		);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kOperationAttributes::getApiType()
+	 */
 	public function getApiType()
 	{
 		return 'KalturaClipAttributes';
+	}
+
+	/* (non-PHPdoc)
+	 * @see kOperationAttributes::getSourceType()
+	 */
+	public function getSourceType()
+	{
+		return EntrySourceType::CLIP;
 	}
 
 	/**

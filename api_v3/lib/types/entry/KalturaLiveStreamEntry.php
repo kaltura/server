@@ -3,15 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStreamEntry extends KalturaMediaEntry
-{
-	/**
-	 * The message to be presented when the stream is offline
-	 * 
-	 * @var string
-	 */
-	public $offlineMessage;
-	
+class KalturaLiveStreamEntry extends KalturaLiveEntry
+{	
 	/**
 	 * The stream id as provided by the provider
 	 * 
@@ -64,30 +57,10 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	public $hlsStreamUrl;
 	
 	/**
-	 * DVR Status Enabled/Disabled
-	 * @var KalturaDVRStatus
-	 * @insertonly
-	 */
-	public $dvrStatus;
-	
-	/**
-	 * Window of time which the DVR allows for backwards scrubbing (in minutes)
-	 * @var int
-	 * @insertonly
-	 */
-	public $dvrWindow;
-	
-	/**
 	 * URL Manager to handle the live stream URL (for instance, add token)
 	 * @var string
 	 */
 	public $urlManager;
-	
-	/**
-	 * Array of key value protocol->live stream url objects
-	 * @var KalturaLiveStreamConfigurationArray
-	 */
-	public $liveStreamConfigurations;
 	
 	/**
 	 * The broadcast primary ip
@@ -125,7 +98,6 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	
 	private static $map_between_objects = array
 	(
-		"offlineMessage",
 		"streamRemoteId",
 	 	"streamRemoteBackupId",
 		"primaryBroadcastingUrl",
@@ -133,10 +105,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		"streamName",
 		"streamUrl",
 	    "hlsStreamUrl",
-	    "dvrStatus",
-	    "dvrWindow",
 	    "urlManager",
-		"liveStreamConfigurations",
 		"encodingIP1",
 		"encodingIP2",
 		"streamPassword",
@@ -163,7 +132,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public function fromObject ( $dbObject )
 	{
-		if(!($dbObject instanceof entry))
+		if(!($dbObject instanceof LiveStreamEntry))
 			return;
 			
 		parent::fromObject($dbObject);
@@ -175,16 +144,39 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaMediaEntry::toObject()
+	 * @see KalturaMediaEntry::toInsertableObject()
 	 */
-	public function toObject ( $dbObject = null , $props_to_skip = array() )
+	public function toInsertableObject ( $dbObject = null , $props_to_skip = array() )
 	{
-		parent::toObject($dbObject, $props_to_skip);
+		// if the given password is empty, generate a random 8-character string as the new password
+		if(($this->streamPassword == null) || (strlen(trim($this->streamPassword)) <= 0))
+		{
+			$tempPassword = sha1(md5(uniqid(rand(), true)));
+			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);		
+		}
+	
+		if(is_null($this->bitrates) || !$this->bitrates->count)
+		{
+			$liveStreamBitrate = new KalturaLiveStreamBitrate();
+			$this->bitrates = array($liveStreamBitrate);
+		}
 		
-		if($this->bitrates)
-			$dbObject->setStreamBitrates($this->bitrates->toArray());
-				
-		return $dbObject;
+		return parent::toInsertableObject($dbObject, $props_to_skip);
+	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaMediaEntry::toSourceType()
+	 */
+	protected function toSourceType(entry $entry) 
+	{
+		if (!$this->sourceType)
+		{
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+			if($partner)
+				$this->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $partner->getDefaultLiveStreamEntrySourceType());
+		}
+		
+		return parent::toSourceType($entry);
 	}
 	
 	/* (non-PHPdoc)

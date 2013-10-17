@@ -8,17 +8,17 @@ class KalturaLiveStreamBitrate extends KalturaObject
 	/**
 	 * @var int
 	 */
-	public $bitrate;
+	public $bitrate = 300;
 	
 	/**
 	 * @var int
 	 */
-	public $width;
+	public $width = 320;
 	
 	/**
 	 * @var int
 	 */
-	public $height;
+	public $height = 240;
 	
 
 	public function fromObject ( $source_object )
@@ -46,4 +46,3 @@ class KalturaLiveStreamBitrate extends KalturaObject
 		return $object_to_fill;	
 	}
 }
-?>

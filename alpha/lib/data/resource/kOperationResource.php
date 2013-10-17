@@ -40,6 +40,22 @@ class kOperationResource extends kContentResource
 	{
 		return $this->operationAttributes;
 	}
+	
+	/**
+	 * Return enum value from EntrySourceType
+	 */
+	public function getSourceType()
+	{
+		foreach($this->operationAttributes as $operationAttributes)
+		{
+			/* @var $operationAttributes kOperationAttributes */
+			$sourceType = $operationAttributes->getSourceType();
+			if($sourceType)
+				return $sourceType;
+		}
+		
+		return null;
+	}
 
 	/**
 	 * @return int $assetParamsId
