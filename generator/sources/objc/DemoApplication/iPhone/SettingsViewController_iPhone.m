@@ -24,6 +24,10 @@
     return self;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
