@@ -31,7 +31,9 @@
     return self;
 }
 
-
+- (BOOL)shouldAutorotate {
+    return NO;
+}
 
 - (IBAction)menuBarButtonPressed:(UIButton *)button {
     
