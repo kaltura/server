@@ -220,15 +220,15 @@ filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp
 id													= 71
 friendlyName										= Convert Widevine
 filter.jobSubTypeIn									= widevine.Widevine
-params.sourceRootPath								= /web/tmp/encrypt
+params.sourceRootPath								= @WEB_DIR@/tmp/encrypt
 params.vodPackagerHost								= http://@VOD_PACKAGER_HOST@
 params.portal										= kaltura
 params.retryInterval                                = 10
 params.maxTimeBeforeFail 							= 10000
 ;The path for local temporary generated product
-params.localTempPath 								= /web/tmp/encrypt
+params.localTempPath 								= @WEB_DIR@/tmp/encrypt
 ;The path for finished products, acessable from the apache
-params.sharedTempPath 								= /web/tmp/encrypt
+params.sharedTempPath 								= @WEB_DIR@/tmp/encrypt
 
 [KAsyncDistributedConvert : KAsyncConvertWorker]
 id													= 72
