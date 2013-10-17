@@ -1,3 +1,4 @@
 # Sqlfile -> Database map
 lib.model.schema.sql=propel
 schema.sql=propel
+Copy of schema.sql=propel
