@@ -30,6 +30,8 @@ class CuePointIndex extends BaseIndexObject
 		return CuePointPeer::getCriteriaFilter();
 	}
 
+	protected static $fieldsMap;
+
 	public static function getIndexFieldsMap()
 	{
 		if (!self::$fieldsMap)
@@ -65,6 +67,8 @@ class CuePointIndex extends BaseIndexObject
 		}
 		return self::$fieldsMap;
 	}
+
+	protected static $typesMap;
 
 	public static function getIndexFieldTypesMap()
 	{
@@ -102,6 +106,8 @@ class CuePointIndex extends BaseIndexObject
 		return self::$typesMap;
 	}
 
+	protected static $nullableFields;
+
 	public static function getIndexNullableList()
 	{
 		if (!self::$nullableFields)
@@ -112,41 +118,45 @@ class CuePointIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $searchableFieldsMap;
+
 	public static function getIndexSearchableFieldsMap()
 	{
 		if (!self::$searchableFieldsMap)
 		{
 			self::$searchableFieldsMap = array(
-				'CuePoint.PARENT_ID' => 'parent_id',
-				'CuePoint.ENTRY_ID' => 'entry_id',
-				'CuePoint.NAME' => 'name',
-				'CuePoint.SYSTEM_NAME' => 'system_name',
-				'CuePoint.TEXT' => 'text',
-				'CuePoint.TAGS' => 'tags',
-				'CuePoint.ROOTS' => 'roots',
-				'CuePoint.ID' => 'int_cue_point_id',
-				'CuePoint.INT_ID' => 'cue_point_int_id',
-				'CuePoint.PARTNER_ID' => 'partner_id',
-				'CuePoint.START_TIME' => 'start_time',
-				'CuePoint.END_TIME' => 'end_time',
-				'CuePoint.DURATION' => 'duration',
-				'CuePoint.STATUS' => 'cue_point_status',
-				'CuePoint.TYPE' => 'cue_point_type',
-				'CuePoint.SUB_TYPE' => 'sub_type',
-				'CuePoint.KUSER_ID' => 'kuser_id',
-				'CuePoint.PARTNER_SORT_VALUE' => 'partner_sort_value',
-				'CuePoint.DEPTH' => 'depth',
-				'CuePoint.CHILDREN_COUNT' => 'children_count',
-				'CuePoint.DIRECT_CHILDREN_COUNT' => 'direct_children_count',
-				'CuePoint.FORCE_STOP' => 'force_stop',
-				'CuePoint.CREATED_AT' => 'created_at',
-				'CuePoint.UPDATED_AT' => 'updated_at',
-				'CuePoint.STR_ENTRY_ID' => 'str_entry_id',
-				'CuePoint.STR_CUE_POINT_ID' => 'str_cue_point_id',
+				'cue_point.PARENT_ID' => 'parent_id',
+				'cue_point.ENTRY_ID' => 'entry_id',
+				'cue_point.NAME' => 'name',
+				'cue_point.SYSTEM_NAME' => 'system_name',
+				'cue_point.TEXT' => 'text',
+				'cue_point.TAGS' => 'tags',
+				'cue_point.ROOTS' => 'roots',
+				'cue_point.ID' => 'int_cue_point_id',
+				'cue_point.INT_ID' => 'cue_point_int_id',
+				'cue_point.PARTNER_ID' => 'partner_id',
+				'cue_point.START_TIME' => 'start_time',
+				'cue_point.END_TIME' => 'end_time',
+				'cue_point.DURATION' => 'duration',
+				'cue_point.STATUS' => 'cue_point_status',
+				'cue_point.TYPE' => 'cue_point_type',
+				'cue_point.SUB_TYPE' => 'sub_type',
+				'cue_point.KUSER_ID' => 'kuser_id',
+				'cue_point.PARTNER_SORT_VALUE' => 'partner_sort_value',
+				'cue_point.DEPTH' => 'depth',
+				'cue_point.CHILDREN_COUNT' => 'children_count',
+				'cue_point.DIRECT_CHILDREN_COUNT' => 'direct_children_count',
+				'cue_point.FORCE_STOP' => 'force_stop',
+				'cue_point.CREATED_AT' => 'created_at',
+				'cue_point.UPDATED_AT' => 'updated_at',
+				'cue_point.STR_ENTRY_ID' => 'str_entry_id',
+				'cue_point.STR_CUE_POINT_ID' => 'str_cue_point_id',
 			);
 		}
 		return self::$searchableFieldsMap;
 	}
+
+	protected static $searchEscapeTypes;
 
 	public static function getSearchFieldsEscapeTypeList()
 	{
@@ -158,6 +168,8 @@ class CuePointIndex extends BaseIndexObject
 		return self::$searchEscapeTypes;
 	}
 
+	protected static $indexEscapeTypes;
+
 	public static function getIndexFieldsEscapeTypeList()
 	{
 		if (!self::$indexEscapeTypes)
@@ -167,6 +179,8 @@ class CuePointIndex extends BaseIndexObject
 		}
 		return self::$indexEscapeTypes;
 	}
+
+	protected static $matchableFields;
 
 	public static function getIndexMatchableList()
 	{
@@ -184,36 +198,42 @@ class CuePointIndex extends BaseIndexObject
 		return self::$matchableFields;
 	}
 
+	protected static $orderFields;
+
 	public static function getIndexOrderList()
 	{
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
-				'CuePoint.START_TIME' => 'start_time',
-				'CuePoint.END_TIME' => 'end_time',
-				'CuePoint.DURATION' => 'duration',
-				'CuePoint.PARTNER_SORT_VALUE' => 'partner_sort_value',
-				'CuePoint.DEPTH' => 'depth',
-				'CuePoint.CHILDREN_COUNT' => 'children_count',
-				'CuePoint.DIRECT_CHILDREN_COUNT' => 'direct_children_count',
-				'CuePoint.CREATED_AT' => 'created_at',
-				'CuePoint.UPDATED_AT' => 'updated_at',
+				'cue_point.START_TIME' => 'start_time',
+				'cue_point.END_TIME' => 'end_time',
+				'cue_point.DURATION' => 'duration',
+				'cue_point.PARTNER_SORT_VALUE' => 'partner_sort_value',
+				'cue_point.DEPTH' => 'depth',
+				'cue_point.CHILDREN_COUNT' => 'children_count',
+				'cue_point.DIRECT_CHILDREN_COUNT' => 'direct_children_count',
+				'cue_point.CREATED_AT' => 'created_at',
+				'cue_point.UPDATED_AT' => 'updated_at',
 			);
 		}
 		return self::$orderFields;
 	}
+
+	protected static $skipFields;
 
 	public static function getIndexSkipFieldsList()
 	{
 		if (!self::$skipFields)
 		{
 			self::$skipFields = array(
-				'CuePoint.ENTRY_ID',
-				'CuePoint.ID',
+				'cue_point.ENTRY_ID',
+				'cue_point.ID',
 			);
 		}
 		return self::$skipFields;
 	}
+
+	protected static $conditionToKeep;
 
 	public static function getSphinxConditionsToKeep()
 	{

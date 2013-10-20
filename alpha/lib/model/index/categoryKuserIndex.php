@@ -30,6 +30,8 @@ class categoryKuserIndex extends BaseIndexObject
 		return categoryKuserPeer::getCriteriaFilter();
 	}
 
+	protected static $fieldsMap;
+
 	public static function getIndexFieldsMap()
 	{
 		if (!self::$fieldsMap)
@@ -50,6 +52,8 @@ class categoryKuserIndex extends BaseIndexObject
 		}
 		return self::$fieldsMap;
 	}
+
+	protected static $typesMap;
 
 	public static function getIndexFieldTypesMap()
 	{
@@ -72,6 +76,8 @@ class categoryKuserIndex extends BaseIndexObject
 		return self::$typesMap;
 	}
 
+	protected static $nullableFields;
+
 	public static function getIndexNullableList()
 	{
 		if (!self::$nullableFields)
@@ -82,48 +88,56 @@ class categoryKuserIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $searchableFieldsMap;
+
 	public static function getIndexSearchableFieldsMap()
 	{
 		if (!self::$searchableFieldsMap)
 		{
 			self::$searchableFieldsMap = array(
-				'categoryKuser.CATEGORY_ID' => 'category_id',
-				'categoryKuser.KUSER_ID' => 'kuser_id',
-				'categoryKuser.CATEGORY_FULL_IDS' => 'category_full_ids',
-				'categoryKuser.PERMISSION_NAMES' => 'permission_names',
-				'categoryKuser.PUSER_ID' => 'puser_id',
-				'categoryKuser.SCREEN_NAME' => 'screen_name',
-				'categoryKuser.STATUS' => 'category_kuser_status',
-				'categoryKuser.PARTNER_ID' => 'partner_id',
-				'categoryKuser.UPDATE_METHOD' => 'update_method',
-				'categoryKuser.CREATED_AT' => 'created_at',
-				'categoryKuser.UPDATED_AT' => 'updated_at',
+				'category_kuser.CATEGORY_ID' => 'category_id',
+				'category_kuser.KUSER_ID' => 'kuser_id',
+				'category_kuser.CATEGORY_FULL_IDS' => 'category_full_ids',
+				'category_kuser.PERMISSION_NAMES' => 'permission_names',
+				'category_kuser.PUSER_ID' => 'puser_id',
+				'category_kuser.SCREEN_NAME' => 'screen_name',
+				'category_kuser.STATUS' => 'category_kuser_status',
+				'category_kuser.PARTNER_ID' => 'partner_id',
+				'category_kuser.UPDATE_METHOD' => 'update_method',
+				'category_kuser.CREATED_AT' => 'created_at',
+				'category_kuser.UPDATED_AT' => 'updated_at',
 			);
 		}
 		return self::$searchableFieldsMap;
 	}
+
+	protected static $searchEscapeTypes;
 
 	public static function getSearchFieldsEscapeTypeList()
 	{
 		if (!self::$searchEscapeTypes)
 		{
 			self::$searchEscapeTypes = array(
-				'categoryKuser.CATEGORY_FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
+				'category_kuser.CATEGORY_FULL_IDS' => SearchIndexFieldEscapeType::MD5_LOWER_CASE,
 			);
 		}
 		return self::$searchEscapeTypes;
 	}
+
+	protected static $indexEscapeTypes;
 
 	public static function getIndexFieldsEscapeTypeList()
 	{
 		if (!self::$indexEscapeTypes)
 		{
 			self::$indexEscapeTypes = array(
-				'categoryKuser.CATEGORY_FULL_IDS' => SearchIndexFieldEscapeType::NO_ESCAPE,
+				'category_kuser.CATEGORY_FULL_IDS' => SearchIndexFieldEscapeType::NO_ESCAPE,
 			);
 		}
 		return self::$indexEscapeTypes;
 	}
+
+	protected static $matchableFields;
 
 	public static function getIndexMatchableList()
 	{
@@ -143,17 +157,21 @@ class categoryKuserIndex extends BaseIndexObject
 		return self::$matchableFields;
 	}
 
+	protected static $orderFields;
+
 	public static function getIndexOrderList()
 	{
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
-				'categoryKuser.CREATED_AT' => 'created_at',
-				'categoryKuser.UPDATED_AT' => 'updated_at',
+				'category_kuser.CREATED_AT' => 'created_at',
+				'category_kuser.UPDATED_AT' => 'updated_at',
 			);
 		}
 		return self::$orderFields;
 	}
+
+	protected static $skipFields;
 
 	public static function getIndexSkipFieldsList()
 	{
@@ -164,6 +182,8 @@ class categoryKuserIndex extends BaseIndexObject
 		}
 		return self::$skipFields;
 	}
+
+	protected static $conditionToKeep;
 
 	public static function getSphinxConditionsToKeep()
 	{

@@ -30,6 +30,8 @@ class EntryDistributionIndex extends BaseIndexObject
 		return EntryDistributionPeer::getCriteriaFilter();
 	}
 
+	protected static $fieldsMap;
+
 	public static function getIndexFieldsMap()
 	{
 		if (!self::$fieldsMap)
@@ -61,6 +63,8 @@ class EntryDistributionIndex extends BaseIndexObject
 		}
 		return self::$fieldsMap;
 	}
+
+	protected static $typesMap;
 
 	public static function getIndexFieldTypesMap()
 	{
@@ -94,6 +98,8 @@ class EntryDistributionIndex extends BaseIndexObject
 		return self::$typesMap;
 	}
 
+	protected static $nullableFields;
+
 	public static function getIndexNullableList()
 	{
 		if (!self::$nullableFields)
@@ -104,37 +110,41 @@ class EntryDistributionIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $searchableFieldsMap;
+
 	public static function getIndexSearchableFieldsMap()
 	{
 		if (!self::$searchableFieldsMap)
 		{
 			self::$searchableFieldsMap = array(
-				'EntryDistribution.ID' => 'entry_distribution_id',
-				'EntryDistribution.CREATED_AT' => 'created_at',
-				'EntryDistribution.UPDATED_AT' => 'updated_at',
-				'EntryDistribution.SUBMITTED_AT' => 'submitted_at',
-				'EntryDistribution.ENTRY_ID' => 'entry_id',
-				'EntryDistribution.PARTNER_ID' => 'partner_id',
-				'EntryDistribution.DISTRIBUTION_PROFILE_ID' => 'distribution_profile_id',
-				'EntryDistribution.STATUS' => 'entry_distribution_status',
-				'EntryDistribution.DIRTY_STATUS' => 'dirty_status',
-				'EntryDistribution.THUMB_ASSET_IDS' => 'thumb_asset_ids',
-				'EntryDistribution.FLAVOR_ASSET_IDS' => 'flavor_asset_ids',
-				'EntryDistribution.ASSET_IDS' => 'asset_ids',
-				'EntryDistribution.SUNRISE' => 'sunrise',
-				'EntryDistribution.SUNSET' => 'sunset',
-				'EntryDistribution.SUN_STATUS' => 'sun_status',
-				'EntryDistribution.REMOTE_ID' => 'remote_id',
-				'EntryDistribution.PLAYS' => 'plays',
-				'EntryDistribution.VIEWS' => 'views',
-				'EntryDistribution.ERROR_TYPE' => 'error_type',
-				'EntryDistribution.ERROR_NUMBER' => 'error_number',
-				'EntryDistribution.LAST_REPORT' => 'last_report',
-				'EntryDistribution.NEXT_REPORT' => 'next_report',
+				'entry_distribution.ID' => 'entry_distribution_id',
+				'entry_distribution.CREATED_AT' => 'created_at',
+				'entry_distribution.UPDATED_AT' => 'updated_at',
+				'entry_distribution.SUBMITTED_AT' => 'submitted_at',
+				'entry_distribution.ENTRY_ID' => 'entry_id',
+				'entry_distribution.PARTNER_ID' => 'partner_id',
+				'entry_distribution.DISTRIBUTION_PROFILE_ID' => 'distribution_profile_id',
+				'entry_distribution.STATUS' => 'entry_distribution_status',
+				'entry_distribution.DIRTY_STATUS' => 'dirty_status',
+				'entry_distribution.THUMB_ASSET_IDS' => 'thumb_asset_ids',
+				'entry_distribution.FLAVOR_ASSET_IDS' => 'flavor_asset_ids',
+				'entry_distribution.ASSET_IDS' => 'asset_ids',
+				'entry_distribution.SUNRISE' => 'sunrise',
+				'entry_distribution.SUNSET' => 'sunset',
+				'entry_distribution.SUN_STATUS' => 'sun_status',
+				'entry_distribution.REMOTE_ID' => 'remote_id',
+				'entry_distribution.PLAYS' => 'plays',
+				'entry_distribution.VIEWS' => 'views',
+				'entry_distribution.ERROR_TYPE' => 'error_type',
+				'entry_distribution.ERROR_NUMBER' => 'error_number',
+				'entry_distribution.LAST_REPORT' => 'last_report',
+				'entry_distribution.NEXT_REPORT' => 'next_report',
 			);
 		}
 		return self::$searchableFieldsMap;
 	}
+
+	protected static $searchEscapeTypes;
 
 	public static function getSearchFieldsEscapeTypeList()
 	{
@@ -146,6 +156,8 @@ class EntryDistributionIndex extends BaseIndexObject
 		return self::$searchEscapeTypes;
 	}
 
+	protected static $indexEscapeTypes;
+
 	public static function getIndexFieldsEscapeTypeList()
 	{
 		if (!self::$indexEscapeTypes)
@@ -155,6 +167,8 @@ class EntryDistributionIndex extends BaseIndexObject
 		}
 		return self::$indexEscapeTypes;
 	}
+
+	protected static $matchableFields;
 
 	public static function getIndexMatchableList()
 	{
@@ -168,24 +182,28 @@ class EntryDistributionIndex extends BaseIndexObject
 		return self::$matchableFields;
 	}
 
+	protected static $orderFields;
+
 	public static function getIndexOrderList()
 	{
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
-				'EntryDistribution.CREATED_AT' => 'created_at',
-				'EntryDistribution.UPDATED_AT' => 'updated_at',
-				'EntryDistribution.SUBMITTED_AT' => 'submitted_at',
-				'EntryDistribution.SUNRISE' => 'sunrise',
-				'EntryDistribution.SUNSET' => 'sunset',
-				'EntryDistribution.PLAYS' => 'plays',
-				'EntryDistribution.VIEWS' => 'views',
-				'EntryDistribution.LAST_REPORT' => 'last_report',
-				'EntryDistribution.NEXT_REPORT' => 'next_report',
+				'entry_distribution.CREATED_AT' => 'created_at',
+				'entry_distribution.UPDATED_AT' => 'updated_at',
+				'entry_distribution.SUBMITTED_AT' => 'submitted_at',
+				'entry_distribution.SUNRISE' => 'sunrise',
+				'entry_distribution.SUNSET' => 'sunset',
+				'entry_distribution.PLAYS' => 'plays',
+				'entry_distribution.VIEWS' => 'views',
+				'entry_distribution.LAST_REPORT' => 'last_report',
+				'entry_distribution.NEXT_REPORT' => 'next_report',
 			);
 		}
 		return self::$orderFields;
 	}
+
+	protected static $skipFields;
 
 	public static function getIndexSkipFieldsList()
 	{
@@ -196,6 +214,8 @@ class EntryDistributionIndex extends BaseIndexObject
 		}
 		return self::$skipFields;
 	}
+
+	protected static $conditionToKeep;
 
 	public static function getSphinxConditionsToKeep()
 	{

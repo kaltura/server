@@ -7,7 +7,7 @@ class CaptionAssetItemIndex extends BaseIndexObject
 {
 	public static function getObjectIndexName()
 	{
-		return 'caption_asset_item';
+		return 'caption_item';
 	}
 
 	public static function getSphinxIdField()
@@ -29,6 +29,8 @@ class CaptionAssetItemIndex extends BaseIndexObject
 	{
 		return CaptionAssetItemPeer::getCriteriaFilter();
 	}
+
+	protected static $fieldsMap;
 
 	public static function getIndexFieldsMap()
 	{
@@ -61,6 +63,8 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		return self::$fieldsMap;
 	}
 
+	protected static $typesMap;
+
 	public static function getIndexFieldTypesMap()
 	{
 		if (!self::$typesMap)
@@ -92,6 +96,8 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		return self::$typesMap;
 	}
 
+	protected static $nullableFields;
+
 	public static function getIndexNullableList()
 	{
 		if (!self::$nullableFields)
@@ -102,36 +108,40 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $searchableFieldsMap;
+
 	public static function getIndexSearchableFieldsMap()
 	{
 		if (!self::$searchableFieldsMap)
 		{
 			self::$searchableFieldsMap = array(
-				'CaptionAssetItem.ENTRY_ID' => 'entry_id',
-				'CaptionAssetItem.CAPTION_ASSET_ID' => 'caption_asset_id',
-				'CaptionAssetItem.TAGS' => 'tags',
-				'CaptionAssetItem.CONTENT' => 'content',
-				'CaptionAssetItem.PARTNER_DESCRIPTION' => 'partner_description',
-				'CaptionAssetItem.LANGUAGE' => 'language',
-				'CaptionAssetItem.LABEL' => 'label',
-				'CaptionAssetItem.FORMAT' => 'format',
-				'CaptionAssetItem.INT_ID' => 'int_id',
-				'CaptionAssetItem.CAPTION_PARAMS_ID' => 'caption_params_id',
-				'CaptionAssetItem.PARTNER_ID' => 'partner_id',
-				'CaptionAssetItem.VERSION' => 'version',
-				'CaptionAssetItem.STATUS' => 'caption_asset_status',
-				'CaptionAssetItem.SIZE' => 'size',
-				'CaptionAssetItem.IS_DEFAULT' => 'is_default',
-				'CaptionAssetItem.START_TIME' => 'start_time',
-				'CaptionAssetItem.END_TIME' => 'end_time',
-				'CaptionAssetItem.CREATED_AT' => 'created_at',
-				'CaptionAssetItem.UPDATED_AT' => 'updated_at',
-				'CaptionAssetItem.STR_ENTRY_ID' => 'str_entry_id',
-				'CaptionAssetItem.STR_CAPTION_ASSET_ID' => 'str_caption_asset_id',
+				'caption_asset_item.ENTRY_ID' => 'entry_id',
+				'caption_asset_item.CAPTION_ASSET_ID' => 'caption_asset_id',
+				'caption_asset_item.TAGS' => 'tags',
+				'caption_asset_item.CONTENT' => 'content',
+				'caption_asset_item.PARTNER_DESCRIPTION' => 'partner_description',
+				'caption_asset_item.LANGUAGE' => 'language',
+				'caption_asset_item.LABEL' => 'label',
+				'caption_asset_item.FORMAT' => 'format',
+				'caption_asset_item.INT_ID' => 'int_id',
+				'caption_asset_item.CAPTION_PARAMS_ID' => 'caption_params_id',
+				'caption_asset_item.PARTNER_ID' => 'partner_id',
+				'caption_asset_item.VERSION' => 'version',
+				'caption_asset_item.STATUS' => 'caption_asset_status',
+				'caption_asset_item.SIZE' => 'size',
+				'caption_asset_item.IS_DEFAULT' => 'is_default',
+				'caption_asset_item.START_TIME' => 'start_time',
+				'caption_asset_item.END_TIME' => 'end_time',
+				'caption_asset_item.CREATED_AT' => 'created_at',
+				'caption_asset_item.UPDATED_AT' => 'updated_at',
+				'caption_asset_item.STR_ENTRY_ID' => 'str_entry_id',
+				'caption_asset_item.STR_CAPTION_ASSET_ID' => 'str_caption_asset_id',
 			);
 		}
 		return self::$searchableFieldsMap;
 	}
+
+	protected static $searchEscapeTypes;
 
 	public static function getSearchFieldsEscapeTypeList()
 	{
@@ -143,6 +153,8 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		return self::$searchEscapeTypes;
 	}
 
+	protected static $indexEscapeTypes;
+
 	public static function getIndexFieldsEscapeTypeList()
 	{
 		if (!self::$indexEscapeTypes)
@@ -152,6 +164,8 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		}
 		return self::$indexEscapeTypes;
 	}
+
+	protected static $matchableFields;
 
 	public static function getIndexMatchableList()
 	{
@@ -171,20 +185,24 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		return self::$matchableFields;
 	}
 
+	protected static $orderFields;
+
 	public static function getIndexOrderList()
 	{
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
-				'CaptionAssetItem.SIZE' => 'size',
-				'CaptionAssetItem.START_TIME' => 'start_time',
-				'CaptionAssetItem.END_TIME' => 'end_time',
-				'CaptionAssetItem.CREATED_AT' => 'created_at',
-				'CaptionAssetItem.UPDATED_AT' => 'updated_at',
+				'caption_asset_item.SIZE' => 'size',
+				'caption_asset_item.START_TIME' => 'start_time',
+				'caption_asset_item.END_TIME' => 'end_time',
+				'caption_asset_item.CREATED_AT' => 'created_at',
+				'caption_asset_item.UPDATED_AT' => 'updated_at',
 			);
 		}
 		return self::$orderFields;
 	}
+
+	protected static $skipFields;
 
 	public static function getIndexSkipFieldsList()
 	{
@@ -195,6 +213,8 @@ class CaptionAssetItemIndex extends BaseIndexObject
 		}
 		return self::$skipFields;
 	}
+
+	protected static $conditionToKeep;
 
 	public static function getSphinxConditionsToKeep()
 	{

@@ -30,6 +30,8 @@ class entryIndex extends BaseIndexObject
 		return entryPeer::getCriteriaFilter();
 	}
 
+	protected static $fieldsMap;
+
 	public static function getIndexFieldsMap()
 	{
 		if (!self::$fieldsMap)
@@ -87,6 +89,8 @@ class entryIndex extends BaseIndexObject
 		}
 		return self::$fieldsMap;
 	}
+
+	protected static $typesMap;
 
 	public static function getIndexFieldTypesMap()
 	{
@@ -148,6 +152,8 @@ class entryIndex extends BaseIndexObject
 		return self::$typesMap;
 	}
 
+	protected static $nullableFields;
+
 	public static function getIndexNullableList()
 	{
 		if (!self::$nullableFields)
@@ -172,6 +178,8 @@ class entryIndex extends BaseIndexObject
 		}
 		return self::$nullableFields;
 	}
+
+	protected static $searchableFieldsMap;
 
 	public static function getIndexSearchableFieldsMap()
 	{
@@ -235,6 +243,8 @@ class entryIndex extends BaseIndexObject
 		return self::$searchableFieldsMap;
 	}
 
+	protected static $searchEscapeTypes;
+
 	public static function getSearchFieldsEscapeTypeList()
 	{
 		if (!self::$searchEscapeTypes)
@@ -245,6 +255,8 @@ class entryIndex extends BaseIndexObject
 		return self::$searchEscapeTypes;
 	}
 
+	protected static $indexEscapeTypes;
+
 	public static function getIndexFieldsEscapeTypeList()
 	{
 		if (!self::$indexEscapeTypes)
@@ -254,6 +266,8 @@ class entryIndex extends BaseIndexObject
 		}
 		return self::$indexEscapeTypes;
 	}
+
+	protected static $matchableFields;
 
 	public static function getIndexMatchableList()
 	{
@@ -278,6 +292,8 @@ class entryIndex extends BaseIndexObject
 		}
 		return self::$matchableFields;
 	}
+
+	protected static $orderFields;
 
 	public static function getIndexOrderList()
 	{
@@ -312,6 +328,8 @@ class entryIndex extends BaseIndexObject
 		return self::$orderFields;
 	}
 
+	protected static $skipFields;
+
 	public static function getIndexSkipFieldsList()
 	{
 		if (!self::$skipFields)
@@ -322,6 +340,8 @@ class entryIndex extends BaseIndexObject
 		}
 		return self::$skipFields;
 	}
+
+	protected static $conditionToKeep;
 
 	public static function getSphinxConditionsToKeep()
 	{

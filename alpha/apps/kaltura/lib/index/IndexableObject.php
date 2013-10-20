@@ -18,6 +18,9 @@ class IndexableObject {
 	/** The id of the propel object */
 	public $objectId = "ID";
 	
+	/** The index table name */
+	public $indexName;
+	
 	/** The ID field in case of 'string' id.
 	 * relevant only for objects in which ID is string.*/
 	public $id = null;
@@ -95,5 +98,22 @@ class IndexableObject {
 	public function setPeerName($peerName) {
 		$this->peerName = $peerName;
 	}
+	
+	/**
+	 * @return the $indexName
+	 */
+	public function getIndexName() {
+		return $this->indexName;
+	}
+
+	/**
+	 * @param field_type $indexName
+	 */
+	public function setIndexName($indexName) {
+		$this->indexName = $indexName;
+	}
+
+	
+	
 }
 

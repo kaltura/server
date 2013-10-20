@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schema>
-	<CaptionAssetItem indexId="int_id">
+	<CaptionAssetItem indexId="int_id" indexName="caption_item" >
 	        <entry_id indexName="entry_id" type="string" matchable="yes" />
 	        <caption_asset_id indexName="caption_asset_id" type="string" matchable="yes" />
 	        <tags indexName="tags" type="string" matchable="yes" />

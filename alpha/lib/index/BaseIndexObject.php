@@ -11,27 +11,27 @@ abstract class BaseIndexObject
 	 * For example - If the index field 'name' is assigned by the function 'getEscapedName'
 	 * then the mapping should be 'name' => 'escapedName'.
 	 */
-	protected static $fieldsMap;
+	// protected static $fieldsMap;
 	
 	/**
 	 * Mapping between propel object property to the matching indexable field.
 	 * For example - if when searching for entry.name (propel) the condition should apply for entry.full_name (index)
 	 * then the mapping should be 'name' => 'full_name'.
 	 */
-	protected static $searchableFieldsMap;
+	// protected static $searchableFieldsMap;
 	
 	/**
 	 * Mapping betwen indexable field to its type. 
 	 * The list of supported types is defined at IIndexable. 
 	 */
-	protected static $typesMap;
+	// protected static $typesMap;
 	
 	/**
 	 * List of fields we can filter by 'is null' condition.
 	 * For example, if we can query from entry table all records in which last name is null, then
 	 * last name should appear in this list.
 	 */
-	protected static $nullableFields;
+	// protected static $nullableFields;
 	
 	/**
 	 * Mapping between property name to escape type for indexing purposes.
@@ -39,7 +39,7 @@ abstract class BaseIndexObject
 	 * For example, if when indexing category names we'd like to md5 them, then the
 	 * mapping should be 'category_names' => 'SearchIndexFieldEscapeType::MD5_LOWER_CASE'. 
 	 */
-	protected static $searchEscapeTypes;
+	// protected static $searchEscapeTypes;
 	
 	/**
 	 * Mapping between property name to escape type for searching purposes.
@@ -47,33 +47,33 @@ abstract class BaseIndexObject
 	 * For example, if when searching for category names we'd like to md5 them first, then the
 	 * mapping should be 'category_names' => 'SearchIndexFieldEscapeType::MD5_LOWER_CASE'.
 	 */
-	protected static $indexEscapeTypes;
+	// protected static $indexEscapeTypes;
 	
 	/**
 	 * List of index Fields. In Sphinx terminology it means that this is a Field and not an attribute, 
 	 * and therefore can be qeuries with 'MATCH'. 
 	 */
-	protected static $matchableFields;
+	// protected static $matchableFields;
 	
 	/**
 	 * List of fields according to which the qeury can be ordered.
 	 * For example, if the query can be ordered by 'created_at' than created at should be in this list.
 	 */
-	protected static $orderFields;
+	// protected static $orderFields;
 	
 	/**
 	 * List of fields indicating whether the query should skip sphinx and go directly to the database. 
 	 * For example, if a query on 'entry' contains entry.ID IN (...) going through sphinx does not help 
 	 * (unless there is some textual match as well). In this case this list should include entry.ID in it.
 	 */
-	protected static $skipFields;
+	// protected static $skipFields;
 	
 	/**
 	 * List of fields indicating whether the query should keep the sphinx qeury condition but use it as well when 
 	 * querying from the database. 
 	 * For example, if a query on 'entry' contains entry.partner_id, we'd like to use the same condition on the database as well.
 	 */
-	protected static $conditionToKeep;
+	// protected static $conditionToKeep;
 	
 	/**
 	 * Returns the field type by name
@@ -98,6 +98,7 @@ abstract class BaseIndexObject
 	 * @param string $fieldName
 	 */
 	public static function getIndexFieldsEscapeType($fieldName) {
+		$fieldName = self::fixFieldName($fieldName);
 		$escapeTypes = static::getIndexFieldsEscapeTypeList();
 		if(array_key_exists($fieldName, $escapeTypes))
 			return $escapeTypes[$fieldName];
@@ -109,6 +110,7 @@ abstract class BaseIndexObject
 	 * @param string $fieldName
 	 */
 	public static function getSearchFieldsEscapeType($fieldName) {
+		$fieldName = self::fixFieldName($fieldName);
 		$escapeTypes = static::getSearchFieldsEscapeTypeList();
 		if(array_key_exists($fieldName, $escapeTypes))
 			return $escapeTypes[$fieldName];
@@ -129,6 +131,7 @@ abstract class BaseIndexObject
 	 * @param string $fieldName
 	 */
 	public static function getIndexFieldName($columnName) {
+		$columnName = self::fixFieldName($columnName);
 		$searchableFields = static::getIndexSearchableFieldsMap();
 		return $searchableFields[$columnName];
 	}
@@ -138,7 +141,18 @@ abstract class BaseIndexObject
 	 * @param string $fieldName
 	 */
 	public static function hasIndexFieldName($columnName) {
+		$columnName = self::fixFieldName($columnName);
 		$searchableFields = static::getIndexSearchableFieldsMap();
 		return array_key_exists($columnName, $searchableFields);
+	}
+	
+	public static function fixFieldName($fieldName) {
+		if(strpos($fieldName, '.') === false)
+		{
+			$indexName = static::getObjectIndexName();
+			$fieldName = strtoupper($fieldName);
+			$fieldName = $indexName . "." . $fieldName;
+		}
+		return $fieldName;
 	}
 }

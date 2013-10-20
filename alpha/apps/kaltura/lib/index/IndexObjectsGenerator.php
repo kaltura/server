@@ -80,6 +80,13 @@ class IndexObjectsGenerator
 			$object->setPeerName($objName . "Peer");
 		}
 		
+		if(isset($objectAttribtues["indexName"])) {
+			$object->setIndexName($objectAttribtues["indexName"]);
+		} else {
+			$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $objName));
+			$object->setIndexName($indexName);
+		}
+		
 		$this->searchableObjects[$objName] = $object;
 	}
 	
@@ -120,8 +127,9 @@ class IndexObjectsGenerator
 		$this->searchableFields[$objName]["$name"] = $field;
 	}
 	
-	private function toFieldName($class, $field) {
-		return $class . "." . strtoupper($field);
+	private function toPeerName($object, $field) {
+		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
+		return $indexName . "." . strtoupper($field);
 	}
 	
 	private function createFileHeader($fp, $class) {
@@ -141,6 +149,11 @@ class IndexObjectsGenerator
 	
 	private function generateMapping($functionName, $fp, $class, $mapName) {
 		$callback = array("IndexObjectsGenerator", $functionName);
+		// Declare map
+		$this->printToFile($fp, "protected static \${$mapName};",1);
+		$this->printToFile($fp, "");
+		
+		// Generate function
 		$this->printToFile($fp, "public static function {$functionName}()",1);
 		$this->printToFile($fp, "{",1);
 		$this->printToFile($fp, "if (!self::\${$mapName})",2);
@@ -148,7 +161,7 @@ class IndexObjectsGenerator
 		$this->printToFile($fp, "self::\${$mapName} = array(",3);
 		
 		foreach($this->searchableFields[$class] as $key => $value)
-			call_user_func($callback, $fp, $class, $key , $value);
+			call_user_func($callback, $fp, $this->searchableObjects[$class], $key , $value);
 		
 		$this->printToFile($fp, ");",3);
 		$this->printToFile($fp, "}",2);
@@ -167,16 +180,15 @@ class IndexObjectsGenerator
 	}
 	
 	private function getObjectIndexName($fp, $object) {
-		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
-		$this->printToFile($fp, "return '{$indexName}';",2);
+		$this->printToFile($fp, "return '" . $object->indexName . "';",2);
 	}
 	
-	private function getIndexFieldsMap($fp, $class, $key , $value) {
+	private function getIndexFieldsMap($fp, $object, $key , $value) {
 		if(!$value->searchOnly)
 			$this->printToFile($fp, "'" . $value->indexName . "' => '" . $value->getter . "',",4);
 	}
 	
-	private function getIndexFieldTypesMap($fp, $class, $key , $value) {
+	private function getIndexFieldTypesMap($fp, $obejct, $key , $value) {
 		$type = null;
 		switch($value->type) {
 			case "string":
@@ -197,33 +209,33 @@ class IndexObjectsGenerator
 			$this->printToFile($fp, "'" . $value->indexName . "' => " . $type . ",",4);
 	}
 	
-	private function getIndexSearchableFieldsMap($fp, $class, $key , $value) {
-		$objectField = $this->toFieldName($class, $key);
+	private function getIndexSearchableFieldsMap($fp, $object, $key , $value) {
+		$objectField = $this->toPeerName($object, $key);
 		$this->printToFile($fp, "'" .  $objectField . "' => '" . $value->indexName . "',",4);
 	}
 	
-	private function getIndexOrderList($fp, $class, $key , $value) {
-		$objectField = $this->toFieldName($class, $key);
+	private function getIndexOrderList($fp, $object, $key , $value) {
+		$objectField = $this->toPeerName($object, $key);
 		if($value->orderable)
 			$this->printToFile($fp, "'" .  $objectField . "' => '" . $value->indexName . "',",4);
 	}
 	
-	private function getIndexNullableList($fp, $class, $key , $value) {
+	private function getIndexNullableList($fp, $object, $key , $value) {
 		if($value->nullable)
 			$this->printToFile($fp, "'" . $value->indexName . "',",4);
 	}
 	
-	private function getIndexMatchableList($fp, $class, $key , $value) {
+	private function getIndexMatchableList($fp, $object, $key , $value) {
 		if($value->matchable)
 			$this->printToFile($fp, "\"" . $key . "\",",4);
 	}
 	
-	private function getIndexSkipFieldsList($fp, $class, $key , $value) {
+	private function getIndexSkipFieldsList($fp, $object, $key , $value) {
 		if($value->skipField) 
-			$this->printToFile($fp, "'" . $this->toFieldName($class, $key) . "',",4);
+			$this->printToFile($fp, "'" . $this->toPeerName($object, $key) . "',",4);
 	}
 	
-	private function getIndexFieldsEscapeTypeList($fp, $class, $key , $value) {
+	private function getIndexFieldsEscapeTypeList($fp, $object, $key , $value) {
 		
 		$val = $value->indexEscapeType;
 		if(!is_null($val)) {
@@ -241,12 +253,12 @@ class IndexObjectsGenerator
 					break;
 			}
 			
-			$objectField = $this->toFieldName($class, $key);
+			$objectField = $this->toPeerName($object, $key);
 			$this->printToFile($fp, "'" . $objectField . "' => " . $type . "," ,4);
 		}
 	}
 	
-	private function getSearchFieldsEscapeTypeList($fp, $class, $key , $value) {
+	private function getSearchFieldsEscapeTypeList($fp, $object, $key , $value) {
 	
 		$val = $value->searchEscapeType;
 		if(!is_null($val)) {
@@ -264,14 +276,14 @@ class IndexObjectsGenerator
 					break;
 			}
 				
-			$objectField = $this->toFieldName($class, $key);
+			$objectField = $this->toPeerName($object, $key);
 			$this->printToFile($fp, "'" . $objectField . "' => " . $type . "," ,4);
 		}
 	}
 	
-	private function getSphinxConditionsToKeep($fp, $class, $key , $value) {
+	private function getSphinxConditionsToKeep($fp, $object, $key , $value) {
 		if($value->keepCondition) 
-			$this->printToFile($fp, "'" . $this->toFieldName($class, $key) . "',",4);
+			$this->printToFile($fp, "'" . $this->toPeerName($object, $key) . "',",4);
 	}
 	
 	private function getSphinxIdField($fp, $object) {

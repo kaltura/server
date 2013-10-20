@@ -30,6 +30,8 @@ class TagIndex extends BaseIndexObject
 		return TagPeer::getCriteriaFilter();
 	}
 
+	protected static $fieldsMap;
+
 	public static function getIndexFieldsMap()
 	{
 		if (!self::$fieldsMap)
@@ -46,6 +48,8 @@ class TagIndex extends BaseIndexObject
 		}
 		return self::$fieldsMap;
 	}
+
+	protected static $typesMap;
 
 	public static function getIndexFieldTypesMap()
 	{
@@ -64,6 +68,8 @@ class TagIndex extends BaseIndexObject
 		return self::$typesMap;
 	}
 
+	protected static $nullableFields;
+
 	public static function getIndexNullableList()
 	{
 		if (!self::$nullableFields)
@@ -74,22 +80,26 @@ class TagIndex extends BaseIndexObject
 		return self::$nullableFields;
 	}
 
+	protected static $searchableFieldsMap;
+
 	public static function getIndexSearchableFieldsMap()
 	{
 		if (!self::$searchableFieldsMap)
 		{
 			self::$searchableFieldsMap = array(
-				'Tag.INT_ID' => 'int_id',
-				'Tag.TAG' => 'tag',
-				'Tag.PARTNER_ID' => 'partner_id',
-				'Tag.OBJECT_TYPE' => 'object_type',
-				'Tag.CREATED_AT' => 'created_at',
-				'Tag.INSTANCE_COUNT' => 'instance_count',
-				'Tag.PRIVACY_CONTEXT' => 'privacy_context',
+				'tag.INT_ID' => 'int_id',
+				'tag.TAG' => 'tag',
+				'tag.PARTNER_ID' => 'partner_id',
+				'tag.OBJECT_TYPE' => 'object_type',
+				'tag.CREATED_AT' => 'created_at',
+				'tag.INSTANCE_COUNT' => 'instance_count',
+				'tag.PRIVACY_CONTEXT' => 'privacy_context',
 			);
 		}
 		return self::$searchableFieldsMap;
 	}
+
+	protected static $searchEscapeTypes;
 
 	public static function getSearchFieldsEscapeTypeList()
 	{
@@ -101,6 +111,8 @@ class TagIndex extends BaseIndexObject
 		return self::$searchEscapeTypes;
 	}
 
+	protected static $indexEscapeTypes;
+
 	public static function getIndexFieldsEscapeTypeList()
 	{
 		if (!self::$indexEscapeTypes)
@@ -110,6 +122,8 @@ class TagIndex extends BaseIndexObject
 		}
 		return self::$indexEscapeTypes;
 	}
+
+	protected static $matchableFields;
 
 	public static function getIndexMatchableList()
 	{
@@ -125,28 +139,34 @@ class TagIndex extends BaseIndexObject
 		return self::$matchableFields;
 	}
 
+	protected static $orderFields;
+
 	public static function getIndexOrderList()
 	{
 		if (!self::$orderFields)
 		{
 			self::$orderFields = array(
-				'Tag.CREATED_AT' => 'created_at',
-				'Tag.INSTANCE_COUNT' => 'instance_count',
+				'tag.CREATED_AT' => 'created_at',
+				'tag.INSTANCE_COUNT' => 'instance_count',
 			);
 		}
 		return self::$orderFields;
 	}
+
+	protected static $skipFields;
 
 	public static function getIndexSkipFieldsList()
 	{
 		if (!self::$skipFields)
 		{
 			self::$skipFields = array(
-				'Tag.TAG',
+				'tag.TAG',
 			);
 		}
 		return self::$skipFields;
 	}
+
+	protected static $conditionToKeep;
 
 	public static function getSphinxConditionsToKeep()
 	{

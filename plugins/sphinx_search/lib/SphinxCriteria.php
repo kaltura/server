@@ -450,6 +450,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						$replace[$orderField] = "w";
 						$conditions .= ",weight() as w";
 						$usesWeight = true;
+						$search = array_keys($replace);
 					}
 					
 					KalturaLog::debug("Add sort field[$orderField] copy from [$orderByColumn]");
