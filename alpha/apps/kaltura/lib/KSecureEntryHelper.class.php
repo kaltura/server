@@ -84,7 +84,7 @@ class KSecureEntryHelper
 	 * 
 	 * @param entry $entry
 	 */
-	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array())
+	public function __construct(entry $entry, $ksStr, $referrer, $contexts = array(), $hashes = array())
 	{
 		if(!is_array($contexts))
 			$contexts = array($contexts);
@@ -93,6 +93,7 @@ class KSecureEntryHelper
 		$this->ksStr = $ksStr;
 		$this->referrer = $referrer;
 		$this->contexts = $contexts;
+		$this->hashes = $hashes;
 		
 		$this->validateKs();
 		$this->applyContext();
