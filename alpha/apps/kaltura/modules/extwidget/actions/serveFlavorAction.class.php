@@ -45,7 +45,11 @@ class serveFlavorAction extends kalturaAction
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
 		myPartnerUtils::enforceDelivery($flavorAsset->getPartnerId());
 		
-		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$version = $this->getRequestParameter( "v" );
+		if (!$version)
+			$version = $flavorAsset->getVersion();
+		
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
@@ -94,7 +98,7 @@ class serveFlavorAction extends kalturaAction
 					PermissionPeer::isValidForPartner(PermissionName::FEATURE_ACCURATE_SERVE_CLIPPING, $flavorAsset->getPartnerId()))
 				{
 					$contentPath = myContentStorage::getFSContentRootPath();
-					$tempClipName = $flavorAsset->getVersion() . '_' . $clipTo . '.mp4';
+					$tempClipName = $version . '_' . $clipTo . '.mp4';
 					$tempClipPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/tempclip", $flavorAsset->getIntId(), $flavorAsset->getId(), $tempClipName);
 					if (!file_exists($tempClipPath))
 					{
