@@ -17,10 +17,14 @@ class KalturaXmlSerializer extends KalturaSerializer
 		header("Content-Type: text/xml");
 	}
 	
+	// Override base class functionality
+	protected function prepareSerializedObject($object)
+	{
+		// Do nothing
+	}
+	
 	function serialize($object)
 	{
-		$object = parent::prepareSerializedObject($object);
-		
 		if (function_exists('kaltura_serialize_xml'))
 		{
 			$serializedResult = kaltura_serialize_xml($object, $this->_ignoreNull);
@@ -96,8 +100,16 @@ class KalturaXmlSerializer extends KalturaSerializer
 		if ($object instanceof Exception)
 		{
 			echo '<error>';
+			
 			$this->writeTag('code', kString::xmlEncode($object->getCode()));
 			$this->writeTag('message', kString::xmlEncode($object->getMessage()));
+			$this->writeTag('objectType', get_class($object));
+			
+			if ( $object instanceof KalturaAPIException )
+			{
+				$this->writeTag('args', $object->getArgs());
+			}
+			
 			echo '</error>';
 		}
 		else
