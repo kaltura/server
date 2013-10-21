@@ -48,7 +48,7 @@ abstract class KalturaSerializer
     	return $object;
 	}
 	
-	function convertTypedArraysToPhpArrays($object)
+	protected function convertTypedArraysToPhpArrays($object)
 	{
 	    if (is_object($object))
     	{
