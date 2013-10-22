@@ -480,6 +480,7 @@ class KalturaErrors extends APIErrors
 	
 	const EXTENDING_ITEM_MISSING_XPATH = 'EXTENDING_ITEM_MISSING_XPATH,Extending item must contain xpath';
 	
+	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND,Live channel segment id [%s] not found';
 	/*
 	 * BaseEntry Service
 	 */
@@ -487,4 +488,11 @@ class KalturaErrors extends APIErrors
 	const DELIVERY_TYPE_NOT_SPECIFIED = 'DELIVERY_TYPE_NOT_SPECIFIED, at least one non auto delivery type must be specified';
 	
 	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED,Unable to generate list. max matches value was reached";
+	
+	
+	/*
+	 * MediaServer Service
+	 */
+	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND,Media server \"%s\" not found";
+	
 }
