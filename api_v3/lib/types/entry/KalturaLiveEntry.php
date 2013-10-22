@@ -13,6 +13,13 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $offlineMessage;
 	
 	/**
+	 * Recording Status Enabled/Disabled
+	 * @var KalturaRecordStatus
+	 * @insertonly
+	 */
+	public $recordStatus;
+	
+	/**
 	 * DVR Status Enabled/Disabled
 	 * @var KalturaDVRStatus
 	 * @insertonly
@@ -35,6 +42,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
+	    "recordStatus",
 	    "dvrStatus",
 	    "dvrWindow",
 		"liveStreamConfigurations",
@@ -46,5 +54,13 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
+	public function toInsertableObject($sourceObject = null, $propsToSkip = array())
+	{
+		if(is_null($this->recordStatus))
+			$this->recordStatus = (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ? KalturaRecordStatus::ENABLED ? KalturaRecordStatus::DISABLED);
+			
+		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
 }
