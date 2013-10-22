@@ -206,6 +206,10 @@ abstract public class KalturaClientBase {
 	public void setKalturaConfiguration(KalturaConfiguration kalturaConfiguration) {
 		this.kalturaConfiguration = kalturaConfiguration;
 	}
+
+	public KalturaConfiguration getKalturaConfiguration() {
+		return this.kalturaConfiguration;
+	}
 	
 	public void queueServiceCall(String service, String action, KalturaParams kparams) {
 		this.queueServiceCall(service, action, kparams, new KalturaFiles());
