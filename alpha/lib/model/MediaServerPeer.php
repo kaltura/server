@@ -15,4 +15,19 @@
  */
 class MediaServerPeer extends BaseMediaServerPeer {
 
+	/**
+	 * Retrieve a single server by its hostname
+	 *
+	 * @param      string $hostname
+	 * @param      PropelPDO $con the connection to use
+	 * @return     MediaServer
+	 */
+	public static function retrieveByHostname($hostname, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(MediaServerPeer::HOSTNAME, $hostname);
+
+		return MediaServerPeer::doSelectOne($criteria, $con);
+	}
+	
 } // MediaServerPeer
