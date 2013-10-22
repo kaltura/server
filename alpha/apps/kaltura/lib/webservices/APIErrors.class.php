@@ -16,8 +16,8 @@ class APIErrors
 	
 	const MISSING_KS ="MISSING_KS;;Missing KS. Session not established";
 	// KS - the ks string, ERR_CODE - error code , ERR_DESC - error description
-	const INVALID_KS ="INVALID_KS;;Invalid KS [@KS@]. Error [@ERR_CODE@,@ERR_DESC@]";
-
+	const INVALID_KS ="INVALID_KS;KSID,ERR_CODE,ERR_DESC;Invalid KS [@KSID@]. Error [@ERR_CODE@,@ERR_DESC@]";
+	
 	// PID - partner_id
 	const START_SESSION_ERROR = "START_SESSION_ERROR;PID;Error while starting session for partner [@PID@]";
 
