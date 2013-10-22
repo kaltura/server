@@ -148,6 +148,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public function toInsertableObject ( $dbObject = null , $props_to_skip = array() )
 	{
+		/* @var $dbObject LiveStreamEntry */
+		
 		// if the given password is empty, generate a random 8-character string as the new password
 		if(($this->streamPassword == null) || (strlen(trim($this->streamPassword)) <= 0))
 		{
@@ -157,8 +159,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	
 		if(is_null($this->bitrates) || !$this->bitrates->count)
 		{
-			$liveStreamBitrate = new KalturaLiveStreamBitrate();
-			$this->bitrates = array($liveStreamBitrate);
+			$this->bitrates = new KalturaLiveStreamBitrateArray();
+			$this->bitrates[] = new KalturaLiveStreamBitrate();
 		}
 		
 		return parent::toInsertableObject($dbObject, $props_to_skip);
