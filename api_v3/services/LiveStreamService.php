@@ -70,14 +70,16 @@ class LiveStreamService extends KalturaEntryService
 	{
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		/* @var $dbEntry LiveStreamEntry */
+		$dbEntry->save();
 		
 		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
 		{
 			$dcUrl = 'rtmp://' . kDataCenterMgr::getCurrentDcDomain();
 			$partnerId = $dbEntry->getPartnerId();
+			$entryId = $dbEntry->getId();
 			$index = 0;
 			$token = $dbEntry->getStreamPassword();
-			$primaryBroadcastingUrl = "$dcUrl/kLive/p/$partnerId/i/$index/t/$token"; 
+			$primaryBroadcastingUrl = "$dcUrl/kLive/p/$partnerId/e/$entryId/i/$index/t/$token"; 
 			$dbEntry->setPrimaryBroadcastingUrl($primaryBroadcastingUrl);
 			
 			$otherDcs = kDataCenterMgr::getAllDcs();
@@ -87,7 +89,7 @@ class LiveStreamService extends KalturaEntryService
 				
 				$dcUrl = 'rtmp://' . $otherDc['domain'];
 				$index = 1;
-				$secondaryBroadcastingUrl = "$dcUrl/kLive/p/$partnerId/i/$index/t/$token"; 
+				$secondaryBroadcastingUrl = "$dcUrl/kLive/p/$partnerId/e/$entryId/i/$index/t/$token"; 
 				$dbEntry->setSecondaryBroadcastingUrl($secondaryBroadcastingUrl);
 			}
 		}
