@@ -220,7 +220,7 @@ try
 				throw new KalturaManifestException("apple HTTP format must start with header '#EXTM3U'");
 				
 			$matches = null;
-			if(!preg_match_all('/#EXT-X-STREAM-INF:PROGRAM-ID=\d+,BANDWIDTH=\d+\n([^\n]+)/', $manifest, $matches))
+			if(!preg_match_all('/#EXT-X-STREAM-INF:PROGRAM-ID=\d+,BANDWIDTH=\d+,RESOLUTION=\d+x\d+\n([^\n]+)/', $manifest, $matches))
 				throw new KalturaManifestException("manifest format does not match Apple HTTP expected format.");
 					
 			foreach($matches[1] as $serveFlavorUrl)
