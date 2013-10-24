@@ -56,9 +56,9 @@ start() {
 	fi
 	
 	echo -n $"Starting:"
-	KP_PARENT=`ps -eo pid,args|grep $BATCHEXE -m1|grep -v grep|awk -F " " '{print $1}'|xargs`
-	KP=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
-	if ! kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then 
+	KP_PARENT=`cat $LOCKFILE 2>/dev/null`
+	KP=`ps axf | awk '!/\\_ / {b=0} /php [K]GenericBatchMgr.class.php/ {b=1} b{print $1}'|xargs`
+	if ! `kill -0 "$KP_PARENT" 2>/dev/null` 2>/dev/null; then
 		echo_failure
 		echo
 		if [ "X$KP_PARENT" != "X" ]; then
@@ -95,8 +95,8 @@ start_scheduler() {
 }
 
 show_status() {
-		KP=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
-		if [ "X$KP" != "X" ]; then
+		KP=`ps axf | awk '!/\\_ / {b=0} /php [K]GenericBatchMgr.class.php/ {b=1} b{print $1}'|xargs`
+		if [ -n "$KP" ]; then
 		echo "Batch is running as $KP ..."
 		return 0
 		else
@@ -107,8 +107,8 @@ show_status() {
 
 stop() {
 	echo -n $"Shutting down:"
-	KP_PARENT=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
-	KP=`ps -eo pid,args|grep $BATCHEXE|grep -v grep|awk -F " " '{print $1}'|xargs`
+	KP_PARENT=`cat $LOCKFILE 2>/dev/null`
+	KP=`ps axf | awk '!/\\_ / {b=0} /php [K]GenericBatchMgr.class.php/ {b=1} b{print $1}'|xargs`
 	if [ -n "$KP" ]; then
 		if [ -f $BASE_DIR/keepAlive ]; then
 			echo "Server is on Keep Alive mode - workers won't be killed!"
