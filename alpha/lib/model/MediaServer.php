@@ -15,17 +15,22 @@
  */
 class MediaServer extends BaseMediaServer {
 	const DEFAULT_MANIFEST_PORT = 1935;
+	const DEFAULT_APPLICATION = 'kLive';
 	
 	public function getManifestUrl()
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
+		$app = MediaServer::DEFAULT_APPLICATION;
 		
 		if(kConf::hasMap('media_servers'))
 		{
 			$mediaServers = kConf::getMap('media_servers');
 			if(isset($mediaServers['port']))
 				$port = $mediaServers['port'];
+				
+			if(isset($mediaServers['application']))
+				$app = $mediaServers['application'];
 				
 			if(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
@@ -36,13 +41,16 @@ class MediaServer extends BaseMediaServer {
 				
 				if(isset($mediaServer['port']))
 					$port = $mediaServer['port'];
+				
+				if(isset($mediaServer['application']))
+					$app = $mediaServer['application'];
 					
 				if(isset($mediaServer['domain']))
 					$domain = $mediaServer['domain'];
 			}
 		}
 		
-		return "http://$domain:$port";
+		return "http://$domain:$port/$app/p";
 	}
 	
 } // MediaServer
