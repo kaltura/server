@@ -120,6 +120,7 @@ class LiveStreamService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
 			
 		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer->getId(), $hostname);
+		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
@@ -149,6 +150,7 @@ class LiveStreamService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
 			
 		$dbEntry->unsetMediaServer($mediaServerIndex, $dbMediaServer->getId());
+		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
