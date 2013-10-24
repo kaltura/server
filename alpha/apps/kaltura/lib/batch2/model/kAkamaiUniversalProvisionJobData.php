@@ -199,11 +199,11 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		$entry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastingUrl());
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName(). "_1_%i@".$entry->getStreamRemoteId());
-		$entry->setHlsStreamUrl("http://". ($this->getDomainName ? $this->domainName : self::DEFAULT_DOMAIN_NAME) ."/i/".$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
+		$entry->setHlsStreamUrl("http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/i/".$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
 		$configs = $entry->getLiveStreamConfigurations();
 		$config = new kLiveStreamConfiguration();
 		$config->setProtocol(PlaybackProtocol::AKAMAI_HDS);
-		$config->setUrl("http://". ($this->getDomainName ? $this->domainName : self::DEFAULT_DOMAIN_NAME) ."/z/".$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m");
+		$config->setUrl("http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/z/".$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m");
 		$configs[] = $config;
 		$entry->setLiveStreamConfigurations($configs);
 	}
