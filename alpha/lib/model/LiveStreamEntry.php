@@ -59,17 +59,26 @@ class LiveStreamEntry extends LiveEntry
 	public function setStreamBitrates (array $v )	{	$this->putInCustomData ( "streamBitrates" , $v );	}
 	public function getStreamBitrates (  )		{	return $this->getFromCustomData( "streamBitrates" );	}
 	
-	public function setMediaServerId($index, $serverId)
+	public function setMediaServer($index, $serverId, $hostname)
 	{
 		$servers = $this->getMediaServerIds();
-		$servers[$index] = $serverId;
+		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
 		
-		$this->putInCustomData("mediaServerId", $servers);	
+		$this->putInCustomData("mediaServers", $servers);	
 	}
 	
-	public function getMediaServerIds()
+	public function unsetMediaServer($index, $serverId)
 	{
-		return $this->getFromCustomData("mediaServerId", null, array());	
+		$servers = $this->getMediaServerIds();
+		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
+			unset($servers[$index]);
+		
+		$this->putInCustomData("mediaServers", $servers);	
+	}
+	
+	public function getMediaServers()
+	{
+		return $this->getFromCustomData("mediaServers", null, array());	
 	}
 	
 	public function getHlsStreamUrl ()

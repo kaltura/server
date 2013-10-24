@@ -14,5 +14,35 @@
  * @subpackage model
  */
 class MediaServer extends BaseMediaServer {
-
+	const DEFAULT_MANIFEST_PORT = 1935;
+	
+	public function getManifestUrl()
+	{
+		$domain = $this->getHostname();
+		$port = MediaServer::DEFAULT_MANIFEST_PORT;
+		
+		if(kConf::hasMap('media_servers'))
+		{
+			$mediaServers = kConf::getMap('media_servers');
+			if(isset($mediaServers['port']))
+				$port = $mediaServers['port'];
+				
+			if(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
+				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
+				
+			if(isset($mediaServers[$this->getHostname()]))
+			{
+				$mediaServer = $mediaServers[$this->getHostname()];
+				
+				if(isset($mediaServer['port']))
+					$port = $mediaServer['port'];
+					
+				if(isset($mediaServer['domain']))
+					$domain = $mediaServer['domain'];
+			}
+		}
+		
+		return "http://$domain:$port";
+	}
+	
 } // MediaServer

@@ -879,17 +879,18 @@ class Partner extends BasePartner
 	
 	public function setAdminLoginUsersOverageUnit($v)	{$this->putInCustomData('admin_login_users_overage_unit', $v);}
 	public function setPublishersOverageUnit($v)		{$this->putInCustomData('publishers_overage_unit', $v);}
-	public function setBandwidthOverageUnit($v)		{$this->putInCustomData('bandwidth_overage_unit', $v);}
-	public function setStreamEntriesOverageUnit($v)	{$this->putInCustomData('stream_entries_overage_unit', $v);}
+	public function setBandwidthOverageUnit($v)			{$this->putInCustomData('bandwidth_overage_unit', $v);}
+	public function setStreamEntriesOverageUnit($v)		{$this->putInCustomData('stream_entries_overage_unit', $v);}
 	public function setEntriesOverageUnit($v)			{$this->putInCustomData('entries_overage_unit', $v);}
 	public function setMonthlyStorageOverageUnit($v)	{$this->putInCustomData('monthly_storage_overage_unit', $v);}
 	public function setMonthlyStorageAndBandwidthOverageUnit($v)	{$this->putInCustomData('monthly_storage_and_bandwidth_overage_unit', $v);}
 	public function setEndUsersOverageUnit($v)			{$this->putInCustomData('end_users_overage_unit', $v);}
-	public function setLoginUsersOverageUnit($v)          {$this->putInCustomData('login_users_overage_unit', $v);}
-    public function setMaxLoginAttemptsOverageUnit($v)    {$this->putInCustomData('login_attempts_overage_unit', $v);}
-    public function setMaxBulkSizeOverageUnit($v)         {$this->putInCustomData('bulk_size_overage_unit', $v);}
-    public function setAutoModerateEntryFilter($v)       {$this->putInCustomData('auto_moderate_entry_filter', $v);}
-    public function setCacheFlavorVersion($v)       {$this->putInCustomData('cache_flavor_version', $v);}
+	public function setLoginUsersOverageUnit($v)		{$this->putInCustomData('login_users_overage_unit', $v);}
+    public function setMaxLoginAttemptsOverageUnit($v)	{$this->putInCustomData('login_attempts_overage_unit', $v);}
+    public function setMaxBulkSizeOverageUnit($v)		{$this->putInCustomData('bulk_size_overage_unit', $v);}
+    public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
+    public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
+    public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -922,11 +923,12 @@ class Partner extends BasePartner
 	public function getMonthlyStorageOverageUnit()		{return $this->getFromCustomData('monthly_storage_overage_unit');}
 	public function getMonthlyStorageAndBandwidthOverageUnit()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_unit');}
 	public function getEndUsersOverageUnit()			{return $this->getFromCustomData('end_users_overage_unit');}
-	public function getLoginUsersOverageUnit()          {return $this->getFromCustomData('login_users_overage_unit');}
-    public function getMaxLoginAttemptsOverageUnit()    {return $this->getFromCustomData('login_attempts_overage_unit');}
-    public function getMaxBulkSizeOverageUnit()         {return $this->getFromCustomData('bulk_size_overage_unit');}
-	public function getAutoModerateEntryFilter()         {return $this->getFromCustomData('auto_moderate_entry_filter');}
-    public function getCacheFlavorVersion()       {return $this->getFromCustomData('cache_flavor_version');}
+	public function getLoginUsersOverageUnit()			{return $this->getFromCustomData('login_users_overage_unit');}
+    public function getMaxLoginAttemptsOverageUnit()	{return $this->getFromCustomData('login_attempts_overage_unit');}
+    public function getMaxBulkSizeOverageUnit()			{return $this->getFromCustomData('bulk_size_overage_unit');}
+	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
+    public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
+    public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
 	
 	
 	/**
