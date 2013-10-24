@@ -262,6 +262,17 @@ class KCurlWrapper
 	{
 		return $this->setOpt(CURLOPT_TIMEOUT, $seconds);
 	}
+	
+	/**
+	 * @param int $seconds
+	 * @return boolean
+	 */
+	public function setKeepAlive($seconds)
+	{
+		return $this->setOpt(CURLOPT_HTTPHEADER, array(
+    						'Connection: Keep-Alive',
+    						'Keep-Alive: ' . $seconds));
+	}
 
 	/**
 	 * @param int $offset
