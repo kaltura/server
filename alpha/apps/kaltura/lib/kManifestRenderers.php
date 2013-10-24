@@ -291,18 +291,18 @@ class kProxyManifestRenderer extends kMultiFlavorManifestRenderer
 		$url = $mediaServer->getManifestUrl();
 		switch($format)
 		{
-			case PlaybackProtocol::HLS:
+			case 'hls':
 				$url .= "/$entryId/manifest.f4m";
 				if($entry->getDvrStatus() == DVRStatus::ENABLED)
 					$url .= '?DVR';
 					
 				break;
 				
-			case PlaybackProtocol::HDS:
+			case 'hds':
 				$url .= "/$entryId/playlist.m3u8";
 				break;
 				
-			case PlaybackProtocol::SILVER_LIGHT:
+			case 'sl':
 				$url .= "/$entryId/Manifest";
 				if($entry->getDvrStatus() == DVRStatus::ENABLED)
 					$url .= '?dvr';
@@ -320,16 +320,16 @@ class kProxyManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		switch($this->format)
 		{
-			case PlaybackProtocol::HLS:
+			case 'hls':
 				return array("Content-Type: application/x-mpegurl");
 				
-			case PlaybackProtocol::HDS:
+			case 'hds':
 				return array(
 					"Content-Type: text/xml; charset=UTF-8",
 					"Content-Disposition: inline; filename=manifest.xml",
 				);
 				
-			case PlaybackProtocol::SILVER_LIGHT:
+			case 'sl':
 				return array(
 					"Content-Type: text/xml; charset=UTF-8",
 					"Content-Disposition: inline; filename=manifest.xml",
