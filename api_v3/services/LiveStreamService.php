@@ -70,28 +70,13 @@ class LiveStreamService extends KalturaEntryService
 	{
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		/* @var $dbEntry LiveStreamEntry */
-		$dbEntry->save();
-		
+				
 		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
 		{
-			$dcUrl = 'rtmp://' . kDataCenterMgr::getCurrentDcDomain();
-			$partnerId = $dbEntry->getPartnerId();
-			$entryId = $dbEntry->getId();
-			$index = 0;
-			$token = $dbEntry->getStreamPassword();
-			$primaryBroadcastingUrl = "$dcUrl/kLive/p/$partnerId/e/$entryId/i/$index/t/$token"; 
-			$dbEntry->setPrimaryBroadcastingUrl($primaryBroadcastingUrl);
-			
-			$otherDcs = kDataCenterMgr::getAllDcs();
-			if(count($otherDcs))
-			{
-				$otherDc = reset($otherDcs);
-				
-				$dcUrl = 'rtmp://' . $otherDc['domain'];
-				$index = 1;
-				$secondaryBroadcastingUrl = "$dcUrl/kLive/p/$partnerId/e/$entryId/i/$index/t/$token"; 
-				$dbEntry->setSecondaryBroadcastingUrl($secondaryBroadcastingUrl);
-			}
+			$dbEntry->save();
+			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
+			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 		}
 		
 		return $dbEntry;
