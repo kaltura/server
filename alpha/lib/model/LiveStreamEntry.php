@@ -61,7 +61,7 @@ class LiveStreamEntry extends LiveEntry
 	
 	public function setMediaServer($index, $serverId, $hostname)
 	{
-		$servers = $this->getMediaServerIds();
+		$servers = $this->getMediaServers();
 		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
 		
 		$this->putInCustomData("mediaServers", $servers);	
@@ -69,7 +69,7 @@ class LiveStreamEntry extends LiveEntry
 	
 	public function unsetMediaServer($index, $serverId)
 	{
-		$servers = $this->getMediaServerIds();
+		$servers = $this->getMediaServers();
 		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
 			unset($servers[$index]);
 		
