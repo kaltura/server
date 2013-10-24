@@ -42,6 +42,7 @@ class KExternalErrors
 	const ILLEGAL_UI_CONF = 33;
 	const EXCEEDED_RESTRICTED_IP = 34;
 	const INVALID_FEED_ID = 35;
+	const ENTRY_NOT_LIVE = 36;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	

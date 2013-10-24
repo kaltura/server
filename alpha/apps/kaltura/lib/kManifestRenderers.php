@@ -121,6 +121,12 @@ abstract class kManifestRenderer
 		
 		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge);
 
+		echo $this->getContent();
+		die;
+	}
+	
+	protected function getContent()
+	{
 		$header = $this->getManifestHeader();
 		$footer = $this->getManifestFooter();
 		$flavors = $this->getManifestFlavors();
@@ -136,11 +142,9 @@ abstract class kManifestRenderer
 		
 		$flavorsString = implode($separator, $flavors);
 		$content .= $separator.$flavorsString;
+		$content .= $separator.$footer;
 		
-		$content.=$separator.$footer;
-		echo $content;
-		
-		die;
+		return $content;
 	}
 	
 	public function getRequiredFiles()
@@ -267,6 +271,107 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 				$flavor['url'] = self::urlJoin($flavor['urlPrefix'], $url);
 			}
 		}
+	}
+}
+
+class kProxyManifestRenderer extends kMultiFlavorManifestRenderer
+{
+	protected $format;
+	protected $body;
+	
+	public function __construct($format, LiveStreamEntry $entry)
+	{
+		$this->format = $format;
+		$entryId = $entry->getId();
+	
+		$mediaServer = $this->getMediaServer($entry);
+		if(!$mediaServer)
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting");
+			
+		$url = $mediaServer->getManifestUrl();
+		switch($format)
+		{
+			case PlaybackProtocol::HLS:
+				$url .= "/$entryId/manifest.f4m";
+				if($entry->getDvrStatus() == DVRStatus::ENABLED)
+					$url .= '?DVR';
+					
+				break;
+				
+			case PlaybackProtocol::HDS:
+				$url .= "/$entryId/playlist.m3u8";
+				break;
+				
+			case PlaybackProtocol::SILVER_LIGHT:
+				$url .= "/$entryId/Manifest";
+				if($entry->getDvrStatus() == DVRStatus::ENABLED)
+					$url .= '?dvr';
+					
+				break;
+		}
+		
+		$this->proxy($url);
+	}
+
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getHeaders()
+	 */
+	protected function getHeaders()
+	{
+		switch($this->format)
+		{
+			case PlaybackProtocol::HLS:
+				return array("Content-Type: application/x-mpegurl");
+				
+			case PlaybackProtocol::HDS:
+				return array(
+					"Content-Type: text/xml; charset=UTF-8",
+					"Content-Disposition: inline; filename=manifest.xml",
+				);
+				
+			case PlaybackProtocol::SILVER_LIGHT:
+				return array(
+					"Content-Type: text/xml; charset=UTF-8",
+					"Content-Disposition: inline; filename=manifest.xml",
+				);
+		}
+		
+		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getContent()
+	 */
+	protected function getContent()
+	{
+		return $this->body;
+	}
+	
+	private function proxy($url)
+	{
+		$curlWrapper = new KCurlWrapper($url);
+		$this->body = $curlWrapper->exec();
+	}
+	
+	/**
+	 * @param LiveStreamEntry $entry
+	 * @return MediaServer
+	 */
+	private function getMediaServer(LiveStreamEntry $entry)
+	{
+		$mediaServers = $entry->getMediaServers();
+		if(!count($mediaServers))
+			return null;
+			
+		foreach($mediaServers as $mediaServer)
+		{
+			/* @var $mediaServer kLiveMediaServer */
+			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+				return $mediaServer->getMediaServer();
+		}
+		
+		$mediaServer = reset($mediaServers);
+		return $mediaServer->getMediaServer();
 	}
 }
 

@@ -1314,7 +1314,7 @@ class playManifestAction extends kalturaAction
 	private function serveLiveEntry()
 	{		
 		$baseUrl = $this->getLiveEntryBaseUrl();
-		if (!$baseUrl)
+		if (!$baseUrl && $this->entry->getSource() != EntrySourceType::LIVE_STREAM)
 			return null;
 			
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
@@ -1338,6 +1338,9 @@ class playManifestAction extends kalturaAction
 				break;
 			
 			case PlaybackProtocol::APPLE_HTTP:
+				if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+					return new kProxyManifestRenderer(PlaybackProtocol::HLS, $this->entry);
+				
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = new kRedirectManifestRenderer();
 				$renderer->flavor = $flavor;
@@ -1345,9 +1348,17 @@ class playManifestAction extends kalturaAction
 			
 			case PlaybackProtocol::HDS:
 			case PlaybackProtocol::AKAMAI_HDS:
+				if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+					return new kProxyManifestRenderer(PlaybackProtocol::HDS, $this->entry);
+					
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = new kF4MManifestRenderer();
 				$renderer->flavors = array($flavor);
+				break;
+			
+			case PlaybackProtocol::SILVER_LIGHT:
+				if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+					return new kProxyManifestRenderer(PlaybackProtocol::SILVER_LIGHT, $this->entry);
 				break;
 		}
 				

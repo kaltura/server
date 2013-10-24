@@ -97,6 +97,63 @@ class LiveStreamService extends KalturaEntryService
 		return $this->getEntry($entryId, $version, KalturaEntryType::LIVE_STREAM);
 	}
 
+	/**
+	 * Register media server to live-stream entry
+	 * 
+	 * @action registerMediaServer
+	 * @param string $entryId Live stream entry id
+	 * @param string $hostname Media server host name
+	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
+	 * @return KalturaLiveStreamEntry The updated live stream entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
+	 */
+	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
+		if (!$dbMediaServer)
+			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
+			
+		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer->getId(), $hostname);
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		return $entry;
+	}
+
+	/**
+	 * Unregister media server from live-stream entry
+	 * 
+	 * @action unregisterMediaServer
+	 * @param string $entryId Live stream entry id
+	 * @param string $hostname Media server host name
+	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
+	 * @return KalturaLiveStreamEntry The updated live stream entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
+	 */
+	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
+		if (!$dbMediaServer)
+			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
+			
+		$dbEntry->unsetMediaServer($mediaServerIndex, $dbMediaServer->getId());
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		return $entry;
+	}
 	
 	/**
 	 * Update live stream entry. Only the properties that were set will be updated.
