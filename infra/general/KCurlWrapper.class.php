@@ -88,6 +88,7 @@ class KCurlWrapper
 {
 	const HTTP_PROTOCOL_HTTP = 1;
 	const HTTP_PROTOCOL_FTP = 2;
+	const DEFAULT_KEEP_ALIVE_TIME = 300;
 
 	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
 
@@ -267,7 +268,7 @@ class KCurlWrapper
 	 * @param int $seconds
 	 * @return boolean
 	 */
-	public function setKeepAlive($seconds)
+	public function setKeepAlive($seconds = self::DEFAULT_KEEP_ALIVE_TIME)
 	{
 		return $this->setOpt(CURLOPT_HTTPHEADER, array(
     						'Connection: Keep-Alive',

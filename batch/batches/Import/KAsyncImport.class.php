@@ -148,7 +148,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			KalturaLog::debug("Executing curl");
-			$curlWrapper->setKeepAlive(self::$taskConfig->params->curlTimeout/2);
+			$curlWrapper->setKeepAlive();
 			$res = $curlWrapper->exec($data->destFileLocalPath);
 			KalturaLog::debug("Curl results: $res");
 
