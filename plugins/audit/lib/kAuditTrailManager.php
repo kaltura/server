@@ -242,7 +242,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return null;
 		}
 		
-		KalturaLog::debug("Creating audit trail for object id[" . $object->getId() . "] type[$objectType]");
+		if(!in_array($objectType, AuditTrail::getAllwodObjectTypes()))
+			return null;
+		
+		KalturaLog::debug("Creating audit trail for object id[" . $object->getId() . "] type[$objectType]");		
 		
 		try
 		{

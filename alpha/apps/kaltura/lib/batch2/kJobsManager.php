@@ -79,6 +79,10 @@ class kJobsManager
 		}
 		
 		$lockObject = $dbBatchJob->getBatchJobLock();
+		if(is_null($lockObject)) {
+			KalturaLog::err("Batch job [" . $dbBatchJob->getId() . "] doesn't have a lock object and can't be deleted. Status (" . $dbBatchJob->getStatus() . ")");
+			return $dbBatchJob;
+		}
 		
 		// Update status 
 		$con = Propel::getConnection();
