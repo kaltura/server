@@ -41,6 +41,8 @@ class ConversionProfileService extends KalturaBaseService
 	 * @action setAsDefault
 	 * @param int $id
 	 * @return KalturaConversionProfile
+	 * 
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 */
 	public function setAsDefaultAction($id)
 	{
@@ -49,7 +51,13 @@ class ConversionProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $id);
 			
 		$partner = $this->getPartner();
-		$partner->setDefaultConversionProfileId($id);
+		
+		if($conversionProfileDb->getType() == ConversionProfileType::MEDIA)
+			$partner->setDefaultConversionProfileId($id);
+		
+		if($conversionProfileDb->getType() == ConversionProfileType::LIVE_STREAM)
+			$partner->setDefaultLiveConversionProfileId($id);
+			
 		$partner->save();
 		PartnerPeer::removePartnerFromCache($partner->getId());
 		
@@ -78,6 +86,8 @@ class ConversionProfileService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaConversionProfile $conversionProfile
 	 * @return KalturaConversionProfile
+	 * 
+	 * @throws KalturaErrors::ASSET_PARAMS_INVALID_TYPE
 	 */
 	public function addAction(KalturaConversionProfile $conversionProfile)
 	{
@@ -114,6 +124,8 @@ class ConversionProfileService extends KalturaBaseService
 	 * @action get
 	 * @param int $id
 	 * @return KalturaConversionProfile
+	 * 
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 */
 	public function getAction($id)
 	{
@@ -135,6 +147,9 @@ class ConversionProfileService extends KalturaBaseService
 	 * @param int $id
 	 * @param KalturaConversionProfile $conversionProfile
 	 * @return KalturaConversionProfile
+	 * 
+	 * @throws KalturaErrors::ASSET_PARAMS_INVALID_TYPE
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 */
 	public function updateAction($id, KalturaConversionProfile $conversionProfile)
 	{
@@ -176,6 +191,9 @@ class ConversionProfileService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param int $id
+	 * 
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE
 	 */
 	public function deleteAction($id)
 	{
@@ -233,6 +251,8 @@ class ConversionProfileService extends KalturaBaseService
 	 * 
 	 * @param conversionProfile2 $conversionProfileDb
 	 * @param $flavorParamsIds
+	 * 
+	 * @throws KalturaErrors::ASSET_PARAMS_INVALID_TYPE
 	 */
 	protected function addFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $flavorParamsIds)
 	{
@@ -244,6 +264,9 @@ class ConversionProfileService extends KalturaBaseService
 			/* @var $assetParams assetParams */
 			if(in_array($assetParams->getId(), $existingIds))
 				continue;
+				
+			if($conversionProfileDb->getType() == ConversionProfileType::LIVE_STREAM && $assetParams->getType() != assetType::LIVE)
+				throw new KalturaAPIException(KalturaErrors::ASSET_PARAMS_INVALID_TYPE, $assetParams->getId(), $assetParams->getType());
 				
 			$fpc = new flavorParamsConversionProfile();
 			$fpc->setConversionProfileId($conversionProfileDb->getId());

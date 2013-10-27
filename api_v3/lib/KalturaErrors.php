@@ -189,6 +189,8 @@ class KalturaErrors extends APIErrors
 
 	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND,Conversion profile id \"%s\" asset params id \"%s\" not found";
 
+	const ASSET_PARAMS_INVALID_TYPE = "ASSET_PARAMS_INVALID_TYPE,Asset params id \"%s\" type \"%s\" is invalid";
+
 
 	/**
 	 * FlavorParams Service

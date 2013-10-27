@@ -182,7 +182,12 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		$partner = PartnerPeer::retrieveByPK($this->partner_id);
 		if ($partner && $this->isDefault === true)
 		{
-			$partner->setDefaultConversionProfileId($this->getId());
+			if($this->getType() == ConversionProfileType::MEDIA)
+				$partner->setDefaultConversionProfileId($this->getId());
+				
+			if($this->getType() == ConversionProfileType::LIVE_STREAM)
+				$partner->setDefaultLiveConversionProfileId($this->getId());
+				
 			$partner->save();
 		}
 	}
@@ -209,7 +214,11 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function copyInto($copyObj, $deepCopy = false)
 	{
+		/* @var $copyObj conversionProfile2 */
+		
 		parent::copyInto($copyObj, $deepCopy);
+		$copyObj->setType($this->getType());
+		$copyObj->setMediaParserType($this->getMediaParserType());
 		$copyObj->setIsDefault($this->getIsDefault());
 	}
 	
@@ -251,5 +260,15 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	public function getCacheInvalidationKeys()
 	{
 		return array("conversionProfile2:partnerId=".$this->getPartnerId());
+	}
+	
+	public function getType()
+	{
+		return $this->getFromCustomData('type', null, conversionProfileType::MEDIA);
+	}
+	
+	public function setType($v)
+	{
+		$this->putInCustomData('type', $v);
 	}
 }

@@ -27,6 +27,12 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
+	 * @var KalturaConversionProfileType
+	 * @insertonly
+	 */
+	public $type;
+	
+	/**
 	 * The name of the Conversion Profile
 	 * 
 	 * @var string
@@ -146,6 +152,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"id",
 		"partnerId",
 		"status",
+		"type",
 		"name",
 		"systemName",
 		"tags",
