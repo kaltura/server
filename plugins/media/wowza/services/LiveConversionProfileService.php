@@ -59,7 +59,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		// translate the $liveParams to XML according to doc: http://www.wowza.com/forums/content.php?304#configTemplate
 		
-		$root = new SimpleXMLElement('Root');
+		$root = new SimpleXMLElement('<Root/>');
 		
 		$transcode = $root->addChild('Transcode');
 		
