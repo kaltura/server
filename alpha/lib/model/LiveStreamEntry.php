@@ -61,10 +61,24 @@ class LiveStreamEntry extends LiveEntry
 	
 	public function setMediaServer($index, $serverId, $hostname)
 	{
+		// TODO create cache
+		
+		if($this->isMediaServerRegistered($index, $serverId))
+			return;
+			
 		$servers = $this->getMediaServers();
 		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
 		
 		$this->putInCustomData("mediaServers", $servers);	
+	}
+	
+	protected function isMediaServerRegistered($index, $serverId)
+	{
+		$servers = $this->getMediaServers();
+		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
+			return true;
+			
+		return false;
 	}
 	
 	public function unsetMediaServer($index, $serverId)
@@ -78,7 +92,9 @@ class LiveStreamEntry extends LiveEntry
 	
 	public function getMediaServers()
 	{
-		return $this->getFromCustomData("mediaServers", null, array());	
+		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
+		// TODO - remove expired cache from $mediaServers
+		return $mediaServers;	
 	}
 	
 	public function getHlsStreamUrl ()
