@@ -327,6 +327,16 @@ class Partner extends BasePartner
 	}
 	
 	/**
+	 * Get the default live conversion profile id for the partner
+	 * 
+	 * @return int 
+	 */
+	public function getDefaultLiveConversionProfileId()
+	{
+		return $this->getFromCustomData("defaultLiveConversionProfileId");
+	}
+	
+	/**
 	 * Set the default access control profile id for the partner
 	 *  
 	 * @param int $v
@@ -356,6 +366,17 @@ class Partner extends BasePartner
 	public function setDefaultConversionProfileId($v)
 	{
 		$this->putInCustomData("defaultConversionProfileId", $v);
+	}
+	
+	/**
+	 * Set the live default conversion profile id for the partner
+	 *  
+	 * @param int $v
+	 * @return int
+	 */
+	public function setDefaultLiveConversionProfileId($v)
+	{
+		$this->putInCustomData("defaultLiveConversionProfileId", $v);
 	}
 	
 	public function getNotificationsConfig()

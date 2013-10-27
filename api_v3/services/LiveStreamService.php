@@ -73,7 +73,12 @@ class LiveStreamService extends KalturaEntryService
 				
 		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
 		{
+			$partner = $dbEntry->getPartner();
+			if($partner)
+				$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
+				
 			$dbEntry->save();
+			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
 			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
 			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
