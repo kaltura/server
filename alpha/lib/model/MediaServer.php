@@ -16,6 +16,50 @@
 class MediaServer extends BaseMediaServer {
 	const DEFAULT_MANIFEST_PORT = 1935;
 	const DEFAULT_APPLICATION = 'kLive';
+	const DEFAULT_TRANSCODER = 'default';
+	const DEFAULT_GPUID = -1;
+	
+	public function getTranscoder()
+	{
+		if(kConf::hasMap('media_servers'))
+		{
+			$mediaServers = kConf::getMap('media_servers');
+			
+			if(isset($mediaServers[$this->getHostname()]))
+			{
+				$mediaServer = $mediaServers[$this->getHostname()];
+				
+				if(isset($mediaServer['transcoder']))
+					return $mediaServer['transcoder'];
+			}
+					
+			if(isset($mediaServers['transcoder']))
+				return $mediaServers['transcoder'];
+		}
+		
+		return MediaServer::DEFAULT_TRANSCODER;
+	}
+	
+	public function getGPUID()
+	{
+		if(kConf::hasMap('media_servers'))
+		{
+			$mediaServers = kConf::getMap('media_servers');
+			
+			if(isset($mediaServers[$this->getHostname()]))
+			{
+				$mediaServer = $mediaServers[$this->getHostname()];
+				
+				if(isset($mediaServer['GPUID']))
+					return $mediaServer['GPUID'];
+			}
+					
+			if(isset($mediaServers['GPUID']))
+				return $mediaServers['GPUID'];
+		}
+		
+		return MediaServer::DEFAULT_GPUID;
+	}
 	
 	public function getManifestUrl()
 	{
