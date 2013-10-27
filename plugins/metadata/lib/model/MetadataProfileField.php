@@ -21,6 +21,6 @@ class MetadataProfileField extends BaseMetadataProfileField {
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("metadataProfileField:metadataProfileId=".$this->getMetadataProfileId());
+		return array("metadataProfileField:metadataProfileId=".strtolower($this->getMetadataProfileId()));
 	}
 } // MetadataProfileField

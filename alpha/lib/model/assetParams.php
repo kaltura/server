@@ -197,7 +197,7 @@ class assetParams extends BaseassetParams
 	}
 	public function getCacheInvalidationKeys()
 	{
-		return array("flavorParams:id=".$this->getId(), "flavorParams:partnerId=".$this->getPartnerId());
+		return array("flavorParams:id=".strtolower($this->getId()), "flavorParams:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
 	public function setSourceAssetParamsIds($sourceAssetParamsIds)

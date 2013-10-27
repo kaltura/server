@@ -176,6 +176,6 @@ class categoryEntry extends BasecategoryEntry {
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("categoryEntry:entryId=".$this->getEntryId());
+		return array("categoryEntry:entryId=".strtolower($this->getEntryId()));
 	}
 } // categoryEntry

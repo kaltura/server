@@ -1395,7 +1395,7 @@ class Partner extends BasePartner
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("partner:id=".$this->getId());
+		return array("partner:id=".strtolower($this->getId()));
 	}	
 	
 	public function getWidgetSessionRoleId() {
