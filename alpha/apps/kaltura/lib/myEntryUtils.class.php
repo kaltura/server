@@ -664,6 +664,9 @@ class myEntryUtils
 		$basePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $tempThumbName, $entryThumbFilename , $version );
 		$tempThumbPath = $contentPath.$basePath;
 		
+		if(!is_null($format))
+			$tempThumbPath = kFile::replaceExt($tempThumbPath, $format);
+		
 		if (file_exists($tempThumbPath) && @filesize($tempThumbPath))
 		{
 			header("X-Kaltura:cached-thumb-exists,".md5($tempThumbPath));
