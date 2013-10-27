@@ -6,9 +6,9 @@ if($argc < 2)
 }
 
 $dirName = $argv[1];
-if(!file_exists($dirName) || !is_dir($dirName))
+if(!file_exists($dirName))
 {
-	echo("Defaults configuration files directory [$dirName] is not a valid directory");
+	echo("Defaults configuration files directory [$dirName] is not a valid path");
 	exit(-2);
 }
 $dirName = realpath($dirName);
