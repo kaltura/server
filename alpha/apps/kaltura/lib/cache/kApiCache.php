@@ -23,7 +23,7 @@ class kApiCache extends kApiCacheBase
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '4';
+	const CACHE_VERSION = '5';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions

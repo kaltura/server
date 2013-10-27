@@ -61,7 +61,7 @@ function generateInvalidationKeyCode($invalidationKey)
 				$peerArrayElems[0] .= "%s";
 				$peerArrayElems[] = "self::" . strtoupper($curStr);
 				$curStrUpperCamel = str_replace(' ', '', ucwords(str_replace('_', ' ', $curStr)));
-				$objArrayElems[] = '$this->get' . $curStrUpperCamel . '()';
+				$objArrayElems[] = 'strtolower($this->get' . $curStrUpperCamel . '())';
 			}
 		}
 		
@@ -90,7 +90,7 @@ function generateInvalidationKeyCode($invalidationKey)
 		return array($peerKeys);		
 	}";
 	
-	return array($objFunc, $peerFunc);
+	return array(str_replace("\n", PHP_EOL, $objFunc), str_replace("\n", PHP_EOL, $peerFunc));
 }
 
 function getFuncEnd($fileData, $funcPos)
@@ -206,7 +206,7 @@ function buildTriggerBody($invalidationKey, $triggerType)
 				$curKey[] = $curStr;
 			else 
 			{
-				$curStrValue = "REPLACE($curStr,' ','_')";
+				$curStrValue = "LOWER(REPLACE($curStr,' ','_'))";
 				$curKey[] = "IF($curStr IS NULL,'',$curStrValue)";
 				$keyChangeCondition[] = str_replace('@OBJ@', 'OLD', $curStr) . ' <> ' . str_replace('@OBJ@', 'NEW', $curStr);
 			}

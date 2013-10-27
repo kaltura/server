@@ -762,7 +762,7 @@ class category extends Basecategory implements IIndexable
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("category:id=".$this->getId(), "category:partnerId=".$this->getPartnerId());
+		return array("category:id=".strtolower($this->getId()), "category:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
 	/**

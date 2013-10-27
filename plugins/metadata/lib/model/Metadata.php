@@ -157,6 +157,6 @@ class Metadata extends BaseMetadata implements ISyncableFile
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("metadata:objectId=".$this->getObjectId());
+		return array("metadata:objectId=".strtolower($this->getObjectId()));
 	}
 } // Metadata

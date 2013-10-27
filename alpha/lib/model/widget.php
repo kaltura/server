@@ -262,7 +262,7 @@ class widget extends Basewidget
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("widget:id=".$this->getId());
+		return array("widget:id=".strtolower($this->getId()));
 	}
 	
 	public function setPrivacyContext ( $v )	{		$this->putInCustomData ( "privacyContext" , $v );	}
