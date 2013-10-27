@@ -264,7 +264,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function getType()
 	{
-		return $this->getFromCustomData('type', null, conversionProfileType::MEDIA);
+		return $this->getFromCustomData('type', null, ConversionProfileType::MEDIA);
 	}
 	
 	public function setType($v)
