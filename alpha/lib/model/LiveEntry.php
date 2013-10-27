@@ -24,6 +24,16 @@ abstract class LiveEntry extends entry
 	public function setOfflineMessage ( $v )	{	$this->putInCustomData ( "offlineMessage" , $v );	}
 	public function getOfflineMessage (  )		{	return $this->getFromCustomData( "offlineMessage" );	}
 
+	public function getRecordStatus ()
+	{
+	    return $this->getFromCustomData("record_status");
+	}
+	
+	public function setRecordStatus ($v)
+	{
+	    $this->putInCustomData("record_status", $v);
+	}
+
 	public function getDvrStatus ()
 	{
 	    return $this->getFromCustomData("dvr_status");
