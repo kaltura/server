@@ -17,6 +17,7 @@ chdir(__DIR__);
 require_once (__DIR__ . '/../../bootstrap.php');
 
 $conversionProfile = new conversionProfile2();
+$conversionProfile->setPartnerId(99);
 $conversionProfile->setName('Default - Live');
 $conversionProfile->setType(ConversionProfileType::LIVE_STREAM);
 $conversionProfile->setSystemName('Default_Live');
