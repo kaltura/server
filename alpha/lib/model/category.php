@@ -16,8 +16,6 @@ class category extends Basecategory implements IIndexable
 	
 	protected $parent_category;
 	
-	protected $old_full_name = "";
-	
 	protected $old_parent_id = null;
 	
 	protected $old_inheritance_type = null;
@@ -40,13 +38,13 @@ class category extends Basecategory implements IIndexable
 	 * Array of entries that decremented in the current session and maybe not indexed yet
 	 * @var array
 	 */
-	protected $decrementedEntryIds = array();
+	protected static $decrementedEntryIds = array();
 	
 	/**
 	 * Array of entries that incremented in the current session and maybe not indexed yet
 	 * @var array
 	 */
-	protected $incrementedEntryIds = array();
+	protected static $incrementedEntryIds = array();
 	
 	public function save(PropelPDO $con = null)
 	{
@@ -340,16 +338,8 @@ class category extends Basecategory implements IIndexable
 	
 	public function setName($v)
 	{
-		$this->old_full_name = $this->getFullName();
-		
 		$v = categoryPeer::getParsedName($v);
 		parent::setName($v);
-	}
-	
-	public function setFullName($v)
-	{
-		$this->old_full_name = $this->getFullName();
-		parent::setFullName($v);
 	}
 	
 	/**
@@ -359,8 +349,6 @@ class category extends Basecategory implements IIndexable
 	
 	public function setParentId($v)
 	{
-		$this->old_full_name = $this->getFullName();
-		
 		$this->validateParentIdIsNotChild($v);
 		
 		if ($v !== 0)
@@ -1449,9 +1437,11 @@ class category extends Basecategory implements IIndexable
 	{
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->setCategoryAncestorId($this->getId());
 		$filter->setLimit(1);
 		$filter->attachToCriteria($baseCriteria);
+		
 		$baseCriteria->applyFilters();
 		
 		$count = $baseCriteria->getRecordsCount();
@@ -1464,14 +1454,19 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function decrementEntriesCount($entryId)
 	{
-		$this->decrementedEntryIds[$entryId] = $entryId;
-		if(isset($this->incrementedEntryIds[$entryId]))
-			unset($this->incrementedEntryIds[$entryId]);
+		KalturaLog::debug("decrementing $entryId from " . $this->getFullName());
+		if(!isset(self::$decrementedEntryIds[$this->getId()]))
+			self::$decrementedEntryIds[$this->getId()] = array();
+		self::$decrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
 		
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn($this->decrementedEntryIds);
+		$filter->setIdNotIn(self::$decrementedEntryIds[$this->getId()]);
 		$filter->setLimit(1);
 		$filter->attachToCriteria($baseCriteria);
 		$baseCriteria->applyFilters();
@@ -1496,20 +1491,25 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function incrementEntriesCount($entryId)
 	{
-		$this->incrementedEntryIds[$entryId] = $entryId;
-		if(isset($this->decrementedEntryIds[$entryId]))
-			unset($this->decrementedEntryIds[$entryId]);
+		KalturaLog::debug("incrementing $entryId to " . $this->getFullName());
+		if(!isset(self::$incrementedEntryIds[$this->getId()]))
+			self::$incrementedEntryIds[$this->getId()] = array();
+		self::$incrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
 		
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn($this->incrementedEntryIds);
+		$filter->setIdNotIn(self::$incrementedEntryIds[$this->getId()]);
 		$filter->setLimit(1);
 		$filter->attachToCriteria($baseCriteria);
 		$baseCriteria->applyFilters();
 		
 		$count = $baseCriteria->getRecordsCount();
-		$count += count($this->incrementedEntryIds);
+		$count += count(self::$incrementedEntryIds[$this->getId()]);
 		
 		$this->setEntriesCount($count);
 	
@@ -1529,9 +1529,16 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function reSetDirectEntriesCount()
 	{
-		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$criteria->addAnd(categoryEntryPeer::CATEGORY_ID, $this->getId());
-		$count = categoryEntryPeer::doCount($criteria);
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->setCategoriesIdsMatchAnd($this->getId());
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
 
 		$this->setDirectEntriesCount($count);
 	}
