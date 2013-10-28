@@ -290,7 +290,7 @@ class LiveStreamService extends KalturaEntryService
 				case KalturaPlaybackProtocol::HLS:
 					KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
 					$url = $liveStreamEntry->getHlsStreamUrl();
-					$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, 'protocol', $protocol);
+					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol);
 					if ($config)
 						$url = $config->getUrl();
 					$url = $this->getTokenizedUrl($id, $url, $protocol);
@@ -299,7 +299,7 @@ class LiveStreamService extends KalturaEntryService
 					
 				case KalturaPlaybackProtocol::HDS:
 				case KalturaPlaybackProtocol::AKAMAI_HDS:
-					$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, "protocol", $protocol);
+					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol);
 					if ($config)
 					{
 						$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
