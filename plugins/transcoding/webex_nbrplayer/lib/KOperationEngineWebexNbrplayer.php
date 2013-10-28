@@ -147,8 +147,8 @@ public function buildCfgFile($inputFile, $outputFile, $format=null,
 						KalturaLog::err("Failed to move ($fileName) to ($toFile)");
 						Sleep(60);
 					}
-					Sleep(60);
 				}
+				Sleep(60);
 				rmdir($tempFolder);
 			}
 		}
