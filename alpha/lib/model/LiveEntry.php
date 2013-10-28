@@ -59,8 +59,136 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurations ()
+	public function getLiveStreamConfigurationByProtocol($protocol, $tag = null)
 	{
-		return $this->getFromCustomData('live_stream_configurations', null, array());
+		$configurations = $this->getLiveStreamConfigurations($tag);
+		foreach($configurations as $configuration)
+		{
+			/* @var $configuration kLiveStreamConfiguration */
+			if ($configuration->getProtocol() == $protocol)
+				return $configuration;
+		}
+
+		return null;
+	}
+	
+	public function getLiveStreamConfigurations($tag = null)
+	{
+		$configurations = $this->getFromCustomData('live_stream_configurations');
+		if($configurations)
+			return $configurations;
+			
+		$configurations = array();
+		$mediaServer = $this->getMediaServer();
+		if($mediaServer)
+		{
+			$streamName = $this->getStreamName();
+			if(is_null($tag) && $this->getConversionProfileId())
+				$tag = 'all';
+			
+			$manifestUrl = $mediaServer->getManifestUrl() . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
+			
+			$hlsStreamUrl	.= "/playlist.m3u8";
+			$hdsStreamUrl	.= "/playlist.f4m";
+			$mpdStreamUrl	.= "/manifest.mpd";
+			$slStreamUrl	.= "/Manifest";
+			
+			if($this->getDvrStatus() == DVRStatus::ENABLED)
+			{
+				$hlsStreamUrl	.= "?DVR";
+				$hdsStreamUrl	.= "?DVR";
+				$slStreamUrl	.= "?dvr";
+			}
+				
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol(PlaybackProtocol::RTMP);
+			$configuration->setUrl($mediaServer->getRtmpUrl());
+			$configurations[] = $configuration;
+			
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol(PlaybackProtocol::HDS);
+			$configuration->setUrl($hdsStreamUrl);
+			$configurations[] = $configuration;
+			
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol(PlaybackProtocol::HLS);
+			$configuration->setUrl($hlsStreamUrl);
+			$configurations[] = $configuration;
+			
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
+			$configuration->setUrl($hlsStreamUrl);
+			$configurations[] = $configuration;
+			
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
+			$configuration->setUrl($slStreamUrl);
+			$configurations[] = $configuration;
+			
+			$configuration = new kLiveStreamConfiguration();
+			$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
+			$configuration->setUrl($mpdStreamUrl);
+			$configurations[] = $configuration;
+		}
+			
+		return $configurations;
+	}
+
+	/**
+	 * @return MediaServer
+	 */
+	protected function getMediaServer()
+	{
+		$mediaServers = $this->getMediaServers();
+		if(!count($mediaServers))
+			return null;
+			
+		foreach($mediaServers as $mediaServer)
+		{
+			/* @var $mediaServer kLiveMediaServer */
+			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+				return $mediaServer->getMediaServer();
+		}
+		
+		$mediaServer = reset($mediaServers);
+		return $mediaServer->getMediaServer();
+	}
+	
+	public function setMediaServer($index, $serverId, $hostname)
+	{
+		// TODO create cache
+		
+		if($this->isMediaServerRegistered($index, $serverId))
+			return;
+			
+		$servers = $this->getMediaServers();
+		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
+		
+		$this->putInCustomData("mediaServers", $servers);	
+	}
+	
+	protected function isMediaServerRegistered($index, $serverId)
+	{
+		$servers = $this->getMediaServers();
+		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
+			return true;
+			
+		return false;
+	}
+	
+	public function unsetMediaServer($index, $serverId)
+	{
+		$servers = $this->getMediaServers();
+		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
+			unset($servers[$index]);
+		
+		$this->putInCustomData("mediaServers", $servers);	
+	}
+	
+	public function getMediaServers()
+	{
+		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
+		// TODO - remove expired cache from $mediaServers
+		return $mediaServers;	
 	}
 }
