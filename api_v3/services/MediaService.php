@@ -115,7 +115,7 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null)
     {
-		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		if(($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && !$dbEntry->getReplacingEntryId()) || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->validateEntry($dbEntry);
 
