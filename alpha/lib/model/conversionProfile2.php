@@ -161,10 +161,15 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 				return false;
 				
 			$partner = PartnerPeer::retrieveByPK($this->partner_id);
-			if ($partner && ($this->getId() == $partner->getDefaultConversionProfileId()))
-				$this->isDefault = true;
-			else
-				$this->isDefault = false;
+			if ($partner)
+			{
+				if ($this->getType() == ConversionProfileType::MEDIA && $this->getId() == $partner->getDefaultConversionProfileId())
+					$this->isDefault = true;
+				elseif ($this->getType() == ConversionProfileType::LIVE_STREAM && $this->getId() == $partner->getDefaultLiveConversionProfileId())
+					$this->isDefault = true;
+				else
+					$this->isDefault = false;
+			}
 		}
 		
 		return $this->isDefault;
