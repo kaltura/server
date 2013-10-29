@@ -274,15 +274,11 @@ class LiveStreamService extends KalturaEntryService
 		{
 			if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
 			{
-				$servers = $liveStreamEntry->getMediaServerIds();
-				if(!count($servers))
-					return false;
+				$servers = $liveStreamEntry->getMediaServers();
+				if(count($servers))
+					return true;
 					
-				/**
-				 * TODO
-				 * 
-				 * Return from WSDL according to $servers;
-				 */
+				return false;
 			}
 			
 			switch ($protocol)
