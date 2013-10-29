@@ -128,7 +128,9 @@ class KalturaPDO extends PropelPDO
 			KalturaLog::alert($pex->getMessage());
 			throw new PropelException("Database error");
 		}
-		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		$sqlTook = microtime(true) - $sqlStart;
+		KalturaLog::debug("Sql took - " . $sqlTook . " seconds");
+		KalturaMonitorClient::monitorDatabaseAccess($sql, $sqlTook, $this->hostName);
 		
 		return $result;
 	}
@@ -141,7 +143,10 @@ class KalturaPDO extends PropelPDO
 		
 		$sqlStart = microtime(true);
 		$stmt = parent::query($finalSql);
-		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		
+		$sqlTook = microtime(true) - $sqlStart;
+		KalturaLog::debug("Sql took - " . $sqlTook . " seconds");
+		KalturaMonitorClient::monitorDatabaseAccess($sql, $sqlTook, $this->hostName);
 		
 		if (!$stmt)
 			return false;
@@ -192,7 +197,9 @@ class KalturaPDO extends PropelPDO
 			KalturaLog::alert($pex->getMessage());
 			throw new PropelException("Database error");
 		}
-		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		$sqlTook = microtime(true) - $sqlStart;
+		KalturaLog::debug("Sql took - " . $sqlTook . " seconds");
+		KalturaMonitorClient::monitorDatabaseAccess($sql, $sqlTook, $this->hostName);
 		
 		return $result;
 	}
