@@ -36,6 +36,7 @@ class kFlowHelper
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
 		$flavorAsset->setIsOriginal(true);
+		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
 		$flavorAsset->save();
