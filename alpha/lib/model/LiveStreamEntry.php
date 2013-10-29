@@ -56,9 +56,6 @@ class LiveStreamEntry extends LiveEntry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
 	
-	public function setStreamBitrates (array $v )	{	$this->putInCustomData ( "streamBitrates" , $v );	}
-	public function getStreamBitrates (  )		{	return $this->getFromCustomData( "streamBitrates" );	}
-
 	public function getHlsStreamUrl ()
 	{
 	    return $this->getFromCustomData("hls_stream_url");
