@@ -449,20 +449,31 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		}
 	}
 	
-	public function validateObjectsExist()
+	public function validateObjectsExist(entry $sourceObject = null)
 	{
-		if(!is_null($this->conversionProfileId) && $this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
-		{
-			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
-			if(!$conversionProfile)
-				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
-		}
+		$this->validateConversionProfile($sourceObject);
 	
 		if(!is_null($this->accessControlId))
 		{
 			$accessControlProfile = accessControlPeer::retrieveByPK($this->accessControlId);
 			if(!$accessControlProfile)
 				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $this->accessControlId);
+		}
+	}
+	
+	public function validateConversionProfile(entry $sourceObject = null)
+	{
+		if(is_null($this->conversionProfileId))
+			return;
+			
+		if($sourceObject && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
+		
+		if($this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
+		{
+			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
+			if(!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::MEDIA)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
 		}
 	}
 	
@@ -583,11 +594,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 //			if(count($c->getFetchedIds()))
 //				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
 //		}
-		
-		if(!is_null($this->conversionProfileId) && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
 				
-		$this->validateObjectsExist();
+		$this->validateObjectsExist($sourceObject);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

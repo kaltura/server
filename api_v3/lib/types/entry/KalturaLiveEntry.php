@@ -63,4 +63,15 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}
+
+	
+	public function validateConversionProfile(entry $sourceObject = null)
+	{
+		if(!is_null($this->conversionProfileId) && $this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
+		{
+			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
+			if(!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::LIVE_STREAM)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
+		}
+	}
 }
