@@ -101,7 +101,7 @@ Templates:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(parseAddress(options.tcpAddress))
 
-    # send the comment
+    # send the command
     sock.send('%s/%s\n' % (options.filter, options.groupBy))
 
     # read the output
