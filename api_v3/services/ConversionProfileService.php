@@ -71,12 +71,17 @@ class ConversionProfileService extends KalturaBaseService
 	/**
 	 * Get the partner's default conversion profile
 	 * 
+	 * @param KalturaConversionProfileType $type
 	 * @action getDefault
 	 * @return KalturaConversionProfile
 	 */
-	public function getDefaultAction()
+	public function getDefaultAction($type = null)
 	{
-		$defaultProfileId = $this->getPartner()->getDefaultConversionProfileId();
+		if(is_null($type) || $type == KalturaConversionProfileType::MEDIA)
+			$defaultProfileId = $this->getPartner()->getDefaultConversionProfileId();
+		elseif($type == KalturaConversionProfileType::LIVE_STREAM)
+			$defaultProfileId = $this->getPartner()->getDefaultLiveConversionProfileId();
+			
 		return $this->getAction($defaultProfileId);
 	}
 	
