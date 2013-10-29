@@ -195,6 +195,18 @@ class categoryKuserIndex extends BaseIndexObject
 		return self::$conditionToKeep;
 	}
 
+	public static function getSphinxOptimizationMap()
+	{
+		return array(
+		);
+	}
+
+	public static function getSphinxOptimizationValues()
+	{
+		return array(
+		);
+	}
+
 	public static function doCountOnPeer(Criteria $c)
 	{
 		return categoryKuserPeer::doCount($c);

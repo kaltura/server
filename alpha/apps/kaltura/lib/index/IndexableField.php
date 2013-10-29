@@ -43,6 +43,9 @@ class IndexableField {
 	
 	/** Whether we keep this field condition for the DB searching as well*/
 	public $keepCondition = false; 
+	
+	/** Whether the field is both sphinx Field and Attribute*/
+	public $sphinxStringAttribute = "field";
 
 	public function __construct($name, $index, $type) {
 		$this->name = $name;
@@ -217,8 +220,20 @@ class IndexableField {
 	public function setKeepCondition($keepCondition) {
 		$this->keepCondition = $keepCondition;
 	}
+	
+	/**
+	 * @return the $sphinxStringAttribute
+	 */
+	public function getSphinxStringAttribute() {
+		return $this->sphinxStringAttribute;
+	}
 
-
+	/**
+	 * @param boolean $sphinxStringAttribute
+	 */
+	public function setSphinxStringAttribute($sphinxStringAttribute) {
+		$this->sphinxStringAttribute = $sphinxStringAttribute;
+	}
 	
 }
 

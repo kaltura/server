@@ -94,6 +94,7 @@ class kuserIndex extends BaseIndexObject
 				'permission_names' => IIndexable::FIELD_TYPE_STRING,
 				'role_ids' => IIndexable::FIELD_TYPE_STRING,
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
+				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -143,6 +144,7 @@ class kuserIndex extends BaseIndexObject
 				'kuser.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
 				'kuser.FIRST_NAME_OR_LAST_NAME' => '(full_name,last_name)',
 				'kuser.PUSER_ID_OR_SCREEN_NAME' => '(puser_id,screen_name)',
+				'kuser.PLUGINS_DATA' => 'plugins_data',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -236,6 +238,18 @@ class kuserIndex extends BaseIndexObject
 			);
 		}
 		return self::$conditionToKeep;
+	}
+
+	public static function getSphinxOptimizationMap()
+	{
+		return array(
+		);
+	}
+
+	public static function getSphinxOptimizationValues()
+	{
+		return array(
+		);
 	}
 
 	public static function doCountOnPeer(Criteria $c)

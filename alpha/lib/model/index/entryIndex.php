@@ -146,7 +146,7 @@ class entryIndex extends BaseIndexObject
 				'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 				'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
-				'partner_status_idx' => IIndexable::FIELD_TYPE_STRING,
+				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -235,7 +235,6 @@ class entryIndex extends BaseIndexObject
 				'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
 				'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
 				'entry.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
-				'entry.PARTNER_STATUS_VALUE' => 'partner_status_idx',
 				'entry.PLUGINS_DATA' => 'plugins_data',
 				'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
 			);
@@ -352,6 +351,22 @@ class entryIndex extends BaseIndexObject
 			);
 		}
 		return self::$conditionToKeep;
+	}
+
+	public static function getSphinxOptimizationMap()
+	{
+		return array(
+			array("P%sST%s","entry.PARTNER_ID","entry.STATUS"),
+			array("%s","entry.ID"),
+		);
+	}
+
+	public static function getSphinxOptimizationValues()
+	{
+		return array(
+			array("P%sST%s","getPartnerId","getStatus"),
+			array("%s","getId"),
+		);
 	}
 
 	public static function doCountOnPeer(Criteria $c)

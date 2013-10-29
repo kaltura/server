@@ -9,12 +9,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return "entryIndex";
 	} 
 	
-	public static $sphinxOptimizationMap = array(
-		// array(format, 'field1', 'field2',...)
-		array(entry::PARTNER_STATUS_FORMAT, entryPeer::PARTNER_ID , entryPeer::STATUS),
-		array("%s", entryPeer::ID),
-	);
-
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::applyFilterFields()
 	 */
@@ -275,11 +269,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		parent::applyFilter($filter);
 	}
 
-	public function getSphinxOptimizationMap() 
-	{
-		return self::$sphinxOptimizationMap;
-	}
-	
 	public function hasPeerFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)

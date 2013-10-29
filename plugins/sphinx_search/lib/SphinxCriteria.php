@@ -294,7 +294,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	protected function addSphinxOptimizationMatches(array $criterionsMap) 
 	{
-		$optimizationField = $this->getSphinxOptimizationMap();
+		$objectClass = $this->getIndexObjectName();
+		$optimizationField = $objectClass::getSphinxOptimizationMap();
 		
 		foreach($optimizationField as $formatParams) {
 			$hasEmptryField = false;
@@ -825,13 +826,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		return $criterionFields;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function getSphinxOptimizationMap() {
-		return array();
 	}
 	
 	private function shouldSkipSphinx()

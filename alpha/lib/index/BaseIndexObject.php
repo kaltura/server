@@ -155,4 +155,18 @@ abstract class BaseIndexObject
 		}
 		return $fieldName;
 	}
+	
+	public static function getSphinxMatchOptimizations($object) {
+		$optimizations = array();
+		$sphinxOptimizationMap = static::getSphinxOptimizationValues();
+		foreach($sphinxOptimizationMap as $optimization) {
+			$format = array_shift($optimization);
+			$curOptimization = array();
+			foreach($optimization as $curGetter) {
+				$curOptimization[] = call_user_func(array($object,$curGetter));
+			}
+			$optimizations[] = vsprintf($format,$curOptimization);
+		}
+		return implode(" ", $optimizations);
+	}
 }

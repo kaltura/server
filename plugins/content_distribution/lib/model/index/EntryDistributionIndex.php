@@ -58,7 +58,6 @@ class EntryDistributionIndex extends BaseIndexObject
 				'error_type' => 'errorType',
 				'error_number' => 'errorNumber',
 				'last_report' => 'lastReport',
-				'next_report' => 'nextReport',
 			);
 		}
 		return self::$fieldsMap;
@@ -93,6 +92,8 @@ class EntryDistributionIndex extends BaseIndexObject
 				'error_number' => IIndexable::FIELD_TYPE_INTEGER,
 				'last_report' => IIndexable::FIELD_TYPE_DATETIME,
 				'next_report' => IIndexable::FIELD_TYPE_DATETIME,
+				'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
+				'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 			);
 		}
 		return self::$typesMap;
@@ -139,6 +140,8 @@ class EntryDistributionIndex extends BaseIndexObject
 				'entry_distribution.ERROR_NUMBER' => 'error_number',
 				'entry_distribution.LAST_REPORT' => 'last_report',
 				'entry_distribution.NEXT_REPORT' => 'next_report',
+				'entry_distribution.STR_ENTRY_ID' => 'str_entry_id',
+				'entry_distribution.INT_ENTRY_ID' => 'int_entry_id',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -197,7 +200,6 @@ class EntryDistributionIndex extends BaseIndexObject
 				'entry_distribution.PLAYS' => 'plays',
 				'entry_distribution.VIEWS' => 'views',
 				'entry_distribution.LAST_REPORT' => 'last_report',
-				'entry_distribution.NEXT_REPORT' => 'next_report',
 			);
 		}
 		return self::$orderFields;
@@ -225,6 +227,18 @@ class EntryDistributionIndex extends BaseIndexObject
 			);
 		}
 		return self::$conditionToKeep;
+	}
+
+	public static function getSphinxOptimizationMap()
+	{
+		return array(
+		);
+	}
+
+	public static function getSphinxOptimizationValues()
+	{
+		return array(
+		);
 	}
 
 	public static function doCountOnPeer(Criteria $c)

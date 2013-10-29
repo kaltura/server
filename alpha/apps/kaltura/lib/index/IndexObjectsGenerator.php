@@ -2,28 +2,30 @@
 
 require('IndexableField.php');
 require('IndexableObject.php');
+require('IndexableOptimization.php');
 
 class IndexObjectsGenerator  
 {
 	private $searchableObjects = array();	
 	private $searchableFields = array();
+	private $searchableIndices = array();
 	private $indexFiles = array();
 	
-	public function handle($file, $dirname)
+	public function generateIndexFiles($keys, $dirname)
 	{
-		$this->load($file);
-		$keys = array_keys($this->searchableFields);
 		foreach($keys as $key) {
 			$this->handleSingleFile($key, $dirname);
 		}
 	}
 	
 	private function handleSingleFile($key, $path) {
-		$path = $path . "/lib/model/index/{$key}Index.php";
+		$path = $path . "//{$key}Index.php";
+		
 		$fp = fopen($path, 'w');
 		if(!$fp)
 			die("Failed to open file " . $path);
 		
+		print "\tGenerating Index objects for $key\n";
 		$this->createFileHeader($fp, $key);
 		
 		$this->generateSimpleFunction("getObjectIndexName", $fp, $this->searchableObjects[$key]);
@@ -43,6 +45,9 @@ class IndexObjectsGenerator
 		$this->generateMapping("getIndexSkipFieldsList", $fp, $key, "skipFields");
 		$this->generateMapping("getSphinxConditionsToKeep", $fp, $key, "conditionToKeep");
 		
+		$this->generateIndexMapping("getSphinxOptimizationMap", $fp, $key, "name");
+		$this->generateIndexMapping("getSphinxOptimizationValues", $fp, $key, "getter");
+		
 		$this->getDoCount($fp, $this->searchableObjects[$key]->peerName);
 		
 		$this->createFileFooter($fp, $key);
@@ -50,23 +55,34 @@ class IndexObjectsGenerator
 		fclose($fp);
 	}
 	
-	private function load($inputFile)
+	public function load($inputFile)
 	{
+		$objects = array();
 		$xml = simplexml_load_file($inputFile);
-		foreach($xml->children() as $objName => $searchableObject) {
- 			$this->searchableFields["$objName"] = array();
+		foreach($xml->children() as $searchableObject) {
+			$objectAttribtues = $searchableObject->attributes();
+			$objName = $objectAttribtues["name"];
+			
+ 			$this->parseObject("$objName", $objectAttribtues);
+ 			$this->searchableIndices["$objName"] = array();
  			
- 			$this->parseObject("$objName", $searchableObject);
- 			
-			foreach($searchableObject->children() as $name => $searchableField) {
-				$this->parseField("$objName", $name, $searchableField);
+			foreach($searchableObject->children() as $type => $searchableField) {
+				switch($type) {
+					case "field":
+						$this->parseField("$objName", $searchableField);
+						break;
+					case "index":
+						$this->parseIndex("$objName", $searchableField);
+						break;
+				}
 			}
+			$objects[] = "$objName";
 		}
+		return $objects;
 	}
 	
-	private function parseObject($objName, $searchableObject) {
+	private function parseObject($objName, $objectAttribtues) {
 		$object = new IndexableObject($objName);
-		$objectAttribtues = $searchableObject->attributes();
 		if(isset($objectAttribtues["indexId"]))
 			$object->setIndexId($objectAttribtues["indexId"]);
 		if(isset($objectAttribtues["objectId"]))
@@ -90,15 +106,16 @@ class IndexObjectsGenerator
 		$this->searchableObjects[$objName] = $object;
 	}
 	
-	private function parseField($objName, $name, $searchableField) 
+	private function parseField($objName, $searchableField) 
 	{
 		$fieldAttribtues = $searchableField->attributes();
+		$name = $fieldAttribtues["name"];
 		$index = $fieldAttribtues["indexName"];
 		$type = $fieldAttribtues["type"];
 		$field = new IndexableField("$name", "$index", "$type");
 		
 		$field->setGetter(isset($fieldAttribtues["getter"]) ? $fieldAttribtues["getter"] :
-				preg_replace('/_(.?)/e',"strtoupper('$1')",$name));
+				preg_replace('/_(.?)/e',"strtoupper('$1')","$name"));
 		
 		if(isset($fieldAttribtues["nullable"]))
 			$field->setNullable($fieldAttribtues["nullable"] == "yes");
@@ -124,7 +141,31 @@ class IndexObjectsGenerator
 		if(isset($fieldAttribtues["keepCondition"]))
 			$field->setKeepCondition($fieldAttribtues["keepCondition"] == "yes");
 		
+		if(isset($fieldAttribtues["sphinxStringAttribute"])) {
+			$sphinxType = $fieldAttribtues["sphinxStringAttribute"];
+			$field->setSphinxStringAttribute("$sphinxType");
+		}
+		
 		$this->searchableFields[$objName]["$name"] = $field;
+	}
+	
+	private function parseIndex($objName, $indexComplex)
+	{
+		$index = array();
+		$fieldAttribtues = $indexComplex->attributes();
+		$format = $fieldAttribtues["format"];
+		$index[] = "\"$format\"";
+		foreach($indexComplex->children() as $indexValue) {
+			$idxValueAttr = $indexValue->attributes();
+			$fieldName = $idxValueAttr["field"];
+			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
+				"get" . ucwords(preg_replace('/_(.?)/e',"strtoupper('$1')", $fieldName));
+			$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
+			
+			$index[] = new IndexableOptimization('"' . $fieldName . '"', '"' . $getter . '"');
+		}
+		
+		$this->searchableIndices[$objName][] = $index;
 	}
 	
 	private function toPeerName($object, $field) {
@@ -195,6 +236,7 @@ class IndexObjectsGenerator
 				$type = "IIndexable::FIELD_TYPE_STRING";
 				break;
 			case "int":
+			case "bint":
 				$type = "IIndexable::FIELD_TYPE_INTEGER";
 				break;
 			case "datetime":
@@ -316,15 +358,96 @@ class IndexObjectsGenerator
 	private function printToFile($fp, $string, $tabs = 0) {
 		fwrite($fp, str_repeat("\t",$tabs) . $string . "\n");
 	}
+	
+	private function generateIndexMapping($function, $fp, $key, $field) {
+		$this->printToFile($fp, "public static function $function()",1);
+		$this->printToFile($fp, "{",1);
+		$this->printToFile($fp, "return array(",2);
+		foreach($this->searchableIndices[$key] as $indices) {
+			$names = array();
+			$names[] = array_shift($indices);
+			foreach($indices as $index)
+				$names[] = call_user_func(array($index, "get" . ucwords($field)));
+			$this->printToFile($fp, "array(" . implode(",", $names) . "),",3);
+		}
+				
+		$this->printToFile($fp, ");",2);
+		$this->printToFile($fp, "}",1);
+		$this->printToFile($fp, "");
+	}
+	
+	public function generateConfigurationFile($structFile, $outputFile) {
+		
+		print "Generating Kaltura.conf file based on {$structFile} at {$outputFile}\n";
+		
+		$sphinxConfiguration = file_get_contents($structFile);
+		
+		foreach ($this->searchableObjects as $object) {
+			$sphinxConfiguration = preg_replace("/@FIELDS_PLACEHOLDER-kaltura_{$object->indexName}@/", 
+				$this->generateFields($object->name), $sphinxConfiguration, -1, $cnt);
+			if($cnt != 1)
+				die("Failed to generate kaltura conf for {$object->name}.");
+		}
+		
+		if(preg_match("/@FIELDS_PLACEHOLDER-([\w]*)@/", $sphinxConfiguration,$matches))
+			die("Not all kaltura conf sections were filled! Missing " . $matches[1]);
+		
+		file_put_contents($outputFile, $sphinxConfiguration);
+	}
+	
+	private function generateFields($objectName) {
+		$fieldsMap = array();
+		foreach ($this->searchableFields[$objectName] as $field) {
+			$types = $this->toSphinxType($field->type, $field->matchable, $field->sphinxStringAttribute);
+			foreach($types as $type)
+				$fieldsMap[] = $type . " = " . $field->indexName;
+		}
+		return implode("\n\t", $fieldsMap);
+	}
+	
+	private function toSphinxType($type, $matchable, $sphinxStringAttr) {
+		switch($type) {
+			case "string":
+				if($sphinxStringAttr == "both")
+					return array("rt_field", "rt_attr_string");
+				if($sphinxStringAttr == "string")
+					return array("rt_attr_string");
+				return array("rt_field");
+			case "int":
+				return array("rt_attr_uint");
+			case "bint":
+				return array("rt_attr_bigint");
+			case "datetime":
+				return array("rt_attr_timestamp");
+			case "json":
+				return array("rt_attr_json");
+		}
+		return array();
+	}
+	
 }
 
 function main($argv) 
 {
-	if(count($argv) != 3)
-		die("Illegal command. use IndexObjectsGenerator <indexFile> <generationPath>\n");
-	print "Generating Index objects for index file : " . $argv[1] . "\n";
+	if(count($argv) < 4)
+		die("Illegal command. use IndexObjectsGenerator <template> <updated-conf> <indexFile>=<generationPath>\n");
+	
+	$template = $argv[1];
+	$confFile = $argv[2];
+	
 	$generator = new IndexObjectsGenerator();
-	$generator->handle($argv[1], $argv[2]);
+	
+	foreach($argv as $arg) {
+		if(strpos($arg, "=") === false)
+			continue;
+		
+		list($indexFile, $dirPath) = explode("=", $arg);
+		print "Handling Index file $indexFile \n";
+		$keys = $generator->load($indexFile);
+		$generator->generateIndexFiles($keys, $dirPath);
+	}
+	
+	$generator->generateConfigurationFile($template, $confFile);
 }
 
 main($argv);

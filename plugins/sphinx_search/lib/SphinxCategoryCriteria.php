@@ -9,11 +9,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		return "categoryIndex";
 	}
 	
-	public static $sphinxOptimizationMap = array(
-			// array(format, 'field1', 'field2',...)
-			array("%s", categoryPeer::ID),
-	);
-
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::applyFilterFields()
 	 */
@@ -273,11 +268,6 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		}
 		
 		return parent::applyFilterFields($filter);
-	}
-	
-	public function getSphinxOptimizationMap()
-	{
-		return self::$sphinxOptimizationMap;
 	}
 	
 	public function hasPeerFieldName($fieldName)

@@ -290,6 +290,20 @@ class categoryIndex extends BaseIndexObject
 		return self::$conditionToKeep;
 	}
 
+	public static function getSphinxOptimizationMap()
+	{
+		return array(
+			array("%s","category.ID"),
+		);
+	}
+
+	public static function getSphinxOptimizationValues()
+	{
+		return array(
+			array("%s","getId"),
+		);
+	}
+
 	public static function doCountOnPeer(Criteria $c)
 	{
 		return categoryPeer::doCount($c);
