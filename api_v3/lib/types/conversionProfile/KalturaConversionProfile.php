@@ -160,6 +160,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"defaultEntryId",
 		"createdAt",
 		"isDefault",
+		"isPartnerDefault" => "isDefault",
 		"clipStart",
 		"clipDuration",
 		"storageProfileId",
@@ -179,14 +180,6 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		
 		$this->cropDimensions = new KalturaCropDimensions();
 		$this->cropDimensions->fromObject($sourceObject);
-		
-		$this->isPartnerDefault = false;
-		if($this->partnerId)
-		{
-			$partner = PartnerPeer::retrieveByPK($this->partnerId);
-			if($partner && $this->id == $partner->getDefaultConversionProfileId())
-				$this->isPartnerDefault = true;
-		}
 	}
 	
 	public function toObject($objectToFill = null , $propsToSkip = array())
