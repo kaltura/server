@@ -533,6 +533,7 @@ CREATE TABLE IF NOT EXISTS `conversion_profile_2` (
   `system_name` varchar(128) NOT NULL DEFAULT '',
   `tags` text NOT NULL,
   `status` int(11) NOT NULL DEFAULT '2',
+  `type` int(11) NOT NULL DEFAULT '1',
   `default_entry_id` varchar(20) DEFAULT NULL,
   `crop_left` int(11) NOT NULL DEFAULT '-1',
   `crop_top` int(11) NOT NULL DEFAULT '-1',

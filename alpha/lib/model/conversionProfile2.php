@@ -262,18 +262,9 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		return $this->getFromCustomData('mediaParserType', null, mediaParserType::MEDIAINFO);
 	}
+	
 	public function getCacheInvalidationKeys()
 	{
 		return array("conversionProfile2:partnerId=".$this->getPartnerId());
-	}
-	
-	public function getType()
-	{
-		return $this->getFromCustomData('type', null, ConversionProfileType::MEDIA);
-	}
-	
-	public function setType($v)
-	{
-		$this->putInCustomData('type', $v);
 	}
 }

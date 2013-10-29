@@ -29,6 +29,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var KalturaConversionProfileType
 	 * @insertonly
+	 * @filter eq,in
 	 */
 	public $type;
 	
