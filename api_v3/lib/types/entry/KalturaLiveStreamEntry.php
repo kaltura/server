@@ -110,6 +110,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"encodingIP2",
 		"streamPassword",
 		"streamUsername",
+		"bitrates" => "streamBitrates",
 	);
 
 	public function __construct()
@@ -136,11 +137,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			return;
 			
 		parent::fromObject($dbObject);
-
-		$bitrates = $dbObject->getStreamBitrates();
-		if(is_array($bitrates))
-			$this->bitrates = KalturaLiveStreamBitrateArray::fromLiveStreamBitrateArray($bitrates);
-		
 	}
 	
 	/* (non-PHPdoc)
@@ -157,12 +153,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);		
 		}
 	
-		if(is_null($this->bitrates) || !$this->bitrates->count)
-		{
-			$this->bitrates = new KalturaLiveStreamBitrateArray();
-			$this->bitrates[] = new KalturaLiveStreamBitrate();
-		}
-		
 		return parent::toInsertableObject($dbObject, $props_to_skip);
 	}
 

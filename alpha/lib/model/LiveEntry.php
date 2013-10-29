@@ -24,6 +24,45 @@ abstract class LiveEntry extends entry
 	public function setOfflineMessage ( $v )	{	$this->putInCustomData ( "offlineMessage" , $v );	}
 	public function getOfflineMessage (  )		{	return $this->getFromCustomData( "offlineMessage" );	}
 
+	public function setStreamBitrates(array $v)
+	{
+		$this->putInCustomData("streamBitrates", $v);
+	}
+	
+	public function getStreamBitrates()
+	{
+		$streamBitrates = $this->getFromCustomData("streamBitrates");
+		if(is_array($streamBitrates) && count($streamBitrates))
+			return $streamBitrates;
+				
+		if($this->getSource() == EntrySourceType::LIVE_STREAM)
+		{
+			$liveParams = assetParamsPeer::retrieveByProfile($this->getConversionProfileId());
+			$streamBitrates = array();
+			foreach($liveParams as $liveParamsItem)
+			{
+				/* @var $liveParamsItem liveParams */
+				
+				$streamBitrate = array(
+					'bitrate' => $liveParamsItem->getVideoBitrate(),
+					'width' => $liveParamsItem->getWidth(),
+					'height' => $liveParamsItem->getHeight(),
+					'tags' => $liveParamsItem->getTags(),
+				);
+				$streamBitrates[] = $streamBitrate;
+			}
+			return $streamBitrates;
+		}
+		
+		return array(
+			array(
+				'bitrate' => 300,
+				'width' => 320,
+				'height' => 240,
+			)
+		);
+	}
+	
 	public function getRecordStatus ()
 	{
 	    return $this->getFromCustomData("record_status");
