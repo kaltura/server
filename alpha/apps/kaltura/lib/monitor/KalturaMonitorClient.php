@@ -9,21 +9,22 @@ class KalturaMonitorClient
 	
 	const EVENT_API_START = 'start';
 	const EVENT_API_END = 	'end';
-	const EVENT_QUERY = 	'query';
+	const EVENT_DATABASE = 	'db';
+	const EVENT_SPHINX = 	'sphinx';
 	
-	const FIELD_EVENT_TYPE = 		'v';
+	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
 	const FIELD_IP_ADDRESS = 		'i';
 	const FIELD_PARTNER_ID = 		'p';
 	const FIELD_ACTION = 			'a';
 	const FIELD_CACHED = 			'c';
 	const FIELD_KS_TYPE = 			'k';
-	const FIELD_CLIENT_TAG = 		't';
+	const FIELD_CLIENT_TAG = 		'l';
 	const FIELD_MULTIREQUEST = 		'm';
-	const FIELD_EXECUTION_TIME = 	'e';
+	const FIELD_EXECUTION_TIME = 	'x';
 	const FIELD_ERROR_CODE = 		'r';
 	const FIELD_DATABASE = 			'd';
-	const FIELD_TABLE = 			'b';
+	const FIELD_TABLE = 			't';
 	const FIELD_QUERY_TYPE = 		'q';
 	
 	protected static $queryTypes = array(
@@ -154,6 +155,7 @@ class KalturaMonitorClient
 		// strip the comment
 		if (kString::beginsWith($sql, '/*'))
 		{
+			$eventType = self::EVENT_DATABASE;
 			$commentEndPos = strpos($sql, '*/') + 2;
 			$comment = substr($sql, 0, $commentEndPos);			
 			$matches = null;
@@ -161,6 +163,8 @@ class KalturaMonitorClient
 				$hostName = $matches[1];
 			$sql = trim(substr($sql, $commentEndPos));
 		}
+		else
+			$eventType = self::EVENT_SPHINX;
 
 		// extract the query type
 		$queryType = null;
@@ -194,7 +198,7 @@ class KalturaMonitorClient
 		$tableName = str_replace('`', '', $tableName);
 		
 		$data = array_merge(self::$basicEventInfo, array(
-			self::FIELD_EVENT_TYPE 		=> self::EVENT_QUERY,
+			self::FIELD_EVENT_TYPE 		=> $eventType,
 			self::FIELD_DATABASE		=> $hostName,
 			self::FIELD_TABLE			=> $tableName,
 			self::FIELD_QUERY_TYPE		=> $queryType,
