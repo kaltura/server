@@ -64,9 +64,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 		}
 	
 		if($data->monitorSyncCompletion)
-			$this->updateFlavorAssets($job, $dataWrap);
-			
-													  
+			$this->updateFlavorAssets($job, $dataWrap);													  
 	}
 	
 			
