@@ -12,7 +12,8 @@ echo `date`
 # Source function library.
 #. /etc/rc.d/init.d/functions
 
-# Directory containing the populate php files SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
+# Directory containing the populate php files 
+SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
 
 SCRIPTEXE=populateFromLog.php
 

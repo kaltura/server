@@ -13,6 +13,9 @@ FilterProvider COMPRESS DEFLATE resp=Content-Type $application/.*xml.*
 FilterProvider COMPRESS DEFLATE resp=Content-Type $image/svg+xml
 FilterChain COMPRESS
 
+SetEnvIfNoCase Request_URI \
+                \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+
 <IfModule !filter_module>
     LoadModule filter_module modules/mod_filter.so
 </IfModule>

@@ -721,7 +721,7 @@ define command{
 
 define command{
 	command_name		kaltura-capture-thumb
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/capturethumbnail.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_CONVERT"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 2 --error-threshold 5 --script "@APP_DIR@/tests/monitoring/api_v3/captureThumbnail.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_CONVERT"
 }
 
 define command{
@@ -741,22 +741,22 @@ define command{
 
 define command{
 	command_name		kaltura-bulk-upload-entries-csv
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/entriesBulkUploadCsv.php --service-url $HOSTADDRESS$"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/entriesBulkUploadCsv.php --timeout 3600 --service-url $HOSTADDRESS$"
 }
 
 define command{
 	command_name		kaltura-bulk-upload-entries-xml
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/entriesBulkUploadXml.php --service-url $HOSTADDRESS$"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/entriesBulkUploadXml.php -- timeout 3600 --service-url $HOSTADDRESS$"
 }
 
 define command{
 	command_name		kaltura-bulk-upload-categories-csv
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/categoriesBulkUploadCsv.php --service-url $HOSTADDRESS$"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/categoriesBulkUploadCsv.php --timeout 1200 --service-url $HOSTADDRESS$"
 }
 
 define command{
 	command_name		kaltura-bulk-upload-users-csv
-	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/usersBulkUploadCsv.php --service-url $HOSTADDRESS$"
+	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 1 --error-threshold 2 --script "@APP_DIR@/tests/monitoring/api_v3/usersBulkUploadCsv.php --timeout 1200 --service-url $HOSTADDRESS$"
 }
 
 

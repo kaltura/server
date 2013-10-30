@@ -3,8 +3,8 @@
 	<UIConfigList>
 		<UIConfig>
 			<target>ContributionWizard.swf</target>
-			<cssUrl> /content/uiconf/kaltura/kmc/kcw/v2.1.4/styles.swf</cssUrl>
-			<localeUrl>/content/uiconf/kaltura/kmc/kcw/v2.1.4/en_US_ContributionWizard_kaltura.swf
+			<cssUrl>/content/uiconf/kaltura/kmc/kcw/v2.1.5/style.swf</cssUrl>
+			<localeUrl>/content/uiconf/kaltura/kmc/kcw/v2.1.5/en_US_ContributionWizard_kaltura.swf
 			</localeUrl>
 		</UIConfig>
 	</UIConfigList>
