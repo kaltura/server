@@ -39,6 +39,13 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $liveStreamConfigurations;
 	
+	/**
+	 * Recorded entry id
+	 * 
+	 * @var string
+	 */
+	public $recordedEntryId;
+	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -46,6 +53,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	    "dvrStatus",
 	    "dvrWindow",
 		"liveStreamConfigurations",
+		"recordedEntryId",
 	);
 	
 	/* (non-PHPdoc)

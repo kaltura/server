@@ -7,6 +7,8 @@
  */
 class kClipAttributes extends kOperationAttributes 
 {
+	const SYSTEM_DEFAULT_FLAVOR_PARAMS_ID = -1;
+	
 	/**
 	 * Offset in milliseconds
 	 * @var int
@@ -36,6 +38,14 @@ class kClipAttributes extends kOperationAttributes
 	public function getApiType()
 	{
 		return 'KalturaClipAttributes';
+	}
+
+	/* (non-PHPdoc)
+	 * @see kOperationAttributes::getAssetParamsId()
+	 */
+	public function getAssetParamsId()
+	{
+		return self::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID;
 	}
 
 	/* (non-PHPdoc)

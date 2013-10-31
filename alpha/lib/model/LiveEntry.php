@@ -63,6 +63,16 @@ abstract class LiveEntry extends entry
 		);
 	}
 	
+	public function getRecordedEntryId ()
+	{
+	    return $this->getFromCustomData("recorded_entry_id");
+	}
+	
+	public function setRecordedEntryId ($v)
+	{
+	    $this->putInCustomData("recorded_entry_id", $v);
+	}
+	
 	public function getRecordStatus ()
 	{
 	    return $this->getFromCustomData("record_status");
@@ -192,11 +202,75 @@ abstract class LiveEntry extends entry
 		$mediaServer = reset($mediaServers);
 		return $mediaServer->getMediaServer();
 	}
+
+	private static function getMediaServerFromCache($key, $roleCacheDirtyAt)
+	{
+		if (!self::useCache())
+		{
+			return null;
+		}
+		
+		self::$cacheStores = array();
+		
+		$cacheLayers = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
+		
+		foreach ($cacheLayers as $cacheLayer)
+		{
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if (!$cacheStore)
+				continue;
+				
+			$value = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache
+			if ( !$value || !isset($value['updatedAt']) || ( $value['updatedAt'] < $roleCacheDirtyAt ) )
+			{
+				self::$cacheStores[] = $cacheStore;
+				continue;
+			}
+			
+			KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
+			self::storeInCache($key, $value);		// store in lower cache layers
+			self::$cacheStores[] = $cacheStore;
+
+			// cache is updated - init from cache
+			unset($value['updatedAt']);
+			return $value;
+		}
+
+		KalturaLog::debug("No cache value found for key [$key]");
+		return null;
+	}
+	
+	/**
+	 *
+	 * Store given value in cache for with the given key as an identifier
+	 * @param string $key
+	 * @param string $value
+	 */
+	private static function storeInCache($key, $value)
+	{
+		if (!self::useCache())
+		{
+			return;
+		}
+		
+		foreach (self::$cacheStores as $cacheStore)
+		{
+			$success = $cacheStore->set(self::getCacheKeyPrefix() . $key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
+			if ($success)
+			{
+				KalturaLog::debug("New value stored in cache for key [$key]");
+			}
+			else
+			{
+				KalturaLog::debug("No cache value stored for key [$key]");
+			}
+		}
+	}
 	
 	public function setMediaServer($index, $serverId, $hostname)
 	{
 		// TODO create cache
-		
+	
 		if($this->isMediaServerRegistered($index, $serverId))
 			return;
 			
