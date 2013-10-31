@@ -15,3 +15,7 @@ passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.media.ini';
 passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaServerFileResource.ini';
+passthru("php $script $config");
+

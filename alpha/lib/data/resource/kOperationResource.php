@@ -7,8 +7,6 @@
  */
 class kOperationResource extends kContentResource 
 {
-	const SYSTEM_DEFAULT_FLAVOR_PARAMS_ID = -1;
-	
 	/**
 	 * @var kContentResource
 	 */
@@ -64,8 +62,16 @@ class kOperationResource extends kContentResource
 	{
 		if($this->assetParamsId)
 			return $this->assetParamsId;
-			
-		return self::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID;
+	
+		foreach($this->operationAttributes as $operationAttributes)
+		{
+			/* @var $operationAttributes kOperationAttributes */
+			$assetParamsId = $operationAttributes->getAssetParamsId();
+			if($assetParamsId)
+				return $assetParamsId;
+		}
+		
+		return null;
 	}
 
 	/**
