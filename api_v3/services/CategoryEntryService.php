@@ -57,7 +57,7 @@ class CategoryEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
 			}
 				
-			if($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
+			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) && !$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
 				$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
 				$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
 				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);				
