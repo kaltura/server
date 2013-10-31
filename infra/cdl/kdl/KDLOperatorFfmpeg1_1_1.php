@@ -62,6 +62,15 @@ class KDLOperatorFfmpeg1_1_1 extends KDLOperatorFfmpeg0_10 {
 			$key = array_search('-acodec', $cmdValsArr);
 			$cmdValsArr[$key] = '-c:a';
 		}
+		
+			/*
+			 * Switch old libfaac to much superior FDK_AAC. The params are the same
+			 */
+		if(in_array('libfaac', $cmdValsArr)) {
+			$key = array_search('libfaac', $cmdValsArr);
+			$cmdValsArr[$key] = 'libfdk_aac';
+		}
+		
 		$cmdStr = implode(" ", $cmdValsArr);
 		
 		return $cmdStr;
