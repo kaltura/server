@@ -133,7 +133,10 @@ function genKalcliCommand($parsedParams)
 	{
 		$curParam = "{$param}={$value}";
 		if (!preg_match('/^[a-zA-Z0-9\:_\-,=\.]+$/', $curParam))
-			$res .= " '{$curParam}'";
+			if (strpos($curParam, "'") === false)
+				$res .= " '{$curParam}'";
+			else
+				$res .= " \"{$curParam}\"";
 		else
 			$res .= " {$curParam}";
 	}
