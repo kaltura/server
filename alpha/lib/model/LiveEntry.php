@@ -5,6 +5,8 @@
  */
 abstract class LiveEntry extends entry
 {
+	const DEFAULT_CACHE_EXPIRY = 70;
+	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
 	 */
@@ -203,75 +205,39 @@ abstract class LiveEntry extends entry
 		return $mediaServer->getMediaServer();
 	}
 
-	private static function getMediaServerFromCache($key, $roleCacheDirtyAt)
+	private static function isCacheValid(kLiveMediaServer $mediaServer)
 	{
-		if (!self::useCache())
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
+		if(!$cacheStore)
 		{
-			return null;
-		}
-		
-		self::$cacheStores = array();
-		
-		$cacheLayers = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
-		
-		foreach ($cacheLayers as $cacheLayer)
-		{
-			$cacheStore = kCacheManager::getCache($cacheLayer);
-			if (!$cacheStore)
-				continue;
-				
-			$value = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache
-			if ( !$value || !isset($value['updatedAt']) || ( $value['updatedAt'] < $roleCacheDirtyAt ) )
-			{
-				self::$cacheStores[] = $cacheStore;
-				continue;
-			}
+			$lastUpdate = time() - $mediaServer->getTime();
+			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
 			
-			KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
-			self::storeInCache($key, $value);		// store in lower cache layers
-			self::$cacheStores[] = $cacheStore;
-
-			// cache is updated - init from cache
-			unset($value['updatedAt']);
-			return $value;
+			return $lastUpdate <= $expiry;
 		}
-
-		KalturaLog::debug("No cache value found for key [$key]");
-		return null;
+	
+		$key = $this->getId() . '_' . $mediaServer->getMediaServerId() . '_' . $mediaServer->getIndex();
+		return $cacheStore->get($key);
 	}
 	
 	/**
 	 *
 	 * Store given value in cache for with the given key as an identifier
 	 * @param string $key
-	 * @param string $value
 	 */
-	private static function storeInCache($key, $value)
+	private static function storeInCache($key)
 	{
-		if (!self::useCache())
-		{
-			return;
-		}
-		
-		foreach (self::$cacheStores as $cacheStore)
-		{
-			$success = $cacheStore->set(self::getCacheKeyPrefix() . $key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
-			if ($success)
-			{
-				KalturaLog::debug("New value stored in cache for key [$key]");
-			}
-			else
-			{
-				KalturaLog::debug("No cache value stored for key [$key]");
-			}
-		}
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
+		if(!$cacheStore)
+			return false;
+			
+		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
 	public function setMediaServer($index, $serverId, $hostname)
 	{
-		// TODO create cache
-	
-		if($this->isMediaServerRegistered($index, $serverId))
+		$key = $this->getId() . "_{$serverId}_{$index}";
+		if(self::storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
 			return;
 			
 		$servers = $this->getMediaServers();
@@ -301,7 +267,12 @@ abstract class LiveEntry extends entry
 	public function getMediaServers()
 	{
 		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
-		// TODO - remove expired cache from $mediaServers
+		foreach($mediaServers as $index => $mediaServer)
+		{
+			if(!self::isCacheValid($mediaServer))
+				unset($mediaServers[$index]);
+		}
+		
 		return $mediaServers;	
 	}
 }

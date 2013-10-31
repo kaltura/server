@@ -1360,6 +1360,9 @@ class playManifestAction extends kalturaAction
 	
 	private function serveLiveEntry()
 	{		
+		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM && !$this->entry->getMediaServer())
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
+		
 		$baseUrl = $this->getLiveEntryBaseUrl();
 			
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		

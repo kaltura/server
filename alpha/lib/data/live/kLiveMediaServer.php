@@ -28,12 +28,18 @@ class kLiveMediaServer
 	 */
 	protected $hostname;
 	
+	/**
+	 * @var int
+	 */
+	protected $time;
+	
 	public function __construct($index, $mediaServerId, $hostname)
 	{
 		$this->index = $index;
 		$this->mediaServerId = $mediaServerId;
 		$this->hostname = $hostname;
 		$this->dc = kDataCenterMgr::getCurrentDcId();
+		$this->time = time();
 	}
 	
 	/**
@@ -76,6 +82,11 @@ class kLiveMediaServer
 		return $this->hostname;
 	}
 
-	
-	
+	/**
+	 * @return int $time
+	 */
+	public function getTime()
+	{
+		return $this->time;
+	}
 }
