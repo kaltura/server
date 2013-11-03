@@ -318,12 +318,6 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 		// Can apply criterion
 		KalturaLog::debug("Applies criterion [$field]");
 	
-		if($comparison == Criteria::CUSTOM || $comparison == Criteria::CUSTOM_EQUAL || $comparison == Criteria::ISNOTNULL)
-		{
-			KalturaLog::debug("Skip criterion[$field] unhandled comparison [$comparison]");
-			return false;
-		}
-	
 		if(!$objectClass::hasIndexFieldName($field))
 		{
 			KalturaLog::debug("Skip criterion[$field] has no sphinx field");
@@ -332,6 +326,13 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 				
 		$sphinxField	= $objectClass::getIndexFieldName($field);
 		$type			= $objectClass::getFieldType($sphinxField);
+		
+		if($comparison == Criteria::CUSTOM || $comparison == Criteria::CUSTOM_EQUAL || 
+				($comparison == Criteria::ISNOTNULL && $type != IIndexable::FIELD_TYPE_STRING))
+		{
+			KalturaLog::debug("Skip criterion[$field] unhandled comparison [$comparison]");
+			return false;
+		}
 		
 		// Update value & comparison in case of id field
 		if($field == $objectClass::getIdField())

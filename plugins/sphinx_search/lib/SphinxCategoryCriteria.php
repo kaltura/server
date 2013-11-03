@@ -267,6 +267,10 @@ class SphinxCategoryCriteria extends SphinxCriteria
 			$filter->set('_in_privacy', implode(",", $newPrivacyIn));
 		}
 		
+		if($filter->get('_eq_display_in_search')) {
+			$filter->set('_eq_display_in_search', $filter->get('_eq_display_in_search') . "P" . $partnerId);
+		}
+		
 		return parent::applyFilterFields($filter);
 	}
 	

@@ -274,6 +274,7 @@ index kaltura_tag:kaltura_kuser_base
 	@FIELDS_PLACEHOLDER-kaltura_tag@
 }
 
+
 searchd
 {
 	log = @LOG_DIR@/sphinx/kaltura_sphinx_searchd.log

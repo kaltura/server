@@ -107,6 +107,7 @@ class kuserIndex extends BaseIndexObject
 		if (!self::$nullableFields)
 		{
 			self::$nullableFields = array(
+				'puser_id',
 			);
 		}
 		return self::$nullableFields;

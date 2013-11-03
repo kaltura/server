@@ -1575,4 +1575,9 @@ class category extends Basecategory implements IIndexable
 		return $this;
 	}
 	
+	public function getDisplayInSearchIndex()
+	{
+		return $this->display_in_search . "P" . $this->getParentId();
+	}
+	
 }
