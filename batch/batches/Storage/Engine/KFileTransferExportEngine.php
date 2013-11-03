@@ -48,13 +48,16 @@ class KFileTransferExportEngine extends KExportEngine
 	
 		try
 		{
+			$chmod_code = octdec ( str_pad ( KBatchBase::$taskConfig->params->chmod, 4, '0', STR_PAD_LEFT ) );
+			$chmod_code = (int) $chmod_code;
+			
 			if (is_file($this->srcFile))
 			{
 				$engine->putFile($this->destFile, $this->srcFile, $this->data->force);
 				if(KBatchBase::$taskConfig->params->chmod)
 				{
 					try {
-					$engine->chmod($this->destFile, KBatchBase::$taskConfig->params->chmod);
+					$engine->chmod($this->destFile, $chmod_code);
 					}
 					catch(Exception $e){}
 				}
@@ -70,7 +73,7 @@ class KFileTransferExportEngine extends KExportEngine
 					if(KBatchBase::$taskConfig->params->chmod)
 					{
 						try {
-						$engine->chmod($destFile, KBatchBase::$taskConfig->params->chmod);
+						$engine->chmod($destFile, $chmod_code);
 						}
 						catch(Exception $e){}
 					}
