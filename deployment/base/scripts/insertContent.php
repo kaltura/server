@@ -24,7 +24,7 @@ foreach($dsnArray as $param)
 {
 	$items = explode("=", $param);
 	if(count($items) == 2)
-		$this->dbParams[$items[0]] = $items[1];
+		$dbParams[$items[0]] = $items[1];
 }
 
 foreach($dbParams as $key => $value)
