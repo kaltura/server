@@ -165,6 +165,9 @@ class myPlaylistUtils
 		{
 			$entryObjectsArray = self::replaceRedirectedEntries( $entryObjectsArray );
 		}
+
+		// Clear the context for next time
+		self::$playlistContext = null;
 		
 		return $entryObjectsArray;
 	}
@@ -847,10 +850,7 @@ HTML;
                         $propertyAsDom->nodeValue = $replaceValue;
     	            }
 	            }
-                        
 	        }
 	    }
-	    
-	    self::$playlistContext = null;
 	}
 }
