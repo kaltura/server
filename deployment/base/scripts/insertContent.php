@@ -69,7 +69,7 @@ foreach($fileNames as $fileName)
 	if($returnValue !== 0)
 		exit(-1);
 		
-	saveScriptAsRun ($fileName);
+	saveScriptAsRun ($dbParams,$fileName);
 }
 
 
