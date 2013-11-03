@@ -131,6 +131,8 @@ class myPlaylistUtils
 		 
 		// the default of detrailed should be true - most of the time the kuse is needed 
 		if ( is_null ( $detailed ) ) $detailed = true ; 
+
+		$entryObjectsArray = null;
 		
 		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
 		{
@@ -142,7 +144,7 @@ class myPlaylistUtils
 				$filter_list_content = $playlist->getDataContent( true );
 			}
 			
-			return self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters , $detailed );
+			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters , $detailed );
 		}
 		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
@@ -153,8 +155,63 @@ class myPlaylistUtils
 		{
 			// static playlist
 			// search the roughcut_entry for the playlist as a roughcut / group
-			return self::executeStaticPlaylist ( $playlist , $extra_filters , $detailed );
+			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $extra_filters , $detailed );
 		}
+
+		// Perform entries redirection
+		if ( ! empty(self::$playlistContext)
+				&& (self::$playlistContext instanceof kEntryContext)
+				&& self::$playlistContext->getFollowEntryRedirect() )
+		{
+			$entryObjectsArray = self::replaceRedirectedEntries( $entryObjectsArray );
+		}
+		
+		return $entryObjectsArray;
+	}
+	
+	/**
+	 * For every entry id that requires redirection, fetch the
+	 * redirected entry from db and replace with the original one. 
+	 *  
+	 * @param array $entryObjectsArray Array of entry objects
+	 * @return array The array with replaced entries for each one that had a redirectedEntryId  
+	 */
+	private static function replaceRedirectedEntries( $entryObjectsArray )
+	{
+		$redirectedEntryIdToPosMap = array();
+
+		// Gather all entries with a valid redirect id
+		foreach ( $entryObjectsArray as $pos => $entry )
+		{
+			/* @var $entry entry */
+			$redirectEntryId = $entry->getRedirectEntryId();
+			if ( ! empty( $redirectEntryId ) ) // Redirection required?
+			{
+				// Map the redirected entry's id to its position in the original array (for fast accessing later on)
+				$redirectedEntryIdToPosMap[ $redirectEntryId ] = $pos;
+			}
+		}
+
+		if ( ! empty( $redirectedEntryIdToPosMap ) ) // Are there any entries that need to be redirected?
+		{
+			// Fetch the redirected entries from DB
+			$redirectedEntries = entryPeer::retrieveByPKs( array_keys( $redirectedEntryIdToPosMap ) );
+			
+			// Replace the entries in the original array with the redirected entries (if relevant) 
+			foreach ( $redirectedEntries as $redirectedEntry )
+			{
+				// Get the [new] redirected entry's id
+				$redirectedEntryId = $redirectedEntry->getId();
+				
+				// Get the orignal array position of the entry to be replaced
+				$posInOrigArray = $redirectedEntryIdToPosMap[ $redirectedEntryId ];
+				
+				// Replace the original entry in the array with the redirected one
+				$entryObjectsArray[ $posInOrigArray ] = $redirectedEntry;
+			}
+		}
+		
+		return $entryObjectsArray;
 	}
 	
 	public static function getPlaylistFiltersById($playlist_id)
