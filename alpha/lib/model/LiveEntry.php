@@ -188,7 +188,7 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return MediaServer
 	 */
-	protected function getMediaServer()
+	public function getMediaServer($currentDcOnly = false)
 	{
 		$mediaServers = $this->getMediaServers();
 		if(!count($mediaServers))
@@ -200,12 +200,14 @@ abstract class LiveEntry extends entry
 			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
 				return $mediaServer->getMediaServer();
 		}
+		if($currentDcOnly)
+			return null;
 		
 		$mediaServer = reset($mediaServers);
 		return $mediaServer->getMediaServer();
 	}
 
-	private static function isCacheValid(kLiveMediaServer $mediaServer)
+	private function isCacheValid(kLiveMediaServer $mediaServer)
 	{
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
 		if(!$cacheStore)
@@ -225,7 +227,7 @@ abstract class LiveEntry extends entry
 	 * Store given value in cache for with the given key as an identifier
 	 * @param string $key
 	 */
-	private static function storeInCache($key)
+	private function storeInCache($key)
 	{
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
 		if(!$cacheStore)
@@ -237,7 +239,7 @@ abstract class LiveEntry extends entry
 	public function setMediaServer($index, $serverId, $hostname)
 	{
 		$key = $this->getId() . "_{$serverId}_{$index}";
-		if(self::storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
+		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
 			return;
 			
 		$servers = $this->getMediaServers();
@@ -264,12 +266,15 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("mediaServers", $servers);	
 	}
 	
+	/**
+	 * @return array<kLiveMediaServer>
+	 */
 	public function getMediaServers()
 	{
 		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
 		foreach($mediaServers as $index => $mediaServer)
 		{
-			if(!self::isCacheValid($mediaServer))
+			if(!$this->isCacheValid($mediaServer))
 				unset($mediaServers[$index]);
 		}
 		
