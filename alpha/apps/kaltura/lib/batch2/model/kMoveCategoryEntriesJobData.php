@@ -29,6 +29,12 @@ class kMoveCategoryEntriesJobData extends kJobData
      */
     private $copyOnly;
     
+    /**
+     * Destination fallback ids
+     * @var string
+     */
+    private $fallback;
+    
 	/**
 	 * @return int $srcCategoryId
 	 */
@@ -92,4 +98,19 @@ class kMoveCategoryEntriesJobData extends kJobData
 	{
 		$this->copyOnly = $copyOnly;
 	}
+	
+	/**
+	 * @return the $fallback
+	 */
+	public function getFallback() {
+		return $this->fallback;
+	}
+
+	/**
+	 * @param string $fallback
+	 */
+	public function setFallback($fallback) {
+		$this->fallback = $fallback;
+	}
+	
 }

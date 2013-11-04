@@ -14,6 +14,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 {
 	const CATEGORY_ENTRY_ALREADY_EXISTS = 'CATEGORY_ENTRY_ALREADY_EXISTS';
 	const INVALID_ENTRY_ID = 'INVALID_ENTRY_ID';
+	const CATEGORY_NOT_FOUND = 'CATEGORY_NOT_FOUND';
 	
 	/**
 	 * Indicates that the moving of the entries could be started
@@ -131,7 +132,51 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		
 		return $job;
 	}
-
+	
+	/**
+	 * Gets the first existing category ancestor according to the fallback list
+	 * @param string $category
+	 * @param string $fallback
+	 */
+	public function getAncestor($categoryId, $fallback)
+	{
+		if($fallback == $categoryId) {
+			return 0;
+		}
+			
+		$parent = null;
+		$fallbacks = explode(">", $fallback);
+		for($i = count($fallbacks) - 2; $i >= 0 ; $i -= 1) {
+			$filter = new KalturaCategoryFilter();
+			$filter->idEqual = $fallbacks[$i];
+			$result = KBatchBase::$kClient->category->listAction($filter,null);
+			if($result->totalCount) {
+				$parent = $result->objects[0];
+				break;
+			}
+		}
+			
+		if($parent)
+			return $parent->id;
+			
+		return 0;
+	}
+	
+	private function addCategoryEntries($categoryEntriesList, $destCategoryId, &$entryIds) 
+	{
+		KBatchBase::$kClient->startMultiRequest();
+		foreach($categoryEntriesList->objects as $oldCategoryEntry)
+		{
+			/* @var $categoryEntry KalturaCategoryEntry */
+			$newCategoryEntry = new KalturaCategoryEntry();
+			$newCategoryEntry->entryId = $oldCategoryEntry->entryId;
+			$newCategoryEntry->categoryId = $destCategoryId;
+			KBatchBase::$kClient->categoryEntry->add($newCategoryEntry);
+			$entryIds[] = $oldCategoryEntry->entryId;
+		}
+		return KBatchBase::$kClient->doMultiRequest();
+	}
+	
 	/**
 	 * Moves category entries from source category to destination category
 	 */
@@ -153,26 +198,32 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
 		while(count($categoryEntriesList->objects))
 		{
-			KBatchBase::$kClient->startMultiRequest();
 			$entryIds = array();
-			foreach($categoryEntriesList->objects as $oldCategoryEntry)
-			{
-				/* @var $categoryEntry KalturaCategoryEntry */
-				$newCategoryEntry = new KalturaCategoryEntry();
-				$newCategoryEntry->entryId = $oldCategoryEntry->entryId;
-				$newCategoryEntry->categoryId = $data->destCategoryId;
-				KBatchBase::$kClient->categoryEntry->add($newCategoryEntry);
-				$entryIds[] = $oldCategoryEntry->entryId;
+			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $data->destCategoryId, $entryIds);
+			
+			$categoryDeleted = false;
+			if(	is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
+				$categoryDeleted = true;
+			
+			
+			if($categoryDeleted) {
+				$ancestor = $this->getAncestor($data->destCategoryId, $data->fallback);
+				
+				// In case the category isn't found since it was just deleted
+				if($ancestor) {
+					$entryIds = array();
+					$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $ancestor, $entryIds);
+				} 
 			}
-			$addedCategoryEntriesResults = KBatchBase::$kClient->doMultiRequest();
-	
+			
 			KBatchBase::$kClient->startMultiRequest();
 			foreach($addedCategoryEntriesResults as $index => $addedCategoryEntryResult)
 			{
-				if(	is_array($addedCategoryEntryResult) 
-					&& isset($addedCategoryEntryResult['code']) 
-					&& !in_array($addedCategoryEntryResult['code'], array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID))
-				)
+				$code = null;
+				if(	is_array($addedCategoryEntryResult) && isset($addedCategoryEntryResult['code']))
+					$code = $addedCategoryEntryResult['code'];
+						
+				if(!is_null($code) && !in_array($code, array(self::CATEGORY_ENTRY_ALREADY_EXISTS, self::INVALID_ENTRY_ID, self::CATEGORY_NOT_FOUND)))
 					continue;
 					
 				if($data->copyOnly)

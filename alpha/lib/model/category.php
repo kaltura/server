@@ -622,7 +622,7 @@ class category extends Basecategory implements IIndexable
 	
 	protected function addMoveEntriesToCategoryJob($destCategoryId)
 	{
-		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
+		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, false, false, $this->getFullIds());
 	}
 	
 	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
