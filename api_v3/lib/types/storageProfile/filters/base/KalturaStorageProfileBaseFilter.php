@@ -108,6 +108,7 @@ abstract class KalturaStorageProfileBaseFilter extends KalturaFilter
 	public $protocolEqual;
 
 	/**
+	 * @dynamicType KalturaStorageProfileProtocol
 	 * @var string
 	 */
 	public $protocolIn;

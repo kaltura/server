@@ -1232,13 +1232,15 @@ class kJobsManager
 	 * @param bool $copyOnly indicates that the entries shouldn't be deleted from the source entry
 	 * @return BatchJob
 	 */
-	public static function addMoveCategoryEntriesJob(BatchJob $parentJob = null, $partnerId, $srcCategoryId, $destCategoryId, $moveFromChildren = false, $copyOnly = false)
+	public static function addMoveCategoryEntriesJob(BatchJob $parentJob = null, $partnerId, $srcCategoryId, $destCategoryId, $moveFromChildren = false, $copyOnly = false,
+			$fallback = null)
 	{
 		$moveCategoryEntriesData = new kMoveCategoryEntriesJobData();
 	    $moveCategoryEntriesData->setSrcCategoryId($srcCategoryId);
 	    $moveCategoryEntriesData->setDestCategoryId($destCategoryId);
 	    $moveCategoryEntriesData->setMoveFromChildren($moveFromChildren);
 	    $moveCategoryEntriesData->setCopyOnly($copyOnly);
+	    $moveCategoryEntriesData->setFallback($fallback);
 		
 		$batchJob = null;
 		if($parentJob)
