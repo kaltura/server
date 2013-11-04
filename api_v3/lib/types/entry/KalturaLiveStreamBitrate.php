@@ -21,7 +21,7 @@ class KalturaLiveStreamBitrate extends KalturaObject
 	public $height;
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $tags;
 	
