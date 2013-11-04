@@ -25,7 +25,7 @@ class KalturaAccessControlActionArray extends KalturaTypedArray
 		return $newArr;
 	}
 
-	static function getInstanceByDbObject(kAccessControlAction $dbObject)
+	static function getInstanceByDbObject(kRuleAction $dbObject)
 	{
 		switch($dbObject->getType())
 		{
