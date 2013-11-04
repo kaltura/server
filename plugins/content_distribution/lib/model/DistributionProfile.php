@@ -445,6 +445,6 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("distributionProfile:id=".$this->getId());
+		return array("distributionProfile:id=".strtolower($this->getId()));
 	}
 } // DistributionProfile

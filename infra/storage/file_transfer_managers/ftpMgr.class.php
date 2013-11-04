@@ -101,8 +101,6 @@ class ftpMgr extends kFileTransferMgr
 	{
 		// try to chmod
 		$remote_file = ltrim($remote_file,'/');
-		$chmod_code = octdec ( str_pad ( $chmod_code, 4, '0', STR_PAD_LEFT ) );
-		$chmod_code = (int) $chmod_code;
 		return ftp_chmod($this->getConnection(), $chmod_code, $remote_file);
 	}
 

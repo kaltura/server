@@ -15,6 +15,6 @@ class mediaInfo extends BasemediaInfo
 	 
 	public function getCacheInvalidationKeys()
 	{
-		return array("mediaInfo:flavorAssetId=".$this->getFlavorAssetId());
+		return array("mediaInfo:flavorAssetId=".strtolower($this->getFlavorAssetId()));
 	}
 }

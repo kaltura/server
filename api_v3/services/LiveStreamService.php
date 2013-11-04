@@ -283,7 +283,11 @@ class LiveStreamService extends KalturaEntryService
 				{
 					$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
 					if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
-						$url .= '?hdcore='.kConf::get('hd_core_version');
+						$parsedUrl = parse_url($url);
+  						if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+   							$url .= '&hdcore='.kConf::get('hd_core_version');
+  						else
+							$url .= '?hdcore='.kConf::get('hd_core_version');
 					}
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
 					return $this->hdsUrlExists($url);
@@ -340,10 +344,15 @@ class LiveStreamService extends KalturaEntryService
 	    $data = curl_exec($ch);  
 	    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
 	    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-	    curl_close($ch);  
+	    curl_close($ch); 
+
+	    $contentTypeToCheck = strstr($contentType, ";", true);
+		if(!$contentTypeToCheck)
+			$contentTypeToCheck = $contentType;
+	    
 	    if($data && $httpcode>=200 && $httpcode<300)
 	    {
-	        return in_array($contentType, $contentTypeToReturn) ? $data : true;
+	        return in_array(trim($contentTypeToCheck), $contentTypeToReturn) ? $data : true;
 	    }  
 	    else 
 	        return false;  
@@ -397,6 +406,7 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	private function checkIfValidUrl($urlToCheck, $parentURL)
 	{
+		$urlToCheck = trim($urlToCheck);
 		if(!filter_var($urlToCheck, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED))
 		{
 			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
