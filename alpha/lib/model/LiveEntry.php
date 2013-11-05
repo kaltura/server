@@ -139,10 +139,10 @@ abstract class LiveEntry extends entry
 			
 			$manifestUrl = $mediaServer->getManifestUrl() . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
 			
-			$hlsStreamUrl	.= "/playlist.m3u8";
-			$hdsStreamUrl	.= "/playlist.f4m";
-			$mpdStreamUrl	.= "/manifest.mpd";
-			$slStreamUrl	.= "/Manifest";
+			$hlsStreamUrl	= "$manifestUrl/playlist.m3u8";
+			$hdsStreamUrl	= "$manifestUrl/manifest.f4m";
+			$mpdStreamUrl	= "$manifestUrl/manifest.mpd";
+			$slStreamUrl	= "$manifestUrl/Manifest";
 			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
