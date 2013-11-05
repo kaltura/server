@@ -1236,7 +1236,7 @@ class kJobsManager
 	    $moveCategoryEntriesData->setDestCategoryId($destCategoryId);
 	    $moveCategoryEntriesData->setMoveFromChildren($moveFromChildren);
 	    $moveCategoryEntriesData->setCopyOnly($copyOnly);
-	    $moveCategoryEntriesData->setFallback($fallback);
+	    $moveCategoryEntriesData->setDestCategoryFullIds($fallback);
 		
 		$batchJob = null;
 		if($parentJob)
