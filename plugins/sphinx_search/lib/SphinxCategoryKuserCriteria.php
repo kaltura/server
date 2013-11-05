@@ -209,10 +209,14 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 			$filter->set('_eq_update_method', categoryKuser::getSearchIndexFieldValue(categoryKuserPeer::UPDATE_METHOD, $filter->get('_eq_update_method'), kCurrentContext::getCurrentPartnerId()));
 		}
 		
-		if ($filter->get('_eq_permission_level'))
+		if (!is_null($filter->get('_eq_permission_level')))
 		{
 			$permissionLevel = $filter->get('_eq_permission_level');
 			$permissionNamesList = categoryKuser::getPermissionNamesByPermissionLevel($permissionLevel);
+			$negativePermissionNamesList = $this->fixPermissionNamesListForSphinx($permissionLevel);
+			
+			if($negativePermissionNamesList)
+				$filter->set('_notcontains_permission_names', implode(',', $negativePermissionNamesList));
 			
 			if($filter->get('_matchand_permission_names'))
 			{
@@ -268,6 +272,26 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 		}
 		
 		return parent::applyFilterFields($filter);
+	}
+	
+	public function fixPermissionNamesListForSphinx($permissionLevel)
+	{
+		switch ($permissionLevel)
+	    {
+	      case CategoryKuserPermissionLevel::MODERATOR:
+	        $negativePermissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+	        break;
+	      case CategoryKuserPermissionLevel::CONTRIBUTOR:
+	        $negativePermissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+	        break;
+	      case CategoryKuserPermissionLevel::MEMBER:
+	        $negativePermissionNamesArr[] = PermissionName::CATEGORY_EDIT;
+	        $negativePermissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+	        $negativePermissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+	        break;
+	    }
+	    
+	    return $negativePermissionNamesArr;    
 	}
 	
 	public function translateToSearchIndexFieldValue($fieldName, $toTranslate)

@@ -77,7 +77,7 @@ def getChildNodeByXPath(node, nodePath):
     return node
 
 # Request parameters container
-class KalturaParams:
+class KalturaParams(object):
     def __init__(self):
         self.params = {}
 
@@ -177,7 +177,7 @@ class KalturaParams:
         return m.digest().encode('hex')
 
 # Request files container
-class KalturaFiles:
+class KalturaFiles(object):
     def __init__(self):
         self.params = {}
 
@@ -191,7 +191,7 @@ class KalturaFiles:
         self.params.update(props.get())
 
 # Abstract base class for all client objects
-class KalturaObjectBase:
+class KalturaObjectBase(object):
     def __init__(self):
         pass
 
@@ -218,7 +218,7 @@ class KalturaObjectBase:
         return result
 
 # Abstract base class for all client services
-class KalturaServiceBase:
+class KalturaServiceBase(object):
     def __init__(self, client = None):
         self.client = client
         
@@ -255,7 +255,7 @@ class KalturaClientException(Exception):
         return "%s (%s)" % (self.message, self.code)
 
 # Client configuration class
-class KalturaConfiguration:
+class KalturaConfiguration(object):
     # Constructs new Kaltura configuration object
     def __init__(self, partnerId = -1, serviceUrl = "http://www.kaltura.com", logger = None):
         self.logger                     = logger
@@ -278,7 +278,7 @@ class KalturaConfiguration:
         return self.logger
 
 # Client plugin interface class
-class IKalturaClientPlugin:
+class IKalturaClientPlugin(object):
     # @return KalturaClientPlugin
     @staticmethod
     def get():
@@ -297,7 +297,7 @@ class KalturaClientPlugin(IKalturaClientPlugin):
     pass
 
 # Kaltura enums factory
-class KalturaEnumsFactory:
+class KalturaEnumsFactory(object):
     enumFactories = {}
 
     @staticmethod
@@ -325,7 +325,7 @@ class KalturaEnumsFactory:
         KalturaEnumsFactory.enumFactories.update(objs)
 
 # Kaltura objects factory
-class KalturaObjectFactory:
+class KalturaObjectFactory(object):
     objectFactories = {}
 
     @staticmethod
@@ -354,6 +354,6 @@ class KalturaObjectFactory:
         KalturaObjectFactory.objectFactories.update(objs)
 
 # Implement to get Kaltura Client logs
-class IKalturaLogger:
+class IKalturaLogger(object):
     def log(self, msg):
         raise NotImplementedError

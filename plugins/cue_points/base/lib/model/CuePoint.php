@@ -322,7 +322,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("cuePoint:id=".$this->getId(), "cuePoint:entryId=".$this->getEntryId());
+		return array("cuePoint:id=".strtolower($this->getId()), "cuePoint:entryId=".strtolower($this->getEntryId()));
 	}
 	
 	public function getSearchIndexFieldsEscapeType($fieldName)

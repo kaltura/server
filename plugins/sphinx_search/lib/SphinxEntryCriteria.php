@@ -41,7 +41,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::RANK => 'rank',
 		entryPeer::TOTAL_RANK => 'total_rank',
 		entryPeer::PLAYS => 'plays',
-		'entry.DURATION' => 'duration',
+		entryPeer::LENGTH_IN_MSECS => 'length_in_msecs',
 		'entry.PARTNER_SORT_VALUE' => 'partner_sort_value',
 		'entry.REPLACEMENT_STATUS' => 'replacement_status',
 		'entry.PARTNER_STATUS_VALUE' =>'partner_status_idx',
@@ -73,7 +73,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		entryPeer::PARTNER_ID => 'partner_id',
 		entryPeer::MODERATION_STATUS => 'moderation_status',
 		entryPeer::DISPLAY_IN_SEARCH => 'display_in_search',
-		entryPeer::LENGTH_IN_MSECS => 'duration',
+		entryPeer::LENGTH_IN_MSECS => 'length_in_msecs',
 		entryPeer::ACCESS_CONTROL_ID => 'access_control_id',
 		entryPeer::MODERATION_COUNT => 'moderation_count',
 		entryPeer::RANK => 'rank',
@@ -122,7 +122,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'moderation_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
-		'duration' => IIndexable::FIELD_TYPE_INTEGER,
+		'length_in_msecs' => IIndexable::FIELD_TYPE_INTEGER,
 		'access_control_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'moderation_count' => IIndexable::FIELD_TYPE_INTEGER,
 		'rank' => IIndexable::FIELD_TYPE_INTEGER,
@@ -199,6 +199,29 @@ class SphinxEntryCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		/* @var $filter entryFilter */
+
+		if ( $filter->is_set('_eq_redirect_from_entry_id' ) )
+		{
+			$entry = entryPeer::retrieveByPK( $filter->get( '_eq_redirect_from_entry_id' ) );
+			$redirectEntryId = $entry->getRedirectEntryId();
+			
+			if ( is_null( $redirectEntryId ) )
+			{
+				$filter->set( '_eq_id', $entry->getId() );
+			}
+			else
+			{
+				// Check if the redirected entry is ready
+				$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
+				if ( $redirectedEntry->getStatus() == entryStatus::READY )
+				{
+					$filter->set( '_eq_id', $redirectEntryId );
+				}
+			}
+				
+			$filter->unsetByName( '_eq_redirect_from_entry_id' );
+		}
+		
 		$categoriesAncestorParsed = null;
 		$categories = $filter->get( "_in_category_ancestor_id");
 		if ($categories !== null)

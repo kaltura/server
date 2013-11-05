@@ -28,6 +28,10 @@ static NSString* flavorID = @"";
     return self;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
@@ -273,7 +277,7 @@ static NSString* flavorID = @"";
     
     if (self.bitrates.count < 1)
     {
-        flavorType = @"ipadnew";
+        flavorType = @"iphonenew";
         buttonBitrate.enabled = YES;
         self.bitrates = [[Client instance] getBitratesList:mediaEntry withFilter:@"iphonenew"];
     }

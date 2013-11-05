@@ -103,8 +103,14 @@ class KCurlWrapper
 
 	private static function read_header($ch, $string) {
 		self::$headers .= $string;
-		if ($string == "\r\n") // mark when we get to the last header so we can abort the curl
-			self::$lastHeader = true;
+		if ($string == "\r\n")
+        {
+        	$curlInfo = curl_getinfo($ch);
+            $httpResponseCode = $curlInfo['http_code'];
+            if(!in_array($httpResponseCode, array(KCurlHeaderResponse::HTTP_STATUS_REDIRECT, KCurlHeaderResponse::HTTP_STATUS_MOVED))) // mark when we get to the last header so we can abort the cur
+            	self::$lastHeader = true;
+		}
+		
 		$length = strlen ( $string );
 		return $length;
 	}
@@ -160,7 +166,7 @@ class KCurlWrapper
 		if(!$params || !isset($params->curlVerifySSL) || !$params->curlVerifySSL)
 		{
 			curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 2);
+			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 1);
 		}
 	}
 

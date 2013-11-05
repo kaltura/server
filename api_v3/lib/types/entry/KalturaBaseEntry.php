@@ -302,8 +302,16 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $conversionProfileId;
 	
 	/**
-	 * ID of source root entry, used for clipped, skipped and cropped entries that created from another entry  
-	 * 
+	 * IF not empty, points to an entry ID the should replace this current entry's id. 
+	 *
+	 * @var string
+	 * @filter eq
+	 */
+	public $redirectEntryId;
+
+	/**
+	 * ID of source root entry, used for clipped, skipped and cropped entries that created from another entry
+	 *
 	 * @var string
 	 * @filter eq,in
 	 * @readonly
@@ -371,6 +379,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"categories",
 	 	"categoriesIds",
 	 	"conversionProfileId" => "conversionQuality",
+	 	"redirectEntryId",
 	 	"rootEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish"

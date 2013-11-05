@@ -28,6 +28,10 @@
     return self;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (IBAction)menuBarButtonPressed:(UIButton *)button {
     
     [app.navigation popToRootViewControllerAnimated:YES];

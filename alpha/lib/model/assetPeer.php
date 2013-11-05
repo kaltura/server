@@ -353,7 +353,7 @@ class assetPeer extends BaseassetPeer
 		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
-		return self::doSelect($c);
+		return self::doSelectAscendingBitrate($c);
 	}
 	
 	public static function retrieveReadyFlavorsIdsByEntryId($entryId, array $paramsIds = null)

@@ -258,6 +258,6 @@ class accessControl extends BaseaccessControl
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("accessControl:id=".$this->getId());
+		return array("accessControl:id=".strtolower($this->getId()));
 	}
 }

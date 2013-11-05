@@ -184,7 +184,8 @@ class ftpMgr extends kFileTransferMgr
 	protected function doListFileObjects ($remoteDir)
 	{
 		$fileObjectsResult = array ();
-		KalturaLog::debug(dirname($remoteDir));
+		KalturaLog::debug($remoteDir);
+		$remoteDir = ltrim($remoteDir,'/');
 		$filesInfo = ftp_rawlist($this->getConnection(), $remoteDir);
 		KalturaLog::debug("ftp rawlist [" . print_r($filesInfo, true) . "]");
 		// -rw-r--r-- 1 kaltura kaltura 1876084736 Oct 31 14:31 1615.mpeg

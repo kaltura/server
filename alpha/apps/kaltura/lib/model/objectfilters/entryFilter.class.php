@@ -122,6 +122,7 @@ class entryFilter extends baseObjectFilter
 			"_in_replacement_status",
 			"_gte_partner_sort_value",
 			"_lte_partner_sort_value",
+			"_eq_redirect_from_entry_id",
 			"_eq_root_entry_id",
 			"_in_root_entry_id",
 			"_is_root",
@@ -630,6 +631,11 @@ class entryFilter extends baseObjectFilter
 	public function setCategoriesIdsMatchAnd($v)
 	{
 		$this->set('_matchand_categories_ids', $v);
+	}
+	
+	public function setCategoryAncestorId($v)
+	{
+		$this->set('_in_category_ancestor_id', $v);
 	}
 	
 	public function typeMatches(entry $entry)
