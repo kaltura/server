@@ -65,7 +65,7 @@ class CaptionAssetEventNotificationsPlugin extends KalturaPlugin implements IKal
 		if($baseClass == 'EventNotificationEventObjectType')
 		{
 			if($enumValue == self::getEventNotificationEventObjectTypeCoreValue(CaptionAssetEventNotificationEventObjectType::CAPTION_ASSET))
-				return CaptionPlugin::getObjectClass(assetPeer::OM_CLASS, self::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+				return CaptionPlugin::getObjectClass(assetPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 		}
 					
 		return null;
