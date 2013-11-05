@@ -79,10 +79,9 @@ function getDeployedScripts(array $dbParams)
 	
 	$db_selected = mysql_select_db($dbParams['dbname'], $link);
 	$result = mysql_query('select filename from version_management');
+	$res = array();
 	if($result)
 	{
-		$res = array();
-		
 		while($row = mysql_fetch_assoc($result))
 		{
 			$res[$row['filename']] = true;
@@ -103,7 +102,6 @@ function saveScriptAsRun (array $dbParams, $fileName)
 	if ($result)
 		KalturaLog::info ("$fileName saved as run");
 	
-	mysql_free_result($result);
 	mysql_close($link);
 }
 
