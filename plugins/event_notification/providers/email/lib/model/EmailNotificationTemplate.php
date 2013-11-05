@@ -73,6 +73,21 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 				
 			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
 		}
+		
+		$dependencyPlugins = KalturaPluginManager::getPluginInstances("IKalturaPending");
+		foreach ($dependencyPlugins as $dependencyPlugin)
+		{
+			/* @var $dependencyPlugin IKalturaPending */
+			if (in_array($dependencyPlugin->dependsOn(), EmailNotificationPlugin::PLUGIN_NAME))
+			{
+				if (method_exists($dependencyPlugin, 'sweepTemplateFields'))
+				{
+					$pluginContentParameters = $dependencyPlugin->sweepTemplateFields($this, $scope);
+					array_merge($contentParametersValues, $pluginContentParameters);
+				}
+			}
+		}
+		
 		$jobData->setContentParameters($contentParametersValues);
 		
 		return $jobData;
