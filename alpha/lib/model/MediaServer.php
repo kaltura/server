@@ -90,7 +90,7 @@ class MediaServer extends BaseMediaServer {
 		return "rtmp://$domain/$app/p";
 	}
 	
-	public function getManifestUrl()
+	public function getManifestUrl($protocol = 'http')
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
@@ -123,7 +123,7 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		return "http://$domain:$port/$app/p/";
+		return "$protocol://$domain:$port/$app/p/";
 	}
 	
 } // MediaServer

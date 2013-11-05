@@ -1339,7 +1339,7 @@ class playManifestAction extends kalturaAction
 		if(count($this->tags) == 1)
 			$tag = reset($this->tags);
 			
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $tag);
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, requestUtils::getProtocol(), $tag);
 		if ($liveStreamConfig)
 			return $liveStreamConfig->getUrl();
 		

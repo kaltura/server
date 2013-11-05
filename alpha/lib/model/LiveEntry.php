@@ -110,20 +110,20 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($protocol, $tag = null)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null)
 	{
-		$configurations = $this->getLiveStreamConfigurations($tag);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
-			if ($configuration->getProtocol() == $protocol)
+			if ($configuration->getProtocol() == $format)
 				return $configuration;
 		}
 
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($tag = null)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
 	{
 		$configurations = $this->getFromCustomData('live_stream_configurations');
 		if($configurations)
@@ -137,7 +137,7 @@ abstract class LiveEntry extends entry
 			if(is_null($tag) && $this->getConversionProfileId())
 				$tag = 'all';
 			
-			$manifestUrl = $mediaServer->getManifestUrl() . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol) . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
 			
 			$hlsStreamUrl	= "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl	= "$manifestUrl/manifest.f4m";
