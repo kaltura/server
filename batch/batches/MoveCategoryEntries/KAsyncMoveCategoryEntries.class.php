@@ -138,7 +138,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	 * @param string $category
 	 * @param string $fallback
 	 */
-	public function getAncestor($categoryId, $fallback)
+	public function getDeepestLiveAncestor($categoryId, $fallback)
 	{
 		if($fallback == $categoryId) {
 			return 0;
@@ -207,7 +207,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			
 			
 			if($categoryDeleted) {
-				$ancestor = $this->getAncestor($data->destCategoryId, $data->fallback);
+				$ancestor = $this->getDeepestLiveAncestor($data->destCategoryId, $data->destCategoryFullIds);
 				
 				// In case the category isn't found since it was just deleted
 				if($ancestor) {
