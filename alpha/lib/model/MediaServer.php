@@ -95,25 +95,30 @@ class MediaServer extends BaseMediaServer {
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
 		$app = MediaServer::DEFAULT_APPLICATION;
+		$portField = 'port';
+		if($protocol != 'http')
+			$portField .= "-$protocol";
 		
 		if(kConf::hasMap('media_servers'))
 		{
 			$mediaServers = kConf::getMap('media_servers');
-			if(isset($mediaServers['port']))
-				$port = $mediaServers['port'];
+			if(isset($mediaServers[$portField]))
+				$port = $mediaServers[$portField];
 				
 			if(isset($mediaServers['application']))
 				$app = $mediaServers['application'];
 				
-			if(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
+			if(isset($mediaServers['domain']))
+				$domain = $mediaServers['domain'];
+			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
 				
 			if(isset($mediaServers[$this->getHostname()]))
 			{
 				$mediaServer = $mediaServers[$this->getHostname()];
 				
-				if(isset($mediaServer['port']))
-					$port = $mediaServer['port'];
+				if(isset($mediaServer[$portField]))
+					$port = $mediaServer[$portField];
 				
 				if(isset($mediaServer['application']))
 					$app = $mediaServer['application'];
