@@ -23,13 +23,14 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        
         self.media = [[NSMutableArray alloc] init];
-        
     }
     return self;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
 
 - (void)didReceiveMemoryWarning
 {

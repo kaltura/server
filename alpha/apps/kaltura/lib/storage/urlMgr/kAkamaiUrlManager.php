@@ -126,7 +126,10 @@ class kAkamaiUrlManager extends kUrlManager
 					$url = "mp4:$url";
 			}
 			else
-			{		
+			{
+				if ($this->protocol == PlaybackProtocol::AKAMAI_HDS)
+					$url .= '/forceproxy/true';
+				
 				if($this->extention)
 					$url .= "/name/a.$this->extention";
 						

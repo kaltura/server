@@ -28,6 +28,10 @@
     return self;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (void)menuProcess {
     
     [[Client instance] getCategories];
