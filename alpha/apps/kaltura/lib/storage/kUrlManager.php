@@ -327,7 +327,7 @@ class kUrlManager
 		$partnerFlavorVersion = $partner->getCacheFlavorVersion();
 		$entryFlavorVersion = $entry->getCacheFlavorVersion();
 
-		return (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion").
+		return (!$flavorAssetVersion ? '' : "/v/$flavorAssetVersion").
 			($partnerFlavorVersion ? "/pv/$partnerFlavorVersion" : '') .
 			($entryFlavorVersion ? "/ev/$entryFlavorVersion" : '');
 	}

@@ -32,9 +32,9 @@
     NSMutableArray *categories;
     NSMutableArray *media;
     
-    #ifdef widevine
+#ifdef widevine
     WVSettings* wvSettings;
-    #endif
+#endif
     
     int partnerId;
     

@@ -62,7 +62,7 @@ class kQueryCache
 	const QUERY_DB_MASTER = 1;
 	const QUERY_DB_SLAVE = 2;
 	
-	const CACHE_VERSION = '1';
+	const CACHE_VERSION = '2';
 	
 	protected static $s_memcacheKeys = null;
 	protected static $s_memcacheQueries = null;
@@ -171,7 +171,8 @@ class kQueryCache
 				{
 					foreach ($values as $value)
 					{
-						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, str_replace(' ', '_', $value));
+						$value = strtolower(str_replace(' ', '_', $value));
+						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, $value);
 					}
 				}
 				$invalidationKeys = $newInvalidationKeys;

@@ -336,7 +336,7 @@ class PermissionPeer extends BasePermissionPeer
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("permission:partnerId=%s", self::PARTNER_ID));
+		return array(array("permission:partnerId=%s", self::PARTNER_ID));		
 	}
 } // PermissionPeer
 

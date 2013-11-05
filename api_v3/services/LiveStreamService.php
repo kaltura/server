@@ -20,6 +20,15 @@ class LiveStreamService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'isLive') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
 	/**
 	 * Adds new live stream entry.
 	 * The entry will be queued for provision.
@@ -264,49 +273,60 @@ class LiveStreamService extends KalturaEntryService
 	{
 		KalturaResponseCacher::setExpiry(self::ISLIVE_ACTION_CACHE_EXPIRY);
 		kApiCache::disableConditionalCache();
-		$liveStreamEntry = entryPeer::retrieveByPK($id);
-		/* @var $liveStreamEntry LiveStreamEntry */
+		if (!kCurrentContext::$ks)
+		{
+			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
+			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
+		}
+		else
+		{
+			$liveStreamEntry = entryPeer::retrieveByPK($id);
+		}
 		
-		if (!$liveStreamEntry)
+		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 		
-		if ($liveStreamEntry)
+		/* @var $liveStreamEntry LiveStreamEntry */
+	
+		if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
 		{
-			if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
-			{
-				$servers = $liveStreamEntry->getMediaServers();
-				if(count($servers))
-					return true;
-					
-				return false;
-			}
-			
-			switch ($protocol)
-			{
-				case KalturaPlaybackProtocol::HLS:
-					KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
-					$url = $liveStreamEntry->getHlsStreamUrl();
-					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol);
-					if ($config)
-						$url = $config->getUrl();
-					$url = $this->getTokenizedUrl($id, $url, $protocol);
-					return $this->hlsUrlExistsRecursive($url);
-					break;
-					
-				case KalturaPlaybackProtocol::HDS:
-				case KalturaPlaybackProtocol::AKAMAI_HDS:
-					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol);
-					if ($config)
-					{
-						$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
-						if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
-							$url .= '?hdcore='.kConf::get('hd_core_version');
-						}
-						KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-						return $this->hdsUrlExists($url);
+			$servers = $liveStreamEntry->getMediaServers();
+			if(count($servers))
+				return true;
+				
+			return false;
+		}
+		
+		switch ($protocol)
+		{
+			case KalturaPlaybackProtocol::HLS:
+				KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
+				$url = $liveStreamEntry->getHlsStreamUrl();
+				$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol);
+				if ($config)
+					$url = $config->getUrl();
+				$url = $this->getTokenizedUrl($id, $url, $protocol);
+				return $this->hlsUrlExistsRecursive($url);
+				break;
+				
+			case KalturaPlaybackProtocol::HDS:
+			case KalturaPlaybackProtocol::AKAMAI_HDS:
+				$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol);
+				if ($config)
+				{
+					$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
+					if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
+						$url .= '?hdcore='.kConf::get('hd_core_version');
 					}
-					break;
-			}
+					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
+					return $this->hdsUrlExists($url);
+				}
+				break;
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
@@ -358,10 +378,15 @@ class LiveStreamService extends KalturaEntryService
 	    $data = curl_exec($ch);  
 	    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
 	    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-	    curl_close($ch);  
+	    curl_close($ch); 
+
+	    $contentTypeToCheck = strstr($contentType, ";", true);
+		if(!$contentTypeToCheck)
+			$contentTypeToCheck = $contentType;
+	    
 	    if($data && $httpcode>=200 && $httpcode<300)
 	    {
-	        return in_array($contentType, $contentTypeToReturn) ? $data : true;
+	        return in_array(trim($contentTypeToCheck), $contentTypeToReturn) ? $data : true;
 	    }  
 	    else 
 	        return false;  
@@ -415,6 +440,7 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	private function checkIfValidUrl($urlToCheck, $parentURL)
 	{
+		$urlToCheck = trim($urlToCheck);
 		if(!filter_var($urlToCheck, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED))
 		{
 			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;

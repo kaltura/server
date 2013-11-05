@@ -1310,7 +1310,7 @@ class FlvMetadataVideo extends FlvInfo
 		
 		$meta_tag = myFlvHandler::createMetadataTag($data);
 
-		file_put_contents($this->info_file_name, $meta_tag); // sync - OK
+		kFile::safeFilePutContents($this->info_file_name, $meta_tag); // sync - OK
 		
 		$meta_tag = null;
 		$amfSerializer = null;

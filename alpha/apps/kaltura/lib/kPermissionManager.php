@@ -99,20 +99,25 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$cacheStore)
 				continue;
 				
-			$value = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache
-			if ( !$value || !isset($value['updatedAt']) || ( $value['updatedAt'] < $roleCacheDirtyAt ) )
+			$cacheRole = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache
+			if ( !$cacheRole || !isset($cacheRole['updatedAt']) || ( $cacheRole['updatedAt'] < $roleCacheDirtyAt ) )
 			{
 				self::$cacheStores[] = $cacheStore;
 				continue;
 			}
-			
-			KalturaLog::debug("Found a cache value for key [$key] in layer [$cacheLayer]");
-			self::storeInCache($key, $value);		// store in lower cache layers
+
+			$map = $cacheStore->get(self::getCacheKeyPrefix() . $cacheRole['mapHash']); // try to fetch from cache
+			if ( !$map )
+			{
+				self::$cacheStores[] = $cacheStore;
+				continue;
+			}
+				
+			KalturaLog::debug("Found a cache value for key [$key] map hash [".$cacheRole['mapHash']."] in layer [$cacheLayer]");
+			self::storeInCache($key, $cacheRole, $map);		// store in lower cache layers
 			self::$cacheStores[] = $cacheStore;
 
-			// cache is updated - init from cache
-			unset($value['updatedAt']);
-			return $value;
+			return $map;
 		}
 
 		KalturaLog::debug("No cache value found for key [$key]");
@@ -125,7 +130,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * @param string $key
 	 * @param string $value
 	 */
-	private static function storeInCache($key, $value)
+	private static function storeInCache($key, $cacheRole, $map)
 	{
 		if (!self::useCache())
 		{
@@ -134,17 +139,24 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		foreach (self::$cacheStores as $cacheStore)
 		{
-			$success = $cacheStore->set(
+			if (!$cacheStore->set(
 				self::getCacheKeyPrefix() . $key,
-				$value,
+				$cacheRole,
+				kConf::get('apc_cache_ttl')))
+				continue;
+
+			$success = $cacheStore->set(
+				self::getCacheKeyPrefix() . $cacheRole['mapHash'],
+				$map,
 				kConf::get('apc_cache_ttl')); // try to store in cache
+					
 			if ($success)
 			{
-				KalturaLog::debug("New value stored in cache for key [$key]");
+				KalturaLog::debug("New value stored in cache for key [$key] map hash [".$cacheRole['mapHash']."]");
 			}
 			else
 			{
-				KalturaLog::debug("No cache value stored for key [$key]");
+				KalturaLog::debug("No cache value stored for key [$key] map hash [".$cacheRole['mapHash']."]");
 			}
 		}
 	}
@@ -225,9 +237,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$map = self::getPermissionsFromDb($dbRole);
 		
 		// update cache
-		$cacheRole = $map;
-		$cacheRole['updatedAt'] = time();
-		self::storeInCache($roleCacheKey, $cacheRole);
+		$cacheRole = array(
+			'updatedAt' => time(),
+			'mapHash' => md5(serialize($map)));
+		self::storeInCache($roleCacheKey, $cacheRole, $map);
 		
 		return $map;
 	}

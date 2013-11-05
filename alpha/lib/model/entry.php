@@ -1607,6 +1607,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 	
+	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
+	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v )		{	$this->putInCustomData ( "createThumb" , (bool) $v );	}
 	public function getCreateThumb (  )			{	return (bool) $this->getFromCustomData( "createThumb" ,null, true );	}
@@ -2715,7 +2718,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				'partner_id' => 'partnerId',
 				'moderation_status' => 'moderationStatus',
 				'display_in_search' => 'displayInSearch',
-				'duration' => 'durationInt',
+				'length_in_msecs' => 'lengthInMsecs',
 				'access_control_id' => 'accessControlId',
 				'moderation_count' => 'moderationCount',
 				'rank' => 'rank',
@@ -2783,7 +2786,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'moderation_status' => IIndexable::FIELD_TYPE_INTEGER,
 			'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
-			'duration' => IIndexable::FIELD_TYPE_INTEGER,
+			'length_in_msecs' => IIndexable::FIELD_TYPE_INTEGER,
 			'access_control_id' => IIndexable::FIELD_TYPE_INTEGER,
 			'moderation_count' => IIndexable::FIELD_TYPE_INTEGER,
 			'rank' => IIndexable::FIELD_TYPE_INTEGER,
@@ -2817,7 +2820,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("entry:id=".$this->getId(), "entry:partnerId=".$this->getPartnerId());
+		return array("entry:id=".strtolower($this->getId()), "entry:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
 	/**

@@ -1200,7 +1200,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		//check if any links were returned in the do select if not no need to continue
 		if(!count($links))
-			continue;
+			return;
 		
 		// choose the first link and convert it to file
 		$firstLink = array_shift($links);

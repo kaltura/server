@@ -12,18 +12,6 @@ class KWidevineOperationEngine extends KOperationEngine
 	
 	/**
 	 * @var string
-	 * folder for the widevine package sources
-	 */
-	private $sourceFolder;
-
-	/**
-	 * @var array
-	 * List of file names that are sources for the encrypted package
-	 */
-	private $packageFiles = array();
-	
-	/**
-	 * @var string
 	 * Name of the package, used as asset name in Widevine. Unique for the provider
 	 */
 	private $packageName;
@@ -51,55 +39,94 @@ class KWidevineOperationEngine extends KOperationEngine
 	protected function doOperation()
 	{
 		KBatchBase::impersonate($this->job->partnerId);
+		
 		$entry = KBatchBase::$kClient->baseEntry->get($this->job->entryId);
 		$this->buildPackageName($entry);
-		$vodPackagerHost = $this->calcVodPackagerHost();
-		KalturaLog::debug('start Widevine packaging: '.$this->packageName.' on '.$vodPackagerHost);
 		
-		$this->preparePackageFolders();
-		$requestXml = $this->preparePackageNotifyRequestXml();	
-		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($vodPackagerHost . WidevinePlugin::PACKAGE_NOTIFY_CGI, $requestXml);
-		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
-		$this->handleResponseError($response);	
-
-		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
-		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);
-		KBatchBase::$kClient->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);
+		KalturaLog::debug('start Widevine packaging: '.$this->packageName);
+		
+		$wvAssetId = $this->registerAsset();
+		$this->encryptPackage();		
+		$this->updateFlavorAsset($wvAssetId);
+		
 		KBatchBase::unimpersonate();	
 		
-		while(($this->job->queueTime + $this->params->maxTimeBeforeFail)>= time())
-		{
-			$res = $this->queryPackage($response->getId(), $vodPackagerHost);
-			if($res)
-				return true;
-			sleep($this->params->retryInterval);
-		}
-		
-		throw new KOperationEngineException("Job execution timed-out");
+		return true;
 	}
 	
-	private function queryPackage($wvJobId, $vodPackagerHost)
+	private function registerAsset()
 	{
-		KalturaLog::debug('start Widevine package query for WV job: '.$wvJobId);
-		$requestXmlObj = new SimpleXMLElement('<PackageQuery/>');
-		$requestXmlObj->addAttribute('id', $wvJobId);		
-		$requestXml = $requestXmlObj->asXML();
+		$wvAssetId = '';
+		$policy = null;
+		$errorMessage = '';
 		
-		$responseXml = WidevinePackageNotifyRequest::sendPostRequest($vodPackagerHost . WidevinePlugin::PACKAGE_QUERY_CGI, $requestXml);
-		$response = WidevinePackagerResponse::createWidevinePackagerResponse($responseXml);
-		KalturaLog::debug("Package status: ".$response->getStatus());
-		if($response->isSuccess())
+		if($this->operator->params)
 		{
-			KBatchBase::impersonate($this->job->partnerId);			
-			$this->updateFlavorAsset($response->getAssetid());
-			KBatchBase::unimpersonate();
-			return true;
+			$params = explode(',', $this->operator->params);
+			foreach ($params as $paramStr) 
+			{
+				$param = explode('=', $paramStr);
+				if(isset($param[0]) && $param[0] == 'policy')
+				{
+					$policy = $param[1];
+				}
+			}
 		}
-		else 
+		
+		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
+										$this->params->wvLicenseServerUrl,
+										$this->packageName,
+										null,
+										$this->params->portal,
+										$policy,
+										$this->data->flavorParamsOutput->widevineDistributionStartDate,
+										$this->data->flavorParamsOutput->widevineDistributionEndDate,
+										$errorMessage);
+
+		if(!$wvAssetId)
 		{
-			$this->handleResponseError($response);
-			return false;
-		}		
+			KBatchBase::unimpersonate();
+			$logMessage = 'Asset registration failed, asset name: '.$this->packageName.' error: '.$errorMessage;
+			KalturaLog::err($logMessage);
+			throw new KOperationEngineException($logMessage);
+		}
+										
+		KalturaLog::debug('Widevine asset id: '.$wvAssetId);
+		
+		return $wvAssetId;
+	}
+	
+	private function encryptPackage()
+	{
+		$returnValue = 0;
+		$output = array();
+		
+		$inputFiles = $this->getInputFilesList();
+		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
+				
+		$cmd = KWidevineBatchHelper::getEncryptPackageCmdLine(
+										$this->params->widevineExe, 
+										$this->params->wvLicenseServerUrl, 
+										$this->params->iv, 
+										$this->params->key, 
+										$this->packageName, 
+										$inputFiles, 
+										$this->data->destFileSyncLocalPath,
+										$this->params->gop,
+										$this->params->portal);
+										
+		exec($cmd, $output, $returnValue);
+		KalturaLog::debug('Command execution output: '.print_r($output));
+		
+		if($returnValue != 0)
+		{
+			KBatchBase::unimpersonate();
+			$errorMessage = '';
+			$errorMessage = KWidevineBatchHelper::getEncryptPackageErrorMessage($returnValue);
+			$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage;
+			KalturaLog::err($logMessage);
+			throw new KOperationEngineException($logMessage);
+		}										
 	}
 	
 	private function getAssetIdsWithRedundantBitrates()
@@ -132,14 +159,10 @@ class KWidevineOperationEngine extends KOperationEngine
 		return $redundantAssets;
 	}
 	
-	private function preparePackageFolders()
-	{
-		$this->sourceFolder = $this->params->sourceRootPath . DIRECTORY_SEPARATOR . basename($this->data->destFileSyncLocalPath);
-		
-		KalturaLog::debug('Creating sources directory: '.$this->sourceFolder);
-		mkdir($this->sourceFolder);
-		
+	private function getInputFilesList()
+	{		
 		$redundantAssets = $this->getAssetIdsWithRedundantBitrates();
+		$inputFilesArr = array();
 		
 		foreach ($this->data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
@@ -149,57 +172,12 @@ class KWidevineOperationEngine extends KOperationEngine
 			}
 			else 
 			{
-				$fileName = basename($srcFileSyncDescriptor->actualFileSyncLocalPath);		
-				KalturaLog::debug('Creating symlink in the source folder: '.$fileName);
-				symlink($srcFileSyncDescriptor->actualFileSyncLocalPath, $this->sourceFolder . DIRECTORY_SEPARATOR . $fileName);
-				$this->packageFiles[] = $fileName;
+				$inputFilesArr[] = $srcFileSyncDescriptor->actualFileSyncLocalPath;
 				$this->actualSrcAssetParams[] = $srcFileSyncDescriptor->assetParamsId;
 			}
 		}		
-		$this->data->destFileSyncLocalPath = $this->data->destFileSyncLocalPath . self::PACKAGE_FILE_EXT;
-		
-		KalturaLog::debug('Target package file name: '.$this->data->destFileSyncLocalPath);
+		return implode(',', $inputFilesArr);
 	}
-	
-	private function preparePackageNotifyRequestXml()
-	{
-		$outputFileName = basename($this->data->destFileSyncLocalPath);
-		$targetFolder = dirname($this->data->destFileSyncLocalPath);
-		
-		$requestInput = new WidevinePackageNotifyRequest($this->packageName, $this->sourceFolder, $targetFolder, $outputFileName, $this->packageFiles, $this->params->portal);
-		
-		if($this->operator->params)
-		{
-			$params = explode(',', $this->operator->params);
-			foreach ($params as $paramStr) 
-			{
-				$param = explode('=', $paramStr);
-				if(isset($param[0]) && $param[0] == 'policy')
-				{
-					$requestInput->setPolicy($param[1]);
-				}
-			}
-		}
-		$requestInput->setLicenseStartDate($this->data->flavorParamsOutput->widevineDistributionStartDate);
-		$requestInput->setLicenseEndDate($this->data->flavorParamsOutput->widevineDistributionEndDate);
-		$requestXml = $requestInput->createPackageNotifyRequestXml();
-			
-		KalturaLog::debug('Package notify request: '.$requestXml);	
-													  
-		return $requestXml;
-	}
-	
-	private function handleResponseError(WidevinePackagerResponse $response)
-	{
-		KalturaLog::debug('Response status: '. $response->getStatus());
-		if($response->isError())
-		{
-			KBatchBase::unimpersonate();
-			$logMessage = 'Package Notify request failed, package name: '.$response->getName().' error: '.$response->getErrorText();
-			KalturaLog::err($logMessage);
-			throw new KOperationEngineException($logMessage);
-		}
-	}	
 	
 	private function buildPackageName($entry)
 	{	
@@ -232,11 +210,12 @@ class KWidevineOperationEngine extends KOperationEngine
 		$this->packageName = $this->originalEntryId.'_'.$flavorAssetId;
 	}
 	
-	private function updateFlavorAsset($wvAssetId)
+	private function updateFlavorAsset($wvAssetId = null)
 	{
 		$updatedFlavorAsset = new KalturaWidevineFlavorAsset();
-		$updatedFlavorAsset->widevineAssetId = $wvAssetId;
-		
+		if($wvAssetId)
+			$updatedFlavorAsset->widevineAssetId = $wvAssetId;
+		$updatedFlavorAsset->actualSourceAssetParamsIds = implode(',', $this->actualSrcAssetParams);		
 		$wvDistributionStartDate = $this->data->flavorParamsOutput->widevineDistributionStartDate;
 		$wvDistributionEndDate = $this->data->flavorParamsOutput->widevineDistributionEndDate;
 		$updatedFlavorAsset->widevineDistributionStartDate = $wvDistributionStartDate;
@@ -244,12 +223,4 @@ class KWidevineOperationEngine extends KOperationEngine
 		KBatchBase::$kClient->flavorAsset->update($this->data->flavorAssetId, $updatedFlavorAsset);		
 	}
 	
-	private function calcVodPackagerHost()
-	{
-		$hosts = explode(',', $this->params->vodPackagerHost);
-		if(!count($hosts))
-			throw new KOperationEngineException("VOD packager host is not defined");
-		$index = crc32($this->originalEntryId) % count($hosts);
-		return trim($hosts[$index]);
-	}
 }
