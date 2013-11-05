@@ -33,7 +33,7 @@ class kMoveCategoryEntriesJobData extends kJobData
      * Destination fallback ids
      * @var string
      */
-    private $fallback;
+    private $destCategoryFullIds;
     
 	/**
 	 * @return int $srcCategoryId
@@ -100,17 +100,17 @@ class kMoveCategoryEntriesJobData extends kJobData
 	}
 	
 	/**
-	 * @return the $fallback
+	 * @return the $destCategoryFullIds
 	 */
-	public function getFallback() {
-		return $this->fallback;
+	public function getDestCategoryFullIds() {
+		return $this->destCategoryFullIds;
 	}
 
 	/**
-	 * @param string $fallback
+	 * @param string $destCategoryFullIds
 	 */
-	public function setFallback($fallback) {
-		$this->fallback = $fallback;
+	public function setDestCategoryFullIds($destCategoryFullIds) {
+		$this->destCategoryFullIds = $destCategoryFullIds;
 	}
-	
+
 }
