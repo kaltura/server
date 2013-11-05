@@ -3,7 +3,7 @@
  * Enable event notifications on metadata objects
  * @package plugins.metadataEventNotifications
  */
-class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader
+class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEmailNotificationContentEditor
 {
 	const PLUGIN_NAME = 'metadataEventNotifications';
 	
@@ -93,7 +93,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	 * Function sweeps the given fields of the emailNotificationTemplate, and parses expressions of the type
 	 * {metadata:[metadataProfileSystemName]:[metadataProfileFieldSystemName]}
 	 */
-	public static function sweepTemplateFields(EmailNotificationTemplate $emailNotificationTemplate, kScope $scope)
+	public static function editTemplateFields(EmailNotificationTemplate $emailNotificationTemplate, kScope $scope)
 	{
 		KalturaLog::info("Sweeping Email Notification Template with id {$emailNotificationTemplate->getId()} for metadata tokens.");
 		if (! ($scope instanceof kEventScope))
