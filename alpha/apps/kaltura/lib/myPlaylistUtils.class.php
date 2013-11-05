@@ -815,6 +815,7 @@ HTML;
 	 */
 	protected static function replaceContextTokens (SimpleXMLElement $contentXml)
 	{
+		KalturaLog::debug("Replace context tokens");
 	    $properties = $contentXml->children();
 	    foreach ($properties as $property)
 	    {
@@ -823,6 +824,7 @@ HTML;
 	        if (isset($propertyAttributes['dynamic']) && $propertyAttributes['dynamic'] = 1)
 	        {
 	            $tokenValue = (string)$property;
+	            KalturaLog::debug("Apply dynamic token [$property]");
 	            $tokenValue = explode("::", $tokenValue);
 	            if ($tokenValue[0] == self::CONTEXT_DELIMITER)
 	            {
@@ -842,7 +844,12 @@ HTML;
     	            }
     	            
     	            if(!$replaceValue)
+    	            {
+    	            	KalturaLog::debug("Dynamic token [$property] is null");
+                        $contentAsDom = dom_import_simplexml($contentXml);
+                        $contentAsDom->removeChild(dom_import_simplexml($property));
     	            	continue;
+    	            }
     	            
     	            if (is_numeric($replaceValue) || is_string($replaceValue))
     	            {
@@ -850,6 +857,7 @@ HTML;
                         $propertyAsDom->nodeValue = $replaceValue;
     	            }
 	            }
+                        
 	        }
 	    }
 	}
