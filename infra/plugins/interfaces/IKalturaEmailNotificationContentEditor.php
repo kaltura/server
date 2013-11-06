@@ -10,9 +10,9 @@ interface IKalturaEmailNotificationContentEditor extends IKalturaBase
 	 * Function sweeps the given fields of the emailNotificationTemplate, and parses expressions of the type
 	 * {metadata:[metadataProfileSystemName]:[metadataProfileFieldSystemName]}
 	 * 
-	 * @param EmailNotificationTemplate $emailNotificationTemplate
+	 * @param kEmailNotificationDispatchJobData $emailNotificationTemplate
 	 * @param kScope $scope
 	 * @return array
 	 */
-	public static function editTemplateFields($emailNotificationTemplate, $scope);
+	public static function editTemplateFields($emailNotificationDispatchJobData, $scope);
 }

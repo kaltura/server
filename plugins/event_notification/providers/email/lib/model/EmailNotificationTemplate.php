@@ -77,7 +77,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		$editorPlugins = KalturaPluginManager::getPluginInstances("IKalturaEmailNotificationContentEditor");
 		foreach ($editorPlugins as $plugin)
 		{
-			$pluginContentParameters = $dependencyPlugin->editTemplateFields($this, $scope);
+			$pluginContentParameters = $plugin->editTemplateFields($jobData, $scope);
 			array_merge($contentParametersValues, $pluginContentParameters);
 		}
 		

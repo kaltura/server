@@ -93,9 +93,10 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	 * Function sweeps the given fields of the emailNotificationTemplate, and parses expressions of the type
 	 * {metadata:[metadataProfileSystemName]:[metadataProfileFieldSystemName]}
 	 */
-	public static function editTemplateFields(EmailNotificationTemplate $emailNotificationTemplate, kScope $scope)
+	public static function editTemplateFields($emailNotificationDispatchJobData, $scope)
 	{
-		KalturaLog::info("Sweeping Email Notification Template with id {$emailNotificationTemplate->getId()} for metadata tokens.");
+		/* @var $emailNotificationDispatchJobData kEmailNotificationDispatchJobData */
+		KalturaLog::info("Sweeping Email Notification Template with id {$emailNotificationDispatchJobData->getTemplateId()} for metadata tokens.");
 		if (! ($scope instanceof kEventScope))
 			return array();
 		
@@ -109,27 +110,25 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 			
 			if (is_string($fieldValue))
 				$sweepFieldValues[] = $fieldValue;
-			elseif ($fieldValue instanceof kEmailNotificationStaticRecipientProvider)
+			elseif ($fieldValue instanceof kEmailNotificationStaticRecipientJobData)
 			{
-				/* @var $fieldValue kEmailNotificationStaticRecipientProvider */
-				foreach($fieldValue->getEmailRecipients() as $emailRecipient)
+				/* @var $fieldValue kEmailNotificationStaticRecipientJobData */
+				foreach($fieldValue->getEmailRecipients() as $email => $name)
 				{
 					/* @var $emailRecipient kEmailNotificationRecipient */
-					$sweepFieldValues[] = $emailRecipient->getEmail();
-					$sweepFieldValues[] = $emailRecipient->getName();
+					$sweepFieldValues[] = $email;
+					$sweepFieldValues[] = $name;
 				}
 			}
 			
 		}
+		
+		KalturaLog::debug ('Field values to sweep: ' . print_r($sweepFieldValues, true));
 		$metadataContentParameters = array();
 		foreach ($sweepFieldValues as $sweepFieldValue)
 		{
-			//Get the field value
-			$getter = "get$sweepField";
-			$fieldValue = $emailNotificationTemplate->$getter();
-			$matches = array();
 			//Obtain matches for the set structure {metadata:[profileSystemName][profileFieldSystemName]}
-			preg_match(self::METADATA_EMAIL_NOTIFICATION_REGEX, $fieldValue,$matches);
+			preg_match(self::METADATA_EMAIL_NOTIFICATION_REGEX, $sweepFieldValue, $matches);
 			foreach ($matches as $match)
 			{
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
