@@ -25,6 +25,11 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	 */
 	private $startMove = true;
 	
+	/**
+	 * list of known ancestors for deleted categories
+	 */
+	private $ancestors = array();
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -140,11 +145,12 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 	 */
 	public function getDeepestLiveAncestor($categoryId, $fallback)
 	{
+		$this->ancestors[$categoryId] = 0;
+		
 		if($fallback == $categoryId) {
-			return 0;
+			return $this->ancestors[$categoryId];
 		}
 			
-		$parent = null;
 		$fallbacks = explode(">", $fallback);
 		for($i = count($fallbacks) - 2; $i >= 0 ; $i -= 1) {
 			$filter = new KalturaCategoryFilter();
@@ -152,14 +158,12 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			$result = KBatchBase::$kClient->category->listAction($filter,null);
 			if($result->totalCount) {
 				$parent = $result->objects[0];
+				$this->ancestors[$categoryId] = $parent->id;
 				break;
 			}
 		}
 			
-		if($parent)
-			return $parent->id;
-			
-		return 0;
+		return $this->ancestors[$categoryId];
 	}
 	
 	private function addCategoryEntries($categoryEntriesList, $destCategoryId, &$entryIds) 
@@ -199,7 +203,11 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 		while(count($categoryEntriesList->objects))
 		{
 			$entryIds = array();
-			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $data->destCategoryId, $entryIds);
+			$ancestor = $data->destCategoryId;
+			if(array_key_exists($ancestor, $this->ancestors))
+				$ancestor = $this->ancestors[$ancestor];
+			
+			$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $ancestor, $entryIds);
 			
 			$categoryDeleted = false;
 			if(	is_array($addedCategoryEntriesResults[0]) && isset($addedCategoryEntriesResults[0]['code']) && ($addedCategoryEntriesResults[0]['code'] == self::CATEGORY_NOT_FOUND))
@@ -207,13 +215,12 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			
 			
 			if($categoryDeleted) {
-				$ancestor = $this->getDeepestLiveAncestor($data->destCategoryId, $data->destCategoryFullIds);
-				
-				// In case the category isn't found since it was just deleted
+				$ancestor = $this->getDeepestLiveAncestor($data->destCategoryId, $data->destCategoryFullIds, true);
+				// In case the category isn't found since it was just deleted, recall with the matching ancestor
 				if($ancestor) {
-					$entryIds = array();
-					$addedCategoryEntriesResults = $this->addCategoryEntries($categoryEntriesList, $ancestor, $entryIds);
-				} 
+					$data->destCategoryId = $ancestor;
+					continue;
+				}
 			}
 			
 			KBatchBase::$kClient->startMultiRequest();
