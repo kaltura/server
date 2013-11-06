@@ -75,9 +75,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		}
 		
 		
-		KalturaLog::info("Sweeping Email Notification Template with id {$emailNotificationDispatchJobData->getTemplateId()} for metadata tokens.");
-		if (! ($scope instanceof kEventScope))
-			return array();
+		KalturaLog::info("Sweeping Email Notification Template with id {$this->getId()} for metadata tokens.");
 		
 		$jobDataFields = array ('to', 'cc', 'bcc');
 		$templateFields = array ('subject', 'body');
@@ -86,7 +84,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		foreach ($jobDataFields as $field)
 		{
 			//Get the field value
-			$getter = "get$sweepField";
+			$getter = "get$field";
 			$fieldValue = $jobData->$getter();
 			
 			if (is_string($fieldValue))
@@ -106,14 +104,14 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 		foreach ($templateFields as $field)
 		{
 			//Get the field value
-			$getter = "get$sweepField";
+			$getter = "get$field";
 			$fieldValue = $this->$getter();
 			
 			if (is_string($fieldValue))
 				$sweepFieldValues[] = $fieldValue;
 		}
 		
-		$editorPlugins = KalturaPluginManager::getPluginInstances("IKalturaEmailNotificationContentEditor");
+		$editorPlugins = KalturaPluginManager::getPluginInstances("IKalturaEventNotificationContentEditor");
 		foreach ($editorPlugins as $plugin)
 		{
 			$pluginContentParameters = $plugin->editTemplateFields($sweepFieldValues, $scope);

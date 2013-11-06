@@ -97,6 +97,11 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	public static function editTemplateFields($sweepFieldValues, $scope)
 	{
 		KalturaLog::debug ('Field values to sweep: ' . print_r($sweepFieldValues, true));
+		
+		if (! ($scope instanceof kEventScope))
+			return array();
+		
+		/* @var $scope kEventScope */
 		$metadataContentParameters = array();
 		foreach ($sweepFieldValues as $sweepFieldValue)
 		{
@@ -106,7 +111,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 			{
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
 				list ($metadata, $profileSystemName, $fieldSystemName) = explode(':', $match);
-				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $emailNotificationTemplate->getPartnerId());
+				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $scope->getEvent()->getObject()->getPartnerId());
 				if (!$profile)
 				{
 					KalturaLog::info("Metadata profile with system name $profileSystemName not found for this partner. No tokens will be replaced.");
