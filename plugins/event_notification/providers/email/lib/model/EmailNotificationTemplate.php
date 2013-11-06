@@ -117,7 +117,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 			$pluginContentParameters = $plugin->editTemplateFields($sweepFieldValues, $scope, $this->getObjectType());
 			$contentParametersValues = array_merge($contentParametersValues, $pluginContentParameters);
 		}
-		
+
 		$jobData->setContentParameters($contentParametersValues);
 		
 		return $jobData;

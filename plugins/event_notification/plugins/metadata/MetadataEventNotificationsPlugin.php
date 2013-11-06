@@ -15,8 +15,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	const EVENT_NOTIFICATION_PLUGIN_VERSION_BUILD = 0;
 	
 	const METADATA_EMAIL_NOTIFICATION_REGEX = '/\{metadata:\w+\:\w+\}/';
-	
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
