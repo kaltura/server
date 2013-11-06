@@ -2,20 +2,27 @@
 
 require_once(dirname(__FILE__).'/../bootstrap.php');
 
-if ($argc < 5)
-	die("Usage: " . basename(__FILE__) . " <partner id> <source dc> <target dc> <max number of jobs to move>\n");
+if ($argc < 4)
+	die("Usage: " . basename(__FILE__) . " <max number of jobs to move> <source dc> <target dc> [<job sub type> [<partner id>]]\n");
 
 // input parameters
-$partnerId = $argv[1];
+$maxMovedJobs = $argv[1];
 $sourceDc = $argv[2];
 $targetDc = $argv[3];
-$maxMovedJobs = $argv[4];
+
+$jobSubType = null;
+if ($argc > 4)
+	$jobSubType = $argv[4];
+
+$partnerId = null;
+if ($argc > 5)
+	$partnerId = $argv[5];
 
 // constants
 $jobType = BatchJobType::CONVERT;
-$jobSubType = conversionEngineType::PDF_CREATOR;
 $jobStatus = BatchJob::BATCHJOB_STATUS_PENDING;
 define('TEMP_JOB_STATUS', 5000);
+define('CHUNK_SIZE', 100);
 
 function getAllReadyInternalFileSyncsForKey(FileSyncKey $key)
 {
@@ -63,58 +70,77 @@ function lockJob($object)
 
 // get candidates for move
 $c = new Criteria();
-$c->add(BatchJobLockPeer::PARTNER_ID, $partnerId);
 $c->add(BatchJobLockPeer::DC, $sourceDc);
-$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
-$c->add(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType);
-$c->add(BatchJobLockPeer::STATUS, $jobStatus);
 $c->add(BatchJobLockPeer::SCHEDULER_ID, null, Criteria::ISNULL);
 $c->add(BatchJobLockPeer::WORKER_ID, null, Criteria::ISNULL);
 $c->add(BatchJobLockPeer::BATCH_INDEX, null, Criteria::ISNULL);
-$c->setLimit($maxMovedJobs);
-$jobLocks = BatchJobLockPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+$c->add(BatchJobLockPeer::STATUS, $jobStatus);
+$c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
+if (!is_null($jobSubType))
+	$c->add(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType);
+if (!is_null($partnerId))
+	$c->add(BatchJobLockPeer::PARTNER_ID, $partnerId);
+$c->setLimit(CHUNK_SIZE);
 
-foreach ($jobLocks as $jobLock)
+$movedJobsCount = 0;
+while ($movedJobsCount < $maxMovedJobs)
 {
-	/* @var $jobLock BatchJobLock */
-	/* @var $job BatchJob */
-	$job = $jobLock->getBatchJob(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+	$jobLocks = BatchJobLockPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+	if (!$jobLocks)
+		break;
 	
-	// check whether the job can be moved
-	$jobData = $job->getData();
-	/* @var $jobData kConvartableJobData */
-	$srcFileSyncs = $jobData->getSrcFileSyncs();
-	if (count($srcFileSyncs) != 1)
-		continue;		// unexpected - multiple sources for doc convert
-	$srcFileSync = reset($srcFileSyncs);
-	/* @var $srcFileSync kSourceFileSyncDescriptor */
-	$sourceAsset = assetPeer::retrieveById($srcFileSync->getAssetId());
-	if (!$sourceAsset)
-		continue;		// unexpected - source flavor asset not found
-	$sourceSyncKey = $sourceAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-	$sourceFileSyncs = getAllReadyInternalFileSyncsForKey($sourceSyncKey);
-	if (!isset($sourceFileSyncs[$sourceDc]) || 
-		$sourceFileSyncs[$sourceDc]->getFullPath() != $srcFileSync->getFileSyncLocalPath())
-		continue;		// unexpected - no file sync for source dc, or the path does not match the job data
-	if (!isset($sourceFileSyncs[$targetDc]))
-		continue;		// source file was not synced to target dc yet
+	$initialMovedJobsCount = $movedJobsCount;
+	foreach ($jobLocks as $jobLock)
+	{
+		/* @var $jobLock BatchJobLock */
+		/* @var $job BatchJob */
+		$job = $jobLock->getBatchJob(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		
+		// check whether the job can be moved
+		$jobData = $job->getData();
+		/* @var $jobData kConvartableJobData */
+		$srcFileSyncs = $jobData->getSrcFileSyncs();
+		if (count($srcFileSyncs) != 1)
+			continue;		// unexpected - multiple sources for doc convert
+		$srcFileSync = reset($srcFileSyncs);
+		/* @var $srcFileSync kSourceFileSyncDescriptor */
+		$sourceAsset = assetPeer::retrieveById($srcFileSync->getAssetId());
+		if (!$sourceAsset)
+			continue;		// unexpected - source flavor asset not found
+		$sourceSyncKey = $sourceAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$sourceFileSyncs = getAllReadyInternalFileSyncsForKey($sourceSyncKey);
+		if (!isset($sourceFileSyncs[$sourceDc]) || 
+			$sourceFileSyncs[$sourceDc]->getFullPath() != $srcFileSync->getFileSyncLocalPath())
+			continue;		// unexpected - no file sync for source dc, or the path does not match the job data
+		if (!isset($sourceFileSyncs[$targetDc]))
+			continue;		// source file was not synced to target dc yet
+		
+		// lock the job to prevent any changes to it while it's being moved
+		if (!lockJob($jobLock))
+			continue;		// failed to lock the job
+		
+		// update batch job
+		$srcFileSync->setFileSyncLocalPath($sourceFileSyncs[$targetDc]->getFullPath());
+		$srcFileSync->setFileSyncRemoteUrl($sourceFileSyncs[$targetDc]->getExternalUrl($sourceAsset->getEntryId()));
+		$jobData->setSrcFileSyncs(array($srcFileSync));
+		$job->setData($jobData);
+		$job->setDc($targetDc);
+		$job->save();
+		
+		// update batch job lock
+		$jobLock->setStatus($jobStatus);
+		$jobLock->setDc($targetDc);
+		$jobLock->save();
+		
+		echo 'Moved job '.$job->getId()." PartnerId ".$job->getPartnerId()." EntryId ".$job->getEntryId()." FlavorId ".$job->getObjectId()."\n";
+		$movedJobsCount++;
+		if ($movedJobsCount >= $maxMovedJobs)
+			break;
+	}
 	
-	// lock the job to prevent any changes to it while it's being moved
-	if (!lockJob($jobLock))
-		continue;		// failed to lock the job
-	
-	// update batch job
-	$srcFileSync->setFileSyncLocalPath($sourceFileSyncs[$targetDc]->getFullPath());
-	$srcFileSync->setFileSyncRemoteUrl($sourceFileSyncs[$targetDc]->getExternalUrl($sourceAsset->getEntryId()));
-	$jobData->setSrcFileSyncs(array($srcFileSync));
-	$job->setData($jobData);
-	$job->setDc($targetDc);
-	$job->save();
-	
-	// update batch job lock
-	$jobLock->setStatus($jobStatus);
-	$jobLock->setDc($targetDc);
-	$jobLock->save();
-	
-	echo 'Moved job '.$job->getId()."\n";
+	if ($movedJobsCount - $initialMovedJobsCount < CHUNK_SIZE / 2)		// most of the page could not be moved, continue to the next page
+		$c->setOffset($c->getOffset() + CHUNK_SIZE / 2);
+	kMemoryManager::clearMemory();
 }
+
+echo "Moved {$movedJobsCount} jobs\n";
