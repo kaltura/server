@@ -26,4 +26,79 @@ class kVelocixUrlManager extends kUrlManager
 		
 		return null;
 	}
+	
+	
+	
+	public function isHdsLive($url){
+		KalturaLog::info('url to check:'.$url);
+		$parts = parse_url($url);
+		parse_str($parts['query'], $query);
+		$token = $query[$this->params['tokenParamName']];
+		$data = $this->urlExists($url, kConf::get("hds_live_stream_content_type"));
+		if(!$data)
+		{
+			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
+			return false;
+		}
+		KalturaLog::info('Velocix HDS manifest data:'.$data);
+		$dom = new KDOMDocument();
+		$dom->loadXML($data);
+		$element = $dom->getElementsByTagName('baseURL')->item(0);
+		if(!$element){
+			KalturaLog::Info("No base url was given");
+			return false;
+		}
+		$baseUrl = $element->nodeValue;
+		foreach ($dom->getElementsByTagName('media') as $media){
+			$href = $media->getAttribute('href');
+			$streamUrl = $baseUrl.$href.'?'.$this->params['tokenParamName']."=$token";
+			$streamUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+			if(!$this->urlExists($streamUrl, array())){
+				KalturaLog::info('not live:'.$streamUrl);
+				continue;
+			}
+			KalturaLog::info('is live:'.$streamUrl);
+			return true;
+		}
+		return false;
+	}
+	
+	public function isHlsLive ($url)
+	{
+		$parts = parse_url($url);
+		parse_str($parts['query'], $query);
+		$token = $query[$this->params['tokenParamName']];
+		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
+		if(!$data)
+		{
+			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
+			return $data;
+		}
+
+		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
+
+		foreach ($lines as $line)
+		{
+			if(!preg_match('/.+\.m3u8/', array_shift($lines), $matches))
+				continue;
+			$streamUrl = $matches[0];
+			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
+			$streamUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
+			if (!$data)
+				continue;
+				
+			$segments = explode("#EXTINF:", $data);
+			if(!preg_match('/.+\.ts.*/', array_pop($segments), $matches))
+				continue;
+			
+			$tsUrl = $matches[0];
+			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
+			$tsUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type")))
+				return true;
+		}
+			
+		return false;
+	}
 }
