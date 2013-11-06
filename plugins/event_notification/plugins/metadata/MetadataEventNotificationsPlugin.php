@@ -16,8 +16,6 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	
 	const METADATA_EMAIL_NOTIFICATION_REGEX = '/\{metadata:\w+\:\w+\}/';
 	
-	public static $jobDataValues = array ('to', 'cc', 'bcc');
-	public static $templateValues = array ('to', 'cc', 'bcc');
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
