@@ -284,7 +284,7 @@ kCall.prototype.init = function(parent){
 	
 	// create service parameter
 	var jqServiceParam = jQuery('<div class="param"><label for="' + this.name + ':service">Select service:</label></div>');
-	this.jqServiceInput = jQuery('<select name="' + this.name + ':service"><option value="">Select service</option></select>');
+	this.jqServiceInput = jQuery('<select name="' + this.name + ':service" class="sub-request-action"><option value="">Select service</option></select>');
 	this.jqServiceHelp = jQuery('<img src="images/help.png" class="service-help help" />');
 	jqServiceParam.append(this.jqServiceInput);
 	jqServiceParam.append(this.jqServiceHelp);
@@ -292,7 +292,7 @@ kCall.prototype.init = function(parent){
 	
 	// create action parameter
 	var jqActionParam = jQuery('<div class="param"><label for="' + this.name + ':action">Select action:</label></div>');
-	this.jqActionInput = jQuery('<select name="' + this.name + ':action"></select> ');
+	this.jqActionInput = jQuery('<select name="' + this.name + ':action" class="sub-request-action"></select> ');
 	this.jqActionHelp = jQuery('<img src="images/help.png" class="action-help help" />');
 	jqActionParam.append(this.jqActionInput);
 	jqActionParam.append(this.jqActionHelp);
@@ -335,7 +335,7 @@ kCall.prototype.getTitle = function(){
 /**
  * Returns the current request data
  */
-kCall.prototype.removeRequest = function(){
+kCall.prototype.removeRequest = function(removeSubRequestAction){
 
 	if(this.keepRequest)
 		return;
@@ -344,6 +344,9 @@ kCall.prototype.removeRequest = function(){
 	kTestMe.jqObjectsContainer.find('input,select').each(function(){
 		var field = jQuery(this);
 		if(!field.attr('name').length)
+			return;
+		
+		if(!removeSubRequestAction && field.hasClass('sub-request-action'))
 			return;
 			
 		field.attr('id', field.attr('name'));
@@ -391,7 +394,7 @@ kCall.prototype.getRequest = function(requestIndex){
 kCall.prototype.setRequest = function(request){
 	this.close();
 
-	this.removeRequest();
+	this.removeRequest(true);
 	
 	// restore input names from their ids
 	kTestMe.jqObjectsContainer.find('.history-field' + request.index).each(function(){
@@ -625,7 +628,7 @@ kCall.prototype.onActionChange = function(){
 	var serviceId = this.getLockedServiceId();
 	var actionId = this.getLockedActionId();
 	
-	this.removeRequest();
+	this.removeRequest(false);
 	if(kTestMe.actionParamsLoaded(serviceId, actionId)){
 		this.loadActionParams();
 		return;
