@@ -152,6 +152,12 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	protected $html5_url;
 
 	/**
+	 * The value for the partner_tags field.
+	 * @var        string
+	 */
+	protected $partner_tags;
+
+	/**
 	 * @var        array widget[] Collection to store aggregation of widget objects.
 	 */
 	protected $collwidgets;
@@ -484,6 +490,16 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function getHtml5Url()
 	{
 		return $this->html5_url;
+	}
+
+	/**
+	 * Get the [partner_tags] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPartnerTags()
+	{
+		return $this->partner_tags;
 	}
 
 	/**
@@ -1042,6 +1058,29 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	} // setHtml5Url()
 
 	/**
+	 * Set the value of [partner_tags] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     uiConf The current object (for fluent API support)
+	 */
+	public function setPartnerTags($v)
+	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::PARTNER_TAGS]))
+			$this->oldColumnsValues[uiConfPeer::PARTNER_TAGS] = $this->partner_tags;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->partner_tags !== $v) {
+			$this->partner_tags = $v;
+			$this->modifiedColumns[] = uiConfPeer::PARTNER_TAGS;
+		}
+
+		return $this;
+	} // setPartnerTags()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1095,6 +1134,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$this->creation_mode = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->version = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->html5_url = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->partner_tags = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1104,7 +1144,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 22; // 22 = uiConfPeer::NUM_COLUMNS - uiConfPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 23; // 23 = uiConfPeer::NUM_COLUMNS - uiConfPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating uiConf object", $e);
@@ -1242,18 +1282,58 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				uiConfPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(uiConfPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(uiConfPeer::CUSTOM_DATA);
+                $stmt = uiConfPeer::doSelectStmt($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						if ($namespace)
+						{
+							$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						$this->putInCustomData($name, $newValue, $namespace);
+					}
+                   }
+                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			uiConfPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1420,7 +1500,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-	
+		
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1640,6 +1720,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			case 21:
 				return $this->getHtml5Url();
 				break;
+			case 22:
+				return $this->getPartnerTags();
+				break;
 			default:
 				return null;
 				break;
@@ -1683,6 +1766,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$keys[19] => $this->getCreationMode(),
 			$keys[20] => $this->getVersion(),
 			$keys[21] => $this->getHtml5Url(),
+			$keys[22] => $this->getPartnerTags(),
 		);
 		return $result;
 	}
@@ -1780,6 +1864,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			case 21:
 				$this->setHtml5Url($value);
 				break;
+			case 22:
+				$this->setPartnerTags($value);
+				break;
 		} // switch()
 	}
 
@@ -1826,6 +1913,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[19], $arr)) $this->setCreationMode($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setVersion($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setHtml5Url($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setPartnerTags($arr[$keys[22]]);
 	}
 
 	/**
@@ -1859,6 +1947,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(uiConfPeer::CREATION_MODE)) $criteria->add(uiConfPeer::CREATION_MODE, $this->creation_mode);
 		if ($this->isColumnModified(uiConfPeer::VERSION)) $criteria->add(uiConfPeer::VERSION, $this->version);
 		if ($this->isColumnModified(uiConfPeer::HTML5_URL)) $criteria->add(uiConfPeer::HTML5_URL, $this->html5_url);
+		if ($this->isColumnModified(uiConfPeer::PARTNER_TAGS)) $criteria->add(uiConfPeer::PARTNER_TAGS, $this->partner_tags);
 
 		return $criteria;
 	}
@@ -1877,17 +1966,29 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 
 		$criteria->add(uiConfPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(uiConfPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != uiConfPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = uiConfPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if ($this->isColumnModified(uiConfPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(uiConfPeer::CUSTOM_DATA, "MD5(cast(" . uiConfPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(uiConfPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(uiConfPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != uiConfPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = uiConfPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1966,6 +2067,8 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		$copyObj->setVersion($this->version);
 
 		$copyObj->setHtml5Url($this->html5_url);
+
+		$copyObj->setPartnerTags($this->partner_tags);
 
 
 		if ($deepCopy) {
@@ -2320,6 +2423,12 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -2377,8 +2486,17 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -2425,6 +2543,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
