@@ -12,7 +12,8 @@ interface IKalturaEventNotificationContentEditor extends IKalturaBase
 	 * 
 	 * @param array $sweepFieldValues
 	 * @param kScope $scope
+	 * @param int $objecType
 	 * @return array
 	 */
-	public static function editTemplateFields($sweepFieldValues, $scope);
+	public static function editTemplateFields($sweepFieldValues, $scope, $objecType);
 }

@@ -94,13 +94,14 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	 * Function sweeps the given fields of the emailNotificationTemplate, and parses expressions of the type
 	 * {metadata:[metadataProfileSystemName]:[metadataProfileFieldSystemName]}
 	 */
-	public static function editTemplateFields($sweepFieldValues, $scope)
+	public static function editTemplateFields($sweepFieldValues, $scope, $objectType)
 	{
 		KalturaLog::debug ('Field values to sweep: ' . print_r($sweepFieldValues, true));
 		
 		if (! ($scope instanceof kEventScope))
 			return array();
 		
+		$partnerId = $scope->getEvent()->getObject()->getPartnerId();
 		/* @var $scope kEventScope */
 		$metadataContentParameters = array();
 		foreach ($sweepFieldValues as $sweepFieldValue)
@@ -111,7 +112,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 			{
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
 				list ($metadata, $profileSystemName, $fieldSystemName) = explode(':', $match);
-				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $scope->getEvent()->getObject()->getPartnerId());
+				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $partnerId);
 				if (!$profile)
 				{
 					KalturaLog::info("Metadata profile with system name $profileSystemName not found for this partner. No tokens will be replaced.");
@@ -122,22 +123,22 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				//If the metadataProfileobjectType matches the one on the emailNotification, we can proceed
 				//If the objectType of the email template is 'asset' we can use the entryId
 				//If the objectType of the email template is a metadata object we can use its id
-				if (kMetadataManager::getObjectTypeName($profile->getObjectType()) == KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $emailNotificationTemplate->getObjectType()))
+				if (kMetadataManager::getObjectTypeName($profile->getObjectType()) == KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType))
 				{
 					$objectId = $scope->getEvent()->getObject()->getId();
 				}
 				elseif (kMetadataManager::getObjectTypeName($profile->getObjectType()) == 'entry'
-						&& KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $emailNotificationTemplate->getObjectType()) == 'asset')
+						&& ($scope->getEvent()->getObject() instanceof asset))
 				{
 					$objectId = $scope->getEvent()->getObject()->getEntryId();
 				}
-				elseif (KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $emailNotificationTemplate->getObjectType()) == MetadataPeer::OM_CLASS)
+				elseif (KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType) == MetadataPeer::OM_CLASS)
 				{
 					$metadataObjectIdb = $scope->getEvent()->getObject()->getId();
 				}
 				
 				$c = new Criteria();
-				$c->add(MetadataPeer::PARTNER_ID, $emailNotificationTemplate->getPartnerId());
+				$c->add(MetadataPeer::PARTNER_ID, $partnerId);
 				$c->add(MetadataPeer::STATUS, Metadata::STATUS_VALID);
 				$c->add(MetadataPeer::METADATA_PROFILE_ID, $profile->getId());
 				if ($objectId)
@@ -162,7 +163,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				
 				/* @var $result Metadata */
 				$metadataXML = new SimpleXMLElement (kFileSyncUtils::file_get_contents($result->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA)));
-				$values = $metadataXML->xpath($fieldSystemName);
+				$values = $metadataXML->xpath("//$fieldSystemName");
 				$strvals = array();
 				foreach ($values as $value)
 				{
