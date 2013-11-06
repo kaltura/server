@@ -4,15 +4,15 @@
  * @package infra
  * @subpackage Plugins
  */
-interface IKalturaEmailNotificationContentEditor extends IKalturaBase
+interface IKalturaEventNotificationContentEditor extends IKalturaBase
 {
 	/**
 	 * Function sweeps the given fields of the emailNotificationTemplate, and parses expressions of the type
 	 * {metadata:[metadataProfileSystemName]:[metadataProfileFieldSystemName]}
 	 * 
-	 * @param kEmailNotificationDispatchJobData $emailNotificationTemplate
+	 * @param array $sweepFieldValues
 	 * @param kScope $scope
 	 * @return array
 	 */
-	public static function editTemplateFields($emailNotificationDispatchJobData, $scope);
+	public static function editTemplateFields($sweepFieldValues, $scope);
 }

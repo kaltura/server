@@ -74,10 +74,49 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
 		}
 		
+		
+		KalturaLog::info("Sweeping Email Notification Template with id {$emailNotificationDispatchJobData->getTemplateId()} for metadata tokens.");
+		if (! ($scope instanceof kEventScope))
+			return array();
+		
+		$jobDataFields = array ('to', 'cc', 'bcc');
+		$templateFields = array ('subject', 'body');
+		
+		$sweepFieldValues = array();
+		foreach ($jobDataFields as $field)
+		{
+			//Get the field value
+			$getter = "get$sweepField";
+			$fieldValue = $jobData->$getter();
+			
+			if (is_string($fieldValue))
+				$sweepFieldValues[] = $fieldValue;
+			elseif ($fieldValue instanceof kEmailNotificationStaticRecipientJobData)
+			{
+				/* @var $fieldValue kEmailNotificationStaticRecipientJobData */
+				foreach($fieldValue->getEmailRecipients() as $email => $name)
+				{
+					/* @var $emailRecipient kEmailNotificationRecipient */
+					$sweepFieldValues[] = $email;
+					$sweepFieldValues[] = $name;
+				}
+			}
+		}
+		
+		foreach ($templateFields as $field)
+		{
+			//Get the field value
+			$getter = "get$sweepField";
+			$fieldValue = $this->$getter();
+			
+			if (is_string($fieldValue))
+				$sweepFieldValues[] = $fieldValue;
+		}
+		
 		$editorPlugins = KalturaPluginManager::getPluginInstances("IKalturaEmailNotificationContentEditor");
 		foreach ($editorPlugins as $plugin)
 		{
-			$pluginContentParameters = $plugin->editTemplateFields($jobData, $scope);
+			$pluginContentParameters = $plugin->editTemplateFields($sweepFieldValues, $scope);
 			array_merge($contentParametersValues, $pluginContentParameters);
 		}
 		

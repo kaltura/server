@@ -3,7 +3,7 @@
  * Enable event notifications on metadata objects
  * @package plugins.metadataEventNotifications
  */
-class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEmailNotificationContentEditor
+class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventNotificationContentEditor
 {
 	const PLUGIN_NAME = 'metadataEventNotifications';
 	
@@ -15,6 +15,9 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	const EVENT_NOTIFICATION_PLUGIN_VERSION_BUILD = 0;
 	
 	const METADATA_EMAIL_NOTIFICATION_REGEX = '/\{metadata:\w+\:\w+\}/';
+	
+	public static $jobDataValues = array ('to', 'cc', 'bcc');
+	public static $templateValues = array ('to', 'cc', 'bcc');
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -93,36 +96,8 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	 * Function sweeps the given fields of the emailNotificationTemplate, and parses expressions of the type
 	 * {metadata:[metadataProfileSystemName]:[metadataProfileFieldSystemName]}
 	 */
-	public static function editTemplateFields($emailNotificationDispatchJobData, $scope)
+	public static function editTemplateFields($sweepFieldValues, $scope)
 	{
-		/* @var $emailNotificationDispatchJobData kEmailNotificationDispatchJobData */
-		KalturaLog::info("Sweeping Email Notification Template with id {$emailNotificationDispatchJobData->getTemplateId()} for metadata tokens.");
-		if (! ($scope instanceof kEventScope))
-			return array();
-		
-		$sweepFields = array ('subject', 'body', 'to', 'cc', 'bcc');
-		$sweepFieldValues = array();
-		foreach ($sweepFields as $sweepField)
-		{
-			//Get the field value
-			$getter = "get$sweepField";
-			$fieldValue = $emailNotificationTemplate->$getter();
-			
-			if (is_string($fieldValue))
-				$sweepFieldValues[] = $fieldValue;
-			elseif ($fieldValue instanceof kEmailNotificationStaticRecipientJobData)
-			{
-				/* @var $fieldValue kEmailNotificationStaticRecipientJobData */
-				foreach($fieldValue->getEmailRecipients() as $email => $name)
-				{
-					/* @var $emailRecipient kEmailNotificationRecipient */
-					$sweepFieldValues[] = $email;
-					$sweepFieldValues[] = $name;
-				}
-			}
-			
-		}
-		
 		KalturaLog::debug ('Field values to sweep: ' . print_r($sweepFieldValues, true));
 		$metadataContentParameters = array();
 		foreach ($sweepFieldValues as $sweepFieldValue)
