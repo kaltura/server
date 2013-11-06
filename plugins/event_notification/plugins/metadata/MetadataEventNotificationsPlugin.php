@@ -14,7 +14,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 	const EVENT_NOTIFICATION_PLUGIN_VERSION_MINOR = 0;
 	const EVENT_NOTIFICATION_PLUGIN_VERSION_BUILD = 0;
 	
-	const METADATA_EMAIL_NOTIFICATION_REGEX = '/\{metadata:\w+\:\w+\}/';
+	const METADATA_EMAIL_NOTIFICATION_REGEX = '/\{metadata\:[^:]+\:[^}]+\}/';
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -106,7 +106,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 		foreach ($sweepFieldValues as $sweepFieldValue)
 		{
 			//Obtain matches for the set structure {metadata:[profileSystemName][profileFieldSystemName]}
-			preg_match(self::METADATA_EMAIL_NOTIFICATION_REGEX, $sweepFieldValue, $matches);
+			preg_match_all(self::METADATA_EMAIL_NOTIFICATION_REGEX, $sweepFieldValue, $matches);
 			foreach ($matches as $match)
 			{
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
@@ -136,17 +136,14 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 					$metadataObjectIdb = $scope->getEvent()->getObject()->getId();
 				}
 				
-				$c = new Criteria();
-				$c->add(MetadataPeer::PARTNER_ID, $partnerId);
-				$c->add(MetadataPeer::STATUS, Metadata::STATUS_VALID);
-				$c->add(MetadataPeer::METADATA_PROFILE_ID, $profile->getId());
+				
 				if ($objectId)
 				{
-					$c->add(MetadataPeer::OBJECT_ID, $objectId);
+					$result = MetadataPeer::retrieveByObject($profile->getId(), $profile->getObjectType(), $objectId);
 				}
 				elseif ($metadataObjectId)
 				{
-					$c->add(MetadataPeer::ID, $metadataObjectId);
+					$result = MetadataPeer::retrieveByPK($metadataObjectId);
 				}
 				else 
 				{
@@ -155,19 +152,10 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 					return array ();	
 				}
 				
-				$result = MetadataPeer::doSelectOne($c);
-				
 				if (!$result)
 					return array ();
 				
-				/* @var $result Metadata */
-				$metadataXML = new SimpleXMLElement (kFileSyncUtils::file_get_contents($result->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA)));
-				$values = $metadataXML->xpath("//$fieldSystemName");
-				$strvals = array();
-				foreach ($values as $value)
-				{
-					$strvals[] = strval($value);
-				}
+				$strvals = kMetadataManager::getMetadataValueForField($result, $fieldSystemName);
 				
 				$metadataContentParameters[$match] = implode(',', $strvals);
 			}
