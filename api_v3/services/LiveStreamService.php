@@ -82,9 +82,12 @@ class LiveStreamService extends KalturaEntryService
 				
 		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
 		{
-			$partner = $dbEntry->getPartner();
-			if($partner)
-				$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
+			if(!$entry->conversionProfileId)
+			{
+				$partner = $dbEntry->getPartner();
+				if($partner)
+					$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
+			}
 				
 			$dbEntry->save();
 			
