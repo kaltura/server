@@ -1712,6 +1712,24 @@ class kFlowHelper
 		$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_DELETED);
 		$uploadToken->save();
 
+		if(is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS))
+		{
+			$dbFileAsset = FileAssetPeer::retrieveByPK($uploadToken->getObjectId());
+			if(!$dbFileAsset)
+			{
+				KalturaLog::err("File asset id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
+
+			if($dbFileAsset->getStatus() == FileAssetStatus::UPLOADING)
+			{
+				$dbFileAsset->setStatus(FileAssetStatus::ERROR);
+				$dbFileAsset->save();
+			}
+
+			return;
+		}
+		
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
@@ -1762,7 +1780,24 @@ class kFlowHelper
 
 		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
 			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
+	
+		if(is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS))
+		{
+			$dbFileAsset = FileAssetPeer::retrieveByPK($uploadToken->getObjectId());
+			if(!$dbFileAsset)
+			{
+				KalturaLog::err("File asset id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
 
+			if($dbFileAsset->getStatus() == FileAssetStatus::UPLOADING)
+			{
+				$dbFileAsset->setStatus(FileAssetStatus::PENDING);
+				$dbFileAsset->save();
+			}
+			return;
+		}
+		
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
@@ -1822,7 +1857,46 @@ class kFlowHelper
 
 			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
+	
+		if(is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS))
+		{
+			$dbFileAsset = FileAssetPeer::retrieveByPK($uploadToken->getObjectId());
+			if(!$dbFileAsset)
+			{
+				KalturaLog::err("File asset id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
 
+			if(!$dbFileAsset->getFileExt())
+				$dbFileAsset->setFileExt(pathinfo($fullPath, PATHINFO_EXTENSION));
+				
+			$dbFileAsset->incrementVersion();
+			$dbFileAsset->save();
+
+			$syncKey = $dbFileAsset->getSyncKey(FileAsset::FILE_SYNC_ASSET);
+
+			try {
+				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
+			}
+			catch (Exception $e) {
+				$dbFileAsset->setStatus(FileAssetStatus::ERROR);
+				$dbFileAsset->save();
+				throw $e;
+			}
+
+			if($dbFileAsset->getStatus() == FileAssetStatus::UPLOADING)
+			{
+				$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				$dbFileAsset->setSize(kFile::fileSize($finalPath));
+				$dbFileAsset->setStatus(FileAssetStatus::READY);
+				$dbFileAsset->save();
+			}
+
+			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
+			$uploadToken->save();
+			return;
+		}
+		
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());

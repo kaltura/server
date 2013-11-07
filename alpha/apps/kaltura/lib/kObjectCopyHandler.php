@@ -28,6 +28,29 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 		return true;
 	}
 	
+	/**
+	 * @param uiConf $fromObject
+	 * @param uiConf $toObject
+	 */
+	protected function uiConfCopied(uiConf $fromObject, uiConf $toObject)
+	{
+		$fileAssets = FileAssetPeer::retrieveByObject(FileAssetObjectType::UI_CONF, $fromObject->getId());
+		foreach($fileAssets as $fileAsset)
+		{
+			/* @var $fileAsset FileAsset */
+				
+			$newFileAssets = $fileAsset->copy();
+			$newFileAssets->setVersion(1);
+			$newFileAssets->save();
+			
+			$syncKey = $fileAsset->getSyncKey(FileAsset::FILE_SYNC_ASSET);
+			$newSyncKey = $newFileAssets->getSyncKey(FileAsset::FILE_SYNC_ASSET);
+			
+			if(kFileSyncUtils::fileSync_exists($syncKey))
+				kFileSyncUtils::softCopy($syncKey, $newSyncKey);
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kObjectCopiedEventConsumer::objectCopied()
 	 */
@@ -63,6 +86,9 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 		{
 			self::mapIds(get_class($fromObject), $fromObject->getId(), $toObject->getId());
 		}
+		
+		if($fromObject instanceof uiConf)
+			$this->uiConfCopied($fromObject, $toObject);
 		
 		if($fromObject instanceof category && $fromObject->getParentId())
 		{

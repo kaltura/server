@@ -218,5 +218,8 @@ return array (
     'BatchJobLogTableMap' => 'lib/model/map/BatchJobLogTableMap.php',
     'BatchJobLogPeer' => 'lib/model/BatchJobLogPeer.php',
     'BatchJobLog' => 'lib/model/BatchJobLog.php',
+    'FileAssetTableMap' => 'lib/model/map/FileAssetTableMap.php',
+    'FileAssetPeer' => 'lib/model/FileAssetPeer.php',
+    'FileAsset' => 'lib/model/FileAsset.php',
   ),
 );
