@@ -99,11 +99,11 @@ class KSecureEntryHelper
 		$this->applyContext();
 	}
 	
-	public function hasRules()
+	public function hasRules($contextType = null)
 	{
 		$accessControl = $this->entry->getAccessControl();
 		if ($accessControl)
-			return $accessControl->hasRules();
+			return $accessControl->hasRules($contextType);
 			
 		return false;
 	}
