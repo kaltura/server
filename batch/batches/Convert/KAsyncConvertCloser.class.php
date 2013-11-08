@@ -30,14 +30,6 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::getMaxJobsEachRun()
 	 */
 	protected function getMaxJobsEachRun()
