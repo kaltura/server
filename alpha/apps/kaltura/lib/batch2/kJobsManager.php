@@ -236,6 +236,9 @@ class kJobsManager
 	
 	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry, kProvisionJobData $jobData)
 	{
+		$entry->setStatus(entryStatus::IMPORT);
+		$entry->save();
+		
 		$batchJob = null;
 		if($parentJob)
 		{

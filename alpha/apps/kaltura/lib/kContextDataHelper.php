@@ -299,7 +299,7 @@ class kContextDataHelper
 			$protocols = array(PlaybackProtocol::AKAMAI_HDS, PlaybackProtocol::HDS);
 			foreach ($protocols as $protocol)
 			{
-				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $protocol);
+				$config = $this->entry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
 				if ($config)
 				{	
 					$this->streamerType = $protocol;

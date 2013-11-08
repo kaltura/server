@@ -524,7 +524,7 @@ class KalturaEntryService extends KalturaBaseService
  			KalturaLog::debug("Creating original flavor asset");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
-		
+	
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
@@ -533,6 +533,13 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$internalResource = $resource->getResource();
 		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
+		
+		$sourceType = $resource->getSourceType();
+		if($sourceType)
+		{
+			$dbEntry->setSource($sourceType);
+			$dbEntry->save();
+		}
 		
 		$errDescription = '';
 		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $resource->getOperationAttributes());
@@ -774,12 +781,10 @@ class KalturaEntryService extends KalturaBaseService
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		if(!$dbEntry)
 		{
-			$coreType = kPluginableEnumsManager::apiToCore('entryType', $entry->type);
-			$class = KalturaPluginManager::getObjectClass(entryPeer::OM_CLASS, $coreType);
-			if(!$class)
-				$class = entryPeer::OM_CLASS;
+			$entryType = kPluginableEnumsManager::apiToCore('entryType', $entry->type);
+			$class = entryPeer::getEntryClassByType($entryType);
 				
-			KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$coreType] class [$class]");
+			KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
 			$dbEntry = new $class();
 		}
 			
