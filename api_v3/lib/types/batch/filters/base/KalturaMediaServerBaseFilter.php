@@ -12,8 +12,6 @@ abstract class KalturaMediaServerBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
-		"reportedAtGreaterThanOrEqual" => "_gte_reported_at",
-		"reportedAtLessThanOrEqual" => "_lte_reported_at",
 	);
 
 	static private $order_by_map = array
@@ -22,8 +20,6 @@ abstract class KalturaMediaServerBaseFilter extends KalturaFilter
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
-		"+reportedAt" => "+reported_at",
-		"-reportedAt" => "-reported_at",
 	);
 
 	public function getMapBetweenObjects()
@@ -55,14 +51,4 @@ abstract class KalturaMediaServerBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $reportedAtGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $reportedAtLessThanOrEqual;
 }
