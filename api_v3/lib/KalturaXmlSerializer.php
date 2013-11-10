@@ -95,6 +95,25 @@ class KalturaXmlSerializer extends KalturaSerializer
 		}
 	}
 	
+	function writeKalturaAPIExceptionArgsTag($object)
+	{
+		if ( $object instanceof KalturaAPIException )
+		{
+			echo '<args>';
+			
+			foreach ( $object->getArgs() as $name => $value )
+			{
+				echo '<item>';
+				echo '<objectType>KalturaAPIExceptionArg</objectType>'; // Hardcoded imaginary type for the client code parsers.
+				echo '<name>' . kString::xmlEncode($name) . '</name>';
+				echo '<value>' . kString::xmlEncode($value) . '</value>';
+				echo '</item>';
+			}
+			
+			echo '</args>';
+		}
+	}
+	
 	function serializeObject($object)
 	{
 		if ($object instanceof Exception)
@@ -104,11 +123,7 @@ class KalturaXmlSerializer extends KalturaSerializer
 			$this->writeTag('code', kString::xmlEncode($object->getCode()));
 			$this->writeTag('message', kString::xmlEncode($object->getMessage()));
 			$this->writeTag('objectType', get_class($object));
-			
-			if ( $object instanceof KalturaAPIException )
-			{
-				$this->writeTag('args', $object->getArgs());
-			}
+			$this->writeKalturaAPIExceptionArgsTag( $object );
 			
 			echo '</error>';
 		}
