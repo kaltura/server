@@ -26,14 +26,6 @@ class KAsyncNotifier extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
@@ -129,7 +121,7 @@ class KAsyncNotifier extends KJobHandlerWorker
 		$freeExclusiveResults = KBatchBase::$kClient->doMultiRequest();
 		$freeExclusiveResults = array_pop($freeExclusiveResults);
 		KalturaLog::info("Queue size: {$freeExclusiveResults->queueSize} sent to scheduler");
-		$this->saveSchedulerQueue($this->getJobType(), $freeExclusiveResults->queueSize);
+		$this->saveSchedulerQueue(static::getType(), $freeExclusiveResults->queueSize);
 	}
 	
 	/**

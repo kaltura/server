@@ -15,14 +15,6 @@ class KAsyncTagIndex extends KJobHandlerWorker
 	}
 
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	protected function getJobType() {
-		return self::getType();
-		
-	}
-
-	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
