@@ -199,6 +199,29 @@ class SphinxEntryCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		/* @var $filter entryFilter */
+
+		if ( $filter->is_set('_eq_redirect_from_entry_id' ) )
+		{
+			$entry = entryPeer::retrieveByPK( $filter->get( '_eq_redirect_from_entry_id' ) );
+			$redirectEntryId = $entry->getRedirectEntryId();
+			
+			if ( is_null( $redirectEntryId ) )
+			{
+				$filter->set( '_eq_id', $entry->getId() );
+			}
+			else
+			{
+				// Check if the redirected entry is ready
+				$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
+				if ( $redirectedEntry->getStatus() == entryStatus::READY )
+				{
+					$filter->set( '_eq_id', $redirectEntryId );
+				}
+			}
+				
+			$filter->unsetByName( '_eq_redirect_from_entry_id' );
+		}
+		
 		$categoriesAncestorParsed = null;
 		$categories = $filter->get( "_in_category_ancestor_id");
 		if ($categories !== null)
