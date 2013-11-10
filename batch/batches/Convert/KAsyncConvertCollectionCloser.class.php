@@ -30,14 +30,6 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
