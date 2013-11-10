@@ -34,7 +34,7 @@ class kVelocixUrlManager extends kUrlManager
 		$parts = parse_url($url);
 		parse_str($parts['query'], $query);
 		$token = $query[$this->params['tokenParamName']];
-		$data = $this->urlExists($url, kConf::get("hds_live_stream_content_type"));
+		$data = $this->urlExists($url, $this->params['hdsManifestContentType']);
 		if(!$data)
 		{
 			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
@@ -51,7 +51,7 @@ class kVelocixUrlManager extends kUrlManager
 		$baseUrl = $element->nodeValue;
 		foreach ($dom->getElementsByTagName('media') as $media){
 			$href = $media->getAttribute('href');
-			$streamUrl = $baseUrl.$href.'?'.$this->params['tokenParamName']."=$token";
+			$streamUrl = $baseUrl.$href;
 			$streamUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
 			if(!$this->urlExists($streamUrl, array(),'0-0')){
 				KalturaLog::info('not live:'.$streamUrl);
