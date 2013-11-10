@@ -93,6 +93,10 @@ class kMetadataFieldChangedCondition extends kCondition
 				$metadata = $object;
 			elseif($object instanceof IMetadataObject)
 				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
+			elseif ($object instanceof asset)
+			{
+				$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $object->getEntryId());
+			}
 		}
 			
 		if(!$metadata)
