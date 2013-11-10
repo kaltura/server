@@ -276,7 +276,7 @@ class LiveStreamService extends KalturaEntryService
 				$url = $this->getTokenizedUrl($id, $url, $protocol);
 				$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
 				$urlManager->setProtocol($protocol);
-				return $urlManager->isHlsLive($url);
+				return $urlManager->isLive($url);
 				break;
 				
 			case KalturaPlaybackProtocol::HDS:
@@ -295,7 +295,7 @@ class LiveStreamService extends KalturaEntryService
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
 					$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
 					$urlManager->setProtocol($protocol);
-					return $urlManager->isHdsLive($url);
+					return $urlManager->isLive($url);
 				}
 				break;
 		}

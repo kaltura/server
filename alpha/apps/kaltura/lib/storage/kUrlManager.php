@@ -432,11 +432,30 @@ class kUrlManager
 	}
 	
 	/**
+	 * Checking if the url is live or not. 
+	 * @param string $url the url to check
+	 * @throws Exception
+	 */
+	public function isLive($url){
+		switch ($this->protocol){
+			case PlaybackProtocol::HDS:
+			case PlaybackProtocol::AKAMAI_HDS:
+				return $this->isHdsLive($url);
+				break;
+			case PlaybackProtocol::HLS:
+			case PlaybackProtocol::APPLE_HTTP:
+				return $this->isHlsLive($url);
+				break;
+		}
+		throw new Exception('Status cannot be determined for live stream protocol '.$this->protocol);
+	}
+	
+	/**
 	 * Method checks whether the URL passed to it as a parameter returns a response.
 	 * @param string $url
 	 * @return string
 	 */
-	protected function urlExists ($url, array $contentTypeToReturn)
+	protected function urlExists ($url, array $contentTypeToReturn, $range = null)
 	{
 		if (is_null($url)) 
 			return false;  
@@ -449,7 +468,11 @@ class kUrlManager
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);  
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);  
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		if (!is_null($range))
+		{
+			curl_setopt($ch, CURLOPT_RANGE, $range);
+		}
 		$data = curl_exec($ch);  
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
 		$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -484,9 +507,10 @@ class kUrlManager
 
 		foreach ($lines as $line)
 		{
-			if(!preg_match('/.+\.m3u8/', array_shift($lines), $matches))
+			$line = trim($line);
+			if(!endsWith($line, '.m3u8'))
 				continue;
-			$streamUrl = $matches[0];
+			$streamUrl = $line;
 			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
 			
 			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
@@ -499,7 +523,7 @@ class kUrlManager
 			
 			$tsUrl = $matches[0];
 			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type")))
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0'))
 				return true;
 		}
 			
