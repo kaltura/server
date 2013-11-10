@@ -641,11 +641,28 @@ class kuser extends Basekuser implements IIndexable
 	{
 		return $this->getFromCustomData('allowed_partner_packages');
 	}
-	
+
 	//TODO: check if needed
 	public function getIsAdmin()
 	{
 		return parent::getisAdmin() == true;
+	}
+	
+	/**
+	 * Set language parameter to $language (in custom_data)
+	 * @param string $language
+	 */
+	public function setLanguage($language)
+	{
+		$this->putInCustomData('language', $language);
+	}
+	
+	/**
+	 * @return language parameter from custom_data
+	 */
+	public function getLanguage()
+	{
+		return $this->getFromCustomData('language');
 	}
 	
 	
