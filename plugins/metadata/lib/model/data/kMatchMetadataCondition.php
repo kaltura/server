@@ -81,6 +81,10 @@ class kMatchMetadataCondition extends kMatchCondition
 				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
 			else if ($object instanceof Metadata)
 				$metadata = $object;
+			elseif ($object instanceof asset)
+			{
+				$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $object->getEntryId());
+			}
 		}
 			
 		if($metadata)
