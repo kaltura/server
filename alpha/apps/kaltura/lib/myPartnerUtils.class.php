@@ -1354,7 +1354,6 @@ class myPartnerUtils
  			}
  		}
  		
- 		$toPartner->save();
 		// make sure conversion profile is set on the new partner in case it was missed/skiped in the conversionProfile2::copy method
 		if(!$toPartner->getDefaultConversionProfileId())
 		{
@@ -1362,9 +1361,19 @@ class myPartnerUtils
 			if($fromPartnerDefaultProfile && key_exists($fromPartnerDefaultProfile, $copiedList))
 			{
 				$toPartner->setDefaultConversionProfileId($copiedList[$fromPartnerDefaultProfile]);
-				$toPartner->save();
 			}
 		}
+ 	
+		if(!$toPartner->getDefaultLiveConversionProfileId())
+		{
+			$fromPartnerDefaultLiveProfile = $fromPartner->getDefaultLiveConversionProfileId();
+			if($fromPartnerDefaultLiveProfile && key_exists($fromPartnerDefaultLiveProfile, $copiedList))
+			{
+				$toPartner->setDefaultLiveConversionProfileId($copiedList[$fromPartnerDefaultLiveProfile]);
+			}
+		}
+		
+ 		$toPartner->save();
  	}
  	
  	public static function copyAccessControls(Partner $fromPartner, Partner $toPartner)

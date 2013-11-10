@@ -6,9 +6,9 @@ if($argc < 2)
 }
 
 $dirName = $argv[1];
-if(!file_exists($dirName) || !is_dir($dirName))
+if(!file_exists($dirName))
 {
-	echo("Defaults configuration files directory [$dirName] is not a valid directory");
+	echo("Defaults configuration files directory [$dirName] is not a valid path");
 	exit(-2);
 }
 $dirName = realpath($dirName);
@@ -17,48 +17,67 @@ chdir(__DIR__);
 require_once(__DIR__ . '/../../bootstrap.php');
 
 myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_MASTER;
-$con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 
-$dir = dir($dirName);
-/* @var $dir Directory */
-
-$fileNames = array();
-$errors = array();
-while (false !== ($fileName = $dir->read()))
+if(is_dir($dirName))
 {
-	$filePath = realpath("$dirName/$fileName");
-	if($fileName[0] == '.' || is_dir($filePath) || !preg_match('/^\d+\.\w+\.ini$/', $fileName))
-		continue;
-
-	KalturaLog::debug("Validate file [$filePath]");
-	$objectConfigurations = parse_ini_file($filePath, true);
-	if(!is_array($objectConfigurations))
-		$errors[] = "Content file [$filePath] is not a valid ini file";
-
-	$matches = null;
-	if(preg_match_all('/@[A-Z_0-9]+@/', file_get_contents($filePath), $matches) > 0)
-		$errors[] = "Content file [$filePath] contains place holders: " . implode("\n\t", $matches[0]);
-
-	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
-	if($fileExtension == 'ini')
-		$fileNames[] = $fileName;
+	handleDirectory($dirName);
 }
-$dir->close();
-if(count($errors))
+elseif(is_file($dirName))
 {
-	KalturaLog::err(implode("\n\n", $errors));
-	exit(-3);
+	handleFile($dirName);
 }
 
-sort($fileNames);
-KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
-
-
-foreach($fileNames as $fileName)
+function handleDirectory($dirName)
 {
+	$dir = dir($dirName);
+	/* @var $dir Directory */
+	
+	$fileNames = array();
+	$errors = array();
+	while (false !== ($fileName = $dir->read()))
+	{
+		$filePath = realpath("$dirName/$fileName");
+		if($fileName[0] == '.' || is_dir($filePath) || !preg_match('/^\d+\.\w+\.ini$/', $fileName))
+			continue;
+	
+		KalturaLog::debug("Validate file [$filePath]");
+		$objectConfigurations = parse_ini_file($filePath, true);
+		if(!is_array($objectConfigurations))
+			$errors[] = "Content file [$filePath] is not a valid ini file";
+	
+		$matches = null;
+		if(preg_match_all('/@[A-Z_0-9]+@/', file_get_contents($filePath), $matches) > 0)
+			$errors[] = "Content file [$filePath] contains place holders: " . implode("\n\t", $matches[0]);
+	
+		list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
+		if($fileExtension == 'ini')
+			$fileNames[] = $fileName;
+	}
+	$dir->close();
+	if(count($errors))
+	{
+		KalturaLog::err(implode("\n\n", $errors));
+		exit(-3);
+	}
+	
+	sort($fileNames);
+	KalturaLog::info("Handling files [" . print_r($fileNames, true) . "]");
+	
+
+	foreach($fileNames as $fileName)
+	{
+		handleFile(realpath("$dirName/$fileName"));
+	}
+}
+
+
+function handleFile($filePath)
+{
+	$con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+	
+	$fileName = basename($filePath);
+	KalturaLog::info("Handling file [$fileName]");
 	list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
-	KalturaLog::info("Handling file [$dirName/$fileName]");
-	$filePath = realpath("$dirName/$fileName");
 	$objectConfigurations = parse_ini_file($filePath, true);
 
 	$newObjectType = "Insert{$objectType}";

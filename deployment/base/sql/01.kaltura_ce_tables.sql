@@ -533,6 +533,7 @@ CREATE TABLE IF NOT EXISTS `conversion_profile_2` (
   `system_name` varchar(128) NOT NULL DEFAULT '',
   `tags` text NOT NULL,
   `status` int(11) NOT NULL DEFAULT '2',
+  `type` int(11) NOT NULL DEFAULT '1',
   `default_entry_id` varchar(20) DEFAULT NULL,
   `crop_left` int(11) NOT NULL DEFAULT '-1',
   `crop_top` int(11) NOT NULL DEFAULT '-1',
@@ -2169,3 +2170,14 @@ CREATE TABLE `api_server`
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE `media_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`hostname` VARCHAR(255),
+	`dc` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
