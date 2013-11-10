@@ -18,14 +18,6 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::getJobs()
 	 * 
 	 * TODO remove the destFilePath from the job data and get it later using the api, then delete this method
