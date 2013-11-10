@@ -38,7 +38,7 @@ class KalturaEntryContext extends KalturaContext
 	        $entry = entryPeer::retrieveByPK($this->entryId);
 	        if (!$entry)
 	        {
-	            throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND . " - OUCH!", $this->entryId);
+	            throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 	        }
         }        
     }
