@@ -13,6 +13,7 @@ class KAutoloader
 	static private $_includePath = null;
 	static private $_classMap = array();
 	static private $_classMapFileLocation = false;
+	static private $_classMapCacheKey = false;
 	static private $_noCache = false;
 
 	static function register()
@@ -44,15 +45,35 @@ class KAutoloader
 			Zend_Loader::loadClass($class);
 			return;
 		}
-
+		
+		$storeToCache = false;
 		if (!self::$_classMap)
-			self::loadClassMap();
-
-		if (array_key_exists($class, self::$_classMap))
 		{
-			require_once(self::$_classMap[$class]);
-			return;
+			if (function_exists('apc_fetch'))
+			{
+				$classPath = apc_fetch(self::$_classMapCacheKey . $class);
+				if ($classPath !== false)
+				{
+					if ($classPath)
+						require_once($classPath);
+					return;
+				}
+				
+				$storeToCache = true;
+			}
+	
+			self::loadClassMap();
 		}
+		
+		$classPath = null;		
+		if (array_key_exists($class, self::$_classMap))
+			$classPath = self::$_classMap[$class];
+
+		if ($storeToCache)
+			apc_store(self::$_classMapCacheKey . $class, $classPath);
+		
+		if ($classPath)
+			require_once($classPath);
 	}
 
 	static function scanDirectory($directory, $recursive)
@@ -116,6 +137,7 @@ class KAutoloader
 	static function setClassMapFilePath($path)
 	{
 		self::$_classMapFileLocation = $path;
+		self::$_classMapCacheKey = 'KAutoloader_'.substr(md5(self::$_classMapFileLocation), 0, 10).'_';
 	}
 
 	/**
@@ -263,13 +285,27 @@ class KAutoloader
 		);
 	}
 
+	private static function saveToApc()
+	{
+		if (!function_exists('apc_store'))
+			return;
+		
+		foreach (self::$_classMap as $key => $value)
+		{
+			apc_store(self::$_classMapCacheKey . $key, $value);
+		}
+	}
+	
 	/**
 	 * Load and cache the class map
 	 */
 	private static function loadClassMap()
 	{
 		if (self::$_classMapFileLocation && !self::$_noCache && self::loadClassMapFromCache())
+		{
+			self::saveToApc();
 			return;
+		}
 
 		require_once(__DIR__ . '/general/kLockBase.php');
 		
@@ -303,10 +339,7 @@ class KAutoloader
 		
 		if (self::$_noCache === false && self::$_classMapFileLocation)
 		{
-			if (function_exists('apc_store'))
-			{
-				apc_store(self::$_classMapFileLocation, self::$_classMap);
-			}
+			self::saveToApc();
 
 			$dirName = dirname(self::$_classMapFileLocation);
 			if (!is_dir($dirName)) 
@@ -334,13 +367,6 @@ class KAutoloader
 		if (self::$_classMap)
 			return true;
 
-		if (function_exists('apc_fetch'))
-		{
-			self::$_classMap = apc_fetch(self::$_classMapFileLocation);
-			if (self::$_classMap)
-			        return true;
-		}
-
 		if (!file_exists(self::$_classMapFileLocation))
 			return false;
 
@@ -351,11 +377,6 @@ class KAutoloader
 			$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
 			error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permissions [$permission]");
 			die('PHP Class map could not be loaded');
-		}
-
-		if (function_exists('apc_store'))
-		{
-			apc_store(self::$_classMapFileLocation, self::$_classMap);
 		}
 
 		return true;
