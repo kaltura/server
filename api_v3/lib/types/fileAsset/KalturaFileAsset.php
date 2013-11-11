@@ -109,26 +109,57 @@ class KalturaFileAsset extends KalturaObject implements IFilterable
 		"status",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
 	public function toObject($dbFileAsset = null, $propsToSkip = array())
 	{
 		if(is_null($dbFileAsset))
 			$dbFileAsset = new FileAsset();
 			
 		return parent::toObject($dbFileAsset, $propsToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert($propertiesToSkip)
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyNotNull('fileAssetObjectType');
+		$this->validatePropertyNotNull('objectId');
+		
+		switch($this->fileAssetObjectType)
+		{
+			case KalturaFileAssetObjectType::UI_CONF:
+				$uiConf = uiConfPeer::retrieveByPK($this->objectId);
+				if(!$uiConf)
+					throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $this->objectId);
+					 
+				break;
+		}
 	}
 }
