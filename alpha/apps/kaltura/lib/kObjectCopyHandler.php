@@ -40,6 +40,7 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			/* @var $fileAsset FileAsset */
 				
 			$newFileAssets = $fileAsset->copy();
+			$newFileAssets->setObjectId($toObject->getId());
 			$newFileAssets->setVersion(1);
 			$newFileAssets->save();
 			
