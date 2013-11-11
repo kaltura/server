@@ -27,7 +27,6 @@ class MetadataFilter extends baseObjectFilter
 			"_lte_updated_at",
 			"_eq_status",
 			"_in_status",
-			"_eq_metadata_object_type"
 			) , NULL );
 
 		$this->allowed_order_fields = array ("created_at" , "updated_at", "metadata_profile_version" , "version");

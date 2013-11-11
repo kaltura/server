@@ -9,16 +9,12 @@ class KalturaBatchJobOrderBy extends KalturaStringEnum
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";
 	const UPDATED_AT_DESC = "-updatedAt";
-	const LOCK_EXPIRATION_ASC = "+lockExpiration";
-	const LOCK_EXPIRATION_DESC = "-lockExpiration";
 	const EXECUTION_ATTEMPTS_ASC = "+executionAttempts";
 	const EXECUTION_ATTEMPTS_DESC = "-executionAttempts";
 	const LOCK_VERSION_ASC = "+lockVersion";
 	const LOCK_VERSION_DESC = "-lockVersion";
 	const STATUS_ASC = "+status";
 	const STATUS_DESC = "-status";
-	const CHECK_AGAIN_TIMEOUT_ASC = "+checkAgainTimeout";
-	const CHECK_AGAIN_TIMEOUT_DESC = "-checkAgainTimeout";
 	const PRIORITY_ASC = "+priority";
 	const PRIORITY_DESC = "-priority";
 	const QUEUE_TIME_ASC = "+queueTime";

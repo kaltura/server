@@ -12,6 +12,7 @@ class DropFolderFileFilter extends baseObjectFilter
 			"_in_id",
 			"_eq_partner_id",
 			"_in_partner_id",
+			"_eq_entry_id",
 			"_eq_drop_folder_id",
 			"_in_drop_folder_id",
 			"_like_file_name",

@@ -17,8 +17,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
-		"lockExpirationGreaterThanOrEqual" => "_gte_lock_expiration",
-		"lockExpirationLessThanOrEqual" => "_lte_lock_expiration",
 		"executionAttemptsGreaterThanOrEqual" => "_gte_execution_attempts",
 		"executionAttemptsLessThanOrEqual" => "_lte_execution_attempts",
 		"lockVersionGreaterThanOrEqual" => "_gte_lock_version",
@@ -33,26 +31,14 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"statusNotIn" => "_notin_status",
-		"abortEqual" => "_eq_abort",
-		"checkAgainTimeoutGreaterThanOrEqual" => "_gte_check_again_timeout",
-		"checkAgainTimeoutLessThanOrEqual" => "_lte_check_again_timeout",
 		"priorityGreaterThanOrEqual" => "_gte_priority",
 		"priorityLessThanOrEqual" => "_lte_priority",
 		"priorityEqual" => "_eq_priority",
 		"priorityIn" => "_in_priority",
 		"priorityNotIn" => "_notin_priority",
-		"bulkJobIdEqual" => "_eq_bulk_job_id",
-		"bulkJobIdIn" => "_in_bulk_job_id",
-		"bulkJobIdNotIn" => "_notin_bulk_job_id",
 		"batchVersionGreaterThanOrEqual" => "_gte_batch_version",
 		"batchVersionLessThanOrEqual" => "_lte_batch_version",
 		"batchVersionEqual" => "_eq_batch_version",
-		"parentJobIdEqual" => "_eq_parent_job_id",
-		"parentJobIdIn" => "_in_parent_job_id",
-		"parentJobIdNotIn" => "_notin_parent_job_id",
-		"rootJobIdEqual" => "_eq_root_job_id",
-		"rootJobIdIn" => "_in_root_job_id",
-		"rootJobIdNotIn" => "_notin_root_job_id",
 		"queueTimeGreaterThanOrEqual" => "_gte_queue_time",
 		"queueTimeLessThanOrEqual" => "_lte_queue_time",
 		"finishTimeGreaterThanOrEqual" => "_gte_finish_time",
@@ -67,24 +53,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 		"estimatedEffortGreaterThan" => "_gt_estimated_effort",
 		"urgencyLessThanOrEqual" => "_lte_urgency",
 		"urgencyGreaterThanOrEqual" => "_gte_urgency",
-		"schedulerIdEqual" => "_eq_scheduler_id",
-		"schedulerIdIn" => "_in_scheduler_id",
-		"schedulerIdNotIn" => "_notin_scheduler_id",
-		"workerIdEqual" => "_eq_worker_id",
-		"workerIdIn" => "_in_worker_id",
-		"workerIdNotIn" => "_notin_worker_id",
-		"batchIndexEqual" => "_eq_batch_index",
-		"batchIndexIn" => "_in_batch_index",
-		"batchIndexNotIn" => "_notin_batch_index",
-		"lastSchedulerIdEqual" => "_eq_last_scheduler_id",
-		"lastSchedulerIdIn" => "_in_last_scheduler_id",
-		"lastSchedulerIdNotIn" => "_notin_last_scheduler_id",
-		"lastWorkerIdEqual" => "_eq_last_worker_id",
-		"lastWorkerIdIn" => "_in_last_worker_id",
-		"lastWorkerIdNotIn" => "_notin_last_worker_id",
-		"dcEqual" => "_eq_dc",
-		"dcIn" => "_in_dc",
-		"dcNotIn" => "_notin_dc",
 	);
 
 	static private $order_by_map = array
@@ -93,16 +61,12 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
-		"+lockExpiration" => "+lock_expiration",
-		"-lockExpiration" => "-lock_expiration",
 		"+executionAttempts" => "+execution_attempts",
 		"-executionAttempts" => "-execution_attempts",
 		"+lockVersion" => "+lock_version",
 		"-lockVersion" => "-lock_version",
 		"+status" => "+status",
 		"-status" => "-status",
-		"+checkAgainTimeout" => "+check_again_timeout",
-		"-checkAgainTimeout" => "-check_again_timeout",
 		"+priority" => "+priority",
 		"-priority" => "-priority",
 		"+queueTime" => "+queue_time",
@@ -167,16 +131,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $lockExpirationGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $lockExpirationLessThanOrEqual;
 
 	/**
 	 * @var int
@@ -253,21 +207,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	/**
 	 * @var int
 	 */
-	public $abortEqual;
-
-	/**
-	 * @var int
-	 */
-	public $checkAgainTimeoutGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $checkAgainTimeoutLessThanOrEqual;
-
-	/**
-	 * @var int
-	 */
 	public $priorityGreaterThanOrEqual;
 
 	/**
@@ -293,21 +232,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	/**
 	 * @var int
 	 */
-	public $bulkJobIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $bulkJobIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $bulkJobIdNotIn;
-
-	/**
-	 * @var int
-	 */
 	public $batchVersionGreaterThanOrEqual;
 
 	/**
@@ -319,36 +243,6 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $batchVersionEqual;
-
-	/**
-	 * @var int
-	 */
-	public $parentJobIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $parentJobIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $parentJobIdNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $rootJobIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $rootJobIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $rootJobIdNotIn;
 
 	/**
 	 * @var int
@@ -419,94 +313,4 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $urgencyGreaterThanOrEqual;
-
-	/**
-	 * @var int
-	 */
-	public $schedulerIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $schedulerIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $schedulerIdNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $workerIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $workerIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $workerIdNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $batchIndexEqual;
-
-	/**
-	 * @var string
-	 */
-	public $batchIndexIn;
-
-	/**
-	 * @var string
-	 */
-	public $batchIndexNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $lastSchedulerIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $lastSchedulerIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $lastSchedulerIdNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $lastWorkerIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $lastWorkerIdIn;
-
-	/**
-	 * @var string
-	 */
-	public $lastWorkerIdNotIn;
-
-	/**
-	 * @var int
-	 */
-	public $dcEqual;
-
-	/**
-	 * @var string
-	 */
-	public $dcIn;
-
-	/**
-	 * @var string
-	 */
-	public $dcNotIn;
 }
