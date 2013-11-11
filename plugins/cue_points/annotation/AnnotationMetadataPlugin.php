@@ -3,7 +3,7 @@
  * Enable custom metadata on annotation objects
  * @package plugins.annotation
  */
-class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser
+class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'annotationMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
