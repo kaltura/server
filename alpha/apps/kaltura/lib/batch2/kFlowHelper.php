@@ -1712,7 +1712,7 @@ class kFlowHelper
 		$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_DELETED);
 		$uploadToken->save();
 
-		if(is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS))
+		if($uploadToken->getObjectType() == FileAssetPeer::OM_CLASS)
 		{
 			$dbFileAsset = FileAssetPeer::retrieveByPK($uploadToken->getObjectId());
 			if(!$dbFileAsset)
@@ -1781,7 +1781,7 @@ class kFlowHelper
 		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
 			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
 	
-		if(is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS))
+		if($uploadToken->getObjectType() == FileAssetPeer::OM_CLASS)
 		{
 			$dbFileAsset = FileAssetPeer::retrieveByPK($uploadToken->getObjectId());
 			if(!$dbFileAsset)
@@ -1845,7 +1845,7 @@ class kFlowHelper
 	public static function handleUploadFinished(UploadToken $uploadToken)
 	{
 		KalturaLog::debug("File asset id [" . $uploadToken->getObjectId() . "] finished");
-		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && !is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
+		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && $uploadToken->getObjectType() != FileAssetPeer::OM_CLASS && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 		{
 			KalturaLog::debug("Class [" . $uploadToken->getObjectType() . "] not supported");
 			return;
@@ -1866,7 +1866,7 @@ class kFlowHelper
 			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
 	
-		if(is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS))
+		if($uploadToken->getObjectType() == FileAssetPeer::OM_CLASS)
 		{
 			$dbFileAsset = FileAssetPeer::retrieveByPK($uploadToken->getObjectId());
 			if(!$dbFileAsset)
