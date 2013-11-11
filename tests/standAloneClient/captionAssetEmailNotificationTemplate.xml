@@ -22,12 +22,7 @@
 				<eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
 				<format>1</format>
 				<subject>A new caption file was added [entry name: {entry_name}]</subject>
-				<body>Hi,
-A new caption file was added to an entry.
-Entry ID: {entry_id}
-Entry Name: {entry_name}
-Caption file name: {file_name}
-Caption file language: {language}</body>
+				<body><![CDATA[ Hi,<br><p>A new caption file was added to an entry.</p><br><p>Entry ID: {entry_id}</p><br><p>Entry Name: {entry_name}</p><br><p>Caption file name: {file_name}</p><br><p>Caption file language: {language}</p>]]></body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
