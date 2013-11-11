@@ -247,7 +247,7 @@ class FileAssetService extends KalturaBaseService
 	 * @param KalturaFileAssetFilter $pager
 	 * @return KalturaFileAssetListResponse
 	 */
-	function listAction(KalturaFileAssetFilter $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaFileAssetFilter $filter, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaFileAssetFilter();
