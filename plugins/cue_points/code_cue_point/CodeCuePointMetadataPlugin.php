@@ -75,7 +75,7 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 		if($baseClass == 'IMetadataPeer' && $enumValue == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
 			return 'CuePointPeer';
 			
-		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT))
+		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
 			return 'CodeCuePoint';
 	}
 
