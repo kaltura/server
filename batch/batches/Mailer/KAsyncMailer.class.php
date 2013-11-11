@@ -34,14 +34,6 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
@@ -64,7 +56,7 @@ class KAsyncMailer extends KJobHandlerWorker
 			KBatchBase::$taskConfig->maximumExecutionTime , 
 			$this->getMaxJobsEachRun() , 
 			$this->getFilter(),
-			$this->getJobType()
+			static::getType()
 		);
 			
 		KalturaLog::info(count($jobs) . " mail jobs to perform");
@@ -88,7 +80,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		{
 			KalturaLog::info("Free job[$job->id]");
 			$this->onFree($job);
-	 		KBatchBase::$kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType());
+	 		KBatchBase::$kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), static::getType());
 		}
 		$responses = KBatchBase::$kClient->doMultiRequest();
 		$response = end($responses);
