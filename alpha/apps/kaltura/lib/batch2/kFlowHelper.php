@@ -1844,7 +1844,7 @@ class kFlowHelper
 	 */
 	public static function handleUploadFinished(UploadToken $uploadToken)
 	{
-		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
+		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && !is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 			return;
 
 		$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
