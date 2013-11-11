@@ -1844,16 +1844,24 @@ class kFlowHelper
 	 */
 	public static function handleUploadFinished(UploadToken $uploadToken)
 	{
+		KalturaLog::debug("File asset id [" . $uploadToken->getObjectId() . "] finished");
 		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && !is_subclass_of($uploadToken->getObjectType(), FileAssetPeer::OM_CLASS) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
+		{
+			KalturaLog::debug("Class [" . $uploadToken->getObjectType() . "] not supported");
 			return;
+		}
 
 		$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
 
 		if(!file_exists($fullPath))
 		{
+			KalturaLog::debug("File path [$fullPath] not found");
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());
 			if(!$remoteDCHost)
+			{
+				KalturaLog::err("File path [$fullPath] could not be redirected");
 				return;
+			}
 
 			kFileUtils::dumpApiRequest($remoteDCHost);
 		}
@@ -1894,6 +1902,8 @@ class kFlowHelper
 
 			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
 			$uploadToken->save();
+			
+			KalturaLog::debug("File asset [" . $dbFileAsset->getId() . "] handled");
 			return;
 		}
 		
