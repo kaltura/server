@@ -120,7 +120,7 @@ class FileAssetService extends KalturaBaseService
      * @action setContent
      * @param string $id
      * @param KalturaContentResource $contentResource
-     * @return KalturaFlavorAsset
+     * @return KalturaFileAsset
 	 * @throws KalturaErrors::FILE_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
