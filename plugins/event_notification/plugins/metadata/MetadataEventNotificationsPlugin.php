@@ -107,14 +107,15 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 		{
 			//Obtain matches for the set structure {metadata:[profileSystemName][profileFieldSystemName]}
 			preg_match_all(self::METADATA_EMAIL_NOTIFICATION_REGEX, $sweepFieldValue, $matches);
-			foreach ($matches as $match)
-			{
+			foreach ($matches[0] as $match)
+			{				
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
 				list ($metadata, $profileSystemName, $fieldSystemName) = explode(':', $match);
 				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $partnerId);
 				if (!$profile)
 				{
 					KalturaLog::info("Metadata profile with system name $profileSystemName not found for this partner. No tokens will be replaced.");
+					return array();
 				}
 				
 				$objectId = null;
@@ -153,7 +154,10 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				}
 				
 				if (!$result)
+				{
+					KalturaLog::info("Metadata object could not be retrieved");
 					return array ();
+				}
 				
 				$strvals = kMetadataManager::getMetadataValueForField($result, $fieldSystemName);
 				
