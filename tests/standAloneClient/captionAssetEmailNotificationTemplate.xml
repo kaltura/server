@@ -33,11 +33,11 @@ Caption file language: {language}</body>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
-							<email objectType="KalturaEvalStringField">
-								<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getkuser()->getEmail() : ''</code>
+							<email objectType="KalturaStringValue">
+								<value>{owner_email}</value>
 							</email>
-							<name objectType="KalturaEvalStringField">
-								<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getkuser()->getLastName() : ''</code>
+							<name objectType="KalturaStringValue">
+								<value>{owner_name}</value>
 							</name>
 						</item>
 					</emailRecipients>
@@ -45,11 +45,11 @@ Caption file language: {language}</body>
 				<cc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
-							<email objectType="KalturaEvalStringField">
-								<code>!is_null(PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())->getAdminEmail() : ''</code>
+							<email objectType="KalturaStringValue">
+								<value>{user_email}</value>
 							</email>
-							<name objectType="KalturaEvalStringField">
-								<code>!is_null(PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())->getFirstName() : ''</code>
+							<name objectType="KalturaStringValue">
+								<value>{user_name}</value>
 							</name>
 						</item>
 					</emailRecipients>
@@ -95,6 +95,34 @@ Caption file language: {language}</body>
 						<description>Language</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getLanguage()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_name</key>
+						<description>Owner name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())->getPartnerName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_email</key>
+						<description>Owner email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())) ? PartnerPeer::retrieveByPk($scope->getEvent()->getObject()->getPartnerId())->getAdminEmail() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>user_name</key>
+						<description>User name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getkuser()->getLastName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>user_email</key>
+						<description>User email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getkuser()->getEmail() : ''</code>
 						</value>
 					</item>
 				</contentParameters>
