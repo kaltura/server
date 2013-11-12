@@ -1080,6 +1080,7 @@ class KalturaEntryService extends KalturaBaseService
 			($filter->idEqual != null ||
 			$filter->idIn != null ||
 			$filter->referenceIdEqual != null ||
+			$filter->redirectFromEntryId != null ||
 			$filter->referenceIdIn != null))
 			$disableWidgetSessionFilters = true;
 			
