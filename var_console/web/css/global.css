@@ -1640,3 +1640,87 @@ form#addNewForm #newPartnerId {
 #report-dialog .CodeMirror-wrapping {
 	border: 1px solid #AAAAAA;
 }
+
+#storage-configure-dialog .storageConfigureFormPanel fieldset {
+	border: none;
+	background: none;
+	margin: 0px 0px 10px 21px;
+	width: 850px;
+	line-height: 2;
+}
+
+#storage-configure-dialog .storageConfigureFormPanel fieldset legend
+	{
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+#storage-configure-dialog .storageConfigureFormPanel fieldset dt {
+	display: block;
+	width: 333px;
+	float: left;
+	line-height: 1.8;
+	clear: both;
+}
+
+#storage-configure-dialog .storageConfigureFormPanel fieldset dd {
+	line-height: 2;
+	display: block;
+}
+
+#storage-configure-dialog .storageConfigureFormPanel fieldset#fieldset-advanced dt {
+	display: block;
+	width: 800px;
+	float: left;
+	line-height: 1.5;
+	clear: both;
+}
+
+#storage-configure-dialog .storageConfigureFormPanel fieldset#fieldset-advanced dd {
+	line-height: 1.7;
+	display: block;
+	width: 800px;
+}
+
+form#frmCreateDrmProfile {
+	margin-left: 20px;
+}
+
+form#frmCreateDrmProfile dd,form#frmCreateDrmProfile dt {
+	float: left;
+}
+
+#drm-profile-configure-dialog {
+	padding-top: 10px;
+}
+
+#drm-profile-configure-dialog label {
+	padding: 0;
+}
+
+#drm-profile-configure-dialog dl {
+	margin-top: 15px;
+}
+
+#drm-profile-configure-dialog dl p {
+	width: 333px;
+	padding: 3px;
+	margin-top: 5px;
+	border: solid 1px #ccc;
+	background: #f0f0f0;
+}
+
+#drm-profile-configure-dialog dt {
+	margin: 10px 0 5px;
+}
+
+#drm-profile-configure-dialog dd input {
+	width: 500px;
+	height: 22px;
+}
+
+#drm-profile-configure-dialog select {
+	min-width: 505px;
+	height: 24px;
+	padding: 1px;
+}
