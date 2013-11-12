@@ -33,7 +33,7 @@
 				</eventConditions>
 				<format>1</format>
 				<subject>A new caption file was added for your review [entry name: {entry_name}]</subject>
-				<body><![CDATA[ Hi,<br><p>A new caption file was added to an entry.</p><br><p>Entry ID: {entry_id}</p><br><p>Entry Name: {entry_name}</p><br><p>Caption file name: {file_name}</p><br><p>Caption file language: {language}</p>]]></body>
+				<body><![CDATA[ Hi,<br><p>A new caption file was added to an entry.</p>Entry ID: {entry_id}<br>Entry Name: {entry_name}<br>Caption file name: {file_name}<br>Caption file language: {language}]]></body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
