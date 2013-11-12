@@ -1,0 +1,20 @@
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+<?php
+	$this->form->setAction($this->url(array('controller' => 'plugin', 'action' => 'DrmProfileConfigureAction')));
+	echo $this->form;
+?>
+
+<script type="text/javascript">
+
+jQuery(function() {
+	<?php if ($this->formValid): ?>
+		dialogDiv.dialog('close');
+		jQuery('#frmPaginator1').submit();
+	<?php endif; ?>
+});
+
+</script>
+
