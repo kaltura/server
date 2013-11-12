@@ -81,6 +81,15 @@ class kMatchMetadataCondition extends kMatchCondition
 				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
 			else if ($object instanceof Metadata)
 				$metadata = $object;
+			elseif ($scope->getEvent()->getObject() instanceof categoryEntry)
+			{
+				$profileObject = kMetadataManager::getObjectTypeName($profile->getObjectType());
+				$getter = "get{$profileObject}Id";
+				KalturaLog::info ("Using $getter in order to retrieve the metadata object ID");
+				$categoryEntry = $scope->getEvent()->getObject();
+				$objectId = $categoryEntry->$getter();
+				$metadata = MetadataPeer::retrieveByObject($profileId, $profile->getObjectType(), $objectId);
+			}
 			elseif ($object instanceof asset)
 			{
 				$metadata = MetadataPeer::retrieveByObject($profileId, MetadataObjectType::ENTRY, $object->getEntryId());

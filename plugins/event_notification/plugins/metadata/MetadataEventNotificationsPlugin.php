@@ -133,6 +133,14 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				{
 					$objectId = $scope->getEvent()->getObject()->getEntryId();
 				}
+				elseif ($scope->getEvent()->getObject() instanceof categoryEntry)
+				{
+					$profileObject = kMetadataManager::getObjectTypeName($profile->getObjectType());
+					$getter = "get{$profileObject}Id";
+					KalturaLog::info ("Using $getter in order to retrieve the metadata object ID");
+					$categoryEntry = $scope->getEvent()->getObject();
+					$objectId = $categoryEntry->$getter();
+				}
 				elseif (KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType) == MetadataPeer::OM_CLASS)
 				{
 					$metadataObjectId = $scope->getEvent()->getObject()->getId();
