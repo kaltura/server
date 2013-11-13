@@ -235,7 +235,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			}
 			else
 			{
-				throw new KalturaAPIException( KalturaErrors::ENTRY_ID_NOT_FOUND, $origEntryId );
+				throw new kCoreException( "Invalid entry id [\"$origEntryId\"]", kCoreException::INVALID_ENTRY_ID, $origEntryId );
 			}
 
 			$filter->unsetByName( '_eq_redirect_from_entry_id' );
