@@ -392,6 +392,14 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaDeleteJobData();
 				break;
 				
+			case 'kConvertLiveSegmentJobData':
+				$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case 'kConcatJobData':
+				$this->data = new KalturaConcatJobData();
+				break;
+				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 				{
@@ -584,6 +592,18 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kDeleteJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaDeleteJobData();
+				break;
+				
+			case KalturaBatchJobType::CONVERT_LIVE_SEGMENT:
+				$dbData = new kConvertLiveSegmentJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case KalturaBatchJobType::CONCAT:
+				$dbData = new kConcatJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConcatJobData();
 				break;
 				
 			default:
