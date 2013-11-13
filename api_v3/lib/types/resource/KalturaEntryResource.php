@@ -27,7 +27,7 @@ class KalturaEntryResource extends KalturaContentResource
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
 		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || $srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH)
 			return parent::validateEntry($dbEntry);
 		
 		$srcFlavorAsset = null;
@@ -60,13 +60,43 @@ class KalturaEntryResource extends KalturaContentResource
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		if(!$object_to_fill)
-			$object_to_fill = new kFileSyncResource();
-			
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
     	if(!$srcEntry)
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+
+    	if($srcEntry->getType() == entryType::LIVE_STREAM)
+    	{
+    		/* @var $srcEntry LiveEntry */
+    		
+    		if($srcEntry->getSource() != EntrySourceType::LIVE_STREAM)
+    			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
+    			
+    		$mediaServer = $srcEntry->getMediaServer();
+    		if($mediaServer && $mediaServer->getDc() != kDataCenterMgr::getCurrentDcId())
+    		{
+				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($mediaServer->getDc());
+				if($remoteDCHost)
+				{
+					kFileUtils::dumpApiRequest($remoteDCHost);
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
+				}
+    		}
+    		
+			if($object_to_fill && !($object_to_fill instanceof kLiveEntryResource))
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($object_to_fill));
+				
+			$object_to_fill = new kLiveEntryResource();
+    		$object_to_fill->setEntry($srcEntry);
+    		    		
+    		return $object_to_fill;
+    	}
     	
+		if(!$object_to_fill)
+			$object_to_fill = new kFileSyncResource();
+			
     	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{
 			$object_to_fill->setFileSyncObjectType(FileSyncObjectType::ENTRY);

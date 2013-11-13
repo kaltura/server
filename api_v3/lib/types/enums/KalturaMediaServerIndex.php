@@ -3,8 +3,6 @@
  * @package api
  * @subpackage enum
  */
-class KalturaMediaServerIndex extends KalturaEnum
+class KalturaMediaServerIndex extends KalturaEnum implements MediaServerIndex
 {
-	const PRIMARY = 0;
-	const SECONDARY = 1;
 }

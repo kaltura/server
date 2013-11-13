@@ -113,6 +113,28 @@ class LiveStreamService extends KalturaEntryService
 	{
 		return $this->getEntry($entryId, $version, KalturaEntryType::LIVE_STREAM);
 	}
+	
+	/**
+	 * Append recorded video to live stream entry
+	 * 
+	 * @action appendRecording
+	 * @param string $entryId Live stream entry id
+	 * @param KalturaMediaServerIndex $mediaServerIndex
+	 * @param KalturaServerFileResource $resource
+	 * @param float $duration
+	 * @return KalturaLiveStreamEntry The requested live stream entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function appendRecordingAction($entryId, $mediaServerIndex, KalturaServerFileResource $resource, $duration)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$kResource = $resource->toObject();
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath());
+	}
 
 	/**
 	 * Register media server to live-stream entry
