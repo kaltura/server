@@ -114,6 +114,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const FILE_SYNC_ENTRY_SUB_TYPE_ISM = 7;
 	const FILE_SYNC_ENTRY_SUB_TYPE_ISMC = 8;
 	const FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG = 9;
+	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY = 10; 
+	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY = 11; 
 	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
@@ -452,7 +454,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getSyncKey ( $sub_type , $version = null )
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::ENTRY;
 		
@@ -515,7 +517,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function generateFilePathArr( $sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA )
 		{
 			$data = $this->getData();
@@ -593,7 +595,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return array ( myContentStorage::getFSContentRootPath( ) , $res );
 	}
 	
-	private function getVersionForSubType ( $sub_type, $version = null  )
+	protected function getVersionForSubType ( $sub_type, $version = null  )
 	{
 		if (
 				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISM
@@ -661,9 +663,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 
 	
-	private static function validateFileSyncSubType ( $sub_type )
+	protected static function validateFileSyncSubType ( $sub_type )
 	{
-		if ( $sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
+		if ($sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE &&

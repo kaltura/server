@@ -15,9 +15,17 @@
  */
 class MediaServer extends BaseMediaServer {
 	const DEFAULT_MANIFEST_PORT = 1935;
+	const DEFAULT_WEB_SERVICES_PORT = 888;
 	const DEFAULT_APPLICATION = 'kLive';
 	const DEFAULT_TRANSCODER = 'default';
 	const DEFAULT_GPUID = -1;
+	
+	const WEB_SERVICE_LIVE = 'live';
+	
+	static protected $webServices = array(
+		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
+	);
+	
 	
 	public function getTranscoder()
 	{
@@ -129,6 +137,52 @@ class MediaServer extends BaseMediaServer {
 		}
 		
 		return "$protocol://$domain:$port/$app/p/";
+	}
+	
+	/**
+	 * @param string $service
+	 * @return KalturaMediaServerClient
+	 */
+	public function getWebService($service)
+	{	
+		if(!isset(self::$webServices[$service]))
+			return null;
+			
+		$domain = $this->getHostname();
+		$port = MediaServer::DEFAULT_WEB_SERVICES_PORT;
+		$protocol = 'http';
+		
+		if(kConf::hasMap('media_servers'))
+		{
+			$mediaServers = kConf::getMap('media_servers');
+			if(isset($mediaServers['port']))
+				$port = $mediaServers['port'];
+				
+			if(isset($mediaServers['protocol']))
+				$protocol = $mediaServers['protocol'];
+				
+			if(isset($mediaServers['domain']))
+				$domain = $mediaServers['domain'];
+			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
+				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
+				
+			if(isset($mediaServers[$this->getHostname()]))
+			{
+				$mediaServer = $mediaServers[$this->getHostname()];
+				
+				if(isset($mediaServer['port']))
+					$port = $mediaServer['port'];
+				
+				if(isset($mediaServer['protocol']))
+					$protocol = $mediaServer['protocol'];
+					
+				if(isset($mediaServer['domain']))
+					$domain = $mediaServer['domain'];
+			}
+		}
+		
+		$url = "$protocol://$domain:$port/$service?wsdl";
+		return new $service($url);
 	}
 	
 } // MediaServer

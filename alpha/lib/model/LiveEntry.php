@@ -10,22 +10,81 @@ abstract class LiveEntry extends entry
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
 	 */
-	public function getLocalThumbFilePath($version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null)
+	public function getLocalThumbFilePath($version, $width, $height, $type, $bgcolor = "ffffff", $crop_provider = null, $quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null)
 	{
-		if ($this->getStatus () == entryStatus::DELETED || $this->getModerationStatus () == moderation::MODERATION_STATUS_BLOCK) {
-			KalturaLog::log ( "rejected live stream entry - not serving thumbnail" );
-			KExternalErrors::dieError ( KExternalErrors::ENTRY_DELETED_MODERATED );
+		if($this->getStatus() == entryStatus::DELETED || $this->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
+		{
+			KalturaLog::log("rejected live stream entry - not serving thumbnail");
+			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
 		
-		$contentPath = myContentStorage::getFSContentRootPath ();
+		$contentPath = myContentStorage::getFSContentRootPath();
 		$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
-		return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
+		return myEntryUtils::resizeEntryImage($this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 	}
 	
-	public function setOfflineMessage ( $v )	{	$this->putInCustomData ( "offlineMessage" , $v );	}
-	public function getOfflineMessage (  )		{	return $this->getFromCustomData( "offlineMessage" );	}
-
+	/* (non-PHPdoc)
+	 * @see entry::validateFileSyncSubType($sub_type)
+	 */
+	protected static function validateFileSyncSubType($sub_type)
+	{
+		if(	$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && 
+			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY && 
+			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && 
+			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
+		)
+			throw new FileSyncException(
+				FileSyncObjectType::ENTRY, 
+				$sub_type, 
+				array(
+					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY,
+					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY,
+					self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB,
+					self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB,
+				)
+			);
+	}
+	
+	/* (non-PHPdoc)
+	 * 
+	 * There should be only one version of recorded segments directory
+	 * New segments are appended to the existing directory
+	 * 
+	 * @see entry::getVersionForSubType($sub_type, $version)
+	 */
+	protected function getVersionForSubType($sub_type, $version = null)
+	{
+		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+			return 1;
+			
+		return parent::getVersionForSubType($sub_type, $version);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see entry::generateFilePathArr($sub_type, $version)
+	 */
+	public function generateFilePathArr($sub_type, $version = null)
+	{
+		static::validateFileSyncSubType($sub_type);
+		
+		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		{
+			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type);
+			return array(myContentStorage::getFSContentRootPath(), $res);
+		}
+		
+		return parent::generateFilePathArr($sub_type, $version);
+	}
+	
+	public function setOfflineMessage($v)
+	{
+		$this->putInCustomData("offlineMessage", $v);
+	}
+	public function getOfflineMessage()
+	{
+		return $this->getFromCustomData("offlineMessage");
+	}
+	
 	public function setStreamBitrates(array $v)
 	{
 		$this->putInCustomData("streamBitrates", $v);
@@ -36,7 +95,7 @@ abstract class LiveEntry extends entry
 		$streamBitrates = $this->getFromCustomData("streamBitrates");
 		if(is_array($streamBitrates) && count($streamBitrates))
 			return $streamBitrates;
-				
+		
 		if($this->getSource() == EntrySourceType::LIVE_STREAM)
 		{
 			$liveParams = assetParamsPeer::retrieveByProfile($this->getConversionProfileId());
@@ -45,67 +104,56 @@ abstract class LiveEntry extends entry
 			{
 				/* @var $liveParamsItem liveParams */
 				
-				$streamBitrate = array(
-					'bitrate' => $liveParamsItem->getVideoBitrate(),
-					'width' => $liveParamsItem->getWidth(),
-					'height' => $liveParamsItem->getHeight(),
-					'tags' => $liveParamsItem->getTags(),
-				);
+				$streamBitrate = array('bitrate' => $liveParamsItem->getVideoBitrate(), 'width' => $liveParamsItem->getWidth(), 'height' => $liveParamsItem->getHeight(), 'tags' => $liveParamsItem->getTags());
 				$streamBitrates[] = $streamBitrate;
 			}
 			return $streamBitrates;
 		}
 		
-		return array(
-			array(
-				'bitrate' => 300,
-				'width' => 320,
-				'height' => 240,
-			)
-		);
+		return array(array('bitrate' => 300, 'width' => 320, 'height' => 240));
 	}
 	
-	public function getRecordedEntryId ()
+	public function getRecordedEntryId()
 	{
-	    return $this->getFromCustomData("recorded_entry_id");
+		return $this->getFromCustomData("recorded_entry_id");
 	}
 	
-	public function setRecordedEntryId ($v)
+	public function setRecordedEntryId($v)
 	{
-	    $this->putInCustomData("recorded_entry_id", $v);
+		$this->putInCustomData("recorded_entry_id", $v);
 	}
 	
-	public function getRecordStatus ()
+	public function getRecordStatus()
 	{
-	    return $this->getFromCustomData("record_status");
+		return $this->getFromCustomData("record_status");
 	}
 	
-	public function setRecordStatus ($v)
+	public function setRecordStatus($v)
 	{
-	    $this->putInCustomData("record_status", $v);
-	}
-
-	public function getDvrStatus ()
-	{
-	    return $this->getFromCustomData("dvr_status");
+		$this->putInCustomData("record_status", $v);
 	}
 	
-	public function setDvrStatus ($v)
+	public function getDvrStatus()
 	{
-	    $this->putInCustomData("dvr_status", $v);
+		return $this->getFromCustomData("dvr_status");
 	}
 	
-    public function getDvrWindow ()
+	public function setDvrStatus($v)
 	{
-	    return $this->getFromCustomData("dvr_window");
+		$this->putInCustomData("dvr_status", $v);
 	}
 	
-	public function setDvrWindow ($v)
+	public function getDvrWindow()
 	{
-	    $this->putInCustomData("dvr_window", $v);
+		return $this->getFromCustomData("dvr_window");
 	}
 	
-	public function setLiveStreamConfigurations (array $v)
+	public function setDvrWindow($v)
+	{
+		$this->putInCustomData("dvr_window", $v);
+	}
+	
+	public function setLiveStreamConfigurations(array $v)
 	{
 		$this->putInCustomData('live_stream_configurations', $v);
 	}
@@ -116,10 +164,10 @@ abstract class LiveEntry extends entry
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
-			if ($configuration->getProtocol() == $format)
+			if($configuration->getProtocol() == $format)
 				return $configuration;
 		}
-
+		
 		return null;
 	}
 	
@@ -128,7 +176,7 @@ abstract class LiveEntry extends entry
 		$configurations = $this->getFromCustomData('live_stream_configurations');
 		if($configurations)
 			return $configurations;
-			
+		
 		$configurations = array();
 		$mediaServer = $this->getMediaServer();
 		if($mediaServer)
@@ -139,18 +187,18 @@ abstract class LiveEntry extends entry
 			
 			$manifestUrl = $mediaServer->getManifestUrl($protocol) . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
 			
-			$hlsStreamUrl	= "$manifestUrl/playlist.m3u8";
-			$hdsStreamUrl	= "$manifestUrl/manifest.f4m";
-			$mpdStreamUrl	= "$manifestUrl/manifest.mpd";
-			$slStreamUrl	= "$manifestUrl/Manifest";
+			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
+			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
+			$slStreamUrl = "$manifestUrl/Manifest";
 			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
-				$hlsStreamUrl	.= "?DVR";
-				$hdsStreamUrl	.= "?DVR";
-				$slStreamUrl	.= "?dvr";
+				$hlsStreamUrl .= "?DVR";
+				$hdsStreamUrl .= "?DVR";
+				$slStreamUrl .= "?dvr";
 			}
-				
+			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::RTMP);
 			$configuration->setUrl($mediaServer->getRtmpUrl());
@@ -181,19 +229,19 @@ abstract class LiveEntry extends entry
 			$configuration->setUrl($mpdStreamUrl);
 			$configurations[] = $configuration;
 		}
-			
+		
 		return $configurations;
 	}
-
+	
 	/**
 	 * @return MediaServer
 	 */
 	public function getMediaServer($currentDcOnly = false)
 	{
 		$mediaServers = $this->getMediaServers();
-		if(!count($mediaServers))
+		if(! count($mediaServers))
 			return null;
-			
+		
 		foreach($mediaServers as $mediaServer)
 		{
 			/* @var $mediaServer kLiveMediaServer */
@@ -206,18 +254,18 @@ abstract class LiveEntry extends entry
 		$mediaServer = reset($mediaServers);
 		return $mediaServer->getMediaServer();
 	}
-
+	
 	private function isCacheValid(kLiveMediaServer $mediaServer)
 	{
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
-		if(!$cacheStore)
+		if(! $cacheStore)
 		{
 			$lastUpdate = time() - $mediaServer->getTime();
 			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
 			
 			return $lastUpdate <= $expiry;
 		}
-	
+		
 		$key = $this->getId() . '_' . $mediaServer->getMediaServerId() . '_' . $mediaServer->getIndex();
 		return $cacheStore->get($key);
 	}
@@ -230,9 +278,9 @@ abstract class LiveEntry extends entry
 	private function storeInCache($key)
 	{
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
-		if(!$cacheStore)
+		if(! $cacheStore)
 			return false;
-			
+		
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
@@ -241,11 +289,11 @@ abstract class LiveEntry extends entry
 		$key = $this->getId() . "_{$serverId}_{$index}";
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
 			return;
-			
+		
 		$servers = $this->getMediaServers();
 		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
 		
-		$this->putInCustomData("mediaServers", $servers);	
+		$this->putInCustomData("mediaServers", $servers);
 	}
 	
 	protected function isMediaServerRegistered($index, $serverId)
@@ -253,7 +301,7 @@ abstract class LiveEntry extends entry
 		$servers = $this->getMediaServers();
 		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
 			return true;
-			
+		
 		return false;
 	}
 	
@@ -263,7 +311,7 @@ abstract class LiveEntry extends entry
 		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
 			unset($servers[$index]);
 		
-		$this->putInCustomData("mediaServers", $servers);	
+		$this->putInCustomData("mediaServers", $servers);
 	}
 	
 	/**
@@ -274,10 +322,97 @@ abstract class LiveEntry extends entry
 		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
 		foreach($mediaServers as $index => $mediaServer)
 		{
-			if(!$this->isCacheValid($mediaServer))
+			if(! $this->isCacheValid($mediaServer))
 				unset($mediaServers[$index]);
 		}
 		
-		return $mediaServers;	
+		return $mediaServers;
+	}
+	
+	/**
+	 * @param entry $entry
+	 */
+	public function attachPendingMediaEntry(entry $entry, $requiredDuration)
+	{
+		$attachedPendingMediaEntries = $this->getAttachedPendingMediaEntries();
+		$attachedPendingMediaEntries[$entry->getId()] = new kPendingMediaEntry($entry->getId(), kDataCenterMgr::getCurrentDcId(), $requiredDuration);
+		
+		$this->setAttachedPendingMediaEntries($attachedPendingMediaEntries);
+	}
+	
+	/**
+	 * @param string $entryId
+	 */
+	public function dettachPendingMediaEntry($entryId)
+	{
+		$attachedPendingMediaEntries = $this->getAttachedPendingMediaEntries();
+		if(isset($attachedPendingMediaEntries[$entryId]))
+			unset($attachedPendingMediaEntries[$entryId]);
+		
+		$this->setAttachedPendingMediaEntries($attachedPendingMediaEntries);
+	}
+	
+	/**
+	 * @param array $attachedPendingMediaEntries
+	 */
+	protected function setAttachedPendingMediaEntries(array $attachedPendingMediaEntries)
+	{
+		$this->putInCustomData("attached_pending_media_entries", $attachedPendingMediaEntries);
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getAttachedPendingMediaEntries()
+	{
+		return $this->getFromCustomData('attached_pending_media_entries', null, array());
+	}
+	
+	/**
+	 * @param int $jobId
+	 */
+	public function addConvertingSegment($jobId)
+	{
+		$convertingSegments = $this->getConvertingSegments();
+		$convertingSegments[$jobId] = true;
+		
+		$this->setConvertingSegments($convertingSegments);
+	}
+	
+	/**
+	 * @param int $jobId
+	 */
+	public function removeConvertingSegment($jobId)
+	{
+		$convertingSegments = $this->getConvertingSegments();
+		if(isset($convertingSegments[$jobId]))
+			unset($convertingSegments[$jobId]);
+		
+		$this->setConvertingSegments($convertingSegments);
+	}
+	
+	/**
+	 * @param array $convertingSegments
+	 */
+	protected function setConvertingSegments(array $convertingSegments)
+	{
+		$this->putInCustomData("converting_segments", $convertingSegments);
+	}
+	
+	/**
+	 * @return array
+	 */
+	protected function getConvertingSegments()
+	{
+		return $this->getFromCustomData('converting_segments', null, array());
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function isConvertingSegments()
+	{
+		$convertingSegments = $this->getConvertingSegments();
+		return count($convertingSegments) > 0;
 	}
 }
