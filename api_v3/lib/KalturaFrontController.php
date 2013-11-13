@@ -368,6 +368,10 @@ class KalturaFrontController
 				case kCoreException::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED:
 					$object = new KalturaAPIException(KalturaErrors::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
 					break;
+
+				case kCoreException::INVALID_ENTRY_ID:
+					$object = new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $ex->getData());
+					break;
 						
 				default:
 		    		KalturaLog::crit($ex);
