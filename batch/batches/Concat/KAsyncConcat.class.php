@@ -75,7 +75,14 @@ class KAsyncConcat extends KJobHandlerWorker
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 		
-		$result = $this->concatFiles($ffmpegBin, $data->srcFiles, $data->destFilePath, $data->offset, $data->duration);
+		$srcFiles = array();
+		foreach($data->srcFiles as $srcFile)
+		{
+			/* @var $srcFile KalturaString */
+			$srcFiles[] = $srcFile->value;
+		}
+		
+		$result = $this->concatFiles($ffmpegBin, $srcFiles, $data->destFilePath, $data->offset, $data->duration);
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);
 		

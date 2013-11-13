@@ -7,7 +7,7 @@ class KalturaConcatJobData extends KalturaJobData
 {
 	/**
 	 * Source files to be concatenated
-	 * @var array
+	 * @var KalturaStringArray
 	 */
 	public $srcFiles;
 	
