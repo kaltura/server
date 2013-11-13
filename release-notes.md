@@ -39,6 +39,7 @@ Kaltura live stream, including DVR configuration and live transcoding.
 
  - Create media_server table using deployment/updates/sql/2013_10_17_create_media_server_table.sql
  - Add conversion_profile_2.type column using deployment/updates/sql/2013_10_29_add_type_column_to_conversion_profile_table.sql
+ - Add media partner using deployment/updates/sql/2013_11_13_create_media_partner.sql
 
 **Shared Content**
 
