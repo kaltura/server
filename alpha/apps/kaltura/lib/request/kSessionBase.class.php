@@ -236,6 +236,9 @@ class kSessionBase
 	{
 		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
 
+		if(!$cacheSections)
+			return null;
+			
 		$lowerStores = array();
 		foreach ($cacheSections as $cacheSection)
 		{
