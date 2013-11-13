@@ -36,4 +36,6 @@ interface BatchJobType extends BaseEnum
 	const INDEX = 32;
 	const MOVE_CATEGORY_ENTRIES = 33;
 	const COPY = 34;
+	const CONCAT = 35;
+	const CONVERT_LIVE_SEGMENT = 36;
 }
