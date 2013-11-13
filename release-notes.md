@@ -54,6 +54,7 @@ Kaltura live stream, including DVR configuration and live transcoding.
 
 **Wowza**
 
+ - Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
  - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
  - Create @WOWZA_DIR@/applications/kLive directory.
  - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
