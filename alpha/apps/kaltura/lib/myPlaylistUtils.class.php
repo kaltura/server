@@ -171,49 +171,61 @@ class myPlaylistUtils
 		
 		return $entryObjectsArray;
 	}
-	
+
 	/**
 	 * For every entry id that requires redirection, fetch the
-	 * redirected entry from db and replace with the original one. 
-	 *  
+	 * redirected entry from db and replace with the original one.
+	 *
 	 * @param array $entryObjectsArray Array of entry objects
-	 * @return array The array with replaced entries for each one that had a redirectedEntryId  
+	 * @return array The same $entryObjectsArray with replaced entries for each one that had a redirectedEntryId
 	 */
 	private static function replaceRedirectedEntries( $entryObjectsArray )
 	{
-		$redirectedEntryIdToPosMap = array();
-
+		// A map between redirected entry id and an array of positions in $entryObjectsArray 
+		$redirectedEntryIdToPosArrayMap = array();
+	
 		// Gather all entries with a valid redirect id
 		foreach ( $entryObjectsArray as $pos => $entry )
 		{
 			/* @var $entry entry */
 			$redirectEntryId = $entry->getRedirectEntryId();
+			
 			if ( ! empty( $redirectEntryId ) ) // Redirection required?
 			{
-				// Map the redirected entry's id to its position in the original array (for fast accessing later on)
-				$redirectedEntryIdToPosMap[ $redirectEntryId ] = $pos;
+				// Entry id not yet mapped?
+				if ( ! array_key_exists( $redirectEntryId, $redirectedEntryIdToPosArrayMap ) )
+				{
+					// Create an empty positions array and map to the entity 
+					$redirectedEntryIdToPosArrayMap[ $redirectEntryId ] = array();
+				}
+
+				// Push the position into the array of postions for the given redirected entry id.
+				$redirectedEntryIdToPosArrayMap[ $redirectEntryId ][] = $pos;
 			}
 		}
-
-		if ( ! empty( $redirectedEntryIdToPosMap ) ) // Are there any entries that need to be redirected?
+	
+		// Are there any entries that need to be redirected?
+		if ( ! empty( $redirectedEntryIdToPosArrayMap ) )
 		{
 			// Fetch the redirected entries from DB
-			$redirectedEntries = entryPeer::retrieveByPKs( array_keys( $redirectedEntryIdToPosMap ) );
+			$redirectedEntries = entryPeer::retrieveByPKs( array_keys( $redirectedEntryIdToPosArrayMap ) );
 			
-			// Replace the entries in the original array with the redirected entries (if relevant) 
+			// Replace the entry objects in the original array with the redirected entry objects
 			foreach ( $redirectedEntries as $redirectedEntry )
 			{
 				// Get the [new] redirected entry's id
 				$redirectedEntryId = $redirectedEntry->getId();
-				
-				// Get the orignal array position of the entry to be replaced
-				$posInOrigArray = $redirectedEntryIdToPosMap[ $redirectedEntryId ];
-				
-				// Replace the original entry in the array with the redirected one
-				$entryObjectsArray[ $posInOrigArray ] = $redirectedEntry;
+	
+				// Get its associated postions array
+				$posArr = $redirectedEntryIdToPosArrayMap[ $redirectedEntryId ];
+				foreach ( $posArr as $pos )
+				{
+					// Replace the original entry in the array with the redirected one
+					$entryObjectsArray[ $pos ] = $redirectedEntry;
+				}
 			}
 		}
-		
+	
 		return $entryObjectsArray;
 	}
 	
