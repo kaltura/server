@@ -122,7 +122,6 @@ class LiveStreamService extends KalturaEntryService
 	 * @param KalturaMediaServerIndex $mediaServerIndex
 	 * @param KalturaServerFileResource $resource
 	 * @param float $duration
-	 * @return KalturaLiveStreamEntry The requested live stream entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
