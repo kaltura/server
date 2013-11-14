@@ -604,6 +604,8 @@ maximumExecutionTime								= 3000
 sleepBetweenStopStart							    = 3600
 scriptPath											= ../plugins/tag_search/lib/batch/tag_resolve/KAsyncTagResolveExe.php
 
+
+
 [KAsyncWidevineRepositorySync : JobHandlerWorker]
 id													= 480
 name												= KAsyncWidevineRepositorySync
@@ -613,3 +615,17 @@ maximumExecutionTime								= 3000
 scriptPath             								= ../plugins/drm/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
 params.wvLicenseServerUrl							= http://@WIDEIVINE_LICENSE_SERVER_HOST@
 params.portal										= kaltura
+
+
+
+[KAsyncConvertLiveSegment : KAsyncConvertWorker]
+id													= 490
+type												= KAsyncConvertLiveSegment
+scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.php
+
+
+
+[KAsyncConcat : KAsyncConvertWorker]
+id													= 500
+type												= KAsyncConcat
+scriptPath											= batches/Concat/KAsyncConcatExe.php
