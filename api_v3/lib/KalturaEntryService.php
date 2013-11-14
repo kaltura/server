@@ -286,14 +286,17 @@ class KalturaEntryService extends KalturaBaseService
 		$duration = null;
 		$requiredDuration = null;
 		
-		foreach($operationAttributes as $operationAttributesItem)
+		if(is_array($operationAttributes))
 		{
-			if($operationAttributesItem instanceof kClipAttributes)
+			foreach($operationAttributes as $operationAttributesItem)
 			{
-				// convert milliseconds to seconds
-				$offset = $operationAttributesItem->getOffset() / 1000;
-				$duration = $operationAttributesItem->getDuration() / 1000;
-				$requiredDuration = $offset + $duration;
+				if($operationAttributesItem instanceof kClipAttributes)
+				{
+					// convert milliseconds to seconds
+					$offset = $operationAttributesItem->getOffset() / 1000;
+					$duration = $operationAttributesItem->getDuration() / 1000;
+					$requiredDuration = $offset + $duration;
+				}
 			}
 		}
 		
