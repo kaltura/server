@@ -1084,7 +1084,8 @@ class kFlowHelper
 			if(is_null($alternateFlavorParamsId))
 			{
 				$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-				$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
+				if($srcFlavorAsset)
+					$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
 			}
 
 			if(is_null($alternateFlavorParamsId))
