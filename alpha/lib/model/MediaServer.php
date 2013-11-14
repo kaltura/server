@@ -148,6 +148,8 @@ class MediaServer extends BaseMediaServer {
 		if(!isset(self::$webServices[$service]))
 			return null;
 			
+		$serviceClass = self::$webServices[$service];
+			
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_WEB_SERVICES_PORT;
 		$protocol = 'http';
@@ -182,7 +184,7 @@ class MediaServer extends BaseMediaServer {
 		}
 		
 		$url = "$protocol://$domain:$port/$service?wsdl";
-		return new $service($url);
+		return new $serviceClass($url);
 	}
 	
 } // MediaServer
