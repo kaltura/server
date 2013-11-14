@@ -196,7 +196,7 @@ class KalturaPropertyInfo
 	 */
 	public function isSimpleType()
 	{
-		$simpleTypes = array("int", "string", "bool", "float");
+		$simpleTypes = array("int", "string", "bool", "float", "bigint");
 		return in_array($this->_type, $simpleTypes);
 	}
 	

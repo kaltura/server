@@ -411,6 +411,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		switch ($propType) 
 		{
+			case "bigint":
 			case "int" :
 			case "string" :
 			case "bool" :
@@ -684,6 +685,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			case "array" :
 				$returnCall .= "return ParseUtils.parseArray($arrayType.class, resultXmlElement);";
 				break;
+			case "bigint":
 			case "int" :
 			case "float" :
 			case "bool" :
@@ -816,7 +818,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		{
 		case "float" :
 			return "Float.MIN_VALUE";
-
+			
+		case "bigint" :
 		case "int" :
 			if ($propertyNode->hasAttribute ("enumType")) 
 				return ""; // we do not want to initialize enums
@@ -837,6 +840,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		case "int":
 		case "float":
+		case "bigint":
 			return '0';
 			
 		case "bool":
@@ -859,7 +863,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				return 'null';
 			else
 				return "\"" . $defaultValue . "\"";
-			
+		case "bigint":
 		case "int": 
 			$value = trim ( $defaultValue );
 			if ($value == 'null')
@@ -915,6 +919,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		case "float" :
 			return "float";
 
+		case "bigint" :
 		case "int" :
 			if ($isEnum) 
 				return $propertyNode->getAttribute ( "enumType" );

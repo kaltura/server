@@ -175,6 +175,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				
 			switch($propType)
 			{
+				case "bigint":
 				case "int":
 					if ($isEnum)
 						$property["default"] = "($dotNetPropType)Int32.MinValue";
@@ -273,6 +274,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("					case \"$propName\":");
 				switch($propType)
 				{
+					case "bigint":
 					case "int":
 						if ($isEnum)
 						{
@@ -336,6 +338,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			
 			switch($propType)
 			{
+				case "bigint":
 				case "int":
 					if ($isEnum)
 						$this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
@@ -620,6 +623,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				case "float":
 						$this->appendLine("			kparams.AddFloatIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
 					break;
+				case "bigint":
 			   	case "int":
 					if ($isEnum)
 						$this->appendLine("			kparams.AddEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
@@ -653,7 +657,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("			if (this._Client.IsMultiRequest)");
 		if (!$resultType) 
 			$this->appendLine("				return;");
-		else if ($resultType == "int" || $resultNode == "float")
+		else if ($resultType == "int" || $resultType == "bigint" || $resultNode == "float")
 			$this->appendLine("				return 0;");
 		else if ($resultType == "bool")
 			$this->appendLine("				return false;");
@@ -675,6 +679,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			}");
 					$this->appendLine("			return list;");
 					break;
+				case "bigint":
 				case "int":
 					$this->appendLine("			return int.Parse(result.InnerText);");
 					break;
@@ -714,6 +719,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				case "file":
 					$dotNetType = "FileStream";
 					break;
+				case "bigint":
 				case "int":
 					if ($isEnum)
 						$dotNetType = $paramNode->getAttribute("enumType");

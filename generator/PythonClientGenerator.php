@@ -413,6 +413,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			
 			switch ($propType) 
 			{
+				case "bigint":
 				case "int" :
 					if ($isEnum) 
 					{
@@ -487,6 +488,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$isEnum = $propertyNode->hasAttribute ( "enumType" );
 			switch ($propType) 
 			{
+				case "bigint":
 				case "int" :
 					if ($isEnum)
 					{
@@ -598,6 +600,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				case "float" :
 					$this->appendLine ( "        kparams.addFloatIfDefined(\"$paramName\", " . $paramName . ")" );
 					break;
+				case "bigint":
 				case "int" :
 					$this->appendLine ( "        kparams.addIntIfDefined(\"$paramName\", " . $paramName . ");" );
 					break;
@@ -639,6 +642,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 						$arrayType = $resultNode->getAttribute ( "arrayType" );
 						$this->appendLine ( "        return KalturaObjectFactory.createArray(resultNode, $arrayType)" );
 						break;
+					case "bigint":
 					case "int" :
 						$this->appendLine ( "        return getXmlNodeInt(resultNode)" );
 						break;

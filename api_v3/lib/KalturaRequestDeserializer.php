@@ -312,6 +312,8 @@ class KalturaRequestDeserializer
 					return (bool)$var;
 			case "float":
 				return (float)$var;
+			case "bigint":
+				return (double)$var;
 		}
 		
 		return null;

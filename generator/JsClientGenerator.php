@@ -248,6 +248,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 					case "string":
 					case "float":
 					case "int":
+					case "bigint":
 					case "bool":
 					case "array":
 						$defaultValue = strtolower($actionParam->attributes()->default);
@@ -285,6 +286,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 					case "string":
 					case "float":
 					case "int":
+					case "bigint":
 					case "bool":
 						$actionClass .= "\tthis.client.addParam(kparams, \"$paramName\", $paramName);\r\n";
 						break;

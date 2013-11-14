@@ -120,6 +120,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$type = "Number = Number.NEGATIVE_INFINITY";
 					break;
 
+				case "bigint":
+					$type = "Number = Number.POSITIVE_INFINITY";
+					break;
 				case "int" :
 					$type = "int = int.MIN_VALUE";
 					break;
@@ -251,6 +254,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			{
 				case "string" :
 				case "float" :
+				case "bigint":
 				case "int" :
 				case "bool" :
 					break;
@@ -353,6 +357,24 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$keys_values_creator .= "			keyArr.push('" . $prop->attributes()->name . "');\n";
 							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";
 
+							break;
+						case "bigint":
+							$const_doc_param .= ' Number';
+							$const_props .= $prop->attributes()->name . " : Number";
+							if($prop->attributes()->optional == "1")
+							{
+								if($prop->attributes()->optional == "1")
+								{
+									if($prop->attributes()->default != "null")
+									$const_props .= "=" . $prop->attributes()->default;
+									else
+									$const_props .= "=Number.POSITIVE_INFINITY";
+								}
+							}
+							$const_props .= ",";
+
+							$keys_values_creator .= "			keyArr.push('" . $prop->attributes()->name . "');\n";
+							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";
 							break;
 						case "int":
 							$const_doc_param .= ' int';
@@ -600,6 +622,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 			switch( $child->result->attributes()->type )
 			{
+				case "bigint":
 				case "int":
 				case "bool":
 				case "float" :
