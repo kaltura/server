@@ -67,6 +67,7 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 			$this->updateWidevineAsset($assetId, $licenseStartDate, $licenseEndDate, $profile);
 		}
 		
+		if($data->monitorSyncCompletion)
 			$this->updateFlavorAssets($job, $dataWrap);
 
 		$this->unimpersonate();
