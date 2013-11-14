@@ -607,7 +607,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
 			
-			return $this->attachLiveEntryResource($resource, $dbEntry, $dbAsset, $operationAttributes);
+			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
 		}
 		
 		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
