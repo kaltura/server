@@ -163,10 +163,10 @@ class MediaServer extends BaseMediaServer {
 			if(isset($mediaServers['protocol']))
 				$protocol = $mediaServers['protocol'];
 				
-			if(isset($mediaServers['domain']))
-				$domain = $mediaServers['domain'];
-			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
-				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
+			if(isset($mediaServers['internal_domain']))
+				$domain = $mediaServers['internal_domain'];
+			elseif(isset($mediaServers['internal_search_regex_pattern']) && isset($mediaServers['internal_replacement']))
+				$domain = preg_replace($mediaServers['internal_search_regex_pattern'], $mediaServers['internal_replacement'], $domain);
 				
 			if(isset($mediaServers[$this->getHostname()]))
 			{
@@ -178,8 +178,8 @@ class MediaServer extends BaseMediaServer {
 				if(isset($mediaServer['protocol']))
 					$protocol = $mediaServer['protocol'];
 					
-				if(isset($mediaServer['domain']))
-					$domain = $mediaServer['domain'];
+				if(isset($mediaServer['internal_domain']))
+					$domain = $mediaServer['internal_domain'];
 			}
 		}
 		
