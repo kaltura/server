@@ -46,6 +46,8 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_WATCHER' => 'Drop Folder Watcher',
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_CONTENT_PROCESSOR' => 'Drop Folder Content Processor',
 	'Kaltura_Client_Enum_BatchJobType::EVENT_NOTIFICATION_HANDLER' => 'Event Notification',
+	'Kaltura_Client_Enum_BatchJobType::CONCAT' => 'Concat',
+	'Kaltura_Client_Enum_BatchJobType::CONVERT_LIVE_SEGMENT' => 'Convert Live Segment',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
