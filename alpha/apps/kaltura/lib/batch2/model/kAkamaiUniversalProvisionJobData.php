@@ -1,6 +1,7 @@
 <?php
 class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 {
+	const DEFAULT_DOMAIN_NAME = 'urtmpkal-f.akamaihd.net';
 	/**
 	 * @var string
 	 */
@@ -198,11 +199,11 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		$entry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastingUrl());
 		$entry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastingUrl());
 		$entry->setStreamName($this->getStreamName(). "_1_%i@".$entry->getStreamRemoteId());
-		$entry->setHlsStreamUrl("http://urtmpkal-f.akamaihd.net/i/".$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
+		$entry->setHlsStreamUrl("http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/i/".$this->getStreamName()."_1@".$this->getStreamID()."/master.m3u8");
 		$configs = $entry->getLiveStreamConfigurations();
 		$config = new kLiveStreamConfiguration();
 		$config->setProtocol(PlaybackProtocol::AKAMAI_HDS);
-		$config->setUrl("http://urtmpkal-f.akamaihd.net/z/".$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m");
+		$config->setUrl("http://". ($this->getDomainName() ? $this->getDomainName() : self::DEFAULT_DOMAIN_NAME) ."/z/".$this->getStreamName()."_1@".$this->getStreamID()."/manifest.f4m");
 		$configs[] = $config;
 		$entry->setLiveStreamConfigurations($configs);
 	}
