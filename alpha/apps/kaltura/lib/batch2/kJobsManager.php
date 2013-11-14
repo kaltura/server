@@ -1016,10 +1016,10 @@ class kJobsManager
 		else
 		{
 			$batchJob = new BatchJob();
-			$batchJob->setEntryId($asset->getEntryId());
 			$batchJob->setPartnerId($asset->getPartnerId());
 		}
 		
+		$batchJob->setEntryId($asset->getEntryId());
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return self::addJob($batchJob, $jobData, BatchJobType::CONCAT);
