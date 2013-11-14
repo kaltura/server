@@ -125,6 +125,8 @@ class KAsyncConcat extends KJobHandlerWorker
 	 */
 	protected function concatFiles($ffmpegBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null)
 	{
+		sort($filesArr);
+		
 		/*
 		 * Check whether the input audio is AAC. If not - convert audio to AAC 
 		 */
