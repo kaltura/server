@@ -67,13 +67,26 @@ abstract class LiveEntry extends entry
 	{
 		static::validateFileSyncSubType($sub_type);
 		
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
 		{
 			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type);
 			return array(myContentStorage::getFSContentRootPath(), $res);
 		}
 		
 		return parent::generateFilePathArr($sub_type, $version);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see entry::generateFileName($sub_type, $version)
+	 */
+	public function generateFileName( $sub_type, $version = null)
+	{
+		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		{
+			return $this->getId() . '_' . $sub_type;
+		}
+		
+		return parent::generateFileName($sub_type, $version);
 	}
 	
 	public function setOfflineMessage($v)
