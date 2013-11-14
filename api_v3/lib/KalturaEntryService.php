@@ -316,6 +316,7 @@ class KalturaEntryService extends KalturaBaseService
 		if($dbLiveEntry->isConvertingSegments())
 		{
 			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
+			$dbLiveEntry->save();
 		}
 		else
 		{
