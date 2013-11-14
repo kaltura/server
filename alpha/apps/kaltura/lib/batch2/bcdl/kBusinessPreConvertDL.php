@@ -863,7 +863,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$originalFlavorAsset->save();
 			
 			kFlowHelper::generateThumbnailsFromFlavor($entry->getId(), null, $originalFlavorAsset->getFlavorParamsId());
-			kBusinessPostConvertDL::handleConvertFinished(null, $originalFlavorAsset);
+			kBusinessPostConvertDL::handleConvertFinished($convertProfileJob, $originalFlavorAsset);
 			return null;
 		}
 		
