@@ -86,10 +86,7 @@ class UiConfService extends KalturaBaseService
 		if ( ! $dbUiConf )
 			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
 		
-		$uiConfUpdate = $uiConf->toUiConf();
-
-		$allowEmpty = true ; // TODO - what is the policy  ? 
-		baseObjectUtils::autoFillObjectFromObject ( $uiConfUpdate , $dbUiConf , $allowEmpty );
+		$dbUiConf = $uiConf->toUpdatableObject($dbUiConf);
 		
 		$dbUiConf->save();
 		$uiConf->fromUiConf( $dbUiConf );
