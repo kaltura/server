@@ -12,7 +12,7 @@
 	<field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes" />
 	<field name="status" indexName="category_status" getter="status" type="int" orderable="yes"/>
 	<field name="kuser_id" indexName="kuser_id" type="int" orderable="yes"/>
-	<field name="display_in_search" indexName="display_in_search" getter="displayInSearchIndex" type="string" orderable="yes" />
+	<field name="display_in_search" indexName="display_in_search" getter="optimizedDisplayInSearchIndex" type="string" orderable="yes" />
 	<field name="free_text" indexName="(str_category_id,name,tags,description,reference_id)" type="null" searchableonly="yes" matchable="yes" />
 	<field name="name_reference_id" indexName="(name,reference_id)" type="null" searchableonly="yes" />
 	<field name="members" indexName="members" getter="membersByPermissionLevel" type="string" nullable="yes" matchable="yes" />

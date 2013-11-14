@@ -48,7 +48,7 @@ class categoryIndex extends BaseIndexObject
 				'tags' => 'tags',
 				'category_status' => 'status',
 				'kuser_id' => 'kuserId',
-				'display_in_search' => 'displayInSearch',
+				'display_in_search' => 'optimizedDisplayInSearchIndex',
 				'members' => 'membersByPermissionLevel',
 				'depth' => 'depth',
 				'reference_id' => 'referenceId',

@@ -303,6 +303,13 @@ class SphinxCategoryCriteria extends SphinxCriteria
 					categoryPeer::FULL_NAME, 
 					Criteria::IN_LIKE, 
 					kString::addSuffixToArray($crit->getValue(), category::FULL_NAME_EQUAL_MATCH_STRING));
+		} else if ($field == categoryPeer::DISPLAY_IN_SEARCH  && $crit->getComparison() == Criteria::EQUAL)
+		{
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+			return array(
+					categoryPeer::DISPLAY_IN_SEARCH,
+					Criteria::EQUAL,
+					$crit->getValue() . "P" . $partnerId);
 		}
 
 		return parent::translateSphinxCriterion($crit);
