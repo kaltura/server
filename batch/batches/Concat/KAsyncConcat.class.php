@@ -187,6 +187,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename";
 		
+		KalturaLog::debug("Executing [$cmdStr]");
 		$output = system($cmdStr, $rv);
 		return ($rv == 0) ? true : false;
 	}

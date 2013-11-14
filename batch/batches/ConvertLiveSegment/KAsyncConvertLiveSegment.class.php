@@ -112,6 +112,7 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 	{
 		$cmdStr = "$ffmpegBin -i $inFilename -c copy -bsf:v h264_mp4toannexb -f mpegts -y $outFilename 2>&1";
 		
+		KalturaLog::debug("Executing [$cmdStr]");
 		$output = system($cmdStr, $rv);
 		return ($rv == 0) ? true : false;
 	}
