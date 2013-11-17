@@ -107,14 +107,16 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 		{
 			//Obtain matches for the set structure {metadata:[profileSystemName][profileFieldSystemName]}
 			preg_match_all(self::METADATA_EMAIL_NOTIFICATION_REGEX, $sweepFieldValue, $matches);
-			foreach ($matches as $match)
-			{
+			foreach ($matches[0] as $match)
+			{				
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
 				list ($metadata, $profileSystemName, $fieldSystemName) = explode(':', $match);
 				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $partnerId);
 				if (!$profile)
 				{
-					KalturaLog::info("Metadata profile with system name $profileSystemName not found for this partner. No tokens will be replaced.");
+					KalturaLog::info("Metadata profile with system name $profileSystemName not found for this partner. Token will be replaced with empty string.");
+					$metadataContentParameters[$match] = '';
+					continue;
 				}
 				
 				$objectId = null;
@@ -131,9 +133,17 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				{
 					$objectId = $scope->getEvent()->getObject()->getEntryId();
 				}
+				elseif ($scope->getEvent()->getObject() instanceof categoryEntry)
+				{
+					$profileObject = kMetadataManager::getObjectTypeName($profile->getObjectType());
+					$getter = "get{$profileObject}Id";
+					KalturaLog::info ("Using $getter in order to retrieve the metadata object ID");
+					$categoryEntry = $scope->getEvent()->getObject();
+					$objectId = $categoryEntry->$getter();
+				}
 				elseif (KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType) == MetadataPeer::OM_CLASS)
 				{
-					$metadataObjectIdb = $scope->getEvent()->getObject()->getId();
+					$metadataObjectId = $scope->getEvent()->getObject()->getId();
 				}
 				
 				
@@ -148,12 +158,17 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				else 
 				{
 					//There is not enough specification regarding the required metadataObject, abort.
-					KalturaLog::info("The template does not contain an object Id for which custom metadata can be retrieved");
-					return array ();	
+					KalturaLog::info("The template does not contain an object Id for which custom metadata can be retrieved. Token will be replaced with empty string.");
+					$metadataContentParameters[$match] = '';
+					continue;	
 				}
 				
 				if (!$result)
-					return array ();
+				{
+					KalturaLog::info("Metadata object could not be retrieved. Token will be replaced with empty string.");
+					$metadataContentParameters[$match] = '';
+					continue;
+				}
 				
 				$strvals = kMetadataManager::getMetadataValueForField($result, $fieldSystemName);
 				

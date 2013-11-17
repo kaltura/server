@@ -24,8 +24,10 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	 */
 	protected function getJobs()
 	{
+		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
 		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
-		return $multiCentersPlugin->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
+		return $multiCentersPlugin->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 
+				$this->getMaxJobsEachRun(), $this->getFilter(), $maxOffset);
 	}
 	
 	/* (non-PHPdoc)
