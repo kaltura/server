@@ -711,6 +711,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			
 			switch($resultType)
 			{
+				case 'bigint':	
 				case 'int':
 					$this->appendLine("		\$resultObject = (int)\$resultObject;");
 					break;

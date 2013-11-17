@@ -173,6 +173,7 @@ function getTypeName($typeName)
 	{
 	case 'bool':
 	case 'int':
+	case 'bigint':
 	case 'float':
 	case 'string':
 	case 'file':
