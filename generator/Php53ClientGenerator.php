@@ -463,11 +463,15 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		
 			switch ($propType) 
 			{
-				case "bigint" :
 				case "int" :
 				case "float" :
 					$this->appendLine("		if(count(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
+					break;
+
+				case "bigint" :
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = (double)\$xml->$propName;");
 					break;
 					
 				case "bool" :
@@ -712,6 +716,8 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			switch($resultType)
 			{
 				case 'bigint':	
+					$this->appendLine("		\$resultObject = (double)\$resultObject;");
+					break;
 				case 'int':
 					$this->appendLine("		\$resultObject = (int)\$resultObject;");
 					break;

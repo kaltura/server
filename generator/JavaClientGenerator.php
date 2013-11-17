@@ -686,6 +686,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				$returnCall .= "return ParseUtils.parseArray($arrayType.class, resultXmlElement);";
 				break;
 			case "bigint":
+				$this->appendLine ( "        String resultText = resultXmlElement.getTextContent();" );
+				$returnCall .= "return ParseUtils.parseInt(resultText);";
 			case "int" :
 			case "float" :
 			case "bool" :
