@@ -412,6 +412,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		switch ($propType) 
 		{
 			case "bigint":
+				$txtIsUsed = true;
+				$parsedProperty = "ParseUtils.parseInt(txt)";
+				$propBlock .= "$parsedProperty;\n";
+				break;
+				
 			case "int" :
 			case "string" :
 			case "bool" :
