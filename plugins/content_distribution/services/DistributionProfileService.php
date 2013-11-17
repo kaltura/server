@@ -15,7 +15,7 @@ class DistributionProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('DistributionProfile');
 		
 		if(!ContentDistributionPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ContentDistributionPlugin::PLUGIN_NAME);
 	}
 	
 	/**

@@ -14,7 +14,7 @@ class AsperaService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		$this->applyPartnerFilterForClass('asset');
 		if(!AsperaPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, AsperaPlugin::PLUGIN_NAME);
 	}
 
 	/**
