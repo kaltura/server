@@ -1577,7 +1577,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function getOptimizedDisplayInSearchIndex()
 	{
-		return $this->display_in_search . "P" . $this->getParentId();
+		return $this->display_in_search . "P" . $this->getPartnerId();
 	}
 	
 }
