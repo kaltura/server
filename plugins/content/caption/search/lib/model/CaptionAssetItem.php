@@ -26,7 +26,7 @@ class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 	protected $aEntry = null;
 	
 	public function getIndexObjectName() {
-		return "CaptionAssetIndex";
+		return "CaptionAssetItemIndex";
 	}
 	
 	/**
