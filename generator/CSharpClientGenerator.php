@@ -166,6 +166,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				$dotNetPropType = "IList<".$propertyNode->getAttribute("arrayType").">";
 			else if ($propType == "bool")
 				$dotNetPropType  = "bool?";
+			else if ($propType == "bigint")
+				$dotNetPropType  = "int";
 			else
 				$dotNetPropType = $propType;
 				
@@ -720,6 +722,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$dotNetType = "FileStream";
 					break;
 				case "bigint":
+					$dotNetType = "int";
 				case "int":
 					if ($isEnum)
 						$dotNetType = $paramNode->getAttribute("enumType");
