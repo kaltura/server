@@ -29,8 +29,8 @@ if(!file_exists($iniDir))
 	die("Configuration file [$iniDir] not found.");
 }
 
-require_once(__DIR__ . '\\..\\bootstrap_scheduler.php');
-require_once(__DIR__ . '\\win-service-constants.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'bootstrap_scheduler.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'win-service-constants.php');
 
 $serviceName = 'kaltura_batch';
 

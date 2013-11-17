@@ -44,7 +44,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter gte,lte,order
 	 */
 	public $lockExpiration;
 	
@@ -99,13 +98,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     
     /**
 	 * @var int
-	 * @filter eq
 	 */
     public $abort;
     
     /**
 	 * @var int
-	 * @filter gte,lte,order
 	 */
     public $checkAgainTimeout;
 
@@ -133,7 +130,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     /**
      * The id of the bulk upload job that initiated this job
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $bulkJobId;
     
@@ -147,7 +143,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     /**
      * When one job creates another - the parent should set this parentJobId to be its own id.
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $parentJobId;
     
@@ -155,7 +150,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     /**
      * The id of the root parent job
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $rootJobId;
     
@@ -204,41 +198,35 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $schedulerId;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $workerId;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $batchIndex;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $lastSchedulerId;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $lastWorkerId;
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $dc;
     

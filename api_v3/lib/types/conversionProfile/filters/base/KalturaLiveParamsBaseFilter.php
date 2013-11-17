@@ -1,9 +1,10 @@
 <?php
 /**
  * @package api
- * @subpackage filters
+ * @subpackage filters.base
+ * @abstract
  */
-class KalturaBaseSyndicationFeedFilter extends KalturaFilter
+abstract class KalturaLiveParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 	static private $map_between_objects = array
 	(
@@ -11,14 +12,6 @@ class KalturaBaseSyndicationFeedFilter extends KalturaFilter
 
 	static private $order_by_map = array
 	(
-		"+playlistId" => "+playlist_id",
-		"-playlistId" => "-playlist_id",
-		"+name" => "+name",
-		"-name" => "-name",
-		"+type" => "+type",
-		"-type" => "-type",
-		"+createdAt" => "+created_at",
-		"-createdAt" => "-created_at",
 	);
 
 	public function getMapBetweenObjects()
