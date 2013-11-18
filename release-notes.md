@@ -16,6 +16,9 @@ Kaltura live stream recording and clipping.
    - deployment/updates/scripts/add_permissions/2013_11_13_liveStream_appendRecording.php
    - deployment/updates/scripts/add_permissions/2013_11_14_media_update_content.php
 
+**DB**
+
+ - Create media server partner permissions deployment/updates/sql/2013_11_18_create_media_partner_permissions.sql
 
 ----------
 
