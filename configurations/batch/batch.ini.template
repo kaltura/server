@@ -118,10 +118,17 @@ params.pattern										= *
 params.minutesOld 									= 10080
 
 [DirectoryCleanupBatchLogs : DirectoryCleanup]
-id													= 16
+id													= 15
 friendlyName										= Batch Logs Cleanup
 params.path											= @LOG_DIR@/batch/
 params.pattern										= *.log
+params.minutesOld 									= 2880
+
+[DirectoryCleanupRecordedMedia : DirectoryCleanup]
+id													= 16
+friendlyName										= Recorded Media Cleanup
+params.path											= @WOWZA_DIR@/content/
+params.pattern										= *
 params.minutesOld 									= 2880
 
 [KAsyncDbCleanup : PeriodicWorker]
