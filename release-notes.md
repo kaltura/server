@@ -6,6 +6,11 @@ Kaltura live stream recording and clipping.
 
  - New `liveStream.appendRecording` action
 
+## Configuration: ##
+ - Add DirectoryCleanupRecordedMedia to batch.ini based on batch.ini.template.
+
+## Deployment: ##
+
 **Permissions**
 
    - deployment/updates/scripts/add_permissions/2013_11_13_liveStream_appendRecording.php
