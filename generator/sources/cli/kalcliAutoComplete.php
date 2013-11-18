@@ -171,16 +171,17 @@ function getTypeName($typeName)
 {
 	switch ($typeName)
 	{
-	case 'bool':
-	case 'int':
-	case 'bigint':
-	case 'float':
-	case 'string':
-	case 'file':
-	case 'array':
-		return $typeName;	
-	default:
-		return 'object';
+		case 'bigint':
+			return "int";
+		case 'bool':
+		case 'int':
+		case 'float':
+		case 'string':
+		case 'file':
+		case 'array':
+			return $typeName;	
+		default:
+			return 'object';
 	}
 }
 

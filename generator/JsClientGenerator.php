@@ -193,6 +193,9 @@ class JsClientGenerator extends ClientGeneratorFromXml
 			foreach($action->children() as $actionParam) {
 				if($actionParam->getName() == "param" ) {
 					$paramType = $actionParam->attributes()->type;
+					
+					$paramType = $this->getJSType($paramType);
+					
 					$paramName = $actionParam->attributes()->name;
 					$optionalp = (boolean)$actionParam->attributes()->optional;
 					$defaultValue = trim($actionParam->attributes()->default);
@@ -384,5 +387,17 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		//override to implement the parsing and file creation.
 		//to add a new file, use: $this->addFile('path to new file', 'file contents');
 		//echo "Create Project File.\r\n";
+	}
+	
+	public function getJSType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }

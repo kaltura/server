@@ -514,6 +514,8 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
+				
+			$propty = $this->getPHPType($propType);
 			$description = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
@@ -716,8 +718,6 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			switch($resultType)
 			{
 				case 'bigint':	
-					$this->appendLine("		\$resultObject = (int)\$resultObject;");
-					break;
 				case 'int':
 					$this->appendLine("		\$resultObject = (int)\$resultObject;");
 					break;
@@ -889,6 +889,18 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
 		parent::addFile($fileName, $fileContents, $addLicense);
+	}
+	
+	public function getPHPType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }
 
