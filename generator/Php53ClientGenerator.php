@@ -515,7 +515,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			else
 				$propType = $propertyNode->getAttribute("type");
 				
-			$propty = $this->getPHPType($propType);
+			$propType = $this->getPHPType($propType);
 			$description = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");

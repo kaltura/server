@@ -132,6 +132,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		//parse the class properties
 		foreach($classNode->children() as $classProperty) {
 			$propType = $classProperty->attributes()->type;
+			$propType = $this->getJSType($propType);
 			$propName = $classProperty->attributes()->name;
 			$description = str_replace("\n", "\n *\t", $classProperty->attributes()->description); // to format multi-line descriptions
 			$vardesc = " * @param\t$propName\t$propType\t\t$description";
