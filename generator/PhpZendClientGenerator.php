@@ -217,9 +217,6 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		if(!isset($this->cacheTypes[$className]))
 			return $className; 
 		
-		if($className == "bigint")
-			return "int";
-			
 		return $this->cacheTypes[$className];
 	}
 	
