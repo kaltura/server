@@ -53,12 +53,10 @@ class kVelocixUrlManager extends kUrlManager
 			$href = $media->getAttribute('href');
 			$streamUrl = $baseUrl.$href;
 			$streamUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			if(!$this->urlExists($streamUrl, array(),'0-0')){
-				KalturaLog::info('not live:'.$streamUrl);
-				continue;
+			if($this->urlExists($streamUrl, array(),'0-0')  !== false){
+				KalturaLog::info('is live:'.$streamUrl);
+				return true;
 			}
-			KalturaLog::info('is live:'.$streamUrl);
-			return true;
 		}
 		return false;
 	}
@@ -96,8 +94,10 @@ class kVelocixUrlManager extends kUrlManager
 			$tsUrl = $matches[0];
 			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
 			$tsUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0'))
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0')  !== false){
+				KalturaLog::info('is live:'.$tsUrl);
 				return true;
+			}
 		}
 			
 		return false;

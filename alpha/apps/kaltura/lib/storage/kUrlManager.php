@@ -437,6 +437,7 @@ class kUrlManager
 	 * @throws Exception
 	 */
 	public function isLive($url){
+		$url = $this->getTokenizedUrl($url);
 		switch ($this->protocol){
 			case PlaybackProtocol::HDS:
 			case PlaybackProtocol::AKAMAI_HDS:
@@ -448,6 +449,21 @@ class kUrlManager
 				break;
 		}
 		throw new Exception('Status cannot be determined for live stream protocol '.$this->protocol);
+	}
+	
+	/**
+	 * get tokenized url if exists
+	 * @param string $url
+	 */
+	private function getTokenizedUrl($url){
+		$urlPath = parse_url($url, PHP_URL_PATH);
+		if (!$urlPath || substr($url, -strlen($urlPath)) != $urlPath)
+			return $url;
+		$urlPrefix = substr($url, 0, -strlen($urlPath));
+		$tokenizer = $this->getTokenizer();
+		if ($tokenizer)
+			return $urlPrefix.$tokenizer->tokenizeSingleUrl($urlPath);
+		return $url;
 	}
 	
 	/**
@@ -523,7 +539,7 @@ class kUrlManager
 			
 			$tsUrl = $matches[0];
 			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0'))
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0') !== false)
 				return true;
 		}
 			
@@ -554,6 +570,14 @@ class kUrlManager
 	 */
 	public function isHdsLive ($url) 
 	{
+		$liveStreamEntry = entryPeer::retrieveByPK($this->entryId); 
+		if ($this->protocol == PlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
+			$parsedUrl = parse_url($url);
+			if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+				$url .= '&hdcore='.kConf::get('hd_core_version');
+			else
+				$url .= '?hdcore='.kConf::get('hd_core_version');
+		}
 		$data = $this->urlExists($url, array('video/f4m'));
 		if (is_bool($data))
 			return $data;
@@ -566,6 +590,5 @@ class kUrlManager
 		
 		return false;
 	}
-	
 	
 }

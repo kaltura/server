@@ -273,7 +273,6 @@ class LiveStreamService extends KalturaEntryService
 				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, 'protocol', $protocol);
 				if ($config)
 					$url = $config->getUrl();
-				$url = $this->getTokenizedUrl($id, $url, $protocol);
 				$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
 				$urlManager->setProtocol($protocol);
 				return $urlManager->isLive($url);
@@ -284,14 +283,7 @@ class LiveStreamService extends KalturaEntryService
 				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, "protocol", $protocol);
 				if ($config)
 				{
-					$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
-					if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
-						$parsedUrl = parse_url($url);
-						if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
-							$url .= '&hdcore='.kConf::get('hd_core_version');
-						else
-							$url .= '?hdcore='.kConf::get('hd_core_version');
-					}
+					$url = $config->getUrl();
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
 					$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
 					$urlManager->setProtocol($protocol);
@@ -301,29 +293,6 @@ class LiveStreamService extends KalturaEntryService
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
-	}
-	
-	/**
-	 * 
-	 * get tokenized url if exists
-	 * @param string $entryId
-	 * @param string $url
-	 * @param string $protocol
-	 */
-	private function getTokenizedUrl($entryId, $url, $protocol){
-		$urlPath = parse_url($url, PHP_URL_PATH);
-		if (!$urlPath || substr($url, -strlen($urlPath)) != $urlPath)
-			return $url;
-		$urlPrefix = substr($url, 0, -strlen($urlPath));
-		$cdnHost = parse_url($url, PHP_URL_HOST);		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $entryId);
-		if ($urlManager){
-			$urlManager->setProtocol($protocol);
-			$tokenizer = $urlManager->getTokenizer();
-			if ($tokenizer)
-				return $urlPrefix.$tokenizer->tokenizeSingleUrl($urlPath);
-		}
-		return $url;
 	}
 
 }
