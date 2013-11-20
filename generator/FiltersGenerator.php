@@ -226,7 +226,9 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 					$filterPropType = $prop->getType();
 					if($filterPropType == 'bool' || $filter == baseObjectFilter::IS_EMPTY)
 						$filterPropType = 'KalturaNullableBoolean';
-					
+
+					if ($prop->isTime())
+						$filterPropType = 'time';
 					$filterDynamicType = null;
 					if (in_array($filter, array(baseObjectFilter::IN, baseObjectFilter::NOT_IN, baseObjectFilter::MATCH_OR, baseObjectFilter::MATCH_AND)))
 					{

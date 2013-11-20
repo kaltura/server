@@ -399,42 +399,42 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $accessControlIdIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateGreaterThanOrEqualOrNull;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateLessThanOrEqualOrNull;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateGreaterThanOrEqualOrNull;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateLessThanOrEqualOrNull;
 

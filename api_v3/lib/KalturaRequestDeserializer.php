@@ -270,6 +270,8 @@ class KalturaRequestDeserializer
 							
 			if ($property->isSimpleType())
 			{
+                if ($property->isTime())
+                    $type = "time";
 				$value = $this->castSimpleType($type, $value);
 				if(!kXml::isXMLValidContent($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
@@ -347,8 +349,34 @@ class KalturaRequestDeserializer
 					return (bool)$var;
 			case "float":
 				return (float)$var;
+			case "time":
+				$maxRelativeTime = kConf::get('max_relative_time');
+				$var = (int)$var;
+				if (-$maxRelativeTime <= $var && $var <= $maxRelativeTime)
+				{
+					$time = $this->getTime();
+					$var = $time + $var;
+				}
+				return $var;
 		}
 		
 		return null;
+	}
+
+	/**
+	 * Looks for the time that is stored under ks privilege as reference time.
+	 * If not found, returns time().
+	 *
+	 * @return int
+	 */
+	private function getTime()
+	{
+		if (kCurrentContext::$ks_object)
+		{
+			$referenceTime = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_REFERENCE_TIME);
+			if ($referenceTime)
+				return (int)$referenceTime;
+		}
+		return time();
 	}
 }
