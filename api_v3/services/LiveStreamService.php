@@ -267,13 +267,15 @@ class LiveStreamService extends KalturaEntryService
 		switch ($protocol)
 		{
 			case KalturaPlaybackProtocol::HLS:
+			case KalturaPlaybackProtocol::APPLE_HTTP:
 				KalturaLog::info('Determining status of live stream URL [' .$liveStreamEntry->getHlsStreamUrl(). ']');
 				$url = $liveStreamEntry->getHlsStreamUrl();
 				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, 'protocol', $protocol);
 				if ($config)
 					$url = $config->getUrl();
-				$url = $this->getTokenizedUrl($id, $url, $protocol);
-				return $this->hlsUrlExistsRecursive($url);
+				$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
+				$urlManager->setProtocol($protocol);
+				return $urlManager->isLive($url);
 				break;
 				
 			case KalturaPlaybackProtocol::HDS:
@@ -281,157 +283,16 @@ class LiveStreamService extends KalturaEntryService
 				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, "protocol", $protocol);
 				if ($config)
 				{
-					$url = $this->getTokenizedUrl($id,$config->getUrl(),$protocol);
-					if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
-						$parsedUrl = parse_url($url);
-  						if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
-   							$url .= '&hdcore='.kConf::get('hd_core_version');
-  						else
-							$url .= '?hdcore='.kConf::get('hd_core_version');
-					}
+					$url = $config->getUrl();
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					return $this->hdsUrlExists($url);
+					$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
+					$urlManager->setProtocol($protocol);
+					return $urlManager->isLive($url);
 				}
 				break;
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
 	}
-	
-	/**
-	 * 
-	 * get tokenized url if exists
-	 * @param string $entryId
-	 * @param string $url
-	 * @param string $protocol
-	 */
-	private function getTokenizedUrl($entryId, $url, $protocol){
-		$urlPath = parse_url($url, PHP_URL_PATH);
-		if (!$urlPath || substr($url, -strlen($urlPath)) != $urlPath)
-			return $url;
-		$urlPrefix = substr($url, 0, -strlen($urlPath));
-		$cdnHost = parse_url($url, PHP_URL_HOST);		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $entryId);
-		if ($urlManager){
-			$urlManager->setProtocol($protocol);
-			$tokenizer = $urlManager->getTokenizer();
-			if ($tokenizer)
-				return $urlPrefix.$tokenizer->tokenizeSingleUrl($urlPath);
-		}
-		return $url;
-	}
-	
-	
-	/**
-	 * Method checks whether the URL passed to it as a parameter returns a response.
-	 * @param string $url
-	 * @return string
-	 */
-	private function urlExists ($url, array $contentTypeToReturn)
-	{
-		if (is_null($url)) 
-			return false;  
-		if (!function_exists('curl_init'))
-		{
-			KalturaLog::err('Unable to use util when php curl is not enabled');
-			return false;  
-		}
-	    $ch = curl_init($url);  
-	    curl_setopt($ch, CURLOPT_TIMEOUT, 5);  
-	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);  
-	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  
-	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  
-	    $data = curl_exec($ch);  
-	    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
-	    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-	    curl_close($ch); 
 
-	    $contentTypeToCheck = strstr($contentType, ";", true);
-		if(!$contentTypeToCheck)
-			$contentTypeToCheck = $contentType;
-	    
-	    if($data && $httpcode>=200 && $httpcode<300)
-	    {
-	        return in_array(trim($contentTypeToCheck), $contentTypeToReturn) ? $data : true;
-	    }  
-	    else 
-	        return false;  
-	}	
-	
-	/**
-	 * Recursive function which returns true/false depending whether the given URL returns a valid video eventually
-	 * @param string $url
-	 * @return bool
-	 */
-	private function hlsUrlExistsRecursive ($url)
-	{
-		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
-		if(!$data)
-		{
-			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
-			return $data;
-		}
-
-		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
-
-		foreach ($lines as $line)
-		{
-			if(!preg_match('/.+\.m3u8/', array_shift($lines), $matches))
-				continue;
-			$streamUrl = $matches[0];
-			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
-			
-			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
-			if (!$data)
-				continue;
-				
-			$segments = explode("#EXTINF:", $data);
-			if(!preg_match('/.+\.ts.*/', array_pop($segments), $matches))
-				continue;
-			
-			$tsUrl = $matches[0];
-			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type")))
-				return true;
-		}
-			
-		return false;
-	}
-	
-	/**
-	 * Function check if URL provided is a valid one if not returns fixed url with the parent url relative path
-	 * @param string $urlToCheck
-	 * @param string $parentURL
-	 * @return fixed url path 
-	 */
-	private function checkIfValidUrl($urlToCheck, $parentURL)
-	{
-		$urlToCheck = trim($urlToCheck);
-		if(!filter_var($urlToCheck, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED))
-		{
-			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
-		}
-		
-		return $urlToCheck;
-	}
-	
-	/**
-	 * Function which returns true/false depending whether the given URL returns a live video
-	 * @param string $url
-	 * @return true
-	 */
-	private function hdsUrlExists ($url) 
-	{
-		$data = $this->urlExists($url, array('video/f4m'));
-		if (is_bool($data))
-			return $data;
-		
-		$element = new KDOMDocument();
-		$element->loadXML($data);
-		$streamType = $element->getElementsByTagName('streamType')->item(0);
-		if ($streamType->nodeValue == 'live')
-			return true;
-		
-		return false;
-	}
 }
