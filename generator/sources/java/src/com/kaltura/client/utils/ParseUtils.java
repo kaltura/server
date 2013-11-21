@@ -57,7 +57,7 @@ public final class ParseUtils {
 		return 0;
 	}
 	
-	public static long parseLong(String txt) {
+	public static long parseBigint(String txt) {
 		if (txt.length() != 0) {
 			try {
 				return Long.parseLong(txt);

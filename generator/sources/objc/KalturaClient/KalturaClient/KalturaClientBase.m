@@ -360,6 +360,21 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     }
 }
 
+- (void)addIfDefinedKey:(NSString*)aKey withLong:(long)aVal
+{
+    if (aVal == KALTURA_UNDEF_LONG)
+        return;
+    
+    if (aVal == KALTURA_NULL_LONG)
+    {
+        [self putNullKey:aKey];
+    }
+    else
+    {
+        [self putKey:aKey withString:[NSString stringWithFormat:@"%qi", aVal]];
+    }
+}
+
 - (void)addIfDefinedKey:(NSString*)aKey withFloat:(double)aVal
 {
     if (isnan(aVal))        // cannot compare to KALTURA_UNDEF_FLOAT since NaN != NaN
