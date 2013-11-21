@@ -524,7 +524,7 @@ class kUrlManager
 		foreach ($lines as $line)
 		{
 			$line = trim($line);
-			if(!endsWith($line, '.m3u8'))
+			if(substr($line, -strlen('.m3u8')) != '.m3u8')
 				continue;
 			$streamUrl = $line;
 			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
