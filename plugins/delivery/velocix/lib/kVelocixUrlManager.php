@@ -34,7 +34,7 @@ class kVelocixUrlManager extends kUrlManager
 		$parts = parse_url($url);
 		parse_str($parts['query'], $query);
 		$token = $query[$this->params['tokenParamName']];
-		$data = $this->urlExists($url, $this->params['hdsManifestContentType']);
+		$data = $this->urlExists($url, array($this->params['hdsManifestContentType']));
 		if(!$data)
 		{
 			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
