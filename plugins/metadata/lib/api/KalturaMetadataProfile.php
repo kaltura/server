@@ -50,14 +50,14 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	public $description;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */

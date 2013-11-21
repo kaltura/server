@@ -68,7 +68,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	/**
 	 * Creation date as Unix timestamp (In seconds) 
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter order
 	 */
