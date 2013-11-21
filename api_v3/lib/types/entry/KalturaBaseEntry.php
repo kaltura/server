@@ -129,7 +129,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -138,7 +138,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

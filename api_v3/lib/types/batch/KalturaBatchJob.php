@@ -22,21 +22,21 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $deletedAt;
