@@ -32,17 +32,17 @@ abstract class KalturaBulkUploadBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $uploadedOnGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $uploadedOnLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $uploadedOnEqual;
 

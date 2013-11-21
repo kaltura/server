@@ -71,12 +71,12 @@ abstract class KalturaAuditTrailBaseFilter extends KalturaFilter
 	public $idEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 

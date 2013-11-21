@@ -43,12 +43,12 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 	public $mediaTypeIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $mediaDateGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $mediaDateLessThanOrEqual;
 

@@ -57,22 +57,22 @@ abstract class KalturaShortLinkBaseFilter extends KalturaFilter
 	public $idIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
 
