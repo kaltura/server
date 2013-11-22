@@ -73,33 +73,16 @@ class kVelocixUrlManager extends kUrlManager
 			return $data;
 		}
 
-		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
-
-		foreach ($lines as $line)
+		$segments = explode("#EXTINF:", $data);
+		if(preg_match('/.+\.ts.*/', array_pop($segments), $matches))
 		{
-			$line = trim($line);
-			if(substr($line, -strlen('.m3u8')) != '.m3u8')
-				continue;
-			$streamUrl = $line;
-			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
-			$streamUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
-			if (!$data)
-				continue;
-				
-			$segments = explode("#EXTINF:", $data);
-			if(!preg_match('/.+\.ts.*/', array_pop($segments), $matches))
-				continue;
-			
 			$tsUrl = $matches[0];
 			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
 			$tsUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0')  !== false){
-				KalturaLog::info('is live:'.$tsUrl);
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0') !== false)
 				return true;
-			}
 		}
-			
+		
 		return false;
 	}
 }
