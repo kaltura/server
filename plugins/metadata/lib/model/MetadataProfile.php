@@ -190,6 +190,6 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("metadataProfile:id=".$this->getId(), "metadataProfile:partnerId=".$this->getPartnerId());
+		return array("metadataProfile:id=".strtolower($this->getId()), "metadataProfile:partnerId=".strtolower($this->getPartnerId()));
 	}
 } // MetadataProfile

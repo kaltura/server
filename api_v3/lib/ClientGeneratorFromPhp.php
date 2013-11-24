@@ -385,7 +385,8 @@ abstract class ClientGeneratorFromPhp
 			$this->loadTypesRecursive($subTypeReflector);
 		}
 		
-		$this->loadChildTypes($typeReflector);
+		if ($typeReflector->getType() != 'KalturaObject')
+			$this->loadChildTypes($typeReflector);
 	}
 	
 	protected function getTypesClassMapPath()

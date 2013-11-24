@@ -18,7 +18,6 @@ class assetParamsConversionProfileFilter extends baseObjectFilter
 			"_in_origin",
 			"_eq_system_name",
 			"_in_system_name",
-			"_eq_force_none_complied",
 			) , NULL );
 
 		$this->allowed_order_fields = array(

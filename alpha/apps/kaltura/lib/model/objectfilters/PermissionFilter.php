@@ -26,6 +26,8 @@ class PermissionFilter extends baseObjectFilter
 				'_lte_created_at',
 				'_gte_updated_at',
 				'_lte_updated_at',
+				"_mlikeor_depends_on_permission_names",
+				"_mlikeand_depends_on_permission_names",
 			) , NULL );
 
 		$this->allowed_order_fields = array ('id', 'name', 'created_at' , 'updated_at');

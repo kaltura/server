@@ -21,6 +21,7 @@ class kCacheManager
 	const CACHE_TYPE_LOCK_KEYS = 'lockKeys';
 	const CACHE_TYPE_API_WARMUP = 'apiWarmup';
 	const CACHE_TYPE_KWIDGET_SWF = 'kwidgetSwf';
+	const CACHE_TYPE_PARTNER_SECRETS = 'partnerSecrets';
 	
 	protected static $caches = array();
 	

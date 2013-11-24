@@ -26,6 +26,9 @@ class BulkService extends KalturaBaseService
 	 */
 	function addEntriesAction($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadEntryData $bulkUploadEntryData = null)
 	{
+		if(get_class($bulkUploadData) == 'KalturaBulkUploadJobData')
+			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, 'KalturaBulkUploadJobData');
+			
 	    if($bulkUploadEntryData->conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
 			$bulkUploadEntryData->conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
 	    

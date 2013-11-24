@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.metadata
+ * @package plugins.eventNotification
  * @subpackage model.enum
  */
 class EventNotificationConditionType implements IKalturaPluginEnum, ConditionType

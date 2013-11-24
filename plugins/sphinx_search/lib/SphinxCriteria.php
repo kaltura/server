@@ -645,6 +645,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
+						$vals = array_filter($vals, 'trim');
 						if($objectClass::isNullableField($fieldName))
 							$val = "((\\\"^" . implode(" $notEmpty$\\\") | (\\\"^", $vals) . " $notEmpty$\\\"))";
 						else

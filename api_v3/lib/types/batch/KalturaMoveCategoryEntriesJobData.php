@@ -50,7 +50,11 @@ class KalturaMoveCategoryEntriesJobData extends KalturaJobData
      */
     public $copyOnly;
 	
-    
+    /**
+     * Destination categories fallback ids
+     * @var string
+     */
+    public $destCategoryFullIds;
     
 	private static $map_between_objects = array
 	(
@@ -61,6 +65,7 @@ class KalturaMoveCategoryEntriesJobData extends KalturaJobData
 	    'lastMovedCategoryEntryPageIndex',
 	    'moveFromChildren',
 	    'copyOnly',
+		'destCategoryFullIds',
 	);
 
 	public function getMapBetweenObjects ( )

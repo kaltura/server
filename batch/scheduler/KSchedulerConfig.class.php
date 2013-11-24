@@ -188,10 +188,12 @@ class KSchedulerConfig extends Zend_Config_Ini
 	protected function calculateFileTimestamp()
 	{
 		clearstatcache();
-		if(!is_dir($this->configFileName))
+		if(!is_dir($this->configFileName)) {
 			return filemtime($this->configFileName);
+		}
 
 		$configFilePaths = $this->getConfigFilePaths();
+		
 		$filemtime = 0;
 		foreach($configFilePaths as $configFilePath)
 			$filemtime = max($filemtime, filemtime($configFilePath));
@@ -204,22 +206,36 @@ class KSchedulerConfig extends Zend_Config_Ini
 		if(!is_dir($this->configFileName))
 			return $this->configFileName;
 
-		if($this->configFilePaths)
-			return $this->configFilePaths;
+		if(!$this->configFilePaths)
+			$this->configFilePaths = $this->getCurrentConfigFilePaths();
 
+		return $this->configFilePaths;
+	}
+	
+	protected function getCurrentConfigFilePaths() 
+	{
+		$configFilePaths = array();
 		$d = dir($this->configFileName);
 		while (false !== ($file = $d->read()))
 		{
 			if(preg_match('/\.ini$/', $file))
-				$this->configFilePaths[] = $this->configFileName . DIRECTORY_SEPARATOR . $file;
+				$configFilePaths[] = $this->configFileName . DIRECTORY_SEPARATOR . $file;
 		}
 		$d->close();
-
-		return $this->configFilePaths;
+		
+		return $configFilePaths;
 	}
 
 	public function reloadRequired()
 	{
+		// Check config path udpated
+		$filePaths = $this->getCurrentConfigFilePaths();
+		if($this->getConfigFilePaths() != $filePaths) {
+			$this->configFilePaths = $filePaths;
+			return true;
+		}
+		
+		// Check config content updated
 		$filemtime = $this->calculateFileTimestamp();
 		return ($filemtime > $this->configTimestamp);
 	}

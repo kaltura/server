@@ -16,8 +16,6 @@ class category extends Basecategory implements IIndexable
 	
 	protected $parent_category;
 	
-	protected $old_full_name = "";
-	
 	protected $old_parent_id = null;
 	
 	protected $old_inheritance_type = null;
@@ -31,6 +29,18 @@ class category extends Basecategory implements IIndexable
 	const FULL_NAME_EQUAL_MATCH_STRING = 'fullnameequalmatchstring';
 	
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
+	
+	/**
+	 * Array of entries that decremented in the current session and maybe not indexed yet
+	 * @var array
+	 */
+	protected static $decrementedEntryIds = array();
+	
+	/**
+	 * Array of entries that incremented in the current session and maybe not indexed yet
+	 * @var array
+	 */
+	protected static $incrementedEntryIds = array();
 	
 	public function save(PropelPDO $con = null)
 	{
@@ -324,16 +334,8 @@ class category extends Basecategory implements IIndexable
 	
 	public function setName($v)
 	{
-		$this->old_full_name = $this->getFullName();
-		
 		$v = categoryPeer::getParsedName($v);
 		parent::setName($v);
-	}
-	
-	public function setFullName($v)
-	{
-		$this->old_full_name = $this->getFullName();
-		parent::setFullName($v);
 	}
 	
 	/**
@@ -343,8 +345,6 @@ class category extends Basecategory implements IIndexable
 	
 	public function setParentId($v)
 	{
-		$this->old_full_name = $this->getFullName();
-		
 		$this->validateParentIdIsNotChild($v);
 		
 		if ($v !== 0)
@@ -380,29 +380,6 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * Increment entries count (will increment recursively the parent categories too)
-	 */
-	public function incrementEntriesCount($increase = 1, array $entryCategoriesAddedIds = null)
-	{
-		if($entryCategoriesAddedIds && $this->entryAlreadyBlongToCategory($entryCategoriesAddedIds))
-		{
-			KalturaLog::debug("Entry already blong to category");
-			return;
-		}
-		
-		$this->setEntriesCount($this->getEntriesCount() + $increase);
-		if($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if($parentCat)
-			{
-				$parentCat->incrementEntriesCount($increase, $entryCategoriesAddedIds);
-				$parentCat->save();
-			}
-		}
-	}
-      
-	/**
 	 * Increment direct entries count
 	 */
 	public function incrementDirectEntriesCount()
@@ -420,45 +397,11 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
-	 * Decrement entries count (will decrement recursively the parent categories too)
-	 */
-	public function decrementEntriesCount($decrease = 1, array $entryCategoriesRemovedIds = null)
-	{
-		if($this->entryAlreadyBlongToCategory($entryCategoriesRemovedIds))
-		{
-			KalturaLog::debug("Entry already blong to category");
-			return;
-		}
-		
-		if($this->getStatus() == CategoryStatus::PURGED)
-		{
-			KalturaLog::debug("Category already purged at [" . $this->getDeletedAt() . "]");
-			return;
-		}
-		
-		$newCount = $this->getEntriesCount() - $decrease;
-		
-		if($newCount < 0)
-			$newCount = 0;
-		$this->setEntriesCount($newCount);
-		
-		if($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if($parentCat)
-			{
-				$parentCat->decrementEntriesCount($decrease, $entryCategoriesRemovedIds);
-				$parentCat->save();
-			}
-		}
-	}
-	
-	/**
 	 * Decrement direct entries count (will decrement recursively the parent categories too)
 	 */
 	public function decrementDirectEntriesCount()
 	{
-		$this->setDirectEntriesCount($this->getDirectEntriesCount() - 1);
+		$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
 	}
       
 	/**
@@ -466,7 +409,7 @@ class category extends Basecategory implements IIndexable
 	*/
 	public function decrementPendingEntriesCount()
 	{
-		$this->setPendingEntriesCount($this->getPendingEntriesCount() - 1);
+		$this->setPendingEntriesCount(max(0, $this->getPendingEntriesCount() - 1));
 	}
       
 	protected function validateFullNameIsUnique()
@@ -618,7 +561,7 @@ class category extends Basecategory implements IIndexable
 	
 	protected function addMoveEntriesToCategoryJob($destCategoryId)
 	{
-		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId);
+		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, false, false, $this->getFullIds());
 	}
 	
 	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
@@ -803,7 +746,7 @@ class category extends Basecategory implements IIndexable
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("category:id=".$this->getId(), "category:partnerId=".$this->getPartnerId());
+		return array("category:id=".strtolower($this->getId()), "category:partnerId=".strtolower($this->getPartnerId()));
 	}
 	
 	/**
@@ -1230,8 +1173,10 @@ class category extends Basecategory implements IIndexable
 			return;
 		}
 
+		$privacyContexts = array();
 		$parentCategory = $this->getParentCategory();
-		$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
+		if($parentCategory)
+			$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
 		$privacyContexts[] = $v;
 		
 		$privacyContextsTrimed = array();
@@ -1362,11 +1307,93 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function reSetEntriesCount()
 	{
-		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$criteria->addAnd(categoryEntryPeer::CATEGORY_FULL_IDS, $this->getFullIds() . '%', Criteria::LIKE);
-		$count = categoryEntryPeer::doCount($criteria);
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
 
 		$this->setEntriesCount($count);
+	}
+	
+	/**
+	 * Decrement category's entriesCount by calculate it.
+	 */
+	public function decrementEntriesCount($entryId)
+	{
+		KalturaLog::debug("decrementing $entryId from " . $this->getFullName());
+		if(!isset(self::$decrementedEntryIds[$this->getId()]))
+			self::$decrementedEntryIds[$this->getId()] = array();
+		self::$decrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
+		
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setIdNotIn(self::$decrementedEntryIds[$this->getId()]);
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
+
+		$this->setEntriesCount($count);
+	
+		if($this->getParentId())
+		{
+			$parentCat = $this->getParentCategory();
+			if($parentCat)
+			{
+				$parentCat->decrementEntriesCount($entryId);
+				$parentCat->save();
+			}
+		}
+	}
+	
+	/**
+	 * Decrement category's entriesCount by calculate it.
+	 */
+	public function incrementEntriesCount($entryId)
+	{
+		KalturaLog::debug("incrementing $entryId to " . $this->getFullName());
+		if(!isset(self::$incrementedEntryIds[$this->getId()]))
+			self::$incrementedEntryIds[$this->getId()] = array();
+		self::$incrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
+		
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setIdNotIn(self::$incrementedEntryIds[$this->getId()]);
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
+		$count += count(self::$incrementedEntryIds[$this->getId()]);
+		
+		$this->setEntriesCount($count);
+	
+		if($this->getParentId())
+		{
+			$parentCat = $this->getParentCategory();
+			if($parentCat)
+			{
+				$parentCat->incrementEntriesCount($entryId);
+				$parentCat->save();
+			}
+		}
 	}
 	
 	/**
@@ -1374,9 +1401,16 @@ class category extends Basecategory implements IIndexable
 	 */
 	public function reSetDirectEntriesCount()
 	{
-		$criteria = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
-		$criteria->addAnd(categoryEntryPeer::CATEGORY_ID, $this->getId());
-		$count = categoryEntryPeer::doCount($criteria);
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->setCategoriesIdsMatchAnd($this->getId());
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
 
 		$this->setDirectEntriesCount($count);
 	}

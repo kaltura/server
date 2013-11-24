@@ -632,6 +632,11 @@ class entryFilter extends baseObjectFilter
 		$this->set('_matchand_categories_ids', $v);
 	}
 	
+	public function setCategoryAncestorId($v)
+	{
+		$this->set('_in_category_ancestor_id', $v);
+	}
+	
 	public function typeMatches(entry $entry)
 	{		
 		if ($this->get('_eq_type') && $entry->getType() != $this->get('_eq_type'))

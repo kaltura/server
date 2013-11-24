@@ -36,6 +36,7 @@ class kFlowHelper
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
 		$flavorAsset->setIsOriginal(true);
+		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
 		$flavorAsset->save();
@@ -169,7 +170,17 @@ class kFlowHelper
 
 		if($ext)
 			$flavorAsset->setFileExt($ext);
+			
+		if($flavorAsset instanceof thumbAsset)
+		{
+			list($width, $height, $type, $attr) = getimagesize($data->getDestFileLocalPath());
+			
+			$flavorAsset->setWidth($width);
+			$flavorAsset->setHeight($height);
+			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
+		}
 		$flavorAsset->save();
+		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
 
@@ -247,7 +258,10 @@ class kFlowHelper
 
 		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
-			kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+			$conversionCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+			
+			if(!$conversionCreated)
+				return $dbBatchJob;
 
 			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
 			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
@@ -1070,7 +1084,8 @@ class kFlowHelper
 			if(is_null($alternateFlavorParamsId))
 			{
 				$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-				$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
+				if($srcFlavorAsset)
+					$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
 			}
 
 			if(is_null($alternateFlavorParamsId))
@@ -1469,13 +1484,14 @@ class kFlowHelper
 		{
 			$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
 
-			if($conversionsCreated)
-			{
-				// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
-				$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-				if($currentFlavorAsset)
-					$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
-			}
+			if(!$conversionsCreated)
+				return $dbBatchJob;
+			
+			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
+			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			if($currentFlavorAsset)
+				$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
+			
 		}
 
 		// mark the job as almost done

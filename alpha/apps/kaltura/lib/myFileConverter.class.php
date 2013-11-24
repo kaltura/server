@@ -425,7 +425,7 @@ class myFileConverter
 	 */
 	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT,
 		$crop_type = self::CROP_TYPE_ORIGINAL_ASPECT_RATIO, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $thumbParams = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -459,6 +459,9 @@ class myFileConverter
 		}
 		else
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));
+		
+		if(!is_null($format))
+			$target_file = kFile::replaceExt($target_file, $format);
 		
 		// do convertion
 		$status = null;

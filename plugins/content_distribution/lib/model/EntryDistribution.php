@@ -404,7 +404,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	}
 	public function getCacheInvalidationKeys()
 	{
-		return array("entryDistribution:entryId=".$this->getEntryId());
+		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
 	}
 	
 } // EntryDistribution

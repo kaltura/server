@@ -950,6 +950,7 @@ class myReportsMgr
 				"added_storage",
 				"deleted_storage",
 				"combined_bandwidth_storage",
+				"transcoding_usage",
 			    "month_id,partner_id",
 			    "date_id,partner_id",
 			),
@@ -962,6 +963,7 @@ class myReportsMgr
 				"added_storage",
 				"deleted_storage",
 				"combined_bandwidth_storage",
+				"transcoding_consumption"
 			),
 			"user_usage" => array (
 				"added_entries",

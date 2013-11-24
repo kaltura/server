@@ -439,7 +439,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 	
 	private function appendLine($txt = "")
 	{
-		$this->_txt .= $txt ."\n";
+		$this->_txt .= $txt . PHP_EOL;
 	}
 	
 	private function writeToFile($fileName, $contents)
