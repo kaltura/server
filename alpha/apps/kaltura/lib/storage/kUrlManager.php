@@ -318,6 +318,33 @@ class kUrlManager
 		return $url;
 	}
 
+	/**
+	 * @param asset $asset
+	 * @return string
+	 */
+	public function getPlayManifestUrl(asset $asset)
+	{
+		$url = null;
+		
+		if($asset instanceof thumbAsset)
+			$url = $this->doGetThumbnailAssetUrl($asset);
+		
+		if($asset instanceof flavorAsset)
+		{
+			$entryId = $asset->getEntryId();
+			$partnerId = $asset->getPartnerId();
+			$subpId = $asset->getentry()->getSubpId();
+			$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+			$flavorAssetId = $asset->getId();
+			
+			$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$this->domain";
+			if($this->storageProfileId)
+				$url .= "/storageId/$this->storageProfileId";
+		}
+		
+		return $url;
+	}
+
 	protected function getFlavorVersionString(flavorAsset $flavorAsset)
 	{
 		$entry = $flavorAsset->getentry();
