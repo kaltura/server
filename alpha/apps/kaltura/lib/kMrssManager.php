@@ -255,7 +255,7 @@ class kMrssManager
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
 			$urlManager->setDomain($cdnHost);
 			
-			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset);
+			$url = $cdnHost . $urlManager->getPlayManifestUrl($asset);
 		}
 		else
 		{
