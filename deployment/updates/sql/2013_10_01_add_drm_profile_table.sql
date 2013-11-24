@@ -12,5 +12,5 @@ CREATE TABLE IF NOT EXISTS `drm_profile`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY `partner_id_index`(`partner_id`)
+	KEY partner_id_provider_status (partner_id, provider, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
