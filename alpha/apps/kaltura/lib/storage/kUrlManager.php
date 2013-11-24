@@ -480,6 +480,7 @@ class kUrlManager
 			KalturaLog::err('Unable to use util when php curl is not enabled');
 			return false;  
 		}
+		KalturaLog::log("Checking URL [$url] with range [$range]");
 		$ch = curl_init($url);  
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);  
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);  
@@ -523,10 +524,20 @@ class kUrlManager
 
 		foreach ($lines as $line)
 		{
-			$line = trim($line);
-			if(substr($line, -strlen('.m3u8')) != '.m3u8')
+			$explodedLine = explode("\n", $line);
+			// find a line that does not start with #
+			array_shift($explodedLine);	// drop the line of the EXT-X-STREAM-INF
+			$streamUrl = null;
+			foreach ($explodedLine as $curLine)
+			{
+				$curLine = trim($curLine);
+				if (!$curLine || $curLine[0] == '#')
+					continue;
+				$streamUrl = $curLine;
+				break;
+			}
+			if (!$streamUrl || strpos($streamUrl, '.m3u8') === false)
 				continue;
-			$streamUrl = $line;
 			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
 			
 			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
