@@ -1,10 +1,7 @@
 <?php
-
-
 class kUploadTokenMgr
 {
 	const NO_EXTENSION_IDENTIFIER = 'noext';
-	
 	/**
 	 * @var UploadToken
 	 */
