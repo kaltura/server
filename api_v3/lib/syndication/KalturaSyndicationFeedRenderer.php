@@ -584,7 +584,7 @@ class KalturaSyndicationFeedRenderer
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
 		$urlManager->setDomain($this->cdnHost);
 		
-		if($this->syndicationFeedDb->getServePlayManifest())
+		if($this->syndicationFeedDB->getServePlayManifest())
 		{
 			$url = $urlManager->getPlayManifestUrl($flavorAsset);
 		}
