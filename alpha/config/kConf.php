@@ -40,7 +40,8 @@ class kConf extends kEnvironment
 		$reloadFileExists = file_exists("$cacheDir/base.reload");
 
 		// fetch the cache version from APC
-		$cacheVersionKey = self::APC_CACHE_MAP . md5(realpath(__file__));
+		$fileHash = md5(realpath(__file__));
+		$cacheVersionKey = self::APC_CACHE_MAP . $fileHash;
 		
 		if (!$reloadFileExists && function_exists('apc_fetch'))
 		{
@@ -53,7 +54,7 @@ class kConf extends kEnvironment
 		}
 		
 		// no cache version in APC - create a new one
-		self::$cacheVersion = time();
+		self::$cacheVersion = substr(time(), -6) . substr($fileHash, 0, 4);
 		self::$cacheKey = 'kConf-'.self::$cacheVersion;
 		
 		// save the cache version
