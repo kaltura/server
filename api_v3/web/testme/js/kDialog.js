@@ -203,6 +203,31 @@ kDialog.prototype.onFieldAdd = function(field){
 	this.fieldsCount++;
 };
 
+kDialog.prototype.removeRequest = function(removeSubRequestAction){
+
+    if(this.keepRequest)
+            return;
+
+    //removing names from field to make sure they won't be submitted
+    this.jqParamsContainer.find('input,select').each(function(){
+            var field = jQuery(this);
+            if(!field.attr('name').length)
+                    return;
+
+            if(!removeSubRequestAction && field.hasClass('sub-request-action'))
+                    return;
+
+            field.attr('id', field.attr('name'));
+            field.removeAttr('name');
+    });
+
+    for(var item in this.fields)
+    {
+            var field = this.fields[item];
+            field.removeRequest(removeSubRequestAction);
+    }
+};
+
 /**
  * Class that represents a single request, as stand alone or as part of multi-request
  * @class kObjectDialog
@@ -335,32 +360,11 @@ kCall.prototype.getTitle = function(){
 /**
  * Returns the current request data
  */
-kCall.prototype.removeRequest = function(removeSubRequestAction){
-
-	if(this.keepRequest)
-		return;
-	
-	// removing names from field to make sure they won't be submitted
-	kTestMe.jqObjectsContainer.find('input,select').each(function(){
-		var field = jQuery(this);
-		if(!field.attr('name').length)
-			return;
-		
-		if(!removeSubRequestAction && field.hasClass('sub-request-action'))
-			return;
-			
-		field.attr('id', field.attr('name'));
-		field.removeAttr('name');
-	});
-};
-
-/**
- * Returns the current request data
- */
 kCall.prototype.getRequest = function(requestIndex){
 
 	var ret = {
 			index: requestIndex,
+			fields: this.fields,
 			serviceId: this.getServiceId(),
 			actionId: this.getActionId(),
 			jqParamsContainer: this.jqParamsContainer.clone(true)
@@ -411,6 +415,7 @@ kCall.prototype.setRequest = function(request){
 
 	this.keepRequest = true;
 	this.setAction(request.serviceId, request.actionId);
+	this.fields = request.fields;
 	this.keepRequest = false;
 	
 	this.jqParamsContainer.remove();

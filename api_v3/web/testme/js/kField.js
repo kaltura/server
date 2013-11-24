@@ -184,6 +184,9 @@ kField.prototype = {
 			this.enable();
 		else
 			this.disable();
+	},
+	
+	removeRequest: function(){
 	}
 };
 
@@ -325,6 +328,11 @@ kObjectField.prototype.initListeners = function() {
 kObjectField.prototype.remove = function(){
 	this.close(true);
 	kField.prototype.remove.apply(this, arguments);
+};
+
+kObjectField.prototype.removeRequest = function(removeSubRequestAction){
+	if(this.dialog != null)
+		this.dialog.removeRequest(removeSubRequestAction);
 };
 
 kObjectField.prototype.getLevel = function(){
@@ -532,6 +540,14 @@ kArrayField.prototype.remove = function(){
 	kField.prototype.remove.apply(this, arguments);
 };
 
+kArrayField.prototype.removeRequest = function(removeSubRequestAction){
+	for(var item in this.fields)
+	{
+		var field = this.fields[item];
+		field.removeRequest(removeSubRequestAction);
+	}
+};
+
 kArrayField.prototype.getLevel = function(){
 	return this.level;
 };
@@ -717,6 +733,11 @@ kCallLink.prototype.call = null;
 kCallLink.prototype.remove = function(){
 	this.close(true);
 	kField.prototype.remove.apply(this, arguments);
+};
+
+kCallLink.prototype.removeRequest = function(removeSubRequestAction){
+	if(this.dialog != null)
+		this.dialog.removeRequest(removeSubRequestAction);
 };
 
 kCallLink.prototype.getLevel = function(){
