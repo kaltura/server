@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/kApiCache.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kApiCache.php');
 
 class kPlayManifestCacher extends kApiCache
 {

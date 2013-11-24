@@ -137,9 +137,23 @@ class accessControl extends BaseaccessControl
 	 * 
 	 * @return boolean
 	 */
-	public function hasRules()
+	public function hasRules($contextType = null)
 	{
-		return count($this->getRulesArray()) ? true : false;
+		$rules = $this->getRulesArray();
+		if (is_null($contextType))
+			return count($rules) ? true : false;
+		
+		foreach($rules as $rule)
+		{
+			/* @var $rule kRule */
+			$contexts = $rule->getContexts();
+			if(!is_array($contexts) || !count($contexts))
+				return true;
+			
+			if (in_array($contextType, $contexts))
+				return true;
+		}
+		return false;
 	}
 	
 	/**

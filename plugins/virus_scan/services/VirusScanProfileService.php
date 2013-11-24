@@ -19,7 +19,7 @@ class VirusScanProfileService extends KalturaBaseService
 		}
 		
 		if(!VirusScanPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, VirusScanPlugin::PLUGIN_NAME);
 	}
 	
 	/**

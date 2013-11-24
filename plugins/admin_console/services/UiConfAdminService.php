@@ -15,7 +15,7 @@ class UiConfAdminService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 
 		if(!AdminConsolePlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, AdminConsolePlugin::PLUGIN_NAME);
 	}
 	
 	/**

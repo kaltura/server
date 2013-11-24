@@ -13,7 +13,7 @@ class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 		"nameOrReferenceIdStartsWith" => "_likex_name_or_reference_id",
 		"managerEqual" => "_eq_manager",
 		"memberEqual" => "_eq_member",
-		"fullNameStartsWithIn" => '_matchor_likex_full_name',
+		"fullNameStartsWithIn" => "_matchor_likex_full_name",
 		"ancestorIdIn" => "_in_ancestor_id",
 		"idOrInheritedParentIdIn" => "_in_id-inherited_parent_id",
 	);

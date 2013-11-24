@@ -39,6 +39,7 @@ class BatchJobLogFilter extends baseObjectFilter
 			"_notin_partner_id",
 			"_gte_created_at",
 			"_lte_created_at",
+			"_eq_created_at",
 			"_gte_updated_at",
 			"_lte_updated_at",
 			"_gte_processor_expiration",

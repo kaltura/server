@@ -80,6 +80,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 									'kLevel3UrlManager' => 'Level 3 CDN',
 									'kMirrorImageUrlManager' => 'Mirror Image CDN',
 									'kFmsUrlManager' => 'FMS Server',
+									'kUplynkUrlManager' => 'Uplynk',
 									),		
 			
 		));

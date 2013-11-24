@@ -61,10 +61,6 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 				$this->content = new KalturaEvalStringField();
 				break;
 				
-			case 'kHttpNotificationObjectField':
-				$this->content = new KalturaHttpNotificationObjectField();
-				break;
-				
 			default:
 				$this->content = KalturaPluginManager::loadObject('KalturaStringValue', $contentType);
 				break;

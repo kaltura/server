@@ -1303,8 +1303,10 @@ class category extends Basecategory implements IIndexable
 			return;
 		}
 
+		$privacyContexts = array();
 		$parentCategory = $this->getParentCategory();
-		$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
+		if($parentCategory)
+			$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
 		$privacyContexts[] = $v;
 		
 		$privacyContextsTrimed = array();

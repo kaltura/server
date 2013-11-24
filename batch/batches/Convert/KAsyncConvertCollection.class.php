@@ -26,14 +26,6 @@ class KAsyncConvertCollection extends KAsyncConvert
 		return KalturaBatchJobType::CONVERT_COLLECTION;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
 	protected function convertImpl(KalturaBatchJob $job, KalturaConvartableJobData $data)
 	{
 		return $this->convertCollection($job, $data);
