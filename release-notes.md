@@ -64,6 +64,10 @@ Kaltura live stream, including DVR configuration and live transcoding.
 **Wowza**
 
  - Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+ - Copy additional jar files (available in Kaltura Java client library) to @WOWZA_DIR@/lib/
+   - commons-codec-1.4.jar
+   - commons-httpclient-3.1.jar
+   - commons-logging-1.1.1.jar 
  - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
  - Create @WOWZA_DIR@/applications/kLive directory.
  - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
@@ -71,6 +75,7 @@ Kaltura live stream, including DVR configuration and live transcoding.
  - Copy @WOWZA_DIR@/conf/Application.xml to @WOWZA_DIR@/conf/kLive/Application.xml
  - **Edit @WOWZA_DIR@/conf/kLive/Application.xml:**
    - /Root/Application/Streams/StreamType - live
+   - /Root/Application/Streams/StorageDir - @WEB_DIR@/content/recorded
    - /Root/Application/Properties, add new properties:
      - HTTP origin mode
          - Name - httpOriginMode
