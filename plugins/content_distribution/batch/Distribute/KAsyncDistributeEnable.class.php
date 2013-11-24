@@ -16,14 +16,6 @@ class KAsyncDistributeEnable extends KAsyncDistribute
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::getDistributionEngine()
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)

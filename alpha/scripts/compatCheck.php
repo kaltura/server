@@ -929,7 +929,10 @@ function generateKalcliCommand($ipAddress, $service, $action, $parsedParams)
 		
 		$curParam = "{$key}={$value}";
 		if (!preg_match('/^[a-zA-Z0-9\:_\-,=\.\/]+$/', $curParam))
-			$kalcliCmd .= " '{$curParam}'";
+			if (strpos($curParam, "'") === false)
+				$kalcliCmd .= " '{$curParam}'";
+			else
+				$kalcliCmd .= " \"{$curParam}\"";
 		else
 			$kalcliCmd .= " {$curParam}";
 	}

@@ -31,9 +31,6 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 		
 		self::$baseServiceUrl = KBatchBase::$taskConfig->params->restapi->akamaiRestApiBaseServiceUrl;
 		
-		$username = null;
-		$password = null;
-		
 		if (!is_null($data) && $data instanceof KalturaAkamaiUniversalProvisionJobData)
 		{
 			//all fields are set and are not empty string
@@ -45,7 +42,7 @@ class KProvisionEngineUniversalAkamai extends KProvisionEngine
 			}
 		}
 		//if one of the params was not set, use the taskConfig data	
-		if (!$username || !$password )
+		if (!$this->systemUser || !$this->systemPassword || !$this->domainName)
 		{
 			$this->systemUser = KBatchBase::$taskConfig->params->restapi->systemUserName;
 			$this->systemPassword = KBatchBase::$taskConfig->params->restapi->systemPassword;

@@ -29,7 +29,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		}
 		
 		if(!CaptionSearchPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CaptionSearchPlugin::PLUGIN_NAME);
 	}
 	
     /**
@@ -76,6 +76,11 @@ class CaptionAssetItemService extends KalturaBaseService
     		$content = '';
     		foreach ($itemData['content'] as $curChunk)
     			$content .= $curChunk['text'];
+    			
+    		//Make sure there are no invalid chars in the caption asset items to avoid braking the search request by providing invalid XML
+    		$content = kString::stripUtf8InvalidChars($content);
+    		$content = kXml::stripXMLInvalidChars($content);
+    		
     		$item->setContent($content);
     		$item->save();
     	}

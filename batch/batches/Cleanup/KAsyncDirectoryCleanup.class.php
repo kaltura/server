@@ -21,14 +21,6 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	}
 
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-
-	/* (non-PHPdoc)
 	 * @see KBatchBase::run()
 	*/
 	public function run($jobs = null)

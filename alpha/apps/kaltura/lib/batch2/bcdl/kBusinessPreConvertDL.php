@@ -65,7 +65,13 @@ class kBusinessPreConvertDL
 			if($srcAsset && $srcAsset->isLocalReadyStatus())
 				return $srcAsset;
 		}
-					
+
+		KalturaLog::debug("Look for a flavor tagged with thumbsource of entry [$entryId]");
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+		if($srcAsset && $srcAsset->isLocalReadyStatus())
+			return $srcAsset;
+		
+		
 		KalturaLog::debug("Look for original flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())

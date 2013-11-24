@@ -15,8 +15,6 @@ class UploadTokenFilter extends baseObjectFilter
 			"_eq_user_id",
 			"_eq_status",
 			"_in_status",
-			"_gte_created_at",
-			"_lte_created_at",
 			"_eq_file_name",
 			"_eq_file_size",
 			) , NULL );

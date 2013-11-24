@@ -18,13 +18,14 @@ class MetadataBatchService extends KalturaBatchService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return.
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs
+	 * @param int $maxOffset The maximum offset we accept for the distance from the best result.
 	 * @return KalturaBatchJobArray
 	 *
 	 * TODO remove the destXsdPath from the job data and get it later using the api, then delete this method
 	 */
-	function getExclusiveTransformMetadataJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	function getExclusiveTransformMetadataJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $maxOffset = null)
 	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::METADATA_TRANSFORM);
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::METADATA_TRANSFORM, $maxOffset);
 
 		if($jobs)
 		{

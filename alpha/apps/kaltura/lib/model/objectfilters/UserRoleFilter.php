@@ -12,6 +12,8 @@ class UserRoleFilter extends baseObjectFilter
 				'_in_id',
 				'_eq_name',
 				'_in_name',
+				'_eq_system_name',
+				'_in_system_name',
 				'_like_description',
 				'_eq_status',
 				'_in_status',

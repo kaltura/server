@@ -80,8 +80,9 @@ class localMgr extends kFileTransferMgr
 	{
 		if($this->createLink)
 			return true;
-			
-		$chmod_code = intval(str_pad ( $chmod_code, 4, '0', STR_PAD_LEFT ), 8); //convert to 0 padded octal value	
+						
+		$chmod_code = octdec ( str_pad ( $chmod_code, 4, '0', STR_PAD_LEFT ) );
+		$chmod_code = (int) $chmod_code;
 		return chmod($remote_file, $chmod_code);
 	}
 

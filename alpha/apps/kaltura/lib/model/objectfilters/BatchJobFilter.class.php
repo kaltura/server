@@ -18,7 +18,12 @@ class BatchJobFilter extends baseObjectFilter
 			"_lte_queue_time",
 			"_gte_finish_time",
 			"_lte_finish_time",
-			"_in_err_type");
+			"_in_err_type",
+			"_eq_err_type",
+			"_notin_err_type",
+			"_in_err_number",
+			"_eq_err_number",
+			"_notin_err_number");
 	
 	 protected $BATCH_JOB_LOCK_FIELDS = array(
 			"_gte_expiration",
@@ -50,6 +55,7 @@ class BatchJobFilter extends baseObjectFilter
 			"_notin_job_sub_type",
 			"_eq_status",
 			"_in_status",
+			"_notin_status",
 			"_gte_priority",
 			"_lte_priority",
 			"_eq_priority",

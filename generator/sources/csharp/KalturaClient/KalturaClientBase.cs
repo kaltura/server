@@ -202,38 +202,40 @@ namespace Kaltura
             }
 
             // get the response
-            WebResponse response = request.GetResponse();
-            Encoding enc = System.Text.Encoding.UTF8;
-            StreamReader responseStream = new StreamReader(response.GetResponseStream(), enc);
-            string responseString = responseStream.ReadToEnd();
+            using (WebResponse response = request.GetResponse())
+            {
+                Encoding enc = System.Text.Encoding.UTF8;
+                StreamReader responseStream = new StreamReader(response.GetResponseStream(), enc);
+                string responseString = responseStream.ReadToEnd();
 
-			this._ResponseHeaders = response.Headers;
-			string serverName = null;
-			string serverSession = null;
-			for(int i = 0; i < this._ResponseHeaders.Count; ++i)  
-			{
-				if (this._ResponseHeaders.Keys[i] == "X-Me")
-                    serverName = this._ResponseHeaders[i];
-				if (this._ResponseHeaders.Keys[i] == "X-Kaltura-Session")
-					serverSession = this._ResponseHeaders[i];
-			}
-			if (serverName != null || serverSession != null)
-				this.Log("server: [" + serverName + "], session: [" + serverSession + "]");
-			
-            this.Log("result (serialized): " + responseString);
+                this._ResponseHeaders = response.Headers;
+                string serverName = null;
+                string serverSession = null;
+                for (int i = 0; i < this._ResponseHeaders.Count; ++i)
+                {
+                    if (this._ResponseHeaders.Keys[i] == "X-Me")
+                        serverName = this._ResponseHeaders[i];
+                    if (this._ResponseHeaders.Keys[i] == "X-Kaltura-Session")
+                        serverSession = this._ResponseHeaders[i];
+                }
+                if (serverName != null || serverSession != null)
+                    this.Log("server: [" + serverName + "], session: [" + serverSession + "]");
 
-            DateTime endTime = DateTime.Now;
+                this.Log("result (serialized): " + responseString);
 
-            this.Log("execution time for [" + url + "]: [" + (endTime - startTime).ToString() + "]");
+                DateTime endTime = DateTime.Now;
 
-            XmlDocument xml = new XmlDocument();
-            xml.LoadXml(responseString);
+                this.Log("execution time for [" + url + "]: [" + (endTime - startTime).ToString() + "]");
 
-            this.ValidateXmlResult(xml);
-            XmlElement result = xml["xml"]["result"];
-            this.ThrowExceptionOnAPIError(result);
+                XmlDocument xml = new XmlDocument();
+                xml.LoadXml(responseString);
 
-            return result;
+                this.ValidateXmlResult(xml);
+                XmlElement result = xml["xml"]["result"];
+                this.ThrowExceptionOnAPIError(result);
+
+                return result;
+            }
         }
         private void createProxy(HttpWebRequest request, KalturaConfiguration _Config)
         {
@@ -267,8 +269,9 @@ namespace Kaltura
 			}
             foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
             {
-                if (arrayNode["error"] != null)
-                    multiResponse.Add(new KalturaAPIException(arrayNode["error"]["code"].InnerText, arrayNode["error"]["message"].InnerText));
+				XmlElement error = arrayNode["error"];
+				if (error != null && error["code"] != null && error["message"] != null)
+                    multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
                 else if (arrayNode["objectType"] != null)
                     multiResponse.Add(KalturaObjectFactory.Create(arrayNode));
                 else
@@ -388,7 +391,7 @@ namespace Kaltura
         private void ThrowExceptionOnAPIError(XmlElement result)
         {
             XmlElement error = result["error"];
-            if (error != null)
+            if (error != null && error["code"] != null && error["message"] != null)
                 throw new KalturaAPIException(error["code"].InnerText, error["message"].InnerText);
         }
 

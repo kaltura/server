@@ -23,7 +23,7 @@ class kApiCache extends kApiCacheBase
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '4';
+	const CACHE_VERSION = '5';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
@@ -99,12 +99,6 @@ class kApiCache extends kApiCacheBase
 		if(isset($this->_params['clientTag']))
 			$this->clientTag = $this->_params['clientTag'];
 		
-		if (!kConf::get('enable_cache') ||
-			$this->isCacheDisabled())
-		{
-			return false;
-		}
-
 		$ks = $this->getKs();
 		if ($ks === false)
 		{
@@ -138,7 +132,13 @@ class kApiCache extends kApiCacheBase
 		{
 			apache_note("Kaltura_PartnerId", $this->_partnerId);
 		}
-		
+
+		if (!kConf::get('enable_cache') ||
+			$this->isCacheDisabled())
+		{
+			return false;
+		}
+
 		return true;
 	}
 
@@ -574,7 +574,7 @@ class kApiCache extends kApiCacheBase
 			if ($action != 'multirequest' && isset($this->_params['action']))
 				$action = $this->_params['service'] . '.' . $this->_params['action'];
 		
-			KalturaMonitorClient::monitor($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $isInMultiRequest);
+			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
 		}
 		
 		return $result;

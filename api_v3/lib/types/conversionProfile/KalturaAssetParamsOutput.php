@@ -7,25 +7,21 @@ class KalturaAssetParamsOutput extends KalturaAssetParams
 {
 	/**
 	 * @var int
-	 * @filter eq
 	 */
 	public $assetParamsId;
 	
 	/**
 	 * @var string
-	 * @filter eq
 	 */
 	public $assetParamsVersion;
 	
 	/**
 	 * @var string
-	 * @filter eq
 	 */
 	public $assetId;
 	
 	/**
 	 * @var string
-	 * @filter eq
 	 */
 	public $assetVersion;
 	
@@ -38,7 +34,6 @@ class KalturaAssetParamsOutput extends KalturaAssetParams
 	 * The container format of the Flavor Params
 	 *  
 	 * @var KalturaContainerFormat
-	 * @filter eq
 	 */
 	public $format;
 	

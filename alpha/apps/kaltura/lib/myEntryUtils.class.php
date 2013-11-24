@@ -637,7 +637,7 @@ class myEntryUtils
 	
 	
 	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
@@ -663,6 +663,9 @@ class myEntryUtils
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
 		$basePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $tempThumbName, $entryThumbFilename , $version );
 		$tempThumbPath = $contentPath.$basePath;
+		
+		if(!is_null($format))
+			$tempThumbPath = kFile::replaceExt($tempThumbPath, $format);
 		
 		if (file_exists($tempThumbPath) && @filesize($tempThumbPath))
 		{
@@ -794,7 +797,7 @@ class myEntryUtils
 				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
 					$tempThumbPath = kFile::replaceExt($tempThumbPath, "gif");
 
-				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams);
+				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format);
 			}
 			
 			// die if resize operation failed and add failed resizing to cache
@@ -824,7 +827,7 @@ class myEntryUtils
 			imagejpeg($im, $tempThumbPath);
 			imagedestroy($im);
 		}		
-		return $tempThumbPath;
+		return $convertedImagePath;
 	}
 	
 	//

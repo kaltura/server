@@ -143,7 +143,12 @@ foreach($config as $name => $item)
 	$isInternal = $item->get("internal");
 	
 	if ($isInternal === null || ($useReadySchema != null && $useReadySchema != ''))
-		$generatedClients[] = $name;
+	{
+		$params = array(
+			'linkhref' => $item->get('linkhref'),
+			'linktext' => $item->get('linktext'));
+		$generatedClients[$name] = $params;
+	}
 	
 	KalturaLog::info("Now generating: $name using $generator");
 	
@@ -245,7 +250,7 @@ foreach($config as $name => $item)
 	
 	$copyPath = null;
 	if($item->get("copyPath"))
-		$copyPath = $item->get("copyPath");
+		$copyPath = KALTURA_ROOT_PATH . '/' . $item->get("copyPath");
 	
 	if ($mainOutput)
 	{ 
@@ -256,7 +261,7 @@ foreach($config as $name => $item)
 		$outputPath = "$outputPathBase/$name";
 		$clearPath = null;
 		if($item->get("clearPath"))
-			$clearPath = $item->get("clearPath");
+			$clearPath = KALTURA_ROOT_PATH . '/' . $item->get("clearPath");
 		else
 			$clearPath = $copyPath;
 		

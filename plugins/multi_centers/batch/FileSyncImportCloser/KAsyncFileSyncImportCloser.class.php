@@ -1,6 +1,4 @@
 <?php
-require_once(__DIR__ . "/../../../../batch/bootstrap.php");
-
 /**
  *
  *
@@ -15,14 +13,6 @@ class KAsyncFileSyncImportCloser extends KJobCloserWorker
 	public static function getType()
 	{
 		return KalturaBatchJobType::FILESYNC_IMPORT;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
 	}
 	
 	/* (non-PHPdoc)

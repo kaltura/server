@@ -122,7 +122,7 @@ class thumbnailAction extends sfAction
 		$bgcolor = $this->getRequestParameter( "bgcolor", "ffffff" );
 		$partner = null;
 		
-		
+		$format = $this->getRequestParameter( "format", null);
 		
 		// validating the inputs
 		if(!is_numeric($quality) || $quality < 0 || $quality > 100)
@@ -157,7 +157,7 @@ class thumbnailAction extends sfAction
 
 		if(!$vid_slices)
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
-				
+
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
@@ -197,7 +197,7 @@ class thumbnailAction extends sfAction
 					}
 						
 					// and resize it
-					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
+					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, null, $format);
 					kFileUtils::dumpFile($thumb_full_path);
 				} else {
 					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
@@ -346,7 +346,7 @@ class thumbnailAction extends sfAction
 			try
 			{
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, null, $density, $stripProfiles, $thumbParams);
+				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, null, $density, $stripProfiles, $thumbParams, $format);
 			}
 			catch(Exception $ex)
 			{
@@ -391,7 +391,7 @@ class thumbnailAction extends sfAction
 		
 		$nocache = false;
 		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
-			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules()))
+			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules(ContextType::THUMBNAIL)))
 			$nocache = true;
 
 		if ($nocache)

@@ -209,6 +209,6 @@ class Permission extends BasePermission
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("permission:partnerId=".$this->getPartnerId());
+		return array("permission:partnerId=".strtolower($this->getPartnerId()));
 	}
 } // Permission

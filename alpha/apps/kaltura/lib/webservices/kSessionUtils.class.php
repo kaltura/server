@@ -683,8 +683,15 @@ class ks extends kSessionBase
 
 		$ksVersion = $partner->getKSVersion();
 
-		if (function_exists('apc_store'))
-			apc_store(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
+		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
+		foreach ($cacheSections as $cacheSection)
+		{
+			$cacheStore = kCacheManager::getCache($cacheSection);
+			if (!$cacheStore)
+				continue;
+			
+			$cacheStore->set(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
+		}
 		
 		return array($ksVersion, $partner->getAdminSecret());
 	}

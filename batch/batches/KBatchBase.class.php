@@ -42,11 +42,6 @@ abstract class KBatchBase implements IKalturaLogger
 	protected $monitorHandle = null;
 
 	/**
-	 * @return KalturaBatchJobType
-	 */
-	abstract protected function getJobType();
-
-	/**
 	 * @param array $jobs
 	 * @return array $jobs
 	 */

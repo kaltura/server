@@ -17,7 +17,7 @@ class VarConsoleService extends KalturaBaseService
 		
 		if(!VarConsolePlugin::isAllowedPartner($this->getPartnerId()))
 		{
-		    throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+		    throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, VarConsolePlugin::PLUGIN_NAME);
 		}	
     }
     
