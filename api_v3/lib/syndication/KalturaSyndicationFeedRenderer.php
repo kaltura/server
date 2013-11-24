@@ -543,8 +543,20 @@ class KalturaSyndicationFeedRenderer
 			return null;
 			
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $flavorAsset->getEntryId());
-		$urlManager->setFileExtension($flavorAsset->getFileExt());
-		$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		
+		if($this->syndicationFeedDb->getServePlayManifest())
+		{
+			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+			$urlManager->setDomain($cdnHost);
+			
+			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset);
+		}
+		else
+		{
+			$urlManager->setFileExtension($flavorAsset->getFileExt());
+			
+			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		}
 		
 		return $url;
 	}
@@ -571,7 +583,16 @@ class KalturaSyndicationFeedRenderer
 		
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
 		$urlManager->setDomain($this->cdnHost);
-		$url = $urlManager->getAssetUrl($flavorAsset);
+		
+		if($this->syndicationFeedDb->getServePlayManifest())
+		{
+			$url = $urlManager->getPlayManifestUrl($flavorAsset);
+		}
+		else
+		{
+			$url = $urlManager->getAssetUrl($flavorAsset);
+		}
+		
 		return $this->cdnHost . $url;
 	}
 	

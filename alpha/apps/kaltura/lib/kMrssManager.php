@@ -222,8 +222,17 @@ class kMrssManager
 		}*/
 	}
 
-	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $storageId = null)
+	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, kMrssParameters $mrssParams = null)
 	{
+		$storageId = null;
+		$servePlayManifest = false;
+		
+		if($mrssParams)
+		{
+			$storageId = $mrssParams->getStorageId();
+			$servePlayManifest = $mrssParams->getServePlayManifest();
+		}
+		
 		if(!$partner->getStorageServePriority() || $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 			return null;
 			
@@ -240,24 +249,36 @@ class kMrssManager
 			return null;
 			
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $asset->getEntryId());
-		$urlManager->setFileExtension($asset->getFileExt());
-		$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		
+		if($servePlayManifest)
+		{
+			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+			$urlManager->setDomain($cdnHost);
+			
+			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset);
+		}
+		else
+		{
+			$urlManager->setFileExtension($asset->getFileExt());
+			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		}
 		
 		return $url;
 	}
 	
 	/**
 	 * @param asset $asset
+	 * @param kMrssParameters $mrssParams
 	 * @return string
 	 */
-	public static function getAssetUrl(asset $asset, $storageId = null)
+	private static function getAssetUrl(asset $asset, kMrssParameters $mrssParams = null)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
 			return null;
 	
 		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $storageId);
+		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $mrssParams);
 		if($externalStorageUrl)
 			return $externalStorageUrl;
 			
@@ -268,7 +289,16 @@ class kMrssManager
 		
 		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
 		$urlManager->setDomain($cdnHost);
-		$url = $urlManager->getAssetUrl($asset);
+		
+		if($mrssParams && $mrssParams->getServePlayManifest())
+		{
+			$url = $urlManager->getPlayManifestUrl($asset);
+		}
+		else
+		{
+			$url = $urlManager->getAssetUrl($asset);
+		}
+		
 		$url = $cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
 			
@@ -328,7 +358,7 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 		
 		$content = $mrss->addChild('content');
-		$content->addAttribute('url', self::getAssetUrl($flavorAsset, ($mrssParams) ? $mrssParams->getStorageId() : null));
+		$content->addAttribute('url', self::getAssetUrl($flavorAsset, $mrssParams));
 		$content->addAttribute('flavorAssetId', $flavorAsset->getId());
 		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
