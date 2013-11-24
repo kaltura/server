@@ -177,7 +177,8 @@ class CaptionAssetService extends KalturaAssetService
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		
 		$captionAsset->incrementVersion();
-		$captionAsset->setFileExt($ext);
+		if ($ext)
+			$captionAsset->setFileExt($ext);
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
 		
