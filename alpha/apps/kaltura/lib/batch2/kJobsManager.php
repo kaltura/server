@@ -1482,4 +1482,23 @@ class kJobsManager
 		$job->setData($jobData);
 		return kJobsManager::updateBatchJob($job, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
+
+	/**
+	 * Copy aspects of one partner into another
+	 * 
+	 * @param int $fromPartnerId
+	 * @param int $toPartnerId
+	 * @return BatchJob
+	 */
+	public static function addCopyPartnerJob( $fromPartnerId, $toPartnerId )
+	{
+	    $jobData = new kCopyPartnerJobData();
+	    $jobData->setFromPartnerId( $fromPartnerId );
+	    $jobData->setToPartnerId( $toPartnerId );
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId( $toPartnerId ); // Associate with the "to" PID
+		
+		return self::addJob( $batchJob, $jobData, BatchJobType::COPY_PARTNER );
+	}
 }

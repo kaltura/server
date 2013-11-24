@@ -48,6 +48,7 @@ enabledWorkers.KAsyncDelete							= 4
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
+enabledWorkers.KAsyncCopyPartner					= 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -606,3 +607,10 @@ friendlyName										= Syncronize Widevine assets
 type												= KAsyncWidevineRepositorySync
 maximumExecutionTime								= 3000
 scriptPath             								= ../plugins/drm/providers/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
+
+[KAsyncCopyPartner : JobHandlerWorker]
+id													= 510
+friendlyName										= CopyPartner
+type												= KAsyncCopyPartner
+maximumExecutionTime								= 12000
+scriptPath											= batches/CopyPartner/KAsyncCopyPartnerExe.php
