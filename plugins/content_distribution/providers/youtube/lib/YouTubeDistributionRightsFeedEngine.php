@@ -347,7 +347,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$port = 22;
 		if ($distributionProfile->sftpPort)
 			$port = $distributionProfile->sftpPort;
-		$engineOptions = isset(kBatchBase::$taskConfig->engineOptions) ? kBatchBase::$taskConfig->engineOptions->toArray() : array();
+		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile, null, $port);
 		$this->_sftpManager = $sftpManager;

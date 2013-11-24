@@ -2251,7 +2251,24 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function isScheduledNow($time = null)
 	{
 		if(is_null($time))
+		{
 			$time = time();
+
+			// entry scheduling status changes within 24H
+			if (($this->getStartDate() && abs($this->getStartDate(null) - time()) <= 86400) ||
+				($this->getEndDate() &&   abs($this->getEndDate(null) - time())   <= 86400))
+			{
+				kApiCache::setConditionalCacheExpiry(600);
+			}
+			
+			// entry scheduling status changes within 10 min
+			if (($this->getStartDate() && abs($this->getStartDate(null) - time()) <= 600) ||
+				($this->getEndDate() &&   abs($this->getEndDate(null) - time())   <= 600))
+			{
+				kApiCache::setExpiry(60);
+				kApiCache::setConditionalCacheExpiry(60);
+			}
+		}
 			
 		$startDateCheck = (!$this->getStartDate() || $this->getStartDate(null) <= $time);
 		$endDateCheck = (!$this->getEndDate() || $this->getEndDate(null) >= $time);

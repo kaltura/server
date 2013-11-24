@@ -18,7 +18,7 @@ class LikeService extends KalturaBaseService
 		
 		if(!LikePlugin::isAllowedPartner($this->getPartnerId()))
 		{
-		    throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+		    throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, LikePlugin::PLUGIN_NAME);
 		}	
 		
 		if (!kCurrentContext::$ks_uid || kCurrentContext::$ks_uid == "")

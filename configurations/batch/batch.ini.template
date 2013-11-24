@@ -227,12 +227,7 @@ filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp
 id													= 71
 friendlyName										= Convert Widevine
 filter.jobSubTypeIn									= widevine.Widevine
-params.wvLicenseServerUrl							= http://@WIDEIVINE_LICENSE_SERVER_HOST@
-params.portal										= kaltura
-params.key											= @WIDEVINE_SIGN_KEY@
-params.iv											= @WIDEVINE_SIGN_IV@
 params.widevineExe									= @WIDEVINE_EXE@
-params.gop											= 3100
 params.retryInterval                                = 10
 params.maxTimeBeforeFail 							= 10000
 ;The path for local temporary generated product
@@ -619,9 +614,7 @@ name												= KAsyncWidevineRepositorySync
 friendlyName										= Syncronize Widevine assets
 type												= KAsyncWidevineRepositorySync
 maximumExecutionTime								= 3000
-scriptPath             								= ../plugins/drm/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
-params.wvLicenseServerUrl							= http://@WIDEIVINE_LICENSE_SERVER_HOST@
-params.portal										= kaltura
+scriptPath             								= ../plugins/drm/providers/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
 
 
 
@@ -636,3 +629,4 @@ scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.ph
 id													= 500
 type												= KAsyncConcat
 scriptPath											= batches/Concat/KAsyncConcatExe.php
+

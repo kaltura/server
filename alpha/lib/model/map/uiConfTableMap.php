@@ -59,6 +59,7 @@ class uiConfTableMap extends TableMap {
 		$this->addColumn('CREATION_MODE', 'CreationMode', 'TINYINT', false, null, null);
 		$this->addColumn('VERSION', 'Version', 'VARCHAR', false, 10, null);
 		$this->addColumn('HTML5_URL', 'Html5Url', 'VARCHAR', false, 256, null);
+		$this->addColumn('PARTNER_TAGS', 'PartnerTags', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

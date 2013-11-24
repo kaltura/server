@@ -170,7 +170,17 @@ class kFlowHelper
 
 		if($ext)
 			$flavorAsset->setFileExt($ext);
+			
+		if($flavorAsset instanceof thumbAsset)
+		{
+			list($width, $height, $type, $attr) = getimagesize($data->getDestFileLocalPath());
+			
+			$flavorAsset->setWidth($width);
+			$flavorAsset->setHeight($height);
+			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
+		}
 		$flavorAsset->save();
+		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
 
@@ -1204,7 +1214,8 @@ class kFlowHelper
 			if(is_null($alternateFlavorParamsId))
 			{
 				$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-				$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
+				if($srcFlavorAsset)
+					$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
 			}
 
 			if(is_null($alternateFlavorParamsId))

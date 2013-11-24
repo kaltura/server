@@ -1,0 +1,200 @@
+
+<p><?php echo $this->translate('drm profile list intro text'); ?></p>
+<?php echo $this->filterForm; ?>
+<?php echo $this->newProfileForm; ?>
+<div id="drm_profile_list_div" class="clear">
+	<table>
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Publisher ID'); ?></th>
+				<th><?php echo $this->translate('Provider'); ?></th>
+				<th><?php echo $this->translate('Creation Date'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="10">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $drmProfile): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $drmProfile->id; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Drm_Enum_DrmProfileStatus', $drmProfile->status); ?></td>
+				<td><?php echo $drmProfile->name; ?></td>
+				<td><?php echo $drmProfile->partnerId; ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Drm_Enum_DrmProfileProvider', $drmProfile->provider); ?></td>
+				<td><?php echo date($this->translate('time format'), $drmProfile->createdAt); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $drmProfile->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configureDrmProfile" ><?php echo $this->translate('Configure'); ?></option>
+						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>				
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	addSubTitle('Drm Profiles');
+});
+
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+	}
+});
+
+jQuery('#filter_type').change();
+
+function doAction(action, profileId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function remove(profileId)
+{
+	var ok = confirm('<?php echo $this->translate('Are you sure you want to remove drm profile ?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+				profileId, 
+			function() {
+				alert('<?php echo $this->translate('Drm profile removed');?>');
+			}
+		);
+	}
+}
+
+function changeStatus(profileId, callback)
+{
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DrmProfileDeleteAction', 'drmProfileId' => 'PROFILEID')); ?>';
+	url = url.replace('PROFILEID', profileId);
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result != 'ok')
+				this.error();
+			
+			if (callback && (typeof callback == 'function'))
+			{
+				callback.apply(this);
+			}			
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function() {
+			alert('<?php echo $this->translate('an error occured'); ?>');
+		}
+	});
+}
+
+
+function newDrmProfile(partnerId, drmProfileProvider)
+{
+	if(!partnerId.length || isNaN(partnerId)){
+		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+		return;
+	}
+	
+	if(!drmProfileProvider.length){
+		alert('<?php echo $this->translate('Drm profile provider not supplied'); ?>');
+		return;
+	}
+
+	paramsStr = '/new_partner_id/' + partnerId + '/new_drm_profile_provider/' + drmProfileProvider;
+
+	loadDrmProfile(paramsStr);
+}
+
+function configureDrmProfile(profileId)
+{
+	if(typeof profileId == 'undefined'){
+		alert('<?php echo $this->translate('Drm profile ID not supplied'); ?>');
+		return;
+	}
+
+	profileIdStr = '/drm_profile_id/' + profileId;
+	
+	loadDrmProfile(profileIdStr);
+}
+
+
+function loadDrmProfile(paramStr)
+{	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DrmProfileConfigureAction')); ?>' + paramStr;
+	
+	jQuery('#drm-profile-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="drm-profile-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 600,
+		height: 600,
+		title: '<?php echo $this->translate('Drm Profile'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmDrmProfileConfigure').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		}
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmDrmProfileConfigure').ajaxForm({
+				success: loadDrmProfileSuccess,
+				iframe: true
+			});
+		}
+	);
+}
+
+
+function loadDrmProfileSuccess(html) {
+	if (jQuery(html).filter('#frmDrmProfileConfigure').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+		if (jQuery('#frmPaginator1').length){
+			jQuery('#frmPaginator1').submit();
+		}
+		else {
+			jQuery('#frmPartnerIdFilter').submit();
+		}
+	}
+	jQuery('#frmDrmProfileConfigure').replaceWith(html);
+	jQuery('#frmDrmProfileConfigure').ajaxForm({
+		success: loadDrmProfileSuccess,
+		iframe: true
+	});
+}
+
+
+
+
+</script>
