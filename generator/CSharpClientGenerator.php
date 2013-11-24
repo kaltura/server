@@ -723,6 +723,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					break;
 				case "bigint":
 					$dotNetType = "int";
+					break;
 				case "int":
 					if ($isEnum)
 						$dotNetType = $paramNode->getAttribute("enumType");
