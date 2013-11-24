@@ -13,7 +13,7 @@ class DropFolderService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		if (!DropFolderPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, DropFolderPlugin::PLUGIN_NAME);
 			
 		$this->applyPartnerFilterForClass('DropFolder');
 		$this->applyPartnerFilterForClass('DropFolderFile');
