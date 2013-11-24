@@ -12,6 +12,8 @@ class WidevineDrmService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		$this->applyPartnerFilterForClass('asset');
+		$this->applyPartnerFilterForClass('DrmProfile');
+		
 		if (!WidevinePlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}

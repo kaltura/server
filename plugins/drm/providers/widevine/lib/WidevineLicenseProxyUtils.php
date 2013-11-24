@@ -95,8 +95,17 @@ class WidevineLicenseProxyUtils
 
 	private static function getKeyBytes()
 	{
-		$key = WidevinePlugin::getWidevineConfigParam('key');
-		$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
+		if($dbDrmProfile)
+		{
+			$key = $dbDrmProfile->getKey();
+			$iv = $dbDrmProfile->getIv();		
+		}
+		else 
+		{
+			$key = WidevinePlugin::getWidevineConfigParam('key');
+			$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		}
 		
 		$key = str_replace("0x", "", $key);
 		$key = str_replace(", ", "", $key);
@@ -143,11 +152,21 @@ class WidevineLicenseProxyUtils
 	
 	protected static function buildLicenseServerUrl($urlParams)
 	{
-		$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
+		if($dbDrmProfile)
+		{
+			$baseUrl = $dbDrmProfile->getLicenseServerUrl();
+			$portal = $dbDrmProfile->getPortal();
+		}
+		else
+		{
+			$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
+			$portal = WidevinePlugin::getWidevineConfigParam('portal');
+		}
+		
 		if(!$baseUrl)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_SERVER_URL_NOT_SET);
-			
-		$portal = WidevinePlugin::getWidevineConfigParam('portal');
+					
 		if(!$portal)
 			$portal = WidevinePlugin::KALTURA_PROVIDER;
 			
