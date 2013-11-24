@@ -47,6 +47,11 @@ class kFileSyncObjectManager
 				$object = conversionProfile2Peer::retrieveByPK( $objectId );
 				conversionProfile2Peer::setUseCriteriaFilter ( true );
 				break;
+			case FileSyncObjectType::FILE_ASSET:
+				conversionProfile2Peer::setUseCriteriaFilter ( false );
+				$object = FileAssetPeer::retrieveByPK( $objectId );
+				conversionProfile2Peer::setUseCriteriaFilter ( true );
+				break;
 		}
 		
 		if ( $object == null )
