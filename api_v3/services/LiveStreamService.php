@@ -67,6 +67,13 @@ class LiveStreamService extends KalturaEntryService
 		{
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();
+		
+			$liveAssets = assetPeer::retrieveByEntryId($dbEntry->getId(),array(assetType::LIVE));
+			foreach ($liveAssets as $liveAsset){
+				/* @var $liveAsset liveAsset */
+				$liveAsset->setStatus(asset::ASSET_STATUS_READY);
+				$liveAsset->save();
+			}
 		}
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $this->getPartnerId(), null, null, null, $dbEntry->getId());
