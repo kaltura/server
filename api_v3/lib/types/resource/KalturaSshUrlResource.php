@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaSshUrlResource extends KalturaUrlResource 
+class KalturaSshUrlResource extends KalturaUrlResource
 {
 	
 	/**
@@ -25,31 +25,34 @@ class KalturaSshUrlResource extends KalturaUrlResource
 	 * @var string
 	 */
 	public $keyPassphrase;
-
 	
-	private static $map_between_objects = array
-	(
-		'privateKey',
-    	'publicKey',
-    	'keyPassphrase',
-	);
-
+	private static $map_between_objects = array('privateKey', 'publicKey', 'keyPassphrase');
+	
+	/* (non-PHPdoc)
+	 * @see KalturaUrlResource::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaContentResource::validateAsset()
+	 */
 	public function validateAsset(asset $dbAsset)
 	{
 		if(!($dbAsset instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
 	}
-
-	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	
+	/* (non-PHPdoc)
+	 * @see KalturaUrlResource::toObject()
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(!$object_to_fill)
 			$object_to_fill = new kSshUrlResource();
-			
+		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
