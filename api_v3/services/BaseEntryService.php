@@ -809,6 +809,10 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function cloneAction( $entryId, KalturaBaseEntry $updateEntry = null )
 	{
+		// Reset criteria filters such that it will be  
+		entryPeer::setUseCriteriaFilter(false);
+		categoryEntryPeer::setUseCriteriaFilter(false);
+
 		// Get the entry
 		$coreEntry = entryPeer::retrieveByPK( $entryId );			
 		if ( ! $coreEntry )
