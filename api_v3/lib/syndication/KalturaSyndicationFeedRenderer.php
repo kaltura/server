@@ -549,7 +549,7 @@ class KalturaSyndicationFeedRenderer
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
 			$urlManager->setDomain($cdnHost);
 			
-			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset);
+			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($flavorAsset);
 		}
 		else
 		{
@@ -586,14 +586,15 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
-			$url = $urlManager->getPlayManifestUrl($flavorAsset);
+			$cdnHost = requestUtils::getApiCdnHost();
+			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset);
 		}
 		else
 		{
-			$url = $urlManager->getAssetUrl($flavorAsset);
+			$url = $this->cdnHost . $urlManager->getAssetUrl($flavorAsset);
 		}
 		
-		return $this->cdnHost . $url;
+		return $url;
 	}
 	
 	private function getOrderByColumn()
