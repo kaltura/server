@@ -102,6 +102,28 @@ class kMetadataManager
 	}
 	
 	/**
+	 * Function expects a particular metadataObject and retrieves the value(s) of a specific field from the XML of the object
+	 * 
+	 * @param Metadata $object
+	 * @param string $fieldSystemName
+	 * 
+	 * @return array
+	 */
+	public static function getMetadataValueForField (Metadata $object, $fieldSystemName)
+	{
+		/* @var $result Metadata */
+		$metadataXML = new SimpleXMLElement (kFileSyncUtils::file_get_contents($object->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA)));
+		$values = $metadataXML->xpath("//$fieldSystemName");
+		$strvals = array();
+		foreach ($values as $value)
+		{
+			$strvals[] = strval($value);
+		}
+		
+		return $strvals;
+	}
+	
+	/**
 	 * Parse the XSD and update the list of search fields
 	 *
 	 * @param MetadataProfile $metadataProfile

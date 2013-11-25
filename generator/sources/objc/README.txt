@@ -55,3 +55,11 @@ Running the demo application
 4. Type your KMC credentials under the UserEmail / UserPassword fields
 5. Choose the Kaltura > iPhone simulator scheme
 6. Hit play
+
+Running the demo application with DRM support
+==============================================
+
+1. Open Xcode 
+2. Open the Kaltura project under DemoApplication (File->Open)
+3. Choose the "Kaltura widevine" > Device (iPhone/iPad) scheme
+4. Hit play

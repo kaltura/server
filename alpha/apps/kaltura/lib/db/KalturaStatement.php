@@ -76,7 +76,9 @@ class KalturaStatement extends PDOStatement
 				KalturaLog::alert($pex->getMessage());
 				throw new PropelException("Database error");
 			}
-			KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+			$sqlTook = (microtime(true) - $sqlStart);
+			KalturaLog::debug("Sql took - " . $sqlTook . " seconds");
+			KalturaMonitorClient::monitorDatabaseAccess($sql, $sqlTook);
 		}
 	}
 	

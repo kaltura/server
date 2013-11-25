@@ -7,18 +7,9 @@
  */
 class KAsyncDeleteFile extends KJobHandlerWorker
 {
-	/**
-	 * (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	protected function getJobType()
-	{
-		return KalturaBatchJobType::DELETE_FILE;
-	}
-	
 	public static function getType()
 	{
-		return  self::getJobType();
+		return KalturaBatchJobType::DELETE_FILE;
 	}
 	
 	/**

@@ -92,6 +92,6 @@ class UploadToken extends BaseUploadToken
 	}
 	public function getCacheInvalidationKeys()
 	{
-		return array("uploadToken:id=".$this->getId());
+		return array("uploadToken:id=".strtolower($this->getId()));
 	}
 }

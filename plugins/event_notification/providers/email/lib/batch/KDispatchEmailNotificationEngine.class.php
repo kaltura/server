@@ -160,6 +160,10 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$recipients = $this->getRecipientArray($data->to, $contentParameters);
 			foreach ($recipients as $email=>$name)
 			{
+				if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+				{
+					continue;
+				}
 				KalturaLog::info("Adding recipient to TO recipients $name<$email>");
 				self::$mailer->AddAddress($email, $name);
 			}
@@ -170,6 +174,10 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$recipients = $this->getRecipientArray($data->cc, $contentParameters);
 			foreach ($recipients as $email=>$name)
 			{
+				if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+				{
+					continue;
+				}
 				KalturaLog::info("Adding recipient to CC recipients $name<$email>");
 				self::$mailer->AddCC($email, $name);
 			}
@@ -180,6 +188,10 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$recipients = $this->getRecipientArray($data->bcc, $contentParameters);
 			foreach ($recipients as $email=>$name)
 			{
+				if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+				{
+					continue;
+				}
 				KalturaLog::info("Adding recipient to BCC recipients $name<$email>");
 				self::$mailer->AddBCC($email, $name);
 			}

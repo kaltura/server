@@ -28,6 +28,8 @@ class kMrssParameters
 	
 	private $encoding;
 	
+	private $servePlayManifest;
+	
 	/**
 	 * @return the $itemXpathsToExtend
 	 */
@@ -118,5 +120,21 @@ class kMrssParameters
 	public function setEncoding($encoding)
 	{
 		$this->encoding = $encoding;
+	}
+	
+	/**
+	 * @return field_type $servePlayManifest
+	 */
+	public function getServePlayManifest()
+	{
+		return $this->servePlayManifest;
+	}
+
+	/**
+	 * @param field_type $servePlayManifest
+	 */
+	public function setServePlayManifest($servePlayManifest)
+	{
+		$this->servePlayManifest = $servePlayManifest;
 	}
 }

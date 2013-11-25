@@ -12,14 +12,14 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 			return $this->init();
 		
 		if(is_null($jobs))
-			$jobs = KBatchBase::$kClient->batch->getExclusiveAlmostDone($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter(), $this->getJobType());
+			$jobs = KBatchBase::$kClient->batch->getExclusiveAlmostDone($this->getExclusiveLockKey(), KBatchBase::$taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter(), static::getType());
 		
 		KalturaLog::info(count($jobs) . " jobs to close");
 		
 		if(! count($jobs) > 0)
 		{
 			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue($this->getJobType());
+			$this->saveSchedulerQueue(static::getType());
 			return null;
 		}
 		

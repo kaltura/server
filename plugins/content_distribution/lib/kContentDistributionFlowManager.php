@@ -1322,24 +1322,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onEntryDistributionUpdateRequired(EntryDistribution $entryDistribution)
 	{
-		$distributionProfileId = $entryDistribution->getDistributionProfileId();
-		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if(!$distributionProfile)
-			return true;
-		
-		$distributionProvider = $distributionProfile->getProvider();
-		if(!$distributionProvider)
-		{
-			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
-			return true;
-		}
-		
-		if(!$distributionProvider->isUpdateEnabled())
-		{
-			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
-			return true;
-		}
-		
 		$ignoreStatuses = array(
 			EntryDistributionStatus::PENDING,
 			EntryDistributionStatus::DELETED,
@@ -1369,6 +1351,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 				
 		$distributionProvider = $distributionProfile->getProvider();
+		if(!$distributionProvider)
+		{
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+			return true;
+		}
+		
 		if(!$distributionProvider->isUpdateEnabled())
 		{
 			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
@@ -1622,9 +1610,20 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
-			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC) {
+		{
+			$entryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entry->getId(), $distributionProfile->getId());
+			if($entryDistribution)
+			{
+				KalturaLog::debug("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distrinution profle [" . $distributionProfile->getId() . "]");
+				self::onEntryDistributionUpdateRequired($entryDistribution);
+				continue;
+			}
+
+			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC) 
+			{
 				self::addEntryDistribution($entry, $distributionProfile, true);
 			}
+		}
 		
 		return true;
 	}
@@ -1782,4 +1781,5 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return $listChanged;
 	}
+	
 }

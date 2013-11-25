@@ -15,24 +15,6 @@
  */
 class categoryEntry extends BasecategoryEntry {
 	
-	/*
-	 * when calculating category->entries count,
-	 * entry might belong to a few sub categories and should not be calculated more than once in the parent category.
-	 * those fields means what categories where already set the calculation of the entry.
-	 */
-	private $entryCategoriesRemovedIds = null;
-	private $entryCategoriesAddedIds = null;
-	
-	public function setEntryCategoriesAddedIds($v)
-	{
-		$this->entryCategoriesAddedIds = $v;
-	}
-	
-	public function setEntryCategoriesRemovedIds($v)
-	{
-		$this->entryCategoriesRemovedIds = $v;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basecategory#preSave()
 	 */
@@ -102,35 +84,36 @@ class categoryEntry extends BasecategoryEntry {
 		{
 			if($this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::ACTIVE)
 			{
-				if(is_null($this->entryCategoriesRemovedIds))
-				{
-					$categoriesEntries = categoryEntryPeer::retrieveActiveByEntryId($this->getEntryId());
-					
-					$categoriesIds = array();
-					foreach ($categoriesEntries as $categroyEntry)
-					{
-						//cannot get directly the full ids - since it might not be updated.
-						if($categroyEntry->getCategoryId() != $this->getCategoryId())
-							$categoriesIds[] = $categroyEntry->getCategoryId();
-					}
-					
-					$categoriesRemoved = categoryPeer::retrieveByPKs($categoriesIds);
-					
-					$entryCategoriesRemovedIds = array();
-					foreach($categoriesRemoved as $categoryRemoved)
-					{
-						$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryRemoved->getFullIds());
-						$entryCategoriesRemovedIds = array_merge($entryCategoriesRemovedIds, $fullIds);
-					}
-					
-					$this->entryCategoriesRemovedIds = $entryCategoriesRemovedIds;
-				}
-				
-				$category->decrementEntriesCount(1, $this->entryCategoriesRemovedIds);
+				$category->decrementEntriesCount($this->getEntryId());
 				$category->decrementDirectEntriesCount();
 		
 				if($entry && !categoryEntryPeer::getSkipSave()) //entry might be deleted - and delete job remove the categoryEntry object
 				{
+					$categories = array();
+					if(trim($entry->getCategories()) != '')
+					{
+						$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
+						
+						foreach($categories as $index => $entryCategoryFullName)
+						{
+							if($entryCategoryFullName == $category->getFullName())
+								unset($categories[$index]);
+						}
+					}
+					
+					$categoriesIds = array();
+					if(trim($entry->getCategoriesIds()) != '')
+					{
+						$categoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
+					
+						foreach($categories as $index => $entryCategoryId)
+						{
+							if($entryCategoryId == $category->getId())
+								unset($categoriesIds[$index]);
+						}	
+					}
+					
+					$entry->setCategories(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categories));
 					$entry->setCategoriesIds(implode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesIds));
 					$entry->save();
 				}
@@ -148,31 +131,7 @@ class categoryEntry extends BasecategoryEntry {
 	
 	private function setEntryOnCategory(category $category, $entry = null)
 	{
-		if(is_null($this->entryCategoriesAddedIds))
-		{
-			$categoriesEntries = categoryEntryPeer::retrieveActiveByEntryId($this->getEntryId());
-			
-			$categoriesIds = array();
-			foreach ($categoriesEntries as $categroyEntry)
-			{
-				//cannot get directly the full ids - since it might not be updated.
-				if($categroyEntry->getCategoryId() != $this->getCategoryId())
-					$categoriesIds[] = $categroyEntry->getCategoryId();
-			}
-			
-			$categoriesAdded = categoryPeer::retrieveByPKs($categoriesIds);
-			
-			$entryCategoriesAddedIds = array();
-			foreach($categoriesAdded as $categoryAdded)
-			{
-				$fullIds = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryAdded->getFullIds());
-				$entryCategoriesAddedIds = array_merge($entryCategoriesAddedIds, $fullIds);
-			}
-			
-			$this->entryCategoriesAddedIds = $entryCategoriesAddedIds;
-		}
-		
-		$category->incrementEntriesCount(1, $this->entryCategoriesAddedIds);
+		$category->incrementEntriesCount($this->getEntryId());
 		$category->incrementDirectEntriesCount();
 		
 		//if was pending - decrease pending entries count!
@@ -217,6 +176,6 @@ class categoryEntry extends BasecategoryEntry {
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("categoryEntry:entryId=".$this->getEntryId());
+		return array("categoryEntry:entryId=".strtolower($this->getEntryId()));
 	}
 } // categoryEntry

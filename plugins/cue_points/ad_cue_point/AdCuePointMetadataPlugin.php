@@ -3,7 +3,7 @@
  * Enable custom metadata on ad cue point objects
  * @package plugins.adCuePoint
  */
-class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser
+class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'adCuePointMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';

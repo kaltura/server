@@ -44,7 +44,7 @@ class kLocalPathUrlManager extends kUrlManager
 		if ($this->extention && strtolower($this->extention) != 'flv' ||
 			$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
 		{
-			$url = "mp4:$url";
+			$url = "mp4:".ltrim($url,'/');
 		}
 
 		$url = str_replace('\\', '/', $url);

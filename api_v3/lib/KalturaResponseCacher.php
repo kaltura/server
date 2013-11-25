@@ -47,16 +47,23 @@ class KalturaResponseCacher extends kApiCache
 		
 		$this->_params['___cache___uri'] = $_SERVER['SCRIPT_NAME'];
 
-		// extract any baseEntry.getContentData referrer parameters
-		$contextDataObjectType = 'contextDataParams:objectType';
-		foreach ($this->_params as $key => $value)
+		// extract any baseEntry.getContextData referrer parameters
+		for ($i = 0; ; $i++)
 		{
-			if (substr($key, -strlen($contextDataObjectType)) !== $contextDataObjectType)
+			$prefix = $i ? "{$i}:" : "";		// 0 = try single request, >0 = try multirequest
+			if (!isset($this->_params["{$prefix}service"]) || !isset($this->_params["{$prefix}action"]))
+			{
+				if (!$i)			// could not find service/action, try multirequest - 1:service/1:action
+					continue;
+				break;
+			}
+			
+			$service = $this->_params["{$prefix}service"];
+			$action = $this->_params["{$prefix}action"];
+			if (strtolower($service) != 'baseentry' || strtolower($action) != 'getcontextdata')
 				continue;
-
-			$keyPrefix = substr($key, 0, -strlen($contextDataObjectType));
-			$referrerKey = $keyPrefix . 'contextDataParams:referrer';
-
+			
+			$referrerKey = "{$prefix}contextDataParams:referrer";
 			if (isset($this->_params[$referrerKey]))
 			{
 				$referrer = $this->_params[$referrerKey];
@@ -64,8 +71,8 @@ class KalturaResponseCacher extends kApiCache
 			}
 			else
 				$referrer = self::getHttpReferrer();
-				
-			$this->_referrers[] = $referrer;
+			
+			$this->_referrers[] = $referrer;			
 		}
 		
 		$this->finalizeCacheKey();

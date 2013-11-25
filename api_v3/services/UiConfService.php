@@ -86,10 +86,7 @@ class UiConfService extends KalturaBaseService
 		if ( ! $dbUiConf )
 			throw new KalturaAPIException ( APIErrors::INVALID_UI_CONF_ID , $id );
 		
-		$uiConfUpdate = $uiConf->toUiConf();
-
-		$allowEmpty = true ; // TODO - what is the policy  ? 
-		baseObjectUtils::autoFillObjectFromObject ( $uiConfUpdate , $dbUiConf , $allowEmpty );
+		$dbUiConf = $uiConf->toUpdatableObject($dbUiConf);
 		
 		$dbUiConf->save();
 		$uiConf->fromUiConf( $dbUiConf );
@@ -195,7 +192,7 @@ class UiConfService extends KalturaBaseService
 		
 		$count = uiConfPeer::doCount( $templateCriteria );
 		if (!$pager)
-		        $pager = new kalturaFilterPager ();
+		        $pager = new KalturaFilterPager ();
 		$pager->attachToCriteria( $templateCriteria );
 		$list = uiConfPeer::doSelect( $templateCriteria );
 		$newList = KalturaUiConfArray::fromUiConfArray( $list );

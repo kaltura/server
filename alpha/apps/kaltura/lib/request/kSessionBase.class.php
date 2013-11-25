@@ -234,14 +234,30 @@ class kSessionBase
 	
 	static public function getSecretsFromCache($partnerId)
 	{
-		if (!function_exists('apc_fetch'))
-			return null;			// no APC - can't get the partner secret here (DB not initialized)
-		
-		$secrets = apc_fetch(self::SECRETS_CACHE_PREFIX . $partnerId);
-		if (!$secrets)
-			return null;			// admin secret not found in APC
-		
-		return $secrets;
+		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
+
+		$lowerStores = array();
+		foreach ($cacheSections as $cacheSection)
+		{
+			$cacheStore = kCacheManager::getCache($cacheSection);
+			if (!$cacheStore)
+				continue;
+
+			$secrets = $cacheStore->get(self::SECRETS_CACHE_PREFIX . $partnerId);
+			if (!$secrets)
+			{
+				$lowerStores[] = $cacheStore; 
+				continue;
+			}
+			
+			foreach ($lowerStores as $cacheStore)
+			{
+				$cacheStore->set(self::SECRETS_CACHE_PREFIX . $partnerId, $secrets);
+			}
+			
+			return $secrets;
+		}
+		return null;
 	}
 
 	// overridable

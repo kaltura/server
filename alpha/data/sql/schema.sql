@@ -1134,6 +1134,7 @@ CREATE TABLE `ui_conf`
 	`creation_mode` TINYINT,
 	`version` VARCHAR(10),
 	`html5_url` VARCHAR(256),
+	`partner_tags` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `partner_id_creation_mode_index`(`partner_id`, `creation_mode`)
@@ -2215,6 +2216,31 @@ CREATE TABLE `batch_job_log`
 	KEY `processor_expiration_index`(`job_type`, `processor_expiration`),
 	KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`),
 	KEY `partner_job_type_bulk_upload_type_index`(`partner_id`, `bulk_upload_type`, `job_type`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- file_asset
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `file_asset`;
+
+
+CREATE TABLE `file_asset`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`version` INTEGER,
+	`partner_id` INTEGER,
+	`object_id` VARCHAR(20),
+	`object_type` INTEGER,
+	`status` TINYINT,
+	`name` VARCHAR(255),
+	`system_name` VARCHAR(255),
+	`file_ext` VARCHAR(4),
+	`size` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `partner_object_status`(`partner_id`, `object_id`, `object_type`, `status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

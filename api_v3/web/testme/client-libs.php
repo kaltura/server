@@ -94,12 +94,15 @@
 							<?php 
 							$buttsInLine = 4;
 							$current = 0;
-							foreach($summary as $clientName)
+							foreach($summary as $clientName => $params)
 							{
 								?>
 									<div class="download-button <?php echo $clientName; ?>-btn">
 										<a href="http://<?php echo kConf::get('cdn_host'); ?>/content/clientlibs/<?php echo $clientName.'_'.$schemaGenDate; ?>.tar.gz" target="_blank" title="Single class <?php echo $clientName; ?> client library" class="download-btn">
 										</a>
+										<?php if (isset($params['linkhref']) && isset($params['linktext']))
+											echo '<a href="' . $params['linkhref'] . '">' . $params['linktext'] . '</a>';
+										?>										
 									</div>
 								<?php 
 								

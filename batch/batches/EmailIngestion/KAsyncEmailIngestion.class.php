@@ -44,14 +44,6 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 	{
 		return KalturaBatchJobType::EMAIL_INGESTION;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
 
 	public function __destruct()
 	{
