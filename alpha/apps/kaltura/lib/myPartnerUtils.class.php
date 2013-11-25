@@ -1182,8 +1182,6 @@ class myPartnerUtils
 
  		// Launch a batch job that will copy the heavy load as an async operation 
   		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
- 		
- 		// ... do I need to check addCopyPartnerJob()'s return value?
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
