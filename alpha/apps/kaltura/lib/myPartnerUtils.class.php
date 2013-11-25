@@ -1176,11 +1176,12 @@ class myPartnerUtils
  		self::copyConversionProfiles($fromPartner, $toPartner);
 		
  		self::copyCategories($fromPartner, $toPartner);
- 		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP, $dontCopyUsers);
- 		self::copyEntriesByType($fromPartner, $toPartner, entryType::PLAYLIST, $dontCopyUsers);
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
+
+ 		// Launch a batch job that will copy the heavy load as an async operation 
+  		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)

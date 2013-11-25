@@ -89,6 +89,8 @@ abstract class KJobHandlerWorker extends KBatchBase
 			{
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ex, KalturaBatchJobStatus::FAILED);
 			}
+			
+			self::unimpersonate();
 		}
 			
 		return $jobs;
