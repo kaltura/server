@@ -48,10 +48,6 @@ class kuser extends Basekuser implements IIndexable
 	
 	private $roughcut_count = -1;
 	
-	private static $indexFieldTypes = null;
-	
-	private static $indexFieldsMap = null;
-	
 	public static function getColumnNames()	{	return array ( 
 		"screen_name" , "full_name" , "url_list" , "tags" , 
 		"about_me" , "network_highschool" , "network_college" ,"network_other") ; 
@@ -1136,94 +1132,8 @@ class kuser extends Basekuser implements IIndexable
         
     }
 
-	/* (non-PHPdoc)
-     * @see IIndexable::getObjectIndexName()
-     */
-    public function getObjectIndexName ()
-    {
-       return kuserPeer::getOMClass(false);
-    }
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexNullableFields()
-	 */
-	public static function getIndexNullableFields()
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-     * @see IIndexable::getIndexFieldsMap()
-     */
-    public function getIndexFieldsMap ()
-    {
-    	if (!self::$indexFieldsMap)
-    	{
-    		self::$indexFieldsMap = array ( 
-        		"login_data_id" => "loginDataId",
-                "is_admin" => "isAdmin",
-                "screen_name" => "screenName",
-                "full_name" => "fullName",
-                "first_name" => "firstName",
-                "last_name" => "lastName",
-                "email" => "email",
-                "about_me" => "aboutMe", 
-                "tags" => "tags",
-                "entries" => "entries",
-                "storage_size" => "storageSize",
-                "kuser_status" => "status",
-                "created_at" => "createdAt",
-                "updated_at" => "updatedAt",
-                "partner_id" => "partnerId",
-                "display_in_search" => "displayInSearch",
-                "partner_data" => "partnerData",
-                "puser_id" => "puserId",
-                "indexed_partner_data_int" => "indexedPartnerDataInt",
-                "indexed_partner_data_string" => "indexedPartnerDataString",
-    			"permission_names"	=> "indexedPermissionNames",
-    			"role_ids"	=> "indexedRoleIds",
-       		 );
-    	}
-        
-    	return self::$indexFieldsMap; 
-    }
-
-	/* (non-PHPdoc)
-     * @see IIndexable::getIndexFieldType()
-     */
-    public function getIndexFieldType ($field)
-    {
-    	if (!self::$indexFieldTypes)
-    	{
-    		self::$indexFieldTypes = array (
-        		"login_data_id" => IIndexable::FIELD_TYPE_INTEGER,
-                "is_admin" => IIndexable::FIELD_TYPE_INTEGER,
-                "screen_name" => IIndexable::FIELD_TYPE_STRING,
-                "full_name" => IIndexable::FIELD_TYPE_STRING,
-                "first_name" => IIndexable::FIELD_TYPE_STRING,
-                "last_name" => IIndexable::FIELD_TYPE_STRING,
-                "email" => IIndexable::FIELD_TYPE_STRING,
-                "about_me" => IIndexable::FIELD_TYPE_STRING,
-                "tags" => IIndexable::FIELD_TYPE_STRING,
-                "entries" => IIndexable::FIELD_TYPE_INTEGER,
-                "storage_size" => IIndexable::FIELD_TYPE_INTEGER,
-                "kuser_status" => IIndexable::FIELD_TYPE_INTEGER,
-                "created_at" => IIndexable::FIELD_TYPE_DATETIME,
-                "updated_at" => IIndexable::FIELD_TYPE_DATETIME,
-                "partner_id" => IIndexable::FIELD_TYPE_INTEGER,
-                "display_in_search" => IIndexable::FIELD_TYPE_INTEGER,
-                "partner_data" => IIndexable::FIELD_TYPE_STRING,
-                "puser_id" => IIndexable::FIELD_TYPE_STRING,
-                "indexed_partner_data_int" => IIndexable::FIELD_TYPE_INTEGER,
-                "indexed_partner_data_string" => IIndexable::FIELD_TYPE_STRING,
-    			"permission_names" => IIndexable::FIELD_TYPE_STRING,
-    			"role_ids" => IIndexable::FIELD_TYPE_STRING,
-       		 );
-    	}
-        if(isset(self::$indexFieldTypes[$field]))
-			return self::$indexFieldTypes[$field];
-			
-		return null;
+    public function getIndexObjectName() {
+    	return "kuserIndex";
     }
 	
 	/* (non-PHPdoc)
@@ -1266,11 +1176,6 @@ class kuser extends Basekuser implements IIndexable
 			$this->modifiedColumns[] = kuserPeer::UPDATED_AT;
 			
 		return $this;
-	}
-	
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
 	}
 	
 	/**
