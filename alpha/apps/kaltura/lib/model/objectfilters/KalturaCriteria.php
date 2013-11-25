@@ -79,11 +79,6 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 		$this->fetchedIds = $fetchedIds;
 	}
 	
-	public function getIdField()
-	{
-		return null;
-	}
-	
 	/**
 	 * @param int $recordsCount
 	 */

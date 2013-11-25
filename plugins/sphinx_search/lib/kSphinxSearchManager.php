@@ -200,17 +200,19 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$dataTimes = array();
 		$dataJson = array();
 		
-		$fields = $object->getIndexFieldsMap();
-		$nullableFields = $object->getIndexNullableFields();
+		$objectIndexClass = $object->getIndexObjectName();
+		$fields = $objectIndexClass::getIndexFieldsMap();
 		foreach($fields as $field => $getterName)
 		{
-			$fieldType = $object->getIndexFieldType($field);
-			$getter = "get{$getterName}";
+			$getter = "get" . $getterName;
+			$fieldType =  $objectIndexClass::getFieldType($field);
+			$nullable = $objectIndexClass::isNullableField($field);
+			
 			switch($fieldType)
 			{
 				case IIndexable::FIELD_TYPE_STRING:
 					$value = $object->$getter();
-					if(in_array($field, $nullableFields))
+					if($nullable)
 					{
 						if(is_null($value) || $value === '')
 							$value = self::HAS_NO_VALUE . $object->getPartnerId();
@@ -288,7 +290,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataStrings as $key => $value)
 		{
-			$escapeType = $object->getSearchIndexFieldsEscapeType($key);
+			
+			$escapeType = $objectIndexClass::getIndexFieldsEscapeType($key);
 			
 			$value = $xmlPipe2 ? $value : SphinxUtils::escapeString($value, $escapeType, 1);
 			$search = array("\0", 	"\n",	"\r",	"\x1a");
@@ -322,7 +325,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$data[$key] = "'" . $valueStr . "'";
 		}
 		
-		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 
 		$placeHolders = isset($options["placeHolders"]) ? $options["placeHolders"] : false;
 
@@ -409,8 +412,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function deleteFromSphinx(IIndexable $object)
 	{
+		$objectIndexClass = $object->getIndexObjectName();
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 		$id = $object->getIntId();
-		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
 		
 		KalturaLog::debug('Deleting sphinx document for object [' . get_class($object) . '] [' . $object->getId() . ']');
 		$sql = "delete from $index where id = $id";
