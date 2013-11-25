@@ -32,21 +32,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		$retVal = $this;
-
-		try
-		{
-			$retVal = $this->doCopyPartner($job, $job->data);
-		}
-		catch ( Exception $e )
-		{
-			self::unimpersonate(); // Make sure we're not impresonating anymore
-			throw $e;
-		}
-		
-		$this->log("KAsyncCopyPartner done.");
-		
-		return $retVal;
+		return $this->doCopyPartner($job, $job->data);
 	}
 	
 	/* (non-PHPdoc)
@@ -55,24 +41,15 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	 */
 	protected function doCopyPartner(KalturaBatchJob $job, KalturaCopyPartnerJobData $jobData)
 	{
+		$this->log( "doCopyPartner job id [$job->id], From PID: $jobData->fromPartnerId, To PID: $jobData->toPartnerId" );
+
 		$this->fromPartnerId = $jobData->fromPartnerId;
 		$this->toPartnerId = $jobData->toPartnerId;
-		$this->log( "CopyPartner job id [$job->id], From PID: $jobData->fromPartnerId, To PID: $jobData->toPartnerId" );
-
-		try
-		{
-			// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
-	 		$this->copyAllEntries();
-		}
-		catch ( Exception $e )
-		{
-			self::unimpersonate(); // Make sure we're not impresonating anymore
-			throw $e;
-		}
 		
- 		$res = $this->closeJob($job, null, null, "CopyPartner finished", KalturaBatchJobStatus::FINISHED);
+		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
+ 		$this->copyAllEntries();
 		
- 		return $res;
+ 		return $this->closeJob($job, null, null, "doCopyPartner finished", KalturaBatchJobStatus::FINISHED);
 	}
 	
 	/**

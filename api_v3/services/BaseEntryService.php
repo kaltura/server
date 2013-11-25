@@ -809,50 +809,21 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function cloneAction( $entryId, KalturaBaseEntry $updateEntry = null )
 	{
-		// Reset criteria filters such that it will be  
-		// possible to copy entries from other partners
-		$isBatchPartner = (kCurrentContext::$master_partner_id == partner::BATCH_PARTNER_ID);
-		if ( $isBatchPartner )
+		// Get the entry
+		$coreEntry = entryPeer::retrieveByPK( $entryId );			
+		if ( ! $coreEntry )
 		{
-			entryPeer::setUseCriteriaFilter(false);
-			categoryEntryPeer::setUseCriteriaFilter(false);
-		}		
-
-		$exceptionToThrow = null;
-		try
-		{
-			// Get the entry
-			$coreEntry = entryPeer::retrieveByPK( $entryId );			
-			if ( ! $coreEntry )
-			{
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			}
-
-			// Copy the entry into a new one based on the given partner data. 
-			$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $this->getPartner() );
-
-			// Need to update attributes?
-			if ( $updateEntry )
-			{
-				// Update extra attributes
-				$clonedEntry = BaseEntryService::updateAction( $clonedEntry, $updateEntry );						
-			}
-		}
-		catch ( Exception $e )
-		{
-			$exceptionToThrow = $e;			
-		}		
-		
-		// Revert criteria filters to prev. values
-		if ( $isBatchPartner )
-		{
-			entryPeer::setUseCriteriaFilter( true );
-			categoryEntryPeer::setUseCriteriaFilter( true );
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 
-		if ( ! empty( $exceptionToThrow ) )
+		// Copy the entry into a new one based on the given partner data. 
+		$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $this->getPartner() );
+
+		// Need to update attributes?
+		if ( $updateEntry )
 		{
-			throw $exceptionToThrow;
+			// Update extra attributes
+			$clonedEntry = BaseEntryService::updateAction( $clonedEntry, $updateEntry );						
 		}
 
 		return $this->getEntry($clonedEntry->getId());
