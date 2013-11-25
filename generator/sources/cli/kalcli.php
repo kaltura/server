@@ -159,15 +159,23 @@ if (!isset($options['raw']) && !isset($options['curl']))
 // renew all ks'es
 if (!isset($options['no-renew']))
 {
+	$renewedSessions = array();
 	foreach ($params as $key => &$value)
 	{
 		if ($key != 'ks' && !preg_match('/[\d]+:ks/', $key))
 			continue;
 
+		if (isset($renewedSessions[$value]))
+		{
+			$value = $renewedSessions[$value];
+			continue;
+		}
+		
 		$renewedKs = KalturaSession::extendKs($value);
 		if (!$renewedKs)
 			continue;
 		
+		$renewedSessions[$value] = $renewedKs; 
 		$value = $renewedKs;
 	}
 }

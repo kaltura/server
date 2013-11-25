@@ -156,6 +156,11 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @filter eq
 	 */
 	public $isAdmin;
+		
+	/**
+	 * @var KalturaLanguageCode
+	 */
+	public $language;
 	
 	/**
 	 * @var int
@@ -235,6 +240,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"firstName",
 		"lastName",
 		"isAdmin",
+		"language",
 		"lastLoginTime",
 		"deletedAt",
 		"roleIds",

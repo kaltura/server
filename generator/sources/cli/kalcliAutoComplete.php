@@ -46,14 +46,14 @@ function startsWith($str, $prefix)
 	return (substr($str, 0, strlen($prefix)) === $prefix);
 }
 
-function findPosition($autoComp, $serviceMap)
+function findPosition($autoComp, $serviceMap, $strCompFunc)
 {
 	$left = 0;
 	$right = count($serviceMap);
 	while ($left < $right)
 	{
 		$mid = floor(($right + $left) / 2);
-		if (strcmp($serviceMap[$mid], $autoComp) < 0)
+		if (call_user_func($strCompFunc, $serviceMap[$mid], $autoComp) < 0)
 			$left = $mid + 1;
 		else
 			$right = $mid;		
@@ -69,22 +69,22 @@ function addPrefix($strArr, $prefix)
 	return $result;
 }
 
-function filterCompletions($autoCompWord, $completions)
+function filterCompletions($autoCompWord, $completions, $strCompFunc = 'strcmp')
 {
-	sort($completions);
+	usort($completions, $strCompFunc);
 
-	$startPos = findPosition($autoCompWord, $completions);
-	$endPos = findPosition($autoCompWord . "\xff", $completions);
+	$startPos = findPosition($autoCompWord, $completions, $strCompFunc);
+	$endPos = findPosition($autoCompWord . "\xff", $completions, $strCompFunc);
 
 	return array_slice($completions, $startPos, $endPos - $startPos);
 }
 
-function printCompletions($autoCompWord, $completions, $finalComp = false, $filterCompletions = true)
+function printCompletions($autoCompWord, $completions, $finalComp = false, $filterCompletions = true, $strCompFunc = 'strcmp')
 {
 	global $compLinePos;
 
 	if ($filterCompletions)
-		$completions = filterCompletions($autoCompWord, $completions);
+		$completions = filterCompletions($autoCompWord, $completions, $strCompFunc);
 	
 	if (!$completions)
 		exit(1);
@@ -402,12 +402,12 @@ switch ($compLineIndex)
 case 1:		// service name / switch
 	$completions = getServiceIds();
 	$completions = array_merge($completions, KalturaCommandLineParser::getAllCommandLineSwitches($commandLineSwitches));
-	printCompletions($autoCompWord, $completions, true);
+	printCompletions($autoCompWord, $completions, true, true, 'strcasecmp');
 	break;
 
 case 2:		// action name
 	$completions = getActionNames($compLine[0]);
-	printCompletions($autoCompWord, $completions, true);
+	printCompletions($autoCompWord, $completions, true, true, 'strcasecmp');
 	break;
 	
 default:	// parameters

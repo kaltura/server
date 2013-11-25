@@ -269,8 +269,9 @@ namespace Kaltura
 			}
             foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
             {
-                if (arrayNode["error"] != null)
-                    multiResponse.Add(new KalturaAPIException(arrayNode["error"]["code"].InnerText, arrayNode["error"]["message"].InnerText));
+				XmlElement error = arrayNode["error"];
+				if (error != null && error["code"] != null && error["message"] != null)
+                    multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
                 else if (arrayNode["objectType"] != null)
                     multiResponse.Add(KalturaObjectFactory.Create(arrayNode));
                 else
@@ -390,7 +391,7 @@ namespace Kaltura
         private void ThrowExceptionOnAPIError(XmlElement result)
         {
             XmlElement error = result["error"];
-            if (error != null)
+            if (error != null && error["code"] != null && error["message"] != null)
                 throw new KalturaAPIException(error["code"].InnerText, error["message"].InnerText);
         }
 

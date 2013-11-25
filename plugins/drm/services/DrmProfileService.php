@@ -13,7 +13,7 @@ class DrmProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('DrmProfile');
 		
 		if (!DrmPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);			
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, DrmPlugin::PLUGIN_NAME);		
 	}
 	
 	/**
