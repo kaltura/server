@@ -20,16 +20,6 @@ class syndicationFeed extends BasesyndicationFeed
 	const SYNDICATION_DELETED = -1;
 	const SYNDICATION_ACTIVE = 1;
 	
-	/* (non-PHPdoc)
-	 * @see BasesyndicationFeed::applyDefaultValues()
-	 */
-	public function applyDefaultValues()
-	{
-		parent::applyDefaultValues();
-		
-		$this->setServePlayManifest(true);
-	}
-	
 	// don't stop until a unique hash is created for this object
 	private static function calculateId ( )
 	{
@@ -65,6 +55,16 @@ class syndicationFeed extends BasesyndicationFeed
 		}                
 	}
 
+	/* (non-PHPdoc)
+	 * @see BasesyndicationFeed::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$this->setServePlayManifest(true);
+		
+		return parent::preInsert($con);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BasesyndicationFeed#postUpdate()
 	 */
