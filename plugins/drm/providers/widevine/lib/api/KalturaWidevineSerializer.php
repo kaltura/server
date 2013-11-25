@@ -14,16 +14,17 @@ class KalturaWidevineSerializer extends KalturaSerializer
 			if(array_key_exists(WidevineLicenseProxyUtils::ASSETID, $requestParams))
 			{
 				$assetid = $requestParams[WidevineLicenseProxyUtils::ASSETID];
-			}  
+			}
+			
 			$object = WidevineLicenseProxyUtils::createErrorResponse(KalturaWidevineErrorCodes::GENERAL_ERROR, $assetid);
     	}
-		$this->_serializedString = $object;		
+		
+		return $object;		
 	}
 	
-	public function setHeaders()
+	public function setHttpHeaders()
 	{
 		header("Content-Type: text/plain");
-		header("Content-Length: " . strlen($this->_serializedString));
 		header("Content-Transfer-Encoding: base64");		
 	}
 }

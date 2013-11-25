@@ -5,5 +5,5 @@
  */
 class KalturaEmailNotificationErrors extends KalturaErrors
 {
-	const INVALID_FILTER_PROPERTY = 'INVALID_FILTER_PROPERTY,The value of property [%s] cannot be set from this context';
+	const INVALID_FILTER_PROPERTY = "INVALID_FILTER_PROPERTY;PROP_VALUE;The value of property [@PROP_VALUE@] cannot be set from this context";
 }
