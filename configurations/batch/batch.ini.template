@@ -48,7 +48,6 @@ enabledWorkers.KAsyncDelete							= 4
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
-enabledWorkers.KAsyncCopyPartner					= 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -63,6 +62,7 @@ enabledWorkers.KAsyncDistributeSubmitCloser			= 1
 enabledWorkers.KAsyncDistributeUpdateCloser			= 1
 enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
+enabledWorkers.KAsyncCopyPartner					= 1
 
 [Worker]
 maximumExecutionTime			= 300
