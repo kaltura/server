@@ -470,7 +470,7 @@ class KalturaErrors extends APIErrors
 	const CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE;;Cannot index object when enetitlment is enabled";
 
 	// live stream
-	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = "LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED;PROT;Status cannot be determined for live stream protocol [@PROT@]";	const ENCODING_IP_NOT_PINGABLE = "ENCODING_IP_NOT_PINGABLE;;One or both of the provided encoding IPs is not pingable";
+	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = "LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED;PROT;Status cannot be determined for live stream protocol [@PROT@]";
 
 	const ENCODING_IP_NOT_PINGABLE = "ENCODING_IP_NOT_PINGABLE;;One or both of the provided encoding IPs is not pingable";
 	
