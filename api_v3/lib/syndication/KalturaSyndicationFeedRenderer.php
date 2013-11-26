@@ -549,7 +549,8 @@ class KalturaSyndicationFeedRenderer
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
 			$urlManager->setDomain($cdnHost);
 			
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($flavorAsset);
+			$clientTag = 'feed-' . $this->syndicationFeedDb->getId();
+			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
 		}
 		else
 		{
@@ -587,7 +588,8 @@ class KalturaSyndicationFeedRenderer
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
 			$cdnHost = requestUtils::getApiCdnHost();
-			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset);
+			$clientTag = 'feed-' . $this->syndicationFeedDb->getId();
+			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
 		}
 		else
 		{

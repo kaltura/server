@@ -320,9 +320,10 @@ class kUrlManager
 
 	/**
 	 * @param asset $asset
+	 * @param string $clientTag
 	 * @return string
 	 */
-	public function getPlayManifestUrl(asset $asset)
+	public function getPlayManifestUrl(asset $asset, $clientTag)
 	{
 		$url = null;
 		
@@ -338,7 +339,7 @@ class kUrlManager
 			$flavorAssetId = $asset->getId();
 			$cdnHost = parse_url($this->domain, PHP_URL_HOST);
 			
-			$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost";
+			$url = "$partnerPath/playManifest/clientTag/$clientTag/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost";
 			if($this->storageProfileId)
 				$url .= "/storageId/$this->storageProfileId";
 		}
