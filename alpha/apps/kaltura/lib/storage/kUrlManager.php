@@ -319,30 +319,22 @@ class kUrlManager
 	}
 
 	/**
-	 * @param asset $asset
+	 * @param flavorAsset $asset
 	 * @param string $clientTag
 	 * @return string
 	 */
-	public function getPlayManifestUrl(asset $asset, $clientTag)
+	public function getPlayManifestUrl(flavorAsset $asset, $clientTag)
 	{
-		$url = null;
+		$entryId = $asset->getEntryId();
+		$partnerId = $asset->getPartnerId();
+		$subpId = $asset->getentry()->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$flavorAssetId = $asset->getId();
+		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
 		
-		if($asset instanceof thumbAsset)
-			$url = $this->doGetThumbnailAssetUrl($asset);
-		
-		if($asset instanceof flavorAsset)
-		{
-			$entryId = $asset->getEntryId();
-			$partnerId = $asset->getPartnerId();
-			$subpId = $asset->getentry()->getSubpId();
-			$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-			$flavorAssetId = $asset->getId();
-			$cdnHost = parse_url($this->domain, PHP_URL_HOST);
-			
-			$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
-			if($this->storageProfileId)
-				$url .= "/storageId/$this->storageProfileId";
-		}
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		if($this->storageProfileId)
+			$url .= "/storageId/$this->storageProfileId";
 		
 		return $url;
 	}
