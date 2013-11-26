@@ -22,30 +22,9 @@ interface IIndexable extends IBaseObject
 	public function getEntryId();
 	
 	/**
-	 * @return string object propel name
+	 * This function returns the index object name (the one responsible for the sphinx mapping)
 	 */
-	public function getObjectIndexName();
-	
-	/**
-	 * @return array while the key is the index attribute name and the value is the getter name
-	 * For example array('name' => 'title') if name should be retrieved by getTitle() getter
-	 */
-	public function getIndexFieldsMap();
-	
-	/**
-	 * @return array of fields that should be indexed with suffix that indicates that the content is not null or text that indicates that the value is null
-	 */
-	public static function getIndexNullableFields();
-	
-	/**
-	 * @return string field type, string, int or timestamp
-	 */
-	public function getIndexFieldType($field);
-	
-	/**
-	 * @return string field escape type for strings
-	 */
-	public function getSearchIndexFieldsEscapeType($field);
+	public function getIndexObjectName();
 	
 	/**
 	 * @param int $time
@@ -57,4 +36,5 @@ interface IIndexable extends IBaseObject
 	 * Index the object in the search engine
 	 */
 	public function indexToSearchIndex();
+	
 }

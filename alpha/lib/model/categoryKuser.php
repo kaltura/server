@@ -29,13 +29,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	
 	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
 	
-	private static $indexFieldTypes = null;
-		
-	private static $indexFieldsMap = null;
-	
 	const STATUS_FIELD_PREFIX = "status";
-	
-	
 	
 	/**
 	 * Applies default values to this object.
@@ -244,88 +238,10 @@ class categoryKuser extends BasecategoryKuser implements IIndexable{
 	 */
 	public function getEntryId() {}
 
-	/* (non-PHPdoc)
-	 * @see IIndexable::getObjectIndexName()
-	 */
-	public function getObjectIndexName() {
-		return categoryKuserPeer::TABLE_NAME;
+	public function getIndexObjectName() {
+		return "categoryKuserIndex";
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexNullableFields()
-	 */
-	public static function getIndexNullableFields()
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldsMap()
-	 */
-	public function getIndexFieldsMap() 
-	{
-		if (! self::$indexFieldsMap)
-		{
-			self::$indexFieldsMap = array (
-			'category_id' => 'categoryId',
-			'kuser_id' => 'kuserId',
-			'category_full_ids' => 'searchIndexCategoryFullIds',
-			'permission_names' => 'searchIndexPermissionNames',
-			'puser_id' => 'puserId',
-			'screen_name' => 'screenName',
-			'category_kuser_status' => 'searchIndexStatus',
-			'partner_id' => 'partnerId',
-			'update_method' => 'searchIndexUpdateMethod',
-			'created_at' => 'createdAt',
-			'updated_at' => 'updatedAt',
-			);
-		}
-		
-		return self::$indexFieldsMap;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldType()
-	 */
-	public function getIndexFieldType($field) 
-	{
-		if (! self::$indexFieldTypes)
-		{
-			self::$indexFieldTypes = array (
-			'category_id' => IIndexable::FIELD_TYPE_STRING,
-			'kuser_id' => IIndexable::FIELD_TYPE_STRING,
-			'category_full_ids' => IIndexable::FIELD_TYPE_STRING,
-			'permission_names' => IIndexable::FIELD_TYPE_STRING,
-			'puser_id' => IIndexable::FIELD_TYPE_STRING,
-			'screen_name' => IIndexable::FIELD_TYPE_STRING,
-			'category_kuser_status' => IIndexable::FIELD_TYPE_STRING,
-			'partner_id' => IIndexable::FIELD_TYPE_STRING,
-			'update_method' => IIndexable::FIELD_TYPE_STRING,
-			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-			);
-		}	
-		if(isset(self::$indexFieldTypes[$field]))
-			return self::$indexFieldTypes[$field];
-			
-		return null;
-	}
-
-	public static $sphinxFieldsEscapeType = array(
-		'category_full_ids' => SearchIndexFieldEscapeType::NO_ESCAPE,
-	);
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getSearchIndexFieldsEscapeType()
-	 */
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		if(!isset(self::$sphinxFieldsEscapeType[$fieldName]))
-			return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
-			
-		return self::$sphinxFieldsEscapeType[$fieldName];
-	}
-
 	/* (non-PHPdoc)
 	 * @see IIndexable::indexToSearchIndex()
 	 */
