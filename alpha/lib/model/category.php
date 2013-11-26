@@ -1322,6 +1322,19 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
+	 * reset category's pendingEntriesCount by calculate it.
+	 */
+	public function reSetPendingEntriesCount()
+	{
+		$criteria = new Criteria();
+		$criteria->add(categoryEntryPeer::CATEGORY_ID, $this->getId());
+		$criteria->add(categoryEntryPeer::STATUS, CategoryEntryStatus::PENDING);
+			
+		$count = categoryEntryPeer::doCount($criteria);
+		$this->setPendingEntriesCount($count);
+	}
+	
+	/**
 	 * Decrement category's entriesCount by calculate it.
 	 */
 	public function decrementEntriesCount($entryId)
