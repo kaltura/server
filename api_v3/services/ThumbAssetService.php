@@ -434,12 +434,13 @@ class ThumbAssetService extends KalturaAssetService
 	 * @param string $thumbAssetId
 	 * @param int $version
 	 * @param KalturaThumbParams $thumbParams
+	 * @param KalturaThumbnailServeOptions $options
 	 * @return file
 	 *  
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
-	public function serveAction($thumbAssetId, $version = null, KalturaThumbParams $thumbParams = null)
+	public function serveAction($thumbAssetId, $version = null, KalturaThumbParams $thumbParams = null, KalturaThumbnailServeOptions $options = null)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -476,7 +477,11 @@ class ThumbAssetService extends KalturaAssetService
 			
 		$fileName = $thumbAsset->getEntryId()."_" . $thumbAsset->getId() . ".$ext";
 		if(!$thumbParams)
+		{
+			if($options && $options->download)
+				header("Content-Disposition: attachment; filename=\"$fileName\"");
 			return $this->serveAsset($thumbAsset, $fileName, $version);
+		}
 			
 		$thumbParams->validate();
 		
@@ -518,6 +523,9 @@ class ThumbAssetService extends KalturaAssetService
 			$thumbParams->stripProfiles, 
 			null);
 		
+		if($options && $options->download)
+			header("Content-Disposition: attachment; filename=\"$fileName\"");
+			
 		$mimeType = kFile::mimeType($tempThumbPath);
 		return $this->dumpFile($tempThumbPath, $mimeType); 
 	}
