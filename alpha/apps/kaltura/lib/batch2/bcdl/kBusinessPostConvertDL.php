@@ -59,6 +59,10 @@ class kBusinessPostConvertDL
 		$productMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 		$targetFlavor = assetParamsOutputPeer::retrieveByAssetId($currentFlavorAsset->getId());
 		
+		//Retrieve convert job executing engien
+		$dbConvertBatchJob = $dbBatchJob->getParentJob();
+		$convertEngineType =  $dbConvertBatchJob->getJobSubType();
+		
 		$postConvertData = $dbBatchJob->getData();
 		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
 		if($postConvertData instanceof kPostConvertJobData)
@@ -68,7 +72,7 @@ class kBusinessPostConvertDL
 		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo)
 		{
 			try{
-				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo);
+				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo, $convertEngineType);
 			}
 			catch(Exception $e){
 				KalturaLog::err('KDL Error: ' . print_r($e, true));
