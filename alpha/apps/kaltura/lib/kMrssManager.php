@@ -255,7 +255,7 @@ class kMrssManager
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
 			$urlManager->setDomain($cdnHost);
 			
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset);
+			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
@@ -292,7 +292,7 @@ class kMrssManager
 		
 		if($mrssParams && $mrssParams->getServePlayManifest())
 		{
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset);
+			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{

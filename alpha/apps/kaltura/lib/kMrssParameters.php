@@ -30,6 +30,24 @@ class kMrssParameters
 	
 	private $servePlayManifest;
 	
+	private $playManifestClientTag;
+	
+	/**
+	 * @return field_type $playManifestClientTag
+	 */
+	public function getPlayManifestClientTag()
+	{
+		return $this->playManifestClientTag;
+	}
+
+	/**
+	 * @param field_type $playManifestClientTag
+	 */
+	public function setPlayManifestClientTag($playManifestClientTag)
+	{
+		$this->playManifestClientTag = $playManifestClientTag;
+	}
+
 	/**
 	 * @return the $itemXpathsToExtend
 	 */
