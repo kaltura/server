@@ -175,9 +175,10 @@ class CaptionAssetService extends KalturaAssetService
 	protected function attachFile(CaptionAsset $captionAsset, $fullPath, $copyOnly = false)
 	{
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
-		
 		$captionAsset->incrementVersion();
-		$captionAsset->setFileExt($ext);
+		if($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
+			$captionAsset->setFileExt($ext);
+		
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
 		
