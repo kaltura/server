@@ -290,7 +290,7 @@ class kMrssManager
 		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
 		$urlManager->setDomain($cdnHost);
 		
-		if($mrssParams && $mrssParams->getServePlayManifest())
+		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
 			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
 		}
