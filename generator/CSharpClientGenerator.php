@@ -167,7 +167,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			else if ($propType == "bool")
 				$dotNetPropType  = "bool?";
 			else if ($propType == "bigint")
-				$dotNetPropType  = "int";
+				$dotNetPropType  = "long";
 			else
 				$dotNetPropType = $propType;
 				
@@ -178,6 +178,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			switch($propType)
 			{
 				case "bigint":
+					$property["default"] = "Long.MIN_VALUE";
+					break;
 				case "int":
 					if ($isEnum)
 						$property["default"] = "($dotNetPropType)Int32.MinValue";
@@ -277,6 +279,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				switch($propType)
 				{
 					case "bigint":
+						$this->appendLine("						this.$dotNetPropName = ParseLong(txt);");
+						break;
 					case "int":
 						if ($isEnum)
 						{
@@ -341,6 +345,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			switch($propType)
 			{
 				case "bigint":
+					$this->appendLine("			kparams.AddLongIfNotNull(\"$propName\", this.$dotNetPropName);");
+					break;
 				case "int":
 					if ($isEnum)
 						$this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
@@ -626,6 +632,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine("			kparams.AddFloatIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
 					break;
 				case "bigint":
+						$this->appendLine("			kparams.AddLongIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
 			   	case "int":
 					if ($isEnum)
 						$this->appendLine("			kparams.AddEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
@@ -682,6 +690,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			return list;");
 					break;
 				case "bigint":
+					$this->appendLine("			return long.Parse(result.InnerText);");
+					break;
 				case "int":
 					$this->appendLine("			return int.Parse(result.InnerText);");
 					break;
@@ -722,7 +732,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$dotNetType = "FileStream";
 					break;
 				case "bigint":
-					$dotNetType = "int";
+					$dotNetType = "long";
 					break;
 				case "int":
 					if ($isEnum)

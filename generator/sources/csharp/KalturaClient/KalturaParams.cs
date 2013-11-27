@@ -80,6 +80,12 @@ namespace Kaltura
             if (value != Single.MinValue)
                 this.Add(key, value.ToString());
         }
+        
+        public void AddLongIfNotNull(string key, long value)
+        {
+            if (value != long.MinValue)
+                this.Add(key, value.ToString());
+        }
 
         public void AddEnumIfNotNull(string key, Enum value)
         {
