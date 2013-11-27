@@ -94,7 +94,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::err('Failed to get modification time and file size for file ['.$fullPath.']');
+			//Currently "modificationTime" does not throw Exception since from php documentation not all servers support the ftp_mdtm feature
+			KalturaLog::err('Failed to get modification time or file size for file ['.$fullPath.']');
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
 															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);	
 			return false;		
