@@ -6,7 +6,7 @@
 class KalturaBulkUpload extends KalturaObject implements IFilterable
 {
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $id;
 	

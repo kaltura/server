@@ -302,7 +302,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
-				
+
+			$propType = $this->getPHPType($propType);
 			$propDescription = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
@@ -605,7 +606,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 						$signature .= " = null";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
-					else if ($paramType == "int" || $paramType == "float")
+					else if ($paramType == "int" || $paramType == "bigint" || $paramType == "float")
 					{
 						if ($defaultValue == "")
 							$signature .= " = \"\""; // hack for partner.getUsage
@@ -698,5 +699,17 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
 		parent::addFile($fileName, $fileContents, $addLicense);
+	}
+	
+	public function getPHPType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }
