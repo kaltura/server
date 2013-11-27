@@ -162,10 +162,10 @@ Kaltura live stream, including DVR configuration and live transcoding.
  - Change `log4j.appender.serverStats.File` = @LOG_DIR@/kaltura\_mediaserver\_stats.log
  - Comment out `log4j.appender.serverError.layout`
  - Add `log4j.appender.serverError.layout` = `org.apache.log4j.PatternLayout`
- - Add `log4j.appender.serverError.layout.ConversionPattern` = `[%d{dd MMM yyyy HH:MM:ss}] %p - "%m" - (%F:%L) %n` 
+ - Add `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}] %p - "%m" - (%F:%L) %n` 
  - Comment out `log4j.appender.serverAccess.layout`
  - Add `log4j.appender.serverAccess.layout` = `org.apache.log4j.PatternLayout`
- - Add `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{dd MMM yyyy HH:MM:ss}] %p - "%m" - (%F:%L) %n`
+ - Add `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}] %p - "%m" - (%F:%L) %n`
 
      
 *Origin:*
