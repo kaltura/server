@@ -149,7 +149,7 @@ class KDLWrap
 	/* ------------------------------
 	 * function CDLValidateProduct
 	 */
-	public static function CDLValidateProduct(mediaInfo $cdlSourceMediaInfo=null, flavorParamsOutput $cdlTarget, mediaInfo $cdlProductMediaInfo, $conversionEngine)
+	public static function CDLValidateProduct(mediaInfo $cdlSourceMediaInfo=null, flavorParamsOutput $cdlTarget, mediaInfo $cdlProductMediaInfo, $conversionEngine=null)
 	{
 		$kdlProduct = new KDLFlavor();
 		KDLWrap::ConvertMediainfoCdl2Mediadataset($cdlProductMediaInfo, $kdlProduct);
@@ -163,12 +163,11 @@ class KDLWrap
 		}
 		else {
 			//In case we have no source media info.
-			//This was added as a part of the fix for SUP-1142 were assets with size 0 were marked as ready. no "mediainfo" assets did not go through validation and got ready.
+			//This was added to fix cases where assets with size 0 were marked as ready. no "mediainfo" assets did not go through validation and got ready.
 			//The addition of the first validation indeed caused ffmpeg flow to fail (the firs part of the volition before the OR) but the meencoder generated invalid files.  
 			//The second part of the OR comes to handle cases were meencoder created faulty gray files that had only video/audio.
-			$meEncoder = 3;
 			if(($kdlProduct->_video===null && $kdlProduct->_audio===null) 
-			|| ($conversionEngine == $meEncoder && !($kdlProduct->_video === null && $kdlProduct->_audio===null))) { 
+			|| (isset($conversionEngine) && $conversionEngine == conversionEngineType::MENCODER && !($kdlProduct->_video === null && $kdlProduct->_audio===null))) { 
 				// "Invalid File - No media content.";
 				$kdlProduct->_errors[KDLConstants::ContainerIndex][] = KDLErrors::ToString(KDLErrors::NoValidMediaStream);
 			}

@@ -60,8 +60,12 @@ class kBusinessPostConvertDL
 		$targetFlavor = assetParamsOutputPeer::retrieveByAssetId($currentFlavorAsset->getId());
 		
 		//Retrieve convert job executing engien
-		$dbConvertBatchJob = $dbBatchJob->getParentJob();
-		$convertEngineType =  $dbConvertBatchJob->getJobSubType();
+		$convertEngineType = null;
+		if($dbBatchJob->getParentJob()){
+			$dbParentBatchJob = $dbBatchJob->getParentJob();
+			if($dbParentBatchJob->getJobType() == BatchJobType::CONVERT)
+				$convertEngineType =  $dbParentBatchJob->getJobSubType();
+		}
 		
 		$postConvertData = $dbBatchJob->getData();
 		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
