@@ -150,6 +150,9 @@ class KalturaResponseCacher extends kApiCache
 			$response = unserialize($response);
 			if (!$response->validate())
 			{
+				if (self::$_debugMode)
+					$this->debugLog('failed to validate the response');
+				
 				$this->sendCachingHeaders(false);
 				return;
 			}
