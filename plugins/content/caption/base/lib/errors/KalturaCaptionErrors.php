@@ -14,4 +14,5 @@ class KalturaCaptionErrors extends KalturaErrors
 	const CAPTION_ASSET_FILE_NOT_FOUND = "CAPTION_ASSET_FILE_NOT_FOUND,Caption asset \"%s\" file not found";
 	const CAPTION_ASSET_INVALID_FORMAT = "CAPTION_ASSET_INVALID_FORMAT,Unsupported caption asset format for id \"%s\"";
 	const CAPTION_ASSET_PARSING_FAILED = "CAPTION_ASSET_PARSING_FAILED,Failed to parse caption asset \"%s\"";
+	const CAPTION_ASSET_UNSUPPORTED_FORMAT = "CAPTION_ASSET_UNSUPPORTED_FORMAT,Unsupported caption asset format \"%s\"";
 }
