@@ -190,6 +190,12 @@ return array(
 	'Kaltura_Client_Enum_SourceType::URL' => 'URL',
 	'Kaltura_Client_Enum_SourceType::SEARCH_PROVIDER' => 'Search',
 	'Kaltura_Client_Enum_SourceType::AKAMAI_LIVE' => 'Akamai',
+	'Kaltura_Client_Enum_SourceType::MANUAL_LIVE_STREAM' => 'Manual Live Stream',
+	'Kaltura_Client_Enum_SourceType::AKAMAI_UNIVERSAL_LIVE' => 'Akamai Universal Live',
+	'Kaltura_Client_Enum_SourceType::LIVE_STREAM' => 'Live Stream',
+	'Kaltura_Client_Enum_SourceType::LIVE_CHANNEL' => 'Live Channel',
+	'Kaltura_Client_Enum_SourceType::RECORDED_LIVE' => 'Recorded Live',
+	'Kaltura_Client_Enum_SourceType::CLIP' => 'Clip',
 	
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA_EDIT' => 'Data Edit',
