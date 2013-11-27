@@ -111,4 +111,16 @@ class KalturaCaptionAsset extends KalturaAsset
 		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
+
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if ($this->format == KalturaCaptionType::WEBVTT)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_UNSUPPORTED_FORMAT, $this->format);
+		
+		parent::validateForInsert($propertiesToSkip);
+	}
 }
