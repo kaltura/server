@@ -8,6 +8,14 @@ Kaltura live stream recording and clipping.
 
 ## Configuration: ##
 
+**File Sync**
+
+Add new file sync exclusions to dc_config.ini based on dc_config.template.ini.  
+
+- FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY = 1:10 
+- FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY = 1:11 
+
+
 **Batch**
 
 Add new workers to batch.ini based on batch.ini.template.
