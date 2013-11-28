@@ -138,6 +138,7 @@ class KImageMagickCropper extends KBaseCropper
 			$geometrics .= ($cropY < 0 ? $cropY : "+$cropY");
 			
 			$attributes[] = "-crop $geometrics";
+			$attributes[] = "+repage"; 
 		}
 				
 		// crop or resize
