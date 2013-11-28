@@ -273,6 +273,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachLiveEntryResource(kLiveEntryResource $resource, entry $dbEntry, asset $dbAsset = null, array $operationAttributes = null)
 	{
+		$dbEntry->setRootEntryId($resource->getEntry()->getId());
 		$dbEntry->setSource(EntrySourceType::RECORDED_LIVE);
 		$dbEntry->save();
 	
