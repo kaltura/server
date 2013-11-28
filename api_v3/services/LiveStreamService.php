@@ -18,6 +18,10 @@ class LiveStreamService extends KalturaEntryService
 
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM, $this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			
+		// KAsyncValidateLiveMediaServers lists all live entries of all partners
+		if($this->getPartnerId() == Partner::BATCH_PARTNER_ID && $actionName == 'list')
+			myPartnerUtils::resetPartnerFilter('entry');
 	}
 	
 	
@@ -200,6 +204,25 @@ class LiveStreamService extends KalturaEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
 		return $entry;
+	}
+
+	/**
+	 * Validates all registered media servers
+	 * 
+	 * @action validateRegisteredMediaServers
+	 * @param string $entryId Live stream entry id
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function validateRegisteredMediaServersAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		/* @var $dbEntry LiveEntry */
+		if($dbEntry->validateMediaServers())
+			$dbEntry->save();	
 	}
 	
 	/**
