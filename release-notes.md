@@ -1,4 +1,4 @@
-
+have 
 # IX-live-1.1 #
 Kaltura live stream recording and clipping.
 
@@ -33,7 +33,12 @@ Add new workers to batch.ini based on batch.ini.template.
 
 **DB**
 
-- Create media server partner permissions deployment/updates/sql/2013_11_18_create_media_partner_permissions.sql
+- Create media server partner permissions - deployment/updates/sql/2013_11_18_create_media_partner_permissions.sql
+
+**Default Content**
+
+- Create live conversion profiles to existing partners -  deployment/updates/scripts/2013_11_20_create_live_profiles.php
+
 
 ----------
 
