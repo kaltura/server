@@ -1319,7 +1319,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $conversionProfileType = null)
  	{
 		$copiedList = array();
 		
@@ -1327,6 +1327,9 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
+ 		
+ 		if(!is_null($conversionProfileType))
+ 			$c->add(conversionProfile2Peer::TYPE, $conversionProfileType);
  		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
