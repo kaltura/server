@@ -398,17 +398,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 	}
 	
-	private function createLiveConversionProfile($partnerId)
+	private function createLiveConversionProfile(Partner $partner)
 	{
 		$c = new Criteria();
-		$c->add(conversionProfile2Peer::PARTNER_ID, $partnerId);
+		$c->add(conversionProfile2Peer::PARTNER_ID, $partner->getId());
 		$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
 		$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 		
 		if(conversionProfile2Peer::doCount($c))
 			return;
 			
-		myPartnerUtils::copyConversionProfiles(kConf::get('template_partner_id'), $partnerId, ConversionProfileType::LIVE_STREAM);
+		$templatePartner = PartnerPeer::retrieveByPK(kConf::get('template_partner_id'));
+		if($templatePartner)
+			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, ConversionProfileType::LIVE_STREAM);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -459,7 +461,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				
 				if($dbPermission->getName() == PermissionName::FEATURE_LIVE_STREAM && $dbPermission->getStatus() == PermissionStatus::ACTIVE)
 				{
-					$this->createLiveConversionProfile($object_to_fill->getId());
+					$this->createLiveConversionProfile($object_to_fill);
 				}
 			}
 		}
