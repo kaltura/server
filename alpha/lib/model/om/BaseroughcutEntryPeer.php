@@ -304,6 +304,17 @@ abstract class BaseroughcutEntryPeer {
 		}
 	}
 	
+	static $maxNumInstancesInPool = null;
+	public static function getMaxNumInstancesInPool()
+	{
+		if ( is_null( self::$maxNumInstancesInPool ) )
+		{
+			self::$maxNumInstancesInPool = kConf::get('max_num_instances_in_pool');
+		}
+		
+		return self::$maxNumInstancesInPool;
+	} 
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
 	 *  
@@ -311,9 +322,15 @@ abstract class BaseroughcutEntryPeer {
 	 */
 	public static function addInstancesToPool($queryResult)
 	{
-		foreach ($queryResult as $curResult)
+		if (Propel::isInstancePoolingEnabled())
 		{
-			roughcutEntryPeer::addInstanceToPool($curResult);
+			if ( count( self::$instances ) + count( $queryResult ) <= self::getMaxNumInstancesInPool() )
+			{  
+				foreach ($queryResult as $curResult)
+				{
+					roughcutEntryPeer::addInstanceToPool($curResult);
+				}
+			}
 		}
 	}
 	
@@ -596,12 +613,20 @@ abstract class BaseroughcutEntryPeer {
 	 */
 	public static function addInstanceToPool(roughcutEntry $obj, $key = null)
 	{
-		if (Propel::isInstancePoolingEnabled()) {
-			if ($key === null) {
+		if ( Propel::isInstancePoolingEnabled() )
+		{
+			if ( $key === null )
+			{
 				$key = (string) $obj->getId();
-			} // if key === null
-			self::$instances[$key] = $obj;
-			kMemoryManager::registerPeer('roughcutEntryPeer');
+			}
+				
+			if ( isset( self::$instances[$key] )									// Instance is already mapped?
+					|| count( self::$instances ) < self::getMaxNumInstancesInPool()	// Not mapped, but max. inst. not yet reached?
+				)
+			{
+				self::$instances[$key] = $obj;
+				kMemoryManager::registerPeer('roughcutEntryPeer');
+			}
 		}
 	}
 
