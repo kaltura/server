@@ -89,14 +89,21 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 		return $bulkUploadResult;
 	}
 	
+	/**
+	 * Get objects according to the input filter and create bulkUploadResults for each one of them
+	 * 
+	 */
 	protected function processObjectsList()
 	{
+		KalturaLog::debug("Processing objects, start index: ".$this->startIndex);
+		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 100;		
 		if(KBatchBase::$taskConfig->params->pageSize)
 			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;			
 		$pager->pageIndex = $this->getPagerIndex($pager->pageSize);
-			
+
+		KalturaLog::debug("Getting objects, page index: ".$pager->pageIndex);
 		$list = $this->listObjects($this->getData()->filter, $pager);
 		$stop = false;
 		
@@ -123,7 +130,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 			else 
 			{
 				$pager->pageIndex = $this->getPagerIndex($pager->pageSize);						
-				KalturaLog::debug("getting next page: ".$pager->pageIndex);				
+				KalturaLog::debug("Getting objects, page index: ".$pager->pageIndex);				
 				$list = $this->listObjects($this->getData()->filter, $pager);
 			}
 		}		

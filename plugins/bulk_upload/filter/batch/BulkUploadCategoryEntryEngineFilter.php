@@ -25,8 +25,6 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
         
 	    if ($this->getData()->templateObject->entryId)
 	        $categoryEntry->entryId = $this->getData()->templateObject->entryId;
-
-	    KalturaLog::debug("template category id:". $this->getData()->templateObject->categoryId);
 	    
 	    if ($this->getData()->templateObject->categoryId)
 	        $categoryEntry->categoryId = $this->getData()->templateObject->categoryId;
@@ -39,11 +37,19 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 		return KBatchBase::$kClient->categoryEntry->delete($bulkUploadResult->entryId, $bulkUploadResult->categoryId);
 	}
 	
+	/**
+	 * create specific instance ob BulkUploadResult and set it's properties
+	 * @param $object - Result can be created either from KalturaBaseEntry or from KalturaCategoryEntry depending on the 
+	 * filter passed to the job
+	 * 
+	 * @see BulkUploadEngineFilter::fillUploadResultInstance()
+	 */
 	protected function fillUploadResultInstance ($object)
 	{
 	    $bulkUploadResult = new KalturaBulkUploadResultCategoryEntry();
 	    if($object instanceof KalturaBaseEntry)
 	    {
+	    	//get category entry object based on the entry details
 	    	$filter = new KalturaCategoryEntryFilter();
 	    	$filter->entryIdEqual = $object->id;
 	    	$filter->categoryIdEqual = $object->categoryId;
@@ -73,7 +79,9 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 		return self::OBJECT_TYPE_TITLE;
 	}
 	
-	/* (non-PHPdoc)
+	/* get a list of objects according to the input filter
+	 * Can either filter entries by if entry filter is passed or category entries if category entry filter is passed
+	 * 
 	 * @see BulkUploadEngineFilter::listObjects()
 	 */
 	protected function listObjects(KalturaFilter $filter, KalturaFilterPager $pager = null) 
