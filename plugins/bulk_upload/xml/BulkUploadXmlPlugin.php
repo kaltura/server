@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadXml
  */
-class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion, IKalturaConfigurator, IKalturaSchemaDefiner
+class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion, IKalturaConfigurator, IKalturaSchemaDefiner, IKalturaPending
 {
 	const PLUGIN_NAME = 'bulkUploadXml';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -15,6 +15,16 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$drmDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
+		
+		return array($drmDependency);
 	}
 	
 	/* (non-PHPdoc)

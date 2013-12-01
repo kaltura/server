@@ -157,6 +157,12 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 			$this->bulkUploadObjectType = BulkUploadObjectType::ENTRY;
 			if ($jobData->getBulkUploadObjectType())
 			    $this->bulkUploadObjectType = $jobData->getBulkUploadObjectType();
+			    
+			if(!$jobData->getFilePath())
+			{
+				$this->csvFileUrl = null;
+				$this->bulkFileUrl = null;
+			}
 		}
 	}
 

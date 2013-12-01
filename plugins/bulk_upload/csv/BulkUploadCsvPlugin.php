@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadCsv
  */
-class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaConfigurator
+class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaConfigurator, IKalturaPending
 {
 	const PLUGIN_NAME = 'bulkUploadCsv';
 
@@ -14,6 +14,16 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$drmDependency = new KalturaDependency(BulkUploadPlugin::PLUGIN_NAME);
+		
+		return array($drmDependency);
 	}
 	
 	/**
