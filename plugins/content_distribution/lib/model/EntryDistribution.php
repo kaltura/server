@@ -374,12 +374,41 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function getUpdateDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
 	public function getDeleteDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
 	
-	public function incrementSubmitResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION);}
-	public function incrementUpdateResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION);}
-	public function incrementDeleteResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION);}
-	public function incrementSubmitDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION);}
-	public function incrementUpdateDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
-	public function incrementDeleteDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
+	public function incrementSubmitResultsVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getSubmitResultsVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION, $version);
+	}
+	
+	public function incrementUpdateResultsVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getUpdateResultsVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION, $version);
+	}
+	
+	public function incrementDeleteResultsVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getDeleteResultsVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION, $version);
+	}
+	
+	public function incrementSubmitDataVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getSubmitDataVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION, $version);
+	}
+	
+	public function incrementUpdateDataVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getUpdateDataVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION, $version);
+	}
+	
+	public function incrementDeleteDataVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getDeleteDataVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION, $version);
+	}
 
 	
 	/**
