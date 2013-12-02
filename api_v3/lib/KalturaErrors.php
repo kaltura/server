@@ -126,6 +126,8 @@ class KalturaErrors extends APIErrors
 
 	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND;;The recorded webcam file was not found by the given token id, or was already used";
 
+	const INVALID_WEBCAM_TOKEN_ID = "INVALID_WEBCAM_TOKEN_ID;;Invalid webcam token id";
+	
 	const PERMISSION_DENIED_TO_UPDATE_ENTRY = "PERMISSION_DENIED_TO_UPDATE_ENTRY;;User can update only the entries he own, otherwise an admin session must be used";
 
 	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE;;Invalid rank value, rank should be between 1 and 5";
