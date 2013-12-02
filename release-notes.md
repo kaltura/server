@@ -165,6 +165,9 @@ Kaltura live stream, including DVR configuration and live transcoding.
      - Kaltura web services http port
          - Name - KalturaServerWebServicesPort
          - Value - 888
+     - Kaltura web services http host name to be used for address binding, external IP could be used as well.
+         - Name - KalturaServerWebServicesHost
+         - Value - Machine external host name or IP.
      - Kaltura recorded files group name
          - Name - KalturaRecordedFileGroup
          - Value - kaltura (or apache if kaltura doesn't exist)
