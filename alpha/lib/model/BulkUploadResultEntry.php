@@ -109,7 +109,7 @@ class BulkUploadResultEntry extends BulkUploadResult
 			throw new kCoreException("Entry not found");
 			
 		if($this->getThumbnailUrl())
-			$entry->setCreateThumb(false);
+			$entry->setCreateThumb(false, $entry->getId());
 			
 		$entry->setBulkUploadId($this->getBulkUploadJobId());
 		$entry->save();

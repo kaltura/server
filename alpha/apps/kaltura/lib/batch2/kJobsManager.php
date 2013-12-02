@@ -1160,7 +1160,7 @@ class kJobsManager
 		if($entry->getType() != entryType::MEDIA_CLIP)
 		{
 			$jobData->setExtractMedia(false);
-			$entry->setCreateThumb(false);
+			$entry->setCreateThumb(false, $entry->getId());
 		}
 		$entry->save();
  		

@@ -70,7 +70,7 @@ class setRoughcutThumbnailAction extends defKeditorservicesAction
 //		echo "for entry: $show_entry_id current thumb path: " . $entry->getThumbnail() ;
 		
 		$entry->setThumbnail ( ".jpg");
-		$entry->setCreateThumb(false);
+		$entry->setCreateThumb(false, $entry->getId());
 		$entry->save();
 		
 		//$thumb_data = $_REQUEST["ThumbData"];

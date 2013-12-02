@@ -50,7 +50,7 @@ class MixingService extends KalturaEntryService
 		if (!$dbEntry->getThumbnail())
 		{
 			$dbEntry->setThumbnail("&auto_edit.jpg");
-			$dbEntry->setCreateThumb(false);
+			$dbEntry->setCreateThumb(false, $dbEntry->getId());
 		}
 			
 		$dbEntry->save(); // we need the id for setDataContent
