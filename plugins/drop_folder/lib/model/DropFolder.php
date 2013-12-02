@@ -22,6 +22,8 @@ class DropFolder extends BaseDropFolder
 	const INCREMENTAL = 'incremental';
 	const LAST_FILE_TIMESTAMP = 'last_file_timestamp'; 
 	const METADATA_PROFILE_ID = 'metadata_profile_id';
+	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
+	const ENFORCE_ENTITLEMENT = 'enforce_entitlement';
 	
 	// -------------------------------------
 	// -- Default values -------------------
@@ -212,6 +214,38 @@ class DropFolder extends BaseDropFolder
 	public function getMetadataProfileId ()
 	{
 		return $this->getFromCustomData(self::METADATA_PROFILE_ID);
+	}
+	
+		/**
+	 * return string
+	 */
+	public function getCategoriesMetadataFieldName ()
+	{
+		return $this->getFromCustomData(self::CATEGORIES_METADATA_FIELD_NAME);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setCategoriesMetadataFieldName ($v)
+	{
+		$this->putInCustomData(self::CATEGORIES_METADATA_FIELD_NAME, $v);
+	}
+	
+	/**
+	 * return bool
+	 */
+	public function getEnforceEntitlement ()
+	{
+		return $this->getFromCustomData(self::ENFORCE_ENTITLEMENT);
+	}
+	
+	/**
+	 * @param bool $v
+	 */
+	public function setEnforceEntitlement ($v)
+	{
+		$this->putInCustomData(self::ENFORCE_ENTITLEMENT, $v);
 	}
 	
 	public function getCacheInvalidationKeys()

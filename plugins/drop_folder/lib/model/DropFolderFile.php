@@ -18,6 +18,7 @@ class DropFolderFile extends BaseDropFolderFile
 
 	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
 	const CUSTOM_DATA_BATCH_JOB_ID = 'batch_job_id';
+	const CUSTOM_DATA_USER_ID = 'user_id';
 	
 	public function setFileSize($size)
 	{
@@ -53,6 +54,16 @@ class DropFolderFile extends BaseDropFolderFile
 	public function setBatchJobId($id)
 	{
 	    $this->putInCustomData(self::CUSTOM_DATA_BATCH_JOB_ID, $id);
+	}
+	
+	public function getParsedUserId()
+	{
+	    return $this->getFromCustomData(self::CUSTOM_DATA_USER_ID);
+	}
+	
+	public function setParsedUserId($id)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_USER_ID, $id);
 	}
 		
 	public function getCacheInvalidationKeys()

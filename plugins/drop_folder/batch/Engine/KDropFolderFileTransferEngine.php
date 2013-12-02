@@ -439,8 +439,16 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->referenceId = $data->parsedSlug;
 			
+		$aKBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->baseEntry->add($newEntry, null);
-		$addedEntry = KBatchBase::$kClient->baseEntry->addContent($addedEntry->id, $resource);	
+		KBatchBase::$kClient->baseEntry->addContent($addedEntry->id, $resource);
+		$result = KBatchBase::$kClient->doMultiRequest();
+		
+		if ($result [1] && $result[1] instanceof KalturaBaseEntry)
+		{
+			$entry = $result [1];
+			$this->createCategoryAssociations ($folder, $entry->userId, $entry->id);
+		}	
 	}
 
 	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)

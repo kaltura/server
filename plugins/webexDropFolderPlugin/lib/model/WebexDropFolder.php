@@ -17,9 +17,6 @@ class WebexDropFolder extends RemoteDropFolder
 
 	const WEBEX_HOST_ID_METADATA_FIELD_NAME = 'webex_host_id_metadata_field_name';
 
-	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
-	
-	const ENFORCE_ENTITLEMENT = 'enforce_entitlement';
 	
 	/**
 	 * @var string
@@ -50,16 +47,6 @@ class WebexDropFolder extends RemoteDropFolder
 	 * @var string
 	 */
 	protected $webexHostIdMetadataFieldName;
-	
-	/**
-	 * @var string
-	 */
-	protected $categoriesMetadataFieldName;
-	
-	/**
-	 * @var bool
-	 */
-	protected $enforceEntitlement;
 	
 	/**
 	 * return string
@@ -157,37 +144,6 @@ class WebexDropFolder extends RemoteDropFolder
 		$this->putInCustomData(self::WEBEX_HOST_ID_METADATA_FIELD_NAME, $v);
 	}
 	
-	/**
-	 * return string
-	 */
-	public function getCategoriesMetadataFieldName ()
-	{
-		return $this->getFromCustomData(self::CATEGORIES_METADATA_FIELD_NAME);
-	}
-	
-	/**
-	 * @param string $v
-	 */
-	public function setCategoriesMetadataFieldName ($v)
-	{
-		$this->putInCustomData(self::CATEGORIES_METADATA_FIELD_NAME, $v);
-	}
-	
-	/**
-	 * return bool
-	 */
-	public function getEnforceEntitlement ()
-	{
-		return $this->getFromCustomData(self::ENFORCE_ENTITLEMENT);
-	}
-	
-	/**
-	 * @param bool $v
-	 */
-	public function setEnforceEntitlement ($v)
-	{
-		$this->putInCustomData(self::ENFORCE_ENTITLEMENT, $v);
-	}
 	
 	public function getImportJobData()
 	{
