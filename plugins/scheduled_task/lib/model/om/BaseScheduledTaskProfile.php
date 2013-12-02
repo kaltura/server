@@ -92,6 +92,12 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 	protected $updated_at;
 
 	/**
+	 * The value for the last_execution_started_at field.
+	 * @var        string
+	 */
+	protected $last_execution_started_at;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -303,6 +309,46 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 				$dt = new DateTime($this->updated_at);
 			} catch (Exception $x) {
 				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [last_execution_started_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getLastExecutionStartedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->last_execution_started_at === null) {
+			return null;
+		}
+
+
+		if ($this->last_execution_started_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->last_execution_started_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->last_execution_started_at, true), $x);
 			}
 		}
 
@@ -645,6 +691,58 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 	} // setUpdatedAt()
 
 	/**
+	 * Sets the value of [last_execution_started_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     ScheduledTaskProfile The current object (for fluent API support)
+	 */
+	public function setLastExecutionStartedAt($v)
+	{
+		if(!isset($this->oldColumnsValues[ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT]))
+			$this->oldColumnsValues[ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT] = $this->last_execution_started_at;
+
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->last_execution_started_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->last_execution_started_at !== null && $tmpDt = new DateTime($this->last_execution_started_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->last_execution_started_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setLastExecutionStartedAt()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -688,6 +786,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			$this->object_tasks = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->last_execution_started_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -697,7 +796,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = ScheduledTaskProfilePeer::NUM_COLUMNS - ScheduledTaskProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = ScheduledTaskProfilePeer::NUM_COLUMNS - ScheduledTaskProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ScheduledTaskProfile object", $e);
@@ -1180,6 +1279,9 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			case 11:
 				return $this->getUpdatedAt();
 				break;
+			case 12:
+				return $this->getLastExecutionStartedAt();
+				break;
 			default:
 				return null;
 				break;
@@ -1213,6 +1315,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			$keys[9] => $this->getObjectTasks(),
 			$keys[10] => $this->getCreatedAt(),
 			$keys[11] => $this->getUpdatedAt(),
+			$keys[12] => $this->getLastExecutionStartedAt(),
 		);
 		return $result;
 	}
@@ -1280,6 +1383,9 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			case 11:
 				$this->setUpdatedAt($value);
 				break;
+			case 12:
+				$this->setLastExecutionStartedAt($value);
+				break;
 		} // switch()
 	}
 
@@ -1316,6 +1422,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		if (array_key_exists($keys[9], $arr)) $this->setObjectTasks($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setLastExecutionStartedAt($arr[$keys[12]]);
 	}
 
 	/**
@@ -1339,6 +1446,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		if ($this->isColumnModified(ScheduledTaskProfilePeer::OBJECT_TASKS)) $criteria->add(ScheduledTaskProfilePeer::OBJECT_TASKS, $this->object_tasks);
 		if ($this->isColumnModified(ScheduledTaskProfilePeer::CREATED_AT)) $criteria->add(ScheduledTaskProfilePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(ScheduledTaskProfilePeer::UPDATED_AT)) $criteria->add(ScheduledTaskProfilePeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT)) $criteria->add(ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT, $this->last_execution_started_at);
 
 		return $criteria;
 	}
@@ -1429,6 +1537,8 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setLastExecutionStartedAt($this->last_execution_started_at);
 
 
 		$copyObj->setNew(true);

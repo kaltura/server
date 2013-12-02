@@ -16,6 +16,8 @@ class KalturaObjectTaskType extends KalturaDynamicEnum implements ObjectTaskType
 		$descriptions = array(
 			self::DELETE_ENTRY => 'Deletes an entry.',
 			self::MODIFY_CATEGORIES => 'Modifies entry categories.',
+			self::DELETE_ENTRY_FLAVORS => 'Deletes entry flavors.',
+			self::CONVERT_ENTRY_FLAVORS => 'Convert entry flavors by the given flavor params.'
 		);
 		
 		return self::mergeDescriptions(self::getEnumClass(), $descriptions);

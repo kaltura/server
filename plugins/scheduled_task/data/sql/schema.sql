@@ -24,9 +24,11 @@ CREATE TABLE `scheduled_task_profile`
 	`object_tasks` TEXT  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
+	`last_execution_started_at` DATETIME,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
-	KEY `system_name_partner_id`(`system_name`, `partner_id`)
+	KEY `system_name_partner_id`(`system_name`, `partner_id`),
+	KEY `status_last_execution_started_at`(`status`, `last_execution_started_at`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

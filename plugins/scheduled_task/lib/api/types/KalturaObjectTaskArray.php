@@ -18,6 +18,11 @@ class KalturaObjectTaskArray extends KalturaTypedArray
 		{
 			/** @var kObjectTask $dbObject */
 			$apiObject = KalturaObjectTask::getInstanceByDbObject($dbObject);
+			if (is_null($apiObject))
+			{
+				KalturaLog::err('Couldn\'t load api object for db object '.$dbObject->getType());
+				continue;
+			}
 			$apiObject->fromObject($dbObject);
 			$apiArray[] = $apiObject;
 		}

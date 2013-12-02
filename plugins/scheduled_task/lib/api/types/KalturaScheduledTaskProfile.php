@@ -77,6 +77,13 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 	 */
 	public $updatedAt;
 
+	/**
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $lastExecutionStartedAt;
+
 	/*
 	 */
 	private static $map_between_objects = array(
@@ -91,6 +98,7 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 		'objectTasks',
 		'createdAt',
 		'updatedAt',
+		'lastExecutionStartedAt',
 	);
 		 
 	/* (non-PHPdoc)

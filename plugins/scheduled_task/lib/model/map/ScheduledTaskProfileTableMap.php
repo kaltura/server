@@ -49,6 +49,7 @@ class ScheduledTaskProfileTableMap extends TableMap {
 		$this->addColumn('OBJECT_TASKS', 'ObjectTasks', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('LAST_EXECUTION_STARTED_AT', 'LastExecutionStartedAt', 'TIMESTAMP', false, null, null);
 		// validators
 	} // initialize()
 
