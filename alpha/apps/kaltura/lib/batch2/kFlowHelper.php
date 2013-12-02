@@ -318,10 +318,19 @@ class kFlowHelper
 	 */
 	public static function handleConcatFailed(BatchJob $dbBatchJob, kConcatJobData $data)
 	{
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
+		
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
+		if(!$flavorAsset)
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+			return $dbBatchJob;
+			
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 
-		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-		if($flavorAsset && !$flavorAsset->isLocalReadyStatus())
+		if(!$flavorAsset->isLocalReadyStatus())
 		{
 			$flavorAsset->setDescription($dbBatchJob->getMessage());
 			$flavorAsset->setStatus(asset::ASSET_STATUS_ERROR);
@@ -346,7 +355,13 @@ class kFlowHelper
 		if(!file_exists($data->getDestFilePath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFilePath());
 
-		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
+		if(!$flavorAsset)
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+			return $dbBatchJob;
+			
 		$flavorAsset->incrementVersion();
 		
 		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
