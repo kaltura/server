@@ -1265,7 +1265,19 @@ class kFlowHelper
 			{
 				try
 				{
-					kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+					$currFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+					if($currFlavorAsset->getIsOriginal() && $currFlavorAsset->getFromCustomData("interFlowCount") != null)
+					{ 
+						if($currFlavorAsset->getFromCustomData("interFlowCount") < 2)
+						{
+							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
+							kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $convertProfileJob, $mediaInfo->getId());
+						}
+						else 
+							kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+					}
+					else 
+						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 				}
 				catch(Exception $e)
 				{

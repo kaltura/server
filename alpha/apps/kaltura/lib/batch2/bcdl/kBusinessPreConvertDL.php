@@ -964,7 +964,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				 */
 			$res = self::decideSourceFlavorConvert($entryId, null, $originalFlavorAsset, $profile->getId(), $flavors, $mediaInfo, $parentJob, $convertProfileJob);
 			if(!$res)
+			{
+				$interSourceFlowCount = $originalFlavorAsset->getFromCustomData("interFlowCount") ? $originalFlavorAsset->getFromCustomData("interFlowCount")+1 : 1;
+				$originalFlavorAsset->putInCustomData("interFlowCount", $interSourceFlowCount);
+				$originalFlavorAsset->save();
 				return false;
+			}
+			$originalFlavorAsset->removeFromCustomData("interFlowCount");
+			$originalFlavorAsset->save();
 		}
 		elseif($shouldConvert)
 		{
@@ -973,8 +980,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			
 			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $flavors, $mediaInfo, $parentJob, $convertProfileJob);
 			if(!$res)
+			{
+				$interSourceFlowCount = $originalFlavorAsset->getFromCustomData("interFlowCount") ? $originalFlavorAsset->getFromCustomData("interFlowCount")+1 : 1;
+				$originalFlavorAsset->putInCustomData("interFlowCount", $interSourceFlowCount);
+				$originalFlavorAsset->save();
 				return false;
-						
+			}
+			
+			$originalFlavorAsset->removeFromCustomData("interFlowCount");
 			$originalFlavorAsset->setStatusLocalReady();
 			$originalFlavorAsset->save();
 			
@@ -1266,7 +1279,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor = null, flavorAsset $originalFlavorAsset, $conversionProfileId, $flavors, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
 	{
-		if($sourceFlavor && ($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()))
+		if($sourceFlavor && ($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()) && $originalFlavorAsset->getFromCustomData("interFlowCount") == null)
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				
