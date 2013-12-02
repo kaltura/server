@@ -142,4 +142,43 @@ class ScheduledTaskProfileService extends KalturaBaseService
 
 		return $response;
 	}
+
+	/**
+	 * Execute object filter for a given scheduled task profile id
+	 *
+	 * @action query
+	 * @param int $id
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaGenericListResponse
+	 *
+	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 */
+	public function queryAction($id, KalturaFilterPager $pager = null)
+	{
+		// get the object
+		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($id);
+		if (!$dbScheduledTaskProfile)
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND, $id);
+
+		if (is_null($pager))
+			$pager = new KalturaFilterPager();
+
+		$scheduledTaskProfile = new KalturaScheduledTaskProfile();
+		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile);
+
+		$objectFilterEngineType = $scheduledTaskProfile->objectFilterEngineType;
+		$objectFilterEngine = KObjectFilterEngineFactory::getInstanceByType($objectFilterEngineType);
+		$objectFilterEngine->setPageSize($pager->pageSize);
+		$objectFilterEngine->setPageIndex($pager->pageIndex);
+		$response = $objectFilterEngine->query($scheduledTaskProfile->objectFilter);
+
+		$genericResponse = new KalturaGenericListResponse();
+		$genericResponse->totalCount = $response->totalCount;
+		foreach($response->objects as $object)
+		{
+			$genericResponse->objects[] = $object;
+		}
+
+		return $genericResponse;
+	}
 }

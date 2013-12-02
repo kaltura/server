@@ -20,6 +20,8 @@ abstract class KalturaScheduledTaskProfileBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"lastExecutionStartedAtGreaterThanOrEqual" => "_gte_last_execution_started_at",
+		"lastExecutionStartedAtLessThanOrEqual" => "_lte_last_execution_started_at",
 	);
 
 	static private $order_by_map = array
@@ -30,6 +32,8 @@ abstract class KalturaScheduledTaskProfileBaseFilter extends KalturaFilter
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
+		"+lastExecutionStartedAt" => "+last_execution_started_at",
+		"-lastExecutionStartedAt" => "-last_execution_started_at",
 	);
 
 	public function getMapBetweenObjects()
@@ -101,4 +105,14 @@ abstract class KalturaScheduledTaskProfileBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $lastExecutionStartedAtGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $lastExecutionStartedAtLessThanOrEqual;
 }

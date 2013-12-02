@@ -2,7 +2,7 @@
 /**
  * @package plugins.scheduledTask
  */
-class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaConfigurator
+class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'scheduledTask';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -63,5 +63,56 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
 
 		return null;
+	}
+
+	/**
+	 * Returns an object that is known only to the plugin, and extends the baseClass.
+	 *
+	 * @param string $baseClass The base class of the loaded object
+	 * @param string $enumValue The enumeration value of the loaded object
+	 * @param array $constructorArgs The constructor arguments of the loaded object
+	 * @return object
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+
+	}
+
+	/**
+	 * Retrieves a class name that is defined by the plugin and is known only to the plugin, and extends the baseClass.
+	 *
+	 * @param string $baseClass The base class of the searched class
+	 * @param string $enumValue The enumeration value of the searched class
+	 * @return string The name of the searched object's class
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		return null;
+	}
+
+	/**
+	 * Returns a list of enumeration class names that implement the baseEnumName interface.
+	 * @param string $baseEnumName the base implemented enum interface, set to null to retrieve all plugin enums
+	 * @return array<string> A string listing the enum class names that extend baseEnumName
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('ScheduledTaskBatchType');
+
+		if($baseEnumName == 'BatchJobType')
+			return array('ScheduledTaskBatchType');
+
+		return array();
+	}
+
+
+	/**
+	 * @param $valueName
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

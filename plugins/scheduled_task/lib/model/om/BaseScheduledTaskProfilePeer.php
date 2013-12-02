@@ -26,7 +26,7 @@ abstract class BaseScheduledTaskProfilePeer {
 	const TM_CLASS = 'ScheduledTaskProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 12;
+	const NUM_COLUMNS = 13;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -67,6 +67,9 @@ abstract class BaseScheduledTaskProfilePeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'scheduled_task_profile.UPDATED_AT';
 
+	/** the column name for the LAST_EXECUTION_STARTED_AT field */
+	const LAST_EXECUTION_STARTED_AT = 'scheduled_task_profile.LAST_EXECUTION_STARTED_AT';
+
 	/**
 	 * An identiy map to hold any loaded instances of ScheduledTaskProfile objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -83,11 +86,11 @@ abstract class BaseScheduledTaskProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'ObjectFilterEngineType', 'ObjectFilter', 'ObjectFilterApiType', 'ObjectTasks', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'systemName', 'description', 'status', 'objectFilterEngineType', 'objectFilter', 'objectFilterApiType', 'objectTasks', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::OBJECT_FILTER_ENGINE_TYPE, self::OBJECT_FILTER, self::OBJECT_FILTER_API_TYPE, self::OBJECT_TASKS, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'system_name', 'description', 'status', 'object_filter_engine_type', 'object_filter', 'object_filter_api_type', 'object_tasks', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'ObjectFilterEngineType', 'ObjectFilter', 'ObjectFilterApiType', 'ObjectTasks', 'CreatedAt', 'UpdatedAt', 'LastExecutionStartedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'systemName', 'description', 'status', 'objectFilterEngineType', 'objectFilter', 'objectFilterApiType', 'objectTasks', 'createdAt', 'updatedAt', 'lastExecutionStartedAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::OBJECT_FILTER_ENGINE_TYPE, self::OBJECT_FILTER, self::OBJECT_FILTER_API_TYPE, self::OBJECT_TASKS, self::CREATED_AT, self::UPDATED_AT, self::LAST_EXECUTION_STARTED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'system_name', 'description', 'status', 'object_filter_engine_type', 'object_filter', 'object_filter_api_type', 'object_tasks', 'created_at', 'updated_at', 'last_execution_started_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -97,11 +100,11 @@ abstract class BaseScheduledTaskProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'SystemName' => 3, 'Description' => 4, 'Status' => 5, 'ObjectFilterEngineType' => 6, 'ObjectFilter' => 7, 'ObjectFilterApiType' => 8, 'ObjectTasks' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'systemName' => 3, 'description' => 4, 'status' => 5, 'objectFilterEngineType' => 6, 'objectFilter' => 7, 'objectFilterApiType' => 8, 'objectTasks' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::SYSTEM_NAME => 3, self::DESCRIPTION => 4, self::STATUS => 5, self::OBJECT_FILTER_ENGINE_TYPE => 6, self::OBJECT_FILTER => 7, self::OBJECT_FILTER_API_TYPE => 8, self::OBJECT_TASKS => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'system_name' => 3, 'description' => 4, 'status' => 5, 'object_filter_engine_type' => 6, 'object_filter' => 7, 'object_filter_api_type' => 8, 'object_tasks' => 9, 'created_at' => 10, 'updated_at' => 11, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'SystemName' => 3, 'Description' => 4, 'Status' => 5, 'ObjectFilterEngineType' => 6, 'ObjectFilter' => 7, 'ObjectFilterApiType' => 8, 'ObjectTasks' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'LastExecutionStartedAt' => 12, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'systemName' => 3, 'description' => 4, 'status' => 5, 'objectFilterEngineType' => 6, 'objectFilter' => 7, 'objectFilterApiType' => 8, 'objectTasks' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'lastExecutionStartedAt' => 12, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::SYSTEM_NAME => 3, self::DESCRIPTION => 4, self::STATUS => 5, self::OBJECT_FILTER_ENGINE_TYPE => 6, self::OBJECT_FILTER => 7, self::OBJECT_FILTER_API_TYPE => 8, self::OBJECT_TASKS => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::LAST_EXECUTION_STARTED_AT => 12, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'system_name' => 3, 'description' => 4, 'status' => 5, 'object_filter_engine_type' => 6, 'object_filter' => 7, 'object_filter_api_type' => 8, 'object_tasks' => 9, 'created_at' => 10, 'updated_at' => 11, 'last_execution_started_at' => 12, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -183,6 +186,7 @@ abstract class BaseScheduledTaskProfilePeer {
 		$criteria->addSelectColumn(ScheduledTaskProfilePeer::OBJECT_TASKS);
 		$criteria->addSelectColumn(ScheduledTaskProfilePeer::CREATED_AT);
 		$criteria->addSelectColumn(ScheduledTaskProfilePeer::UPDATED_AT);
+		$criteria->addSelectColumn(ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT);
 	}
 
 	/**
