@@ -108,6 +108,11 @@ class KalturaDispatcher
 			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
 		}
 		
+		$this->validateConstraint($actionParams, $params, $actionInfo->validateMaxLengthConstraints, "validateMaxLength");
+		$this->validateConstraint($actionParams, $params, $actionInfo->validateMinLengthConstraints,"validateMinLength");
+		$this->validateConstraint($actionParams, $params, $actionInfo->validateMaxValueConstraints, "validateMaxValue");
+		$this->validateConstraint($actionParams, $params, $actionInfo->validateMinValueConstraints, "validateMinValue");
+		
 		// initialize the service before invoking the action on it
 		// action reflector will init the service to maintain the pluginable action transparency
 		$actionReflector->initService();
@@ -124,7 +129,41 @@ class KalturaDispatcher
 		
 		return $res;
 	}
-
+	
+	protected function validateConstraint($actionParams, $params, $constraints, $callback) {
+		foreach ($constraints as $object => $constraint) {
+			if(isset($actionParams[$object])) {
+				if(is_array($constraint)) {
+					foreach ($constraint as $field => $value) {
+						$this->$callback($object . ":" . $field, $params[$object . ":" . $field], $value);
+					}
+				} else {
+					$this->$callback($object, $params[$object], $constraint);
+				}
+			}
+		}
+	}
+	
+	protected function validateMinLength($name, $objectValue, $constraint) {
+		if(strlen($objectValue) < $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $name, $constraint);
+	}
+	
+	protected function validateMaxLength($name, $objectValue, $constraint) {
+		if(strlen($objectValue) > $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $name, $constraint);
+	}
+	
+	protected function validateMinValue($name, $objectValue, $constraint) {
+		if($objectValue < $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_VALUE, $name, $constraint);
+	}
+	
+	protected function validateMaxValue($name, $objectValue, $constraint) {
+		if($objectValue > $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_VALUE, $name, $constraint);
+	}
+	
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

@@ -47,6 +47,14 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([\\w\\,\\s\\d]*)/";
     
+    const DOCCOMMENT_VALIDATE_MIN_LENGTH = "/\\@minLength\\s+([\\w.]+)\\s+(\\d+)/";
+    
+    const DOCCOMMENT_VALIDATE_MAX_LENGTH = "/\\@maxLength\\s+([\\w.]+)\\s+(\\d+)/";
+    
+    const DOCCOMMENT_VALIDATE_MIN_VALUE = "/\\@minValue\\s+([\\w.]+)\\s+(\\d+)/";
+    
+    const DOCCOMMENT_VALIDATE_MAX_VALUE = "/\\@maxValue\\s+([\\w.]+)\\s+(\\d+)/";
+    
     /**
      * @var bool
      */
@@ -173,6 +181,26 @@ class KalturaDocCommentParser
     public $validateUserPrivilege = null;
     
     /**
+     * @var array
+     */
+    public $validateMinLengthConstraints = array();
+    
+    /**
+     * @var array
+     */
+    public $validateMaxLengthConstraints = array();
+    
+    /**
+     * @var array
+     */
+    public $validateMinValueConstraints = array();
+    
+    /**
+     * @var array
+     */
+    public $validateMaxValueConstraints = array();
+    
+    /**
      * @var string
      */
     public $actionAlias = null;
@@ -283,6 +311,11 @@ class KalturaDocCommentParser
         	if(isset($result[3]) && strlen($result[3]))
         		$this->validateUserPrivilege = $result[3];
         } 
+        
+        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MIN_LENGTH, $this->validateMinLengthConstraints);
+        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MAX_LENGTH, $this->validateMaxLengthConstraints);
+        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MIN_VALUE, $this->validateMinValueConstraints);
+        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MAX_VALUE, $this->validateMaxValueConstraints);
             
         $result = null;
         $error_array = array();
@@ -305,5 +338,24 @@ class KalturaDocCommentParser
             }
         }
         $this->errors = $error_array;        
+     }
+     
+     private function fillConstraint($comment, $constraintName, array &$constrainArray) {
+     	
+     	$result = null;
+     	if (preg_match_all($constraintName, $comment, $result)) {
+     		$size = count($result[0]);
+     		for($i = 0 ; $i < $size ; $i = $i += 1) {
+     			$field = $result[1][$i];
+     			$parts = explode(".", $field);
+     			if(count($parts) == 1) {
+     				$constrainArray[$field] = $result[2][$i];
+     			} else {
+     				if(!array_key_exists($parts[0], $constrainArray))
+     					$constrainArray[$parts[0]] = array();
+     				$constrainArray[$parts[0]][$parts[1]] = $result[2][$i];
+     			}
+     		}
+     	}
      }
 }
