@@ -110,7 +110,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 			foreach ($matches[0] as $match)
 			{				
 				$match = str_replace(array ('{', '}'), array ('', ''), $match);
-				list ($metadata, $profileSystemName, $fieldSystemName) = explode(':', $match);
+				list ($metadata, $profileSystemName, $fieldSystemName, $format) = explode(':', $match, 4);
 				$profile = MetadataProfilePeer::retrieveBySystemName($profileSystemName, $partnerId);
 				if (!$profile)
 				{
@@ -171,6 +171,13 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				}
 				
 				$strvals = kMetadataManager::getMetadataValueForField($result, $fieldSystemName);
+				foreach ($strvals as &$strval)
+				{
+					if ($format && is_numeric($strval))
+					{
+						$strval = date($format);
+					}
+				}
 				
 				$metadataContentParameters[$match] = implode(',', $strvals);
 			}
