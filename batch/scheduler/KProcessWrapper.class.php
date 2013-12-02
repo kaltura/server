@@ -68,7 +68,7 @@ class KProcessWrapper
 		$logName = str_replace('kasync', '', strtolower($this->taskConfig->name));
 		$logDate = date('Y-m-d');
 		$logFileOut = "$logDir/$logName-$idx-$logDate.log";
-		$logFileErr = "$logDir/$logName-$logDate.err";
+		$logFileErr = "$logDir/$logName-$logDate.err.log";
 	
 		$taskConfigStr = base64_encode(gzcompress(serialize($this->taskConfig)));
 		
