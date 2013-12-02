@@ -1266,9 +1266,9 @@ class kFlowHelper
 				try
 				{
 					$currFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-					if($currFlavorAsset->getIsOriginal() && $currFlavorAsset->getFromCustomData("interFlowCount") != null)
+					if( $currFlavorAsset instanceof flavorAsset && $currFlavorAsset->getIsOriginal() && $currFlavorAsset->getInterFlowCount() != null)
 					{ 
-						if($currFlavorAsset->getFromCustomData("interFlowCount") < 2)
+						if($currFlavorAsset->getInterFlowCount() < 2)
 						{
 							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 							kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $convertProfileJob, $mediaInfo->getId());
