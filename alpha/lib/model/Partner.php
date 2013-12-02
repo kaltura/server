@@ -513,12 +513,12 @@ class Partner extends BasePartner
 							);
 		
 		$criteria = new Criteria();
-		$criteria->add(BatchJobPeer::PARTNER_ID, $this->getId());
-		$criteria->add(BatchJobPeer::JOB_TYPE, BatchJobType::INDEX);
-		$criteria->add(BatchJobPeer::JOB_SUB_TYPE, $type);
-		$criteria->add(BatchJobPeer::STATUS, $openStatuses, Criteria::IN);
+		$criteria->add(BatchJobLockPeer::PARTNER_ID, $this->getId());
+		$criteria->add(BatchJobLockPeer::JOB_TYPE, BatchJobType::INDEX);
+		$criteria->add(BatchJobLockPeer::JOB_SUB_TYPE, $type);
+		$criteria->add(BatchJobLockPeer::STATUS, $openStatuses, Criteria::IN);
 		
-		$batchJob = BatchJobPeer::doSelectOne($criteria);
+		$batchJob = BatchJobLockPeer::doSelectOne($criteria);
 		
 		if($batchJob)
 		{
