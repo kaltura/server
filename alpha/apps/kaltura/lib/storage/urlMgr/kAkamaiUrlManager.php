@@ -96,6 +96,9 @@ class kAkamaiUrlManager extends kUrlManager
 		if($this->protocol==PlaybackProtocol::RTSP) {
 			return $url;
 		}
+		
+		if($this->clipTo)
+			$url .= "/clipTo/$this->clipTo";
 	
 		if($this->protocol==PlaybackProtocol::APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
@@ -110,9 +113,6 @@ class kAkamaiUrlManager extends kUrlManager
 				$url .= "/file/playlist.m3u8";
 		}
 		else {
-			if($this->clipTo)
-				$url .= "/clipTo/$this->clipTo";
-
 			if($this->protocol == "hdnetworksmil" && isset($this->params["hd_flash"]))
 			{
 				$url = "http://".$this->params["hd_flash"].$url.'/forceproxy/true';
