@@ -5,7 +5,7 @@ class myEntryUtils
 	public static function updateThumbnailFromFile(entry $dbEntry, $filePath, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
-		$dbEntry->setCreateThumb(false, $dbEntry->getId());
+		$dbEntry->setCreateThumb(false);
 		$dbEntry->save();
 		
 		$dbEntry->reload();
@@ -594,7 +594,7 @@ class myEntryUtils
 				return false;
 			}			
 			$entry->setThumbnail ( ".jpg");
-			$entry->setCreateThumb(false, $entry->getId());
+			$entry->setCreateThumb(false);
 			$entry->save();
 			
 			// create new thumb file for entry
@@ -611,7 +611,7 @@ class myEntryUtils
 			}
 
 			$entry->setThumbnail ( ".jpg");
-			$entry->setCreateThumb(false, $entry->getId());
+			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
 			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
@@ -622,7 +622,7 @@ class myEntryUtils
 			$thumb_key = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			$thumb_path = kFileSyncUtils::getLocalFilePathForKey($thumb_key);
 			$entry->setThumbnail ( ".jpg");
-			$entry->setCreateThumb(false, $entry->getId());
+			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
 			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);

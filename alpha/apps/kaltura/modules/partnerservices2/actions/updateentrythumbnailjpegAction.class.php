@@ -53,7 +53,7 @@ class updateentrythumbnailjpegAction extends defPartnerservices2Action
 		}
 		
 		$entry->setThumbnail ( ".jpg");
-		$entry->setCreateThumb(false, $entry->getId());
+		$entry->setCreateThumb(false);
 		$entry->save();
 		
 		if(isset($HTTP_RAW_POST_DATA))

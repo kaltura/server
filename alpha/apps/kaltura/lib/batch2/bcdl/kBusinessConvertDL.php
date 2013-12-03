@@ -174,7 +174,7 @@ class kBusinessConvertDL
 		}
 
 		$entry->setThumbnail(".jpg");
-		$entry->setCreateThumb(false, null, $thumbAsset);
+		$entry->setCreateThumb(false, $thumbAsset);
 		$entry->save();
 
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

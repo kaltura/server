@@ -29,25 +29,4 @@ class thumbAsset extends asset
 						
 		return $finalPath;
 	}
-
-	public static function removeThumbAssetDeafultTags($entryID = null, thumbAsset $thumbAsset = null)
-	{
-		$entryThumbAssets = array();
-		if($thumbAsset)
-			$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		else if($entryID)
-			$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryID);
-			
-		foreach($entryThumbAssets as $entryThumbAsset)
-		{
-			if($thumbAsset && $entryThumbAsset->getId() == $thumbAsset->getId())
-				continue;
-
-			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-				continue;
-
-			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			$entryThumbAsset->save();
-		}
-	}
 }

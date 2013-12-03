@@ -1635,10 +1635,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
-	public function setCreateThumb ( $v , $entryID = null, $thumbAsset = null)		
+	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
 		if(!$v)
-			thumbAsset::removeThumbAssetDeafultTags($entryID, $thumbAsset); 
+			assetPeer::removeThumbAssetDeafultTags($this->getId(), $thumbAsset); 
 		
 		$this->putInCustomData ( "createThumb" , (bool) $v );	
 	}
