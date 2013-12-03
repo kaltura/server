@@ -49,7 +49,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		}
 		$url2 = $matches[1];
 		$curlWrapper = new KCurlWrapper($url2);
-		$curlWrapper->setOpt(CURLOPT_COOKIE, $curlInfo->headers["set-cookie"]);
+		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;'.$curlInfo->headers["set-cookie"]);
 		$result = $curlWrapper->exec();
 		
 		if(!preg_match("/var prepareTicket = '([^']+)';/", $result, $matches))
