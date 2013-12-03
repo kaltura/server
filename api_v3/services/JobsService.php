@@ -1007,6 +1007,16 @@ class JobsService extends KalturaBaseService
 		return $this->getStatusAction($jobId, $jobType);
 	}
 	
+	/**
+	 * batch boosEntryJobsAction boosts all the jobs associated with the entry
+	 * 
+	 * @action boosEntryJobs
+	 * @param string $entryId the id of the entry to be boosted  
+	 */
+	function boosEntryJobsAction($entryId)
+	{
+		kJobsManager::boostEntryJobs($entryId);
+	}
 
 	/**
 	 * list Batch Jobs 
