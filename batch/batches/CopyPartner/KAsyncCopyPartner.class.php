@@ -64,8 +64,6 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$pageFilter->pageSize = 50;
 		$pageFilter->pageIndex = 0;
 		
-		$totalReceivedObjectsCount = 0;		
-		
 		/* @var $this->getClient() KalturaClient */
 		do
 		{
@@ -74,7 +72,6 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter );
 
 			$receivedObjectsCount = count($entriesList->objects);
-			$totalReceivedObjectsCount += $receivedObjectsCount; 
 			$pageFilter->pageIndex++;
 			
 			if ( $receivedObjectsCount > 0 )
