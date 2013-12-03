@@ -73,12 +73,9 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			self::impersonate( $this->fromPartnerId );
 			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter );
 
-			$totalCount = $entriesList->totalCount;
 			$receivedObjectsCount = count($entriesList->objects);
 			$totalReceivedObjectsCount += $receivedObjectsCount; 
 			$pageFilter->pageIndex++;
-			
-			$this->log( "Got $receivedObjectsCount entry object(s) [= $totalReceivedObjectsCount/$totalCount]" );
 			
 			if ( $receivedObjectsCount > 0 )
 			{
@@ -86,7 +83,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				self::impersonate( $this->toPartnerId );
 				foreach ( $entriesList->objects as $entry )
 				{
-					$newEntry = $this->getClient()->baseEntry->cloneAction( $entry->id /* anything else? */ );
+					$newEntry = $this->getClient()->baseEntry->cloneAction( $entry->id );
 				}
 			}			
 		} while ( $receivedObjectsCount );
