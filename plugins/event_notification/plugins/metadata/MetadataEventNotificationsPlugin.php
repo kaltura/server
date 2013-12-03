@@ -100,6 +100,9 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 		if (! ($scope instanceof kEventScope))
 			return array();
 		
+		if (!method_exists($scope->getEvent()->getObject(), 'getPartnerId'))
+                        return array();
+		
 		$partnerId = $scope->getEvent()->getObject()->getPartnerId();
 		/* @var $scope kEventScope */
 		$metadataContentParameters = array();
