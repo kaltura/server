@@ -89,7 +89,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 					$newEntry = $this->getClient()->baseEntry->cloneAction( $entry->id /* anything else? */ );
 				}
 			}			
-		} while ( $totalReceivedObjectsCount < $totalCount );
+		} while ( $receivedObjectsCount );
 	
 		self::unimpersonate();
 	}	
