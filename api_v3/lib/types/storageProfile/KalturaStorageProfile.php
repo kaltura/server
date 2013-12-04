@@ -94,6 +94,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 */
+	public $deliveryHttpsBaseUrl;
+	
+	/**
+	 * @var string
+	 */
 	public $deliveryRmpBaseUrl;
 	
 	/**
@@ -210,6 +215,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"storagePassword",
 		"storageFtpPassiveMode",
 		"deliveryHttpBaseUrl",
+		"deliveryHttpsBaseUrl",
 		"deliveryRmpBaseUrl",
 		"deliveryIisBaseUrl",
 		"minFileSize",

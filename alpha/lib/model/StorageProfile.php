@@ -33,6 +33,7 @@ class StorageProfile extends BaseStorageProfile
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
+	const CUSTOM_DATA_HTTPS_DELIVERY_URL ='https_delivery_url';
 	
 	/**
 	 * @var kStorageProfileScope
@@ -117,6 +118,16 @@ class StorageProfile extends BaseStorageProfile
     public function setCreateFileLink ($v)
 	{
 	    $this->putInCustomData(self::CUSTOM_DATA_CREATE_FILE_LINK, $v);
+	}
+	
+	public function getDeliveryHttpsBaseUrl()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL);
+	}
+
+	public function setDeliveryHttpsBaseUrl($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL, $v);
 	}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
