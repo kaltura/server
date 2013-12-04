@@ -268,9 +268,15 @@ abstract class LiveEntry extends entry
 		return $mediaServer->getMediaServer();
 	}
 	
+	private static function getCacheType($dc)
+	{
+		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . "_$dc";
+	}
+	
 	private function isCacheValid(kLiveMediaServer $mediaServer)
 	{
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
+		$cacheType = self::getCacheType($mediaServer->getDc());
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 		{
 			$lastUpdate = time() - $mediaServer->getTime();
@@ -290,7 +296,8 @@ abstract class LiveEntry extends entry
 	 */
 	private function storeInCache($key)
 	{
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER);
+		$cacheType = self::getCacheType(kDataCenterMgr::getCurrentDcId());
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 			return false;
 		
@@ -328,18 +335,31 @@ abstract class LiveEntry extends entry
 	}
 	
 	/**
-	 * @return array<kLiveMediaServer>
+	 * @return bool true is list changed
 	 */
-	public function getMediaServers()
+	public function validateMediaServers()
 	{
+		$listChanged = false;
 		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
 		foreach($mediaServers as $index => $mediaServer)
 		{
 			if(! $this->isCacheValid($mediaServer))
+			{
+				$listChanged = true;
 				unset($mediaServers[$index]);
+			}
 		}
 		
-		return $mediaServers;
+		$this->putInCustomData("mediaServers", $mediaServers);
+		return $listChanged;
+	}
+	
+	/**
+	 * @return array<kLiveMediaServer>
+	 */
+	public function getMediaServers()
+	{
+		return $this->getFromCustomData("mediaServers", null, array());
 	}
 	
 	/**

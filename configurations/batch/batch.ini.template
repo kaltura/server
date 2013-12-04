@@ -52,16 +52,17 @@ enabledWorkers.KAsyncParseCaptionAsset				= 1
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
 enabledWorkers.KAsyncDbCleanup						= 1
-enabledWorkers.KAsyncPartnerLoadCleanup				= 3
+enabledWorkers.KAsyncPartnerLoadCleanup				= 1
 enabledWorkers.KAsyncJobSuspender                   = 1
 enabledWorkers.KAsyncConvertCloser					= 1
-enabledWorkers.KAsyncConvertProfileCloser			= 2
+enabledWorkers.KAsyncConvertProfileCloser			= 1
 enabledWorkers.KAsyncBulkDownloadCloser				= 1
 enabledWorkers.KAsyncBulkUploadCloser				= 1
 enabledWorkers.KAsyncDistributeSubmitCloser			= 1
 enabledWorkers.KAsyncDistributeUpdateCloser			= 1
 enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
+enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 
 [Worker]
 maximumExecutionTime			= 300
@@ -629,4 +630,13 @@ scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.ph
 id													= 500
 type												= KAsyncConcat
 scriptPath											= batches/Concat/KAsyncConcatExe.php
+
+
+
+[KAsyncValidateLiveMediaServers : PeriodicWorker]
+id													= 510
+friendlyName										= Validate Live Media Servers
+type												= KAsyncValidateLiveMediaServers
+scriptPath											= batches/ValidateLiveMediaServers/KAsyncValidateLiveMediaServersExe.php
+sleepBetweenStopStart								= 30
 
