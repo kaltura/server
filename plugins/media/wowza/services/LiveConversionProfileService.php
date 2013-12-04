@@ -101,10 +101,6 @@ class LiveConversionProfileService extends KalturaBaseService
 		}
 		
 		$properties = $transcode->addChild('Properties');
-		$property = $properties->addChild('Property');
-		$property->addChild('Name', 'sourceStreamFrameRate');
-		$property->addChild('Value', 30);
-		$property->addChild('Type', 'Double');
 		
 		return new kRendererString($root->asXML(), 'text/xml');
 	}
@@ -198,7 +194,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$video->addChild('Profile', $profile);
 		$video->addChild('Bitrate', $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * 1024 : '${SourceVideoBitrate}');
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
-		$keyFrameInterval->addChild('FollowSource', 'true');
+		$keyFrameInterval->addChild('FollowSource', 'false');
 		$keyFrameInterval->addChild('Interval', 60);
 		
 		$audio = $encode->addChild('Audio');
