@@ -411,8 +411,8 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		{
 			$parsedSlug   = isset($matches[self::REFERENCE_ID_WILDCARD]) ? $matches[self::REFERENCE_ID_WILDCARD] : null;
 			$parsedFlavor = isset($matches[self::FLAVOR_NAME_WILDCARD])  ? $matches[self::FLAVOR_NAME_WILDCARD]  : null;
-			$parsedUser = isset($matches[self::USER_ID_WILDCARD])  ? $matches[self::USER_ID_WILDCARD]  : null;
-			KalturaLog::debug('Parsed slug ['.$parsedSlug.'], Parsed flavor ['.$parsedFlavor.'], parsed user id ['. $parsedUser .']');
+			$parsedUserId = isset($matches[self::USER_ID_WILDCARD])  ? $matches[self::USER_ID_WILDCARD]  : null;
+			KalturaLog::debug('Parsed slug ['.$parsedSlug.'], Parsed flavor ['.$parsedFlavor.'], parsed user id ['. $parsedUserId .']');
 		}
 		if(!$parsedSlug)
 			$matchFound = false;
