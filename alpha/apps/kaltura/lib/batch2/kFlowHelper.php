@@ -1266,8 +1266,13 @@ class kFlowHelper
 				try
 				{
 					$currFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+					//In cases we are returning from intermediate flow need to check maybe if another round is needed
+					//This comes to support the creation of silent audio tracks on source assets such as .arf that require initial inter flow for the source and only than the addition
+					//of the silent audio track
 					if( $currFlavorAsset instanceof flavorAsset && $currFlavorAsset->getIsOriginal() && $currFlavorAsset->getInterFlowCount() != null)
 					{ 
+						//check if the inter flow count is larger than 2.  
+						//In this cases probably something went wrong so we will continue with the original flow and will not check if any additioanl inter flow nneds to be done.
 						if($currFlavorAsset->getInterFlowCount() < 2)
 						{
 							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
