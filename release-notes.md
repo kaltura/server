@@ -23,6 +23,7 @@ Add new workers to batch.ini based on batch.ini.template.
 - DirectoryCleanupRecordedMedia
 - KAsyncConvertLiveSegment
 - KAsyncConcat
+- KAsyncValidateLiveMediaServers
 
 ## Deployment: ##
 
@@ -30,6 +31,7 @@ Add new workers to batch.ini based on batch.ini.template.
 
 - deployment/updates/scripts/add_permissions/2013_11_13_liveStream_appendRecording.php
 - deployment/updates/scripts/add_permissions/2013_11_14_media_update_content.php
+- deployment/updates/scripts/add_permissions/2013_11_28_liveStream_validateRegisteredMediaServers.php
 
 **DB**
 
