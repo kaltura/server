@@ -25,6 +25,10 @@ class KalturaDropFolderContentProcessorJobData extends KalturaJobData
 	 */
 	public $conversionProfileId;
 	
+	/**
+	 * @var string
+	 */
+	public $parsedUserId;
 	
 	private static $map_between_objects = array
 	(
@@ -32,6 +36,7 @@ class KalturaDropFolderContentProcessorJobData extends KalturaJobData
 		"parsedSlug",
 		"contentMatchPolicy",
 		"conversionProfileId",
+		"parsedUserId",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -44,9 +49,10 @@ class KalturaDropFolderContentProcessorJobData extends KalturaJobData
 	{
 		if(is_null($dbData))
 			$dbData = new kDropFolderContentProcessorJobData();
-			
+		
 		return parent::toObject($dbData, $props_to_skip);
 	}
+
 	
 	/**
 	 * @param string $subType

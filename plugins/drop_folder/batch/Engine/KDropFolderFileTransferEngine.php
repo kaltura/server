@@ -405,10 +405,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	{
 		KBatchBase::impersonate($job->partnerId);
 		
+		/* @var $data KalturaWebexDropFolderContentProcessorJobData */
+		$dropFolder = $this->dropFolderPlugin->dropFolder->get ($data->dropFolderId);
+		
 		switch ($data->contentMatchPolicy)
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
-				$this->addAsNewContent($job, $data);
+				$this->addAsNewContent($job, $data, $dropFolder);
 				break;
 			
 			case KalturaDropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_KEEP_IN_FOLDER:
@@ -420,7 +423,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				if($matchedEntry)
 					$this->addAsExistingContent($job, $data, $matchedEntry);
 				else
-					 $this->addAsNewContent($job, $data);	
+					 $this->addAsNewContent($job, $data, $dropFolder);	
 				break;			
 			default:
 				KalturaLog::err('No content match policy is defined for drop folder');
@@ -431,14 +434,14 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		KBatchBase::unimpersonate();
 	}
 	
-	private function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
+	private function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data, KalturaDropFolder $dropFolder)
 	{ 		
 		$resource = $this->getIngestionResource($job, $data);
 		$newEntry = new KalturaBaseEntry();
 		$newEntry->conversionProfileId = $data->conversionProfileId;
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->referenceId = $data->parsedSlug;
-			
+		$newEntry->userId = $data->parsedUserId;
 		$aKBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->baseEntry->add($newEntry, null);
 		KBatchBase::$kClient->baseEntry->addContent($addedEntry->id, $resource);

@@ -167,7 +167,7 @@ abstract class KDropFolderEngine
 		return $resource;		
 	}
 
-	protected function createCategoryAssociations (KalturaWebexDropFolder $folder, $userId, $entryId)
+	protected function createCategoryAssociations (KalturaDropFolder $folder, $userId, $entryId)
 	{
 		if ($folder->metadataProfileId && $folder->categoriesMetadataFieldName)
 		{
