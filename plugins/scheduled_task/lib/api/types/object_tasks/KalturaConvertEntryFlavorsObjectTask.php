@@ -13,13 +13,6 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 	 */
 	public $flavorParams;
 
-	/**
-	 * Should reconvert a flavor if it already exists
-	 *
-	 * @var bool
-	 */
-	public $shouldReconvert;
-
 	public function __construct()
 	{
 		$this->type = ObjectTaskType::CONVERT_ENTRY_FLAVORS;
@@ -30,7 +23,6 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 		/** @var kObjectTask $dbObject */
 		$dbObject = parent::toObject($dbObject, $skip);
 		$dbObject->setDataValue('flavorParams', $this->flavorParams);
-		$dbObject->setDataValue('shouldReconvert', $this->shouldReconvert);
 		return $dbObject;
 	}
 
@@ -40,6 +32,5 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 
 		/** @var kObjectTask $srcObj */
 		$this->flavorParams = $srcObj->getDataValue('flavorParams');
-		$this->shouldReconvert = $srcObj->getDataValue('shouldReconvert');
 	}
 }

@@ -2,6 +2,9 @@
 
 /**
  * Abstract class for all engines that are based on a default list service
+ *
+ * @package plugins.scheduledTask
+ * @subpackage lib.objectFilterEngine
  */
 abstract class KObjectFilterServiceEngine extends KObjectFilterEngineBase
 {

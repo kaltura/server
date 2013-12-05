@@ -1,11 +1,19 @@
 <?php
 
+/**
+ * @package plugins.scheduledTask
+ * @subpackage lib.objectTaskEngine
+ */
 class KObjectTaskDeleteEntryEngine extends KObjectTaskEntryEngineBase
 {
+	/**
+	 * @param KalturaBaseEntry $object
+	 */
 	function processObject($object)
 	{
-		/** @var KalturaBaseEntry $object */
 		$client = $this->getClient();
-		$client->baseEntry->delete($object->id);
+		$entryId = $object->id;
+		KalturaLog::debug('Deleting entry '. $entryId);
+		$client->baseEntry->delete($entryId);
 	}
 }

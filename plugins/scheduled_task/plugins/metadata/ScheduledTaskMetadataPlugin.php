@@ -58,9 +58,10 @@ class ScheduledTaskMetadataPlugin extends KalturaPlugin implements IKalturaPendi
 		$apiValue = self::getApiValue(ExecuteMetadataXsltObjectTaskType::EXECUTE_METADATA_XSLT);
 		$executeMetadataXsltObjectTaskCoreValue = kPluginableEnumsManager::apiToCore('ObjectTaskType', $apiValue);
 		if($baseClass == 'KalturaObjectTask' && $enumValue == $executeMetadataXsltObjectTaskCoreValue)
-		{
 			return new KalturaExecuteMetadataXsltObjectTask();
-		}
+
+		if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == $apiValue)
+			return new KObjectTaskExecuteMetadataXsltEngine();
 
 		return null;
 	}
@@ -79,5 +80,16 @@ class ScheduledTaskMetadataPlugin extends KalturaPlugin implements IKalturaPendi
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	/* (non-PHPdoc)
+ * @see IKalturaConfigurator::getConfig()
+ */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+
+		return null;
 	}
 }
