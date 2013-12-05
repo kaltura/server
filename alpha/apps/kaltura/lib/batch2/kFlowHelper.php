@@ -270,8 +270,15 @@ class kFlowHelper
 					continue;
 				}
 					
-				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
 				$dbAsset = assetPeer::retrieveOriginalByEntryId($attachedPendingMediaEntry->getEntryId());
+				if(!$dbAsset)
+				{
+					KalturaLog::info("Source of entry id [" . $attachedPendingMediaEntry->getEntryId() . "] not found (probably deleted)");
+					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+					continue;
+				}
+				
+				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
 				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files);
 				if($job)
 					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
