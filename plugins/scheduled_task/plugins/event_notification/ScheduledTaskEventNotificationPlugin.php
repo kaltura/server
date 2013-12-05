@@ -4,7 +4,7 @@
  *
  * @package plugins.scheduledTaskEventNotification
  */
-class ScheduledTaskEventNotificationPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader
+class ScheduledTaskEventNotificationPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'scheduledTaskEventNotification';
 	
@@ -58,9 +58,10 @@ class ScheduledTaskEventNotificationPlugin extends KalturaPlugin implements IKal
 		$apiValue = self::getApiValue(DispatchEventNotificationObjectTaskType::DISPATCH_EVENT_NOTIFICATION);
 		$dispatchEventNotificationObjectTaskCoreValue = kPluginableEnumsManager::apiToCore('ObjectTaskType', $apiValue);
 		if($baseClass == 'KalturaObjectTask' && $enumValue == $dispatchEventNotificationObjectTaskCoreValue)
-		{
 			return new KalturaDispatchEventNotificationObjectTask();
-		}
+
+		if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == $apiValue)
+			return new KObjectTaskDispatchEventNotificationEngine();
 
 		return null;
 	}
@@ -79,5 +80,16 @@ class ScheduledTaskEventNotificationPlugin extends KalturaPlugin implements IKal
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+
+		return null;
 	}
 }

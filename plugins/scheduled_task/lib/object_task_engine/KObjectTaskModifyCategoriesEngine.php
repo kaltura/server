@@ -1,10 +1,16 @@
 <?php
 
+/**
+ * @package plugins.scheduledTask
+ * @subpackage lib.objectTaskEngine
+ */
 class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 {
+	/**
+	 * @param KalturaBaseEntry $object
+	 */
 	function processObject($object)
 	{
-		/** @var KalturaBaseEntry $object */
 		/** @var KalturaModifyCategoriesObjectTask $objectTask */
 		$objectTask = $this->getObjectTask();
 		if (is_null($objectTask))

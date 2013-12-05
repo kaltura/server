@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.scheduledTaskMetadata
  * @subpackage model.enum

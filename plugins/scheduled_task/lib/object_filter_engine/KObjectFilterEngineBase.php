@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugins.scheduledTask
+ * @subpackage lib.objectFilterEngine
+ */
 abstract class KObjectFilterEngineBase
 {
 	/**

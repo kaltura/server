@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * @package plugins.scheduledTask
+ * @subpackage lib.objectTaskEngine
+ */
 abstract class KObjectTaskEngineBase
 {
+	/**
+	 * @var int
+	 */
+	private $_originalPartnerId;
+
 	/**
 	 * @var KalturaClient
 	 */
@@ -22,6 +31,8 @@ abstract class KObjectTaskEngineBase
 	 */
 	public function execute($object)
 	{
+		KalturaLog::debug('Executing object task '.get_class($this).' for object '.get_class($object));
+
 		if (is_null($this->_client))
 			throw new Exception('Client must be set before execution');
 
@@ -94,6 +105,20 @@ abstract class KObjectTaskEngineBase
 
 		$dummyObjectInstance = new $objectClass;
 		return $this->isObjectSupported($dummyObjectInstance);
+	}
+
+	protected function impersonate($partnerId)
+	{
+		$config = $this->_client->getConfig();
+		if (is_null($this->_originalPartnerId))
+			$this->_originalPartnerId = $config->partnerId;
+		$config->partnerId = $partnerId;
+	}
+
+	protected function unimpersonate()
+	{
+		$this->_client->getConfig()->partnerId = $this->_originalPartnerId;
+		$this->_originalPartnerId = null;
 	}
 
 }

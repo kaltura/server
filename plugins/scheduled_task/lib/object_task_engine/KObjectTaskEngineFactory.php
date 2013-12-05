@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugins.scheduledTask
+ * @subpackage lib.objectTaskEngine
+ */
 class KObjectTaskEngineFactory
 {
 	public static function getInstanceByType($type)
