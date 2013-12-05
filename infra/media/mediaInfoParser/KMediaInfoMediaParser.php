@@ -63,21 +63,21 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			$cmd = "{$this->cmdPath} \"--Inform=General;done %Duration%\" \"{$this->filePath}\"";
 			$output=0;
 			$output = shell_exec($cmd);
-			$aux = explode(" ", $output);
+			$aux = explode(" ", trim($output));
 			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
 				$kMi->containerDuration=(int)$aux[1];
 			}
 			$cmd = "{$this->cmdPath} \"--Inform=Video;done %Duration%\" \"{$this->filePath}\"";
 			$output=0;
 			$output = shell_exec($cmd);
-			$aux = explode(" ", $output);
+			$aux = explode(" ", trim($output));
 			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
 				$kMi->videoDuration=(int)$aux[1];
 			}
 			$cmd = "{$this->cmdPath} \"--Inform=Audio;done %Duration%\" \"{$this->filePath}\"";
 			$output=0;
 			$output = shell_exec($cmd);
-			$aux = explode(" ", $output);
+			$aux = explode(" ", trim($output));
 			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
 				$kMi->audioDuration=(int)$aux[1];
 			}
