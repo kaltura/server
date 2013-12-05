@@ -315,6 +315,9 @@ class KalturaRequestDeserializer
 			case "float":
 				return (float)$var;
 			case "time":
+				// empty fields should be treated as 0 and not the current time
+				if (strlen($var) == 0)
+					return 0;
 				$maxRelativeTime = kConf::get('max_relative_time');
 				$var = (int)$var;
 				if (-$maxRelativeTime <= $var && $var <= $maxRelativeTime)
@@ -342,6 +345,6 @@ class KalturaRequestDeserializer
 			if ($referenceTime)
 				return (int)$referenceTime;
 		}
-		return time();
+		return kApiCache::getTime();
 	}
 }
