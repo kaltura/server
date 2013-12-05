@@ -5,6 +5,12 @@
  */
 class KalturaDropFolderContentProcessorJobData extends KalturaJobData
 {
+	
+	/**
+	 * @var int
+	 */
+	public $dropFolderId;
+	
 	/**
 	 * @var string
 	 */
@@ -32,6 +38,7 @@ class KalturaDropFolderContentProcessorJobData extends KalturaJobData
 	
 	private static $map_between_objects = array
 	(
+		"dropFolderId",
 		"dropFolderFileIds",
 		"parsedSlug",
 		"contentMatchPolicy",

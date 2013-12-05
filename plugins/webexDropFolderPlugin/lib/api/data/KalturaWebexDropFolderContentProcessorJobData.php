@@ -15,16 +15,10 @@ class KalturaWebexDropFolderContentProcessorJobData extends KalturaDropFolderCon
 	 */
 	public $webexHostId;
 
-	/**
-	 * @var int
-	 */
-	public $dropFolderId;
-	
 	private static $map_between_objects = array
 	(
 		"description",
 		"webexHostId",
-		"dropFolderId",
 	);
 
 	public function getMapBetweenObjects ( )

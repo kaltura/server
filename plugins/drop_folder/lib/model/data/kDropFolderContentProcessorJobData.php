@@ -26,6 +26,11 @@ class kDropFolderContentProcessorJobData extends kJobData
 	 * @var string
 	 */
 	private $parsedUserId;
+	
+	/**
+	 * @var int
+	 */
+	protected $dropFolderId;
     
 	/**
      * @return the $dropFolderFileIds
@@ -106,6 +111,16 @@ class kDropFolderContentProcessorJobData extends kJobData
 	{
 		$this->parsedUserId = $v;
 	}
+	
+	public function getDropFolderId ()
+	{
+		return $this->dropFolderId;
+	}
+	
+	public function setDropFolderId ($v)
+	{
+		$this->dropFolderId = $v;
+	}
 
 
     public static function getInstance ($dropFolderType)
@@ -131,6 +146,7 @@ class kDropFolderContentProcessorJobData extends kJobData
 	
 	public function setData (DropFolder $folder, DropFolderFile $dropFolderFileForObject, $dropFolderFileIds)
 	{
+		$this->dropFolderId = $folder->getId();
 		$this->setConversionProfileId($folder->getConversionProfileId());
 		$this->setParsedSlug($dropFolderFileForObject->getParsedSlug());
 		$this->setContentMatchPolicy($folder->getFileHandlerConfig()->getContentMatchPolicy());
