@@ -442,7 +442,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->referenceId = $data->parsedSlug;
 		$newEntry->userId = $data->parsedUserId;
-		$aKBatchBase::$kClient->startMultiRequest();
+		KBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->baseEntry->add($newEntry, null);
 		KBatchBase::$kClient->baseEntry->addContent($addedEntry->id, $resource);
 		$result = KBatchBase::$kClient->doMultiRequest();
