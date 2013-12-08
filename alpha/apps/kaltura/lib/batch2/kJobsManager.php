@@ -75,6 +75,10 @@ class kJobsManager
 	{
 		// No need to abort finished job
 		if(in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList())) {
+			if($force) {
+				$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
+				$dbBatchJob->save();
+			}
 			return $dbBatchJob;
 		}
 		
