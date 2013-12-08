@@ -55,13 +55,21 @@ class ScheduledTaskEventNotificationPlugin extends KalturaPlugin implements IKal
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		$apiValue = self::getApiValue(DispatchEventNotificationObjectTaskType::DISPATCH_EVENT_NOTIFICATION);
-		$dispatchEventNotificationObjectTaskCoreValue = kPluginableEnumsManager::apiToCore('ObjectTaskType', $apiValue);
-		if($baseClass == 'KalturaObjectTask' && $enumValue == $dispatchEventNotificationObjectTaskCoreValue)
-			return new KalturaDispatchEventNotificationObjectTask();
+		if (class_exists('KalturaClient'))
+		{
+			if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == KalturaObjectTaskType::DISPATCH_EVENT_NOTIFICATION)
+				return new KObjectTaskDispatchEventNotificationEngine();
+		}
+		else
+		{
+			$apiValue = self::getApiValue(DispatchEventNotificationObjectTaskType::DISPATCH_EVENT_NOTIFICATION);
+			$dispatchEventNotificationObjectTaskCoreValue = kPluginableEnumsManager::apiToCore('ObjectTaskType', $apiValue);
+			if($baseClass == 'KalturaObjectTask' && $enumValue == $dispatchEventNotificationObjectTaskCoreValue)
+				return new KalturaDispatchEventNotificationObjectTask();
 
-		if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == $apiValue)
-			return new KObjectTaskDispatchEventNotificationEngine();
+			if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == $apiValue)
+				return new KObjectTaskDispatchEventNotificationEngine();
+		}
 
 		return null;
 	}

@@ -27,8 +27,8 @@ class KalturaDispatchEventNotificationObjectTask extends KalturaObjectTask
 
 		$this->validatePropertyNotNull('eventNotificationTemplateId');
 
-		myPartnerUtils::addPartnerToCriteria('EventNotification', kCurrentContext::getCurrentPartnerId(), true);
-		$eventNotificationTemplate = MetadataProfilePeer::retrieveByPK($this->eventNotificationTemplateId);
+		myPartnerUtils::addPartnerToCriteria('EventNotificationTemplate', kCurrentContext::getCurrentPartnerId(), true);
+		$eventNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($this->eventNotificationTemplateId);
 		if (is_null($eventNotificationTemplate))
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND, $this->eventNotificationTemplateId);
 	}
