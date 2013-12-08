@@ -16,10 +16,15 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 	public function getDc()
 	{
 	    $content = myContentStorage::getFSContentRootPath();
-	    $entryFullPath = "{$content}/content/webcam/{$this->token}.flv";
+	    $entryFullPaths = array(
+	    	"{$content}/content/webcam/{$this->token}.flv",
+	    	"{$content}/content/webcam/{$this->token}.f4v",
+	    	"{$content}/content/webcam/{$this->token}.f4v.mp4",
+	    );
 	    
-		if(file_exists($entryFullPath))
-			return kDataCenterMgr::getCurrentDcId();
+	    foreach($entryFullPaths as $entryFullPath)
+			if(file_exists($entryFullPath))
+				return kDataCenterMgr::getCurrentDcId();
 			
 		return (1 - kDataCenterMgr::getCurrentDcId()); // other dc
 	}
@@ -74,25 +79,37 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 			$object_to_fill = new kLocalFileResource();
 			
 	    $content = myContentStorage::getFSContentRootPath();
-	    $entryFullPath = "{$content}/content/webcam/{$this->token}.flv";
+	    $entryFullPaths = array(
+	    	'flv' => "{$content}/content/webcam/{$this->token}.flv",
+	    	'f4v' => "{$content}/content/webcam/{$this->token}.f4v",
+	    	'mp4' => "{$content}/content/webcam/{$this->token}.f4v.mp4",
+	    );
 	    
-		if(!file_exists($entryFullPath))
-			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
-					
-		$entryFixedFullPath = $entryFullPath . '.fixed.flv';
- 		KalturaLog::debug("Fix webcam full path from [$entryFullPath] to [$entryFixedFullPath]");
-		myFlvStaticHandler::fixRed5WebcamFlv($entryFullPath, $entryFixedFullPath);
-				
-		$entryNewFullPath = $entryFullPath . '.clipped.flv';
- 		KalturaLog::debug("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
-		myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath, 0, 0);
-		$entryFullPath = $entryNewFullPath ;
-				
-		if(!file_exists($entryFullPath))
-			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
-					
-		$object_to_fill->setSourceType(KalturaSourceType::WEBCAM);
-		$object_to_fill->setLocalFilePath($entryFullPath);
-		return $object_to_fill;
+	    foreach($entryFullPaths as $type => $entryFullPath)
+	    {
+			if(file_exists($entryFullPath))
+			{
+				if($type == 'flv')
+				{
+					$entryFixedFullPath = $entryFullPath . '.fixed.flv';
+			 		KalturaLog::debug("Fix webcam full path from [$entryFullPath] to [$entryFixedFullPath]");
+					myFlvStaticHandler::fixRed5WebcamFlv($entryFullPath, $entryFixedFullPath);
+							
+					$entryNewFullPath = $entryFullPath . '.clipped.flv';
+			 		KalturaLog::debug("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
+					myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath, 0, 0);
+					$entryFullPath = $entryNewFullPath ;
+							
+					if(!file_exists($entryFullPath))
+						throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
+				}
+							
+				$object_to_fill->setSourceType(KalturaSourceType::WEBCAM);
+				$object_to_fill->setLocalFilePath($entryFullPath);
+				return $object_to_fill;
+			}
+	    }
+		
+		throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
 	}
 }
