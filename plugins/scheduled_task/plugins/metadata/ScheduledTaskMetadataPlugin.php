@@ -55,13 +55,21 @@ class ScheduledTaskMetadataPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		$apiValue = self::getApiValue(ExecuteMetadataXsltObjectTaskType::EXECUTE_METADATA_XSLT);
-		$executeMetadataXsltObjectTaskCoreValue = kPluginableEnumsManager::apiToCore('ObjectTaskType', $apiValue);
-		if($baseClass == 'KalturaObjectTask' && $enumValue == $executeMetadataXsltObjectTaskCoreValue)
-			return new KalturaExecuteMetadataXsltObjectTask();
+		if (class_exists('KalturaClient'))
+		{
+			if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == KalturaObjectTaskType::EXECUTE_METADATA_XSLT)
+				return new KObjectTaskExecuteMetadataXsltEngine();
+		}
+		else
+		{
+			$apiValue = self::getApiValue(ExecuteMetadataXsltObjectTaskType::EXECUTE_METADATA_XSLT);
+			$executeMetadataXsltObjectTaskCoreValue = kPluginableEnumsManager::apiToCore('ObjectTaskType', $apiValue);
+			if($baseClass == 'KalturaObjectTask' && $enumValue == $executeMetadataXsltObjectTaskCoreValue)
+				return new KalturaExecuteMetadataXsltObjectTask();
 
-		if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == $apiValue)
-			return new KObjectTaskExecuteMetadataXsltEngine();
+			if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == $apiValue)
+				return new KObjectTaskExecuteMetadataXsltEngine();
+		}
 
 		return null;
 	}

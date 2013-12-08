@@ -105,7 +105,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			/** @var KalturaObjectTask $objectTask */
 			$objectTaskEngine = $this->getObjectTaskEngineByType($objectTask->type);
 			$objectTaskEngine->setObjectTask($objectTask);
-			$objectTaskEngine->execute($object);
+			try
+			{
+				$objectTaskEngine->execute($object);
+			}
+			catch(Exception $ex)
+			{
+				$id = '';
+				if (property_exists($object, 'id'))
+					$id = $object->id;
+				KalturaLog::err(sprintf('An error occurred while executing %s on object %s (id %s)', get_class($objectTaskEngine), get_class($object), $id));
+				KalturaLog::err($ex);
+			}
 		}
 	}
 

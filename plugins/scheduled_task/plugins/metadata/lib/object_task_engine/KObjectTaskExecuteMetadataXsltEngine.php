@@ -30,11 +30,14 @@ class KObjectTaskExecuteMetadataXsltEngine extends KObjectTaskEntryEngineBase
 		$metadataResult = $metadataPlugin->metadata->listAction($filter);
 		if (!count($metadataResult->objects))
 		{
-			KalturaLog::err(sprintf('Metadata object was not found for entry %s, profile id %s and object type %s', $entryId, $metadataProfileId, $metadataObjectType));
+			KalturaLog::info(sprintf('Metadata object was not found for entry %s, profile id %s and object type %s', $entryId, $metadataProfileId, $metadataObjectType));
 			return;
 		}
 
+		$xsltFilePath = sys_get_temp_dir().'/xslt_'.time(true).'.xslt';
+		file_put_contents($xsltFilePath, $xslt);
+
 		$metadataId = $metadataResult->objects[0]->id;
-		$metadataPlugin->metadata->updateFromXSL($metadataId, $xslt);
+		$metadataPlugin->metadata->updateFromXSL($metadataId, $xsltFilePath);
 	}
 }
