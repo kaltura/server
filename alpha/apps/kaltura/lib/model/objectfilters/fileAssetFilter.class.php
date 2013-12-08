@@ -14,7 +14,7 @@ class fileAssetFilter extends baseObjectFilter
 			"_eq_id",
 			"_in_id",
 			"_eq_partner_id",
-			"_eq_file_asset_object_type",
+			"_eq_object_type",
 			"_eq_object_id",
 			"_in_object_id",
 			"_gte_created_at",
