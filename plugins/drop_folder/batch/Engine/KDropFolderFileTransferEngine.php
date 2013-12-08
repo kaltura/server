@@ -450,7 +450,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		if ($result [1] && $result[1] instanceof KalturaBaseEntry)
 		{
 			$entry = $result [1];
-			$this->createCategoryAssociations ($folder, $entry->userId, $entry->id);
+			$this->createCategoryAssociations ($dropFolder, $entry->userId, $entry->id);
 		}	
 	}
 
