@@ -18,7 +18,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()
 	 */
-	public function init($config)
+	protected function doInit($config)
 	{		
 		$this->baseFolder = rtrim($config['rootFolder'], '/') . '/' . rtrim($config['baseFolder'], '/') . '/';
 		$this->keyFolderChars = $config['keyFolderChars'];
@@ -70,7 +70,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key)
+	protected function doGet($key)
 	{
 		$filePath = $this->getFilePath($key);
 		if (!file_exists($filePath))
@@ -93,13 +93,14 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		}
 		
 		$result = self::safeFileGetContents($filePath);
+
 		return $result;
 	}
 		
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0)
 	{
 		$filePath = $this->getFilePath($key);
 		
@@ -118,7 +119,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::add()
 	 */
-	public function add($key, $var, $expiry = 0)
+	protected function doAdd($key, $var, $expiry = 0)
 	{
 		return false;
 	}
@@ -126,7 +127,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::delete()
 	 */
-	public function delete($key)
+	protected function doDelete($key)
 	{
 		$filePath = $this->getFilePath($key);
 		if ($this->supportExpiry)
