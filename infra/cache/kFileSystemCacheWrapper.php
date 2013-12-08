@@ -12,7 +12,6 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 
 	protected $baseFolder;
 	protected $keyFolderChars;
-	protected $serializeData;
 	protected $defaultExpiry;
 	protected $supportExpiry;
 
@@ -23,7 +22,6 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	{		
 		$this->baseFolder = rtrim($config['rootFolder'], '/') . '/' . rtrim($config['baseFolder'], '/') . '/';
 		$this->keyFolderChars = $config['keyFolderChars'];
-		$this->serializeData = isset($config['serializeData']) ? $config['serializeData'] : false;
 		$this->defaultExpiry = $config['defaultExpiry'];
 		$this->supportExpiry = isset($config['supportExpiry']) ? $config['supportExpiry'] : false;
 		return true;
@@ -95,10 +93,6 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		}
 		
 		$result = self::safeFileGetContents($filePath);
-		if ($result === false)
-			return false;
-		if ($this->serializeData)
-			$result = @unserialize($result);
 		return $result;
 	}
 		
@@ -108,8 +102,6 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	public function set($key, $var, $expiry = 0)
 	{
 		$filePath = $this->getFilePath($key);
-		if ($this->serializeData)
-			$var = serialize($var);
 		
 		self::createDirForPath($filePath);
 		
