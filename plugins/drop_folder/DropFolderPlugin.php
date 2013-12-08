@@ -2,10 +2,11 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEventConsumers
+class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaServices, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'dropFolder';
 	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderEventsConsumer';
+	const METADATA_PLUGIN_NAME = 'metadata';
 	
 	//Error Messages
 	const ERROR_CONNECT_MESSAGE = 'Failed to connect to the drop folder. Please verify host and port information and/or actual access to the drop folder';
@@ -22,6 +23,12 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	const ERROR_DOWNLOADING_FILE_MESSAGE = 'Failed in file transferring from the drop folder to Kaltura';
 	const FLAVOR_NOT_FOUND_MESSAGE = 'Failed to handle file. Could not find a matched transcoding flavor setting with system name: ';
 	
+	public static function dependsOn()
+	{
+		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME);
+		
+		return array($metadataDependency);
+	}
 	
 	public static function getPluginName()
 	{
