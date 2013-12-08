@@ -309,17 +309,13 @@ class assetPeer extends BaseassetPeer
 		return self::countByEntryId($entryId, $types);
 	}
 	
-	public static function removeThumbAssetDeafultTags($entryID = null, thumbAsset $thumbAsset = null)
+	public static function removeThumbAssetDeafultTags($entryID, $thumbAssetId = null)
 	{
-		$entryThumbAssets = array();
-		if($thumbAsset)
-			$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		else if($entryID)
-			$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryID);
+		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryID);
 			
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
-			if($thumbAsset && $entryThumbAsset->getId() == $thumbAsset->getId())
+			if($thumbAssetId && $entryThumbAsset->getId() == $thumbAssetId)
 				continue;
 
 			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
