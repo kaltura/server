@@ -65,7 +65,7 @@ Templates:
 \tpython apimonClient.py -g pia -f e=start,c=False | sort -gr | head
 
     Top uncached APIs by execution time
-\tpython apimonClient.py -g pa -f e=end | sort -rk2 | head
+\tpython apimonClient.py -g pa -f e=end | sort -grk2 | head
 
   API errors:
     Top API errors by count
@@ -76,23 +76,23 @@ Templates:
 
   Database:
     Top DB actions by execution time
-\tpython apimonClient.py -g pqdt -f e=db | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=db | sort -grk2 | head
 
     Top DB read actions by execution time
-\tpython apimonClient.py -g pqdt -f e=db,q=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=db,q=SELECT | sort -grk2 | head
 
     Top DB write actions by execution time
-\tpython apimonClient.py -g pqdt -f e=db,q\!=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=db,q\!=SELECT | sort -grk2 | head
 
   Sphinx:
     Top sphinx actions by execution time
-\tpython apimonClient.py -g pqdt -f e=sphinx | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=sphinx | sort -grk2 | head
 
     Top sphinx read actions by execution time
-\tpython apimonClient.py -g pqdt -f e=sphinx,q=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=sphinx,q=SELECT | sort -grk2 | head
 
     Top sphinx write actions by execution time
-\tpython apimonClient.py -g pqdt -f e=sphinx,q\!=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=sphinx,q\!=SELECT | sort -grk2 | head
 
 """ % columnNamesDesc
     (options, args) = parser.parse_args()
