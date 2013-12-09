@@ -6,7 +6,7 @@
  */
 abstract class kBaseCacheWrapper
 {
-	protected $serializeData;
+	private $serializeData;
 	
 	/**
 	 * @param array $config
@@ -111,7 +111,22 @@ abstract class kBaseCacheWrapper
 	 */
 	public function multiGet($keys)
 	{
-		return $this->doMultiGet( $keys );
+		$result = $this->doMultiGet( $keys );
+
+		// Result needs to be deserialized?
+		if ( $result !== false && $this->serializeData )
+		{
+			if ( is_array( $keys ) )
+			{
+				array_map( 'unserialize', $result );
+			}
+			else // Single object
+			{
+				$result = @unserialize( $result );
+			}
+		}
+		
+		return $result;
 	}
 	
 	/**
@@ -124,7 +139,9 @@ abstract class kBaseCacheWrapper
 		
 		foreach ($keys as $key)
 		{
-			$curResult = $this->get($key);
+			// Note: Calling doGet() instead of get() in order to make sure the result is not unserialized.
+			//       The result will be unserialized later on in multiGet().
+			$curResult = $this->doGet($key);
 			
 			if ($curResult !== false)
 			{

@@ -47,25 +47,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	 */
 	protected function doMultiGet($keys)
 	{
-		$result = apc_fetch($keys);
-
-		// Result needs to be deserialized?
-		if ( $result !== false && $this->serializeData )
-		{
-			if ( is_array( $keys ) )
-			{
-				foreach ( $keys as $key )
-				{
-					$result[$key] = @unserialize( $result[$key] );
-				}
-			}
-			else // Single object
-			{
-				$result = @unserialize( $result );
-			}
-		}
-
-		return $result;
+		return apc_fetch($keys);
 	}
 
 
