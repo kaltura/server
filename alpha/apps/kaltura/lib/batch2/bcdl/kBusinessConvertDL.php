@@ -371,15 +371,65 @@ class kBusinessConvertDL
 		return 0;
 	}
 	
-	public static function decideLiveProfile(entry $entry){
+	public static function decideLiveProfile(entry $entry)
+	{
+		// find all live assets of the entry
+		$c = new Criteria();
+		$c->add(assetPeer::PARTNER_ID, $entry->getPartnerId());
+		$c->add(assetPeer::ENTRY_ID, $entry->getId());
+		$c->add(assetPeer::TYPE, assetType::LIVE);
+		// include deleted assets
+		assetPeer::setUseCriteriaFilter(false); 
+		$liveAssets = assetPeer::doSelect($c);
+		assetPeer::setUseCriteriaFilter(true);
+		
+		// build array of all assets with asset params id as key
+		$liveAssetsParams = array();
+		foreach($liveAssets as $liveAsset)
+		{
+			/* @var $liveAsset liveAsset */
+			$flavorParamsId = is_null($liveAsset->getFlavorParamsId()) ? $liveAsset->getId() : $liveAsset->getFlavorParamsId();
+			$liveAssetsParams[$flavorParamsId] = $liveAsset;
+		}
+		
 		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
-		foreach ($liveParamsArray as $liveParams){
+		foreach ($liveParamsArray as $liveParams)
+		{
 			/* @var $liveParams liveParams */
-			$liveAsset = new liveAsset(); 
-			$liveAsset->setType(assetType::LIVE);
-			$liveAsset->setFromAssetParams($liveParams);
-			$liveAsset->setEntryId($entry->getId());
-			$liveAsset->setStatus(asset::ASSET_STATUS_IMPORTING);
+			
+			// check if asset already exists
+			if(isset($liveAssetsParams[$liveParams->getId()]))
+			{
+				$liveAsset = $liveAssetsParams[$liveParams->getId()];
+				$liveAsset->setDeletedAt(null);
+
+				// remove the asset from the list, the left assets will be deleted later
+				unset($liveAssetsParams[$liveParams->getId()]);
+			}
+			else
+			{
+				// create a new asset
+				$liveAsset = new liveAsset();
+				$liveAsset->setType(assetType::LIVE);
+				$liveAsset->setFromAssetParams($liveParams);
+				$liveAsset->setEntryId($entry->getId());
+			}
+			
+			// set the status according to the entry status
+			if($entry->getStatus() == entryStatus::READY)
+				$liveAsset->setStatus( asset::ASSET_STATUS_READY);
+			else
+				$liveAsset->setStatus( asset::ASSET_STATUS_IMPORTING);
+				
+			$liveAsset->save();
+		}
+		
+		// delete all left assets
+		foreach($liveAssetsParams as $liveAsset)
+		{
+			/* @var $liveAsset liveAsset */
+			$liveAsset->setDeletedAt(time());
+			$liveAsset->setStatus(asset::ASSET_STATUS_DELETED);
 			$liveAsset->save();
 		}
 	}
