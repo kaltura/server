@@ -44,7 +44,7 @@ class FileAssetTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, null);
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
-		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 255, null);
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 255, null);
 		$this->addColumn('FILE_EXT', 'FileExt', 'VARCHAR', false, 4, null);

@@ -276,7 +276,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		foreach ($categoriesArr as $category)
 		{
 			/* @var $category KalturaCategory */
-			$ks = $client->generateSessionV2($partnerInfo->adminSecret, $userId, KalturaSessionType::ADMIN, $partnerInfo->id, 86400, 'enableentitlement,privacycontext:'.$category->privacyContext);
+			$ks = $client->generateSessionV2($partnerInfo->adminSecret, $userId, KalturaSessionType::ADMIN, $partnerInfo->id, 86400, 'enableentitlement,privacycontext:'.$category->privacyContexts);
 			$client->setKs($ks);
 			$categoryEntry = new KalturaCategoryEntry();
 			$categoryEntry->categoryId = $category->id;

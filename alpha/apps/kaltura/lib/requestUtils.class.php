@@ -60,9 +60,7 @@ class requestUtils extends infraRequestUtils
 	
 	public static function getApiCdnHost()
 	{
-		$protocol = 'http';
-		if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
-			$protocol = 'https';
+		$protocol = self::getProtocol();
 			
 		if ($protocol == "https" && kConf::hasParam('cdn_api_host_https'))
 			return "$protocol://" . kConf::get('cdn_api_host_https');

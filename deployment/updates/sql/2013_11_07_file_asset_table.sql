@@ -10,7 +10,7 @@ CREATE TABLE `file_asset`
 	`partner_id` INTEGER,
 	`object_id` VARCHAR(20),
 	`object_type` INTEGER,
-	`status` TINYINT,
+	`status` INTEGER,
 	`name` VARCHAR(255),
 	`system_name` VARCHAR(255),
 	`file_ext` VARCHAR(4),

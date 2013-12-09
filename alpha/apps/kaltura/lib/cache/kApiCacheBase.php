@@ -52,18 +52,29 @@ class kApiCacheBase
 	protected $_extraFields = array();
 	protected static $_usesHttpReferrer = false;	// enabled if the request is dependent on the http referrer field (opposed to an API parameter referrer)
 	protected static $_hasExtraFields = false;		// set to true if the response depends on http headers and should not return caching headers to the user / cdn
+
+	// debug
+	protected static $_debugMode = false;
 	
 	protected function __construct()
 	{
+		// Uncomment to support debug mode
+		//if (self::$_nextInstanceId == 0)
+		//	self::$_debugMode = isset($_REQUEST['__debugcache']);
+		
 		$this->_instanceId = self::$_nextInstanceId;
 		self::$_nextInstanceId++;
 
 		if (!$this->init())
 		{
+			if (self::$_debugMode)
+				$this->debugLog('kApiCacheBase::init returned false');
 			self::disableCache();
 			return;
 		}
 
+		if (self::$_debugMode)
+			$this->debugLog('enabling cache');
 		$this->enableCache();
 	}
 
@@ -80,9 +91,12 @@ class kApiCacheBase
 	}
 
 	public static function disableCache()
-	{
+	{		
 		foreach (self::$_activeInstances as $curInstance)
 		{
+			if (self::$_debugMode)
+				$curInstance->debugLog('disableCache called');
+			
 			$curInstance->_cacheStatus = self::CACHE_STATUS_DISABLED;
 		}
 		self::$_activeInstances = array();
@@ -99,6 +113,9 @@ class kApiCacheBase
 	
 	protected function disableConditionalCacheInternal()
 	{
+		if (self::$_debugMode && $this->_cacheStatus != self::CACHE_STATUS_ANONYMOUS_ONLY)
+			$this->debugLog('disableConditionalCache called');
+		
 		$this->_cacheStatus = self::CACHE_STATUS_ANONYMOUS_ONLY;
 		$this->_invalidationKeys = array();
 		$this->_sqlConditions = array();	
@@ -116,21 +133,25 @@ class kApiCacheBase
 
 	// expiry control functions
 	public static function setExpiry($expiry)
-	{
+	{		
 		foreach (self::$_activeInstances as $curInstance)
-		{
+		{			
 			if ($curInstance->_expiry && $curInstance->_expiry < $expiry)
 				continue;
+			if (self::$_debugMode)
+				$curInstance->debugLog("setExpiry called with [$expiry]");
 			$curInstance->_expiry = $expiry;
 		}
 	}
 
 	public static function setConditionalCacheExpiry($expiry)
-	{
+	{		
 		foreach (self::$_activeInstances as $curInstance)
 		{
 			if ($curInstance->_conditionalCacheExpiry && $curInstance->_conditionalCacheExpiry < $expiry)
 				continue;
+			if (self::$_debugMode)
+				$curInstance->debugLog("setConditionalCacheExpiry called with [$expiry]");
 			$curInstance->_conditionalCacheExpiry = $expiry;
 		}
 	}
@@ -281,5 +302,10 @@ class kApiCacheBase
 	{
 		self::setConditionalCacheExpiry(600);
 		return time();
+	}
+
+	protected function debugLog($msg)
+	{
+		error_log("kApiCache [$this->_instanceId] ".$msg);
 	}
 }

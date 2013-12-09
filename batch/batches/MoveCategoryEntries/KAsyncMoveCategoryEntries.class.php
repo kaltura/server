@@ -255,5 +255,7 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 				
 			$categoryEntriesList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
 		}
+		
+		KBatchBase::$kClient->category->index($data->destCategoryId);
 	}
 }
