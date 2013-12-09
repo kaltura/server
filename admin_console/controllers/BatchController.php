@@ -936,7 +936,7 @@ class BatchController extends Zend_Controller_Action
 			{
 				try
 				{
-					$client->jobs->boosEntryJobs($entryId);
+					$client->jobs->boostEntryJobs($entryId);
 				}
 				catch (Exception $e)
 				{
