@@ -178,7 +178,7 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				{
 					if ($format && is_numeric($strval))
 					{
-						$strval = date($format);
+						$strval = date($format,$strval);
 					}
 				}
 				
