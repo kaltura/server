@@ -1638,7 +1638,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
 		if(!$v)
-			assetPeer::removeThumbAssetDeafultTags($this->getId(), $thumbAsset->getId() ? $thumbAsset->getId() : null); 
+			assetPeer::removeThumbAssetDeafultTags($this->getId(), $thumbAsset ? $thumbAsset->getId() : null); 
 		
 		$this->putInCustomData ( "createThumb" , (bool) $v );	
 	}
