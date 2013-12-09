@@ -118,7 +118,7 @@ abstract class kBaseCacheWrapper
 		{
 			if ( is_array( $keys ) )
 			{
-				array_map( 'unserialize', $result );
+				$result = array_map( 'unserialize', $result );
 			}
 			else // Single object
 			{
