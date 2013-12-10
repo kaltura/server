@@ -411,6 +411,7 @@ class kBusinessConvertDL
 				// create a new asset
 				$liveAsset = new liveAsset();
 				$liveAsset->setType(assetType::LIVE);
+				$liveAsset->setPartnerId($entry->getPartnerId());
 				$liveAsset->setFlavorParamsId($liveParams->getId());
 				$liveAsset->setFromAssetParams($liveParams);
 				$liveAsset->setEntryId($entry->getId());
