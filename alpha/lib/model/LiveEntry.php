@@ -94,13 +94,19 @@ abstract class LiveEntry extends entry
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		$decideLiveProfile = false;
 		if(!$this->alreadyInSave && $this->conversion_profile_id)
 		{
 			if(isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
-				kBusinessConvertDL::decideLiveProfile($this);
+				$decideLiveProfile = true;
 		}
 			
-		return parent::postUpdate($con);
+		$ret = parent::postUpdate($con);
+		
+		if($decideLiveProfile)
+			kBusinessConvertDL::decideLiveProfile($this);
+			
+		return $ret;
 	}
 	
 	/* (non-PHPdoc)
