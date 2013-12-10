@@ -90,17 +90,17 @@ abstract class LiveEntry extends entry
 	}
 	
 	/* (non-PHPdoc)
-	 * @see Baseentry::postSave()
+	 * @see Baseentry::postUpdate()
 	 */
-	public function postSave(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
-		if ($this->conversion_profile_id)
+		if(!$this->alreadyInSave && $this->conversion_profile_id)
 		{
 			if(isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
 				kBusinessConvertDL::decideLiveProfile($this);
 		}
 			
-		parent::postSave($con);
+		return parent::postUpdate($con);
 	}
 	
 	/* (non-PHPdoc)
