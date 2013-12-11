@@ -79,12 +79,6 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 	 */
 	public $customHeaders;
 	
-	/**
-	 * Define the content dynamic parameters
-	 * @var KalturaKeyValueArray
-	 */
-	public $contentParameters;
-	
 	private static $map_between_objects = array
 	(
 		'fromEmail',
@@ -98,7 +92,6 @@ class KalturaEmailNotificationDispatchJobData extends KalturaEventNotificationDi
 		'hostname',
 		'messageID',
 		'customHeaders',
-		'contentParameters',
 	);
 
 	public function getMapBetweenObjects ( )
