@@ -391,6 +391,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kDeleteJobData':
 				$this->data = new KalturaDeleteJobData();
 				break;
+
+			case 'kDeleteFileJobData':
+				$this->data = new KalturaDeleteFileJobData();
+				break;
 				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
@@ -584,6 +588,12 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kDeleteJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaDeleteJobData();
+				break;
+
+			case KalturaBatchJobType::DELETE_FILE:
+				$dbData = new kDeleteFileJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaDeleteFileJobData();
 				break;
 				
 			default:

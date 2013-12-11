@@ -1284,7 +1284,7 @@ class kJobsManager
 		$deleteFileData = new kDeleteFileJobData();
 		$deleteFileData->setLocalFileSyncPath($localFileSyncPath);
 		$deleteFileData->setSyncKey($syncKey);
-		
+
 		if ($parentJob)
 		{
 			$batchJob = $parentJob->createChild(BatchJobType::DELETE_FILE, null, false);
@@ -1296,11 +1296,11 @@ class kJobsManager
 			$batchJob->setPartnerId($partner->getId());
 		}
 		
-		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-		$batchJob->setCheckAgainTimeout(12*60*60);
+		//$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
+		//$batchJob->setCheckAgainTimeout(12*60*60);
 		$batchJob->setDc($dc);
 		
-		KalturaLog::log("Creating File Delete job, from data center id: ". $deleteFileData->getDC() ." with source file: " . $deleteFileData->getLocalFileSyncPath()); 
+		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
 	}
 	
