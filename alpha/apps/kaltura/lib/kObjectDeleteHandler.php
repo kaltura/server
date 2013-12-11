@@ -33,6 +33,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof kuser)
 			return true;
+
+		if($object instanceof FileSync)
+			return true;
 			
 		return false;
 	}
@@ -68,6 +71,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof kuser)
 			$this->kuserDelete($object);
+
+		if($object instanceof FileSync)
+			$this->fileSyncDelete($object, $raisedJob);
 			
 		return true;
 	}
@@ -219,4 +225,24 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	{
 		$this->syncableDeleted($conversionProfile->getId(), FileSyncObjectType::CONVERSION_PROFILE);
 	}
+
+	/**
+	 * @param FileSync $fileSync
+	 */
+	protected function fileSyncDelete(FileSync $fileSync, BatchJob $raisedJob = null)
+	{
+		$partner = PartnerPeer::retrieveByPK($fileSync->getPartnerId());
+		if (is_null($partner))
+		{
+			KalturaLog::err('Cannot physically delete a file sync for partner that doesn\'t exists');
+			return;
+		}
+
+		if ($partner->getEnabledService('PURGE_FILES_ON_DELETE'))
+		{
+			$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+			kJobsManager::addFutureDeletionJob($raisedJob, null, $partner, $syncKey, $fileSync->getFullPath(), $fileSync->getDc());
+		}
+	}
+
 }

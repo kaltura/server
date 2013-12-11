@@ -78,6 +78,10 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 			case KalturaBatchJobType::DELETE:
 				$data = new KalturaDeleteJobData();
 				break;
+
+			case KalturaBatchJobType::DELETE_FILE:
+				$data = new KalturaDeleteFileJobData();
+				break;
 				
 			case KalturaBatchJobType::MOVE_CATEGORY_ENTRIES:
 				$data = new KalturaMoveCategoryEntriesJobData();
