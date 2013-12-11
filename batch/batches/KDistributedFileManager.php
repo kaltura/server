@@ -77,8 +77,8 @@ class KDistributedFileManager
 			if(!file_exists($folder))
 				mkdir($folder, 777, true);
 			
-			$curlWrapper = new KCurlWrapper($remotePath);
-			$curlHeaderResponse = $curlWrapper->getHeader(true);
+			$curlWrapper = new KCurlWrapper();
+			$curlHeaderResponse = $curlWrapper->getHeader($remotePath, true);
 			$removeServer = isset($curlHeaderResponse->headers['X-Me']) ? $curlHeaderResponse->headers['X-Me'] : "unknown";
 			
 			if(!$curlHeaderResponse || $curlWrapper->getError())
@@ -109,8 +109,8 @@ class KDistributedFileManager
 			}
 			else
 			{			
-				$curlWrapper = new KCurlWrapper($remotePath);
-				$res = $curlWrapper->exec($localPath);
+				$curlWrapper = new KCurlWrapper();
+				$res = $curlWrapper->exec($remotePath, $localPath);
 				KalturaLog::debug("Curl results: $res");
 			
 				if(!$res || $curlWrapper->getError())
