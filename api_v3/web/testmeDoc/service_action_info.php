@@ -74,11 +74,15 @@ foreach($actionParams as $actionParam):
 		<td><?php echo ($actionParam->isEnum() || $actionParam->isStringEnum() ? $actionParam->getType() . '::' . $actionParam->getConstantName($actionParam->getDefaultValue()) : $actionParam->getDefaultValue()); ?></td>
 		<td><?php 
 			$constrains = array();
-			$name = $actionParam->getName();
-			$constrains = array_merge($constrains, format_constraint($actionInfo, $name, $actionInfo->validateMinLengthConstraints, "Minimal Length"));
-			$constrains = array_merge($constrains, format_constraint($actionInfo, $name, $actionInfo->validateMaxLengthConstraints, "Maximal Length"));
-			$constrains = array_merge($constrains, format_constraint($actionInfo, $name, $actionInfo->validateMinValueConstraints, "Minimal Value"));
-			$constrains = array_merge($constrains, format_constraint($actionInfo, $name, $actionInfo->validateMaxValueConstraints, "Maximal Value"));
+			if(!is_null($actionParam->getMinLengthConstraint()))
+				$constrains[] = "Minimal Length : " . $actionParam->getMinLengthConstraint();
+			if(!is_null($actionParam->getMaxLengthConstraint()))
+				$constrains[] = "Maximal Length : " . $actionParam->getMaxLengthConstraint();
+			if(!is_null($actionParam->getMinValueConstraint()))
+				$constrains[] = "Minimal value : " . $actionParam->getMinValueConstraint();
+			if(!is_null($actionParam->getMaxValueConstraint()))
+				$constrains[] = "Maximal value : " . $actionParam->getMaxValueConstraint();
+			
 			echo implode("<br/>", $constrains);
 		?></td>
 	</tr>
@@ -124,20 +128,6 @@ endif;
 	</tr>
 </table>
 <?php
-
-function format_constraint($actionInfo, $name, $constraintsArray, $prefix) {
-	$constrains = array();
-	if(array_key_exists($name , $constraintsArray)) {
-		$values = $constraintsArray[$name];
-		if(is_array($values)) {
-			foreach ($values as $key => $value)
-				$constrains[] = $prefix ." ($key) : " . $value;
-		} else {
-			$constrains[] = $prefix ." : " . $values;
-		}
-	}
-	return $constrains;
-}
 
 function doc_link($link_type, $target_obj, $complex_type)
 {

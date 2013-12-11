@@ -146,6 +146,7 @@ else
 	{
 		$columns[] = 'Writable';
 	}
+	$columns[] = 'Restrictions';
 	$columns[] = 'Description';
 	
 	// build baseClass->properties mapping
@@ -256,6 +257,19 @@ else
 				$isWritable = $property->isReadOnly() ? '' : 'V';
 				echo "<td>$isWritable</td>";
 			}
+			
+			// Property restrictions
+			$constrains = array();
+			if(!is_null($property->getMinLengthConstraint()))
+				$constrains[] = "Minimal Length : " . $property->getMinLengthConstraint();
+			if(!is_null($property->getMaxLengthConstraint()))
+				$constrains[] = "Maximal Length : " . $property->getMaxLengthConstraint();
+			if(!is_null($property->getMinValueConstraint()))
+				$constrains[] = "Minimal value : " . $property->getMinValueConstraint();
+			if(!is_null($property->getMaxValueConstraint()))
+				$constrains[] = "Maximal value : " . $property->getMaxValueConstraint();
+				
+			echo "<td>" . implode("<br/>", $constrains) . "</td>";
 			 
 			// property description
 			if ($property->getName() == "orderBy")

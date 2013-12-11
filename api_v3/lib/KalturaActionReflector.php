@@ -155,6 +155,8 @@ class KalturaActionReflector extends KalturaReflector
 					$paramInfo->setOptional(true);
 				}
 				
+				$paramInfo->setConstraints($parsedDocComment, $name);
+				
 				$this->_actionParams[$name] = $paramInfo;
 			}
 		}

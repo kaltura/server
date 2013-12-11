@@ -54,6 +54,7 @@ class KalturaRequestDeserializer
 
 	public function buildActionArguments(&$actionParams)
 	{
+		
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
@@ -69,6 +70,7 @@ class KalturaRequestDeserializer
 						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
 						
 					$serviceArguments[] = $value;
+					$this->validateParameter($name, $value, $actionParam);
 					continue;
 				}
 				
@@ -177,6 +179,42 @@ class KalturaRequestDeserializer
 		return $serviceArguments;
 	}
 	
+	protected function validateParameter($name, $value, $constraintsObj) {
+		
+		$constraint = $constraintsObj->getMaxLengthConstraint();
+		if(!is_null($constraint))
+			$this->validateMaxLength($name, $value, $constraint);
+		$constraint = $constraintsObj->getMinLengthConstraint($name);
+		if(!is_null($constraint))
+			$this->validateMinLength($name, $value, $constraint);
+		$constraint = $constraintsObj->getMaxValueConstraint($name);
+		if(!is_null($constraint))
+			$this->validateMaxValue($name, $value, $constraint);
+		$constraint = $constraintsObj->getMinValueConstraint($name);
+		if(!is_null($constraint))
+			$this->validateMinValue($name, $value, $constraint);
+	}
+	
+	protected function validateMinLength($name, $objectValue, $constraint) {
+		if(strlen($objectValue) < $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $name, $constraint);
+	}
+	
+	protected function validateMaxLength($name, $objectValue, $constraint) {
+		if(strlen($objectValue) > $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $name, $constraint);
+	}
+	
+	protected function validateMinValue($name, $objectValue, $constraint) {
+		if($objectValue < $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_VALUE, $name, $constraint);
+	}
+	
+	protected function validateMaxValue($name, $objectValue, $constraint) {
+		if($objectValue > $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_VALUE, $name, $constraint);
+	}
+	
 	private function validateFile($fileData) 
 	{
 		if (!isset($fileData['tmp_name']) || !is_uploaded_file($fileData['tmp_name'])) {
@@ -240,6 +278,7 @@ class KalturaRequestDeserializer
 				if(!kXml::isXMLValidContent($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
 				$obj->$name = $value;
+				$this->validateParameter($name, $value, $property);
 				continue;
 			}
 			

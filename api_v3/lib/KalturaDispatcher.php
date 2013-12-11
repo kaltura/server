@@ -66,6 +66,7 @@ class KalturaDispatcher
         }
         
 		$actionParams = $actionReflector->getActionParams();
+		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
         
 		// validate it's ok to access this service
@@ -87,7 +88,7 @@ class KalturaDispatcher
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		
-	    $disableTags = $actionReflector->getActionInfo()->disableTags;
+	    $disableTags = $actionInfo->disableTags;
 		if($disableTags && is_array($disableTags) && count($disableTags))
 		{
 			foreach ($disableTags as $disableTag)
@@ -96,8 +97,6 @@ class KalturaDispatcher
 			}
 		}
 		
-		$actionInfo = $actionReflector->getActionInfo();
-
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
 		{
 //			// TODO maybe if missing should throw something, maybe a bone?
@@ -107,11 +106,6 @@ class KalturaDispatcher
 			$objectId = $params[$actionInfo->validateUserIdParamName];
 			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
 		}
-		
-		$this->validateConstraint($actionParams, $params, $actionInfo->validateMaxLengthConstraints, "validateMaxLength");
-		$this->validateConstraint($actionParams, $params, $actionInfo->validateMinLengthConstraints,"validateMinLength");
-		$this->validateConstraint($actionParams, $params, $actionInfo->validateMaxValueConstraints, "validateMaxValue");
-		$this->validateConstraint($actionParams, $params, $actionInfo->validateMinValueConstraints, "validateMinValue");
 		
 		// initialize the service before invoking the action on it
 		// action reflector will init the service to maintain the pluginable action transparency
@@ -128,40 +122,6 @@ class KalturaDispatcher
 				
 		
 		return $res;
-	}
-	
-	protected function validateConstraint($actionParams, $params, $constraints, $callback) {
-		foreach ($constraints as $object => $constraint) {
-			if(isset($actionParams[$object])) {
-				if(is_array($constraint)) {
-					foreach ($constraint as $field => $value) {
-						$this->$callback($object . ":" . $field, $params[$object . ":" . $field], $value);
-					}
-				} else {
-					$this->$callback($object, $params[$object], $constraint);
-				}
-			}
-		}
-	}
-	
-	protected function validateMinLength($name, $objectValue, $constraint) {
-		if(strlen($objectValue) < $constraint)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $name, $constraint);
-	}
-	
-	protected function validateMaxLength($name, $objectValue, $constraint) {
-		if(strlen($objectValue) > $constraint)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $name, $constraint);
-	}
-	
-	protected function validateMinValue($name, $objectValue, $constraint) {
-		if($objectValue < $constraint)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_VALUE, $name, $constraint);
-	}
-	
-	protected function validateMaxValue($name, $objectValue, $constraint) {
-		if($objectValue > $constraint)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_VALUE, $name, $constraint);
 	}
 	
 	/**
