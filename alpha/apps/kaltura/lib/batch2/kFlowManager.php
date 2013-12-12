@@ -649,6 +649,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$entry->setStatus(entryStatus::PENDING); // we change the entry to pending
 				$entry->save();
 			}
+			
+			if ($object instanceof thumbAsset)
+				if ($flavorAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+					kBusinessConvertDL::setAsDefaultThumbAsset($flavorAsset);
+				
 		}
 		
 		return true;
