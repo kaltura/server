@@ -20,6 +20,11 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	
 	const LEADING_ZEROS_PADDING = '-%03d';
 	
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+			'PDF document',
+	);
+	
 	public function __construct($cmd, $outFilePath)
 	{
 		parent::__construct($cmd,$outFilePath);
@@ -59,6 +64,11 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 			$inFilePath = "$inFilePath.jpg";
 			
 		parent::operate($operator, realpath($inFilePath), $configFilePath);
+		
+		$errorMsg = null;
+		if(!$this->checkFileType($inFilePath,$errorMsg))
+			$this->message = $errorMsg;
+		
 		$imagesListXML = $this->createImagesListXML($outDirPath);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
@@ -80,4 +90,21 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		return $imagesListXML;	
 	}
 	
+	private function checkFileType($filePath, &$errorMsg) {
+	
+		$fileInfo = $this->getFileInfo($filePath);
+		$supportedTypes = $this->SUPPORTED_FILE_TYPES;
+	
+		$isValid = false;
+		foreach ($supportedTypes as $validType)
+		{
+			if (strpos($fileInfo, $validType) !== false)
+				return true;
+		}
+	
+		$fileType = explode(':', $fileInfo, 2);
+		$fileType = substr(trim($fileType[1]), 0, 30);
+		$errorMsg = "invalid file type: {$fileType}";
+		return false;
+	}
 }

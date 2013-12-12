@@ -30,6 +30,19 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	// this will be the default value if it is not set in task's configuration under - killPopupsPath
 	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
 	
+	// This is the value that underneath the image is suspected as being a black image
+	const STD_LIMIT = 50;
+	
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+			'CDF V2 Document, Little Endian, Os: MacOS',
+			'CDF V2 Document, Little Endian, Os: Windows',
+			'OpenDocument Text',
+			'PDF document',
+			'Rich Text Format data, version 1, ANSI',
+			'Zip archive data, at least',
+	);
+	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		KalturaLog::debug("document : operator [". print_r($operator, true)."] inFilePath [$inFilePath]"); 
@@ -132,14 +145,17 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		if (!file_exists(realpath($tmpFile))) {
+			$errorMsg = null;
+			if(!$this->checkFileType($inFilePath,$errorMsg)) 
+				$this->message = $errorMsg;
+			
 			throw new kTemporaryException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.'] 
 					Convert Engine message [' . $this->message . ']');
 		}else{
 			KalturaLog::notice('document temp  found ['.$tmpFile.'] output file ['.$this->outFilePath.']'); 
 		}
 		
-		
-		// $this->validateOutput($inFilePath, $tmpFile);
+		$this->validateOutput($inFilePath, realpath($tmpFile));
 		
 		$fileUnlockRetries = KBatchBase::$taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
@@ -163,21 +179,83 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 			throw new KOperationEngineException('Cannot rename file ['.$tmpFile.'] to ['.$this->outFilePath.'] - ['.$error.']');
 		}
-		
 		return true;
-		
 	}
 	
 	private function validateOutput($inFilePath, $outFilePath)
 	{
 		$pdfInfo = KBatchBase::$taskConfig->params->pdfInfo;
+		$identifyExe = KBatchBase::$taskConfig->params->identify;
+		
+		$errorMsg = null;
+
+		// Check Page count
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
 			$inputNum = $this->getNumberOfPages($pdfInfo, $inFilePath);
 			$outputNum = $this->getNumberOfPages($pdfInfo, $outFilePath);
-			if($inputNum != $outputNum)
-				throw new KOperationEngineException("Output file doesn't match expected page count (input: $inputNum, output: $outputNum) ");
+			if($inputNum != $outputNum) {
+				$errorMsg = "Output file doesn't match expected page count (input: $inputNum, output: $outputNum)";
+				$this->message = $errorMsg;
+			}
 		}
+		
+		// Check black Image
+		if(!$this->testBlackImage($identifyExe, $outFilePath, $errorMsg)) {
+			$this->message = $errorMsg;
+		}
+	}
+	
+	private function checkFileType($filePath, &$errorMsg) {
+	
+		$fileInfo = $this->getFileInfo($filePath);
+		$supportedTypes = $this->SUPPORTED_FILE_TYPES;
+	
+		$isValid = false;
+		foreach ($supportedTypes as $validType)
+		{
+			if (strpos($fileInfo, $validType) !== false)
+				return true;
+		}
+
+		$fileType = explode(':', $fileInfo, 2);
+		$fileType = substr(trim($fileType[1]), 0, 30);
+		$errorMsg = "invalid file type: {$fileType}";
+		return false;
+	}
+	
+	private function getFileInfo($filePath)
+	{
+		$returnValue = null;
+		$output = null;
+		$command = "file '{$filePath}' 2>&1";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+		return implode("\n",$output);
+	}
+	
+	private function testBlackImage($identifyExe, $filePath, &$errorMsg) {
+		$returnValue = null;
+		$output = null;
+		$command = $identifyExe . " -verbose '{$filePath}' 2>&1";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+		
+		$std = -1;
+		$outputString = implode("\n",$output);
+		
+		if(preg_match_all('/standard deviation: ([\d\.]*)/', $outputString, $matches)) {
+			foreach($matches[1] as $std) {
+				if(intval($std) < self::STD_LIMIT) {
+					$errorMsg = "Image is suspected to be black. Score ($std)";
+					return false;
+				}
+			}
+		} else {
+			$errorMsg = "Failed to test Image.";
+			return false;
+		}
+		return true;
 	}
 	
 	private function getNumberOfPages($pdfInfo, $file) 

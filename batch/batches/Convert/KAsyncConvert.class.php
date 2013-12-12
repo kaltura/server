@@ -208,7 +208,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				
 			$jobMessage = "engine [" . get_class($this->operationEngine) . "] converted successfully. ";
 			if($this->operationEngine->getMessage())
-				$jobMessage = $jobMessage.$this->operationEngine->getMessage();
+				$jobMessage =  " Engine message [ " . $jobMessage.$this->operationEngine->getMessage() . "]";
 				
 			if(!$isDone)
 			{
@@ -237,6 +237,8 @@ class KAsyncConvert extends KJobHandlerWorker
 				}
 			}
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
+			if($this->operationEngine->getMessage())
+				$err .= " Engine message [ " . $this->operationEngine->getMessage() . "]";
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);
 		}
 	}
@@ -317,6 +319,10 @@ class KAsyncConvert extends KJobHandlerWorker
 			$data->logFileSyncLocalPath = '';
 		}
 		
-		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
+		$jobMessage = $job->message;
+		if($this->operationEngine->getMessage())
+				$jobMessage .=  " Engine message [ " . $this->operationEngine->getMessage() . "]";
+		
+		return $this->closeJob($job, null, null, $jobMessage, $job->status, $data);
 	}
 }
