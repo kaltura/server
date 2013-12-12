@@ -178,6 +178,9 @@ class kFlowHelper
 			$flavorAsset->setWidth($width);
 			$flavorAsset->setHeight($height);
 			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
+			
+			if ($flavorAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
 		}
 		$flavorAsset->save();
 		
