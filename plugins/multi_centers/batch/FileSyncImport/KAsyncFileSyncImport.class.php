@@ -13,11 +13,11 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	{
 		$this->curlWrapper = new KCurlWrapper();
 		
-		$rerJobs = parent::run($jobs);
+		$retJobs = parent::run($jobs);
 		
 		$this->curlWrapper->close();
 		
-		return $rerJobs;
+		return $retJobs;
 	}
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
