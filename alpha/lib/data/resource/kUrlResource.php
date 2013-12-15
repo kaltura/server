@@ -14,6 +14,12 @@ class kUrlResource extends kContentResource
 	private $url;
 	
 	/**
+	 * Force Import Job 
+	 * @var bool
+	 */
+	private $forceAsyncDownload = false;
+	
+	/**
 	 * @return string
 	 */
 	public function getUrl()
@@ -41,8 +47,13 @@ class kUrlResource extends kContentResource
 	/**
 	 * @return bool
 	 */
-	public function forceAsyncDownload()
+	public function getForceAsyncDownload()
 	{
-	    return false;
+	    return $this->forceAsyncDownload;
+	}
+	
+	public function setForceAsyncDownload($force)
+	{
+	    $this->forceAsyncDownload = $force;
 	}
 }

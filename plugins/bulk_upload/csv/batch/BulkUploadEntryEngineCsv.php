@@ -43,6 +43,8 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		        $resource = new KalturaUrlResource();
 		    }
 			$resource->url = $url;
+			if($bulkUploadResult->contentType && strtolower($bulkUploadResult->contentType) == 'image')
+				$resource->forceAsyncDownload = true;
 
 			KBatchBase::impersonate($this->currentPartnerId);;
 			KBatchBase::$kClient->media->addContent($bulkUploadResult->entryId, $resource);
