@@ -100,8 +100,8 @@ class DistributionProfileConfigureAction extends KalturaApplicationPlugin
 						$form->resetUnUpdatebleAttributes($distributionProfile);
 						Infra_ClientHelper::impersonate($partnerId);
 						$distributionProfile = $contentDistributionPlugin->distributionProfile->update($profileId, $distributionProfile);
-						Infra_ClientHelper::unimpersonate();
 						$form->saveProviderAdditionalObjects($distributionProfile);
+						Infra_ClientHelper::unimpersonate();
 						$form->setAttrib('class', 'valid');
 						$action->view->formValid = true;
 					}
