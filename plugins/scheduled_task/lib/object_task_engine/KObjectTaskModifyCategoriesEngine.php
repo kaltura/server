@@ -22,7 +22,7 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 		foreach($objectTask->categories as $categoryString)
 		{
 			/** @var KalturaString $categoryString */
-			$taskCategories[] = $categoryString->value;
+			$taskCategories[] = trim($categoryString->value);
 		}
 
 		if ($objectTask->addRemoveType == KalturaScheduledTaskAddOrRemoveType::ADD)
@@ -31,10 +31,17 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 		}
 		elseif ($objectTask->addRemoveType == KalturaScheduledTaskAddOrRemoveType::REMOVE)
 		{
-			foreach($entryCategories as &$tmpCategory)
+			if (count($taskCategories))
 			{
-				if (in_array($tmpCategory, $taskCategories))
-					$tmpCategory = null;
+				foreach($entryCategories as &$tmpCategory)
+				{
+					if (in_array($tmpCategory, $taskCategories))
+						$tmpCategory = null;
+				}
+			}
+			else
+			{
+				$entryCategories = array();
 			}
 		}
 
