@@ -62,7 +62,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		
 		$pageFilter = new KalturaFilterPager();
 		$pageFilter->pageSize = 50;
-		$pageFilter->pageIndex = 0;
+		$pageFilter->pageIndex = 1;
 		
 		/* @var $this->getClient() KalturaClient */
 		do
