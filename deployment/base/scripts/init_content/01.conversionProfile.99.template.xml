@@ -33,5 +33,13 @@
 			<isDefault>1</isDefault>
 			<flavorParamsIds>32,33,34,35</flavorParamsIds>
 		</conversionProfile>
+		<conversionProfile objectType="KalturaConversionProfile">
+			<name>Passthrough - Live</name>
+			<type>2</type>
+			<systemName>Passthrough_Live</systemName>
+			<description>Publish only the broadcasted stream</description>
+			<isDefault>0</isDefault>
+			<flavorParamsIds>32</flavorParamsIds>
+		</conversionProfile>
 	</request>
 </xml>
