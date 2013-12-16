@@ -3,7 +3,7 @@
  * Enable custom metadata on annotation objects
  * @package plugins.annotation
  */
-class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser
+class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'annotationMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
@@ -75,7 +75,7 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 		if($baseClass == 'IMetadataPeer' && $enumValue == self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION))
 			return 'CuePointPeer';
 			
-		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT))
+		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION))
 			return 'Annotation';
 	}
 

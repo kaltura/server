@@ -14,6 +14,7 @@ class syndicationFeed extends BasesyndicationFeed
 	const CUSTOM_DATA_STORAGE_ID = 'storage_id';
 	const CUSTOM_DATA_ENTRIES_ORDER_BY = 'entries_order_by';
 	const CUSTOM_DATA_ENFORCE_ORDER = 'enforce_order';
+	const CUSTOM_DATA_SERVE_PLAY_MANIFEST = 'serve_play_manifest';
 
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
@@ -54,6 +55,16 @@ class syndicationFeed extends BasesyndicationFeed
 		}                
 	}
 
+	/* (non-PHPdoc)
+	 * @see BasesyndicationFeed::preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		// $this->setServePlayManifest(true);
+		
+		return parent::preInsert($con);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BasesyndicationFeed#postUpdate()
 	 */
@@ -124,19 +135,35 @@ class syndicationFeed extends BasesyndicationFeed
 		$this->putInCustomData(self::CUSTOM_DATA_ENTRIES_ORDER_BY, $entriesOrderBy);
 	}
 	
-/**
-	* @param boolean $enforceOrder
-	*/
+	/**
+	 * @param boolean $enforceOrder
+	 */
 	public function setEnforceOrder($enforceOrder)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ENFORCE_ORDER, $enforceOrder);
 	}
 	
 	/**
-	* @return boolean
-	*/
+	 * @return boolean
+	 */
 	public function getEnforceOrder()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENFORCE_ORDER);
+	}
+	
+	/**
+	 * @param boolean $servePlayManifest
+	 */
+	public function setServePlayManifest($servePlayManifest)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, $servePlayManifest);
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function getServePlayManifest()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, null, false);
 	}
 }

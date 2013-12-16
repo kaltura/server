@@ -1388,6 +1388,9 @@ class playManifestAction extends kalturaAction
 			case PlaybackProtocol::APPLE_HTTP:
 			case PlaybackProtocol::SILVER_LIGHT:
 			case PlaybackProtocol::MPEG_DASH:
+				$flavors = array();
+				$this->urlManager->finalizeUrls($baseUrl, $flavors);
+				
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = new kRedirectManifestRenderer();
 				$renderer->flavor = $flavor;

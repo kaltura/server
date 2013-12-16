@@ -317,10 +317,10 @@ class kwidgetAction extends sfAction
 							KExternalErrors::dieGracefully();
 							
 						$serializer = new KalturaXmlSerializer(false);
-						$widget_xml = $serializer->getSerializedData($widget_result);
+						$widget_xml = $serializer->serialize($widget_result);
 
 						$serializer = new KalturaXmlSerializer(false);
-						$ui_conf_xml = $serializer->getSerializedData($ui_conf_result);
+						$ui_conf_xml = $serializer->serialize($ui_conf_result);
 
 						$result = "<xml><result>$widget_xml</result><result>$ui_conf_xml</result></xml>";
 						

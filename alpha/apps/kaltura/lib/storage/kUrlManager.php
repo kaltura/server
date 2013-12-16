@@ -66,7 +66,7 @@ class kUrlManager
 		if(isset($urlManagers[$cdnHost]))
 		{
 			$class = $urlManagers[$cdnHost]["class"];
-			$params = isset($urlManagers[$cdnHost]["params"]) ? $urlManagers[$cdnHost]["params"] : null;
+			$params = isset($urlManagers[$cdnHost]["params"]) ? $urlManagers[$cdnHost]["params"] : array();
 			$entry = entryPeer::retrieveByPK($entryId);
 			$urlManagersMap = kConf::getMap('url_managers');
 			if ($entry && isset($urlManagersMap["override"]))
@@ -287,6 +287,16 @@ class kUrlManager
 			$baseUrl = preg_replace('/^rtmp:\/\//', 'rtmpe://', $baseUrl);
 			$baseUrl = preg_replace('/^rtmpt:\/\//', 'rtmpte://', $baseUrl);
 		}
+
+		if (isset($this->params['extra_params']) && $this->params['extra_params'] && !$flavorsUrls)
+		{
+			$parsedUrl = parse_url($baseUrl);
+			if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+				$baseUrl .= '&';
+			else
+				$baseUrl .= '?';
+			$baseUrl .= $this->params['extra_params'];
+		}
 	}
 
 	/**
@@ -315,6 +325,27 @@ class kUrlManager
 			}
 		}
 			
+		return $url;
+	}
+
+	/**
+	 * @param flavorAsset $asset
+	 * @param string $clientTag
+	 * @return string
+	 */
+	public function getPlayManifestUrl(flavorAsset $asset, $clientTag)
+	{
+		$entryId = $asset->getEntryId();
+		$partnerId = $asset->getPartnerId();
+		$subpId = $asset->getentry()->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$flavorAssetId = $asset->getId();
+		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
+		
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		if($this->storageProfileId)
+			$url .= "/storageId/$this->storageProfileId";
+		
 		return $url;
 	}
 

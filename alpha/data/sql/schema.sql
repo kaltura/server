@@ -2282,5 +2282,30 @@ CREATE TABLE `batch_job_log`
 	KEY `partner_job_type_bulk_upload_type_index`(`partner_id`, `bulk_upload_type`, `job_type`)
 )Type=InnoDB;
 
+#-----------------------------------------------------------------------------
+#-- file_asset
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `file_asset`;
+
+
+CREATE TABLE `file_asset`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`version` INTEGER,
+	`partner_id` INTEGER,
+	`object_id` VARCHAR(20),
+	`object_type` INTEGER,
+	`status` TINYINT,
+	`name` VARCHAR(255),
+	`system_name` VARCHAR(255),
+	`file_ext` VARCHAR(4),
+	`size` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `partner_object_status`(`partner_id`, `object_id`, `object_type`, `status`)
+)Type=InnoDB;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

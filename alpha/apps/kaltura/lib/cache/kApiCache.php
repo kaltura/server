@@ -72,6 +72,7 @@ class kApiCache extends kApiCacheBase
 
 	// ks
 	protected $_ks = "";
+	protected $_ksStatus = kSessionBase::UNKNOWN;
 	protected $_ksObj = null;
 	protected $_ksPartnerId = null;
 	protected $_partnerId = null;
@@ -102,6 +103,8 @@ class kApiCache extends kApiCacheBase
 		$ks = $this->getKs();
 		if ($ks === false)
 		{
+			if (self::$_debugMode)
+				$this->debugLog("getKs failed, disabling cache");
 			return false;
 		}
 
@@ -136,6 +139,8 @@ class kApiCache extends kApiCacheBase
 		if (!kConf::get('enable_cache') ||
 			$this->isCacheDisabled())
 		{
+			if (self::$_debugMode)
+				$this->debugLog("cache disabled due to request parameters / configuration");
 			return false;
 		}
 
@@ -152,9 +157,37 @@ class kApiCache extends kApiCacheBase
 	protected function addKSData($ks)
 	{
 		$this->_ks = $ks;
-		$this->_ksObj = kSessionBase::getKSObject($ks);
-		$this->_ksPartnerId = ($this->_ksObj ? $this->_ksObj->partner_id : null);
+		
+		// determine the KS status
+		if (empty($ks))
+		{
+			$this->_ksStatus = kSessionBase::OK;
+		}
+		else
+		{
+			$ksObj = new kSessionBase();
+			$parseResult = $ksObj->parseKS($ks);
+			if ($parseResult)
+			{
+				$this->_ksStatus = $ksObj->tryToValidateKS();
+				if ($this->_ksStatus == kSessionBase::OK)
+				{
+					$this->_ksObj = $ksObj;
+					$this->_ksPartnerId = $ksObj->partner_id;
+				}
+			}
+			else if ($parseResult === false)
+			{
+				$this->_ksStatus = kSessionBase::INVALID_STR;
+			}
+			else	// null
+			{
+				$this->_ksStatus = kSessionBase::UNKNOWN;
+			}
+		}
+
 		$this->_params["___cache___partnerId"] =  $this->_ksPartnerId;
+		$this->_params["___cache___ksStatus"] =   $this->_ksStatus;
 		$this->_params["___cache___ksType"] = 	  ($this->_ksObj ? $this->_ksObj->type		 : null);
 		$this->_params["___cache___userId"] =     ($this->_ksObj ? $this->_ksObj->user		 : null);
 		$this->_params["___cache___privileges"] = ($this->_ksObj ? $this->_ksObj->privileges : null);
@@ -440,22 +473,39 @@ class kApiCache extends kApiCacheBase
 			$cacheTTL = $cacheExpiry - time();
 			if($cacheTTL <= 0)
 			{
-				// the cache is expired
+				if (self::$_debugMode)
+					$this->debugLog("validateCachingRules - cache expired");
 				continue;
 			}
 
 			if ($conditions)
 			{
 				list($this->_cacheId, $invalidationKeys, $cachedInvalidationTime, $sqlConditions) = $conditions;
-				$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
-				if ($invalidationTime === null)
-					continue;					// failed to get the invalidation time from memcache, can't use cache
-
-				if ($cachedInvalidationTime < $invalidationTime)
-					continue;					// something changed since the response was cached
+				
+				if ($invalidationKeys)
+				{
+					$invalidationTime = self::getMaxInvalidationTime($invalidationKeys);
+					if ($invalidationTime === null)
+					{
+						if (self::$_debugMode)
+							$this->debugLog("validateCachingRules - failed to get invalidation time");
+						continue;					// failed to get the invalidation time from memcache, can't use cache
+					}
+	
+					if ($cachedInvalidationTime < $invalidationTime)
+					{
+						if (self::$_debugMode)
+							$this->debugLog("validateCachingRules - invalidation keys changed since the response was cached");
+						continue;					// something changed since the response was cached
+					}
+				}
 
 				if (!$this->validateSqlQueries($sqlConditions))
+				{
+					if (self::$_debugMode)
+						$this->debugLog("validateCachingRules - failed to validate sql queries");
 					continue;
+				}
 				
 				if (isset($this->_cacheRules[self::CACHE_MODE_ANONYMOUS]))
 				{
@@ -495,8 +545,12 @@ class kApiCache extends kApiCacheBase
 
 	protected function getCacheStoreForRead()
 	{
-		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
+		if ($this->_ksStatus == kSessionBase::UNKNOWN)
+		{
+			if (self::$_debugMode)
+				$this->debugLog('getCacheStoreForRead ks status is unknown');
 			return array(null, null);					// ks not valid, do not return from cache
+		}
 
 		// if the request is for warming the cache, disregard the cache and run the request
 		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
@@ -529,6 +583,8 @@ class kApiCache extends kApiCacheBase
 			$this->_cacheStores[] = $cacheStore;
 		}
 
+		if (self::$_debugMode)
+			$this->debugLog('cache rules validation failed on all cache stores');
 		return array(null, null);
 	}
 
@@ -595,6 +651,8 @@ class kApiCache extends kApiCacheBase
 		$cacheResult = $cacheStore->get($this->_cacheKey . self::SUFFIX_DATA);
 		if (!$cacheResult)
 		{
+			if (self::$_debugMode)
+				$this->debugLog('failed to get cached data from cache');
 			$this->_cacheStores[] = $cacheStore;
 			return false;
 		}
@@ -602,6 +660,8 @@ class kApiCache extends kApiCacheBase
 		list($cacheId, $responseMetadata, $response) = explode(self::CACHE_DELIMITER, $cacheResult, 3);
 		if ($this->_cacheId && $this->_cacheId != $cacheId)
 		{
+			if (self::$_debugMode)
+				$this->debugLog('response cache id does not match the cache id of the rules');
 			$this->_cacheStores[] = $cacheStore;
 			return false;
 		}
@@ -673,8 +733,11 @@ class kApiCache extends kApiCacheBase
 		if ($this->_cacheStatus == self::CACHE_STATUS_DISABLED)
 			return;
 
-		if ($this->_ks && (!$this->_ksObj || !$this->_ksObj->tryToValidateKS()))
+		if ($this->_ksStatus == kSessionBase::UNKNOWN)
 		{
+			if (self::$_debugMode)
+				$this->debugLog('ks status is unknown - not saving to cache');
+				
 			self::disableCache();
 			return;
 		}
@@ -682,6 +745,9 @@ class kApiCache extends kApiCacheBase
 		$isAnonymous = $this->isAnonymous($this->_ksObj);
 		if (!$isAnonymous && $this->_cacheStatus == self::CACHE_STATUS_ANONYMOUS_ONLY)
 		{
+			if (self::$_debugMode)
+				$this->debugLog('request is not anonymous and conditional cache was disabled');
+			
 			self::disableCache();
 			return;
 		}
@@ -767,7 +833,8 @@ class kApiCache extends kApiCacheBase
 
 		foreach ($this->_cacheStores as $curCacheStore)
 		{
-			//$curCacheStore->set($this->_cacheKey . self::SUFFIX_LOG, print_r($this->_params, true), $maxExpiry + self::EXPIRY_MARGIN);
+			if (self::$_debugMode)
+				$curCacheStore->set($this->_cacheKey . self::SUFFIX_LOG, print_r($this->_params, true), $maxExpiry + self::EXPIRY_MARGIN);
 			$curCacheStore->set($this->_cacheKey . self::SUFFIX_RULES, serialize($this->_cacheRules), $maxExpiry + self::EXPIRY_MARGIN);
 			$curCacheStore->set($this->_cacheKey . self::SUFFIX_DATA, implode(self::CACHE_DELIMITER, array($this->_cacheId, $this->_responseMetadata, $response)), $maxExpiry);
 		}

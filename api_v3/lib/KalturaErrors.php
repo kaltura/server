@@ -11,83 +11,83 @@ class KalturaErrors extends APIErrors
 	 */
 
 	//
-	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR,Internal server error occurred";
+	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
 
 	// should be used for internal actions only
-	const INTERNAL_SERVERL_ERROR_DEBUG = "INTERNAL_SERVERL_ERROR,Internal server error occurred \"%s\"";
+	const INTERNAL_SERVERL_ERROR_DEBUG = "INTERNAL_SERVERL_ERROR;ERROR;Internal server error occurred \"@ERROR@\"";
 
 	//
-	const MISSING_KS ="MISSING_KS,Missing KS, session not established";
+	const MISSING_KS = "MISSING_KS;;Missing KS, session not established";
 
-	// %s - the ks string, %s - error code, %s - error description
-	const INVALID_KS ="INVALID_KS,Invalid KS \"%s\", Error \"%s,%s\"";
-
-	//
-	const SERVICE_NOT_SPECIFIED = "SERVICE_NOT_SPECIFIED,Service name was not specified, please specify one";
-
-	// %s - service name
-	const SERVICE_DOES_NOT_EXISTS = "SERVICE_DOES_NOT_EXISTS,Service \"%s\" does not exists";
-
-	// %s - xml field
-	const INVALID_PARAMETER_CHAR= "INVALID_PARAMETER_CHAR,Invalid char in \"%s\" field";
+	// KS - the ks string, ERR_CODE - error code, ERR_DESC - error description
+	const INVALID_KS = "INVALID_KS;KSID,ERR_CODE,ERR_DESC;Invalid KS \"@KSID@\", Error \"@ERR_CODE@,@ERR_DESC@\"";
 
 	//
-	const ACTION_NOT_SPECIFIED = "ACTION_NOT_SPECIFIED,Action name was not specified, please specify one";
+	const SERVICE_NOT_SPECIFIED = "SERVICE_NOT_SPECIFIED;;Service name was not specified, please specify one";
 
-	// %s - action name, %s - service name
-	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS,Action \"%s\" does not exists for service \"%s\"";
+	// SRV_NAME - service name
+	const SERVICE_DOES_NOT_EXISTS = "SERVICE_DOES_NOT_EXISTS;SRV_NAME;Service \"@SRV_NAME@\" does not exists";
 
-	// %s - action name
-	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN,Action \"%s\" is forbidden for use";
+	// XML_FIELD - xml field
+	const INVALID_PARAMETER_CHAR= "INVALID_PARAMETER_CHAR;XML_FIELD;Invalid char in \"@XML_FIELD@\" field";
 
-	// %s - parameter name
-	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER,Missing parameter \"%s\"";
+	//
+	const ACTION_NOT_SPECIFIED = "ACTION_NOT_SPECIFIED;;Action name was not specified, please specify one";
 
-	// %s - invalid object type
-	const INVALID_OBJECT_TYPE = "INVALID_OBJECT_TYPE,Invalid object type \"%s\"";
+	// ACTION_NAME - action name, SERVICE_NAME - service name
+	const ACTION_DOES_NOT_EXISTS = "ACTION_DOES_NOT_EXISTS;ACTION_NAME,SERVICE_NAME;Action \"@ACTION_NAME@\" does not exists for service \"@SERVICE_NAME@\"";
 
-	// %s - enum value, %s - parameter name, %s - enum type
-	const INVALID_ENUM_VALUE = "INVALID_ENUM_VALUE,Invalid enumeration value \"%s\" for parameter \"%s\", expecting enumeration type \"%s\"";
+	// ACTION_NAME - action name
+	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN;ACTION_NAME;Action \"@ACTION_NAME@\" is forbidden for use";
 
-	// %s - partner id
-	const INVALID_PARTNER_ID = "INVALID_PARTNER_ID,Invalid partner id \"%s\"";
+	// PARAM_NAME - parameter name
+	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER;PARAM_NAME;Missing parameter \"@PARAM_NAME@\"";
 
-	// %s - service , %s - action
-	const INVALID_SERVICE_CONFIGURATION = "INVALID_SERVICE_CONFIGURATION,Invalid service configuration. Unknown service [%s:%s].";
+	// INVALID_OBJ_TYPE - invalid object type
+	const INVALID_OBJECT_TYPE = "INVALID_OBJECT_TYPE;INVALID_OBJ_TYPE;Invalid object type \"@INVALID_OBJ_TYPE@\"";
 
-	const OBJECT_TYPE_ABSTRACT = "OBJECT_TYPE_ABSTRACT,The object type \"%s\" is abstract, use one of the object implementations";
+	// ENUM_VAL - enum value, PARAM_NAME - parameter name, ENUM_TYPE - enum type
+	const INVALID_ENUM_VALUE = "INVALID_ENUM_VALUE;ENUM_VAL,PARAM_NAME,ENUM_TYPE;Invalid enumeration value \"@ENUM_VAL@\" for parameter \"@PARAM_NAME@\", expecting enumeration type \"@ENUM_TYPE@\"";
 
-	const PROPERTY_VALIDATION_CANNOT_BE_NULL =  "PROPERTY_VALIDATION_CANNOT_BE_NULL,The property \"%s\" cannot be NULL";
+	// PID - partner id
+	const INVALID_PARTNER_ID = "INVALID_PARTNER_ID;PID;Invalid partner id \"@PID@\"";
 
-	const PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE = "PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE,Only one of the passed properties: %s should not be null";
+	// SRV_NAME - service , ACTION_NAME - action
+	const INVALID_SERVICE_CONFIGURATION = "INVALID_SERVICE_CONFIGURATION;SRV_NAME,ACTION_NAME;Invalid service configuration. Unknown service [@SRV_NAME@:@ACTION_NAME@].";
 
-	const PROPERTY_VALIDATION_MIN_LENGTH = "PROPERTY_VALIDATION_MIN_LENGTH,The property \"%s\" must have a min length of %s characters";
+	const OBJECT_TYPE_ABSTRACT = "OBJECT_TYPE_ABSTRACT;OBJ_TYPE;The object type \"@OBJ_TYPE@\" is abstract, use one of the object implementations";
 
-	const PROPERTY_VALIDATION_MAX_LENGTH = "PROPERTY_VALIDATION_MAX_LENGTH,The property \"%s\" cannot have more than %s characters";
+	const PROPERTY_VALIDATION_CANNOT_BE_NULL =  "PROPERTY_VALIDATION_CANNOT_BE_NULL;PROP_NAME;The property \"@PROP_NAME@\" cannot be null";
 
-	const PROPERTY_VALIDATION_NUMERIC_VALUE = "PROPERTY_VALIDATION_NUMERIC_VALUE,The property \"%s\" must be numeric";
+	const PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE = "PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE;PROP_NAME;Only one of the passed properties: @PROP_NAME@ should not be null";
 
-	const PROPERTY_VALIDATION_WRONG_FORMAT = "PROPERTY_VALIDATION_WRONG_FORMAT,The property \"%s\" must match format %s";
+	const PROPERTY_VALIDATION_MIN_LENGTH = "PROPERTY_VALIDATION_MIN_LENGTH;PROP_NAME,MIN_LEN;The property \"@PROP_NAME@\" must have a min length of @MIN_LEN@ characters";
 
-	const PROPERTY_VALIDATION_MIN_VALUE = "PROPERTY_VALIDATION_MIN_VALUE,The property \"%s\" must have a min value of %s";
+	const PROPERTY_VALIDATION_MAX_LENGTH = "PROPERTY_VALIDATION_MAX_LENGTH;PROP_NAME,MAX_LEN;The property \"@PROP_NAME@\" cannot have more than @MAX_LEN@ characters";
 
-	const PROPERTY_VALIDATION_MAX_VALUE = "PROPERTY_VALIDATION_MAX_VALUE,The property \"%s\" must have a max value of %s";
+	const PROPERTY_VALIDATION_NUMERIC_VALUE = "PROPERTY_VALIDATION_NUMERIC_VALUE;PROP_NAME;The property \"@PROP_NAME@\" must be numeric";
 
-	const PROPERTY_VALIDATION_NOT_UPDATABLE = "PROPERTY_VALIDATION_NOT_UPDATABLE,The property \"%s\" cannot be updated";
+	const PROPERTY_VALIDATION_WRONG_FORMAT = "PROPERTY_VALIDATION_WRONG_FORMAT;PROP_NAME,FORMAT;The property \"@PROP_NAME@\" must match format @FORMAT@";
 
-	const PROPERTY_VALIDATION_ADMIN_PROPERTY = "PROPERTY_VALIDATION_ADMIN_PROPERTY,The property \"%s\" is updatable with admin session only";
+	const PROPERTY_VALIDATION_MIN_VALUE = "PROPERTY_VALIDATION_MIN_VALUE;PROP_NAME,MIN_VAL;The property \"@PROP_NAME@\" must have a min value of @MIN_VAL@";
 
-	const PROPERTY_VALIDATION_ENTRY_STATUS =  "PROPERTY_VALIDATION_ENTRY_STATUS,The property \"%s\" cannot be set for entry status \"%s\"";
+	const PROPERTY_VALIDATION_MAX_VALUE = "PROPERTY_VALIDATION_MAX_VALUE;PROP_NAME,MAX_VAL;The property \"@PROP_NAME@\" must have a max value of @MAX_VAL@";
 
-	const INVALID_USER_ID = "INVALID_USER_ID,Invalid user id";
+	const PROPERTY_VALIDATION_NOT_UPDATABLE = "PROPERTY_VALIDATION_NOT_UPDATABLE;PROP_NAME;The property \"@PROP_NAME@\" cannot be updated";
 
-	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND,There is no data center with id [%s]";
+	const PROPERTY_VALIDATION_ADMIN_PROPERTY = "PROPERTY_VALIDATION_ADMIN_PROPERTY;PROP_NAME;The property \"@PROP_NAME@\" is updatable with admin session only";
 
-	const PLUGIN_NOT_AVAILABLE_FOR_PARTNER = "PLUGIN_NOT_AVAILABLE_FOR_PARTNER,Plugin [%s] is not available for partner [%s]";
+	const PROPERTY_VALIDATION_ENTRY_STATUS =  "PROPERTY_VALIDATION_ENTRY_STATUS;PROP_NAME,STATUS;The property \"@PROP_NAME@\" cannot be set for entry status \"@STATUS@\"";
 
-	const SYSTEM_NAME_ALREADY_EXISTS = "SYSTEM_NAME_ALREADY_EXISTS,System name [%s] already exists";
+	const INVALID_USER_ID = "INVALID_USER_ID;;Invalid user id";
 
-	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT,Timed out while attempting to grab lock";
+	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND;DCID;There is no data center with id [@DCID@]";
+
+	const PLUGIN_NOT_AVAILABLE_FOR_PARTNER = "PLUGIN_NOT_AVAILABLE_FOR_PARTNER;PLUGIN,PARTNER;Plugin [@PLUGIN@] is not available for partner [@PARTNER@]";
+
+	const SYSTEM_NAME_ALREADY_EXISTS = "SYSTEM_NAME_ALREADY_EXISTS;SYS_NAME;System name [@SYS_NAME@] already exists";
+
+	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 	
 	/**
 	 * Service Oriented Errors
@@ -98,403 +98,406 @@ class KalturaErrors extends APIErrors
 	 * Media Service
 	 */
 
-	const ENTRY_NOT_READY = "ENTRY_NOT_READY,Entry \"%s\" is not ready";
+	const ENTRY_NOT_READY = "ENTRY_NOT_READY;ENTRY_NAME;Entry \"@ENTRY_NAME@\" is not ready";
 
-	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE,Entry \"%s\" type is \"%s\", type must be \"%s\"";
+	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE;ENTRY_NAME,WRONG_ENTRY_TYPE,RIGHT_ENTRY_TYPE;Entry \"@ENTRY_NAME@\" type is \"@WRONG_ENTRY_TYPE@\", type must be \"@RIGHT_ENTRY_TYPE@\"";
 
-	const INVALID_ENTRY_MEDIA_TYPE = "INVALID_ENTRY_MEDIA_TYPE,Entry \"%s\" media type is \"%s\", media type must be \"%s\"";
+	const INVALID_ENTRY_MEDIA_TYPE = "INVALID_ENTRY_MEDIA_TYPE;ENTRY_NAME,WRONG_MEDIA_TYPE,RIGHT_MEDIA_TYPE;Entry \"@ENTRY_NAME@\" media type is \"@WRONG_MEDIA_TYPE@\", media type must be \"@RIGHT_MEDIA_TYPE@\"";
 
-	const ENTRY_ALREADY_WITH_CONTENT = "ENTRY_ALREADY_WITH_CONTENT,Entry already associated with content";
+	const ENTRY_ALREADY_WITH_CONTENT = "ENTRY_ALREADY_WITH_CONTENT;;Entry already associated with content";
 
-	const ENTRY_ID_NOT_REPLACED = "ENTRY_ID_NOT_REPLACED,Entry id \"%s\" not replaced";
+	const ENTRY_ID_NOT_REPLACED = "ENTRY_ID_NOT_REPLACED;ENTRY_ID;Entry id \"@ENTRY_ID@\" not replaced";
 
-	const ENTRY_REPLACEMENT_ALREADY_EXISTS = "ENTRY_REPLACEMENT_ALREADY_EXISTS,Entry already in replacement";
+	const ENTRY_REPLACEMENT_ALREADY_EXISTS = "ENTRY_REPLACEMENT_ALREADY_EXISTS;;Entry already in replacement";
 
-	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED,Entry type \"%s\" not suppported";
+	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;ENTRY_TYPE;Entry type \"@ENTRY_TYPE@\" not suppported";
 
-	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED,Resource type \"%s\" not suppported";
+	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED;RES_TYPE;Resource type \"@RES_TYPE@\" not suppported";
 
-	const RESOURCES_MULTIPLE_DATA_CENTERS = "RESOURCES_MULTIPLE_DATA_CENTERS,Resources created on different data centers";
+	const RESOURCES_MULTIPLE_DATA_CENTERS = "RESOURCES_MULTIPLE_DATA_CENTERS;;Resources created on different data centers";
 
-	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED,Entry media type \"%s\" not suppported";
+	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED;MEDIA_TYPE;Entry media type \"@MEDIA_TYPE@\" not suppported";
 
-	const UPLOADED_FILE_NOT_FOUND_BY_TOKEN = "UPLOADED_FILE_NOT_FOUND_BY_TOKEN,The uploaded file was not found by the given token id, or was already used";
+	const UPLOADED_FILE_NOT_FOUND_BY_TOKEN = "UPLOADED_FILE_NOT_FOUND_BY_TOKEN;;The uploaded file was not found by the given token id, or was already used";
 
-	const REMOTE_DC_NOT_FOUND = "REMOTE_DC_NOT_FOUND,Remote data center \"%s\" not found";
+	const REMOTE_DC_NOT_FOUND = "REMOTE_DC_NOT_FOUND;DC;Remote data center \"@DC@\" not found";
 
-	const LOCAL_FILE_NOT_FOUND = "LOCAL_FILE_NOT_FOUND,Local file was not found \"%s\"";
+	const LOCAL_FILE_NOT_FOUND = "LOCAL_FILE_NOT_FOUND;FILE;Local file was not found \"@FILE@\"";
 
-	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND,The recorded webcam file was not found by the given token id, or was already used";
+	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND;;The recorded webcam file was not found by the given token id, or was already used";
 
-	const PERMISSION_DENIED_TO_UPDATE_ENTRY = "PERMISSION_DENIED_TO_UPDATE_ENTRY,User can update only the entries he own, otherwise an admin session must be used";
+	const PERMISSION_DENIED_TO_UPDATE_ENTRY = "PERMISSION_DENIED_TO_UPDATE_ENTRY;;User can update only the entries he own, otherwise an admin session must be used";
 
-	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE,Invalid rank value, rank should be between 1 and 5";
+	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE;;Invalid rank value, rank should be between 1 and 5";
 
-	const MAX_CATEGORIES_FOR_ENTRY_REACHED = "MAX_CATEGORIES_FOR_ENTRY_REACHED,Entry can be linked with a maximum of \"%s\" categories";
+	const MAX_CATEGORIES_FOR_ENTRY_REACHED = "MAX_CATEGORIES_FOR_ENTRY_REACHED;CATEGORIES;Entry can be linked with a maximum of \"@CATEGORIES@\" categories";
 
-	const INVALID_ENTRY_SCHEDULE_DATES = "INVALID_ENTRY_SCHEDULE_DATES,Invalid entry schedule dates";
+	const INVALID_ENTRY_SCHEDULE_DATES = "INVALID_ENTRY_SCHEDULE_DATES;;Invalid entry schedule dates";
 
-	const INVALID_ENTRY_STATUS = "INVALID_ENTRY_STATUS,Invalid entry status";
+	const INVALID_ENTRY_STATUS = "INVALID_ENTRY_STATUS;;Invalid entry status";
 
-	const ENTRY_CANNOT_BE_FLAGGED = "ENTRY_CANNOT_BE_FLAGGED,Entry cannot be flagged";
+	const ENTRY_CANNOT_BE_FLAGGED = "ENTRY_CANNOT_BE_FLAGGED;;Entry cannot be flagged";
 
 	/**
 	 * Notification Service
 	 */
 
-	const NOTIFICATION_FOR_ENTRY_NOT_FOUND = "NOTIFICATION_FOR_ENTRY_NOT_FOUND,Notification for entry id \"%s\" not found";
+	const NOTIFICATION_FOR_ENTRY_NOT_FOUND = "NOTIFICATION_FOR_ENTRY_NOT_FOUND;ENTRY;Notification for entry id \"@ENTRY@\" not found";
 
 	/**
 	 * Bulk Upload Service
 	 */
 
-	const BULK_UPLOAD_NOT_FOUND = "BULK_UPLOAD_NOT_FOUND,Bulk upload id \"%s\" not found";
+	const BULK_UPLOAD_NOT_FOUND = "BULK_UPLOAD_NOT_FOUND;ID;Bulk upload id \"@ID@\" not found";
 
 	/**
 	 * Widget Service
 	 */
 
-	const SOURCE_WIDGET_OR_UICONF_REQUIRED = "SOURCE_WIDGET_OR_UICONF_REQUIRED,SourceWidgetId or UiConfId id are required";
+	const SOURCE_WIDGET_OR_UICONF_REQUIRED = "SOURCE_WIDGET_OR_UICONF_REQUIRED;;SourceWidgetId or UiConfId id are required";
 
-	const SOURCE_WIDGET_NOT_FOUND = "SOURCE_WIDGET_NOT_FOUND,Source widget id \"%s\" not found";
+	const SOURCE_WIDGET_NOT_FOUND = "SOURCE_WIDGET_NOT_FOUND;ID;Source widget id \"@ID@\" not found";
 
-	const CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID = "CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID,Cannot disable entitlement when widget is not set to an entry";
+	const CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID = "CANNOT_DISABLE_ENTITLEMENT_WITH_NO_ENTRY_ID;;Cannot disable entitlement when widget is not set to an entry";
 
-	const CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE = "CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE,Cannot create widget with no entitlement enforcement when current session is with entitlement enabled";
+	const CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE = "CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE;;Cannot create widget with no entitlement enforcement when current session is with entitlement enabled";
 
 	/**
 	 * UiConf Service
 	 */
-	const UICONF_ID_NOT_FOUND = "UICONF_ID_NOT_FOUND,Ui conf id \"%s\" not found";
+	const UICONF_ID_NOT_FOUND = "UICONF_ID_NOT_FOUND;ID;UI conf id \"@ID@\" not found";
 
 	/**
 	 * AccessControl Service
 	 */
-	const ACCESS_CONTROL_NEW_VERSION_UPDATE = "ACCESS_CONTROL_NEW_VERSION_UPDATE,Access control id \"%s\" should be updated using AccessControlProfile service";
+	const ACCESS_CONTROL_NEW_VERSION_UPDATE = "ACCESS_CONTROL_NEW_VERSION_UPDATE;ID;Access control id \"@ID@\" should be updated using AccessControlProfile service";
 
-	const ACCESS_CONTROL_ID_NOT_FOUND = "ACCESS_CONTROL_ID_NOT_FOUND,Access control id \"%s\" not found";
+	const ACCESS_CONTROL_ID_NOT_FOUND = "ACCESS_CONTROL_ID_NOT_FOUND;ID;Access control id \"@ID@\" not found";
 
-	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED,Max number of \"%s\" access controls was reached";
+	const MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED = "MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED;MAX_NUM;Max number of \"@MAX_NUM@\" access controls was reached";
 
-	const CANNOT_DELETE_DEFAULT_ACCESS_CONTROL = "CANNOT_DELETE_DEFAULT_ACCESS_CONTROL,Default access control cannot be deleted";
+	const CANNOT_DELETE_DEFAULT_ACCESS_CONTROL = "CANNOT_DELETE_DEFAULT_ACCESS_CONTROL;;Default access control cannot be deleted";
 
 	/**
 	 * ConversionProfile Service
 	 */
-	const CONVERSION_PROFILE_ID_NOT_FOUND = "CONVERSION_PROFILE_ID_NOT_FOUND,Conversion profile id \"%s\" not found";
+	const CONVERSION_PROFILE_ID_NOT_FOUND = "CONVERSION_PROFILE_ID_NOT_FOUND;ID;Conversion profile id \"@ID@\" not found";
 
-	const INGESTION_PROFILE_ID_NOT_FOUND = "INGESTION_PROFILE_ID_NOT_FOUND,Ingestion profile id \"%s\" not found";
+	const INGESTION_PROFILE_ID_NOT_FOUND = "INGESTION_PROFILE_ID_NOT_FOUND;ID;Ingestion profile id \"@ID@\" not found";
 
-	const CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE = "CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE,Default conversion profile cannot be deleted";
+	const CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE = "CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE;;Default conversion profile cannot be deleted";
 
-	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND,Conversion profile id \"%s\" asset params id \"%s\" not found";
+	const ASSET_PARAMS_INVALID_TYPE = "ASSET_PARAMS_INVALID_TYPE;ASSET_PARAMS_ID,TYPE;Asset params id \"@ASSET_PARAMS_ID@\" type \"@TYPE@\" is invalid";
 
-	const ASSET_PARAMS_INVALID_TYPE = "ASSET_PARAMS_INVALID_TYPE,Asset params id \"%s\" type \"%s\" is invalid";
-
+	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND;PROFILE_ID,PARAMS_ID;Conversion profile id \"@PROFILE_ID@\" asset params id \"@PARAMS_ID@\" not found";
 
 	/**
 	 * FlavorParams Service
 	 */
-	const FLAVOR_PARAMS_ID_NOT_FOUND = "FLAVOR_PARAMS_ID_NOT_FOUND,Flavor params id \"%s\" not found";
+	const FLAVOR_PARAMS_ID_NOT_FOUND = "FLAVOR_PARAMS_ID_NOT_FOUND;ID;Flavor params id \"@ID@\" not found";
 
-	const FLAVOR_PARAMS_NOT_FOUND = "FLAVOR_PARAMS_NOT_FOUND,Flavor params not found";
+	const FLAVOR_PARAMS_NOT_FOUND = "FLAVOR_PARAMS_NOT_FOUND;;Flavor params not found";
 
-	const FLAVOR_PARAMS_DUPLICATE = "FLAVOR_PARAMS_DUPLICATE,Flavor params [%s] defined more than once";
+	const FLAVOR_PARAMS_DUPLICATE = "FLAVOR_PARAMS_DUPLICATE;PARAMS;Flavor params [@PARAMS@] defined more than once";
 
-	const FLAVOR_PARAMS_SOURCE_DUPLICATE = "FLAVOR_PARAMS_SOURCE_DUPLICATE,More than onc source flavor defined";
+	const FLAVOR_PARAMS_SOURCE_DUPLICATE = "FLAVOR_PARAMS_SOURCE_DUPLICATE;;More than onc source flavor defined";
 
-	const FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND = "FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND,Flavor params output id \"%s\" not found";
+	const FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND = "FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND;ID;Flavor params output id \"@ID@\" not found";
 
-	const THUMB_PARAMS_OUTPUT_ID_NOT_FOUND = "THUMB_PARAMS_OUTPUT_ID_NOT_FOUND,Thumbnail params output id \"%s\" not found";
+	const THUMB_PARAMS_OUTPUT_ID_NOT_FOUND = "THUMB_PARAMS_OUTPUT_ID_NOT_FOUND;ID;Thumbnail params output id \"@ID@\" not found";
 
-
-	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND,Asset id \"%s\" not found";
+	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND;ID;Asset id \"@ID@\" not found";
 
 	/**
 	 * FlavorAsset Service
 	 */
-	const FLAVOR_ASSET_ID_NOT_FOUND = "FLAVOR_ASSET_ID_NOT_FOUND,Flavor asset id \"%s\" not found";
+	const FLAVOR_ASSET_ID_NOT_FOUND = "FLAVOR_ASSET_ID_NOT_FOUND;ID;Flavor asset id \"@ID@\" not found";
 
-	const FLAVOR_ASSET_ALREADY_EXISTS = "FLAVOR_ASSET_ALREADY_EXISTS,Flavor asset id \"%s\" already use flavor params id \"%s\"";
+	const FLAVOR_ASSET_ALREADY_EXISTS = "FLAVOR_ASSET_ALREADY_EXISTS;ASSET_ID,PARAMS_ID;Flavor asset id \"@ASSET_ID@\" already use flavor params id \"@PARAMS_ID@\"";
 
-	const FLAVOR_ASSET_RECONVERT_ORIGINAL = "FLAVOR_ASSET_RECONVERT_ORIGINAL,Cannot reconvert original flavor asset";
+	const FLAVOR_ASSET_RECONVERT_ORIGINAL = "FLAVOR_ASSET_RECONVERT_ORIGINAL;;Cannot reconvert original flavor asset";
 
-	const ORIGINAL_FLAVOR_ASSET_IS_MISSING = "ORIGINAL_FLAVOR_ASSET_IS_MISSING,The original flavor asset is missing";
+	const ORIGINAL_FLAVOR_ASSET_IS_MISSING = "ORIGINAL_FLAVOR_ASSET_IS_MISSING;;The original flavor asset is missing";
 
-	const ORIGINAL_FLAVOR_ASSET_NOT_CREATED = "ORIGINAL_FLAVOR_ASSET_NOT_CREATED,The original flavor asset could not be created [%s]";
+	const ORIGINAL_FLAVOR_ASSET_NOT_CREATED = "ORIGINAL_FLAVOR_ASSET_NOT_CREATED;DATA;The original flavor asset could not be created [@DATA@]";
 
-	const NO_FLAVORS_FOUND = "NO_FLAVORS_FOUND,No flavors found";
+	const NO_FLAVORS_FOUND = "NO_FLAVORS_FOUND;;No flavors found";
 
 	/**
 	 * ThumbAsset Service
 	 */
-	const THUMB_ASSET_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND,The Thumbnail asset id \"%s\" not found";
+	const THUMB_ASSET_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND;ID;The Thumbnail asset id \"@ID@\" not found";
 
-	const THUMB_ASSET_PARAMS_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND,The Thumbnail asset not found for params id \"%s\"";
+	const THUMB_ASSET_PARAMS_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND;ID;The Thumbnail asset not found for params id \"@ID@\"";
 
-	const THUMB_ASSET_IS_NOT_READY = "THUMB_ASSET_IS_NOT_READY,The thumbnail asset is not ready";
+	const THUMB_ASSET_IS_NOT_READY = "THUMB_ASSET_IS_NOT_READY;;The thumbnail asset is not ready";
 
-	const THUMB_ASSET_ALREADY_EXISTS = "THUMB_ASSET_ALREADY_EXISTS,Thumbnail asset id \"%s\" already use thumbnail params id \"%s\"";
+	const THUMB_ASSET_ALREADY_EXISTS = "THUMB_ASSET_ALREADY_EXISTS;ASSET_ID,PARAMS_ID;Thumbnail asset id \"@ASSET_ID@\" already use thumbnail params id \"@PARAMS_ID@\"";
 
-	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED,Fail to download thumbnain from URL \"%s\"";
+	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED;URL_PATH;Failed to download thumbnail from URL \"@URL_PATH@\"";
 
-	const THUMB_ASSET_IS_DEFAULT = "THUMB_ASSET_IS_DEFAULT,Thumbnail asset \"%s\" is default and could not be deleted";
+	const THUMB_ASSET_IS_DEFAULT = "THUMB_ASSET_IS_DEFAULT;ASSET;Thumbnail asset \"@ASSET@\" is default and could not be deleted";
 
 	/**
 	 * Category Service
 	 */
-	const CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND,Category id \"%s\" not found";
+	const CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND;ID;Category id \"@ID@\" not found";
 
-	const CATEGORY_NOT_PERMITTED = "CATEGORY_NOT_PERMITTED,Category \"%s\" is not permitted";
+	const CATEGORY_NOT_PERMITTED = "CATEGORY_NOT_PERMITTED;CATEGORY;Category \"@CATEGORY@\" is not permitted";
 
-	const PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND,Parent category id \"%s\" not found";
+	const PARENT_CATEGORY_NOT_FOUND = "PARENT_CATEGORY_NOT_FOUND;ID;Parent category id \"@ID@\" not found";
 
-	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY,The category \"%s\" already exists";
+	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY;CATEGORY;The category \"@CATEGORY@\" already exists";
 
-	const PARENT_CATEGORY_IS_CHILD = "PARENT_CATEGORY_IS_CHILD,The parent category \"%s\" is one of the childs for category \"%s\"";
+	const PARENT_CATEGORY_IS_CHILD = "PARENT_CATEGORY_IS_CHILD;PARENT_CATEGORY,OTHER_CATEGORY;The parent category \"@PARENT_CATEGORY@\" is one of the children for category \"@OTHER_CATEGORY@\"";
 
-	const CATEGORIES_LOCKED = "CATEGORIES_LOCKED,Categories are locked";
+	const CATEGORIES_LOCKED = "CATEGORIES_LOCKED;;Categories are locked";
 
-	const CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET = "CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET,Cannot inherit members when parent category is not set";
+	const CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET = "CANNOT_INHERIT_MEMBERS_WHEN_PARENT_CATEGORY_IS_NOT_SET;;Cannot inherit members when parent category is not set";
 
-	const NOT_ENTITLED_TO_UPDATE_CATEGORY = "NOT_ENTITLED_TO_UPDATE_CATEGORY, Current User is not entitled to update this category";
+	const NOT_ENTITLED_TO_UPDATE_CATEGORY = "NOT_ENTITLED_TO_UPDATE_CATEGORY;;Current User is not entitled to update this category";
 
-	const CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY = "CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY,Category doesn't have parent category";
+	const CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY = "CATEGORY_DOES_NOT_HAVE_PARENT_CATEGORY;;Category doesn't have parent category";
 
-	const CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT,Cannot update privacy context";
+	const CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_PRIVACY_CONTEXT;;Cannot update privacy context";
 
-	const CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY = "CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORIES,Cannot move categories from different parent categories";
+	const CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORY = "CANNOT_MOVE_CATEGORIES_FROM_DIFFERENT_PARENT_CATEGORIES;;Cannot move categories from different parent categories";
 
-	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT,Cannot update category's entitlement fields when privacy context is not set on the categroy";
+	const CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT = "CANNOT_UPDATE_CATEGORY_ENTITLEMENT_FIELDS_WITH_NO_PRIVACY_CONTEXT;;Cannot update category's entitlement fields when privacy context is not set on the categroy";
 
-	const CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set appear in list field when privacy context is not set on the categroy";
+	const CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_APPEAR_IN_LIST_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set appear in list field when privacy context is not set on the categroy";
 
-	const CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set moderation field when privacy context is not set on the categroy";
+	const CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_MODERATION_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set moderation field when privacy context is not set on the categroy";
 
-	const CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set inheritance field when privacy context is not set on the categroy";
+	const CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_INHERITANCE_TYPE_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set inheritance field when privacy context is not set on the categroy";
 
-	const CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set privacy field when privacy context is not set on the categroy";
+	const CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_PRIVACY_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set privacy field when privacy context is not set on the categroy";
 
-	const CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set owner field when privacy context is not set on the categroy";
+	const CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_OWNER_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set owner field when privacy context is not set on the categroy";
 
-	const CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set user join policy field when privacy context is not set on the categroy";
+	const CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_USER_JOIN_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set user join policy field when privacy context is not set on the categroy";
 	
-	const CANNOT_SET_OWNER_FIELD_WITH_USER_ID = "CANNOT_SET_OWNER_FIELD_WITH_USER_ID, Cannot set owner field with user id \"%s\", user id is invalid";
+	const CANNOT_SET_OWNER_FIELD_WITH_USER_ID = "CANNOT_SET_OWNER_FIELD_WITH_USER_ID;ID;Cannot set owner field with user id \"@ID@\", user id is invalid";
 
-	const CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set contribution policy field when privacy context is not set on the categroy";
+	const CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_CONTIRUBUTION_POLICY_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set contribution policy field when privacy context is not set on the categroy";
 
-	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT, Cannot set default permission level field when privacy context is not set on the categroy";
+	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_FIELD_WITH_NO_PRIVACY_CONTEXT;;Cannot set default permission level field when privacy context is not set on the categroy";
 
-	const PRIVACY_CONTEXT_INVALID_STRING = "PRIVACY_CONTEXT_INVALID_STRING,Privacy context is invalid \"%s\"";
+	const PRIVACY_CONTEXT_INVALID_STRING = "PRIVACY_CONTEXT_INVALID_STRING;CONTEXT;Privacy context is invalid \"@CONTEXT@\"";
 
-	const CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS, Cannot set owner when category is set to inherit";
+	const CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_OWNER_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set owner when category is set to inherit";
 
-	const CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS, Cannot set user join policy when category is set to inherit";
+	const CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set user join policy when category is set to inherit";
 
-	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS, Cannot set default permission level when category is set to inherit";
+	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set default permission level when category is set to inherit";
 
 	/**
 	 * Batch Service
 	 */
 
-	const SCHEDULER_HOST_CONFLICT = "SCHEDULER_HOST_CONFLICT, Scheduler id \"%s\" conflicts between hosts: \"%s\" and \"%s\"";
+	const SCHEDULER_HOST_CONFLICT = "SCHEDULER_HOST_CONFLICT;SCHED_ID,HOST1,HOST2;Scheduler id \"@SCHED_ID@\" conflicts between hosts: \"@HOST1@\" and \"@HOST2@\"";
 
-	const SCHEDULER_NOT_FOUND = "SCHEDULER_NOT_FOUND, Scheduler id \"%s\" not found";
+	const SCHEDULER_NOT_FOUND = "SCHEDULER_NOT_FOUND;ID;Scheduler id \"@ID@\" not found";
 
-	const WORKER_NOT_FOUND = "WORKER_NOT_FOUND, Worker id \"%s\" not found";
+	const WORKER_NOT_FOUND = "WORKER_NOT_FOUND;ID;Worker id \"@ID@\" not found";
 
-	const COMMAND_NOT_FOUND = "COMMAND_NOT_FOUND, Command id \"%s\" not found";
+	const COMMAND_NOT_FOUND = "COMMAND_NOT_FOUND;ID;Command id \"@ID@\" not found";
 
-	const COMMAND_ALREADY_PENDING = "COMMAND_ALREADY_PENDING, Command already pending";
+	const COMMAND_ALREADY_PENDING = "COMMAND_ALREADY_PENDING;;Command already pending";
 
-	const PARTNER_NOT_SET = "PARTNER_NOT_SET, Partner not set";
+	const PARTNER_NOT_SET = "PARTNER_NOT_SET;;Partner not set";
 
-	const PARTNER_NOT_FOUND = "PARTNER_NOT_FOUND, Partner not found %s";
+	const PARTNER_NOT_FOUND = "PARTNER_NOT_FOUND;PARTNER;Partner not found @PARTNER@";
 
 	/**
 	 * Upload Service
 	 */
-	const INVALID_UPLOAD_TOKEN_ID = "INVALID_UPLOAD_TOKEN_ID,Invalid upload token id";
+	const INVALID_UPLOAD_TOKEN_ID = "INVALID_UPLOAD_TOKEN_ID;;Invalid upload token id";
 
-	const UPLOAD_PARTIAL_ERROR = "UPLOAD_PARTIAL_ERROR,File was uploaded partially";
+	const UPLOAD_PARTIAL_ERROR = "UPLOAD_PARTIAL_ERROR;;File was uploaded partially";
 
-	const UPLOAD_ERROR = "UPLOAD_ERROR,Upload failed";
+	const UPLOAD_ERROR = "UPLOAD_ERROR;;Upload failed";
 
-	const UPLOADED_FILE_NOT_FOUND = "UPLOADED_FILE_NOT_FOUND,Uploaded file not found [%s]";
+	const UPLOADED_FILE_NOT_FOUND = "UPLOADED_FILE_NOT_FOUND;FILE;Uploaded file not found [@FILE@]";
 
-	const BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR,Unable to create file sync object for bulk upload result";
+	const BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR;;Unable to create file sync object for bulk upload result";
 
-	const BULK_UPLOAD_CREATE_CONVERT_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_CONVERT_FILE_SYNC_ERROR,Unable to create file sync object for flavor conversion";
+	const BULK_UPLOAD_CREATE_CONVERT_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_CONVERT_FILE_SYNC_ERROR;;Unable to create file sync object for flavor conversion";
 
 	/**
 	 * Upload Token Service
 	 */
-	const UPLOAD_TOKEN_NOT_FOUND = "UPLOAD_TOKEN_NOT_FOUND,Upload token not found";
+	const UPLOAD_TOKEN_NOT_FOUND = "UPLOAD_TOKEN_NOT_FOUND;;Upload token not found";
 
-	const UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD = "UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD,Upload token is in an invalid status for uploading a file, maybe the file was already uploaded";
+	const UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD = "UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD;;Upload token is in an invalid status for uploading a file, maybe the file was already uploaded";
 
-	const UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY = "UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY,Upload token is in an invalid status for adding entry, maybe the a file was not uploaded or the token was used";
+	const UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY = "UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY;;Upload token is in an invalid status for adding entry, maybe the a file was not uploaded or the token was used";
 
-	const UPLOAD_TOKEN_CANNOT_RESUME = "UPLOAD_TOKEN_CANNOT_RESUME,Cannot resume the upload, original file was not found";
+	const UPLOAD_TOKEN_CANNOT_RESUME = "UPLOAD_TOKEN_CANNOT_RESUME;;Cannot resume the upload, original file was not found";
 
-	const UPLOAD_TOKEN_RESUMING_NOT_ALLOWED = "UPLOAD_TOKEN_RESUMING_NOT_ALLOWED,Resuming not allowed when file size was not specified";
+	const UPLOAD_TOKEN_RESUMING_NOT_ALLOWED = "UPLOAD_TOKEN_RESUMING_NOT_ALLOWED;;Resuming not allowed when file size was not specified";
 
-	const UPLOAD_TOKEN_RESUMING_INVALID_POSITION = "UPLOAD_TOKEN_RESUMING_INVALID_POSITION,Resuming not allowed after end of file";
+	const UPLOAD_TOKEN_RESUMING_INVALID_POSITION = "UPLOAD_TOKEN_RESUMING_INVALID_POSITION;;Resuming not allowed after end of file";
 
 	/*
 	 * Partenrs service
-	 * %s - the parent partner_id
+	 * PID - the parent partner_id
 	 */
-	const NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD = "NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD,Partner id [%s] is not a VAR/GROUP, but is attempting to create child partner";
+	const NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD = "NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD;PID;Partner id [@PID@] is not a VAR/GROUP, but is attempting to create child partner";
 
-	const NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER = "NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER,Partner id [%s] is not the parent of template partner [%s]";
+	const NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER = "NON_PARENT_PARTNER_ATTEMPTING_TO_COPY_PARTNER;PID,T_PARTNER;Partner id [@PID@] is not the parent of template partner [@T_PARTNER@]";
 
-	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID,Invalid object id [%s]";
+	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID;ID;Invalid object id [@ID@]";
 
-	const USER_NOT_FOUND = "USER_NOT_FOUND,User was not found";
+	const USER_NOT_FOUND = "USER_NOT_FOUND;;User was not found";
 
-	const USER_LOGIN_ALREADY_ENABLED = 'USER_LOGIN_ALREADY_ENABLED,User is already allowed to login';
+	const USER_LOGIN_ALREADY_ENABLED = "USER_LOGIN_ALREADY_ENABLED;;User is already allowed to login";
 
-	const USER_LOGIN_ALREADY_DISABLED = 'USER_LOGIN_ALREADY_DISABLED,User is already not allowed to login';
+	const USER_LOGIN_ALREADY_DISABLED = "USER_LOGIN_ALREADY_DISABLED;;User is already not allowed to login";
 
-	const PROPERTY_VALIDATION_NO_USAGE_PERMISSION = "PROPERTY_VALIDATION_NO_USAGE_PERMISSION,Current user does not have permission to use property \"%s\"";
+	const PROPERTY_VALIDATION_NO_USAGE_PERMISSION = "PROPERTY_VALIDATION_NO_USAGE_PERMISSION;PROP;Current user does not have permission to use property \"@PROP@\"";
 
-	const PROPERTY_VALIDATION_NO_UPDATE_PERMISSION = "PROPERTY_VALIDATION_NO_UPDATE_PERMISSION,Current user does not have permission to update property \"%s\"";
+	const PROPERTY_VALIDATION_NO_UPDATE_PERMISSION = "PROPERTY_VALIDATION_NO_UPDATE_PERMISSION;PROP;Current user does not have permission to update property \"@PROP@\"";
 
-	const PROPERTY_VALIDATION_NO_INSERT_PERMISSION = "PROPERTY_VALIDATION_NO_INSERT_PERMISSION,Current user does not have permission to insert property \"%s\"";
+	const PROPERTY_VALIDATION_NO_INSERT_PERMISSION = "PROPERTY_VALIDATION_NO_INSERT_PERMISSION;PROP;Current user does not have permission to insert property \"@PROP@\"";
 
-	const USER_NOT_ADMIN = "USER_NOT_ADMIN,User [%s] is not admin";
+	const USER_NOT_ADMIN = "USER_NOT_ADMIN;USER;User [@USER@] is not admin";
 
-	const ROLE_NAME_ALREADY_EXISTS = "ROLE_NAME_ALREADY_EXISTS,A role with the same name already exists";
+	const ROLE_NAME_ALREADY_EXISTS = "ROLE_NAME_ALREADY_EXISTS;;A role with the same name already exists";
 
-	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND,Permission item does not exists";
+	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND;;Permission item does not exists";
 
-	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED,The property \"%s\" is deprecated and should not be used";
+	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED;PROP;The property \"@PROP@\" is deprecated and should not be used";
 
 	/*
 	 * syndication service
 	 */
-	const INVALID_XSLT = "INVALID_XSLT,Invalid xslt";
+	const INVALID_XSLT = "INVALID_XSLT;;Invalid xslt";
 
-	const INVALID_XSLT_MISSING_TEMPLATE_RSS = "INVALID_XSLT_MISSING_TEMPLATE_RSS,Invalid xslt, missing rss's template tag with the following convention: xsl:template name=\"rssx\" match=\"/\"";
+	const INVALID_XSLT_MISSING_TEMPLATE_RSS = "INVALID_XSLT_MISSING_TEMPLATE_RSS;;Invalid xslt, missing rss's template tag with the following convention: xsl:template name=\"rssx\" match=\"/\"";
 
-	const INVALID_XSLT_MISSING_TEMPLATE_ITEM = "INVALID_XSLT_MISSING_TEMPLATE_ITEM,Invalid xslt, missing item's template tag with the following convention: xsl:template name=\"item\" match=\"item\"";
+	const INVALID_XSLT_MISSING_TEMPLATE_ITEM = "INVALID_XSLT_MISSING_TEMPLATE_ITEM;;Invalid xslt, missing item's template tag with the following convention: xsl:template name=\"item\" match=\"item\"";
 
-	const INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM = "INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM,Invalid xslt, missing apply-template tag for item's template with the following convention: xsl:apply-templates name=\"item\"";
+	const INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM = "INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM;;Invalid xslt, missing apply-template tag for item's template with the following convention: xsl:apply-templates name=\"item\"";
 
-	const SYNDICATION_FEED_INVALID_STORAGE_ID = "SYNDICATION_FEED_INVALID_STORAGE_ID,Invalid storage id";
+	const SYNDICATION_FEED_INVALID_STORAGE_ID = "SYNDICATION_FEED_INVALID_STORAGE_ID;;Invalid storage id";
 
-	const SYNDICATION_FEED_KALTURA_DC_ONLY = "SYNDICATION_FEED_KALTURA_DC_ONLY,Partner configured to use Kaltura data centers only";
+	const SYNDICATION_FEED_KALTURA_DC_ONLY = "SYNDICATION_FEED_KALTURA_DC_ONLY;;Partner configured to use Kaltura data centers only";
 
 	/*
 	 * file sync
 	 */
-	const FILE_DOESNT_EXIST = "FILE_DOESNT_EXIST,File doesnt exist";
+	const FILE_DOESNT_EXIST = "FILE_DOESNT_EXIST;;File doesnt exist";
 
-	const FILE_NOT_FOUND = "FILE_NOT_FOUND,File not found";
+	const FILE_NOT_FOUND = "FILE_NOT_FOUND;;File not found";
 
-	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND,Storage profile id %s not found";
+	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND;ID;Storage profile id @ID@ not found";	
 	
-	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED,Storage profile rules for profile id %s are not fulfilled";
+	const STORAGE_PROFILE_RULES_NOT_FULFILLED = "STORAGE_PROFILE_RULES_NOT_FULFILLED;ID;Storage profile rules for profile id @ID@ are not fulfilled";
 
 	/*
 	 * resetUserPassword
 	 */
-	const CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER = "CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER,Password cannot be reset for system partner";
+	const CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER = "CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER;;Password cannot be reset for system partner";
 
 	/*
 	 * Report service
 	 */
-	const REPORT_NOT_FOUND = "REPORT_NOT_FOUND,Report id \"%s\" not found";
+	const REPORT_NOT_FOUND = "REPORT_NOT_FOUND;ID;Report id \"@ID@\" not found";
 
-	const REPORT_NOT_PUBLIC = "REPORT_NOT_PUBLIC,Report id \"%s\" is not public";
+	const REPORT_NOT_PUBLIC = "REPORT_NOT_PUBLIC;ID;Report id \"@ID@\" is not public";
 
-	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING,Parameter \"%s\" is missing";
+	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING;PARAM;Parameter \"@PARAM@\" is missing";
 
-	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL,Unable to create report. Query produced too many results";
+	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL;;Unable to create report. Query produced too many results";
 
 	/**
 	 * categoryUser service
 	 */
-	const INVALID_CATEGORY_USER_ID = "INVALID_CATEGORY_USER_ID,Invalid CategoryUser for category [\"%s\"] and for user [\"%s\"]";
+	const INVALID_CATEGORY_USER_ID = "INVALID_CATEGORY_USER_ID;CAT,USER;Invalid CategoryUser for category [\"@CAT@\"] and for user [\"@USER@\"]";
 
-	const CATEGORY_USER_ALREADY_EXISTS = "CATEGORY_USER_ALREADY_EXISTS,CategoryUser already exists";
+	const CATEGORY_USER_ALREADY_EXISTS = "CATEGORY_USER_ALREADY_EXISTS;;CategoryUser already exists";
 
-	const CATEGORY_INHERIT_MEMBERS = "CATEGORY_INHERIT_MEMBERS,Cannot add members to this category since its inherit members from parent category [\"%s\"]";
+	const CATEGORY_INHERIT_MEMBERS = "CATEGORY_INHERIT_MEMBERS;CAT;Cannot add members to this category since its inherit members from parent category [\"@CAT@\"]";
 
-	const CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY = "CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY,Category that inherit members must have parent category set";
+	const CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY = "CATEGORY_INHERIT_MEMBERS_MUST_SET_PARENT_CATEGORY;;Category that inherit members must have parent category set";
 
-	const CATEGORY_USER_JOIN_NOT_ALLOWED = "CATEGORY_USER_JOIN_NOT_ALLOWED,cannot register to this category [\"%s\"]";
+	const CATEGORY_USER_JOIN_NOT_ALLOWED = "CATEGORY_USER_JOIN_NOT_ALLOWED;CAT;cannot register to this category [\"@CAT@\"]";
 
-	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER,cannot update categoryUser";
+	const CANNOT_UPDATE_CATEGORY_USER = "CANNOT_UPDATE_CATEGORY_USER;;cannot update category user";
 
-	const MUST_FILTER_USERS_OR_CATEGORY = "MUST_FILTER_USERS_OR_CATEGORY, Must filter users or categories";
+	const MUST_FILTER_USERS_OR_CATEGORY = "MUST_FILTER_USERS_OR_CATEGORY;;Must filter users or categories";
 
-	const CANNOT_OVERRIDE_MANUAL_CHANGES = "CANNOT_OVERRIDE_MANUAL_CHANGES,Cannot override manual changes";
+	const CANNOT_OVERRIDE_MANUAL_CHANGES = "CANNOT_OVERRIDE_MANUAL_CHANGES;;Cannot override manual changes";
 
-	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER, Cannot change CategoryUser object for category Owner";
+	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER;;Cannot change CategoryUser object for category Owner";
 
 	/**
 	 * entry
 	 */
 
-	const ENTRY_CATEGORY_FIELD_IS_DEPRECATED = "ENTRY_CATEGORY_FIELD_IS_DEPRECATED, entry->categories and entry->categoriesIds fields are deprecated - user categoryEntry service";
+	const ENTRY_CATEGORY_FIELD_IS_DEPRECATED = "ENTRY_CATEGORY_FIELD_IS_DEPRECATED;;entry->categories and entry->categoriesIds fields are deprecated - user categoryEntry service";
 
 	
 	/**
 	 * categoryEntry
 	 */
-	const INVALID_ENTRY_ID ="INVALID_ENTRY_ID,Invalid entry id [\"%s\"]";
+	const INVALID_ENTRY_ID ="INVALID_ENTRY_ID;ID;Invalid entry id [\"@ID@\"]";
 
-	const CANNOT_ASSIGN_ENTRY_TO_CATEGORY = "CANNOT_ASSIGN_ENTRY_TO_CATEGORY,Cannot assign entry to category";
+	const CANNOT_ASSIGN_ENTRY_TO_CATEGORY = "CANNOT_ASSIGN_ENTRY_TO_CATEGORY;;Cannot assign entry to category";
 
-	const CANNOT_REMOVE_ENTRY_FROM_CATEGORY = "CANNOT_REMOVE_ENTRY_FROM_CATEGORY,Cannot remove entry from category";
+	const CANNOT_REMOVE_ENTRY_FROM_CATEGORY = "CANNOT_REMOVE_ENTRY_FROM_CATEGORY;;Cannot remove entry from category";
 
-	const CANNOT_ACTIVATE_CATEGORY_ENTRY = "CANNOT_ACTIVATE_CATEGORY_ENTRY,Cannot activate categoryEntry";
+	const CANNOT_ACTIVATE_CATEGORY_ENTRY = "CANNOT_ACTIVATE_CATEGORY_ENTRY;;Cannot activate categoryEntry";
 
-	const CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING = "CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING,Cannot activate a non pending categoryEntry";
+	const CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING = "CANNOT_ACTIVATE_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING;;Cannot activate a non pending categoryEntry";
 
-	const CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING = "CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING,Cannot reject a non pending categoryEntry";
+	const CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING = "CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING;;Cannot reject a non pending categoryEntry";
 
-	const CANNOT_REJECT_CATEGORY_ENTRY = "CANNOT_REJECT_CATEGORY_ENTRY, Cannot reject category entry";
+	const CANNOT_REJECT_CATEGORY_ENTRY = "CANNOT_REJECT_CATEGORY_ENTRY;;Cannot reject category entry";
 
-	const ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY = "ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY,Entry doesn't assigned to category";
+	const ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY = "ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY;;Entry doesn't assigned to category";
 
-	const MUST_FILTER_ENTRY_ID_EQUAL = "MUST_FILTER_ENTRY_ID_EQUAL,Must filter on entry id";
+	const MUST_FILTER_ENTRY_ID_EQUAL = "MUST_FILTER_ENTRY_ID_EQUAL;;Must filter on entry id";
 
-	const MUST_FILTER_ON_ENTRY_OR_CATEGORY = "MUST_FILTER_ON_ENTRY_OR_CATEGORY,Must filter on entry id or category";
+	const MUST_FILTER_ON_ENTRY_OR_CATEGORY = "MUST_FILTER_ON_ENTRY_OR_CATEGORY;;Must filter on entry id or category";
 
-	const CATEGORY_ENTRY_ALREADY_EXISTS = "CATEGORY_ENTRY_ALREADY_EXISTS,Entry already assigned to this category";
+	const CATEGORY_ENTRY_ALREADY_EXISTS = "CATEGORY_ENTRY_ALREADY_EXISTS;;Entry already assigned to this category";
 
-	const CATEGORY_IS_LOCKED = 'CATEGORY_IS_LOCKED,Category is locked - cannot delete or change parent id';
+	const CATEGORY_IS_LOCKED = "CATEGORY_IS_LOCKED;;Category is locked - cannot delete or change parent id";
 
 	/**
 	 * Entitlement
 	 */
-	const CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE = 'CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE,Cannot index object when enetitlment is enabled';
+	const CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE = "CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE;;Cannot index object when enetitlment is enabled";
 
 	// live stream
-	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = 'LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED,Status cannot be determined for live stream protocol [%s]';
+	const LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED = "LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED;PROT;Status cannot be determined for live stream protocol [@PROT@]";
 
-	const ENCODING_IP_NOT_PINGABLE = 'ENCODING_IP_NOT_PINGABLE,One or both of the provided encoding IPs is not pingable';
+	const ENCODING_IP_NOT_PINGABLE = "ENCODING_IP_NOT_PINGABLE;;One or both of the provided encoding IPs is not pingable";
 	
-	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = 'EXTENDING_ITEM_INCOMPATIBLE_COMBINATION,This extending object MRSS must replace the XPath contents';
+	const EXTENDING_ITEM_INCOMPATIBLE_COMBINATION = "EXTENDING_ITEM_INCOMPATIBLE_COMBINATION;;This extending object MRSS must replace the XPath contents";
 	
-	const EXTENDING_ITEM_MISSING_XPATH = 'EXTENDING_ITEM_MISSING_XPATH,Extending item must contain xpath';
+	const EXTENDING_ITEM_MISSING_XPATH = "EXTENDING_ITEM_MISSING_XPATH;;Extending item must contain xpath";
 	
 	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND,Live channel segment id [%s] not found';
 	/*
 	 * BaseEntry Service
 	 */
 	
-	const DELIVERY_TYPE_NOT_SPECIFIED = 'DELIVERY_TYPE_NOT_SPECIFIED, at least one non auto delivery type must be specified';
+	const DELIVERY_TYPE_NOT_SPECIFIED = "DELIVERY_TYPE_NOT_SPECIFIED;;At least one non auto delivery type must be specified";
 	
-	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED,Unable to generate list. max matches value was reached";
+	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED;;Unable to generate list. max matches value was reached";
 	
+	/*
+	 * FileAsset Service
+	 */
+	
+	const FILE_ASSET_ID_NOT_FOUND = "FILE_ASSET_ID_NOT_FOUND;ASSET_ID;File asset id [\"@ASSET_ID@\"] not found";
 	
 	/*
 	 * MediaServer Service
 	 */
-	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND,Media server \"%s\" not found";
+	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server \"@MEDIA_SERVER_ID@\" not found";
 	
 }

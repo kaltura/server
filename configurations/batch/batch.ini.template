@@ -63,6 +63,7 @@ enabledWorkers.KAsyncDistributeUpdateCloser			= 1
 enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
+enabledWorkers.KAsyncCopyPartner					= 1
 
 [Worker]
 maximumExecutionTime			= 300
@@ -640,3 +641,11 @@ type												= KAsyncValidateLiveMediaServers
 scriptPath											= batches/ValidateLiveMediaServers/KAsyncValidateLiveMediaServersExe.php
 sleepBetweenStopStart								= 30
 
+
+
+[KAsyncCopyPartner : JobHandlerWorker]
+id													= 520
+friendlyName										= CopyPartner
+type												= KAsyncCopyPartner
+maximumExecutionTime								= 12000
+scriptPath											= batches/CopyPartner/KAsyncCopyPartnerExe.php
