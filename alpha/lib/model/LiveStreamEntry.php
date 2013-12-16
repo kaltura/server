@@ -12,20 +12,6 @@ class LiveStreamEntry extends LiveEntry
 		$this->setStatus(entryStatus::NO_CONTENT);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see entry::postInsert($con)
-	 */
-	public function postInsert(PropelPDO $con = null)
-	{
-		if(!$this->wasObjectSaved())
-			return;
-			
-		parent::postInsert($con);
-	
-		if ($this->conversion_profile_id)
-			kBusinessConvertDL::decideLiveProfile($this);
-	}
-	
 	public function setEncodingIP1 ( $v )	{	$this->putInCustomData ( "encodingIP1" , $v );	}
 	public function getEncodingIP1 (  )		{	return $this->getFromCustomData( "encodingIP1" );	}
 

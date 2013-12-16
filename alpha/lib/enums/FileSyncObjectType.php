@@ -13,6 +13,7 @@ interface FileSyncObjectType extends BaseEnum
 	const METADATA_PROFILE = 6;
 	const SYNDICATION_FEED = 7;
 	const CONVERSION_PROFILE = 8;
+	const FILE_ASSET = 9;
 	
 	/**
 	 * @deprecated use ASSET instead

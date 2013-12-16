@@ -524,22 +524,12 @@ class Partner extends BasePartner
 	
 	public function resetFeaturesStatusByType($type)
 	{
-		$openStatuses = array(BatchJob::BATCHJOB_STATUS_ALMOST_DONE,
-							  BatchJob::BATCHJOB_STATUS_RETRY,
-							  BatchJob::BATCHJOB_STATUS_PENDING,
-							  BatchJob::BATCHJOB_STATUS_QUEUED,
-							  BatchJob::BATCHJOB_STATUS_PROCESSING,
-							  BatchJob::BATCHJOB_STATUS_PROCESSED,
-							  BatchJob::BATCHJOB_STATUS_MOVEFILE
-							);
-		
 		$criteria = new Criteria();
-		$criteria->add(BatchJobPeer::PARTNER_ID, $this->getId());
-		$criteria->add(BatchJobPeer::JOB_TYPE, BatchJobType::INDEX);
-		$criteria->add(BatchJobPeer::JOB_SUB_TYPE, $type);
-		$criteria->add(BatchJobPeer::STATUS, $openStatuses, Criteria::IN);
+		$criteria->add(BatchJobLockPeer::PARTNER_ID, $this->getId());
+		$criteria->add(BatchJobLockPeer::JOB_TYPE, BatchJobType::INDEX);
+		$criteria->add(BatchJobLockPeer::JOB_SUB_TYPE, $type);
 		
-		$batchJob = BatchJobPeer::doSelectOne($criteria);
+		$batchJob = BatchJobLockPeer::doSelectOne($criteria);
 		
 		if($batchJob)
 		{

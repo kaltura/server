@@ -103,20 +103,18 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		switch ($this->format)
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
-				$serializer = new KalturaXmlSerializer($this->ignoreNull);
-				$data = '<notification>' . $serializer->getSerializedData($notification) . '</notification>';
+				$serializer = new KalturaXmlSerializer($this->ignoreNull);				
+				$data = '<notification>' . $serializer->serialize($notification) . '</notification>';
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_PHP:
-				$serializer = new KalturaPhpSerializer($this->ignoreNull);
-				$serializer->serialize($notification);
-				$data = $serializer->getSerializedData();
+				$serializer = new KalturaPhpSerializer($this->ignoreNull);				
+				$data = $serializer->serialize($notification);
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
-				$serializer = new KalturaJsonSerializer($this->ignoreNull);
-				$serializer->serialize($notification);
-				$data = $serializer->getSerializedData();
+				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
+				$data = $serializer->serialize($notification);
 				break;
 		}
 		

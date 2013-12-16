@@ -89,6 +89,40 @@ abstract class LiveEntry extends entry
 		return parent::generateFileName($sub_type, $version);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see Baseentry::postUpdate()
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		$decideLiveProfile = false;
+		if(!$this->alreadyInSave && $this->conversion_profile_id)
+		{
+			if(isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
+				$decideLiveProfile = true;
+		}
+			
+		$ret = parent::postUpdate($con);
+		
+		if($decideLiveProfile)
+			kBusinessConvertDL::decideLiveProfile($this);
+			
+		return $ret;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Baseentry::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		if(!$this->wasObjectSaved())
+			return;
+			
+		parent::postInsert($con);
+	
+		if ($this->conversion_profile_id)
+			kBusinessConvertDL::decideLiveProfile($this);
+	}
+	
 	public function setOfflineMessage($v)
 	{
 		$this->putInCustomData("offlineMessage", $v);

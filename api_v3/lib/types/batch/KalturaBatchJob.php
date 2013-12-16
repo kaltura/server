@@ -388,6 +388,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaConcatJobData();
 				break;
 				
+			case 'kCopyPartnerJobData':
+				$this->data = new KalturaCopyPartnerJobData();
+				break;
+				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 				{
@@ -592,6 +596,12 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kConcatJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaConcatJobData();
+					
+			case KalturaBatchJobType::COPY_PARTNER:
+				$dbData = new kCopyPartnerJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCopyPartnerJobData();
+					
 				break;
 				
 			default:

@@ -214,8 +214,12 @@ class KSchedulerConfig extends Zend_Config_Ini
 	
 	protected function getCurrentConfigFilePaths() 
 	{
+		if(!is_dir($this->configFileName))
+			return  $this->configFileName;
+		
 		$configFilePaths = array();
 		$d = dir($this->configFileName);
+		
 		while (false !== ($file = $d->read()))
 		{
 			if(preg_match('/\.ini$/', $file))

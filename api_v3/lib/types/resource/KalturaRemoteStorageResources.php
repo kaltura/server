@@ -5,21 +5,28 @@
  * @package api
  * @subpackage objects
  */
-class KalturaRemoteStorageResources extends KalturaContentResource 
+class KalturaRemoteStorageResources extends KalturaContentResource
 {
 	/**
 	 * Array of remote stoage resources 
 	 * @var KalturaRemoteStorageResourceArray
 	 */
 	public $resources;
-
-	public function validateEntry(entry $dbEntry)
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateEntry($dbEntry);
-    	$this->validatePropertyNotNull('resources');
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+		
+		$this->validatePropertyNotNull('resources');
 	}
-
-	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(!$object_to_fill)
 			$object_to_fill = new kRemoteStorageResources();
@@ -34,10 +41,13 @@ class KalturaRemoteStorageResources extends KalturaContentResource
 			}
 		}
 		$object_to_fill->setResources($resources);
-			
+		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject($srcObj)
+	 */
 	public function fromObject($source_object)
 	{
 		/* @var $source_object kRemoteStorageResources */

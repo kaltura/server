@@ -227,19 +227,7 @@ class ks extends kSessionBase
 	const PRIVILEGE_WILDCARD = "*";
 
 	static $ERROR_MAP = null;
-		
-	const INVALID_STR = -1;
-	const INVALID_PARTNER = -2;
-	const INVALID_USER = -3;
-	const INVALID_TYPE = -4;
-	const EXPIRED = -5;
-	const LOGOUT = -6;
-	const EXCEEDED_ACTIONS_LIMIT = -8;
-	const EXCEEDED_RESTRICTED_IP = -9;
-	const OK = 1;
-
-	const INVALID_LKS = -7;
-	
+			
 	const PATTERN_WILDCARD = "*";
 	
 	public $error;
