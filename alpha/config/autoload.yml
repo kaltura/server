@@ -16,6 +16,12 @@ autoload:
 #    prefix:         1
     recursive:      on   
     
+  nusoap:
+    name:           nusoap
+    path:           %SF_MODEL_LIB_DIR%/../../../vendor/nusoap
+#    prefix:         1
+    recursive:      on   
+    
   zend:
     name:           zend
     path:           %SF_MODEL_LIB_DIR%/../../../vendor/ZendFramework/library

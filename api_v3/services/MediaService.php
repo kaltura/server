@@ -174,6 +174,9 @@ class MediaService extends KalturaEntryService
 			case 'kLocalFileResource':
 				return $this->attachLocalFileResource($resource, $dbEntry, $dbAsset);
 
+			case 'kLiveEntryResource':
+				return $this->attachLiveEntryResource($resource, $dbEntry, $dbAsset);
+
 			case 'kFileSyncResource':
 				return $this->attachFileSyncResource($resource, $dbEntry, $dbAsset);
 

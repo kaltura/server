@@ -21,14 +21,6 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	 */
 	public $duration;
 
-	public function toAttributesArray()
-	{
-		return array(
-			'ClipOffset' => $this->offset,
-			'ClipDuration' => $this->duration,
-		);
-	}
-	
 	private static $map_between_objects = array
 	(
 	 	"offset" , 

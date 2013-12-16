@@ -187,6 +187,8 @@ class KalturaErrors extends APIErrors
 
 	const CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE = "CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE;;Default conversion profile cannot be deleted";
 
+	const ASSET_PARAMS_INVALID_TYPE = "ASSET_PARAMS_INVALID_TYPE;ASSET_PARAMS_ID,TYPE;Asset params id \"@ASSET_PARAMS_ID@\" type \"@TYPE@\" is invalid";
+
 	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND;PROFILE_ID,PARAMS_ID;Conversion profile id \"@PROFILE_ID@\" asset params id \"@PARAMS_ID@\" not found";
 
 	/**
@@ -478,6 +480,7 @@ class KalturaErrors extends APIErrors
 	
 	const EXTENDING_ITEM_MISSING_XPATH = "EXTENDING_ITEM_MISSING_XPATH;;Extending item must contain xpath";
 	
+	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND,Live channel segment id [%s] not found';
 	/*
 	 * BaseEntry Service
 	 */
@@ -492,5 +495,9 @@ class KalturaErrors extends APIErrors
 	
 	const FILE_ASSET_ID_NOT_FOUND = "FILE_ASSET_ID_NOT_FOUND;ASSET_ID;File asset id [\"@ASSET_ID@\"] not found";
 	
+	/*
+	 * MediaServer Service
+	 */
+	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server \"@MEDIA_SERVER_ID@\" not found";
 	
 }
