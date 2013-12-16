@@ -72,6 +72,7 @@ Add new workers to batch.ini based on batch.ini.template.
 **Default Content**
 
 - Create live conversion profiles to existing partners -  deployment/updates/scripts/2013_11_20_create_live_profiles.php
+- Create source-only live conversion profile to existing partners -  deployment/updates/scripts/2013_12_16_create_live_passthru_profile.php
 
 
 **Plugins and Client libraries**
