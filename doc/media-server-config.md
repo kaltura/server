@@ -175,3 +175,62 @@ media_servers.ini is optional and needed only for custom configurations.
      - Name - LiveStreamEntry
      - Description - Live-Stream Entry Listener
      - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry`
+
+
+## For webcam recording servers: ##
+
+**Create oflaDemo application**
+
+ - Create oflaDemo application in your Wowza server.
+  - Create @WOWZA_DIR@/applications/oflaDemo directory
+  - Create @WOWZA_DIR@/conf/oflaDemo directory
+  - Copy @WOWZA_DIR@/conf/Application.xml to @WOWZA_DIR@/conf/oflaDemo/Application.xml.
+ - Configure @WOWZA_DIR@/conf/oflaDemo/Application.xml
+  - /Root/Streams/StreamType - live-record
+  - /Root/Streams/StorageDir - @WEB_DIR@/content/webcam
+  - /Root/Transcoder/LiveStreamTranscoder - transcoder
+  - /Root/Transcoder/Templates - hdfvr.xml
+
+**Create transcoding template**
+
+ - Create @WOWZA_DIR@/transcoder/templates/hdfvr.xml template:
+
+>     <Root>
+>     	<Transcode>
+>     		<Encodes>
+>     			<!-- Example Encode block for source, not required unless Member of StreamNameGroup. -->
+>     			<Encode>
+>     				<Enable>true</Enable>
+>     				<Name>aac</Name>
+>     				<StreamName>mp4:${SourceStreamName}</StreamName>
+>     				<Video>
+>     					<!-- H.264, PassThru, Disable -->
+>     					<Codec>PassThru</Codec>
+>     					<Bitrate>${SourceVideoBitrate}</Bitrate>
+>     					<Parameters>
+>     					</Parameters>
+>     				</Video>
+>     				<Audio>
+>     					<!-- AAC, PassThru, Disable -->
+>     					<Codec>AAC</Codec>
+>     					<Bitrate>48000</Bitrate>
+>     				</Audio>
+>     				<Properties>
+>     				</Properties>
+>     			</Encode>
+>     		</Encodes>
+>     		<Decode>
+>     		</Decode>
+>     		<StreamNameGroups>
+>     		</StreamNameGroups>
+>     		<Properties>
+>     		</Properties>
+>     	</Transcode>
+>     </Root>
+
+**Configure file system**
+
+ - Make sure that @WEB_DIR@/content/webcam group is kaltura or apache
+ - Define permissions stickiness on the group:
+  - chmod +t @WEB_DIR@/content/webcam
+  - chmod g+s @WEB_DIR@/content/webcam

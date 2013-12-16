@@ -477,7 +477,7 @@ class MediaService extends KalturaEntryService
 	    // check that the webcam file exists
 	    $content = myContentStorage::getFSContentRootPath();
 	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
-		if (!file_exists("$webcamBasePath.flv") && !file_exists("$webcamBasePath.f4v"))
+		if (!file_exists("$webcamBasePath.flv") && !file_exists("$webcamBasePath.f4v") && !file_exists("$webcamBasePath.f4v.mp4"))
 		{
 			if (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId()))
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
