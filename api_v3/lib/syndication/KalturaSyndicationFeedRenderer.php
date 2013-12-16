@@ -108,7 +108,7 @@ class KalturaSyndicationFeedRenderer
 		$microTimeStart = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- initialize ");
 				
-		$this->syndicationFeedDB = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
+		$this->syndicationFeedDb = $syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");
 		kCurrentContext::initKsPartnerUser($ks, $syndicationFeedDB->getPartnerId(), '');
@@ -440,7 +440,7 @@ class KalturaSyndicationFeedRenderer
 		$microTimeStart = microtime(true);
 		
 		$renderer = KalturaSyndicationFeedFactory::getRendererByType($this->syndicationFeed->type);
-		$renderer->init($this->syndicationFeed, $this->syndicationFeedDB, $this->mimeType);
+		$renderer->init($this->syndicationFeed, $this->syndicationFeedDb, $this->mimeType);
 		
 		header($renderer->handleHttpHeader());
 		echo $renderer->handleHeader();
@@ -450,7 +450,7 @@ class KalturaSyndicationFeedRenderer
 			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
 		
 		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry_";
-		$feedUpdatedAt = $this->syndicationFeedDB->getUpdatedAt(null);
+		$feedUpdatedAt = $this->syndicationFeedDb->getUpdatedAt(null);
 
 		$e = null;
 		$kalturaFeed = $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA || $this->syndicationFeed->type == KalturaSyndicationFeedType::KALTURA_XSLT;
@@ -543,8 +543,21 @@ class KalturaSyndicationFeedRenderer
 			return null;
 			
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $flavorAsset->getEntryId());
-		$urlManager->setFileExtension($flavorAsset->getFileExt());
-		$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		
+		if($this->syndicationFeedDb->getServePlayManifest())
+		{
+			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+			$urlManager->setDomain($cdnHost);
+			
+			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
+			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
+		}
+		else
+		{
+			$urlManager->setFileExtension($flavorAsset->getFileExt());
+			
+			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		}
 		
 		return $url;
 	}
@@ -571,8 +584,19 @@ class KalturaSyndicationFeedRenderer
 		
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
 		$urlManager->setDomain($this->cdnHost);
-		$url = $urlManager->getAssetUrl($flavorAsset);
-		return $this->cdnHost . $url;
+		
+		if($this->syndicationFeedDb->getServePlayManifest())
+		{
+			$cdnHost = requestUtils::getApiCdnHost();
+			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
+			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
+		}
+		else
+		{
+			$url = $this->cdnHost . $urlManager->getAssetUrl($flavorAsset);
+		}
+		
+		return $url;
 	}
 	
 	private function getOrderByColumn()

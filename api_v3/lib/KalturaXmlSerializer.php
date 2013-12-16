@@ -3,7 +3,7 @@
  * @package api
  * @subpackage v3
  */
-class KalturaXmlSerializer
+class KalturaXmlSerializer extends KalturaSerializer
 {
 	private $_ignoreNull = false;
 	
@@ -12,19 +12,35 @@ class KalturaXmlSerializer
 		$this->_ignoreNull = (bool)$ignoreNull;
 	}
 	
-	function getSerializedData($object)
+	function setHttpHeaders()
 	{
-		if (function_exists('kaltura_serialize_xml'))
-			return kaltura_serialize_xml($object, $this->_ignoreNull);
-		
-		ob_start();
-		$this->serialize($object);
-		$result = ob_get_contents();
-		ob_end_clean();
-		return $result;
+		header("Content-Type: text/xml");
+	}
+	
+	// Override base class functionality
+	protected function prepareSerializedObject($object)
+	{
+		// Do nothing
 	}
 	
 	function serialize($object)
+	{
+		if (function_exists('kaltura_serialize_xml'))
+		{
+			$serializedResult = kaltura_serialize_xml($object, $this->_ignoreNull);
+		}
+		else
+		{
+			ob_start();
+			$this->serializeByType($object);
+			$serializedResult = ob_get_contents();
+			ob_end_clean();
+		}
+		
+		return $serializedResult;
+	}
+	
+	function serializeByType($object)
 	{
 		$type = gettype($object);
 
@@ -74,8 +90,27 @@ class KalturaXmlSerializer
 		foreach($object as $val)
 		{
 			echo '<item>';
-			$this->serialize($val);
+			$this->serializeByType($val);
 			echo '</item>';
+		}
+	}
+	
+	function writeKalturaAPIExceptionArgsTag($object)
+	{
+		if ( $object instanceof KalturaAPIException )
+		{
+			echo '<args>';
+			
+			foreach ( $object->getArgs() as $name => $value )
+			{
+				echo '<item>';
+				echo '<objectType>KalturaAPIExceptionArg</objectType>'; // Hardcoded imaginary type for the client code parsers.
+				echo '<name>' . kString::xmlEncode($name) . '</name>';
+				echo '<value>' . kString::xmlEncode($value) . '</value>';
+				echo '</item>';
+			}
+			
+			echo '</args>';
 		}
 	}
 	
@@ -84,8 +119,12 @@ class KalturaXmlSerializer
 		if ($object instanceof Exception)
 		{
 			echo '<error>';
+			
 			$this->writeTag('code', kString::xmlEncode($object->getCode()));
 			$this->writeTag('message', kString::xmlEncode($object->getMessage()));
+			$this->writeTag('objectType', get_class($object));
+			$this->writeKalturaAPIExceptionArgsTag( $object );
+			
 			echo '</error>';
 		}
 		else
@@ -117,7 +156,7 @@ class KalturaXmlSerializer
 					continue;
 					
 				echo '<'.$name.'>';
-				$this->serialize($value);
+				$this->serializeByType($value);
 				echo '</'.$name.'>';
 			}
 		}

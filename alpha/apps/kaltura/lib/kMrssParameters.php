@@ -28,6 +28,26 @@ class kMrssParameters
 	
 	private $encoding;
 	
+	private $servePlayManifest;
+	
+	private $playManifestClientTag;
+	
+	/**
+	 * @return field_type $playManifestClientTag
+	 */
+	public function getPlayManifestClientTag()
+	{
+		return $this->playManifestClientTag;
+	}
+
+	/**
+	 * @param field_type $playManifestClientTag
+	 */
+	public function setPlayManifestClientTag($playManifestClientTag)
+	{
+		$this->playManifestClientTag = $playManifestClientTag;
+	}
+
 	/**
 	 * @return the $itemXpathsToExtend
 	 */
@@ -118,5 +138,21 @@ class kMrssParameters
 	public function setEncoding($encoding)
 	{
 		$this->encoding = $encoding;
+	}
+	
+	/**
+	 * @return field_type $servePlayManifest
+	 */
+	public function getServePlayManifest()
+	{
+		return $this->servePlayManifest;
+	}
+
+	/**
+	 * @param field_type $servePlayManifest
+	 */
+	public function setServePlayManifest($servePlayManifest)
+	{
+		$this->servePlayManifest = $servePlayManifest;
 	}
 }

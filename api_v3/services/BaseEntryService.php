@@ -723,11 +723,6 @@ class BaseEntryService extends KalturaEntryService
 		$result->isAdmin = $contextDataHelper->getIsAdmin();
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
 		
-		if (($dbEntry->getStartDate() && abs($dbEntry->getStartDate(null) - time()) <= 86400) ||
-			($dbEntry->getEndDate() &&   abs($dbEntry->getEndDate(null) - time())   <= 86400))
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry(600);
-		}
 		return $result;
 	}
 	
@@ -796,5 +791,33 @@ class BaseEntryService extends KalturaEntryService
 		}
 		
 		return myEntryUtils::index($entryDb);
+	}
+
+	/**
+	 * Clone an entry with optional attributes to apply to the clone
+	 * 
+	 * @action clone
+	 * @param string $entryId Id of entry to clone
+	 * @param KalturaBaseEntry $updateEntry [optional] Attributes from these entry will be updated into the cloned entry
+	 * @return KalturaBaseEntry The cloned entry
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function cloneAction( $entryId )
+	{
+		// Reset criteria filters such that it will be  
+		entryPeer::setUseCriteriaFilter(false);
+		categoryEntryPeer::setUseCriteriaFilter(false);
+
+		// Get the entry
+		$coreEntry = entryPeer::retrieveByPK( $entryId );			
+		if ( ! $coreEntry )
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+
+		// Copy the entry into a new one based on the given partner data. 
+		$clonedEntry = myEntryUtils::copyEntry( $coreEntry, $this->getPartner() );
+
+		return $this->getEntry($clonedEntry->getId());
 	}
 }

@@ -62,6 +62,7 @@ enabledWorkers.KAsyncDistributeSubmitCloser			= 1
 enabledWorkers.KAsyncDistributeUpdateCloser			= 1
 enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
+enabledWorkers.KAsyncCopyPartner					= 1
 
 [Worker]
 maximumExecutionTime			= 300
@@ -606,3 +607,10 @@ friendlyName										= Syncronize Widevine assets
 type												= KAsyncWidevineRepositorySync
 maximumExecutionTime								= 3000
 scriptPath             								= ../plugins/drm/providers/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
+
+[KAsyncCopyPartner : JobHandlerWorker]
+id													= 510
+friendlyName										= CopyPartner
+type												= KAsyncCopyPartner
+maximumExecutionTime								= 12000
+scriptPath											= batches/CopyPartner/KAsyncCopyPartnerExe.php

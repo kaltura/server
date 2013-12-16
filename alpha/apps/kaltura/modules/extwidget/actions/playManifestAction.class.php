@@ -1338,6 +1338,9 @@ class playManifestAction extends kalturaAction
 				break;
 			
 			case PlaybackProtocol::APPLE_HTTP:
+				$flavors = array();
+				$this->urlManager->finalizeUrls($baseUrl, $flavors);
+				
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = new kRedirectManifestRenderer();
 				$renderer->flavor = $flavor;
