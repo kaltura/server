@@ -14,3 +14,4 @@ plugins/.buildpath
 plugins/.settings/*
 alpha/.settings/
 .idea
+.DS_Store

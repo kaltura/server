@@ -14,6 +14,7 @@ class KalturaMonitorClient
 	
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
+	const FIELD_UNIQUE_ID =			'u';
 	const FIELD_IP_ADDRESS = 		'i';
 	const FIELD_PARTNER_ID = 		'p';
 	const FIELD_ACTION = 			'a';
@@ -118,6 +119,12 @@ class KalturaMonitorClient
 			self::FIELD_PARTNER_ID		=> $partnerId,
 			self::FIELD_ACTION			=> $action,
 		);
+		
+		if (!$cached)
+		{
+			require_once(__DIR__ . '/../../../../../infra/log/UniqueId.php');
+			self::$basicEventInfo[self::FIELD_UNIQUE_ID] = UniqueId::get();
+		}
 		
 		self::$basicApiInfo = array(
 			self::FIELD_CACHED			=> $cached,

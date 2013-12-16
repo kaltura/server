@@ -64,13 +64,16 @@ abstract class KJobHandlerWorker extends KBatchBase
 			try
 			{
 				$job = $this->exec($job);
+				self::unimpersonate();
 			}
 			catch(KalturaException $kex)
 			{
+				self::unimpersonate();
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_API, $kex, KalturaBatchJobStatus::FAILED);
 			}
 			catch(kApplicativeException $kaex)
 			{
+				self::unimpersonate();
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::APP, $kaex, KalturaBatchJobStatus::FAILED);
 			}
 			catch(kTemporaryException $ktex)
@@ -83,10 +86,12 @@ abstract class KJobHandlerWorker extends KBatchBase
 			}
 			catch(KalturaClientException $kcex)
 			{
+				self::unimpersonate();
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex, KalturaBatchJobStatus::RETRY);
 			}
 			catch(Exception $ex)
 			{
+				self::unimpersonate();
 				$this->closeJobOnError($job,KalturaBatchJobErrorTypes::RUNTIME, $ex, KalturaBatchJobStatus::FAILED);
 			}
 		}
