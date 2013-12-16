@@ -96,7 +96,8 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function incrementXslVersion()
 	{
-		$this->incInCustomData("xslVersion");
+		$varsion = kDataCenterMgr::incrementVersion($this->getVersion());
+		$this->putInCustomData("xslVersion", $varsion);
 	}
 	
 	/**

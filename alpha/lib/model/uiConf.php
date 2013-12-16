@@ -125,13 +125,11 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		{
 			if($isClone)
 			{
-				$this->setVersion(1);
+				$this->setVersion(kFileSyncObjectManager::incrementVersion());
 			}
 			else
 			{
-				$version = $this->getVersion();
-				if ( ! is_numeric( $version ) ) $this->setVersion(1);
-				else $this->setVersion($version+1);
+				$this->incrementVersion();
 			}
 			foreach ($this->content as $contentItem) 
 			{
@@ -713,5 +711,10 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			return self::FILE_NAME_FEATURES;
 		if($subType == self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG)
 			return self::FILE_NAME_CONFIG;			
+	}
+
+	public function incrementVersion()
+	{
+		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 }

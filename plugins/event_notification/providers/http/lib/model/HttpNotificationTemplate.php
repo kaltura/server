@@ -231,13 +231,7 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	public function preSave(PropelPDO $con = null)
 	{
 		if($this->setPost)
-		{
-			$this->postPreviousVersion = $this->getPostFileVersion();
-			if($this->postPreviousVersion)
-				$this->incrementPostFileVersion();
-			else 
-				$this->resetPostFileVersion();
-		}
+			$this->incrementPostFileVersion();
 			
 		return parent::preSave($con);
 	}
@@ -284,8 +278,11 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	public function getSslKeyPassword()							{return $this->getFromCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD);}
 	public function getCustomHeaders()							{return $this->getFromCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, null, array());}
 
-	public function incrementPostFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_POST_FILE_VERSION);}
-	public function resetPostFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_POST_FILE_VERSION, 1);}
+	public function incrementPostFileVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getPostFileVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_POST_FILE_VERSION, $version);
+	}
 	
 	public function setData(kHttpNotificationData $v = null)	{return $this->putInCustomData(self::CUSTOM_DATA_DATA, $v);}
 	public function setUrl($v)									{return $this->putInCustomData(self::CUSTOM_DATA_URL, $v);}
