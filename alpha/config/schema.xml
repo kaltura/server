@@ -892,7 +892,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="max_number_of_hits_per_day" type="integer" default="-1" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="appear_in_search" type="integer" default="2" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="debug_level" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="invalid_login_count" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="anonymous_kuser_id" type="integer" />

@@ -29,8 +29,6 @@ class Partner extends BasePartner
 	const CONTENT_BLOCK_SERVICE_CONFIG_ID = 'services_limited_partner.ct';
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
 	
-	const MAX_ALLOWD_INVALID_LOGIN_COUNT = 10;
-	
 	const MAX_ACCESS_CONTROLS = 24;
 	
 	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
@@ -63,29 +61,14 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		if ( $this->getInvalidLoginCount() > self::MAX_ALLOWD_INVALID_LOGIN_COUNT )
-		{
-//			return self::VALIDATE_TOO_MANY_INVALID_LOGINS;
-		}
-		
 		$secret_to_match = $admin ? $this->getAdminSecret() : $this->getSecret() ;
 		if ( $partner_secret == $secret_to_match )
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
-			if ( $this->getInvalidLoginCount() > 0 )
-			{
-				$this->setInvalidLoginCount( 0 ); // reset the invalid login count 
-				$this->save();
-			}
 			return true;
 		}
 		else
 		{
-			// same invalid count is done both for secret and for admin_secret - 
-			// TODO - split counts ?
-			$this->setInvalidLoginCount( $this->getInvalidLoginCount() + 1 );
-			$this->save();
-			
 			return self::VALIDATE_WRONG_PASSWORD;
 		}
 	}

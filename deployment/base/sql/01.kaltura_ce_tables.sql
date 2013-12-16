@@ -1467,7 +1467,6 @@ CREATE TABLE IF NOT EXISTS `partner` (
   `max_number_of_hits_per_day` int(11) DEFAULT '-1',
   `appear_in_search` int(11) DEFAULT '2',
   `debug_level` int(11) DEFAULT '0',
-  `invalid_login_count` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `partner_alias` varchar(64) DEFAULT NULL,
