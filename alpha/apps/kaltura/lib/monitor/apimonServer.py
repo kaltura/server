@@ -39,27 +39,37 @@ class CommandHandler(SocketServer.BaseRequestHandler):
     FIELD_EXECUTION_TIME = 'x'
     
     @staticmethod
-    def getRowBuilder(columns):
+    def getRowBuilder(groupColumns, selectColumns):
         def result(obj):
             # get groupBy key
-            values = []
-            for column in columns:
+            groupValues = []
+            for column in groupColumns:
                 if obj.has_key(column):
-                    values.append(str(obj[column]))
+                    groupValues.append(str(obj[column]))
                 else:
-                    values.append('Missing')
+                    groupValues.append('Missing')
+            # get select values
+            selectValues = []
+            for column in selectColumns:
+                if obj.has_key(column):
+                    selectValues.append(str(obj[column]))
+                else:
+                    selectValues.append('Missing')
             # get execution time
             executionTime = float('nan')
             if obj.has_key(CommandHandler.FIELD_EXECUTION_TIME):
                 executionTime = float(obj[CommandHandler.FIELD_EXECUTION_TIME])
-            return ('\t'.join(values), executionTime)
+            return ('\t'.join(groupValues), '\t'.join(selectValues), executionTime)
         return result
 
     @staticmethod
-    def dictIncrement(theDict, (theKey, executionTime)):
-        theDict.setdefault(theKey, [0, 0])
-        theDict[theKey][0] += 1
-        theDict[theKey][1] += executionTime
+    def dictIncrement(theDict, (groupByValues, selectValues, executionTime)):
+        theDict.setdefault(groupByValues, [selectValues, executionTime, 0, 0])      # maxSelect, maxExecTime, totalCount, totalTime
+        theDict[groupByValues][2] += 1
+        theDict[groupByValues][3] += executionTime
+        if not isnan(executionTime) and (isnan(theDict[groupByValues][1]) or theDict[groupByValues][1] < executionTime):
+            theDict[groupByValues][0] = selectValues
+            theDict[groupByValues][1] = executionTime
         return theDict
 
     @staticmethod
@@ -103,14 +113,14 @@ class CommandHandler(SocketServer.BaseRequestHandler):
         global eventsBuffer
         
         command = self.request.recv(4096).strip()
-        cmdFilter, cmdGroupBy = command.split('/')
+        cmdFilter, cmdGroupBy, cmdSelect = command.split('/')
 
         # init filter
         filterFunction = self.getFilterFunction(cmdFilter)
 
         # init group by
         cmdGroupBy = cmdGroupBy.replace(CommandHandler.FIELD_EXECUTION_TIME, '').strip()
-        getGroupByColumns = self.getRowBuilder(cmdGroupBy)
+        getGroupByColumns = self.getRowBuilder(cmdGroupBy, cmdSelect)
 
         # process the events
         result = {}
@@ -123,18 +133,18 @@ class CommandHandler(SocketServer.BaseRequestHandler):
 
         # format the result
         hasExecTime = False
-        for _, execTime in result.values():
+        for _, _, _, execTime in result.values():
             if not isnan(execTime):
                 hasExecTime = True
                 break
 
         resultText = ''
         if hasExecTime:
-            for key, (count, execTime) in result.items():
-                resultText += '%s\t%.3f\t%s\n' % (count, execTime, key)
+            for groupByValues, (selectValues, _, count, execTime) in result.items():
+                resultText += '%s\t%.3f\t%s\t%s\n' % (count, execTime, groupByValues, selectValues)
         else:
-            for key, (count, _) in result.items():
-                resultText += '%s\t%s\n' % (count, key)
+            for groupByValues, (selectValues, _, count, _) in result.items():
+                resultText += '%s\t%s\t%s\n' % (count, groupByValues, selectValues)
         self.request.sendall(resultText)
         
 class CommandThread(Thread):

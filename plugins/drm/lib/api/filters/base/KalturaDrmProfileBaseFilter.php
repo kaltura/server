@@ -17,8 +17,6 @@ abstract class KalturaDrmProfileBaseFilter extends KalturaFilter
 		"providerIn" => "_in_provider",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
-		"licenseServerUrlEqual" => "_eq_license_server_url",
-		"licenseServerUrlIn" => "_in_license_server_url",
 	);
 
 	static private $order_by_map = array
@@ -84,14 +82,4 @@ abstract class KalturaDrmProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
-
-	/**
-	 * @var string
-	 */
-	public $licenseServerUrlEqual;
-
-	/**
-	 * @var string
-	 */
-	public $licenseServerUrlIn;
 }

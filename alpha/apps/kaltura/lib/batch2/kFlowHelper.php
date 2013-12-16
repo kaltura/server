@@ -9,7 +9,7 @@
 class kFlowHelper
 {
 	protected static $thumbUnSupportVideoCodecs = array(
-	flavorParams::VIDEO_CODEC_VP8,
+		flavorParams::VIDEO_CODEC_VP8,
 	);
 
 	/**
@@ -229,6 +229,158 @@ class kFlowHelper
 				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $flavorAsset->getId(), $srcAssetType, $thumbParamsOutput);
 			}
 		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConvertLiveSegmentJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $entry LiveEntry */
+		
+		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
+			
+		$key = $entry->getSyncKey($keyType);
+		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
+		$files = kFileSyncUtils::dir_get_files($key);
+		
+		$entry->removeConvertingSegment($dbBatchJob->getId());
+		if(!$entry->isConvertingSegments())
+		{
+			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
+			foreach($attachedPendingMediaEntries as $attachedPendingMediaEntry)
+			{
+				/* @var $attachedPendingMediaEntry kPendingMediaEntry */
+				if($attachedPendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
+				{
+					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] is pending on different dc [" . $attachedPendingMediaEntry->getDc() . "]");
+					continue;
+				}
+				
+				if($attachedPendingMediaEntry->getRequiredDuration() && $attachedPendingMediaEntry->getRequiredDuration() < $data->getEndTime())
+				{
+					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] requires longer duration [" . $attachedPendingMediaEntry->getRequiredDuration() . "]");
+					continue;
+				}
+					
+				$dbAsset = assetPeer::retrieveOriginalByEntryId($attachedPendingMediaEntry->getEntryId());
+				if(!$dbAsset)
+				{
+					KalturaLog::info("Source of entry id [" . $attachedPendingMediaEntry->getEntryId() . "] not found (probably deleted)");
+					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+					continue;
+				}
+				
+				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
+				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files);
+				if($job)
+					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+			}
+		}
+		$entry->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConvertLiveSegmentJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConvertLiveSegmentFailed(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $entry LiveEntry */
+		
+		$entry->removeConvertingSegment($dbBatchJob->getId());
+		if(!$entry->isConvertingSegments())
+		{
+			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
+			foreach($attachedPendingMediaEntries as $attachedPendingMediaEntry)
+			{
+				/* @var $attachedPendingMediaEntry kPendingMediaEntry */
+				if($attachedPendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
+					continue;
+				
+				kBatchManager::updateEntry($attachedPendingMediaEntry->getEntryId(), entryStatus::ERROR_CONVERTING);
+				$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+			}
+		}
+		$entry->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConcatJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConcatFailed(BatchJob $dbBatchJob, kConcatJobData $data)
+	{
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
+		
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
+		if(!$flavorAsset)
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+			return $dbBatchJob;
+			
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+
+		if(!$flavorAsset->isLocalReadyStatus())
+		{
+			$flavorAsset->setDescription($dbBatchJob->getMessage());
+			$flavorAsset->setStatus(asset::ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConcatJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConcatFinished(BatchJob $dbBatchJob, kConcatJobData $data)
+	{
+		KalturaLog::debug("Concat finished, with file: " . $data->getDestFilePath());
+
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
+
+		if(!file_exists($data->getDestFilePath()))
+			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFilePath());
+
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
+		if(!$flavorAsset)
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+			return $dbBatchJob;
+			
+		$flavorAsset->incrementVersion();
+		
+		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
+		if($ext)
+			$flavorAsset->setFileExt($ext);
+			
+		$flavorAsset->save();
+
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+
+		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
 		return $dbBatchJob;
 	}
@@ -258,10 +410,7 @@ class kFlowHelper
 
 		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
-			$conversionCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
-			
-			if(!$conversionCreated)
-				return $dbBatchJob;
+			kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 
 			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
 			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
@@ -1484,14 +1633,13 @@ class kFlowHelper
 		{
 			$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
 
-			if(!$conversionsCreated)
-				return $dbBatchJob;
-			
-			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
-			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-			if($currentFlavorAsset)
-				$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
-			
+			if($conversionsCreated)
+			{
+				// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
+				$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+				if($currentFlavorAsset)
+					$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
+			}
 		}
 
 		// mark the job as almost done
