@@ -1587,7 +1587,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCountDate ( $v )	{	$this->putInCustomData ( "count_date" , $v );	}
 	public function getCountDate (  )		{	return $this->getFromCustomData( "count_date" );	}
 
-	public function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
+	protected function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
 	public function getIsmVersion (  )		{	return (int) $this->getFromCustomData( "ismVersion" );	}
 	
 	public function setReferenceID  ( $v )	{	$this->putInCustomData ( "referenceID" , $v );	}
@@ -1825,7 +1825,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function incrementIsmVersion (  )
 	{
-		$version = $this->getIsmVersion() + 1;
+		$version = kDataCenterMgr::incrementVersion($this->getIsmVersion());
 		$this->setIsmVersion($version);
 		return $version;
 	}

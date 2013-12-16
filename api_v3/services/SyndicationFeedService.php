@@ -55,7 +55,7 @@ class SyndicationFeedService extends KalturaBaseService
 		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
 			$syndicationFeed->validatePropertyNotNull('xslt');				
 			$syndicationFeedDB = new genericSyndicationFeed();
-			$syndicationFeedDB->setVersion(1);	
+			$syndicationFeedDB->incrementVersion();	
 		}else
 		{
 			$syndicationFeedDB = new syndicationFeed();

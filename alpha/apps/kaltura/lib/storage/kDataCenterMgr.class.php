@@ -299,8 +299,8 @@ class kDataCenterMgr
 		return !is_null($tempDc);
 	}
 	
-	public static function incrementVersion($version) 
+	public static function incrementVersion($version = 0) 
 	{
-		return (ceil($version / 10) * 10) + 2 - self::getCurrentDcId();		
+		return (ceil(intval($version) / 10) * 10) + 2 - self::getCurrentDcId();		
 	}
 }
