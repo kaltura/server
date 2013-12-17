@@ -28,6 +28,13 @@ class KalturaEntryResource extends KalturaContentResource
 		
 		$this->validatePropertyNotNull('entryId');
 	
+    	$srcEntry = entryPeer::retrieveByPK($this->entryId);
+		if (!$srcEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+			
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || $srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH)
+			return;
+		
 		$srcFlavorAsset = null;
 		if(is_null($this->flavorParamsId))
 		{
