@@ -6,7 +6,7 @@
 class KalturaThumbnailServeOptions extends KalturaObject 
 {
 	/**
-	 * @var boolean
+	 * @var bool
 	 */
 	public $download;
 }
