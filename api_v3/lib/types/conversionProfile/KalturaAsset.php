@@ -65,7 +65,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -73,7 +73,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -81,7 +81,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

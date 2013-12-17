@@ -146,6 +146,7 @@ else
 	{
 		$columns[] = 'Writable';
 	}
+	$columns[] = 'Restrictions';
 	$columns[] = 'Description';
 	
 	// build baseClass->properties mapping
@@ -256,6 +257,14 @@ else
 				$isWritable = $property->isReadOnly() ? '' : 'V';
 				echo "<td>$isWritable</td>";
 			}
+			
+			// Property restrictions
+			$constrains = array();
+			
+			foreach($property->getConstraints() as $constraintName => $constraintValue)
+				$constrains[] = "$constraintName : $constraintValue";
+				
+			echo "<td>" . implode("<br/>", $constrains) . "</td>";
 			 
 			// property description
 			if ($property->getName() == "orderBy")

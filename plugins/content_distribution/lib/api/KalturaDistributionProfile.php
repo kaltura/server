@@ -18,7 +18,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	/**
 	 * Profile creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -27,7 +27,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	/**
 	 * Profile last update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

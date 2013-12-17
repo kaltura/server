@@ -8,8 +8,4 @@
  */
 abstract class KalturaOperationAttributes extends KalturaObject 
 {
-	public function toAttributesArray()
-	{
-		return array();
-	}
 }

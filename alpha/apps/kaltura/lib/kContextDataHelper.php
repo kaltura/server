@@ -296,10 +296,16 @@ class kContextDataHelper
 		}
 		elseif ($this->entry->getType() == entryType::LIVE_STREAM)
 		{
-			$protocols = array(PlaybackProtocol::AKAMAI_HDS, PlaybackProtocol::HDS);
+			$protocols = array();
+			
+			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM)
+				$protocols[] = PlaybackProtocol::AKAMAI_HDS;
+				
+			$protocols[] = PlaybackProtocol::HDS;
+			
 			foreach ($protocols as $protocol)
 			{
-				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $protocol);
+				$config = $this->entry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
 				if ($config)
 				{	
 					$this->streamerType = $protocol;

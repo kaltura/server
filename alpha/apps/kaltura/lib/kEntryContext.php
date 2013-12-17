@@ -7,7 +7,15 @@ class kEntryContext extends kContext
      */
     protected $entry;
     
-	/**
+    /**
+     * Flag indicating whether to replace and with the one that
+     * it's pointing to via entry->redirectEntryId (if at all). 
+     * @var boolean
+     */    
+    protected $followEntryRedirect;
+    
+    
+    /**
      * @return entry
      */
     public function getEntry ()
@@ -22,5 +30,20 @@ class kEntryContext extends kContext
     {
         $this->entry = $entry;
     }
+    
+	/**
+     * @return boolean
+     */
+    public function getFollowEntryRedirect()
+    {
+        return $this->followEntryRedirect;
+    }
 
+	/**
+     * @param boolean $followEntryRedirect
+     */
+    public function setFollowEntryRedirect( $followEntryRedirect )
+    {
+        $this->followEntryRedirect = $followEntryRedirect;
+    }
 }

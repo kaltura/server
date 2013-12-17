@@ -15,4 +15,9 @@ interface EntrySourceType extends BaseEnum
 	const AKAMAI_LIVE = 29;
 	const MANUAL_LIVE_STREAM = 30;
 	const AKAMAI_UNIVERSAL_LIVE = 31;
+	
+	const LIVE_STREAM = 32;
+	const LIVE_CHANNEL = 33;
+	const RECORDED_LIVE = 34;
+	const CLIP = 35;
 }

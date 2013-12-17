@@ -22,21 +22,21 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $deletedAt;
@@ -379,11 +379,23 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kDeleteJobData':
 				$this->data = new KalturaDeleteJobData();
 				break;
+
+			case 'kDeleteFileJobData':
+				$this->data = new KalturaDeleteFileJobData();
+				break;
 				
-				case 'kCopyPartnerJobData':
-					$this->data = new KalturaCopyPartnerJobData();
-					break;
-							
+			case 'kConvertLiveSegmentJobData':
+				$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case 'kConcatJobData':
+				$this->data = new KalturaConcatJobData();
+				break;
+				
+			case 'kCopyPartnerJobData':
+				$this->data = new KalturaCopyPartnerJobData();
+				break;
+				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 				{
@@ -577,11 +589,29 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				if(is_null($this->data))
 					$this->data = new KalturaDeleteJobData();
 				break;
+
+			case KalturaBatchJobType::DELETE_FILE:
+				$dbData = new kDeleteFileJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaDeleteFileJobData();
+				break;
 				
+			case KalturaBatchJobType::CONVERT_LIVE_SEGMENT:
+				$dbData = new kConvertLiveSegmentJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case KalturaBatchJobType::CONCAT:
+				$dbData = new kConcatJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConcatJobData();
+					
 			case KalturaBatchJobType::COPY_PARTNER:
 				$dbData = new kCopyPartnerJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaCopyPartnerJobData();
+					
 				break;
 				
 			default:

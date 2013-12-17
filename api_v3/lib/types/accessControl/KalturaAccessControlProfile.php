@@ -45,7 +45,7 @@ class KalturaAccessControlProfile extends KalturaObject implements IFilterable
 	/**
 	 * Creation time as Unix timestamp (In seconds) 
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -54,7 +54,7 @@ class KalturaAccessControlProfile extends KalturaObject implements IFilterable
 	/**
 	 * Update time as Unix timestamp (In seconds) 
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

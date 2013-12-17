@@ -47,7 +47,6 @@ class PartnerTableMap extends TableMap {
 		$this->addColumn('MAX_NUMBER_OF_HITS_PER_DAY', 'MaxNumberOfHitsPerDay', 'INTEGER', false, null, -1);
 		$this->addColumn('APPEAR_IN_SEARCH', 'AppearInSearch', 'INTEGER', false, null, 2);
 		$this->addColumn('DEBUG_LEVEL', 'DebugLevel', 'INTEGER', false, null, 0);
-		$this->addColumn('INVALID_LOGIN_COUNT', 'InvalidLoginCount', 'INTEGER', false, null, 0);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addForeignKey('ANONYMOUS_KUSER_ID', 'AnonymousKuserId', 'INTEGER', 'kuser', 'ID', false, null, null);

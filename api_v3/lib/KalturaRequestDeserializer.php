@@ -54,6 +54,7 @@ class KalturaRequestDeserializer
 
 	public function buildActionArguments(&$actionParams)
 	{
+		
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
@@ -68,6 +69,7 @@ class KalturaRequestDeserializer
 					if(!kXml::isXMLValidContent($value))
 						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
 						
+					$this->validateParameter($name, $value, $actionParam);
 					$serviceArguments[] = $value;
 					continue;
 				}
@@ -177,6 +179,38 @@ class KalturaRequestDeserializer
 		return $serviceArguments;
 	}
 	
+	protected function validateParameter($name, $value, $constraintsObj) {
+		$constraints = $constraintsObj->getConstraints();
+		if(array_key_exists("minLength", $constraints))
+			$this->validateMinLength($name, $value, $constraints["minLength"]);
+		if(array_key_exists("maxLength", $constraints))
+			$this->validateMaxLength($name, $value, $constraints["maxLength"]);
+		if(array_key_exists("minValue", $constraints))
+			$this->validateMinValue($name, $value, $constraints["minValue"]);
+		if(array_key_exists("maxValue", $constraints))
+			$this->validateMaxValue($name, $value, $constraints["maxValue"]);
+	}
+	
+	protected function validateMinLength($name, $objectValue, $constraint) {
+		if(strlen($objectValue) < $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $name, $constraint);
+	}
+	
+	protected function validateMaxLength($name, $objectValue, $constraint) {
+		if(strlen($objectValue) > $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $name, $constraint);
+	}
+	
+	protected function validateMinValue($name, $objectValue, $constraint) {
+		if($objectValue < $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_VALUE, $name, $constraint);
+	}
+	
+	protected function validateMaxValue($name, $objectValue, $constraint) {
+		if($objectValue > $constraint)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_VALUE, $name, $constraint);
+	}
+	
 	private function validateFile($fileData) 
 	{
 		if (!isset($fileData['tmp_name']) || !is_uploaded_file($fileData['tmp_name'])) {
@@ -236,9 +270,12 @@ class KalturaRequestDeserializer
 							
 			if ($property->isSimpleType())
 			{
+                if ($property->isTime())
+                    $type = "time";
 				$value = $this->castSimpleType($type, $value);
 				if(!kXml::isXMLValidContent($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
+				$this->validateParameter($name, $value, $property);
 				$obj->$name = $value;
 				continue;
 			}
@@ -312,8 +349,37 @@ class KalturaRequestDeserializer
 					return (bool)$var;
 			case "float":
 				return (float)$var;
+			case "time":
+				// empty fields should be treated as 0 and not the current time
+				if (strlen($var) == 0)
+					return 0;
+				$maxRelativeTime = kConf::get('max_relative_time');
+				$var = (int)$var;
+				if (-$maxRelativeTime <= $var && $var <= $maxRelativeTime)
+				{
+					$time = $this->getTime();
+					$var = $time + $var;
+				}
+				return $var;
 		}
 		
 		return null;
+	}
+
+	/**
+	 * Looks for the time that is stored under ks privilege as reference time.
+	 * If not found, returns time().
+	 *
+	 * @return int
+	 */
+	private function getTime()
+	{
+		if (kCurrentContext::$ks_object)
+		{
+			$referenceTime = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_REFERENCE_TIME);
+			if ($referenceTime)
+				return (int)$referenceTime;
+		}
+		return kApiCache::getTime();
 	}
 }
