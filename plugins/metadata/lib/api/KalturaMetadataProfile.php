@@ -175,7 +175,10 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	 * @see KalturaObject::validateForUpdate()
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{	    
+	{
+		if (!is_null($this->name))
+			$this->validatePropertyMinLength("name", 1);
+				    
 	    if ($this->systemName)
 	    {
 	        $c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);
