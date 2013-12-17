@@ -354,8 +354,9 @@ class KalturaRequestDeserializer
 				if (strlen($var) == 0)
 					return 0;
 				$maxRelativeTime = kConf::get('max_relative_time');
+				$relativeTimeEnabled = $this->isRelativeTimeEnabled();
 				$var = (int)$var;
-				if (-$maxRelativeTime <= $var && $var <= $maxRelativeTime)
+				if ($relativeTimeEnabled && -$maxRelativeTime <= $var && $var <= $maxRelativeTime)
 				{
 					$time = $this->getTime();
 					$var = $time + $var;
@@ -381,5 +382,13 @@ class KalturaRequestDeserializer
 				return (int)$referenceTime;
 		}
 		return kApiCache::getTime();
+	}
+
+	private function isRelativeTimeEnabled()
+	{
+		if (!kConf::hasParam('disable_relative_time_partners'))
+			return true;
+
+		return !in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('disable_relative_time_partners'));
 	}
 }
