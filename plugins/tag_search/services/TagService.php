@@ -114,6 +114,12 @@ class TagService extends KalturaBaseService
 	    	$tag->delete();	
 	    	return 1;
 	    }
+		else
+		{
+			$tag->setInstanceCount($count);
+			$tag->save();
+			return 1;		
+		}
 	    
 	    return 0;
 	    
@@ -138,7 +144,13 @@ class TagService extends KalturaBaseService
 	    	$tag->delete();	
 	    	return 1;
 	    }
-	    
+	    else
+		{
+			$tag->setInstanceCount($count);
+			$tag->save();
+			return 1;		
+		}
+		
 	    return 0;
 	}
 	
