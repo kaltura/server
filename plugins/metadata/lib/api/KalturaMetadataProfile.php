@@ -176,7 +176,7 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if ($this->name)
+		if (!is_null($this->name))
 			$this->validatePropertyMinLength("name", 1);
 				    
 	    if ($this->systemName)
