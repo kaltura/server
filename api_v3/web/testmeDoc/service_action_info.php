@@ -29,23 +29,23 @@ $actionInfo = $actionReflector->getActionInfo();
 <h2>Kaltura API</h2>
 <table class="action">
 	<tr>
-		<th colspan="5" class="service_action_title"><?php echo $service; ?>:<?php echo $action; ?></th>
+		<th colspan="6" class="service_action_title"><?php echo $service; ?>:<?php echo $action; ?></th>
 	</tr>
 <?php 
 $description = trim(nl2br($actionInfo->description));
 if ($description):
 ?>
 	<tr>
-		<td  colspan="5" class="title">Description:</td>
+		<td  colspan="6" class="title">Description:</td>
 	</tr>
 	<tr>
-		<td class="description" colspan="5"><?php echo $description; ?></td>
+		<td class="description" colspan="6"><?php echo $description; ?></td>
 	</tr>
 <?php 
 endif;
 if($actionParams): ?>
 	<tr>
-		<td colspan="5" class="title">Input Params</td>
+		<td colspan="6" class="title">Input Params</td>
 	</tr>
 	<tr>
 		<th class="subtitle">Name</th>
@@ -53,6 +53,7 @@ if($actionParams): ?>
 		<th class="subtitle">Description</th>
 		<th class="subtitle">Required</th>
 		<th class="subtitle">Default Value</th>
+		<th class="subtitle">Restrictions</th>
 	</tr>
 <?php
 endif;
@@ -71,46 +72,54 @@ foreach($actionParams as $actionParam):
 		<td><?php echo $actionParam->getDescription(); ?></td>
 		<td><?php echo ($actionParam->isOptional() ? '' : 'V'); ?></td>
 		<td><?php echo ($actionParam->isEnum() || $actionParam->isStringEnum() ? $actionParam->getType() . '::' . $actionParam->getConstantName($actionParam->getDefaultValue()) : $actionParam->getDefaultValue()); ?></td>
+		<td><?php 
+			$constrains = array();
+			$actionParamConstraints = $actionParam->getConstraints();
+			foreach($actionParamConstraints as $constraintName => $constraintValue)
+				$constrains[] = "$constraintName : $constraintValue";
+			
+			echo implode("<br/>", $constrains);
+		?></td>
 	</tr>
 <?php endforeach; ?>
 	<tr>
-		<td colspan="5" class="title">Output Type</td>
+		<td colspan="6" class="title">Output Type</td>
 	</tr>
 <?php
 $returnValue = $actionReflector->getActionOutputType();
 if ($returnValue):
 ?>
 	<tr>
-		<td colspan="5" ><a href="?object=<?php echo $returnValue->getType(); ?>"><?php echo $returnValue->getType();?></a></td>
+		<td colspan="6" ><a href="?object=<?php echo $returnValue->getType(); ?>"><?php echo $returnValue->getType();?></a></td>
 	</tr>
 <?php
 else:
 ?>
 	<tr>
-		<td colspan="5" class="sub_title_no_output">No Output</td>
+		<td colspan="6" class="sub_title_no_output">No Output</td>
 	</tr>
 <?php
 endif;
 if (is_array($actionInfo->errors) && count($actionInfo->errors)):
 ?>
 	<tr>
-		<td colspan="5" class="title">Errors</td>
+		<td colspan="6" class="title">Errors</td>
 	</tr>
 <?php
 	foreach($actionInfo->errors as $error):
 ?>
 	<tr>
-		<td colspan="5"><?php echo  $error[1]; ?></td>
+		<td colspan="6"><?php echo  $error[1]; ?></td>
 	</tr>
 <?php
 	endforeach;
 endif;
 ?>
 	<tr>
-		<td colspan="5" class="title">Example HTTP Hit</td>
+		<td colspan="6" class="title">Example HTTP Hit</td>
 	</tr>
 	<tr>
-		<td colspan="5"><?php example_hit($service, $action, $actionParams); ?></td>
+		<td colspan="6"><?php example_hit($service, $action, $actionParams); ?></td>
 	</tr>
 </table>
 <?php

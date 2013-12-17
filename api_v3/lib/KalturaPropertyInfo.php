@@ -63,6 +63,11 @@ class KalturaPropertyInfo
 	private $_permissions = array();
 	
 	/**
+	 * @var array
+	 */
+	private $_constraints = array();
+	
+	/**
 	 * @var bool
 	 */
 	private $_deprecated = false;
@@ -427,6 +432,13 @@ class KalturaPropertyInfo
 		return $this->_filters;
 	}
 	
+	public function setConstraints($constaints) {
+		$this->_constraints = $constaints;
+	}
+	
+	public function getConstraints() {
+		return $this->_constraints;
+	}
 	
 	/**
 	 * @param array $permissions
