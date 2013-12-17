@@ -47,13 +47,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([\\w\\,\\s\\d]*)/";
     
-    const DOCCOMMENT_VALIDATE_MIN_LENGTH = "/\\@minLength\\s+([\\w.]+\\s+)?(\\d+)/";
-    
-    const DOCCOMMENT_VALIDATE_MAX_LENGTH = "/\\@maxLength\\s+([\\w.]+\\s+)?(\\d+)/";
-    
-    const DOCCOMMENT_VALIDATE_MIN_VALUE = "/\\@minValue\\s+([\\w.]+\\s+)?(\\d+)/";
-    
-    const DOCCOMMENT_VALIDATE_MAX_VALUE = "/\\@maxValue\\s+([\\w.]+\\s+)?(\\d+)/";
+    const DOCCOMMENT_VALIDATE_CONSTRAINT = "/\\@CONSTRAINT\\s+([\\w.]+\\s+)?(\\d+)/";
     
     /**
      * @var bool
@@ -183,22 +177,7 @@ class KalturaDocCommentParser
     /**
      * @var array
      */
-    public $validateMinLengthConstraints = array();
-    
-    /**
-     * @var array
-     */
-    public $validateMaxLengthConstraints = array();
-    
-    /**
-     * @var array
-     */
-    public $validateMinValueConstraints = array();
-    
-    /**
-     * @var array
-     */
-    public $validateMaxValueConstraints = array();
+    public $validateConstraints = array();
     
     /**
      * @var string
@@ -215,7 +194,7 @@ class KalturaDocCommentParser
      * Parse a docComment
      *
      * @param string $comment
-     * @param array $replacements Optional associative array for replacing values in search patterns
+      @param array $replacements Optional associative array for replacing values in search patterns
      * @return array
      */
     function __construct($comment , $replacements = null)
@@ -312,10 +291,10 @@ class KalturaDocCommentParser
         		$this->validateUserPrivilege = $result[3];
         } 
         
-        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MIN_LENGTH, $this->validateMinLengthConstraints);
-        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MAX_LENGTH, $this->validateMaxLengthConstraints);
-        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MIN_VALUE, $this->validateMinValueConstraints);
-        self::fillConstraint($comment, self::DOCCOMMENT_VALIDATE_MAX_VALUE, $this->validateMaxValueConstraints);
+        self::fillConstraint($comment, "minLength");
+       	self::fillConstraint($comment, "maxLength");
+        self::fillConstraint($comment, "minValue");
+        self::fillConstraint($comment, "maxValue");
         
         $result = null;
         $error_array = array();
@@ -340,14 +319,20 @@ class KalturaDocCommentParser
         $this->errors = $error_array;        
      }
      
-     private function fillConstraint($comment, $constraintName, array &$constrainArray) {
+     private function fillConstraint($comment, $constraintName) {
      	
      	$result = null;
-     	if (preg_match_all($constraintName, $comment, $result)) {
+     	$constraintRegex = self::DOCCOMMENT_VALIDATE_CONSTRAINT;
+     	$constraintRegex = str_replace("CONSTRAINT", $constraintName, $constraintRegex);
+     	if (preg_match_all($constraintRegex, $comment, $result)) {
      		$size = count($result[0]);
      		for($i = 0 ; $i < $size ; $i = $i += 1) {
      			$field = trim($result[1][$i]);
-     			$constrainArray[$field] = $result[2][$i];
+     			
+     			if(!array_key_exists($field, $this->validateConstraints))
+     				$this->validateConstraints[$field] = array();
+     			
+     			$this->validateConstraints[$field][$constraintName] = $result[2][$i];
      		}
      	}
      }

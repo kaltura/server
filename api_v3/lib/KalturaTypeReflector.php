@@ -205,7 +205,9 @@ class KalturaTypeReflector
 							if ($parsedDocComment->permissions)
 								$prop->setPermissions($parsedDocComment->permissions);
 							
-							$prop->setConstraints($parsedDocComment);
+							if(array_key_exists("", $parsedDocComment->validateConstraints)) 
+								$prop->setConstraints($parsedDocComment->validateConstraints[""]);
+							
 						}
 					}
 				}

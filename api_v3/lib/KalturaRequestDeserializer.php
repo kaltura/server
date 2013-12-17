@@ -69,8 +69,8 @@ class KalturaRequestDeserializer
 					if(!kXml::isXMLValidContent($value))
 						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
 						
-					$serviceArguments[] = $value;
 					$this->validateParameter($name, $value, $actionParam);
+					$serviceArguments[] = $value;
 					continue;
 				}
 				
@@ -180,19 +180,15 @@ class KalturaRequestDeserializer
 	}
 	
 	protected function validateParameter($name, $value, $constraintsObj) {
-		
-		$constraint = $constraintsObj->getMaxLengthConstraint();
-		if(!is_null($constraint))
-			$this->validateMaxLength($name, $value, $constraint);
-		$constraint = $constraintsObj->getMinLengthConstraint($name);
-		if(!is_null($constraint))
-			$this->validateMinLength($name, $value, $constraint);
-		$constraint = $constraintsObj->getMaxValueConstraint($name);
-		if(!is_null($constraint))
-			$this->validateMaxValue($name, $value, $constraint);
-		$constraint = $constraintsObj->getMinValueConstraint($name);
-		if(!is_null($constraint))
-			$this->validateMinValue($name, $value, $constraint);
+		$constraints = $constraintsObj->getConstraints();
+		if(array_key_exists("minLength", $constraints))
+			$this->validateMinLength($name, $value, $constraints["minLength"]);
+		if(array_key_exists("maxLength", $constraints))
+			$this->validateMaxLength($name, $value, $constraints["maxLength"]);
+		if(array_key_exists("minValue", $constraints))
+			$this->validateMinValue($name, $value, $constraints["minValue"]);
+		if(array_key_exists("maxValue", $constraints))
+			$this->validateMaxValue($name, $value, $constraints["maxValue"]);
 	}
 	
 	protected function validateMinLength($name, $objectValue, $constraint) {
@@ -277,8 +273,8 @@ class KalturaRequestDeserializer
 				$value = $this->castSimpleType($type, $value);
 				if(!kXml::isXMLValidContent($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
-				$obj->$name = $value;
 				$this->validateParameter($name, $value, $property);
+				$obj->$name = $value;
 				continue;
 			}
 			

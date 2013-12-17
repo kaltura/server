@@ -65,22 +65,7 @@ class KalturaPropertyInfo
 	/**
 	 * @var array
 	 */
-	private $_minLengthConstraint = null;
-	
-	/**
-	 * @var array
-	 */
-	private $_maxLengthConstraint = null;
-	
-	/**
-	 * @var array
-	 */
-	private $_minValueConstraint = null;
-	
-	/**
-	 * @var array
-	 */
-	private $_maxValueConstraint = null;
+	private $_constraints = array();
 	
 	/**
 	 * @var bool
@@ -447,34 +432,12 @@ class KalturaPropertyInfo
 		return $this->_filters;
 	}
 	
-	public function setConstraints($parsedDocComment, $name = "") {
-		if (array_key_exists($name, $parsedDocComment->validateMaxLengthConstraints))
-			$this->_maxLengthConstraint = $parsedDocComment->validateMaxLengthConstraints[$name];
-		
-		if (array_key_exists($name, $parsedDocComment->validateMinLengthConstraints))
-			$this->_minLengthConstraint = $parsedDocComment->validateMinLengthConstraints[$name];
-		
-		if (array_key_exists($name, $parsedDocComment->validateMaxValueConstraints))
-			$this->_maxValueConstraint = $parsedDocComment->validateMaxValueConstraints[$name];
-		
-		if (array_key_exists($name, $parsedDocComment->validateMinValueConstraints))
-			$this->_minValueConstraint = $parsedDocComment->validateMinValueConstraints[$name];
+	public function setConstraints($constaints) {
+		$this->_constraints = $constaints;
 	}
 	
-	public function getMaxLengthConstraint() {
-		return $this->_maxLengthConstraint;
-	}
-	
-	public function getMinLengthConstraint() {
-		return $this->_minLengthConstraint;
-	}
-	
-	public function getMaxValueConstraint() {
-		return $this->_maxValueConstraint;
-	}
-	
-	public function getMinValueConstraint() {
-		return $this->_minValueConstraint;
+	public function getConstraints() {
+		return $this->_constraints;
 	}
 	
 	/**

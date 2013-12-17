@@ -260,14 +260,9 @@ else
 			
 			// Property restrictions
 			$constrains = array();
-			if(!is_null($property->getMinLengthConstraint()))
-				$constrains[] = "Minimal Length : " . $property->getMinLengthConstraint();
-			if(!is_null($property->getMaxLengthConstraint()))
-				$constrains[] = "Maximal Length : " . $property->getMaxLengthConstraint();
-			if(!is_null($property->getMinValueConstraint()))
-				$constrains[] = "Minimal value : " . $property->getMinValueConstraint();
-			if(!is_null($property->getMaxValueConstraint()))
-				$constrains[] = "Maximal value : " . $property->getMaxValueConstraint();
+			
+			foreach($property->getConstraints() as $constraintName => $constraintValue)
+				$constrains[] = "$constraintName : $constraintValue";
 				
 			echo "<td>" . implode("<br/>", $constrains) . "</td>";
 			 

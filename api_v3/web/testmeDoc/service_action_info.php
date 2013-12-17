@@ -74,14 +74,9 @@ foreach($actionParams as $actionParam):
 		<td><?php echo ($actionParam->isEnum() || $actionParam->isStringEnum() ? $actionParam->getType() . '::' . $actionParam->getConstantName($actionParam->getDefaultValue()) : $actionParam->getDefaultValue()); ?></td>
 		<td><?php 
 			$constrains = array();
-			if(!is_null($actionParam->getMinLengthConstraint()))
-				$constrains[] = "Minimal Length : " . $actionParam->getMinLengthConstraint();
-			if(!is_null($actionParam->getMaxLengthConstraint()))
-				$constrains[] = "Maximal Length : " . $actionParam->getMaxLengthConstraint();
-			if(!is_null($actionParam->getMinValueConstraint()))
-				$constrains[] = "Minimal value : " . $actionParam->getMinValueConstraint();
-			if(!is_null($actionParam->getMaxValueConstraint()))
-				$constrains[] = "Maximal value : " . $actionParam->getMaxValueConstraint();
+			$actionParamConstraints = $actionParam->getConstraints();
+			foreach($actionParamConstraints as $constraintName => $constraintValue)
+				$constrains[] = "$constraintName : $constraintValue";
 			
 			echo implode("<br/>", $constrains);
 		?></td>

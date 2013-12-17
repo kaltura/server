@@ -155,7 +155,8 @@ class KalturaActionReflector extends KalturaReflector
 					$paramInfo->setOptional(true);
 				}
 				
-				$paramInfo->setConstraints($parsedDocComment, $name);
+				if(array_key_exists($name, $parsedDocComment->validateConstraints))
+					$paramInfo->setConstraints($parsedDocComment->validateConstraints[$name]);
 				
 				$this->_actionParams[$name] = $paramInfo;
 			}
