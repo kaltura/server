@@ -141,6 +141,21 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $html5Url;
+	
+	/**
+	 * UiConf version
+	 * @var string
+	 * @readonly
+	 * @filter eq, mlikeor, mlikeand
+	 */
+	public $version;
+	
+	/**
+	 * @var string
+	 * @filter mlikeor, mlikeand
+	 */
+	public $partnerTags;
+	
 		
 	private static $map_between_objects = array
 	(
@@ -166,7 +181,8 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 		"updatedAt", 
 		"html5Url",
 		"config",
-        
+        "version",
+		"partnerTags",
 	);
 
 	public function getMapBetweenObjects ( )

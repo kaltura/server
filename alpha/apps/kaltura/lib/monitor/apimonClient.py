@@ -17,6 +17,7 @@ COLUMN_NAMES = [
     ('q', 'QueryType'),
     ('s', 'Server'),
     ('t', 'Table'),
+    ('u', 'UniqueId'),
 ]
 
 def parseAddress(addressStr):
@@ -35,6 +36,8 @@ if __name__ == '__main__':
                       help="the TCP address to listen on", metavar="ADDR")
     parser.add_option("-g", "--group-by", dest="groupBy",default="-",
                       help="fields to group the data by", metavar="FIELDS")
+    parser.add_option("-s", "--select", dest="select",default="",
+                      help="fields to select for each group", metavar="FIELDS")
     parser.add_option("-f", "--filter", dest="filter",default="",
                       help="filter definition - format is <field1><operator1><value1>, <field2><operator2><value2>,...", metavar="FILTER")
     parser.epilog = """
@@ -65,7 +68,7 @@ Templates:
 \tpython apimonClient.py -g pia -f e=start,c=False | sort -gr | head
 
     Top uncached APIs by execution time
-\tpython apimonClient.py -g pa -f e=end | sort -rk2 | head
+\tpython apimonClient.py -g pa -f e=end | sort -grk2 | head
 
   API errors:
     Top API errors by count
@@ -76,23 +79,23 @@ Templates:
 
   Database:
     Top DB actions by execution time
-\tpython apimonClient.py -g pqdt -f e=db | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=db | sort -grk2 | head
 
     Top DB read actions by execution time
-\tpython apimonClient.py -g pqdt -f e=db,q=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=db,q=SELECT | sort -grk2 | head
 
     Top DB write actions by execution time
-\tpython apimonClient.py -g pqdt -f e=db,q\!=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=db,q\!=SELECT | sort -grk2 | head
 
   Sphinx:
     Top sphinx actions by execution time
-\tpython apimonClient.py -g pqdt -f e=sphinx | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=sphinx | sort -grk2 | head
 
     Top sphinx read actions by execution time
-\tpython apimonClient.py -g pqdt -f e=sphinx,q=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=sphinx,q=SELECT | sort -grk2 | head
 
     Top sphinx write actions by execution time
-\tpython apimonClient.py -g pqdt -f e=sphinx,q\!=SELECT | sort -rk2 | head
+\tpython apimonClient.py -g pqdt -f e=sphinx,q\!=SELECT | sort -grk2 | head
 
 """ % columnNamesDesc
     (options, args) = parser.parse_args()
@@ -102,7 +105,7 @@ Templates:
     sock.connect(parseAddress(options.tcpAddress))
 
     # send the command
-    sock.send('%s/%s\n' % (options.filter, options.groupBy))
+    sock.send('%s/%s/%s\n' % (options.filter, options.groupBy, options.select))
 
     # read the output
     while 1:

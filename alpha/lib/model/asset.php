@@ -94,7 +94,7 @@ class asset extends Baseasset implements ISyncableFile
 	{
 		$newFlavorAsset = $this->copy();
 		//this is the first version of the new asset.
-		$newFlavorAsset->setVersion(1);
+		$newFlavorAsset->incrementVersion();
 		if($partnerId)
 			$newFlavorAsset->setPartnerId($partnerId);
 		if($entryId)
@@ -185,8 +185,7 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incrementVersion()
 	{
-		$version = $this->getVersion();
-		$this->setVersion(is_null($version) ? 1 : $version + 1);
+		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 	
 	public function addTags(array $newTags)
@@ -552,7 +551,8 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incLogFileVersion()
 	{
-		$this->incInCustomData("logFileVersion", 1);
+		$version = kDataCenterMgr::incrementVersion($this->getLogFileVersion());
+		$this->putInCustomData("logFileVersion", $version);
 	}
 
 	public function getCacheInvalidationKeys()

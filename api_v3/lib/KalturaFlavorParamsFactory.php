@@ -34,6 +34,9 @@ class KalturaFlavorParamsFactory
 			case KalturaAssetType::THUMBNAIL:
 				return new KalturaThumbParams();
 				
+			case KalturaAssetType::LIVE:
+				return new KalturaLiveParams();
+				
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaFlavorParams', $type);
 				if($obj)

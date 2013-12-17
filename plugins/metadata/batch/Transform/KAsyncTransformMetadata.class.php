@@ -21,14 +21,6 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::getJobType()
-	 */
-	public function getJobType()
-	{
-		return self::getType();
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
@@ -43,7 +35,9 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	 */
 	protected function getJobs()
 	{
-		return self::$kClient->metadataBatch->getExclusiveTransformMetadataJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 1, $this->getFilter());
+		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
+		return self::$kClient->metadataBatch->getExclusiveTransformMetadataJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 1, 
+				$this->getFilter(), $maxOffset);
 	}
 	
 	/* (non-PHPdoc)

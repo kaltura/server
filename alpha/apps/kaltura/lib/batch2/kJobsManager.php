@@ -75,6 +75,10 @@ class kJobsManager
 	{
 		// No need to abort finished job
 		if(in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList())) {
+			if($force) {
+				$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::ABORTED);
+				$dbBatchJob->save();
+			}
 			return $dbBatchJob;
 		}
 		
@@ -236,6 +240,9 @@ class kJobsManager
 	
 	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry, kProvisionJobData $jobData)
 	{
+		$entry->setStatus(entryStatus::IMPORT);
+		$entry->save();
+		
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -941,6 +948,88 @@ class kJobsManager
 	}
 	
 	/**
+	 * @param BatchJob $parentJob
+	 * @param flavorAsset $asset
+	 * @param array $files
+	 * @return BatchJob
+	 */
+	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, LiveEntry $entry, $mediaServerIndex, $filePath, $endTime)
+	{
+		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
+		if($mediaServerIndex == MediaServerIndex::SECONDARY)
+			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
+			
+		$key = $entry->getSyncKey($keyType);
+		$files = kFileSyncUtils::dir_get_files($key, false);
+		
+		$jobData = new kConvertLiveSegmentJobData();
+ 		$jobData->setEntryId($entry->getId());
+		$jobData->setMediaServerIndex($mediaServerIndex);
+		$jobData->setEndTime($endTime);
+		$jobData->setSrcFilePath($filePath);
+		$jobData->setFileIndex(count($files));
+ 			
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild(BatchJobType::CONVERT_LIVE_SEGMENT);
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setEntryId($entry->getId());
+			$batchJob->setPartnerId($entry->getPartnerId());
+		}
+		
+		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
+		$batchJob = self::addJob($batchJob, $jobData, BatchJobType::CONVERT_LIVE_SEGMENT);
+		
+ 		$entry->addConvertingSegment($batchJob->getId());
+		$entry->save();
+ 		
+		return $batchJob;
+	}
+	
+	/**
+	 * @param BatchJob $parentJob
+	 * @param flavorAsset $asset
+	 * @param array $files
+	 * @return BatchJob
+	 */
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $offset = null, $duration = null)
+	{
+		$jobData = new kConcatJobData();
+ 		$jobData->setSrcFiles($files);
+		$jobData->setFlavorAssetId($asset->getId());
+		$jobData->setOffset($offset);
+		$jobData->setDuration($duration);
+ 			
+ 		$entry = $asset->getentry();
+ 		if($entry && $entry->getStatus() != entryStatus::READY)
+		{
+			$entry->setStatus(entryStatus::PRECONVERT);
+			$entry->save();
+		}
+ 		
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild(BatchJobType::CONCAT);
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setPartnerId($asset->getPartnerId());
+		}
+		
+		$batchJob->setEntryId($asset->getEntryId());
+		$batchJob->setObjectId($jobData->getFlavorAssetId());
+		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		return self::addJob($batchJob, $jobData, BatchJobType::CONCAT);
+	}
+	
+	/**
 	 * @param int $partnerId
 	 * @param int $objectType of enum IndexObjectType
 	 * @param baseObjectFilter $filter The filter should return the list of objects that need to be reindexed
@@ -1481,5 +1570,24 @@ class kJobsManager
 
 		$job->setData($jobData);
 		return kJobsManager::updateBatchJob($job, BatchJob::BATCHJOB_STATUS_PENDING);
+	}
+
+	/**
+	 * Copy aspects of one partner into another
+	 * 
+	 * @param int $fromPartnerId
+	 * @param int $toPartnerId
+	 * @return BatchJob
+	 */
+	public static function addCopyPartnerJob( $fromPartnerId, $toPartnerId )
+	{
+	    $jobData = new kCopyPartnerJobData();
+	    $jobData->setFromPartnerId( $fromPartnerId );
+	    $jobData->setToPartnerId( $toPartnerId );
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId( $toPartnerId ); // Associate with the "to" PID
+		
+		return self::addJob( $batchJob, $jobData, BatchJobType::COPY_PARTNER );
 	}
 }

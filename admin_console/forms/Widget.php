@@ -151,6 +151,7 @@ class Form_Widget extends Infra_Form
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
+		$properties['version'] = null;
 		return parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 	}
 	

@@ -2315,3 +2315,46 @@ form#addNewForm #newPartnerId {
 	display: block;
 	width: 800px;
 }
+
+form#frmCreateDrmProfile {
+	margin-left: 20px;
+}
+
+form#frmCreateDrmProfile dd,form#frmCreateDrmProfile dt {
+	float: left;
+}
+
+#drm-profile-configure-dialog {
+	padding-top: 10px;
+}
+
+#drm-profile-configure-dialog label {
+	padding: 0;
+}
+
+#drm-profile-configure-dialog dl {
+	margin-top: 15px;
+}
+
+#drm-profile-configure-dialog dl p {
+	width: 333px;
+	padding: 3px;
+	margin-top: 5px;
+	border: solid 1px #ccc;
+	background: #f0f0f0;
+}
+
+#drm-profile-configure-dialog dt {
+	margin: 10px 0 5px;
+}
+
+#drm-profile-configure-dialog dd input {
+	width: 500px;
+	height: 22px;
+}
+
+#drm-profile-configure-dialog select {
+	min-width: 505px;
+	height: 24px;
+	padding: 1px;
+}

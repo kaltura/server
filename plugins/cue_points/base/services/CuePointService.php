@@ -27,7 +27,7 @@ class CuePointService extends KalturaBaseService
 			CuePointPeer::setDefaultCriteriaFilterByKuser();
 		
 		if(!CuePointPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, CuePointPlugin::PLUGIN_NAME);
 	}
 	
 	/**

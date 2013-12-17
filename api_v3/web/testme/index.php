@@ -42,7 +42,13 @@ foreach($services as $serviceName => $serviceActionItem)
 	if($serviceActionItem->serviceInfo->serverOnly)
 		unset($services[$serviceName]);
 }
-ksort($services, SORT_STRING);
+
+function compareServicesByName( $srvA, $srvB )
+{
+	return strcasecmp( $srvA->serviceInfo->serviceName, $srvB->serviceInfo->serviceName );
+}
+
+usort($services, "compareServicesByName");
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

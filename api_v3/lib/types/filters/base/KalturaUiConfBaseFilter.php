@@ -23,6 +23,11 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"creationModeEqual" => "_eq_creation_mode",
 		"creationModeIn" => "_in_creation_mode",
+		"versionEqual" => "_eq_version",
+		"versionMultiLikeOr" => "_mlikeor_version",
+		"versionMultiLikeAnd" => "_mlikeand_version",
+		"partnerTagsMultiLikeOr" => "_mlikeor_partner_tags",
+		"partnerTagsMultiLikeAnd" => "_mlikeand_partner_tags",
 	);
 
 	static private $order_by_map = array
@@ -117,4 +122,29 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $creationModeIn;
+
+	/**
+	 * @var string
+	 */
+	public $versionEqual;
+
+	/**
+	 * @var string
+	 */
+	public $versionMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $versionMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $partnerTagsMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $partnerTagsMultiLikeAnd;
 }

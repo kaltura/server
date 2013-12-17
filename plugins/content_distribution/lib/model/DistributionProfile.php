@@ -425,7 +425,17 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $ret;
 	}
 	
-	public function getConfigVersion()							{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}	
+	public function getConfigVersion()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);
+	}
+	
+	public function incrementConfigVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION, $version);
+	}
+	
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
 	public function getSunsetDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET);}	
 	public function getRecommendedStorageProfileForDownload()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD);}	
@@ -434,7 +444,6 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function getRequiredAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, null, array());}
 	public function getOptionalAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, null, array());}
 	
-	public function incrementConfigVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}
 	public function setSunriseDefaultOffset($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET, $v);}
 	public function setSunsetDefaultOffset($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET, $v);}
 	public function setRecommendedStorageProfileForDownload($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD, $v);}

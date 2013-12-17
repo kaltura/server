@@ -239,6 +239,69 @@ CREATE TABLE `entry`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
+#-- live_channel_segment
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `live_channel_segment`;
+
+
+CREATE TABLE `live_channel_segment`
+(
+	`id` BIGINT  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`name` VARCHAR(255),
+	`description` TEXT,
+	`tags` TEXT,
+	`type` INTEGER,
+	`status` INTEGER,
+	`channel_id` VARCHAR(20),
+	`entry_id` VARCHAR(20),
+	`trigger_type` INTEGER,
+	`trigger_segment_id` BIGINT,
+	`start_time` FLOAT,
+	`duration` FLOAT,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_channel_status_index`(`partner_id`, `channel_id`, `status`),
+	KEY `partner_entry_status_index`(`partner_id`, `entry_id`, `status`),
+	INDEX `live_channel_segment_FI_1` (`trigger_segment_id`),
+	CONSTRAINT `live_channel_segment_FK_1`
+		FOREIGN KEY (`trigger_segment_id`)
+		REFERENCES `live_channel_segment` (`id`),
+	CONSTRAINT `live_channel_segment_FK_2`
+		FOREIGN KEY (`partner_id`)
+		REFERENCES `partner` (`id`),
+	INDEX `live_channel_segment_FI_3` (`channel_id`),
+	CONSTRAINT `live_channel_segment_FK_3`
+		FOREIGN KEY (`channel_id`)
+		REFERENCES `entry` (`id`),
+	INDEX `live_channel_segment_FI_4` (`entry_id`),
+	CONSTRAINT `live_channel_segment_FK_4`
+		FOREIGN KEY (`entry_id`)
+		REFERENCES `entry` (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- media_server
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `media_server`;
+
+
+CREATE TABLE `media_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`hostname` VARCHAR(255),
+	`dc` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
 #-- kvote
 #-----------------------------------------------------------------------------
 
@@ -886,7 +949,6 @@ CREATE TABLE `partner`
 	`max_number_of_hits_per_day` INTEGER default -1,
 	`appear_in_search` INTEGER default 2,
 	`debug_level` INTEGER default 0,
-	`invalid_login_count` INTEGER default 0,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`anonymous_kuser_id` INTEGER,
@@ -1134,6 +1196,7 @@ CREATE TABLE `ui_conf`
 	`creation_mode` TINYINT,
 	`version` VARCHAR(10),
 	`html5_url` VARCHAR(256),
+	`partner_tags` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `partner_id_creation_mode_index`(`partner_id`, `creation_mode`)
@@ -1568,6 +1631,7 @@ CREATE TABLE `conversion_profile_2`
 	`system_name` VARCHAR(128),
 	`tags` TEXT,
 	`status` INTEGER default 2,
+	`type` INTEGER default 1,
 	`default_entry_id` VARCHAR(20),
 	`crop_left` INTEGER default -1 NOT NULL,
 	`crop_top` INTEGER default -1 NOT NULL,
@@ -2215,6 +2279,31 @@ CREATE TABLE `batch_job_log`
 	KEY `processor_expiration_index`(`job_type`, `processor_expiration`),
 	KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`),
 	KEY `partner_job_type_bulk_upload_type_index`(`partner_id`, `bulk_upload_type`, `job_type`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- file_asset
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `file_asset`;
+
+
+CREATE TABLE `file_asset`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`version` INTEGER,
+	`partner_id` INTEGER,
+	`object_id` VARCHAR(20),
+	`object_type` INTEGER,
+	`status` INTEGER,
+	`name` VARCHAR(255),
+	`system_name` VARCHAR(255),
+	`file_ext` VARCHAR(4),
+	`size` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `partner_object_status`(`partner_id`, `object_id`, `object_type`, `status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

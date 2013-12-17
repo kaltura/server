@@ -19,9 +19,9 @@ $summary = file_get_contents("http://{$serverName}/{$clientsName}/summary.kinf")
 $summary = unserialize($summary);
 
 $generatedDate = $summary['generatedDate'];
-foreach ($summary as $index => $name)
+foreach ($summary as $name => $params)
 {
-	if (!is_numeric($index))
+	if (!is_array($params))
 		continue;
 	
 	$fileName = "{$name}_{$generatedDate}.tar.gz";

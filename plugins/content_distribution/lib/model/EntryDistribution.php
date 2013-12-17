@@ -30,6 +30,10 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	const CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION = "UpdateDataVersion";
 	const CUSTOM_DATA_FIELD_DELETE_DATA_VERSION = "DeleteDataVersion";
 	
+	public function getIndexObjectName() {
+		return "EntryDistributionIndex";
+	}
+	
 	/**
 	 * Get the [optionally formatted] temporal [next_report] calculated value.
 	 * 
@@ -322,89 +326,6 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	}
 
 	/* (non-PHPdoc)
-	 * @see IIndexable::getObjectIndexName()
-	 */
-	public function getObjectIndexName()
-	{
-		return EntryDistributionPeer::TABLE_NAME;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexNullableFields()
-	 */
-	public static function getIndexNullableFields()
-	{
-		return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldsMap()
-	 */
-	public function getIndexFieldsMap()
-	{
-		return array(
-			'entry_distribution_id' => 'id',
-			'created_at' => 'createdAt',
-			'updated_at' => 'updatedAt',
-			'submitted_at' => 'submittedAt',
-			'entry_id' => 'entryId',
-			'partner_id' => 'partnerId',
-			'distribution_profile_id' => 'distributionProfileId',
-			'entry_distribution_status' => 'status',
-			'dirty_status' => 'dirtyStatus',
-			'thumb_asset_ids' => 'thumbAssetIds',
-			'flavor_asset_ids' => 'flavorAssetIds',
-			'asset_ids' => 'assetIds',
-			'sunrise' => 'sunrise',
-			'sunset' => 'sunset',
-			'sun_status' => 'sunStatus',
-			'remote_id' => 'remoteId',
-			'plays' => 'plays',
-			'views' => 'views',
-			'error_type' => 'errorType',
-			'error_number' => 'errorNumber',
-			'last_report' => 'lastReport',
-			'next_report' => 'nextReport',
-		);
-	}
-
-	private static $indexFieldTypes = array(
-		'entry_distribution_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'submitted_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'entry_id' => IIndexable::FIELD_TYPE_STRING,
-		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'distribution_profile_id' => IIndexable::FIELD_TYPE_INTEGER,
-		'entry_distribution_status' => IIndexable::FIELD_TYPE_INTEGER,
-		'dirty_status' => IIndexable::FIELD_TYPE_INTEGER,
-		'thumb_asset_ids' => IIndexable::FIELD_TYPE_STRING,
-		'flavor_asset_ids' => IIndexable::FIELD_TYPE_STRING,
-		'asset_ids' => IIndexable::FIELD_TYPE_STRING,
-		'sunrise' => IIndexable::FIELD_TYPE_DATETIME,
-		'sunset' => IIndexable::FIELD_TYPE_DATETIME,
-		'sun_status' => IIndexable::FIELD_TYPE_INTEGER,
-		'remote_id' => IIndexable::FIELD_TYPE_STRING,
-		'plays' => IIndexable::FIELD_TYPE_INTEGER,
-		'views' => IIndexable::FIELD_TYPE_INTEGER,
-		'error_type' => IIndexable::FIELD_TYPE_INTEGER,
-		'error_number' => IIndexable::FIELD_TYPE_INTEGER,
-		'last_report' => IIndexable::FIELD_TYPE_DATETIME,
-		'next_report' => IIndexable::FIELD_TYPE_DATETIME,
-	);
-	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getIndexFieldType()
-	 */
-	public function getIndexFieldType($field)
-	{
-		if(isset(self::$indexFieldTypes[$field]))
-			return self::$indexFieldTypes[$field];
-			
-		return null;
-	}
-	
-	/* (non-PHPdoc)
 	 * @see IIndexable::indexToSearchIndex()
 	 */
 	public function indexToSearchIndex()
@@ -453,12 +374,41 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function getUpdateDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
 	public function getDeleteDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
 	
-	public function incrementSubmitResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION);}
-	public function incrementUpdateResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION);}
-	public function incrementDeleteResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION);}
-	public function incrementSubmitDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION);}
-	public function incrementUpdateDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
-	public function incrementDeleteDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
+	public function incrementSubmitResultsVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getSubmitResultsVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION, $version);
+	}
+	
+	public function incrementUpdateResultsVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getUpdateResultsVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION, $version);
+	}
+	
+	public function incrementDeleteResultsVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getDeleteResultsVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION, $version);
+	}
+	
+	public function incrementSubmitDataVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getSubmitDataVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION, $version);
+	}
+	
+	public function incrementUpdateDataVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getUpdateDataVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION, $version);
+	}
+	
+	public function incrementDeleteDataVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getDeleteDataVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION, $version);
+	}
 
 	
 	/**
@@ -486,8 +436,4 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		return array("entryDistribution:entryId=".strtolower($this->getEntryId()));
 	}
 	
-	public function getSearchIndexFieldsEscapeType($fieldName)
-	{
-		return SearchIndexFieldEscapeType::DEFAULT_ESCAPE;
-	}
 } // EntryDistribution

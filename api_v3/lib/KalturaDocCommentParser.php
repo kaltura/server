@@ -47,6 +47,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([\\w\\,\\s\\d]*)/";
     
+    const DOCCOMMENT_VALIDATE_CONSTRAINT = "/\\@CONSTRAINT\\s+([\\w.]+\\s+)?(\\d+)/";
+    
     /**
      * @var bool
      */
@@ -173,6 +175,11 @@ class KalturaDocCommentParser
     public $validateUserPrivilege = null;
     
     /**
+     * @var array
+     */
+    public $validateConstraints = array();
+    
+    /**
      * @var string
      */
     public $actionAlias = null;
@@ -187,7 +194,7 @@ class KalturaDocCommentParser
      * Parse a docComment
      *
      * @param string $comment
-     * @param array $replacements Optional associative array for replacing values in search patterns
+      @param array $replacements Optional associative array for replacing values in search patterns
      * @return array
      */
     function __construct($comment , $replacements = null)
@@ -283,7 +290,12 @@ class KalturaDocCommentParser
         	if(isset($result[3]) && strlen($result[3]))
         		$this->validateUserPrivilege = $result[3];
         } 
-            
+        
+        self::fillConstraint($comment, "minLength");
+       	self::fillConstraint($comment, "maxLength");
+        self::fillConstraint($comment, "minValue");
+        self::fillConstraint($comment, "maxValue");
+        
         $result = null;
         $error_array = array();
         if (preg_match_all(self::DOCCOMMENT_ACTION_ERRORS, $comment, $result))
@@ -305,5 +317,23 @@ class KalturaDocCommentParser
             }
         }
         $this->errors = $error_array;        
+     }
+     
+     private function fillConstraint($comment, $constraintName) {
+     	
+     	$result = null;
+     	$constraintRegex = self::DOCCOMMENT_VALIDATE_CONSTRAINT;
+     	$constraintRegex = str_replace("CONSTRAINT", $constraintName, $constraintRegex);
+     	if (preg_match_all($constraintRegex, $comment, $result)) {
+     		$size = count($result[0]);
+     		for($i = 0 ; $i < $size ; $i = $i += 1) {
+     			$field = trim($result[1][$i]);
+     			
+     			if(!array_key_exists($field, $this->validateConstraints))
+     				$this->validateConstraints[$field] = array();
+     			
+     			$this->validateConstraints[$field][$constraintName] = $result[2][$i];
+     		}
+     	}
      }
 }

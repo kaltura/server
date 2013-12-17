@@ -66,6 +66,7 @@ class KalturaDispatcher
         }
         
 		$actionParams = $actionReflector->getActionParams();
+		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
 
 		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
@@ -87,7 +88,7 @@ class KalturaDispatcher
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		
-	    $disableTags = $actionReflector->getActionInfo()->disableTags;
+	    $disableTags = $actionInfo->disableTags;
 		if($disableTags && is_array($disableTags) && count($disableTags))
 		{
 			foreach ($disableTags as $disableTag)
@@ -96,8 +97,6 @@ class KalturaDispatcher
 			}
 		}
 		
-		$actionInfo = $actionReflector->getActionInfo();
-
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
 		{
 //			// TODO maybe if missing should throw something, maybe a bone?
@@ -124,7 +123,7 @@ class KalturaDispatcher
 		
 		return $res;
 	}
-
+	
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaFileSyncResource extends KalturaContentResource 
+class KalturaFileSyncResource extends KalturaContentResource
 {
 	/**
 	 * The object type of the file sync object 
@@ -30,33 +30,37 @@ class KalturaFileSyncResource extends KalturaContentResource
 	 * @var string
 	 */
 	public $version;
-
-	public function validateEntry(entry $dbEntry)
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateEntry($dbEntry);
-    	$this->validatePropertyNotNull('fileSyncObjectType');
-    	$this->validatePropertyNotNull('objectSubType');
-    	$this->validatePropertyNotNull('objectId');
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+		
+		$this->validatePropertyNotNull('fileSyncObjectType');
+		$this->validatePropertyNotNull('objectSubType');
+		$this->validatePropertyNotNull('objectId');
 	}
-
-	private static $map_between_objects = array
-	(
-		'fileSyncObjectType',
-		'objectSubType',
-		'objectId',
-		'version',
-	);
-
+	
+	private static $map_between_objects = array('fileSyncObjectType', 'objectSubType', 'objectId', 'version');
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
-	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(!$object_to_fill)
 			$object_to_fill = new kFileSyncResource();
-			
+		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }

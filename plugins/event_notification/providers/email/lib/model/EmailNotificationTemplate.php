@@ -73,6 +73,51 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 				
 			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
 		}
+		
+		
+		KalturaLog::info("Sweeping Email Notification Template with id {$this->getId()} for metadata tokens.");
+		
+		$jobDataFields = array ('to', 'cc', 'bcc');
+		$templateFields = array ('subject', 'body');
+		
+		$sweepFieldValues = array();
+		foreach ($jobDataFields as $field)
+		{
+			//Get the field value
+			$getter = "get$field";
+			$fieldValue = $jobData->$getter();
+			
+			if (is_string($fieldValue))
+				$sweepFieldValues[] = $fieldValue;
+			elseif ($fieldValue instanceof kEmailNotificationStaticRecipientJobData)
+			{
+				/* @var $fieldValue kEmailNotificationStaticRecipientJobData */
+				foreach($fieldValue->getEmailRecipients() as $email => $name)
+				{
+					/* @var $emailRecipient kEmailNotificationRecipient */
+					$sweepFieldValues[] = $email;
+					$sweepFieldValues[] = $name;
+				}
+			}
+		}
+		
+		foreach ($templateFields as $field)
+		{
+			//Get the field value
+			$getter = "get$field";
+			$fieldValue = $this->$getter();
+			
+			if (is_string($fieldValue))
+				$sweepFieldValues[] = $fieldValue;
+		}
+		
+		$editorPlugins = KalturaPluginManager::getPluginInstances("IKalturaEventNotificationContentEditor");
+		foreach ($editorPlugins as $plugin)
+		{
+			$pluginContentParameters = $plugin->editTemplateFields($sweepFieldValues, $scope, $this->getObjectType());
+			$contentParametersValues = array_merge($contentParametersValues, $pluginContentParameters);
+		}
+
 		$jobData->setContentParameters($contentParametersValues);
 		
 		return $jobData;
@@ -226,13 +271,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function preSave(PropelPDO $con = null)
 	{
 		if($this->setBody)
-		{
-			$this->bodyPreviousVersion = $this->getBodyFileVersion();
-			if($this->bodyPreviousVersion)
-				$this->incrementBodyFileVersion();
-			else 
-				$this->resetBodyFileVersion();
-		}
+			$this->incrementBodyFileVersion();
 			
 		return parent::preSave($con);
 	}
@@ -286,8 +325,12 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	 */
 	public function getReplyTo()								{return $this->getFromCustomData(self::CUSTOM_DATA_REPLY_TO);}
 	
-	public function incrementBodyFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION);}
-	public function resetBodyFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, 1);}
+	public function incrementBodyFileVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getBodyFileVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, $version);
+	}
+	
 	public function setFormat($v)								{return $this->putInCustomData(self::CUSTOM_DATA_FORMAT, $v);}
 	public function setSubject($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SUBJECT, $v);}
 	public function setFromEmail($v)							{return $this->putInCustomData(self::CUSTOM_DATA_FROM_EMAIL, $v);}

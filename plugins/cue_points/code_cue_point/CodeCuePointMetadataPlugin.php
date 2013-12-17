@@ -3,7 +3,7 @@
  * Enable custom metadata on code cue point objects
  * @package plugins.codeCuePoint
  */
-class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser
+class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObjectLoader, IKalturaCuePointXmlParser, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'codeCuePointMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
@@ -75,7 +75,7 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 		if($baseClass == 'IMetadataPeer' && $enumValue == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
 			return 'CuePointPeer';
 			
-		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT))
+		if($baseClass == 'IMetadataObject' && $enumValue == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
 			return 'CodeCuePoint';
 	}
 

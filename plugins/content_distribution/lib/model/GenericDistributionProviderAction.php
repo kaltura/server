@@ -161,7 +161,21 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 	public function setHttpFieldName($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_HTTP_FIELD_NAME, $v);}
 	public function setHttpFileName($v)						{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_HTTP_FILE_NAME, $v);}
 	
-	public function incrementMrssTransformerVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_MRSS_TRANSFORMER_VERSION);}
-	public function incrementMrssValidatorVersion()			{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_MRSS_VALIDATOR_VERSION);}
-	public function incrementResultsTransformerVersion()	{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_RESULTS_TRANSFORMER_VERSION);}
+	public function incrementMrssTransformerVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getMrssTransformerVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_MRSS_TRANSFORMER_VERSION, $version);
+	}
+	
+	public function incrementMrssValidatorVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getMrssValidatorVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_MRSS_VALIDATOR_VERSION, $version);
+	}
+	
+	public function incrementResultsTransformerVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getResultsTransformerVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_FIELD_RESULTS_TRANSFORMER_VERSION, $version);
+	}
 }

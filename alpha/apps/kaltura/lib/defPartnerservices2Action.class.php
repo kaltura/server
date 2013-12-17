@@ -920,14 +920,23 @@ $this->benchmarkStart( "beforeImpl" );
 		}
 		array_shift($args);
 		
-		$error = explode(",", $error_code, 2);
+		$components = explode(';', $error_code, 3);
+		$error_code = $components[0];
+		$error_message = $components[2];
 		
-		$error_code = $error[0];
-		$error_message = $error[1];
-
-		$formated_desc = @call_user_func_array('sprintf', array_merge((array)$error_message, $args)); 
+		if ( ! empty($components[1]) ) // Need to process arguments?
+		{
+			$paramNames = explode(',', $components[1]);
+			$numParamNames = count($paramNames);
+						
+			for ( $i = 0; $i < $numParamNames; $i++ )
+			{
+				$replacement = isset($args[$i]) ? $args[$i] : '';
+				$error_message = str_replace("@{$paramNames[$i]}@", $replacement, $error_message);
+			}
+		}
 		
-		$this->error[] = array("code" => $error_code, "desc" => $formated_desc);
+		$this->error[] = array("code" => $error_code, "desc" => $error_message);
 	}
 
 	// all this does is add an error and throw an APIException

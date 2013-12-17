@@ -98,8 +98,10 @@ class DistributionProfileConfigureAction extends KalturaApplicationPlugin
 						$form->populate($request->getPost());
 						$distributionProfile = $form->getObject($profileClass, $request->getPost());
 						$form->resetUnUpdatebleAttributes($distributionProfile);
+						Infra_ClientHelper::impersonate($partnerId);
 						$distributionProfile = $contentDistributionPlugin->distributionProfile->update($profileId, $distributionProfile);
 						$form->saveProviderAdditionalObjects($distributionProfile);
+						Infra_ClientHelper::unimpersonate();
 						$form->setAttrib('class', 'valid');
 						$action->view->formValid = true;
 					}
@@ -128,8 +130,8 @@ class DistributionProfileConfigureAction extends KalturaApplicationPlugin
 					Infra_ClientHelper::impersonate($distributionProfile->partnerId);
 					$distributionProfile->partnerId = null;
 					$distributionProfile = $contentDistributionPlugin->distributionProfile->add($distributionProfile);
-					Infra_ClientHelper::unimpersonate();
 					$form->saveProviderAdditionalObjects($distributionProfile);
+					Infra_ClientHelper::unimpersonate();
 					$form->setAttrib('class', 'valid');
 					$action->view->formValid = true;
 				}
@@ -152,6 +154,7 @@ class DistributionProfileConfigureAction extends KalturaApplicationPlugin
 				$distributionProfile = $form->getObject($profileClass, $request->getPost());
 				$this->populateForm($form, $distributionProfile, $flavorParamsResponse);
 			}
+			Infra_ClientHelper::unimpersonate();
 		}
 		$action->view->form = $form;
 	}

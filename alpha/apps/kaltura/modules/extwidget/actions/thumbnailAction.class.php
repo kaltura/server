@@ -316,7 +316,7 @@ class thumbnailAction extends sfAction
 			
 		if ( ! $file_sync )
 		{
-			$tempThumbPath = $entry->getLocalThumbFilePath( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name );
+			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name );
 			if (!$tempThumbPath ){
 				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}
@@ -391,7 +391,7 @@ class thumbnailAction extends sfAction
 		
 		$nocache = false;
 		if ($securyEntryHelper->shouldDisableCache() || kApiCache::hasExtraFields() ||
-			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules()))
+			(!$securyEntryHelper->isKsWidget() && $securyEntryHelper->hasRules(ContextType::THUMBNAIL)))
 			$nocache = true;
 
 		if ($nocache)

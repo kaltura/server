@@ -65,7 +65,13 @@ class kBusinessPreConvertDL
 			if($srcAsset && $srcAsset->isLocalReadyStatus())
 				return $srcAsset;
 		}
-					
+
+		KalturaLog::debug("Look for a flavor tagged with thumbsource of entry [$entryId]");
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+		if($srcAsset && $srcAsset->isLocalReadyStatus())
+			return $srcAsset;
+		
+		
 		KalturaLog::debug("Look for original flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
@@ -863,7 +869,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$originalFlavorAsset->save();
 			
 			kFlowHelper::generateThumbnailsFromFlavor($entry->getId(), null, $originalFlavorAsset->getFlavorParamsId());
-			kBusinessPostConvertDL::handleConvertFinished(null, $originalFlavorAsset);
+			kBusinessPostConvertDL::handleConvertFinished($convertProfileJob, $originalFlavorAsset);
 			return null;
 		}
 		

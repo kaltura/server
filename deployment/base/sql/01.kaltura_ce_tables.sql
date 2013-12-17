@@ -533,6 +533,7 @@ CREATE TABLE IF NOT EXISTS `conversion_profile_2` (
   `system_name` varchar(128) NOT NULL DEFAULT '',
   `tags` text NOT NULL,
   `status` int(11) NOT NULL DEFAULT '2',
+  `type` int(11) NOT NULL DEFAULT '1',
   `default_entry_id` varchar(20) DEFAULT NULL,
   `crop_left` int(11) NOT NULL DEFAULT '-1',
   `crop_top` int(11) NOT NULL DEFAULT '-1',
@@ -1466,7 +1467,6 @@ CREATE TABLE IF NOT EXISTS `partner` (
   `max_number_of_hits_per_day` int(11) DEFAULT '-1',
   `appear_in_search` int(11) DEFAULT '2',
   `debug_level` int(11) DEFAULT '0',
-  `invalid_login_count` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `partner_alias` varchar(64) DEFAULT NULL,
@@ -2169,3 +2169,49 @@ CREATE TABLE `api_server`
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `media_server`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`hostname` VARCHAR(255),
+	`dc` INTEGER,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `file_asset`
+(
+	`id` BIGINT NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`version` INTEGER,
+	`partner_id` INTEGER,
+	`object_id` VARCHAR(20),
+	`object_type` INTEGER,
+	`status` INTEGER,
+	`name` VARCHAR(255),
+	`system_name` VARCHAR(255),
+	`file_ext` VARCHAR(4),
+	`size` BIGINT,
+	PRIMARY KEY (`id`),
+	KEY `partner_object_status` (`partner_id`, `object_id`, `object_type`, `status`),
+	KEY (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `drm_profile`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`name` TEXT  NOT NULL,
+	`description` TEXT,
+	`provider` INTEGER  NOT NULL,
+	`status` INTEGER  NOT NULL,
+	`license_server_url` TEXT,
+	`default_policy` TEXT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY partner_id_provider_status (partner_id, provider, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
