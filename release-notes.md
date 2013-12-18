@@ -11,6 +11,7 @@
  - Recording
  - Clipping
 - File assets (for ui-confs)
+- Internal indication for api time properties and support for times that are relative to "now()"
 
 
 ## API: ##
@@ -38,6 +39,19 @@ Add new workers to batch.ini based on batch.ini.template.
 - KAsyncConvertLiveSegment
 - KAsyncConcat
 - KAsyncValidateLiveMediaServers
+
+
+**Relative Time Properties**
+- default "max_relative_time" is set to 315360000 (10 years), times under 10 years would be converted as relative to now.
+- Relative time conversion can be disabled for certain partners by modifying local.ini and adding
+
+```
+[disable_relative_time_partners]
+0 = PID1
+1 = PID2
+```
+
+
 
 ## Deployment: ##
 
