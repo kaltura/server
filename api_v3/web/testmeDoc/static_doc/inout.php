@@ -118,13 +118,12 @@ The following table lists few possible general API error codes and their equival
 <?php foreach($generalError as $error => $errorParams): ?>
 <tr class="<?php echo ($odd) ? "odd" : ""; ?>">
 <?php
-	$ex = new KalturaAPIException(null); 
-	call_user_func_array(array($ex, 'KalturaAPIException'), array_merge(array($error), $errorParams));  
+	$errorData = call_user_func_array( 'APIErrors::getErrorData', array_merge(array($error), $errorParams) );
 ?>
-	<td><?php echo $ex->getCode(); ?></td>
-	<td><?php echo $ex->getMessage(); ?></td>
+	<td><?php echo $errorData['code']; ?></td>
+	<td><?php echo $errorData['message']; ?></td>
 </tr>
-<?php $odd = !$odd; ?>
+	<?php $odd = !$odd; ?>
 <?php endforeach; ?>
 </table>
 

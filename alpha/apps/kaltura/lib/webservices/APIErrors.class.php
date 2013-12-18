@@ -5,6 +5,61 @@
  */
 class APIErrors 
 {
+	/**
+	 * For a given error code and optional args, compose a text message (embedding arguments
+	 * if given) and return a response array containing the message and the given error code and args.
+	 * 
+	 * Sample usage:
+	 *     $errorData = APIErrors::getErrorData( APIErrors::INTERNAL_SERVERL_ERROR, 'some informative text' );
+	 *     
+	 * Sample usage from a generic function (e.g. KalturaAPIError):
+	 *     function KalturaAPIException( $errorString )
+	 *     {
+	 *         $errorData = call_user_func_array( 'APIErrors::getErrorData', func_get_args() );
+	 *     }
+	 *  
+	 * @param string $errorString
+	 * @return array(
+	 * 	   <br>'code' => The given error code (e.g. 'INTERNAL_SERVERL_ERROR'),
+	 *     <br>'args' => All extra arguments that were passed to the function (otherwise - an empty array),
+	 * 	   <br>'message' => Composed English message. Any placeholedrs will be replaced with the supplied args.
+	 *   <br>)
+	 */
+	public static function getErrorData( $errorString )
+	{
+		$errorData = array();
+	
+		$components = explode(';', $errorString, 3);
+		$errorData['code'] = $components[0];
+		$message = $components[2];
+	
+		$args = array();
+	
+		if ( ! empty($components[1]) ) // Need to process arguments?
+		{
+			$paramNames = explode(',', $components[1]);
+			$numParamNames = count($paramNames);
+	
+			$funcArgs = func_get_args();
+			array_shift( $funcArgs ); // Get rid of the first arg (= $errorString)
+	
+			// Create and fill the args dictionary
+			for ( $i = 0; $i < $numParamNames; $i++ )
+			{
+				// Map the arg's name to its value
+				$args[ $paramNames[$i] ] = $funcArgs[$i];
+	
+				// Replace the arg's placeholder with its value in the destination string
+				$message = str_replace("@{$paramNames[$i]}@", $funcArgs[$i], $message);
+			}
+		}
+	
+		$errorData['message'] = $message;
+		$errorData['args'] = $args;
+	
+		return $errorData;
+	}
+	
 	//  ERR_TEXT - some text to display in the message
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVER_ERROR;ERR_TEXT;Internal server error @ERR_TEXT@";
 	
