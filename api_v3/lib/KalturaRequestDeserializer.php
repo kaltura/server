@@ -181,14 +181,14 @@ class KalturaRequestDeserializer
 	
 	protected function validateParameter($name, $value, $constraintsObj) {
 		$constraints = $constraintsObj->getConstraints();
-		if(array_key_exists("minLength", $constraints))
-			$this->validateMinLength($name, $value, $constraints["minLength"]);
-		if(array_key_exists("maxLength", $constraints))
-			$this->validateMaxLength($name, $value, $constraints["maxLength"]);
-		if(array_key_exists("minValue", $constraints))
-			$this->validateMinValue($name, $value, $constraints["minValue"]);
-		if(array_key_exists("maxValue", $constraints))
-			$this->validateMaxValue($name, $value, $constraints["maxValue"]);
+		if(array_key_exists(KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT, $constraints))
+			$this->validateMinLength($name, $value, $constraints[KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT]);
+		if(array_key_exists(KalturaDocCommentParser::MAX_LENGTH_CONSTRAINT, $constraints))
+			$this->validateMaxLength($name, $value, $constraints[KalturaDocCommentParser::MAX_LENGTH_CONSTRAINT]);
+		if(array_key_exists(KalturaDocCommentParser::MIN_VALUE_CONSTRAINT, $constraints))
+			$this->validateMinValue($name, $value, $constraints[KalturaDocCommentParser::MIN_VALUE_CONSTRAINT]);
+		if(array_key_exists(KalturaDocCommentParser::MAX_VALUE_CONSTRAINT, $constraints))
+			$this->validateMaxValue($name, $value, $constraints[KalturaDocCommentParser::MAX_VALUE_CONSTRAINT]);
 	}
 	
 	protected function validateMinLength($name, $objectValue, $constraint) {
