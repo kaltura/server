@@ -483,7 +483,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
-		KalturaLog::debug("convert finished, start handling");		
+		KalturaLog::debug("convert finished, start handling");	
+
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -616,6 +617,7 @@ class kFlowHelper
 	
 	private static function handleOperatorsProcessingFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, entry $entry, BatchJob $dbBatchJob, kConvertJobData $data, $rootBatchJob = null)
 	{
+		KalturaLog::debug("in handleOperatorsProcessingFinished");
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
 		$createThumb = $entry->getCreateThumb();
@@ -648,6 +650,7 @@ class kFlowHelper
 
 		if($createThumb || $extractMedia)
 		{
+			KalturaLog::debug("before addPostConvertJob");
 			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
 			if($flavorAsset->getIsOriginal())
 				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
@@ -656,6 +659,7 @@ class kFlowHelper
 		}
 		else // no need to run post convert
 		{
+			KalturaLog::debug("before handleFlavorReady");
 			$flavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
 			if($flavorAsset)
 			{
@@ -765,8 +769,7 @@ class kFlowHelper
 				}
 			}			
 		}
-		$data->setDestFileAssets(null);
-		$data->save();		
+		$data->setDestFileAssets(null);	
 	}
 
 	/**
