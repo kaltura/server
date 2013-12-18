@@ -410,7 +410,15 @@ class kFlowHelper
 
 		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
-			kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+			try {
+				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+			}
+			catch (kCoreException $ex) {
+				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
+					throw $ex;
+				
+				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
+			}
 
 			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
 			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
@@ -1631,7 +1639,15 @@ class kFlowHelper
 		}
 		else
 		{
-			$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
+			try {
+				$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
+			}
+			catch (kCoreException $ex) {
+				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
+					throw $ex;
+				
+				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
+			}
 
 			if($conversionsCreated)
 			{
