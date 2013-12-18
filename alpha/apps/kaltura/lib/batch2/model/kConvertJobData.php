@@ -48,6 +48,11 @@ class kConvertJobData extends kConvartableJobData
 	 * @var int
 	 */
 	private $priority;
+	
+	/**
+	 * @var array<kFileAssetDescriptor>
+	 */
+	private $destFileAssets;	
 
 	/**
 	 * @return the $destFileSyncLocalPath
@@ -269,4 +274,18 @@ class kConvertJobData extends kConvartableJobData
 		}
 		return $this->priority;
 	}
+	
+	/**
+	 * @return the $destFileAssets
+	 */
+	public function getDestFileAssets() {
+		return $this->destFileAssets;
+	}
+
+	/**
+	 * @param array<kFileAssetDescriptor> $destFileAssets
+	 */
+	public function setDestFileAssets($destFileAssets) {
+		$this->destFileAssets = $destFileAssets;
+	}	
 }
