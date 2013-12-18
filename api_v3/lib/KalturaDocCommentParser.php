@@ -49,6 +49,11 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_VALIDATE_CONSTRAINT = "/\\@CONSTRAINT\\s+([\\w.]+\\s+)?(\\d+)/";
     
+    const MIN_LENGTH_CONSTRAINT = "minLength";
+    const MAX_LENGTH_CONSTRAINT = "maxLength";
+    const MIN_VALUE_CONSTRAINT = "minValue";
+    const MAX_VALUE_CONSTRAINT = "maxValue";
+    
     /**
      * @var bool
      */
@@ -291,10 +296,10 @@ class KalturaDocCommentParser
         		$this->validateUserPrivilege = $result[3];
         } 
         
-        self::fillConstraint($comment, "minLength");
-       	self::fillConstraint($comment, "maxLength");
-        self::fillConstraint($comment, "minValue");
-        self::fillConstraint($comment, "maxValue");
+        self::fillConstraint($comment, self::MIN_LENGTH_CONSTRAINT);
+       	self::fillConstraint($comment, self::MAX_LENGTH_CONSTRAINT);
+        self::fillConstraint($comment, self::MIN_VALUE_CONSTRAINT);
+        self::fillConstraint($comment, self::MAX_VALUE_CONSTRAINT);
         
         $result = null;
         $error_array = array();
