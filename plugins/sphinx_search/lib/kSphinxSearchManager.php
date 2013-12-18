@@ -10,6 +10,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	const HAS_VALUE = 'HASVALUE';
 
 	const HAS_NO_VALUE = 'HASNOVALUE';
+	
+	const CACHE_PREFIX = 'executed_sphinx_server_';
 
 	/**
 	 * @param string $baseName
@@ -385,7 +387,29 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		KalturaLog::debug($sql);
 				
+		$sphinxConnection = null;
+        $sphinxConnectionId = null;
+        if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
+        {
+                $sphinxConnection = DbManager::getSphinxConnection(false);
+				$sphinxServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
+				if ($sphinxServerCacheStore)
+				{
+					$sphinxConnectionId = $sphinxServerCache->get(self::CACHE_PREFIX . $sphinxConnection->getHostName());
+					if (!$sphinxConnectionId)
+					{
+						$sphinxConnectionId = $this->retrieveSphinxConnectionIdByHostname($sphinxConnection->getHostName());
+						$sphinxServerCacheStore->set(self::CACHE_PREFIX . $sphinxConnection->getHostName(), $sphinxConnectionId);
+					}
+				}
+				else 
+				{
+	                $sphinxConnectionId = $this->retrieveSphinxConnectionIdByHostname($sphinxConnection->getHostName());
+				}
+        }
+				
 		$sphinxLog = new SphinxLog();
+		$sphinxLog->setExecutedServerId($sphinxConnectionId);
 		$sphinxLog->setObjectId($object->getId());
 		$sphinxLog->setObjectType(get_class($object));
 		$sphinxLog->setEntryId($object->getEntryId());
@@ -404,6 +428,20 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$arr = $sphinxConnection->errorInfo();
 		KalturaLog::err($arr[2]);
 		return false;
+	}
+		
+	/**
+	 * @param $hostname string
+	 * @return int
+	 */
+	private function retrieveSphinxConnectionIdByHostname ($hostname)
+	{
+		$sphinxConnectionId = null;
+		$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($hostname);
+		if($sphinxServer)
+        	$sphinxConnectionId = $sphinxServer->getId();
+		
+		return $sphinxConnectionId;
 	}
 		
 	/**
