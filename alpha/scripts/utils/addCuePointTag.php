@@ -12,7 +12,7 @@ $type = null;
 
 try
 {
-	$type = kPluginableEnumsManager::apiToCore ('CuePointType', $argv[3]);
+	$type = $argv[3] != 'all' ? kPluginableEnumsManager::apiToCore ('CuePointType', $argv[3]) : null;
 }
 catch (kCoreException $e)
 {
