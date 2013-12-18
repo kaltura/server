@@ -2007,6 +2007,7 @@ CREATE TABLE IF NOT EXISTS `ui_conf` (
   `creation_mode` tinyint(4) DEFAULT '1',
   `version` varchar(10) DEFAULT NULL,
   `html5_url` varchar(256) DEFAULT NULL,
+  `partner_tags` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_creation_mode_index` (`partner_id`,`creation_mode`),
   KEY `updated_at` (`updated_at`)
