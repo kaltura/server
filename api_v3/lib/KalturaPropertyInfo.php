@@ -66,6 +66,11 @@ class KalturaPropertyInfo
 	 * @var array
 	 */
 	private $_constraints = array();
+
+	/**
+	 * @var bool
+	 */
+	private $_disableRelativeTime = false;
 	
 	/**
 	 * @var bool
@@ -460,7 +465,23 @@ class KalturaPropertyInfo
 	public function getConstraints() {
 		return $this->_constraints;
 	}
-	
+
+	/**
+	 * @param boolean $disableRelativeTime
+	 */
+	public function setDisableRelativeTime($disableRelativeTime)
+	{
+		$this->_disableRelativeTime = $disableRelativeTime;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getDisableRelativeTime()
+	{
+		return $this->_disableRelativeTime;
+	}
+
 	/**
 	 * @param array $permissions
 	 */

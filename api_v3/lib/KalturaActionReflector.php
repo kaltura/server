@@ -157,6 +157,9 @@ class KalturaActionReflector extends KalturaReflector
 				
 				if(array_key_exists($name, $parsedDocComment->validateConstraints))
 					$paramInfo->setConstraints($parsedDocComment->validateConstraints[$name]);
+
+				if(in_array($name, $parsedDocComment->disableRelativeTimeParams, true))
+					$paramInfo->setDisableRelativeTime(true);
 				
 				$this->_actionParams[$name] = $paramInfo;
 			}

@@ -9,6 +9,7 @@ class KalturaRequestDeserializer
 	private $paramsGrouped = array();
 	private $objects = array();
 	private $extraParams = array("format", "ks", "fullObjects");
+	private $disableRelativeTime = false;
 
 	const PREFIX = ":";
 
@@ -58,8 +59,11 @@ class KalturaRequestDeserializer
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
+			/** @var KalturaParamInfo $actionParam */
 			$type = $actionParam->getType();
 			$name = $actionParam->getName();
+
+			$this->disableRelativeTime = $actionParam->getDisableRelativeTime();
 			
 			if ($actionParam->isSimpleType($type))
 			{
@@ -386,6 +390,9 @@ class KalturaRequestDeserializer
 
 	private function isRelativeTimeEnabled()
 	{
+		if ($this->disableRelativeTime)
+			return false;
+
 		if (!kConf::hasParam('disable_relative_time_partners'))
 			return true;
 
