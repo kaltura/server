@@ -50,7 +50,7 @@ class APIErrors
 				$args[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? $errorArgsArray[$i] : "N/A";
 	
 				// Replace the arg's placeholder with its value in the destination string
-				$message = str_replace("@{$paramNames[$i]}@", $errorArgsArray[$i], $message);
+				$message = str_replace("@{$paramNames[$i]}@", $args[ $paramNames[$i] ], $message);
 			}
 		}
 	
