@@ -117,8 +117,8 @@
 				KDLConstants::VideoIndex=>array("wvc1", KDLVideoTarget::WMV2,KDLVideoTarget::WMV3)),
 			KDLTranscoders::EE3 => array(
 				KDLConstants::ContainerIndex=>array(KDLContainerTarget::FLV, KDLContainerTarget::MP4)),
-			KDLTranscoders::FFMPEG => array(
-				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
+			KDLTranscoders::FFMPEG => array(),
+//				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 			KDLTranscoders::FFMPEG_AUX => array(
 				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 			KDLTranscoders::ENCODING_COM => array(
