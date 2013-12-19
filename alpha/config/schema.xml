@@ -220,6 +220,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="end_date" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_played_at" type="timestamp" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
 			<reference local="kshow_id" foreign="id" />
 		</foreign-key>

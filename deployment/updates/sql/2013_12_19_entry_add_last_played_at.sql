@@ -1,0 +1,1 @@
+ALTER TABLE `entry` ADD `last_played_at` DATETIME;
