@@ -23,7 +23,7 @@ foreach($indexSchemas as $schemaPath => $dirPath) {
 
 $exe = __DIR__ . "/IndexObjectsGenerator.php";
 $template = "@APP_DIR@/configurations/sphinx/kaltura.conf.source";
-$generatedConf = "@APP_DIR@/sphinx/kaltura.conf.template";
+$generatedConf = "@APP_DIR@/configurations/sphinx/kaltura.conf.template";
 
 $returnVar = 0;
 passthru("php {$exe} {$template} {$generatedConf} {$args}", $returnVar);
