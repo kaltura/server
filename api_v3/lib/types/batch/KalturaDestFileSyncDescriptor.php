@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaFileAssetDescriptor extends KalturaObject
+class KalturaDestFileSyncDescriptor extends KalturaObject
 {
 	/**
 	 * @var string
@@ -17,22 +17,15 @@ class KalturaFileAssetDescriptor extends KalturaObject
 	public $fileSyncRemoteUrl;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
-	public $fileExt;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $name;
+	public $fileSyncObjectSubType;
 	
 	private static $map_between_objects = array
 	(
 		"fileSyncLocalPath" ,
 		"fileSyncRemoteUrl" ,
-		"fileExt" ,
-		"name" ,
+		"fileSyncObjectSubType" ,
 	);
 
 
@@ -44,7 +37,7 @@ class KalturaFileAssetDescriptor extends KalturaObject
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kFileAssetDescriptor();
+			$dbObject = new kDestFileSyncDescriptor();
 			
 		return parent::toObject($dbObject, $skip);
 	}

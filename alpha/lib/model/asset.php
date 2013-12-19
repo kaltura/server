@@ -85,6 +85,8 @@ class asset extends Baseasset implements ISyncableFile
 	
 	const FILE_SYNC_ASSET_SUB_TYPE_ASSET = 1;
 	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
+	const FILE_SYNC_ASSET_SUB_TYPE_ISM = 3;
+	const FILE_SYNC_ASSET_SUB_TYPE_ISMC = 4;
 	
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
@@ -122,9 +124,13 @@ class asset extends Baseasset implements ISyncableFile
 		
 		$assetSyncKey = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$convertLogSyncKey = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+		$ismSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+		$ismcSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		
 		$newAssetSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$newConvertLogSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+		$newIsmSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+		$newIsmcSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		
 		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
 			kFileSyncUtils::softCopy($assetSyncKey, $newAssetSyncKey);
@@ -132,6 +138,12 @@ class asset extends Baseasset implements ISyncableFile
 		if(kFileSyncUtils::fileSync_exists($convertLogSyncKey))
 			kFileSyncUtils::softCopy($convertLogSyncKey, $newConvertLogSyncKey);
 		
+		if(kFileSyncUtils::fileSync_exists($ismSyncKey))
+			kFileSyncUtils::softCopy($ismSyncKey, $newIsmSyncKey);
+			
+		if(kFileSyncUtils::fileSync_exists($ismcSyncKey))
+			kFileSyncUtils::softCopy($ismcSyncKey, $newIsmcSyncKey);
+			
 		kEventsManager::raiseEvent(new kObjectAddedEvent($newFlavorAsset));
 		
 		return $newFlavorAsset;
@@ -215,6 +227,8 @@ class asset extends Baseasset implements ISyncableFile
 		$valid_sub_types = array(
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET,
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG,
+			self::FILE_SYNC_ASSET_SUB_TYPE_ISM,
+			self::FILE_SYNC_ASSET_SUB_TYPE_ISMC,
 		);
 		if (!in_array($sub_type, $valid_sub_types))
 			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
@@ -240,6 +254,8 @@ class asset extends Baseasset implements ISyncableFile
 			switch ($sub_type)
 			{
 				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
 					$key->version = $this->getVersion();
 					break;
 				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
@@ -277,6 +293,12 @@ class asset extends Baseasset implements ISyncableFile
 				
 			case self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
 				return "$fileName.conv.log";
+				
+			case self::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+				return "$fileName.ism";
+
+			case self::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+				return "$fileName.ismc";				
 		}
 		
 		return null;

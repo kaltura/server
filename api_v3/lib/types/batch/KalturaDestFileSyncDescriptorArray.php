@@ -3,16 +3,16 @@
  * @package api
  * @subpackage objects
  */
-class KalturaFileAssetDescriptorArray extends KalturaTypedArray
+class KalturaDestFileSyncDescriptorArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)
 	{
-		$newArr = new KalturaFileAssetDescriptorArray();
+		$newArr = new KalturaDestFileSyncDescriptorArray();
 		if ($arr == null)
 			return $newArr;
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaFileAssetDescriptor();
+    		$nObj = new KalturaDestFileSyncDescriptor();
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
@@ -22,6 +22,6 @@ class KalturaFileAssetDescriptorArray extends KalturaTypedArray
 		
 	public function __construct()
 	{
-		parent::__construct("KalturaFileAssetDescriptor");	
+		parent::__construct("KalturaDestFileSyncDescriptor");	
 	}
 }

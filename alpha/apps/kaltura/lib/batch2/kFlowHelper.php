@@ -484,7 +484,7 @@ class kFlowHelper
 	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		KalturaLog::debug("convert finished, start handling");	
-
+		
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
@@ -499,10 +499,10 @@ class kFlowHelper
 
 		$flavorParamsOutput = $data->getFlavorParamsOutput();
 		
-		if(count($data->getDestFileAssets()))
+		if(count($data->getDestFileSyncs()))
 		{
 			//operation engine creating only file assets should be the last one in the operations chain
-			self::handleFileAssetsConvertFinished($flavorAsset, $dbBatchJob, $data);
+			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
 		}			
 		if($data->getDestFileSyncLocalPath())
 		{
@@ -729,35 +729,23 @@ class kFlowHelper
 	
 	/**
 	 * 
-	 * Allows to create additional files in the conversion process in addition to flavor asset and save them as file assets
-	 * corresponding to the given flavor asset
+	 * Allows to create additional files in the conversion process in addition to flavor asset 
 	 */
-	private static function handleFileAssetsConvertFinished(flavorAsset $flavorAsset, BatchJob $dbBatchJob, kConvertJobData $data)
+	private static function handleAdditionalFilesConvertFinished(flavorAsset $flavorAsset, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
-		KalturaLog::debug("Convert finished, creating file assets ");
+		KalturaLog::debug("Convert finished, creating additional file syncs ");
 		
-		foreach ($data->getDestFileAssets() as $destFileAssetDesc) 
+		foreach ($data->getDestFileSyncs() as $destFileSyncDesc) 
 		{
-			KalturaLog::debug("Creating file asset for destination file: ".$destFileAssetDesc->getFileSyncLocalPath());
-			
-			$fileAsset = new FileAsset();
-			$fileAsset->setName($destFileAssetDesc->getName());
-			$fileAsset->setSystemName($destFileAssetDesc->getName());
-			$fileAsset->setFileExt($destFileAssetDesc->getFileExt());
-			$fileAsset->setObjectId($flavorAsset->getId());
-			$fileAsset->setObjectType(FileAssetObjectType::ASSET);
-			$fileAsset->setPartnerId($flavorAsset->getPartnerId());
-			$fileAsset->setVersion($flavorAsset->getVersion());
-			$fileAsset->setStatus(FileAssetStatus::READY);
-			$fileAsset->save();
-			
-			$syncKey = $fileAsset->getSyncKey(FileAsset::FILE_SYNC_ASSET);
+			KalturaLog::debug("Creating file sync for destination file: ".$destFileSyncDesc->getFileSyncLocalPath());
+						
+			$syncKey = $flavorAsset->getSyncKey($destFileSyncDesc->getFileSyncObjectSubType());
 
 			$flavorParamsOutput = $data->getFlavorParamsOutput();
 			$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
 			if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 			{
-				kFileSyncUtils::moveFromFile($destFileAssetDesc->getFileSyncLocalPath(), $syncKey);
+				kFileSyncUtils::moveFromFile($destFileSyncDesc->getFileSyncLocalPath(), $syncKey);
 			}
 			elseif($flavorParamsOutput->getRemoteStorageProfileIds())
 			{
@@ -765,11 +753,11 @@ class kFlowHelper
 				foreach($remoteStorageProfileIds as $remoteStorageProfileId)
 				{
 					$storageProfile = StorageProfilePeer::retrieveByPK($remoteStorageProfileId);
-					kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $destFileAssetDesc->getFileSyncLocalPath(), $storageProfile);
+					kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $destFileSyncDesc->getFileSyncLocalPath(), $storageProfile);
 				}
 			}			
 		}
-		$data->setDestFileAssets(null);	
+		$data->setDestFileSyncs(null);	
 	}
 
 	/**

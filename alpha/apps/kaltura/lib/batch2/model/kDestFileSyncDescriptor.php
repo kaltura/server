@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kFileAssetDescriptor 
+class kDestFileSyncDescriptor 
 {
 	/**
 	 * @var string
@@ -17,15 +17,9 @@ class kFileAssetDescriptor
 	
 	/**
 	 * 
-	 * @var string
+	 * @var int
 	 */
-	private $fileExt;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	private $name;
+	private $fileSyncObjectSubType;
 	
 	/**
 	 * @return the $fileSyncLocalPath
@@ -42,17 +36,10 @@ class kFileAssetDescriptor
 	}
 
 	/**
-	 * @return the $fileExt
+	 * @return the $fileSyncObjectSubType
 	 */
-	public function getFileExt() {
-		return $this->fileExt;
-	}
-
-	/**
-	 * @return the $name
-	 */
-	public function getName() {
-		return $this->name;
+	public function getFileSyncObjectSubType() {
+		return $this->fileSyncObjectSubType;
 	}
 
 	/**
@@ -70,16 +57,12 @@ class kFileAssetDescriptor
 	}
 
 	/**
-	 * @param string $fileExt
+	 * @param int $fileSyncObjectSubType
 	 */
-	public function setFileExt($fileExt) {
-		$this->fileExt = $fileExt;
+	public function setFileSyncObjectSubType($fileSyncObjectSubType) {
+		$this->fileSyncObjectSubType = $fileSyncObjectSubType;
 	}
 
-	/**
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
+	
+
 }

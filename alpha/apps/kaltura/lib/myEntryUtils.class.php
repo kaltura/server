@@ -951,6 +951,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		}
 		
 		foreach($entrySyncKeys as $syncKey)
