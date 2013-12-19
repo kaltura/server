@@ -12,9 +12,11 @@ class KalturaAPIException extends Exception
 	 * @param string $errorString A string in the format: "ERR_CODE;PARAMS;MSG_STRING"
 	 * @throws Exception
 	 */
-	function KalturaAPIException($errorString)
+	function KalturaAPIException( $errorString )
 	{
-		$errorData = call_user_func_array( 'APIErrors::getErrorData', func_get_args() );
+		$errorArgs = func_get_args();
+		array_shift( $errorArgs );
+		$errorData = APIErrors::getErrorData( $errorString, $errorArgs );
 		
 		$this->message = $errorData['message'];
 		$this->code = $errorData['code'];

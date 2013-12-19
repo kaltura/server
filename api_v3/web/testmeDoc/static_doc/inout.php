@@ -118,7 +118,7 @@ The following table lists few possible general API error codes and their equival
 <?php foreach($generalError as $error => $errorParams): ?>
 <tr class="<?php echo ($odd) ? "odd" : ""; ?>">
 <?php
-	$errorData = call_user_func_array( 'APIErrors::getErrorData', array_merge(array($error), $errorParams) );
+	$errorData = APIErrors::getErrorData( $error, $errorParams );
 ?>
 	<td><?php echo $errorData['code']; ?></td>
 	<td><?php echo $errorData['message']; ?></td>
