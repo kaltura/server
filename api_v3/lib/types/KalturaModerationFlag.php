@@ -70,13 +70,13 @@ class KalturaModerationFlag extends KalturaObject
 	public $flagType;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $updatedAt;

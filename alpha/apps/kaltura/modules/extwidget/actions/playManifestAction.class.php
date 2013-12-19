@@ -1114,6 +1114,21 @@ class playManifestAction extends kalturaAction
 	///////////////////////////////////////////////////////////////////////////////////
 	//	Serve functions
 	
+	private function getRenderer($defaultClass, $flavors)
+	{
+		$class = $this->urlManager->getRendererClass();
+		if (!$class)
+			$class = $defaultClass;
+		
+		$renderer = new $class;
+		if ($renderer instanceof kMultiFlavorManifestRenderer)
+			$renderer->flavors = $flavors;
+		else
+			$renderer->flavor = reset($flavors);
+		
+		return $renderer;
+	}
+	
 	/**
 	 * @return kManifestRenderer
 	 */
@@ -1123,9 +1138,7 @@ class playManifestAction extends kalturaAction
 		
 		$flavorInfo = $this->getFlavorHttpUrl(reset($this->flavorAssets));
 
-		$renderer = new kRedirectManifestRenderer();
-		$renderer->flavor = $flavorInfo;
-		return $renderer;
+		return $this->getRenderer('kRedirectManifestRenderer', array($flavorInfo));
 	}
 	
 	/**
@@ -1137,8 +1150,7 @@ class playManifestAction extends kalturaAction
 		
 		$flavors = $this->buildHttpFlavorsArray();
 		
-		$renderer = new kF4MManifestRenderer();
-		$renderer->flavors = $flavors;
+		$renderer = $this->getRenderer('kF4MManifestRenderer', $flavors);
 		$renderer->mimeType = $this->getMimeType($flavors);						
 		return $renderer;
 	}
@@ -1154,8 +1166,7 @@ class playManifestAction extends kalturaAction
 		if(!count($flavors))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
-		$renderer = new kF4MManifestRenderer();
-		$renderer->flavors = $flavors;
+		$renderer = $this->getRenderer('kF4MManifestRenderer', $flavors);
 		$renderer->baseUrl = $baseUrl;
 		$renderer->mimeType = $this->getMimeType($flavors);
 		return $renderer;
@@ -1168,9 +1179,7 @@ class playManifestAction extends kalturaAction
 	{
 		$manifestInfo = $this->getSmoothStreamUrl();
 
-		$renderer = new kSilverLightManifestRenderer();
-		$renderer->flavor = $manifestInfo;
-		return $renderer;
+		return $this->getRenderer('kSilverLightManifestRenderer', array($manifestInfo));
 	}
 	
 	/**
@@ -1181,18 +1190,14 @@ class playManifestAction extends kalturaAction
 		$flavor = $this->getSecureHdUrl();
 		if ($flavor)
 		{
-			$renderer = new kRedirectManifestRenderer();
-			$renderer->flavor = $flavor;
-			return $renderer;
+			return $this->getRenderer('kRedirectManifestRenderer', array($flavor));
 		}
 		
 		$flavors = $this->buildHttpFlavorsArray();
 		
 		$flavors = $this->sortFlavors($flavors);
 
-		$renderer = new kM3U8ManifestRenderer();
-		$renderer->flavors = $flavors;
-		return $renderer;
+		return $this->getRenderer('kM3U8ManifestRenderer', $flavors);
 	}
 
 	/**
@@ -1204,9 +1209,7 @@ class playManifestAction extends kalturaAction
 		
 		$flavors = $this->sortFlavors($flavors);
 
-		$renderer = new kF4MManifestRenderer();
-		$renderer->flavors = $flavors;
-		return $renderer;		
+		return $this->getRenderer('kF4MManifestRenderer', $flavors);
 	}
 	
 	/**
@@ -1219,9 +1222,7 @@ class playManifestAction extends kalturaAction
 		// When playing HDS with Akamai HD the bitrates in the manifest must be unique
 		$this->ensureUniqueBitrates($flavors); 
 
-		$renderer = new kSmilManifestRenderer();
-		$renderer->flavors = $flavors;
-		return $renderer;
+		return $this->getRenderer('kSmilManifestRenderer', $flavors);
 	}
 	
 	/**
@@ -1233,7 +1234,7 @@ class playManifestAction extends kalturaAction
 		
 		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
 
-		$renderer = new kF4MManifestRenderer();
+		$renderer = $this->getRenderer('kF4MManifestRenderer', array());
 		$renderer->mediaUrl = $mediaUrl;
 		return $renderer;
 	}
@@ -1250,9 +1251,7 @@ class playManifestAction extends kalturaAction
 			return null;
 		}
 		
-		$renderer = new kF4MManifestRenderer();
-		$renderer->flavors = array($flavor);
-		return $renderer;
+		return $this->getRenderer('kF4MManifestRenderer', array($flavor));
 	}	
 
 	/**
@@ -1264,9 +1263,7 @@ class playManifestAction extends kalturaAction
 		
 		$flavorInfo = $this->getFlavorHttpUrl(reset($this->flavorAssets));
 
-		$renderer = new kRtspManifestRenderer();
-		$renderer->flavor = $flavorInfo;
-		return $renderer;
+		return $this->getRenderer('kRtspManifestRenderer', array($flavorInfo));
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
@@ -1378,8 +1375,7 @@ class playManifestAction extends kalturaAction
 				
 				$this->urlManager->finalizeUrls($baseUrl, $flavors);
 				
-				$renderer = new kF4MManifestRenderer();
-				$renderer->flavors = $flavors;
+				$renderer = $this->getRenderer('kF4MManifestRenderer', $flavors);
 				$renderer->baseUrl = $baseUrl;
 				$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 				$renderer->mimeType = $this->getMimeType($flavors);
@@ -1392,15 +1388,13 @@ class playManifestAction extends kalturaAction
 				$this->urlManager->finalizeUrls($baseUrl, $flavors);
 				
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-				$renderer = new kRedirectManifestRenderer();
-				$renderer->flavor = $flavor;
+				$renderer = $this->getRenderer('kRedirectManifestRenderer', array($flavor));
 				break;
 			
 			case PlaybackProtocol::HDS:
 			case PlaybackProtocol::AKAMAI_HDS:
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
-				$renderer = new kF4MManifestRenderer();
-				$renderer->flavors = array($flavor);
+				$renderer = $this->getRenderer('kF4MManifestRenderer', array($flavor));
 				break;
 		}
 				

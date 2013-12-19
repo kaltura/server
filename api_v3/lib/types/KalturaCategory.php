@@ -74,7 +74,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	/**
 	 * Creation date as Unix timestamp (In seconds)
 	 *  
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -83,7 +83,7 @@ class KalturaCategory extends KalturaObject implements IFilterable
 	/**
 	 * Update date as Unix timestamp (In seconds)
 	 *  
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

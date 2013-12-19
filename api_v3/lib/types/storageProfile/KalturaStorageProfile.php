@@ -13,14 +13,14 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	public $id;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
