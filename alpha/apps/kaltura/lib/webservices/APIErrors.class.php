@@ -10,18 +10,20 @@ class APIErrors
 	 * if given) and return a response array containing the message and the given error code and args.
 	 * 
 	 * Sample usage:
-	 *     $errorData = APIErrors::getErrorData( APIErrors::INTERNAL_SERVERL_ERROR, 'some informative text' );
+	 *     $errorData = APIErrors::getErrorData( APIErrors::INVALID_KS, array( 'KSID', 'ERR_CODE', 'ERR_DESC' ) );
 	 *     
-	 * Sample usage from a generic function (e.g. KalturaAPIError):
+	 * Sample usage from a generic function (e.g. from KalturaAPIError):
 	 *     function KalturaAPIException( $errorString )
 	 *     {
-	 *         $errorData = call_user_func_array( 'APIErrors::getErrorData', func_get_args() );
+	 *         $args = func_get_args();
+	 *         array_shift( $args );
+	 *         $errorData = APIErrors::getErrorData( $errorString, $args );
 	 *     }
 	 *  
 	 * @param string $errorString
 	 * @return array(
-	 * 	   <br>'code' => The given error code (e.g. 'INTERNAL_SERVERL_ERROR'),
-	 *     <br>'args' => All extra arguments that were passed to the function (otherwise - an empty array),
+	 * 	   <br>'code'    => The given error code (e.g. 'INTERNAL_SERVERL_ERROR'),
+	 *     <br>'args'    => A map between the error's params and the given values from $errorArgs, e.g. array( 'KSID' => '1234' ), or an empty array in case of no params 
 	 * 	   <br>'message' => Composed English message. Any placeholedrs will be replaced with the supplied args.
 	 *   <br>)
 	 */
@@ -29,33 +31,40 @@ class APIErrors
 	{
 		$errorData = array();
 	
+		// The error string format is:
+		//     "ERROR_CODE;OPTIONAL,COMMA,SEPARATED,VALUES;ERROR STRING TEMPLATE WITH OPTIONAL @PARAM@ VARS"
+		//
+		// Sample format w/o params:
+		//     "INTERNAL_DATABASE_ERROR;;Internal database error"
+		//
+		// Sample format w/ params:
+		//     "INTERNAL_SERVER_ERROR;ERR_TEXT;Internal server error @ERR_TEXT@"
 		$components = explode(';', $errorString, 3);
+		
 		$errorData['code'] = $components[0];
 		$message = $components[2];
 	
-		$args = array();
+		$argsDictionary = array(); // A map between the params from the error string and their given errorArgs counterparts
 	
 		if ( ! empty($components[1]) ) // Need to process arguments?
 		{
 			$paramNames = explode(',', $components[1]);
 			$numParamNames = count($paramNames);
 	
-			$funcArgs = func_get_args();
-			array_shift( $funcArgs ); // Get rid of the first arg (= $errorString)
-	
-			// Create and fill the args dictionary
+			// Create and fill the argsDictionary dictionary
 			for ( $i = 0; $i < $numParamNames; $i++ )
 			{
 				// Map the arg's name to its value
-				$args[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? $errorArgsArray[$i] : "N/A";
+				// NOTE: N/A means there was a mismatch in the number of supplied arguments (i.e. a bug in the calling code)
+				$argsDictionary[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? $errorArgsArray[$i] : "N/A";
 	
 				// Replace the arg's placeholder with its value in the destination string
-				$message = str_replace("@{$paramNames[$i]}@", $args[ $paramNames[$i] ], $message);
+				$message = str_replace("@{$paramNames[$i]}@", $argsDictionary[ $paramNames[$i] ], $message);
 			}
 		}
 	
 		$errorData['message'] = $message;
-		$errorData['args'] = $args;
+		$errorData['args'] = $argsDictionary;
 	
 		return $errorData;
 	}
