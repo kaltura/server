@@ -88,12 +88,12 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	public $statusIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 

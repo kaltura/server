@@ -48,7 +48,9 @@ class KalturaDocCommentParser
     const DOCCOMMENT_DISABLE_TAGS = "/\\@disableTags ([\\w\\,\\s\\d]*)/";
     
     const DOCCOMMENT_VALIDATE_CONSTRAINT = "/\\@CONSTRAINT\\s+([\\w.]+\\s+)?(\\d+)/";
-    
+
+    const DOCCOMMENT_DISABLE_RELATIVE_TIME = "/\\@disableRelativeTime \\$(\\w*)/";
+
     const MIN_LENGTH_CONSTRAINT = "minLength";
     const MAX_LENGTH_CONSTRAINT = "maxLength";
     const MIN_VALUE_CONSTRAINT = "minValue";
@@ -321,7 +323,9 @@ class KalturaDocCommentParser
 	            }
             }
         }
-        $this->errors = $error_array;        
+        $this->errors = $error_array;
+
+		$this->disableRelativeTimeParams = $this->getDisableRelativeTimeParams($comment);
      }
      
      private function fillConstraint($comment, $constraintName) {
@@ -341,4 +345,18 @@ class KalturaDocCommentParser
      		}
      	}
      }
+
+	private function getDisableRelativeTimeParams($comment)
+	{
+		$array = array();
+		if (preg_match_all(self::DOCCOMMENT_DISABLE_RELATIVE_TIME, $comment, $result))
+		{
+			foreach($result[1] as $paramName)
+			{
+				$array[] = $paramName;
+			}
+		}
+
+		return $array;
+	}
 }
