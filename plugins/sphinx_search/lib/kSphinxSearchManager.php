@@ -418,12 +418,12 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$sphinxServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
 			if ($sphinxServerCacheStore)
 			{
-				$sphinxConnectionId = $sphinxServerCache->get(self::CACHE_PREFIX . $sphinxConnection->getHostName());
+				$sphinxConnectionId = $sphinxServerCacheStore->get(self::CACHE_PREFIX . $sphinxConnection->getHostName());
 				if ($sphinxConnectionId)
 					return $sphinxConnectionId;
 			}
 			
-			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($hostname);
+			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($sphinxConnection->getHostName());
 			if($sphinxServer)
 			{
 	        	$sphinxConnectionId = $sphinxServer->getId();
