@@ -25,7 +25,7 @@ class APIErrors
 	 * 	   <br>'message' => Composed English message. Any placeholedrs will be replaced with the supplied args.
 	 *   <br>)
 	 */
-	public static function getErrorData( $errorString )
+	public static function getErrorData( $errorString, $errorArgsArray = array() )
 	{
 		$errorData = array();
 	
@@ -47,10 +47,10 @@ class APIErrors
 			for ( $i = 0; $i < $numParamNames; $i++ )
 			{
 				// Map the arg's name to its value
-				$args[ $paramNames[$i] ] = $funcArgs[$i];
+				$args[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? $errorArgsArray[$i] : "N/A";
 	
 				// Replace the arg's placeholder with its value in the destination string
-				$message = str_replace("@{$paramNames[$i]}@", $funcArgs[$i], $message);
+				$message = str_replace("@{$paramNames[$i]}@", $errorArgsArray[$i], $message);
 			}
 		}
 	
