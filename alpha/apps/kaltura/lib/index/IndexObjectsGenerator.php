@@ -1,8 +1,8 @@
 <?php
 
-require('IndexableField.php');
-require('IndexableObject.php');
-require('IndexableOptimization.php');
+require(__DIR__ . '/IndexableField.php');
+require(__DIR__ . '/IndexableObject.php');
+require(__DIR__ . '/IndexableOptimization.php');
 
 class IndexObjectsGenerator  
 {
