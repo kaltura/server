@@ -78,7 +78,7 @@ Add new workers to batch.ini based on batch.ini.template.
 - Add conversion_profile_2.type column using deployment/updates/sql/2013_10_29_add_type_column_to_conversion_profile_table.sql
 - Add media partner using deployment/updates/sql/2013_11_13_create_media_partner.sql
 - Create media server partner permissions - deployment/updates/sql/2013_11_18_create_media_partner_permissions.sql
-- Add `last_played_at` to entry table - `deployment/updates/sql/2013_12_19_entry_add_last_played_at.sql`
+- Add last_played_at to entry table - deployment/updates/sql/2013_12_19_entry_add_last_played_at.sql
 
 **Shared Content**
 
