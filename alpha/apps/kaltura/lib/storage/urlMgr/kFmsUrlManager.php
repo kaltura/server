@@ -33,4 +33,12 @@ class kFmsUrlManager extends kUrlManager
 		
 		return str_replace('{url}', $url, $pattern);
 	}
+	
+	public function getRendererClass()
+	{
+		$paramName = 'renderer_class_' . $this->protocol;
+		if (isset($this->params[$paramName]))
+			return $this->params[$paramName];
+		return null;
+	}
 }
