@@ -13,8 +13,8 @@ function getIndexSchemas($dirname)
 	return $indexSchemas;
 }
 	
-$indexSchemas = getIndexSchemas("@APP_DIR@/alpha/");
-$indexSchemas = array_merge( $indexSchemas, getIndexSchemas("@APP_DIR@/plugins/"));
+$indexSchemas = getIndexSchemas(__DIR__ . "/../../../../alpha/");
+$indexSchemas = array_merge( $indexSchemas, getIndexSchemas(__DIR__ . "/../../../../plugins/"));
 
 $args = "";
 foreach($indexSchemas as $schemaPath => $dirPath) {
@@ -22,8 +22,8 @@ foreach($indexSchemas as $schemaPath => $dirPath) {
 }
 
 $exe = __DIR__ . "/IndexObjectsGenerator.php";
-$template = "@APP_DIR@/configurations/sphinx/kaltura.conf.source";
-$generatedConf = "@APP_DIR@/configurations/sphinx/kaltura.conf.template";
+$template = __DIR__ . "/../../../../configurations/sphinx/kaltura.conf.source";
+$generatedConf = __DIR__ . "/../../../../configurations/sphinx/kaltura.conf.template";
 
 $returnVar = 0;
 passthru("php {$exe} {$template} {$generatedConf} {$args}", $returnVar);
