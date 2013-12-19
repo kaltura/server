@@ -40,12 +40,12 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 	}
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $lastPlayedAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $lastPlayedAtLessThanOrEqual;
 

@@ -26,7 +26,7 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 	/**
 	 * The last time the entry was played
 	 *
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
