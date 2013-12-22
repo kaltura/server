@@ -74,7 +74,7 @@ class KalturaMetadata extends KalturaObject implements IFilterable
 	
 	/**
 	 * 
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
@@ -84,7 +84,7 @@ class KalturaMetadata extends KalturaObject implements IFilterable
 	
 	/**
 	 * 
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */

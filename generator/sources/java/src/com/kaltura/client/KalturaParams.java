@@ -81,6 +81,15 @@ public class KalturaParams extends HashMap<String, String> {
 		else
 			this.put(key, Integer.toString(value));
 	}
+	
+	public void add(String key, long value) {
+		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_LONG)
+			return;
+		if (value == KalturaParamsValueDefaults.KALTURA_NULL_LONG)
+			putNull(key);
+		else
+			this.put(key, Long.toString(value));
+	}
 
 	public void add(String key, float value) {
 		if (value == KalturaParamsValueDefaults.KALTURA_UNDEF_FLOAT)

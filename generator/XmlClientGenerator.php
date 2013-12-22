@@ -389,6 +389,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	                    else if ($defaultValue === false)
 	                        $actionParamElement->setAttribute("default", "false");
                         break;
+			        case "bigint":
 			        case "int":
 		            case "float":
 	                case "string":

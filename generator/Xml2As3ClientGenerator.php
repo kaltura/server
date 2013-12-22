@@ -116,10 +116,11 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$type = "String = null";
 					break;
 
+				case "bigint":
 				case "float" :
 					$type = "Number = Number.NEGATIVE_INFINITY";
 					break;
-
+					
 				case "int" :
 					$type = "int = int.MIN_VALUE";
 					break;
@@ -251,6 +252,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			{
 				case "string" :
 				case "float" :
+				case "bigint":
 				case "int" :
 				case "bool" :
 					break;
@@ -335,6 +337,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";
 
 							break;
+						case "bigint":
 						case "float" :
 							$const_doc_param .= ' Number';
 							$const_props .= $prop->attributes()->name . " : Number";
@@ -600,6 +603,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 
 			switch( $child->result->attributes()->type )
 			{
+				case "bigint":
 				case "int":
 				case "bool":
 				case "float" :

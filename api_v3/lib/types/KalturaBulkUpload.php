@@ -6,7 +6,7 @@
 class KalturaBulkUpload extends KalturaObject implements IFilterable
 {
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $id;
 	
@@ -21,7 +21,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	public $uploadedByUserId;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,eq
 	 */
 	public $uploadedOn;
