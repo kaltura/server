@@ -11,6 +11,7 @@ class kFlowHelper
 	protected static $thumbUnSupportVideoCodecs = array(
 	flavorParams::VIDEO_CODEC_VP8,
 	);
+	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 
 	/**
 	 * @param int $partnerId
@@ -1262,7 +1263,24 @@ class kFlowHelper
 			{
 				try
 				{
-					kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+					$currFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+					//In cases we are returning from intermediate flow need to check maybe if another round is needed
+					//This comes to support the creation of silent audio tracks on source assets such as .arf that require initial inter flow for the source and only than the addition
+					//of the silent audio track
+					if( $currFlavorAsset instanceof flavorAsset && $currFlavorAsset->getIsOriginal() && $currFlavorAsset->getInterFlowCount() != null)
+					{ 
+						//check if the inter flow count is larger than 2.  
+						//In this cases probably something went wrong so we will continue with the original flow and will not check if any additioanl inter flow nneds to be done.
+						if($currFlavorAsset->getInterFlowCount() < self::MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE)
+						{
+							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
+							kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $convertProfileJob, $mediaInfo->getId());
+						}
+						else 
+							kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+					}
+					else 
+						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 				}
 				catch(Exception $e)
 				{
