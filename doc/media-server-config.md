@@ -30,6 +30,7 @@ media_servers.ini is optional and needed only for custom configurations.
 - commons-codec-1.4.jar
 - commons-httpclient-3.1.jar
 - commons-logging-1.1.1.jar
+- commons-lang-2.6.jar
 
 ## For all wowza machine (origin and edge): ##
 - Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
