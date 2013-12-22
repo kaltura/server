@@ -37,6 +37,7 @@ media_servers.ini is optional and needed only for custom configurations.
  - commons-codec-1.4.jar
  - commons-httpclient-3.1.jar
  - commons-logging-1.1.1.jar 
+ - commons-lang-2.6.jar
 - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
 - Create @WOWZA_DIR@/applications/kLive directory.
 - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
@@ -124,6 +125,9 @@ media_servers.ini is optional and needed only for custom configurations.
      - Kaltura recorded files group name
          - Name - KalturaRecordedFileGroup
          - Value - kaltura (or apache if kaltura doesn't exist)
+     - Kaltura web services binding host anme
+         - Name - KalturaServerWebServicesHost
+         - Value - external IP as will be accessed from the API machines.
 
 **Edit @WOWZA_DIR@/conf/log4j.properties:**
 
