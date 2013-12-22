@@ -23,5 +23,5 @@
 5. Deploy on tomcat:
 	- Extract a WAR file and put it under <TOMCAT>/webapps
 
-6. On KMC, set the notification URL to be http://<your tomcat server path>/<war name>/HttpNotificationHandler.jsp
+6. Contact your project manager to set the notification URL to be http://<your tomcat server path>/<war name>/HttpNotificationHandler.jsp
 	
