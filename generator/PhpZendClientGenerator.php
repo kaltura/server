@@ -404,6 +404,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
 					
+				case "bigint" :
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = (int)\$xml->$propName;");
+					break;
+					
 				case "bool" :
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = true;");
@@ -676,7 +681,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 						$signature .= " = null";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
-					else if ($paramType == "int" || $paramType == "float")
+					else if ($paramType == "int" || $paramType == "bigint" || $paramType == "float")
 					{
 						if ($defaultValue == "")
 							$signature .= " = \"\""; // hack for partner.getUsage
