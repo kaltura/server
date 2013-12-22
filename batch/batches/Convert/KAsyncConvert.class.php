@@ -257,6 +257,13 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
 		
+		if(!$data->destFileSyncLocalPath)
+		{
+			$job->status = KalturaBatchJobStatus::FINISHED;
+			$job->message = "No file to move";
+			return $this->closeJob($job, null, null, $job->message, $job->status, $data);
+		}
+			
 		$uniqid = uniqid("convert_{$job->entryId}_");
 		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
 				
