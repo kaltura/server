@@ -149,7 +149,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 * @action query
 	 * @param int $id
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaGenericListResponse
+	 * @return KalturaObjectListResponse
 	 *
 	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
 	 */
@@ -172,7 +172,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$objectFilterEngine->setPageIndex($pager->pageIndex);
 		$response = $objectFilterEngine->query($scheduledTaskProfile->objectFilter);
 
-		$genericResponse = new KalturaGenericListResponse();
+		$genericResponse = new KalturaObjectListResponse();
 		$genericResponse->totalCount = $response->totalCount;
 		foreach($response->objects as $object)
 		{

@@ -4,7 +4,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaGenericArray extends KalturaTypedArray
+class KalturaObjectArray extends KalturaTypedArray
 {
 	public function __construct()
 	{

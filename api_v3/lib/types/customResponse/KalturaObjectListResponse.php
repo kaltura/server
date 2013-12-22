@@ -4,10 +4,10 @@
  * @package api
  * @subpackage objects
  */
-class KalturaGenericListResponse extends KalturaObject
+class KalturaObjectListResponse extends KalturaObject
 {
 	/**
-	 * @var KalturaGenericArray
+	 * @var KalturaObjectArray
 	 * @readonly
 	 */
 	public $objects;
