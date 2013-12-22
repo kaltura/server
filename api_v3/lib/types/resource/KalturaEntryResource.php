@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaEntryResource extends KalturaContentResource 
+class KalturaEntryResource extends KalturaContentResource
 {
 	/**
 	 * ID of the source entry 
@@ -18,17 +18,22 @@ class KalturaEntryResource extends KalturaContentResource
 	 * @var int
 	 */
 	public $flavorParamsId;
-
-	public function validateEntry(entry $dbEntry)
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateEntry($dbEntry);
-    	$this->validatePropertyNotNull('entryId');
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+		
+		$this->validatePropertyNotNull('entryId');
 	
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
 		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
-			return parent::validateEntry($dbEntry);
+			
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || $srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH)
+			return;
 		
 		$srcFlavorAsset = null;
 		if(is_null($this->flavorParamsId))
@@ -58,15 +63,64 @@ class KalturaEntryResource extends KalturaContentResource
 		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaResource::validateEntry()
+	 */
+	public function validateEntry(entry $dbEntry)
+	{
+		parent::validateEntry($dbEntry);
+		
+		$srcEntry = entryPeer::retrieveByPK($this->entryId);
+		if(!$srcEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
+			return parent::validateEntry($dbEntry);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		if(!$object_to_fill)
-			$object_to_fill = new kFileSyncResource();
-			
+		$this->validateForUsage($object_to_fill, $props_to_skip);
+		
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
     	if(!$srcEntry)
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+
+    	if($srcEntry->getType() == entryType::LIVE_STREAM)
+    	{
+    		/* @var $srcEntry LiveEntry */
+    		
+    		if($srcEntry->getSource() != EntrySourceType::LIVE_STREAM)
+    			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
+    			
+    		$mediaServer = $srcEntry->getMediaServer();
+    		if($mediaServer && $mediaServer->getDc() != kDataCenterMgr::getCurrentDcId())
+    		{
+				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($mediaServer->getDc());
+				if($remoteDCHost)
+				{
+					kFileUtils::dumpApiRequest($remoteDCHost);
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
+				}
+    		}
+    		
+			if($object_to_fill && !($object_to_fill instanceof kLiveEntryResource))
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($object_to_fill));
+				
+			$object_to_fill = new kLiveEntryResource();
+    		$object_to_fill->setEntry($srcEntry);
+    		    		
+    		return $object_to_fill;
+    	}
     	
+		if(!$object_to_fill)
+			$object_to_fill = new kFileSyncResource();
+			
     	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{
 			$object_to_fill->setFileSyncObjectType(FileSyncObjectType::ENTRY);
@@ -98,6 +152,9 @@ class KalturaEntryResource extends KalturaContentResource
 		return $object_to_fill;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaResource::entryHandled()
+	 */
 	public function entryHandled(entry $dbEntry)
 	{
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);

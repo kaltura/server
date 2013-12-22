@@ -232,7 +232,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 			$paramNames = join(', ', $paramNames);
 			
 			// action method signature
-			if (in_array($actionName, array("list", "clone", "delete"))) // because list & clone are preserved in PHP
+			if (in_array($actionName, array("list", "clone", "delete", "export"))) // because list & clone are preserved in PHP And export is preserved in js
 				$actionSignature = "$serviceClassName.prototype.".$actionName."Action = function($paramNames)";
 			else
 				$actionSignature = "$serviceClassName.prototype.".$actionName." = function($paramNames)";

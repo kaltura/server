@@ -18,7 +18,7 @@ class MetadataService extends KalturaBaseService
 			$this->applyPartnerFilterForClass('Metadata');
 		
 		if(!MetadataPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, MetadataPlugin::PLUGIN_NAME);
 	}
 	
 	protected function kalturaNetworkAllowed($actionName)

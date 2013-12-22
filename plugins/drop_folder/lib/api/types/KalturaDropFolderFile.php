@@ -40,7 +40,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $fileSize;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter order
 	 * @readonly
 	 */
@@ -108,36 +108,36 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $uploadStartDetectedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $uploadEndDetectedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $importStartedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $importEndedAt;
 

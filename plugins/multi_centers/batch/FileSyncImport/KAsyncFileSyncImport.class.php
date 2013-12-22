@@ -1,6 +1,4 @@
 <?php
-require_once(__DIR__ . "/../../../../batch/bootstrap.php");
-
 /**
  *
  *
@@ -26,7 +24,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	{
 		$maxOffset = min($this->getMaxOffset(), KBatchBase::$taskConfig->getQueueSize());
 		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get(self::$kClient);
-		return $multiCentersPlugin->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 
+		return $multiCentersPlugin->filesyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), self::$taskConfig->maximumExecutionTime, 
 				$this->getMaxJobsEachRun(), $this->getFilter(), $maxOffset);
 	}
 	

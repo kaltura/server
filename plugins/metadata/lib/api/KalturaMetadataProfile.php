@@ -50,14 +50,14 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	public $description;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
@@ -176,8 +176,9 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-	    $this->validatePropertyMinLength("name", 1); 
-	    
+		if (!is_null($this->name))
+			$this->validatePropertyMinLength("name", 1);
+				    
 	    if ($this->systemName)
 	    {
 	        $c = KalturaCriteria::create(MetadataProfilePeer::OM_CLASS);

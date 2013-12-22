@@ -97,7 +97,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 
 	/**
 	 * Creation date as Unix timestamp (In seconds)
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -105,7 +105,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 
 	/**
 	 * Last update date as Unix timestamp (In seconds)
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $updatedAt;
@@ -156,6 +156,11 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @filter eq
 	 */
 	public $isAdmin;
+		
+	/**
+	 * @var KalturaLanguageCode
+	 */
+	public $language;
 	
 	/**
 	 * @var int
@@ -172,7 +177,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 	
 	/**
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $deletedAt;
@@ -235,6 +240,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"firstName",
 		"lastName",
 		"isAdmin",
+		"language",
 		"lastLoginTime",
 		"deletedAt",
 		"roleIds",

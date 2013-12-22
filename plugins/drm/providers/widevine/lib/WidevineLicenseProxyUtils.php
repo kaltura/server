@@ -33,12 +33,7 @@ class WidevineLicenseProxyUtils
 	*/
 	public static function sendLicenseRequest($requestParams, $overrideParamsStr = null, $isAdmin = false)
 	{
-		if(	!array_key_exists(self::CLIENTID, $requestParams) ||
-			!array_key_exists(self::MK, $requestParams) ||
-			!array_key_exists(self::MD, $requestParams) ||
-			!array_key_exists(self::ASSETID, $requestParams) 
-			)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::MISSING_MANDATORY_SIGN_PARAMETER);
+		self::validateRequest($requestParams);
 		
 		$ptime = time();
 		$signInput = $requestParams[self::ASSETID].
@@ -53,17 +48,29 @@ class WidevineLicenseProxyUtils
 		$overrideParams = self::getLicenseOverrideParams($overrideParamsStr, $isAdmin);
 		
 		$requestParams = array_merge($requestParams, $overrideParams);
-		$url = self::buildLicenseServerUrl($requestParams);
 		
-		$ch = curl_init();		
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	
-		$response = curl_exec($ch);		
-		$error = curl_error($ch);
-		curl_close($ch);
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
+		if($dbDrmProfile)
+		{
+			$baseUrl = $dbDrmProfile->getLicenseServerUrl();
+			$portal = $dbDrmProfile->getPortal();
+		}
+		else
+		{
+			$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
+			$portal = WidevinePlugin::getWidevineConfigParam('portal');
+		}
 		
-		return $response;
+		if(!$baseUrl)
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_SERVER_URL_NOT_SET);
+					
+		if(!$portal)
+			$portal = WidevinePlugin::KALTURA_PROVIDER;
+			
+		$requestParams[self::PORTAL] = $portal;
+		$baseUrl .= '/'.$portal;
+		
+		return self::doCurl($baseUrl, $requestParams);
 	}
 	
 	public static function createErrorResponse($errorCode, $assetid)
@@ -95,8 +102,17 @@ class WidevineLicenseProxyUtils
 
 	private static function getKeyBytes()
 	{
-		$key = WidevinePlugin::getWidevineConfigParam('key');
-		$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
+		if($dbDrmProfile)
+		{
+			$key = $dbDrmProfile->getKey();
+			$iv = $dbDrmProfile->getIv();		
+		}
+		else 
+		{
+			$key = WidevinePlugin::getWidevineConfigParam('key');
+			$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		}
 		
 		$key = str_replace("0x", "", $key);
 		$key = str_replace(", ", "", $key);
@@ -141,22 +157,33 @@ class WidevineLicenseProxyUtils
 		return $overrideParams;
 	}
 	
-	protected static function buildLicenseServerUrl($urlParams)
+	protected static function validateRequest($requestParams)
 	{
-		$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
-		if(!$baseUrl)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_SERVER_URL_NOT_SET);
-			
-		$portal = WidevinePlugin::getWidevineConfigParam('portal');
-		if(!$portal)
-			$portal = WidevinePlugin::KALTURA_PROVIDER;
-			
-		$urlParams[self::PORTAL] = $portal;
-		$requestUrl = $baseUrl.'?';
-		$requestUrl .= http_build_query($urlParams, '', '&');
+		if(	!array_key_exists(self::CLIENTID, $requestParams) ||
+			!array_key_exists(self::MK, $requestParams) ||
+			!array_key_exists(self::MD, $requestParams) ||
+			!array_key_exists(self::ASSETID, $requestParams) 
+			)
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::MISSING_MANDATORY_SIGN_PARAMETER);		
+	}
+	
+	protected static function doCurl($baseUrl, $requestParams)
+	{
+		$requestParamsStr = http_build_query($requestParams, '', '&');
 		
-		KalturaLog::debug("License request URL: ".$requestUrl);
+		KalturaLog::debug("License request URL: ".$baseUrl);
+		KalturaLog::debug("License request params: ".$requestParamsStr);
 		
-		return $requestUrl;
+		$ch = curl_init();		
+		curl_setopt($ch, CURLOPT_URL, $baseUrl);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch,CURLOPT_POST, count($requestParams));
+		curl_setopt($ch,CURLOPT_POSTFIELDS, $requestParamsStr);
+		
+		$response = curl_exec($ch);		
+		$error = curl_error($ch);
+		curl_close($ch);
+		
+		return $response;
 	}
 }

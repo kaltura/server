@@ -37,6 +37,7 @@ class kSessionBase
 	const PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY = "disableentitlementforentry";
 	const PRIVILEGE_PRIVACY_CONTEXT = "privacycontext";
 	const PRIVILEGE_ENABLE_CATEGORY_MODERATION = "enablecategorymoderation";
+	const PRIVILEGE_REFERENCE_TIME = "reftime";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
@@ -44,6 +45,18 @@ class kSessionBase
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
 
+	const INVALID_STR = -1;
+	const INVALID_PARTNER = -2;
+	const INVALID_USER = -3;
+	const INVALID_TYPE = -4;
+	const EXPIRED = -5;
+	const LOGOUT = -6;
+	const INVALID_LKS = -7;
+	const EXCEEDED_ACTIONS_LIMIT = -8;
+	const EXCEEDED_RESTRICTED_IP = -9;
+	const UNKNOWN = 0;
+	const OK = 1;
+	
 	// KS V1 constants
 	const SEPARATOR = ";";
 	
@@ -103,7 +116,7 @@ class kSessionBase
 	
 	/**
 	 * @param string $encoded_str
-	 * @return boolean
+	 * @return boolean - true = success, false = error, null = failed to get secret
 	 */
 	public function parseKS($encoded_str)
 	{
@@ -116,14 +129,16 @@ class kSessionBase
 		
 		if (substr($decodedKs, 0, 3) == 'v2|')
 		{		
-			if (!$this->parseKsV2($decodedKs))
-				return false;
+			$parseResult = $this->parseKsV2($decodedKs);
 		}
 		else
 		{
-			if (!$this->parseKsV1($decodedKs))
-				return false;
+			$parseResult = $this->parseKsV1($decodedKs);
 		}
+		
+		if (!$parseResult)
+			return $parseResult;
+		
 		$this->original_str = $encoded_str;
 		
 		return true;
@@ -152,7 +167,7 @@ class kSessionBase
 		if (!$salt)
 		{
 			$this->logError("Couldn't get admin secret for partner [$partnerId]");
-			return false;
+			return null;
 		}
 
 		if (sha1($salt . $real_str) != $hash)
@@ -236,6 +251,9 @@ class kSessionBase
 	{
 		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
 
+		if(!$cacheSections)
+			return null;
+			
 		$lowerStores = array();
 		foreach ($cacheSections as $cacheSection)
 		{
@@ -309,6 +327,31 @@ class kSessionBase
 	{
 		return $this->privileges;
 	}
+
+	public function hasPrivilege($privilegeName)
+	{
+		if (!is_array($this->parsedPrivileges))
+			return false;
+
+		return isset($this->parsedPrivileges[$privilegeName]);
+	}
+
+	public function getPrivilegeValues($privilegeName, $default = array())
+	{
+		if ($this->hasPrivilege($privilegeName))
+			return $this->parsedPrivileges[$privilegeName];
+		else
+			return $default;
+	}
+
+	public function getPrivilegeValue($privilegeName, $default = null)
+	{
+		$values = $this->getPrivilegeValues($privilegeName);
+		if (isset($values[0]))
+			return $values[0];
+		else
+			return $default;
+	}
 	
 	public function getPartnerId()
 	{
@@ -318,14 +361,14 @@ class kSessionBase
 	public function tryToValidateKS()
 	{
 		if (!$this->real_str || !$this->hash)
-			return false;						// KS parsing failed
+			return self::INVALID_STR;			// KS parsing failed
 		
 		if ($this->valid_until <= time())
-			return false;						// KS is expired
+			return self::EXPIRED;				// KS is expired
 			
 		if ($this->partner_id == -1 ||			// Batch KS are never invalidated
 			$this->isWidgetSession())			// Since anyone can create a widget session, no need to check for invalidation
-			return true;
+			return self::OK;
 
 		$allPrivileges = explode(',', $this->privileges);
 		foreach($allPrivileges as $priv)
@@ -335,15 +378,17 @@ class kSessionBase
 				$exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION &&
 				$exPrivileges[1] != infraRequestUtils::getRemoteAddress())
 			{
-				return false;
+				return self::EXCEEDED_RESTRICTED_IP;
 			}
 		}
 
 		$isInvalidated = $this->isKSInvalidated();
-		if ($isInvalidated === null || $isInvalidated)
-			return false;						// KS is invalidated, or failed to check
-
-		return true;
+		if ($isInvalidated)
+			return self::LOGOUT;
+		else if ($isInvalidated === null)
+			return self::UNKNOWN;				// failed to check
+		
+		return self::OK;
 	}
 
 	public static function generateSession($ksVersion, $adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId = null, $additionalData = null)
@@ -442,7 +487,10 @@ class kSessionBase
 	{
 		$explodedKs = explode('|', $decodedKs , 3);
 		if (count($explodedKs) != 3)
+		{
+			$this->logError("Not enough | delimiters in the KS");
 			return false;						// not KS V2
+		}
 		
 		list($version, $partnerId, $encKs) = $explodedKs;
 		
@@ -450,7 +498,7 @@ class kSessionBase
 		if (!$adminSecret)
 		{
 			$this->logError("Couldn't get secret for partner [$partnerId].");
-			return false;						// admin secret not found, can't decrypt the KS
+			return null;						// admin secret not found, can't decrypt the KS
 		}
 				
 		$decKs = self::aesDecrypt($adminSecret, $encKs);

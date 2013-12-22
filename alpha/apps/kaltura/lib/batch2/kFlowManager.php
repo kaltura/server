@@ -30,6 +30,34 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 
+	protected function updatedConcat(BatchJob $dbBatchJob, kConcatJobData $data)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleConcatFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return kFlowHelper::handleConcatFailed($dbBatchJob, $data);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
+	protected function updatedConvertLiveSegment(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleConvertLiveSegmentFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return kFlowHelper::handleConvertLiveSegmentFailed($dbBatchJob, $data);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
 	protected function updatedIndex(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
@@ -399,6 +427,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					
 				case BatchJobType::DELETE:
 					$dbBatchJob=$this->updatedDelete($dbBatchJob, $dbBatchJob->getData());
+					break;
+					
+				case BatchJobType::CONCAT:
+					$dbBatchJob=$this->updatedConcat($dbBatchJob, $dbBatchJob->getData());
+					break;
+					
+				case BatchJobType::CONVERT_LIVE_SEGMENT:
+					$dbBatchJob=$this->updatedConvertLiveSegment($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				default:

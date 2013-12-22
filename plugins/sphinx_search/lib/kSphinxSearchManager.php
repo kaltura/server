@@ -10,6 +10,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	const HAS_VALUE = 'HASVALUE';
 
 	const HAS_NO_VALUE = 'HASNOVALUE';
+	
+	const CACHE_PREFIX = 'executed_sphinx_server_';
 
 	/**
 	 * @param string $baseName
@@ -200,17 +202,19 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$dataTimes = array();
 		$dataJson = array();
 		
-		$fields = $object->getIndexFieldsMap();
-		$nullableFields = $object->getIndexNullableFields();
+		$objectIndexClass = $object->getIndexObjectName();
+		$fields = $objectIndexClass::getIndexFieldsMap();
 		foreach($fields as $field => $getterName)
 		{
-			$fieldType = $object->getIndexFieldType($field);
-			$getter = "get{$getterName}";
+			$getter = "get" . $getterName;
+			$fieldType =  $objectIndexClass::getFieldType($field);
+			$nullable = $objectIndexClass::isNullableField($field);
+			
 			switch($fieldType)
 			{
 				case IIndexable::FIELD_TYPE_STRING:
 					$value = $object->$getter();
-					if(in_array($field, $nullableFields))
+					if($nullable)
 					{
 						if(is_null($value) || $value === '')
 							$value = self::HAS_NO_VALUE . $object->getPartnerId();
@@ -288,7 +292,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 		foreach($dataStrings as $key => $value)
 		{
-			$escapeType = $object->getSearchIndexFieldsEscapeType($key);
+			
+			$escapeType = $objectIndexClass::getIndexFieldsEscapeType($key);
 			
 			$value = $xmlPipe2 ? $value : SphinxUtils::escapeString($value, $escapeType, 1);
 			$search = array("\0", 	"\n",	"\r",	"\x1a");
@@ -322,7 +327,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$data[$key] = "'" . $valueStr . "'";
 		}
 		
-		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 
 		$placeHolders = isset($options["placeHolders"]) ? $options["placeHolders"] : false;
 
@@ -383,6 +388,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		KalturaLog::debug($sql);
 				
 		$sphinxLog = new SphinxLog();
+		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId());
 		$sphinxLog->setObjectId($object->getId());
 		$sphinxLog->setObjectType(get_class($object));
 		$sphinxLog->setEntryId($object->getEntryId());
@@ -402,6 +408,32 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		KalturaLog::err($arr[2]);
 		return false;
 	}
+
+	private function retrieveSphinxConnectionId ()
+	{
+		$sphinxConnectionId = null;
+		if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
+        {
+        	$sphinxConnection = DbManager::getSphinxConnection(false);
+			$sphinxServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
+			if ($sphinxServerCacheStore)
+			{
+				$sphinxConnectionId = $sphinxServerCacheStore->get(self::CACHE_PREFIX . $sphinxConnection->getHostName());
+				if ($sphinxConnectionId)
+					return $sphinxConnectionId;
+			}
+			
+			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($sphinxConnection->getHostName());
+			if($sphinxServer)
+			{
+	        	$sphinxConnectionId = $sphinxServer->getId();
+				if ($sphinxServerCacheStore)
+					$sphinxServerCacheStore->set(self::CACHE_PREFIX . $sphinxConnection->getHostName(), $sphinxConnectionId);
+			}
+		}
+		
+		return $sphinxConnectionId;
+	}
 		
 	/**
 	 * @param IIndexable $object
@@ -409,8 +441,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function deleteFromSphinx(IIndexable $object)
 	{
+		$objectIndexClass = $object->getIndexObjectName();
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 		$id = $object->getIntId();
-		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
 		
 		KalturaLog::debug('Deleting sphinx document for object [' . get_class($object) . '] [' . $object->getId() . ']');
 		$sql = "delete from $index where id = $id";

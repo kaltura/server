@@ -56,12 +56,12 @@ abstract class KalturaCategoryEntryBaseFilter extends KalturaFilter
 	public $entryIdIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 

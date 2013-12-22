@@ -7,15 +7,13 @@
  */
 class DrmProfileService extends KalturaBaseService
 {
-	const MYSQL_CODE_DUPLICATE_KEY = 23000;
-	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		if (!DrmPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
-			
 		$this->applyPartnerFilterForClass('DrmProfile');
+		
+		if (!DrmPlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, DrmPlugin::PLUGIN_NAME);		
 	}
 	
 	/**

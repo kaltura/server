@@ -35,7 +35,7 @@ class DrmProfileConfigureAction extends KalturaApplicationPlugin
 				$partnerId = $this->_getParam('partnerId');
 				$drmProfileProvider = $this->_getParam('provider');
 				$drmProfileForm = new Form_DrmProfileConfigure($partnerId, $drmProfileProvider);
-				$action->view->formValid = $this->processForm($drmProfileForm, $request->getPost(), $drmProfileId);
+				$action->view->formValid = $this->processForm($drmProfileForm, $request->getPost(), $partnerId, $drmProfileId);
 				if(!is_null($drmProfileId))
 				{
 					$drmProfile = $drmProfileForm->getObject("Kaltura_Client_Drm_Type_DrmProfile", $request->getPost(), false, true);
@@ -70,7 +70,7 @@ class DrmProfileConfigureAction extends KalturaApplicationPlugin
 		$action->view->form = $drmProfileForm;
 	}
 	
-	private function processForm(Form_DrmProfileConfigure $form, $formData, $drmProfileId = null)
+	private function processForm(Form_DrmProfileConfigure $form, $formData, $partnerId, $drmProfileId = null)
 	{
 		if ($form->isValid($formData))
 		{
@@ -80,6 +80,7 @@ class DrmProfileConfigureAction extends KalturaApplicationPlugin
 			$drmProfile = $form->getObject("Kaltura_Client_Drm_Type_DrmProfile", $formData, false, true);
 			unset($drmProfile->id);
 			
+			Infra_ClientHelper::impersonate($partnerId);
 			if (is_null($drmProfileId)) {
 				$drmProfile->status = Kaltura_Client_Drm_Enum_DrmProfileStatus::ACTIVE;
 				$responseDrmProfile = $drmPluginClient->drmProfile->add($drmProfile);
@@ -87,6 +88,8 @@ class DrmProfileConfigureAction extends KalturaApplicationPlugin
 			else {
 				$responseDrmProfile = $drmPluginClient->drmProfile->update($drmProfileId, $drmProfile);
 			}
+			Infra_ClientHelper::unimpersonate();
+			
 			$form->setAttrib('class', 'valid');
 			return true;
 		}

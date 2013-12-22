@@ -11,6 +11,8 @@ class widgetFilter extends baseObjectFilter
 		// or can use this to set default valuse
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id" , 
+			"_in_id",
+			"_eq_partner_id",
 			"_eq_source_widget_id",
 			"_eq_root_widget_id",
 			"_eq_entry_id",

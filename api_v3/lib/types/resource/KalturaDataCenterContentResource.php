@@ -10,10 +10,13 @@ abstract class KalturaDataCenterContentResource extends KalturaContentResource
 	{
 		return kDataCenterMgr::getCurrentDcId();
 	}
-	
-	public function validateEntry(entry $dbEntry)
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateEntry($dbEntry);
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
 		
 		$dc = $this->getDc();
 		if($dc == kDataCenterMgr::getCurrentDcId())

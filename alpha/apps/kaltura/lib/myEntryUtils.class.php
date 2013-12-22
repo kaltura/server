@@ -1208,6 +1208,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			categoryPeer::setUseCriteriaFilter(true);
 		}
 		
+		return $newEntry;
  	} 	
  	/*
  	 * re-index to search index, and recalculate fields.

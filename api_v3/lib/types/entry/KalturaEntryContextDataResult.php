@@ -77,7 +77,7 @@ class KalturaEntryContextDataResult extends KalturaContextDataResult
 	
 	/**
 	 * Array of actions as received from the access control rules that invalidated
-	 * @var KalturaAccessControlActionArray
+	 * @var KalturaRuleActionArray
 	 * @deprecated
 	 */
 	public $accessControlActions;

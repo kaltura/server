@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/kGeoCoder.php');
+
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'kGeoCoder.php');
 
 class myIPGeocoder extends kGeoCoder
 {

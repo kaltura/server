@@ -72,7 +72,7 @@ class KalturaScheduler extends KalturaObject
 	/**
 	 * creation time
 	 *  
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $createdAt;

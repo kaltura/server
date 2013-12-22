@@ -22,21 +22,21 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $deletedAt;
@@ -44,7 +44,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter gte,lte,order
 	 */
 	public $lockExpiration;
 	
@@ -99,13 +98,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     
     /**
 	 * @var int
-	 * @filter eq
 	 */
     public $abort;
     
     /**
 	 * @var int
-	 * @filter gte,lte,order
 	 */
     public $checkAgainTimeout;
 
@@ -133,7 +130,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     /**
      * The id of the bulk upload job that initiated this job
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $bulkJobId;
     
@@ -147,7 +143,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     /**
      * When one job creates another - the parent should set this parentJobId to be its own id.
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $parentJobId;
     
@@ -155,7 +150,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     /**
      * The id of the root parent job
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $rootJobId;
     
@@ -204,41 +198,35 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $schedulerId;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $workerId;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $batchIndex;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $lastSchedulerId;
 	
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $lastWorkerId;
     
     /**
 	 * @var int
-	 * @filter eq,in,notin
 	 */    
     public $dc;
     
@@ -390,6 +378,18 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				
 			case 'kDeleteJobData':
 				$this->data = new KalturaDeleteJobData();
+				break;
+				
+			case 'kConvertLiveSegmentJobData':
+				$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case 'kConcatJobData':
+				$this->data = new KalturaConcatJobData();
+				break;
+				
+			case 'kCopyPartnerJobData':
+				$this->data = new KalturaCopyPartnerJobData();
 				break;
 				
 			default:			
@@ -584,6 +584,24 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kDeleteJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaDeleteJobData();
+				break;
+				
+			case KalturaBatchJobType::CONVERT_LIVE_SEGMENT:
+				$dbData = new kConvertLiveSegmentJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case KalturaBatchJobType::CONCAT:
+				$dbData = new kConcatJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConcatJobData();
+					
+			case KalturaBatchJobType::COPY_PARTNER:
+				$dbData = new kCopyPartnerJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCopyPartnerJobData();
+					
 				break;
 				
 			default:

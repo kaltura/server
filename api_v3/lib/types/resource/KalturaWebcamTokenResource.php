@@ -12,32 +12,47 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 	 * @var string
 	 */
 	public $token;
-
+	
+	/* (non-PHPdoc)
+	 * @see KalturaDataCenterContentResource::getDc()
+	 */
 	public function getDc()
 	{
 	    $content = myContentStorage::getFSContentRootPath();
-	    $entryFullPath = "{$content}/content/webcam/{$this->token}.flv";
+	    $entryFullPaths = array(
+	    	"{$content}/content/webcam/{$this->token}.flv",
+	    	"{$content}/content/webcam/{$this->token}.f4v",
+	    	"{$content}/content/webcam/{$this->token}.f4v.mp4",
+	    );
 	    
-		if(file_exists($entryFullPath))
-			return kDataCenterMgr::getCurrentDcId();
+	    foreach($entryFullPaths as $entryFullPath)
+			if(file_exists($entryFullPath))
+				return kDataCenterMgr::getCurrentDcId();
 			
 		return (1 - kDataCenterMgr::getCurrentDcId()); // other dc
 	}
 	
-	public function validateEntry(entry $dbEntry)
+	/* (non-PHPdoc)
+	 * @see KalturaDataCenterContentResource::validateForUsage()
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		parent::validateEntry($dbEntry);
-    	$this->validatePropertyNotNull('token');
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+		
+		$this->validatePropertyNotNull('token');
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see KalturaResource::entryHandled()
+	 */
 	public function entryHandled(entry $dbEntry)
 	{
 		parent::entryHandled($dbEntry);
 		
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($dbEntry->getId());
 		$syncKey = $originalFlavorAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-    	$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-    	
+		$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		
 		// call mediaInfo for file
 		$dbMediaInfo = new mediaInfo();
 		try
@@ -61,38 +76,55 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 			$flavorTags = KDLWrap::CDLMediaInfo2Tags($dbMediaInfo, array(flavorParams::TAG_WEB));
 			$originalFlavorAsset->setTags(implode(',', array_unique($flavorTags)));
 		}
-   		$originalFlavorAsset->setStatusLocalReady();
-   		$originalFlavorAsset->save();
+		$originalFlavorAsset->setStatusLocalReady();
+		$originalFlavorAsset->save();
 		
-   		$dbEntry->setStatus(entryStatus::READY);
-   		$dbEntry->save();
+		$dbEntry->setStatus(entryStatus::READY);
+		$dbEntry->save();
 	}
 	
-	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
+		$this->validateForUsage($object_to_fill, $props_to_skip);
+		
 		if(!$object_to_fill)
 			$object_to_fill = new kLocalFileResource();
 			
 	    $content = myContentStorage::getFSContentRootPath();
-	    $entryFullPath = "{$content}/content/webcam/{$this->token}.flv";
+	    $entryFullPaths = array(
+	    	'flv' => "{$content}/content/webcam/{$this->token}.flv",
+	    	'f4v' => "{$content}/content/webcam/{$this->token}.f4v",
+	    	'mp4' => "{$content}/content/webcam/{$this->token}.f4v.mp4",
+	    );
 	    
-		if(!file_exists($entryFullPath))
-			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
-					
-		$entryFixedFullPath = $entryFullPath . '.fixed.flv';
- 		KalturaLog::debug("Fix webcam full path from [$entryFullPath] to [$entryFixedFullPath]");
-		myFlvStaticHandler::fixRed5WebcamFlv($entryFullPath, $entryFixedFullPath);
-				
-		$entryNewFullPath = $entryFullPath . '.clipped.flv';
- 		KalturaLog::debug("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
-		myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath, 0, 0);
-		$entryFullPath = $entryNewFullPath ;
-				
-		if(!file_exists($entryFullPath))
-			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
-					
-		$object_to_fill->setSourceType(KalturaSourceType::WEBCAM);
-		$object_to_fill->setLocalFilePath($entryFullPath);
-		return $object_to_fill;
+	    foreach($entryFullPaths as $type => $entryFullPath)
+	    {
+			if(file_exists($entryFullPath))
+			{
+				if($type == 'flv')
+				{
+					$entryFixedFullPath = $entryFullPath . '.fixed.flv';
+			 		KalturaLog::debug("Fix webcam full path from [$entryFullPath] to [$entryFixedFullPath]");
+					myFlvStaticHandler::fixRed5WebcamFlv($entryFullPath, $entryFixedFullPath);
+							
+					$entryNewFullPath = $entryFullPath . '.clipped.flv';
+			 		KalturaLog::debug("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
+					myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath, 0, 0);
+					$entryFullPath = $entryNewFullPath ;
+							
+					if(!file_exists($entryFullPath))
+						throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
+				}
+							
+				$object_to_fill->setSourceType(KalturaSourceType::WEBCAM);
+				$object_to_fill->setLocalFilePath($entryFullPath);
+				return $object_to_fill;
+			}
+	    }
+		
+		throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
 	}
 }
