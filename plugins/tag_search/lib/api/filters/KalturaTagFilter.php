@@ -39,8 +39,6 @@ class KalturaTagFilter extends KalturaFilter
  	static private $map_between_objects = array
 	(
 		"objectTypeEqual" => "_eq_object_type",
-		"tagEqual" => "_eq_tag",
-		"tagStartsWith" => "_likex_tag",
 	    "instanceCountEqual" => "_eq_instance_count",
 	    "instanceCountIn" => "_in_instance_count", 
 	);
@@ -66,5 +64,19 @@ class KalturaTagFilter extends KalturaFilter
 		$this->trimStringProperties(array ('tagStartsWith', 'tagEqual'));
 		$this->validatePropertyMinLength('tagStartsWith', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
 		$this->validatePropertyMinLength('tagEqual', TagSearchPlugin::MIN_TAG_SEARCH_LENGTH, true, true);
+	}
+	
+	public function toObject ($object = null, $props_to_skip = array())
+	{
+		if (!$object)
+		{
+			$object = new TagFilter();
+		}
+		
+		/* @var $object TagFilter */
+		$object->set ('_eq_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagEqual));
+		$object->set ('_likex_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagStartsWith));
+		
+		return parent::toObject($object, $props_to_skip);
 	}
 }
