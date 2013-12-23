@@ -1119,6 +1119,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	
 	/**
+	 * Used to add dynamic JSON attributes to the search index
+	 */
+	public function getDynamicAttributes()
+	{
+		return null;
+	}
+	
+	/**
 	 * Set the categories (use only the most child categories)
 	 *
 	 * @param string $categories
