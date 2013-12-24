@@ -26,12 +26,20 @@
 			<flavorParamsIds>0,2,3,4,5,6,7</flavorParamsIds>
 		</conversionProfile>
 		<conversionProfile objectType="KalturaConversionProfile">
-			<name>Default - Live</name>
+			<name>Cloud transcode</name>
 			<type>2</type>
 			<systemName>Default_Live</systemName>
 			<description>The default set of live renditions</description>
 			<isDefault>1</isDefault>
 			<flavorParamsIds>32,33,34,35</flavorParamsIds>
+		</conversionProfile>
+		<conversionProfile objectType="KalturaConversionProfile">
+			<name>Passthrough</name>
+			<type>2</type>
+			<systemName>Passthrough_Live</systemName>
+			<description>Publish only the broadcasted stream</description>
+			<isDefault>0</isDefault>
+			<flavorParamsIds>32</flavorParamsIds>
 		</conversionProfile>
 	</request>
 </xml>

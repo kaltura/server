@@ -1991,7 +1991,7 @@
         </index>
 	</table>
 	<table skipSql="false" abstract="false" name="file_asset">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column lazyLoad="false" name="id" type="bigint" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="version" type="integer" />
@@ -2002,12 +2002,15 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="file_ext" type="varchar" size="4" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="size" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="size" type="bigint" />
 		<index name="partner_object_status">
 			<index-column name="partner_id" />
 			<index-column name="object_id" />
 			<index-column name="object_type" />
 			<index-column name="status" />
 		</index>
+		<index name="updated_at">
+			<index-column name="updated_at" />
+		</index>		
 	</table>
 </database>
