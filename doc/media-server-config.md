@@ -212,6 +212,7 @@ media_servers.ini is optional and needed only for custom configurations.
      - sanjosestreaming
      - mpegdashstreaming
      - dvrchunkstreaming
+ - /Root/Application/Repeater - list all origin servers URLs separated with `|`, for example, `wowz://wowza-origin-server1:1935/kLive|wowz://wowza-origin-server2:1935/kLive`.
 
 
 **Setting keystore.jks:**
