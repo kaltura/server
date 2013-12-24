@@ -213,8 +213,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$orderByField = substr($this->orderBy, 1);
 			$orderBy = $this->orderBy[0] == '+' ? Criteria::ASC : Criteria::DESC;
 			
-			$metadataField = $this->getMetadataSearchField($orderByField);
-			$metadataFieldType = $this->getMetadataSearchFieldType($orderByField);
+			$metadataFieldType = null;
+			$metadataField = $this->getMetadataSearchField($orderByField, array(), $metadataFieldType);
 			$isIntVal = in_array($metadataFieldType, array(MetadataSearchFilter::KMC_FIELD_TYPE_DATE, MetadataSearchFilter::KMC_FIELD_TYPE_INT));
 			if ($metadataField)
 			{
@@ -230,7 +230,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	 * 
 	 * @param string $field - xPath (metadataProfileField)
 	 */
-	public function getMetadataSearchField($field = null, $xPaths = array()){
+	protected function getMetadataSearchField($field = null, $xPaths = array(), &$fieldType = null){
+		$fieldType = null;
 		if(!$field)
 			return MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA);
 		
@@ -245,6 +246,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			return null;
 		}
 		
+		$fieldType = $xPaths[$field]->getType();
 		switch ($xPaths[$field]->getType()){
 			case MetadataSearchFilter::KMC_FIELD_TYPE_DATE:
 			case MetadataSearchFilter::KMC_FIELD_TYPE_INT:
@@ -256,24 +258,6 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		}
 		
 		return $metadataField;
-	}
-	
-	public function getMetadataSearchFieldType($field = null, $xPaths = array()){
-		if(!$field)
-			return null;
-		
-		if (!count($xPaths)){
-			$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($this->metadataProfileId);
-			foreach($profileFields as $profileField)
-				$xPaths[$profileField->getXpath()] = $profileField;
-		}
-		
-		if(!isset($xPaths[$field])){
-			KalturaLog::ERR("Missing field: " . $field);
-			return null;
-		}
-		
-		return $xPaths[$field]->getType();
 	}
 	
 	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false) {

@@ -967,7 +967,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	public function addNumericOrderBy($column, $orderByType = Criteria::ASC) 
 	{
-		$newColumn = str_replace ( "." , "_" , $column); 
+		$newColumn = "ord" . (count($this->numericalOrderConditions) + 1); 
 		$this->addOrderBy($newColumn, $orderByType);
 		$this->numericalOrderConditions[] = "integer($column) $newColumn";
 	}
