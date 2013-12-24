@@ -65,32 +65,32 @@ abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	public $idIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $submittedAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $submittedAtLessThanOrEqual;
 
@@ -135,22 +135,22 @@ abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	public $dirtyStatusIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $sunriseGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $sunriseLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $sunsetGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $sunsetLessThanOrEqual;
 }

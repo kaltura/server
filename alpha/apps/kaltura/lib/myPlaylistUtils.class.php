@@ -131,6 +131,8 @@ class myPlaylistUtils
 		 
 		// the default of detrailed should be true - most of the time the kuse is needed 
 		if ( is_null ( $detailed ) ) $detailed = true ; 
+
+		$entryObjectsArray = null;
 		
 		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
 		{
@@ -142,7 +144,7 @@ class myPlaylistUtils
 				$filter_list_content = $playlist->getDataContent( true );
 			}
 			
-			return self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters , $detailed );
+			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters , $detailed );
 		}
 		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
@@ -153,8 +155,78 @@ class myPlaylistUtils
 		{
 			// static playlist
 			// search the roughcut_entry for the playlist as a roughcut / group
-			return self::executeStaticPlaylist ( $playlist , $extra_filters , $detailed );
+			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $extra_filters , $detailed );
 		}
+
+		// Perform entries redirection
+		if ( ! empty(self::$playlistContext)
+				&& (self::$playlistContext instanceof kEntryContext)
+				&& self::$playlistContext->getFollowEntryRedirect() )
+		{
+			$entryObjectsArray = self::replaceRedirectedEntries( $entryObjectsArray );
+		}
+
+		// Clear the context for next time
+		self::$playlistContext = null;
+		
+		return $entryObjectsArray;
+	}
+
+	/**
+	 * For every entry id that requires redirection, fetch the
+	 * redirected entry from db and replace with the original one.
+	 *
+	 * @param array $entryObjectsArray Array of entry objects
+	 * @return array The same $entryObjectsArray with replaced entries for each one that had a redirectedEntryId
+	 */
+	private static function replaceRedirectedEntries( $entryObjectsArray )
+	{
+		// A map between redirected entry id and an array of positions in $entryObjectsArray 
+		$redirectedEntryIdToPosArrayMap = array();
+	
+		// Gather all entries with a valid redirect id
+		foreach ( $entryObjectsArray as $pos => $entry )
+		{
+			/* @var $entry entry */
+			$redirectEntryId = $entry->getRedirectEntryId();
+			
+			if ( ! empty( $redirectEntryId ) ) // Redirection required?
+			{
+				// Entry id not yet mapped?
+				if ( ! array_key_exists( $redirectEntryId, $redirectedEntryIdToPosArrayMap ) )
+				{
+					// Create an empty positions array and map to the entity 
+					$redirectedEntryIdToPosArrayMap[ $redirectEntryId ] = array();
+				}
+
+				// Push the position into the array of postions for the given redirected entry id.
+				$redirectedEntryIdToPosArrayMap[ $redirectEntryId ][] = $pos;
+			}
+		}
+	
+		// Are there any entries that need to be redirected?
+		if ( ! empty( $redirectedEntryIdToPosArrayMap ) )
+		{
+			// Fetch the redirected entries from DB
+			$redirectedEntries = entryPeer::retrieveByPKs( array_keys( $redirectedEntryIdToPosArrayMap ) );
+			
+			// Replace the entry objects in the original array with the redirected entry objects
+			foreach ( $redirectedEntries as $redirectedEntry )
+			{
+				// Get the [new] redirected entry's id
+				$redirectedEntryId = $redirectedEntry->getId();
+	
+				// Get its associated postions array
+				$posArr = $redirectedEntryIdToPosArrayMap[ $redirectedEntryId ];
+				foreach ( $posArr as $pos )
+				{
+					// Replace the original entry in the array with the redirected one
+					$entryObjectsArray[ $pos ] = $redirectedEntry;
+				}
+			}
+		}
+	
+		return $entryObjectsArray;
 	}
 	
 	public static function getPlaylistFiltersById($playlist_id)
@@ -755,6 +827,7 @@ HTML;
 	 */
 	protected static function replaceContextTokens (SimpleXMLElement $contentXml)
 	{
+		KalturaLog::debug("Replace context tokens");
 	    $properties = $contentXml->children();
 	    foreach ($properties as $property)
 	    {
@@ -763,6 +836,7 @@ HTML;
 	        if (isset($propertyAttributes['dynamic']) && $propertyAttributes['dynamic'] = 1)
 	        {
 	            $tokenValue = (string)$property;
+	            KalturaLog::debug("Apply dynamic token [$property]");
 	            $tokenValue = explode("::", $tokenValue);
 	            if ($tokenValue[0] == self::CONTEXT_DELIMITER)
 	            {
@@ -782,7 +856,12 @@ HTML;
     	            }
     	            
     	            if(!$replaceValue)
+    	            {
+    	            	KalturaLog::debug("Dynamic token [$property] is null");
+                        $contentAsDom = dom_import_simplexml($contentXml);
+                        $contentAsDom->removeChild(dom_import_simplexml($property));
     	            	continue;
+    	            }
     	            
     	            if (is_numeric($replaceValue) || is_string($replaceValue))
     	            {
@@ -793,7 +872,5 @@ HTML;
                         
 	        }
 	    }
-	    
-	    self::$playlistContext = null;
 	}
 }

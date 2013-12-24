@@ -83,13 +83,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	protected $debug_level;
 
 	/**
-	 * The value for the invalid_login_count field.
-	 * Note: this column has a database default value of: 0
-	 * @var        int
-	 */
-	protected $invalid_login_count;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -344,7 +337,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		$this->max_number_of_hits_per_day = -1;
 		$this->appear_in_search = 2;
 		$this->debug_level = 0;
-		$this->invalid_login_count = 0;
 		$this->ks_max_expiry_in_seconds = 86400;
 		$this->create_user_on_demand = 1;
 		$this->commercial_use = 0;
@@ -469,16 +461,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	public function getDebugLevel()
 	{
 		return $this->debug_level;
-	}
-
-	/**
-	 * Get the [invalid_login_count] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getInvalidLoginCount()
-	{
-		return $this->invalid_login_count;
 	}
 
 	/**
@@ -1072,29 +1054,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	} // setDebugLevel()
 
 	/**
-	 * Set the value of [invalid_login_count] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     Partner The current object (for fluent API support)
-	 */
-	public function setInvalidLoginCount($v)
-	{
-		if(!isset($this->oldColumnsValues[PartnerPeer::INVALID_LOGIN_COUNT]))
-			$this->oldColumnsValues[PartnerPeer::INVALID_LOGIN_COUNT] = $this->invalid_login_count;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->invalid_login_count !== $v || $this->isNew()) {
-			$this->invalid_login_count = $v;
-			$this->modifiedColumns[] = PartnerPeer::INVALID_LOGIN_COUNT;
-		}
-
-		return $this;
-	} // setInvalidLoginCount()
-
-	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -1434,11 +1393,10 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setCustomData($v)
 	{
-
 		if ($v !== null) {
 			$v = (string) $v;
 		}
-			
+
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
 			$this->modifiedColumns[] = PartnerPeer::CUSTOM_DATA;
@@ -1860,10 +1818,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				return false;
 			}
 
-			if ($this->invalid_login_count !== 0) {
-				return false;
-			}
-
 			if ($this->ks_max_expiry_in_seconds !== 86400) {
 				return false;
 			}
@@ -1952,37 +1906,36 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			$this->max_number_of_hits_per_day = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
 			$this->appear_in_search = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->debug_level = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->invalid_login_count = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->anonymous_kuser_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->ks_max_expiry_in_seconds = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
-			$this->create_user_on_demand = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->prefix = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->admin_name = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->admin_email = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->description = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->commercial_use = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->moderate_content = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
-			$this->notify = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
-			$this->custom_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->service_config_id = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->status = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
-			$this->content_categories = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
-			$this->type = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->phone = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
-			$this->describe_yourself = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
-			$this->adult_content = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
-			$this->partner_package = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
-			$this->usage_percent = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
-			$this->storage_usage = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
-			$this->eighty_percent_warning = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
-			$this->usage_limit_warning = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
-			$this->monitor_usage = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
-			$this->priority_group_id = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
-			$this->partner_group_type = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
-			$this->partner_parent_id = ($row[$startcol + 39] !== null) ? (int) $row[$startcol + 39] : null;
-			$this->kmc_version = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
+			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->anonymous_kuser_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->ks_max_expiry_in_seconds = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->create_user_on_demand = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->prefix = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->admin_name = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->admin_email = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->description = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->commercial_use = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->moderate_content = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->notify = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->custom_data = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->service_config_id = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->status = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->content_categories = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
+			$this->type = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+			$this->phone = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
+			$this->describe_yourself = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
+			$this->adult_content = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
+			$this->partner_package = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
+			$this->usage_percent = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
+			$this->storage_usage = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
+			$this->eighty_percent_warning = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
+			$this->usage_limit_warning = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
+			$this->monitor_usage = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
+			$this->priority_group_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
+			$this->partner_group_type = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
+			$this->partner_parent_id = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
+			$this->kmc_version = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1992,7 +1945,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 41; // 41 = PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 40; // 40 = PartnerPeer::NUM_COLUMNS - PartnerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Partner object", $e);
@@ -2353,7 +2306,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-	
+		
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -2542,96 +2495,93 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				return $this->getDebugLevel();
 				break;
 			case 10:
-				return $this->getInvalidLoginCount();
-				break;
-			case 11:
 				return $this->getCreatedAt();
 				break;
-			case 12:
+			case 11:
 				return $this->getUpdatedAt();
 				break;
-			case 13:
+			case 12:
 				return $this->getAnonymousKuserId();
 				break;
-			case 14:
+			case 13:
 				return $this->getKsMaxExpiryInSeconds();
 				break;
-			case 15:
+			case 14:
 				return $this->getCreateUserOnDemand();
 				break;
-			case 16:
+			case 15:
 				return $this->getPrefix();
 				break;
-			case 17:
+			case 16:
 				return $this->getAdminName();
 				break;
-			case 18:
+			case 17:
 				return $this->getAdminEmail();
 				break;
-			case 19:
+			case 18:
 				return $this->getDescription();
 				break;
-			case 20:
+			case 19:
 				return $this->getCommercialUse();
 				break;
-			case 21:
+			case 20:
 				return $this->getModerateContent();
 				break;
-			case 22:
+			case 21:
 				return $this->getNotify();
 				break;
-			case 23:
+			case 22:
 				return $this->getCustomData();
 				break;
-			case 24:
+			case 23:
 				return $this->getServiceConfigId();
 				break;
-			case 25:
+			case 24:
 				return $this->getStatus();
 				break;
-			case 26:
+			case 25:
 				return $this->getContentCategories();
 				break;
-			case 27:
+			case 26:
 				return $this->getType();
 				break;
-			case 28:
+			case 27:
 				return $this->getPhone();
 				break;
-			case 29:
+			case 28:
 				return $this->getDescribeYourself();
 				break;
-			case 30:
+			case 29:
 				return $this->getAdultContent();
 				break;
-			case 31:
+			case 30:
 				return $this->getPartnerPackage();
 				break;
-			case 32:
+			case 31:
 				return $this->getUsagePercent();
 				break;
-			case 33:
+			case 32:
 				return $this->getStorageUsage();
 				break;
-			case 34:
+			case 33:
 				return $this->getEightyPercentWarning();
 				break;
-			case 35:
+			case 34:
 				return $this->getUsageLimitWarning();
 				break;
-			case 36:
+			case 35:
 				return $this->getMonitorUsage();
 				break;
-			case 37:
+			case 36:
 				return $this->getPriorityGroupId();
 				break;
-			case 38:
+			case 37:
 				return $this->getPartnerGroupType();
 				break;
-			case 39:
+			case 38:
 				return $this->getPartnerParentId();
 				break;
-			case 40:
+			case 39:
 				return $this->getKmcVersion();
 				break;
 			default:
@@ -2665,37 +2615,36 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			$keys[7] => $this->getMaxNumberOfHitsPerDay(),
 			$keys[8] => $this->getAppearInSearch(),
 			$keys[9] => $this->getDebugLevel(),
-			$keys[10] => $this->getInvalidLoginCount(),
-			$keys[11] => $this->getCreatedAt(),
-			$keys[12] => $this->getUpdatedAt(),
-			$keys[13] => $this->getAnonymousKuserId(),
-			$keys[14] => $this->getKsMaxExpiryInSeconds(),
-			$keys[15] => $this->getCreateUserOnDemand(),
-			$keys[16] => $this->getPrefix(),
-			$keys[17] => $this->getAdminName(),
-			$keys[18] => $this->getAdminEmail(),
-			$keys[19] => $this->getDescription(),
-			$keys[20] => $this->getCommercialUse(),
-			$keys[21] => $this->getModerateContent(),
-			$keys[22] => $this->getNotify(),
-			$keys[23] => $this->getCustomData(),
-			$keys[24] => $this->getServiceConfigId(),
-			$keys[25] => $this->getStatus(),
-			$keys[26] => $this->getContentCategories(),
-			$keys[27] => $this->getType(),
-			$keys[28] => $this->getPhone(),
-			$keys[29] => $this->getDescribeYourself(),
-			$keys[30] => $this->getAdultContent(),
-			$keys[31] => $this->getPartnerPackage(),
-			$keys[32] => $this->getUsagePercent(),
-			$keys[33] => $this->getStorageUsage(),
-			$keys[34] => $this->getEightyPercentWarning(),
-			$keys[35] => $this->getUsageLimitWarning(),
-			$keys[36] => $this->getMonitorUsage(),
-			$keys[37] => $this->getPriorityGroupId(),
-			$keys[38] => $this->getPartnerGroupType(),
-			$keys[39] => $this->getPartnerParentId(),
-			$keys[40] => $this->getKmcVersion(),
+			$keys[10] => $this->getCreatedAt(),
+			$keys[11] => $this->getUpdatedAt(),
+			$keys[12] => $this->getAnonymousKuserId(),
+			$keys[13] => $this->getKsMaxExpiryInSeconds(),
+			$keys[14] => $this->getCreateUserOnDemand(),
+			$keys[15] => $this->getPrefix(),
+			$keys[16] => $this->getAdminName(),
+			$keys[17] => $this->getAdminEmail(),
+			$keys[18] => $this->getDescription(),
+			$keys[19] => $this->getCommercialUse(),
+			$keys[20] => $this->getModerateContent(),
+			$keys[21] => $this->getNotify(),
+			$keys[22] => $this->getCustomData(),
+			$keys[23] => $this->getServiceConfigId(),
+			$keys[24] => $this->getStatus(),
+			$keys[25] => $this->getContentCategories(),
+			$keys[26] => $this->getType(),
+			$keys[27] => $this->getPhone(),
+			$keys[28] => $this->getDescribeYourself(),
+			$keys[29] => $this->getAdultContent(),
+			$keys[30] => $this->getPartnerPackage(),
+			$keys[31] => $this->getUsagePercent(),
+			$keys[32] => $this->getStorageUsage(),
+			$keys[33] => $this->getEightyPercentWarning(),
+			$keys[34] => $this->getUsageLimitWarning(),
+			$keys[35] => $this->getMonitorUsage(),
+			$keys[36] => $this->getPriorityGroupId(),
+			$keys[37] => $this->getPartnerGroupType(),
+			$keys[38] => $this->getPartnerParentId(),
+			$keys[39] => $this->getKmcVersion(),
 		);
 		return $result;
 	}
@@ -2758,96 +2707,93 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				$this->setDebugLevel($value);
 				break;
 			case 10:
-				$this->setInvalidLoginCount($value);
-				break;
-			case 11:
 				$this->setCreatedAt($value);
 				break;
-			case 12:
+			case 11:
 				$this->setUpdatedAt($value);
 				break;
-			case 13:
+			case 12:
 				$this->setAnonymousKuserId($value);
 				break;
-			case 14:
+			case 13:
 				$this->setKsMaxExpiryInSeconds($value);
 				break;
-			case 15:
+			case 14:
 				$this->setCreateUserOnDemand($value);
 				break;
-			case 16:
+			case 15:
 				$this->setPrefix($value);
 				break;
-			case 17:
+			case 16:
 				$this->setAdminName($value);
 				break;
-			case 18:
+			case 17:
 				$this->setAdminEmail($value);
 				break;
-			case 19:
+			case 18:
 				$this->setDescription($value);
 				break;
-			case 20:
+			case 19:
 				$this->setCommercialUse($value);
 				break;
-			case 21:
+			case 20:
 				$this->setModerateContent($value);
 				break;
-			case 22:
+			case 21:
 				$this->setNotify($value);
 				break;
-			case 23:
+			case 22:
 				$this->setCustomData($value);
 				break;
-			case 24:
+			case 23:
 				$this->setServiceConfigId($value);
 				break;
-			case 25:
+			case 24:
 				$this->setStatus($value);
 				break;
-			case 26:
+			case 25:
 				$this->setContentCategories($value);
 				break;
-			case 27:
+			case 26:
 				$this->setType($value);
 				break;
-			case 28:
+			case 27:
 				$this->setPhone($value);
 				break;
-			case 29:
+			case 28:
 				$this->setDescribeYourself($value);
 				break;
-			case 30:
+			case 29:
 				$this->setAdultContent($value);
 				break;
-			case 31:
+			case 30:
 				$this->setPartnerPackage($value);
 				break;
-			case 32:
+			case 31:
 				$this->setUsagePercent($value);
 				break;
-			case 33:
+			case 32:
 				$this->setStorageUsage($value);
 				break;
-			case 34:
+			case 33:
 				$this->setEightyPercentWarning($value);
 				break;
-			case 35:
+			case 34:
 				$this->setUsageLimitWarning($value);
 				break;
-			case 36:
+			case 35:
 				$this->setMonitorUsage($value);
 				break;
-			case 37:
+			case 36:
 				$this->setPriorityGroupId($value);
 				break;
-			case 38:
+			case 37:
 				$this->setPartnerGroupType($value);
 				break;
-			case 39:
+			case 38:
 				$this->setPartnerParentId($value);
 				break;
-			case 40:
+			case 39:
 				$this->setKmcVersion($value);
 				break;
 		} // switch()
@@ -2884,37 +2830,36 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[7], $arr)) $this->setMaxNumberOfHitsPerDay($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setAppearInSearch($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setDebugLevel($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setInvalidLoginCount($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setAnonymousKuserId($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setKsMaxExpiryInSeconds($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setCreateUserOnDemand($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setPrefix($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setAdminName($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setAdminEmail($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setDescription($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setCommercialUse($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setModerateContent($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setNotify($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setCustomData($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setServiceConfigId($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setStatus($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setContentCategories($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setType($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setPhone($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setDescribeYourself($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setAdultContent($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setPartnerPackage($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setUsagePercent($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setStorageUsage($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setEightyPercentWarning($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setUsageLimitWarning($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setMonitorUsage($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setPriorityGroupId($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setPartnerGroupType($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setPartnerParentId($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setKmcVersion($arr[$keys[40]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setAnonymousKuserId($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setKsMaxExpiryInSeconds($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setCreateUserOnDemand($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setPrefix($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setAdminName($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setAdminEmail($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setDescription($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setCommercialUse($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setModerateContent($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setNotify($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setCustomData($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setServiceConfigId($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setStatus($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setContentCategories($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setType($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setPhone($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setDescribeYourself($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setAdultContent($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setPartnerPackage($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setUsagePercent($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setStorageUsage($arr[$keys[32]]);
+		if (array_key_exists($keys[33], $arr)) $this->setEightyPercentWarning($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setUsageLimitWarning($arr[$keys[34]]);
+		if (array_key_exists($keys[35], $arr)) $this->setMonitorUsage($arr[$keys[35]]);
+		if (array_key_exists($keys[36], $arr)) $this->setPriorityGroupId($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setPartnerGroupType($arr[$keys[37]]);
+		if (array_key_exists($keys[38], $arr)) $this->setPartnerParentId($arr[$keys[38]]);
+		if (array_key_exists($keys[39], $arr)) $this->setKmcVersion($arr[$keys[39]]);
 	}
 
 	/**
@@ -2936,7 +2881,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(PartnerPeer::MAX_NUMBER_OF_HITS_PER_DAY)) $criteria->add(PartnerPeer::MAX_NUMBER_OF_HITS_PER_DAY, $this->max_number_of_hits_per_day);
 		if ($this->isColumnModified(PartnerPeer::APPEAR_IN_SEARCH)) $criteria->add(PartnerPeer::APPEAR_IN_SEARCH, $this->appear_in_search);
 		if ($this->isColumnModified(PartnerPeer::DEBUG_LEVEL)) $criteria->add(PartnerPeer::DEBUG_LEVEL, $this->debug_level);
-		if ($this->isColumnModified(PartnerPeer::INVALID_LOGIN_COUNT)) $criteria->add(PartnerPeer::INVALID_LOGIN_COUNT, $this->invalid_login_count);
 		if ($this->isColumnModified(PartnerPeer::CREATED_AT)) $criteria->add(PartnerPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(PartnerPeer::UPDATED_AT)) $criteria->add(PartnerPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(PartnerPeer::ANONYMOUS_KUSER_ID)) $criteria->add(PartnerPeer::ANONYMOUS_KUSER_ID, $this->anonymous_kuser_id);
@@ -2989,7 +2933,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		{
 			if ($this->isColumnModified(PartnerPeer::CUSTOM_DATA))
 			{
-				if (!is_null($this->custom_data_md5)) 
+				if (!is_null($this->custom_data_md5))
 					$criteria->add(PartnerPeer::CUSTOM_DATA, "MD5(cast(" . PartnerPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
@@ -3007,8 +2951,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
-			
-		}
+		}		
 
 		return $criteria;
 	}
@@ -3063,8 +3006,6 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		$copyObj->setAppearInSearch($this->appear_in_search);
 
 		$copyObj->setDebugLevel($this->debug_level);
-
-		$copyObj->setInvalidLoginCount($this->invalid_login_count);
 
 		$copyObj->setCreatedAt($this->created_at);
 

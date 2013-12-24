@@ -15,6 +15,48 @@ class SphinxEntryCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		/* @var $filter entryFilter */
+
+		if ( $filter->is_set('_eq_redirect_from_entry_id' ) )
+		{
+			$origEntryId = $filter->get( '_eq_redirect_from_entry_id' );
+			$origEntry = entryPeer::retrieveByPK( $origEntryId );
+			
+			if ( ! empty( $origEntry ) )
+			{
+				// Get the id of the entry id that is being redirected from the original entry
+				$redirectEntryId = $origEntry->getRedirectEntryId(); 
+				
+				if ( is_null( $redirectEntryId ) ) // No redirection required? 
+				{
+					$filter->set( '_eq_id', $origEntryId ); // Continue with original entry id
+				}
+				else
+				{
+					// Get the redirected entry and check if it exists and is ready
+					$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
+					
+					if ( ! empty( $redirectedEntry )
+							&& $redirectedEntry->getStatus() == entryStatus::READY )
+					{
+						// Redirected entry is ready.
+						// Set it as the replacement of the original one
+						$filter->set( '_eq_id', $redirectEntryId );
+					}
+					else
+					{
+						// Can't redirect? --> Fallback to the original entry
+						$filter->set( '_eq_id', $origEntryId );
+					}
+				}
+			}
+			else
+			{
+				throw new kCoreException( "Invalid entry id [\"$origEntryId\"]", kCoreException::INVALID_ENTRY_ID, $origEntryId );
+			}
+
+			$filter->unsetByName( '_eq_redirect_from_entry_id' );
+		}
+		
 		$categoriesAncestorParsed = null;
 		$categories = $filter->get( "_in_category_ancestor_id");
 		if ($categories !== null)

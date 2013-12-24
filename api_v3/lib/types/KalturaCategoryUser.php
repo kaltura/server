@@ -49,7 +49,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	/**
 	 * CategoryUser creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -58,7 +58,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 	/**
 	 * CategoryUser update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

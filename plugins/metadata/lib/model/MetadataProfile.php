@@ -30,9 +30,9 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		$this->setVersion(1);
-		$this->setViewsVersion(1);
-		$this->setXsltVersion(1);
+		$this->incrementVersion();
+		$this->incrementViewsVersion();
+		$this->incrementXsltVersion();
 		return parent::preInsert($con);
 	}
 
@@ -58,20 +58,20 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function incrementVersion()
 	{
-		$this->setVersion($this->getVersion() + 1);
+		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 
 	public function incrementViewsVersion()
 	{
-		$this->setViewsVersion($this->getViewsVersion() + 1);
+		$this->setViewsVersion(kDataCenterMgr::incrementVersion($this->getViewsVersion()));
 	}
 	
     public function incrementXsltVersion()
 	{
-		$this->setXsltVersion($this->getXsltVersion() + 1);
+		$this->setXsltVersion(kDataCenterMgr::incrementVersion($this->getXsltVersion()));
 	}
 	
-	public function setXsltVersion($version)
+	protected function setXsltVersion($version)
 	{
 	    $this->putInCustomData(self::CUSTOM_DATA_METADATA_XSLT_VERSION, $version);
 	}

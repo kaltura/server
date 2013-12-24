@@ -30,6 +30,7 @@ class Permission extends BasePermission
 	{
 		if ($this->permissionItemIdsChanged)
 		{
+			$this->setUpdatedAt(time());
 			PermissionItemPeer::checkValidForParther(implode(',',$this->permissionItemIds), $this->getPartnerId());
 		}
 		

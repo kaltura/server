@@ -55,14 +55,14 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	public $securityPolicy;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte
 	 */

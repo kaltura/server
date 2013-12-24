@@ -50,12 +50,12 @@ abstract class KalturaControlPanelCommandBaseFilter extends KalturaFilter
 	public $idIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 

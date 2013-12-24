@@ -63,7 +63,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	/**
 	 * The media date extracted from EXIF data (For images) as Unix timestamp (In seconds)
 	 *
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte
 	 */
@@ -102,17 +102,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 		parent::fromObject ( $entry );
 		
 		$this->mediaDate = $entry->getMediaDate ( null );
-		
-		$reflect = KalturaTypeReflectorCacher::get ( 'KalturaSourceType' );
-		$constants = $reflect->getConstantsValues ();
-		$sourceApi = kPluginableEnumsManager::coreToApi ( 'EntrySourceType', $entry->getSource () );
-		if (! in_array ( $sourceApi, $constants ) || $sourceApi == EntrySourceType::SEARCH_PROVIDER) {
-			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
-			$this->searchProviderType = $sourceApi;
-		} else {
-			$this->sourceType = $sourceApi;
-			$this->searchProviderType = null;
-		}
+		$this->fromSourceType($entry);
 	}
 	
 	/* (non-PHPdoc)
@@ -141,16 +131,48 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public function toInsertableObject($sourceObject = null, $propsToSkip = array()) 
 	{
-		/* @var $sourceObject entry */
-		if ($this->sourceType === KalturaSourceType::SEARCH_PROVIDER)
+		if($sourceObject)
+			$this->toSourceType($sourceObject);
+		
+		return parent::toInsertableObject($sourceObject, $propsToSkip);
+	}
+	
+	/**
+	 * Get the source type from the entry
+	 * 
+	 * @param entry $entry
+	 */
+	protected function fromSourceType(entry $entry) 
+	{
+		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
+		$constants = $reflect->getConstantsValues();
+		$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $entry->getSource());
+		if(! in_array($sourceApi, $constants))
 		{
-			$sourceObject->setSource($this->searchProviderType);
+			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
+			$this->searchProviderType = $sourceApi;
 		}
 		else
 		{
-			$sourceObject->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
+			$this->sourceType = $sourceApi;
+			$this->searchProviderType = null;
 		}
-		
-		return parent::toInsertableObject($sourceObject, $propsToSkip);
+	}
+	
+	/**
+	 * Set the source type on the entry
+	 * 
+	 * @param entry $entry
+	 */
+	protected function toSourceType(entry $entry) 
+	{
+		if ($this->sourceType === KalturaSourceType::SEARCH_PROVIDER)
+		{
+			$entry->setSource($this->searchProviderType);
+		}
+		else
+		{
+			$entry->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
+		}
 	}
 }

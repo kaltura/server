@@ -66,8 +66,17 @@ class KalturaDispatcher
         }
         
 		$actionParams = $actionReflector->getActionParams();
+		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
-        
+
+		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
+		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
+		kCurrentContext::$ps_vesion = "ps3";
+		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
+		kCurrentContext::$action =  $action;
+		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
+		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
+
 		// validate it's ok to access this service
 		$deserializer = new KalturaRequestDeserializer($params);
 		$this->arguments = $deserializer->buildActionArguments($actionParams);
@@ -75,19 +84,11 @@ class KalturaDispatcher
 			kCurrentContext::$multiRequest_index."] with params " . print_r($this->arguments, true));
 
 		$serviceInstance = $actionReflector->getServiceInstance();
-		
-		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
-		kCurrentContext::$ps_vesion = "ps3";
-		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
-		kCurrentContext::$action =  $action;
-		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
-		
-		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
+
 		kPermissionManager::init(kConf::get('enable_cache'));
 		kEntitlementUtils::initEntitlementEnforcement();
 		
-	    $disableTags = $actionReflector->getActionInfo()->disableTags;
+	    $disableTags = $actionInfo->disableTags;
 		if($disableTags && is_array($disableTags) && count($disableTags))
 		{
 			foreach ($disableTags as $disableTag)
@@ -96,8 +97,6 @@ class KalturaDispatcher
 			}
 		}
 		
-		$actionInfo = $actionReflector->getActionInfo();
-
 		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
 		{
 //			// TODO maybe if missing should throw something, maybe a bone?
@@ -124,7 +123,7 @@ class KalturaDispatcher
 		
 		return $res;
 	}
-
+	
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

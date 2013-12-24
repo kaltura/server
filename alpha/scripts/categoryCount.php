@@ -23,11 +23,14 @@ while(count($allCats))
 {
 	foreach ($allCats as $categoryDb)
 	{
+		/* @var $categoryDb category */
+		
 		$categoryDb->reSetEntriesCount();
 		$categoryDb->reSetDirectSubCategoriesCount();
 		$categoryDb->reSetDirectEntriesCount();	
+		$categoryDb->reSetPendingEntriesCount();
+		$categoryDb->reSetPendingMembersCount();	
 		$categoryDb->save();
-		
 	}
 	
 	$criteria->setOffset($criteria->getOffset() + count($allCats));
