@@ -6,6 +6,13 @@
 class KalturaEntryService extends KalturaBaseService 
 {
 	
+	//amount of time for attempting to grab kLock
+	const KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT = 0.1;
+	
+	//amount of time for holding kLock
+	const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
+	
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
@@ -124,7 +131,7 @@ class KalturaEntryService extends KalturaBaseService
 			KalturaLog::notice("Replacement is not allowed to the partner permission [FEATURE_ENTRY_REPLACEMENT] is needed");
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_ENTRY_REPLACEMENT);
 		}
-		
+
 		if($dbEntry->getReplacingEntryId())
 			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 		
