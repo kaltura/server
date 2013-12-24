@@ -11,28 +11,27 @@
 chdir(__DIR__);
 require_once (__DIR__ . '/../../bootstrap.php');
 
-function isLiveConversionProfileExists($partnerId)
+function isLivePassThruConversionProfileExists($partnerId)
 {
 	$c = new Criteria();
 	$c->add(conversionProfile2Peer::PARTNER_ID, $partnerId);
 	$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
 	$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 	
-	return conversionProfile2Peer::doCount($c);
+	return conversionProfile2Peer::doCount($c) > 1;
 }
 
-function createLiveConversionProfile($partnerId)
+function createLivePassThruConversionProfile($partnerId)
 {
 	$conversionProfile = new conversionProfile2();
 	$conversionProfile->setPartnerId($partnerId);
-	$conversionProfile->setName('Cloud transcode');
+	$conversionProfile->setName('Passthrough');
 	$conversionProfile->setType(ConversionProfileType::LIVE_STREAM);
-	$conversionProfile->setSystemName('Default_Live');
-	$conversionProfile->setDescription('The default set of live renditions');
-	$conversionProfile->setIsDefault(true);
+	$conversionProfile->setSystemName('Passthrough_Live');
+	$conversionProfile->setDescription('Publish only the broadcasted stream');
 	$conversionProfile->save();
 	
-	$flavorParamsIds = array(32, 33, 34, 35);
+	$flavorParamsIds = array(32);
 	
 	foreach($flavorParamsIds as $flavorParamsId)
 	{
@@ -62,8 +61,8 @@ while(count($permissions))
 	{
 		/* @var $permission Permission */
 		$partnerId = $permission->getPartnerId();
-		if(!isLiveConversionProfileExists($partnerId))
-			createLiveConversionProfile($partnerId);
+		if(!isLivePassThruConversionProfileExists($partnerId))
+			createLivePassThruConversionProfile($partnerId);
 	} 
 	
 	$offset += count($permissions);
