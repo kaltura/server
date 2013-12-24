@@ -2,7 +2,7 @@
 /**
  * @package plugins.scheduledTask
  */
-class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEnumerator
+class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'scheduledTask';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -62,31 +62,6 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 		if($configName == 'testme')
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
 
-		return null;
-	}
-
-	/**
-	 * Returns an object that is known only to the plugin, and extends the baseClass.
-	 *
-	 * @param string $baseClass The base class of the loaded object
-	 * @param string $enumValue The enumeration value of the loaded object
-	 * @param array $constructorArgs The constructor arguments of the loaded object
-	 * @return object
-	 */
-	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
-	{
-
-	}
-
-	/**
-	 * Retrieves a class name that is defined by the plugin and is known only to the plugin, and extends the baseClass.
-	 *
-	 * @param string $baseClass The base class of the searched class
-	 * @param string $enumValue The enumeration value of the searched class
-	 * @return string The name of the searched object's class
-	 */
-	public static function getObjectClass($baseClass, $enumValue)
-	{
 		return null;
 	}
 
