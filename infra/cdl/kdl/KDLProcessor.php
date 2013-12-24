@@ -140,6 +140,7 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 			}
 							
 			$interSrcProfile = null;
+			$forceAudioStream = false;
 			/*
 			 * For ARF ==> webex plaugin 
 			 */
@@ -196,6 +197,22 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 				}
 			}
 			/*
+			 * Add silent audio track to the video in case on of the flavors is with widevine tag since widevine does not support files with no audio track 
+			 */
+			else if(isset($mediaSet->_video) && !isset($mediaSet->_audio)) {
+	            foreach($profile->_flavors as $flvr) {
+	            	if(preg_match('/widevine/', strtolower($flvr->_tags), $matches)) {
+	                	$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
+								KDLVideoTarget::H264H, 4000, 1080, 
+								KDLAudioTarget::AAC, 128, 0, 
+								0, KDLTranscoders::FFMPEG);
+						$forceAudioStream = true;
+						break;
+					}
+				}
+			}
+			
+			/*
 			else if($mediaSet->_video->IsFormatOf(array("tscc","tsc2"))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::MP4, 
 						KDLVideoTarget::H264H, 4000, 1080, 
@@ -217,6 +234,13 @@ KalturaLog::log("Automatic Intermediate Source will be generated");
 				return null;
 			if(!isset($targetList[0]->_video->_width)){
 				$targetList[0]->_video->_width = 0;
+			}
+			//Add silent track to video
+			if($forceAudioStream){
+				$cmd = $targetList[0]->_transcoders[0]->_cmd;
+				$cmd = str_replace("__inFileName__", "__inFileName__ -ar 44100 -ac 2 -f s16le -i /dev/zero -shortest", $cmd);
+				$cmd = str_replace("-an", "-b:a 64k", $cmd);
+				$targetList[0]->_transcoders[0]->_cmd = $cmd;
 			}
 			return $targetList[0];
 		}

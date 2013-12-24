@@ -37,6 +37,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			return "void";
 		case "bool" :
 			return "BOOL";
+		case "bigint" :
 		case "int" :
 			return "int";
 		case "float" :
@@ -58,6 +59,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 		case "bool" :
 		case "int" :
+		case "bigint" :
 		case "float" :
 			return true;
 		default :
@@ -71,6 +73,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 		case "bool" :
 			return "KALTURA_UNDEF_BOOL";
+		case "bigint":
 		case "int" :
 			return "KALTURA_UNDEF_INT";
 		case "float" :
@@ -86,6 +89,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 		case "bool" :
 			return "Bool";
+		case "bigint":
 		case "int" :
 			return "Int";
 		case "float" :
@@ -105,6 +109,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		switch ($propType)
 		{
 		case "bool" :
+		case "bigint":
 		case "int" :
 		case "float" :
 			return "assign";

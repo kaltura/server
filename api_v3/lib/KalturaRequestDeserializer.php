@@ -353,6 +353,8 @@ class KalturaRequestDeserializer
 					return (bool)$var;
 			case "float":
 				return (float)$var;
+			case "bigint":
+				return (double)$var;
 			case "time":
 				// empty fields should be treated as 0 and not the current time
 				if (strlen($var) == 0)

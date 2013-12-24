@@ -468,6 +468,11 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("		if(count(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
+
+				case "bigint" :
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = (int)\$xml->$propName;");
+					break;
 					
 				case "bool" :
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
@@ -509,6 +514,8 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
+				
+			$propType = $this->getPHPType($propType);
 			$description = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
@@ -710,6 +717,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			
 			switch($resultType)
 			{
+				case 'bigint':	
 				case 'int':
 					$this->appendLine("		\$resultObject = (int)\$resultObject;");
 					break;
@@ -774,7 +782,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 						$signature .= " = null";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
-					else if ($paramType == "int" || $paramType == "float")
+					else if ($paramType == "int" || $paramType == "bigint" || $paramType == "float")
 					{
 						if ($defaultValue == "")
 							$signature .= " = \"\""; // hack for partner.getUsage
@@ -881,6 +889,18 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
 		parent::addFile($fileName, $fileContents, $addLicense);
+	}
+	
+	public function getPHPType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }
 

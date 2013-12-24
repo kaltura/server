@@ -5,8 +5,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     
     const PARTNER_ID_FIELD = "partner_id";
     
-    public static $specialCharacters = array ('!', '*', '"');
-    public static $specialCharactersReplacement = array ('\\!', '\\*', '\\"');
+    public static $specialCharacters = array ('\\', '!', '*', '"', );
+    public static $specialCharactersReplacement = array ('\\\\', '\\!', '\\*', '\\"');
     
     const NULL_PC = "NO_PC";
     
