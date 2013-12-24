@@ -710,23 +710,18 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		//calling replaceResource only if no lock or we grabbed it
-		$myLock = kLock::create("media_updateContent_{$entryId}");
+		$lock = kLock::create("media_updateContent_{$entryId}");
 		
-		if (!$myLock)
-			$this->replaceResource($resource, $dbEntry, $conversionProfileId);
-		else if ($myLock->lock(KalturaEntryService::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , KalturaEntryService::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT)){
-			try{
-				$this->replaceResource($resource, $dbEntry, $conversionProfileId);
-			}
-			catch(Exception $e){
-				$myLock->unlock();
-				throw $e;
-			}
-			$myLock->unlock();
-		}
-		else
+		if ($lock && !$lock->lock(KalturaEntryService::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , KalturaEntryService::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
-
+		try{
+			$this->replaceResource($resource, $dbEntry, $conversionProfileId);
+			}
+		catch(Exception $e){
+			$lock->unlock();
+			throw $e;
+			}
+			$lock->unlock();
 		return $this->getEntry($entryId);
 	}
 
