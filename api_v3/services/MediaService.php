@@ -716,12 +716,12 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 		try{
 			$this->replaceResource($resource, $dbEntry, $conversionProfileId);
-			}
+		}
 		catch(Exception $e){
 			$lock->unlock();
 			throw $e;
-			}
-			$lock->unlock();
+		}
+		$lock->unlock();
 		return $this->getEntry($entryId);
 	}
 
