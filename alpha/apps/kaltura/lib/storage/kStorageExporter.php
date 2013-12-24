@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage storage
  */
-class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer
+class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 	/**
 	 * per session cache of kRule->fulfilled result per storage profile and entry id
@@ -146,10 +146,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		
 		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 			return false;
-						
-		// convert collection finished - export ism and ismc files
-		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
-			return true;
 		
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 			return true;
@@ -181,26 +177,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
     				    self::exportFlavorAsset($sourceFlavor, $externalStorage);
     				}
     			}
-			}
-		}
-    			
-		// convert collection finished - export ism and ismc files
-		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
-		{
-			$entry = $dbBatchJob->getEntry();
-			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());
-			foreach($externalStorages as $externalStorage)
-			{
-				if($externalStorage->triggerFitsReadyAsset($entry->getId()))
-				{
-					$ismKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-					if(kFileSyncUtils::fileSync_exists($ismKey))
-						self::export($entry, $externalStorage, $ismKey);
-					
-					$ismcKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
-					if(kFileSyncUtils::fileSync_exists($ismcKey))
-						self::export($entry, $externalStorage, $ismcKey);
-				}
 			}
 		}
 		return true;
@@ -393,4 +369,36 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
+	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null) 
+	{
+		//export ism/ismc files
+		$entry = entryPeer::retrieveByPK($object->getObjectId());
+		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+		foreach($externalStorages as $externalStorage)
+		{
+			if($externalStorage->triggerFitsReadyAsset($entry->getId()))
+			{
+				self::export($entry, $externalStorage, kFileSyncUtils::getKeyForFileSync($object));
+			}
+		}
+	}		
+
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object) 
+	{
+		if(	$object instanceof FileSync && $object->getObjectType == FileSyncObjectType::ENTRY
+			&& ($object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM || $object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC))
+			return true;
+		else
+			return false;		
+	}
+
+	
+	
 }
