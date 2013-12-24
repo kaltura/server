@@ -398,7 +398,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 	}
 	
-	private function createLiveConversionProfile(Partner $partner)
+	private function createLiveConversionProfiles(Partner $partner)
 	{
 		$c = new Criteria();
 		$c->add(conversionProfile2Peer::PARTNER_ID, $partner->getId());
@@ -461,7 +461,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				
 				if($dbPermission->getName() == PermissionName::FEATURE_LIVE_STREAM && $dbPermission->getStatus() == PermissionStatus::ACTIVE)
 				{
-					$this->createLiveConversionProfile($object_to_fill);
+					$this->createLiveConversionProfiles($object_to_fill);
 				}
 			}
 		}
