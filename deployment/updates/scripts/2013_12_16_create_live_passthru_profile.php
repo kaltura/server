@@ -25,7 +25,7 @@ function createLivePassThruConversionProfile($partnerId)
 {
 	$conversionProfile = new conversionProfile2();
 	$conversionProfile->setPartnerId($partnerId);
-	$conversionProfile->setName('Passthrough - Live');
+	$conversionProfile->setName('Passthrough');
 	$conversionProfile->setType(ConversionProfileType::LIVE_STREAM);
 	$conversionProfile->setSystemName('Passthrough_Live');
 	$conversionProfile->setDescription('Publish only the broadcasted stream');
