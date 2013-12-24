@@ -231,17 +231,12 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	 */
 	protected function fileSyncDelete(FileSync $fileSync, BatchJob $raisedJob = null)
 	{
-		$partner = PartnerPeer::retrieveByPK($fileSync->getPartnerId());
-		if (is_null($partner))
-		{
-			KalturaLog::err('Cannot physically delete a file sync for partner that doesn\'t exists');
-			return;
-		}
-
-		if ($partner->getEnabledService('PURGE_FILES_ON_DELETE'))
+		$partnerId = $fileSync->getPartnerId();
+		$purgeEnabled = PermissionPeer::isValidForPartner('PURGE_FILES_ON_DELETE', $partnerId);
+		if ($purgeEnabled)
 		{
 			$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
-			kJobsManager::addFutureDeletionJob($raisedJob, null, $partner, $syncKey, $fileSync->getFullPath(), $fileSync->getDc());
+			kJobsManager::addDeleteFileJob($raisedJob, null, $partnerId, $syncKey, $fileSync->getFullPath(), $fileSync->getDc());
 		}
 	}
 
