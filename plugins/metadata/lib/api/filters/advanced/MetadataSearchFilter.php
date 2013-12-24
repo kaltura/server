@@ -211,15 +211,17 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		if (isset($this->orderBy))
 		{
 			$orderByField = substr($this->orderBy, 1);
-			$orderByAscending = $this->orderBy[0] == '+' ? true : false;
+			$orderBy = $this->orderBy[0] == '+' ? Criteria::ASC : Criteria::DESC;
 			
 			$metadataField = $this->getMetadataSearchField($orderByField);
+			$metadataFieldType = $this->getMetadataSearchFieldType($orderByField);
+			$isIntVal = in_array($metadataFieldType, array(MetadataSearchFilter::KMC_FIELD_TYPE_DATE, MetadataSearchFilter::KMC_FIELD_TYPE_INT));
 			if ($metadataField)
 			{
-				if ($orderByAscending)
-					$query->addOrderBy($metadataField, Criteria::ASC);
+				if ($isIntVal)
+						$query->addNumericOrderBy($metadataField, $orderBy);
 				else
-					$query->addOrderBy($metadataField, Criteria::DESC);
+						$query->addOrderBy($metadataField, $orderBy);
 			}
 		}
 	}
@@ -254,6 +256,24 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		}
 		
 		return $metadataField;
+	}
+	
+	public function getMetadataSearchFieldType($field = null, $xPaths = array()){
+		if(!$field)
+			return null;
+		
+		if (!count($xPaths)){
+			$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($this->metadataProfileId);
+			foreach($profileFields as $profileField)
+				$xPaths[$profileField->getXpath()] = $profileField;
+		}
+		
+		if(!isset($xPaths[$field])){
+			KalturaLog::ERR("Missing field: " . $field);
+			return null;
+		}
+		
+		return $xPaths[$field]->getType();
 	}
 	
 	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false) {
