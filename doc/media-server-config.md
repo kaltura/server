@@ -53,12 +53,12 @@ media_servers.ini is optional and needed only for custom configurations.
 
 
 ## For all wowza machine (origin and edge): ##
-- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
 - Copy additional jar files (available in Kaltura Java client library) to @WOWZA_DIR@/lib/
- - commons-codec-1.4.jar
- - commons-httpclient-3.1.jar
- - commons-logging-1.1.1.jar 
- - commons-lang-2.6.jar
+ - [commons-codec-1.4.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-codec-1.4.jar "commons-codec-1.4.jar")
+ - [commons-httpclient-3.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-httpclient-3.1.jar "commons-httpclient-3.1.jar")
+ - [commons-logging-1.1.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-logging-1.1.1.jar "commons-logging-1.1.1.jar") 
+ - [commons-lang-2.6.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-lang-2.6.jar "commons-lang-2.6.jar")
 - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
 - Create @WOWZA_DIR@/applications/kLive directory.
 - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
