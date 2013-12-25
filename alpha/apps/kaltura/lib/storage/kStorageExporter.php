@@ -392,8 +392,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object) 
 	{
-		if(	$object instanceof FileSync && $object->getObjectType == FileSyncObjectType::ENTRY
-			&& ($object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM || $object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC))
+		if(	$object instanceof FileSync && $object->getObjectType() == FileSyncObjectType::ENTRY
+			&& ($object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM || $object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)
+			&& $object->getDc() == StorageProfile::STORAGE_KALTURA_DC)
 			return true;
 		else
 			return false;		

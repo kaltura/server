@@ -22,8 +22,8 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{	
-		$flavorParamsOutput = assetParamsOutputPeer::retrieveByAsset($object);
-		if($flavorParamsOutput->getConversionEngines() != conversionEngineType::EXPRESSION_ENCODER3)	
+		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($object->getFlavorParamsId());
+		if($flavorParams && $flavorParams->getConversionEngines() != conversionEngineType::EXPRESSION_ENCODER3)	
 			$this->mergeManifestFiles($object->getEntryId());
 							
 		return true;
