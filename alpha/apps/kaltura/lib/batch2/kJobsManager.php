@@ -173,6 +173,28 @@ class kJobsManager
 		return $dbBatchJob;
 	}
 	
+	/**
+	 * @param int $entryId
+	 */
+	public static function boostEntryJobs($entryId)
+	{
+		$entrydb = entryPeer::retrieveByPK($entryId);
+		if(!$entrydb) {
+			throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		
+		//Retrieve all batch jobs associated to the entry
+		$batchJobs = BatchJobLockPeer::retrieveByEntryId($entryId);
+		
+		foreach($batchJobs as $job)
+		{
+			/* @var $job BatchJobLock */
+			//Boost the job by setting priority and urjeny to 1 
+			$job->setPriority(1);
+			$job->setUrgency(1);
+		}
+	}
+	
 	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null)
 	{
 	  	$jobData = new kMailJobData();
