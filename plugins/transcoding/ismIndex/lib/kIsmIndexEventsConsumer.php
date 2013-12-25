@@ -116,7 +116,7 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
   			
 		  	for($strIdx=0; $strIdx<count($xml->StreamIndex); $strIdx++) 
   			{
-   				$this->addQualityLevel($rootIsmc->StreamIndex[$strIdx], $xml->StreamIndex[$strIdx]->QualityLevel);
+   				$this->addQualityLevel($root->StreamIndex[$strIdx], $xml->StreamIndex[$strIdx]->QualityLevel);
   			}
  		}
 		return $root->asXML();
