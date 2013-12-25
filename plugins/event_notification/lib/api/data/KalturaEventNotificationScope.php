@@ -8,23 +8,12 @@ class KalturaEventNotificationScope extends KalturaScope
 	/**
 	 * @var string
 	 */
-	public $scopeObjectId;
+	public $objectId;
 
 	/**
 	 * @var KalturaEventNotificationEventObjectType
 	 */
 	public $scopeObjectType;
-
-	private static $map_between_objects = array
-	(
-		'scopeObjectId' => 'objectId',
-		'scopeObjectType' => 'objectType',
-	);
-
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
 
 	public function toObject($objectToFill = null, $propsToSkip = array())
 	{
@@ -36,7 +25,7 @@ class KalturaEventNotificationScope extends KalturaScope
 
 		$objectClassName = KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $this->scopeObjectType);
 		$peerClass = $objectClassName.'Peer';
-		$objectId = $this->scopeObjectId;
+		$objectId = $this->objectId;
 		if (class_exists($peerClass))
 		{
 			$objectToFill->setObject($peerClass::retrieveByPk($objectId));
@@ -50,7 +39,7 @@ class KalturaEventNotificationScope extends KalturaScope
 		}
 
 		if (is_null($objectToFill->getObject()))
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->scopeObjectId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->objectId);
 
 		return $objectToFill;
 	}

@@ -3,22 +3,17 @@
  * @package plugins.eventNotification
  * @subpackage model.data
  */
-class kEventNotificationScope extends kScope implements IKalturaObjectRelatedEvent
+class kEventNotificationScope extends kEventScope
 {
-	/**
-	 * @var string
-	 */
-	protected $objectId;
-
-	/**
-	 * @var int
-	 */
-	protected $objectType;
-
 	/**
 	 * @var BaseObject
 	 */
 	protected $object;
+
+	public function __construct()
+	{
+		parent::__construct(null);
+	}
 
 	/**
 	 * @param \BaseObject $object
@@ -33,38 +28,9 @@ class kEventNotificationScope extends kScope implements IKalturaObjectRelatedEve
 	 */
 	public function getObject()
 	{
-		return $this->object;
-	}
-
-	/**
-	 * @param string $objectId
-	 */
-	public function setObjectId($objectId)
-	{
-		$this->objectId = $objectId;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getObjectId()
-	{
-		return $this->objectId;
-	}
-
-	/**
-	 * @param int $objectType
-	 */
-	public function setObjectType($objectType)
-	{
-		$this->objectType = $objectType;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getObjectType()
-	{
-		return $this->objectType;
+		if (parent::getObject())
+			return parent::getObject();
+		else
+			return $this->object;
 	}
 }

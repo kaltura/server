@@ -23,8 +23,9 @@ class kEventScope extends kScope
 	/**
 	 * @param KalturaEvent $v
 	 */
-	public function __construct(KalturaEvent $v)
+	public function __construct(KalturaEvent $v = null)
 	{
+		parent::__construct();
 		$this->event = $v;
 	}
 	
@@ -34,6 +35,17 @@ class kEventScope extends kScope
 	public function getEvent()
 	{
 		return $this->event;
+	}
+
+	/**
+	 * @return BaseObject|null
+	 */
+	public function getObject()
+	{
+		if ($this->event instanceof IKalturaObjectRelatedEvent)
+			return $this->event->getObject();
+		else
+			return null;
 	}
 	
 	/**
