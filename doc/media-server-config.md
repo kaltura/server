@@ -37,7 +37,7 @@ media_servers.ini is optional and needed only for custom configurations.
 
 
 ## Prerequisites: ##
-- Wowza media server 3.6.2 path 11 or above.
+- Wowza media server 3.6.2.16 or above.
 - Java jre 1.7.
 - kaltura group (gid = 613) or any other group that apache user is associated with.
 
@@ -198,7 +198,11 @@ media_servers.ini is optional and needed only for custom configurations.
  - /Root/Application/Modules, add new Module:
      - Name - LiveStreamEntry
      - Description - Live-Stream Entry Listener
-     - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry`
+     - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry` 
+ - /Root/Application/Properties, add new Property:
+     - Name - streamTimeout
+     - Value - 200 (the value is in milliseconds)
+     - Type - Integer
 
 
 
