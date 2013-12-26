@@ -11,7 +11,7 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 	 *
 	 * @var string
 	 */
-	public $flavorParams;
+	public $flavorParamsIds;
 
 	public function __construct()
 	{
@@ -22,7 +22,9 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 	{
 		/** @var kObjectTask $dbObject */
 		$dbObject = parent::toObject($dbObject, $skip);
-		$dbObject->setDataValue('flavorParams', $this->flavorParams);
+
+		$flavorParamsIds = array_unique(kString::fromCommaSeparatedToArray($this->flavorParamsIds));
+		$dbObject->setDataValue('flavorParamsIds', $flavorParamsIds);
 		return $dbObject;
 	}
 
@@ -31,6 +33,6 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 		parent::fromObject($srcObj);
 
 		/** @var kObjectTask $srcObj */
-		$this->flavorParams = $srcObj->getDataValue('flavorParams');
+		$this->flavorParamsIds = implode(',', $srcObj->getDataValue('flavorParamsIds'));
 	}
 }

@@ -14,9 +14,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		/** @var KalturaDeleteEntryFlavorsObjectTask $objectTask */
 		$objectTask = $this->getObjectTask();
 		$deleteType = $objectTask->deleteType;
-		$flavorParams = array_map('trim', explode(',', $objectTask->flavorParams));
-		// remove empty elements that can be identified as flavor params 0
-		$flavorParams = array_filter($flavorParams, create_function('$a','return strlen($a) > 0;'));
+		$flavorParamsIds = explode(',', $objectTask->flavorParamsIds);
 		$client = $this->getClient();
 
 		$pager = new KalturaFilterPager();
@@ -36,10 +34,10 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		switch($deleteType)
 		{
 			case KalturaDeleteFlavorsLogicType::DELETE_LIST:
-				$this->deleteFlavorByList($flavors, $flavorParams);
+				$this->deleteFlavorByList($flavors, $flavorParamsIds);
 				break;
 			case KalturaDeleteFlavorsLogicType::KEEP_LIST_DELETE_OTHERS:
-				$this->deleteFlavorsKeepingConfiguredList($flavors, $flavorParams);
+				$this->deleteFlavorsKeepingConfiguredList($flavors, $flavorParamsIds);
 				break;
 			case KalturaDeleteFlavorsLogicType::DELETE_KEEP_SMALLEST:
 				$this->deleteAllButKeepSmallest($flavors);
@@ -90,9 +88,9 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 
 	/**
 	 * @param $flavors
-	 * @param $flavorParams
+	 * @param $flavorParamsIds
 	 */
-	protected function deleteFlavorsKeepingConfiguredList(array $flavors, array $flavorParams)
+	protected function deleteFlavorsKeepingConfiguredList(array $flavors, array $flavorParamsIds)
 	{
 		// make sure at least one flavor will be left from the configured list
 		$atLeastOneFlavorWillBeLeft = false;
@@ -102,7 +100,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			if ($flavor->status != KalturaFlavorAssetStatus::READY)
 				continue;
 
-			if (in_array($flavor->flavorParamsId, $flavorParams))
+			if (in_array($flavor->flavorParamsId, $flavorParamsIds))
 			{
 				$atLeastOneFlavorWillBeLeft = true;
 				break;
@@ -118,7 +116,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		foreach ($flavors as $flavor)
 		{
 			/** @var $flavor KalturaFlavorAsset */
-			if (!in_array($flavor->flavorParamsId, $flavorParams))
+			if (!in_array($flavor->flavorParamsId, $flavorParamsIds))
 			{
 				$this->deleteFlavor($flavor->id, $flavor->partnerId);
 			}

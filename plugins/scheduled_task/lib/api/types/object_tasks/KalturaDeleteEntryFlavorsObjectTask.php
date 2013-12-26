@@ -18,7 +18,7 @@ class KalturaDeleteEntryFlavorsObjectTask extends KalturaObjectTask
 	 *
 	 * @var string
 	 */
-	public $flavorParams;
+	public $flavorParamsIds;
 
 	public function __construct()
 	{
@@ -29,8 +29,10 @@ class KalturaDeleteEntryFlavorsObjectTask extends KalturaObjectTask
 	{
 		/** @var kObjectTask $dbObject */
 		$dbObject = parent::toObject($dbObject, $skip);
+
+		$flavorParamsIds = array_unique(kString::fromCommaSeparatedToArray($this->flavorParamsIds));
 		$dbObject->setDataValue('deleteType', $this->deleteType);
-		$dbObject->setDataValue('flavorParams', $this->flavorParams);
+		$dbObject->setDataValue('flavorParamsIds', $flavorParamsIds);
 		return $dbObject;
 	}
 
@@ -40,6 +42,6 @@ class KalturaDeleteEntryFlavorsObjectTask extends KalturaObjectTask
 
 		/** @var kObjectTask $srcObj */
 		$this->deleteType = $srcObj->getDataValue('deleteType');
-		$this->flavorParams = $srcObj->getDataValue('flavorParams');
+		$this->flavorParamsIds = implode(',', $srcObj->getDataValue('flavorParamsIds'));
 	}
 }

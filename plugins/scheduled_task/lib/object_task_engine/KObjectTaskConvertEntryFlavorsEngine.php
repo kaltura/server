@@ -16,20 +16,18 @@ class KObjectTaskConvertEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		$entryId = $object->id;
 
 		$client = $this->getClient();
-		$flavorParams = array_map('trim', explode(',', $objectTask->flavorParams));
-		// remove empty elements that can be identified as flavor params 0
-		$flavorParams = array_filter($flavorParams, create_function('$a','return strlen($a) > 0;'));
-		foreach($flavorParams as $flavorParamId)
+		$flavorParamsIds = explode(',', $objectTask->flavorParamsIds);
+		foreach($flavorParamsIds as $flavorParamsId)
 		{
 			try
 			{
 				$this->impersonate($object->partnerId);
-				$client->flavorAsset->convert($entryId, $flavorParamId);
+				$client->flavorAsset->convert($entryId, $flavorParamsId);
 				$this->unimpersonate();
 			}
 			catch(Exception $ex)
 			{
-				KalturaLog::err(sprintf('Failed to convert entry id %s with flavor params id %s', $entryId, $flavorParamId));
+				KalturaLog::err(sprintf('Failed to convert entry id %s with flavor params id %s', $entryId, $flavorParamsId));
 				KalturaLog::err($ex);
 			}
 		}

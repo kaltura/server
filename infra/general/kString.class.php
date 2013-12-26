@@ -420,4 +420,12 @@ class kString
 			$value .= $suffix;
 		return $strings;		
 	}
+
+	public static function fromCommaSeparatedToArray($str, $allowEmpty = false)
+	{
+		$values = array_map('trim', explode(',', $str));
+		if (!$allowEmpty)
+			$values = array_filter($values, 'strlen');
+		return $values;
+	}
 }

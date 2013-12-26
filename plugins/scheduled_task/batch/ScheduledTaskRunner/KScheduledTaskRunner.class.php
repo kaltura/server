@@ -69,11 +69,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$scheduledTaskClient = $this->getScheduledTaskClient();
 		//$this->updateProfileBeforeExecution($profile);
 
-		$objectFilterEngineType = $profile->objectFilterEngineType;
-		$objectFilterEngine = KObjectFilterEngineFactory::getInstanceByType($objectFilterEngineType, $this->getClient());
-		if (is_null($objectFilterEngine))
-			throw new Exception('Object filter engine was not found for type '.$objectFilterEngineType);
-
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
