@@ -650,7 +650,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$url = $resource->getUrl();
 		
-		if (!$resource->forceAsyncDownload())
+		if (!$resource->getForceAsyncDownload())
 		{
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)

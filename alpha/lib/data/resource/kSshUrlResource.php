@@ -96,7 +96,7 @@ class kSshUrlResource extends kUrlResource
 	 * (non-PHPdoc)
 	 * @see kUrlResource::forceAsyncDownload()
 	 */
-	public function forceAsyncDownload()
+	public function getForceAsyncDownload()
 	{
 	    return true;
 	}

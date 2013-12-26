@@ -13,7 +13,13 @@ class KalturaUrlResource extends KalturaContentResource
 	 */
 	public $url;
 	
-	private static $map_between_objects = array('url');
+	/**
+	 * Force Import Job 
+	 * @var bool
+	 */
+	public $forceAsyncDownload;
+	
+	private static $map_between_objects = array('url', 'forceAsyncDownload');
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
