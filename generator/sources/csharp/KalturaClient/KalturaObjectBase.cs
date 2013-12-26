@@ -53,7 +53,7 @@ namespace Kaltura
             return i;
         }
         
-        protected Single ParseLong(string s)
+        protected long ParseLong(string s)
         {
             long l = long.MinValue;
             long.TryParse(s, out l);
