@@ -68,6 +68,19 @@ class DrmProfileConfigureAction extends KalturaApplicationPlugin
 		}
 		
 		$action->view->form = $drmProfileForm;
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaApplicationPartialView');
+		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
+		foreach($pluginInstances as $pluginInstance)
+		{
+			$drmProfilePlugins = $pluginInstance->getApplicationPartialViews('plugin', get_class($this));
+			if(!$drmProfilePlugins)
+				continue;
+			foreach($drmProfilePlugins as $plugin)
+			{
+				/* @var $plugin Kaltura_View_Helper_PartialViewPlugin */
+	    			$plugin->plug($action->view);
+			}
+		}
 	}
 	
 	private function processForm(Form_DrmProfileConfigure $form, $formData, $partnerId, $drmProfileId = null)
