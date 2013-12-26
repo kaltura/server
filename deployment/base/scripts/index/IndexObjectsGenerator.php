@@ -33,6 +33,7 @@ class IndexObjectsGenerator
 		print "\tGenerating Index objects for $key\n";
 		$this->createFileHeader($fp, $key);
 		
+		$this->generateSimpleFunction("getObjectName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getObjectIndexName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getSphinxIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getPropelIdField", $fp, $this->searchableObjects[$key]);
@@ -230,6 +231,11 @@ class IndexObjectsGenerator
 		call_user_func($callback, $fp, $object);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
+	}
+	
+	private function getObjectName($fp, $object) {
+		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
+		$this->printToFile($fp, "return '$indexName';",2);
 	}
 	
 	private function getObjectIndexName($fp, $object) {
