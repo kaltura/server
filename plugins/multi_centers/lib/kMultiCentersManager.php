@@ -43,6 +43,12 @@ class kMultiCentersManager
 		$batchJob->setObjectId($fileSyncId);
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		
+		$assetdb = assetPeer::retrieveById($fileSync->getObjectId());
+    	$isSourceAsset = $assetdb->getIsOriginal();
+     
+    	if($isSourceAsset)
+			$fileSyncImportData->setIsSourceAsset(true);
+		
 		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId size: $fileSize"); 
 		return kJobsManager::addJob($batchJob, $fileSyncImportData, BatchJobType::FILESYNC_IMPORT);
 	}
