@@ -68,39 +68,45 @@ media_servers.ini is optional and needed only for custom configurations.
 **Edit @WOWZA_DIR@/conf/kLive/Application.xml:**
 
  - /Root/Application/Streams/StorageDir - @WEB_DIR@/content/recorded
- - /Root/Application/Properties, add new properties:
-     - HTTP origin mode
-         - Name - httpOriginMode
-         - Value - on
+ - /Root/Application/DVR/Properties, add new properties:
      - HTTP random media name
          - Name - httpRandomizeMediaName
          - Value - true
          - Type - Boolean
+ - /Root/Application/LiveStreamPacketizer/Properties, add new properties:
+     - HTTP random media name
+         - Name - httpRandomizeMediaName
+         - Value - true
+         - Type - Boolean
+ - /Root/Application/HTTPStreamer/Properties, add new properties:
+     - HTTP origin mode
+         - Name - httpOriginMode
+         - Value - on
      - Apple HLS cache control playlist
          - Name - cupertinoCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Apple HLS cache control media chunk
          - Name - cupertinoCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Flash HDS cache control reset counter
          - Name - cupertinoOnChunkStartResetCounter
          - Value - true
          - Type - Boolean
      - Smooth Streaming cache control playlist
          - Name - smoothCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Smooth Streaming cache control media chunk
          - Name - smoothCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Smooth Streaming cache control data chunk
          - Name - smoothCacheControlDataChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Flash HDS cache control playlist
          - Name - sanjoseCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Flash HDS cache control media chunk
          - Name - sanjoseCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
 
 **Edit @WOWZA_DIR@/conf/Server.xml:**
 
