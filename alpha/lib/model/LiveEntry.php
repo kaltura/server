@@ -232,7 +232,7 @@ abstract class LiveEntry extends entry
 			if(is_null($tag) && $this->getConversionProfileId())
 				$tag = 'all';
 			
-			$manifestUrl = $mediaServer->getManifestUrl($protocol) . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol) . ($tag ? "smil:{$streamName}_{$tag}.smil" : $streamName);
 			
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
