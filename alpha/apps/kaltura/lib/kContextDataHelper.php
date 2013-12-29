@@ -312,8 +312,7 @@ class kContextDataHelper
 					break;
 				}
 			}	
-			if (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO)
-				$this->streamerType = PlaybackProtocol::RTMP;
+			$this->streamerType = PlaybackProtocol::RTMP;
 		}
 		else
 		{

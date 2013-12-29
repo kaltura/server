@@ -97,6 +97,7 @@
 	<field name="start_date" indexName="start_date" type="datetime" orderable="yes" />
 	<field name="end_date" indexName="end_date" type="datetime" orderable="yes" />
 	<field name="available_from" indexName="available_from" type="datetime" orderable="yes" />
+	<field name="last_played_at" indexName="last_played_at" type="datetime" orderable="yes" />
 	<field name="entitled_kusers_publish" indexName="entitled_kusers_publish" type="string" nullable="yes" />
 	<field name="entitled_kusers_edit" indexName="entitled_kusers_edit" type="string" nullable="yes" />
 	<field name="entitled_kusers" indexName="entitled_kusers" type="string" nullable="yes" />
