@@ -335,7 +335,8 @@ class KalturaObjectFactory(object):
             return None
         objType = getXmlNodeText(objTypeNode)
         if not KalturaObjectFactory.objectFactories.has_key(objType):
-            raise KalturaClientException("Unrecognized object '%s'" % objType, KalturaClientException.ERROR_INVALID_OBJECT_TYPE)
+            print("Unrecognized object '%s' fall to default" % objType)
+            objType = expectedType.__name__        
         result = KalturaObjectFactory.objectFactories[objType]()
         if not isinstance(result, expectedType):
             raise KalturaClientException("Unexpected object type '%s'" % objType, KalturaClientException.ERROR_INVALID_OBJECT_TYPE)
