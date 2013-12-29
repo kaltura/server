@@ -1861,8 +1861,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setDimensionsIfBigger ($width, $height)
 	{
-		if(($width>$this->getFromCustomData("width") && $height>$this->getFromCustomData("height")) || 
-		(is_null($this->getFromCustomData("width")) && is_null($this->getFromCustomData("height"))) )
+		if( (is_null($this->getFromCustomData("width")) && is_null($this->getFromCustomData("height"))) 
+			|| ($width>$this->getFromCustomData("width") && $height>$this->getFromCustomData("height")) )
 			$this->setDimensions($width, $height);
 	}
 	
