@@ -8,7 +8,18 @@ class extloginAction extends kalturaAction
 	
 	private function dieOnError($error_code)
 	{
-		$errorData = call_user_func_array( 'APIErrors::getErrorData', func_get_args() );
+		if ( is_array ( $error_code ) )
+		{
+			$args = $error_code;
+			$error_code = $error_code[0];
+		}
+		else
+		{
+			$args = func_get_args();
+		}
+		array_shift($args);
+		
+		$errorData = APIErrors::getErrorData( $error_code, $args );
 		$error_code = $errorData['code'];
 		$formated_desc = $errorData['message'];
 		
