@@ -14,11 +14,11 @@ class KalturaModifyCategoriesObjectTask extends KalturaObjectTask
 	public $addRemoveType;
 
 	/**
-	 * The list of categories to add or remove
+	 * The list of category ids to add or remove
 	 *
-	 * @var KalturaStringArray
+	 * @var KalturaIntegerValueArray
 	 */
-	public $categories;
+	public $categoryIds;
 
 	public function __construct()
 	{
@@ -30,7 +30,7 @@ class KalturaModifyCategoriesObjectTask extends KalturaObjectTask
 		/** @var kObjectTask $dbObject */
 		$dbObject = parent::toObject($dbObject, $skip);
 		$dbObject->setDataValue('addRemoveType', $this->addRemoveType);
-		$dbObject->setDataValue('categories', $this->categories);
+		$dbObject->setDataValue('categoryIds', $this->categoryIds);
 		return $dbObject;
 	}
 
@@ -40,6 +40,6 @@ class KalturaModifyCategoriesObjectTask extends KalturaObjectTask
 
 		/** @var kObjectTask $srcObj */
 		$this->addRemoveType = $srcObj->getDataValue('addRemoveType');
-		$this->categories = $srcObj->getDataValue('categories');
+		$this->categoryIds = $srcObj->getDataValue('categoryIds');
 	}
 }

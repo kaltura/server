@@ -16,38 +16,58 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 		if (is_null($objectTask))
 			return;
 
+		$taskCategoryIds = array();
+		foreach($objectTask->categoryIds as $categoryIntValue)
+		{
+			/** @var KalturaString $categoryIntValue */
+			$taskCategoryIds[] = $categoryIntValue->value;
+		}
+
+		foreach($taskCategoryIds as $categoryId)
+		{
+			$entryId = $object->id;
+			$addRemoveType = $objectTask->addRemoveType;
+
+			try
+			{
+				$this->impersonate($object->partnerId);
+				$this->processCategory($entryId, $categoryId, $addRemoveType);
+				$this->unimpersonate();
+			}
+			catch(Exception $ex)
+			{
+				KalturaLog::err($ex);
+			}
+		}
+	}
+
+	/**
+	 * @param $entryId
+	 * @param $categoryId
+	 * @param $addRemoveType
+	 */
+	public function processCategory($entryId, $categoryId, $addRemoveType)
+	{
 		$client = $this->getClient();
-		$entryCategories = explode(',', $object->categories);
-		$taskCategories = array();
-		foreach($objectTask->categories as $categoryString)
-		{
-			/** @var KalturaString $categoryString */
-			$taskCategories[] = trim($categoryString->value);
-		}
+		$categoryEntry = null;
+		$filter = new KalturaCategoryEntryFilter();
+		$filter->entryIdEqual = $entryId;
+		$filter->categoryIdEqual = $categoryId;
+		$categoryEntryListResponse = $client->categoryEntry->listAction($filter);
+		/** @var KalturaCategoryEntry $categoryEntry */
+		if (count($categoryEntryListResponse->objects))
+			$categoryEntry = $categoryEntryListResponse->objects[0];
 
-		if ($objectTask->addRemoveType == KalturaScheduledTaskAddOrRemoveType::ADD)
+		if (is_null($categoryEntry) && $addRemoveType == KalturaScheduledTaskAddOrRemoveType::ADD)
 		{
-			$entryCategories = array_merge($entryCategories, $taskCategories);
+			$categoryEntry = new KalturaCategoryEntry();
+			$categoryEntry->entryId = $entryId;
+			$categoryEntry->categoryId = $categoryId;
+			$client->categoryEntry->add($categoryEntry);
 		}
-		elseif ($objectTask->addRemoveType == KalturaScheduledTaskAddOrRemoveType::REMOVE)
+		elseif (!is_null($categoryEntry) && $addRemoveType == KalturaScheduledTaskAddOrRemoveType::REMOVE)
 		{
-			if (count($taskCategories))
-			{
-				foreach($entryCategories as &$tmpCategory)
-				{
-					if (in_array($tmpCategory, $taskCategories))
-						$tmpCategory = null;
-				}
-			}
-			else
-			{
-				$entryCategories = array();
-			}
+			$client->categoryEntry->delete($entryId, $categoryId);
 		}
-
-		$entryForUpdate = new KalturaBaseEntry();
-		$entryForUpdate->categories = implode(',', $entryCategories);
-
-		$client->baseEntry->update($object->id, $entryForUpdate);
 	}
 }
