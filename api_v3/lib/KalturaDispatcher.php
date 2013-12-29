@@ -28,7 +28,7 @@ class KalturaDispatcher
 		return $this->arguments;
 	}
 	
-	public function dispatch($service, $action, $params = array()) 
+	public function dispatch($service, $action, $params = array(), $returnsFile) 
 	{
 		$start = microtime( true );
 	
@@ -68,7 +68,9 @@ class KalturaDispatcher
 		$actionParams = $actionReflector->getActionParams();
 		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
-
+		if ($actionInfo->returnType == 'file')
+			$returnsFile = true;
+			
 		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 		kCurrentContext::$ps_vesion = "ps3";
