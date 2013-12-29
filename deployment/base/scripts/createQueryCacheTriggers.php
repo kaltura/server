@@ -321,6 +321,22 @@ if ($line[0] <= 0)
 
 mysql_free_result($result);
 
+// Get the slave status
+$query = "SHOW SLAVE STATUS";
+$result = mysql_query($query) or die('Error: show slave status query failed: ' . mysql_error() . "\n");
+
+$status = mysql_fetch_array($result, MYSQL_ASSOC);
+$slaveRunning = isset($status['Slave_SQL_Running']) ? $status['Slave_SQL_Running'] : null;
+if (!in_array($slaveRunning, array('Yes', 'No')))
+{
+	die("Unexpected: show slave status returned an unexpected result [$slaveRunning]\n");
+}
+
+$slaveRunning = ($slaveRunning == 'Yes');
+$initialSlaveRunning = $slaveRunning;
+
+mysql_free_result($result);
+
 // Get list of installed triggers
 $triggers = array();
 $query = "SHOW TRIGGERS";
@@ -384,12 +400,33 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		}
 		else
 		{
+			if ($slaveRunning)
+			{
+				print "Stopping slave...\n";
+				$result = mysql_query('STOP SLAVE') or die('Error: Stop slave query failed: ' . mysql_error() . "\n");
+				if ($result !== true)
+				{
+					die("Error: Unexpected result returned while stopping slave\n");
+				}
+				$slaveRunning = false;
+			}
+			
 			$result = mysql_query($sqlCommand) or die('Error: Trigger query failed: ' . mysql_error() . "\n");
 			if ($result !== true)
 			{
 				die("Error: Unexpected result returned from mysql_query\n");
 			}
 		}
+	}
+}
+
+if (!$slaveRunning && $initialSlaveRunning)
+{
+	print "Starting slave...\n";
+	$result = mysql_query('START SLAVE') or die('Error: Start slave query failed: ' . mysql_error() . "\n");
+	if ($result !== true)
+	{
+		die("Error: Unexpected result returned while starting slave\n");
 	}
 }
 
