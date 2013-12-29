@@ -11,6 +11,7 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 			&&	in_array(assetPeer::STATUS, $modifiedColumns)
 			&&  $object->getStatus() == flavorAsset::ASSET_STATUS_READY
 			&&  $object->hasTag(assetParams::TAG_ISM)
+			&& 	!$object->getentry()->getReplacingEntryId()
 		)
 			return true;
 			
@@ -46,22 +47,34 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 			if(	$flavorAsset->getStatus() != flavorAsset::ASSET_STATUS_READY && 
 				$flavorAsset->getStatus() != flavorAsset::ASSET_STATUS_NOT_APPLICABLE)
 				return true;	
-					
-			$ismFiles[] = $this->getFilePath($flavorAsset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
-			$ismcFiles[] = $this->getFilePath($flavorAsset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
-			
+
+			if( $flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_READY )
+			{
+				$ismFilePath = $this->getFilePath($flavorAsset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+				$ismcFilePath = $this->getFilePath($flavorAsset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+				$ismvFilePath = $this->getFilePath($flavorAsset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+				
+				if($ismFilePath)
+					$ismFiles[] = array($ismFilePath, $ismvFilePath);
+				if($ismcFilePath) 
+					$ismcFiles[] = $ismcFilePath; 
+			}			
 		}
 		
+		if(!count($ismcFiles))
+			return true;
+			
 		try 
 		{
 			$ismcMerged = $this->mergeIsmcManifests($ismcFiles);				
-			$ismVersion = $entry->getIsmVersion();
+			$ismVersion = $entry->incrementIsmVersion();
 			$ismcSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
 			kFileSyncUtils::file_put_contents($ismcSyncKey, $ismcMerged);
+			$entry->save();
 					
 			$ismMerged = $this->mergeIsmManifests($ismFiles, kFileSyncUtils::getLocalFilePathForKey($ismcSyncKey));
 			$ismSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion);
-			kFileSyncUtils::file_put_contents($ismSyncKey, $ismMerged);
+			kFileSyncUtils::file_put_contents($ismSyncKey, $ismMerged);			
 		}
 		catch (kFileSyncException $e)
 		{
@@ -81,45 +94,54 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 	
 	private function mergeIsmManifests(array $filePaths, $targetIsmcPath)
 	{
-		$root = new SimpleXMLElement(file_get_contents(current($filePaths)));
-		while(true) 
+		$root = null;
+		foreach ($filePaths as $filePathPair) 
 		{
-  			$nextFilePath = next($filePaths);
-  			if($nextFilePath == false)
-  			{
-   				break;
-  			}
-  			$xml = new SimpleXMLElement(file_get_contents($nextFilePath));
-  			
-  			$xml->body->switch->video['src'] = basename($nextFilePath);
-  			$xml->body->switch->audio['src'] = basename($nextFilePath);
-  			
-  			KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->video);
-  			KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->audio);
-  			$root->head->meta['content'] = basename($targetIsmcPath);
- 		}
- 		
+			list($ismFilePath, $ismvFilePath) = $filePathPair;
+			if($ismFilePath)
+			{
+				$xml = new SimpleXMLElement(file_get_contents($ismFilePath));
+				$xml->body->switch->video['src'] = basename($ismvFilePath);
+  				$xml->body->switch->audio['src'] = basename($ismvFilePath);
+  				
+  				if(!$root)
+  				{
+  					$root = $xml;
+  				}
+  				else 
+  				{
+   					KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->video);
+  					KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->audio); 					
+  				}				
+			}
+
+		} 		
+ 		$root->head->meta['content'] = basename($targetIsmcPath);
  		return $root->asXML();
 	}
 	
 	private function mergeIsmcManifests(array $filePaths)
 	{
-		$root = new SimpleXMLElement(file_get_contents(current($filePaths)));
-		while(true) 
+		$root = null;
+		foreach ($filePaths as $filePath) 
 		{
-  			$nextFilePath = next($filePaths);
-  			if($nextFilePath == false)
-  			{
-   				break;
-  			}
-  			$xml = new SimpleXMLElement(file_get_contents($nextFilePath));
-  			
-		  	for($strIdx=0; $strIdx<count($xml->StreamIndex); $strIdx++) 
-  			{
-   				$this->addQualityLevel($root->StreamIndex[$strIdx], $xml->StreamIndex[$strIdx]->QualityLevel);
-  			}
- 		}
-		return $root->asXML();
+			if($filePath)
+			{
+				$xml = new SimpleXMLElement(file_get_contents($filePath));
+				if(!$root)
+  				{
+  					$root = $xml;
+  				}
+				else
+				{
+			  		for($strIdx=0; $strIdx<count($xml->StreamIndex); $strIdx++) 
+	  				{
+	   					$this->addQualityLevel($root->StreamIndex[$strIdx], $xml->StreamIndex[$strIdx]->QualityLevel);
+	  				}
+				} 				
+			}
+		} 		
+ 		return $root->asXML(); 		
 	}
 
 	private function addQualityLevel(SimpleXMLElement $dest, SimpleXMLElement $source)

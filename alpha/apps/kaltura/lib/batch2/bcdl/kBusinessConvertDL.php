@@ -70,12 +70,11 @@ class kBusinessConvertDL
 
 				$oldAsset->linkFromAsset($newAsset);
 				$oldAsset->save();
-
-				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$newFileSync = $newAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
-				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);
-
+				
+				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+				
 				$newFlavorMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($newAsset->getId());
 				if($newFlavorMediaInfo)
 				{
@@ -129,11 +128,14 @@ class kBusinessConvertDL
 			KalturaLog::debug("No default ThumbAsset found for replacing entry [". $tempEntry->getId() ."]");
 			$entry->setThumbnail(".jpg"); // thumbnailversion++
 			$entry->save();
+			
 			$tempEntrySyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
+			$realEntrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);		
+			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);		
 		}
 
+		self::createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $entry);
+		
 		$entry->setDimensions($tempEntry->getWidth(), $tempEntry->getHeight());
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
 		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
@@ -158,6 +160,32 @@ class kBusinessConvertDL
 		TrackEntry::addTrackEntry($te);
 	}
 
+	
+	private static function createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, $fileSyncSubType)
+	{
+		$oldFileSync = $oldAsset->getSyncKey($fileSyncSubType);
+		$newFileSync = $newAsset->getSyncKey($fileSyncSubType);
+
+		if(kFileSyncUtils::fileSync_exists($newFileSync))
+			kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);		
+	}
+	
+	private static function createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $realEntry)
+	{
+		$tempEntryIsmSyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$tempEntryIsmcSyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		
+		if(kFileSyncUtils::fileSync_exists($tempEntryIsmSyncKey) && kFileSyncUtils::fileSync_exists($tempEntryIsmcSyncKey))
+		{
+				
+			$ismVersion = $realEntry->incrementIsmVersion();
+			$realEntryIsmSyncKey = $realEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion);
+			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmSyncKey, $tempEntryIsmSyncKey);	
+			$realEntryIsmcSyncKey = $realEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmcSyncKey, $tempEntryIsmcSyncKey);
+		}
+	}
+	
 	public static function setAsDefaultThumbAsset($thumbAsset)
 	{
 		/* @var $thumbAsset thumbAsset */
