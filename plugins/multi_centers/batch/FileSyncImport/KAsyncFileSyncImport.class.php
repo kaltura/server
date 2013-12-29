@@ -12,6 +12,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	public function run($jobs = null)
 	{
 		$this->curlWrapper = new KCurlWrapper();
+		$this->curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 		
 		$retJobs = parent::run($jobs);
 		
@@ -147,7 +148,6 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// get directory contents
 		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');	
-		$this->curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 		$contents = $this->curlWrapper->exec($sourceUrl);
 		$curlError = $this->curlWrapper->getError();
 		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
@@ -262,8 +262,6 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		
 		// get http body
-		$this->curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
-
 		if($resumeOffset)
 		{
 			// will resume from the current offset
@@ -431,7 +429,6 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		$this->updateJob($job, 'Downloading header for ['.$url.']', KalturaBatchJobStatus::PROCESSING);
 		
 		// fetch the http headers
-		$this->curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 		$curlHeaderResponse = $this->curlWrapper->getHeader($url);
 		$curlError = $this->curlWrapper->getError();
 		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
