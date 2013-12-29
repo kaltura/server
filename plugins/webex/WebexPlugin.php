@@ -48,9 +48,9 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 			return $importData;
 		}
 		$url2 = $matches[1];
-		$curlWrapper = new KCurlWrapper($url2);
+		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_COOKIE, 'DetectionBrowserStatus=3|1|32|1|11|2;'.$curlInfo->headers["set-cookie"]);
-		$result = $curlWrapper->exec();
+		$result = $curlWrapper->exec($url2);
 		
 		if(!preg_match("/var prepareTicket = '([^']+)';/", $result, $matches))
 		{
@@ -89,12 +89,10 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$url4 = $matches[0];
 		$url4 = str_replace(array("'",' ','+'), '', $url4);
 		
-		$curlWrapper->setOpt(CURLOPT_URL, $url3);
-		
 		$status = null;
 		for($i = 0; $i < 10; $i++)
 		{
-			$result = $curlWrapper->exec();
+			$result = $curlWrapper->exec($url3);
 			
 			if(!preg_match("/window\.parent\.func_prepare\('([^']+)','([^']*)','([^']*)'\);/", $result, $matches))
 			{
@@ -118,13 +116,12 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		
 		$url4 = str_replace("ticket=ticket", "ticket=$ticket", $url4);
 		
-		$curlWrapper->setOpt(CURLOPT_URL, $url4);
 		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, false);
 		$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
 		$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", "$fileName.arf", $importData->destFileLocalPath);
 		$importData->destFileLocalPath = $destFileLocalPath;
 		KalturaLog::info('destination: ' . $importData->destFileLocalPath);
-		$result = $curlWrapper->exec($importData->destFileLocalPath);
+		$result = $curlWrapper->exec($url4, $importData->destFileLocalPath);
 		
 		if (!$result)
 		{	

@@ -126,31 +126,12 @@ class KCurlWrapper
 	/**
 	 * @param string $url
 	 */
-	public function __construct($url, $params = null) {
-		$url = trim($url);
-
+	public function __construct($params = null) {
 		// this is the default - will change only in very specific conditions (bellow)
 		$this->protocol = self::HTTP_PROTOCOL_HTTP;
-		try
-		{
-			$url_parts = parse_url( $url );
-			if ( isset ( $url_parts["scheme"] ) )
-			{
-				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
-					$this->protocol = self::HTTP_PROTOCOL_FTP;
-			}
-		}
-		catch ( Exception $exception )
-		{
-			throw new Exception($exception->getMessage());
-		}
-
-		KalturaLog::info("Fetching url [$url]");
 		$this->ch = curl_init();
 
-		// set URL and other appropriate options - these can be overriden with the setOpt function if desired
-		$url = self::encodeUrl($url);
-		curl_setopt($this->ch, CURLOPT_URL, $url);
+		// set appropriate options - these can be overriden with the setOpt function if desired
 		curl_setopt($this->ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
 		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
 
@@ -191,16 +172,15 @@ class KCurlWrapper
 	{
 		if(!is_null($maxFileSize))
 		{
-			$curlWrapper = new KCurlWrapper($url);
-			$curlHeaderResponse = $curlWrapper->getHeader(true);
+			$curlWrapper = new KCurlWrapper();
+			$curlHeaderResponse = $curlWrapper->getHeader($url, true);
+			$curlWrapper->close();
 			
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 				throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
 				
 			if(!$curlHeaderResponse->isGoodCode())
 				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
-					
-			$curlWrapper->close();
 			
 			if(isset($curlHeaderResponse->headers['content-length']))
 			{
@@ -216,8 +196,8 @@ class KCurlWrapper
 			}
 		}
 		
-		$curlWrapper = new KCurlWrapper($url);
-		$res = $curlWrapper->exec($destFilePath);
+		$curlWrapper = new KCurlWrapper();
+		$res = $curlWrapper->exec($url, $destFilePath);
 		$curlWrapper->close();
 		
 		return $res;
@@ -275,14 +255,14 @@ class KCurlWrapper
 	/**
 	 * @return false|KCurlHeaderResponse
 	 */
-	public function getHeader($noBody = false)
+	public function getHeader($sourceUrl, $noBody = false)
 	{
 		curl_setopt($this->ch, CURLOPT_HEADER, true);
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
-
-
+		
+		$this->setSourceUrlAndprotocol($sourceUrl);
 
 		if($this->protocol == self::HTTP_PROTOCOL_FTP)
 			$noBody = true;
@@ -344,7 +324,7 @@ class KCurlWrapper
 				}
 				else
 				{
-					return $this->getHeader(true);
+					return $this->getHeader($sourceUrl, true);
 				}
 			}
 		}
@@ -395,8 +375,10 @@ class KCurlWrapper
 	 * @param string $destFile
 	 * @return boolean
 	 */
-	public function exec($destFile = null)
+	public function exec($sourceUrl, $destFile = null)
 	{
+		$this->setSourceUrlAndprotocol($sourceUrl);
+		
 		$returnTransfer = is_null($destFile);
 		if (!is_null($destFile))
 			$destFd = fopen($destFile, "ab");
@@ -414,6 +396,28 @@ class KCurlWrapper
 		}
 
 		return $ret;
+	}
+	
+	public function setSourceUrlAndprotocol($sourceUrl)
+	{
+		$sourceUrl = trim($sourceUrl);
+		try
+		{
+			$url_parts = parse_url( $sourceUrl );
+			if ( isset ( $url_parts["scheme"] ) )
+			{
+				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
+					$this->protocol = self::HTTP_PROTOCOL_FTP;
+			}
+		}
+		catch ( Exception $exception )
+		{
+			throw new Exception($exception->getMessage());
+		}
+		KalturaLog::info("Setting source URL to [$sourceUrl]");
+		
+		$sourceUrl = self::encodeUrl($sourceUrl);
+		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 	}
 
 	public function close()
