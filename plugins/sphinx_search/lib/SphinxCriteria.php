@@ -46,6 +46,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected $orderByClause = array();
 	
 	/**
+	 * Sphinx numerical order by conditions
+	 * @var array
+	 */
+	protected $numericalOrderConditions = array();
+	
+	/**
 	 * Indicates that order by clauses added and the results should be sorted
 	 * @var bool
 	 */
@@ -484,6 +490,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->applySortRequired = true;
 			$orders = array_unique($orders);
 			$orderBy = 'ORDER BY ' . implode(',', $orders);
+			
+			if(count($this->numericalOrderConditions))
+				$conditions .= "," . implode(",", $this->numericalOrderConditions);
 		}
 		else
 		{
@@ -954,6 +963,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			KalturaLog::debug("Added [$condition]");
 			$this->conditionClause[] = $condition;
 		}
+	}
+	
+	public function addNumericOrderBy($column, $orderByType = Criteria::ASC) 
+	{
+		$newColumn = "ord" . (count($this->numericalOrderConditions) + 1); 
+		$this->addOrderBy($newColumn, $orderByType);
+		$this->numericalOrderConditions[] = "integer($column) $newColumn";
 	}
 
 	/* (non-PHPdoc)
