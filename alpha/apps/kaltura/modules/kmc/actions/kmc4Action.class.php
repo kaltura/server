@@ -188,6 +188,9 @@ class kmc4Action extends kalturaAction
 				'kdp'					=> $this->content_uiconds_clipapp_kdp->getId(),
 				'kclip'					=> $this->content_uiconds_clipapp_kclip->getId(),
 			),
+			'studio'					=> array(
+                'version'				=> kConf::get("studio_version"),
+            ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
 			'language'					=> $language,
