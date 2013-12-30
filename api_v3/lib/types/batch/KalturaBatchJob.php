@@ -596,12 +596,12 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kConcatJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaConcatJobData();
+				break;
 					
 			case KalturaBatchJobType::COPY_PARTNER:
 				$dbData = new kCopyPartnerJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaCopyPartnerJobData();
-					
 				break;
 				
 			default:

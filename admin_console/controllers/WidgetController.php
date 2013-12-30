@@ -226,6 +226,10 @@ class WidgetController extends Zend_Controller_Action
 						$partnerIds[] = $partner->id;
 					$uiConfFilter->partnerIdIn = implode(',', $partnerIds);
 				}
+				break;
+			default:
+				// We don't want to query all ui-confs.
+				$uiConfFilter->partnerIdIn = 0;
 		}
 		
 		return $uiConfFilter;

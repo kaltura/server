@@ -97,13 +97,14 @@
 	<field name="start_date" indexName="start_date" type="datetime" orderable="yes" />
 	<field name="end_date" indexName="end_date" type="datetime" orderable="yes" />
 	<field name="available_from" indexName="available_from" type="datetime" orderable="yes" />
+	<field name="last_played_at" indexName="last_played_at" type="datetime" orderable="yes" />
 	<field name="entitled_kusers_publish" indexName="entitled_kusers_publish" type="string" nullable="yes" />
 	<field name="entitled_kusers_edit" indexName="entitled_kusers_edit" type="string" nullable="yes" />
 	<field name="entitled_kusers" indexName="entitled_kusers" type="string" nullable="yes" />
 	<field name="privacy_by_contexts" indexName="privacy_by_contexts" type="string" nullable="yes" />
 	<field name="creator_kuser_id" indexName="creator_kuser_id" type="string" />
 	<field name="creator_puser_id" indexName="creator_puser_id" type="string" />
-	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" searchableonly="yes" matchable="yes" />
+	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" matchable="yes" />
 	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" matchable="yes" />
 	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" type="null" searchableonly="yes" matchable="yes" />
 	<index format="P%sST%s">

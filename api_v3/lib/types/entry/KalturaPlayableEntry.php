@@ -22,6 +22,15 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 	 * @filter order
 	 */
 	public $views;
+
+	/**
+	 * The last time the entry was played
+	 *
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $lastPlayedAt;
 	
 	/**
 	 * The width in pixels
@@ -69,6 +78,7 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 	(
 		"plays",
 		"views",
+		"lastPlayedAt",
 		"width",
 		"height",
 		"msDuration" => "lengthInMsecs",

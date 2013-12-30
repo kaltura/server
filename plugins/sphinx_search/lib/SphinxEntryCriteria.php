@@ -157,7 +157,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_in_categories_full_name');
 		}		
-		
+	
+		if($filter->is_set('_is_live'))
+		{
+			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . $filter->get('_is_live'));
+			$filter->unsetByName('_is_live');
+		}
 		
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))

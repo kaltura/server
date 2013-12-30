@@ -69,35 +69,6 @@ class MediaServer extends BaseMediaServer {
 		return MediaServer::DEFAULT_GPUID;
 	}
 	
-	public function getRtmpUrl()
-	{
-		$domain = $this->getHostname();
-		$app = MediaServer::DEFAULT_APPLICATION;
-		
-		if(kConf::hasMap('media_servers'))
-		{
-			$mediaServers = kConf::getMap('media_servers');
-			if(isset($mediaServers['application']))
-				$app = $mediaServers['application'];
-				
-			if(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
-				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
-				
-			if(isset($mediaServers[$this->getHostname()]))
-			{
-				$mediaServer = $mediaServers[$this->getHostname()];
-				
-				if(isset($mediaServer['application']))
-					$app = $mediaServer['application'];
-					
-				if(isset($mediaServer['domain']))
-					$domain = $mediaServer['domain'];
-			}
-		}
-		
-		return "rtmp://$domain/$app/p";
-	}
-	
 	public function getManifestUrl($protocol = 'http')
 	{
 		$domain = $this->getHostname();

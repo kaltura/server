@@ -120,4 +120,31 @@ Internal indication for api time properties and support for times that are relat
 
 
 
+## Entry - last played at ##
+
+*Core:*
+ 
+- Added `last_played_at` to entry table.
+
+*API:*
+
+- New field `lastPlayedAt` for `KalturaPlayableEntry`
+
+*Sphinx:*
+
+- New date attribute `last_played_at` for `kaltura_entry`
+
+
+**Deployment:**
+
+*DB*
+
+- Add last_played_at to entry table - deployment/updates/sql/2013_12_19_entry_add_last_played_at.sql
+
+*Sphinx*
+
+- Update configurations/sphinx/kaltura.conf according to template.
+- Repopulate sphinx entries
+
+
 ----------
