@@ -79,7 +79,6 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 
 	/**
 	 * @var time
-	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $lastExecutionStartedAt;

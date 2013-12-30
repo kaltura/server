@@ -37,7 +37,14 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$profiles = $this->getScheduledTaskProfiles($maxProfiles);
 		foreach($profiles as $profile)
 		{
-			$this->processProfile($profile);
+			try
+			{
+				$this->processProfile($profile);
+			}
+			catch(Exception $ex)
+			{
+				KalturaLog::err($ex);
+			}
 		}
 	}
 
@@ -67,7 +74,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	protected function processProfile(KalturaScheduledTaskProfile $profile)
 	{
 		$scheduledTaskClient = $this->getScheduledTaskClient();
-		//$this->updateProfileBeforeExecution($profile);
+		$this->updateProfileBeforeExecution($profile);
 
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
