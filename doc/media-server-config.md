@@ -37,7 +37,7 @@ media_servers.ini is optional and needed only for custom configurations.
 
 
 ## Prerequisites: ##
-- Wowza media server 3.6.2 path 11 or above.
+- Wowza media server 3.6.2.16 or above.
 - Java jre 1.7.
 - kaltura group (gid = 613) or any other group that apache user is associated with.
 
@@ -53,12 +53,12 @@ media_servers.ini is optional and needed only for custom configurations.
 
 
 ## For all wowza machine (origin and edge): ##
-- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
 - Copy additional jar files (available in Kaltura Java client library) to @WOWZA_DIR@/lib/
- - commons-codec-1.4.jar
- - commons-httpclient-3.1.jar
- - commons-logging-1.1.1.jar 
- - commons-lang-2.6.jar
+ - [commons-codec-1.4.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-codec-1.4.jar "commons-codec-1.4.jar")
+ - [commons-httpclient-3.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-httpclient-3.1.jar "commons-httpclient-3.1.jar")
+ - [commons-logging-1.1.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-logging-1.1.1.jar "commons-logging-1.1.1.jar") 
+ - [commons-lang-2.6.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-lang-2.6.jar "commons-lang-2.6.jar")
 - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
 - Create @WOWZA_DIR@/applications/kLive directory.
 - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
@@ -68,39 +68,45 @@ media_servers.ini is optional and needed only for custom configurations.
 **Edit @WOWZA_DIR@/conf/kLive/Application.xml:**
 
  - /Root/Application/Streams/StorageDir - @WEB_DIR@/content/recorded
- - /Root/Application/Properties, add new properties:
-     - HTTP origin mode
-         - Name - httpOriginMode
-         - Value - on
+ - /Root/Application/DVR/Properties, add new properties:
      - HTTP random media name
          - Name - httpRandomizeMediaName
          - Value - true
          - Type - Boolean
+ - /Root/Application/LiveStreamPacketizer/Properties, add new properties:
+     - HTTP random media name
+         - Name - httpRandomizeMediaName
+         - Value - true
+         - Type - Boolean
+ - /Root/Application/HTTPStreamer/Properties, add new properties:
+     - HTTP origin mode
+         - Name - httpOriginMode
+         - Value - on
      - Apple HLS cache control playlist
          - Name - cupertinoCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Apple HLS cache control media chunk
          - Name - cupertinoCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Flash HDS cache control reset counter
          - Name - cupertinoOnChunkStartResetCounter
          - Value - true
          - Type - Boolean
      - Smooth Streaming cache control playlist
          - Name - smoothCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Smooth Streaming cache control media chunk
          - Name - smoothCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Smooth Streaming cache control data chunk
          - Name - smoothCacheControlDataChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Flash HDS cache control playlist
          - Name - sanjoseCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Flash HDS cache control media chunk
          - Name - sanjoseCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
 
 **Edit @WOWZA_DIR@/conf/Server.xml:**
 
@@ -192,7 +198,11 @@ media_servers.ini is optional and needed only for custom configurations.
  - /Root/Application/Modules, add new Module:
      - Name - LiveStreamEntry
      - Description - Live-Stream Entry Listener
-     - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry`
+     - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry` 
+ - /Root/Application/Properties, add new Property:
+     - Name - streamTimeout
+     - Value - 200 (the value is in milliseconds)
+     - Type - Integer
 
 
 
@@ -212,6 +222,7 @@ media_servers.ini is optional and needed only for custom configurations.
      - sanjosestreaming
      - mpegdashstreaming
      - dvrchunkstreaming
+ - /Root/Application/Repeater - list all origin servers URLs separated with `|`, for example, `wowz://wowza-origin-server1:1935/kLive|wowz://wowza-origin-server2:1935/kLive`.
 
 
 **Setting keystore.jks:**

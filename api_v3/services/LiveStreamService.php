@@ -143,7 +143,7 @@ class LiveStreamService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$kResource = $resource->toObject();
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath());
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath(), $duration);
 	}
 
 	/**
@@ -349,11 +349,7 @@ class LiveStreamService extends KalturaEntryService
 	
 		if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
 		{
-			$servers = $liveStreamEntry->getMediaServers();
-			if(count($servers))
-				return true;
-				
-			return false;
+			return $liveStreamEntry->hasMediaServer();
 		}
 		
 		switch ($protocol)
@@ -381,15 +377,6 @@ class LiveStreamService extends KalturaEntryService
 				if ($config)
 				{
 					$url = $config->getUrl();
-				
-					if ($protocol == KalturaPlaybackProtocol::AKAMAI_HDS || in_array($liveStreamEntry->getSource(), array(EntrySourceType::AKAMAI_LIVE,EntrySourceType::AKAMAI_UNIVERSAL_LIVE))){
-						$parsedUrl = parse_url($url);
-  						if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
-   							$url .= '&hdcore='.kConf::get('hd_core_version');
-  						else
-							$url .= '?hdcore='.kConf::get('hd_core_version');
-					}
-					
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
 					$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
 					$urlManager->setProtocol($protocol);

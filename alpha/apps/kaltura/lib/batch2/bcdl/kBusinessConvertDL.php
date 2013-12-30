@@ -371,7 +371,7 @@ class kBusinessConvertDL
 		return 0;
 	}
 	
-	public static function decideLiveProfile(entry $entry)
+	public static function decideLiveProfile(LiveEntry $entry)
 	{
 		// find all live assets of the entry
 		$c = new Criteria();
@@ -393,9 +393,13 @@ class kBusinessConvertDL
 		}
 		
 		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
+		$streamBitrates = array();
 		foreach ($liveParamsArray as $liveParams)
 		{
 			/* @var $liveParams liveParams */
+			
+			$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
+			$streamBitrates[] = $streamBitrate;
 			
 			// check if asset already exists
 			if(isset($liveAssetsParams[$liveParams->getId()]))
@@ -434,5 +438,8 @@ class kBusinessConvertDL
 			$liveAsset->setStatus(asset::ASSET_STATUS_DELETED);
 			$liveAsset->save();
 		}
+		
+		$entry->setStreamBitrates($streamBitrates);
+		$entry->save();
 	}
 }

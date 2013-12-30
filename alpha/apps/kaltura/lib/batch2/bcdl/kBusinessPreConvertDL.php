@@ -78,6 +78,12 @@ class kBusinessPreConvertDL
 			return $srcAsset;
 					
 			
+		KalturaLog::debug("Look for highest bitrate flavor with web tag on entry [$entryId]");
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB);
+		if($srcAsset && $srcAsset->isLocalReadyStatus())
+			return $srcAsset;
+					
+			
 		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
@@ -293,7 +299,7 @@ class kBusinessPreConvertDL
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!file_exists($tempDir))
 			mkdir($tempDir, 0700, true);
-		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid.jpg;
+		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 		$logPath = $destPath . '.log';
 	
 		if(!file_exists($srcPath))
@@ -332,7 +338,7 @@ class kBusinessPreConvertDL
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 				if(!file_exists($tempDir))
 					mkdir($tempDir, 0700, true);
-				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
+				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 			
 			$quality = $destThumbParamsOutput->getQuality();

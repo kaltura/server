@@ -1336,7 +1336,7 @@ class playManifestAction extends kalturaAction
 		if(count($this->tags) == 1)
 			$tag = reset($this->tags);
 			
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, requestUtils::getProtocol(), $tag);
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $this->protocol, $tag);
 		if ($liveStreamConfig)
 			return $liveStreamConfig->getUrl();
 		
@@ -1357,7 +1357,7 @@ class playManifestAction extends kalturaAction
 	
 	private function serveLiveEntry()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM && !$this->entry->getMediaServer())
+		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM && !$this->entry->hasMediaServer())
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
 		
 		$baseUrl = $this->getLiveEntryBaseUrl();

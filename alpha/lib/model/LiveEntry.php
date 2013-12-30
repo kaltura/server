@@ -5,6 +5,7 @@
  */
 abstract class LiveEntry extends entry
 {
+	const IS_LIVE = 'isLive';
 	const DEFAULT_CACHE_EXPIRY = 70;
 	
 	/* (non-PHPdoc)
@@ -232,8 +233,13 @@ abstract class LiveEntry extends entry
 			if(is_null($tag) && $this->getConversionProfileId())
 				$tag = 'all';
 			
-			$manifestUrl = $mediaServer->getManifestUrl($protocol) . ($tag ? "ngrp:{$streamName}_{$tag}" : $streamName);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+			if($tag)
+				$streamName = "smil:{$streamName}_{$tag}.smil";
 			
+			$rtmpStreamUrl = $manifestUrl;
+			
+			$manifestUrl .= $streamName;
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
@@ -248,7 +254,7 @@ abstract class LiveEntry extends entry
 			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::RTMP);
-			$configuration->setUrl($mediaServer->getRtmpUrl());
+			$configuration->setUrl($rtmpStreamUrl);
 			$configurations[] = $configuration;
 			
 			$configuration = new kLiveStreamConfiguration();
@@ -300,6 +306,25 @@ abstract class LiveEntry extends entry
 		
 		$mediaServer = reset($mediaServers);
 		return $mediaServer->getMediaServer();
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function hasMediaServer($currentDcOnly = false)
+	{
+		$mediaServers = $this->getMediaServers();
+		if(! count($mediaServers))
+			return false;
+		
+		foreach($mediaServers as $mediaServer)
+		{
+			/* @var $mediaServer kLiveMediaServer */
+			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+				return true;
+		}
+		
+		return !$currentDcOnly;
 	}
 	
 	private static function getCacheType($dc)
@@ -394,6 +419,14 @@ abstract class LiveEntry extends entry
 	public function getMediaServers()
 	{
 		return $this->getFromCustomData("mediaServers", null, array());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see entry::getDynamicAttributes()
+	 */
+	public function getDynamicAttributes()
+	{
+		return array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
 	}
 	
 	/**

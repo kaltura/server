@@ -135,6 +135,7 @@ class entryFilter extends baseObjectFilter
 			"_gte_total_rank",
 			"_gte_last_played_at",
 			"_lte_last_played_at",
+			"_is_live",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
