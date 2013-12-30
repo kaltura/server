@@ -5,6 +5,8 @@
 */
 class entryIndex extends BaseIndexObject
 {
+	const DYNAMIC_ATTRIBUTES = 'dynamic_attributes';
+		
 	public static function getObjectIndexName()
 	{
 		return 'entry';
@@ -84,6 +86,7 @@ class entryIndex extends BaseIndexObject
 				'privacy_by_contexts' => 'privacyByContexts',
 				'creator_kuser_id' => 'creatorKuserId',
 				'creator_puser_id' => 'creatorPuserId',
+				'dynamic_attributes' => 'dynamicAttributes',
 			);
 		}
 		return self::$fieldsMap;

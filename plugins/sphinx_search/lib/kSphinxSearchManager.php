@@ -275,8 +275,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach ($sphinxPluginsData as $key => $value){
 
 			if(is_array($value)) {
-				if (array_key_exists($key, $dataJson)) {
-					$dataJson[$key] = array_merge($value, $dataJson[$key]);
+				if (isset($dataJson[$key])) {
+					$value = array_merge($value, $dataJson[$key]);
 				}
 				$dataJson[$key] = $value;
 			} else if (is_numeric($value)) {

@@ -5,6 +5,7 @@
  */
 abstract class LiveEntry extends entry
 {
+	const IS_LIVE = 'isLive';
 	const DEFAULT_CACHE_EXPIRY = 70;
 	
 	/* (non-PHPdoc)
@@ -302,6 +303,25 @@ abstract class LiveEntry extends entry
 		return $mediaServer->getMediaServer();
 	}
 	
+	/**
+	 * @return boolean
+	 */
+	public function hasMediaServer($currentDcOnly = false)
+	{
+		$mediaServers = $this->getMediaServers();
+		if(! count($mediaServers))
+			return false;
+		
+		foreach($mediaServers as $mediaServer)
+		{
+			/* @var $mediaServer kLiveMediaServer */
+			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+				return true;
+		}
+		
+		return !$currentDcOnly;
+	}
+	
 	private static function getCacheType($dc)
 	{
 		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . "_$dc";
@@ -394,6 +414,14 @@ abstract class LiveEntry extends entry
 	public function getMediaServers()
 	{
 		return $this->getFromCustomData("mediaServers", null, array());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see entry::getDynamicAttributes()
+	 */
+	public function getDynamicAttributes()
+	{
+		return array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
 	}
 	
 	/**
