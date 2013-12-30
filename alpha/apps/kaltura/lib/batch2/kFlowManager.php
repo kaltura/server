@@ -313,48 +313,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		try
 		{
-			if(!in_array($dbBatchJob->getStatus(), BatchJobLockPeer::getSchedulingRequiredStatusList())) {
-				
-				if($dbBatchJobLock !== null) {	
-					$dbBatchJobLock->delete();
-					$dbBatchJob->setBatchJobLock(null);
-					$dbBatchJob->save();
-				}
-			}
-				
-			$jobType = $dbBatchJob->getJobType();
-
-			if(is_null($dbBatchJob->getQueueTime()) && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_RETRY)
-			{
-				$dbBatchJob->setQueueTime(time());
-				$dbBatchJob->save();
-			}
-
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
-			{
-				$dbBatchJob->setFinishTime(time());
-				$dbBatchJob->save();
-			}
-
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY)
-			{
-				$dbBatchJob->setQueueTime(null);
-				$dbBatchJob->save();
-			}
-
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_ALMOST_DONE)
-			{
-				$dbBatchJob->save();
-			}
-
-			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)
-			{
-				$dbBatchJob->setFinishTime(time());
-				$dbBatchJob->save();
-
+			if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)	{
 				kJobsManager::abortChildJobs($dbBatchJob);
 			}
-
+			
+			$jobType = $dbBatchJob->getJobType();
 			switch($jobType)
 			{
 				case BatchJobType::IMPORT:

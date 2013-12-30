@@ -134,9 +134,9 @@ KalturaLog::log("ERROR:".$this->message);
 	{
 		KalturaLog::debug("Caption object:\n".print_r($captionObj, 1));
 		KalturaLog::debug("Executing curl to retrieve caption asset file from - $captionUrl");
-		$curlWrapper = new KCurlWrapper($captionUrl);
+		$curlWrapper = new KCurlWrapper();
 		$cptFilePath = $destFolder.".temp.".$captionObj->languageCode.".srt";
-		$res = $curlWrapper->exec($cptFilePath);
+		$res = $curlWrapper->exec($captionUrl, $cptFilePath);
 		KalturaLog::debug("Curl results: $res");
 		if(!$res || $curlWrapper->getError())
 		{

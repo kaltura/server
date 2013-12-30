@@ -5,6 +5,11 @@
 */
 class categoryIndex extends BaseIndexObject
 {
+	public static function getObjectName()
+	{
+		return 'category';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'category';

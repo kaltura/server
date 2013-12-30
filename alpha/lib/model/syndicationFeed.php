@@ -60,7 +60,7 @@ class syndicationFeed extends BasesyndicationFeed
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		// $this->setServePlayManifest(true);
+		$this->setServePlayManifest(true);
 		
 		return parent::preInsert($con);
 	}

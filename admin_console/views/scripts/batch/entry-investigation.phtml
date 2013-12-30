@@ -105,6 +105,7 @@
 					<th><?php echo $this->translate('entry-investigate info entry updated label'); ?></th>
 					<?php if($enableActions): ?>
 						<th><?php echo $this->translate('entry-investigate info entry actions label'); ?></th>
+						<th><?php echo $this->translate('entry-investigate info entry boost label'); ?></th>
 					<?php endif; ?>
 				</tr>
 				<tr class="<?php echo $this->cycle(array('odd', 'even'), 'entry')->next(); ?>">
@@ -165,6 +166,7 @@
 					<td><?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 					<?php if($enableActions): ?>
 						<td><button onclick="doReconvertEntry();"><?php echo $this->translate('entry-investigate entry reconvert'); ?></button></td>
+						<td><button onclick="doBoostEntryJobs();"><?php echo $this->translate('entry-investigate entry boostJobs'); ?></button></td>
 					<?php endif; ?>
 				</tr>
 			</table>
@@ -1294,6 +1296,16 @@
 
 		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
 		jQuery('#submitAction').val('reconvertEntry');
+	
+		frm.submit();
+	}
+
+	function doBoostEntryJobs(){
+		var frm = document.getElementById("frmSearch");
+		frm.reset();
+
+		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
+		jQuery('#submitAction').val('boostEntryJobs');
 	
 		frm.submit();
 	}

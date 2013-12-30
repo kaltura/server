@@ -415,6 +415,7 @@ return array(
 	'entry-investigate info entry modified label' => 'Modified At',
 	'entry-investigate info entry updated label' => 'Updated At',
 	'entry-investigate info entry actions label' => 'Reconvert',
+	'entry-investigate info entry boost label' => 'Boost Jobs',
 
 	'entry-investigate info entry ip1 label' => 'IP 1',
 	'entry-investigate info entry ip2 label' => 'IP 2',
@@ -437,6 +438,7 @@ return array(
 	'entry-investigate info entry manifest label' => 'Manifest',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
+	'entry-investigate entry boostJobs' => 'Boost Jobs',
 
 	'entry-investigate entry upload support' => 'Investigate File',
 

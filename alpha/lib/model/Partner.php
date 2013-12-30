@@ -456,6 +456,9 @@ class Partner extends BasePartner
 	public function getEnforceHttpsApi()	{		return $this->getFromCustomData( "enforceHttpsApi" , null, false  );	}
 	public function setEnforceHttpsApi( $v )	{		return $this->putInCustomData( "enforceHttpsApi", $v );	}
 	
+	public function getAssetsPerEntryLimitation()    		{	return $this->getFromCustomData( "assetsPerEntryAllowed" , null, false  ); 	}
+	public function setAssetsPerEntryLimitation( $v )       {	return $this->putInCustomData( "assetsPerEntryAllowed", $v ); 				}
+	
 	public function getFeaturesStatus()	
 	{		
 		$featuresStatus = $this->getFromCustomData(null, 'featuresStatuses');
@@ -1006,7 +1009,7 @@ class Partner extends BasePartner
 	{
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
-		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		return kuserPeer::doCount($c);
 	}

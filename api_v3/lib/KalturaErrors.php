@@ -131,6 +131,8 @@ class KalturaErrors extends APIErrors
 	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE;;Invalid rank value, rank should be between 1 and 5";
 
 	const MAX_CATEGORIES_FOR_ENTRY_REACHED = "MAX_CATEGORIES_FOR_ENTRY_REACHED;CATEGORIES;Entry can be linked with a maximum of \"@CATEGORIES@\" categories";
+	
+	const MAX_ASSETS_FOR_ENTRY_REACHED = "MAX_ASSETS_FOR_ENTRY_REACHED;ASSETS;Entry can contain maximum of \"@ASSETS@\" assets";
 
 	const INVALID_ENTRY_SCHEDULE_DATES = "INVALID_ENTRY_SCHEDULE_DATES;;Invalid entry schedule dates";
 

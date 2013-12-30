@@ -932,6 +932,18 @@ class BatchController extends Zend_Controller_Action
 				}
 			}
 			
+			if($submitAction == 'boostEntryJobs')
+			{
+				try
+				{
+					$client->jobs->boostEntryJobs($entryId);
+				}
+				catch (Exception $e)
+				{
+					$this->view->errors[] = "Boost entry [$entryId] jobs error: " . $e->getMessage();					
+				}
+			}
+			
 			if($submitAction == 'reconvertEntry')
 			{
 				try
