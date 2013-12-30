@@ -229,14 +229,7 @@ class Base
 
 			$this->log("result (serialized): " . $postResult);
 			
-			if ($this->config->getFormat() == self::KALTURA_SERVICE_FORMAT_XML)
-			{
-				$result = $this->unmarshal($postResult);
-
-				if (is_null($result)) 
-					throw new ClientException("failed to unserialize server result\n$postResult", ClientException::ERROR_UNSERIALIZE_FAILED);
-			}
-			else
+			if ($this->config->getFormat() != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				throw new ClientException("unsupported format: $postResult", ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
@@ -246,49 +239,7 @@ class Base
 		
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
 		
-		return $result;
-	}
-
-	private static function unmarshalArray(\SimpleXMLElement $xmls)
-	{
-		$ret = array();
-		foreach($xmls as $xml)
-			$ret[] = self::unmarshalItem($xml);
-			
-		return $ret;
-	}
-
-	public static function unmarshalItem(\SimpleXMLElement $xml)
-	{
-		$nodeName = $xml->getName();
-		
-		if(!$xml->objectType)
-		{
-			if($xml->item)
-				return self::unmarshalArray($xml->children());
-				
-			if($xml->error)
-			{
-				$code = "{$xml->error->code}";
-				$message = "{$xml->error->message}";
-				return new ApiException($message, $code);
-			}
-			
-			return "$xml";
-		}
-		$objectType = reset($xml->objectType);
-			
-		$type = TypeMap::getZendType($objectType);
-		if(!class_exists($type))
-			throw new ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", ClientException::ERROR_INVALID_OBJECT_TYPE);
-			
-		return new $type($xml);
-	}
-
-	private function unmarshal($xmlData)
-	{
-		$xml = new \SimpleXMLElement($xmlData);
-		return self::unmarshalItem($xml->result);
+		return $postResult;
 	}
 
 	/**
@@ -497,29 +448,6 @@ class Base
 		{
 			$this->addParam($params, "$paramName:-", "");
 		}
-	}
-	
-	/**
-	 * Validate the result object and throw exception if its an error
-	 *
-	 * @param object $resultObject
-	 */
-	public function throwExceptionIfError($resultObject)
-	{
-		if ($this->isError($resultObject))
-		{
-			throw $resultObject;
-		}
-	}
-	
-	/**
-	 * Checks whether the result object is an error
-	 *
-	 * @param object $resultObject
-	 */
-	public function isError($resultObject)
-	{
-		return ($resultObject instanceof ApiException);
 	}
 	
 	/**
