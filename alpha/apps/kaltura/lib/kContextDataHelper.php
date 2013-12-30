@@ -311,9 +311,14 @@ class kContextDataHelper
 					$this->streamerType = $protocol;
 					break;
 				}
-			}	
-			if (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO)
+			}
+			
+			if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+				$this->streamerType = PlaybackProtocol::HDS;
+			if($this->entry->getSource() == EntrySourceType::AKAMAI_LIVE)
 				$this->streamerType = PlaybackProtocol::RTMP;
+			if($this->entry->getSource() == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
+				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
 		}
 		else
 		{
