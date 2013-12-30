@@ -154,11 +154,32 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		if(!$this->alreadyInSave)
 			BatchJobPeer::preBatchJobUpdate($this);
 		
+		$this->updateDerivedFields();
+		
 		if(BatchJobLockPeer::shouldUpdateLockObject($this, $con)) {
 			BatchJobLockPeer::updateLockObject($this, $con);
 		}
-	
+		
+		if(BatchJobLockPeer::shouldDeleteLockObject($this, $con)) {
+			$batchJobLock = $this->getBatchJobLock($con);
+			$batchJobLock->delete($con);
+			$this->setBatchJobLock(null);
+		}
+		
 		return parent::preUpdate($con);
+	}
+	
+	private function updateDerivedFields() {
+		if(is_null($this->getQueueTime()) && $this->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING && $this->getStatus() != BatchJob::BATCHJOB_STATUS_RETRY) {
+			$this->setQueueTime(time());
+		}
+	
+		if($this->getStatus() == BatchJob::BATCHJOB_STATUS_RETRY) {
+			$this->setQueueTime(null);
+		}
+	
+		if(in_array($this->getStatus(), array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_FINISHED)))
+			$this->setFinishTime(time());
 	}
 	
 	public function postInsert(PropelPDO $con = null) {
@@ -179,7 +200,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	public function postUpdate(PropelPDO $con = null) {
 		if(!$this->alreadyInSave && BatchJobLockPeer::shouldCreateLockObject($this,false, $con))
 			BatchJobLockPeer::createLockObject($this);
-	
+		
 		return parent::postUpdate($con);
 	}
 	
