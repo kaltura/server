@@ -118,6 +118,7 @@ class KalturaMonitorClient
 			self::FIELD_IP_ADDRESS		=> infraRequestUtils::getRemoteAddress(),
 			self::FIELD_PARTNER_ID		=> $partnerId,
 			self::FIELD_ACTION			=> $action,
+			self::FIELD_CLIENT_TAG		=> $clientTag,
 		);
 		
 		if (!$cached)
@@ -129,7 +130,6 @@ class KalturaMonitorClient
 		self::$basicApiInfo = array(
 			self::FIELD_CACHED			=> $cached,
 			self::FIELD_KS_TYPE			=> $sessionType,
-			self::FIELD_CLIENT_TAG		=> $clientTag,
 			self::FIELD_MULTIREQUEST 	=> $isInMultiRequest,
 		);
 		
