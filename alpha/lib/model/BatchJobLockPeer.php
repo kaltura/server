@@ -117,16 +117,24 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	
 	public static function shouldUpdateLockObject(BatchJob $batchJob, PropelPDO $con = null) 
 	{
-		
-		if(!in_array($batchJob->getStatus(), BatchJobLockPeer::getSchedulingRequiredStatusList())) 
+		if ($batchJob->getBatchJobLock() === null)
 			return false;
-		if ($batchJob->getBatchJobLock() === null) 
+		if(!in_array($batchJob->getStatus(), BatchJobLockPeer::getSchedulingRequiredStatusList())) 
 			return false;
 		$result = array_intersect(self::$LOCK_AFFECTED_BY_COLUMNS_NAMES, $batchJob->getModifiedColumns());
 		if (count($result) > 0) 
 			return true;
 		
 		return false;
+	}
+	
+	public static function shouldDeleteLockObject(BatchJob $batchJob, PropelPDO $con = null) 
+	{
+		if ($batchJob->getBatchJobLock() === null)
+			return false;
+		if(in_array($batchJob->getStatus(), BatchJobLockPeer::getSchedulingRequiredStatusList()))
+			return false;
+		return true;
 	}
 	
 	/**
