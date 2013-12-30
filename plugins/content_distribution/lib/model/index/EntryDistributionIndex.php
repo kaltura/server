@@ -5,6 +5,11 @@
 */
 class EntryDistributionIndex extends BaseIndexObject
 {
+	public static function getObjectName()
+	{
+		return 'entry_distribution';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'entry_distribution';

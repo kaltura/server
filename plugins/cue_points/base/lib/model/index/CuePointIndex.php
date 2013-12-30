@@ -5,6 +5,11 @@
 */
 class CuePointIndex extends BaseIndexObject
 {
+	public static function getObjectName()
+	{
+		return 'cue_point';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'cue_point';

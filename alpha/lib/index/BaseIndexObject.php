@@ -149,7 +149,7 @@ abstract class BaseIndexObject
 	public static function fixFieldName($fieldName) {
 		if(strpos($fieldName, '.') === false)
 		{
-			$indexName = static::getObjectIndexName();
+			$indexName = static::getObjectName();
 			$fieldName = strtoupper($fieldName);
 			$fieldName = $indexName . "." . $fieldName;
 		}
