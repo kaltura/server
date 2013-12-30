@@ -40,17 +40,20 @@ class KOperationEngineIsmIndex  extends KSingleOutputOperationEngine
 		rename("$this->outFilePath.ism", "$newIsmBaseName.ism");
 		rename("$this->outFilePath.ismc", "$newIsmBaseName.ismc");
 		
-		$fsDescArr = new KalturaDestFileSyncDescriptorArray();
-		$fsDesc = KalturaDestFileSyncDescriptor();
+		$fsDescArr = array();
+		$fsDesc = new KalturaDestFileSyncDescriptor();
 		$fsDesc->fileSyncLocalPath = "$newIsmBaseName.ism";
 		$fsDesc->fileSyncObjectSubType = 3; //".ism";
 		$fsDescArr[] = $fsDesc;
-		$fsDesc = KalturaDestFileSyncDescriptor();
+		$fsDesc = new KalturaDestFileSyncDescriptor();
 		$fsDesc->fileSyncLocalPath = "$newIsmBaseName.ismc";
 		$fsDesc->fileSyncObjectSubType = 4; //".ismc";
 		$fsDescArr[] = $fsDesc;
 		
 		$this->data->destFileSyncs  = $fsDescArr;
+
+		$this->data->destFileSyncLocalPath = null;
+		$this->outFilePath = null;
 		return $res;
 	}
 }
