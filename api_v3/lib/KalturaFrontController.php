@@ -101,7 +101,7 @@ class KalturaFrontController
 			try
 			{
 				$returnsFile = false;
-		    	$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params, &$returnsFile);
+		    	$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
 			}
 			catch(Exception $ex)
 			{
@@ -121,11 +121,6 @@ class KalturaFrontController
 		ob_end_clean();
 		
 		$this->end = microtime(true);
-		
-		if ($returnsFile && ($result instanceof KalturaAPIException))
-		{
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-		}
 		
 		return $this->serializeResponse($result, $ignoreNull);
 	}
