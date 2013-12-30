@@ -6,6 +6,12 @@
 class KalturaEntryService extends KalturaBaseService 
 {
 	
+	  //amount of time for attempting to grab kLock
+	  const KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT = 0.1;
+	
+	  //amount of time for holding kLock
+	  const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */

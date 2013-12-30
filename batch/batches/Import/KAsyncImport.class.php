@@ -148,7 +148,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$errNumber = $curlWrapper->getErrorNumber();
 				if($errNumber != CURLE_OPERATION_TIMEOUTED)
 				{
-					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Operation time out. Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
 					$curlWrapper->close();
 					return $job;
 				}
