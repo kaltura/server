@@ -1,6 +1,59 @@
 
 ----------
  
+# IX-9.8.0 #
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_12_03_jobs_service.php
+
+
+
+
+
+## Admin console boost entry jobs ##
+A new button was added to the Admin page which allows you to boost the jobs of the entry.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_12_03_jobs_service.php
+
+
+
+
+## KAsyncFileSyncImport - use HTTP keep-alive ##
+By adding this optimization we now can use the same curl handle to import multiple files.
+There is no creation of new handle per file as before.
+
+
+
+
+## FilesyncImport - increase priority for source flavors ##
+From now on source asset file sync import jobs will have higher urgency and priority than others. This was added so we could start the convert process quicker.
+
+
+
+
+## Limit amount of assets alowed per entry ##
+A limit was added to the amount of assets that each entry can contain.
+By default the limitation is set to 500 but this could be configured per partner based if needed by calling "setAssetsPerEntryLimitation" on the partner.
+
+
+
+
+## Add flavor required for intermediate flow to flavorParams.ini ##
+Add support for intermediate flow to on-prem installations as well.
+
+
+
+
+
+---------
+ 
 # IX-9.7.0 #
 
 ## Kaltura live platform ##
