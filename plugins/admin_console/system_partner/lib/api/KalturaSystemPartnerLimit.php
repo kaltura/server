@@ -55,6 +55,14 @@ class KalturaSystemPartnerLimit extends KalturaObject
 			case KalturaSystemPartnerLimitType::ACCESS_CONTROLS:
 				$partner->setAccessControls($this->max);
 				break;
+				
+			case KalturaSystemPartnerLimitType::LIVE_STREAM_INPUTS:
+				$partner->setMaxLiveStreamInputs($this->max);
+				break;
+				
+			case KalturaSystemPartnerLimitType::LIVE_STREAM_OUTPUTS:
+				$partner->setMaxLiveStreamOutputs($this->max);
+				break;
 		}
 	} 
 }
