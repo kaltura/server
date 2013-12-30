@@ -1,6 +1,7 @@
 <?php
 class kUploadTokenMgr
 {
+	const NO_EXTENSION_IDENTIFIER = 'noext';
 	/**
 	 * @var UploadToken
 	 */
@@ -168,7 +169,7 @@ class kUploadTokenMgr
 	protected function getUploadPath($uploadTokenId, $extension = '')
 	{
 		if (!$extension)
-			$extension = 'noext';
+			$extension = self::NO_EXTENSION_IDENTIFIER;
 			
 		return myContentStorage::getFSUploadsPath().$uploadTokenId.'.'.$extension;
 	}
