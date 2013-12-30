@@ -101,8 +101,8 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 			if($ismFilePath)
 			{
 				$xml = new SimpleXMLElement(file_get_contents($ismFilePath));
-				$xml->body->switch->video['src'] = basename($ismvFilePath);
-  				$xml->body->switch->audio['src'] = basename($ismvFilePath);
+				if(isset($xml->body->switch->video)) $xml->body->switch->video['src'] = basename($ismvFilePath);
+  				if(isset($xml->body->switch->audio)) $xml->body->switch->audio['src'] = basename($ismvFilePath);
   				
   				if(!$root)
   				{
@@ -110,8 +110,8 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
   				}
   				else 
   				{
-   					KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->video);
-  					KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->audio); 					
+   					if(isset($xml->body->switch->video)) KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->video);
+  					if(isset($xml->body->switch->audio)) KDLUtils::AddXMLElement($root->body->switch, $xml->body->switch->audio); 					
   				}				
 			}
 
