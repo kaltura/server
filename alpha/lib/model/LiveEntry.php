@@ -233,8 +233,13 @@ abstract class LiveEntry extends entry
 			if(is_null($tag) && $this->getConversionProfileId())
 				$tag = 'all';
 			
-			$manifestUrl = $mediaServer->getManifestUrl($protocol) . ($tag ? "smil:{$streamName}_{$tag}.smil" : $streamName);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+			if($tag)
+				$streamName = "smil:{$streamName}_{$tag}.smil";
 			
+			$rtmpStreamUrl = $manifestUrl;
+			
+			$manifestUrl .= $streamName;
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
@@ -249,7 +254,7 @@ abstract class LiveEntry extends entry
 			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::RTMP);
-			$configuration->setUrl($mediaServer->getRtmpUrl());
+			$configuration->setUrl($rtmpStreamUrl);
 			$configurations[] = $configuration;
 			
 			$configuration = new kLiveStreamConfiguration();

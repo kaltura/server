@@ -265,7 +265,7 @@ class kFlowHelper
 					continue;
 				}
 				
-				if($attachedPendingMediaEntry->getRequiredDuration() && $attachedPendingMediaEntry->getRequiredDuration() < $data->getEndTime())
+				if($attachedPendingMediaEntry->getRequiredDuration() && $attachedPendingMediaEntry->getRequiredDuration() > $data->getEndTime())
 				{
 					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] requires longer duration [" . $attachedPendingMediaEntry->getRequiredDuration() . "]");
 					continue;

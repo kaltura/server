@@ -143,7 +143,7 @@ class LiveStreamService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$kResource = $resource->toObject();
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath());
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath(), $duration);
 	}
 
 	/**
