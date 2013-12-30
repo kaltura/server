@@ -456,6 +456,9 @@ class Partner extends BasePartner
 	public function getEnforceHttpsApi()	{		return $this->getFromCustomData( "enforceHttpsApi" , null, false  );	}
 	public function setEnforceHttpsApi( $v )	{		return $this->putInCustomData( "enforceHttpsApi", $v );	}
 	
+	public function getAssetsPerEntryLimitation()    		{	return $this->getFromCustomData( "assetsPerEntryAllowed" , null, false  ); 	}
+	public function setAssetsPerEntryLimitation( $v )       {	return $this->putInCustomData( "assetsPerEntryAllowed", $v ); 				}
+	
 	public function getFeaturesStatus()	
 	{		
 		$featuresStatus = $this->getFromCustomData(null, 'featuresStatuses');

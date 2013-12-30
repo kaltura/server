@@ -90,6 +90,8 @@ class asset extends Baseasset implements ISyncableFile
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
 	
+	const MAX_ASSETS_PER_ENTRY = 500;
+	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
 		$newFlavorAsset = $this->copy();
