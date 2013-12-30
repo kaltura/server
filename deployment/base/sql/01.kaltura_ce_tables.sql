@@ -755,6 +755,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   `start_date` datetime DEFAULT NULL,
   `end_date` datetime DEFAULT NULL,
   `available_from` datetime DEFAULT NULL,
+  `last_played_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `kshow_created_index` (`kshow_id`,`created_at`),
   KEY `int_id_index` (`int_id`),

@@ -8,6 +8,8 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	static private $map_between_objects = array
 	(
+		"lastPlayedAtGreaterThanOrEqual" => "_gte_last_played_at",
+		"lastPlayedAtLessThanOrEqual" => "_lte_last_played_at",
 		"durationLessThan" => "_lt_duration",
 		"durationGreaterThan" => "_gt_duration",
 		"durationLessThanOrEqual" => "_lte_duration",
@@ -21,6 +23,8 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 		"-plays" => "-plays",
 		"+views" => "+views",
 		"-views" => "-views",
+		"+lastPlayedAt" => "+last_played_at",
+		"-lastPlayedAt" => "-last_played_at",
 		"+duration" => "+duration",
 		"-duration" => "-duration",
 	);
@@ -34,6 +38,16 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/**
+	 * @var time
+	 */
+	public $lastPlayedAtGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $lastPlayedAtLessThanOrEqual;
 
 	/**
 	 * @var int

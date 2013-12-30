@@ -311,7 +311,7 @@ class kContextDataHelper
 					$this->streamerType = $protocol;
 					break;
 				}
-			}
+			}	
 			
 			if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
 				$this->streamerType = PlaybackProtocol::HDS;

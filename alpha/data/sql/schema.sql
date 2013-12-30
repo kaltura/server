@@ -208,6 +208,7 @@ CREATE TABLE `entry`
 	`end_date` DATETIME,
 	`flavor_params_ids` VARCHAR(512),
 	`available_from` DATETIME,
+	`last_played_at` DATETIME,
 	PRIMARY KEY (`id`),
 	KEY `kshow_rank_index`(`kshow_id`, `rank`),
 	KEY `kshow_views_index`(`kshow_id`, `views`),
