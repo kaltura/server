@@ -167,7 +167,7 @@ class asset extends Baseasset implements ISyncableFile
 	public function preInsert(PropelPDO $con = null)
 	{
 		//Validate max assets limitation was not reached before doing insert
-		$partner = PartnerPeer::retrieveByPK($this->partner_id);
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		
 		if($partner)
 	  		$assetPerEntryLimitation = $partner->getAssetsPerEntryLimitation();
