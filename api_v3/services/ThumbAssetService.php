@@ -136,17 +136,8 @@ class ThumbAssetService extends KalturaAssetService
 		$defaultThumbKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb
- 		if($dbEntry->getCreateThumb() && 
- 			(
-				$dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) 
-				|| 
-				(
-					$dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT 
-					&& $thumbAssetsCount == 1 
-					&& !kFileSyncUtils::fileSync_exists($defaultThumbKey)
-				)
-			)
-		)
+ 		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || ($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT 
+ 			&& $thumbAssetsCount == 1 && !kFileSyncUtils::fileSync_exists($defaultThumbKey)))
 		{
 			$this->setAsDefaultAction($dbThumbAsset->getId());
 		}

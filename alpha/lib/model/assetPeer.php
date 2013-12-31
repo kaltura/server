@@ -308,6 +308,23 @@ class assetPeer extends BaseassetPeer
 		$types = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
 		return self::countByEntryId($entryId, $types);
 	}
+	
+	public static function removeThumbAssetDeafultTags($entryID, $thumbAssetId = null)
+	{
+		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryID);
+			
+		foreach($entryThumbAssets as $entryThumbAsset)
+		{
+			if($thumbAssetId && $entryThumbAsset->getId() == $thumbAssetId)
+				continue;
+
+			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				continue;
+
+			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			$entryThumbAsset->save();
+		}
+	}
 
 	public static function retrieveReadyByEntryId($entryId, $ids = null, array $statuses = null)
 	{

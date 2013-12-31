@@ -617,18 +617,7 @@ class kFlowHelper
 			if($syncFile)
 			{
 				// removes the DEFAULT_THUMB tag from all other thumb assets
-				$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-				foreach($entryThumbAssets as $entryThumbAsset)
-				{
-					if($entryThumbAsset->getId() == $thumbAsset->getId())
-						continue;
-
-					if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-						continue;
-
-					$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-					$entryThumbAsset->save();
-				}
+				assetPeer::removeThumbAssetDeafultTags($entry->getId(), $thumbAsset->getId());
 			}
 		}
 

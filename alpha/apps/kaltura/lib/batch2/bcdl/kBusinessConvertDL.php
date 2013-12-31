@@ -165,17 +165,6 @@ class kBusinessConvertDL
 		if (!$entry)
 			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]", APIErrors::ENTRY_ID_NOT_FOUND);
 
-		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		foreach($entryThumbAssets as $entryThumbAsset)
-		{
-			if($entryThumbAsset->getId() == $thumbAsset->getId())
-				continue;
-			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-				continue;
-			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			$entryThumbAsset->save();
-		}
-
 		if(!$thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 		{
 			/* @var $thumbAsset KalturaThumbAsset */
@@ -185,7 +174,7 @@ class kBusinessConvertDL
 		}
 
 		$entry->setThumbnail(".jpg");
-		$entry->setCreateThumb(false);
+		$entry->setCreateThumb(false, $thumbAsset);
 		$entry->save();
 
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
