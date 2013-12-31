@@ -419,15 +419,16 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "array" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
 					$this->appendLine("		if(empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = array();");
 					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalItem(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
 					break;
 					
 				default : // sub object
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalItem(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalObject(\$xml->$propName, $propType);");
 					break;
 			}
 			
@@ -612,23 +613,25 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
-			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
-			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
+			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
+			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
+			$this->appendLine("		Kaltura_Client_ParseUtils::throwExceptionIfError(\$resultXmlObject->result);");
 			
 			switch($resultType)
 			{
 				case 'int':
-					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"integer\");");
+					$this->appendLine("		\$resultObject = (int)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				
 				case 'bool':
-					$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+					$this->appendLine("		\$resultObject = (bool)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				
 				case 'string':
+					$this->appendLine("		\$resultObject = (string)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
+					break;
 				case 'array':
-					$this->appendLine("		if(!\$resultObject)");
-					$this->appendLine("			\$resultObject = array();");
+					$this->appendLine("		\$resultObject = Kaltura_Client_ParseUtils::unmarshalArray(\$resultXmlObject->result, \"$resultType\");");
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					break;
 				
@@ -636,12 +639,14 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					if ($resultType)
 					{
 						$resultType = $this->getTypeClass($resultType);
+						$this->appendLine("		\$resultObject = Kaltura_Client_ParseUtils::unmarshalObject(\$resultXmlObject->result, \"$resultType\");");
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					}
 			}
 	    }
 			
-		$this->appendLine("		return \$resultObject;");
+		if($resultType)
+			$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");
 	}
 	

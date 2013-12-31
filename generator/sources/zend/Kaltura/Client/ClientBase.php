@@ -255,21 +255,7 @@ class Kaltura_Client_ClientBase
 			
 			$this->log("result (serialized): " . $postResult);
 
-			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
-			{
-				$result = $this->unmarshal($postResult);
-				
-				if ($result instanceof Kaltura_Client_Exception)
-					throw $result;
-
-				if (is_null($result))
-					throw new Kaltura_Client_ClientException("failed to unserialize server result\n$postResult", Kaltura_Client_ClientException::ERROR_UNSERIALIZE_FAILED);
-
-				$dump = print_r($result, true);
-//				if(strlen($dump) < 8192)
-					$this->log("result (object dump): " . $dump);
-			}
-			else
+			if ($this->config->format != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
@@ -279,49 +265,7 @@ class Kaltura_Client_ClientBase
 
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
 
-		return $result;
-	}
-
-	private static function unmarshalArray(SimpleXMLElement $xmls)
-	{
-		$ret = array();
-		foreach($xmls as $xml)
-			$ret[] = self::unmarshalItem($xml);
-
-		return $ret;
-	}
-
-	public static function unmarshalItem(SimpleXMLElement $xml)
-	{
-		$nodeName = $xml->getName();
-
-		if(!$xml->objectType)
-		{
-			if($xml->item)
-				return self::unmarshalArray($xml->children());
-
-			if($xml->error)
-			{
-				$code = "{$xml->error->code}";
-				$message = "{$xml->error->message}";
-				return new Kaltura_Client_Exception($message, $code);
-			}
-
-			return "$xml";
-		}
-		$objectType = reset($xml->objectType);
-
-		$type = Kaltura_Client_TypeMap::getZendType($objectType);
-		if(!class_exists($type))
-			throw new Kaltura_Client_ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
-
-		return new $type($xml);
-	}
-
-	private function unmarshal($xmlData)
-	{
-		$xml = new SimpleXMLElement($xmlData);
-		return self::unmarshalItem($xml->result);
+		return $postResult;
 	}
 
 	/**
