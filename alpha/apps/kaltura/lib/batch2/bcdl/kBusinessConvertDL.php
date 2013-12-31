@@ -393,6 +393,17 @@ class kBusinessConvertDL
 		}
 		
 		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
+		
+		$liveParamIdsArray = array();
+		/* @var $flavorAsset flavorAsset */
+		foreach ($liveParamsArray as $liveParams)
+			$liveParamIdsArray[] = $liveParams->getId();
+			
+		asort($liveParamIdsArray);
+		$liveParamIds = implode(",", $liveParamIdsArray);
+		if($liveParamIds == $entry->getFlavorParamsIds())
+			return;
+		
 		$streamBitrates = array();
 		foreach ($liveParamsArray as $liveParams)
 		{

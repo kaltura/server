@@ -31,7 +31,11 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$filter->isLive = KalturaNullableBoolean::TRUE_VALUE;
 		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_ASC;
 		
-		$entries = self::$kClient->liveStream->listAction($filter);
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
+		
+		$entries = self::$kClient->liveStream->listAction($filter, $pager);
 		while(count($entries->objects))
 		{
 			foreach($entries->objects as $entry)
@@ -44,7 +48,8 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 				$filter->createdAtGreaterThanOrEqual = $entry->createdAt;
 			}
 			
-			$entries = self::$kClient->liveStream->listAction($filter);
+			$pager->pageIndex++;
+			$entries = self::$kClient->liveStream->listAction($filter, $pager);
 		}
 	}
 }
