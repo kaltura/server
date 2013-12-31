@@ -3,16 +3,6 @@
  
 # IX-9.8.0 #
 
-**Deployment:**
-
-*Permissions*
-
-- deployment/updates/scripts/add_permissions/2013_12_03_jobs_service.php
-
-
-
-
-
 ## Admin console boost entry jobs ##
 A new button was added to the Admin page which allows you to boost the jobs of the entry.
 
@@ -48,6 +38,33 @@ By default the limitation is set to 500 but this could be configured per partner
 ## Add flavor required for intermediate flow to flavorParams.ini ##
 Add support for intermediate flow to on-prem installations as well.
 
+
+
+## Entry - last played at ##
+
+*Core:*
+ 
+- Added `last_played_at` to entry table.
+
+*API:*
+
+- New field `lastPlayedAt` for `KalturaPlayableEntry`
+
+*Sphinx:*
+
+- New date attribute `last_played_at` for `kaltura_entry`
+
+
+**Deployment:**
+
+*DB*
+
+- Add last_played_at to entry table - deployment/updates/sql/2013_12_19_entry_add_last_played_at.sql
+
+*Sphinx*
+
+- Update configurations/sphinx/kaltura.conf according to template.
+- Repopulate sphinx entries
 
 
 
@@ -171,33 +188,6 @@ Internal indication for api time properties and support for times that are relat
 
 
 
-
-
-## Entry - last played at ##
-
-*Core:*
- 
-- Added `last_played_at` to entry table.
-
-*API:*
-
-- New field `lastPlayedAt` for `KalturaPlayableEntry`
-
-*Sphinx:*
-
-- New date attribute `last_played_at` for `kaltura_entry`
-
-
-**Deployment:**
-
-*DB*
-
-- Add last_played_at to entry table - deployment/updates/sql/2013_12_19_entry_add_last_played_at.sql
-
-*Sphinx*
-
-- Update configurations/sphinx/kaltura.conf according to template.
-- Repopulate sphinx entries
 
 
 ----------
