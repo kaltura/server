@@ -156,9 +156,9 @@ class kFileSyncImportJobData extends kJobData
 	public function calculateUrgency(BatchJob $batchJob) {		
 	  	//In case the asset currently being synced is source we lower its urgency by 1 to process the job faster 
 	  	if($this->isSourceAsset)
-	    	$urgency = BatchJobUrgencyType::URGENCY_FILE_SYNC_SOURCE;
+	    	$urgency = BatchJobUrgencyType::FILE_SYNC_SOURCE;
 	  	else 
-	    	$urgency = BatchJobUrgencyType::URGENCY_FILE_SYNC_NOT_SOURCE;
+	    	$urgency = BatchJobUrgencyType::FILE_SYNC_NOT_SOURCE;
 	    
 	  	return $urgency;
 	}
