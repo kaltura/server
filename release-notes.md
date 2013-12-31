@@ -191,3 +191,12 @@ Internal indication for api time properties and support for times that are relat
 
 
 ----------
+# IX-9.8.0 #
+
+## Bulk Upload from Filter – infrastructure ##
+
+Deployment instructions:
+
+1. Update the code and clients
+2. Update plugins.ini – add BulkUploadFilter plugin
+3. Run installPlugins.php
