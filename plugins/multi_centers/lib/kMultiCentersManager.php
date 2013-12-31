@@ -48,10 +48,13 @@ class kMultiCentersManager
 		 && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
 		{
 			$assetdb = assetPeer::retrieveById($fileSync->getObjectId());
-	    	$isSourceAsset = $assetdb->getIsOriginal();
+			if($assetdb)
+			{
+	    		$isSourceAsset = $assetdb->getIsOriginal();
 	     
-	    	if($isSourceAsset)
-				$fileSyncImportData->setIsSourceAsset(true);
+	    		if($isSourceAsset)
+					$fileSyncImportData->setIsSourceAsset(true);
+			}
 		}
 		
 		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId size: $fileSize"); 
