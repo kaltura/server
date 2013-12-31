@@ -115,7 +115,7 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null)
     {
-		if(($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && !$dbEntry->getReplacingEntryId()) || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->validateEntry($dbEntry);
 
@@ -708,10 +708,20 @@ class MediaService extends KalturaEntryService
 
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-
-
-		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
+		
+		//calling replaceResource only if no lock or we grabbed it
+		$lock = kLock::create("media_updateContent_{$entryId}");
+		
+	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
+     	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+     	try{
+       		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
+		}
+		catch(Exception $e){
+       		$lock->unlock();
+       		throw $e;
+		}
+		$lock->unlock();
 
 		return $this->getEntry($entryId);
 	}
