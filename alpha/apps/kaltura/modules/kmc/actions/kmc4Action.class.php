@@ -132,6 +132,7 @@ class kmc4Action extends kalturaAction
 		/** fill $confs with all uiconf objects for all modules **/
 		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
 		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
+
 		
 		/** for each module, create separated lists of its uiconf, for each need **/
 		/** kmc general uiconfs **/
@@ -148,6 +149,9 @@ class kmc4Action extends kalturaAction
 
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
+		
+		$this->content_uiconfs_studio_v2 = array_values(kmcUtils::getStudioUiconf());
+
 
 		$kmcVars = array(
 			'kmc_version'				=> $this->kmc_swf_version,
@@ -190,6 +194,7 @@ class kmc4Action extends kalturaAction
 			),
 			'studio'					=> array(
                 'version'				=> kConf::get("studio_version"),
+                'uiConfID'				=> $this->content_uiconfs_studio_v2[0]->getId(),
             ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
