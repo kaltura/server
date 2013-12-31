@@ -861,6 +861,8 @@ class Partner extends BasePartner
 	public function setMonthlyStorageAndBandwidth($v)	{$this->putInCustomData('monthly_storage_and_bandwidth', $v);}
 	public function setEndUsers($v)						{$this->putInCustomData('end_users', $v);}
 	public function setAccessControls($v)				{$this->putInCustomData('access_controls', $v);}
+	public function setMaxLiveStreamInputs($v)			{$this->putInCustomData('live_stream_inputs', $v);}
+	public function setMaxLiveStreamOutputs($v)			{$this->putInCustomData('live_stream_outputs', $v);}
 	
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
 	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
@@ -899,6 +901,8 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
+	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs');}
+	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs');}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}

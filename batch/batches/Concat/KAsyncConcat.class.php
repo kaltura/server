@@ -174,8 +174,9 @@ class KAsyncConcat extends KJobHandlerWorker
 		{
 			$videoParams = "libx264";
 			if(isset($srcBr))
-				$videoParams .= "  -subq 7  -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
-			$videoParams .= " -b:v $srcBr" . "k";
+				$videoParams .= " -b:v $srcBr" . "k";
+				
+			$videoParams .= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
 		}
 		else
 			$videoParams = "copy";

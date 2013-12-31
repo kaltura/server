@@ -90,24 +90,23 @@ abstract class LiveEntry extends entry
 		return parent::generateFileName($sub_type, $version);
 	}
 	
+	protected $decidingLiveProfile = false;
+	
 	/* (non-PHPdoc)
 	 * @see Baseentry::postUpdate()
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
-		$decideLiveProfile = false;
-		if(!$this->alreadyInSave && $this->conversion_profile_id)
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+			
+		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
 		{
-			if(isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
-				$decideLiveProfile = true;
+			$this->decidingLiveProfile = true;
+			kBusinessConvertDL::decideLiveProfile($this);
 		}
 			
-		$ret = parent::postUpdate($con);
-		
-		if($decideLiveProfile)
-			kBusinessConvertDL::decideLiveProfile($this);
-			
-		return $ret;
+		return parent::postUpdate($con);
 	}
 	
 	/* (non-PHPdoc)
