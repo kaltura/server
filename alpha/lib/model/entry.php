@@ -1617,7 +1617,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
-	public function setCreateThumb ( $v )		{	$this->putInCustomData ( "createThumb" , (bool) $v );	}
+	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
+	{	
+		if(!$v)
+			assetPeer::removeThumbAssetDeafultTags($this->getId(), $thumbAsset ? $thumbAsset->getId() : null); 
+		
+		$this->putInCustomData ( "createThumb" , (bool) $v );	
+	}
 	public function getCreateThumb (  )			{	return (bool) $this->getFromCustomData( "createThumb" ,null, true );	}
 	
 	// indicates that duration shouldn't be auto calculated, because it already supplied by the user
