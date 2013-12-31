@@ -195,41 +195,41 @@ class BulkService extends KalturaBaseService
 		return $bulkUpload;
 	}
 	
-	/**
-	 * @action addCategoryEntries
-	 * @actionAlias categoryEntry.addFromBulkUpload
-	 * Action adds active category entries
-	 * @param KalturaBulkServiceData $bulkUploadData
-	 * @param KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData
-	 * @return KalturaBulkUpload
-	 */
-	public function addCategoryEntriesAction (KalturaBulkServiceData $bulkUploadData, KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData = null)
-	{
-	   	$bulkUploadJobData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadData->getType());
-	   	$bulkUploadData->toBulkUploadJobData($bulkUploadJobData);
-	    
-        if (!$bulkUploadCategoryEntryData)
-        {
-            $bulkUploadCategoryEntryData = new KalturaBulkUploadCategoryEntryData();
-        }
-				
-		$dbBulkUploadJobData = $bulkUploadJobData->toInsertableObject();
-		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadJobData->type);
-		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::CATEGORY_ENTRY);
-		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
-		$dbObjectData = $bulkUploadCategoryEntryData->toInsertableObject();
-		$dbBulkUploadJobData->setObjectData($dbObjectData);
-		
-		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
-		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
-		if(!$dbJobLog)
-			return null;
-		
-		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog);
-		
-		return $bulkUpload;
-	}	
+//	/**
+//	 * @action addCategoryEntries
+//	 * @actionAlias categoryEntry.addFromBulkUpload
+//	 * Action adds active category entries
+//	 * @param KalturaBulkServiceData $bulkUploadData
+//	 * @param KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData
+//	 * @return KalturaBulkUpload
+//	 */
+//	public function addCategoryEntriesAction (KalturaBulkServiceData $bulkUploadData, KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData = null)
+//	{
+//	   	$bulkUploadJobData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadData->getType());
+//	   	$bulkUploadData->toBulkUploadJobData($bulkUploadJobData);
+//	    
+//        if (!$bulkUploadCategoryEntryData)
+//        {
+//            $bulkUploadCategoryEntryData = new KalturaBulkUploadCategoryEntryData();
+//        }
+//				
+//		$dbBulkUploadJobData = $bulkUploadJobData->toInsertableObject();
+//		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadJobData->type);
+//		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::CATEGORY_ENTRY);
+//		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
+//		$dbObjectData = $bulkUploadCategoryEntryData->toInsertableObject();
+//		$dbBulkUploadJobData->setObjectData($dbObjectData);
+//		
+//		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
+//		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+//		if(!$dbJobLog)
+//			return null;
+//		
+//		$bulkUpload = new KalturaBulkUpload();
+//		$bulkUpload->fromObject($dbJobLog);
+//		
+//		return $bulkUpload;
+//	}	
 	
 	/**
 	 * Get bulk upload batch job by id
