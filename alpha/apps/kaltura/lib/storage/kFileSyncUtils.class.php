@@ -1369,6 +1369,28 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		return kFileSyncObjectManager::retrieveObject( $sync_key->object_type, $sync_key->object_id );
 	}
+	
+	public static function validateFileSyncAmountLimitation($object_id, $version, $object_type, $object_sub_type)
+	{		
+		if($version < 1002)
+			return true;
+			
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_ID, $object_id);
+		$c->add(FileSyncPeer::OBJECT_TYPE, $object_type);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $object_sub_type);
+		$c->addAscendingOrderByColumn(FileSyncPeer::VERSION);
+		$c->setOffset(100);
+		
+		$res = FileSyncPeer::doSelectOne($c);
+		if($res)
+		{
+			if(strtotime($res->getCreatedAt('Y-m-d')) == strtotime(date('Y-m-d')))
+				return false;
+		}
+		
+		return true;
+	}
 
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::objectChanged()

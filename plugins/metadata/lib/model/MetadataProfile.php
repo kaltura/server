@@ -58,16 +58,31 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function incrementVersion()
 	{
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), $this->getObjectType(), self::FILE_SYNC_METADATA_DEFINITION);
+		if(!$isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		
 		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 
 	public function incrementViewsVersion()
 	{
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getViewsVersion(), $this->getObjectType(), self::FILE_SYNC_METADATA_VIEWS);
+		if(!$isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		
 		$this->setViewsVersion(kDataCenterMgr::incrementVersion($this->getViewsVersion()));
 	}
 	
     public function incrementXsltVersion()
 	{
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getXsltVersion(), $this->getObjectType(), self::FILE_SYNC_METADATA_XSLT);
+		if(!$isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		
 		$this->setXsltVersion(kDataCenterMgr::incrementVersion($this->getXsltVersion()));
 	}
 	

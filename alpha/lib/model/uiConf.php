@@ -708,6 +708,16 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function incrementVersion()
 	{
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), $this->getType(), self::FILE_SYNC_UICONF_SUB_TYPE_DATA);
+		if(!$isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), $this->getType(), self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG);
+		if(!$isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		
 		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 }

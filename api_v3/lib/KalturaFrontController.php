@@ -376,6 +376,10 @@ class KalturaFrontController
 				case kCoreException::INVALID_ENTRY_ID:
 					$object = new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $ex->getData());
 					break;
+					
+				case kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED:
+					$object = new KalturaAPIException(KalturaErrors::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $ex->getData());
+					break;
 						
 				default:
 		    		KalturaLog::crit($ex);

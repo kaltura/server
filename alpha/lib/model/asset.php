@@ -209,6 +209,11 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incrementVersion()
 	{
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), $this->getType(), asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		if(!isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		
 		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 	
@@ -575,6 +580,11 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incLogFileVersion()
 	{
+		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getLogFileVersion(), $this->getType(), asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
+		if(!isValid)
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+			
 		$version = kDataCenterMgr::incrementVersion($this->getLogFileVersion());
 		$this->putInCustomData("logFileVersion", $version);
 	}

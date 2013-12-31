@@ -89,6 +89,8 @@ class KalturaErrors extends APIErrors
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 	
+	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;;Object ID \"@OBJECT_ID@\" not updated with latest chnages";
+	
 	/**
 	 * Service Oriented Errors
 	 *
