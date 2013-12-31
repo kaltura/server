@@ -26,6 +26,8 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaScheduledTaskProfile $scheduledTaskProfile
 	 * @return KalturaScheduledTaskProfile
+	 *
+	 * @disableRelativeTime $scheduledTaskProfile
 	 */
 	public function addAction(KalturaScheduledTaskProfile $scheduledTaskProfile)
 	{
@@ -71,6 +73,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 * @return KalturaScheduledTaskProfile
 	 *
 	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 * @disableRelativeTime $scheduledTaskProfile
 	 */
 	public function updateAction($id, KalturaScheduledTaskProfile $scheduledTaskProfile)
 	{
@@ -159,6 +162,9 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($id);
 		if (!$dbScheduledTaskProfile)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND, $id);
+
+		if ($dbScheduledTaskProfile->getStatus() != KalturaScheduledTaskProfileStatus::ACTIVE)
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_ACTIVE, $id);
 
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
