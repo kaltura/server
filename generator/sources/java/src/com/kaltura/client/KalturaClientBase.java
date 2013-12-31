@@ -308,6 +308,7 @@ abstract public class KalturaClientBase {
 			
 			if (logger.isEnabled() && statusCode != HttpStatus.SC_OK) {
 				logger.error("Method failed: " + method.getStatusLine ( ));
+				throw new KalturaApiException("Unexpected Http return code: " + statusCode);
 			}
 
 			// Read the response body

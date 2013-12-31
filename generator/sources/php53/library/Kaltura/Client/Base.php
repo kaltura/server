@@ -205,10 +205,11 @@ class Base
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 		
-		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
+		list($postResult, $errorCode, $error) = $this->doHttpRequest($url, $params, $files);
 						
-		if ($error)
+		if ($error || ($errorCode != 200 ))
 		{
+			$error .= ". RC : $errorCode";
 			throw new ClientException($error, ClientException::ERROR_GENERIC);
 		}
 		else 
@@ -264,7 +265,7 @@ class Base
 	 *
 	 * @param string $url
 	 * @param parameters $params
-	 * @return array of result and error
+	 * @return array of result, error code and error
 	 */
 	private function doHttpRequest($url, $params = array(), $files = array())
 	{
@@ -279,7 +280,7 @@ class Base
 	 *
 	 * @param string $url
 	 * @param array $params
-	 * @return array of result and error
+	 * @return array of result, error code and error
 	 */
 	private function doCurl($url, $params = array(), $files = array())
 	{
@@ -348,9 +349,10 @@ class Base
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
 		
 		$result = curl_exec($ch);
+		$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$curlError = curl_error($ch);
 		curl_close($ch);
-		return array($result, $curlError);
+		return array($result, $curlErrorCode, $curlError);
 	}
 
 	/**

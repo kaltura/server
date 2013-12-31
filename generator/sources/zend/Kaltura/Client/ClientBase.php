@@ -231,10 +231,11 @@ class Kaltura_Client_ClientBase
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 
-		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
+		list($postResult, $errorCode, $error) = $this->doHttpRequest($url, $params, $files);
 
-		if ($error)
+		if ($error || ($errorCode != 200 ))
 		{
+			$error .= ". RC : $errorCode";
 			throw new Kaltura_Client_ClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
 		}
 		else
@@ -379,8 +380,9 @@ class Kaltura_Client_ClientBase
 		
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
+		$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
-		return array($result, $curlError);
+		return array($result, $curlErrorCode, $curlError);
 	}
 
 	/**
@@ -430,7 +432,7 @@ class Kaltura_Client_ClientBase
 		if ($response === false) {
 		   throw new Kaltura_Client_ClientException("Problem reading data from $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_READ_FAILED);
 		}
-		return array($response, '');
+		return array($response, 200, '');
 	}
 
 	/**
