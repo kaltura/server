@@ -12,4 +12,6 @@ interface BulkUploadResultObjectType extends BaseEnum
 	const USER = 3;
 	
 	const CATEGORY_USER = 4;
+	
+	const CATEGORY_ENTRY = 5;
 }
