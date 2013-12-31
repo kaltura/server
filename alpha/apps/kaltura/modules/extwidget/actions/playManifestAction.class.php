@@ -867,7 +867,12 @@ class playManifestAction extends kalturaAction
 		
 		$urlPrefix = '';					
 		if (strpos($url, "://") === false)
-			$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpBaseUrl(), "/") . "/";
+		{
+			if($this->protocol == 'https' && $this->storageProfile->getDeliveryHttpsBaseUrl())
+				$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpsBaseUrl(), "/") . "/";
+			else 
+				$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpBaseUrl(), "/") . "/";
+		}
 		 			
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
 	}
