@@ -1599,18 +1599,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		//Validate max assets limitation was not reached before doing insert
-		$partner = PartnerPeer::retrieveByPK($this->partner_id);
-		if($partner)
-		{
-			$assetPerEntryLimitation = $partner->getAssetsPerEntryLimitation();
-			if($assetPerEntryLimitation == false)
-				$assetPerEntryLimitation = asset::MAX_ASSETS_PER_ENTRY;
-			$assetsCount = assetPeer::countByEntryId($this->entry_id);
-			if($assetsCount+1 > $assetPerEntryLimitation)
-				throw new kCoreException("Max number of allowed assets per entry was reached", kCoreException::MAX_ASSETS_PER_ENTRY);
-		}
-    	
 		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);

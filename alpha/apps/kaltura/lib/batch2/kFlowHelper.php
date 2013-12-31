@@ -415,6 +415,7 @@ class kFlowHelper
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
 			catch (kCoreException $ex) {
+				//This was added so the all the assets prior to reaching the limit would still be created
 				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
 					throw $ex;
 				
@@ -1661,6 +1662,7 @@ class kFlowHelper
 				$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
 			}
 			catch (kCoreException $ex) {
+				//This was added so the all the assets prior to reaching the limit would still be created
 				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
 					throw $ex;
 				

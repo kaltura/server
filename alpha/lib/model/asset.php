@@ -160,6 +160,28 @@ class asset extends Baseasset implements ISyncableFile
 		}
 		return parent::save($con);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseAsset#preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		//Validate max assets limitation was not reached before doing insert
+		$partner = PartnerPeer::retrieveByPK($this->partner_id);
+		
+		if($partner)
+	  		$assetPerEntryLimitation = $partner->getAssetsPerEntryLimitation();
+	  		
+	  	if(!isset($assetPerEntryLimitation) || $assetPerEntryLimitation == false)
+	    	$assetPerEntryLimitation = self::MAX_ASSETS_PER_ENTRY;
+	    		
+	  	$assetsCount = assetPeer::countByEntryId($this->entry_id);
+	  		
+	  	if($assetsCount+1 > $assetPerEntryLimitation)
+	    	throw new kCoreException("Max number of allowed assets per entry was reached", kCoreException::MAX_ASSETS_PER_ENTRY);
+	    	
+	    return parent::preInsert();
+	}
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseflavorAsset#postUpdate()
