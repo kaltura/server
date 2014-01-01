@@ -123,7 +123,7 @@ class KalturaDispatcher
 				 throw ($e);
 			 }
 // 			
-			 $res = new kRendererDieError ($e);
+			 $res = new kRendererDieError ($e->getCode(), $e->getMessage());
 		 }
 		
 		kEventsManager::flushEvents();

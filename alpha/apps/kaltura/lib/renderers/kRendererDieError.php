@@ -19,11 +19,11 @@ class kRendererDieError implements kRendererBase
 	 */
 	private $message;
 	
-	public function __construct(KalturaAPIException $e)
+	public function __construct($code, $message)
 	{
 	KalturaLog::debug(print_r($e));
-		$this->code = $e->getCode();
-		$this->message = $e->getMessage();
+		$this->code = $code;
+		$this->message = $message;
 	}
 	
 	public function validate()

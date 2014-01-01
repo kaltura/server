@@ -100,7 +100,6 @@ class KalturaFrontController
 			$this->onRequestStart($this->service, $this->action, $this->params);
 			try
 			{
-				$returnsFile = false;
 		    	$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
 			}
 			catch(Exception $ex)
