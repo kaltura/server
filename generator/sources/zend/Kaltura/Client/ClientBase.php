@@ -585,7 +585,22 @@ class Kaltura_Client_ClientBase
 
 	public function doMultiRequest()
 	{
-		return $this->doQueue();
+		$xmlData = $this->doQueue();
+		$xml = new SimpleXMLElement($xmlData);
+		$items = $xml->result->children();
+		$ret = array();
+		foreach($items as $item) {
+			$error = Kaltura_Client_ParseUtils::checkIfError($item);
+			if($error)
+				$ret[] = $error;
+			else if($item->objectType)
+				$ret[] = Kaltura_Client_ParseUtils::unmarshalObject($item);
+			else if($item->item)
+				$ret[] = Kaltura_Client_ParseUtils::unmarshalArray($item);
+			else			
+				$ret[] = Kaltura_Client_ParseUtils::unmarshalSimpleType($item);
+		}
+		return $ret;
 	}
 
 	public function isMultiRequest()
