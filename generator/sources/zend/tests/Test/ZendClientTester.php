@@ -40,6 +40,45 @@ class ZendClientTester
 		echo "\nFinished running client library tests\n";
 	}
 	
+		public function testMultiRequest() {
+		
+		$this->_client->startMultiRequest();
+
+		$mixEntry = new Kaltura_Client_Type_MixEntry();
+		$mixEntry->name = ".Net Mix";
+		$mixEntry->editorType = Kaltura_Client_Enum_EditorType::SIMPLE;
+
+		# Request 1
+		$mixEntry = $this->_client->mixing->add($mixEntry);
+
+		# Request 2
+		$uploadFilePath = dirname(__FILE__) . '/../resources/' . self::UPLOAD_VIDEO_FILENAME;
+    	$uploadTokenId = $this->_client->media->upload($uploadFilePath);
+
+		$mediaEntry = new Kaltura_Client_Type_MediaEntry();
+		$mediaEntry->name = "Media Entry For Mix";
+		$mediaEntry->mediaType = Kaltura_Client_Enum_MediaType::VIDEO;
+
+		# Request 3
+		$mediaEntry = $this->_client->media->addFromUploadedFile($mediaEntry, $uploadTokenId);
+
+		# Request 4
+		$this->_client->mixing->appendMediaEntry($mixEntry->id, $mediaEntry->id);
+
+		$response = $this->_client->doMultiRequest();
+
+		foreach( $response as $subResponse)
+			if($subResponse instanceof KalturaException)
+				throw new Exception("Error occurred: " + $subResponse.message);
+
+		# when accessing the response object we will use an index and not the response number (response number - 1)
+		$this->assertTrue($response[0] instanceof Kaltura_Client_Type_MixEntry);
+		$mixEntry = $response[0];
+		
+		if(is_null($mixEntry->id))
+			throw new Exception("Failed to add entry within multi request");
+	}
+	
 	public function testSyncFlow()
 	{
 		// add upload token

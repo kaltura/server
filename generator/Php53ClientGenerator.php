@@ -715,7 +715,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
-			$this->appendLine("		\\Kaltura\\Client\\ParseUtils::throwExceptionIfError(\$resultXmlObject->result);");
+			$this->appendLine("		\\Kaltura\\Client\\ParseUtils::checkIfError(\$resultXmlObject->result);");
 			switch($resultType)
 			{
 				case 'bigint':	

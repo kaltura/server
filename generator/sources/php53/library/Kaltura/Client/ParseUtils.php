@@ -43,7 +43,7 @@ class ParseUtils
 		return "$xml";
 	}
 	
-	public static function unmarshalObject(\SimpleXMLElement $xml, $fallbackType) 
+	public static function unmarshalObject(\SimpleXMLElement $xml, $fallbackType = null) 
 	{
 		$objectType = reset($xml->objectType);
 		$type = TypeMap::getZendType($objectType);
@@ -56,7 +56,7 @@ class ParseUtils
 		return new $type($xml);
 	}
 	
-	public static function unmarshalArray(\SimpleXMLElement $xml, $fallbackType)
+	public static function unmarshalArray(\SimpleXMLElement $xml, $fallbackType = null)
 	{
 		$xmls = $xml->children();
 		$ret = array();
@@ -66,13 +66,18 @@ class ParseUtils
 		return $ret;
 	}
 
-	public static function throwExceptionIfError(\SimpleXMLElement $xml) 
+	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
 	{
 		if($xml->error)
 		{
 			$code = "{$xml->error->code}";
 			$message = "{$xml->error->message}";
-			throw new ApiException($message, $code);
+			if($throwException)
+				throw new ApiException($message, $code);
+			else 
+				return new ApiException($message, $code);
 		}
+		return null;
 	}
+	
 }
