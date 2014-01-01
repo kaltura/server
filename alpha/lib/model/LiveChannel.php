@@ -36,7 +36,7 @@ class LiveChannel extends LiveEntry
 	/**
 	 * @param string $playlistId
 	 */
-	protected function setPlaylistId($playlistId)
+	public function setPlaylistId($playlistId)
 	{
 		$this->putInCustomData('playlist_id', $playlistId);
 	}
@@ -44,7 +44,7 @@ class LiveChannel extends LiveEntry
 	/**
 	 * @return string
 	 */
-	protected function getPlaylistId()
+	public function getPlaylistId()
 	{
 		return $this->getFromCustomData('playlist_id');
 	}
@@ -52,7 +52,7 @@ class LiveChannel extends LiveEntry
 	/**
 	 * @param boolean $repeat
 	 */
-	protected function setRepeat($repeat)
+	public function setRepeat($repeat)
 	{
 		$this->putInCustomData('repeat', $repeat);
 	}
@@ -60,7 +60,7 @@ class LiveChannel extends LiveEntry
 	/**
 	 * @return boolean
 	 */
-	protected function getRepeat()
+	public function getRepeat()
 	{
 		return $this->getFromCustomData('repeat');
 	}
