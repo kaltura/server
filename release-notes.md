@@ -3,6 +3,22 @@
  
 # IX-9.8.0 #
 
+## VOD to Live ##
+Demo version only, enables broadcasting a live-channel base on playlist.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_01_live_channel_services.php
+
+*DB*
+
+- Add live_channel_segment table - deployment/updates/sql/2014_01_01_create_live_channel_segment_table.sql
+
+
+
+
 ## Admin console boost entry jobs ##
 A new button was added to the Admin page which allows you to boost the jobs of the entry.
 
@@ -67,12 +83,12 @@ Add support for intermediate flow to on-prem installations as well.
 - Repopulate sphinx entries
 
 
-## Bulk Upload from Filter – infrastructure ##
+## Bulk Upload from Filter â€“ infrastructure ##
 
 Deployment instructions:
 
 1. Update the code and clients
-2. Update plugins.ini – add BulkUploadFilter plugin
+2. Update plugins.ini â€“ add BulkUploadFilter plugin
 3. Run installPlugins.php
 
 ---------

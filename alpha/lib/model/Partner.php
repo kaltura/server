@@ -12,6 +12,9 @@ class Partner extends BasePartner
 {	
 	const BATCH_PARTNER_ID = -1;
 	const ADMIN_CONSOLE_PARTNER_ID = -2;
+	const HOSTED_PAGES_PARTNER_ID = -3;
+	const MONITORING_PARTNER_ID = -4;
+	const MEDIA_SERVER_PARTNER_ID = -5;
 	
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
