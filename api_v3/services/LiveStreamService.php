@@ -251,7 +251,7 @@ class LiveStreamService extends KalturaEntryService
 		
 		$maxLiveStreamOutputs = $this->getPartner()->getMaxLiveStreamOutputs();
 		if(is_null($maxLiveStreamOutputs))
-			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', null, 10);
+			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', null, 30);
 			
 		KalturaLog::debug("live params outputs [$liveParamsOutputs], max live stream outputs [$maxLiveStreamOutputs]");
 		if($liveParamsOutputs > $maxLiveStreamOutputs)
