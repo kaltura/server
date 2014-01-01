@@ -24,6 +24,14 @@ class KalturaLiveChannel extends KalturaLiveEntry
 		'repeat',
 	);
 
+	/* (non-PHPdoc)
+	 * @see KalturaLiveEntry::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
 	public function __construct()
 	{
 		parent::__construct();
