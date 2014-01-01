@@ -67,12 +67,12 @@ Add support for intermediate flow to on-prem installations as well.
 - Repopulate sphinx entries
 
 
-## Bulk Upload from Filter – infrastructure ##
+## Bulk Upload from Filter ï¿½ infrastructure ##
 
 Deployment instructions:
 
 1. Update the code and clients
-2. Update plugins.ini – add BulkUploadFilter plugin
+2. Update plugins.ini ï¿½ add BulkUploadFilter plugin
 3. Run installPlugins.php
 
 ---------
@@ -192,5 +192,9 @@ Internal indication for api time properties and support for times that are relat
 1 = PID2
 `
 
-
+## HTML5 Studio Deployment ##
+* Update base.ini with studio_version
+* Fetch latest studio project files into apps/studio from https://github.com/kaltura/player-studio/releases
+* Execute deployment script on studio.ini file (located in studio project root):
+From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
 
