@@ -12,30 +12,15 @@ class KalturaAPIException extends Exception
 	 * @param string $errorString A string in the format: "ERR_CODE;PARAMS;MSG_STRING"
 	 * @throws Exception
 	 */
-	function KalturaAPIException($errorString)
+	function KalturaAPIException( $errorString )
 	{
-		$components = explode(';', $errorString, 3);
-		$this->code = $components[0];
-		$this->message = $components[2];
+		$errorArgs = func_get_args();
+		array_shift( $errorArgs );
+		$errorData = APIErrors::getErrorData( $errorString, $errorArgs );
 		
-		if ( ! empty($components[1]) ) // Need to process arguments?
-		{
-			$paramNames = explode(',', $components[1]);
-			$numParamNames = count($paramNames);
-			
-			$funcArgs = func_get_args();
-			array_shift( $funcArgs ); // Get rid of the first arg (= $errorString)
-
-			// Create and fill the args dictionary
-			for ( $i = 0; $i < $numParamNames; $i++ )
-			{
-				// Map the arg's name to its value
-				$this->args[ $paramNames[$i] ] = $funcArgs[$i];
-				
-				// Replace the arg's placeholder with its value in the destination string
-				$this->message = str_replace("@{$paramNames[$i]}@", $funcArgs[$i], $this->message);
-			}
-		}
+		$this->message = $errorData['message'];
+		$this->code = $errorData['code'];
+		$this->args = $errorData['args'];
 	}
 	
 	/**

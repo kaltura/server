@@ -19,12 +19,9 @@ class extloginAction extends kalturaAction
 		}
 		array_shift($args);
 		
-		$error = explode(",", $error_code, 2);
-		
-		$error_code = $error[0];
-		$error_message = $error[1];
-
-		$formated_desc = @call_user_func_array('sprintf', array_merge((array)$error_message, $args));
+		$errorData = APIErrors::getErrorData( $error_code, $args );
+		$error_code = $errorData['code'];
+		$formated_desc = $errorData['message'];
 		
 		header("X-Kaltura:error-$error_code");
 		header('X-Kaltura-App: exiting on error '.$error_code.' - '.$formated_desc);
