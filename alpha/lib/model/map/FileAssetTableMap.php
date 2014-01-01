@@ -37,7 +37,7 @@ class FileAssetTableMap extends TableMap {
 		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
-		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('ID', 'Id', 'BIGINT', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
@@ -48,7 +48,7 @@ class FileAssetTableMap extends TableMap {
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 255, null);
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 255, null);
 		$this->addColumn('FILE_EXT', 'FileExt', 'VARCHAR', false, 4, null);
-		$this->addColumn('SIZE', 'Size', 'INTEGER', false, null, null);
+		$this->addColumn('SIZE', 'Size', 'BIGINT', false, null, null);
 		// validators
 	} // initialize()
 
