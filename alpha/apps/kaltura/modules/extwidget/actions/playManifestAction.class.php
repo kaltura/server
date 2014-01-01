@@ -9,6 +9,23 @@ class playManifestAction extends kalturaAction
 	
 	const HDNETWORKSMIL = 'hdnetworksmil';
 	
+	
+	static protected $httpProtocols = array(
+		'http',
+		'https',
+	);
+
+	static protected $httpFormats = array(
+		self::HTTP,
+		self::SILVER_LIGHT,
+		self::APPLE_HTTP,
+		self::HDS,
+		self::HLS,	
+		self::AKAMAI_HDS,
+		self::AKAMAI_HD,
+		self::MPEG_DASH,
+	);
+	
 	/**
 	 * Short names for action arguments
 	 * @var array
@@ -1342,7 +1359,7 @@ class playManifestAction extends kalturaAction
 			$tag = reset($this->tags);
 			
 		$protocol = $this->protocol; 
-		if(in_array($this->format, PlaybackProtocol::HTTP_FORMATS) && !in_array($protocol, PlaybackProtocol::HTTP_PROTOCOLS))
+		if(in_array($this->format, self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
 			$protocol = requestUtils::getProtocol();
 			
 		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $protocol, $tag);

@@ -16,20 +16,4 @@ interface PlaybackProtocol extends BaseEnum
 	const AKAMAI_HDS = 'hdnetworkmanifest';
 	const AKAMAI_HD = 'hdnetwork';
 	const MPEG_DASH = 'mpegdash';
-	
-	const HTTP_PROTOCOLS = array(
-		'http',
-		'https',
-	);
-
-	const HTTP_FORMATS = array(
-		self::HTTP,
-		self::SILVER_LIGHT,
-		self::APPLE_HTTP,
-		self::HDS,
-		self::HLS,	
-		self::AKAMAI_HDS,
-		self::AKAMAI_HD,
-		self::MPEG_DASH,
-	);
 }
