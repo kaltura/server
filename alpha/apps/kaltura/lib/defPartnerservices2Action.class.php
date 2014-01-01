@@ -812,13 +812,13 @@ $this->benchmarkStart( "beforeImpl" );
 		$kshow = kshowPeer::retrieveByPK( $kshow_id );
 		if ( ! $kshow )
 		{
-			$this->addError ( "no such kshow [$kshow_id]" );
+			$this->addError ( APIErrors::INVALID_KSHOW_ID, $kshow_id );
 			throw new Exception();
 		}
 
 		if ( $kshow->getProducerId() != $kshow_id )
 		{
-			$this->addError ( "no such kshow [$kshow_id]" );
+			$this->addError ( APIErrors::INVALID_KSHOW_ID, $kshow_id );
 			throw new Exception();
 		}
 	}

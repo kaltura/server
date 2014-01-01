@@ -364,7 +364,7 @@ class APIErrors
 	
 	const ADMIN_LOGIN_USERS_QUOTA_EXCEEDED = "ADMIN_LOGIN_USERS_QUOTA_EXCEEDED;;Partner login users quota exceeded";
 	
-	const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
+	const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS;;User already exists";
 	
 	const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA;;Login data cannot be updated by this action";
 
@@ -408,5 +408,5 @@ class APIErrors
 	
 	const ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA;; error accored while gzuncompress job data";
 
-	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND";
+	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND;;Object not found";
 }

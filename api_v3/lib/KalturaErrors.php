@@ -480,7 +480,7 @@ class KalturaErrors extends APIErrors
 	
 	const EXTENDING_ITEM_MISSING_XPATH = "EXTENDING_ITEM_MISSING_XPATH;;Extending item must contain xpath";
 	
-	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND,Live channel segment id [%s] not found';
+	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = "LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND;SEGMENT_ID;Live channel segment id [@SEGMENT_ID@] not found";
 	/*
 	 * BaseEntry Service
 	 */
