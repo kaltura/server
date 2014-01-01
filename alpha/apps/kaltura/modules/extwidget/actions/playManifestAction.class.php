@@ -492,7 +492,7 @@ class playManifestAction extends kalturaAction
 		{
 			case PlaybackProtocol::HTTP:
 			case "url":
-			case "rtsp":
+			case PlaybackProtocol::RTSP:
 				$oneOnly = true;	// single flavor delivery formats
 				break;
 				
@@ -1341,7 +1341,11 @@ class playManifestAction extends kalturaAction
 		if(count($this->tags) == 1)
 			$tag = reset($this->tags);
 			
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $this->protocol, $tag);
+		$protocol = $this->protocol; 
+		if(in_array($this->format, PlaybackProtocol::HTTP_FORMATS) && !in_array($protocol, PlaybackProtocol::HTTP_PROTOCOLS))
+			$protocol = requestUtils::getProtocol();
+			
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $protocol, $tag);
 		if ($liveStreamConfig)
 			return $liveStreamConfig->getUrl();
 		
