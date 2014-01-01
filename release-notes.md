@@ -194,6 +194,7 @@ Internal indication for api time properties and support for times that are relat
 
 ## HTML5 Studio Deployment ##
 * Update base.ini with studio_version
+* Create a sub folder with the name of the version for the studio files (for example: v0.1)
 * Fetch latest studio project files into apps/studio from https://github.com/kaltura/player-studio/releases
 * Execute deployment script on studio.ini file (located in studio project root):
 From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
