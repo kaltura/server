@@ -9,6 +9,23 @@ class playManifestAction extends kalturaAction
 	
 	const HDNETWORKSMIL = 'hdnetworksmil';
 	
+	
+	static protected $httpProtocols = array(
+		'http',
+		'https',
+	);
+
+	static protected $httpFormats = array(
+		PlaybackProtocol::HTTP,
+		PlaybackProtocol::SILVER_LIGHT,
+		PlaybackProtocol::APPLE_HTTP,
+		PlaybackProtocol::HDS,
+		PlaybackProtocol::HLS,	
+		PlaybackProtocol::AKAMAI_HDS,
+		PlaybackProtocol::AKAMAI_HD,
+		PlaybackProtocol::MPEG_DASH,
+	);
+	
 	/**
 	 * Short names for action arguments
 	 * @var array
@@ -492,7 +509,7 @@ class playManifestAction extends kalturaAction
 		{
 			case PlaybackProtocol::HTTP:
 			case "url":
-			case "rtsp":
+			case PlaybackProtocol::RTSP:
 				$oneOnly = true;	// single flavor delivery formats
 				break;
 				
@@ -1341,7 +1358,11 @@ class playManifestAction extends kalturaAction
 		if(count($this->tags) == 1)
 			$tag = reset($this->tags);
 			
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $this->protocol, $tag);
+		$protocol = $this->protocol; 
+		if(in_array($this->format, self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
+			$protocol = requestUtils::getProtocol();
+			
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $protocol, $tag);
 		if ($liveStreamConfig)
 			return $liveStreamConfig->getUrl();
 		
