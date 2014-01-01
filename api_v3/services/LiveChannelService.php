@@ -92,7 +92,7 @@ class LiveChannelService extends KalturaLiveEntryService
 	 * @action list
      * @param KalturaLiveChannelFilter $filter live channel filter
 	 * @param KalturaFilterPager $pager Pager
-	 * @return KalturaLiveStreamListResponse Wrapper for array of live channels and total count
+	 * @return KalturaLiveChannelListResponse Wrapper for array of live channels and total count
 	 */
 	function listAction(KalturaLiveChannelFilter $filter = null, KalturaFilterPager $pager = null)
 	{
@@ -103,7 +103,7 @@ class LiveChannelService extends KalturaLiveEntryService
 	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
 	    $newList = KalturaLiveChannelArray::fromEntryArray($list);
-		$response = new KalturaLiveStreamListResponse();
+		$response = new KalturaLiveChannelListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
 		return $response;
