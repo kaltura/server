@@ -91,6 +91,8 @@ class PlayReadyDrmService extends KalturaBaseService
 			try 
 			{
 				$drmKey->save();
+				$entry->putInCustomData(PlayReadyPlugin::ENTRY_CUSTOM_DATA_PLAY_READY_KEY_ID, $keyId);
+				$entry->save();
 			}
 			catch(PropelException $e)
 			{

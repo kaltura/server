@@ -2,14 +2,27 @@
 /**
  * @package plugins.smoothProtect
  */
-class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers
+class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers, IKalturaPending
 {
 	const PLUGIN_NAME = 'smoothProtect';
 	const PARAMS_STUB = '__params__';
 	
+	const SMOOTH_PROTECT_EVENTS_CONSUMER = 'kSmoothProtectEventsConsumer';
+	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$playReadyDependency = new KalturaDependency(PlayReadyPlugin::getPluginName());
+		$ismIndexDependency = new KalturaDependency(IsmIndexPlugin::getPluginName());
+		
+		return array($playReadyDependency, $ismIndexDependency);
 	}
 	
 	/**
@@ -90,7 +103,7 @@ class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader,
 	public static function getEventConsumers()
 	{
 		return array(
-			IsmIndexPlugin::ISM_INDEX_EVENTS_CONSUMER,
+			self::SMOOTH_PROTECT_EVENTS_CONSUMER,
 		);
 	}
 	

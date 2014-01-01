@@ -8,6 +8,7 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	const SEARCH_DATA_SUFFIX = 's';
 	
 	const ENTRY_CUSTOM_DATA_PLAY_READY_KEY_ID = 'play_ready_key_id';
+	const PLAY_READY_TAG = 'playready';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
