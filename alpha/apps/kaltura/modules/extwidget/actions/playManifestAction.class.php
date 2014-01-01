@@ -16,14 +16,14 @@ class playManifestAction extends kalturaAction
 	);
 
 	static protected $httpFormats = array(
-		self::HTTP,
-		self::SILVER_LIGHT,
-		self::APPLE_HTTP,
-		self::HDS,
-		self::HLS,	
-		self::AKAMAI_HDS,
-		self::AKAMAI_HD,
-		self::MPEG_DASH,
+		PlaybackProtocol::HTTP,
+		PlaybackProtocol::SILVER_LIGHT,
+		PlaybackProtocol::APPLE_HTTP,
+		PlaybackProtocol::HDS,
+		PlaybackProtocol::HLS,	
+		PlaybackProtocol::AKAMAI_HDS,
+		PlaybackProtocol::AKAMAI_HD,
+		PlaybackProtocol::MPEG_DASH,
 	);
 	
 	/**
