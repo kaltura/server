@@ -58,8 +58,8 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function incrementVersion()
 	{
-		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), $this->getObjectType(), self::FILE_SYNC_METADATA_DEFINITION);
-		if(!$isValid)
+		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_DEFINITION);
+		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
 			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
 									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
 		
@@ -68,8 +68,8 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function incrementViewsVersion()
 	{
-		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getViewsVersion(), $this->getObjectType(), self::FILE_SYNC_METADATA_VIEWS);
-		if(!$isValid)
+		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getViewsVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_VIEWS);
+		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
 			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
 									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
 		
@@ -78,8 +78,8 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	
     public function incrementXsltVersion()
 	{
-		$isValid = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getXsltVersion(), $this->getObjectType(), self::FILE_SYNC_METADATA_XSLT);
-		if(!$isValid)
+		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getXsltVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_XSLT);
+		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
 			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
 									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
 		

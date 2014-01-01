@@ -9,6 +9,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
 	const CACHE_KEY_PREFIX = 'fileSyncContent_';
 	const FILE_SYNC_CACHE_EXPIRY = 2592000;		// 30 days
+	
+	//File sync Insert limitation consts
+	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
+	const FILE_SYNC_LIMIT_REACHED = "limit_reached";
+	const FILE_SYNC_LIMIT_NOT_REACHED = "limit_not_reached";
+	
 
 	protected static $uncachedObjectTypes = array(
 		FileSyncObjectType::ASSET,				// should not cache conversion logs since they can change (batch.logConversion)
@@ -1372,24 +1378,26 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	
 	public static function validateFileSyncAmountLimitation($object_id, $version, $object_type, $object_sub_type)
 	{		
-		if($version < 1002)
-			return true;
+		if($version > self::FILE_SYNC_MIN_VERSION_VALIDATE)
+		{			
+			$c = new Criteria();
+			$c->add(FileSyncPeer::OBJECT_ID, $object_id);
+			$c->add(FileSyncPeer::OBJECT_TYPE, $object_type);
+			$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $object_sub_type);
+			$c->add(FileSyncPeer::VERSION, $version-self::FILE_SYNC_MIN_VERSION_VALIDATE, Criteria::LESS_EQUAL);
+			$c->addDescendingOrderByColumn(FileSyncPeer::CREATED_AT);
 			
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_ID, $object_id);
-		$c->add(FileSyncPeer::OBJECT_TYPE, $object_type);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $object_sub_type);
-		$c->addAscendingOrderByColumn(FileSyncPeer::VERSION);
-		$c->setOffset(100);
-		
-		$res = FileSyncPeer::doSelectOne($c);
-		if($res)
-		{
-			if(strtotime($res->getCreatedAt('Y-m-d')) == strtotime(date('Y-m-d')))
-				return false;
+			FileSyncPeer::setUseCriteriaFilter(false);
+			$res = FileSyncPeer::doSelectOne($c);
+			FileSyncPeer::setUseCriteriaFilter(true);
+			if($res)
+			{
+				if(strtotime($res->getCreatedAt('Y-m-d')) == strtotime(date('Y-m-d')))
+					return self::FILE_SYNC_LIMIT_REACHED;
+			}
 		}
 		
-		return true;
+		return self::FILE_SYNC_LIMIT_NOT_REACHED;
 	}
 
 	/* (non-PHPdoc)
