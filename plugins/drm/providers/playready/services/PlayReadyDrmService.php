@@ -9,6 +9,7 @@ class PlayReadyDrmService extends KalturaBaseService
 {	
 	const PLAY_READY_BEGIN_DATE_PARAM = 'playReadyBeginDate';
 	const PLAY_READY_EXPIRATION_DATE_PARAM = 'playReadyExpirationDate';
+	const MYSQL_CODE_DUPLICATE_KEY = 23000;
 	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -19,6 +20,7 @@ class PlayReadyDrmService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('DrmPolicy');
 		$this->applyPartnerFilterForClass('DrmProfile');	
 		$this->applyPartnerFilterForClass('entry');
+		$this->applyPartnerFilterForClass('DrmKey');
 	}
 	
 	/**
@@ -64,17 +66,44 @@ class PlayReadyDrmService extends KalturaBaseService
 	 * 
 	 * @action getEntryContentKey
 	 * @param string $entryId 
+	 * @param int $createIfMissing
 	 * @return KalturaPlayReadyContentKey $response
 	 * 
 	 */
-	public function getEntryContentKeyAction($entryId)
+	public function getEntryContentKeyAction($entryId, $createIfMissing = false)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		$keySeed = $this->getPartnerKeySeed();
-		$keyId = $entry->getFromCustomData("playready_key_id");
+		
+		$keyId = $this->getEntryKeyId($entry->getId());
+		if(!$keyId && $createIfMissing)
+		{
+			$drmKey = new DrmKey();
+			$drmKey->setPartnerId($entry->getPartnerId());
+			$drmKey->setObjectId($entryId);
+			$drmKey->setObjectType(DrmKeyObjectType::ENTRY);
+			$drmKey->setProvider(PlayReadyPlugin::getPlayReadyProviderCoreValue());
+			$keyId = kPlayReadyAESContentKeyGenerator::generatePlayReadyKeyId();
+			$drmKey->setKey($keyId);
+			try 
+			{
+				$drmKey->save();
+			}
+			catch(PropelException $e)
+			{
+				if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+				{
+					$keyId = $this->getEntryKeyId($entry->getId());
+				}
+			}
+		}
+		
+		if(!$keyId)
+			throw new KalturaAPIException(KalturaPlayReadyErrors::FAILED_TO_GET_ENTRY_KEY_ID, $entryId);
+			
 		$contentKey = $this->createContentKeyObject($keySeed, $keyId);
 		$response = new KalturaPlayReadyContentKey();
 		$response->fromObject($contentKey);
@@ -153,7 +182,7 @@ class PlayReadyDrmService extends KalturaBaseService
 			 if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);	
 				
-			$entryKeyId = $entry->getFromCustomData("playready_key_id");
+			$entryKeyId = $this->getEntryKeyId($entry->getId());
 			if($entryKeyId != $keyId)
 				throw new KalturaAPIException(KalturaPlayReadyErrors::KEY_ID_DONT_MATCH, $keyId, $entryKeyId);	
 		}
@@ -240,5 +269,14 @@ class PlayReadyDrmService extends KalturaBaseService
 		}
 				
 		return array($beginDate, $expirationDate, $removalDate);		
+	}
+	
+	private function getEntryKeyId($entryId)
+	{
+		$drmKey = DrmKeyPeer::retrieveByUniqueKey($entryId, DrmKeyObjectType::ENTRY, PlayReadyPlugin::getPlayReadyProviderCoreValue());
+		if($drmKey)
+			return $drmKey->getKey();
+		else
+			return null;
 	}
 }

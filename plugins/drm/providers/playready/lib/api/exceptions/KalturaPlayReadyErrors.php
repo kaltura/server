@@ -12,4 +12,5 @@ class KalturaPlayReadyErrors
 	const KEY_ID_DONT_MATCH = "KEY_ID_DONT_MATCH, Input key ID \"%s\" doesn't match entry key ID \"%s\"";
 	const ANALOG_OUTPUT_PROTECTION_ID_NOT_ALLOWED = "ANALOG_OUTPUT_PROTECTION_ID_NOT_ALLOWED, Analog video output protection ID \"%s\" maybe specified only if ID \"%s\" is not specified";
 	const COPY_ENABLER_TYPE_MISSING = "COPY_ENABLER_TYPE_MISSING, At least one copy enabler type should be specified";
+	const FAILED_TO_GET_ENTRY_KEY_ID = "FAILED_TO_GET_ENTRY_KEY_ID,Failed to get PlayReady key id for entry \"%s\"";
 }

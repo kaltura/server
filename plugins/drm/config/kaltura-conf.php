@@ -35,5 +35,8 @@ return array (
     'DrmDeviceTableMap' => 'lib/model/map/DrmDeviceTableMap.php',
     'DrmDevicePeer' => 'lib/model/DrmDevicePeer.php',
     'DrmDevice' => 'lib/model/DrmDevice.php',
+    'DrmKeyTableMap' => 'lib/model/map/DrmKeyTableMap.php',
+    'DrmKeyPeer' => 'lib/model/DrmKeyPeer.php',
+    'DrmKey' => 'lib/model/DrmKey.php',
   ),
 );
