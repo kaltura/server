@@ -240,7 +240,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 			}
 		}
 	}
-	
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
 	 *  
@@ -248,9 +248,15 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	 */
 	public static function addInstancesToPool(\$queryResult)
 	{
-		foreach (\$queryResult as \$curResult)
+		if (Propel::isInstancePoolingEnabled())
 		{
-			".$this->getPeerClassname()."::addInstanceToPool(\$curResult);
+			if ( count( self::\$instances ) + count( \$queryResult ) <= kConf::get('max_num_instances_in_pool') )
+			{  
+				foreach (\$queryResult as \$curResult)
+				{
+					".$this->getPeerClassname()."::addInstanceToPool(\$curResult);
+				}
+			}
 		}
 	}
 	
@@ -1367,21 +1373,29 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	 */
 	public static function addInstanceToPool(".$this->getObjectClassname()." \$obj, \$key = null)
 	{
-		if (Propel::isInstancePoolingEnabled()) {
-			if (\$key === null) {";
-
-		$pks = $this->getTable()->getPrimaryKey();
-
-		$php = array();
-		foreach ($pks as $pk) {
-			$php[] = '$obj->get' . $pk->getPhpName() . '()';
-		}
-		$script .= "
+		if ( Propel::isInstancePoolingEnabled() )
+		{
+			if ( \$key === null )
+			{";
+		
+				$pks = $this->getTable()->getPrimaryKey();
+			
+				$php = array();
+				foreach ($pks as $pk) {
+					$php[] = '$obj->get' . $pk->getPhpName() . '()';
+				}
+				$script .= "
 				\$key = ".$this->getInstancePoolKeySnippet($php).";";
-		$script .= "
-			} // if key === null
-			self::\$instances[\$key] = \$obj;
-			kMemoryManager::registerPeer('".$this->getPeerClassname()."');
+				$script .= "
+			}
+				
+			if ( isset( self::\$instances[\$key] )											// Instance is already mapped?
+					|| count( self::\$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+				)
+			{
+				self::\$instances[\$key] = \$obj;
+				kMemoryManager::registerPeer('".$this->getPeerClassname()."');
+			}
 		}
 	}
 ";
