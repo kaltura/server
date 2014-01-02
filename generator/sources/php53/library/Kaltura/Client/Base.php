@@ -478,7 +478,22 @@ class Base
 	
 	public function doMultiRequest()
 	{
-		return $this->doQueue();
+		$xmlData = $this->doQueue();
+		$xml = new \SimpleXMLElement($xmlData);
+		$items = $xml->result->children();
+		$ret = array();
+		foreach($items as $item) {
+			$error = ParseUtils::checkIfError($item);
+			if($error)
+				$ret[] = $error;
+			else if($item->objectType)
+				$ret[] = ParseUtils::unmarshalObject($item);
+			else if($item->item)
+				$ret[] = ParseUtils::unmarshalArray($item);
+			else			
+				$ret[] = ParseUtils::unmarshalSimpleType($item);
+		}
+		return $ret;
 	}
 	
 	public function isMultiRequest()

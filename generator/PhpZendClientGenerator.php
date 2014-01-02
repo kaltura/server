@@ -615,7 +615,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
 			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
-			$this->appendLine("		Kaltura_Client_ParseUtils::throwExceptionIfError(\$resultXmlObject->result);");
+			$this->appendLine("		Kaltura_Client_ParseUtils::checkIfError(\$resultXmlObject->result);");
 			
 			switch($resultType)
 			{

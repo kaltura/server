@@ -34,7 +34,7 @@ class Kaltura_Client_ParseUtils
 		return "$xml";
 	}
 	
-	public static function unmarshalObject(\SimpleXMLElement $xml, $fallbackType) 
+	public static function unmarshalObject(\SimpleXMLElement $xml, $fallbackType = null) 
 	{
 		$objectType = reset($xml->objectType);
 		$type = Kaltura_Client_TypeMap::getZendType($objectType);
@@ -47,7 +47,7 @@ class Kaltura_Client_ParseUtils
 		return new $type($xml);
 	}
 	
-	public static function unmarshalArray(\SimpleXMLElement $xml, $fallbackType)
+	public static function unmarshalArray(\SimpleXMLElement $xml, $fallbackType = null)
 	{
 		$xmls = $xml->children();
 		$ret = array();
@@ -57,13 +57,16 @@ class Kaltura_Client_ParseUtils
 		return $ret;
 	}
 
-	public static function throwExceptionIfError(\SimpleXMLElement $xml) 
+	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
 	{
 		if($xml->error)
 		{
 			$code = "{$xml->error->code}";
 			$message = "{$xml->error->message}";
-			throw new Kaltura_Client_Exception($message, $code);
+			if($throwException)
+				throw new Kaltura_Client_Exception($message, $code);
+			else 
+				return new Kaltura_Client_Exception($message, $code);
 		}
 	}
 }
