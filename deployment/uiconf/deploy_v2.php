@@ -436,7 +436,8 @@ class uiConfDeployment
 		$uiconf->setWidth(@$widget->width);
 		$uiconf->setHeight(@$widget->height);
 		$uiconf->setConfVars(@$widget->conf_vars);
-		$uiconf->setConfig(@$widget->config);
+		if ($widget->config)
+			$uiconf->setConfig(@$widget->config);
 
 		$uiconf->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
 			
