@@ -121,9 +121,10 @@ class KalturaDispatcher
 			if ($actionInfo->returnType != 'file')
 			{
 				 throw ($e);
-			 }
-// 			
-			 $res = new kRendererDieError ($e->getCode(), $e->getMessage());
+			}
+					
+			KalturaResponseCacher::adjustApiCacheForException($e);
+			$res = new kRendererDieError ($e->getCode(), $e->getMessage());
 		 }
 		
 		kEventsManager::flushEvents();
