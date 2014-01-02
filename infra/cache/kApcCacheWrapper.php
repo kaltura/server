@@ -11,7 +11,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()
 	 */
-	public function init($config)
+	protected function doInit($config)
 	{
 		if (!function_exists('apc_fetch'))
 			return false;
@@ -21,7 +21,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key)
+	protected function doGet($key)
 	{
 		return apc_fetch($key);
 	}
@@ -29,7 +29,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0)
 	{
 		return apc_store($key, $var, $expiry);
 	}
@@ -37,7 +37,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::add()
 	 */
-	public function add($key, $var, $expiry = 0)
+	protected function doAdd($key, $var, $expiry = 0)
 	{
 		return apc_add($key, $var, $expiry);
 	}
@@ -45,7 +45,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::multiGet()
 	 */
-	public function multiGet($keys)
+	protected function doMultiGet($keys)
 	{
 		return apc_fetch($keys);
 	}
@@ -54,7 +54,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::delete()
 	 */
-	public function delete($key)
+	protected function doDelete($key)
 	{
 		return apc_delete($key);
 	}
@@ -62,7 +62,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::increment()
 	 */
-	public function increment($key, $delta = 1)
+	public function doIncrement($key, $delta = 1)
 	{
 		return apc_inc($key, $delta);
 	}
@@ -70,7 +70,7 @@ class kApcCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::decrement()
 	 */
-	public function decrement($key, $delta = 1)
+	public function doDecrement($key, $delta = 1)
 	{
 		return apc_dec($key, $delta);
 	}

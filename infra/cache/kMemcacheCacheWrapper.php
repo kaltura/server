@@ -22,9 +22,9 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	protected $connectAttempts = 0;
 	
 	/* (non-PHPdoc)
-	 * @see kBaseCacheWrapper::init()
+	 * @see kBaseCacheWrapper::doInit()
 	 */
-	public function init($config)
+	protected function doInit($config)
 	{
 		if (!class_exists('Memcache'))
 		{
@@ -127,7 +127,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key)
+	protected function doGet($key)
 	{
 		return $this->callAndDetectErrors('get', array($key));
 	}
@@ -135,7 +135,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0)
 	{
 		return $this->callAndDetectErrors('set', array($key, $var, $this->flags, $expiry));
 	}
@@ -143,7 +143,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::add()
 	 */
-	public function add($key, $var, $expiry = 0)
+	public function doAdd($key, $var, $expiry = 0)
 	{
 		return $this->callAndDetectErrors('add', array($key, $var, $this->flags, $expiry));
 	}
@@ -151,7 +151,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::multiGet()
 	 */
-	public function multiGet($keys)
+	public function doMultiGet($keys)
 	{
 		return $this->callAndDetectErrors('get', array($keys));
 	}
@@ -159,7 +159,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::delete()
 	 */
-	public function delete($key)
+	public function doDelete($key)
 	{
 		return $this->callAndDetectErrors('delete', array($key));
 	}
@@ -167,7 +167,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::increment()
 	 */
-	public function increment($key, $delta = 1)
+	public function doIncrement($key, $delta = 1)
 	{
 		return $this->callAndDetectErrors('increment', array($key, $delta));
 	}
@@ -175,7 +175,7 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::decrement()
 	 */
-	public function decrement($key, $delta = 1)
+	public function doDecrement($key, $delta = 1)
 	{
 		return $this->callAndDetectErrors('decrement', array($key, $delta));
 	}
