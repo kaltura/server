@@ -5,6 +5,7 @@
  */
 class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
+	const MAX_FILES_IN_CATEGORY = 5000;
 	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
 	const CACHE_KEY_PREFIX = 'fileSyncContent_';
 	const FILE_SYNC_CACHE_EXPIRY = 2592000;		// 30 days
@@ -360,6 +361,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $directory_key );
 		$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN);
+		$c->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
 
 		$fileSync = FileSyncPeer::doSelectOne( $c );
 		$dirFullPath = null;
@@ -393,6 +395,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			self::createSyncFileForKey($rootPath, $filePath, $directory_key);
 		}
 		
+		$existing_files = glob($dirFullPath . DIRECTORY_SEPARATOR . '*');
+		if(count($existing_files) >= self::MAX_FILES_IN_CATEGORY)
+			throw new kFileSyncException("Exceeded max number of files [" . self::MAX_FILES_IN_CATEGORY . "] in category [$dirFullPath]");
+			
 		$destination_file_path = $dirFullPath . DIRECTORY_SEPARATOR . basename($temp_file_path);
 		$success = kFile::moveFile($temp_file_path, $destination_file_path);
 		self::setPermissions($dirFullPath);

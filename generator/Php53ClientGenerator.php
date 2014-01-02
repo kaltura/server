@@ -468,6 +468,11 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("		if(count(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
 					break;
+
+				case "bigint" :
+					$this->appendLine("		if(count(\$xml->{$propName}))");
+					$this->appendLine("			\$this->$propName = (int)\$xml->$propName;");
+					break;
 					
 				case "bool" :
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
@@ -479,15 +484,16 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "array" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
 					$this->appendLine("		if(empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = array();");
 					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\Client::unmarshalItem(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
 					break;
 					
 				default : // sub object
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\Client::unmarshalItem(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, $propType);");
 					break;
 			}
 		}
@@ -509,6 +515,8 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
+				
+			$propType = $this->getPHPType($propType);
 			$description = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
@@ -704,24 +712,24 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			else
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			return \$this->client->getMultiRequestResult();;");
-			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
-			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
-			
+			$this->appendLine("			return \$this->client->getMultiRequestResult();");
+			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
+			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
+			$this->appendLine("		\\Kaltura\\Client\\ParseUtils::checkIfError(\$resultXmlObject->result);");
 			switch($resultType)
 			{
+				case 'bigint':	
 				case 'int':
-					$this->appendLine("		\$resultObject = (int)\$resultObject;");
+					$this->appendLine("		\$resultObject = (int)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				case 'bool':
-					$this->appendLine("		\$resultObject = (bool)\$resultObject;");
+					$this->appendLine("		\$resultObject = (bool)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				case 'string':
-					$this->appendLine("		\$resultObject = (string)\$resultObject;");
+					$this->appendLine("		\$resultObject = (String)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				case 'array':
-					$this->appendLine("		if(!\$resultObject)");
-					$this->appendLine("			\$resultObject = array();");
+					$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalArray(\$resultXmlObject->result, \"$resultType\");");
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					break;
 				default:
@@ -729,12 +737,14 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					{
 						$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
 						$resultObjectTypeEscaped = str_replace("\\", "\\\\", $resultTypeClassInfo->getFullyQualifiedName());
+						$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalObject(\$resultXmlObject->result, \"$resultType\");");
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"{$resultObjectTypeEscaped}\");");
 					}
 			}
 	    }
 			
-		$this->appendLine("		return \$resultObject;");
+	    if($resultType)
+			$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");
 	}
 	
@@ -774,7 +784,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 						$signature .= " = null";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
-					else if ($paramType == "int" || $paramType == "float")
+					else if ($paramType == "int" || $paramType == "bigint" || $paramType == "float")
 					{
 						if ($defaultValue == "")
 							$signature .= " = \"\""; // hack for partner.getUsage
@@ -881,6 +891,18 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
 		parent::addFile($fileName, $fileContents, $addLicense);
+	}
+	
+	public function getPHPType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }
 

@@ -129,7 +129,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -138,7 +138,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -235,7 +235,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry scheduling start date (null when not set, send -1 to remove)
 	 *  
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,gteornull,lteornull,order
 	 * @requiresPermission insert,update
 	 */
@@ -244,7 +244,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry scheduling end date (null when not set, send -1 to remove)
 	 * 
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,gteornull,lteornull,order
 	 * @requiresPermission insert,update
 	 */

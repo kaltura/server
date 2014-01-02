@@ -5,6 +5,11 @@
 */
 class categoryKuserIndex extends BaseIndexObject
 {
+	public static function getObjectName()
+	{
+		return 'category_kuser';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'category_kuser';

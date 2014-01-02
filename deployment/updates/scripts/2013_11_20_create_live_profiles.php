@@ -25,7 +25,7 @@ function createLiveConversionProfile($partnerId)
 {
 	$conversionProfile = new conversionProfile2();
 	$conversionProfile->setPartnerId($partnerId);
-	$conversionProfile->setName('Default - Live');
+	$conversionProfile->setName('Cloud transcode');
 	$conversionProfile->setType(ConversionProfileType::LIVE_STREAM);
 	$conversionProfile->setSystemName('Default_Live');
 	$conversionProfile->setDescription('The default set of live renditions');

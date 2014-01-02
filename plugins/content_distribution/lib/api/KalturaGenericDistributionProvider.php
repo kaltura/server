@@ -17,7 +17,7 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	/**
 	 * Generic distribution provider creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -26,7 +26,7 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	/**
 	 * Generic distribution provider last update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

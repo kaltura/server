@@ -122,14 +122,14 @@ public class SyncSampleHandler extends BaseNotificationHandler {
 	}
 	
 	/**
-	 * This function handles the case in which an entry was deleted
+	 * This function handles the case in which an entry was marked as deleted
 	 * @param entry The entry.
 	 * @param syncMetadata The SyncMetadataObject
 	 * @throws KalturaApiException
 	 */
 	protected void handleDelete(KalturaMediaEntry entry, KalturaMetadata syncMetadata) throws KalturaApiException {
 		if(!SYNC_DONE.equals(getValue(syncMetadata.xml, SYNC_FIELD_NAME))) {
-			console.write("No sync is needed");
+			console.write("Entry is not marked as synched with the CMS, do nothing");
 			return;
 		}
 		

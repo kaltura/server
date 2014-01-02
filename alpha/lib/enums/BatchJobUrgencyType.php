@@ -11,5 +11,9 @@ interface BatchJobUrgencyType extends BaseEnum
 	const OPTIONAL_REGULAR_UPLOAD	= 3;
 	const OPTIONAL_BULK_UPLOAD		= 4;
 	const DEFAULT_URGENCY			= 5;	
-	const MIGRATION_URGENCY			= 10;	
+	const MIGRATION_URGENCY			= 10;
+	
+	// Urgencies for file sync import Jobs
+   	const FILE_SYNC_SOURCE = 1;
+   	const FILE_SYNC_NOT_SOURCE = 2;
 }

@@ -158,12 +158,13 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 			
 			$propName = $propertyNode->getAttribute("name");
 			$propType = $propertyNode->getAttribute("type");
-			if (!in_array($propType, array("int", "float", "bool")))
+			if (!in_array($propType, array("int", "float", "bool", "bigint")))
 				continue;
 				
 			$this->appendLine("		def ".$this->camelCaseToUnderscoreAndLower($propName)."=(val)");
 			switch($propType)
 			{
+				case "bigint":
 				case "int":
 					$this->appendLine("			@".$this->camelCaseToUnderscoreAndLower($propName)." = val.to_i");
 					break;

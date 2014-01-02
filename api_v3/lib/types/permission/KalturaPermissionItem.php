@@ -38,7 +38,7 @@ abstract class KalturaPermissionItem extends KalturaObject implements IFilterabl
 
 
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -46,7 +46,7 @@ abstract class KalturaPermissionItem extends KalturaObject implements IFilterabl
 
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

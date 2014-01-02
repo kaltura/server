@@ -63,7 +63,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	/**
 	 * The media date extracted from EXIF data (For images) as Unix timestamp (In seconds)
 	 *
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte
 	 */

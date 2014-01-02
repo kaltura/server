@@ -78,7 +78,7 @@ class KalturaPermission extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -86,7 +86,7 @@ class KalturaPermission extends KalturaObject implements IFilterable
 
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

@@ -238,8 +238,11 @@ class kBatchExclusiveLock
 		$now = time();
 		$now_str = date('Y-m-d H:i:s', $now);
 		
+		$delayedJobTypes = kConf::get('delayed_job_types');
+		$apiJobType = kPluginableEnumsManager::coreToApi('BatchJobType', $jobType);
+		
 		// added to support nfs delay
-		if($jobType == BatchJobType::EXTRACT_MEDIA || $jobType == BatchJobType::POSTCONVERT || $jobType == BatchJobType::STORAGE_EXPORT)
+		if(in_array($apiJobType, $delayedJobTypes))
 		{
 			$interval = kConf::hasParam('nfs_safety_margin_sec') ? kConf::get('nfs_safety_margin_sec') : 5;
 			$c->add ( BatchJobLockPeer::CREATED_AT, (time() - $interval), Criteria::LESS_THAN);

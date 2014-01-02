@@ -5,6 +5,11 @@
 */
 class CaptionAssetItemIndex extends BaseIndexObject
 {
+	public static function getObjectName()
+	{
+		return 'caption_asset_item';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'caption_item';

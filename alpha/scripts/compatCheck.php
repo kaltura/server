@@ -160,6 +160,9 @@ function print_r_reverse($in) {
         // bottomed out to something that isn't an array
         return $in;
     } else {
+        if (!isset($lines[1]))
+            return 'Array';
+    	 
         // this is an array, lets parse it
         if (preg_match('/(\s{5,})\(/', $lines[1], $match)) {
             // this is a tested array/recursive call to this function

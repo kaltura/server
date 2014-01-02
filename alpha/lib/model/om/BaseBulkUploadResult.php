@@ -39,7 +39,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the bulk_upload_job_id field.
-	 * @var        int
+	 * @var        bigint
 	 */
 	protected $bulk_upload_job_id;
 

@@ -76,7 +76,8 @@ class LiveConversionProfileService extends KalturaBaseService
 				if(!isset($groups[$tag]))
 					$groups[$tag] = array();
 					
-				$groups[$tag][] = $liveParamsItem->getSystemName();
+				$systemName = $liveParamsItem->getSystemName() ? $liveParamsItem->getSystemName() : $liveParamsItem->getId();
+				$groups[$tag][] = $systemName;
 			}
 		}
 		
@@ -159,10 +160,11 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 		}
 		
+		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
 		$encode = $encodes->addChild('Encode');
 		$encode->addChild('Enable', 'true');
-		$encode->addChild('Name', $liveParams->getSystemName());
+		$encode->addChild('Name', $systemName);
 		$encode->addChild('StreamName', $streamName);
 		$video = $encode->addChild('Video');
 		$video->addChild('Codec', $videoCodec);

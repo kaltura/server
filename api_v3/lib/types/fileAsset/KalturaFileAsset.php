@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.metadata
+ * @package api
  * @subpackage api.objects
  */
 class KalturaFileAsset extends KalturaObject implements IFilterable 

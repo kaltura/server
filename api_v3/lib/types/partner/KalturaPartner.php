@@ -35,7 +35,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $appearInSearch;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter order
 	 */

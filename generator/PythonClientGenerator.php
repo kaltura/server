@@ -341,7 +341,8 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
-				
+			
+			$propType = $this->getPythonType($propType); 
 			$description = self::buildMultilineComment($propertyNode->getAttribute("description"), "        ");
 			if ($description)
 				$this->appendLine($description);
@@ -413,6 +414,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			
 			switch ($propType) 
 			{
+				case "bigint":
 				case "int" :
 					if ($isEnum) 
 					{
@@ -487,6 +489,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$isEnum = $propertyNode->hasAttribute ( "enumType" );
 			switch ($propType) 
 			{
+				case "bigint":
 				case "int" :
 					if ($isEnum)
 					{
@@ -598,6 +601,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				case "float" :
 					$this->appendLine ( "        kparams.addFloatIfDefined(\"$paramName\", " . $paramName . ")" );
 					break;
+				case "bigint":
 				case "int" :
 					$this->appendLine ( "        kparams.addIntIfDefined(\"$paramName\", " . $paramName . ");" );
 					break;
@@ -639,6 +643,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 						$arrayType = $resultNode->getAttribute ( "arrayType" );
 						$this->appendLine ( "        return KalturaObjectFactory.createArray(resultNode, $arrayType)" );
 						break;
+					case "bigint":
 					case "int" :
 						$this->appendLine ( "        return getXmlNodeInt(resultNode)" );
 						break;
@@ -725,5 +730,17 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
 		parent::addFile($fileName, $fileContents, $addLicense);
+	}
+	
+	public function getPythonType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }

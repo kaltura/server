@@ -7,7 +7,7 @@ class kMultiCentersBroadcastUrlManager extends kBroadcastUrlManager
 		$app = $mediaServerConfig['application'];
 		
 		$partnerId = $this->partnerId;
-		$url = "rtmp://$partnerId.$mediaServerIndex." . kConf::get('domin', 'broadcast');
+		$url = "rtmp://$partnerId.$mediaServerIndex." . kConf::get('domain', 'broadcast');
 		$entryId = $entry->getId();
 		$token = $entry->getStreamPassword();
 		return "$url/$app/p/$partnerId/e/$entryId/i/$mediaServerIndex/t/$token"; 

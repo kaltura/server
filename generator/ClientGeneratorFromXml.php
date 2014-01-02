@@ -146,7 +146,7 @@ abstract class ClientGeneratorFromXml
 	
 	protected function isSimpleType($type)
 	{
-		return in_array($type, array("int","string","bool","float"));
+		return in_array($type, array("int","string","bool","float","bigint"));
 	}
 	
 	protected function startNewTextBlock()

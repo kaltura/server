@@ -16,7 +16,7 @@ class KalturaBulkUploadResult extends KalturaObject
 	/**
 	 * The id of the parent job
 	 * 
-     * @var int
+     * @var bigint
      */
     public $bulkUploadJobId;
 

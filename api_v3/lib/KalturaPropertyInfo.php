@@ -66,6 +66,11 @@ class KalturaPropertyInfo
 	 * @var array
 	 */
 	private $_constraints = array();
+
+	/**
+	 * @var bool
+	 */
+	private $_disableRelativeTime = false;
 	
 	/**
 	 * @var bool
@@ -81,7 +86,12 @@ class KalturaPropertyInfo
 	 * @var bool
 	 */
 	private $_serverOnly = false;
-	
+
+    /**
+     * @var bool
+     */
+    private $_isTime = false;
+
 	const READ_PERMISSION_NAME = 'read';
 	const UPDATE_PERMISSION_NAME = 'update';
 	const INSERT_PERMISSION_NAME = 'insert';
@@ -93,6 +103,11 @@ class KalturaPropertyInfo
 	 */
 	public function KalturaPropertyInfo($type, $name = '')
 	{
+		if ($type == 'time')
+		{
+			$this->_isTime = true;
+			$type = 'int';
+		}
 		$this->_type = $type;
 		$this->_name = $name;
 	}
@@ -201,7 +216,7 @@ class KalturaPropertyInfo
 	 */
 	public function isSimpleType()
 	{
-		$simpleTypes = array("int", "string", "bool", "float");
+		$simpleTypes = array("int", "string", "bool", "float", "bigint");
 		return in_array($this->_type, $simpleTypes);
 	}
 	
@@ -211,6 +226,17 @@ class KalturaPropertyInfo
 	public function isComplexType()
 	{
 		return !$this->isSimpleType() && !$this->isFile();
+	}
+
+	/**
+	 * Returns true when the property is marked as time.
+	 * Time types are actually treated as int.
+	 *
+	 * @return boolean
+	 */
+	public function isTime()
+	{
+		return ($this->_isTime);
 	}
 	
 	/**
@@ -439,7 +465,23 @@ class KalturaPropertyInfo
 	public function getConstraints() {
 		return $this->_constraints;
 	}
-	
+
+	/**
+	 * @param boolean $disableRelativeTime
+	 */
+	public function setDisableRelativeTime($disableRelativeTime)
+	{
+		$this->_disableRelativeTime = $disableRelativeTime;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getDisableRelativeTime()
+	{
+		return $this->_disableRelativeTime;
+	}
+
 	/**
 	 * @param array $permissions
 	 */

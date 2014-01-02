@@ -89,6 +89,7 @@ class entryTableMap extends TableMap {
 		$this->addColumn('END_DATE', 'EndDate', 'TIMESTAMP', false, null, null);
 		$this->addColumn('FLAVOR_PARAMS_IDS', 'FlavorParamsIds', 'VARCHAR', false, 512, null);
 		$this->addColumn('AVAILABLE_FROM', 'AvailableFrom', 'TIMESTAMP', false, null, null);
+		$this->addColumn('LAST_PLAYED_AT', 'LastPlayedAt', 'TIMESTAMP', false, null, null);
 		// validators
 	} // initialize()
 

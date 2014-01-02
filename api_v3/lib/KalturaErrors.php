@@ -131,6 +131,8 @@ class KalturaErrors extends APIErrors
 	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE;;Invalid rank value, rank should be between 1 and 5";
 
 	const MAX_CATEGORIES_FOR_ENTRY_REACHED = "MAX_CATEGORIES_FOR_ENTRY_REACHED;CATEGORIES;Entry can be linked with a maximum of \"@CATEGORIES@\" categories";
+	
+	const MAX_ASSETS_FOR_ENTRY_REACHED = "MAX_ASSETS_FOR_ENTRY_REACHED;ASSETS;Entry can contain maximum of \"@ASSETS@\" assets";
 
 	const INVALID_ENTRY_SCHEDULE_DATES = "INVALID_ENTRY_SCHEDULE_DATES;;Invalid entry schedule dates";
 
@@ -480,7 +482,13 @@ class KalturaErrors extends APIErrors
 	
 	const EXTENDING_ITEM_MISSING_XPATH = "EXTENDING_ITEM_MISSING_XPATH;;Extending item must contain xpath";
 	
-	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = "LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND;SEGMENT_ID;Live channel segment id [@SEGMENT_ID@] not found";
+	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND;SEGMENT_ID;Live channel segment id [@SEGMENT_ID@] not found';
+	
+	const LIVE_STREAM_INVALID_TOKEN = "LIVE_STREAM_INVALID_TOKEN;ENTRY_ID;Invalid token supplied for live entry [@ENTRY_ID@]";
+	
+	const LIVE_STREAM_EXCEEDED_MAX_INPUTS = "LIVE_STREAM_EXCEEDED_MAX_INPUTS;ENTRY_ID;Partner exceeded max concurrent input live streams in entry[@ENTRY_ID@]";
+	
+	const LIVE_STREAM_EXCEEDED_MAX_OUTPUTS = "LIVE_STREAM_EXCEEDED_MAX_OUTPUTS;ENTRY_ID;Partner exceeded max concurrent output live streams in entry[@ENTRY_ID@]";
 	/*
 	 * BaseEntry Service
 	 */

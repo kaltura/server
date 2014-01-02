@@ -123,14 +123,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		
 		if($this->shouldSetContent())
 		{
-			if($isClone)
-			{
-				$this->setVersion(kFileSyncObjectManager::incrementVersion());
-			}
-			else
-			{
-				$this->incrementVersion();
-			}
+			$this->incrementVersion();
 			foreach ($this->content as $contentItem) 
 			{
 				$confFile = $this->getConfFileBySuffix($contentItem['suffix']);

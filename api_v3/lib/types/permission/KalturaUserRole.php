@@ -61,7 +61,7 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 	public $tags;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -69,7 +69,7 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

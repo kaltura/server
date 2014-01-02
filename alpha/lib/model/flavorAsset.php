@@ -220,6 +220,10 @@ class flavorAsset extends asset
 		$this->setVideoCodecId($fromAsset->getVideoCodecId());
 	}
 	
+	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
+	public function incrementInterFlowCount() { $this->putInCustomData("interFlowCount", $this->getInterFlowCount() ? $this->getInterFlowCount()+1 : 1); }
+	public function removeInterFlowCount() { $this->removeFromCustomData("interFlowCount"); }
+	
 	/**
 	 * @param int $type
 	 * @return flavorAsset

@@ -165,17 +165,6 @@ class kBusinessConvertDL
 		if (!$entry)
 			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]", APIErrors::ENTRY_ID_NOT_FOUND);
 
-		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		foreach($entryThumbAssets as $entryThumbAsset)
-		{
-			if($entryThumbAsset->getId() == $thumbAsset->getId())
-				continue;
-			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-				continue;
-			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			$entryThumbAsset->save();
-		}
-
 		if(!$thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 		{
 			/* @var $thumbAsset KalturaThumbAsset */
@@ -185,7 +174,7 @@ class kBusinessConvertDL
 		}
 
 		$entry->setThumbnail(".jpg");
-		$entry->setCreateThumb(false);
+		$entry->setCreateThumb(false, $thumbAsset);
 		$entry->save();
 
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -371,7 +360,7 @@ class kBusinessConvertDL
 		return 0;
 	}
 	
-	public static function decideLiveProfile(entry $entry)
+	public static function decideLiveProfile(LiveEntry $entry)
 	{
 		// find all live assets of the entry
 		$c = new Criteria();
@@ -393,9 +382,24 @@ class kBusinessConvertDL
 		}
 		
 		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
+		
+		$liveParamIdsArray = array();
+		/* @var $flavorAsset flavorAsset */
+		foreach ($liveParamsArray as $liveParams)
+			$liveParamIdsArray[] = $liveParams->getId();
+			
+		asort($liveParamIdsArray);
+		$liveParamIds = implode(",", $liveParamIdsArray);
+		if($liveParamIds == $entry->getFlavorParamsIds())
+			return;
+		
+		$streamBitrates = array();
 		foreach ($liveParamsArray as $liveParams)
 		{
 			/* @var $liveParams liveParams */
+			
+			$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
+			$streamBitrates[] = $streamBitrate;
 			
 			// check if asset already exists
 			if(isset($liveAssetsParams[$liveParams->getId()]))
@@ -434,5 +438,8 @@ class kBusinessConvertDL
 			$liveAsset->setStatus(asset::ASSET_STATUS_DELETED);
 			$liveAsset->save();
 		}
+		
+		$entry->setStreamBitrates($streamBitrates);
+		$entry->save();
 	}
 }

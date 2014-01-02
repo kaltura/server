@@ -83,8 +83,10 @@ class kEventsManager
 			$a = $priorities[$consumerA];
 		if(isset($priorities[$consumerB]))
 			$b = $priorities[$consumerB];
-			
-		return ($a == $b ? 0 : ($a < $b ? 1 : -1)); 
+		
+		if($a == $b)
+			return strcmp($consumerA, $consumerB);
+		return ($a < $b ? 1 : -1);
 	}
 	
 	protected static function getConsumers($interfaceType)

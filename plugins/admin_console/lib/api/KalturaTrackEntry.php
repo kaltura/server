@@ -76,12 +76,12 @@ class KalturaTrackEntry extends KalturaObject
 	public $description;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAt;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAt;
 

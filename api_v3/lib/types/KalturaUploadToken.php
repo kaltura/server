@@ -61,7 +61,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	
 	/**
 	 * Creation date as Unix timestamp (In seconds)
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter order
 	 */
@@ -70,7 +70,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	
 	/**
 	 * Last update date as Unix timestamp (In seconds)
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $updatedAt;

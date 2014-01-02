@@ -78,6 +78,12 @@ class kBusinessPreConvertDL
 			return $srcAsset;
 					
 			
+		KalturaLog::debug("Look for highest bitrate flavor with web tag on entry [$entryId]");
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB);
+		if($srcAsset && $srcAsset->isLocalReadyStatus())
+			return $srcAsset;
+					
+			
 		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
 		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
@@ -232,18 +238,7 @@ class kBusinessPreConvertDL
 			if($syncFile)
 			{
 				// removes the DEFAULT_THUMB tag from all other thumb assets
-				$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-				foreach($entryThumbAssets as $entryThumbAsset)
-				{
-					if($entryThumbAsset->getId() == $thumbAsset->getId())
-						continue;
-						
-					if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-						continue;
-						
-					$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-					$entryThumbAsset->save();
-				}
+				assetPeer::removeThumbAssetDeafultTags($entry->getId(), $thumbAsset->getId());
 			}
 		}
 		
@@ -293,7 +288,7 @@ class kBusinessPreConvertDL
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!file_exists($tempDir))
 			mkdir($tempDir, 0700, true);
-		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid.jpg;
+		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 		$logPath = $destPath . '.log';
 	
 		if(!file_exists($srcPath))
@@ -332,7 +327,7 @@ class kBusinessPreConvertDL
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 				if(!file_exists($tempDir))
 					mkdir($tempDir, 0700, true);
-				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . ".jpg";
+				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 			
 			$quality = $destThumbParamsOutput->getQuality();
@@ -964,7 +959,13 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				 */
 			$res = self::decideSourceFlavorConvert($entryId, null, $originalFlavorAsset, $profile->getId(), $flavors, $mediaInfo, $parentJob, $convertProfileJob);
 			if(!$res)
+			{
+				$originalFlavorAsset->incrementInterFlowCount();
+				$originalFlavorAsset->save();
 				return false;
+			}
+			$originalFlavorAsset->removeInterFlowCount();
+			$originalFlavorAsset->save();
 		}
 		elseif($shouldConvert)
 		{
@@ -973,8 +974,13 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			
 			$res = self::decideSourceFlavorConvert($entryId, $sourceFlavor, $originalFlavorAsset, $profile->getId(), $flavors, $mediaInfo, $parentJob, $convertProfileJob);
 			if(!$res)
+			{
+				$originalFlavorAsset->incrementInterFlowCount();
+				$originalFlavorAsset->save();
 				return false;
-						
+			}
+			
+			$originalFlavorAsset->removeInterFlowCount();
 			$originalFlavorAsset->setStatusLocalReady();
 			$originalFlavorAsset->save();
 			
@@ -1266,7 +1272,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 	private static function decideSourceFlavorConvert($entryId, assetParams $sourceFlavor = null, flavorAsset $originalFlavorAsset, $conversionProfileId, $flavors, mediaInfo $mediaInfo = null, BatchJob $parentJob, BatchJob $convertProfileJob)
 	{
-		if($sourceFlavor && ($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()))
+		if($sourceFlavor && ($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines()) && $originalFlavorAsset->getInterFlowCount()== null)
 		{
 			KalturaLog::log("Source flavor asset requires conversion");
 				

@@ -1,15 +1,23 @@
 # Kaltura Server #
 
+
+
 ## Plugins: ##
 - Add Wowza to plugins.ini.
+
+
 
 ## Admin Console: ##
 - Add admin.ini new permissions, see admin.template.ini:
  - FEATURE_LIVE_STREAM_RECORD
  - FEATURE_KALTURA_LIVE_STREAM
 
+
+
 ## Origin Servers: ##
 -  broadcast.ini according to broadcast.template.ini
+
+
 
 ## Edge Servers: ##
 media_servers.ini is optional and needed only for custom configurations.
@@ -20,23 +28,37 @@ media_servers.ini is optional and needed only for custom configurations.
 - port - defaults to 1935.
 - port-https - no default defined.
 
+
+
+
+
 # Wowza #
 
+
+
 ## Prerequisites: ##
-- Wowza media server 3.6.2 path 11 or above.
+- Wowza media server 3.6.2.16 or above.
 - Java jre 1.7.
+- kaltura group (gid = 613) or any other group that apache user is associated with.
+
+
 
 ## Additional libraries: ##
 - commons-codec-1.4.jar
 - commons-httpclient-3.1.jar
 - commons-logging-1.1.1.jar
+- commons-lang-2.6.jar
+
+
+
 
 ## For all wowza machine (origin and edge): ##
-- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
 - Copy additional jar files (available in Kaltura Java client library) to @WOWZA_DIR@/lib/
- - commons-codec-1.4.jar
- - commons-httpclient-3.1.jar
- - commons-logging-1.1.1.jar 
+ - [commons-codec-1.4.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-codec-1.4.jar "commons-codec-1.4.jar")
+ - [commons-httpclient-3.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-httpclient-3.1.jar "commons-httpclient-3.1.jar")
+ - [commons-logging-1.1.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-logging-1.1.1.jar "commons-logging-1.1.1.jar") 
+ - [commons-lang-2.6.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-lang-2.6.jar "commons-lang-2.6.jar")
 - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
 - Create @WOWZA_DIR@/applications/kLive directory.
 - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
@@ -45,41 +67,46 @@ media_servers.ini is optional and needed only for custom configurations.
 
 **Edit @WOWZA_DIR@/conf/kLive/Application.xml:**
 
- - /Root/Application/Streams/StreamType - live
  - /Root/Application/Streams/StorageDir - @WEB_DIR@/content/recorded
- - /Root/Application/Properties, add new properties:
-     - HTTP origin mode
-         - Name - httpOriginMode
-         - Value - on
+ - /Root/Application/DVR/Properties, add new properties:
      - HTTP random media name
          - Name - httpRandomizeMediaName
          - Value - true
          - Type - Boolean
+ - /Root/Application/LiveStreamPacketizer/Properties, add new properties:
+     - HTTP random media name
+         - Name - httpRandomizeMediaName
+         - Value - true
+         - Type - Boolean
+ - /Root/Application/HTTPStreamer/Properties, add new properties:
+     - HTTP origin mode
+         - Name - httpOriginMode
+         - Value - on
      - Apple HLS cache control playlist
          - Name - cupertinoCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Apple HLS cache control media chunk
          - Name - cupertinoCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Flash HDS cache control reset counter
          - Name - cupertinoOnChunkStartResetCounter
          - Value - true
          - Type - Boolean
      - Smooth Streaming cache control playlist
          - Name - smoothCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Smooth Streaming cache control media chunk
          - Name - smoothCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Smooth Streaming cache control data chunk
          - Name - smoothCacheControlDataChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
      - Flash HDS cache control playlist
          - Name - sanjoseCacheControlPlaylist
-         - Value - max-age=1
+         - Value - max-age=3
      - Flash HDS cache control media chunk
          - Name - sanjoseCacheControlMediaChunk
-         - Value - max-age=3600
+         - Value - max-age=86400
 
 **Edit @WOWZA_DIR@/conf/Server.xml:**
 
@@ -124,6 +151,12 @@ media_servers.ini is optional and needed only for custom configurations.
      - Kaltura recorded files group name
          - Name - KalturaRecordedFileGroup
          - Value - kaltura (or apache if kaltura doesn't exist)
+     - Kaltura web services binding host anme
+         - Name - KalturaServerWebServicesHost
+         - Value - external IP as will be accessed from the API machines.
+     - Kaltura recorded file group
+         - Name - KalturaRecordedFileGroup
+         - Value - kaltura (gid = 613) or any other group that apache user is associated with.
 
 **Edit @WOWZA_DIR@/conf/log4j.properties:**
 
@@ -131,30 +164,21 @@ media_servers.ini is optional and needed only for custom configurations.
  - Change `log4j.appender.serverAccess.File` = @LOG_DIR@/kaltura\_mediaserver\_access.log
  - Change `log4j.appender.serverError.File` = @LOG_DIR@/kaltura\_mediaserver\_error.log
  - Change `log4j.appender.serverStats.File` = @LOG_DIR@/kaltura\_mediaserver\_stats.log
- - Comment out `log4j.appender.serverError.layout`
+ - Comment out `log4j.appender.serverError.layout` and its sub values `log4j.appender.serverError.layout.*` 
  - Add `log4j.appender.serverError.layout` = `org.apache.log4j.PatternLayout`
  - Add `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}] %p - "%m" - (%F:%L) %n` 
- - Comment out `log4j.appender.serverAccess.layout`
+ - Comment out `log4j.appender.serverAccess.layout` and its sub values `log4j.appender.serverAccess.layout.*` 
  - Add `log4j.appender.serverAccess.layout` = `org.apache.log4j.PatternLayout`
  - Add `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}] %p - "%m" - (%F:%L) %n`
 
 
-## For edge servers: ##
-**Setting keystore.jks:**
-
-- [Create a self-signed SSL certificate](http://www.wowza.com/forums/content.php?435 "Create a self-signed SSL certificate") or use existing one.
-- Copy the certificate file to @WOWZA_DIR@/conf/keystore.jks
 
 
-**Edit @WOWZA_DIR@/conf/VHost.xml:**
-
-- Uncomment /Root/VHost/HostPortList/HostPort with port 443 for SSL.
-- /Root/VHost/HostPortList/HostPort/SSLConfig/KeyStorePassword - set the password for your certificate file.
 
 ## For origin servers: ##
-
 **Edit @WOWZA_DIR@/conf/kLive/Application.xml:**
 
+ - /Root/Application/Streams/StreamType - liverepeater-origin
  - /Root/Application/Streams/LiveStreamPacketizers:
      - cupertinostreamingpacketizer
      - smoothstreamingpacketizer
@@ -174,7 +198,45 @@ media_servers.ini is optional and needed only for custom configurations.
  - /Root/Application/Modules, add new Module:
      - Name - LiveStreamEntry
      - Description - Live-Stream Entry Listener
-     - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry`
+     - Class - `com.kaltura.media.server.wowza.listeners.LiveStreamEntry` 
+ - /Root/Application/Properties, add new Property:
+     - Name - streamTimeout
+     - Value - 200 (the value is in milliseconds)
+     - Type - Integer
+
+
+
+
+## For edge servers: ##
+**Edit @WOWZA_DIR@/conf/kLive/Application.xml:**
+
+ - /Root/Application/Streams/StreamType - liverepeater-edge
+ - /Root/Application/Streams/LiveStreamPacketizers:
+     - cupertinostreamingrepeater
+     - smoothstreamingrepeater
+     - sanjosestreamingrepeater
+     - dvrstreamingrepeater
+ - /Root/Application/HTTPStreamers:
+     - cupertinostreaming
+     - smoothstreaming
+     - sanjosestreaming
+     - mpegdashstreaming
+     - dvrchunkstreaming
+ - /Root/Application/Repeater - list all origin servers URLs separated with `|`, for example, `wowz://wowza-origin-server1:1935/kLive|wowz://wowza-origin-server2:1935/kLive`.
+
+
+**Setting keystore.jks:**
+
+- [Create a self-signed SSL certificate](http://www.wowza.com/forums/content.php?435 "Create a self-signed SSL certificate") or use existing one.
+- Copy the certificate file to @WOWZA_DIR@/conf/keystore.jks
+
+
+**Edit @WOWZA_DIR@/conf/VHost.xml:**
+
+- Uncomment /Root/VHost/HostPortList/HostPort with port 443 for SSL.
+- /Root/VHost/HostPortList/HostPort/SSLConfig/KeyStorePassword - set the password for your certificate file.
+
+
 
 
 ## For webcam recording servers: ##

@@ -133,11 +133,16 @@ class entryFilter extends baseObjectFilter
 			"_eq_creator_id",
 			"_lte_total_rank",
 			"_gte_total_rank",
+			"_gte_last_played_at",
+			"_lte_last_played_at",
+			"_is_live",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
 			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , 
-			"modified_at", "available_from", "duration" , "partner_sort_value" , "total_rank", "weight", "start_date", "end_date")	;
+			"modified_at", "available_from", "duration" , "partner_sort_value" , "total_rank", "weight", 
+			"start_date", "end_date", "last_played_at",
+		);
 
 		$this->aliases = array ( 
 			"creator_id" => "creator_puser_id",
@@ -636,6 +641,11 @@ class entryFilter extends baseObjectFilter
 	public function setCategoryAncestorId($v)
 	{
 		$this->set('_in_category_ancestor_id', $v);
+	}
+	
+	public function setIsLive($v)
+	{
+		$this->set('_is_live', intval($v));
 	}
 	
 	public function typeMatches(entry $entry)

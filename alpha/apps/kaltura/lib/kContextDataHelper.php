@@ -312,8 +312,13 @@ class kContextDataHelper
 					break;
 				}
 			}	
-			if (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO)
+			
+			if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+				$this->streamerType = PlaybackProtocol::HDS;
+			if($this->entry->getSource() == EntrySourceType::AKAMAI_LIVE)
 				$this->streamerType = PlaybackProtocol::RTMP;
+			if($this->entry->getSource() == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
+				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
 		}
 		else
 		{
@@ -332,11 +337,21 @@ class kContextDataHelper
 			
 			if(!$deliveryType)
 				$deliveryType = array();
+				
 			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
 			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
-			if ($this->streamerType == PlaybackProtocol::HTTP && infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS)
-				$this->mediaProtocol = 'https';
 		}
+		
+		$httpStreamerTypes = array(
+			PlaybackProtocol::HTTP,
+			PlaybackProtocol::HDS,
+			PlaybackProtocol::HLS,
+			PlaybackProtocol::SILVER_LIGHT,
+			PlaybackProtocol::MPEG_DASH,
+		);
+		
+		if (in_array($this->streamerType, $httpStreamerTypes))
+			$this->mediaProtocol = infraRequestUtils::getProtocol();
 		
 		if ($this->streamerType == PlaybackProtocol::AKAMAI_HD || $this->streamerType == PlaybackProtocol::AKAMAI_HDS)
 			$this->mediaProtocol = PlaybackProtocol::HTTP;

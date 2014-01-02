@@ -1,8 +1,10 @@
-<?php
+﻿<?php
 
 require(__DIR__ . '/IndexableField.php');
 require(__DIR__ . '/IndexableObject.php');
 require(__DIR__ . '/IndexableOptimization.php');
+
+require_once(__DIR__ . '/../../../bootstrap.php');
 
 class IndexObjectsGenerator  
 {
@@ -23,11 +25,15 @@ class IndexObjectsGenerator
 		
 		$fp = fopen($path, 'w');
 		if(!$fp)
-			die("Failed to open file " . $path);
+		{
+			KalturaLog::err("Failed to open file " . $path);
+			exit(1);
+		}
 		
 		print "\tGenerating Index objects for $key\n";
 		$this->createFileHeader($fp, $key);
 		
+		$this->generateSimpleFunction("getObjectName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getObjectIndexName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getSphinxIdField", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getPropelIdField", $fp, $this->searchableObjects[$key]);
@@ -58,7 +64,14 @@ class IndexObjectsGenerator
 	public function load($inputFile)
 	{
 		$objects = array();
-		$xml = simplexml_load_file($inputFile);
+		if (!file_exists ($inputFile))
+		{
+			KalturaLog::err ("input file ". $inputFile ." not found");
+			exit(1);
+		}
+		
+		$inputXml = file_get_contents($inputFile);
+		$xml = new SimpleXMLElement($inputXml);
 		foreach($xml->children() as $searchableObject) {
 			$objectAttribtues = $searchableObject->attributes();
 			$objName = $objectAttribtues["name"];
@@ -218,6 +231,11 @@ class IndexObjectsGenerator
 		call_user_func($callback, $fp, $object);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
+	}
+	
+	private function getObjectName($fp, $object) {
+		$indexName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $object->name));
+		$this->printToFile($fp, "return '$indexName';",2);
 	}
 	
 	private function getObjectIndexName($fp, $object) {
@@ -386,12 +404,17 @@ class IndexObjectsGenerator
 			$sphinxConfiguration = preg_replace("/@FIELDS_PLACEHOLDER-kaltura_{$object->indexName}@/", 
 				$this->generateFields($object->name), $sphinxConfiguration, -1, $cnt);
 			if($cnt != 1)
-				die("Failed to generate kaltura conf for {$object->name}.");
+			{
+				KalturaLog::err("Failed to generate kaltura conf for {$object->name}.");
+				exit (1);
+			}
 		}
 		
 		if(preg_match("/@FIELDS_PLACEHOLDER-([\w]*)@/", $sphinxConfiguration,$matches))
-			die("Not all kaltura conf sections were filled! Missing " . $matches[1]);
-		
+		{
+			KalturaLog::err("Not all kaltura conf sections were filled! Missing " . $matches[1]);
+			exit (1);
+		}
 		file_put_contents($outputFile, $sphinxConfiguration);
 	}
 	
@@ -430,8 +453,10 @@ class IndexObjectsGenerator
 function main($argv) 
 {
 	if(count($argv) < 4)
-		die("Illegal command. use IndexObjectsGenerator <template> <updated-conf> <indexFile>=<generationPath>\n");
-	
+	{
+		KalturaLog::err("Illegal command. use IndexObjectsGenerator <template> <updated-conf> <indexFile>=<generationPath>\n");
+		exit(1);
+	}
 	$template = $argv[1];
 	$confFile = $argv[2];
 	
@@ -442,12 +467,14 @@ function main($argv)
 			continue;
 		
 		list($indexFile, $dirPath) = explode("=", $arg);
-		print "Handling Index file $indexFile \n";
+		KalturaLog::info("Handling Index file $indexFile");
 		$keys = $generator->load($indexFile);
 		$generator->generateIndexFiles($keys, $dirPath);
 	}
 	
 	$generator->generateConfigurationFile($template, $confFile);
+	
 }
 
 main($argv);
+exit(0);

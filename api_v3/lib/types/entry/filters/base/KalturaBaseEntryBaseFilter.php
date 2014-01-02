@@ -338,24 +338,24 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	/**
 	 * This filter parameter should be in use for retrieving only entries which were created at Kaltura system after a specific time/date (standard timestamp format).
 	 * 
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
 	 * This filter parameter should be in use for retrieving only entries which were created at Kaltura system before a specific time/date (standard timestamp format).
 	 * 
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
 
@@ -399,42 +399,42 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $accessControlIdIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateGreaterThanOrEqualOrNull;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $startDateLessThanOrEqualOrNull;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateLessThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateGreaterThanOrEqualOrNull;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $endDateLessThanOrEqualOrNull;
 

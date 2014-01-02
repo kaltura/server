@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 function getIndexSchemas($dirname) 
 {
@@ -13,8 +13,8 @@ function getIndexSchemas($dirname)
 	return $indexSchemas;
 }
 	
-$indexSchemas = getIndexSchemas("c:\\opt\\kaltura\\app\\alpha\\");
-$indexSchemas = array_merge( $indexSchemas, getIndexSchemas("c:\\opt\\kaltura\\app\\plugins\\"));
+$indexSchemas = getIndexSchemas(__DIR__ . "/../../../../alpha/");
+$indexSchemas = array_merge( $indexSchemas, getIndexSchemas(__DIR__ . "/../../../../plugins/"));
 
 $args = "";
 foreach($indexSchemas as $schemaPath => $dirPath) {
@@ -22,7 +22,10 @@ foreach($indexSchemas as $schemaPath => $dirPath) {
 }
 
 $exe = __DIR__ . "/IndexObjectsGenerator.php";
-$template = __DIR__ . "/../../../../../configurations/sphinx/kaltura.conf.template";
-$generatedConf = __DIR__ . "/../../../../../configurations/sphinx/kaltura.conf.generated";
-passthru("php {$exe} {$template} {$generatedConf} {$args}");
-	
+$template = __DIR__ . "/../../../../configurations/sphinx/kaltura.conf.source";
+$generatedConf = __DIR__ . "/../../../../configurations/sphinx/kaltura.conf.template";
+
+$returnVar = 0;
+passthru("php {$exe} {$template} {$generatedConf} {$args}", $returnVar);
+
+exit ($returnVar);	
