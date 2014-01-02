@@ -21,7 +21,6 @@ class kRendererDieError implements kRendererBase
 	
 	public function __construct($code, $message)
 	{
-	KalturaLog::debug(print_r($e));
 		$this->code = $code;
 		$this->message = $message;
 	}
