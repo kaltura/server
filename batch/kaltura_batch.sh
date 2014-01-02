@@ -9,6 +9,17 @@ echo `date`
 # chkconfig: 2345 13 87
 # description: Kaltura Batch
 
+### BEGIN INIT INFO
+# Provides:          kaltura-batch
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop Kaltura batch server
+# Description:       Control the Kaltura batch server.
+### END INIT INFO
+
 # Source function library.
 #. /etc/rc.d/init.d/functions
 
