@@ -34,6 +34,12 @@ class kSourceFileSyncDescriptor
 	private $assetParamsId;
 	
 	/**
+	 * 
+	 * @var int
+	 */
+	private $fileSyncObjectSubType;
+	
+	/**
 	 * @return the $fileSyncLocalPath
 	 */
 	public function getFileSyncLocalPath() 
@@ -111,5 +117,19 @@ class kSourceFileSyncDescriptor
 	public function setAssetParamsId($assetParamsId) 
 	{
 		$this->assetParamsId = $assetParamsId;
+	}
+	
+	/**
+	 * @return the $fileSyncObjectSubType
+	 */
+	public function getFileSyncObjectSubType() {
+		return $this->fileSyncObjectSubType;
+	}
+
+	/**
+	 * @param int $fileSyncObjectSubType
+	 */
+	public function setFileSyncObjectSubType($fileSyncObjectSubType) {
+		$this->fileSyncObjectSubType = $fileSyncObjectSubType;
 	}	
 }

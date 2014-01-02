@@ -505,7 +505,7 @@ class kFlowHelper
 			$flavorAsset->save();
 		}
 		
-		if(count($data->getDestFileSyncs()))
+		if(count($data->getExtraDestFileSyncs()))
 		{
 			//operation engine creating only file assets should be the last one in the operations chain
 			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
@@ -738,7 +738,7 @@ class kFlowHelper
 	{
 		KalturaLog::debug("Convert finished, creating additional file syncs ");
 		
-		foreach ($data->getDestFileSyncs() as $destFileSyncDesc) 
+		foreach ($data->getExtraDestFileSyncs() as $destFileSyncDesc) 
 		{
 			KalturaLog::debug("Creating file sync for destination file: ".$destFileSyncDesc->getFileSyncLocalPath());
 						
@@ -760,7 +760,6 @@ class kFlowHelper
 				}
 			}			
 		}
-		$data->setDestFileSyncs(null);	
 	}
 
 	/**

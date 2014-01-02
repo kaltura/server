@@ -50,7 +50,7 @@ class KOperationEngineIsmIndex  extends KSingleOutputOperationEngine
 		$fsDesc->fileSyncObjectSubType = 4; //".ismc";
 		$fsDescArr[] = $fsDesc;
 		
-		$this->data->destFileSyncs  = $fsDescArr;
+		$this->data->extraDestFileSyncs  = $fsDescArr;
 
 		$this->data->destFileSyncLocalPath = null;
 		$this->outFilePath = null;

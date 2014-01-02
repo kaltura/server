@@ -82,7 +82,7 @@ class KOperationEngineSmoothProtect  extends KSingleOutputOperationEngine
 		$fsDesc->fileSyncLocalPath = "$outFolderName//$outFileName.ismc";
 		$fsDesc->fileSyncObjectSubType = 4; //".ismc";
 		$fsDescArr[] = $fsDesc;
-		$this->data->destFileSyncs  = $fsDescArr;
+		$this->data->extraDestFileSyncs  = $fsDescArr;
 		return $res;
 	}
 

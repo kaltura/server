@@ -280,7 +280,8 @@ class kJobsManager
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
 				$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());
 			$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($entry->getId()));
-			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());			
+			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());	
+			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());		
 		}
 		
 		// increment entry version
@@ -468,6 +469,7 @@ class kJobsManager
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
 				$srcFileSyncDescriptor->setAssetParamsId($srcFlavorAsset->getFlavorParamsId());
+				$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
@@ -556,7 +558,7 @@ class kJobsManager
 		return $fileSync;		
 	}
 	
-	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData $convertData)
+	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData &$convertData)
 	{
 		KalturaLog::log("Conversion engines string: '" . $flavor->getConversionEngines() . "'");
 		
@@ -650,9 +652,29 @@ class kJobsManager
 			}
 		}
 		KalturaLog::log("Using conversion engine [$currentConversionEngine]");
+		
+		self::contributeToConvertJobData($currentConversionEngine, $convertData);
+		
 		$dbCurrentConversionEngine = kPluginableEnumsManager::apiToCore('conversionEngineType', $currentConversionEngine);
 		
 		return $dbCurrentConversionEngine;
+	}
+	
+	/**
+	 * 
+	 * Allow plugin to set additional information on ConvertJobData object
+	 * 
+	 * @param string $conversionEngineId
+	 * @param kConvertJobData $convertData
+	 */
+	private static function contributeToConvertJobData($conversionEngineId, kConvertJobData &$convertData)
+	{
+		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
+		if($plugin && $plugin instanceof IKalturaConvertContributor)
+		{
+			KalturaLog::log("Setting additional data by plugin");
+			$convertData = $plugin->contributeToConvertJobData($convertData);
+		}
 	}
 	
 	/**

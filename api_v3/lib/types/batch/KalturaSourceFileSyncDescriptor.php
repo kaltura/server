@@ -32,6 +32,12 @@ class KalturaSourceFileSyncDescriptor extends KalturaObject
 	 * @var int
 	 */
 	public $assetParamsId;
+
+	/**
+	 * 
+	 * @var int
+	*/
+	public $fileSyncObjectSubType;
 	
 	private static $map_between_objects = array
 	(
@@ -40,6 +46,7 @@ class KalturaSourceFileSyncDescriptor extends KalturaObject
 		"fileSyncRemoteUrl" ,
 		"assetId" ,
 		"assetParamsId" ,
+		"fileSyncObjectSubType" ,
 	);
 
 

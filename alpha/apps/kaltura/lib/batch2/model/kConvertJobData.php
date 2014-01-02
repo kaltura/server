@@ -52,7 +52,7 @@ class kConvertJobData extends kConvartableJobData
 	/**
 	 * @var array<kDestFileSyncDescriptor>
 	 */
-	private $destFileSyncs;	
+	private $extraDestFileSyncs;	
 
 	/**
 	 * @return the $destFileSyncLocalPath
@@ -278,14 +278,14 @@ class kConvertJobData extends kConvartableJobData
 	/**
 	 * @return the $destFileAssets
 	 */
-	public function getDestFileSyncs() {
-		return $this->destFileSyncs;
+	public function getExtraDestFileSyncs() {
+		return $this->extraDestFileSyncs;
 	}
 
 	/**
 	 * @param array<kDestFileSyncDescriptor> $destFileSyncs
 	 */
-	public function setDestFileSyncs($destFileSyncs) {
-		$this->destFileSyncs = $destFileSyncs;
+	public function setExtraDestFileSyncs($destFileSyncs) {
+		$this->extraDestFileSyncs = $destFileSyncs;
 	}	
 }

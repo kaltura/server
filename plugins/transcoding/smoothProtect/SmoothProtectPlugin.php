@@ -2,7 +2,7 @@
 /**
  * @package plugins.smoothProtect
  */
-class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers, IKalturaPending
+class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers, IKalturaPending, IKalturaConvertContributor
 {
 	const PLUGIN_NAME = 'smoothProtect';
 	const PARAMS_STUB = '__params__';
@@ -107,4 +107,40 @@ class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader,
 		);
 	}
 	
+	public static function contributeToConvertJobData (kConvertJobData $jobData)
+	{
+		$additionalFileSyncs = array();
+		foreach ($jobData->getSrcFileSyncs() as $srcFileSyncDesc) 
+		{
+			$ismDescriptor = self::getFileSyncDescriptor($srcFileSyncDesc, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			$ismcDescriptor = self::getFileSyncDescriptor($srcFileSyncDesc, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+			if($ismDescriptor && $ismcDescriptor)
+			{
+				$additionalFileSyncs[] = $ismDescriptor;
+				$additionalFileSyncs[] = $ismcDescriptor;
+			}								
+		}
+		
+		$jobData->setSrcFileSyncs(array_merge($jobData->getSrcFileSyncs(), $additionalFileSyncs));
+		return $jobData;
+	}
+	
+	private static function getFileSyncDescriptor(kSourceFileSyncDescriptor $flavorAssetDesc, $objectSubType)
+	{
+		$ismDescriptor = null;
+		$flavorAsset = assetPeer::retrieveById($flavorAssetDesc->getObjectId());
+		$key = $flavorAsset->getSyncKey($objectSubType);			
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key);
+		if($fileSync)
+		{
+			$ismDescriptor = new kSourceFileSyncDescriptor();
+			$ismDescriptor->setFileSyncLocalPath($fileSync->getFullPath());							
+			$ismDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
+			$ismDescriptor->setAssetId($key->getObjectId());
+			$ismDescriptor->setAssetParamsId($flavorAssetDesc->getAssetParamsId());
+			$ismDescriptor->setFileSyncObjectSubType($key->getObjectSubType());
+		}
+
+		return $ismDescriptor;
+	}
 }
