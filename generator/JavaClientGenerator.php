@@ -493,10 +493,12 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$resultNode = $actionNode->getElementsByTagName ( "result" )->item ( 0 );
 		$resultType = $resultNode->getAttribute ( "type" );
 		$arrayType = '';
-		if ($resultType == "array")
+		$fallbackClass = '';
+		if ($resultType == "array") {
 			$arrayType = $resultNode->getAttribute ( "arrayType" );
+		}
 		
-	  	$javaOutputType = $this->getResultType($resultType, $arrayType, $serviceImports);
+	  	$javaOutputType = $this->getResultType($resultType, $arrayType, $serviceImports, $fallbackClass);
 		
 		$signaturePrefix = "public $javaOutputType " . $action . "(";
 		
@@ -518,7 +520,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( $desc );
 		$this->appendLine ( "    $signaturePrefix$signature throws KalturaApiException {" );
 		
-		$this->generateActionBodyServiceCall($serviceId, $action, $paramNodesArr, $serviceImports);
+		$this->generateActionBodyServiceCall($serviceId, $action, $paramNodesArr, $serviceImports, $fallbackClass);
 				
 		if($resultType == 'file')
 		{
@@ -643,7 +645,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	public function generateActionBodyServiceCall($serviceId, $action, $paramNodes, &$serviceImports) 
+	public function generateActionBodyServiceCall($serviceId, $action, $paramNodes, &$serviceImports, $fallbackClass) 
 	{
 		$this->appendLine ( "        KalturaParams kparams = new KalturaParams();" );
 		$haveFiles = false;
@@ -671,9 +673,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		// Add files to call
 		if ($haveFiles)
-			$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
+			if($fallbackClass == "")
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
+			else
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles, $fallbackClass.class);" );
 		else
-			$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
+			if($fallbackClass == "")
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
+			else
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, $fallbackClass.class);" );
 	}
 	
 	public function handleResultType($resultType, $arrayType, &$serviceImports) 
@@ -887,26 +895,31 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	public function getResultType($resultType, $arrayType, &$serviceImports) 
+	public function getResultType($resultType, $arrayType, &$serviceImports, &$fallbackClass) 
 	{
 		switch ($resultType)
 		{
 		case null :
+			$fallbackClass = null;
 			return "void";
 			
 		case "array" :
 			$serviceImports[] = "java.util.List";
+			$fallbackClass = $arrayType;
 			return ("List<" . $arrayType . ">");
 			
 		case "bool" :
+			$fallbackClass = null;
 			return "boolean";
 			
 		case "file":
 		case "string" :
+			$fallbackClass = null;
 			return "String";
 			
 		default :
 			$serviceImports[] = "com.kaltura.client.types.*";
+			$fallbackClass = $resultType;
 			return $resultType;
 		}
 	}

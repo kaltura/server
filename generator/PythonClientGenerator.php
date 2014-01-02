@@ -563,6 +563,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
+	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
 		
 		// method signature
 		$signature = "def ".$action."(";
@@ -622,15 +623,21 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		
 	    if($resultType == 'file')
 	    {
-			$this->appendLine("        self.client.queueServiceActionCall('" . strtolower($serviceId) . "', '$action', kparams)");
+			$this->appendLine("        self.client.queueServiceActionCall('" . strtolower($serviceId) . "', '$action', None ,kparams)");
 			$this->appendLine('        return self.client.getServeUrl()');
 	    }
 	    else
 	    {
+	    	$fallbackClass = 'None';
+	    	if($resultType == 'array')
+	    		$fallbackClass = $arrayObjectType;
+	    	if($resultType && !in_array($resultType, array('bigint', 'int', 'bool', 'string','array')))
+	    		$fallbackClass = $resultType;
+	    	
 			if ($haveFiles)
-				$this->appendLine("        self.client.queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", kparams, kfiles)");
+				$this->appendLine("        self.client.queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, kparams, kfiles)");
 			else
-				$this->appendLine("        self.client.queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", kparams)");
+				$this->appendLine("        self.client.queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, kparams)");
 			$this->appendLine("        if self.client.isMultiRequest():");
 			$this->appendLine("            return self.client.getMultiRequestResult()");
 			$this->appendLine("        resultNode = self.client.doQueue()");
