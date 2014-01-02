@@ -395,7 +395,16 @@ class MediaService extends KalturaEntryService
 		try
 		{
 		    // check that the uploaded file exists
-			    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+		    
+		    // Make sure that the uploads path is not modified by $uploadTokenId (with the value of "../" for example )
+		    $entryRootDir = realpath( dirname( $entryFullPath ) );
+			$uploadPathBase = realpath( myContentStorage::getFSUploadsPath() );
+			if ( strpos( $entryRootDir, $uploadPathBase ) !== 0 ) // Composed path doesn't begin with $uploadPathBase?  
+			{
+				KalturaLog::err( "uploadTokenId [$uploadTokenId] points outside of uploads directory" );
+				throw new KalturaAPIException( KalturaErrors::INVALID_UPLOAD_TOKEN_ID );			
+			}
 		}
 		catch(kCoreException $ex)
 		{
@@ -476,7 +485,18 @@ class MediaService extends KalturaEntryService
 
 	    // check that the webcam file exists
 	    $content = myContentStorage::getFSContentRootPath();
-	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
+	    $webcamContentRootDir = $content . "/content/webcam/";
+	    $webcamBasePath = $webcamContentRootDir . $webcamTokenId;
+
+	    // Make sure that the root path of the webcam content is not modified by $webcamTokenId (with the value of "../" for example )
+	    $webcamContentRootDir = realpath( $webcamContentRootDir );
+	    $webcamBaseRootDir = realpath( dirname( $webcamBasePath ) ); // Get realpath of target directory 
+	    if ( strpos( $webcamBaseRootDir, $webcamContentRootDir ) !== 0 ) // The uploaded file's path is different from the content path?    
+	    {
+			KalturaLog::err( "webcamTokenId [$webcamTokenId] points outside of webcam content directory" );
+	    	throw new KalturaAPIException( KalturaErrors::INVALID_WEBCAM_TOKEN_ID );
+	    }
+	     
 		if (!file_exists("$webcamBasePath.flv") && !file_exists("$webcamBasePath.f4v") && !file_exists("$webcamBasePath.f4v.mp4"))
 		{
 			if (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId()))
