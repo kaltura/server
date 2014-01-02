@@ -710,14 +710,14 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 	    {
 	    	$fallbackClass = 'null';
 	    	if($resultType == 'array')
-	    		$fallbackClass = $arrayObjectType;
+	    		$fallbackClass = "\"$arrayObjectType\"";
 	    	if($resultType && !in_array($resultType, array('bigint', 'int', 'bool', 'string','array')))
-	    		$fallbackClass = $resultType;
+	    		$fallbackClass = "\"$resultType\"";
 	    	
 			if ($haveFiles)
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \"$fallbackClass\", \$kparams, \$kfiles);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams, \$kfiles);");
 			else
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \"$fallbackClass\", \$kparams);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
