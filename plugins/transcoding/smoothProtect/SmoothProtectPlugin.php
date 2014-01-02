@@ -128,7 +128,7 @@ class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader,
 	private static function getFileSyncDescriptor(kSourceFileSyncDescriptor $flavorAssetDesc, $objectSubType)
 	{
 		$ismDescriptor = null;
-		$flavorAsset = assetPeer::retrieveById($flavorAssetDesc->getObjectId());
+		$flavorAsset = assetPeer::retrieveById($flavorAssetDesc->getAssetId());
 		$key = $flavorAsset->getSyncKey($objectSubType);			
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key);
 		if($fileSync)
