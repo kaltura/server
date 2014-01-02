@@ -812,13 +812,13 @@ $this->benchmarkStart( "beforeImpl" );
 		$kshow = kshowPeer::retrieveByPK( $kshow_id );
 		if ( ! $kshow )
 		{
-			$this->addError ( "no such kshow [$kshow_id]" );
+			$this->addError ( APIErrors::INVALID_KSHOW_ID, $kshow_id );
 			throw new Exception();
 		}
 
 		if ( $kshow->getProducerId() != $kshow_id )
 		{
-			$this->addError ( "no such kshow [$kshow_id]" );
+			$this->addError ( APIErrors::INVALID_KSHOW_ID, $kshow_id );
 			throw new Exception();
 		}
 	}
@@ -919,24 +919,10 @@ $this->benchmarkStart( "beforeImpl" );
 			$args = func_get_args();
 		}
 		array_shift($args);
+
+		$errorData = APIErrors::getErrorData( $error_code, $args );
 		
-		$components = explode(';', $error_code, 3);
-		$error_code = $components[0];
-		$error_message = $components[2];
-		
-		if ( ! empty($components[1]) ) // Need to process arguments?
-		{
-			$paramNames = explode(',', $components[1]);
-			$numParamNames = count($paramNames);
-						
-			for ( $i = 0; $i < $numParamNames; $i++ )
-			{
-				$replacement = isset($args[$i]) ? $args[$i] : '';
-				$error_message = str_replace("@{$paramNames[$i]}@", $replacement, $error_message);
-			}
-		}
-		
-		$this->error[] = array("code" => $error_code, "desc" => $error_message);
+		$this->error[] = array("code" => $errorData['code'], "desc" => $errorData['message']);
 	}
 
 	// all this does is add an error and throw an APIException
