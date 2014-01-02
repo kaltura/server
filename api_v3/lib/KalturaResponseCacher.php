@@ -346,7 +346,7 @@ class KalturaResponseCacher extends kApiCache
 
 	public static function adjustApiCacheForException($ex)
 	{
-		KalturaResponseCacher::setExpiry(120);
+		self::setExpiry(120);
 		
 		$cacheConditionally = false;
 		if ($ex instanceof KalturaAPIException && kConf::hasParam("v3cache_conditional_cached_errors"))
@@ -355,7 +355,7 @@ class KalturaResponseCacher extends kApiCache
 		}
 		if (!$cacheConditionally)
 		{
-			KalturaResponseCacher::disableConditionalCache();
+			self::disableConditionalCache();
 		}
 	}
 }
