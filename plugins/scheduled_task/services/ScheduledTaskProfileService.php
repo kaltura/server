@@ -147,44 +147,73 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	}
 
 	/**
-	 * Execute object filter for a given scheduled task profile id
 	 *
-	 * @action query
-	 * @param int $id
-	 * @param KalturaFilterPager $pager
+	 *
+	 * @action requestDryRun
+	 * @param int $scheduledTaskProfileId
+	 * @return int
+	 *
+	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
+	 */
+	public function requestDryRunAction($scheduledTaskProfileId)
+	{
+		// get the object
+		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($scheduledTaskProfileId);
+		if (!$dbScheduledTaskProfile)
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND, $scheduledTaskProfileId);
+
+		if ($dbScheduledTaskProfile->getStatus() != KalturaScheduledTaskProfileStatus::ACTIVE)
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_ACTIVE, $scheduledTaskProfileId);
+
+		$jobData = new kScheduledTaskJobData();
+		$batchJob = $this->createScheduledTaskJob($dbScheduledTaskProfile, $jobData);
+
+		return $batchJob->getId();
+	}
+
+	/**
+	 *
+	 *
+	 * @action getDryRunResults
+	 * @param int $requestId
 	 * @return KalturaObjectListResponse
 	 *
 	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
 	 */
-	public function queryAction($id, KalturaFilterPager $pager = null)
+	public function getDryRunResultsAction($requestId)
 	{
-		// get the object
-		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($id);
-		if (!$dbScheduledTaskProfile)
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND, $id);
+		$this->applyPartnerFilterForClass('BatchJob');
+		$batchJob = BatchJobPeer::retrieveByPK($requestId);
+		$batchJobType = ScheduledTaskPlugin::getBatchJobTypeCoreValue(ScheduledTaskBatchType::SCHEDULED_TASK);
+		if (is_null($batchJob) || $batchJob->getJobType() != $batchJobType)
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::OBJECT_NOT_FOUND);
 
-		if ($dbScheduledTaskProfile->getStatus() != KalturaScheduledTaskProfileStatus::ACTIVE)
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_ACTIVE, $id);
+		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+		$data = kFileSyncUtils::file_get_contents($syncKey, true);
+		$results = unserialize($data);
+		return $results;
+	}
 
-		if (is_null($pager))
-			$pager = new KalturaFilterPager();
+	/**
+	 * @param ScheduledTaskProfile $scheduledTaskProfile
+	 * @param kScheduledTaskJobData $jobData
+	 * @return BatchJob
+	 */
+	protected function createScheduledTaskJob(ScheduledTaskProfile $scheduledTaskProfile, kScheduledTaskJobData $jobData)
+	{
+		$scheduledTaskProfileId = $scheduledTaskProfile->getId();
+		$jobType = ScheduledTaskPlugin::getBatchJobTypeCoreValue(ScheduledTaskBatchType::SCHEDULED_TASK);
+		$objectType = ScheduledTaskPlugin::getBatchJobObjectTypeCoreValue(ScheduledTaskBatchJobObjectType::SCHEDULED_TASK_PROFILE);
 
-		$scheduledTaskProfile = new KalturaScheduledTaskProfile();
-		$scheduledTaskProfile->fromObject($dbScheduledTaskProfile);
+		KalturaLog::log("Creating scheduled task dry run job for profile [".$scheduledTaskProfileId."]");
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($scheduledTaskProfile->getPartnerId());
+		$batchJob->setObjectId($scheduledTaskProfileId);
+		$batchJob->setObjectType($objectType);
+		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
 
-		$objectFilterEngineType = $scheduledTaskProfile->objectFilterEngineType;
-		$objectFilterEngine = KObjectFilterEngineFactory::getInstanceByType($objectFilterEngineType);
-		$objectFilterEngine->setPageSize($pager->pageSize);
-		$objectFilterEngine->setPageIndex($pager->pageIndex);
-		$response = $objectFilterEngine->query($scheduledTaskProfile->objectFilter);
+		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType);
 
-		$genericResponse = new KalturaObjectListResponse();
-		$genericResponse->totalCount = $response->totalCount;
-		foreach($response->objects as $object)
-		{
-			$genericResponse->objects[] = $object;
-		}
-
-		return $genericResponse;
+		return $batchJob;
 	}
 }

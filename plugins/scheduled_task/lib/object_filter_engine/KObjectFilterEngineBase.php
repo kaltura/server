@@ -7,6 +7,11 @@
 abstract class KObjectFilterEngineBase
 {
 	/**
+	 * @var KalturaClient
+	 */
+	protected $_client;
+
+	/**
 	 * @var int
 	 */
 	private $_pageSize;
@@ -16,15 +21,16 @@ abstract class KObjectFilterEngineBase
 	 */
 	private $_pageIndex;
 
-	public function __construct()
+	public function __construct(KalturaClient $client)
 	{
+		$this->_client = $client;
 	}
 
 	/**
-	 * @param KalturaFilter $objectFilter
-	 * @return array
+	 * @param KalturaFilter $filter
+	 * @return KalturaObjectListResponse
 	 */
-	abstract function query(KalturaFilter $objectFilter);
+	abstract function query(KalturaFilter $filter);
 
 	/**
 	 * @param int $pageIndex
@@ -56,5 +62,16 @@ abstract class KObjectFilterEngineBase
 	public function getPageSize()
 	{
 		return $this->_pageSize;
+	}
+
+	/**
+	 * @return KalturaFilterPager
+	 */
+	public function getPager()
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = $this->_pageIndex;
+		$pager->pageSize = $this->_pageSize;
+		return $pager;
 	}
 }

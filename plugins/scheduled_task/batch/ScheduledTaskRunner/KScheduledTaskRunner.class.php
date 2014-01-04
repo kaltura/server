@@ -73,7 +73,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 */
 	protected function processProfile(KalturaScheduledTaskProfile $profile)
 	{
-		$scheduledTaskClient = $this->getScheduledTaskClient();
 		$this->updateProfileBeforeExecution($profile);
 
 		$pager = new KalturaFilterPager();
@@ -81,9 +80,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$pager->pageSize = 500;
 		while(true)
 		{
-			$this->impersonate($profile->partnerId);
-			$result = $scheduledTaskClient->scheduledTaskProfile->query($profile->id, $pager);
-			$this->unimpersonate();
+			$result = ScheduledTaskBatchHelper::query($this->getClient(), $profile, $pager);
 			if (!count($result->objects))
 				break;
 
@@ -148,6 +145,8 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	}
 
 	/**
+	 * Update the profile last execution time so we would have profiles rotation in case one execution dies
+	 *
 	 * @param KalturaScheduledTaskProfile $profile
 	 */
 	protected function updateProfileBeforeExecution(KalturaScheduledTaskProfile $profile)

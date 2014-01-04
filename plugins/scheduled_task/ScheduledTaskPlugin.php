@@ -2,12 +2,14 @@
 /**
  * @package plugins.scheduledTask
  */
-class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
+class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator, IKalturaObjectLoader, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'scheduledTask';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
+
+	const BATCH_JOB_FLOW_MANAGER = 'kScheduledTaskBatchJobFlowManager';
 
 	public static function getPluginName()
 	{
@@ -73,14 +75,57 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('ScheduledTaskBatchType');
+			return array('ScheduledTaskBatchType', 'ScheduledTaskBatchJobObjectType');
 
 		if($baseEnumName == 'BatchJobType')
 			return array('ScheduledTaskBatchType');
 
+		if($baseEnumName == 'BatchJobObjectType')
+			return array('ScheduledTaskBatchJobObjectType');
+
 		return array();
 	}
 
+	/**
+	 * Returns an object that is known only to the plugin, and extends the baseClass.
+	 *
+	 * @param string $baseClass The base class of the loaded object
+	 * @param string $enumValue The enumeration value of the loaded object
+	 * @param array $constructorArgs The constructor arguments of the loaded object
+	 * @return object
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ScheduledTaskBatchType::SCHEDULED_TASK))
+			return new KalturaScheduledTaskJobData();
+
+		return null;
+	}
+
+	/**
+	 * Retrieves a class name that is defined by the plugin and is known only to the plugin, and extends the baseClass.
+	 *
+	 * @param string $baseClass The base class of the searched class
+	 * @param string $enumValue The enumeration value of the searched class
+	 * @return string The name of the searched object's class
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if($baseClass == 'KalturaJobData' && $enumValue == self::getApiValue(ScheduledTaskBatchType::SCHEDULED_TASK))
+			return 'KalturaScheduledTaskJobData';
+
+		return null;
+	}
+
+	/**
+	 * Retrieves the event consumers used by the plugin.
+	 *
+	 * @return array The list of event consumers
+	 */
+	public static function getEventConsumers()
+	{
+		return array(self::BATCH_JOB_FLOW_MANAGER);
+	}
 
 	/**
 	 * @param $valueName
@@ -89,5 +134,23 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
+
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobObjectType', $value);
 	}
 }

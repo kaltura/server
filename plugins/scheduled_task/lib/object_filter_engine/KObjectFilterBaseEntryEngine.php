@@ -4,37 +4,14 @@
  * @package plugins.scheduledTask
  * @subpackage lib.objectFilterEngine
  */
-class KObjectFilterBaseEntryEngine extends KObjectFilterServiceEngine
+class KObjectFilterBaseEntryEngine extends KObjectFilterEngineBase
 {
 	/**
-	 * @return string
+	 * @param KalturaFilter $filter
+	 * @return array
 	 */
-	function getServiceId()
+	public function query(KalturaFilter $filter)
 	{
-		return strtolower($this->getServiceName());
-	}
-
-	/**
-	 * @return string
-	 */
-	function getServiceName()
-	{
-		return 'baseEntry';
-	}
-
-	/**
-	 * @return string
-	 */
-	function getActionName()
-	{
-		return 'list';
-	}
-
-	/**
-	 * @return BaseEntryService
-	 */
-	function getServiceInstance()
-	{
-		return new BaseEntryService();
+		return $this->_client->baseEntry->listAction($filter, $this->getPager());
 	}
 }
