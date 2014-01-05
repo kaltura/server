@@ -514,7 +514,9 @@ class KalturaFrontController
 		{
 			$serializedObject .= $this->serializer->getItemHeader($i);
 			$serializedObject .= $objects[$i];
-			$serializedObject .= $this->serializer->getItemFooter();
+			//check if item is the last one to avoid putting footer chars in json and jsonp serializers
+			if($i+1 != $objectsCount || ($this->format != KalturaResponseType::RESPONSE_TYPE_JSONP && $this->format != KalturaResponseType::RESPONSE_TYPE_JSON))
+				$serializedObject .= $this->serializer->getItemFooter();
 		}
 		$serializedObject .= $this->serializer->getMulitRequestFooter();
 		
