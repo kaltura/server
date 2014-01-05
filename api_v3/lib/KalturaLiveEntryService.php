@@ -63,7 +63,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
@@ -93,7 +93,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
@@ -119,7 +119,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	function validateRegisteredMediaServersAction($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		/* @var $dbEntry LiveEntry */
