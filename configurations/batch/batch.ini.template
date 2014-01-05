@@ -45,6 +45,7 @@ enabledWorkers.KAsyncTransformMetadata				= 1
 enabledWorkers.KAsyncDispatchEventNotification		= 1
 enabledWorkers.KAsyncIndex							= 4
 enabledWorkers.KAsyncDelete							= 4
+enabledWorkers.KAsyncDeleteFile						= 1
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
@@ -575,6 +576,8 @@ type												= KAsyncDelete
 maximumExecutionTime								= 1200
 scriptPath											= batches/Delete/KAsyncDeleteExe.php
 
+
+
 [KAsyncMoveCategoryEntries : JobHandlerWorker]
 id													= 440
 friendlyName										= Move Categories Entries
@@ -649,3 +652,12 @@ friendlyName										= CopyPartner
 type												= KAsyncCopyPartner
 maximumExecutionTime								= 12000
 scriptPath											= batches/CopyPartner/KAsyncCopyPartnerExe.php
+
+[KAsyncDeleteFile : JobHandlerWorker]
+id													= 530
+name												= KAsyncDeleteFile
+friendlyName										= Delete
+type												= KAsyncDeleteFile
+maximumExecutionTime								= 1200
+scriptPath											= batches/DeleteFile/KAsyncDeleteFileExe.php
+maxInstances										= 1
