@@ -135,6 +135,9 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		{
 			foreach ($data->extraDestFileSyncs as $destFileSync) 
 			{
+				$ext = pathinfo($destFileSync->fileSyncLocalPath, PATHINFO_EXTENSION);
+				$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid.'.'.$ext;
+				$err = null;
 				if(!$this->fetchFile($destFileSync->fileSyncRemoteUrl, $destFileSync->fileSyncLocalPath, $err))
 				{
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, $err, KalturaBatchJobStatus::ALMOST_DONE);
