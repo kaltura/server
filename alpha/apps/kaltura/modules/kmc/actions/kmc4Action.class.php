@@ -106,11 +106,11 @@ class kmc4Action extends kalturaAction
 		}
 
 		/** get partner languae **/
-		$language = "es_ES";
-		/* 
+		//$language = "es_ES";
+		 
 		if ($partner->getKMCLanguage())
 			$language = $partner->getKMCLanguage();
-*/	
+	
 		$first_login = $partner->getIsFirstLogin();
 		if ($first_login === true)
 		{
