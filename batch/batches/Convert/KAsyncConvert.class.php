@@ -331,8 +331,10 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	private function moveExtraFiles(KalturaConvertJobData &$data, $sharedFile)
 	{
+		$i=0;
 		foreach ($data->extraDestFileSyncs as $destFileSync) 
 		{
+			$i++;
 			clearstatcache();
 			$directorySync = is_dir($destFileSync->fileSyncLocalPath);
 			if($directorySync)
@@ -340,8 +342,11 @@ class KAsyncConvert extends KJobHandlerWorker
 			else
 				$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 
-			$ext = pathinfo($data->destFileSyncLocalPath, PATHINFO_EXTENSION);
-			$newName = $sharedFile.'.'.$ext;
+			$ext = pathinfo($destFileSync->fileSyncLocalPath, PATHINFO_EXTENSION);
+			if($ext)
+				$newName = $sharedFile.'.'.$ext;
+			else
+				$newName = $sharedFile.'.'.$i;
 			
 			kFile::moveFile($destFileSync->fileSyncLocalPath, $newName);
 				
