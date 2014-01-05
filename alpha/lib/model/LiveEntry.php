@@ -200,6 +200,10 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("dvr_window", $v);
 	}
 	
+	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
+	
+	
 	public function setLiveStreamConfigurations(array $v)
 	{
 		$this->putInCustomData('live_stream_configurations', $v);
@@ -229,7 +233,7 @@ abstract class LiveEntry extends entry
 		if($mediaServer)
 		{
 			$streamName = $this->getStreamName();
-			if(is_null($tag) && $this->getConversionProfileId())
+			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
 			$manifestUrl = $mediaServer->getManifestUrl($protocol);

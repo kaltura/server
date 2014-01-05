@@ -501,7 +501,7 @@ class playManifestAction extends kalturaAction
 	protected function initFlavorAssetArray()
 	{
 		// check whether the flavor asset list is needed
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
+		if ($this->entry instanceof LiveEntry)
 			return;			// live stream entries don't have flavors
 		
 		$oneOnly = false;
@@ -1074,7 +1074,7 @@ class playManifestAction extends kalturaAction
 	 */
 	private function buildRtmpLiveStreamFlavorsArray()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
 		{
 			$flavors = array(
 				0 => array(
@@ -1383,7 +1383,7 @@ class playManifestAction extends kalturaAction
 	
 	private function serveLiveEntry()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM && !$this->entry->hasMediaServer())
+		if (($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL) && !$this->entry->hasMediaServer())
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
 		
 		$baseUrl = $this->getLiveEntryBaseUrl();
@@ -1530,7 +1530,8 @@ class playManifestAction extends kalturaAction
 			$renderer = $this->serveVodEntry();
 			break;
 			
-		case entryType::LIVE_STREAM:
+		case entryType::LIVE_STREAM:			
+		case entryType::LIVE_CHANNEL:
 			// Live stream
 			$renderer = $this->serveLiveEntry();
 			break;

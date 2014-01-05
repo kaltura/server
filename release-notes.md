@@ -3,6 +3,24 @@
  
 # IX-9.8.0 #
 
+## VOD to Live ##
+Demo version only, enables broadcasting a live-channel base on playlist.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_01_live_channel_services.php
+
+*DB*
+
+- Add live_channel_segment table - deployment/updates/sql/2014_01_01_create_live_channel_segment_table.sql
+
+
+*Media Server*
+- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.0.jar "KalturaWowzaServer.jar")
+
+
 ## Enforce max concurrent streams ##
 - New partner configuration fields in admin console.
 - New API action liveStream.authenticate.
@@ -87,13 +105,17 @@ Add support for intermediate flow to on-prem installations as well.
 - Repopulate sphinx entries
 
 
-## Bulk Upload from Filter � infrastructure ##
+## Bulk Upload from Filter – infrastructure ##
 
 Deployment instructions:
 
 1. Update the code and clients
-2. Update plugins.ini � add BulkUploadFilter plugin
+2. Update plugins.ini – add BulkUploadFilter plugin
 3. Run installPlugins.php
+
+
+
+
 
 ## HTML5 Studio Deployment ##
 * Update base.ini with studio_version
