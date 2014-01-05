@@ -92,8 +92,11 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	
 	public static function shouldCreateLockObject(BatchJob $batchJob, $isNew, PropelPDO $con = null) 
 	{
-		if($isNew)
-			return true;
+		if($isNew) {
+			if(in_array($batchJob->getStatus(), self::getSchedulingRequiredStatusList()))
+				return true;
+			return false;
+		}
 		
 		$oldStatus = $batchJob->getColumnsOldValue(BatchJobPeer::STATUS);
 		$oldValueInClosed = is_null($oldStatus) ? false : in_array($oldStatus, BatchJobPeer::getClosedStatusList());

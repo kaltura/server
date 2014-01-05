@@ -4076,7 +4076,7 @@ kmc.utils = {
 		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
 		$("#flash_wrap").height(doc_height + "px");
 		$("#server_wrap iframe").height(doc_height + "px");
-		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
+		$("#server_wrap").css("margin-top", "-"+ (doc_height + 4) +"px");
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
@@ -4190,7 +4190,7 @@ kmc.utils = {
 	openIframe : function(url) {
 		$("#flash_wrap").css("visibility","hidden");
 		$("#server_frame").attr("src", url);
-		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
+		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 4) +"px");
 		$("#server_wrap").show();
 	},
 	
