@@ -20,7 +20,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		{
 			$origEntryId = $filter->get( '_eq_redirect_from_entry_id' );
 			
-			$partners = array (0,kCurrentContext::getCurrentPartnerId());
+			$partners = array (PartnerPeer::GLOBAL_PARTNER,kCurrentContext::getCurrentPartnerId());
 			
 			$c = new Criteria();
 			$c->add(entryPeer::ID , $origEntryId );
