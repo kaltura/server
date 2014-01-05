@@ -233,7 +233,7 @@ abstract class LiveEntry extends entry
 		if($mediaServer)
 		{
 			$streamName = $this->getStreamName();
-			if(is_null($tag) && $this->getConversionProfileId())
+			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
 			$manifestUrl = $mediaServer->getManifestUrl($protocol);
