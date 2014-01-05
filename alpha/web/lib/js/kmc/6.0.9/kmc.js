@@ -1,4 +1,4 @@
-/*! KMC - v6.0.9 - 2013-08-26
+/*! KMC - v6.0.9 - 2013-12-30
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2013 Ran Yefet; Licensed GNU */
 /*! Kaltura Embed Code Generator - v1.0.6 - 2013-02-28
@@ -3048,6 +3048,9 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 		};
 
 	var setDeliveryTypes = function(player) {
+			if( $scope.liveBitrates && $scope.liveBitrates != false ) {
+				previewService.setDeliveryType('auto');
+			}
 			var deliveryTypes = Preview.objectToArray(kmc.vars.delivery_types);
 			var defaultType = $scope.deliveryType || Preview.getDefault('deliveryType');
 			var validDeliveryTypes = [];
@@ -3081,9 +3084,10 @@ kmcApp.controller('PreviewCtrl', ['$scope', 'previewService', function($scope, p
 					}
 					return true;
 				}
-				// Check for library minimum version to eanble embed type
+				// Check for library minimum version to enable embed type
 				var libVersion = kmc.functions.getVersionFromPath(player.html5Url);
-				if(this.minVersion && !kmc.functions.versionIsAtLeast(this.minVersion, libVersion)) {
+                if((this.minVersion && !kmc.functions.versionIsAtLeast(this.minVersion, libVersion)) ||
+                    (libVersion[0] == "2" && this.id == "legacy")) {
 					if(this.id == defaultType) {
 						defaultType = null;
 					}
