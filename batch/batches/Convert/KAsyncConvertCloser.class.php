@@ -136,7 +136,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			foreach ($data->extraDestFileSyncs as $destFileSync) 
 			{
 				$ext = pathinfo($destFileSync->fileSyncLocalPath, PATHINFO_EXTENSION);
-				$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid.'.'.$ext;
+				$destFileSync->fileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid.'.'.$ext;
 				$err = null;
 				if(!$this->fetchFile($destFileSync->fileSyncRemoteUrl, $destFileSync->fileSyncLocalPath, $err))
 				{
