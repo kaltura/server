@@ -311,7 +311,7 @@ abstract class BaseMetadataProfileFieldPeer {
 			}
 		}
 	}
-	
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
 	 *  
@@ -319,9 +319,15 @@ abstract class BaseMetadataProfileFieldPeer {
 	 */
 	public static function addInstancesToPool($queryResult)
 	{
-		foreach ($queryResult as $curResult)
+		if (Propel::isInstancePoolingEnabled())
 		{
-			MetadataProfileFieldPeer::addInstanceToPool($curResult);
+			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
+			{  
+				foreach ($queryResult as $curResult)
+				{
+					MetadataProfileFieldPeer::addInstanceToPool($curResult);
+				}
+			}
 		}
 	}
 	
@@ -604,12 +610,20 @@ abstract class BaseMetadataProfileFieldPeer {
 	 */
 	public static function addInstanceToPool(MetadataProfileField $obj, $key = null)
 	{
-		if (Propel::isInstancePoolingEnabled()) {
-			if ($key === null) {
+		if ( Propel::isInstancePoolingEnabled() )
+		{
+			if ( $key === null )
+			{
 				$key = (string) $obj->getId();
-			} // if key === null
-			self::$instances[$key] = $obj;
-			kMemoryManager::registerPeer('MetadataProfileFieldPeer');
+			}
+				
+			if ( isset( self::$instances[$key] )											// Instance is already mapped?
+					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+				)
+			{
+				self::$instances[$key] = $obj;
+				kMemoryManager::registerPeer('MetadataProfileFieldPeer');
+			}
 		}
 	}
 
