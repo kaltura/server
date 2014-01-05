@@ -200,6 +200,10 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("dvr_window", $v);
 	}
 	
+	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
+	
+	
 	public function setLiveStreamConfigurations(array $v)
 	{
 		$this->putInCustomData('live_stream_configurations', $v);
