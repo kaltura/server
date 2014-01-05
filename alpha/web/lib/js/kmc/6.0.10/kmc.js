@@ -3294,11 +3294,8 @@ if ( window.XDomainRequest ) {
 		previewService.disableEvents();
 		// In case of live entry preview, set delivery type to auto
 		if( options.liveBitrates ) {
-            previewService.set('live', true);
 			previewService.setDeliveryType('auto');
-		}else{
-            previewService.set('live',false);
-        }
+		}
 		// Update our players
 		previewService.updatePlayers(options);
 		previewService.enableEvents();
@@ -3386,15 +3383,12 @@ if ( window.XDomainRequest ) {
 		return (previewService.get('secureEmbed')) ? 'https' : 'http';
 	};
 
-	Preview.getEmbedFlashVars = function(previewService, previewPlayer) {
-		var protocol = this.getEmbedProtocol(previewService, previewPlayer);
+	Preview.getEmbedFlashVars = function(previewService, addKs) {
+		var protocol = this.getEmbedProtocol(previewService, addKs);
 		var player = previewService.get('player');
 		var flashVars = this.getDeliveryTypeFlashVars(previewService.get('deliveryType'));
-		if(previewPlayer === true) {
+		if(addKs === true) {
 			flashVars.ks = kmc.vars.ks;
-            if (previewService.get('live') == true){
-                flashVars.disableEntryRedirect = true;
-            }
 		}
 
 		var playlistId = previewService.get('playlistId');
@@ -3488,7 +3482,7 @@ var kmcApp = angular.module('kmcApp', ['pascalprecht.translate']);
 
 kmcApp.config(['$translateProvider', function ($translateProvider) {
 	$translateProvider.useStaticFilesLoader({
-		prefix: './lib/locales/locale-',
+		prefix: '/locales/locale-',
 		suffix: '.json'
 	});
 	var lang = kmc.vars.language || 'en';
@@ -4076,7 +4070,7 @@ kmc.utils = {
 		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
 		$("#flash_wrap").height(doc_height + "px");
 		$("#server_wrap iframe").height(doc_height + "px");
-		$("#server_wrap").css("margin-top", "-"+ (doc_height + 4) +"px");
+		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
@@ -4190,7 +4184,7 @@ kmc.utils = {
 	openIframe : function(url) {
 		$("#flash_wrap").css("visibility","hidden");
 		$("#server_frame").attr("src", url);
-		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 4) +"px");
+		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();
 	},
 	
