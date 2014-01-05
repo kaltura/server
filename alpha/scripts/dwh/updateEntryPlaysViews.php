@@ -27,7 +27,7 @@ while($s = trim(fgets($f))){
 
 		try {
 			// update entry without setting the updated at
-			$updateSql = "UPDATE entry set views='$views',plays='$plays' WHERE id='$entryId'";
+			$updateSql = "UPDATE entry set views='$views',plays='$plays',last_played_at=NOW() WHERE id='$entryId'";
 			$stmt = $connection->prepare($updateSql);
 			$stmt->execute();
 			$affectedRows = $stmt->rowCount();
