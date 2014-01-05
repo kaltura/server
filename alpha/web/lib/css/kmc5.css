@@ -82,7 +82,7 @@ form div.buttons button:hover{ color:#cdcdd0; }
 /*--------------------------------
 	main container
 ---------------------------------*/
-#main{ min-height: 548px; z-index: 44; background-color:#F7F7F7;  margin: 0; position:relative; overflow:hidden; bottom:1px; }
+#main{ min-height: 548px; z-index: 44; background-color:#F7F7F7;  margin: 0; position:relative; overflow:hidden; bottom:1px; clear:both; }
 #main.help_page { background-color:#f4f4f6; }
 #main ul { height:29px; background:url(../images/kmc/navbar.gif) 0 -29px repeat-x; overflow:hidden; }
 #main ul li { float:left; width:9em; height:29px; line-height:29px; text-align:center; display:inline; padding:0 5px 0 7px; background:url(../images/kmc/menu_sep.gif) 0 center no-repeat; }
