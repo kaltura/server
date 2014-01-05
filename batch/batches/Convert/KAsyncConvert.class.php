@@ -340,7 +340,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			if($directorySync)
 				$fileSize=KBatchBase::foldersize($destFileSync->fileSyncLocalPath);
 			else
-				$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
+				$fileSize = kFile::fileSize($destFileSync->fileSyncLocalPath);
 
 			$ext = pathinfo($destFileSync->fileSyncLocalPath, PATHINFO_EXTENSION);
 			if($ext)
