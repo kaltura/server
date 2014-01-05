@@ -33,6 +33,13 @@ class SphinxEntryCriteria extends SphinxCriteria
 			
 			if ( ! empty( $origEntry ) )
 			{
+				if ( $origEntry->getType() == entryType::LIVE_STREAM )
+				{
+					// Set a relatively short expiry value in order to reduce the wait-time
+					// until the cache is refreshed and a redirection kicks-in. 
+					kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
+				}
+								
 				// Get the id of the entry id that is being redirected from the original entry
 				$redirectEntryId = $origEntry->getRedirectEntryId(); 
 				
