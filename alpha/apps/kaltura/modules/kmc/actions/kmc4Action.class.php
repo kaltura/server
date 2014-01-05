@@ -106,10 +106,11 @@ class kmc4Action extends kalturaAction
 		}
 
 		/** get partner languae **/
-		$language = null; 
+		$language = "es_ES";
+		/* 
 		if ($partner->getKMCLanguage())
 			$language = $partner->getKMCLanguage();
-	
+*/	
 		$first_login = $partner->getIsFirstLogin();
 		if ($first_login === true)
 		{
@@ -151,8 +152,9 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 		
-		$this->content_uiconfs_studio_v2 = array_values(kmcUtils::getStudioUiconf());
-
+		$this->studioUiConf = kmcUtils::getStudioUiconf();
+		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
+		
 
 		$kmcVars = array(
 			'kmc_version'				=> $this->kmc_swf_version,
@@ -195,7 +197,8 @@ class kmc4Action extends kalturaAction
 			),
 			'studio'					=> array(
                 'version'				=> kConf::get("studio_version"),
-                'uiConfID'				=> $this->content_uiconfs_studio_v2[0]->getId(),
+                'uiConfID'				=> isset($this->content_uiconfs_studio_v2) ? $this->content_uiconfs_studio_v2[0]->getId() : '',
+                'config'				=> isset($this->content_uiconfs_studio_v2) ? $this->content_uiconfs_studio_v2[0]->getConfig() : '',
             ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
