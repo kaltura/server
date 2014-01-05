@@ -60,75 +60,75 @@ var kmc = {
 <div id="previewModal" class="modal preview_embed" ng-controller="PreviewCtrl">
 	<div class="title clearfix">
 		<h2></h2>
-		<span class="close icon"></span>		
+		<span class="close icon"></span>
 		<a class="help icon" href="javascript:kmc.utils.openHelp('section_pne');"></a>
 	</div>
 	<div class="content row-fluid">
 		<div class="span4 options form-horizontal">
 			<div ng-show="liveBitrates">
 				<div class="control-group">
-					<label class="control-label">Live Bitrates: </label>
+					<label class="control-label">{{ 'LIVE_BITRATES' | translate }}</label>
 				</div>
 				<ul ng-repeat="bitrate in liveBitrates">
-					<li>{{bitrate.bitrate}} kbps, {{bitrate.width}}x{{bitrate.height}}</li>
+					<li>{{bitrate.bitrate}} {{ 'KBPS' | translate }}, {{bitrate.width}}x{{bitrate.height}}</li>
 				</ul>
 				<div class="hr"></div>
 			</div>
 			<div class="control-group" ng-hide="playerOnly">
-				<label class="control-label">Select Player: </label>
+				<label class="control-label">{{ 'SELECT_PLAYER' | translate }}</label>
 				<div class="controls">
 					<select id="player" ng-model="player" ng-options="p.id as p.name for p in players"></select>
 				</div>
-				<small class="help-block">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</small>
+				<small class="help-block">{{ 'SELECT_PLAYER_HELP' | translate }}</small>
 				<div class="hr"></div>
 			</div>
 			<div class="control-group advance">
 				<div class="arrow-right pull-left" ng-hide="showAdvancedOptionsStatus"></div>
-				<a ng-hide="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, true)" href="#">Show Advanced Options</a>
+				<a ng-hide="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, true)" href="#">{{ 'SHOW_ADVANCED_OPTIONS' | translate }}</a>
 				<div class="arrow-down pull-left" ng-show="showAdvancedOptionsStatus"></div>
-				<a ng-show="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, false)" href="#">Hide Advanced Options</a>
+				<a ng-show="showAdvancedOptionsStatus" ng-click="showAdvancedOptions($event, false)" href="#">{{ 'HIDE_ADVANCED_OPTIONS' | translate }}</a>
 			</div>
 			<div class="hr"></div>
 			<div show-slide="showAdvancedOptionsStatus">
 				<div class="control-group" ng-hide="liveBitrates">
-					<label class="control-label">Delivery Type: </label>
+					<label class="control-label">{{ 'DELIVERY_TYPE' | translate }}</label>
 					<div class="controls"><select ng-model="deliveryType" ng-options="d.id as d.label for d in deliveryTypes"></select></div>
-					<small class="help-block">Adaptive Streaming automatically adjusts to the viewer's bandwidth, while Progressive Download allows buffering of the content. <a href="javascript:kmc.utils.openHelp('section_pne_stream');">Read more</a></small>
-					<div class="hr"></div>					
+					<small class="help-block">{{ 'DELIVERY_TYPE_HELP' | translate }} <a href="javascript:kmc.utils.openHelp('section_pne_stream');">{{ 'READ_MORE' | translate }}</a></small>
+					<div class="hr"></div>
 				</div>
 				<div class="control-group">
-					<label class="control-label">Embed Type: </label>
+					<label class="control-label">{{ 'EMBED_TYPE' | translate }}</label>
 					<div class="controls"><select ng-model="embedType" ng-options="e.id as e.label for e in embedTypes"></select></div>
-					<small class="help-block">Auto embed is the default embed code type and is best to get a player quickly on a page without any runtime customizations. <a href="javascript:kmc.utils.openHelp('section_pne_embed');">Read more</a> about the different embed code types.</small>
+					<small class="help-block">{{ 'EMBED_TYPE_HELP' | translate }} <a href="javascript:kmc.utils.openHelp('section_pne_embed');">{{ 'READ_MORE' | translate }}</a> {{ 'EMBED_TYPE_HELP2' | translate }}</small>
 				</div>
 				<div class="hr"></div>
 				<div class="control-group">
-					<label class="checkbox"><input type="checkbox" ng-model="includeSeo"> Include Search Engine Optimization data</label>
-					<label class="checkbox"><input type="checkbox" ng-model="secureEmbed"> Support for HTTPS embed code</label>
+					<label class="checkbox"><input type="checkbox" ng-model="includeSeo"> {{ 'INCLUDE_SEO_LABEL' | translate }}</label>
+					<label class="checkbox"><input type="checkbox" ng-model="secureEmbed"> {{ 'HTTPS_SUPPORT_LABEL' | translate }}</label>
 				</div>
 				<div class="hr"></div>
 			</div>
 			<div>
 				<div class="control-group clearfix">
-					<label class="control-label">Preview: </label>
+					<label class="control-label">{{ 'PREVIEW' | translate }}</label>
 				</div>
 				<div class="qr-block">
-					<small class="help-block">Scan the QR code to preview in your mobile device</small>
-					<div ng-hide="shortLinkGenerated" class="qr-placeholder"><div class="qr-text">Generating...</div></div>
+					<small class="help-block">{{ 'SCAN_QR_CODE' | translate }}</small>
+					<div ng-hide="shortLinkGenerated" class="qr-placeholder"><div class="qr-text">{{ 'GENERATING' | translate }}</div></div>
 					<div ng-show="shortLinkGenerated" id="qrcode"></div>
 					<div class="hr"></div>
 				</div>
-				<small class="help-block">View a standalone page with this player</small>
+				<small class="help-block">{{ 'VIEW_STANDALONE_PREVIEW_PAGE' | translate }}</small>
 				<div class="urlBox"><a href="{{previewUrl}}" target="_blank">{{previewUrl}}</a></div>
 			</div>
 			<div ng-hide="previewOnly">
 				<div class="hr"></div>
 				<div class="control-group">
-					<label class="control-label">Embed Code: </label>
+					<label class="control-label">{{ 'EMBED_CODE' | translate }}</label>
+					<button class="btn copy-code" data-clipboard-target="embedCode">{{ 'COPY' | translate }}</button>
 				</div>
 				<div class="input-append">
 				  <textarea class="span2" id="embedCode" readonly>{{embedCode}}</textarea>
-				  <button class="btn copy-code" data-clipboard-target="embedCode">Copy</button>
 				</div>
 			</div>
 		</div>
