@@ -49,6 +49,8 @@ enabledWorkers.KAsyncDeleteFile						= 1
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
+enabledWorkers.KScheduledTaskRunner					= 1
+enabledWorkers.KScheduledTaskDryRunner				= 1
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
@@ -661,3 +663,14 @@ type												= KAsyncDeleteFile
 maximumExecutionTime								= 1200
 scriptPath											= batches/DeleteFile/KAsyncDeleteFileExe.php
 maxInstances										= 1
+
+[KScheduledTaskDryRunner : JobHandlerWorker]
+id													= 540
+type												= KScheduledTaskDryRunner
+scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskDryRunnerExe.php
+params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
+
+[KScheduledTaskRunner : PeriodicWorker]
+type												= KScheduledTaskRunner
+maximumExecutionTime								= 600
+scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
