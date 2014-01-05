@@ -122,7 +122,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			// Expected behavior
@@ -137,7 +137,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			// Expected behavior
@@ -152,7 +152,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			// Expected behavior
@@ -164,7 +164,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			// Expected behavior
@@ -176,7 +176,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			// Expected behavior
@@ -188,7 +188,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			assertEquals("Invalid object : UnknownObjectType", e.getMessage());
@@ -200,7 +200,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams());
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaObjectFactory.create(resultXmlElement);
+			KalturaObjectFactory.create(resultXmlElement, null);
 			fail();
 		} catch (Exception e) {
 			assertEquals("Invalid object : NSString", e.getMessage());
@@ -217,7 +217,7 @@ public class ErrorTest extends BaseTest {
 		mockClient.queueServiceCall("system", "ping", new KalturaParams()); // Just since we need something in the queue
 		Element resultXmlElement = mockClient.doQueue();
 		try {
-			KalturaMediaListResponse res = (KalturaMediaListResponse) KalturaObjectFactory.create(resultXmlElement);
+			KalturaMediaListResponse res = (KalturaMediaListResponse) KalturaObjectFactory.create(resultXmlElement, null);
 			assertEquals(2, res.totalCount);
 			KalturaMediaEntry entry1 = res.objects.get(0);
 			KalturaMediaEntry entry2 = res.objects.get(1);

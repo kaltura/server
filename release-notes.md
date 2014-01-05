@@ -21,6 +21,26 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 - Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.0.jar "KalturaWowzaServer.jar")
 
 
+## Enforce max concurrent streams ##
+- New partner configuration fields in admin console.
+- New API action liveStream.authenticate.
+- New media server version - 1.1.0
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_12_30_liveStream_authenticate.php
+
+*Media Server*
+
+- Redeploy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+
+
+
+
+
+
 ## Admin console boost entry jobs ##
 A new button was added to the Admin page which allows you to boost the jobs of the entry.
 
@@ -92,6 +112,19 @@ Deployment instructions:
 1. Update the code and clients
 2. Update plugins.ini – add BulkUploadFilter plugin
 3. Run installPlugins.php
+
+
+
+
+
+## HTML5 Studio Deployment ##
+* Update base.ini with studio_version
+* Located the studio folder: /opt/kaltura/apps/studio/ (create it if it doesn't exist)
+* Create a sub folder within the studio folder. Name it by the version of the studio (for example: v0.1)
+* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases
+* Execute deployment script on studio.ini file (located in studio project root):
+From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
+
 
 ---------
  
@@ -209,6 +242,4 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
-
-
 

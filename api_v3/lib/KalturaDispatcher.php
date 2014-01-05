@@ -68,7 +68,6 @@ class KalturaDispatcher
 		$actionParams = $actionReflector->getActionParams();
 		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
-
 		kCurrentContext::$host = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		kCurrentContext::$user_ip = requestUtils::getRemoteAddress();
 		kCurrentContext::$ps_vesion = "ps3";
@@ -113,7 +112,20 @@ class KalturaDispatcher
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");
-		$res =  $actionReflector->invoke( $this->arguments );
+		try
+		{
+			$res =  $actionReflector->invoke( $this->arguments );
+		}
+		catch (KalturaAPIException $e)
+		{
+			if ($actionInfo->returnType != 'file')
+			{
+				 throw ($e);
+			}
+					
+			KalturaResponseCacher::adjustApiCacheForException($e);
+			$res = new kRendererDieError ($e->getCode(), $e->getMessage());
+		 }
 		
 		kEventsManager::flushEvents();
 		

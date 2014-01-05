@@ -40,7 +40,7 @@ function searchFolder($pluginsFolder, $level = 1)
 
 $origWD = getcwd();
 
-$rootFolder = realpath(dirname(__FILE__)."/../..");
+$rootFolder = realpath(dirname(__FILE__)."/../../../../..");
 
 // Core
 $alphaConfigFolder = "$rootFolder/alpha/config";

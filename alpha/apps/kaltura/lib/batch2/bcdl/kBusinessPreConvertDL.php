@@ -330,6 +330,14 @@ class kBusinessPreConvertDL
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 			
+			if($srcAsset->getType() == assetType::THUMBNAIL)
+			{
+				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
+				if(!file_exists($tempDir))
+					mkdir($tempDir, 0700, true);
+				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . "." . $srcAsset->getFileExt();
+			}
+
 			$quality = $destThumbParamsOutput->getQuality();
 			$cropType = $destThumbParamsOutput->getCropType();
 			$cropX = $destThumbParamsOutput->getCropX();

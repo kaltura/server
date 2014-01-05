@@ -169,7 +169,7 @@ package com.kaltura.delegates {
 
 		protected function formatRequest():void {
 			//The configuration is stronger then the args
-			if (_config.partnerId != null && _call.args["partnerId"] == -1)
+			if (_config.partnerId != null && (!_call.args["partnerId"] || _call.args["partnerId"]==-1))
 				_call.setRequestArgument("partnerId", _config.partnerId);
 
 			if (_config.ks != null)
