@@ -256,44 +256,46 @@ class KAsyncConvert extends KJobHandlerWorker
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
 		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
-		
-		if(!$data->destFileSyncLocalPath)
-		{
-			$job->status = KalturaBatchJobStatus::FINISHED;
-			$job->message = "No file to move";
-			return $this->closeJob($job, null, null, $job->message, $job->status, $data);
-		}
-			
+				
 		$uniqid = uniqid("convert_{$job->entryId}_");
 		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
 				
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
-			clearstatcache();
-			$directorySync = is_dir($data->destFileSyncLocalPath);
-			if($directorySync)
-				$fileSize=KBatchBase::foldersize($data->destFileSyncLocalPath);
-			else
-				$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
-			
-			kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
-			
-			// directory sizes may differ on different devices
-			if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
+			$destFileExists = false;			
+			if(count($data->extraDestFileSyncs))
 			{
-				KalturaLog::err("Error: moving file failed");
-				die();
+				$this->moveExtraFiles($data, $sharedFile);
+			}			
+			if($data->destFileSyncLocalPath)
+			{
+				clearstatcache();
+				$directorySync = is_dir($data->destFileSyncLocalPath);
+				if($directorySync)
+					$fileSize=KBatchBase::foldersize($data->destFileSyncLocalPath);
+				else
+					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
+				
+				kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
+				
+				// directory sizes may differ on different devices
+				if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
+				{
+					KalturaLog::err("Error: moving file failed");
+					die();
+				}				
+				$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
+				if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+					$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
+				else if ($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
+					$destFileExists = true;
 			}
-			
-			$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
-			
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 			{
-				$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
 				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
 				$job->message = "File ready for download";
 			}
-			elseif($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
+			elseif(!$data->destFileSyncLocalPath || $destFileExists)
 			{
 				$job->status = KalturaBatchJobStatus::FINISHED;
 				$job->message = "File moved to shared";
@@ -325,5 +327,37 @@ class KAsyncConvert extends KJobHandlerWorker
 		}
 		
 		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
+	}
+	
+	private function moveExtraFiles(KalturaConvertJobData &$data, $sharedFile)
+	{
+		foreach ($data->extraDestFileSyncs as $destFileSync) 
+		{
+			clearstatcache();
+			$directorySync = is_dir($destFileSync->fileSyncLocalPath);
+			if($directorySync)
+				$fileSize=KBatchBase::foldersize($destFileSync->fileSyncLocalPath);
+			else
+				$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
+
+			$ext = pathinfo($data->destFileSyncLocalPath, PATHINFO_EXTENSION);
+			$newName = $sharedFile.'.'.$ext;
+			
+			kFile::moveFile($destFileSync->fileSyncLocalPath, $newName);
+				
+			// directory sizes may differ on different devices
+			if(!file_exists($newName) || (is_file($newName) && kFile::fileSize($newName) != $fileSize))
+			{
+				KalturaLog::err("Error: moving file failed");
+				die();
+			}
+				
+			$destFileSync->fileSyncLocalPath = $this->translateLocalPath2Shared($newName);
+			
+			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+			{
+				$destFileSync->fileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($destFileSync->fileSyncLocalPath);
+			}					
+		}
 	}
 }

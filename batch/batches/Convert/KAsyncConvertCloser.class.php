@@ -175,6 +175,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		}
 		
 		clearstatcache();
+		$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 		$this->moveSingleFile($data->destFileSyncLocalPath, $sharedFile);
 		
 		$data->destFileSyncLocalPath = $sharedFile;
