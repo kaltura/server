@@ -17,6 +17,8 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 - Add live_channel_segment table - deployment/updates/sql/2014_01_01_create_live_channel_segment_table.sql
 
 
+*Media Server*
+- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.0.jar "KalturaWowzaServer.jar")
 
 
 ## Admin console boost entry jobs ##
