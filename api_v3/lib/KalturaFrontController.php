@@ -13,6 +13,8 @@ class KalturaFrontController
 	private $service = "";
 	private $action = "";
 	private $disptacher = null;
+	private $format;
+	private $serializer;
 	
     private function KalturaFrontController()
     {
@@ -88,6 +90,14 @@ class KalturaFrontController
 		set_error_handler(array(&$this, "errorHandler"));
 		
 		KalturaLog::debug("Params [" . print_r($this->params, true) . "]");
+		
+		if (isset($_REQUEST["ignoreNull"]))
+			$ignoreNull = ($_REQUEST["ignoreNull"] === "1") ? true : false;
+		else
+			$ignoreNull = false;
+			
+		$this->setSerializerByFormat($ignoreNull);
+		
 		if ($this->service == "multirequest")
 		{
 		    set_exception_handler(null);
@@ -110,11 +120,6 @@ class KalturaFrontController
 			}
 	        $this->onRequestEnd($success, $errorCode);
 		}
-		
-		if (isset($_REQUEST["ignoreNull"]))
-			$ignoreNull = ($_REQUEST["ignoreNull"] === "1") ? true : false;
-		else
-			$ignoreNull = false;
 
 		ob_end_clean();
 		
@@ -128,6 +133,8 @@ class KalturaFrontController
 		// arrange the parameters by request index
 		$commonParams = array();
 		$listOfRequests = array();
+		$dependencies = array(); 
+		$pastResults = array();
 		foreach ($this->params as $paramName => $paramValue)
 		{
 			$explodedName = explode(':', $paramName, 2);
@@ -144,6 +151,16 @@ class KalturaFrontController
 				$listOfRequests[$requestIndex] = array();
 			}
 			$listOfRequests[$requestIndex][$paramName] = $paramValue;
+			
+			$matches = array();
+			if (preg_match('/\{([0-9]*)\:result\:?(.*)?\}/', $paramValue, $matches))
+			{
+				$pastResultsIndex = $matches[0];
+				$resultIndex = $matches[1];
+				$resultKey = $matches[2];
+				if(!isset($dependencies[$requestIndex][pastResultsIndex]))
+					$dependencies[$resultIndex][pastResultsIndex] =  $resultKey;
+			}
 		}
 			
 		// process the requests
@@ -173,7 +190,7 @@ class KalturaFrontController
 			{
 				$currentParams['partnerId'] = $commonParams['partnerId'];
 			}
-					        
+
 	        // check if we need to replace params with prev results
 	        foreach($currentParams as $key => &$val)
 	        {
@@ -186,17 +203,12 @@ class KalturaFrontController
 				// {1:result:playlistContent}
                 if (preg_match('/\{([0-9]*)\:result\:?(.*)?\}/', $val, $matches))
                 {
+                	$pastResultsIndex = $matches[0]; 
                     $resultIndex = $matches[1];
-                    $resultKey = $matches[2];
                     
                     if (count($results) >= $resultIndex) // if the result index is valid
                     {
-                        if (strlen(trim($resultKey)) > 0)
-                            $resultPathArray = explode(":",$resultKey);
-                        else
-                            $resultPathArray = array();
-                            
-                        $val = $this->getValueFromObject($results[$resultIndex], $resultPathArray);
+                        $val = $pastResults[$pastResultsIndex];
                     }
                 }
 	        }
@@ -238,8 +250,22 @@ class KalturaFrontController
 				$cache->storeCache($currentResult, "", true);
 			}
 			$this->onRequestEnd($success, $errorCode, $i);
+			
+			if(isset($dependencies[$i]))
+            {
+				foreach($dependencies[$i] as $currentDependency => $dependencyName)
+				{
+					if (strlen(trim($dependencyName)) > 0)
+						$resultPathArray = explode(":",$dependencyName);
+					else
+                    	$resultPathArray = array();
+					
+                    $currValue = $this->getValueFromObject($currentResult, $resultPathArray);
+					$pastResults[$currentDependency] = $currValue;
+				}
+            }
 	        
-            $results[$i] = $currentResult;
+			$results[$i] = $this->serializer->serialize($currentResult);
             
             // in case a serve action is included in a multirequest, return only the result of the serve action
             // in order to avoid serializing the kRendererBase object and returning the internal server paths to the client
@@ -411,21 +437,13 @@ class KalturaFrontController
 		}
 	}
 	
-	public function serializeResponse($object, $ignoreNull = false)
+	public function setSerializerByFormat($ignoreNull = false)
 	{
-		if ($object instanceof kRendererBase)
-		{
-			return $object;
-		}
-		
-		$start = microtime(true);
-		KalturaLog::debug("Serialize start");
-
 		// Determine the output format (or default to XML)
-		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
+		$this->format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
 		
 		// Create a serializer according to the given format
-		switch($format)
+		switch($this->format)
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
 				$serializer = new KalturaXmlSerializer($ignoreNull);
@@ -444,11 +462,24 @@ class KalturaFrontController
 				break;
 			    
 			default:
-				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $format);
+				$serializer = KalturaPluginManager::loadObject('KalturaSerializer', $this->format);
 				break;
 		}
+		
+		$this->serializer = $serializer; 
+	}
+	
+	public function serializeResponse($object)
+	{
+		if ($object instanceof kRendererBase)
+		{
+			return $object;
+		}
+		
+		$start = microtime(true);
+		KalturaLog::debug("Serialize start");
 
-		if ( ! empty( $serializer ) ) // Got a serializer for the given format?
+		if ( ! empty( $this->serializer ) ) // Got a serializer for the given format?
 		{
 			// Set HTTP headers
 			if(isset($this->params['content-type']))
@@ -457,41 +488,36 @@ class KalturaFrontController
 			}
 			else
 			{
-				$serializer->setHttpHeaders();
+				$$this->serializer->setHttpHeaders();
 			}
 
-			// Serialize the object
-			$serializedObject = $serializer->serialize($object);
+			// Check if this is multi request if yes than object are already serialized so we will skip otherwise serialize the object
+			if ($this->service != "multirequest")
+				$serializedObject = $this->serializer->serialize($object);
+			else
+				$serializedObject = $this->handleSerializedObjectArray($object);
 			
 			// Post processing (handle special cases)
-			switch($format)
-			{
-				case KalturaResponseType::RESPONSE_TYPE_XML:
-					$result = 
-						'<?xml version="1.0" encoding="utf-8"?>' .
-						'<xml>' .
-							'<result>' .
-								$serializedObject .
-							'</result>' .
-							'<executionTime>' . ($this->end - $this->start) . '</executionTime>' .
-						'</xml>';
-					break;
-
-				case KalturaResponseType::RESPONSE_TYPE_JSONP:
-					$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
-					if (is_null($callback))
-						die("Expecting \"callback\" parameter for jsonp format");
-					$response = array();
-					$result = $callback . "(" . $serializedObject . ");";
-					break;
-					
-				default:
-					$result = $serializedObject;
-					break;
-			}
+			$result = $this->serializer->getHeader() . $serializedObject . $this->serializer->getFooter($this->end - $this->start);
 		}
 		
 		KalturaLog::debug("Serialize took - " . (microtime(true) - $start));
 		return $result;
+	}
+	
+	public function handleSerializedObjectArray($objects)
+	{
+		$objectsCount = count($objects);
+		$serializedObject = '';
+		$serializedObject .= $this->serializer->getMulitRequestHeader($objectsCount);
+		for($i = 0 ; $i < $objectsCount; $i++)
+		{
+			$serializedObject .= $this->serializer->getItemHeader($i);
+			$serializedObject .= $objects[$i];
+			$serializedObject .= $this->serializer->getItemFooter();
+		}
+		$serializedObject .= $this->serializer->getMulitRequestFooter();
+		
+		return $serializedObject;
 	}
 }
