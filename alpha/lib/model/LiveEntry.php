@@ -100,7 +100,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
+		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['mediaServers']))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
@@ -368,16 +368,14 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
 			return;
 		
-		$servers = $this->getMediaServers();
-		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
-		
-		$this->putInCustomData("mediaServers", $servers);
+		$server = new kLiveMediaServer($index, $serverId, $hostname);
+		$this->putInCustomData($index, $server, 'mediaServers');
 	}
 	
 	protected function isMediaServerRegistered($index, $serverId)
 	{
-		$servers = $this->getMediaServers();
-		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
+		$server = $this->getFromCustomData($index, 'mediaServers');
+		if($server && $server->getMediaServerId() == $serverId)
 			return true;
 		
 		return false;
@@ -385,11 +383,9 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $serverId)
 	{
-		$servers = $this->getMediaServers();
-		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
-			unset($servers[$index]);
-		
-		$this->putInCustomData("mediaServers", $servers);
+		$server = $this->getFromCustomData($index, 'mediaServers');
+		if($server && $server->getMediaServerId() == $serverId)
+			$server = $this->removeFromCustomData($index, 'mediaServers');
 	}
 	
 	/**
@@ -398,17 +394,16 @@ abstract class LiveEntry extends entry
 	public function validateMediaServers()
 	{
 		$listChanged = false;
-		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
+		$mediaServers = $this->getFromCustomData(null, 'mediaServers', array());
 		foreach($mediaServers as $index => $mediaServer)
 		{
 			if(! $this->isCacheValid($mediaServer))
 			{
 				$listChanged = true;
-				unset($mediaServers[$index]);
+				$this->removeFromCustomData($index, 'mediaServers');
 			}
 		}
 		
-		$this->putInCustomData("mediaServers", $mediaServers);
 		return $listChanged;
 	}
 	
@@ -417,7 +412,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServers()
 	{
-		return $this->getFromCustomData("mediaServers", null, array());
+		return $this->getFromCustomData(null, 'mediaServers', array());
 	}
 	
 	/* (non-PHPdoc)
