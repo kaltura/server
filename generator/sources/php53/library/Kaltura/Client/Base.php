@@ -70,9 +70,9 @@ class Base
 	private $shouldLog = false;
 	
 	/**
-	 * @var bool
+	 * @var Array of classes
 	 */
-	private $isMultiRequest = false;
+	private $multiRequestReturnType = null;
 	
 	/**
 	 * @var array<\Kaltura\Client\ServiceActionCall>
@@ -127,7 +127,6 @@ class Base
 		
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
-		$this->isMultiRequest = false; 
 		
 		$params = array_merge($params, $call->params);
 		$signature = $this->signature($params);
@@ -139,7 +138,7 @@ class Base
 		return $url;
 	}
 
-	public function queueServiceActionCall($service, $action, $params = array(), $files = array())
+	public function queueServiceActionCall($service, $action, $returnType, $params = array(), $files = array())
 	{
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
 		if (!isset($params["partnerId"]) || $params["partnerId"] === -1)
@@ -148,6 +147,8 @@ class Base
 		$this->addParam($params, "ks", $this->ks);
 		
 		$call = new ServiceActionCall($service, $action, $params, $files);
+		if(!is_null($this->multiRequestReturnType))
+			$this->multiRequestReturnType[] = $returnType;
 		$this->callsQueue[] = $call;
 	}
 	
@@ -160,7 +161,7 @@ class Base
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->isMultiRequest = false; 
+			$this->multiRequestReturnType = null; 
 			return null;
 		}
 			 
@@ -177,7 +178,7 @@ class Base
 		$this->addParam($params, "ignoreNull", true);
 		
 		$url = $this->config->getServiceUrl()."/api_v3/index.php?service=";
-		if ($this->isMultiRequest)
+		if (count($this->multiRequestReturnType))
 		{
 			$url .= "multirequest";
 			$i = 1;
@@ -200,8 +201,7 @@ class Base
 		
 		// reset
 		$this->callsQueue = array();
-		$this->isMultiRequest = false; 
-		
+				
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 		
@@ -473,7 +473,7 @@ class Base
 	
 	public function startMultiRequest()
 	{
-		$this->isMultiRequest = true;
+		$this->multiRequestReturnType = array();
 	}
 	
 	public function doMultiRequest()
@@ -482,23 +482,27 @@ class Base
 		$xml = new \SimpleXMLElement($xmlData);
 		$items = $xml->result->children();
 		$ret = array();
+		$i = 0;
 		foreach($items as $item) {
-			$error = ParseUtils::checkIfError($item);
+			$error = ParseUtils::checkIfError($item, false);
 			if($error)
 				$ret[] = $error;
 			else if($item->objectType)
-				$ret[] = ParseUtils::unmarshalObject($item);
+				$ret[] = ParseUtils::unmarshalObject($item, $this->multiRequestReturnType[$i]);
 			else if($item->item)
-				$ret[] = ParseUtils::unmarshalArray($item);
+				$ret[] = ParseUtils::unmarshalArray($item, $this->multiRequestReturnType[$i]);
 			else			
 				$ret[] = ParseUtils::unmarshalSimpleType($item);
+			$i++;
 		}
+		
+		$this->multiRequestReturnType = null;
 		return $ret;
 	}
 	
 	public function isMultiRequest()
 	{
-		return $this->isMultiRequest;	
+		return count($this->multiRequestReturnType);	
 	}
 		
 	public function getMultiRequestQueueSize()

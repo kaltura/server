@@ -9,7 +9,7 @@ $generalError = array(
 	KalturaErrors::ACTION_DOES_NOT_EXISTS => array("%ACTION_NAME%", "%SERVICE_NAME%"),
 	KalturaErrors::MISSING_MANDATORY_PARAMETER => array("%PARAMETER_NAME%"),
 	KalturaErrors::INVALID_OBJECT_TYPE => array("%OBJECT_TYPE%"),
-	KalturaErrors::INVALID_ENUM_VALUE => array("%GIVEN_VALUE%", "%PARAMETER_NAME%", "%ENUM_TYPE"),
+	KalturaErrors::INVALID_ENUM_VALUE => array("%GIVEN_VALUE%", "%PARAMETER_NAME%", "%ENUM_TYPE%"),
 	KalturaErrors::INVALID_PARTNER_ID => array("%PARTNER_ID%"),
 	KalturaErrors::INVALID_SERVICE_CONFIGURATION => array("%SERVICE_NAME%", "%ACTION_NAME%"),
 	KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL => array("%PROPERTY_NAME%"),
@@ -118,13 +118,12 @@ The following table lists few possible general API error codes and their equival
 <?php foreach($generalError as $error => $errorParams): ?>
 <tr class="<?php echo ($odd) ? "odd" : ""; ?>">
 <?php
-	$ex = new KalturaAPIException(null); 
-	call_user_func_array(array($ex, 'KalturaAPIException'), array_merge(array($error), $errorParams));  
+	$errorData = APIErrors::getErrorData( $error, $errorParams );
 ?>
-	<td><?php echo $ex->getCode(); ?></td>
-	<td><?php echo $ex->getMessage(); ?></td>
+	<td><?php echo $errorData['code']; ?></td>
+	<td><?php echo $errorData['message']; ?></td>
 </tr>
-<?php $odd = !$odd; ?>
+	<?php $odd = !$odd; ?>
 <?php endforeach; ?>
 </table>
 

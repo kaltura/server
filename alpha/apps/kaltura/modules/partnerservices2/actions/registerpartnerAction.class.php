@@ -81,8 +81,8 @@ class registerpartnerAction extends defPartnerservices2Action
 			catch ( Exception $ex )
 			{
 				// this assumes the partner name is unique - TODO - remove key from DB !
-				$this->addError( "Partner with name already exists" );
-				$this->addError( $ex->getMessage() );
+				$this->addError( APIErrors::SERVERL_ERROR, "Partner with name already exists" );
+				$this->addError( APIErrors::SERVERL_ERROR, $ex->getMessage() );
 				return;
 			}
 

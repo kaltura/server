@@ -3,6 +3,26 @@
  
 # IX-9.8.0 #
 
+## Enforce max concurrent streams ##
+- New partner configuration fields in admin console.
+- New API action liveStream.authenticate.
+- New media server version - 1.1.0
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_12_30_liveStream_authenticate.php
+
+*Media Server*
+
+- Redeploy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+
+
+
+
+
+
 ## Admin console boost entry jobs ##
 A new button was added to the Admin page which allows you to boost the jobs of the entry.
 
