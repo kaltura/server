@@ -373,12 +373,12 @@ abstract class LiveEntry extends entry
 			return;
 		
 		$server = new kLiveMediaServer($index, $serverId, $hostname);
-		$this->putInCustomData($index, $server, 'mediaServers');
+		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	
 	protected function isMediaServerRegistered($index, $serverId)
 	{
-		$server = $this->getFromCustomData($index, 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", 'mediaServers');
 		if($server && $server->getMediaServerId() == $serverId)
 			return true;
 		
@@ -387,9 +387,9 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $serverId)
 	{
-		$server = $this->getFromCustomData($index, 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", 'mediaServers');
 		if($server && $server->getMediaServerId() == $serverId)
-			$server = $this->removeFromCustomData($index, 'mediaServers');
+			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
 	}
 	
 	/**
@@ -399,12 +399,12 @@ abstract class LiveEntry extends entry
 	{
 		$listChanged = false;
 		$mediaServers = $this->getFromCustomData(null, 'mediaServers', array());
-		foreach($mediaServers as $index => $mediaServer)
+		foreach($mediaServers as $key => $mediaServer)
 		{
 			if(! $this->isCacheValid($mediaServer))
 			{
 				$listChanged = true;
-				$this->removeFromCustomData($index, 'mediaServers');
+				$this->removeFromCustomData($key, 'mediaServers');
 			}
 		}
 		
