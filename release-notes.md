@@ -17,7 +17,7 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 
 
 *Media Server*
-- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.0.jar "KalturaWowzaServer.jar")
+- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.1.jar "KalturaWowzaServer.jar")
 
 
 *Configuration*
