@@ -105,9 +105,7 @@ class kmc4Action extends kalturaAction
 			$ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 		}
 
-		/** get partner languae **/
-		//$language = "es_ES";
-		 
+		$language = null;
 		if ($partner->getKMCLanguage())
 			$language = $partner->getKMCLanguage();
 	
