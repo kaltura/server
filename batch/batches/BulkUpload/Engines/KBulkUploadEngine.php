@@ -279,6 +279,23 @@ abstract class KBulkUploadEngine
 		return $this->data;
 	}
 
+
+	/**
+	 * @param KalturaBatchJob $job
+	 */
+	public function setJob(KalturaBatchJob $job)
+	{
+		$this->job = $job;
+	}
+
+	/**
+	 * @param KalturaBulkUploadJobData $data
+	 */
+	public function setData(KalturaBulkUploadJobData $data)
+	{
+		$this->data = $data;
+	}
+	
 	/**
 	 * @return bool
 	 */
