@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-01-05
+/*! KMC - v6.0.10 - 2014-01-06
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Ran Yefet; Licensed GNU */
 /**
@@ -3294,8 +3294,11 @@ if ( window.XDomainRequest ) {
 		previewService.disableEvents();
 		// In case of live entry preview, set delivery type to auto
 		if( options.liveBitrates ) {
+            previewService.set('live', true);
 			previewService.setDeliveryType('auto');
-		}
+		}else{
+            previewService.set('live',false);
+        }
 		// Update our players
 		previewService.updatePlayers(options);
 		previewService.enableEvents();
@@ -3383,12 +3386,15 @@ if ( window.XDomainRequest ) {
 		return (previewService.get('secureEmbed')) ? 'https' : 'http';
 	};
 
-	Preview.getEmbedFlashVars = function(previewService, addKs) {
-		var protocol = this.getEmbedProtocol(previewService, addKs);
+	Preview.getEmbedFlashVars = function(previewService, previewPlayer) {
+		var protocol = this.getEmbedProtocol(previewService, previewPlayer);
 		var player = previewService.get('player');
 		var flashVars = this.getDeliveryTypeFlashVars(previewService.get('deliveryType'));
-		if(addKs === true) {
+		if(previewPlayer === true) {
 			flashVars.ks = kmc.vars.ks;
+            if (previewService.get('live') == true){
+                flashVars.disableEntryRedirect = true;
+            }
 		}
 
 		var playlistId = previewService.get('playlistId');
