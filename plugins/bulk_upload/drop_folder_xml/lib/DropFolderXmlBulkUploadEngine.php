@@ -26,6 +26,24 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	 */
 	private $contentResourceNameToIdMap = null;
 	
+	
+	public function __construct(KalturaBatchJob $job)
+	{
+		parent::__construct($job);
+		
+		KBatchBase::impersonate($this->currentPartnerId);
+		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::$kClient->startMultiRequest();
+		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
+		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
+		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
+				
+		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
+		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
+		
+		KBatchBase::unimpersonate();
+	}
+	
 	/* (non-PHPdoc)
 	 * @see BulkUploadEngineXml::getSchemaType()
 	 */
@@ -43,15 +61,9 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		
 		KBatchBase::impersonate($this->currentPartnerId);
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
-		KBatchBase::$kClient->startMultiRequest();
-		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
-		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
-		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
-				
-		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
-		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
 		$this->setContentResourceFilesMap($dropFolderPlugin);
 		KBatchBase::unimpersonate();
+		
 		parent::handleBulkUpload();
 	}
 	
