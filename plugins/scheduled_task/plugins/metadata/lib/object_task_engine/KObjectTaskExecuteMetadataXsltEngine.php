@@ -39,5 +39,6 @@ class KObjectTaskExecuteMetadataXsltEngine extends KObjectTaskEntryEngineBase
 
 		$metadataId = $metadataResult->objects[0]->id;
 		$metadataPlugin->metadata->updateFromXSL($metadataId, $xsltFilePath);
+		unlink($xsltFilePath);
 	}
 }

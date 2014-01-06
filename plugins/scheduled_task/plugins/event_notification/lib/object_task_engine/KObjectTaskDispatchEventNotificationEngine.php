@@ -19,21 +19,9 @@ class KObjectTaskDispatchEventNotificationEngine extends KObjectTaskEntryEngineB
 		$client = $this->getClient();
 		$templateId = $objectTask->eventNotificationTemplateId;
 		$eventNotificationPlugin = KalturaEventNotificationClientPlugin::get($client);
-		$data = new KalturaEventNotificationDispatchJobData();
-
-		$objectProperties = get_object_vars($object);
-		foreach($objectProperties as $property => $value)
-		{
-			// append only scalar variables and nulls
-			if (!is_null($value) && !is_scalar($value))
-				continue;
-
-			$keyValue = new KalturaKeyValue();
-			$keyValue->key = $property;
-			$keyValue->value = (string)$value;
-			$data->contentParameters[] = $keyValue;
-		}
-		$data->templateId = $templateId;
-		$eventNotificationPlugin->eventNotificationTemplate->dispatch($templateId, $data);
+		$scope = new KalturaEventNotificationScope();
+		$scope->objectId =$object->id;
+		$scope->scopeObjectType = KalturaEventNotificationEventObjectType::ENTRY;
+		$eventNotificationPlugin->eventNotificationTemplate->dispatch($templateId, $scope);
 	}
 }
