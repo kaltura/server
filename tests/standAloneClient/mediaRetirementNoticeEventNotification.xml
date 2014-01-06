@@ -12,7 +12,7 @@
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaEmailNotificationTemplate">
 				<name>Media Retirement Notice</name>
-				<systemName>MEDIA_RETIREMENT_NOTICE</systemName>
+				<systemName>Media_Retirement_Notice</systemName>
 				<automaticDispatchEnabled>0</automaticDispatchEnabled>
 				<contentParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
