@@ -1,4 +1,3 @@
-
 ----------
  
 # IX-9.8.0 #
@@ -19,6 +18,12 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 
 *Media Server*
 - Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.0.jar "KalturaWowzaServer.jar")
+
+
+*Configuration*
+- Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+ 
+
 
 
 ## Enforce max concurrent streams ##
