@@ -24,6 +24,7 @@ if(!file_exists($inFile))
 	echo "Input file is missing [$inFile]\n";
 	exit(-1);
 }
+$variables = array();
 
 /* --------  Parse input XML -------- */
 
@@ -89,6 +90,17 @@ function parseInputObject(SimpleXMLElement $input = null)
 	{
 		$userInput = askForUserParameter($matches[1]);
 		$value = preg_replace('/\{prompt:[^}]+\}/', $userInput, $value);
+	}
+
+	if(preg_match('/\{php:([^}]+)\}/', $value, $matches))
+	{
+		$value = eval($matches[1]);
+	}
+
+	if(preg_match('/\{variable:([^}]+)\}/', $value, $matches))
+	{
+		global $variables;
+		$value = isset($variables[$matches[1]]) ? $variables[$matches[1]] : null;
 	}
 	
 	if(isset($input['path']))
@@ -257,6 +269,18 @@ class KalturaStandAloneTestLogger implements IKalturaLogger
 
 $config = new KalturaConfiguration();
 $config->setLogger(new KalturaStandAloneTestLogger());
+$client = new KalturaClient($config);
+if(isset($inXml->variables))
+{
+	$variablesXml = $inXml->variables->children();
+	foreach($variablesXml as $variableXml)
+	{
+		if (!isset($variableXml['name']))
+			continue;
+		$variableValue = parseInputObject($variableXml);
+		$variables[strval($variableXml['name'])] = $variableValue;
+	}
+}
 if(isset($inXml->config))
 {
 	$configs = $inXml->config->children();
