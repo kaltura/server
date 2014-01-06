@@ -2,7 +2,7 @@
 /**
  * @package plugins.playReady
  */
-class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView
+class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissions, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'playReady';
 	const SEARCH_DATA_SUFFIX = 's';
@@ -217,6 +217,17 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 	public static function getPlayReadyConfigParam($key)
 	{
 		return DrmPlugin::getConfigParam(self::PLUGIN_NAME, $key);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }
 
