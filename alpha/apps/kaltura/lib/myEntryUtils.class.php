@@ -1197,10 +1197,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
-			$categoryId = self::getDstCategoryEntryIdBasedOnSrcCategoryEntryId( $entry->getPartnerId(), $categoryEntry->getCategoryId(), $newEntry->getPartnerId() );
-			if($categoryId)
+			$categoryId = self::getDstCategoryIdBasedOnSrcCategoryId( $entry->getPartnerId(), $categoryEntry->getCategoryId(), $newEntry->getPartnerId() );
+			if ( $categoryId !== false )
+			{
 				$newCategoryEntry->setCategoryId($categoryId);
-			
+			}
+
 			categoryPeer::setUseCriteriaFilter(false);
 			entryPeer::setUseCriteriaFilter(false);
 			$newCategoryEntry->save();
@@ -1219,19 +1221,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  	 * @param int $dstPartnerId
  	 * @return int|false The category id on the dst. partner, or false in case of any error
  	 */
- 	private static function getDstCategoryEntryIdBasedOnSrcCategoryEntryId( $srcPartnerId, $srcPartnerCategoryId, $dstPartnerId )
+ 	private static function getDstCategoryIdBasedOnSrcCategoryId( $srcPartnerId, $srcPartnerCategoryId, $dstPartnerId )
  	{
  		$dstCategoryId = false;
  		
  		categoryPeer::setUseCriteriaFilter(false);
  		
  		// Get the source partner's category based on the given source category id
- 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-//		$c->addAnd(categoryPeer::PARTNER_ID, $srcPartnerId);
-		$c->addAnd(categoryPeer::CATEGORY_ID, $srcPartnerCategoryId);
-
 		/* @var $srcCategory category */
-		$srcCategory = categoryPeer::doSelectOne($c);
+		$srcCategory = categoryPeer::retrieveByPk( $srcPartnerCategoryId );
 		
 		if ( $srcCategory )
 		{
