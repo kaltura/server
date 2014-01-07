@@ -492,13 +492,17 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		$resultNode = $actionNode->getElementsByTagName ( "result" )->item ( 0 );
 		$resultType = $resultNode->getAttribute ( "type" );
+		
 		$arrayType = '';
-		$fallbackClass = '';
+		$fallbackClass = null;
 		if ($resultType == "array") {
 			$arrayType = $resultNode->getAttribute ( "arrayType" );
+			$fallbackClass = $arrayType;
 		}
+    	else if($resultType && ($resultType != 'file') && !$this->isSimpleType($resultType))
+    		$fallbackClass = $resultType;
 		
-	  	$javaOutputType = $this->getResultType($resultType, $arrayType, $serviceImports, $fallbackClass);
+	  	$javaOutputType = $this->getResultType($resultType, $arrayType, $serviceImports);
 		
 		$signaturePrefix = "public $javaOutputType " . $action . "(";
 		
@@ -673,12 +677,12 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		// Add files to call
 		if ($haveFiles)
-			if($fallbackClass == "")
+			if(is_null($fallbackClass))
 				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
 			else
 				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles, $fallbackClass.class);" );
 		else
-			if($fallbackClass == "")
+			if(is_null($fallbackClass))
 				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
 			else
 				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, $fallbackClass.class);" );
@@ -895,31 +899,26 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	public function getResultType($resultType, $arrayType, &$serviceImports, &$fallbackClass) 
+	public function getResultType($resultType, $arrayType, &$serviceImports) 
 	{
 		switch ($resultType)
 		{
 		case null :
-			$fallbackClass = null;
 			return "void";
 			
 		case "array" :
 			$serviceImports[] = "java.util.List";
-			$fallbackClass = $arrayType;
 			return ("List<" . $arrayType . ">");
 			
 		case "bool" :
-			$fallbackClass = null;
 			return "boolean";
 			
 		case "file":
 		case "string" :
-			$fallbackClass = null;
 			return "String";
 			
 		default :
 			$serviceImports[] = "com.kaltura.client.types.*";
-			$fallbackClass = $resultType;
 			return $resultType;
 		}
 	}

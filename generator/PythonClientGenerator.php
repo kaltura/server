@@ -631,7 +631,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	    	$fallbackClass = 'None';
 	    	if($resultType == 'array')
 	    		$fallbackClass = $arrayObjectType;
-	    	if($resultType && !in_array($resultType, array('bigint', 'int', 'bool', 'string','array')))
+	    	else if($resultType && !$this->isSimpleType($resultType))
 	    		$fallbackClass = $resultType;
 	    	
 			if ($haveFiles)

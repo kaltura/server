@@ -125,7 +125,7 @@ var kmc = {
 				<div class="hr"></div>
 				<div class="control-group">
 					<label class="control-label">{{ 'EMBED_CODE' | translate }}</label>
-					<button class="btn copy-code" data-clipboard-target="embedCode">{{ 'COPY' | translate }}</button>
+					<button class="btn copy-code pullright" data-clipboard-target="embedCode">{{ 'COPY' | translate }}</button>
 				</div>
 				<div class="input-append">
 				  <textarea class="span2" id="embedCode" readonly>{{embedCode}}</textarea>
