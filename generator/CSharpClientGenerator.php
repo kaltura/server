@@ -663,10 +663,10 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$fallbackClass = 'null';
-	    	if($resultType == 'array')
-	    		$fallbackClass = "\"$arrayObjectType\"";
-	    	if($resultType && !in_array($resultType, array('bigint', 'int', 'bool', 'string','array')))
-	    		$fallbackClass = "\"$resultType\"";
+    	if($resultType == 'array')
+    		$fallbackClass = "\"$arrayObjectType\"";
+    	else if($resultType && !$this->isSimpleType($resultType))
+    		$fallbackClass = "\"$resultType\"";
 		
 		if ($haveFiles)
 			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", $fallbackClass, kparams, kfiles);");

@@ -200,11 +200,6 @@ abstract public class KalturaClientBase {
 		return (requestReturnType != null);
 	}
 
-	public void setMultiRequest(boolean isMultiRequest) {
-		if(isMultiRequest)
-			requestReturnType = new ArrayList<Class<?>>();
-	}
-
 	public void setKalturaConfiguration(KalturaConfiguration kalturaConfiguration) {
 		this.kalturaConfiguration = kalturaConfiguration;
 	}
@@ -509,7 +504,7 @@ abstract public class KalturaClientBase {
 	}
 
 	public void startMultiRequest() {
-		setMultiRequest(true);
+		requestReturnType = new ArrayList<Class<?>>();
 	}
 
 	public Element getElementByXPath(Element element, String xPath) throws KalturaApiException

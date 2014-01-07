@@ -213,7 +213,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	    else
 	    {
 	    	// remote drop folder	
-			$tempFilePath = tempnam($this->tempDirectory, 'parse_dropFolderFileId_'.$fileId.'_');		
+			$tempFilePath = tempnam(KBatchBase::$taskConfig->params->sharedTempPath, 'parse_dropFolderFileId_'.$fileId.'_');		
 			$this->fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
 			return $tempFilePath;
 	    }			    		

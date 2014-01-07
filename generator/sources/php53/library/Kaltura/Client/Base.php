@@ -178,7 +178,7 @@ class Base
 		$this->addParam($params, "ignoreNull", true);
 		
 		$url = $this->config->getServiceUrl()."/api_v3/index.php?service=";
-		if (count($this->multiRequestReturnType))
+		if (!is_null($this->multiRequestReturnType))
 		{
 			$url .= "multirequest";
 			$i = 1;

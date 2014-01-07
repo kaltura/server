@@ -49,7 +49,7 @@ public class MultiRequestTest extends BaseTest{
 	public void testMultiRequest() throws Exception {
 		
 		BaseTest.startAdminSession(client,kalturaConfig);
-		client.setMultiRequest(true);
+		client.startMultiRequest();
 		
 		// 1. Ping (Bool : void)
 		client.getSystemService().ping();
@@ -96,7 +96,7 @@ public class MultiRequestTest extends BaseTest{
 		assertTrue(multi.get(4) instanceof KalturaUploadToken);
 		
 		// Multi request part II:
-		client.setMultiRequest(true);
+		client.startMultiRequest();
 		
 		// execute from filters (Array: Array, int)
 		KalturaMediaEntryFilterForPlaylist filter = new KalturaMediaEntryFilterForPlaylist();
@@ -123,7 +123,7 @@ public class MultiRequestTest extends BaseTest{
 	public void testMultiRequestWithError() throws KalturaApiException {
 		
 		BaseTest.startAdminSession(client,kalturaConfig);
-		client.setMultiRequest(true);
+		client.startMultiRequest();
 		
 		client.getSystemService().ping();
 		client.getMediaService().get("Illegal String");
