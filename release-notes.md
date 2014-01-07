@@ -130,10 +130,10 @@ Deployment instructions:
 
 
 ## HTML5 Studio Deployment ##
-* Update base.ini with studio_version
-* Located the studio folder: /opt/kaltura/apps/studio/ (create it if it doesn't exist)
-* Create a sub folder within the studio folder. Name it by the version of the studio (for example: v0.1)
-* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases
+* Located the studio directory: @BASE_DIR@/apps/studio/ (create it if it doesn't exist)
+	* The directory owner should be apache and its group should be kaltura.
+* Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
+* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
 * Execute deployment script on studio.ini file (located in studio project root):
 From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
 
