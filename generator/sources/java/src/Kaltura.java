@@ -129,7 +129,7 @@ public class Kaltura {
 	private static void multiRequest() throws KalturaApiException
  {
 		KalturaClient client = getKalturaClient();
-		client.setMultiRequest(true);
+		client.startMultiRequest();
 		client.getBaseEntryService().count();
 		client.getPartnerService().getInfo();
 		client.getPartnerService().getUsage(2010);
