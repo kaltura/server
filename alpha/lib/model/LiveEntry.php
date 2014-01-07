@@ -301,6 +301,7 @@ abstract class LiveEntry extends entry
 		foreach($mediaServers as $mediaServer)
 		{
 			/* @var $mediaServer kLiveMediaServer */
+			KalturaLog::debug("mediaServer->getDc [" . $mediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
 			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
 				return $mediaServer->getMediaServer();
 		}
@@ -330,17 +331,18 @@ abstract class LiveEntry extends entry
 		return !$currentDcOnly;
 	}
 	
-	private static function getCacheType($dc)
+	private static function getCacheType()
 	{
-		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . "_$dc";
+		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . '_' . kDataCenterMgr::getCurrentDcId();
 	}
 	
 	private function isCacheValid(kLiveMediaServer $mediaServer)
 	{
-		$cacheType = self::getCacheType($mediaServer->getDc());
+		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 		{
+			KalturaLog::warning("Cache store [$cacheType] not found");
 			$lastUpdate = time() - $mediaServer->getTime();
 			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
 			
@@ -348,6 +350,7 @@ abstract class LiveEntry extends entry
 		}
 		
 		$key = $this->getId() . '_' . $mediaServer->getMediaServerId() . '_' . $mediaServer->getIndex();
+		KalturaLog::debug("Get cache key [$key] from store [$cacheType]");
 		return $cacheStore->get($key);
 	}
 	
@@ -358,7 +361,7 @@ abstract class LiveEntry extends entry
 	 */
 	private function storeInCache($key)
 	{
-		$cacheType = self::getCacheType(kDataCenterMgr::getCurrentDcId());
+		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 			return false;
@@ -366,13 +369,14 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, $serverId, $hostname)
+	public function setMediaServer($index, MediaServer $mediaServer)
 	{
+		$serverId = $mediaServer->getId();
 		$key = $this->getId() . "_{$serverId}_{$index}";
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
 			return;
 		
-		$server = new kLiveMediaServer($index, $serverId, $hostname);
+		$server = new kLiveMediaServer($index, $mediaServer);
 		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	
@@ -404,6 +408,7 @@ abstract class LiveEntry extends entry
 			if(! $this->isCacheValid($mediaServer))
 			{
 				$listChanged = true;
+				KalturaLog::debug("Removing media server [" . $mediaServer->getHostname() . "]");
 				$this->removeFromCustomData($key, 'mediaServers');
 			}
 		}
