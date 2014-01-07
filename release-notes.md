@@ -138,6 +138,9 @@ Deployment instructions:
 * Execute deployment script on studio.ini file (located in studio project root):
 From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
 
+## Fixed a security hole in media.addFromUploaded file ##
+Restricting webcam and uploaded to their designated directories and blocking attempts to access outer directories, with ../../some_sensitive_data_file for example.    
+
 
 ---------
  
