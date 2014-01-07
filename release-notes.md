@@ -138,6 +138,12 @@ Deployment instructions:
 * Execute deployment script on studio.ini file (located in studio project root):
 From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
 
+## Fixed a security hole in media.addFromUploaded file ##
+Restricting webcam and uploaded to their designated directories and blocking attempts to access outer directories, with ../../some_sensitive_data_file for example.
+
+## Fixed Animated GIF thumbnail cropping ##
+Bug fix: When cropping a .gif thumbnail, black margins appear around the crop are not removed.
+Bug fix: File extension of downloaded thumbnails is hardcoded to .jpg instead of the original file's ext.
 
 ---------
  
