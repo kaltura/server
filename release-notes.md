@@ -1,4 +1,3 @@
-
 ----------
  
 # IX-9.8.0 #
@@ -18,7 +17,20 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 
 
 *Media Server*
-- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.0.jar "KalturaWowzaServer.jar")
+- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.1.jar "KalturaWowzaServer.jar")
+
+
+*Configuration*
+
+- Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+ 
+
+*File System*
+
+- Create a symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content 
+ 
+
 
 
 ## Enforce max concurrent streams ##
@@ -118,12 +130,12 @@ Deployment instructions:
 
 
 ## HTML5 Studio Deployment ##
-* Update base.ini with studio_version
-* Located the studio folder: /opt/kaltura/apps/studio/ (create it if it doesn't exist)
-* Create a sub folder within the studio folder. Name it by the version of the studio (for example: v0.1)
-* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases
+* Located the studio directory: @BASE_DIR@/apps/studio/ (create it if it doesn't exist)
+	* The directory owner should be apache and its group should be kaltura.
+* Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
+* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
 * Execute deployment script on studio.ini file (located in studio project root):
-From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
+From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
 
 
 ---------
