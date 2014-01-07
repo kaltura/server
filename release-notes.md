@@ -143,7 +143,7 @@ Restricting webcam and uploaded to their designated directories and blocking att
 
 ## Fixed Animated GIF thumbnail cropping ##
 Bug fix: When cropping a .gif thumbnail, black margins appear around the crop are not removed.
-
+Bug fix: File extension of downloaded thumbnails is hardcoded to .jpg instead of the original file's ext.
 
 ---------
  
