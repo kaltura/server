@@ -375,7 +375,7 @@ class KalturaClient(object):
         raise exceptionObj
 
     def startMultiRequest(self):
-        self.multiRequestReturnType = list()
+        self.multiRequestReturnType = []
         
     def doMultiRequest(self):
         resultXml = self.doQueue()
