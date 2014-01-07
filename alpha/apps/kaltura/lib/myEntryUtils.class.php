@@ -1197,7 +1197,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
-			$categoryId = self::getDstCategoryEntryIdBasedOnSrcCategoryEntryId( $entry->getPartnerId(), $categoryEntry->getId(), $newEntry->getPartnerId() );
+			$categoryId = self::getDstCategoryEntryIdBasedOnSrcCategoryEntryId( $entry->getPartnerId(), $categoryEntry->getCategoryId(), $newEntry->getPartnerId() );
 			if($categoryId)
 				$newCategoryEntry->setCategoryId($categoryId);
 			
@@ -1219,7 +1219,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  	 * @param int $dstPartnerId
  	 * @return int|false The category id on the dst. partner, or false in case of any error
  	 */
- 	private function getDstCategoryEntryIdBasedOnSrcCategoryEntryId( $srcPartnerId, $srcPartnerCategoryId, $dstPartnerId )
+ 	private static function getDstCategoryEntryIdBasedOnSrcCategoryEntryId( $srcPartnerId, $srcPartnerCategoryId, $dstPartnerId )
  	{
  		$dstCategoryId = false;
  		
@@ -1227,15 +1227,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		
  		// Get the source partner's category based on the given source category id
  		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		$c->addAnd(categoryPeer::PARTNER_ID, $srcPartnerId);
+//		$c->addAnd(categoryPeer::PARTNER_ID, $srcPartnerId);
 		$c->addAnd(categoryPeer::CATEGORY_ID, $srcPartnerCategoryId);
 
 		/* @var $srcCategory category */
-		$result = categoryPeer::doSelect($c);
+		$srcCategory = categoryPeer::doSelectOne($c);
 		
-		if ( $result && count( $result ) > 0 )
+		if ( $srcCategory )
 		{
-			$srcCategory = $result[0];
 			$categoryFullName = $srcCategory->getFullName();
 			
 			// Get the dst category based on category name 
@@ -1244,11 +1243,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$c->addAnd(categoryPeer::FULL_NAME, $categoryFullName);
 
 			/* @var $dstCategory category */
-			$result = categoryPeer::doSelect($c);
+			$dstCategory = categoryPeer::doSelectOne($c);
 			
-			if ( $result && count( $result ) > 0 )
+			if ( $dstCategory )
 			{
-				$dstCategory = $result[0];
 				$dstCategoryId = $dstCategory->getId();
 			}
 	 	}
