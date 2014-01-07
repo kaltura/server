@@ -21,7 +21,14 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 
 
 *Configuration*
+
 - Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+ 
+
+*File System*
+
+- Create a symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content 
  
 
 

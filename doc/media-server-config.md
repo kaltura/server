@@ -40,7 +40,9 @@ media_servers.ini is optional and needed only for custom configurations.
 - Wowza media server 3.6.2.16 or above.
 - Java jre 1.7.
 - kaltura group (gid = 613) or any other group that apache user is associated with.
-
+- Write access to @WEB_DIR@/content/recorded directory.
+- Read access to symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content
 
 
 ## Additional libraries: ##
