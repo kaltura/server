@@ -215,7 +215,24 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	    	// remote drop folder	
 			$tempFilePath = tempnam(KBatchBase::$taskConfig->params->sharedTempPath, 'parse_dropFolderFileId_'.$fileId.'_');		
 			$this->fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
+			$this->setFilePermissions ($tempFilePath);
 			return $tempFilePath;
 	    }			    		
+	}
+	
+	protected function setFilePermissions ($filepath)
+	{
+		$chmod = 0640;
+		if(KBatchBase::$taskConfig->getChmod())
+			$chmod = octdec(KBatchBase::$taskConfig->getChmod());
+			
+		KalturaLog::debug("chmod($filepath, $chmod)");
+		@chmod($filepath, $chmod);
+		
+		$chown_name = KBatchBase::$taskConfig->params->fileOwner;
+		if ($chown_name) {
+			KalturaLog::debug("Changing owner of file [$filepath] to [$chown_name]");
+			@chown($filepath, $chown_name);
+		}
 	}
 }
