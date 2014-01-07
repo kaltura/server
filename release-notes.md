@@ -23,6 +23,7 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 *Configuration*
 
 - Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+- Add sharedTempPath param to the Bulk Upload worker configuration
  
 
 *File System*
