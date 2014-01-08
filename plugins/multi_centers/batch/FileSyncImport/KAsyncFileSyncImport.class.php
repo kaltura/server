@@ -426,7 +426,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// fetch the http headers
 		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-		$curlHeaderResponse = $curlWrapper->getHeader();
+		$curlHeaderResponse = $curlWrapper->getHeader($url);
 		$curlError = $curlWrapper->getError();
 		$curlErrorNumber = $curlWrapper->getErrorNumber();
 		$curlWrapper->close();
