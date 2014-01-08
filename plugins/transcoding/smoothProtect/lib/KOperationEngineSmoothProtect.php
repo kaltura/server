@@ -23,10 +23,12 @@ class KOperationEngineSmoothProtect  extends KSingleOutputOperationEngine
 		$pathInfo = pathinfo($this->inFilePath);
 		$ismFilePath = $pathInfo['dirname']."/".$pathInfo['filename'].".ism";
 		$outFilePath = dirname($this->outFilePath);
+			// SmoothPortect is Windows tool, it requires its path params to have Win's folder notation
+		$outFilePath = str_replace("/", "\\", $outFilePath);
+		$ismFilePath = str_replace("/", "\\", $ismFilePath);
 		$paramsStr = " -input $ismFilePath -output $outFilePath ".$this->getLicenseParamsStr();
-		$paramsStr = str_replace("/", "\\", $paramsStr);
 		$exeCmd = str_replace(SmoothProtectPlugin::PARAMS_STUB, $paramsStr, $exeCmd);
-		KalturaLog::info(print_r($this,true));
+		KalturaLog::info($exeCmd);
 		return $exeCmd;
 	}
 
