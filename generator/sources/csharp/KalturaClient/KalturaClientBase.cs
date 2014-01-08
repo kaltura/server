@@ -64,10 +64,6 @@ namespace Kaltura
         public bool IsMultiRequest
         {
             get { return (_MultiRequestReturnType != null); }
-            set { 
-                if(value == true)
-                    _MultiRequestReturnType = new List<string>();
-            }
         }
 
 		public WebHeaderCollection ResponseHeaders

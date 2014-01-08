@@ -112,22 +112,23 @@ while(true)
 			$lastLogs[$dc] = $serverLastLog;
 		}
 		
-		if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
-		{
-			KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
-			continue;
-		}
-		
 		$handledRecords[$dc][] = $sphinxLogId;
 		KalturaLog::log("Sphinx log id $sphinxLogId dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
 
 		try
 		{
-			$sql = $sphinxLog->getSql();
-			$affected = $sphinxCon->exec($sql);
+			if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
+                       {
+                               KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
+                       }
+                       else
+                       {
+                        	$sql = $sphinxLog->getSql();
+                        	$affected = $sphinxCon->exec($sql);
 
-			if(!$affected)
-				$errorInfo = $sphinxCon->errorInfo();
+                        	if(!$affected)
+                              		$errorInfo = $sphinxCon->errorInfo();
+                       }
 
 			// If the record is an historical record, don't take back the last log id
 			if($serverLastLog->getLastLogId() < $sphinxLogId) {

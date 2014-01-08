@@ -21,7 +21,15 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 
 
 *Configuration*
+
 - Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+- Add sharedTempPath param to the Bulk Upload worker configuration
+ 
+
+*File System*
+
+- Create a symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content 
  
 
 
@@ -123,13 +131,19 @@ Deployment instructions:
 
 
 ## HTML5 Studio Deployment ##
-* Update base.ini with studio_version
-* Located the studio folder: /opt/kaltura/apps/studio/ (create it if it doesn't exist)
-* Create a sub folder within the studio folder. Name it by the version of the studio (for example: v0.1)
-* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases
+* Located the studio directory: @BASE_DIR@/apps/studio/ (create it if it doesn't exist)
+	* The directory owner should be apache and its group should be kaltura.
+* Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
+* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
 * Execute deployment script on studio.ini file (located in studio project root):
-From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
+From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
 
+## Fixed a security hole in media.addFromUploaded file ##
+Restricting webcam and uploaded to their designated directories and blocking attempts to access outer directories, with ../../some_sensitive_data_file for example.
+
+## Fixed Animated GIF thumbnail cropping ##
+Bug fix: When cropping a .gif thumbnail, black margins appear around the crop are not removed.
+Bug fix: File extension of downloaded thumbnails is hardcoded to .jpg instead of the original file's ext.
 
 ---------
  

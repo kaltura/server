@@ -62,6 +62,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
+		$entryDc = substr($entryId, 0, 1);
+		if($entryDc != kDataCenterMgr::getCurrentDcId())
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
+			kFileUtils::dumpApiRequest($remoteDCHost);
+		}
+		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -70,7 +77,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbMediaServer)
 			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
 			
-		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer->getId(), $hostname);
+		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer, $hostname);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
@@ -92,6 +99,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
 	{
+		$entryDc = substr($entryId, 0, 1);
+		if($entryDc != kDataCenterMgr::getCurrentDcId())
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
+			kFileUtils::dumpApiRequest($remoteDCHost);
+		}
+		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -118,6 +132,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function validateRegisteredMediaServersAction($entryId)
 	{
+		$entryDc = substr($entryId, 0, 1);
+		if($entryDc != kDataCenterMgr::getCurrentDcId())
+		{
+			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc);
+			kFileUtils::dumpApiRequest($remoteDCHost);
+		}
+		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);

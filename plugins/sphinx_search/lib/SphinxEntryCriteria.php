@@ -18,18 +18,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 
 		if ( $filter->is_set('_eq_redirect_from_entry_id' ) )
 		{
+			$partnerGroup = array(kCurrentContext::getCurrentPartnerId(), PartnerPeer::GLOBAL_PARTNER);
+			$criteriaFilter = entryPeer::getCriteriaFilter();
+			$defaultCriteria = $criteriaFilter->getFilter();
+			$defaultCriteria->remove(entryPeer::PARTNER_ID);
+			$defaultCriteria->add(entryPeer::PARTNER_ID, $partnerGroup, Criteria::IN);
+						
 			$origEntryId = $filter->get( '_eq_redirect_from_entry_id' );
-			
-			$partners = array (PartnerPeer::GLOBAL_PARTNER,kCurrentContext::getCurrentPartnerId());
-			
-			$c = new Criteria();
-			$c->add(entryPeer::ID , $origEntryId );
-			$c->add(entryPeer::PARTNER_ID , $partners , Criteria::IN);
-			$c->add(entryPeer::STATUS ,entryStatus::DELETED , Criteria::NOT_EQUAL);
-			entryPeer::setUseCriteriaFilter(false);
-			$origEntry = entryPeer::doSelectOne($c);
-			entryPeer::setUseCriteriaFilter(true);
-				
+			$origEntry = entryPeer::retrieveByPK($origEntryId);				
 			
 			if ( ! empty( $origEntry ) )
 			{

@@ -204,7 +204,7 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "ignoreNull", true);
 
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
-		if (count($this->multiRequestReturnType))
+		if (!is_null($this->multiRequestReturnType))
 		{
 			$url .= "multirequest";
 			$i = 1;

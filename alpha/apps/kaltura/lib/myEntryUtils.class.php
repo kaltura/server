@@ -1177,8 +1177,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
- 	
+		{
+			try {
+				$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
+			}
+			catch (kCoreException $ex) {
+				//This was added so the all the assets prior to reaching the limit would still be handled
+				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
+					throw $ex;
+				
+				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
+			}
+		}
+		 	
 		// copy relationships to categories
 		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
@@ -1197,10 +1208,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
-			$categoryId = kObjectCopyHandler::getMappedId('category', $newCategoryEntry->getCategoryId());
-			if($categoryId)
+			$categoryId = self::getDstCategoryIdBasedOnSrcCategoryId( $entry->getPartnerId(), $categoryEntry->getCategoryId(), $newEntry->getPartnerId() );
+			if ( $categoryId !== false )
+			{
 				$newCategoryEntry->setCategoryId($categoryId);
-			
+			}
+
 			categoryPeer::setUseCriteriaFilter(false);
 			entryPeer::setUseCriteriaFilter(false);
 			$newCategoryEntry->save();
@@ -1210,6 +1223,48 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return $newEntry;
  	} 	
+ 	
+ 	/**
+ 	 * Get the id of a dst. partner category entry based on the category entry's id on the src. partner (by matching full names)
+ 	 *
+ 	 * @param int $srcPartnerId
+ 	 * @param int $srcPartnerCategoryId
+ 	 * @param int $dstPartnerId
+ 	 * @return int|false The category id on the dst. partner, or false in case of any error
+ 	 */
+ 	private static function getDstCategoryIdBasedOnSrcCategoryId( $srcPartnerId, $srcPartnerCategoryId, $dstPartnerId )
+ 	{
+ 		$dstCategoryId = false;
+ 		
+ 		categoryPeer::setUseCriteriaFilter(false);
+ 		
+ 		// Get the source partner's category based on the given source category id
+		/* @var $srcCategory category */
+		$srcCategory = categoryPeer::retrieveByPk( $srcPartnerCategoryId );
+		
+		if ( $srcCategory )
+		{
+			$categoryFullName = $srcCategory->getFullName();
+			
+			// Get the dst category based on category name 
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$c->addAnd(categoryPeer::PARTNER_ID, $dstPartnerId);
+			$c->addAnd(categoryPeer::FULL_NAME, $categoryFullName);
+
+			/* @var $dstCategory category */
+			$dstCategory = categoryPeer::doSelectOne($c);
+			
+			if ( $dstCategory )
+			{
+				$dstCategoryId = $dstCategory->getId();
+			}
+	 	}
+	 	
+		categoryPeer::setUseCriteriaFilter(true);
+
+		return $dstCategoryId;
+ 	}
+ 	 	
  	/*
  	 * re-index to search index, and recalculate fields.
  	 */

@@ -105,10 +105,11 @@ class kmc4Action extends kalturaAction
 			$ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 		}
 
+		/** get partner languae **/
 		$language = null;
 		if ($partner->getKMCLanguage())
 			$language = $partner->getKMCLanguage();
-	
+
 		$first_login = $partner->getIsFirstLogin();
 		if ($first_login === true)
 		{
@@ -152,6 +153,7 @@ class kmc4Action extends kalturaAction
 		
 		$this->studioUiConf = kmcUtils::getStudioUiconf();
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
+		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		
 
 		$kmcVars = array(
@@ -195,8 +197,8 @@ class kmc4Action extends kalturaAction
 			),
 			'studio'					=> array(
                 'version'				=> kConf::get("studio_version"),
-                'uiConfID'				=> isset($this->content_uiconfs_studio_v2) ? $this->content_uiconfs_studio_v2[0]->getId() : '',
-                'config'				=> isset($this->content_uiconfs_studio_v2) ? $this->content_uiconfs_studio_v2[0]->getConfig() : '',
+                'uiConfID'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getId() : '',
+                'config'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getConfig() : '',
             ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),

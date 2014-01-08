@@ -7,17 +7,9 @@
  */
 class KAsyncFileSyncImport extends KJobHandlerWorker
 {
-	protected $curlWrapper;
-
 	public function run($jobs = null)
 	{
-		$this->curlWrapper = new KCurlWrapper();
-		$this->curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
-		
 		$retJobs = parent::run($jobs);
-		
-		$this->curlWrapper->close();
-		
 		return $retJobs;
 	}
 	/* (non-PHPdoc)
@@ -148,9 +140,11 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// get directory contents
 		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');	
-		$contents = $this->curlWrapper->exec($sourceUrl);
-		$curlError = $this->curlWrapper->getError();
-		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+		$contents = $curlWrapper->exec($sourceUrl);
+		$curlError = $curlWrapper->getError();
+		$curlErrorNumber = $curlWrapper->getErrorNumber();
+		$curlWrapper->close();
 		
 		if ($contents === false || $curlError) {
 			$msg = "Error: $curlError";
@@ -262,10 +256,11 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		
 		// get http body
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 		if($resumeOffset)
 		{
 			// will resume from the current offset
-			$this->curlWrapper->setResumeOffset($resumeOffset);
+			$curlWrapper->setResumeOffset($resumeOffset);
 		}
 		else
 		{
@@ -284,9 +279,10 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 			
 		KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
-		$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
-		$curlError = $this->curlWrapper->getError();
-		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
+		$res = $curlWrapper->exec($sourceUrl, $fileDestination); // download file
+		$curlError = $curlWrapper->getError();
+		$curlErrorNumber = $curlWrapper->getErrorNumber();
+		$curlWrapper->close();
 		
 		KalturaLog::debug("Curl results: $res");
 
@@ -429,9 +425,11 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		$this->updateJob($job, 'Downloading header for ['.$url.']', KalturaBatchJobStatus::PROCESSING);
 		
 		// fetch the http headers
-		$curlHeaderResponse = $this->curlWrapper->getHeader($url);
-		$curlError = $this->curlWrapper->getError();
-		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+		$curlHeaderResponse = $curlWrapper->getHeader($url);
+		$curlError = $curlWrapper->getError();
+		$curlErrorNumber = $curlWrapper->getErrorNumber();
+		$curlWrapper->close();
 		
 		if(!$curlHeaderResponse || !count($curlHeaderResponse->headers))
 		{

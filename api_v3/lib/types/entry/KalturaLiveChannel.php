@@ -14,7 +14,7 @@ class KalturaLiveChannel extends KalturaLiveEntry
 	
 	/**
 	 * Indicates that the segments should be repeated for ever
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $repeat;
 	
