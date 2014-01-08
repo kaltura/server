@@ -23,7 +23,7 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 *Configuration*
 
 - Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
-- Add sharedTempPath param to the Bulk Upload worker configuration
+- Update Bulkupload worker configuration. Added parameters sharedTempPath and fileOwner. The value for sharedTempPath is /web/tmp/bulkupload and needs to be created on the machine.
  
 
 *File System*
