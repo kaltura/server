@@ -1177,19 +1177,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-		{
-			try {
-				$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
-			}
-			catch (kCoreException $ex) {
-				//This was added so the all the assets prior to reaching the limit would still be handled
-				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
-					throw $ex;
-				
-				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
-			}
-		}
-		 	
+			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
+ 	
 		// copy relationships to categories
 		KalturaLog::debug('Copy relationships to categories from entry [' . $entry->getId() . '] to entry [' . $newEntry->getId() . ']');
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
