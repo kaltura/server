@@ -30,6 +30,19 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	// this will be the default value if it is not set in task's configuration under - killPopupsPath
 	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
 	
+	// This is the value that underneath the image is suspected as being a black image
+	const STD_LIMIT = 50;
+	
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+			'CDF V2 Document, Little Endian, Os: MacOS',
+			'CDF V2 Document, Little Endian, Os: Windows',
+			'OpenDocument Text',
+			'PDF document',
+			'Rich Text Format data, version 1, ANSI',
+			'Zip archive data, at least',
+	);
+	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		KalturaLog::debug("document : operator [". print_r($operator, true)."] inFilePath [$inFilePath]"); 
@@ -97,6 +110,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		if(file_exists($killPopupsPath))
 			unlink($killPopupsPath);
 		
+		// Test file type 
+		$errorMsg = null;
+		if(!$this->checkFileType($realInFilePath,$errorMsg))
+			$this->message = $errorMsg;
+		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 
 		$this->outFilePath = $finalOutputPath;
@@ -138,8 +156,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			KalturaLog::notice('document temp  found ['.$tmpFile.'] output file ['.$this->outFilePath.']'); 
 		}
 		
-		
-		// $this->validateOutput($inFilePath, $tmpFile);
+		$this->validateOutput($inFilePath, realpath($tmpFile));
 		
 		$fileUnlockRetries = KBatchBase::$taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
@@ -163,28 +180,68 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 			throw new KOperationEngineException('Cannot rename file ['.$tmpFile.'] to ['.$this->outFilePath.'] - ['.$error.']');
 		}
-		
 		return true;
-		
 	}
 	
 	private function validateOutput($inFilePath, $outFilePath)
 	{
-		$pdfInfo = KBatchBase::$taskConfig->params->pdfInfo;
+		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
+		
+		$errorMsg = null;
+
+		// Check Page count
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
-			$inputNum = $this->getNumberOfPages($pdfInfo, $inFilePath);
-			$outputNum = $this->getNumberOfPages($pdfInfo, $outFilePath);
-			if($inputNum != $outputNum)
-				throw new KOperationEngineException("Output file doesn't match expected page count (input: $inputNum, output: $outputNum) ");
+			$inputPdfInfo = $this->getPdfInfo($pdfInfoExe, $inFilePath);
+			$inputNum = $this->getNumberOfPages($inputPdfInfo);
+			
+			$outputPdfInfo = $this->getPdfInfo($pdfInfoExe, $outFilePath);
+			$outputNum = $this->getNumberOfPages($outputPdfInfo);
+			if($inputNum != $outputNum) {
+				$errorMsg = "Output file doesn't match expected page count (input: $inputNum, output: $outputNum)";
+				$this->message = $errorMsg;
+			}
 		}
 	}
 	
-	private function getNumberOfPages($pdfInfo, $file) 
+	private function checkFileType($filePath, &$errorMsg) {
+	
+		$fileInfo = $this->getFileInfo($filePath);
+		$supportedTypes = $this->SUPPORTED_FILE_TYPES;
+	
+		$isValid = false;
+		foreach ($supportedTypes as $validType)
+		{
+			if (strpos($fileInfo, $validType) !== false)
+				return true;
+		}
+
+		$fileType = explode(':', $fileInfo, 2);
+		$fileType = substr(trim($fileType[1]), 0, 30);
+		$errorMsg = "invalid file type: {$fileType}";
+		return false;
+	}
+	
+	private function getFileInfo($filePath)
 	{
-		$cmd = $pdfInfo . " " . realpath($file);
+		$returnValue = null;
+		$output = null;
+		$command = "file '{$filePath}' 2>&1";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+		return implode("\n",$output);
+	}
+	
+	private function getPdfInfo($pdfInfoExe, $file) {
+		$output = null;
+		$cmd = $pdfInfoExe . " " . realpath($file) . " 2>& 1";
 		exec($cmd, $output);
-		foreach($output as $cur) {
+		return $output;
+	}
+	
+	private function getNumberOfPages($pdfInfo) 
+	{
+		foreach($pdfInfo as $cur) {
 			if(preg_match('/Pages:\s*(\d+)/' , $cur, $matches))
 				return $matches[1];
 		}

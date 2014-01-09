@@ -20,6 +20,11 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	
 	const LEADING_ZEROS_PADDING = '-%03d';
 	
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+			'PDF document',
+	);
+	
 	public function __construct($cmd, $outFilePath)
 	{
 		parent::__construct($cmd,$outFilePath);
@@ -57,19 +62,39 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		
 		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::linkFile($inFilePath, "$inFilePath.jpg"))
 			$inFilePath = "$inFilePath.jpg";
-			
+		
+		// Test input
+		// - Test file type
+		$errorMsg = null;
+		if(!$this->checkFileType(realpath($inFilePath),$errorMsg)) {
+			$this->message = $errorMsg;
+		}
+		
+		// Test password required
+		if($this->testPasswordRequired(realpath($inFilePath))) {
+			$this->message = "Password required.";
+		}
+		
 		parent::operate($operator, realpath($inFilePath), $configFilePath);
-		$imagesListXML = $this->createImagesListXML($outDirPath);
+		
+		$imagesList = kFile::dirList($outDirPath,false);
+		// Test output
+		// - Test black Image
+		$identifyExe = KBatchBase::$taskConfig->params->identify;
+		$firstImage = $outDirPath . DIRECTORY_SEPARATOR . $imagesList[0];
+		if(!$this->testBlackImage($identifyExe, $firstImage, $errorMsg)) {
+			$this->message = $errorMsg;
+		}
+		
+		$imagesListXML = $this->createImagesListXML($imagesList);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
 	    return true;
 	}
 	
-
 	// The returned xml will be stored in the images directory. it than can be downloaded by he user with serveFlavorAction and provide him
 	// information about the created images.
-	private function createImagesListXML($outDirPath){
-		$imagesList = kFile::dirList($outDirPath,false);
+	private function createImagesListXML($imagesList){
 		sort($imagesList);
 		$imagesListXML = new SimpleXMLElement('<'.self::IMAGES_LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
@@ -80,4 +105,73 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		return $imagesListXML;	
 	}
 	
+	private function checkFileType($filePath, &$errorMsg) {
+	
+		$fileInfo = $this->getFileInfo($filePath);
+		$supportedTypes = $this->SUPPORTED_FILE_TYPES;
+	
+		$isValid = false;
+		foreach ($supportedTypes as $validType)
+		{
+			if (strpos($fileInfo, $validType) !== false)
+				return true;
+		}
+	
+		$fileType = explode(':', $fileInfo, 2);
+		$fileType = substr(trim($fileType[1]), 0, 30);
+		$errorMsg = "invalid file type: {$fileType}";
+		return false;
+	}
+	
+	private function testPasswordRequired($file) {
+		$matches = null;
+		$pdfInfo = $this->getPdfInfo($file);
+		foreach($pdfInfo as $cur) {
+			if(preg_match('/Error: Incorrect password/', $cur, $matches))
+				return true;
+		}
+		return false;
+	}
+	
+	private function testBlackImage($identifyExe, $filePath, &$errorMsg) {
+		$returnValue = null;
+		$output = null;
+		$command = $identifyExe . " -verbose '{$filePath}' 2>&1";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+	
+		$std = -1;
+		$outputString = implode("\n",$output);
+	
+		if(preg_match_all('/standard deviation: ([\d\.]*)/', $outputString, $matches)) {
+			foreach($matches[1] as $std) {
+				if(intval($std) < self::STD_LIMIT) {
+					$errorMsg = "Image is suspected to be black. Score ($std)";
+					return false;
+				}
+			}
+		} else {
+			$errorMsg = "Failed to test Image.";
+			return false;
+		}
+		return true;
+	}
+	
+	private function getFileInfo($filePath)
+	{
+		$returnValue = null;
+		$output = null;
+		$command = "file '{$filePath}' 2>&1";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+		return implode("\n",$output);
+	}
+	
+	private function getPdfInfo($file) {
+		$output = null;
+		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
+		$cmd = $pdfInfoExe . " " . realpath($file) . " 2>& 1";
+		exec($cmd, $output);
+		return $output;
+	}
 }
