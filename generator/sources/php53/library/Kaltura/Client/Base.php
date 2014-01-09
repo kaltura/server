@@ -502,7 +502,7 @@ class Base
 	
 	public function isMultiRequest()
 	{
-		return count($this->multiRequestReturnType);	
+		return !is_null($this->multiRequestReturnType);
 	}
 		
 	public function getMultiRequestQueueSize()
