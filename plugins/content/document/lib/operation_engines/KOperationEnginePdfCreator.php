@@ -110,6 +110,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		if(file_exists($killPopupsPath))
 			unlink($killPopupsPath);
 		
+		// Test file type 
+		$errorMsg = null;
+		if(!$this->checkFileType($realInFilePath,$errorMsg))
+			$this->message = $errorMsg;
+		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 
 		$this->outFilePath = $finalOutputPath;
@@ -145,10 +150,6 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		if (!file_exists(realpath($tmpFile))) {
-			$errorMsg = null;
-			if(!$this->checkFileType($inFilePath,$errorMsg)) 
-				$this->message = $errorMsg;
-			
 			throw new kTemporaryException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.'] 
 					Convert Engine message [' . $this->message . ']');
 		}else{
@@ -184,25 +185,22 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	
 	private function validateOutput($inFilePath, $outFilePath)
 	{
-		$pdfInfo = KBatchBase::$taskConfig->params->pdfInfo;
-		$identifyExe = KBatchBase::$taskConfig->params->identify;
+		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
 		
 		$errorMsg = null;
 
 		// Check Page count
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
-			$inputNum = $this->getNumberOfPages($pdfInfo, $inFilePath);
-			$outputNum = $this->getNumberOfPages($pdfInfo, $outFilePath);
+			$inputPdfInfo = $this->getPdfInfo($pdfInfoExe, $inFilePath);
+			$inputNum = $this->getNumberOfPages($inputPdfInfo);
+			
+			$outputPdfInfo = $this->getPdfInfo($pdfInfoExe, $outFilePath);
+			$outputNum = $this->getNumberOfPages($outputPdfInfo);
 			if($inputNum != $outputNum) {
 				$errorMsg = "Output file doesn't match expected page count (input: $inputNum, output: $outputNum)";
 				$this->message = $errorMsg;
 			}
-		}
-		
-		// Check black Image
-		if(!$this->testBlackImage($identifyExe, $outFilePath, $errorMsg)) {
-			$this->message = $errorMsg;
 		}
 	}
 	
@@ -234,35 +232,16 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		return implode("\n",$output);
 	}
 	
-	private function testBlackImage($identifyExe, $filePath, &$errorMsg) {
-		$returnValue = null;
+	private function getPdfInfo($pdfInfoExe, $file) {
 		$output = null;
-		$command = $identifyExe . " -verbose '{$filePath}' 2>&1";
-		KalturaLog::debug("Executing: $command");
-		exec($command, $output, $returnValue);
-		
-		$std = -1;
-		$outputString = implode("\n",$output);
-		
-		if(preg_match_all('/standard deviation: ([\d\.]*)/', $outputString, $matches)) {
-			foreach($matches[1] as $std) {
-				if(intval($std) < self::STD_LIMIT) {
-					$errorMsg = "Image is suspected to be black. Score ($std)";
-					return false;
-				}
-			}
-		} else {
-			$errorMsg = "Failed to test Image.";
-			return false;
-		}
-		return true;
+		$cmd = $pdfInfoExe . " " . realpath($file) . " 2>& 1";
+		exec($cmd, $output);
+		return $output;
 	}
 	
-	private function getNumberOfPages($pdfInfo, $file) 
+	private function getNumberOfPages($pdfInfo) 
 	{
-		$cmd = $pdfInfo . " " . realpath($file);
-		exec($cmd, $output);
-		foreach($output as $cur) {
+		foreach($pdfInfo as $cur) {
 			if(preg_match('/Pages:\s*(\d+)/' , $cur, $matches))
 				return $matches[1];
 		}
