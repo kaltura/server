@@ -672,7 +672,7 @@ maxInstances										= 1
 [KScheduledTaskDryRunner : JobHandlerWorker]
 id													= 540
 type												= KScheduledTaskDryRunner
-scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskDryRunnerExe.php
+scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskDryRunner/KScheduledTaskDryRunnerExe.php
 params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 
 [KScheduledTaskRunner : PeriodicWorker]
