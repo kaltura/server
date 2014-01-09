@@ -4,7 +4,7 @@
  * @package plugins.document
  * @subpackage lib
  */
-class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
+class KOperationEnginePdfCreator extends KOperationEngineDocument
 {
 	/**
 	 * @var string
@@ -30,17 +30,13 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	// this will be the default value if it is not set in task's configuration under - killPopupsPath
 	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
 	
-	// This is the value that underneath the image is suspected as being a black image
-	const STD_LIMIT = 50;
-	
 	// List of supported file types
 	private $SUPPORTED_FILE_TYPES = array(
-			'CDF V2 Document, Little Endian, Os: MacOS',
-			'CDF V2 Document, Little Endian, Os: Windows',
+			'CDF V2 Document',
 			'OpenDocument Text',
 			'PDF document',
-			'Rich Text Format data, version 1, ANSI',
-			'Zip archive data, at least',
+			'Rich Text Format data',
+			'Zip archive data',
 	);
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
@@ -111,8 +107,8 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			unlink($killPopupsPath);
 		
 		// Test file type 
-		$errorMsg = null;
-		if(!$this->checkFileType($realInFilePath,$errorMsg))
+		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
+		if(!is_null($errorMsg))
 			$this->message = $errorMsg;
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
@@ -185,58 +181,21 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	
 	private function validateOutput($inFilePath, $outFilePath)
 	{
-		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
-		
 		$errorMsg = null;
 
 		// Check Page count
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
-			$inputPdfInfo = $this->getPdfInfo($pdfInfoExe, $inFilePath);
+			$inputPdfInfo = $this->getPdfInfo($inFilePath);
 			$inputNum = $this->getNumberOfPages($inputPdfInfo);
 			
-			$outputPdfInfo = $this->getPdfInfo($pdfInfoExe, $outFilePath);
+			$outputPdfInfo = $this->getPdfInfo($outFilePath);
 			$outputNum = $this->getNumberOfPages($outputPdfInfo);
 			if($inputNum != $outputNum) {
 				$errorMsg = "Output file doesn't match expected page count (input: $inputNum, output: $outputNum)";
 				$this->message = $errorMsg;
 			}
 		}
-	}
-	
-	private function checkFileType($filePath, &$errorMsg) {
-	
-		$fileInfo = $this->getFileInfo($filePath);
-		$supportedTypes = $this->SUPPORTED_FILE_TYPES;
-	
-		$isValid = false;
-		foreach ($supportedTypes as $validType)
-		{
-			if (strpos($fileInfo, $validType) !== false)
-				return true;
-		}
-
-		$fileType = explode(':', $fileInfo, 2);
-		$fileType = substr(trim($fileType[1]), 0, 30);
-		$errorMsg = "invalid file type: {$fileType}";
-		return false;
-	}
-	
-	private function getFileInfo($filePath)
-	{
-		$returnValue = null;
-		$output = null;
-		$command = "file '{$filePath}' 2>&1";
-		KalturaLog::debug("Executing: $command");
-		exec($command, $output, $returnValue);
-		return implode("\n",$output);
-	}
-	
-	private function getPdfInfo($pdfInfoExe, $file) {
-		$output = null;
-		$cmd = $pdfInfoExe . " " . realpath($file) . " 2>& 1";
-		exec($cmd, $output);
-		return $output;
 	}
 	
 	private function getNumberOfPages($pdfInfo) 

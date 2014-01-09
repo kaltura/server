@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage lib
  */
-class KOperationEngineImageMagick extends KSingleOutputOperationEngine
+class KOperationEngineImageMagick extends KOperationEngineDocument
 {
 	const PDF_FORMAT = 'PDF document';
 	const JPG_FORMAT = 'JPEG image data';
@@ -19,6 +19,9 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	const IMAGES_LIST_XML_ATTRIBUTE_COUNT = 'count';
 	
 	const LEADING_ZEROS_PADDING = '-%03d';
+	
+	// This is the value that underneath the image is suspected as being a black image
+	const BLACK_IMAGE_STD_LIMIT = 50;
 	
 	// List of supported file types
 	private $SUPPORTED_FILE_TYPES = array(
@@ -63,26 +66,27 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::linkFile($inFilePath, "$inFilePath.jpg"))
 			$inFilePath = "$inFilePath.jpg";
 		
+		$realInFilePath = realpath($inFilePath);
 		// Test input
 		// - Test file type
-		$errorMsg = null;
-		if(!$this->checkFileType(realpath($inFilePath),$errorMsg)) {
+		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
+		if(!is_null($errorMsg))
 			$this->message = $errorMsg;
-		}
 		
 		// Test password required
-		if($this->testPasswordRequired(realpath($inFilePath))) {
+		if($this->testPasswordRequired($realInFilePath)) {
 			$this->message = "Password required.";
 		}
 		
-		parent::operate($operator, realpath($inFilePath), $configFilePath);
+		parent::operate($operator, $realInFilePath, $configFilePath);
 		
 		$imagesList = kFile::dirList($outDirPath,false);
 		// Test output
 		// - Test black Image
 		$identifyExe = KBatchBase::$taskConfig->params->identify;
 		$firstImage = $outDirPath . DIRECTORY_SEPARATOR . $imagesList[0];
-		if(!$this->testBlackImage($identifyExe, $firstImage, $errorMsg)) {
+		$errorMsg = $this->testBlackImage($identifyExe, $firstImage, $errorMsg);
+		if(!is_null($errorMsg)) {
 			$this->message = $errorMsg;
 		}
 		
@@ -105,24 +109,6 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		return $imagesListXML;	
 	}
 	
-	private function checkFileType($filePath, &$errorMsg) {
-	
-		$fileInfo = $this->getFileInfo($filePath);
-		$supportedTypes = $this->SUPPORTED_FILE_TYPES;
-	
-		$isValid = false;
-		foreach ($supportedTypes as $validType)
-		{
-			if (strpos($fileInfo, $validType) !== false)
-				return true;
-		}
-	
-		$fileType = explode(':', $fileInfo, 2);
-		$fileType = substr(trim($fileType[1]), 0, 30);
-		$errorMsg = "invalid file type: {$fileType}";
-		return false;
-	}
-	
 	private function testPasswordRequired($file) {
 		$matches = null;
 		$pdfInfo = $this->getPdfInfo($file);
@@ -133,7 +119,7 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		return false;
 	}
 	
-	private function testBlackImage($identifyExe, $filePath, &$errorMsg) {
+	private function testBlackImage($identifyExe, $filePath ) {
 		$returnValue = null;
 		$output = null;
 		$command = $identifyExe . " -verbose '{$filePath}' 2>&1";
@@ -145,33 +131,13 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	
 		if(preg_match_all('/standard deviation: ([\d\.]*)/', $outputString, $matches)) {
 			foreach($matches[1] as $std) {
-				if(intval($std) < self::STD_LIMIT) {
-					$errorMsg = "Image is suspected to be black. Score ($std)";
-					return false;
+				if(intval($std) < self::BLACK_IMAGE_STD_LIMIT) {
+					return "Image is suspected to be black. Score ($std)";
 				}
 			}
 		} else {
-			$errorMsg = "Failed to test Image.";
-			return false;
+			return "Failed to test Image.";
 		}
-		return true;
-	}
-	
-	private function getFileInfo($filePath)
-	{
-		$returnValue = null;
-		$output = null;
-		$command = "file '{$filePath}' 2>&1";
-		KalturaLog::debug("Executing: $command");
-		exec($command, $output, $returnValue);
-		return implode("\n",$output);
-	}
-	
-	private function getPdfInfo($file) {
-		$output = null;
-		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
-		$cmd = $pdfInfoExe . " " . realpath($file) . " 2>& 1";
-		exec($cmd, $output);
-		return $output;
+		return null;
 	}
 }
