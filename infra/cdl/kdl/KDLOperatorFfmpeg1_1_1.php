@@ -22,7 +22,7 @@ $con = $target->_container;
 			break;
 	 */
 		case KDLContainerTarget::ISMV:
-			$cmdStr = " -f ismv";
+			$cmdStr = " -movflags frag_keyframe -f ismv";
 			break;
 		default:
 			$cmdStr = parent::generateContainerParams($design, $target);
