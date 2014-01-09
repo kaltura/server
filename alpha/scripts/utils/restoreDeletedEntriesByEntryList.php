@@ -51,11 +51,11 @@ foreach ($entries as $deletedEntryId){
 	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB)){
 		$entryFileSyncKeys[] = $key; 
 	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)){
-		$entryFileSyncKeys[] = $key; 
+	foreach (entry::getIsmFileSyncSubTypes() as $ismFileSyncSybType) 
+	{
+		if ($key = $deletedEntry->getSyncKey($ismFileSyncSybType)){
+			$entryFileSyncKeys[] = $key; 
+		
 	}
 	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG)){
 		$entryFileSyncKeys[] = $key; 

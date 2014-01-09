@@ -280,7 +280,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	protected static function exportAdditionalEntryFiles(entry $entry, StorageProfile $profile)
 	{
-		$additionalFileSyncKeys = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$additionalFileSyncKeys = entry::getIsmFileSyncSubTypes();
+		$additionalFileSyncKeys[] = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
 		foreach ($additionalFileSyncKeys as $subType) 
 		{
 			$key = $entry->getSyncKey($subType);
@@ -299,7 +300,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	protected static function deleteAdditionalEntryFilesFromStorage(entry $entry, StorageProfile $profile)
 	{
-		$additionalFileSyncKeys = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$additionalFileSyncKeys = entry::getIsmFileSyncSubTypes();
+		$additionalFileSyncKeys[] = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
 		foreach ($additionalFileSyncKeys as $subType) 
 		{
 			$key = $entry->getSyncKey($subType);
@@ -393,7 +395,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	public function shouldConsumeAddedEvent(BaseObject $object) 
 	{
 		if(	$object instanceof FileSync && $object->getObjectType() == FileSyncObjectType::ENTRY
-			&& ($object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM || $object->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)
+			&& (in_array($object->getObjectSubType(), entry::getIsmFileSyncSubTypes()))
 			&& $object->getDc() == StorageProfile::STORAGE_KALTURA_DC
 			&& $object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
 			return true;

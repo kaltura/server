@@ -39,7 +39,7 @@ class kSmoothManifestHelper
 		try 
 		{
 			$ismcMerged = self::mergeIsmcManifests($ismcFiles);				
-			$ismVersion = $entry->incrementIsmVersion();
+			$ismVersion = $entry->incrementIsmVersion($ismEntryFileSyncSubType);
 			$ismcSyncKey = $entry->getSyncKey($ismcEntryFileSyncSubType, $ismVersion);
 			kFileSyncUtils::file_put_contents($ismcSyncKey, $ismcMerged);
 			$entry->save();

@@ -9,8 +9,9 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 		if(
 			$object instanceof flavorAsset
 			&&	in_array(assetPeer::STATUS, $modifiedColumns)
-			&&  $object->getStatus() == flavorAsset::ASSET_STATUS_READY
+			&&  ($object->getStatus() == flavorAsset::ASSET_STATUS_READY || $object->getStatus() == flavorAsset::ASSET_STATUS_DELETED)
 			&&  $object->hasTag(assetParams::TAG_ISM)
+			&&  !$object->getentry()->getStatus() == entryStatus::DELETED
 			&& 	!$object->getentry()->getReplacingEntryId()
 		)
 			return true;

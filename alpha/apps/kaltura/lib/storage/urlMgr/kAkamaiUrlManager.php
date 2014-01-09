@@ -224,7 +224,7 @@ class kAkamaiUrlManager extends kUrlManager
 			return $urlPrefix. '/' . ltrim($urlSuffix, '/');
 		}
 		
-		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if(!in_array($fileSync->getObjectSubType(), entry::getIsmFileSyncSubTypes()))
 			return parent::doGetFileSyncUrl($fileSync);
 
 		$serverUrl = myPartnerUtils::getIisHost($fileSync->getPartnerId(), "http");	

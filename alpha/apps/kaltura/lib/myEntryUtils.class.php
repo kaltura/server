@@ -941,10 +941,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE),
 			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD),
 			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC),
 			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG),
 		);
+		
+		foreach (entry::getIsmFileSyncSubTypes() as $ismFileSyncSubType) 
+		{
+			$entrySyncKeys[] = $entry->getSyncKey($ismFileSyncSubType);
+		}
+		
 		
 		$assets = assetPeer::retrieveByEntryId($entry_id);
 		foreach($assets as $asset)
@@ -1133,20 +1137,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			kFileSyncUtils::softCopy($from, $to);
 		}
 		
-		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);		
-		if(kFileSyncUtils::fileSync_exists($ismFrom))
+		foreach (entry::getIsmFileSyncSubTypes() as $ismFileSyncSubType) 
 		{
-			$ismTo = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
-			kFileSyncUtils::softCopy($ismFrom, $ismTo);
-		}
-		
-		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);		
-		if(kFileSyncUtils::fileSync_exists($ismcFrom))
-		{
-			$ismcTo = $newEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
-			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
-			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
+			$ismFrom = $entry->getSyncKey($ismFileSyncSubType);		
+			if(kFileSyncUtils::fileSync_exists($ismFrom))
+			{
+				$ismTo = $newEntry->getSyncKey($ismFileSyncSubType);
+				KalturaLog::log("copying entry ism file sync sub type [".$ismFileSyncSubType."] from [".$ismFrom."] to [".$ismTo."]");
+				kFileSyncUtils::softCopy($ismFrom, $ismTo);
+			}
 		}
  		
 		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath

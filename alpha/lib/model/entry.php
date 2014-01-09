@@ -112,6 +112,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG = 9;
 	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY = 10; 
 	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY = 11; 
+	const FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC = 12;
+	const FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC = 13;
 	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
@@ -171,7 +173,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_QUICKTIME => 'LIVE_STREAM_QUICKTIME',
 	);
 	
-	
+	private static $ismFileSyncSubTypePairs = array(
+		array(self::FILE_SYNC_ENTRY_SUB_TYPE_ISM, self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC),
+		array(self::FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC, self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC));
+		
+	private static $ismFileSyncSubTypes = array(
+		self::FILE_SYNC_ENTRY_SUB_TYPE_ISM, 
+		self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC,
+		self::FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC, 
+		self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC);
+		
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -482,10 +493,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$version = $this->getVersion();
 			
 		// TODO - remove after Akamai bug fixed and create the file names with sub type
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
-			return "_{$version}";
-			
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)
+		if(in_array($sub_type, self::getIsmFileSyncSubTypes()))
 			return "_{$version}";
 		// remove till here
 			
@@ -497,11 +505,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
-			return $this->getId() . '_' . $this->generateBaseFileName(0, $version) . '.ism';
-			
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)
-			return $this->getId() . '_' . $this->generateBaseFileName(0, $version) . '.ismc';
+		if(in_array($sub_type, self::getIsmFileSyncSubTypes()))
+		{
+			return $this->getId() . '_' . $this->generateBaseFileName(0, $version) . self::getIsmExtentionByFileSyncSubType($sub_type);
+		}
 			
 		return $this->getId() . '_' . $this->generateBaseFileName($sub_type, $version);
 	}
@@ -568,22 +575,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		else
 		{
 			$path =  "entry/data";
-			switch($sub_type)
+			if(in_array($sub_type, self::getIsmFileSyncSubTypes()))
 			{
-				case self::FILE_SYNC_ENTRY_SUB_TYPE_ISM:
-					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
-					$basename .= '.ism';
-					break;
-					
-				case self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC:
-					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
-					$basename .= '.ismc';
-					break;
-					
-				case self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG:
-					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
-					$basename .= '.log';
-					break;
+				$basename = $this->generateBaseFileName(0, $this->getVersionForSubType($sub_type));
+				$basename .= self::getIsmExtentionByFileSyncSubType($sub_type);
+			}
+			else if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG)
+			{
+				$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
+				$basename .= '.log';
 			}
 			$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
 		}
@@ -606,7 +606,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				
 			return $this->getIsmVersion();
 		}
+
+		if( 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC
+			||
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC)
+		{
+			if(!is_null($version))
+				return $version;
 			
+			return $this->getIsmEncVersion();		
+		}
+		
 		$new_version = "";
 		if ( $version )
 		{
@@ -661,28 +672,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	protected static function validateFileSyncSubType ( $sub_type )
 	{
-		if ($sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ISM  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
-		)
-			throw new FileSyncException ( FileSyncObjectType::ENTRY ,
-				 $sub_type , array (
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA ,
+		$validSubTypes = array_merge(
+					array(self::FILE_SYNC_ENTRY_SUB_TYPE_DATA ,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB ,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE ,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISM ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC ,
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB ,
-				 ) );
+				 	self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB),
+				 	self::getIsmFileSyncSubTypes());
+				 	
+		if (!in_array($sub_type, $validSubTypes))
+			throw new FileSyncException ( FileSyncObjectType::ENTRY ,$sub_type , $validSubTypes);
 	}
 
 	
@@ -1589,6 +1590,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	protected function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
 	public function getIsmVersion (  )		{	return (int) $this->getFromCustomData( "ismVersion" );	}
+
+	protected function setIsmEncVersion ( $v )	{	$this->putInCustomData ( "ismEncVersion" , $v );	}
+	public function getIsmEncVersion (  )		{	return (int) $this->getFromCustomData( "ismEncVersion" );	}
 	
 	public function setReferenceID  ( $v )	{	$this->putInCustomData ( "referenceID" , $v );	}
 	public function getReferenceID (  )		{	return $this->getFromCustomData( "referenceID" );	}
@@ -1823,10 +1827,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function getPrivacySettings ()	{		return $this->getPermissions();	}
 	public function setPrivacySettings ( $v )	{		return $this->setPermissions( $v );	}
 
-	public function incrementIsmVersion (  )
+	public function incrementIsmVersion ( $ismFileSyncSubType = null )
 	{
-		$version = kDataCenterMgr::incrementVersion($this->getIsmVersion());
-		$this->setIsmVersion($version);
+		if($ismFileSyncSubType && 
+		($ismFileSyncSubType == self::FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC || $ismFileSyncSubType == self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC))
+		{
+			$version = kDataCenterMgr::incrementVersion($this->getIsmEncVersion());
+			$this->setIsmEncVersion($version);
+		}
+		else 
+		{
+			$version = kDataCenterMgr::incrementVersion($this->getIsmVersion());
+			$this->setIsmVersion($version);
+		}
 		return $version;
 	}
 	
@@ -2881,6 +2894,31 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 					}
 				}
 			}
+		}
+	}
+	
+	public static function getIsmFileSyncSubTypes()
+	{
+		return self::$ismFileSyncSubTypes;
+	}
+	
+	public static function getIsmFileSyncSubTypePairs()
+	{
+		return self::$ismFileSyncSubTypePairs;
+	}
+	
+	public static function getIsmExtentionByFileSyncSubType($fileSyncSubType)
+	{
+		switch ($fileSyncSubType) 
+		{
+			case self::FILE_SYNC_ENTRY_SUB_TYPE_ISM:
+			case self::FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC:
+				return '.ism';
+			case self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC:
+			case self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC:
+				return '.ismc';			
+			default:
+				return null;;
 		}
 	}
 }

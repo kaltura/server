@@ -9,9 +9,10 @@ class kSmoothProtectEventsConsumer implements kObjectChangedEventConsumer
 		if(
 			$object instanceof flavorAsset
 			&&	in_array(assetPeer::STATUS, $modifiedColumns)
-			&&  $object->getStatus() == flavorAsset::ASSET_STATUS_READY
+			&&  ($object->getStatus() == flavorAsset::ASSET_STATUS_READY || $object->getStatus() == flavorAsset::ASSET_STATUS_DELETED)
 			&&  $object->hasTag(PlayReadyPlugin::PLAY_READY_TAG)
-			&& 	!$object->getentry()->getReplacingEntryId()
+			&&  !$object->getentry()->getStatus() == entryStatus::DELETED	
+			&& !$object->getentry()->getReplacingEntryId()
 		)
 			return true;
 			
@@ -26,7 +27,7 @@ class kSmoothProtectEventsConsumer implements kObjectChangedEventConsumer
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($object->getFlavorParamsId());
 		if($flavorParams && $flavorParams->getConversionEngines() != conversionEngineType::EXPRESSION_ENCODER3)	
 			kSmoothManifestHelper::mergeManifestFiles($object->getEntryId(), PlayReadyPlugin::PLAY_READY_TAG, 
-						entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+						entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM_ENC, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC_ENC);
 							
 		return true;
 	}
