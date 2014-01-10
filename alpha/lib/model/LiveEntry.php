@@ -29,21 +29,17 @@ abstract class LiveEntry extends entry
 	 */
 	protected static function validateFileSyncSubType($sub_type)
 	{
-		if(	$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
-		)
-			throw new FileSyncException(
-				FileSyncObjectType::ENTRY, 
-				$sub_type, 
-				array(
-					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB,
-				)
-			);
+		if(	$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB )
+			{
+				return true;
+			}
+			
+			KalturaLog::log("Sub type provided [$sub_type] is not one of knowen LiveEntry sub types validating from parent");
+			return parent::validateFileSyncSubType($sub_type);
+		
 	}
 	
 	/* (non-PHPdoc)
