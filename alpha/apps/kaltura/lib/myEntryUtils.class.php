@@ -1196,8 +1196,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$srcCategoryIdSet = array();
 		foreach($categoryEntries as $categoryEntry)
 		{
-			// Map an ID to itself in order to aviod duplicates
-			$srcCategoryIdSet[ $categoryEntry->getCategoryId() ] = $categoryEntry->getCategoryId();
+			$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
 		}
 
 		// Get src category objects
@@ -1209,9 +1208,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$fullNamesToSrcCategoryIdMap = array();
 		foreach ( $srcCategories as $category )
 		{
-			$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
+			if ( $category->getStatus() != CategoryStatus::DELETED && $category->getStatus() != CategoryStatus::PURGED )
+			{
+				$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
+			}
 		}
 
+		// Get dst. partner categories based on src. category full-names
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
 		$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
@@ -1237,10 +1240,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
-			$categoryId = $srcCategoryIdToDstCategoryIdMap[ $categoryEntry->getCategoryId() ];
-			if ( $categoryId !== false )
+			$srcCategoryId = $categoryEntry->getCategoryId();
+			if ( array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
 			{
-				$newCategoryEntry->setCategoryId($categoryId);
+				$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
+				$newCategoryEntry->setCategoryId( $dstCategoryId );
 			}
 
 			categoryPeer::setUseCriteriaFilter(false);
