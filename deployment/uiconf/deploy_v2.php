@@ -355,22 +355,25 @@ class uiConfDeployment
 		
 		$pe_conf->save();
 		
-		$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
-		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
-		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
-		
-		$ret = null;
-		chmod($localPath, 0640);
-	
-		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
-			return $pe_conf->getId();
-		
-		$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
-		passthru("chown $user_group $localPath", $ret);
-		if($ret !== 0 && $ret !== 127)
+		if($pe_conf->getConfFile())
 		{
-			KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
-			exit(1);
+			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
+			$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
+			$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
+		
+			$ret = null;
+			chmod($localPath, 0640);
+	
+			if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
+				return $pe_conf->getId();
+			
+			$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
+			passthru("chown $user_group $localPath", $ret);
+			if($ret !== 0 && $ret !== 127)
+			{
+				KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
+				exit(1);
+			}
 		}
 
 		return $pe_conf->getId();
@@ -389,24 +392,31 @@ class uiConfDeployment
 	{
 		$uiconf = new uiConf();
 		
-		$confFileContents = uiConfDeployment::readConfFileFromPath($widget->conf_file);
-		
-		if(!$confFileContents)
+		if($widget->conf_file)
 		{
-			KalturaLog::debug("Unable to read xml file from: {$widget->conf_file}");
+			$confFileContents = uiConfDeployment::readConfFileFromPath($widget->conf_file);
+		
+			if(!$confFileContents)
+			{
+				KalturaLog::debug("Unable to read xml file from: {$widget->conf_file}");
+			}
+		
+			if ($disableUrlHashing)
+			{
+				$confFileContents = str_replace('<Plugin id="kalturaMix"','<Plugin id="kalturaMix" disableUrlHashing="true" ',$confFileContents);
+			}
+		
+			$uiconf->setConfFile($confFileContents);
+		
 		}
 		
-		if ($disableUrlHashing)
-		{
-			$confFileContents = str_replace('<Plugin id="kalturaMix"','<Plugin id="kalturaMix" disableUrlHashing="true" ',$confFileContents);
-		}
+		if ($widget->config)
+			$uiconf->setConfig(@$widget->config);
 		
-		$uiconf->setConfFile($confFileContents);
-		
-		if($uiconf->getConfFile() === FALSE)
+		if($uiconf->getConfFile() === FALSE && $uiconf->getConfig() === FALSE)
 		{
-			return FALSE; // conf file is a must, features is not.
-		}
+			return FALSE; // conf file or config is a must, features is not.
+		}		
 		
 		if(isset($widget->features))
 		{
@@ -436,9 +446,6 @@ class uiConfDeployment
 		$uiconf->setWidth(@$widget->width);
 		$uiconf->setHeight(@$widget->height);
 		$uiconf->setConfVars(@$widget->conf_vars);
-
-		if ($widget->config)
-			$uiconf->setConfig(@$widget->config);
 
 		$uiconf->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
 			
