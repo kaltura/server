@@ -719,12 +719,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			return myPlaylistUtils::getExecutionUrl( $this );
 		}
 		//$path = $this->getThumbnailPath ( $version );
-		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/flvclipper/entry_id/" . $this->getId() ;
-		$current_version = $this->getVersion();
-		if ( $version )
-			$path .= "/version/$version";
-		else
-			$path .= "/version/$current_version";
+		$flavor = assetPeer::retrieveHighestBitrateByEntryId ($this->getId());
+		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/serveFlavor/entryId/" . ($version ? "{$version}" : $this->getVersion()) . $this->getId() .'/flavorId/' . $flavor->getId() ;
+		
 		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $path ;
 		return $url;
 	}
