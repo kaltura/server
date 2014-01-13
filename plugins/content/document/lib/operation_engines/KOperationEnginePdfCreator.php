@@ -143,9 +143,14 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		// Read popup log file
 		if(file_exists($killPopupsPath)) {
 			$data = file_get_contents($killPopupsPath);
-			KalturaLog::notice("Convert popups warnings - " . $data);
-			$this->message = $data;
-
+			$data = trim($data);
+			if(!empty($data)){
+				KalturaLog::notice("Convert popups warnings - " . $data);
+				if(is_null($this->message))
+					$this->message = $data;
+				else 
+					$this->message .= $data;
+			}
 			unlink($killPopupsPath);
 		}
 		
