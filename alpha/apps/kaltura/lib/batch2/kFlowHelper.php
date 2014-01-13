@@ -505,6 +505,7 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
+		$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $dbBatchJob->getMessage());
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
 
@@ -856,6 +857,11 @@ class kFlowHelper
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+		
+		$description = $flavorAsset->getDescription();
+		$description .= "\n" . $dbBatchJob->getMessage();
+		$flavorAsset->setDescription($description);
+		$flavorAsset->save();
 
 		// creats the file sync
 		if(file_exists($data->getLogFileSyncLocalPath()))
