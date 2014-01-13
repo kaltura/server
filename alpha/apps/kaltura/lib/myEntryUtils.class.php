@@ -1214,10 +1214,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$fullNamesToSrcCategoryIdMap = array();
 		foreach ( $srcCategories as $category )
 		{
-			if ( $category->getStatus() != CategoryStatus::DELETED && $category->getStatus() != CategoryStatus::PURGED )
-			{
-				$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
-			}
+			$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
 		}
 
 		// Get dst. partner categories based on src. category full-names
@@ -1248,15 +1245,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
 			$srcCategoryId = $categoryEntry->getCategoryId();
-			if ( array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
+			if ( ! array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
 			{
-				$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
-				$newCategoryEntry->setCategoryId( $dstCategoryId );
+				continue; // Skip the category_entry's creation
 			}
-			else
-			{
-				continute; // Skip the category_entry's creation
-			}
+
+			$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
+			$newCategoryEntry->setCategoryId( $dstCategoryId );
 
 			categoryPeer::setUseCriteriaFilter(false);
 			entryPeer::setUseCriteriaFilter(false);
