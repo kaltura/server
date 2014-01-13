@@ -52,6 +52,13 @@ namespace Kaltura
             Single.TryParse(s, out i);
             return i;
         }
+        
+        protected long ParseLong(string s)
+        {
+            long l = long.MinValue;
+            long.TryParse(s, out l);
+            return l;
+        }
 
         protected Enum ParseEnum(Type type, string s)
         {

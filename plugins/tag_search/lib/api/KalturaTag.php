@@ -36,13 +36,13 @@ class KalturaTag extends KalturaObject
     public $instanceCount;
     
     /**
-     * @var int
+     * @var time
      * @readonly
      */
     public $createdAt;
     
     /**
-     * @var int
+     * @var time
      * @readonly
      */
     public $updatedAt;

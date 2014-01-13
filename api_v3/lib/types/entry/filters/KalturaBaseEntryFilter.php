@@ -11,6 +11,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		"isRoot" => "_is_root",
 		"categoriesFullNameIn" => "_in_categories_full_name", 
 		"categoryAncestorIdIn" => "_in_category_ancestor_id",
+		"redirectFromEntryId" => "_eq_redirect_from_entry_id",
 	);
 	
 	static private $order_by_map = array
@@ -48,6 +49,12 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var string
 	 */
 	public $categoryAncestorIdIn;
+
+	/**
+	 * The id of the original entry
+	 * @var string
+	 */
+	public $redirectFromEntryId;
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()

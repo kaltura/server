@@ -5,6 +5,7 @@
  */
 class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
+	const MAX_FILES_IN_CATEGORY = 5000;
 	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
 	const CACHE_KEY_PREFIX = 'fileSyncContent_';
 	const FILE_SYNC_CACHE_EXPIRY = 2592000;		// 30 days
@@ -91,6 +92,53 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$content = kDataCenterMgr::retrieveFileFromRemoteDataCenter( $file_sync );
 			return $content;
 		}
+	}
+	
+	/**
+	 * @param FileSyncKey $key
+	 * @param boolean $fetch_from_remote_if_no_local
+	 * @param boolean $strict
+	 * @throws kFileSyncException
+	 * @throws Exception
+	 * @return array
+	 */
+	public static function dir_get_files(FileSyncKey $key, $strict = true)
+	{
+		KalturaLog::debug("key [$key], strict [$strict]");
+		list($file_sync, $local) = self::getReadyFileSyncForKey($key, false, $strict);
+		if($file_sync)
+		{
+			$file_sync = self::resolve($file_sync);
+		}
+
+		if(!$file_sync || !$local)
+		{
+			if($strict)
+				throw new kFileSyncException("Cannot find directory file sync for key [$key]", kFileSyncException::FILE_SYNC_DOES_NOT_EXIST);
+				
+			KalturaLog::err("FileSync not found");
+			return null;
+		}
+
+		$real_path = realpath($file_sync->getFullPath());
+		if(!is_dir($real_path))
+		{
+			KalturaLog::log("directory was not found locally [$real_path]");
+			throw new kFileSyncException("Cannot find directory on local disk [$real_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
+		}
+		
+		KalturaLog::debug("directory was found locally at [$real_path]");
+		
+		$dir = dir($real_path);
+		$files = array();
+		while (false !== ($entry = $dir->read())) 
+		{
+			if($entry != '.' && $entry != '..')
+				$files[] = realpath("$real_path/$entry");
+		}
+		$dir->close();
+		
+		return $files;
 	}
 
 	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true , $max_file_size = 0 )
@@ -305,6 +353,58 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::log("copy failed - not changing filesync");
 			return false;
 		}
+	}
+
+	public static function moveFromFileToDirectory(FileSyncKey $directory_key, $temp_file_path)
+	{
+		KalturaLog::debug("move file to directory: [$temp_file_path] to key [$directory_key]");
+
+		$c = FileSyncPeer::getCriteriaForFileSyncKey( $directory_key );
+		$c->add(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN);
+		$c->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
+
+		$fileSync = FileSyncPeer::doSelectOne( $c );
+		$dirFullPath = null;
+		if($fileSync)
+		{
+			$dirFullPath = $fileSync->getFullPath();
+		}
+		else
+		{
+			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($directory_key);
+			$dirFullPath = $rootPath . $filePath; 
+			if(!$dirFullPath)
+			{
+				$dirFullPath = kPathManager::getFilePath($directory_key);
+				KalturaLog::debug("Generated new path [$dirFullPath]");
+			}
+			
+			$dirFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $dirFullPath);
+	
+			if (file_exists($dirFullPath))
+			{
+				$time = time(); 
+				$dirFullPath .= $time;
+				$filePath .= $time; 
+			}
+			else
+			{
+				KalturaLog::debug("Creating directory [$dirFullPath] for file");
+				kFile::fullMkfileDir($dirFullPath);
+			}
+			self::createSyncFileForKey($rootPath, $filePath, $directory_key);
+		}
+		
+		$existing_files = glob($dirFullPath . DIRECTORY_SEPARATOR . '*');
+		if(count($existing_files) >= self::MAX_FILES_IN_CATEGORY)
+			throw new kFileSyncException("Exceeded max number of files [" . self::MAX_FILES_IN_CATEGORY . "] in category [$dirFullPath]");
+			
+		$destination_file_path = $dirFullPath . DIRECTORY_SEPARATOR . basename($temp_file_path);
+		$success = kFile::moveFile($temp_file_path, $destination_file_path);
+		self::setPermissions($dirFullPath);
+
+		if(!$success)
+			throw new kFileSyncException("Could not move file from [$temp_file_path] to [{$destination_file_path}]");
 	}
 
 	public static function moveFromFile ( $temp_file_path , FileSyncKey $target_key , $strict = true, $copyOnly = false, $cacheOnly = false)

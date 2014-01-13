@@ -31,7 +31,8 @@ class entryPeer extends BaseentryPeer
 		entryType::MIX => parent::OM_CLASS,
 		entryType::PLAYLIST => parent::OM_CLASS,
 		entryType::DATA => parent::OM_CLASS,
-		entryType::LIVE_STREAM => parent::OM_CLASS,
+		entryType::LIVE_STREAM => 'LiveStreamEntry',
+		entryType::LIVE_CHANNEL => 'LiveChannel',
 	);
 
 	public static function setUserContentOnly($contentOnly)
@@ -497,6 +498,24 @@ class entryPeer extends BaseentryPeer
 	}
 
 	/**
+	 * Return the class name that associated with the entry type
+	 */
+	public static function getEntryClassByType($entryType)
+	{
+		if(isset(self::$class_types_cache[$entryType]))
+			return self::$class_types_cache[$entryType];
+
+		$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $entryType);
+		if($extendedCls)
+		{
+			self::$class_types_cache[$entryType] = $extendedCls;
+			return $extendedCls;
+		}
+		self::$class_types_cache[$entryType] = parent::OM_CLASS;
+		return parent::OM_CLASS;
+	}
+
+	/**
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
 	 *
@@ -510,18 +529,7 @@ class entryPeer extends BaseentryPeer
 		if($row)
 		{
 			 $typeField = self::translateFieldName(entryPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
-  			 $entryType = $row[$typeField];
-			if(isset(self::$class_types_cache[$entryType]))
-				return self::$class_types_cache[$entryType];
-
-			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $entryType);
-			if($extendedCls)
-			{
-				KalturaLog::debug("Found class[$extendedCls]");
-				self::$class_types_cache[$entryType] = $extendedCls;
-				return $extendedCls;
-			}
-			self::$class_types_cache[$entryType] = parent::OM_CLASS;
+  			 return self::getEntryClassByType($row[$typeField]);
 		}
 
 		return parent::OM_CLASS;

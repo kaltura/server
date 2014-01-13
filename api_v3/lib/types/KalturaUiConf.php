@@ -115,7 +115,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	
 	/**
 	 * Entry creation date as Unix timestamp (In seconds)
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -124,7 +124,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	
 	/**
 	 * Entry creation date as Unix timestamp (In seconds)
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

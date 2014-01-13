@@ -126,11 +126,15 @@ class KalturaErrors extends APIErrors
 
 	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND;;The recorded webcam file was not found by the given token id, or was already used";
 
+	const INVALID_WEBCAM_TOKEN_ID = "INVALID_WEBCAM_TOKEN_ID;;Invalid webcam token id";
+	
 	const PERMISSION_DENIED_TO_UPDATE_ENTRY = "PERMISSION_DENIED_TO_UPDATE_ENTRY;;User can update only the entries he own, otherwise an admin session must be used";
 
 	const INVALID_RANK_VALUE = "INVALID_RANK_VALUE;;Invalid rank value, rank should be between 1 and 5";
 
 	const MAX_CATEGORIES_FOR_ENTRY_REACHED = "MAX_CATEGORIES_FOR_ENTRY_REACHED;CATEGORIES;Entry can be linked with a maximum of \"@CATEGORIES@\" categories";
+	
+	const MAX_ASSETS_FOR_ENTRY_REACHED = "MAX_ASSETS_FOR_ENTRY_REACHED;ASSETS;Entry can contain maximum of \"@ASSETS@\" assets";
 
 	const INVALID_ENTRY_SCHEDULE_DATES = "INVALID_ENTRY_SCHEDULE_DATES;;Invalid entry schedule dates";
 
@@ -186,6 +190,8 @@ class KalturaErrors extends APIErrors
 	const INGESTION_PROFILE_ID_NOT_FOUND = "INGESTION_PROFILE_ID_NOT_FOUND;ID;Ingestion profile id \"@ID@\" not found";
 
 	const CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE = "CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE;;Default conversion profile cannot be deleted";
+
+	const ASSET_PARAMS_INVALID_TYPE = "ASSET_PARAMS_INVALID_TYPE;ASSET_PARAMS_ID,TYPE;Asset params id \"@ASSET_PARAMS_ID@\" type \"@TYPE@\" is invalid";
 
 	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND;PROFILE_ID,PARAMS_ID;Conversion profile id \"@PROFILE_ID@\" asset params id \"@PARAMS_ID@\" not found";
 
@@ -478,6 +484,13 @@ class KalturaErrors extends APIErrors
 	
 	const EXTENDING_ITEM_MISSING_XPATH = "EXTENDING_ITEM_MISSING_XPATH;;Extending item must contain xpath";
 	
+	const LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND = 'LIVE_CHANNEL_SEGMENT_ID_NOT_FOUND;SEGMENT_ID;Live channel segment id [@SEGMENT_ID@] not found';
+	
+	const LIVE_STREAM_INVALID_TOKEN = "LIVE_STREAM_INVALID_TOKEN;ENTRY_ID;Invalid token supplied for live entry [@ENTRY_ID@]";
+	
+	const LIVE_STREAM_EXCEEDED_MAX_INPUTS = "LIVE_STREAM_EXCEEDED_MAX_INPUTS;ENTRY_ID;Partner exceeded max concurrent input live streams in entry[@ENTRY_ID@]";
+	
+	const LIVE_STREAM_EXCEEDED_MAX_OUTPUTS = "LIVE_STREAM_EXCEEDED_MAX_OUTPUTS;ENTRY_ID;Partner exceeded max concurrent output live streams in entry[@ENTRY_ID@]";
 	/*
 	 * BaseEntry Service
 	 */
@@ -492,5 +505,9 @@ class KalturaErrors extends APIErrors
 	
 	const FILE_ASSET_ID_NOT_FOUND = "FILE_ASSET_ID_NOT_FOUND;ASSET_ID;File asset id [\"@ASSET_ID@\"] not found";
 	
+	/*
+	 * MediaServer Service
+	 */
+	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server \"@MEDIA_SERVER_ID@\" not found";
 	
 }

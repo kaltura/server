@@ -178,4 +178,8 @@ class categoryEntry extends BasecategoryEntry {
 	{
 		return array("categoryEntry:entryId=".strtolower($this->getEntryId()));
 	}
+	
+	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}
+	public function getBulkUploadId (  )	{		return $this->getFromCustomData( "bulk_upload_id" );	}
+	
 } // categoryEntry

@@ -1,19 +1,24 @@
 <?php
 
 /**
- * Live Stream service lets you manage live stream channels
+ * Live Stream service lets you manage live stream entries
  *
  * @service liveStream
  * @package api
  * @subpackage services
  */
-class LiveStreamService extends KalturaEntryService
+class LiveStreamService extends KalturaLiveEntryService
 {
-	const DEFAULT_BITRATE = 300;
-	const DEFAULT_WIDTH = 320;
-	const DEFAULT_HEIGHT = 240;
 	const ISLIVE_ACTION_CACHE_EXPIRY = 30;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
+
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+
+		if($this->getPartnerId() > 0 && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM, $this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+	}
 	
 	
 	protected function partnerRequired($actionName)
@@ -29,55 +34,47 @@ class LiveStreamService extends KalturaEntryService
 	 * The entry will be queued for provision.
 	 * 
 	 * @action add
-	 * @param KalturaLiveStreamAdminEntry $liveStreamEntry Live stream entry metadata  
+	 * @param KalturaLiveStreamEntry $liveStreamEntry Live stream entry metadata  
 	 * @param KalturaSourceType $sourceType  Live stream source type
-	 * @return KalturaLiveStreamAdminEntry The new live stream entry
+	 * @return KalturaLiveStreamEntry The new live stream entry
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 */
-	function addAction(KalturaLiveStreamAdminEntry $liveStreamEntry, $sourceType = null)
+	function addAction(KalturaLiveStreamEntry $liveStreamEntry, $sourceType = null)
 	{
-		//TODO: allow sourceType that belongs to LIVE entries only - same for mediaType
-		if ($sourceType) {
+		if($sourceType)
 			$liveStreamEntry->sourceType = $sourceType;
-		}
-		else {
-			// default sourceType is AKAMAI_LIVE
-			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
-		}
+	
+		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
+		$dbEntry->save();
 		
-		// if the given password is empty, generate a random 8-character string as the new password
-		if ( ($liveStreamEntry->streamPassword == null) || (strlen(trim($liveStreamEntry->streamPassword)) <= 0) )
-		{
-			$tempPassword = sha1(md5(uniqid(rand(), true)));
-			$liveStreamEntry->streamPassword = substr($tempPassword, rand(0,strlen($tempPassword)-8), 8);		
-		}
+		$te = new TrackEntry();
+		$te->setEntryId($dbEntry->getId());
+		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
+		$te->setDescription(__METHOD__ . ":" . __LINE__ . "::" . $dbEntry->getSource());
+		TrackEntry::addTrackEntry($te);
 		
-		// if no bitrate given, add default
-		if(is_null($liveStreamEntry->bitrates) || !$liveStreamEntry->bitrates->count)
+		//If a jobData can be created for entry sourceType, add provision job. Otherwise, just save the entry.
+		$jobData = kProvisionJobData::getInstance($dbEntry->getSource());
+		if ($jobData)
 		{
-			$liveStreamBitrate = new KalturaLiveStreamBitrate();
-			$liveStreamBitrate->bitrate = self::DEFAULT_BITRATE;
-			$liveStreamBitrate->width = self::DEFAULT_WIDTH;
-			$liveStreamBitrate->height = self::DEFAULT_HEIGHT;
-			
-			$liveStreamEntry->bitrates = new KalturaLiveStreamBitrateArray();
-			$liveStreamEntry->bitrates[] = $liveStreamBitrate;
+			/* @var $data kProvisionJobData */
+			$jobData->populateFromPartner($dbEntry->getPartner());
+			$jobData->populateFromEntry($dbEntry);
+			kJobsManager::addProvisionProvideJob(null, $dbEntry, $jobData);
 		}
-		else 
+		else
 		{
-			$bitrates = new KalturaLiveStreamBitrateArray();
-			foreach($liveStreamEntry->bitrates as $bitrate)
-			{		
-				if(is_null($bitrate->bitrate))	$bitrate->bitrate = self::DEFAULT_BITRATE;
-				if(is_null($bitrate->width))	$bitrate->bitrate = self::DEFAULT_WIDTH;
-				if(is_null($bitrate->height))	$bitrate->bitrate = self::DEFAULT_HEIGHT;
-				$bitrates[] = $bitrate;
+			$dbEntry->setStatus(entryStatus::READY);
+			$dbEntry->save();
+		
+			$liveAssets = assetPeer::retrieveByEntryId($dbEntry->getId(),array(assetType::LIVE));
+			foreach ($liveAssets as $liveAsset){
+				/* @var $liveAsset liveAsset */
+				$liveAsset->setStatus(asset::ASSET_STATUS_READY);
+				$liveAsset->save();
 			}
-			$liveStreamEntry->bitrates = $bitrates;
 		}
-		
-		$dbEntry = $this->insertLiveStreamEntry($liveStreamEntry);
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $this->getPartnerId(), null, null, null, $dbEntry->getId());
 
@@ -85,6 +82,29 @@ class LiveStreamService extends KalturaEntryService
 		return $liveStreamEntry;
 	}
 
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
+	{
+		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
+		/* @var $dbEntry LiveStreamEntry */
+				
+		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
+		{
+			if(!$entry->conversionProfileId)
+			{
+				$partner = $dbEntry->getPartner();
+				if($partner)
+					$dbEntry->setConversionProfileId($partner->getDefaultLiveConversionProfileId());
+			}
+				
+			$dbEntry->save();
+			
+			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
+			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+		}
+		
+		return $dbEntry;
+	}
 	
 	/**
 	 * Get live stream entry by ID.
@@ -100,20 +120,106 @@ class LiveStreamService extends KalturaEntryService
 	{
 		return $this->getEntry($entryId, $version, KalturaEntryType::LIVE_STREAM);
 	}
-
 	
+	/**
+	 * Authenticate live-stream entry against stream token and partner limitations
+	 * 
+	 * @action authenticate
+	 * @param string $entryId Live stream entry id
+	 * @param string $token Live stream broadcasting token
+	 * @return KalturaLiveStreamEntry The authenticated live stream entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::LIVE_STREAM_INVALID_TOKEN
+	 */
+	function authenticateAction($entryId, $token)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		/* @var $dbEntry LiveStreamEntry */
+		if ($dbEntry->getStreamPassword() != $token)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
+
+		// fetch current stream live params
+		$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());
+		$liveParamsCounts = array();
+		
+		// counting the current stream live params
+		foreach($liveParamsIds as $liveParamsId)
+			$liveParamsCounts[$liveParamsId] = 1;
+		
+			
+		// fetch all live entries that currently are live
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setIsLive(true);
+		$filter->setIdNotIn(array($entryId));
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->attachToCriteria($baseCriteria);
+		
+		$entries = entryPeer::doSelect($baseCriteria);
+		$liveParamsInputs = count($entries) + 1;
+		$maxLiveStreamInputs = $this->getPartner()->getMaxLiveStreamInputs();
+		if(is_null($maxLiveStreamInputs))
+			$maxLiveStreamInputs = kConf::get('partner_max_live_stream_inputs', 'local', 10);
+			
+		KalturaLog::debug("live params inputs [$liveParamsInputs], max live stream inputs [$maxLiveStreamInputs]");
+		if($liveParamsInputs > $maxLiveStreamInputs)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_INPUTS, $entryId);
+			
+		foreach($entries as $liveEntry)
+		{
+			/* @var $liveEntry LiveEntry */
+			$liveParamsIds = explode(',', $liveEntry->getFlavorParamsIds());
+			
+			foreach($liveParamsIds as $liveParamsId)
+			{
+				if(isset($liveParamsCounts[$liveParamsId]))
+					$liveParamsCounts[$liveParamsId]++;
+				else
+					$liveParamsCounts[$liveParamsId] = 1;
+			}
+		}
+			
+		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($liveParamsCounts));
+		$liveParamsOutputs = 0;
+		foreach($liveParams as $liveParamsItem)
+		{
+			/* @var $liveParamsItem LiveParams */
+			if(!$liveParamsItem->hasTag(liveParams::TAG_SOURCE))
+			{
+				KalturaLog::debug("Output live params [" . $liveParamsItem->getId() . "] [" . $liveParamsItem->getSystemName() . "]: " . $liveParamsCounts[$liveParamsItem->getId()]);
+				$liveParamsOutputs += $liveParamsCounts[$liveParamsItem->getId()];
+			}
+		}
+		
+		$maxLiveStreamOutputs = $this->getPartner()->getMaxLiveStreamOutputs();
+		if(is_null($maxLiveStreamOutputs))
+			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', 'local', 30);
+			
+		KalturaLog::debug("live params outputs [$liveParamsOutputs], max live stream outputs [$maxLiveStreamOutputs]");
+		if($liveParamsOutputs > $maxLiveStreamOutputs)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_OUTPUTS, $entryId);
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		return $entry;
+	}
+
 	/**
 	 * Update live stream entry. Only the properties that were set will be updated.
 	 * 
 	 * @action update
 	 * @param string $entryId Live stream entry id to update
-	 * @param KalturaLiveStreamAdminEntry $liveStreamEntry Live stream entry metadata to update
-	 * @return KalturaLiveStreamAdminEntry The updated live stream entry
+	 * @param KalturaLiveStreamEntry $liveStreamEntry Live stream entry metadata to update
+	 * @return KalturaLiveStreamEntry The updated live stream entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit
 	 */
-	function updateAction($entryId, KalturaLiveStreamAdminEntry $liveStreamEntry)
+	function updateAction($entryId, KalturaLiveStreamEntry $liveStreamEntry)
 	{
 		return $this->updateEntry($entryId, $liveStreamEntry, KalturaEntryType::LIVE_STREAM);
 	}
@@ -189,59 +295,16 @@ class LiveStreamService extends KalturaEntryService
 		return parent::updateThumbnailForEntryFromUrl($entryId, $url, KalturaEntryType::LIVE_STREAM, entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB);
 	}
 	
-	private function insertLiveStreamEntry(KalturaLiveStreamAdminEntry $liveStreamEntry)
-	{
-		// create a default name if none was given
-		if (!$liveStreamEntry->name)
-			$liveStreamEntry->name = $this->getPartnerId().'_'.time();
-		
-		// first copy all the properties to the db entry, then we'll check for security stuff
-		$dbEntry = $liveStreamEntry->toInsertableObject(new entry());
-
-		$this->checkAndSetValidUserInsert($liveStreamEntry, $dbEntry);
-		$this->checkAdminOnlyInsertProperties($liveStreamEntry);
-		$this->validateAccessControlId($liveStreamEntry);
-		$this->validateEntryScheduleDates($liveStreamEntry, $dbEntry);
-		/* @var $dbEntry entry */
-		$dbEntry->setPartnerId($this->getPartnerId());
-		$dbEntry->setSubpId($this->getPartnerId() * 100);
-		$dbEntry->setKuserId($this->getKuser()->getId());
-		$dbEntry->setCreatorKuserId($this->getKuser()->getId());
-		$dbEntry->setStatus(entryStatus::IMPORT);
-		
-		$te = new TrackEntry();
-		$te->setEntryId( $dbEntry->getId() );
-		$te->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY );
-		$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE" );
-		TrackEntry::addTrackEntry( $te );
-		
-		$dbEntry->save();
-		//If a jobData can be created for entry sourceType, add provision job. Otherwise, just save the entry.
-		$jobData = kProvisionJobData::getInstance($dbEntry->getSource());
-		if ($jobData)
-		{
-			/* @var $data kProvisionJobData */
-			$jobData->populateFromPartner($dbEntry->getPartner());
-			$jobData->populateFromEntry($dbEntry);
-			kJobsManager::addProvisionProvideJob(null, $dbEntry, $jobData);
-		}
-		else
-		{
-			$dbEntry->setStatus(entryStatus::READY);
-			$dbEntry->save();
-		}
- 			
-		return $dbEntry;
-	}	
-	
 	/**
-	 * New action delivering the status of a live stream (on-air/offline) if it is possible
+	 * Delivering the status of a live stream (on-air/offline) if it is possible
+	 * 
 	 * @action isLive
 	 * @param string $id ID of the live stream
 	 * @param KalturaPlaybackProtocol $protocol protocol of the stream to test.
+	 * @return bool
+	 * 
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
-	 * @return bool
 	 */
 	public function isLiveAction ($id, $protocol)
 	{
@@ -261,16 +324,25 @@ class LiveStreamService extends KalturaEntryService
 		{
 			$liveStreamEntry = entryPeer::retrieveByPK($id);
 		}
+		
 		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+		
+		/* @var $liveStreamEntry LiveStreamEntry */
+	
+		if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
+		{
+			return $liveStreamEntry->hasMediaServer();
+		}
 		
 		switch ($protocol)
 		{
 			case KalturaPlaybackProtocol::HLS:
 			case KalturaPlaybackProtocol::APPLE_HTTP:
 				$url = $liveStreamEntry->getHlsStreamUrl();
+				
 				foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol){
-					$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, 'protocol', $hlsProtocol);
+					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::getProtocol());
 					if ($config){
 						$url = $config->getUrl();
 						$protocol = $hlsProtocol;
@@ -281,11 +353,10 @@ class LiveStreamService extends KalturaEntryService
 				$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
 				$urlManager->setProtocol($protocol);
 				return $urlManager->isLive($url);
-				break;
 				
 			case KalturaPlaybackProtocol::HDS:
 			case KalturaPlaybackProtocol::AKAMAI_HDS:
-				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($liveStreamEntry, "protocol", $protocol);
+				$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
 				if ($config)
 				{
 					$url = $config->getUrl();
@@ -299,5 +370,4 @@ class LiveStreamService extends KalturaEntryService
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
 	}
-
 }

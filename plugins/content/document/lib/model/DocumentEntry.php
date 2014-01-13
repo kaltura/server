@@ -74,7 +74,7 @@ class DocumentEntry extends entry
 
 	public function getCreateThumb (  )			{	return false;} // Documents never have a thumb
 	
-	public function getLocalThumbFilePath(entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
+	public function getLocalThumbFilePath($version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null) {
 		KalturaLog::log ( "flavor_id [$flavorId] file_name [$fileName]" );
 		if (is_null ( $flavorId ))
@@ -92,7 +92,7 @@ class DocumentEntry extends entry
 		}
 		try 
 		{
-			return myEntryUtils::resizeEntryImage ( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density );
+			return myEntryUtils::resizeEntryImage($this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density);
 		} 
 		catch ( Exception $ex ) 
 		{

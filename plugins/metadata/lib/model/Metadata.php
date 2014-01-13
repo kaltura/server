@@ -30,7 +30,7 @@ class Metadata extends BaseMetadata implements ISyncableFile
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		$this->setVersion(1);
+		$this->incrementVersion();
 		return parent::preInsert($con);
 	}
 

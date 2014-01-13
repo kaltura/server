@@ -165,17 +165,6 @@ class kBusinessConvertDL
 		if (!$entry)
 			throw new kCoreException("Could not retrieve entry ID [".$thumbAsset->getEntryId()."] from ThumbAsset ID [".$thumbAsset->getId()."]", APIErrors::ENTRY_ID_NOT_FOUND);
 
-		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-		foreach($entryThumbAssets as $entryThumbAsset)
-		{
-			if($entryThumbAsset->getId() == $thumbAsset->getId())
-				continue;
-			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-				continue;
-			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			$entryThumbAsset->save();
-		}
-
 		if(!$thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 		{
 			/* @var $thumbAsset KalturaThumbAsset */
@@ -185,7 +174,7 @@ class kBusinessConvertDL
 		}
 
 		$entry->setThumbnail(".jpg");
-		$entry->setCreateThumb(false);
+		$entry->setCreateThumb(false, $thumbAsset);
 		$entry->save();
 
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -371,16 +360,86 @@ class kBusinessConvertDL
 		return 0;
 	}
 	
-	public static function decideLiveProfile(entry $entry){
+	public static function decideLiveProfile(LiveEntry $entry)
+	{
+		// find all live assets of the entry
+		$c = new Criteria();
+		$c->add(assetPeer::PARTNER_ID, $entry->getPartnerId());
+		$c->add(assetPeer::ENTRY_ID, $entry->getId());
+		$c->add(assetPeer::TYPE, assetType::LIVE);
+		// include deleted assets
+		assetPeer::setUseCriteriaFilter(false); 
+		$liveAssets = assetPeer::doSelect($c);
+		assetPeer::setUseCriteriaFilter(true);
+		
+		// build array of all assets with asset params id as key
+		$liveAssetsParams = array();
+		foreach($liveAssets as $liveAsset)
+		{
+			/* @var $liveAsset liveAsset */
+			$flavorParamsId = is_null($liveAsset->getFlavorParamsId()) ? $liveAsset->getId() : $liveAsset->getFlavorParamsId();
+			$liveAssetsParams[$flavorParamsId] = $liveAsset;
+		}
+		
 		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
-		foreach ($liveParamsArray as $liveParams){
+		
+		$liveParamIdsArray = array();
+		/* @var $flavorAsset flavorAsset */
+		foreach ($liveParamsArray as $liveParams)
+			$liveParamIdsArray[] = $liveParams->getId();
+			
+		asort($liveParamIdsArray);
+		$liveParamIds = implode(",", $liveParamIdsArray);
+		if($liveParamIds == $entry->getFlavorParamsIds())
+			return;
+		
+		$streamBitrates = array();
+		foreach ($liveParamsArray as $liveParams)
+		{
 			/* @var $liveParams liveParams */
-			$liveAsset = new liveAsset(); 
-			$liveAsset->setType(assetType::LIVE);
-			$liveAsset->setFromAssetParams($liveParams);
-			$liveAsset->setEntryId($entry->getId());
-			$liveAsset->setStatus(asset::ASSET_STATUS_IMPORTING);
+			
+			$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
+			$streamBitrates[] = $streamBitrate;
+			
+			// check if asset already exists
+			if(isset($liveAssetsParams[$liveParams->getId()]))
+			{
+				$liveAsset = $liveAssetsParams[$liveParams->getId()];
+				$liveAsset->setDeletedAt(null);
+
+				// remove the asset from the list, the left assets will be deleted later
+				unset($liveAssetsParams[$liveParams->getId()]);
+			}
+			else
+			{
+				// create a new asset
+				$liveAsset = new liveAsset();
+				$liveAsset->setType(assetType::LIVE);
+				$liveAsset->setPartnerId($entry->getPartnerId());
+				$liveAsset->setFlavorParamsId($liveParams->getId());
+				$liveAsset->setFromAssetParams($liveParams);
+				$liveAsset->setEntryId($entry->getId());
+			}
+			
+			// set the status according to the entry status
+			if($entry->getStatus() == entryStatus::READY)
+				$liveAsset->setStatus( asset::ASSET_STATUS_READY);
+			else
+				$liveAsset->setStatus( asset::ASSET_STATUS_IMPORTING);
+				
 			$liveAsset->save();
 		}
+		
+		// delete all left assets
+		foreach($liveAssetsParams as $liveAsset)
+		{
+			/* @var $liveAsset liveAsset */
+			$liveAsset->setDeletedAt(time());
+			$liveAsset->setStatus(asset::ASSET_STATUS_DELETED);
+			$liveAsset->save();
+		}
+		
+		$entry->setStreamBitrates($streamBitrates);
+		$entry->save();
 	}
 }

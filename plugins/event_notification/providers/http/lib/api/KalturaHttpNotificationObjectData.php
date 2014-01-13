@@ -92,7 +92,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		
 		$notification = new KalturaHttpNotification();
 		$notification->object = $apiObject;
-		$notification->eventObjectType = $httpNotificationTemplate->getObjectType();
+		$notification->eventObjectType = kPluginableEnumsManager::coreToApi('EventNotificationEventObjectType', $httpNotificationTemplate->getObjectType());
 		$notification->eventNotificationJobId = $jobData->getJobId();
 		$notification->templateId = $httpNotificationTemplate->getId();
 		$notification->templateName = $httpNotificationTemplate->getName();

@@ -20,12 +20,19 @@ class KalturaLiveStreamBitrate extends KalturaObject
 	 */
 	public $height;
 	
+	/**
+	 * @var string
+	 */
+	public $tags;
+	
 
 	public function fromObject ( $source_object )
 	{
 		$this->bitrate = $source_object['bitrate'];
 		$this->width = $source_object['width'];
 		$this->height = $source_object['height'];
+		if(isset($source_object['tags']))
+			$this->tags = $source_object['tags'];
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -42,8 +49,9 @@ class KalturaLiveStreamBitrate extends KalturaObject
 		$object_to_fill['bitrate'] = $this->bitrate;
 		$object_to_fill['width'] = $this->width;
 		$object_to_fill['height'] = $this->height;
+		if($this->tags)
+			$object_to_fill['tags'] = $this->tags;
 		
 		return $object_to_fill;	
 	}
 }
-?>

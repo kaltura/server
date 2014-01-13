@@ -105,7 +105,10 @@ class myCustomData
 			}
 		}
 		
-		return @$this->data [$name] ;
+		if(isset($this->data [$name]))
+			return $this->data [$name];
+			
+		return null;
 	}
 	
 	/**
@@ -145,13 +148,23 @@ class myCustomData
 		if($namespace)
 		{
 			if ($name)
+			{
+				if(!isset($this->data[$namespace][$name]))
+					return;
 				unset($this->data[$namespace][$name]);
+			}
 			else
+			{
+				if(!isset($this->data[$namespace]))
+					return;
 				unset($this->data[$namespace]);
+			}
 		}
 		else
 		{
-			unset ($this->data [$name]);
+			if(!isset($this->data[$name]))
+				return;
+			unset ($this->data[$name]);
 		}
 	}
 	

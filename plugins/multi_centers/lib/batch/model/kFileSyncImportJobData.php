@@ -38,6 +38,11 @@ class kFileSyncImportJobData extends kJobData
 	 */
 	private $fileSize;
 	
+	/**
+ 	* Is the asset being synced the entries source asset
+ 	* @var bool
+ 	*/
+	private $isSourceAsset = false;	
 	
 	/** GETTERS & SETTERS **/
 	
@@ -123,8 +128,52 @@ class kFileSyncImportJobData extends kJobData
 		return $this->fileSize;
 	}
 	
+	/** 
+ 	* @param bool $isSourceAsset the $isSourceAsset to set
+ 	*/
+	public function setIsSourceAsset($isSourceAsset)
+	{
+  		$this->isSourceAsset = $isSourceAsset;
+	}
+
+	/**
+ 	* @return the $isSourceAsset
+ 	*/
+	public function getIsSourceAsset()
+	{
+  		return $this->isSourceAsset;
+	}
+	
 	public function calculateEstimatedEffort(BatchJob $batchJob) {
 		return $this->fileSize;
 	}
 	
+	/**
+	 * This function calculates the urgency of the job according to its data
+	 * @param BatchJob $batchJob
+	 * @return integer the calculated urgency
+	 */
+	public function calculateUrgency(BatchJob $batchJob) {		
+	  	//In case the asset currently being synced is source we lower its urgency by 1 to process the job faster 
+	  	if($this->isSourceAsset)
+	    	$urgency = BatchJobUrgencyType::FILE_SYNC_SOURCE;
+	  	else 
+	    	$urgency = BatchJobUrgencyType::FILE_SYNC_NOT_SOURCE;
+	    
+	  	return $urgency;
+	}
+	
+	/**
+	 * This function calculates the priority of the job.
+	 * @param BatchJob $batchJob
+	 * @return integer the calculated priority
+	 */
+	public function calculatePriority(BatchJob $batchJob) {
+	  	$priority = parent::calculatePriority($batchJob);
+	  
+	  	if($this->isSourceAsset)
+	    	$priority = $priority - 1;
+	    
+	  	return $priority;
+	}
 }

@@ -15,6 +15,61 @@ class SphinxEntryCriteria extends SphinxCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		/* @var $filter entryFilter */
+
+		if ( $filter->is_set('_eq_redirect_from_entry_id' ) )
+		{
+			$partnerGroup = array(kCurrentContext::getCurrentPartnerId(), PartnerPeer::GLOBAL_PARTNER);
+			$criteriaFilter = entryPeer::getCriteriaFilter();
+			$defaultCriteria = $criteriaFilter->getFilter();
+			$defaultCriteria->remove(entryPeer::PARTNER_ID);
+			$defaultCriteria->add(entryPeer::PARTNER_ID, $partnerGroup, Criteria::IN);
+						
+			$origEntryId = $filter->get( '_eq_redirect_from_entry_id' );
+			$origEntry = entryPeer::retrieveByPK($origEntryId);				
+			
+			if ( ! empty( $origEntry ) )
+			{
+				if ( $origEntry->getType() == entryType::LIVE_STREAM )
+				{
+					// Set a relatively short expiry value in order to reduce the wait-time
+					// until the cache is refreshed and a redirection kicks-in. 
+					kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
+				}
+								
+				// Get the id of the entry id that is being redirected from the original entry
+				$redirectEntryId = $origEntry->getRedirectEntryId(); 
+				
+				if ( is_null( $redirectEntryId ) ) // No redirection required? 
+				{
+					$filter->set( '_eq_id', $origEntryId ); // Continue with original entry id
+				}
+				else
+				{
+					// Get the redirected entry and check if it exists and is ready
+					$redirectedEntry = entryPeer::retrieveByPK( $redirectEntryId );
+					
+					if ( ! empty( $redirectedEntry )
+							&& $redirectedEntry->getStatus() == entryStatus::READY )
+					{
+						// Redirected entry is ready.
+						// Set it as the replacement of the original one
+						$filter->set( '_eq_id', $redirectEntryId );
+					}
+					else
+					{
+						// Can't redirect? --> Fallback to the original entry
+						$filter->set( '_eq_id', $origEntryId );
+					}
+				}
+			}
+			else
+			{
+				throw new kCoreException( "Invalid entry id [\"$origEntryId\"]", kCoreException::INVALID_ENTRY_ID, $origEntryId );
+			}
+
+			$filter->unsetByName( '_eq_redirect_from_entry_id' );
+		}
+		
 		$categoriesAncestorParsed = null;
 		$categories = $filter->get( "_in_category_ancestor_id");
 		if ($categories !== null)
@@ -115,7 +170,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_in_categories_full_name');
 		}		
-		
+	
+		if($filter->is_set('_is_live'))
+		{
+			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . $filter->get('_is_live'));
+			$filter->unsetByName('_is_live');
+		}
 		
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))

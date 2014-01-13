@@ -10,6 +10,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	const HAS_VALUE = 'HASVALUE';
 
 	const HAS_NO_VALUE = 'HASNOVALUE';
+	
+	const CACHE_PREFIX = 'executed_sphinx_server_';
 
 	/**
 	 * @param string $baseName
@@ -273,8 +275,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach ($sphinxPluginsData as $key => $value){
 
 			if(is_array($value)) {
-				if (array_key_exists($key, $dataJson)) {
-					$dataJson[$key] = array_merge($value, $dataJson[$key]);
+				if (isset($dataJson[$key])) {
+					$value = array_merge($value, $dataJson[$key]);
 				}
 				$dataJson[$key] = $value;
 			} else if (is_numeric($value)) {
@@ -386,6 +388,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		KalturaLog::debug($sql);
 				
 		$sphinxLog = new SphinxLog();
+		$sphinxLog->setExecutedServerId($this->retrieveSphinxConnectionId());
 		$sphinxLog->setObjectId($object->getId());
 		$sphinxLog->setObjectType(get_class($object));
 		$sphinxLog->setEntryId($object->getEntryId());
@@ -404,6 +407,32 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$arr = $sphinxConnection->errorInfo();
 		KalturaLog::err($arr[2]);
 		return false;
+	}
+
+	private function retrieveSphinxConnectionId ()
+	{
+		$sphinxConnectionId = null;
+		if(kConf::hasParam('exec_sphinx') && kConf::get('exec_sphinx'))
+        {
+        	$sphinxConnection = DbManager::getSphinxConnection(false);
+			$sphinxServerCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
+			if ($sphinxServerCacheStore)
+			{
+				$sphinxConnectionId = $sphinxServerCacheStore->get(self::CACHE_PREFIX . $sphinxConnection->getHostName());
+				if ($sphinxConnectionId)
+					return $sphinxConnectionId;
+			}
+			
+			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($sphinxConnection->getHostName());
+			if($sphinxServer)
+			{
+	        	$sphinxConnectionId = $sphinxServer->getId();
+				if ($sphinxServerCacheStore)
+					$sphinxServerCacheStore->set(self::CACHE_PREFIX . $sphinxConnection->getHostName(), $sphinxConnectionId);
+			}
+		}
+		
+		return $sphinxConnectionId;
 	}
 		
 	/**

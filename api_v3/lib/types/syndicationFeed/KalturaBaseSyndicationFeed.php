@@ -71,7 +71,7 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 	/**
 	 * Creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter order
 	 */
@@ -147,7 +147,7 @@ abstract class KalturaBaseSyndicationFeed extends KalturaObject implements IFilt
 	/**
 	 * Update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter order
 	 */

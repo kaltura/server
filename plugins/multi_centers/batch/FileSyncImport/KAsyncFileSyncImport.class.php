@@ -7,6 +7,11 @@
  */
 class KAsyncFileSyncImport extends KJobHandlerWorker
 {
+	public function run($jobs = null)
+	{
+		$retJobs = parent::run($jobs);
+		return $retJobs;
+	}
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -134,10 +139,9 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		
 		// get directory contents
-		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');
-		$curlWrapper = new KCurlWrapper($sourceUrl);	
-		$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
-		$contents = $curlWrapper->exec();
+		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');	
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+		$contents = $curlWrapper->exec($sourceUrl);
 		$curlError = $curlWrapper->getError();
 		$curlErrorNumber = $curlWrapper->getErrorNumber();
 		$curlWrapper->close();
@@ -252,9 +256,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		
 		// get http body
-		$curlWrapper = new KCurlWrapper($sourceUrl);
-		$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
-
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 		if($resumeOffset)
 		{
 			// will resume from the current offset
@@ -277,7 +279,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 			
 		KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
-		$res = $curlWrapper->exec($fileDestination); // download file
+		$res = $curlWrapper->exec($sourceUrl, $fileDestination); // download file
 		$curlError = $curlWrapper->getError();
 		$curlErrorNumber = $curlWrapper->getErrorNumber();
 		$curlWrapper->close();
@@ -423,9 +425,8 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		$this->updateJob($job, 'Downloading header for ['.$url.']', KalturaBatchJobStatus::PROCESSING);
 		
 		// fetch the http headers
-		$curlWrapper = new KCurlWrapper($url);
-		$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
-		$curlHeaderResponse = $curlWrapper->getHeader();
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+		$curlHeaderResponse = $curlWrapper->getHeader($url);
 		$curlError = $curlWrapper->getError();
 		$curlErrorNumber = $curlWrapper->getErrorNumber();
 		$curlWrapper->close();

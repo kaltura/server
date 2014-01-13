@@ -220,6 +220,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="end_date" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_played_at" type="timestamp" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">
 			<reference local="kshow_id" foreign="id" />
 		</foreign-key>
@@ -278,6 +279,54 @@
 			<index-column name="partner_id" />
 			<index-column name="modified_at" />
 		</index>
+	</table>
+	<table skipSql="false" abstract="false" name="live_channel_segment" phpName="LiveChannelSegment">
+		<column lazyLoad="false" name="id" type="bigint" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="channel_id" type="varchar" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="trigger_type" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="trigger_segment_id" type="bigint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="start_time" type="float" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="duration" type="float" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="live_channel_segment">
+			<reference local="trigger_segment_id" foreign="id" />
+		</foreign-key>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="partner">
+			<reference local="partner_id" foreign="id" />
+		</foreign-key>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
+			<reference local="channel_id" foreign="id" />
+		</foreign-key>
+		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
+			<reference local="entry_id" foreign="id" />
+		</foreign-key>
+		<index name="partner_channel_status_index">
+			<index-column name="partner_id" />
+			<index-column name="channel_id" />
+			<index-column name="status" />
+		</index>
+		<index name="partner_entry_status_index">
+			<index-column name="partner_id" />
+			<index-column name="entry_id" />
+			<index-column name="status" />
+		</index>
+	</table>
+	<table skipSql="false" abstract="false" name="media_server" phpName="MediaServer">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="hostname" type="varchar" size="255" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 	</table>
 	<table skipSql="false" abstract="false" name="kvote" phpName="kvote">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -844,7 +893,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="max_number_of_hits_per_day" type="integer" default="-1" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="appear_in_search" type="integer" default="2" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="debug_level" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="invalid_login_count" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="anonymous_kuser_id" type="integer" />
@@ -1414,6 +1462,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" default="2" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" default="1" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="default_entry_id" type="varchar" size="20" />
 		<column primaryKey="false" lazyLoad="false" name="crop_left" type="integer" required="true" default="-1" />
 		<column primaryKey="false" lazyLoad="false" name="crop_top" type="integer" required="true" default="-1" />
@@ -1942,7 +1991,7 @@
         </index>
 	</table>
 	<table skipSql="false" abstract="false" name="file_asset">
-		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column lazyLoad="false" name="id" type="bigint" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="version" type="integer" />
@@ -1953,12 +2002,15 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="file_ext" type="varchar" size="4" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="size" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="size" type="bigint" />
 		<index name="partner_object_status">
 			<index-column name="partner_id" />
 			<index-column name="object_id" />
 			<index-column name="object_type" />
 			<index-column name="status" />
 		</index>
+		<index name="updated_at">
+			<index-column name="updated_at" />
+		</index>		
 	</table>
 </database>

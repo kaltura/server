@@ -83,6 +83,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const ENTRY_MEDIA_SOURCE_KALTURA_PARTNER_KSHOW = 27;
 	const ENTRY_MEDIA_SOURCE_SEARCH_PROXY = 28;
 	const ENTRY_MEDIA_SOURCE_AKAMAI_LIVE = 29;
+	const ENTRY_MEDIA_SOURCE_MANUAL_LIVE_STREAM = 30;
+	const ENTRY_MEDIA_SOURCE_AKAMAI_UNIVERSAL_LIVE = 31;
+	const ENTRY_MEDIA_SOURCE_LIVE_STREAM = 32;
+	const ENTRY_MEDIA_SOURCE_LIVE_CHANNEL = 33;
+	const ENTRY_MEDIA_SOURCE_RECORDED_LIVE = 34;
+	const ENTRY_MEDIA_SOURCE_CLIP = 35;
 	const ENTRY_MEDIA_SOURCE_PARTNER_SPECIFIC = 100;
 		
 	const ENTRY_MODERATION_STATUS_PENDING_MODERATION = 1;
@@ -104,6 +110,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const FILE_SYNC_ENTRY_SUB_TYPE_ISM = 7;
 	const FILE_SYNC_ENTRY_SUB_TYPE_ISMC = 8;
 	const FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG = 9;
+	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY = 10; 
+	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY = 11; 
 	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
@@ -442,7 +450,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getSyncKey ( $sub_type , $version = null )
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::ENTRY;
 		
@@ -505,7 +513,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function generateFilePathArr( $sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA )
 		{
 			$data = $this->getData();
@@ -583,7 +591,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return array ( myContentStorage::getFSContentRootPath( ) , $res );
 	}
 	
-	private function getVersionForSubType ( $sub_type, $version = null  )
+	protected function getVersionForSubType ( $sub_type, $version = null  )
 	{
 		if (
 				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISM
@@ -651,9 +659,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 
 	
-	private static function validateFileSyncSubType ( $sub_type )
+	protected static function validateFileSyncSubType ( $sub_type )
 	{
-		if ( $sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
+		if ($sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE &&
@@ -1108,6 +1116,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function indexToSearchIndex()
 	{
 		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
+	}
+	
+	/**
+	 * Used to add dynamic JSON attributes to the search index
+	 */
+	public function getDynamicAttributes()
+	{
+		return null;
 	}
 	
 	/**
@@ -1579,44 +1595,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCountDate ( $v )	{	$this->putInCustomData ( "count_date" , $v );	}
 	public function getCountDate (  )		{	return $this->getFromCustomData( "count_date" );	}
 
-
-	public function setEncodingIP1 ( $v )	{	$this->putInCustomData ( "encodingIP1" , $v );	}
-	public function getEncodingIP1 (  )		{	return $this->getFromCustomData( "encodingIP1" );	}
-
-	public function setEncodingIP2 ( $v )	{	$this->putInCustomData ( "encodingIP2" , $v );	}
-	public function getEncodingIP2 (  )		{	return $this->getFromCustomData( "encodingIP2" );	}
-
-	public function setStreamUsername ( $v )	{	$this->putInCustomData ( "streamUsername" , $v );	}
-	public function getStreamUsername (  )		{	return $this->getFromCustomData( "streamUsername" );	}
-
-	public function setStreamPassword ( $v )	{	$this->putInCustomData ( "streamPassword" , $v );	}
-	public function getStreamPassword (  )		{	return $this->getFromCustomData( "streamPassword" );	}
-
-	public function setOfflineMessage ( $v )	{	$this->putInCustomData ( "offlineMessage" , $v );	}
-	public function getOfflineMessage (  )		{	return $this->getFromCustomData( "offlineMessage" );	}
-
-	public function setStreamRemoteId ( $v )	{	$this->putInCustomData ( "streamRemoteId" , $v );	}
-	public function getStreamRemoteId (  )		{	return $this->getFromCustomData( "streamRemoteId" );	}
-
-	public function setStreamRemoteBackupId ( $v )	{	$this->putInCustomData ( "streamRemoteBackupId" , $v );	}
-	public function getStreamRemoteBackupId (  )		{	return $this->getFromCustomData( "streamRemoteBackupId" );	}
-
-	public function setStreamUrl ( $v )	{	$this->putInCustomData ( "streamUrl" , $v );	}
-	public function getStreamUrl (  )		{	return $this->getFromCustomData( "streamUrl" );	}
-	
-	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryBroadcastingUrl" , $v );	}
-	public function getPrimaryBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryBroadcastingUrl" );	}
-	
-	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
-	public function getSecondaryBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryBroadcastingUrl" );	}
-	
-	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName" );	}
-	
-	public function setStreamBitrates (array $v )	{	$this->putInCustomData ( "streamBitrates" , $v );	}
-	public function getStreamBitrates (  )		{	return $this->getFromCustomData( "streamBitrates" );	}
-	
-	public function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
+	protected function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
 	public function getIsmVersion (  )		{	return (int) $this->getFromCustomData( "ismVersion" );	}
 	
 	public function setReferenceID  ( $v )	{	$this->putInCustomData ( "referenceID" , $v );	}
@@ -1634,8 +1613,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 	
+	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
+	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
+	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
-	public function setCreateThumb ( $v )		{	$this->putInCustomData ( "createThumb" , (bool) $v );	}
+	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
+	{	
+		if(!$v)
+			assetPeer::removeThumbAssetDeafultTags($this->getId(), $thumbAsset ? $thumbAsset->getId() : null); 
+		
+		$this->putInCustomData ( "createThumb" , (bool) $v );	
+	}
 	public function getCreateThumb (  )			{	return (bool) $this->getFromCustomData( "createThumb" ,null, true );	}
 	
 	// indicates that duration shouldn't be auto calculated, because it already supplied by the user
@@ -1851,7 +1839,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function incrementIsmVersion (  )
 	{
-		$version = $this->getIsmVersion() + 1;
+		$version = kDataCenterMgr::incrementVersion($this->getIsmVersion());
 		$this->setIsmVersion($version);
 		return $version;
 	}
@@ -2508,10 +2496,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 		if (!$this->alreadyInSave)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
-			
-		if ($this->type == entryType::LIVE_STREAM && $this->conversion_profile_id)
-			kBusinessConvertDL::decideLiveProfile($this);
-		
 	}
 	
 	/*************** Bulk download functions - start ******************/
@@ -2869,7 +2853,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 * will create thumbnail according to the entry type
 	 * @return the thumbnail path.
 	 */
-	public function getLocalThumbFilePath(entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
+	public function getLocalThumbFilePath($version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $density = 0, $stripProfiles = false, $flavorId = null, $fileName = null)
 	{
 		$contentPath = myContentStorage::getFSContentRootPath ();
@@ -2882,13 +2866,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$msgPath = $contentPath . "content/templates/entry/thumbnail/audio_thumb.jpg";
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		
-		} elseif ($this->getType () == entryType::LIVE_STREAM) {
-			if ($this->getStatus () == entryStatus::DELETED || $this->getModerationStatus () == moderation::MODERATION_STATUS_BLOCK) {
-				KalturaLog::log ( "rejected live stream entry - not serving thumbnail" );
-				KExternalErrors::dieError ( KExternalErrors::ENTRY_DELETED_MODERATED );
-			}
-			$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
-			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		} elseif ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_SHOW) { // roughcut without any thumbnail, probably just created
 			$msgPath = $contentPath . "content/templates/entry/thumbnail/auto_edit.jpg";
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
@@ -2920,56 +2897,4 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
-	
-	public function getHlsStreamUrl ()
-	{
-	    return $this->getFromCustomData("hls_stream_url");
-	}
-	
-	public function setHlsStreamUrl ($v)
-	{
-	    $this->putInCustomData("hls_stream_url", $v);
-	}
-	
-	public function getDvrStatus ()
-	{
-	    return $this->getFromCustomData("dvr_status");
-	}
-	
-	public function setDvrStatus ($v)
-	{
-	    $this->putInCustomData("dvr_status", $v);
-	}
-	
-    public function getDvrWindow ()
-	{
-	    return $this->getFromCustomData("dvr_window");
-	}
-	
-	public function setDvrWindow ($v)
-	{
-	    $this->putInCustomData("dvr_window", $v);
-	}
-	
-    public function getUrlManager ()
-	{
-	    return $this->getFromCustomData("url_manager");
-	}
-	
-	public function setUrlManager ($v)
-	{
-	    $this->putInCustomData("url_manager", $v);
-	}
-	
-	public function setLiveStreamConfigurations (array $v)
-	{
-		$this->putInCustomData('live_stream_configurations', $v);
-	}
-	
-	public function getLiveStreamConfigurations ()
-	{
-		return $this->getFromCustomData('live_stream_configurations', null, array());
-	}
-
-	
 }

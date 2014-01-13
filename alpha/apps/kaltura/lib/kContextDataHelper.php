@@ -294,20 +294,31 @@ class kContextDataHelper
 		{
 			$this->mediaProtocol = $this->mediaProtocol ? $this->mediaProtocol : $this->streamerType;
 		}
-		elseif ($this->entry->getType() == entryType::LIVE_STREAM)
+		elseif ($this->entry instanceof LiveEntry)
 		{
-			$protocols = array(PlaybackProtocol::AKAMAI_HDS, PlaybackProtocol::HDS);
+			$protocols = array();
+			
+			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM && $this->entry->getSource() != EntrySourceType::LIVE_CHANNEL)
+				$protocols[] = PlaybackProtocol::AKAMAI_HDS;
+				
+			$protocols[] = PlaybackProtocol::HDS;
+			
 			foreach ($protocols as $protocol)
 			{
-				$config = kLiveStreamConfiguration::getSingleItemByPropertyValue($this->entry, 'protocol', $protocol);
+				$config = $this->entry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
 				if ($config)
 				{	
 					$this->streamerType = $protocol;
 					break;
 				}
 			}	
-			if (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO)
+			
+			if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+				$this->streamerType = PlaybackProtocol::HDS;
+			if($this->entry->getSource() == EntrySourceType::AKAMAI_LIVE)
 				$this->streamerType = PlaybackProtocol::RTMP;
+			if($this->entry->getSource() == EntrySourceType::AKAMAI_UNIVERSAL_LIVE)
+				$this->streamerType = PlaybackProtocol::AKAMAI_HDS;
 		}
 		else
 		{
@@ -326,11 +337,21 @@ class kContextDataHelper
 			
 			if(!$deliveryType)
 				$deliveryType = array();
+				
 			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
 			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
-			if ($this->streamerType == PlaybackProtocol::HTTP && infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS)
-				$this->mediaProtocol = 'https';
 		}
+		
+		$httpStreamerTypes = array(
+			PlaybackProtocol::HTTP,
+			PlaybackProtocol::HDS,
+			PlaybackProtocol::HLS,
+			PlaybackProtocol::SILVER_LIGHT,
+			PlaybackProtocol::MPEG_DASH,
+		);
+		
+		if (in_array($this->streamerType, $httpStreamerTypes))
+			$this->mediaProtocol = infraRequestUtils::getProtocol();
 		
 		if ($this->streamerType == PlaybackProtocol::AKAMAI_HD || $this->streamerType == PlaybackProtocol::AKAMAI_HDS)
 			$this->mediaProtocol = PlaybackProtocol::HTTP;

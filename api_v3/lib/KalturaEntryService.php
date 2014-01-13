@@ -6,6 +6,12 @@
 class KalturaEntryService extends KalturaBaseService 
 {
 	
+	  //amount of time for attempting to grab kLock
+	  const KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT = 0.1;
+	
+	  //amount of time for holding kLock
+	  const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
@@ -259,6 +265,76 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->syncFlavorParamsIds();
 				$dbEntry->save();
 			}
+		}
+		
+		return $dbAsset;
+	}
+	
+	/**
+	 * @param kLiveEntryResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return array $operationAttributes
+	 * @return asset
+	 */
+	protected function attachLiveEntryResource(kLiveEntryResource $resource, entry $dbEntry, asset $dbAsset = null, array $operationAttributes = null)
+	{
+		$dbEntry->setRootEntryId($resource->getEntry()->getId());
+		$dbEntry->setSource(EntrySourceType::RECORDED_LIVE);
+		$dbEntry->save();
+	
+		if(!$dbAsset)
+		{
+ 			KalturaLog::debug("Creating original flavor asset for local file");
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+		}
+		
+		$offset = null;
+		$duration = null;
+		$requiredDuration = null;
+		
+		if(is_array($operationAttributes))
+		{
+			foreach($operationAttributes as $operationAttributesItem)
+			{
+				if($operationAttributesItem instanceof kClipAttributes)
+				{
+					// convert milliseconds to seconds
+					$offset = $operationAttributesItem->getOffset() / 1000;
+					$duration = $operationAttributesItem->getDuration() / 1000;
+					$requiredDuration = $offset + $duration;
+				}
+			}
+		}
+		
+		$dbLiveEntry = $resource->getEntry();
+		
+		if($requiredDuration)
+		{
+			$mediaServer = $dbLiveEntry->getMediaServer(true);
+			if($mediaServer)
+			{
+				$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
+				if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
+					$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
+			} 
+		}
+		
+		if($dbLiveEntry->isConvertingSegments())
+		{
+			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
+			$dbLiveEntry->save();
+		}
+		else
+		{
+			$key = $dbLiveEntry->getSyncKey(LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY);
+			if(!kFileSyncUtils::file_exists($key))
+				$key = $dbLiveEntry->getSyncKey(LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY);
+			if(!kFileSyncUtils::file_exists($key))
+				throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+			
+			$files = kFileSyncUtils::dir_get_files($key);
+			kJobsManager::addConcatJob(null, $dbAsset, $files, $offset, $duration);
 		}
 		
 		return $dbAsset;
@@ -524,18 +600,34 @@ class KalturaEntryService extends KalturaBaseService
  			KalturaLog::debug("Creating original flavor asset");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
-		
+	
 		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 		}
 		
+		$operationAttributes = $resource->getOperationAttributes();
 		$internalResource = $resource->getResource();
+		if($internalResource instanceof kLiveEntryResource)
+		{
+			$dbEntry->setOperationAttributes($operationAttributes);
+			$dbEntry->save();
+			
+			return $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
+		}
+		
 		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
 		
+		$sourceType = $resource->getSourceType();
+		if($sourceType)
+		{
+			$dbEntry->setSource($sourceType);
+			$dbEntry->save();
+		}
+		
 		$errDescription = '';
-		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $resource->getOperationAttributes());
+		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $operationAttributes);
 		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -551,7 +643,7 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
 			}
 			
-			$dbEntry->setOperationAttributes($resource->getOperationAttributes());
+			$dbEntry->setOperationAttributes($operationAttributes);
 			$dbEntry->save();
 		}
 		
@@ -774,12 +866,10 @@ class KalturaEntryService extends KalturaBaseService
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		if(!$dbEntry)
 		{
-			$coreType = kPluginableEnumsManager::apiToCore('entryType', $entry->type);
-			$class = KalturaPluginManager::getObjectClass(entryPeer::OM_CLASS, $coreType);
-			if(!$class)
-				$class = entryPeer::OM_CLASS;
+			$entryType = kPluginableEnumsManager::apiToCore('entryType', $entry->type);
+			$class = entryPeer::getEntryClassByType($entryType);
 				
-			KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$coreType] class [$class]");
+			KalturaLog::debug("Creating new entry of API type [$entry->type] core type [$entryType] class [$class]");
 			$dbEntry = new $class();
 		}
 			
@@ -1044,8 +1134,12 @@ class KalturaEntryService extends KalturaBaseService
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
 	
-		$this->setDefaultStatus($filter);
-		$this->setDefaultModerationStatus($filter);
+		if( $filter->idEqual == null && $filter->redirectFromEntryId == null )
+        {
+        	$this->setDefaultStatus($filter);
+            $this->setDefaultModerationStatus($filter);
+		}
+		
 		$this->fixFilterUserId($filter);
 		$this->fixFilterDuration($filter);
 		
@@ -1075,6 +1169,7 @@ class KalturaEntryService extends KalturaBaseService
 			($filter->idEqual != null ||
 			$filter->idIn != null ||
 			$filter->referenceIdEqual != null ||
+			$filter->redirectFromEntryId != null ||
 			$filter->referenceIdIn != null))
 			$disableWidgetSessionFilters = true;
 			

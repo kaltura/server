@@ -343,6 +343,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	protected $available_from;
 
 	/**
+	 * The value for the last_played_at field.
+	 * @var        string
+	 */
+	protected $last_played_at;
+
+	/**
 	 * @var        kshow
 	 */
 	protected $akshow;
@@ -1245,6 +1251,46 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				$dt = new DateTime($this->available_from);
 			} catch (Exception $x) {
 				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->available_from, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [last_played_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getLastPlayedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->last_played_at === null) {
+			return null;
+		}
+
+
+		if ($this->last_played_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->last_played_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->last_played_at, true), $x);
 			}
 		}
 
@@ -2665,6 +2711,58 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	} // setAvailableFrom()
 
 	/**
+	 * Sets the value of [last_played_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     entry The current object (for fluent API support)
+	 */
+	public function setLastPlayedAt($v)
+	{
+		if(!isset($this->oldColumnsValues[entryPeer::LAST_PLAYED_AT]))
+			$this->oldColumnsValues[entryPeer::LAST_PLAYED_AT] = $this->last_played_at;
+
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->last_played_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->last_played_at !== null && $tmpDt = new DateTime($this->last_played_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->last_played_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = entryPeer::LAST_PLAYED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setLastPlayedAt()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -2792,6 +2890,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->end_date = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
 			$this->flavor_params_ids = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
 			$this->available_from = ($row[$startcol + 51] !== null) ? (string) $row[$startcol + 51] : null;
+			$this->last_played_at = ($row[$startcol + 52] !== null) ? (string) $row[$startcol + 52] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2801,7 +2900,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 52; // 52 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 53; // 53 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating entry object", $e);
@@ -3668,6 +3767,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			case 51:
 				return $this->getAvailableFrom();
 				break;
+			case 52:
+				return $this->getLastPlayedAt();
+				break;
 			default:
 				return null;
 				break;
@@ -3741,6 +3843,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$keys[49] => $this->getEndDate(),
 			$keys[50] => $this->getFlavorParamsIds(),
 			$keys[51] => $this->getAvailableFrom(),
+			$keys[52] => $this->getLastPlayedAt(),
 		);
 		return $result;
 	}
@@ -3928,6 +4031,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			case 51:
 				$this->setAvailableFrom($value);
 				break;
+			case 52:
+				$this->setLastPlayedAt($value);
+				break;
 		} // switch()
 	}
 
@@ -4004,6 +4110,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[49], $arr)) $this->setEndDate($arr[$keys[49]]);
 		if (array_key_exists($keys[50], $arr)) $this->setFlavorParamsIds($arr[$keys[50]]);
 		if (array_key_exists($keys[51], $arr)) $this->setAvailableFrom($arr[$keys[51]]);
+		if (array_key_exists($keys[52], $arr)) $this->setLastPlayedAt($arr[$keys[52]]);
 	}
 
 	/**
@@ -4067,6 +4174,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(entryPeer::END_DATE)) $criteria->add(entryPeer::END_DATE, $this->end_date);
 		if ($this->isColumnModified(entryPeer::FLAVOR_PARAMS_IDS)) $criteria->add(entryPeer::FLAVOR_PARAMS_IDS, $this->flavor_params_ids);
 		if ($this->isColumnModified(entryPeer::AVAILABLE_FROM)) $criteria->add(entryPeer::AVAILABLE_FROM, $this->available_from);
+		if ($this->isColumnModified(entryPeer::LAST_PLAYED_AT)) $criteria->add(entryPeer::LAST_PLAYED_AT, $this->last_played_at);
 
 		return $criteria;
 	}
@@ -4234,6 +4342,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$copyObj->setFlavorParamsIds($this->flavor_params_ids);
 
 		$copyObj->setAvailableFrom($this->available_from);
+
+		$copyObj->setLastPlayedAt($this->last_played_at);
 
 
 		if ($deepCopy) {

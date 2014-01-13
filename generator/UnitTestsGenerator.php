@@ -426,7 +426,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					$testParam .= " = null";
 				else if ($paramType == "string")
 					$testParam .= " = \"$defaultValue\"";
-				else if ($paramType == "int")
+				else if ($paramType == "int" || $paramType == "bigint")
 				{
 					if ($defaultValue == "")
 						$testParam .= " = \"\""; // hack for partner.getUsage

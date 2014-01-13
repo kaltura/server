@@ -111,6 +111,7 @@ class UserRolePeer extends BaseUserRolePeer
 		$c = new Criteria();
 		$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 		$c->addAnd(UserRolePeer::NAME, $roleName, Criteria::EQUAL);
+		$c->addAnd(UserRolePeer::STATUS, UserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		UserRolePeer::setUseCriteriaFilter(false);
 		$userRole = UserRolePeer::doSelectOne($c);
 		UserRolePeer::setUseCriteriaFilter(true);

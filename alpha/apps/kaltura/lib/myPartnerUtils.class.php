@@ -1320,7 +1320,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $conversionProfileType = null)
  	{
 		$copiedList = array();
 		
@@ -1328,6 +1328,9 @@ class myPartnerUtils
  		
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
+ 		
+ 		if(!is_null($conversionProfileType))
+ 			$c->add(conversionProfile2Peer::TYPE, $conversionProfileType);
  		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
@@ -1355,7 +1358,6 @@ class myPartnerUtils
  			}
  		}
  		
- 		$toPartner->save();
 		// make sure conversion profile is set on the new partner in case it was missed/skiped in the conversionProfile2::copy method
 		if(!$toPartner->getDefaultConversionProfileId())
 		{
@@ -1363,9 +1365,19 @@ class myPartnerUtils
 			if($fromPartnerDefaultProfile && key_exists($fromPartnerDefaultProfile, $copiedList))
 			{
 				$toPartner->setDefaultConversionProfileId($copiedList[$fromPartnerDefaultProfile]);
-				$toPartner->save();
 			}
 		}
+ 	
+		if(!$toPartner->getDefaultLiveConversionProfileId())
+		{
+			$fromPartnerDefaultLiveProfile = $fromPartner->getDefaultLiveConversionProfileId();
+			if($fromPartnerDefaultLiveProfile && key_exists($fromPartnerDefaultLiveProfile, $copiedList))
+			{
+				$toPartner->setDefaultLiveConversionProfileId($copiedList[$fromPartnerDefaultLiveProfile]);
+			}
+		}
+		
+ 		$toPartner->save();
  	}
  	
  	public static function copyAccessControls(Partner $fromPartner, Partner $toPartner)

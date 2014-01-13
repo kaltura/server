@@ -11,6 +11,22 @@
 # pidfile:      /var/run/monit.pid
 # config:       /etc/monit.conf
 
+### BEGIN INIT INFO
+# Provides:          monit
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Should-Start:      $all
+# Should-Stop:       $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: service and resource monitoring daemon
+# Description:       monit is a utility for managing and monitoring
+#                    processes, programs, files, directories and filesystems
+#                    on a Unix system. Monit conducts automatic maintenance
+#                    and repair and can execute meaningful causal actions
+#                    in error situations.
+### END INIT INFO
+
 # Source networking configuration.
 . /etc/sysconfig/network
 

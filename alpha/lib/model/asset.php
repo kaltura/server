@@ -90,11 +90,13 @@ class asset extends Baseasset implements ISyncableFile
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
 	
+	const MAX_ASSETS_PER_ENTRY = 500;
+	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
 		$newFlavorAsset = $this->copy();
 		//this is the first version of the new asset.
-		$newFlavorAsset->setVersion(1);
+		$newFlavorAsset->incrementVersion();
 		if($partnerId)
 			$newFlavorAsset->setPartnerId($partnerId);
 		if($entryId)
@@ -158,6 +160,28 @@ class asset extends Baseasset implements ISyncableFile
 		}
 		return parent::save($con);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseAsset#preInsert()
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		//Validate max assets limitation was not reached before doing insert
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		
+		if($partner)
+	  		$assetPerEntryLimitation = $partner->getAssetsPerEntryLimitation();
+	  		
+	  	if(!isset($assetPerEntryLimitation) || $assetPerEntryLimitation == false)
+	    	$assetPerEntryLimitation = self::MAX_ASSETS_PER_ENTRY;
+	    		
+	  	$assetsCount = assetPeer::countByEntryId($this->entry_id);
+	  		
+	  	if($assetsCount+1 > $assetPerEntryLimitation)
+	    	throw new kCoreException("Max number of allowed assets per entry was reached", kCoreException::MAX_ASSETS_PER_ENTRY);
+	    	
+	    return parent::preInsert();
+	}
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseflavorAsset#postUpdate()
@@ -185,8 +209,7 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incrementVersion()
 	{
-		$version = $this->getVersion();
-		$this->setVersion(is_null($version) ? 1 : $version + 1);
+		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
 	}
 	
 	public function addTags(array $newTags)
@@ -552,7 +575,8 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incLogFileVersion()
 	{
-		$this->incInCustomData("logFileVersion", 1);
+		$version = kDataCenterMgr::incrementVersion($this->getLogFileVersion());
+		$this->putInCustomData("logFileVersion", $version);
 	}
 
 	public function getCacheInvalidationKeys()

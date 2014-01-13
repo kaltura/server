@@ -25,6 +25,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/sphinx/' . basename(__FILE__) . '.cache');
 KAutoloader::register();
 
+$skipExecutedUpdates = false;
 error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
@@ -74,6 +75,7 @@ while(true)
 	
 	while(!count($sphinxLogs))
 	{
+		$skipExecutedUpdates = true;
 		sleep(1);
 		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords);
 	}
@@ -97,6 +99,7 @@ while(true)
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
 		
+		
 		$serverLastLog = null;
 		
 		if(isset($lastLogs[$dc])) {
@@ -114,11 +117,18 @@ while(true)
 
 		try
 		{
-			$sql = $sphinxLog->getSql();
-			$affected = $sphinxCon->exec($sql);
+			if ($skipExecutedUpdates && $executedServerId == $serverLastLog->getId())
+                       {
+                               KalturaLog::log ("Sphinx server is initiated and the command already ran synchronously on this machine. Skipping");
+                       }
+                       else
+                       {
+                        	$sql = $sphinxLog->getSql();
+                        	$affected = $sphinxCon->exec($sql);
 
-			if(!$affected)
-				$errorInfo = $sphinxCon->errorInfo();
+                        	if(!$affected)
+                              		$errorInfo = $sphinxCon->errorInfo();
+                       }
 
 			// If the record is an historical record, don't take back the last log id
 			if($serverLastLog->getLastLogId() < $sphinxLogId) {

@@ -6,7 +6,7 @@
 class KalturaBulkUpload extends KalturaObject implements IFilterable
 {
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $id;
 	
@@ -21,7 +21,7 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 	public $uploadedByUserId;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,eq
 	 */
 	public $uploadedOn;
@@ -157,6 +157,12 @@ class KalturaBulkUpload extends KalturaObject implements IFilterable
 			$this->bulkUploadObjectType = BulkUploadObjectType::ENTRY;
 			if ($jobData->getBulkUploadObjectType())
 			    $this->bulkUploadObjectType = $jobData->getBulkUploadObjectType();
+			    
+			if(!$jobData->getFilePath())
+			{
+				$this->csvFileUrl = null;
+				$this->bulkFileUrl = null;
+			}
 		}
 	}
 

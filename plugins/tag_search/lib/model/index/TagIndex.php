@@ -5,6 +5,11 @@
 */
 class TagIndex extends BaseIndexObject
 {
+	public static function getObjectName()
+	{
+		return 'tag';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'tag';

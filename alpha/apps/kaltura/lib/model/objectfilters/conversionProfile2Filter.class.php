@@ -24,6 +24,8 @@ class conversionProfile2Filter extends baseObjectFilter
 			"_like_tags" ,
 			"_mlikeor_tags",
 			"_mlikeand_tags" ,
+			"_eq_type",
+			"_in_type",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at")	;

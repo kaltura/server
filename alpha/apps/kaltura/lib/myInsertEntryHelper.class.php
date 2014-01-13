@@ -136,6 +136,7 @@ class myInsertEntryHelper
 			$webcam_basePath = $content.'/content/webcam/'.($webcam_suffix ? $webcam_suffix : 'my_recorded_stream_'.$kuser_id);
 			$entry_fullPath = $webcam_basePath.'.flv';
 			$entry_fullPathF4v = $webcam_basePath.'.f4v';
+			$entry_fullPathMp4 = $webcam_basePath.'.f4v.mp4';
 			if(file_exists($entry_fullPath))
 			{
 				// webcam should be preconvert until REALLY ready
@@ -168,6 +169,15 @@ class myInsertEntryHelper
 				$entry_status = entryStatus::PRECONVERT;
 				$ext = 'f4v';
 				$entry_fullPath = $entry_fullPathF4v;
+				// continue tracking the webcam
+				$te->setParam3Str( $entry_fullPath );
+				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
+			}
+			else if (file_exists($entry_fullPathMp4))
+			{
+				$entry_status = entryStatus::PRECONVERT;
+				$ext = 'mp4';
+				$entry_fullPath = $entry_fullPathMp4;
 				// continue tracking the webcam
 				$te->setParam3Str( $entry_fullPath );
 				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );

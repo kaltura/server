@@ -27,6 +27,13 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
+	 * @var KalturaConversionProfileType
+	 * @insertonly
+	 * @filter eq,in
+	 */
+	public $type;
+	
+	/**
 	 * The name of the Conversion Profile
 	 * 
 	 * @var string
@@ -68,7 +75,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	/**
 	 * Creation date as Unix timestamp (In seconds) 
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter order
 	 */
@@ -146,6 +153,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"id",
 		"partnerId",
 		"status",
+		"type",
 		"name",
 		"systemName",
 		"tags",
@@ -153,6 +161,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"defaultEntryId",
 		"createdAt",
 		"isDefault",
+		"isPartnerDefault" => "isDefault",
 		"clipStart",
 		"clipDuration",
 		"storageProfileId",
@@ -172,14 +181,6 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		
 		$this->cropDimensions = new KalturaCropDimensions();
 		$this->cropDimensions->fromObject($sourceObject);
-		
-		$this->isPartnerDefault = false;
-		if($this->partnerId)
-		{
-			$partner = PartnerPeer::retrieveByPK($this->partnerId);
-			if($partner && $this->id == $partner->getDefaultConversionProfileId())
-				$this->isPartnerDefault = true;
-		}
 	}
 	
 	public function toObject($objectToFill = null , $propsToSkip = array())

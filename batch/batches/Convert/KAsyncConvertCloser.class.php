@@ -189,8 +189,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		
 		try
 		{
-			$curlWrapper = new KCurlWrapper($srcFileSyncRemoteUrl);
-			$curlHeaderResponse = $curlWrapper->getHeader(true);
+			$curlWrapper = new KCurlWrapper();
+			$curlHeaderResponse = $curlWrapper->getHeader($srcFileSyncRemoteUrl, true);
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
 				$errDescription = "Error: " . $curlWrapper->getError();
@@ -208,8 +208,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			$curlWrapper->close();
 				
 			KalturaLog::debug("Executing curl");
-			$curlWrapper = new KCurlWrapper($srcFileSyncRemoteUrl);
-			$res = $curlWrapper->exec($srcFileSyncLocalPath);
+			$curlWrapper = new KCurlWrapper();
+			$res = $curlWrapper->exec($srcFileSyncRemoteUrl, $srcFileSyncLocalPath);
 			KalturaLog::debug("Curl results: $res");
 		
 			if(!$res || $curlWrapper->getError())

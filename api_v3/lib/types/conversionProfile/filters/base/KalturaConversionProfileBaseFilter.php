@@ -12,6 +12,8 @@ abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 		"idIn" => "_in_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"typeEqual" => "_eq_type",
+		"typeIn" => "_in_type",
 		"nameEqual" => "_eq_name",
 		"systemNameEqual" => "_eq_system_name",
 		"systemNameIn" => "_in_system_name",
@@ -57,6 +59,17 @@ abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * @var KalturaConversionProfileType
+	 */
+	public $typeEqual;
+
+	/**
+	 * @dynamicType KalturaConversionProfileType
+	 * @var string
+	 */
+	public $typeIn;
 
 	/**
 	 * @var string

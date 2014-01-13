@@ -411,6 +411,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		switch ($propType) 
 		{
+			case "bigint" :
 			case "int" :
 			case "string" :
 			case "bool" :
@@ -491,9 +492,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		$resultNode = $actionNode->getElementsByTagName ( "result" )->item ( 0 );
 		$resultType = $resultNode->getAttribute ( "type" );
+		
 		$arrayType = '';
-		if ($resultType == "array")
+		$fallbackClass = null;
+		if ($resultType == "array") {
 			$arrayType = $resultNode->getAttribute ( "arrayType" );
+			$fallbackClass = $arrayType;
+		}
+    	else if($resultType && ($resultType != 'file') && !$this->isSimpleType($resultType))
+    		$fallbackClass = $resultType;
 		
 	  	$javaOutputType = $this->getResultType($resultType, $arrayType, $serviceImports);
 		
@@ -517,7 +524,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( $desc );
 		$this->appendLine ( "    $signaturePrefix$signature throws KalturaApiException {" );
 		
-		$this->generateActionBodyServiceCall($serviceId, $action, $paramNodesArr, $serviceImports);
+		$this->generateActionBodyServiceCall($serviceId, $action, $paramNodesArr, $serviceImports, $fallbackClass);
 				
 		if($resultType == 'file')
 		{
@@ -642,7 +649,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	public function generateActionBodyServiceCall($serviceId, $action, $paramNodes, &$serviceImports) 
+	public function generateActionBodyServiceCall($serviceId, $action, $paramNodes, &$serviceImports, $fallbackClass) 
 	{
 		$this->appendLine ( "        KalturaParams kparams = new KalturaParams();" );
 		$haveFiles = false;
@@ -670,9 +677,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		// Add files to call
 		if ($haveFiles)
-			$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
+			if(is_null($fallbackClass))
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
+			else
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles, $fallbackClass.class);" );
 		else
-			$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
+			if(is_null($fallbackClass))
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
+			else
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, $fallbackClass.class);" );
 	}
 	
 	public function handleResultType($resultType, $arrayType, &$serviceImports) 
@@ -684,6 +697,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			case "array" :
 				$returnCall .= "return ParseUtils.parseArray($arrayType.class, resultXmlElement);";
 				break;
+			case "bigint":
 			case "int" :
 			case "float" :
 			case "bool" :
@@ -816,7 +830,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		{
 		case "float" :
 			return "Float.MIN_VALUE";
-
+			
+		case "bigint" :
+			return "Long.MIN_VALUE";
 		case "int" :
 			if ($propertyNode->hasAttribute ("enumType")) 
 				return ""; // we do not want to initialize enums
@@ -837,6 +853,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		case "int":
 		case "float":
+		case "bigint":
 			return '0';
 			
 		case "bool":
@@ -859,7 +876,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				return 'null';
 			else
 				return "\"" . $defaultValue . "\"";
-			
+		case "bigint":
+			$value = trim ( $defaultValue );
+			if ($value == 'null')
+				$value = "Long.MIN_VALUE";
+			return $value;
 		case "int": 
 			$value = trim ( $defaultValue );
 			if ($value == 'null')
@@ -915,6 +936,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		case "float" :
 			return "float";
 
+		case "bigint" :
+			return "long";
+			
 		case "int" :
 			if ($isEnum) 
 				return $propertyNode->getAttribute ( "enumType" );

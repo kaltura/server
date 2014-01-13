@@ -50,14 +50,14 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	public $status;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

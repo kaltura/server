@@ -115,7 +115,7 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null)
     {
-		if(($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && !$dbEntry->getReplacingEntryId()) || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->validateEntry($dbEntry);
 
@@ -173,6 +173,9 @@ class MediaService extends KalturaEntryService
 
 			case 'kLocalFileResource':
 				return $this->attachLocalFileResource($resource, $dbEntry, $dbAsset);
+
+			case 'kLiveEntryResource':
+				return $this->attachLiveEntryResource($resource, $dbEntry, $dbAsset);
 
 			case 'kFileSyncResource':
 				return $this->attachFileSyncResource($resource, $dbEntry, $dbAsset);
@@ -392,7 +395,16 @@ class MediaService extends KalturaEntryService
 		try
 		{
 		    // check that the uploaded file exists
-			    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+		    
+		    // Make sure that the uploads path is not modified by $uploadTokenId (with the value of "../" for example )
+		    $entryRootDir = realpath( dirname( $entryFullPath ) );
+			$uploadPathBase = realpath( myContentStorage::getFSUploadsPath() );
+			if ( strpos( $entryRootDir, $uploadPathBase ) !== 0 ) // Composed path doesn't begin with $uploadPathBase?  
+			{
+				KalturaLog::err( "uploadTokenId [$uploadTokenId] points outside of uploads directory" );
+				throw new KalturaAPIException( KalturaErrors::INVALID_UPLOAD_TOKEN_ID );			
+			}
 		}
 		catch(kCoreException $ex)
 		{
@@ -473,8 +485,19 @@ class MediaService extends KalturaEntryService
 
 	    // check that the webcam file exists
 	    $content = myContentStorage::getFSContentRootPath();
-	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
-		if (!file_exists("$webcamBasePath.flv") && !file_exists("$webcamBasePath.f4v"))
+	    $webcamContentRootDir = $content . "/content/webcam/";
+	    $webcamBasePath = $webcamContentRootDir . $webcamTokenId;
+
+	    // Make sure that the root path of the webcam content is not modified by $webcamTokenId (with the value of "../" for example )
+	    $webcamContentRootDir = realpath( $webcamContentRootDir );
+	    $webcamBaseRootDir = realpath( dirname( $webcamBasePath ) ); // Get realpath of target directory 
+	    if ( strpos( $webcamBaseRootDir, $webcamContentRootDir ) !== 0 ) // The uploaded file's path is different from the content path?    
+	    {
+			KalturaLog::err( "webcamTokenId [$webcamTokenId] points outside of webcam content directory" );
+	    	throw new KalturaAPIException( KalturaErrors::INVALID_WEBCAM_TOKEN_ID );
+	    }
+	     
+		if (!file_exists("$webcamBasePath.flv") && !file_exists("$webcamBasePath.f4v") && !file_exists("$webcamBasePath.f4v.mp4"))
 		{
 			if (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId()))
 				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
@@ -705,10 +728,20 @@ class MediaService extends KalturaEntryService
 
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-
-
-		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
+		
+		//calling replaceResource only if no lock or we grabbed it
+		$lock = kLock::create("media_updateContent_{$entryId}");
+		
+	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
+     	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+     	try{
+       		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
+		}
+		catch(Exception $e){
+       		$lock->unlock();
+       		throw $e;
+		}
+		$lock->unlock();
 
 		return $this->getEntry($entryId);
 	}

@@ -97,6 +97,8 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
+				
+			$propType = $this->getPHPType($propType);
 			$propDescription = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
@@ -258,7 +260,7 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 						$signature .= " = null";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
-					else if ($paramType == "int" || $paramType == "float")
+					else if ($paramType == "int" || $paramType == "bigint" || $paramType == "float")
 					{
 						if ($defaultValue == "")
 							$signature .= " = \"\""; // hack for partner.getUsage
@@ -318,5 +320,17 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendLine("	}");
 		$this->appendLine("}");
+	}
+	
+	public function getPHPType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }

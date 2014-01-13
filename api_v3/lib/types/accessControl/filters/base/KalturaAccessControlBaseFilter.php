@@ -53,12 +53,12 @@ abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 	public $systemNameIn;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 
 	/**
-	 * @var int
+	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 }

@@ -17,7 +17,7 @@ class KalturaGenericDistributionProviderAction extends KalturaObject implements 
 	/**
 	 * Generic distribution provider action creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -26,7 +26,7 @@ class KalturaGenericDistributionProviderAction extends KalturaObject implements 
 	/**
 	 * Generic distribution provider action last update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

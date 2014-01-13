@@ -10,4 +10,14 @@ abstract class kOperationAttributes
 	abstract public function toArray();
 	
 	abstract public function getApiType();
+	
+	abstract public function getAssetParamsId();
+
+	/**
+	 * Return enum value from EntrySourceType
+	 */
+	public function getSourceType()
+	{
+		return null;
+	}
 }

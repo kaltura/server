@@ -39,6 +39,9 @@ public final class KalturaParamsValueDefaults {
 	public static final float KALTURA_UNDEF_FLOAT = Float.MIN_VALUE;
 	public static final float KALTURA_NULL_FLOAT =  Float.MAX_VALUE;
 	
+	public static final long KALTURA_UNDEF_LONG =  Long.MIN_VALUE;
+	public static final long KALTURA_NULL_LONG =  Long.MAX_VALUE;
+	
 	public static final String KALTURA_NULL_STRING =  "__null_string__";
 	
 }

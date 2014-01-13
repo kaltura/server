@@ -108,6 +108,7 @@ class KalturaFrontController
 				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex);
 			}
+			
 	        $this->onRequestEnd($success, $errorCode);
 		}
 		
@@ -294,7 +295,7 @@ class KalturaFrontController
 	
 	public function getExceptionObject($ex)
 	{
-		$this->adjustApiCacheForException($ex);
+		KalturaResponseCacher::adjustApiCacheForException($ex);
 		
 	    if ($ex instanceof KalturaAPIException)
 		{
@@ -327,6 +328,10 @@ class KalturaFrontController
 					
 				case kCoreException::MAX_CATEGORIES_PER_ENTRY:
 					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
+					break;
+					
+				case kCoreException::MAX_ASSETS_PER_ENTRY:
+					$object = new KalturaAPIException(KalturaErrors::MAX_ASSETS_FOR_ENTRY_REACHED, asset::MAX_ASSETS_PER_ENTRY);
 					break;
 				
 				case kCoreException::SEARCH_TOO_GENERAL:
@@ -368,6 +373,10 @@ class KalturaFrontController
 				case kCoreException::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED:
 					$object = new KalturaAPIException(KalturaErrors::SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
 					break;
+
+				case kCoreException::INVALID_ENTRY_ID:
+					$object = new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $ex->getData());
+					break;
 						
 				default:
 		    		KalturaLog::crit($ex);
@@ -388,20 +397,6 @@ class KalturaFrontController
 		return $object;
 	}
 	
-	public function adjustApiCacheForException($ex)
-	{
-		KalturaResponseCacher::setExpiry(120);
-		
-		$cacheConditionally = false;
-		if ($ex instanceof KalturaAPIException && kConf::hasParam("v3cache_conditional_cached_errors"))
-		{
-			$cacheConditionally = in_array($ex->getCode(), kConf::get("v3cache_conditional_cached_errors"));
-		}
-		if (!$cacheConditionally)
-		{
-			KalturaResponseCacher::disableConditionalCache();
-		}
-	}
 	
 	public function serializeResponse($object, $ignoreNull = false)
 	{

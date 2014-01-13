@@ -17,7 +17,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	/**
 	 * Entry distribution creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -26,7 +26,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	/**
 	 * Entry distribution last update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -35,7 +35,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	/**
 	 * Entry distribution submission date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -102,7 +102,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	/**
 	 * Entry distribution publish time as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 */
 	public $sunrise;
@@ -110,7 +110,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	/**
 	 * Entry distribution un-publish time as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 */
 	public $sunset;

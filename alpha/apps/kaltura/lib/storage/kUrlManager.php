@@ -633,4 +633,8 @@ class kUrlManager
 		return false;
 	}
 	
+	public function getRendererClass()
+	{
+		return null;		// use the default of playManifest
+	} 
 }

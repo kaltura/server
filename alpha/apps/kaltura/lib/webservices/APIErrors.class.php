@@ -5,6 +5,70 @@
  */
 class APIErrors 
 {
+	/**
+	 * For a given error code and optional args, compose a text message (embedding arguments
+	 * if given) and return a response array containing the message and the given error code and args.
+	 * 
+	 * Sample usage:
+	 *     $errorData = APIErrors::getErrorData( APIErrors::INVALID_KS, array( 'KSID', 'ERR_CODE', 'ERR_DESC' ) );
+	 *     
+	 * Sample usage from a generic function (e.g. from KalturaAPIError):
+	 *     function KalturaAPIException( $errorString )
+	 *     {
+	 *         $args = func_get_args();
+	 *         array_shift( $args );
+	 *         $errorData = APIErrors::getErrorData( $errorString, $args );
+	 *     }
+	 *  
+	 * @param string $errorString
+	 * @return array(
+	 * 	   <br>'code'    => The given error code (e.g. 'INTERNAL_SERVERL_ERROR'),
+	 *     <br>'args'    => A map between the error's params and the given values from $errorArgs, e.g. array( 'KSID' => '1234' ), or an empty array in case of no params 
+	 * 	   <br>'message' => Composed English message. Any placeholedrs will be replaced with the supplied args.
+	 *   <br>)
+	 */
+	public static function getErrorData( $errorString, $errorArgsArray = array() )
+	{
+		$errorData = array();
+	
+		// The error string format is:
+		//     "ERROR_CODE;OPTIONAL,COMMA,SEPARATED,VALUES;ERROR STRING TEMPLATE WITH OPTIONAL @PARAM@ VARS"
+		//
+		// Sample format w/o params:
+		//     "INTERNAL_DATABASE_ERROR;;Internal database error"
+		//
+		// Sample format w/ params:
+		//     "INTERNAL_SERVER_ERROR;ERR_TEXT;Internal server error @ERR_TEXT@"
+		$components = explode(';', $errorString, 3);
+		
+		$errorData['code'] = $components[0];
+		$message = $components[2];
+	
+		$argsDictionary = array(); // A map between the params from the error string and their given errorArgs counterparts
+	
+		if ( ! empty($components[1]) ) // Need to process arguments?
+		{
+			$paramNames = explode(',', $components[1]);
+			$numParamNames = count($paramNames);
+	
+			// Create and fill the argsDictionary dictionary
+			for ( $i = 0; $i < $numParamNames; $i++ )
+			{
+				// Map the arg's name to its value
+				// NOTE: N/A means there was a mismatch in the number of supplied arguments (i.e. a bug in the calling code)
+				$argsDictionary[ $paramNames[$i] ] = isset( $errorArgsArray[$i] ) ? $errorArgsArray[$i] : "N/A";
+	
+				// Replace the arg's placeholder with its value in the destination string
+				$message = str_replace("@{$paramNames[$i]}@", $argsDictionary[ $paramNames[$i] ], $message);
+			}
+		}
+	
+		$errorData['message'] = $message;
+		$errorData['args'] = $argsDictionary;
+	
+		return $errorData;
+	}
+	
 	//  ERR_TEXT - some text to display in the message
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVER_ERROR;ERR_TEXT;Internal server error @ERR_TEXT@";
 	
@@ -300,7 +364,7 @@ class APIErrors
 	
 	const ADMIN_LOGIN_USERS_QUOTA_EXCEEDED = "ADMIN_LOGIN_USERS_QUOTA_EXCEEDED;;Partner login users quota exceeded";
 	
-	const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
+	const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS;;User already exists";
 	
 	const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA;;Login data cannot be updated by this action";
 
@@ -344,5 +408,5 @@ class APIErrors
 	
 	const ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA;; error accored while gzuncompress job data";
 
-	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND";
+	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND;;Object not found";
 }

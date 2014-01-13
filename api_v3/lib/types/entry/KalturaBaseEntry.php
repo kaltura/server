@@ -129,7 +129,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -138,7 +138,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -235,7 +235,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry scheduling start date (null when not set, send -1 to remove)
 	 *  
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,gteornull,lteornull,order
 	 * @requiresPermission insert,update
 	 */
@@ -244,7 +244,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Entry scheduling end date (null when not set, send -1 to remove)
 	 * 
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,gteornull,lteornull,order
 	 * @requiresPermission insert,update
 	 */
@@ -302,8 +302,16 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $conversionProfileId;
 	
 	/**
-	 * ID of source root entry, used for clipped, skipped and cropped entries that created from another entry  
-	 * 
+	 * IF not empty, points to an entry ID the should replace this current entry's id. 
+	 *
+	 * @var string
+	 * @filter eq
+	 */
+	public $redirectEntryId;
+
+	/**
+	 * ID of source root entry, used for clipped, skipped and cropped entries that created from another entry
+	 *
 	 * @var string
 	 * @filter eq,in
 	 * @readonly
@@ -371,6 +379,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"categories",
 	 	"categoriesIds",
 	 	"conversionProfileId" => "conversionQuality",
+	 	"redirectEntryId",
 	 	"rootEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish"
@@ -449,20 +458,31 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		}
 	}
 	
-	public function validateObjectsExist()
+	public function validateObjectsExist(entry $sourceObject = null)
 	{
-		if(!is_null($this->conversionProfileId) && $this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
-		{
-			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
-			if(!$conversionProfile)
-				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
-		}
+		$this->validateConversionProfile($sourceObject);
 	
 		if(!is_null($this->accessControlId))
 		{
 			$accessControlProfile = accessControlPeer::retrieveByPK($this->accessControlId);
 			if(!$accessControlProfile)
 				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $this->accessControlId);
+		}
+	}
+	
+	public function validateConversionProfile(entry $sourceObject = null)
+	{
+		if(is_null($this->conversionProfileId))
+			return;
+			
+		if($sourceObject && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
+		
+		if($this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
+		{
+			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
+			if(!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::MEDIA)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
 		}
 	}
 	
@@ -583,11 +603,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 //			if(count($c->getFetchedIds()))
 //				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
 //		}
-		
-		if(!is_null($this->conversionProfileId) && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
 				
-		$this->validateObjectsExist();
+		$this->validateObjectsExist($sourceObject);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

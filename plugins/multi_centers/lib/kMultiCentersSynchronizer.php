@@ -71,7 +71,7 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 						$this->excludedSyncFileObjectTypes[$configObjectType] = array();
 						
 					if(!is_null($configObjectSubType))
-						$this->excludedSyncFileObjectTypes[$configObjectType] = true;
+						$this->excludedSyncFileObjectTypes[$configObjectType][] = $configObjectSubType;
 				}
 			}
 		}

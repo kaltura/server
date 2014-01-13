@@ -15,13 +15,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
-	{
+	{		
 		// if changed object is entry 
-		if($object instanceof entry && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
+		if($object instanceof entry && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 			return true;
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if($object instanceof flavorAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
 			
 		return false;		
@@ -141,6 +141,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $dbBatchJob->getPartnerId()))
+			return false;
+		
 		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 			return false;
 						
@@ -273,10 +276,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @return bool true if the consumer should handle the event
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
-	{
-		
+	{	
 		if ($object instanceof FileSync)
 		{
+			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()))
+				return false;
+				
 			if ($object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
 				$storage = StorageProfilePeer::retrieveByPK($object->getDc());

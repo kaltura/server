@@ -103,7 +103,7 @@ class BulkUploadService extends KalturaBaseService
 	 * Get bulk upload batch job by id
 	 *
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaBulkUpload
 	 */
 	public function getAction($id)
@@ -163,7 +163,7 @@ class BulkUploadService extends KalturaBaseService
 	 * serve action returan the original file.
 	 * 
 	 * @action serve
-	 * @param int $id job id
+	 * @param bigint $id job id
 	 * @return file
 	 * 
 	 */
@@ -209,7 +209,7 @@ function serveAction($id)
 	 * serveLog action returan the original file.
 	 * 
 	 * @action serveLog
-	 * @param int $id job id
+	 * @param bigint $id job id
 	 * @return file
 	 * 
 	 */
@@ -238,7 +238,7 @@ function serveAction($id)
 	 * Aborts the bulk upload and all its child jobs
 	 * 
 	 * @action abort
-	 * @param int $id job id
+	 * @param bigint $id job id
 	 * @return KalturaBulkUpload
 	 */
 	public function abortAction($id)

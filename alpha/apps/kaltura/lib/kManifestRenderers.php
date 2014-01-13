@@ -111,6 +111,7 @@ abstract class kManifestRenderer
 		$this->tokenizeUrls();
 	
 		$headers = $this->getHeaders();
+		$headers[] = "Access-Control-Allow-Origin:*";
 		foreach ($headers as $header)
 		{
 			header($header);

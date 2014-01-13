@@ -27,25 +27,32 @@ class KalturaEntryResource extends KalturaContentResource
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 		
 		$this->validatePropertyNotNull('entryId');
+	
+    	$srcEntry = entryPeer::retrieveByPK($this->entryId);
+		if (!$srcEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+			
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE || $srcEntry->getMediaType() == KalturaMediaType::LIVE_STREAM_FLASH)
+			return;
 		
 		$srcFlavorAsset = null;
 		if(is_null($this->flavorParamsId))
 		{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
-			if(!$srcFlavorAsset)
+			if (!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		}
 		else
 		{
 			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
-			if(!$srcFlavorAsset)
+			if (!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
 		}
 		
 		$key = $srcFlavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
 		$c->addAnd(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN);
-		
+		 
 		$fileSyncs = FileSyncPeer::doSelect($c);
 		foreach($fileSyncs as $fileSync)
 		{
@@ -73,40 +80,71 @@ class KalturaEntryResource extends KalturaContentResource
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
-	public function toObject($object_to_fill = null, $props_to_skip = array())
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$this->validateForUsage($object_to_fill, $props_to_skip);
 		
+    	$srcEntry = entryPeer::retrieveByPK($this->entryId);
+    	if(!$srcEntry)
+    		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+
+    	if($srcEntry->getType() == entryType::LIVE_STREAM)
+    	{
+    		/* @var $srcEntry LiveEntry */
+    		
+    		if($srcEntry->getSource() != EntrySourceType::LIVE_STREAM)
+    			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
+    			
+    		$mediaServer = $srcEntry->getMediaServer();
+    		if($mediaServer && $mediaServer->getDc() != kDataCenterMgr::getCurrentDcId())
+    		{
+				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($mediaServer->getDc());
+				if($remoteDCHost)
+				{
+					kFileUtils::dumpApiRequest($remoteDCHost);
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
+				}
+    		}
+    		
+			if($object_to_fill && !($object_to_fill instanceof kLiveEntryResource))
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($object_to_fill));
+				
+			$object_to_fill = new kLiveEntryResource();
+    		$object_to_fill->setEntry($srcEntry);
+    		    		
+    		return $object_to_fill;
+    	}
+    	
 		if(!$object_to_fill)
 			$object_to_fill = new kFileSyncResource();
-		
-		$srcEntry = entryPeer::retrieveByPK($this->entryId);
-		if(!$srcEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		
-		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
-		{
+			
+    	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
+    	{
 			$object_to_fill->setFileSyncObjectType(FileSyncObjectType::ENTRY);
 			$object_to_fill->setObjectSubType(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			$object_to_fill->setObjectId($srcEntry->getId());
 			
 			return $object_to_fill;
-		}
-		
-		$srcFlavorAsset = null;
-		if(is_null($this->flavorParamsId))
-		{
+    	}
+    	
+    	$srcFlavorAsset = null;
+    	if(is_null($this->flavorParamsId))
+    	{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
-			if(!$srcFlavorAsset)
-				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
-		}
+	    	if(!$srcFlavorAsset)
+	    		throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
+    	}
 		else
 		{
 			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
-			if(!$srcFlavorAsset)
-				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $this->flavorParamsId);
+	    	if(!$srcFlavorAsset)
+	    		throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $this->flavorParamsId);
 		}
 		
+    		
 		$object_to_fill->setFileSyncObjectType(FileSyncObjectType::FLAVOR_ASSET);
 		$object_to_fill->setObjectSubType(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$object_to_fill->setObjectId($srcFlavorAsset->getId());
@@ -119,31 +157,37 @@ class KalturaEntryResource extends KalturaContentResource
 	 */
 	public function entryHandled(entry $dbEntry)
 	{
-		$srcEntry = entryPeer::retrieveByPK($this->entryId);
-		if($srcEntry->getType() == KalturaEntryType::MEDIA_CLIP && $dbEntry->getType() == KalturaEntryType::MEDIA_CLIP && $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-		{
-			if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-			{
-				$dbEntry->setDimensions($srcEntry->getWidth(), $srcEntry->getHeight());
-				$dbEntry->setMediaDate($srcEntry->getMediaDate(null));
-				$dbEntry->save();
-			}
-			else
-			{
-				$srcFlavorAsset = null;
-				if(is_null($this->flavorParamsId))
+    	$srcEntry = entryPeer::retrieveByPK($this->entryId);
+    	if(
+    		$srcEntry->getType() == KalturaEntryType::MEDIA_CLIP 
+    		&& 
+    		$dbEntry->getType() == KalturaEntryType::MEDIA_CLIP 
+    		&& 
+    		$dbEntry->getMediaType() == KalturaMediaType::IMAGE
+    	)
+    	{
+    		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+    		{
+    			$dbEntry->setDimensions($srcEntry->getWidth(), $srcEntry->getHeight());
+    			$dbEntry->setMediaDate($srcEntry->getMediaDate(null));
+    			$dbEntry->save();
+    		}
+    		else 
+    		{
+		    	$srcFlavorAsset = null;
+		    	if(is_null($this->flavorParamsId))
 					$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
 				else
 					$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
 				
 				if($srcFlavorAsset)
 				{
-					$dbEntry->setDimensions($srcFlavorAsset->getWidth(), $srcFlavorAsset->getHeight());
-					$dbEntry->save();
+	    			$dbEntry->setDimensions($srcFlavorAsset->getWidth(), $srcFlavorAsset->getHeight());
+	    			$dbEntry->save();
 				}
-			}
-		}
-		
-		return parent::entryHandled($dbEntry);
+    		}
+    	}
+    	
+    	return parent::entryHandled($dbEntry);
 	}
 }

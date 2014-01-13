@@ -13,7 +13,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 	public $id;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @filter gte,lte,order
 	 * @readonly
 	 */

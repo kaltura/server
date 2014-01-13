@@ -146,7 +146,7 @@ class KalturaTypeReflector
 		{
 			$this->_properties = array();
 			$this->_currentProperties = array();
-			
+
 			if (!$this->isEnum() && !$this->isArray())
 			{
 				$reflectClass = new ReflectionClass($this->_type);
@@ -174,6 +174,7 @@ class KalturaTypeReflector
 								throw new Exception("Property name [$name] is a reserved word in type [$currentReflectClass]");
 								
 							$docComment = $property->getDocComment();
+							
 							$parsedDocComment = new KalturaDocCommentParser( $docComment );
 							if ($parsedDocComment->varType)
 							{
@@ -203,13 +204,17 @@ class KalturaTypeReflector
 								
 							if ($parsedDocComment->permissions)
 								$prop->setPermissions($parsedDocComment->permissions);
+							
+							if(array_key_exists("", $parsedDocComment->validateConstraints)) 
+								$prop->setConstraints($parsedDocComment->validateConstraints[""]);
+							
 						}
 					}
 				}
 				
 				$reflectClass = null;
 			}
-		}
+		} 
 		
 		return $this->_properties;
 	}

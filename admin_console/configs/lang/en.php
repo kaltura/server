@@ -46,6 +46,8 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_WATCHER' => 'Drop Folder Watcher',
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_CONTENT_PROCESSOR' => 'Drop Folder Content Processor',
 	'Kaltura_Client_Enum_BatchJobType::EVENT_NOTIFICATION_HANDLER' => 'Event Notification',
+	'Kaltura_Client_Enum_BatchJobType::CONCAT' => 'Concat',
+	'Kaltura_Client_Enum_BatchJobType::CONVERT_LIVE_SEGMENT' => 'Convert Live Segment',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -188,6 +190,12 @@ return array(
 	'Kaltura_Client_Enum_SourceType::URL' => 'URL',
 	'Kaltura_Client_Enum_SourceType::SEARCH_PROVIDER' => 'Search',
 	'Kaltura_Client_Enum_SourceType::AKAMAI_LIVE' => 'Akamai',
+	'Kaltura_Client_Enum_SourceType::MANUAL_LIVE_STREAM' => 'Manual Live Stream',
+	'Kaltura_Client_Enum_SourceType::AKAMAI_UNIVERSAL_LIVE' => 'Akamai Universal Live',
+	'Kaltura_Client_Enum_SourceType::LIVE_STREAM' => 'Live Stream',
+	'Kaltura_Client_Enum_SourceType::LIVE_CHANNEL' => 'Live Channel',
+	'Kaltura_Client_Enum_SourceType::RECORDED_LIVE' => 'Recorded Live',
+	'Kaltura_Client_Enum_SourceType::CLIP' => 'Clip',
 	
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA_EDIT' => 'Data Edit',
@@ -198,6 +206,8 @@ return array(
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::ISM' => 'Silver-Light Server Manifest',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::ISMC' => 'Silver-Light Client Manifest',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::CONVERSION_LOG' => 'Conversion Log',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_PRIMARY' => 'Primary Live Segments', 
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_SECONDARY' => 'Secondary Live Segments',
 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::FEATURES' => 'Features',
@@ -240,6 +250,7 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::S3' => 'Amazon S3',
 	'Kaltura_Client_Enum_StorageProfileProtocol::LOCAL' => 'Local',
+	'Kaltura_Client_Enum_StorageProfileProtocol::KONTIKI' => 'Kontiki',
 
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::BLOCKED' => 'Blocked',
@@ -405,6 +416,7 @@ return array(
 	'entry-investigate info entry modified label' => 'Modified At',
 	'entry-investigate info entry updated label' => 'Updated At',
 	'entry-investigate info entry actions label' => 'Reconvert',
+	'entry-investigate info entry boost label' => 'Boost Jobs',
 
 	'entry-investigate info entry ip1 label' => 'IP 1',
 	'entry-investigate info entry ip2 label' => 'IP 2',
@@ -427,6 +439,7 @@ return array(
 	'entry-investigate info entry manifest label' => 'Manifest',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
+	'entry-investigate entry boostJobs' => 'Boost Jobs',
 
 	'entry-investigate entry upload support' => 'Investigate File',
 

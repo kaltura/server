@@ -14,8 +14,8 @@ class KAsyncCurlTest extends PHPUnit_Framework_TestCase
 {
 	public function testRedirectFileSize()
 	{
-		$curlWrapper = new KCurlWrapper('http://scoregolf.com/Web-Media/Video/2008/May/pumafinal.flv');
-		$curlHeaderResponse = $curlWrapper->getHeader();
+		$curlWrapper = new KCurlWrapper();
+		$curlHeaderResponse = $curlWrapper->getHeader('http://scoregolf.com/Web-Media/Video/2008/May/pumafinal.flv');
 		var_dump($curlHeaderResponse);
 	}
 }

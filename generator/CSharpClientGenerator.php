@@ -166,6 +166,8 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				$dotNetPropType = "IList<".$propertyNode->getAttribute("arrayType").">";
 			else if ($propType == "bool")
 				$dotNetPropType  = "bool?";
+			else if ($propType == "bigint")
+				$dotNetPropType  = "long";
 			else
 				$dotNetPropType = $propType;
 				
@@ -175,6 +177,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				
 			switch($propType)
 			{
+				case "bigint":
+					$property["default"] = "long.MinValue";
+					break;
 				case "int":
 					if ($isEnum)
 						$property["default"] = "($dotNetPropType)Int32.MinValue";
@@ -273,6 +278,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("					case \"$propName\":");
 				switch($propType)
 				{
+					case "bigint":
+						$this->appendLine("						this.$dotNetPropName = ParseLong(txt);");
+						break;
 					case "int":
 						if ($isEnum)
 						{
@@ -302,11 +310,11 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine("						this.$dotNetPropName = new List<$arrayType>();");
 						$this->appendLine("						foreach(XmlElement arrayNode in propertyNode.ChildNodes)");
 						$this->appendLine("						{");
-						$this->appendLine("							this.$dotNetPropName.Add(($arrayType)KalturaObjectFactory.Create(arrayNode));");
+						$this->appendLine("							this.$dotNetPropName.Add(($arrayType)KalturaObjectFactory.Create(arrayNode, \"$arrayType\"));");
 						$this->appendLine("						}");
 						break;
 					default: // sub object
-						$this->appendLine("						this.$dotNetPropName = ($propType)KalturaObjectFactory.Create(propertyNode);");
+						$this->appendLine("						this.$dotNetPropName = ($propType)KalturaObjectFactory.Create(propertyNode, \"$propType\");");
 						break;
 				}
 				$this->appendLine("						continue;");
@@ -336,6 +344,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			
 			switch($propType)
 			{
+				case "bigint":
+					$this->appendLine("			kparams.AddLongIfNotNull(\"$propName\", this.$dotNetPropName);");
+					break;
 				case "int":
 					if ($isEnum)
 						$this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
@@ -408,21 +419,23 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("{");
 		$this->appendLine("	public static class KalturaObjectFactory");
 		$this->appendLine("	{");
-		$this->appendLine("		public static object Create(XmlElement xmlElement)");
+		$this->appendLine("		public static object Create(XmlElement xmlElement, string fallbackClass = null)");
 		$this->appendLine("		{");
 		$this->appendLine("			if (xmlElement[\"objectType\"] == null)");
 		$this->appendLine("			{");
 		$this->appendLine("				return null;");
 		$this->appendLine("			}");
-		$this->appendLine("			switch (xmlElement[\"objectType\"].InnerText)");
+		$this->appendLine("			string className = xmlElement[\"objectType\"].InnerText;");
+		$this->appendLine("			Type type = Type.GetType(\"Kaltura.\" + className);");
+		$this->appendLine("			if (type == null)");
 		$this->appendLine("			{");
-		foreach($classNodes as $classNode)
-		{
-			$this->appendLine("				case \"".$classNode->getAttribute("name")."\":");
-			$this->appendLine("					return new ".$classNode->getAttribute("name")."(xmlElement);");	
-		}
+		$this->appendLine("				if (fallbackClass != null)");
+		$this->appendLine("					type = Type.GetType(fallbackClass);");
 		$this->appendLine("			}");
-		$this->appendLine("			throw new SerializationException(\"Invalid object type\");");
+		$this->appendLine("			");
+		$this->appendLine("			if(type == null)");
+		$this->appendLine("				throw new SerializationException(\"Invalid object type\");");
+		$this->appendLine("			return System.Activator.CreateInstance(type, xmlElement);");
 		$this->appendLine("		}");
 		$this->appendLine("	}");
 		$this->appendLine("}");
@@ -498,6 +511,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
+		$arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
 	    
 	    if($resultType == 'file')
 	    	return;
@@ -620,6 +634,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				case "float":
 						$this->appendLine("			kparams.AddFloatIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
 					break;
+				case "bigint":
+						$this->appendLine("			kparams.AddLongIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
 			   	case "int":
 					if ($isEnum)
 						$this->appendLine("			kparams.AddEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
@@ -645,15 +662,21 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			}
 		}
 		
+		$fallbackClass = 'null';
+    	if($resultType == 'array')
+    		$fallbackClass = "\"$arrayObjectType\"";
+    	else if($resultType && !$this->isSimpleType($resultType))
+    		$fallbackClass = "\"$resultType\"";
+		
 		if ($haveFiles)
-			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);");
+			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", $fallbackClass, kparams, kfiles);");
 		else
-			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", kparams);");
+			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", $fallbackClass, kparams);");
 		
 		$this->appendLine("			if (this._Client.IsMultiRequest)");
 		if (!$resultType) 
 			$this->appendLine("				return;");
-		else if ($resultType == "int" || $resultNode == "float")
+		else if ($resultType == "int" || $resultType == "bigint" || $resultNode == "float")
 			$this->appendLine("				return 0;");
 		else if ($resultType == "bool")
 			$this->appendLine("				return false;");
@@ -671,9 +694,12 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			IList<$arrayType> list = new List<$arrayType>();");
 					$this->appendLine("			foreach(XmlElement node in result.ChildNodes)");
 					$this->appendLine("			{");
-					$this->appendLine("				list.Add(($arrayType)KalturaObjectFactory.Create(node));");
+					$this->appendLine("				list.Add(($arrayType)KalturaObjectFactory.Create(node, \"$arrayType\"));");
 					$this->appendLine("			}");
 					$this->appendLine("			return list;");
+					break;
+				case "bigint":
+					$this->appendLine("			return long.Parse(result.InnerText);");
 					break;
 				case "int":
 					$this->appendLine("			return int.Parse(result.InnerText);");
@@ -690,7 +716,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			return result.InnerText;");
 					break;
 				default:
-					$this->appendLine("			return ($resultType)KalturaObjectFactory.Create(result);");
+					$this->appendLine("			return ($resultType)KalturaObjectFactory.Create(result, \"$resultType\");");
 					break;
 			}
 		}
@@ -713,6 +739,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					break;
 				case "file":
 					$dotNetType = "FileStream";
+					break;
+				case "bigint":
+					$dotNetType = "long";
 					break;
 				case "int":
 					if ($isEnum)

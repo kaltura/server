@@ -132,6 +132,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		//parse the class properties
 		foreach($classNode->children() as $classProperty) {
 			$propType = $classProperty->attributes()->type;
+			$propType = $this->getJSType($propType);
 			$propName = $classProperty->attributes()->name;
 			$description = str_replace("\n", "\n *\t", $classProperty->attributes()->description); // to format multi-line descriptions
 			$vardesc = " * @param\t$propName\t$propType\t\t$description";
@@ -193,6 +194,9 @@ class JsClientGenerator extends ClientGeneratorFromXml
 			foreach($action->children() as $actionParam) {
 				if($actionParam->getName() == "param" ) {
 					$paramType = $actionParam->attributes()->type;
+					
+					$paramType = $this->getJSType($paramType);
+					
 					$paramName = $actionParam->attributes()->name;
 					$optionalp = (boolean)$actionParam->attributes()->optional;
 					$defaultValue = trim($actionParam->attributes()->default);
@@ -248,6 +252,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 					case "string":
 					case "float":
 					case "int":
+					case "bigint":
 					case "bool":
 					case "array":
 						$defaultValue = strtolower($actionParam->attributes()->default);
@@ -285,6 +290,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 					case "string":
 					case "float":
 					case "int":
+					case "bigint":
 					case "bool":
 						$actionClass .= "\tthis.client.addParam(kparams, \"$paramName\", $paramName);\r\n";
 						break;
@@ -382,5 +388,17 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		//override to implement the parsing and file creation.
 		//to add a new file, use: $this->addFile('path to new file', 'file contents');
 		//echo "Create Project File.\r\n";
+	}
+	
+	public function getJSType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
 	}
 }

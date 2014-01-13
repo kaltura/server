@@ -94,9 +94,9 @@ class Kaltura_Client_ClientBase
 	private $shouldLog = false;
 
 	/**
-	 * @var bool
+	 * @var Array of classes
 	 */
-	private $isMultiRequest = false;
+	private $multiRequestReturnType = null;
 
 	/**
 	 * @var array<Kaltura_Client_ServiceActionCall>
@@ -151,7 +151,6 @@ class Kaltura_Client_ClientBase
 
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
-		$this->isMultiRequest = false;
 
 		$params = array_merge($params, $call->params);
 		$signature = $this->signature($params);
@@ -163,7 +162,7 @@ class Kaltura_Client_ClientBase
 		return $url;
 	}
 
-	public function queueServiceActionCall($service, $action, $params = array(), $files = array())
+	public function queueServiceActionCall($service, $action, $returnType, $params = array(), $files = array())
 	{
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
 		if (!isset($params["partnerId"]) || $params["partnerId"] === -1)
@@ -174,6 +173,8 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "ks", $this->ks);
 
 		$call = new Kaltura_Client_ServiceActionCall($service, $action, $params, $files);
+		if(!is_null($this->multiRequestReturnType))
+			$this->multiRequestReturnType[] = $returnType;
 		$this->callsQueue[] = $call;
 	}
 
@@ -186,7 +187,7 @@ class Kaltura_Client_ClientBase
 	{
 		if (count($this->callsQueue) == 0)
 		{
-			$this->isMultiRequest = false;
+			$this->multiRequestReturnType = null; 
 			return null;
 		}
 
@@ -203,7 +204,7 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "ignoreNull", true);
 
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
-		if ($this->isMultiRequest)
+		if (!is_null($this->multiRequestReturnType))
 		{
 			$url .= "multirequest";
 			$i = 1;
@@ -226,15 +227,15 @@ class Kaltura_Client_ClientBase
 
 		// reset
 		$this->callsQueue = array();
-		$this->isMultiRequest = false;
 
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 
-		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
+		list($postResult, $errorCode, $error) = $this->doHttpRequest($url, $params, $files);
 
-		if ($error)
+		if ($error || ($errorCode != 200 ))
 		{
+			$error .= ". RC : $errorCode";
 			throw new Kaltura_Client_ClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
 		}
 		else
@@ -255,21 +256,7 @@ class Kaltura_Client_ClientBase
 			
 			$this->log("result (serialized): " . $postResult);
 
-			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
-			{
-				$result = $this->unmarshal($postResult);
-				
-				if ($result instanceof Kaltura_Client_Exception)
-					throw $result;
-
-				if (is_null($result))
-					throw new Kaltura_Client_ClientException("failed to unserialize server result\n$postResult", Kaltura_Client_ClientException::ERROR_UNSERIALIZE_FAILED);
-
-				$dump = print_r($result, true);
-//				if(strlen($dump) < 8192)
-					$this->log("result (object dump): " . $dump);
-			}
-			else
+			if ($this->config->format != self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
@@ -279,49 +266,7 @@ class Kaltura_Client_ClientBase
 
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
 
-		return $result;
-	}
-
-	private static function unmarshalArray(SimpleXMLElement $xmls)
-	{
-		$ret = array();
-		foreach($xmls as $xml)
-			$ret[] = self::unmarshalItem($xml);
-
-		return $ret;
-	}
-
-	public static function unmarshalItem(SimpleXMLElement $xml)
-	{
-		$nodeName = $xml->getName();
-
-		if(!$xml->objectType)
-		{
-			if($xml->item)
-				return self::unmarshalArray($xml->children());
-
-			if($xml->error)
-			{
-				$code = "{$xml->error->code}";
-				$message = "{$xml->error->message}";
-				return new Kaltura_Client_Exception($message, $code);
-			}
-
-			return "$xml";
-		}
-		$objectType = reset($xml->objectType);
-
-		$type = Kaltura_Client_TypeMap::getZendType($objectType);
-		if(!class_exists($type))
-			throw new Kaltura_Client_ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
-
-		return new $type($xml);
-	}
-
-	private function unmarshal($xmlData)
-	{
-		$xml = new SimpleXMLElement($xmlData);
-		return self::unmarshalItem($xml->result);
+		return $postResult;
 	}
 
 	/**
@@ -435,8 +380,9 @@ class Kaltura_Client_ClientBase
 		
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
+		$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
-		return array($result, $curlError);
+		return array($result, $curlErrorCode, $curlError);
 	}
 
 	/**
@@ -486,7 +432,7 @@ class Kaltura_Client_ClientBase
 		if ($response === false) {
 		   throw new Kaltura_Client_ClientException("Problem reading data from $url, $phpErrorMsg", Kaltura_Client_ClientException::ERROR_READ_FAILED);
 		}
-		return array($response, '');
+		return array($response, 200, '');
 	}
 
 	/**
@@ -634,17 +580,36 @@ class Kaltura_Client_ClientBase
 
 	public function startMultiRequest()
 	{
-		$this->isMultiRequest = true;
+		$this->multiRequestReturnType = array();
 	}
 
 	public function doMultiRequest()
 	{
-		return $this->doQueue();
+		$xmlData = $this->doQueue();
+		$xml = new SimpleXMLElement($xmlData);
+		$items = $xml->result->children();
+		$ret = array();
+		$i = 0;
+		foreach($items as $item) {
+			$error = Kaltura_Client_ParseUtils::checkIfError($item, false);
+			if($error)
+				$ret[] = $error;
+			else if($item->objectType)
+				$ret[] = Kaltura_Client_ParseUtils::unmarshalObject($item, $this->multiRequestReturnType[$i]);
+			else if($item->item)
+				$ret[] = Kaltura_Client_ParseUtils::unmarshalArray($item, $this->multiRequestReturnType[$i]);
+			else			
+				$ret[] = Kaltura_Client_ParseUtils::unmarshalSimpleType($item);
+			$i++;
+		}
+	
+			$this->multiRequestReturnType = null;
+		return $ret;
 	}
 
 	public function isMultiRequest()
 	{
-		return $this->isMultiRequest;
+		return !is_null($this->multiRequestReturnType);
 	}
 
 	public function getMultiRequestQueueSize()

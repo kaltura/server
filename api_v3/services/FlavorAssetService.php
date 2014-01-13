@@ -763,6 +763,8 @@ class FlavorAssetService extends KalturaAssetService
 		$c = new Criteria();
 		$flavorTypes = assetParamsPeer::retrieveAllFlavorParamsTypes();
 		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
+		$partnerIds = array($dbEntry->getPartnerId(), PartnerPeer::GLOBAL_PARTNER);
+		$c->add(assetParamsPeer::PARTNER_ID, array_map('strval', $partnerIds), Criteria::IN);
 		
 		$flavorParamsDb = assetParamsPeer::doSelect($c);
 		

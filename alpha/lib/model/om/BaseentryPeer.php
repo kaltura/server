@@ -26,7 +26,7 @@ abstract class BaseentryPeer {
 	const TM_CLASS = 'entryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 52;
+	const NUM_COLUMNS = 53;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -187,6 +187,9 @@ abstract class BaseentryPeer {
 	/** the column name for the AVAILABLE_FROM field */
 	const AVAILABLE_FROM = 'entry.AVAILABLE_FROM';
 
+	/** the column name for the LAST_PLAYED_AT field */
+	const LAST_PLAYED_AT = 'entry.LAST_PLAYED_AT';
+
 	/**
 	 * An identiy map to hold any loaded instances of entry objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -203,11 +206,11 @@ abstract class BaseentryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'KuserId', 'Name', 'Type', 'MediaType', 'Data', 'Thumbnail', 'Views', 'Votes', 'Comments', 'Favorites', 'TotalRank', 'Rank', 'Tags', 'Anonymous', 'Status', 'Source', 'SourceId', 'SourceLink', 'LicenseType', 'Credit', 'LengthInMsecs', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'DisplayInSearch', 'SubpId', 'CustomData', 'ScreenName', 'SiteUrl', 'Permissions', 'GroupId', 'Plays', 'PartnerData', 'IntId', 'IndexedCustomData1', 'Description', 'MediaDate', 'AdminTags', 'ModerationStatus', 'ModerationCount', 'ModifiedAt', 'PuserId', 'AccessControlId', 'ConversionProfileId', 'Categories', 'CategoriesIds', 'StartDate', 'EndDate', 'FlavorParamsIds', 'AvailableFrom', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'kuserId', 'name', 'type', 'mediaType', 'data', 'thumbnail', 'views', 'votes', 'comments', 'favorites', 'totalRank', 'rank', 'tags', 'anonymous', 'status', 'source', 'sourceId', 'sourceLink', 'licenseType', 'credit', 'lengthInMsecs', 'createdAt', 'updatedAt', 'partnerId', 'displayInSearch', 'subpId', 'customData', 'screenName', 'siteUrl', 'permissions', 'groupId', 'plays', 'partnerData', 'intId', 'indexedCustomData1', 'description', 'mediaDate', 'adminTags', 'moderationStatus', 'moderationCount', 'modifiedAt', 'puserId', 'accessControlId', 'conversionProfileId', 'categories', 'categoriesIds', 'startDate', 'endDate', 'flavorParamsIds', 'availableFrom', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::KUSER_ID, self::NAME, self::TYPE, self::MEDIA_TYPE, self::DATA, self::THUMBNAIL, self::VIEWS, self::VOTES, self::COMMENTS, self::FAVORITES, self::TOTAL_RANK, self::RANK, self::TAGS, self::ANONYMOUS, self::STATUS, self::SOURCE, self::SOURCE_ID, self::SOURCE_LINK, self::LICENSE_TYPE, self::CREDIT, self::LENGTH_IN_MSECS, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::DISPLAY_IN_SEARCH, self::SUBP_ID, self::CUSTOM_DATA, self::SCREEN_NAME, self::SITE_URL, self::PERMISSIONS, self::GROUP_ID, self::PLAYS, self::PARTNER_DATA, self::INT_ID, self::INDEXED_CUSTOM_DATA_1, self::DESCRIPTION, self::MEDIA_DATE, self::ADMIN_TAGS, self::MODERATION_STATUS, self::MODERATION_COUNT, self::MODIFIED_AT, self::PUSER_ID, self::ACCESS_CONTROL_ID, self::CONVERSION_PROFILE_ID, self::CATEGORIES, self::CATEGORIES_IDS, self::START_DATE, self::END_DATE, self::FLAVOR_PARAMS_IDS, self::AVAILABLE_FROM, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'kuser_id', 'name', 'type', 'media_type', 'data', 'thumbnail', 'views', 'votes', 'comments', 'favorites', 'total_rank', 'rank', 'tags', 'anonymous', 'status', 'source', 'source_id', 'source_link', 'license_type', 'credit', 'length_in_msecs', 'created_at', 'updated_at', 'partner_id', 'display_in_search', 'subp_id', 'custom_data', 'screen_name', 'site_url', 'permissions', 'group_id', 'plays', 'partner_data', 'int_id', 'indexed_custom_data_1', 'description', 'media_date', 'admin_tags', 'moderation_status', 'moderation_count', 'modified_at', 'puser_id', 'access_control_id', 'conversion_profile_id', 'categories', 'categories_ids', 'start_date', 'end_date', 'flavor_params_ids', 'available_from', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'KuserId', 'Name', 'Type', 'MediaType', 'Data', 'Thumbnail', 'Views', 'Votes', 'Comments', 'Favorites', 'TotalRank', 'Rank', 'Tags', 'Anonymous', 'Status', 'Source', 'SourceId', 'SourceLink', 'LicenseType', 'Credit', 'LengthInMsecs', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'DisplayInSearch', 'SubpId', 'CustomData', 'ScreenName', 'SiteUrl', 'Permissions', 'GroupId', 'Plays', 'PartnerData', 'IntId', 'IndexedCustomData1', 'Description', 'MediaDate', 'AdminTags', 'ModerationStatus', 'ModerationCount', 'ModifiedAt', 'PuserId', 'AccessControlId', 'ConversionProfileId', 'Categories', 'CategoriesIds', 'StartDate', 'EndDate', 'FlavorParamsIds', 'AvailableFrom', 'LastPlayedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'kuserId', 'name', 'type', 'mediaType', 'data', 'thumbnail', 'views', 'votes', 'comments', 'favorites', 'totalRank', 'rank', 'tags', 'anonymous', 'status', 'source', 'sourceId', 'sourceLink', 'licenseType', 'credit', 'lengthInMsecs', 'createdAt', 'updatedAt', 'partnerId', 'displayInSearch', 'subpId', 'customData', 'screenName', 'siteUrl', 'permissions', 'groupId', 'plays', 'partnerData', 'intId', 'indexedCustomData1', 'description', 'mediaDate', 'adminTags', 'moderationStatus', 'moderationCount', 'modifiedAt', 'puserId', 'accessControlId', 'conversionProfileId', 'categories', 'categoriesIds', 'startDate', 'endDate', 'flavorParamsIds', 'availableFrom', 'lastPlayedAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::KUSER_ID, self::NAME, self::TYPE, self::MEDIA_TYPE, self::DATA, self::THUMBNAIL, self::VIEWS, self::VOTES, self::COMMENTS, self::FAVORITES, self::TOTAL_RANK, self::RANK, self::TAGS, self::ANONYMOUS, self::STATUS, self::SOURCE, self::SOURCE_ID, self::SOURCE_LINK, self::LICENSE_TYPE, self::CREDIT, self::LENGTH_IN_MSECS, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::DISPLAY_IN_SEARCH, self::SUBP_ID, self::CUSTOM_DATA, self::SCREEN_NAME, self::SITE_URL, self::PERMISSIONS, self::GROUP_ID, self::PLAYS, self::PARTNER_DATA, self::INT_ID, self::INDEXED_CUSTOM_DATA_1, self::DESCRIPTION, self::MEDIA_DATE, self::ADMIN_TAGS, self::MODERATION_STATUS, self::MODERATION_COUNT, self::MODIFIED_AT, self::PUSER_ID, self::ACCESS_CONTROL_ID, self::CONVERSION_PROFILE_ID, self::CATEGORIES, self::CATEGORIES_IDS, self::START_DATE, self::END_DATE, self::FLAVOR_PARAMS_IDS, self::AVAILABLE_FROM, self::LAST_PLAYED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'kuser_id', 'name', 'type', 'media_type', 'data', 'thumbnail', 'views', 'votes', 'comments', 'favorites', 'total_rank', 'rank', 'tags', 'anonymous', 'status', 'source', 'source_id', 'source_link', 'license_type', 'credit', 'length_in_msecs', 'created_at', 'updated_at', 'partner_id', 'display_in_search', 'subp_id', 'custom_data', 'screen_name', 'site_url', 'permissions', 'group_id', 'plays', 'partner_data', 'int_id', 'indexed_custom_data_1', 'description', 'media_date', 'admin_tags', 'moderation_status', 'moderation_count', 'modified_at', 'puser_id', 'access_control_id', 'conversion_profile_id', 'categories', 'categories_ids', 'start_date', 'end_date', 'flavor_params_ids', 'available_from', 'last_played_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, )
 	);
 
 	/**
@@ -217,11 +220,11 @@ abstract class BaseentryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'KuserId' => 2, 'Name' => 3, 'Type' => 4, 'MediaType' => 5, 'Data' => 6, 'Thumbnail' => 7, 'Views' => 8, 'Votes' => 9, 'Comments' => 10, 'Favorites' => 11, 'TotalRank' => 12, 'Rank' => 13, 'Tags' => 14, 'Anonymous' => 15, 'Status' => 16, 'Source' => 17, 'SourceId' => 18, 'SourceLink' => 19, 'LicenseType' => 20, 'Credit' => 21, 'LengthInMsecs' => 22, 'CreatedAt' => 23, 'UpdatedAt' => 24, 'PartnerId' => 25, 'DisplayInSearch' => 26, 'SubpId' => 27, 'CustomData' => 28, 'ScreenName' => 29, 'SiteUrl' => 30, 'Permissions' => 31, 'GroupId' => 32, 'Plays' => 33, 'PartnerData' => 34, 'IntId' => 35, 'IndexedCustomData1' => 36, 'Description' => 37, 'MediaDate' => 38, 'AdminTags' => 39, 'ModerationStatus' => 40, 'ModerationCount' => 41, 'ModifiedAt' => 42, 'PuserId' => 43, 'AccessControlId' => 44, 'ConversionProfileId' => 45, 'Categories' => 46, 'CategoriesIds' => 47, 'StartDate' => 48, 'EndDate' => 49, 'FlavorParamsIds' => 50, 'AvailableFrom' => 51, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'kuserId' => 2, 'name' => 3, 'type' => 4, 'mediaType' => 5, 'data' => 6, 'thumbnail' => 7, 'views' => 8, 'votes' => 9, 'comments' => 10, 'favorites' => 11, 'totalRank' => 12, 'rank' => 13, 'tags' => 14, 'anonymous' => 15, 'status' => 16, 'source' => 17, 'sourceId' => 18, 'sourceLink' => 19, 'licenseType' => 20, 'credit' => 21, 'lengthInMsecs' => 22, 'createdAt' => 23, 'updatedAt' => 24, 'partnerId' => 25, 'displayInSearch' => 26, 'subpId' => 27, 'customData' => 28, 'screenName' => 29, 'siteUrl' => 30, 'permissions' => 31, 'groupId' => 32, 'plays' => 33, 'partnerData' => 34, 'intId' => 35, 'indexedCustomData1' => 36, 'description' => 37, 'mediaDate' => 38, 'adminTags' => 39, 'moderationStatus' => 40, 'moderationCount' => 41, 'modifiedAt' => 42, 'puserId' => 43, 'accessControlId' => 44, 'conversionProfileId' => 45, 'categories' => 46, 'categoriesIds' => 47, 'startDate' => 48, 'endDate' => 49, 'flavorParamsIds' => 50, 'availableFrom' => 51, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::KUSER_ID => 2, self::NAME => 3, self::TYPE => 4, self::MEDIA_TYPE => 5, self::DATA => 6, self::THUMBNAIL => 7, self::VIEWS => 8, self::VOTES => 9, self::COMMENTS => 10, self::FAVORITES => 11, self::TOTAL_RANK => 12, self::RANK => 13, self::TAGS => 14, self::ANONYMOUS => 15, self::STATUS => 16, self::SOURCE => 17, self::SOURCE_ID => 18, self::SOURCE_LINK => 19, self::LICENSE_TYPE => 20, self::CREDIT => 21, self::LENGTH_IN_MSECS => 22, self::CREATED_AT => 23, self::UPDATED_AT => 24, self::PARTNER_ID => 25, self::DISPLAY_IN_SEARCH => 26, self::SUBP_ID => 27, self::CUSTOM_DATA => 28, self::SCREEN_NAME => 29, self::SITE_URL => 30, self::PERMISSIONS => 31, self::GROUP_ID => 32, self::PLAYS => 33, self::PARTNER_DATA => 34, self::INT_ID => 35, self::INDEXED_CUSTOM_DATA_1 => 36, self::DESCRIPTION => 37, self::MEDIA_DATE => 38, self::ADMIN_TAGS => 39, self::MODERATION_STATUS => 40, self::MODERATION_COUNT => 41, self::MODIFIED_AT => 42, self::PUSER_ID => 43, self::ACCESS_CONTROL_ID => 44, self::CONVERSION_PROFILE_ID => 45, self::CATEGORIES => 46, self::CATEGORIES_IDS => 47, self::START_DATE => 48, self::END_DATE => 49, self::FLAVOR_PARAMS_IDS => 50, self::AVAILABLE_FROM => 51, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'kuser_id' => 2, 'name' => 3, 'type' => 4, 'media_type' => 5, 'data' => 6, 'thumbnail' => 7, 'views' => 8, 'votes' => 9, 'comments' => 10, 'favorites' => 11, 'total_rank' => 12, 'rank' => 13, 'tags' => 14, 'anonymous' => 15, 'status' => 16, 'source' => 17, 'source_id' => 18, 'source_link' => 19, 'license_type' => 20, 'credit' => 21, 'length_in_msecs' => 22, 'created_at' => 23, 'updated_at' => 24, 'partner_id' => 25, 'display_in_search' => 26, 'subp_id' => 27, 'custom_data' => 28, 'screen_name' => 29, 'site_url' => 30, 'permissions' => 31, 'group_id' => 32, 'plays' => 33, 'partner_data' => 34, 'int_id' => 35, 'indexed_custom_data_1' => 36, 'description' => 37, 'media_date' => 38, 'admin_tags' => 39, 'moderation_status' => 40, 'moderation_count' => 41, 'modified_at' => 42, 'puser_id' => 43, 'access_control_id' => 44, 'conversion_profile_id' => 45, 'categories' => 46, 'categories_ids' => 47, 'start_date' => 48, 'end_date' => 49, 'flavor_params_ids' => 50, 'available_from' => 51, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'KuserId' => 2, 'Name' => 3, 'Type' => 4, 'MediaType' => 5, 'Data' => 6, 'Thumbnail' => 7, 'Views' => 8, 'Votes' => 9, 'Comments' => 10, 'Favorites' => 11, 'TotalRank' => 12, 'Rank' => 13, 'Tags' => 14, 'Anonymous' => 15, 'Status' => 16, 'Source' => 17, 'SourceId' => 18, 'SourceLink' => 19, 'LicenseType' => 20, 'Credit' => 21, 'LengthInMsecs' => 22, 'CreatedAt' => 23, 'UpdatedAt' => 24, 'PartnerId' => 25, 'DisplayInSearch' => 26, 'SubpId' => 27, 'CustomData' => 28, 'ScreenName' => 29, 'SiteUrl' => 30, 'Permissions' => 31, 'GroupId' => 32, 'Plays' => 33, 'PartnerData' => 34, 'IntId' => 35, 'IndexedCustomData1' => 36, 'Description' => 37, 'MediaDate' => 38, 'AdminTags' => 39, 'ModerationStatus' => 40, 'ModerationCount' => 41, 'ModifiedAt' => 42, 'PuserId' => 43, 'AccessControlId' => 44, 'ConversionProfileId' => 45, 'Categories' => 46, 'CategoriesIds' => 47, 'StartDate' => 48, 'EndDate' => 49, 'FlavorParamsIds' => 50, 'AvailableFrom' => 51, 'LastPlayedAt' => 52, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'kuserId' => 2, 'name' => 3, 'type' => 4, 'mediaType' => 5, 'data' => 6, 'thumbnail' => 7, 'views' => 8, 'votes' => 9, 'comments' => 10, 'favorites' => 11, 'totalRank' => 12, 'rank' => 13, 'tags' => 14, 'anonymous' => 15, 'status' => 16, 'source' => 17, 'sourceId' => 18, 'sourceLink' => 19, 'licenseType' => 20, 'credit' => 21, 'lengthInMsecs' => 22, 'createdAt' => 23, 'updatedAt' => 24, 'partnerId' => 25, 'displayInSearch' => 26, 'subpId' => 27, 'customData' => 28, 'screenName' => 29, 'siteUrl' => 30, 'permissions' => 31, 'groupId' => 32, 'plays' => 33, 'partnerData' => 34, 'intId' => 35, 'indexedCustomData1' => 36, 'description' => 37, 'mediaDate' => 38, 'adminTags' => 39, 'moderationStatus' => 40, 'moderationCount' => 41, 'modifiedAt' => 42, 'puserId' => 43, 'accessControlId' => 44, 'conversionProfileId' => 45, 'categories' => 46, 'categoriesIds' => 47, 'startDate' => 48, 'endDate' => 49, 'flavorParamsIds' => 50, 'availableFrom' => 51, 'lastPlayedAt' => 52, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::KUSER_ID => 2, self::NAME => 3, self::TYPE => 4, self::MEDIA_TYPE => 5, self::DATA => 6, self::THUMBNAIL => 7, self::VIEWS => 8, self::VOTES => 9, self::COMMENTS => 10, self::FAVORITES => 11, self::TOTAL_RANK => 12, self::RANK => 13, self::TAGS => 14, self::ANONYMOUS => 15, self::STATUS => 16, self::SOURCE => 17, self::SOURCE_ID => 18, self::SOURCE_LINK => 19, self::LICENSE_TYPE => 20, self::CREDIT => 21, self::LENGTH_IN_MSECS => 22, self::CREATED_AT => 23, self::UPDATED_AT => 24, self::PARTNER_ID => 25, self::DISPLAY_IN_SEARCH => 26, self::SUBP_ID => 27, self::CUSTOM_DATA => 28, self::SCREEN_NAME => 29, self::SITE_URL => 30, self::PERMISSIONS => 31, self::GROUP_ID => 32, self::PLAYS => 33, self::PARTNER_DATA => 34, self::INT_ID => 35, self::INDEXED_CUSTOM_DATA_1 => 36, self::DESCRIPTION => 37, self::MEDIA_DATE => 38, self::ADMIN_TAGS => 39, self::MODERATION_STATUS => 40, self::MODERATION_COUNT => 41, self::MODIFIED_AT => 42, self::PUSER_ID => 43, self::ACCESS_CONTROL_ID => 44, self::CONVERSION_PROFILE_ID => 45, self::CATEGORIES => 46, self::CATEGORIES_IDS => 47, self::START_DATE => 48, self::END_DATE => 49, self::FLAVOR_PARAMS_IDS => 50, self::AVAILABLE_FROM => 51, self::LAST_PLAYED_AT => 52, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'kuser_id' => 2, 'name' => 3, 'type' => 4, 'media_type' => 5, 'data' => 6, 'thumbnail' => 7, 'views' => 8, 'votes' => 9, 'comments' => 10, 'favorites' => 11, 'total_rank' => 12, 'rank' => 13, 'tags' => 14, 'anonymous' => 15, 'status' => 16, 'source' => 17, 'source_id' => 18, 'source_link' => 19, 'license_type' => 20, 'credit' => 21, 'length_in_msecs' => 22, 'created_at' => 23, 'updated_at' => 24, 'partner_id' => 25, 'display_in_search' => 26, 'subp_id' => 27, 'custom_data' => 28, 'screen_name' => 29, 'site_url' => 30, 'permissions' => 31, 'group_id' => 32, 'plays' => 33, 'partner_data' => 34, 'int_id' => 35, 'indexed_custom_data_1' => 36, 'description' => 37, 'media_date' => 38, 'admin_tags' => 39, 'moderation_status' => 40, 'moderation_count' => 41, 'modified_at' => 42, 'puser_id' => 43, 'access_control_id' => 44, 'conversion_profile_id' => 45, 'categories' => 46, 'categories_ids' => 47, 'start_date' => 48, 'end_date' => 49, 'flavor_params_ids' => 50, 'available_from' => 51, 'last_played_at' => 52, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, )
 	);
 
 	/**
@@ -343,6 +346,7 @@ abstract class BaseentryPeer {
 		$criteria->addSelectColumn(entryPeer::END_DATE);
 		$criteria->addSelectColumn(entryPeer::FLAVOR_PARAMS_IDS);
 		$criteria->addSelectColumn(entryPeer::AVAILABLE_FROM);
+		$criteria->addSelectColumn(entryPeer::LAST_PLAYED_AT);
 	}
 
 	/**
@@ -475,7 +479,7 @@ abstract class BaseentryPeer {
 			}
 		}
 	}
-	
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
 	 *  
@@ -483,9 +487,15 @@ abstract class BaseentryPeer {
 	 */
 	public static function addInstancesToPool($queryResult)
 	{
-		foreach ($queryResult as $curResult)
+		if (Propel::isInstancePoolingEnabled())
 		{
-			entryPeer::addInstanceToPool($curResult);
+			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
+			{  
+				foreach ($queryResult as $curResult)
+				{
+					entryPeer::addInstanceToPool($curResult);
+				}
+			}
 		}
 	}
 	
@@ -775,12 +785,20 @@ abstract class BaseentryPeer {
 	 */
 	public static function addInstanceToPool(entry $obj, $key = null)
 	{
-		if (Propel::isInstancePoolingEnabled()) {
-			if ($key === null) {
+		if ( Propel::isInstancePoolingEnabled() )
+		{
+			if ( $key === null )
+			{
 				$key = (string) $obj->getId();
-			} // if key === null
-			self::$instances[$key] = $obj;
-			kMemoryManager::registerPeer('entryPeer');
+			}
+				
+			if ( isset( self::$instances[$key] )											// Instance is already mapped?
+					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+				)
+			{
+				self::$instances[$key] = $obj;
+				kMemoryManager::registerPeer('entryPeer');
+			}
 		}
 	}
 

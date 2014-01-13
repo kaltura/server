@@ -5,6 +5,13 @@
 */
 class entryIndex extends BaseIndexObject
 {
+	const DYNAMIC_ATTRIBUTES = 'dynamic_attributes';
+		
+	public static function getObjectName()
+	{
+		return 'entry';
+	}
+
 	public static function getObjectIndexName()
 	{
 		return 'entry';
@@ -78,12 +85,14 @@ class entryIndex extends BaseIndexObject
 				'start_date' => 'startDate',
 				'end_date' => 'endDate',
 				'available_from' => 'availableFrom',
+				'last_played_at' => 'lastPlayedAt',
 				'entitled_kusers_publish' => 'entitledKusersPublish',
 				'entitled_kusers_edit' => 'entitledKusersEdit',
 				'entitled_kusers' => 'entitledKusers',
 				'privacy_by_contexts' => 'privacyByContexts',
 				'creator_kuser_id' => 'creatorKuserId',
 				'creator_puser_id' => 'creatorPuserId',
+				'dynamic_attributes' => 'dynamicAttributes',
 			);
 		}
 		return self::$fieldsMap;
@@ -137,6 +146,7 @@ class entryIndex extends BaseIndexObject
 				'start_date' => IIndexable::FIELD_TYPE_DATETIME,
 				'end_date' => IIndexable::FIELD_TYPE_DATETIME,
 				'available_from' => IIndexable::FIELD_TYPE_DATETIME,
+				'last_played_at' => IIndexable::FIELD_TYPE_DATETIME,
 				'entitled_kusers_publish' => IIndexable::FIELD_TYPE_STRING,
 				'entitled_kusers_edit' => IIndexable::FIELD_TYPE_STRING,
 				'entitled_kusers' => IIndexable::FIELD_TYPE_STRING,
@@ -225,6 +235,7 @@ class entryIndex extends BaseIndexObject
 				'entry.START_DATE' => 'start_date',
 				'entry.END_DATE' => 'end_date',
 				'entry.AVAILABLE_FROM' => 'available_from',
+				'entry.LAST_PLAYED_AT' => 'last_played_at',
 				'entry.ENTITLED_KUSERS_PUBLISH' => 'entitled_kusers_publish',
 				'entry.ENTITLED_KUSERS_EDIT' => 'entitled_kusers_edit',
 				'entry.ENTITLED_KUSERS' => 'entitled_kusers',
@@ -319,6 +330,7 @@ class entryIndex extends BaseIndexObject
 				'entry.START_DATE' => 'start_date',
 				'entry.END_DATE' => 'end_date',
 				'entry.AVAILABLE_FROM' => 'available_from',
+				'entry.LAST_PLAYED_AT' => 'last_played_at',
 			);
 		}
 		return self::$orderFields;

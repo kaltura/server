@@ -48,21 +48,27 @@ enabledWorkers.KAsyncDelete							= 4
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
+enabledWorkers.KAsyncConvertLiveSegment				= 1
+enabledWorkers.KAsyncConcat							= 1
+enabledWorkers.KAsyncValidateLiveMediaServers		= 1
+
 
 [mainTemplate : template]
 enabledWorkers.DirectoryCleanupShared				= 1
 enabledWorkers.KAsyncDbCleanup						= 1
-enabledWorkers.KAsyncPartnerLoadCleanup				= 3
+enabledWorkers.KAsyncPartnerLoadCleanup				= 1
 enabledWorkers.KAsyncJobSuspender                   = 1
 enabledWorkers.KAsyncConvertCloser					= 1
-enabledWorkers.KAsyncConvertProfileCloser			= 2
+enabledWorkers.KAsyncConvertProfileCloser			= 1
 enabledWorkers.KAsyncBulkDownloadCloser				= 1
 enabledWorkers.KAsyncBulkUploadCloser				= 1
 enabledWorkers.KAsyncDistributeSubmitCloser			= 1
 enabledWorkers.KAsyncDistributeUpdateCloser			= 1
 enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
+enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
+
 
 [Worker]
 maximumExecutionTime			= 300
@@ -119,10 +125,17 @@ params.pattern										= *
 params.minutesOld 									= 10080
 
 [DirectoryCleanupBatchLogs : DirectoryCleanup]
-id													= 16
+id													= 15
 friendlyName										= Batch Logs Cleanup
 params.path											= @LOG_DIR@/batch/
 params.pattern										= *.log
+params.minutesOld 									= 2880
+
+[DirectoryCleanupRecordedMedia : DirectoryCleanup]
+id													= 16
+friendlyName										= Recorded Media Cleanup
+params.path											= @WOWZA_DIR@/content/
+params.pattern										= *
 params.minutesOld 									= 2880
 
 [KAsyncDbCleanup : PeriodicWorker]
@@ -600,6 +613,8 @@ maximumExecutionTime								= 3000
 sleepBetweenStopStart							    = 3600
 scriptPath											= ../plugins/tag_search/lib/batch/tag_resolve/KAsyncTagResolveExe.php
 
+
+
 [KAsyncWidevineRepositorySync : JobHandlerWorker]
 id													= 480
 name												= KAsyncWidevineRepositorySync
@@ -608,8 +623,33 @@ type												= KAsyncWidevineRepositorySync
 maximumExecutionTime								= 3000
 scriptPath             								= ../plugins/drm/providers/widevine/batch/widevineRepositorySync/KAsyncWidevineRepositorySyncExe.php
 
-[KAsyncCopyPartner : JobHandlerWorker]
+
+
+[KAsyncConvertLiveSegment : KAsyncConvertWorker]
+id													= 490
+type												= KAsyncConvertLiveSegment
+scriptPath											= batches/ConvertLiveSegment/KAsyncConvertLiveSegmentExe.php
+
+
+
+[KAsyncConcat : KAsyncConvertWorker]
+id													= 500
+type												= KAsyncConcat
+scriptPath											= batches/Concat/KAsyncConcatExe.php
+
+
+
+[KAsyncValidateLiveMediaServers : PeriodicWorker]
 id													= 510
+friendlyName										= Validate Live Media Servers
+type												= KAsyncValidateLiveMediaServers
+scriptPath											= batches/ValidateLiveMediaServers/KAsyncValidateLiveMediaServersExe.php
+sleepBetweenStopStart								= 30
+
+
+
+[KAsyncCopyPartner : JobHandlerWorker]
+id													= 520
 friendlyName										= CopyPartner
 type												= KAsyncCopyPartner
 maximumExecutionTime								= 12000

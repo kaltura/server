@@ -9,8 +9,9 @@
 class kFlowHelper
 {
 	protected static $thumbUnSupportVideoCodecs = array(
-	flavorParams::VIDEO_CODEC_VP8,
+		flavorParams::VIDEO_CODEC_VP8,
 	);
+	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 
 	/**
 	 * @param int $partnerId
@@ -229,6 +230,156 @@ class kFlowHelper
 				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $flavorAsset->getId(), $srcAssetType, $thumbParamsOutput);
 			}
 		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConvertLiveSegmentJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $entry LiveEntry */
+		
+		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
+			
+		$key = $entry->getSyncKey($keyType);
+		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
+		$files = kFileSyncUtils::dir_get_files($key);
+		
+		if(!$entry->isConvertingSegments())
+		{
+			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
+			foreach($attachedPendingMediaEntries as $attachedPendingMediaEntry)
+			{
+				/* @var $attachedPendingMediaEntry kPendingMediaEntry */
+				if($attachedPendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
+				{
+					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] is pending on different dc [" . $attachedPendingMediaEntry->getDc() . "]");
+					continue;
+				}
+				
+				if($attachedPendingMediaEntry->getRequiredDuration() && $attachedPendingMediaEntry->getRequiredDuration() > $data->getEndTime())
+				{
+					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] requires longer duration [" . $attachedPendingMediaEntry->getRequiredDuration() . "]");
+					continue;
+				}
+					
+				$dbAsset = assetPeer::retrieveOriginalByEntryId($attachedPendingMediaEntry->getEntryId());
+				if(!$dbAsset)
+				{
+					KalturaLog::info("Source of entry id [" . $attachedPendingMediaEntry->getEntryId() . "] not found (probably deleted)");
+					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+					continue;
+				}
+				
+				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
+				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files);
+				if($job)
+					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+			}
+		}
+		$entry->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConvertLiveSegmentJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConvertLiveSegmentFailed(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $entry LiveEntry */
+		
+		if(!$entry->isConvertingSegments())
+		{
+			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
+			foreach($attachedPendingMediaEntries as $attachedPendingMediaEntry)
+			{
+				/* @var $attachedPendingMediaEntry kPendingMediaEntry */
+				if($attachedPendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
+					continue;
+				
+				kBatchManager::updateEntry($attachedPendingMediaEntry->getEntryId(), entryStatus::ERROR_CONVERTING);
+				$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
+			}
+		}
+		$entry->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConcatJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConcatFailed(BatchJob $dbBatchJob, kConcatJobData $data)
+	{
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
+		
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
+		if(!$flavorAsset)
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+			return $dbBatchJob;
+			
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+
+		if(!$flavorAsset->isLocalReadyStatus())
+		{
+			$flavorAsset->setDescription($dbBatchJob->getMessage());
+			$flavorAsset->setStatus(asset::ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConcatJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleConcatFinished(BatchJob $dbBatchJob, kConcatJobData $data)
+	{
+		KalturaLog::debug("Concat finished, with file: " . $data->getDestFilePath());
+
+		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
+			return $dbBatchJob;
+
+		if(!file_exists($data->getDestFilePath()))
+			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFilePath());
+
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
+		if(!$flavorAsset)
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+			return $dbBatchJob;
+			
+		$flavorAsset->incrementVersion();
+		
+		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
+		if($ext)
+			$flavorAsset->setFileExt($ext);
+			
+		$flavorAsset->save();
+
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+
+		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
 		return $dbBatchJob;
 	}
@@ -258,7 +409,16 @@ class kFlowHelper
 
 		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
-			kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+			try {
+				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+			}
+			catch (kCoreException $ex) {
+				//This was added so the all the assets prior to reaching the limit would still be created
+				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
+					throw $ex;
+				
+				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
+			}
 
 			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
 			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
@@ -617,18 +777,7 @@ class kFlowHelper
 			if($syncFile)
 			{
 				// removes the DEFAULT_THUMB tag from all other thumb assets
-				$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-				foreach($entryThumbAssets as $entryThumbAsset)
-				{
-					if($entryThumbAsset->getId() == $thumbAsset->getId())
-						continue;
-
-					if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-						continue;
-
-					$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-					$entryThumbAsset->save();
-				}
+				assetPeer::removeThumbAssetDeafultTags($entry->getId(), $thumbAsset->getId());
 			}
 		}
 
@@ -1262,7 +1411,24 @@ class kFlowHelper
 			{
 				try
 				{
-					kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+					$currFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+					//In cases we are returning from intermediate flow need to check maybe if another round is needed
+					//This comes to support the creation of silent audio tracks on source assets such as .arf that require initial inter flow for the source and only than the addition
+					//of the silent audio track
+					if( $currFlavorAsset instanceof flavorAsset && $currFlavorAsset->getIsOriginal() && $currFlavorAsset->getInterFlowCount() != null)
+					{ 
+						//check if the inter flow count is larger than 2.  
+						//In this cases probably something went wrong so we will continue with the original flow and will not check if any additioanl inter flow nneds to be done.
+						if($currFlavorAsset->getInterFlowCount() < self::MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE)
+						{
+							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
+							kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $convertProfileJob, $mediaInfo->getId());
+						}
+						else 
+							kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+					}
+					else 
+						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 				}
 				catch(Exception $e)
 				{
@@ -1479,7 +1645,16 @@ class kFlowHelper
 		}
 		else
 		{
-			$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
+			try {
+				$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
+			}
+			catch (kCoreException $ex) {
+				//This was added so the all the assets prior to reaching the limit would still be created
+				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
+					throw $ex;
+				
+				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
+			}
 
 			if($conversionsCreated)
 			{

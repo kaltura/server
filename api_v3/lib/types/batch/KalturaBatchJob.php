@@ -22,21 +22,21 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 	
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 	
 	/**
-	 * @var int
+	 * @var time
 	 * @readonly
 	 */
 	public $deletedAt;
@@ -380,10 +380,18 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaDeleteJobData();
 				break;
 				
-				case 'kCopyPartnerJobData':
-					$this->data = new KalturaCopyPartnerJobData();
-					break;
-							
+			case 'kConvertLiveSegmentJobData':
+				$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case 'kConcatJobData':
+				$this->data = new KalturaConcatJobData();
+				break;
+				
+			case 'kCopyPartnerJobData':
+				$this->data = new KalturaCopyPartnerJobData();
+				break;
+				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 				{
@@ -578,6 +586,18 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 					$this->data = new KalturaDeleteJobData();
 				break;
 				
+			case KalturaBatchJobType::CONVERT_LIVE_SEGMENT:
+				$dbData = new kConvertLiveSegmentJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConvertLiveSegmentJobData();
+				break;
+				
+			case KalturaBatchJobType::CONCAT:
+				$dbData = new kConcatJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaConcatJobData();
+				break;
+					
 			case KalturaBatchJobType::COPY_PARTNER:
 				$dbData = new kCopyPartnerJobData();
 				if(is_null($this->data))

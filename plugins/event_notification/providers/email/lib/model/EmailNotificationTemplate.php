@@ -271,13 +271,7 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	public function preSave(PropelPDO $con = null)
 	{
 		if($this->setBody)
-		{
-			$this->bodyPreviousVersion = $this->getBodyFileVersion();
-			if($this->bodyPreviousVersion)
-				$this->incrementBodyFileVersion();
-			else 
-				$this->resetBodyFileVersion();
-		}
+			$this->incrementBodyFileVersion();
 			
 		return parent::preSave($con);
 	}
@@ -331,8 +325,12 @@ class EmailNotificationTemplate extends EventNotificationTemplate implements ISy
 	 */
 	public function getReplyTo()								{return $this->getFromCustomData(self::CUSTOM_DATA_REPLY_TO);}
 	
-	public function incrementBodyFileVersion()					{return $this->incInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION);}
-	public function resetBodyFileVersion()						{return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, 1);}
+	public function incrementBodyFileVersion()
+	{
+		$version = kDataCenterMgr::incrementVersion($this->getBodyFileVersion());
+		return $this->putInCustomData(self::CUSTOM_DATA_BODY_FILE_VERSION, $version);
+	}
+	
 	public function setFormat($v)								{return $this->putInCustomData(self::CUSTOM_DATA_FORMAT, $v);}
 	public function setSubject($v)								{return $this->putInCustomData(self::CUSTOM_DATA_SUBJECT, $v);}
 	public function setFromEmail($v)							{return $this->putInCustomData(self::CUSTOM_DATA_FROM_EMAIL, $v);}

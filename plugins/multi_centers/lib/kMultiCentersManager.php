@@ -43,6 +43,20 @@ class kMultiCentersManager
 		$batchJob->setObjectId($fileSyncId);
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		
+		//In case file sync is of type data and holds flavor asset than we need to check if its the source asset that is being synced and raise it sync priority 
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA 
+		 && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
+		{
+			$assetdb = assetPeer::retrieveById($fileSync->getObjectId());
+			if($assetdb)
+			{
+	    		$isSourceAsset = $assetdb->getIsOriginal();
+	     
+	    		if($isSourceAsset)
+					$fileSyncImportData->setIsSourceAsset(true);
+			}
+		}
+		
 		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId size: $fileSize"); 
 		return kJobsManager::addJob($batchJob, $fileSyncImportData, BatchJobType::FILESYNC_IMPORT);
 	}

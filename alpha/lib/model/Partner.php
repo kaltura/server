@@ -12,6 +12,9 @@ class Partner extends BasePartner
 {	
 	const BATCH_PARTNER_ID = -1;
 	const ADMIN_CONSOLE_PARTNER_ID = -2;
+	const HOSTED_PAGES_PARTNER_ID = -3;
+	const MONITORING_PARTNER_ID = -4;
+	const MEDIA_SERVER_PARTNER_ID = -5;
 	
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
@@ -28,8 +31,6 @@ class Partner extends BasePartner
 	
 	const CONTENT_BLOCK_SERVICE_CONFIG_ID = 'services_limited_partner.ct';
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
-	
-	const MAX_ALLOWD_INVALID_LOGIN_COUNT = 10;
 	
 	const MAX_ACCESS_CONTROLS = 24;
 	
@@ -63,29 +64,14 @@ class Partner extends BasePartner
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
 	{
-		if ( $this->getInvalidLoginCount() > self::MAX_ALLOWD_INVALID_LOGIN_COUNT )
-		{
-//			return self::VALIDATE_TOO_MANY_INVALID_LOGINS;
-		}
-		
 		$secret_to_match = $admin ? $this->getAdminSecret() : $this->getSecret() ;
 		if ( $partner_secret == $secret_to_match )
 		{
 			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
-			if ( $this->getInvalidLoginCount() > 0 )
-			{
-				$this->setInvalidLoginCount( 0 ); // reset the invalid login count 
-				$this->save();
-			}
 			return true;
 		}
 		else
 		{
-			// same invalid count is done both for secret and for admin_secret - 
-			// TODO - split counts ?
-			$this->setInvalidLoginCount( $this->getInvalidLoginCount() + 1 );
-			$this->save();
-			
 			return self::VALIDATE_WRONG_PASSWORD;
 		}
 	}
@@ -327,6 +313,16 @@ class Partner extends BasePartner
 	}
 	
 	/**
+	 * Get the default live conversion profile id for the partner
+	 * 
+	 * @return int 
+	 */
+	public function getDefaultLiveConversionProfileId()
+	{
+		return $this->getFromCustomData("defaultLiveConversionProfileId");
+	}
+	
+	/**
 	 * Set the default access control profile id for the partner
 	 *  
 	 * @param int $v
@@ -356,6 +352,17 @@ class Partner extends BasePartner
 	public function setDefaultConversionProfileId($v)
 	{
 		$this->putInCustomData("defaultConversionProfileId", $v);
+	}
+	
+	/**
+	 * Set the live default conversion profile id for the partner
+	 *  
+	 * @param int $v
+	 * @return int
+	 */
+	public function setDefaultLiveConversionProfileId($v)
+	{
+		$this->putInCustomData("defaultLiveConversionProfileId", $v);
 	}
 	
 	public function getNotificationsConfig()
@@ -451,6 +458,9 @@ class Partner extends BasePartner
 
 	public function getEnforceHttpsApi()	{		return $this->getFromCustomData( "enforceHttpsApi" , null, false  );	}
 	public function setEnforceHttpsApi( $v )	{		return $this->putInCustomData( "enforceHttpsApi", $v );	}
+	
+	public function getAssetsPerEntryLimitation()    		{	return $this->getFromCustomData( "assetsPerEntryAllowed" , null, false  ); 	}
+	public function setAssetsPerEntryLimitation( $v )       {	return $this->putInCustomData( "assetsPerEntryAllowed", $v ); 				}
 	
 	public function getFeaturesStatus()	
 	{		
@@ -854,6 +864,8 @@ class Partner extends BasePartner
 	public function setMonthlyStorageAndBandwidth($v)	{$this->putInCustomData('monthly_storage_and_bandwidth', $v);}
 	public function setEndUsers($v)						{$this->putInCustomData('end_users', $v);}
 	public function setAccessControls($v)				{$this->putInCustomData('access_controls', $v);}
+	public function setMaxLiveStreamInputs($v)			{$this->putInCustomData('live_stream_inputs', $v);}
+	public function setMaxLiveStreamOutputs($v)			{$this->putInCustomData('live_stream_outputs', $v);}
 	
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
 	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
@@ -869,17 +881,18 @@ class Partner extends BasePartner
 	
 	public function setAdminLoginUsersOverageUnit($v)	{$this->putInCustomData('admin_login_users_overage_unit', $v);}
 	public function setPublishersOverageUnit($v)		{$this->putInCustomData('publishers_overage_unit', $v);}
-	public function setBandwidthOverageUnit($v)		{$this->putInCustomData('bandwidth_overage_unit', $v);}
-	public function setStreamEntriesOverageUnit($v)	{$this->putInCustomData('stream_entries_overage_unit', $v);}
+	public function setBandwidthOverageUnit($v)			{$this->putInCustomData('bandwidth_overage_unit', $v);}
+	public function setStreamEntriesOverageUnit($v)		{$this->putInCustomData('stream_entries_overage_unit', $v);}
 	public function setEntriesOverageUnit($v)			{$this->putInCustomData('entries_overage_unit', $v);}
 	public function setMonthlyStorageOverageUnit($v)	{$this->putInCustomData('monthly_storage_overage_unit', $v);}
 	public function setMonthlyStorageAndBandwidthOverageUnit($v)	{$this->putInCustomData('monthly_storage_and_bandwidth_overage_unit', $v);}
 	public function setEndUsersOverageUnit($v)			{$this->putInCustomData('end_users_overage_unit', $v);}
-	public function setLoginUsersOverageUnit($v)          {$this->putInCustomData('login_users_overage_unit', $v);}
-    public function setMaxLoginAttemptsOverageUnit($v)    {$this->putInCustomData('login_attempts_overage_unit', $v);}
-    public function setMaxBulkSizeOverageUnit($v)         {$this->putInCustomData('bulk_size_overage_unit', $v);}
-    public function setAutoModerateEntryFilter($v)       {$this->putInCustomData('auto_moderate_entry_filter', $v);}
-    public function setCacheFlavorVersion($v)       {$this->putInCustomData('cache_flavor_version', $v);}
+	public function setLoginUsersOverageUnit($v)		{$this->putInCustomData('login_users_overage_unit', $v);}
+    public function setMaxLoginAttemptsOverageUnit($v)	{$this->putInCustomData('login_attempts_overage_unit', $v);}
+    public function setMaxBulkSizeOverageUnit($v)		{$this->putInCustomData('bulk_size_overage_unit', $v);}
+    public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
+    public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
+    public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -891,6 +904,8 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
+	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs');}
+	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs');}
 	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
@@ -912,11 +927,12 @@ class Partner extends BasePartner
 	public function getMonthlyStorageOverageUnit()		{return $this->getFromCustomData('monthly_storage_overage_unit');}
 	public function getMonthlyStorageAndBandwidthOverageUnit()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_unit');}
 	public function getEndUsersOverageUnit()			{return $this->getFromCustomData('end_users_overage_unit');}
-	public function getLoginUsersOverageUnit()          {return $this->getFromCustomData('login_users_overage_unit');}
-    public function getMaxLoginAttemptsOverageUnit()    {return $this->getFromCustomData('login_attempts_overage_unit');}
-    public function getMaxBulkSizeOverageUnit()         {return $this->getFromCustomData('bulk_size_overage_unit');}
-	public function getAutoModerateEntryFilter()         {return $this->getFromCustomData('auto_moderate_entry_filter');}
-    public function getCacheFlavorVersion()       {return $this->getFromCustomData('cache_flavor_version');}
+	public function getLoginUsersOverageUnit()			{return $this->getFromCustomData('login_users_overage_unit');}
+    public function getMaxLoginAttemptsOverageUnit()	{return $this->getFromCustomData('login_attempts_overage_unit');}
+    public function getMaxBulkSizeOverageUnit()			{return $this->getFromCustomData('bulk_size_overage_unit');}
+	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
+    public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
+    public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
 	
 	
 	/**
@@ -996,7 +1012,7 @@ class Partner extends BasePartner
 	{
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
-		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		return kuserPeer::doCount($c);
 	}

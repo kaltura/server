@@ -28,5 +28,5 @@ class thumbAsset extends asset
 		$finalPath .= '/thumbAssetId/' . $this->getId();
 						
 		return $finalPath;
-	}	
+	}
 }

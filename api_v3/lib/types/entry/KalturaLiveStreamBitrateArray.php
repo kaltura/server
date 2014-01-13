@@ -5,11 +5,12 @@
  */
 class KalturaLiveStreamBitrateArray extends KalturaTypedArray
 {
-	public static function fromLiveStreamBitrateArray (array $arr )
+	public static function fromDbArray(array $arr)
 	{
 		$newArr = new KalturaLiveStreamBitrateArray();
 		if ($arr == null)
-			return $newArr;		
+			return $newArr;
+			
 		foreach ($arr as $obj)
 		{
 			$nObj = new KalturaLiveStreamBitrate();
@@ -22,11 +23,7 @@ class KalturaLiveStreamBitrateArray extends KalturaTypedArray
 		
 	public function toArray()
 	{
-		$ret = array();
-		foreach($this as $nObj)
-			$ret[] = $nObj->toObject();
-			
-		return $ret;
+		return $this->toObjectsArray();
 	}
 		
 	public function __construct()
@@ -34,4 +31,3 @@ class KalturaLiveStreamBitrateArray extends KalturaTypedArray
 		parent::__construct("KalturaLiveStreamBitrate");	
 	}
 }
-?>

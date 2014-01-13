@@ -211,15 +211,17 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		if (isset($this->orderBy))
 		{
 			$orderByField = substr($this->orderBy, 1);
-			$orderByAscending = $this->orderBy[0] == '+' ? true : false;
+			$orderBy = $this->orderBy[0] == '+' ? Criteria::ASC : Criteria::DESC;
 			
-			$metadataField = $this->getMetadataSearchField($orderByField);
+			$metadataFieldType = null;
+			$metadataField = $this->getMetadataSearchField($orderByField, array(), $metadataFieldType);
+			$isIntVal = in_array($metadataFieldType, array(MetadataSearchFilter::KMC_FIELD_TYPE_DATE, MetadataSearchFilter::KMC_FIELD_TYPE_INT));
 			if ($metadataField)
 			{
-				if ($orderByAscending)
-					$query->addOrderBy($metadataField, Criteria::ASC);
+				if ($isIntVal)
+						$query->addNumericOrderBy($metadataField, $orderBy);
 				else
-					$query->addOrderBy($metadataField, Criteria::DESC);
+						$query->addOrderBy($metadataField, $orderBy);
 			}
 		}
 	}
@@ -228,7 +230,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	 * 
 	 * @param string $field - xPath (metadataProfileField)
 	 */
-	public function getMetadataSearchField($field = null, $xPaths = array()){
+	protected function getMetadataSearchField($field = null, $xPaths = array(), &$fieldType = null){
+		$fieldType = null;
 		if(!$field)
 			return MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA);
 		
@@ -243,6 +246,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			return null;
 		}
 		
+		$fieldType = $xPaths[$field]->getType();
 		switch ($xPaths[$field]->getType()){
 			case MetadataSearchFilter::KMC_FIELD_TYPE_DATE:
 			case MetadataSearchFilter::KMC_FIELD_TYPE_INT:

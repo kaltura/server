@@ -96,7 +96,8 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function incrementXslVersion()
 	{
-		$this->incInCustomData("xslVersion");
+		$varsion = kDataCenterMgr::incrementVersion($this->getVersion());
+		$this->putInCustomData("xslVersion", $varsion);
 	}
 	
 	/**
@@ -161,10 +162,15 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 				return false;
 				
 			$partner = PartnerPeer::retrieveByPK($this->partner_id);
-			if ($partner && ($this->getId() == $partner->getDefaultConversionProfileId()))
-				$this->isDefault = true;
-			else
-				$this->isDefault = false;
+			if ($partner)
+			{
+				if ($this->getType() == ConversionProfileType::MEDIA && $this->getId() == $partner->getDefaultConversionProfileId())
+					$this->isDefault = true;
+				elseif ($this->getType() == ConversionProfileType::LIVE_STREAM && $this->getId() == $partner->getDefaultLiveConversionProfileId())
+					$this->isDefault = true;
+				else
+					$this->isDefault = false;
+			}
 		}
 		
 		return $this->isDefault;
@@ -182,7 +188,12 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		$partner = PartnerPeer::retrieveByPK($this->partner_id);
 		if ($partner && $this->isDefault === true)
 		{
-			$partner->setDefaultConversionProfileId($this->getId());
+			if($this->getType() == ConversionProfileType::MEDIA)
+				$partner->setDefaultConversionProfileId($this->getId());
+				
+			if($this->getType() == ConversionProfileType::LIVE_STREAM)
+				$partner->setDefaultLiveConversionProfileId($this->getId());
+				
 			$partner->save();
 		}
 	}
@@ -209,7 +220,11 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function copyInto($copyObj, $deepCopy = false)
 	{
+		/* @var $copyObj conversionProfile2 */
+		
 		parent::copyInto($copyObj, $deepCopy);
+		$copyObj->setType($this->getType());
+		$copyObj->setMediaParserType($this->getMediaParserType());
 		$copyObj->setIsDefault($this->getIsDefault());
 	}
 	
@@ -248,6 +263,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		return $this->getFromCustomData('mediaParserType', null, mediaParserType::MEDIAINFO);
 	}
+	
 	public function getCacheInvalidationKeys()
 	{
 		return array("conversionProfile2:partnerId=".strtolower($this->getPartnerId()));
