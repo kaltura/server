@@ -2,6 +2,16 @@
  
 # IX-9.8.0 #
 
+## Update live-params permissions ##
+
+Enable only to partners with live-stream permission to list live-params as part of flavor-params lists.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
 ## VOD to Live ##
 Demo version only, enables broadcasting a live-channel base on playlist.
 
