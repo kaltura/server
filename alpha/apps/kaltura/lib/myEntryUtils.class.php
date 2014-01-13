@@ -1199,9 +1199,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
 		}
 
+		$illegalCategoryStatus = array( CategoryStatus::DELETED, CategoryStatus::PURGED );
+
 		// Get src category objects
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
+		$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
+		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
 		categoryPeer::setUseCriteriaFilter(false);
-		$srcCategories = categoryPeer::retrieveByPks( $srcCategoryIdSet );
+		$srcCategories = categoryPeer::doSelect($c);
 		categoryPeer::setUseCriteriaFilter(true);
 		
 		// Map the category names to their IDs
@@ -1218,6 +1224,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
 		$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
+		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
 		categoryPeer::setUseCriteriaFilter(false);
 		$dstCategories = categoryPeer::doSelect($c);
 		categoryPeer::setUseCriteriaFilter(true);
@@ -1245,6 +1252,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
 				$newCategoryEntry->setCategoryId( $dstCategoryId );
+			}
+			else
+			{
+				continute; // Skip the category_entry's creation
 			}
 
 			categoryPeer::setUseCriteriaFilter(false);
