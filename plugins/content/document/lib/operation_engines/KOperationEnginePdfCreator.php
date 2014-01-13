@@ -32,7 +32,11 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 	
 	// List of supported file types
 	private $SUPPORTED_FILE_TYPES = array(
+			'Composite Document File V2 Document',
 			'CDF V2 Document',
+			'Microsoft Word',
+			'Microsoft PowerPoint',
+			'Microsoft Excel',
 			'OpenDocument Text',
 			'PDF document',
 			'Rich Text Format data',
