@@ -1190,6 +1190,53 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$categoryEntries = categoryEntryPeer::doSelect($c);
 		categoryEntryPeer::setUseCriteriaFilter(true);
 		
+		// Create srcCategoryIdToDstCategoryIdMap - a map of source partner category ids -> dst. partner category ids
+		//
+		// Build src category IDs set
+		$srcCategoryIdSet = array();
+		foreach($categoryEntries as $categoryEntry)
+		{
+			$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
+		}
+
+		$illegalCategoryStatus = array( CategoryStatus::DELETED, CategoryStatus::PURGED );
+
+		// Get src category objects
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
+		$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
+		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
+		categoryPeer::setUseCriteriaFilter(false);
+		$srcCategories = categoryPeer::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		// Map the category names to their IDs
+		$fullNamesToSrcCategoryIdMap = array();
+		foreach ( $srcCategories as $category )
+		{
+			$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
+		}
+
+		// Get dst. partner categories based on src. category full-names
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
+		$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
+		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
+		categoryPeer::setUseCriteriaFilter(false);
+		$dstCategories = categoryPeer::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
+
+		$srcCategoryIdToDstCategoryIdMap = array();
+		foreach ( $dstCategories as $dstCategory )
+		{
+			$fullName = $dstCategory->getFullName();
+			if ( array_key_exists( $fullName, $fullNamesToSrcCategoryIdMap ) )
+			{
+				$srcCategoryId = $fullNamesToSrcCategoryIdMap[ $fullName ];
+				$srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ] = $dstCategory->getId();
+			}
+		}
+
 		foreach($categoryEntries as $categoryEntry)
 		{
 			/* @var $categoryEntry categoryEntry */
@@ -1197,11 +1244,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
-			$categoryId = self::getDstCategoryIdBasedOnSrcCategoryId( $entry->getPartnerId(), $categoryEntry->getCategoryId(), $newEntry->getPartnerId() );
-			if ( $categoryId !== false )
+			$srcCategoryId = $categoryEntry->getCategoryId();
+			if ( ! array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
 			{
-				$newCategoryEntry->setCategoryId($categoryId);
+				continue; // Skip the category_entry's creation
 			}
+
+			$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
+			$newCategoryEntry->setCategoryId( $dstCategoryId );
 
 			categoryPeer::setUseCriteriaFilter(false);
 			entryPeer::setUseCriteriaFilter(false);
@@ -1213,47 +1263,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $newEntry;
  	} 	
  	
- 	/**
- 	 * Get the id of a dst. partner category entry based on the category entry's id on the src. partner (by matching full names)
- 	 *
- 	 * @param int $srcPartnerId
- 	 * @param int $srcPartnerCategoryId
- 	 * @param int $dstPartnerId
- 	 * @return int|false The category id on the dst. partner, or false in case of any error
- 	 */
- 	private static function getDstCategoryIdBasedOnSrcCategoryId( $srcPartnerId, $srcPartnerCategoryId, $dstPartnerId )
- 	{
- 		$dstCategoryId = false;
- 		
- 		categoryPeer::setUseCriteriaFilter(false);
- 		
- 		// Get the source partner's category based on the given source category id
-		/* @var $srcCategory category */
-		$srcCategory = categoryPeer::retrieveByPk( $srcPartnerCategoryId );
-		
-		if ( $srcCategory )
-		{
-			$categoryFullName = $srcCategory->getFullName();
-			
-			// Get the dst category based on category name 
-			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-			$c->addAnd(categoryPeer::PARTNER_ID, $dstPartnerId);
-			$c->addAnd(categoryPeer::FULL_NAME, $categoryFullName);
-
-			/* @var $dstCategory category */
-			$dstCategory = categoryPeer::doSelectOne($c);
-			
-			if ( $dstCategory )
-			{
-				$dstCategoryId = $dstCategory->getId();
-			}
-	 	}
-	 	
-		categoryPeer::setUseCriteriaFilter(true);
-
-		return $dstCategoryId;
- 	}
- 	 	
  	/*
  	 * re-index to search index, and recalculate fields.
  	 */
