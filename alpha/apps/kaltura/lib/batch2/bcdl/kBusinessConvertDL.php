@@ -381,12 +381,14 @@ class kBusinessConvertDL
 			$liveAssetsParams[$flavorParamsId] = $liveAsset;
 		}
 		
-		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
+		$flavorParamsConversionProfileArray = flavorParamsConversionProfilePeer::retrieveByConversionProfile($entry->getConversionProfileId());
 		
 		$liveParamIdsArray = array();
-		/* @var $flavorAsset flavorAsset */
-		foreach ($liveParamsArray as $liveParams)
-			$liveParamIdsArray[] = $liveParams->getId();
+		foreach ($flavorParamsConversionProfileArray as $flavorParamsConversionProfile)
+		{
+			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */
+			$liveParamIdsArray[] = $flavorParamsConversionProfile->getFlavorParamsId();
+		}
 			
 		asort($liveParamIdsArray);
 		$liveParamIds = implode(",", $liveParamIdsArray);
@@ -394,40 +396,46 @@ class kBusinessConvertDL
 			return;
 		
 		$streamBitrates = array();
-		foreach ($liveParamsArray as $liveParams)
+		foreach ($flavorParamsConversionProfileArray as $flavorParamsConversionProfile)
 		{
-			/* @var $liveParams liveParams */
-			
-			$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
-			$streamBitrates[] = $streamBitrate;
-			
-			// check if asset already exists
-			if(isset($liveAssetsParams[$liveParams->getId()]))
+			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */
+			$liveParams = $flavorParamsConversionProfile->getassetParams();
+			if($liveParams instanceof liveParams)
 			{
-				$liveAsset = $liveAssetsParams[$liveParams->getId()];
-				$liveAsset->setDeletedAt(null);
-
-				// remove the asset from the list, the left assets will be deleted later
-				unset($liveAssetsParams[$liveParams->getId()]);
-			}
-			else
-			{
-				// create a new asset
-				$liveAsset = new liveAsset();
-				$liveAsset->setType(assetType::LIVE);
-				$liveAsset->setPartnerId($entry->getPartnerId());
-				$liveAsset->setFlavorParamsId($liveParams->getId());
-				$liveAsset->setFromAssetParams($liveParams);
-				$liveAsset->setEntryId($entry->getId());
-			}
-			
-			// set the status according to the entry status
-			if($entry->getStatus() == entryStatus::READY)
-				$liveAsset->setStatus( asset::ASSET_STATUS_READY);
-			else
-				$liveAsset->setStatus( asset::ASSET_STATUS_IMPORTING);
+				if($flavorParamsConversionProfile->getOrigin() == assetParamsOrigin::INGEST)
+				{
+					$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
+					$streamBitrates[] = $streamBitrate;
+				}
 				
-			$liveAsset->save();
+				// check if asset already exists
+				if(isset($liveAssetsParams[$liveParams->getId()]))
+				{
+					$liveAsset = $liveAssetsParams[$liveParams->getId()];
+					$liveAsset->setDeletedAt(null);
+	
+					// remove the asset from the list, the left assets will be deleted later
+					unset($liveAssetsParams[$liveParams->getId()]);
+				}
+				else
+				{
+					// create a new asset
+					$liveAsset = new liveAsset();
+					$liveAsset->setType(assetType::LIVE);
+					$liveAsset->setPartnerId($entry->getPartnerId());
+					$liveAsset->setFlavorParamsId($liveParams->getId());
+					$liveAsset->setFromAssetParams($liveParams);
+					$liveAsset->setEntryId($entry->getId());
+				}
+				
+				// set the status according to the entry status
+				if($entry->getStatus() == entryStatus::READY)
+					$liveAsset->setStatus( asset::ASSET_STATUS_READY);
+				else
+					$liveAsset->setStatus( asset::ASSET_STATUS_IMPORTING);
+					
+				$liveAsset->save();
+			}
 		}
 		
 		// delete all left assets

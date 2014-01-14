@@ -71,18 +71,41 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 		'deletePolicy',
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		/* @var $sourceObject flavorParamsConversionProfile */
+		$assetParams = $sourceObject->getassetParams();
+		if(!$assetParams)
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $sourceObject->getFlavorParamsId());
+			
+		if($assetParams instanceof liveParams && $this->origin == KalturaAssetParamsOrigin::CONVERT_WHEN_MISSING)
+			throw new KalturaAPIException(KalturaErrors::LIVE_PARAMS_ORIGIN_NOT_SUPPORTED, $sourceObject->getFlavorParamsId(), $assetParams->getType(), $this->origin);
 	}
 }

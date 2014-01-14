@@ -212,6 +212,8 @@ class KalturaErrors extends APIErrors
 
 	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND;ID;Asset id \"@ID@\" not found";
 
+	const ASSET_PARAMS_ORIGIN_NOT_SUPPORTED = "LIVE_PARAMS_ORIGIN_NOT_SUPPORTED;ID,TYPE,ORIGIN;Asset params @ID@ of type @TYPE@ does not support origin @ORIGIN@";
+
 	/**
 	 * FlavorAsset Service
 	 */
