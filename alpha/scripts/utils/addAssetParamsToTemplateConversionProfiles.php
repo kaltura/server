@@ -30,8 +30,10 @@ foreach($additioalFlavorParamsItems as $additioalFlavorParamsItem)
 }
 
 $partnerCriteria = new Criteria();
+$partnerCriterion = $partnerCriteria->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, 0);
+$partnerCriterion->addOr($partnerCriteria->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, null, Criteria::ISNULL));
+$partnerCriteria->add($partnerCriterion);
 $partnerCriteria->add(PartnerPeer::PARTNER_GROUP_TYPE, PartnerGroupType::TEMPLATE);
-$partnerCriteria->add(PartnerPeer::PARTNER_PARENT_ID, 0);
 $partnerCriteria->add(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE);
 
 $partners = PartnerPeer::doSelect($partnerCriteria);
