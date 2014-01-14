@@ -15,7 +15,7 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 	{
 		$returnValue = null;
 		$output = null;
-		$command = "file '{$filePath}' 2>&1";
+		$command = "file '{$filePath}'";
 		KalturaLog::debug("Executing: $command");
 		exec($command, $output, $returnValue);
 		return implode("\n",$output);
