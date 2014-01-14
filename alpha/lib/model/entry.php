@@ -721,18 +721,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		if ($this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$tempThumbPath = myEntryUtils::resizeEntryImage( $entry ,  $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-			$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
-			
-			kFileUtils::dumpFile($tempThumbPath, null, strpos($tempThumbPath, "_NOCACHE_") === false ? null : 0);
+			$path = myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/thumbnail/entry_id/" . $this->getId() . ($version ? "/version/$version" : '');
 		}
-		
-		if ($this->getSource() == entry::ENTRY_MEDIA_SOURCE_WEBCAM)
-			$flavor = assetPeer::retrieveOriginalByEntryId($this->getId());
 		else
-			$flavor = assetPeer::retrieveBestPlayByEntryId($this->getId());
-		
-		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/serveFlavor/entryId/" . $this->getId() . ($flavor? '/flavorId/' . $flavor->getId() : '') ;
+		{
+			if ($this->getSource() == entry::ENTRY_MEDIA_SOURCE_WEBCAM)
+				$flavor = assetPeer::retrieveOriginalByEntryId($this->getId());
+			else
+				$flavor = assetPeer::retrieveBestPlayByEntryId($this->getId());
+			
+			$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/serveFlavor/entryId/" . $this->getId() . ($flavor? '/flavorId/' . $flavor->getId() : '') ;
+			
+		}
 		
 		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $path ;
 		return $url;
