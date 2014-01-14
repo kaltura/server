@@ -11,7 +11,7 @@ $conversionProfileType = $argv[1];
 $additioalFlavorParamsIds = explode(',', $argv[2]);
 
 chdir(__DIR__);
-require_once (__DIR__ . '/../../bootstrap.php');
+require_once (__DIR__ . '/../bootstrap.php');
 
 $additioalFlavorParamsItems = assetParamsPeer::retrieveByPKs($additioalFlavorParamsIds);
 if(count($additioalFlavorParamsItems) != count($additioalFlavorParamsIds))
