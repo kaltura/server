@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `access_control` (
   `custom_data` text,
   `rules` text,
   PRIMARY KEY (`id`),
-  KEY `partner_id` (`partnerl_id`,`deleted_at`)
+  KEY `partner_id` (`partner_id`,`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `audit_trail` */
