@@ -1,4 +1,3 @@
-
 /*Table structure for table `access_control` */
 
 CREATE TABLE IF NOT EXISTS `access_control` (
@@ -21,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `access_control` (
   `custom_data` text,
   `rules` text,
   PRIMARY KEY (`id`),
-  KEY `partner_id` (`partner_id`,`deleted_at`)
+  KEY `partner_id` (`partnerl_id`,`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `audit_trail` */
@@ -769,43 +768,30 @@ CREATE TABLE IF NOT EXISTS `entry` (
 
 /*Table structure for table `live_channel_segment` */
 
-CREATE TABLE `live_channel_segment`
+CREATE TABLE live_channel_segment
 (
-	`id` BIGINT  NOT NULL AUTO_INCREMENT,
-	`partner_id` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`name` VARCHAR(255),
-	`description` TEXT,
-	`tags` TEXT,
-	`type` INTEGER,
-	`status` INTEGER,
-	`channel_id` VARCHAR(20),
-	`entry_id` VARCHAR(20),
-	`trigger_type` INTEGER,
-	`trigger_segment_id` BIGINT,
-	`start_time` FLOAT,
-	`duration` FLOAT,
-	`custom_data` TEXT,
-	PRIMARY KEY (`id`),
-	KEY `partner_channel_status_index`(`partner_id`, `channel_id`, `status`),
-	KEY `partner_entry_status_index`(`partner_id`, `entry_id`, `status`),
-	INDEX `live_channel_segment_FI_1` (`trigger_segment_id`),
-	CONSTRAINT `live_channel_segment_FK_1`
-		FOREIGN KEY (`trigger_segment_id`)
-		REFERENCES `live_channel_segment` (`id`),
-	CONSTRAINT `live_channel_segment_FK_2`
-		FOREIGN KEY (`partner_id`)
-		REFERENCES `partner` (`id`),
-	INDEX `live_channel_segment_FI_3` (`channel_id`),
-	CONSTRAINT `live_channel_segment_FK_3`
-		FOREIGN KEY (`channel_id`)
-		REFERENCES `entry` (`id`),
-	INDEX `live_channel_segment_FI_4` (`entry_id`),
-	CONSTRAINT `live_channel_segment_FK_4`
-		FOREIGN KEY (`entry_id`)
-		REFERENCES `entry` (`id`)
-)Type=InnoDB DEFAULT CHARSET=utf8;
+        id BIGINT  NOT NULL AUTO_INCREMENT,
+        partner_id INTEGER,
+        created_at DATETIME,
+        updated_at DATETIME,
+        name VARCHAR(255),
+        description TEXT,
+        tags TEXT,
+        type INTEGER,
+        status INTEGER,
+        channel_id VARCHAR(20),
+        entry_id VARCHAR(20),
+        trigger_type INTEGER,
+        trigger_segment_id BIGINT,
+        start_time FLOAT,
+        duration FLOAT,
+        custom_data TEXT,
+        PRIMARY KEY (id),
+        KEY partner_index(partner_id),
+        KEY live_channel_segment_FI_1 (trigger_segment_id),
+        Key live_channel_segment_FI_3 (channel_id,status),
+        Key live_channel_segment_FI_4 (entry_id,status)
+)Engine=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `entry_distribution` */
 
