@@ -102,6 +102,8 @@ class entryTableMap extends TableMap {
     $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('kuser_id' => 'id', ), null, null);
     $this->addRelation('accessControl', 'accessControl', RelationMap::MANY_TO_ONE, array('access_control_id' => 'id', ), null, null);
     $this->addRelation('conversionProfile2', 'conversionProfile2', RelationMap::MANY_TO_ONE, array('conversion_profile_id' => 'id', ), null, null);
+    $this->addRelation('LiveChannelSegmentRelatedByChannelId', 'LiveChannelSegment', RelationMap::ONE_TO_MANY, array('id' => 'channel_id', ), null, null);
+    $this->addRelation('LiveChannelSegmentRelatedByEntryId', 'LiveChannelSegment', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('kvote', 'kvote', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('conversion', 'conversion', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('WidgetLog', 'WidgetLog', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);

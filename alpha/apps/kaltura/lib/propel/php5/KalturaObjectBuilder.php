@@ -177,7 +177,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= 
 			substr($parentReload, 0, $doSelectPos) .
 			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine . 
-			$doSelectStmt . $newLine . 
+			"\$stmt = BasePeer::doSelect(\$this->buildPkeyCriteria(), \$con);" . $newLine . 
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
 	}
@@ -272,7 +272,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
                 KalturaLog::debug(\"was unable to save! retrying for the \$retries time\");
                 \$criteria = \$this->buildPkeyCriteria();
 				\$criteria->addSelectColumn(".$this->getPeerClassname()."::CUSTOM_DATA);
-                \$stmt = ".$this->getPeerClassname()."::doSelectStmt(\$criteria, \$con);
+                \$stmt = BasePeer::doSelect(\$criteria, \$con);
                 \$cutsomDataArr = \$stmt->fetchAll(PDO::FETCH_COLUMN);
                 \$newCustomData = \$cutsomDataArr[0];
                 
@@ -621,8 +621,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		
 		if($createdAtColumn)
 		$script .= "
-    	\$this->setCreatedAt(time());
-    	";
+		\$this->setCreatedAt(time());";
 		
 		if($updatedAtColumn)
 		$script .= "
@@ -718,7 +717,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 * @var array
 	 */
 	private \$tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *
