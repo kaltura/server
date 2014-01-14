@@ -23,14 +23,22 @@ class LiveConversionProfileService extends KalturaBaseService
 	 * Allows you to add a new KalturaDropFolderFile object
 	 * 
 	 * @action serve
-	 * @param string $entryId the id of the live entry to be converted
+	 * @param string $streamName the id of the live entry with it's stream suffix
 	 * @param string $hostname the media server host name
 	 * @return file
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws WowzaErrors::INVALID_STREAM_NAME
 	 */
-	public function serveAction($entryId, $hostname = null)
+	public function serveAction($streamName, $hostname = null)
 	{
+		$matches = null;
+		if(!preg_match('/^(\d_.{8})_(.+)$/', $streamName, $matches))
+			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
+			
+		$entryId = $matches[1];
+		$suffix = $matches[2];
+		
 		$entry = null;
 		if (!kCurrentContext::$ks)
 		{
@@ -56,6 +64,20 @@ class LiveConversionProfileService extends KalturaBaseService
 			
 		$conversionProfileId = $entry->getConversionProfileId();
 		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
+		
+		$liveParamsInput = null;
+		foreach($liveParams as $liveParamsItem)
+		{
+			/* @var $liveParamsItem liveParams */
+			if($liveParamsItem->getStreamSuffix() == $suffix)
+			{
+				$liveParamsInput = $liveParamsItem;
+				if(!$liveParamsInput->hasTag(assetParams::TAG_SOURCE))
+					$liveParams = array($liveParamsInput);
+					
+				break;
+			}
+		}
 		
 		// translate the $liveParams to XML according to doc: http://www.wowza.com/forums/content.php?304#configTemplate
 		
@@ -110,7 +132,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	{
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = 'PassThru';
+		$audioCodec = 'AAC';
 		$profile = 'main';
 		
 		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
