@@ -427,8 +427,9 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				default : // sub object
+					$fallback = $propertyNode->getAttribute("type");
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalObject(\$xml->$propName, $propType);");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalObject(\$xml->$propName, \"$fallback\");");
 					break;
 			}
 			
@@ -646,8 +647,8 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				default:
 					if ($resultType)
 					{
-						$resultType = $this->getTypeClass($resultType);
 						$this->appendLine("		\$resultObject = Kaltura_Client_ParseUtils::unmarshalObject(\$resultXmlObject->result, \"$resultType\");");
+						$resultType = $this->getTypeClass($resultType);
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					}
 			}
