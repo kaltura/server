@@ -302,6 +302,9 @@ class kContextDataHelper
 				$protocols[] = PlaybackProtocol::AKAMAI_HDS;
 				
 			$protocols[] = PlaybackProtocol::HDS;
+
+			if ($this->entry->getStreamName())
+				$this->streamerType = PlaybackProtocol::RTMP;
 			
 			foreach ($protocols as $protocol)
 			{
