@@ -120,9 +120,25 @@ class Form_DropFolderConfigure extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 
+		$this->addElement('text', 'metadataProfileId', array(
+			'label'			=> 'Metadata Profile ID:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'categoriesMetadataFieldName', array(
+			'label'			=> 'Categories Metadata Field Name:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('checkbox', 'enforceEntitlement', array(
+			'label'	  => 'Enforce Entitlement',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
+		));
+		
 		$this->addElement('hidden', 'crossLine2', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
+		
 
 		// --------------------------------
 
@@ -172,7 +188,7 @@ class Form_DropFolderConfigure extends Infra_Form
 			'value'			=> 0,
 			'filters'		=> array('StringTrim'),
 		));
-
+		
 		// --------------------------------
 
 		$extendTypeSubForm = KalturaPluginManager::loadObject('Form_DropFolderConfigureExtend_SubForm', $this->dropFolderType);

@@ -72,6 +72,12 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $parsedFlavor;
 	
 	/**
+	 * @var string
+	 * 
+	 */
+	public $parsedUserId;
+	
+	/**
 	 * @var int
 	 * @filter eq
 	 */
@@ -175,6 +181,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		'importStartedAt',
 		'importEndedAt',
 		'batchJobId',
+		'parsedUserId',
 	 );
 		 
 	public function getMapBetweenObjects()
