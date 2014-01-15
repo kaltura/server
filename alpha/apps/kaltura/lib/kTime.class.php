@@ -11,9 +11,8 @@ class kTime
 		if (strlen($value) == 0)
 			return 0;
 		$maxRelativeTime = kConf::get('max_relative_time');
-		$relativeTimeEnabled = self::isRelativeTimeEnabled();
 		$value = (int)$value;
-		if ($relativeTimeEnabled && -$maxRelativeTime <= $value && $value <= $maxRelativeTime)
+		if (-$maxRelativeTime <= $value && $value <= $maxRelativeTime && self::isRelativeTimeEnabled())
 		{
 			$time = self::getTime();
 			$value = $time + $value;
