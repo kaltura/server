@@ -175,13 +175,25 @@ class DbManager
 		self::$sphinxCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 		if (!self::$sphinxCache)
 			return false;
-
-		self::$stickySessionKey = 'StickySessionIndex:'.infraRequestUtils::getRemoteAddress();	
+		
+		self::$stickySessionKey = self::getStickySessionKey();
 		$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);
 		if ($preferredIndex === false)
 			return false;
 		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
 		return $preferredIndex;
+	}
+	
+	protected static function getStickySessionKey() 
+	{
+		$stickyPrefix = 'StickySessionIndex:';
+		$ksObject = kCurrentContext::$ks_object;
+		$sessionKey = null;
+
+		if($ksObject && $ksObject->hasPrivilege("sessionKey")) 
+			return $stickyPrefix . kCurrentContext::getCurrentPartnerId() . "_" . $ksObject->getPrivilegeValue("sessionKey");
+		
+		return $stickyPrefix . infraRequestUtils::getRemoteAddress();
 	}
 	
 	/**
