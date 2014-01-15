@@ -2,16 +2,18 @@
 <?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'exteneded-free-trail-history'))); ?>
 
 <?php if (!isset($this->auditList) || !count($this->auditList)):?>
-	<div>No Trial Extension history</div>
+	<div>No events history</div>
 <?php else:?>
 
 <table class="clear">
 		<thead>
 			<tr>
-				<th>Extended By</th>
-				<th>Extended On</th>				
-				<th>Until Experation Date</th>
-				<th>Experation Reason</th>
+				<th>Performed By</th>
+				<th>Performed On</th>				
+				<th>Extended Until</th>
+				<th>Extension Reason</th>
+				<th>Status</th>
+				<th>Status Reason</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -34,6 +36,22 @@
 				<?php if (@$audit->data->changedItems){
 					foreach($audit->data->changedItems as $changedItems){
 					 	if ($changedItems->descriptor == 'extendedFreeTrailExpiryReason'){ 
+					 		echo $changedItems->newValue; 
+					 		break;
+						}
+					}}?>
+					</td><td>
+				<?php if (@$audit->data->changedItems){
+					foreach($audit->data->changedItems as $changedItems){
+					 	if ($changedItems->descriptor == 'partner.STATUS'){
+					 		echo $this->enumTranslate( 'Kaltura_Client_Enum_PartnerStatus', $changedItems->newValue ); 
+					 		break;
+						}
+					}}?>
+					</td><td>
+				<?php if (@$audit->data->changedItems){
+					foreach($audit->data->changedItems as $changedItems){
+					 	if ($changedItems->descriptor == 'statusChangeReason'){ 
 					 		echo $changedItems->newValue; 
 					 		break;
 						}

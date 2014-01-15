@@ -204,9 +204,10 @@ class PartnerController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$partnerId = $this->_getParam('partner_id');
 		$status = $this->_getParam('status');
+		$reason = $this->_getParam('reason');
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-		$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status);
+		$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status, $reason);
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -505,7 +506,12 @@ class PartnerController extends Zend_Controller_Action
 				foreach($result[0]->objects as $audit) {
 					$isExtendedFreeTrailHistory = false;
 					foreach($audit->data->changedItems as $changedItem){
-						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate' || $changedItem->descriptor == 'extendedFreeTrailExpiryReason'){ 
+						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate'
+								|| $changedItem->descriptor == 'extendedFreeTrailExpiryReason'
+								|| $changedItem->descriptor == 'partner.STATUS'
+								|| $changedItem->descriptor == 'statusChangeReason'
+							)
+						{ 
 					 		$isExtendedFreeTrailHistory = true; 
 						 	break;	
 					 	}
