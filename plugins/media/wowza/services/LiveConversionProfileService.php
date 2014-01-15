@@ -66,6 +66,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
 		
 		$liveParamsInput = null;
+		$disableIngested = true;
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
@@ -73,9 +74,23 @@ class LiveConversionProfileService extends KalturaBaseService
 			{
 				$liveParamsInput = $liveParamsItem;
 				if(!$liveParamsInput->hasTag(assetParams::TAG_SOURCE))
+				{
 					$liveParams = array($liveParamsInput);
-					
+					$disableIngested = false;
+				}
 				break;
+			}
+		}
+		
+		$ignoreLiveParamsIds = array();
+		if($disableIngested)
+		{
+			$conversionProfileAssetParams = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
+			foreach($conversionProfileAssetParams as $conversionProfileAssetParamsItem)
+			{
+				/* @var $conversionProfileAssetParamsItem flavorParamsConversionProfile */
+				if($conversionProfileAssetParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+					$ignoreLiveParamsIds[] = $conversionProfileAssetParamsItem->getFlavorParamsId();
 			}
 		}
 		
@@ -90,6 +105,9 @@ class LiveConversionProfileService extends KalturaBaseService
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
+			if(in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
+				continue;
+				
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
 			$tags = $liveParamsItem->getTagsArray();
 			$tags[] = 'all';
