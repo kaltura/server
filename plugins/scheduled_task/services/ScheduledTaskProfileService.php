@@ -188,6 +188,9 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		if (is_null($batchJob) || $batchJob->getJobType() != $batchJobType)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::OBJECT_NOT_FOUND);
 
+		if ($batchJob->getStatus() != KalturaBatchJobStatus::FINISHED)
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_NOT_READY);
+
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 		$data = kFileSyncUtils::file_get_contents($syncKey, true);
 		$results = unserialize($data);
