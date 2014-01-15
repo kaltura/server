@@ -13,10 +13,10 @@
 		<userAgent>Stand alone php 1.0.0</userAgent>
 	</config>
 	<session />
-	<!-- Global Purge - Content Type: Announcement -->
+	<!-- Global Purge - Content Type: Meeting -->
 	<request service="scheduledTaskProfile" action="add" plugin="scheduledTask" partnerId="{variable:partnerId}">
 		<scheduledTaskProfile objectType="KalturaScheduledTaskProfile">
-			<name>Global Purge - Content Type: Announcement</name>
+			<name>Global Purge - Content Type: Meeting</name>
 			<objectFilterEngineType>1</objectFilterEngineType>
 			<objectFilter objectType="KalturaMediaEntryFilter">
 				<createdAtLessThanOrEqual>{php:return -30*24*60*60;}</createdAtLessThanOrEqual>
@@ -241,6 +241,35 @@
 								<item objectType="KalturaSearchCondition">
 									<field>/*[local-name()='metadata']/*[local-name()='LegalHold']</field>
 									<value>-1</value>
+								</item>
+							</items>
+						</item>
+					</items>
+				</advancedSearch>
+			</objectFilter>
+			<objectTasks objectType="array">
+				<item objectType="KalturaDeleteEntryObjectTask">
+				</item>
+			</objectTasks>
+		</scheduledTaskProfile>
+	</request>
+	<!-- Global Purge - Override Date -->
+	<request service="scheduledTaskProfile" action="add" plugin="scheduledTask" partnerId="{variable:partnerId}">
+		<scheduledTaskProfile objectType="KalturaScheduledTaskProfile">
+			<name>Global Purge - Override Date</name>
+			<objectFilterEngineType>1</objectFilterEngineType>
+			<objectFilter objectType="KalturaMediaEntryFilter">
+				<advancedSearch objectType="KalturaSearchOperator">
+					<type>1</type>
+					<items objectType="array">
+						<item objectType="KalturaMetadataSearchItem">
+							<metadataProfileId>{variable:metadataProfileId}</metadataProfileId>
+							<type>1</type>
+							<items objectType="array">
+								<item objectType="KalturaSearchComparableCondition">
+									<field>/*[local-name()='metadata']/*[local-name()='OverrideDate']</field>
+									<comparison>5</comparison><!-- LESS_THAN_OR_EQUAL -->
+									<value>0</value>
 								</item>
 							</items>
 						</item>
