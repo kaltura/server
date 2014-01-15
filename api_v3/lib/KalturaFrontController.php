@@ -158,8 +158,8 @@ class KalturaFrontController
 				$pastResultsIndex = $matches[0];
 				$resultIndex = $matches[1];
 				$resultKey = $matches[2];
-				if(!isset($dependencies[$requestIndex][pastResultsIndex]))
-					$dependencies[$resultIndex][pastResultsIndex] =  $resultKey;
+				if(!isset($dependencies[$requestIndex][$pastResultsIndex]))
+					$dependencies[$resultIndex][$pastResultsIndex] =  $resultKey;
 			}
 		}
 			
@@ -488,7 +488,7 @@ class KalturaFrontController
 			}
 			else
 			{
-				$$this->serializer->setHttpHeaders();
+				$this->serializer->setHttpHeaders();
 			}
 
 			// Check if this is multi request if yes than object are already serialized so we will skip otherwise serialize the object
@@ -510,12 +510,12 @@ class KalturaFrontController
 		$objectsCount = count($objects);
 		$serializedObject = '';
 		$serializedObject .= $this->serializer->getMulitRequestHeader($objectsCount);
-		for($i = 0 ; $i < $objectsCount; $i++)
+		for($i = 1 ; $i <= $objectsCount; $i++)
 		{
-			$serializedObject .= $this->serializer->getItemHeader($i);
+			$serializedObject .= $this->serializer->getItemHeader($i-1);
 			$serializedObject .= $objects[$i];
 			//check if item is the last one to avoid putting footer chars in json and jsonp serializers
-			if($i+1 != $objectsCount || ($this->format != KalturaResponseType::RESPONSE_TYPE_JSONP && $this->format != KalturaResponseType::RESPONSE_TYPE_JSON))
+			if($i != $objectsCount || ($this->format != KalturaResponseType::RESPONSE_TYPE_JSONP && $this->format != KalturaResponseType::RESPONSE_TYPE_JSON))
 				$serializedObject .= $this->serializer->getItemFooter();
 		}
 		$serializedObject .= $this->serializer->getMulitRequestFooter();
