@@ -808,8 +808,8 @@ $plannedDur = 0;
 		 * x16 - make sure both hgt/wid comply to x16
 		 * - if the frame size is an 'industry-standard', skip x16 constraint 
 		 */
-		if((isset($target->_forceMult16) && $target->_forceMult16==0)
-		|| (($target->_width == 640 || $target->_width == 480) && $target->_height==360)){
+		if((isset($target->_forceMult16) && $target->_forceMult16 == 0)
+		|| (($target->_width == 640 || $target->_width == 480) && $target->_height == 360) || ($target->_width == 1920 && $target->_height == 1080)){
 			;
 		}
 		else {
