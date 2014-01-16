@@ -175,6 +175,9 @@ class SingleRequestTests(KalturaBaseTest):
         xmlquoted = rc.xml
         print "XML: " + xmlquoted
 
+
+from secret_config import PARTNER_ID, SERVICE_URL
+from secret_config import SECRET, ADMIN_SECRET, USER_NAME
 class MultiRequestTests(KalturaBaseTest):
     
     def setUp(self):
@@ -182,45 +185,92 @@ class MultiRequestTests(KalturaBaseTest):
            Instead of self.client.generateSession
            TODO: Document Why
         """
-        from secret_config import PARTNER_ID, SERVICE_URL, SECRET, ADMIN_SECRET, USER_NAME
+        
         self.config = GetConfig()
         self.client = KalturaClient(self.config)
-        self.ks = self.client.session.start(ADMIN_SECRET, USER_NAME, 
-                                            KalturaSessionType.ADMIN, 
-                                            PARTNER_ID, 86400, "") 
-        self.client.setKs(self.ks)           
+        self.ks = None
+                  
     
+    def test_MultiRequest(self):
+        """From lines 221- 241 of origional PythonTester.py"""
+        
+        self.client.startMultiRequest()
+        ks = self.client.session.start(ADMIN_SECRET, USER_NAME, 
+                                       KalturaSessionType.ADMIN, 
+                                       PARTNER_ID, 86400, "") 
+        self.client.setKs(ks)
+        
+        listResult = self.client.baseEntry.list()
+
+        multiResult = self.client.doMultiRequest()
+        print multiResult[1].totalCount
+        self.client.setKs(multiResult[0])
+        
+        # error
+        try:
+            mediaEntry = self.client.media.get('invalid entry id')
+            assert(False)
+        except KalturaException, e:
+            assert(e.code == 'ENTRY_ID_NOT_FOUND')                    
+           
+        # multi request error
+        self.client = KalturaClient(GetConfig())
+
+        #start a NEW multirequest (could move to separate unit test?)
+        self.client.startMultiRequest()
+
+        ks = self.client.session.start(ADMIN_SECRET, USER_NAME, 
+                                            KalturaSessionType.ADMIN, 
+                                            PARTNER_ID, 86400, "")
+        self.client.setKs(ks)
+
+        mediaEntry = self.client.media.get('invalid entry id')
+    
+        multiResult = self.client.doMultiRequest()
+        self.client.setKs(multiResult[0])
+        assert(isinstance(multiResult[1], KalturaException))
+        assert(multiResult[1].code == 'ENTRY_ID_NOT_FOUND')    
+
+        #must be called with existing client multirequest session
+        self._AdvancedMultiRequestExample()
+
     # copied from C# tester
-    def test_AdvancedMultiRequestExample(self):
+    def _AdvancedMultiRequestExample(self):
+        #this is a separate, local client - not 'self.client'
+        client = KalturaClient(self.config) #matches line 154 in PythonTester.py
+        client.startMultiRequest()
         
         from KalturaClient.Plugins.Core import KalturaMixEntry
         from KalturaClient.Plugins.Core import KalturaEditorType
         
-        self.client.startMultiRequest()
-    
         # Request 1
+        ks = client.session.start(ADMIN_SECRET, USER_NAME, 
+                                  KalturaSessionType.ADMIN, 
+                                  PARTNER_ID, 86400, "")
+        client.setKs(ks) # for the current multi request, the result of the first call will be used as the ks for next calls
+  
         mixEntry = KalturaMixEntry()
         mixEntry.setName(".Net Mix %s" % (testString,))
         mixEntry.setEditorType(KalturaEditorType.SIMPLE)
     
         # Request 2
-        mixEntry = self.client.mixing.add(mixEntry)
+        mixEntry = client.mixing.add(mixEntry)
     
         # Request 3
         ulFile = getTestFile('DemoVideo.flv')
-        uploadTokenId = self.client.media.upload(ulFile)
+        uploadTokenId = client.media.upload(ulFile)
     
         mediaEntry = KalturaMediaEntry()
         mediaEntry.setName("Media Entry For Mix %s" % (testString,))
         mediaEntry.setMediaType(KalturaMediaType.VIDEO)
     
         # Request 4
-        mediaEntry = self.client.media.addFromUploadedFile(mediaEntry, uploadTokenId)
+        mediaEntry = client.media.addFromUploadedFile(mediaEntry, uploadTokenId)
     
         # Request 5
-        self.client.mixing.appendMediaEntry(mixEntry.id, mediaEntry.id)
+        client.mixing.appendMediaEntry(mixEntry.id, mediaEntry.id)
     
-        response = self.client.doMultiRequest()
+        response = client.doMultiRequest()
     
         for subResponse in response:
             if isinstance(subResponse, KalturaException):
@@ -232,27 +282,6 @@ class MultiRequestTests(KalturaBaseTest):
         
         print "The new mix entry id is: " + mixEntry.id
 
-
-    def test_MultiRequest(self):
-        listResult = self.client.baseEntry.list()
-
-        multiResult = self.client.doMultiRequest()
-        print multiResult[1].totalCount
-        client.setKs(multiResult[0])
-
-        # error
-        try:
-            mediaEntry = self.client.media.get('invalid entry id')
-            assert(False)
-        except KalturaException, e:
-            assert(e.code == 'ENTRY_ID_NOT_FOUND')
-            
-        mediaEntry = self.client.media.get('invalid entry id')
-                    
-        multiResult = self.client.doMultiRequest()
-        self.client.setKs(multiResult[0])
-        assert(isinstance(multiResult[1], KalturaException))
-        assert(multiResult[1].code == 'ENTRY_ID_NOT_FOUND')
 
 import unittest
 def test_suite():
