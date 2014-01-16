@@ -2,7 +2,7 @@
 /**
  * 
  */
-abstract class KDropFolderEngine
+abstract class KDropFolderEngine implements IKalturaLogger
 {
 	protected $dropFolder;
 	
@@ -244,5 +244,10 @@ abstract class KDropFolderEngine
 			$categoryEntry->entryId = $entryId;
 			$client->categoryEntry->add ($categoryEntry);
 		}
+	}
+	
+	function log($message)
+	{
+		KalturaLog::log($message);
 	}
 }
