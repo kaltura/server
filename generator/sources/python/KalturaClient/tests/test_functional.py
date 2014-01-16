@@ -36,7 +36,6 @@ from utils import KalturaLogger
 from KalturaClient import *
 
 from KalturaClient.Base import KalturaConfiguration
-from KalturaClient.Base import KalturaObjectFactory, KalturaEnumsFactory
 
 from KalturaClient.Plugins.Core import KalturaSessionType
 from KalturaClient.Plugins.Core import KalturaMediaEntry, KalturaMediaEntryFilter, KalturaMediaEntryOrderBy
@@ -81,6 +80,12 @@ class SingleRequestTests(KalturaBaseTest):
     
     
     def test_SampleMetadataOperations(self):
+        
+        from KalturaClient.Plugins.Metadata import KalturaMetadataProfile
+        from KalturaClient.Plugins.Metadata import KalturaMetadataObjectType
+        from KalturaClient.Plugins.Metadata import KalturaMetadataProfileFilter
+        from KalturaClient.Plugins.Metadata import KalturaMetadataFilter        
+        
         # The metadata field we'll add/update
         metaDataFieldName = "SubtitleFormat"
         fieldValue = "VobSub"
@@ -88,12 +93,6 @@ class SingleRequestTests(KalturaBaseTest):
         # The Schema file for the field
         # Currently, you must build the xsd yourself. There is no utility provided.
         xsdFile = "MetadataSchema.xsd"
-            
-        KalturaMetadataProfile = KalturaObjectFactory.objectFactories['KalturaMetadataProfile']
-        KalturaMetadataObjectType = KalturaEnumsFactory.enumFactories['KalturaMetadataObjectType']    
-        KalturaMetadataProfileFilter = KalturaObjectFactory.objectFactories['KalturaMetadataProfileFilter']
-        KalturaMetadataFilter = KalturaObjectFactory.objectFactories['KalturaMetadataFilter']
-        KalturaMixEntry = KalturaObjectFactory.objectFactories['KalturaMixEntry']
     
         # Setup a pager and search to use
         pager = KalturaFilterPager()
@@ -193,9 +192,9 @@ class MultiRequestTests(KalturaBaseTest):
     
     # copied from C# tester
     def test_AdvancedMultiRequestExample(self):
-
-        KalturaMixEntry = KalturaObjectFactory.objectFactories['KalturaMixEntry']
-        KalturaEditorType = KalturaEnumsFactory.enumFactories['KalturaEditorType']
+        
+        from KalturaClient.Plugins.Core import KalturaMixEntry
+        from KalturaClient.Plugins.Core import KalturaEditorType
         
         self.client.startMultiRequest()
     
