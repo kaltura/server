@@ -16,6 +16,8 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 		if (is_null($objectTask))
 			return;
 
+		$entryId = $object->id;
+		$addRemoveType = $objectTask->addRemoveType;
 		$taskCategoryIds = array();
 		foreach($objectTask->categoryIds as $categoryIntValue)
 		{
@@ -23,20 +25,36 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 			$taskCategoryIds[] = $categoryIntValue->value;
 		}
 
-		foreach($taskCategoryIds as $categoryId)
+		// remove all categories if nothing was configured in the list
+		if (count($taskCategoryIds) == 0 && $addRemoveType == KalturaScheduledTaskAddOrRemoveType::REMOVE)
 		{
-			$entryId = $object->id;
-			$addRemoveType = $objectTask->addRemoveType;
-
 			try
 			{
 				$this->impersonate($object->partnerId);
-				$this->processCategory($entryId, $categoryId, $addRemoveType);
+				$this->removeAllCategories($entryId);
 				$this->unimpersonate();
 			}
 			catch(Exception $ex)
 			{
+				$this->unimpersonate();
 				KalturaLog::err($ex);
+			}
+		}
+		else
+		{
+			foreach($taskCategoryIds as $categoryId)
+			{
+				try
+				{
+					$this->impersonate($object->partnerId);
+					$this->processCategory($entryId, $categoryId, $addRemoveType);
+					$this->unimpersonate();
+				}
+				catch(Exception $ex)
+				{
+					$this->unimpersonate();
+					KalturaLog::err($ex);
+				}
 			}
 		}
 	}
@@ -68,6 +86,22 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 		elseif (!is_null($categoryEntry) && $addRemoveType == KalturaScheduledTaskAddOrRemoveType::REMOVE)
 		{
 			$client->categoryEntry->delete($entryId, $categoryId);
+		}
+	}
+
+	/**
+	 * @param $entryId
+	 */
+	public function removeAllCategories($entryId)
+	{
+		$client = $this->getClient();
+		$filter = new KalturaCategoryEntryFilter();
+		$filter->entryIdEqual = $entryId;
+		$categoryEntryListResponse = $client->categoryEntry->listAction($filter);
+		foreach($categoryEntryListResponse->objects as $categoryEntry)
+		{
+			/** @var $categoryEntry KalturaCategoryEntry */
+			$client->categoryEntry->delete($entryId, $categoryEntry->categoryId);
 		}
 	}
 }

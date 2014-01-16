@@ -13,6 +13,13 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 	 */
 	public $flavorParamsIds;
 
+	/**
+	 * Should reconvert when flavor already exists?
+	 *
+	 * @var bool
+	 */
+	public $reconvert;
+
 	public function __construct()
 	{
 		$this->type = ObjectTaskType::CONVERT_ENTRY_FLAVORS;
@@ -25,6 +32,7 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 
 		$flavorParamsIds = array_unique(kString::fromCommaSeparatedToArray($this->flavorParamsIds));
 		$dbObject->setDataValue('flavorParamsIds', $flavorParamsIds);
+		$dbObject->setDataValue('reconvert', $this->reconvert);
 		return $dbObject;
 	}
 
@@ -34,5 +42,6 @@ class KalturaConvertEntryFlavorsObjectTask extends KalturaObjectTask
 
 		/** @var kObjectTask $srcObj */
 		$this->flavorParamsIds = implode(',', $srcObj->getDataValue('flavorParamsIds'));
+		$this->reconvert = $srcObj->getDataValue('reconvert');
 	}
 }

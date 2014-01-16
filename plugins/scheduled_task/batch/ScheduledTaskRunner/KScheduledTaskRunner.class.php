@@ -80,7 +80,17 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$pager->pageSize = 500;
 		while(true)
 		{
-			$result = ScheduledTaskBatchHelper::query($this->getClient(), $profile, $pager);
+			$this->impersonate($profile->partnerId);
+			try
+			{
+				$result = ScheduledTaskBatchHelper::query($this->getClient(), $profile, $pager);
+				$this->unimpersonate();
+			}
+			catch(Exception $ex)
+			{
+				$this->unimpersonate();
+				throw $ex;
+			}
 			if (!count($result->objects))
 				break;
 

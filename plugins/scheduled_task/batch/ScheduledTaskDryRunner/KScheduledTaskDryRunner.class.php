@@ -56,7 +56,17 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 			$client = $this->getClient();
 			$ks = $this->createKs($client, $jobData);
 			$client->setKs($ks);
-			$results = ScheduledTaskBatchHelper::query($client, $scheduledTaskProfile, $pager);
+			$this->impersonate($scheduledTaskProfile->partnerId);
+			try
+			{
+				$results = ScheduledTaskBatchHelper::query($client, $scheduledTaskProfile, $pager);
+				$this->unimpersonate();
+			}
+			catch(Exception $ex)
+			{
+				$this->unimpersonate();
+				throw $ex;
+			}
 			if (!count($results->objects))
 				break;
 
