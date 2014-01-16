@@ -493,7 +493,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					
 				default : // sub object
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, $propType);");
+					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, \"{$propType}\");");
 					break;
 			}
 		}
@@ -744,7 +744,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					{
 						$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
 						$resultObjectTypeEscaped = str_replace("\\", "\\\\", $resultTypeClassInfo->getFullyQualifiedName());
-						$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalObject(\$resultXmlObject->result, \"$resultType\");");
+						$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalObject(\$resultXmlObject->result, \"{$resultType}\");");
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"{$resultObjectTypeEscaped}\");");
 					}
 			}

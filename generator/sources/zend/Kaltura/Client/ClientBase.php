@@ -586,6 +586,9 @@ class Kaltura_Client_ClientBase
 	public function doMultiRequest()
 	{
 		$xmlData = $this->doQueue();
+		if(is_null($xmlData))
+			return null;
+		
 		$xml = new SimpleXMLElement($xmlData);
 		$items = $xml->result->children();
 		$ret = array();
