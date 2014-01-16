@@ -2,7 +2,7 @@
 /**
  * 
  */
-class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
+class KWebexDropFolderEngine extends KDropFolderEngine 
 {
 	const ZERO_DATE = '12/31/1971 00:00:01';
 	
@@ -206,9 +206,4 @@ class KWebexDropFolderEngine extends KDropFolderEngine implements IKalturaLogger
 		return $data->webexHostId;
 	}
 	
-	
-	function log($message)
-	{
-		KalturaLog::log($message);
-	}
 }
