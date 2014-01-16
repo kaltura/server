@@ -53,7 +53,10 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 		$resultsCount = 0;
 		while(true)
 		{
-			$results = ScheduledTaskBatchHelper::query($this->getClient(), $scheduledTaskProfile, $pager);
+			$client = $this->getClient();
+			$ks = $this->createKs($client, $jobData);
+			$client->setKs($ks);
+			$results = ScheduledTaskBatchHelper::query($client, $scheduledTaskProfile, $pager);
 			if (!count($results->objects))
 				break;
 
@@ -80,5 +83,17 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	{
 		$client = $this->getClient();
 		return KalturaScheduledTaskClientPlugin::get($client);
+	}
+
+	private function createKs(KalturaClient $client, KalturaScheduledTaskJobData $jobData)
+	{
+		$partnerId = self::$taskConfig->getPartnerId();
+		$sessionType = KalturaSessionType::ADMIN;
+		$puserId = 'batchUser';
+		$adminSecret = self::$taskConfig->getSecret();
+		$privileges = array('disableentitlement');
+		if ($jobData->referenceTime)
+			$privileges[] = 'reftime:'.$jobData->referenceTime;
+		return $client->generateSession($adminSecret, $puserId, $sessionType, $partnerId, 86400, implode(',', $privileges));
 	}
 }

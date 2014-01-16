@@ -16,6 +16,11 @@ class kScheduledTaskJobData extends kJobData
 	private $_resultsFilePath;
 
 	/**
+	 * @var int
+	 */
+	private $_referenceTime;
+
+	/**
 	 * @param int $maxResults
 	 */
 	public function setMaxResults($maxResults)
@@ -45,5 +50,21 @@ class kScheduledTaskJobData extends kJobData
 	public function getResultsFilePath()
 	{
 		return $this->_resultsFilePath;
+	}
+
+	/**
+	 * @param int $referenceTime
+	 */
+	public function setReferenceTime($referenceTime)
+	{
+		$this->_referenceTime = (int)$referenceTime;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getReferenceTime()
+	{
+		return $this->_referenceTime;
 	}
 }

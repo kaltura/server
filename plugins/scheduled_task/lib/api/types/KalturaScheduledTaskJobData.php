@@ -16,10 +16,17 @@ class KalturaScheduledTaskJobData extends KalturaJobData
 	 */
 	public $resultsFilePath;
 
+
+	/**
+	 * @var time
+	 */
+	public $referenceTime;
+
 	private static $map_between_objects = array
 	(
 		'maxResults' ,
 		'resultsFilePath',
+		'referenceTime',
 	);
 
 	public function getMapBetweenObjects ( )

@@ -151,11 +151,12 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 *
 	 * @action requestDryRun
 	 * @param int $scheduledTaskProfileId
+	 * @param int $maxResults
 	 * @return int
 	 *
 	 * @throws KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND
 	 */
-	public function requestDryRunAction($scheduledTaskProfileId)
+	public function requestDryRunAction($scheduledTaskProfileId, $maxResults = 500)
 	{
 		// get the object
 		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($scheduledTaskProfileId);
@@ -166,6 +167,10 @@ class ScheduledTaskProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_ACTIVE, $scheduledTaskProfileId);
 
 		$jobData = new kScheduledTaskJobData();
+		$jobData->setMaxResults($maxResults);
+		$referenceTime = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_REFERENCE_TIME);
+		if ($referenceTime)
+			$jobData->setReferenceTime($referenceTime);
 		$batchJob = $this->createScheduledTaskJob($dbScheduledTaskProfile, $jobData);
 
 		return $batchJob->getId();
@@ -187,6 +192,9 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$batchJobType = ScheduledTaskPlugin::getBatchJobTypeCoreValue(ScheduledTaskBatchType::SCHEDULED_TASK);
 		if (is_null($batchJob) || $batchJob->getJobType() != $batchJobType)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::OBJECT_NOT_FOUND);
+
+		if (in_array($batchJob->getStatus(), array(KalturaBatchJobStatus::FAILED, KalturaBatchJobStatus::FATAL)))
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_FAILED);
 
 		if ($batchJob->getStatus() != KalturaBatchJobStatus::FINISHED)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::DRY_RUN_NOT_READY);
