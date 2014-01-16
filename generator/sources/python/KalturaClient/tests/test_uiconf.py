@@ -63,8 +63,7 @@ class UiConfTests(KalturaBaseTest):
         """Until I find a better way... this gets all uiconfs that are 'single video' players
            Not sure if this is the right way"""
         filt = KalturaUiConfFilter()
-        players = [KalturaUiConfObjType.HTML5_PLAYER, 
-                   KalturaUiConfObjType.PLAYER_V3,
+        players = [KalturaUiConfObjType.PLAYER_V3,
                    KalturaUiConfObjType.PLAYER,
                    KalturaUiConfObjType.PLAYER_SL,
                   ]
