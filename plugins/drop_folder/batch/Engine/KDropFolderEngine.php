@@ -242,7 +242,14 @@ abstract class KDropFolderEngine implements IKalturaLogger
 			$categoryEntry = new KalturaCategoryEntry();
 			$categoryEntry->categoryId = $category->id;
 			$categoryEntry->entryId = $entryId;
-			$client->categoryEntry->add ($categoryEntry);
+			try
+			{
+				$client->categoryEntry->add ($categoryEntry);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err("Could not add entry $entryId to category {$category->id}. Exception thrown.");
+			}
 		}
 	}
 	
