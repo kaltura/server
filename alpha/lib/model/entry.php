@@ -1833,14 +1833,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function incrementIsmVersion (  )
 	{
-		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getIsmVersion(), FileSyncObjectType::ENTRY, self::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
-			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
-									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
-			
-		$version = kDataCenterMgr::incrementVersion($this->getIsmVersion());
-		$this->setIsmVersion($version);
-		return $version;
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getIsmVersion(), FileSyncObjectType::ENTRY, self::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+
+		$this->setIsmVersion($newVersion);
+		
+		return $newVersion;
 	}
 	
 	public function getHeight()

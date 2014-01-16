@@ -708,16 +708,11 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function incrementVersion()
 	{
-		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), FileSyncObjectType::UICONF, self::FILE_SYNC_UICONF_SUB_TYPE_DATA);
-		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
-			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
-									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::UICONF, self::FILE_SYNC_UICONF_SUB_TYPE_DATA);
 		
-		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), FileSyncObjectType::UICONF, self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG);
-		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
-			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
-									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
-		
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		//No need to calc the version again it will be the same one
+		kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::UICONF, self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG);
+									
+		$this->setVersion($newVersion);
 	}
 }

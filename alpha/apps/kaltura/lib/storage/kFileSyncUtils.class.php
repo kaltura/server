@@ -12,9 +12,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
-	const FILE_SYNC_LIMIT_REACHED = "limit_reached";
-	const FILE_SYNC_LIMIT_NOT_REACHED = "limit_not_reached";
-	
 
 	protected static $uncachedObjectTypes = array(
 		FileSyncObjectType::ASSET,				// should not cache conversion logs since they can change (batch.logConversion)
@@ -1376,7 +1373,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return kFileSyncObjectManager::retrieveObject( $sync_key->object_type, $sync_key->object_id );
 	}
 	
-	public static function validateFileSyncAmountLimitation($object_id, $version, $object_type, $object_sub_type)
+	public static function calcObjectNewVersion($object_id, $version, $object_type, $object_sub_type)
+	{
+		if(self::wasFileSyncLimitationReached($object_id, $version, $object_type, $object_sub_type))
+		{
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $object_id
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $object_id);
+		}
+
+		return kDataCenterMgr::incrementVersion($version);
+	}
+	
+	public static function wasFileSyncLimitationReached($object_id, $version, $object_type, $object_sub_type)
 	{		
 		if($version > self::FILE_SYNC_MIN_VERSION_VALIDATE)
 		{			
@@ -1392,12 +1400,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			FileSyncPeer::setUseCriteriaFilter(true);
 			if($res)
 			{
-				if(strtotime($res->getCreatedAt('Y-m-d')) == strtotime(date('Y-m-d')))
-					return self::FILE_SYNC_LIMIT_REACHED;
+				if($res->getCreatedAt(null) > (time()-86400))
+					return true;
 			}
 		}
 		
-		return self::FILE_SYNC_LIMIT_NOT_REACHED;
+		return false;
 	}
 
 	/* (non-PHPdoc)

@@ -80,12 +80,9 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	
 	public function incrementVersion()
 	{
-		$wasLimitReached = kFileSyncUtils::validateFileSyncAmountLimitation($this->getId(), $this->getVersion(), FileSyncObjectType::SYNDICATION_FEED, self::FILE_SYNC_SYNDICATION_FEED_XSLT);
-		if($wasLimitReached == kFileSyncUtils::FILE_SYNC_LIMIT_REACHED)
-			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $this->getId()
-									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $this->getId());
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::SYNDICATION_FEED, self::FILE_SYNC_SYNDICATION_FEED_XSLT);
 		
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$this->setVersion($newVersion);
 	}
 	
 	/* (non-PHPdoc)
