@@ -686,7 +686,7 @@ abstract class KalturaObject
 	}
 	
 	
-	private function getObjectPropertyName($propertyName)
+	protected function getObjectPropertyName($propertyName)
 	{
 		$objectPropertyName = null;
 		$mapBetweenObjects = $this->getMapBetweenObjects();
