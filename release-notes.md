@@ -54,6 +54,7 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 *Permissions*
 
 - deployment/updates/scripts/add_permissions/2013_12_30_liveStream_authenticate.php
+- deployment/updates/scripts/add_permissions/2014_01_15_conversionprofileassetparams_permission_media_partner.php
 
 *Media Server*
 
