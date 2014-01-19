@@ -421,11 +421,9 @@ class IndexObjectsGenerator
 	private function generateFields($objectName) {
 		$fieldsMap = array();
 		foreach ($this->searchableFields[$objectName] as $field) {
-			if(!$field->searchOnly) {
-				$types = $this->toSphinxType($field->type, $field->matchable, $field->sphinxStringAttribute);
-				foreach($types as $type)
-					$fieldsMap[] = $type . " = " . $field->indexName;
-			}
+			$types = $this->toSphinxType($field->type, $field->matchable, $field->sphinxStringAttribute);
+ 			foreach($types as $type)
+ 				$fieldsMap[] = $type . " = " . $field->indexName;
 		}
 		return implode("\n\t", $fieldsMap);
 	}
