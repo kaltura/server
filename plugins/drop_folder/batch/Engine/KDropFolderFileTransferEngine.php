@@ -503,10 +503,26 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				}	
 				throw $e;		
 			}
-		}	
+		}
+		
 		$resource = $this->getIngestionResource($job, $data);
+		
+		//If entry user ID differs from the parsed user ID on the job data - update the entry
+		KBatchBase::$kClient->startMultiRequest();
+		if ($data->parsedUserId != $matchedEntry->userId)
+		{
+			$updateEntry = new KalturaMediaEntry();
+			$updateEntry->userId = $data->parsedUserId;
+			KBatchBase::$kClient->baseEntry->update ($matchedEntry->id, $updateEntry);
+		}
 		KBatchBase::$kClient->media->cancelReplace($matchedEntry->id);
 		$updatedEntry = KBatchBase::$kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
+		$result = KBatchBase::$kClient->doMultiRequest();
+		
+		if ($updatedEntry && $updatedEntry instanceof KalturaBaseEntry)
+		{
+			$this->createCategoryAssociations ($dropFolder, $updatedEntry->userId, $updatedEntry->id);
+		}
 	}
 
 }
