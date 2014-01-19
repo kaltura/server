@@ -9,6 +9,8 @@ class DbManager
 	
 	const EXTRA_DB_CONFIG_KEY = 'extra_db_configs';
 	
+	const STICKY_SESSION_PREFIX = 'StickySessionIndex:';
+	
 	/**
 	 * @var array
 	 */
@@ -186,14 +188,12 @@ class DbManager
 	
 	protected static function getStickySessionKey() 
 	{
-		$stickyPrefix = 'StickySessionIndex:';
 		$ksObject = kCurrentContext::$ks_object;
-		$sessionKey = null;
 
-		if($ksObject && $ksObject->hasPrivilege("sessionKey")) 
-			return $stickyPrefix . kCurrentContext::getCurrentPartnerId() . "_" . $ksObject->getPrivilegeValue("sessionKey");
+		if($ksObject && $ksObject->hasPrivilege(kSessionBase::PRIVILEGE_SESSION_KEY)) 
+			return self::STICKY_SESSION_PREFIX . kCurrentContext::getCurrentPartnerId() . "_" . $ksObject->getPrivilegeValue(kSessionBase::PRIVILEGE_SESSION_KEY);
 		
-		return $stickyPrefix . infraRequestUtils::getRemoteAddress();
+		return self::STICKY_SESSION_PREFIX . infraRequestUtils::getRemoteAddress();
 	}
 	
 	/**
