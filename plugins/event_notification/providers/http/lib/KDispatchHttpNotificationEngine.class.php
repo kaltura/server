@@ -59,6 +59,13 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		}
 		
 		$headers = array();
+		$curlData = $data->data;
+		$secret = $data->signSecret;
+		if(!is_null($secret)) { 
+			$dataSig = md5($curlData . $secret);
+			$headers[] = "X-KALTURA-SIGNATURE: $dataSig";
+		}
+		
 		if(is_array($data->customHeaders) && count($data->customHeaders))
 		{
 			foreach($data->customHeaders as $customHeader)
@@ -88,17 +95,17 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			case KalturaHttpNotificationMethod::POST:
 				curl_setopt($ch, CURLOPT_POST, true);
 				
-				if($data->data)
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $data->data);
+				if($curlData)
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $curlData);
 				break;
 				
 			case KalturaHttpNotificationMethod::PUT:
 				curl_setopt($ch, CURLOPT_PUT, true);
 				
-				if($data->data)
+				if($curlData)
 				{
 					$filename = tempnam($this->tempFolderPath, 'httpPut_');
-					file_put_contents($filename, $data->data) ;
+					file_put_contents($filename, $curlData) ;
 					curl_setopt($ch, CURLOPT_INFILE, $filename);
 				}
 				break;
@@ -106,14 +113,14 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			case KalturaHttpNotificationMethod::DELETE:
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 				
-				if($data->data)
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $data->data);
+				if($curlData)
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $curlData);
 				break;
 				
 			case KalturaHttpNotificationMethod::GET:
 			default:
-				if($data->data)
-					$url .= '?' . $data->data;
+				if($curlData)
+					$url .= '?' . $curlData;
 		}
 
 		curl_setopt($ch, CURLOPT_URL, $url);
