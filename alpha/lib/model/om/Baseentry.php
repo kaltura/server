@@ -2985,7 +2985,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		entryPeer::setUseCriteriaFilter(false);
-		$stmt = BasePeer::doSelect($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		entryPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();

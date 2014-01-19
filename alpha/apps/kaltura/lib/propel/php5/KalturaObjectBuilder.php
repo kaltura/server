@@ -176,8 +176,10 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		
 		$script .= 
 			substr($parentReload, 0, $doSelectPos) .
-			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine . 
-			"\$stmt = BasePeer::doSelect(\$this->buildPkeyCriteria(), \$con);" . $newLine . 
+			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine .
+			"\$criteria = \$this->buildPkeyCriteria();" . $newLine .
+			"entryPeer::addSelectColumns(\$criteria);" . $newLine .
+			"\$stmt = BasePeer::doSelect(\$criteria, \$con);" . $newLine . 
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
 	}

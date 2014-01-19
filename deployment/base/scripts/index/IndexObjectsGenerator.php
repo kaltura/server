@@ -422,8 +422,8 @@ class IndexObjectsGenerator
 		$fieldsMap = array();
 		foreach ($this->searchableFields[$objectName] as $field) {
 			$types = $this->toSphinxType($field->type, $field->matchable, $field->sphinxStringAttribute);
-			foreach($types as $type)
-				$fieldsMap[] = $type . " = " . $field->indexName;
+ 			foreach($types as $type)
+ 				$fieldsMap[] = $type . " = " . $field->indexName;
 		}
 		return implode("\n\t", $fieldsMap);
 	}

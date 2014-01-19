@@ -1873,6 +1873,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->putInCustomData( "width" , $width );
 	}
 	
+	public function setDimensionsIfBigger ($width, $height)
+	{
+		if( (is_null($this->getFromCustomData("width")) && is_null($this->getFromCustomData("height"))) 
+			|| ($width>$this->getFromCustomData("width") && $height>$this->getFromCustomData("height")) )
+			$this->setDimensions($width, $height);
+	}
+	
 	public function updateDimensions ( )
 	{
 		if ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
