@@ -43,7 +43,7 @@ class Form_ContentFileHandlerConfig extends Zend_Form_SubForm
 	 * @param Kaltura_Client_ObjectBase $object
 	 * @param boolean $add_underscore
 	 */
-	public function populateFromObject($object, $add_underscore = true)
+	public function populateFromObject($object, $dropFolderObject, $add_underscore = true)
 	{
 		$props = $object;
 		if(is_object($object))
@@ -59,5 +59,9 @@ class Form_ContentFileHandlerConfig extends Zend_Form_SubForm
 			}
 			$this->setDefault($prop, $value);
 		}
+		
+		$this->setDefault ('metadataProfileId', $dropFolderObject->metadataProfileId);
+		$this->setDefault ('categoriesMetadataFieldName', $dropFolderObject->categoriesMetadataFieldName);	
+		$this->setDefault ('enforceEntitlement', $dropFolderObject->enforceEntitlement);
 	}
 }
