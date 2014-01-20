@@ -52,9 +52,12 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 	{
 		KalturaLog::debug('Deleting flavor id '.$id);
 		$client = $this->getClient();
+		$this->impersonate($partnerId);
 		try
 		{
 			$client->flavorAsset->delete($id);
+			KalturaLog::debug('Flavor id '.$id.' was deleted');
+			$this->unimpersonate();
 		}
 		catch(Exception $ex)
 		{
