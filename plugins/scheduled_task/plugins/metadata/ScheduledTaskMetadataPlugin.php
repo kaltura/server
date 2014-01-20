@@ -55,6 +55,9 @@ class ScheduledTaskMetadataPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
+		if (class_exists('Kaltura_Client_Client'))
+			return null;
+
 		if (class_exists('KalturaClient'))
 		{
 			if ($baseClass == 'KObjectTaskEntryEngineBase' && $enumValue == KalturaObjectTaskType::EXECUTE_METADATA_XSLT)
