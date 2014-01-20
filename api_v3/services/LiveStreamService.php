@@ -155,6 +155,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
 		$filter->setIsLive(true);
+		$filter->setIdNotIn(array($entryId));
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($baseCriteria);
 		

@@ -29,21 +29,17 @@ abstract class LiveEntry extends entry
 	 */
 	protected static function validateFileSyncSubType($sub_type)
 	{
-		if(	$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
-		)
-			throw new FileSyncException(
-				FileSyncObjectType::ENTRY, 
-				$sub_type, 
-				array(
-					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB,
-				)
-			);
+		if(	$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB )
+			{
+				return true;
+			}
+			
+			KalturaLog::log("Sub type provided [$sub_type] is not one of knowen LiveEntry sub types validating from parent");
+			return parent::validateFileSyncSubType($sub_type);
+		
 	}
 	
 	/* (non-PHPdoc)
@@ -472,50 +468,20 @@ abstract class LiveEntry extends entry
 	}
 	
 	/**
-	 * @param int $jobId
-	 */
-	public function addConvertingSegment($jobId)
-	{
-		$convertingSegments = $this->getConvertingSegments();
-		$convertingSegments[$jobId] = true;
-		
-		$this->setConvertingSegments($convertingSegments);
-	}
-	
-	/**
-	 * @param int $jobId
-	 */
-	public function removeConvertingSegment($jobId)
-	{
-		$convertingSegments = $this->getConvertingSegments();
-		if(isset($convertingSegments[$jobId]))
-			unset($convertingSegments[$jobId]);
-		
-		$this->setConvertingSegments($convertingSegments);
-	}
-	
-	/**
-	 * @param array $convertingSegments
-	 */
-	protected function setConvertingSegments(array $convertingSegments)
-	{
-		$this->putInCustomData("converting_segments", $convertingSegments);
-	}
-	
-	/**
-	 * @return array
-	 */
-	protected function getConvertingSegments()
-	{
-		return $this->getFromCustomData('converting_segments', null, array());
-	}
-	
-	/**
 	 * @return boolean
 	 */
 	public function isConvertingSegments()
 	{
-		$convertingSegments = $this->getConvertingSegments();
-		return count($convertingSegments) > 0;
+		$criteria = new Criteria();
+		$criteria->add(BatchJobLockPeer::PARTNER_ID, $this->getPartnerId());
+		$criteria->add(BatchJobLockPeer::ENTRY_ID, $this->getId());
+		$criteria->add(BatchJobLockPeer::JOB_TYPE, BatchJobType::CONVERT_LIVE_SEGMENT);
+		$criteria->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
+		
+		$batchJob = BatchJobLockPeer::doSelectOne($criteria);
+		if($batchJob)
+			return true;
+			
+		return false;
 	}
 }

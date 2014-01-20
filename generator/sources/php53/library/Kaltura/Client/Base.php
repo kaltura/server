@@ -479,6 +479,8 @@ class Base
 	public function doMultiRequest()
 	{
 		$xmlData = $this->doQueue();
+		if(is_null($xmlData))
+			return null;
 		$xml = new \SimpleXMLElement($xmlData);
 		$items = $xml->result->children();
 		$ret = array();
@@ -502,7 +504,7 @@ class Base
 	
 	public function isMultiRequest()
 	{
-		return count($this->multiRequestReturnType);	
+		return !is_null($this->multiRequestReturnType);
 	}
 		
 	public function getMultiRequestQueueSize()

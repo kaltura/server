@@ -1042,13 +1042,18 @@ class kuser extends Basekuser implements IIndexable
 	 */
 	public function getUserRoleNames()
 	{		
+		if (!$this->getRoleIds())
+			return '';
+		
 		$c = new Criteria();
-		$c->addSelectColumn(UserRolePeer::NAME);
 		$c->add(UserRolePeer::ID, explode(',',$this->getRoleIds()), Criteria::IN);
-		$stmt = UserRolePeer::doSelectStmt($c);
-		$names = $stmt->fetchAll(PDO::FETCH_COLUMN);
-		$names = implode(',', $names);
-		return $names;
+		$roles = UserRolePeer::doSelect($c);
+		$names = array();
+		foreach ($roles as $role)
+		{
+			$names[] = $role->getName();
+		}
+		return implode(',', $names);
 	}
 	
 	/**
