@@ -62,7 +62,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		$curlData = $data->data;
 		$secret = $data->signSecret;
 		if(!is_null($secret)) { 
-			$dataSig = md5($curlData . $secret);
+			$dataSig = sha1($secret . $curlData);
 			$headers[] = "X-KALTURA-SIGNATURE: $dataSig";
 		}
 		

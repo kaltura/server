@@ -15,18 +15,23 @@ public class RequestHandler {
 	 * @param signature The signature as the server passed
 	 */
 	public static void validateSignature(String data, String secret, String signature) {
-		String originalText = data+secret;
+		String originalText = secret + data;
 		
-		MessageDigest mdEnc = null;
+		MessageDigest algorithm = null;
 		try {
-			mdEnc = MessageDigest.getInstance("MD5");
+			
+			algorithm = MessageDigest.getInstance("SHA1");
 		} catch (NoSuchAlgorithmException e) {
-			 throw new NotificationHandlerException("Can'e validate signature. unknown algorithm.", NotificationHandlerException.ERROR_WRONG_SIGNATURE);
+			 throw new NotificationHandlerException("Can't validate signature. unknown algorithm.", NotificationHandlerException.ERROR_WRONG_SIGNATURE);
 		}
-		mdEnc.update(originalText.getBytes(), 0, originalText.length());
-		String md5 = new BigInteger(1, mdEnc.digest()).toString(16); // Encrypted
-																		// string
-		if(!md5.equals(signature))
+		
+		algorithm.reset();
+		algorithm.update(originalText.getBytes());
+		
+		String calculatedSig = new BigInteger(1,algorithm.digest()).toString(16); 
+		calculatedSig = String.format("%40s", calculatedSig).replace(' ', '0');	// Restore leading zeros
+		System.out.println("@_!! /" + calculatedSig + "/\t/" + signature +"/");
+		if(!calculatedSig.equals(signature))
 			throw new NotificationHandlerException("The signature validation failed!", NotificationHandlerException.ERROR_WRONG_SIGNATURE);
 	}
 	
