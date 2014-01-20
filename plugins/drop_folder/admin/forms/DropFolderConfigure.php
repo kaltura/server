@@ -202,7 +202,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		parent::populateFromObject($object, $add_underscore);
 
 		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
-			$this->getSubForm('fileHandlerConfig')->populateFromObject($object->fileHandlerConfig, false);
+			$this->getSubForm('fileHandlerConfig')->populateFromObject($object->fileHandlerConfig, $object, false);
 		}
 
 		//add troubleshoot form only to existing object
@@ -249,13 +249,25 @@ class Form_DropFolderConfigure extends Infra_Form
 		else if ($fileHandlerType == Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML){
 			$object->fileHandlerConfig = new Kaltura_Client_DropFolderXmlBulkUpload_Type_DropFolderXmlBulkUploadFileHandlerConfig();
 		}
-
 	    $object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
 
 		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
 		if ($extendTypeSubForm) {
 		    $object =  $extendTypeSubForm->getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
 		}
+		
+		if ($fileHandlerType == Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT)
+		{
+			if (isset ($object->fileHandlerConfig->metadataProfileId))
+				$object->metadataProfileId = $object->fileHandlerConfig->metadataProfileId;
+				
+			if (isset ($object->fileHandlerConfig->categoriesMetadataFieldName))
+				$object->categoriesMetadataFieldName = $object->fileHandlerConfig->categoriesMetadataFieldName;
+				
+			if (isset ($object->fileHandlerConfig->enforceEntitlement))
+				$object->enforceEntitlement = $object->fileHandlerConfig->enforceEntitlement;
+		}
+		
 		return $object;
 	}
 
