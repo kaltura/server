@@ -10,10 +10,8 @@
 			<tr>
 				<th>Performed By</th>
 				<th>Performed On</th>				
-				<th>Extended Until</th>
-				<th>Extension Reason</th>
-				<th>Status</th>
-				<th>Status Reason</th>
+				<th>Action</th>
+				<th>Reason</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -24,38 +22,30 @@
 				<td><?php echo $audit->userId; ?></td>
 				<td><?php echo date('m/d/y H:m:s',$audit->createdAt);?></td>
 				<td>
-				<?php
-				if (@$audit->data->changedItems){
-					foreach($audit->data->changedItems as $changedItems){
-					 if ($changedItems->descriptor == 'extendedFreeTrailExpiryDate'){ 
-					 	echo date('m/d/y',$changedItems->newValue); 
-					 	break;
-					 }
-				}}?>
-					</td><td>
 				<?php if (@$audit->data->changedItems){
 					foreach($audit->data->changedItems as $changedItems){
-					 	if ($changedItems->descriptor == 'extendedFreeTrailExpiryReason'){ 
-					 		echo $changedItems->newValue; 
-					 		break;
+						if ($changedItems->descriptor == 'extendedFreeTrailExpiryDate'){
+							echo 'Extended until: ' . date('m/d/y',$changedItems->newValue);
+							break;
+						}
+						else if ($changedItems->descriptor == 'partner.STATUS'){
+							$newStatusString = $this->enumTranslate( 'Kaltura_Client_Enum_PartnerStatus', $changedItems->newValue );
+							echo 'Status changed to: ' . $newStatusString; 
+							break;
 						}
 					}}?>
 					</td><td>
 				<?php if (@$audit->data->changedItems){
-					foreach($audit->data->changedItems as $changedItems){
-					 	if ($changedItems->descriptor == 'partner.STATUS'){
-					 		echo $this->enumTranslate( 'Kaltura_Client_Enum_PartnerStatus', $changedItems->newValue ); 
-					 		break;
-						}
-					}}?>
-					</td><td>
-				<?php if (@$audit->data->changedItems){
-					foreach($audit->data->changedItems as $changedItems){
-					 	if ($changedItems->descriptor == 'statusChangeReason'){ 
-					 		echo $changedItems->newValue; 
-					 		break;
-						}
-					}}?>
+						foreach($audit->data->changedItems as $changedItems){
+							if ($changedItems->descriptor == 'extendedFreeTrailExpiryReason'){
+								echo $changedItems->newValue;
+								break;
+							}
+							else if ($changedItems->descriptor == 'statusChangeReason'){
+								echo $changedItems->newValue;
+								break;
+							}
+						}}?>
 					</td>
 			</tr>
 			<?php endforeach;?>
