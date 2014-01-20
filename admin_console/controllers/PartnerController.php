@@ -450,7 +450,7 @@ class PartnerController extends Zend_Controller_Action
 					$status = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
 					$client = Infra_ClientHelper::getClient();
 					$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-					$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status);
+					$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status, "Activated due to trial extension");
 				}
 				
 			}else{
