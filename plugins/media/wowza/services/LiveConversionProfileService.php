@@ -153,50 +153,53 @@ class LiveConversionProfileService extends KalturaBaseService
 		$audioCodec = 'AAC';
 		$profile = 'main';
 		
-		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
+		if(!$liveParams->hasTag(liveParams::TAG_INGEST))
 		{
-			switch ($liveParams->getVideoCodec())
+			if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
 			{
-				case flavorParams::VIDEO_CODEC_COPY:
-					$videoCodec = 'PassThru';
-					break;
-					
-				case flavorParams::VIDEO_CODEC_FLV:
-				case flavorParams::VIDEO_CODEC_VP6:
-				case flavorParams::VIDEO_CODEC_H263:
-					$profile = 'baseline';
-					$videoCodec = 'H.263';
-					break;
-					
-				case flavorParams::VIDEO_CODEC_H264:
-				case flavorParams::VIDEO_CODEC_H264B:
-					$profile = 'baseline';
-					// don't break
-					
-				case flavorParams::VIDEO_CODEC_H264H:
-				case flavorParams::VIDEO_CODEC_H264M:
-					$streamName = "mp4:$streamName";
-					$videoCodec = 'H.264';
-					break;
-					
-				default:
-					KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
-					break;
+				switch ($liveParams->getVideoCodec())
+				{
+					case flavorParams::VIDEO_CODEC_COPY:
+						$videoCodec = 'PassThru';
+						break;
+						
+					case flavorParams::VIDEO_CODEC_FLV:
+					case flavorParams::VIDEO_CODEC_VP6:
+					case flavorParams::VIDEO_CODEC_H263:
+						$profile = 'baseline';
+						$videoCodec = 'H.263';
+						break;
+						
+					case flavorParams::VIDEO_CODEC_H264:
+					case flavorParams::VIDEO_CODEC_H264B:
+						$profile = 'baseline';
+						// don't break
+						
+					case flavorParams::VIDEO_CODEC_H264H:
+					case flavorParams::VIDEO_CODEC_H264M:
+						$streamName = "mp4:$streamName";
+						$videoCodec = 'H.264';
+						break;
+						
+					default:
+						KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
+						break;
+				}
 			}
-		}
 		
-		if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
-		{
-			switch ($liveParams->getAudioCodec())
+			if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
 			{
-				case flavorParams::AUDIO_CODEC_AAC:
-				case flavorParams::AUDIO_CODEC_AACHE:
-					$audioCodec = 'AAC';
-					break;
-				
-				default:
-					KalturaLog::err("Live params audio codec id [" . $liveParams->getAudioCodec() . "] is not expected");
-					break;
+				switch ($liveParams->getAudioCodec())
+				{
+					case flavorParams::AUDIO_CODEC_AAC:
+					case flavorParams::AUDIO_CODEC_AACHE:
+						$audioCodec = 'AAC';
+						break;
+					
+					default:
+						KalturaLog::err("Live params audio codec id [" . $liveParams->getAudioCodec() . "] is not expected");
+						break;
+				}
 			}
 		}
 		
@@ -212,7 +215,11 @@ class LiveConversionProfileService extends KalturaBaseService
 		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : MediaServer::DEFAULT_GPUID);
 		$frameSize = $video->addChild('FrameSize');
 	
-		if($liveParams->getWidth() && $liveParams->getHeight())
+		if($liveParams->hasTag(liveParams::TAG_INGEST) || (!$liveParams->getWidth() && !$liveParams->getHeight()))
+		{
+			$frameSize->addChild('FitMode', 'match-source');
+		}
+		elseif($liveParams->getWidth() && $liveParams->getHeight())
 		{
 			$frameSize->addChild('FitMode', 'fit-height');
 			$frameSize->addChild('Width', $liveParams->getWidth());
@@ -227,10 +234,6 @@ class LiveConversionProfileService extends KalturaBaseService
 		{
 			$frameSize->addChild('FitMode', 'fit-height');
 			$frameSize->addChild('Height', $liveParams->getHeight());
-		}
-		else
-		{
-			$frameSize->addChild('FitMode', 'match-source');
 		}
 		
 		$video->addChild('Profile', $profile);
