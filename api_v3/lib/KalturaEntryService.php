@@ -312,15 +312,22 @@ class KalturaEntryService extends KalturaBaseService
 		if($requiredDuration)
 		{
 			$mediaServer = $dbLiveEntry->getMediaServer(true);
-			if($mediaServer)
+			if(!$mediaServer)
+				throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $dbLiveEntry->getId());
+				
+			$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
+			if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
 			{
-				$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
-				if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
-					$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
-			} 
+				$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
+				$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
+				$dbLiveEntry->save();
+			}
+			else 
+			{
+				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
+			}
 		}
-		
-		if($dbLiveEntry->isConvertingSegments())
+		elseif($dbLiveEntry->isConvertingSegments())
 		{
 			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
 			$dbLiveEntry->save();
