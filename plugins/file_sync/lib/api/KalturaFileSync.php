@@ -7,7 +7,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 {
 	/**
 	 * 
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 */
 	public $id;
