@@ -1005,12 +1005,7 @@ class kJobsManager
 		
 		$batchJob->setObjectId($entry->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
-		$batchJob = self::addJob($batchJob, $jobData, BatchJobType::CONVERT_LIVE_SEGMENT);
-		
- 		$entry->addConvertingSegment($batchJob->getId());
-		$entry->save();
- 		
-		return $batchJob;
+		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_LIVE_SEGMENT);
 	}
 	
 	/**

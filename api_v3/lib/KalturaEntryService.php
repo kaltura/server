@@ -1134,8 +1134,12 @@ class KalturaEntryService extends KalturaBaseService
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
 	
-		$this->setDefaultStatus($filter);
-		$this->setDefaultModerationStatus($filter);
+		if( $filter->idEqual == null && $filter->redirectFromEntryId == null )
+        {
+        	$this->setDefaultStatus($filter);
+            $this->setDefaultModerationStatus($filter);
+		}
+		
 		$this->fixFilterUserId($filter);
 		$this->fixFilterDuration($filter);
 		

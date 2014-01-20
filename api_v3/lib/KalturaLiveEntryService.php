@@ -77,7 +77,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbMediaServer)
 			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
 			
-		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer, $hostname);
+		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());

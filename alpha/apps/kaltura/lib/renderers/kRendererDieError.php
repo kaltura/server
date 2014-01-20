@@ -35,6 +35,7 @@ class kRendererDieError implements kRendererBase
 		header('X-Kaltura:error- ' . $this->code);
 		header("X-Kaltura-App: exiting on error {$this->code} - {$this->message}");
 		
-		KExternalErrors::dieGracefully();
+		if (class_exists('KalturaLog') && isset($GLOBALS["start"])) 
+			KalturaLog::debug("Disptach took - " . (microtime(true) - $GLOBALS["start"]) . " seconds, memory: ".memory_get_peak_usage(true));
 	}
 }

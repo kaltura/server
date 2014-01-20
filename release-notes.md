@@ -2,6 +2,16 @@
  
 # IX-9.8.0 #
 
+## Update live-params permissions ##
+
+Enable only to partners with live-stream permission to list live-params as part of flavor-params lists.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
 ## VOD to Live ##
 Demo version only, enables broadcasting a live-channel base on playlist.
 
@@ -23,7 +33,7 @@ Demo version only, enables broadcasting a live-channel base on playlist.
 *Configuration*
 
 - Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
-- Add sharedTempPath param to the Bulk Upload worker configuration
+- Update Bulkupload worker configuration. Added parameters sharedTempPath and fileOwner. The value for sharedTempPath is /web/tmp/bulkupload and needs to be created on the machine.
  
 
 *File System*
@@ -144,6 +154,40 @@ Restricting webcam and uploaded to their designated directories and blocking att
 ## Fixed Animated GIF thumbnail cropping ##
 Bug fix: When cropping a .gif thumbnail, black margins appear around the crop are not removed.
 Bug fix: File extension of downloaded thumbnails is hardcoded to .jpg instead of the original file's ext.
+
+##  Client libraries update
+Part of PLAT-528.
+The updated client libraries are - 
+
+- java
+- php53
+- phpzend
+- python
+- ruby
+
+The change included the following - 
+
+1. Changed client libraries to have a fallback class in case of object de-serialization. supported both for regular request and multi request. 
+2.  Check the http return code and throw an exception in case it isn't 200
+
+##  Batch changes
+Contains the following improvements:
+
+1. Don't create lock object if not needed (#plat-718)
+2. Use less save commands when creating a new batch (#PLAT-661)
+
+
+## Sphinx
+Merged into the code changes that were hot-fixed at the beginning of the sprint. Including :
+
+- Addition of 'getObjectName' and use it in fixing field name
+- Numerical ordering of Json attributes. 
+
+## Minor issues
+
+- #PLAT-526: Sort the event consumers alphabetically if not requested otherwise.
+- #PLAT-681: In case an empty ui-conf filter is used, filter at least by the partner
+- #PLAT-489: Extract delayed job types to kconf. <b><u> requires updateding base.ini </u></b>
 
 ---------
  

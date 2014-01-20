@@ -252,7 +252,6 @@ class kFlowHelper
 		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
 		$files = kFileSyncUtils::dir_get_files($key);
 		
-		$entry->removeConvertingSegment($dbBatchJob->getId());
 		if(!$entry->isConvertingSegments())
 		{
 			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
@@ -300,7 +299,6 @@ class kFlowHelper
 		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
 		/* @var $entry LiveEntry */
 		
-		$entry->removeConvertingSegment($dbBatchJob->getId());
 		if(!$entry->isConvertingSegments())
 		{
 			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();

@@ -3,6 +3,8 @@ from ctypes import *
 import win32process
 import pywintypes
 import win32event
+import win32job
+import win32con
 import win32api
 import sys
 import os
@@ -39,6 +41,16 @@ if hDesktop == 0:
 	print 'CreateDesktop failed, err=%s' % windll.kernel32.GetLastError()
 	sys.exit(20)
 
+#### Create a job
+
+JOB_NAME = 'UniqueJob-%s' % os.getpid()
+
+try:
+	hJob = win32job.CreateJobObject(None, JOB_NAME)
+except pywintypes.error, e:
+	print 'CreateJobObject failed, err=%s' % e[0]
+	sys.exit(25)
+
 #### Create the process
 
 startupInfo = win32process.STARTUPINFO()
@@ -51,7 +63,7 @@ try:
 		None,
 		None,
 		True,
-		0,
+		win32con.CREATE_SUSPENDED,
 		None,
 		None,
 		startupInfo)
@@ -59,8 +71,24 @@ except pywintypes.error, e:
 	print 'CreateProcess failed, err=%s' % e[0]
 	sys.exit(30)
 
-win32api.CloseHandle(processInfo[1])
 hProcess = processInfo[0]
+
+#### Associate the process with the job
+
+try:
+	win32job.AssignProcessToJobObject(hJob, hProcess)
+except pywintypes.error, e:
+	print 'AssignProcessToJobObject failed, err=%s' % e[0]
+	sys.exit(33)
+
+#### Resume the process
+	
+hThread = processInfo[1]
+if not win32process.ResumeThread(hThread):
+	print 'ResumeThread failed, err=%s' % e[0]
+	sys.exit(36)
+
+win32api.CloseHandle(hThread)
 
 #### Wait on the process and get the exit code
 
@@ -75,6 +103,10 @@ exitCode = win32process.GetExitCodeProcess(hProcess)
 #### Clean up
 
 win32api.CloseHandle(hProcess)
+
+win32job.TerminateJobObject(hJob, 0)
+
+win32api.CloseHandle(hJob)
 
 windll.user32.CloseDesktop(hDesktop)
 
