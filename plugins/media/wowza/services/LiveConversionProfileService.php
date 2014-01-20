@@ -89,7 +89,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			foreach($conversionProfileAssetParams as $conversionProfileAssetParamsItem)
 			{
 				/* @var $conversionProfileAssetParamsItem flavorParamsConversionProfile */
-				if(!$liveParamsInput->hasTag(assetParams::TAG_SOURCE) && $conversionProfileAssetParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+				if($conversionProfileAssetParamsItem->getOrigin() == assetParamsOrigin::INGEST)
 					$ignoreLiveParamsIds[] = $conversionProfileAssetParamsItem->getFlavorParamsId();
 			}
 		}
@@ -105,7 +105,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
-			if(in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
+			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
 				continue;
 				
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
