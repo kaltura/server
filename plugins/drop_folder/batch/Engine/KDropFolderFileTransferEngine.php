@@ -94,10 +94,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		}
 		catch (Exception $e)
 		{
-			//Currently "modificationTime" does not throw Exception since from php documentation not all servers support the ftp_mdtm feature
-			KalturaLog::err('Failed to get modification time or file size for file ['.$fullPath.']');
-			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
-															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);	
+			$closedStatuses = array(
+				KalturaDropFolderFileStatus::HANDLED, 
+				KalturaDropFolderFileStatus::PURGED, 
+				KalturaDropFolderFileStatus::DELETED
+			);
+			
+			//In cases drop folder is not configured with auto delete we want to verify that the status file is not in one of the closed statuses so 
+			//we won't update it to error status
+			if(!in_array($dropFolderFile->status, $closedStatuses))
+			{
+				//Currently "modificationTime" does not throw Exception since from php documentation not all servers support the ftp_mdtm feature
+				KalturaLog::err('Failed to get modification time or file size for file ['.$fullPath.']');
+				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
+															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);
+			}
 			return false;		
 		}				 
 				
