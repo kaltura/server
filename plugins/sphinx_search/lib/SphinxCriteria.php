@@ -551,6 +551,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 			list($prefix, $operator, $fieldName) = $fieldParts;
 			
+			$type = null;
 			$fieldNamesArr = explode(baseObjectFilter::OR_SEPARATOR, $fieldName);
 			if(count($fieldNamesArr) > 1)
 			{
@@ -583,7 +584,6 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			else
 			{
 				$sphinxField = $objectClass::getIndexFieldName($fieldName);
-				$type = $objectClass::getFieldType($sphinxField);
 			}
 			
 			$valStr = print_r($val, true);

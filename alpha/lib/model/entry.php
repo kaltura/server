@@ -1873,6 +1873,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->putInCustomData( "width" , $width );
 	}
 	
+	public function setDimensionsIfBigger ($width, $height)
+	{
+		if( (is_null($this->getFromCustomData("width")) && is_null($this->getFromCustomData("height"))) 
+			|| ($width>$this->getFromCustomData("width") && $height>$this->getFromCustomData("height")) )
+			$this->setDimensions($width, $height);
+	}
+	
 	public function updateDimensions ( )
 	{
 		if ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
@@ -2437,12 +2444,38 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			entryPeer::KUSER_ID,
 			entryPeer::CREATOR_KUSER_ID,
 			entryPeer::ACCESS_CONTROL_ID,
+			
+			'' => array(
+				'replacementStatus',
+				'replacingEntryId',
+				'replacedEntryId',
+				'redirectEntryId',
+			)
 		);
 		
 		$changedProperties = array();
-		foreach($trackColumns as $trackColumn)
+		foreach($trackColumns as $namespace => $trackColumn)
 		{
-			if($this->isColumnModified($trackColumn))
+			if(is_array($trackColumn))
+			{
+				if(isset($this->oldCustomDataValues[$namespace]))
+				{
+					foreach($trackColumn as $trackCustomData)
+					{
+						if(isset($this->oldCustomDataValues[$namespace][$trackCustomData]))
+						{
+							$column = $trackCustomData;
+							if($namespace)
+								$column = "$namespace.$trackCustomData";
+								
+							$previousValue = $this->oldCustomDataValues[$namespace][$trackCustomData];
+							$newValue = $this->getFromCustomData($trackCustomData, $namespace);
+							$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
+						}
+					}
+				}
+			}
+			elseif($this->isColumnModified($trackColumn))
 			{
 				$column = entryPeer::translateFieldName($trackColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_STUDLYPHPNAME);
 				$previousValue = $this->getColumnsOldValue($trackColumn);

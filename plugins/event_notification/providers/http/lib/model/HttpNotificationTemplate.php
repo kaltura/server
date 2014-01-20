@@ -92,6 +92,9 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 		$jobData->setCustomHeaders($this->getCustomHeaders());
 		$jobData->setContentParameters($contentParametersValues);
 		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$jobData->setSignSecret($partner->getAdminSecret());
+		
 		return $jobData;
 	}
 	

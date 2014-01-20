@@ -6,7 +6,6 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 {
 	const PLUGIN_NAME = 'WebexDropFolder';
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
-	const METADATA_PLUGIN_NAME = 'metadata';
 		
 	public static function getPluginName()
 	{
@@ -16,9 +15,8 @@ class WebexDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IK
 	public static function dependsOn()
 	{
 		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
-		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME);
 		
-		return array($dropFolderDependency,$metadataDependency);
+		return array($dropFolderDependency);
 	}
 	
 	public static function isAllowedPartner($partnerId)
