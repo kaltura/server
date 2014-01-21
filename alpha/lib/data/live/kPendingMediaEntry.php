@@ -23,11 +23,23 @@ class kPendingMediaEntry
 	 */
 	protected $requiredDuration;
 	
-	public function __construct($entryId, $dc, $requiredDuration)
+	/**
+	 * @var float
+	 */
+	protected $offset;
+	
+	/**
+	 * @var float
+	 */
+	protected $duration;
+	
+	public function __construct($entryId, $dc, $requiredDuration, $offset, $duration)
 	{
 		$this->entryId = $entryId;
 		$this->dc = $dc;
 		$this->requiredDuration = $requiredDuration;
+		$this->offset = $offset;
+		$this->duration = $duration;
 	}
 	
 	/**
@@ -52,5 +64,19 @@ class kPendingMediaEntry
 	public function getDc()
 	{
 		return $this->dc;
+	}
+	
+	/**
+	 * @return the $offset
+	 */
+	public function getOffset() {
+		return $this->offset;
+	}
+
+	/**
+	 * @return the $duration
+	 */
+	public function getDuration() {
+		return $this->duration;
 	}
 }

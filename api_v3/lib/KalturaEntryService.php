@@ -319,7 +319,7 @@ class KalturaEntryService extends KalturaBaseService
 			if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
 			{
 				$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
-				$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
+				$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration, $offset, $duration);
 				$dbLiveEntry->save();
 			}
 			else 
@@ -329,7 +329,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		elseif($dbLiveEntry->isConvertingSegments())
 		{
-			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
+			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration, $offset, $duration);
 			$dbLiveEntry->save();
 		}
 		else

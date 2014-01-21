@@ -279,7 +279,7 @@ class kFlowHelper
 				}
 				
 				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
-				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files);
+				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files, $attachedPendingMediaEntry->getOffset(), $attachedPendingMediaEntry->getDuration());
 				if($job)
 					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
 			}
