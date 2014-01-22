@@ -9,4 +9,37 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 	{
 		header("Content-Type: application/javascript");
 	}
+	
+	public function getHeader()
+	{
+		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
+		if (is_null($callback))
+			die("Expecting \"callback\" parameter for jsonp format");
+		$response = array();
+		
+		return $callback .  "(";
+	}
+	
+	public function getFooter($execTime = null)
+	{
+		return ");";
+	}
+	
+	public function getItemFooter($lastItem = false)
+	{
+		if(!$lastItem)
+			return ',';
+		
+		return '';
+	}
+	
+	public function getMulitRequestHeader($itemsCount = null)
+	{
+		return '[';
+	}
+	
+	public function getMulitRequestFooter()
+	{
+		return ']';
+	}
 }

@@ -145,6 +145,12 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	protected $contentParameters;
 	
 	/**
+	 * The secret to sign the notification with
+	 * @var string
+	 */
+	protected $signSecret;
+	
+	/**
 	 * @return string $url
 	 */
 	public function getUrl()
@@ -463,5 +469,19 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	public function setContentParameters(array $contentParameters)
 	{
 		$this->contentParameters = $contentParameters;
+	}
+	
+	/**
+	 * @return the $signSecret
+	 */
+	public function getSignSecret() {
+		return $this->signSecret;
+	}
+	
+	/**
+	 * @param string $signSecret
+	 */
+	public function setSignSecret($signSecret) {
+		$this->signSecret = $signSecret;
 	}
 }

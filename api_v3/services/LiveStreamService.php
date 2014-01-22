@@ -99,8 +99,14 @@ class LiveStreamService extends KalturaLiveEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
-			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$otherDCs = kDataCenterMgr::getAllDcs();
+			$otherDc = reset($otherDCs);
+			
+			//In case there is only 1 DC
+			$otherDcId = $otherDc ? $otherDc['id'] : kDataCenterMgr::getCurrentDcId();
+			
+			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kDataCenterMgr::getCurrentDcId(), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, $otherDcId, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 		}
 		
 		return $dbEntry;

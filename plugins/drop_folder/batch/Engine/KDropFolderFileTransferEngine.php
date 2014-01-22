@@ -94,10 +94,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		}
 		catch (Exception $e)
 		{
-			//Currently "modificationTime" does not throw Exception since from php documentation not all servers support the ftp_mdtm feature
-			KalturaLog::err('Failed to get modification time or file size for file ['.$fullPath.']');
-			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
-															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);	
+			$closedStatuses = array(
+				KalturaDropFolderFileStatus::HANDLED, 
+				KalturaDropFolderFileStatus::PURGED, 
+				KalturaDropFolderFileStatus::DELETED
+			);
+			
+			//In cases drop folder is not configured with auto delete we want to verify that the status file is not in one of the closed statuses so 
+			//we won't update it to error status
+			if(!in_array($dropFolderFile->status, $closedStatuses))
+			{
+				//Currently "modificationTime" does not throw Exception since from php documentation not all servers support the ftp_mdtm feature
+				KalturaLog::err('Failed to get modification time or file size for file ['.$fullPath.']');
+				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
+															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);
+			}
 			return false;		
 		}				 
 				
@@ -405,10 +416,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	{
 		KBatchBase::impersonate($job->partnerId);
 		
+		/* @var $data KalturaWebexDropFolderContentProcessorJobData */
+		$dropFolder = $this->dropFolderPlugin->dropFolder->get ($data->dropFolderId);
+		
 		switch ($data->contentMatchPolicy)
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
-				$this->addAsNewContent($job, $data);
+				$this->addAsNewContent($job, $data, $dropFolder);
 				break;
 			
 			case KalturaDropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_KEEP_IN_FOLDER:
@@ -420,7 +434,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				if($matchedEntry)
 					$this->addAsExistingContent($job, $data, $matchedEntry);
 				else
-					 $this->addAsNewContent($job, $data);	
+					 $this->addAsNewContent($job, $data, $dropFolder);	
 				break;			
 			default:
 				KalturaLog::err('No content match policy is defined for drop folder');
@@ -431,16 +445,24 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		KBatchBase::unimpersonate();
 	}
 	
-	private function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
+	private function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data, KalturaDropFolder $dropFolder)
 	{ 		
 		$resource = $this->getIngestionResource($job, $data);
 		$newEntry = new KalturaBaseEntry();
 		$newEntry->conversionProfileId = $data->conversionProfileId;
 		$newEntry->name = $data->parsedSlug;
 		$newEntry->referenceId = $data->parsedSlug;
-			
+		$newEntry->userId = $data->parsedUserId;
+		KBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->baseEntry->add($newEntry, null);
-		$addedEntry = KBatchBase::$kClient->baseEntry->addContent($addedEntry->id, $resource);	
+		KBatchBase::$kClient->baseEntry->addContent($addedEntry->id, $resource);
+		$result = KBatchBase::$kClient->doMultiRequest();
+		
+		if ($result [1] && $result[1] instanceof KalturaBaseEntry)
+		{
+			$entry = $result [1];
+			$this->createCategoryAssociations ($dropFolder, $entry->userId, $entry->id);
+		}	
 	}
 
 	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)
@@ -492,10 +514,26 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				}	
 				throw $e;		
 			}
-		}	
+		}
+		
 		$resource = $this->getIngestionResource($job, $data);
+		
+		//If entry user ID differs from the parsed user ID on the job data - update the entry
+		KBatchBase::$kClient->startMultiRequest();
+		if ($data->parsedUserId != $matchedEntry->userId)
+		{
+			$updateEntry = new KalturaMediaEntry();
+			$updateEntry->userId = $data->parsedUserId;
+			KBatchBase::$kClient->baseEntry->update ($matchedEntry->id, $updateEntry);
+		}
 		KBatchBase::$kClient->media->cancelReplace($matchedEntry->id);
 		$updatedEntry = KBatchBase::$kClient->baseEntry->updateContent($matchedEntry->id, $resource, $data->conversionProfileId);
+		$result = KBatchBase::$kClient->doMultiRequest();
+		
+		if ($updatedEntry && $updatedEntry instanceof KalturaBaseEntry)
+		{
+			$this->createCategoryAssociations ($dropFolder, $updatedEntry->userId, $updatedEntry->id);
+		}
 	}
 
 }

@@ -4,6 +4,7 @@
 <%@page import="lib.Kaltura.HttpNotificationHandler"%>
 <%@page import="com.kaltura.client.types.KalturaHttpNotification"%>
 <%@page import="com.kaltura.client.utils.ParseUtils"%>
+<%@page import="lib.Kaltura.RequestHandler"%>
 <%
 
 BufferedReader reader = request.getReader();
@@ -15,6 +16,9 @@ while ((line = reader.readLine()) != null){
 reader.reset();
 
 String xml = sb.toString();
+String signature = request.getHeader("x-kaltura-signature");
+RequestHandler.validateSignature(xml, SessionConfig.KALTURA_ADMIN_SECRET, signature);
+
 int dataOffset = xml.indexOf("data=");
 if(dataOffset < 0) {
 	System.out.println("Couldn't find data");
