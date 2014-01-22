@@ -23,13 +23,14 @@ function updateBroadCastUrl(LiveStreamEntry $entry)
 	$dcs = kDataCenterMgr::getAllDcs(true);
 	foreach($dcs as $dc)
 	{
-		if($dc == $entryDc)
+		$dcId = $dc['id'];
+		if($dcId == $entryDc)
 		{
-			$entry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($entry, $dc, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+			$entry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($entry, $dcId, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
 		}
 		else 
 		{
-			$entry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($entry, $dc, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$entry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($entry, $dcId, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 		}
 	}
 	
