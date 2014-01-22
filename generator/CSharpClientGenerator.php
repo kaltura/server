@@ -511,6 +511,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
+		$arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
 	    
 	    if($resultType == 'file')
 	    	return;
@@ -661,10 +662,16 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			}
 		}
 		
+		$fallbackClass = 'null';
+    	if($resultType == 'array')
+    		$fallbackClass = "\"$arrayObjectType\"";
+    	else if($resultType && !$this->isSimpleType($resultType))
+    		$fallbackClass = "\"$resultType\"";
+		
 		if ($haveFiles)
-			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);");
+			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", $fallbackClass, kparams, kfiles);");
 		else
-			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", kparams);");
+			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", $fallbackClass, kparams);");
 		
 		$this->appendLine("			if (this._Client.IsMultiRequest)");
 		if (!$resultType) 

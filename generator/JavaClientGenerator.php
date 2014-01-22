@@ -492,9 +492,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		$resultNode = $actionNode->getElementsByTagName ( "result" )->item ( 0 );
 		$resultType = $resultNode->getAttribute ( "type" );
+		
 		$arrayType = '';
-		if ($resultType == "array")
+		$fallbackClass = null;
+		if ($resultType == "array") {
 			$arrayType = $resultNode->getAttribute ( "arrayType" );
+			$fallbackClass = $arrayType;
+		}
+    	else if($resultType && ($resultType != 'file') && !$this->isSimpleType($resultType))
+    		$fallbackClass = $resultType;
 		
 	  	$javaOutputType = $this->getResultType($resultType, $arrayType, $serviceImports);
 		
@@ -518,7 +524,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine ( $desc );
 		$this->appendLine ( "    $signaturePrefix$signature throws KalturaApiException {" );
 		
-		$this->generateActionBodyServiceCall($serviceId, $action, $paramNodesArr, $serviceImports);
+		$this->generateActionBodyServiceCall($serviceId, $action, $paramNodesArr, $serviceImports, $fallbackClass);
 				
 		if($resultType == 'file')
 		{
@@ -643,7 +649,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	public function generateActionBodyServiceCall($serviceId, $action, $paramNodes, &$serviceImports) 
+	public function generateActionBodyServiceCall($serviceId, $action, $paramNodes, &$serviceImports, $fallbackClass) 
 	{
 		$this->appendLine ( "        KalturaParams kparams = new KalturaParams();" );
 		$haveFiles = false;
@@ -671,9 +677,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		// Add files to call
 		if ($haveFiles)
-			$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
+			if(is_null($fallbackClass))
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);" );
+			else
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles, $fallbackClass.class);" );
 		else
-			$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
+			if(is_null($fallbackClass))
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams);" );
+			else
+				$this->appendLine ( "        this.kalturaClient.queueServiceCall(\"$serviceId\", \"$action\", kparams, $fallbackClass.class);" );
 	}
 	
 	public function handleResultType($resultType, $arrayType, &$serviceImports) 

@@ -294,14 +294,17 @@ class kContextDataHelper
 		{
 			$this->mediaProtocol = $this->mediaProtocol ? $this->mediaProtocol : $this->streamerType;
 		}
-		elseif ($this->entry->getType() == entryType::LIVE_STREAM)
+		elseif ($this->entry instanceof LiveEntry)
 		{
 			$protocols = array();
 			
-			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM)
+			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM && $this->entry->getSource() != EntrySourceType::LIVE_CHANNEL)
 				$protocols[] = PlaybackProtocol::AKAMAI_HDS;
 				
 			$protocols[] = PlaybackProtocol::HDS;
+
+			if ($this->entry->getStreamName())
+				$this->streamerType = PlaybackProtocol::RTMP;
 			
 			foreach ($protocols as $protocol)
 			{

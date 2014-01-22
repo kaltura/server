@@ -29,21 +29,17 @@ abstract class LiveEntry extends entry
 	 */
 	protected static function validateFileSyncSubType($sub_type)
 	{
-		if(	$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && 
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
-		)
-			throw new FileSyncException(
-				FileSyncObjectType::ENTRY, 
-				$sub_type, 
-				array(
-					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB,
-					self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB,
-				)
-			);
+		if(	$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB || 
+			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB )
+			{
+				return true;
+			}
+			
+			KalturaLog::log("Sub type provided [$sub_type] is not one of knowen LiveEntry sub types validating from parent");
+			return parent::validateFileSyncSubType($sub_type);
+		
 	}
 	
 	/* (non-PHPdoc)
@@ -100,7 +96,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['mediaServers']))
+		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['mediaServers']))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
@@ -200,6 +196,10 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("dvr_window", $v);
 	}
 	
+	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
+	
+	
 	public function setLiveStreamConfigurations(array $v)
 	{
 		$this->putInCustomData('live_stream_configurations', $v);
@@ -229,7 +229,7 @@ abstract class LiveEntry extends entry
 		if($mediaServer)
 		{
 			$streamName = $this->getStreamName();
-			if(is_null($tag) && $this->getConversionProfileId())
+			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
 			$manifestUrl = $mediaServer->getManifestUrl($protocol);
@@ -290,21 +290,22 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServer($currentDcOnly = false)
 	{
-		$mediaServers = $this->getMediaServers();
-		if(! count($mediaServers))
+		$kMediaServers = $this->getMediaServers();
+		if(! count($kMediaServers))
 			return null;
 		
-		foreach($mediaServers as $mediaServer)
+		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $mediaServer kLiveMediaServer */
-			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-				return $mediaServer->getMediaServer();
+			/* @var $kMediaServer kLiveMediaServer */
+			KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+				return $kMediaServer->getMediaServer();
 		}
 		if($currentDcOnly)
 			return null;
 		
-		$mediaServer = reset($mediaServers);
-		return $mediaServer->getMediaServer();
+		$kMediaServer = reset($kMediaServers);
+		return $kMediaServer->getMediaServer();
 	}
 	
 	/**
@@ -312,38 +313,40 @@ abstract class LiveEntry extends entry
 	 */
 	public function hasMediaServer($currentDcOnly = false)
 	{
-		$mediaServers = $this->getMediaServers();
-		if(! count($mediaServers))
+		$kMediaServers = $this->getMediaServers();
+		if(! count($kMediaServers))
 			return false;
 		
-		foreach($mediaServers as $mediaServer)
+		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $mediaServer kLiveMediaServer */
-			if($mediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+			/* @var $kMediaServer kLiveMediaServer */
+			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
 				return true;
 		}
 		
 		return !$currentDcOnly;
 	}
 	
-	private static function getCacheType($dc)
+	private static function getCacheType()
 	{
-		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . "_$dc";
+		return kCacheManager::CACHE_TYPE_LIVE_MEDIA_SERVER . '_' . kDataCenterMgr::getCurrentDcId();
 	}
 	
-	private function isCacheValid(kLiveMediaServer $mediaServer)
+	private function isCacheValid(kLiveMediaServer $kMediaServer)
 	{
-		$cacheType = self::getCacheType($mediaServer->getDc());
+		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 		{
-			$lastUpdate = time() - $mediaServer->getTime();
+			KalturaLog::warning("Cache store [$cacheType] not found");
+			$lastUpdate = time() - $kMediaServer->getTime();
 			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
 			
 			return $lastUpdate <= $expiry;
 		}
 		
-		$key = $this->getId() . '_' . $mediaServer->getMediaServerId() . '_' . $mediaServer->getIndex();
+		$key = $this->getId() . '_' . $kMediaServer->getMediaServerId() . '_' . $kMediaServer->getIndex();
+		KalturaLog::debug("Get cache key [$key] from store [$cacheType]");
 		return $cacheStore->get($key);
 	}
 	
@@ -354,7 +357,7 @@ abstract class LiveEntry extends entry
 	 */
 	private function storeInCache($key)
 	{
-		$cacheType = self::getCacheType(kDataCenterMgr::getCurrentDcId());
+		$cacheType = self::getCacheType();
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if(! $cacheStore)
 			return false;
@@ -362,22 +365,21 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, $serverId, $hostname)
+	public function setMediaServer($index, MediaServer $mediaServer)
 	{
+		$serverId = $mediaServer->getId();
 		$key = $this->getId() . "_{$serverId}_{$index}";
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
 			return;
 		
-		$servers = $this->getMediaServers();
-		$servers[$index] = new kLiveMediaServer($index, $serverId, $hostname);
-		
-		$this->putInCustomData("mediaServers", $servers);
+		$server = new kLiveMediaServer($index, $mediaServer);
+		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	
 	protected function isMediaServerRegistered($index, $serverId)
 	{
-		$servers = $this->getMediaServers();
-		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
+		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		if($server && $server->getMediaServerId() == $serverId)
 			return true;
 		
 		return false;
@@ -385,11 +387,9 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $serverId)
 	{
-		$servers = $this->getMediaServers();
-		if(isset($servers[$index]) && $servers[$index]->getMediaServerId() == $serverId)
-			unset($servers[$index]);
-		
-		$this->putInCustomData("mediaServers", $servers);
+		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		if($server && $server->getMediaServerId() == $serverId)
+			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
 	}
 	
 	/**
@@ -398,17 +398,17 @@ abstract class LiveEntry extends entry
 	public function validateMediaServers()
 	{
 		$listChanged = false;
-		$mediaServers = $this->getFromCustomData("mediaServers", null, array());
-		foreach($mediaServers as $index => $mediaServer)
+		$kMediaServers = $this->getFromCustomData(null, 'mediaServers', array());
+		foreach($kMediaServers as $key => $kMediaServer)
 		{
-			if(! $this->isCacheValid($mediaServer))
+			if(! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
-				unset($mediaServers[$index]);
+				KalturaLog::debug("Removing media server [" . $kMediaServer->getHostname() . "]");
+				$this->removeFromCustomData($key, 'mediaServers');
 			}
 		}
 		
-		$this->putInCustomData("mediaServers", $mediaServers);
 		return $listChanged;
 	}
 	
@@ -417,7 +417,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServers()
 	{
-		return $this->getFromCustomData("mediaServers", null, array());
+		return $this->getFromCustomData(null, 'mediaServers', array());
 	}
 	
 	/* (non-PHPdoc)
@@ -468,50 +468,20 @@ abstract class LiveEntry extends entry
 	}
 	
 	/**
-	 * @param int $jobId
-	 */
-	public function addConvertingSegment($jobId)
-	{
-		$convertingSegments = $this->getConvertingSegments();
-		$convertingSegments[$jobId] = true;
-		
-		$this->setConvertingSegments($convertingSegments);
-	}
-	
-	/**
-	 * @param int $jobId
-	 */
-	public function removeConvertingSegment($jobId)
-	{
-		$convertingSegments = $this->getConvertingSegments();
-		if(isset($convertingSegments[$jobId]))
-			unset($convertingSegments[$jobId]);
-		
-		$this->setConvertingSegments($convertingSegments);
-	}
-	
-	/**
-	 * @param array $convertingSegments
-	 */
-	protected function setConvertingSegments(array $convertingSegments)
-	{
-		$this->putInCustomData("converting_segments", $convertingSegments);
-	}
-	
-	/**
-	 * @return array
-	 */
-	protected function getConvertingSegments()
-	{
-		return $this->getFromCustomData('converting_segments', null, array());
-	}
-	
-	/**
 	 * @return boolean
 	 */
 	public function isConvertingSegments()
 	{
-		$convertingSegments = $this->getConvertingSegments();
-		return count($convertingSegments) > 0;
+		$criteria = new Criteria();
+		$criteria->add(BatchJobLockPeer::PARTNER_ID, $this->getPartnerId());
+		$criteria->add(BatchJobLockPeer::ENTRY_ID, $this->getId());
+		$criteria->add(BatchJobLockPeer::JOB_TYPE, BatchJobType::CONVERT_LIVE_SEGMENT);
+		$criteria->add(BatchJobLockPeer::DC, kDataCenterMgr::getCurrentDcId());
+		
+		$batchJob = BatchJobLockPeer::doSelectOne($criteria);
+		if($batchJob)
+			return true;
+			
+		return false;
 	}
 }

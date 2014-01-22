@@ -58,6 +58,11 @@ class playManifestAction extends kalturaAction
 	 * @var string
 	 */
 	private $format;
+
+	/**
+	 * @var string
+	 */
+	private $responseFormat;
 	
 	/**
 	 * may contain several fallbacks options, each one with a set of tags 
@@ -501,7 +506,7 @@ class playManifestAction extends kalturaAction
 	protected function initFlavorAssetArray()
 	{
 		// check whether the flavor asset list is needed
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
+		if ($this->entry instanceof LiveEntry)
 			return;			// live stream entries don't have flavors
 		
 		$oneOnly = false;
@@ -1074,7 +1079,7 @@ class playManifestAction extends kalturaAction
 	 */
 	private function buildRtmpLiveStreamFlavorsArray()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
 		{
 			$flavors = array(
 				0 => array(
@@ -1138,7 +1143,25 @@ class playManifestAction extends kalturaAction
 	
 	private function getRenderer($defaultClass, $flavors)
 	{
-		$class = $this->urlManager->getRendererClass();
+		$class = null;
+		if ($this->responseFormat)
+		{
+			$formatMapping = array(
+				'f4m' => 	'kF4MManifestRenderer',
+				'f4mv2' => 	'kF4Mv2ManifestRenderer',
+				'smil' => 	'kSmilManifestRenderer',
+				'm3u8' => 	'kM3U8ManifestRenderer',
+				'jsonp' => 	'kJSONPManifestRenderer',
+				'redirect' => 'kRedirectManifestRenderer',
+			);
+
+			if (isset($formatMapping[$this->responseFormat]))
+				$class = $formatMapping[$this->responseFormat];
+		}
+		
+		if (!$class)
+			$class = $this->urlManager->getRendererClass();
+		
 		if (!$class)
 			$class = $defaultClass;
 		
@@ -1383,7 +1406,7 @@ class playManifestAction extends kalturaAction
 	
 	private function serveLiveEntry()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM && !$this->entry->hasMediaServer())
+		if (($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL) && !$this->entry->hasMediaServer())
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
 		
 		$baseUrl = $this->getLiveEntryBaseUrl();
@@ -1515,6 +1538,8 @@ class playManifestAction extends kalturaAction
 
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
+
+		$this->responseFormat = $this->getRequestParameter ( "responseFormat", null );
 		
 		// Initialize
 		$this->initEntry();
@@ -1530,7 +1555,8 @@ class playManifestAction extends kalturaAction
 			$renderer = $this->serveVodEntry();
 			break;
 			
-		case entryType::LIVE_STREAM:
+		case entryType::LIVE_STREAM:			
+		case entryType::LIVE_CHANNEL:
 			// Live stream
 			$renderer = $this->serveLiveEntry();
 			break;

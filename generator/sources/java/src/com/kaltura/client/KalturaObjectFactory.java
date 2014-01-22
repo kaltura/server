@@ -42,18 +42,16 @@ import java.lang.reflect.Constructor;
  */
 
 public class KalturaObjectFactory {
-    public static Object create(Element xmlElement) throws KalturaApiException {
-    	return create(xmlElement, null);
-   }
     
-    public static <T> Object create(Element xmlElement, Class<T> fallbackClazz) throws KalturaApiException {
+    @SuppressWarnings("unchecked")
+	public static <T> T create(Element xmlElement, Class<T> fallbackClazz) throws KalturaApiException {
     	NodeList objectTypeNodes = xmlElement.getElementsByTagName("objectType");
         Node objectTypeNode = objectTypeNodes.item(0);
         String objectType = objectTypeNode.getTextContent();
         
-		Class<?> clazz = null;
+		Class<T> clazz = null;
 		try {
-			clazz = Class.forName("com.kaltura.client.types." + objectType);
+			clazz = (Class<T>) Class.forName("com.kaltura.client.types." + objectType);
 		} catch (ClassNotFoundException e1) {
 			if(fallbackClazz != null) {
 				clazz = fallbackClazz;
@@ -64,7 +62,7 @@ public class KalturaObjectFactory {
 
         try {
             Constructor<?> ctor = clazz.getConstructor(Element.class);
-            return ctor.newInstance(xmlElement);
+            return (T) ctor.newInstance(xmlElement);
         } catch (Exception e) {
         	 throw new KalturaApiException("Failed to construct object");
         }

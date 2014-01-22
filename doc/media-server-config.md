@@ -40,7 +40,9 @@ media_servers.ini is optional and needed only for custom configurations.
 - Wowza media server 3.6.2.16 or above.
 - Java jre 1.7.
 - kaltura group (gid = 613) or any other group that apache user is associated with.
-
+- Write access to @WEB_DIR@/content/recorded directory.
+- Read access to symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content
 
 
 ## Additional libraries: ##
@@ -53,7 +55,7 @@ media_servers.ini is optional and needed only for custom configurations.
 
 
 ## For all wowza machine (origin and edge): ##
-- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.1.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
 - Copy additional jar files (available in Kaltura Java client library) to @WOWZA_DIR@/lib/
  - [commons-codec-1.4.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-codec-1.4.jar "commons-codec-1.4.jar")
  - [commons-httpclient-3.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-httpclient-3.1.jar "commons-httpclient-3.1.jar")

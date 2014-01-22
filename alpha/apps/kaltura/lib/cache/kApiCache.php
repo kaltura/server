@@ -32,6 +32,7 @@ class kApiCache extends kApiCacheBase
 	const ANONYMOUS_CACHE_EXPIRY = 600;
 	const CONDITIONAL_CACHE_EXPIRY = 86400;		// 1 day, must not be greater than the expiry of the query cache keys
 	const KALTURA_COMMENT_MARKER = '@KALTURA_COMMENT@';
+	const REDIRECT_ENTRY_CACHE_EXPIRY = 120;
 	
 	const EXPIRY_MARGIN = 300;
 

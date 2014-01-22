@@ -1,7 +1,68 @@
-
 ----------
  
 # IX-9.8.0 #
+
+## Update live-params permissions ##
+
+Enable only to partners with live-stream permission to list live-params as part of flavor-params lists.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
+## VOD to Live ##
+Demo version only, enables broadcasting a live-channel base on playlist.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_01_live_channel_services.php
+
+*DB*
+
+- Add live_channel_segment table - deployment/updates/sql/2014_01_01_create_live_channel_segment_table.sql
+
+
+*Media Server*
+- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.1.jar "KalturaWowzaServer.jar")
+
+
+*Configuration*
+
+- Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+- Update Bulkupload worker configuration. Added parameters sharedTempPath and fileOwner. The value for sharedTempPath is /web/tmp/bulkupload and needs to be created on the machine.
+ 
+
+*File System*
+
+- Create a symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content 
+ 
+
+
+
+## Enforce max concurrent streams ##
+- New partner configuration fields in admin console.
+- New API action liveStream.authenticate.
+- New media server version - 1.1.0
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_12_30_liveStream_authenticate.php
+
+*Media Server*
+
+- Redeploy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+
+
+
+
+
 
 ## Admin console boost entry jobs ##
 A new button was added to the Admin page which allows you to boost the jobs of the entry.
@@ -67,22 +128,66 @@ Add support for intermediate flow to on-prem installations as well.
 - Repopulate sphinx entries
 
 
-## Bulk Upload from Filter � infrastructure ##
+## Bulk Upload from Filter – infrastructure ##
 
 Deployment instructions:
 
 1. Update the code and clients
-2. Update plugins.ini � add BulkUploadFilter plugin
+2. Update plugins.ini – add BulkUploadFilter plugin
 3. Run installPlugins.php
 
-## HTML5 Studio Deployment ##
-* Update base.ini with studio_version
-* Located the studio folder: /opt/kaltura/apps/studio/ (create it if it doesn't exist)
-* Create a sub folder within the studio folder. Name it by the version of the studio (for example: v0.1)
-* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases
-* Execute deployment script on studio.ini file (located in studio project root):
-From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini --group=apache
 
+
+
+
+## HTML5 Studio Deployment ##
+* Located the studio directory: @BASE_DIR@/apps/studio/ (create it if it doesn't exist)
+	* The directory owner should be apache and its group should be kaltura.
+* Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
+* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
+* Execute deployment script on studio.ini file (located in studio project root):
+From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
+
+## Fixed a security hole in media.addFromUploaded file ##
+Restricting webcam and uploaded to their designated directories and blocking attempts to access outer directories, with ../../some_sensitive_data_file for example.
+
+## Fixed Animated GIF thumbnail cropping ##
+Bug fix: When cropping a .gif thumbnail, black margins appear around the crop are not removed.
+Bug fix: File extension of downloaded thumbnails is hardcoded to .jpg instead of the original file's ext.
+
+##  Client libraries update
+Part of PLAT-528.
+The updated client libraries are - 
+
+- java
+- php53
+- phpzend
+- python
+- ruby
+
+The change included the following - 
+
+1. Changed client libraries to have a fallback class in case of object de-serialization. supported both for regular request and multi request. 
+2.  Check the http return code and throw an exception in case it isn't 200
+
+##  Batch changes
+Contains the following improvements:
+
+1. Don't create lock object if not needed (#plat-718)
+2. Use less save commands when creating a new batch (#PLAT-661)
+
+
+## Sphinx
+Merged into the code changes that were hot-fixed at the beginning of the sprint. Including :
+
+- Addition of 'getObjectName' and use it in fixing field name
+- Numerical ordering of Json attributes. 
+
+## Minor issues
+
+- #PLAT-526: Sort the event consumers alphabetically if not requested otherwise.
+- #PLAT-681: In case an empty ui-conf filter is used, filter at least by the partner
+- #PLAT-489: Extract delayed job types to kconf. <b><u> requires updateding base.ini </u></b>
 
 ---------
  

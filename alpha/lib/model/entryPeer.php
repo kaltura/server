@@ -32,6 +32,7 @@ class entryPeer extends BaseentryPeer
 		entryType::PLAYLIST => parent::OM_CLASS,
 		entryType::DATA => parent::OM_CLASS,
 		entryType::LIVE_STREAM => 'LiveStreamEntry',
+		entryType::LIVE_CHANNEL => 'LiveChannel',
 	);
 
 	public static function setUserContentOnly($contentOnly)

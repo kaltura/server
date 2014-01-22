@@ -118,6 +118,7 @@ class KalturaFrontController
 				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex);
 			}
+			
 	        $this->onRequestEnd($success, $errorCode);
 		}
 
@@ -320,7 +321,7 @@ class KalturaFrontController
 	
 	public function getExceptionObject($ex)
 	{
-		$this->adjustApiCacheForException($ex);
+		KalturaResponseCacher::adjustApiCacheForException($ex);
 		
 	    if ($ex instanceof KalturaAPIException)
 		{
@@ -422,20 +423,6 @@ class KalturaFrontController
 		return $object;
 	}
 	
-	public function adjustApiCacheForException($ex)
-	{
-		KalturaResponseCacher::setExpiry(120);
-		
-		$cacheConditionally = false;
-		if ($ex instanceof KalturaAPIException && kConf::hasParam("v3cache_conditional_cached_errors"))
-		{
-			$cacheConditionally = in_array($ex->getCode(), kConf::get("v3cache_conditional_cached_errors"));
-		}
-		if (!$cacheConditionally)
-		{
-			KalturaResponseCacher::disableConditionalCache();
-		}
-	}
 	
 	public function setSerializerByFormat($ignoreNull = false)
 	{

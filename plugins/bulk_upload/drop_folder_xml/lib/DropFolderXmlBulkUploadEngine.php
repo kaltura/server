@@ -26,6 +26,24 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	 */
 	private $contentResourceNameToIdMap = null;
 	
+	
+	public function __construct(KalturaBatchJob $job)
+	{
+		parent::__construct($job);
+		
+		KBatchBase::impersonate($this->currentPartnerId);
+		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::$kClient->startMultiRequest();
+		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
+		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
+		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
+				
+		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
+		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
+		
+		KBatchBase::unimpersonate();
+	}
+	
 	/* (non-PHPdoc)
 	 * @see BulkUploadEngineXml::getSchemaType()
 	 */
@@ -43,15 +61,9 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		
 		KBatchBase::impersonate($this->currentPartnerId);
 		$dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
-		KBatchBase::$kClient->startMultiRequest();
-		$dropFolderFile = $dropFolderPlugin->dropFolderFile->get($this->job->jobObjectId);
-		$dropFolderPlugin->dropFolder->get($dropFolderFile->dropFolderId);
-		list($this->xmlDropFolderFile, $this->dropFolder) = KBatchBase::$kClient->doMultiRequest();
-				
-		$this->fileTransferMgr = KDropFolderFileTransferEngine::getFileTransferManager($this->dropFolder);
-		$this->data->filePath = $this->getLocalFilePath($this->xmlDropFolderFile->fileName, $this->xmlDropFolderFile->id);
 		$this->setContentResourceFilesMap($dropFolderPlugin);
 		KBatchBase::unimpersonate();
+		
 		parent::handleBulkUpload();
 	}
 	
@@ -201,9 +213,26 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	    else
 	    {
 	    	// remote drop folder	
-			$tempFilePath = tempnam($this->tempDirectory, 'parse_dropFolderFileId_'.$fileId.'_');		
+			$tempFilePath = tempnam(KBatchBase::$taskConfig->params->sharedTempPath, 'parse_dropFolderFileId_'.$fileId.'_');		
 			$this->fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
+			$this->setFilePermissions ($tempFilePath);
 			return $tempFilePath;
 	    }			    		
+	}
+	
+	protected function setFilePermissions ($filepath)
+	{
+		$chmod = 0640;
+		if(KBatchBase::$taskConfig->getChmod())
+			$chmod = octdec(KBatchBase::$taskConfig->getChmod());
+			
+		KalturaLog::debug("chmod($filepath, $chmod)");
+		@chmod($filepath, $chmod);
+		
+		$chown_name = KBatchBase::$taskConfig->params->fileOwner;
+		if ($chown_name) {
+			KalturaLog::debug("Changing owner of file [$filepath] to [$chown_name]");
+			@chown($filepath, $chown_name);
+		}
 	}
 }

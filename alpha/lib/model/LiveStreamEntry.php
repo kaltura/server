@@ -39,9 +39,6 @@ class LiveStreamEntry extends LiveEntry
 	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
 	public function getSecondaryBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryBroadcastingUrl" );	}
 	
-	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
-	
 	public function getHlsStreamUrl ()
 	{
 	    return $this->getFromCustomData("hls_stream_url");

@@ -493,7 +493,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					
 				default : // sub object
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, $propType);");
+					$this->appendLine("			\$this->$propName = \Kaltura\Client\ParseUtils::unmarshalObject(\$xml->$propName, \"{$propType}\");");
 					break;
 			}
 		}
@@ -611,6 +611,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
+	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
 		$description = $actionNode->getAttribute("description");
 		
 		// method signature
@@ -702,15 +703,21 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 		
 	    if($resultType == 'file')
 	    {
-			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', \$kparams);");
+			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', null, \$kparams);");
 			$this->appendLine('		$resultObject = $this->client->getServeUrl();');
 	    }
 	    else
 	    {
+	    	$fallbackClass = 'null';
+	    	if($resultType == 'array')
+	    		$fallbackClass = "\"$arrayObjectType\"";
+	    	else if($resultType && !$this->isSimpleType($resultType))
+	    		$fallbackClass = "\"$resultType\"";
+	    	
 			if ($haveFiles)
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams, \$kfiles);");
 			else
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
@@ -729,7 +736,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("		\$resultObject = (String)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				case 'array':
-					$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalArray(\$resultXmlObject->result, \"$resultType\");");
+					$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalArray(\$resultXmlObject->result, \"$arrayObjectType\");");
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					break;
 				default:
@@ -737,7 +744,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 					{
 						$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
 						$resultObjectTypeEscaped = str_replace("\\", "\\\\", $resultTypeClassInfo->getFullyQualifiedName());
-						$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalObject(\$resultXmlObject->result, \"$resultType\");");
+						$this->appendLine("		\$resultObject = \\Kaltura\\Client\\ParseUtils::unmarshalObject(\$resultXmlObject->result, \"{$resultType}\");");
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"{$resultObjectTypeEscaped}\");");
 					}
 			}

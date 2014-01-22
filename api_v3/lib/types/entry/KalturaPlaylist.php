@@ -82,7 +82,8 @@ class KalturaPlaylist extends KalturaBaseEntry
 		if ($this->playlistType == KalturaPlaylistType::DYNAMIC && $this->filters !== null)
 			$this->filtersToPlaylistContentXml();
 			
-		$object_to_fill = new entry();
+		if (!$object_to_fill)
+			$object_to_fill = new entry();
 		$object_to_fill->setType ( entryType::PLAYLIST );
 		parent::toUpdatableObject( $object_to_fill )	;
 		$object_to_fill->setType ( entryType::PLAYLIST );

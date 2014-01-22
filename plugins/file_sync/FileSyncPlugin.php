@@ -21,7 +21,7 @@ class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	
 	public static function isAllowedPartner($partnerId)
 	{
-		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID || $partnerId == Partner::MEDIA_SERVER_PARTNER_ID)
 			return true;
 		
 		return false;
