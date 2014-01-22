@@ -191,18 +191,8 @@ class KalturaXmlSerializer extends KalturaSerializer
 		return '<item>';
 	}
 	
-	public function getItemFooter()
+	public function getItemFooter($lastItem = false)
 	{
 		return '</item>';
-	}
-	
-	public function getMulitRequestHeader($itemsCount = null)
-	{
-		return '';
-	}
-	
-	public function getMulitRequestFooter()
-	{
-		return '';
 	}
 }

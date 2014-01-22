@@ -25,14 +25,12 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 		return ");";
 	}
 	
-	public function getItemHeader($itemIndex = null)
+	public function getItemFooter($lastItem = false)
 	{
+		if(!$lastItem)
+			return ',';
+		
 		return '';
-	}
-	
-	public function getItemFooter()
-	{
-		return ',';
 	}
 	
 	public function getMulitRequestHeader($itemsCount = null)

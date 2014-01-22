@@ -409,4 +409,6 @@ class APIErrors
 	const ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA;; error accored while gzuncompress job data";
 
 	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND;;Object not found";
+	
+	const UNKNOWN_RESPONSE_FORMAT = "UNKNOWN_RESPONSE_FORMAT;FORMAT;Response format provided [@FORMAT@] is not recognized by server";
 }

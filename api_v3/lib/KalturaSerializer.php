@@ -23,7 +23,7 @@ abstract class KalturaSerializer
 	
 	public function getFooter($execTime = null) { return '';}
 	public function getMulitRequestFooter() { return '';}
-	public function getItemFooter() { return '';}
+	public function getItemFooter($lastItem = false) { return '';}
 	
 	protected function convertExceptionsToPhpArrays($object)
 	{
