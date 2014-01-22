@@ -151,6 +151,12 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 	 */
 	public $contentParameters;
 	
+	/**
+	 * The secret to sign the notification with
+	 * @var string
+	 */
+	public $signSecret;
+	
 	private static $map_between_objects = array
 	(
 		'url',
@@ -172,6 +178,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		'sslKeyPassword',
 		'customHeaders',
 		'contentParameters',
+		'signSecret',
 	);
 
 	/* (non-PHPdoc)

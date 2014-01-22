@@ -128,8 +128,8 @@ class MediaServer extends BaseMediaServer {
 		if(kConf::hasMap('media_servers'))
 		{
 			$mediaServers = kConf::getMap('media_servers');
-			if(isset($mediaServers['port']))
-				$port = $mediaServers['port'];
+			if(isset($mediaServers['service-port']))
+				$port = $mediaServers['service-port'];
 				
 			if(isset($mediaServers['protocol']))
 				$protocol = $mediaServers['protocol'];
@@ -143,8 +143,8 @@ class MediaServer extends BaseMediaServer {
 			{
 				$mediaServer = $mediaServers[$this->getHostname()];
 				
-				if(isset($mediaServer['port']))
-					$port = $mediaServer['port'];
+				if(isset($mediaServer['service-port']))
+					$port = $mediaServer['service-port'];
 				
 				if(isset($mediaServer['protocol']))
 					$protocol = $mediaServer['protocol'];
@@ -155,6 +155,7 @@ class MediaServer extends BaseMediaServer {
 		}
 		
 		$url = "$protocol://$domain:$port/$service?wsdl";
+		KalturaLog::debug("Service URL: $url");
 		return new $serviceClass($url);
 	}
 	

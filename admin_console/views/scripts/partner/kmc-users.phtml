@@ -80,11 +80,13 @@ function doAction(action, partnerId, userId) {
 	jQuery('select.options').val('');
 }
 
-function resetUserPassword(partnerId, userId) {
+function resetUserPassword(partnerId, userId, pageHtml /* default = null */)
+{
+	pageHtml = (typeof pageHtml !== 'undefined') ? pageHtml : null;
 
+	jQuery('#reset-user-password-dialog').remove();
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'reset-user-password', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
 	
-	jQuery('#reset-user-password-dialog').remove();
 	var dialogDiv = jQuery('<div id="reset-user-password-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
@@ -108,31 +110,27 @@ function resetUserPassword(partnerId, userId) {
 		url, 
 		null, 
 		function() {
+			if ( pageHtml != null ) {
+				// Replace with the updated server page html, which includes a block
+				// of error text, or an updated form with the 'valid' attribute
+				jQuery('#resetUserPasswordPage').replaceWith( pageHtml );
+			}
+
+			if (jQuery('#frmKmcUsersResetPassword').hasClass('valid')) {
+				jQuery('#reset-user-password-dialog').dialog('close');
+				return;
+			}
+
 			jQuery(this).find('#frmKmcUsersResetPassword').ajaxForm({
-				success: resetUserPasswordSuccess,
+				success: function( html ) {
+					// Re-invoke this method with the server's result html
+					resetUserPassword(partnerId, userId, html);
+				},
 				iframe: true
 			});
 		}
 	);
 
 }
-
-function resetUserPasswordSuccess(html) {
-	
-	jQuery('#resetUserPasswordPage').replaceWith(html);
-	if (jQuery('#frmKmcUsersResetPassword').hasClass('valid')) 
-	{
-		jQuery('#reset-user-password-dialog').dialog('close');
-	}
-	else
-	{
-		jQuery(this).find('#frmKmcUsersResetPassword').ajaxForm({
-			success: resetUserPasswordSuccess,
-			iframe: true
-		});
-	}
-}
-
-
 
 </script>

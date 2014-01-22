@@ -337,7 +337,10 @@ class SystemPartnerService extends KalturaBaseService
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				$passwordRules = $userLoginData->getInvalidPasswordStructureMessage();
+				$passwordRules = str_replace( "\\n", "<br>", $passwordRules );
+				$passwordRules = "<br>" . $passwordRules; // Add a newline prefix
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID, $passwordRules);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
