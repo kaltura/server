@@ -330,6 +330,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this->getStatus();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see Baseentry::setModerationStatus()
+	 */
+	public function setModerationStatus($v)
+	{
+		if($v == $this->getModerationStatus())
+			return $this;
+			
+		if($v == entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION || $v == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW)
+			$this->incModerationCount();
+		
+		parent::setModerationStatus($v);
+	}
+	
 	public function setDefaultModerationStatus()
 	{
 		$should_moderate = false;
@@ -1922,10 +1936,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if( $this->getDisplayInSearch() == 0 ) return "";
 		if( $this->getDisplayInSearch() == 1 ) return "_PRIVATE_";
-		if( $this->getDisplayInSearch() >= 2 ) return "_KN_";
+		if ($this->getDisplayInSearch () >= 2)
+			return "_KN_";
 	}
 	
-	public function incModerationCount()	{		$this->setModerationCount( $this->getModerationCount() + 1 );	}
+	protected function incModerationCount()
+	{
+		$this->setModerationCount($this->getModerationCount() + 1);
+	}
 		
 	/**
 	 * @return partner
@@ -2481,6 +2499,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				$previousValue = $this->getColumnsOldValue($trackColumn);
 				$newValue = $this->getByName($trackColumn, BasePeer::TYPE_COLNAME);
 				$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
+			}
+		}
+		
+		if($this->getRedirectEntryId() && isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['redirectEntryId']))
+		{
+			$redirectEntry = entryPeer::retrieveByPK($this->getRedirectEntryId());
+			if($redirectEntry)
+			{
+				$redirectEntry->setModerationStatus($this->getModerationStatus());
+				$redirectEntry->save();
 			}
 		}
 		
