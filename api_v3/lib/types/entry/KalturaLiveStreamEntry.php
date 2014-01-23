@@ -29,11 +29,13 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	public $bitrates;
 	
 	/**
+	 * @requiresPermission all
 	 * @var string
 	 */
 	public $primaryBroadcastingUrl;
 	
 	/**
+	 * @requiresPermission all
 	 * @var string
 	 */
 	public $secondaryBroadcastingUrl;
