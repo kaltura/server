@@ -1,8 +1,21 @@
 ----------
 
-# IX-9.9.0 #
+# IX-9.10.0 #
+
+## Entry redirect moderation ##
+The moderation status is copied to the redirected entry from the original entry when the redirect defined.
+
+## Media Server - support multiple sources ingestion ##
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+- deployment/updates/scripts/add_permissions/2014_01_14_conversion_profile_asset_params_media_server.php
+- deployment/updates/scripts/add_permissions/2014_01_21_media_server_partner_live.php
+
 
 ## Media Server - DVR with edge-origin ##
+Fixed broadcast path to use query string instead of slashed parameters.
 
 *Data Migration*
 
@@ -12,6 +25,10 @@
 
 - deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
 
+
+----------
+
+# IX-9.9.0 #
 
 ## Media Server - live stream recording ##
 
