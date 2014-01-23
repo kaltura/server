@@ -38,6 +38,21 @@ Fixed broadcast path to use query string instead of slashed parameters.
 
 ----------
  
+# IX-9.9.0 #
+
+## Live stream multiple flavors ingestion ##
+
+Enable streaming more than one source.
+
+**Deployment:**
+
+*Shared Content*
+
+- Add source LiveParams using deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+
+
+----------
+ 
 # IX-9.8.0 #
 
 ## Update live-params permissions ##
