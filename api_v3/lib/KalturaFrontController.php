@@ -190,28 +190,13 @@ class KalturaFrontController
 				$currentParams['partnerId'] = $commonParams['partnerId'];
 			}
 
-	        // check if we need to replace params with prev results
+			// check if we need to replace params with prev results
 	        foreach($currentParams as $key => &$val)
 	        {
-	        	$matches = array();
-
-				// keywords: multirequest, result, depend, pass
-				// figuring out if requested params should be extracted from previous result
-				// example: if you want to use KalturaPlaylist->playlistContent result from the first request
-				// in your second request, the second request will contain the following value:
-				// {1:result:playlistContent}
-                if (preg_match('/\{([0-9]*)\:result\:?(.*)?\}/', $val, $matches))
-                {
-                	$pastResultsIndex = $matches[0]; 
-                    $resultIndex = $matches[1];
-                    
-                    if (count($results) >= $resultIndex) // if the result index is valid
-                    {
-                        $val = $pastResults[$pastResultsIndex];
-                    }
-                }
+	        	if(isset($pastResults[$val]))
+					$val = $pastResults[$pastResultsIndex];
 	        }
-	        	         
+	        
 			// cached parameters should be different when the request is part of a multirequest
 			// as part of multirequest - the cached data is a serialized php object
 			// when not part of multirequest - the cached data is the actual response
