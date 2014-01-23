@@ -213,4 +213,10 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 		if($this->parentQuery)
 			$this->parentQuery->addOrderBy($column, $orderByType);
 	}
+	
+	public function addNumericOrderBy($column, $orderByType = Criteria::ASC)
+	{
+		if($this->parentQuery)
+			$this->parentQuery->addNumericOrderBy($column, $orderByType);
+	}
 }
