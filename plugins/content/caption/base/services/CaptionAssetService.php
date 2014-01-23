@@ -13,9 +13,9 @@ class CaptionAssetService extends KalturaAssetService
 	
 	protected function getEnabledMediaTypes()
 	{
-		$mediaClipTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
-		$mediaTypes = array_merge($mediaClipTypes, $liveStreamTypes);
+		
+		$mediaTypes = array_merge($mediaClipTypes, parent::getEnabledMediaTypes());
 		$mediaTypes = array_unique($mediaTypes);
 		return $mediaTypes;
 	}
