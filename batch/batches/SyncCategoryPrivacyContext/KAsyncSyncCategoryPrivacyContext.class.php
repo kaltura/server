@@ -42,18 +42,54 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 		
 	    KBatchBase::impersonate($job->partnerId);
 	    
+	    if(!$data->lastUpdatedCategoryCreatedAt)
+	    {
+	    	//sync root category
+	    	$this->syncCategoryPrivacyContext($job, $data, $data->categoryId);
+	    }
+	    
+	    //sync sub categories	    
+	    $categoryFilter = new KalturaCategoryFilter();
+		$categoryFilter->orderBy = KalturaCategoryOrderBy::CREATED_AT_ASC;
+		$categoryFilter->ancestorIdIn = $data->categoryId;
+		if($data->lastUpdatedCategoryCreatedAt)
+			$categoryFilter->$createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryCreatedAt;	    
+		$pager = $this->getFilterPager();		
+		$categoryList = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
+	    
+		while(count($categoryList->objects))
+		{
+			foreach ($categoryList->objects as $category) 
+			{
+				$data->lastUpdatedCategoryCreatedAt = $category->createdAt;
+				KBatchBase::unimpersonate();
+				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
+				KBatchBase::impersonate($job->partnerId);
+				
+				KalturaLog::debug('handling sub category '.$category->categoryId);
+				$this->syncCategoryPrivacyContext($job, $data, $category->id);				
+			}
+			$pager->pageIndex++;
+			$categoryList = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
+		}
+		
+		KBatchBase::unimpersonate();
+		$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
+		
+		return $job;
+	}
+	
+	private function syncCategoryPrivacyContext(KalturaBatchJob $job, KalturaSyncCategoryPrivacyContextJobData $data, $categoryId)
+	{
+			    
+		$categoryEntryPager = $this->getFilterPager();
 	    $categoryEntryFilter = new KalturaCategoryEntryFilter();
 		$categoryEntryFilter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
-		$categoryEntryFilter->categoryIdEqual = $data->categoryId;
+		$categoryEntryFilter->categoryIdEqual = $categoryId;
 		if($data->lastUpdatedCategoryEntryCreatedAt)
-			$categoryEntryFilter->$createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryEntryCreatedAt;
-	    
-		$categoryEntryPager = new KalturaFilterPager();
-		$categoryEntryPager->pageSize = 100;
-		if(KBatchBase::$taskConfig->params->pageSize)
-			$categoryEntryPager->pageSize = KBatchBase::$taskConfig->params->pageSize;
-		
+			$categoryEntryFilter->createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryEntryCreatedAt;		
 		$categoryEntryList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
+		
 		while(count($categoryEntryList->objects))
 		{
 			KBatchBase::$kClient->startMultiRequest();
@@ -73,10 +109,14 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 							
 			$categoryEntryList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
 		}
+	}
 		
-		KBatchBase::unimpersonate();
-		$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
-		
-		return $job;
+	private function getFilterPager()
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 100;
+		if(KBatchBase::$taskConfig->params->pageSize)
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		return $pager;
 	}
 }

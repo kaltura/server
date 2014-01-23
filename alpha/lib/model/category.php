@@ -1178,6 +1178,7 @@ class category extends Basecategory implements IIndexable
 	
 	public function setPrivacyContext($v)
 	{
+		$this->validatePrivacyContextBeforeSet($v);
 		if (!$this->getParentId())
 		{
 			$this->setPrivacyContexts($v);
@@ -1639,4 +1640,20 @@ class category extends Basecategory implements IIndexable
 		return $this->display_in_search . "P" . $this->getPartnerId();
 	}
 	
+	private function validatePrivacyContextBeforeSet($privacyContext)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+		{
+			$privacyContexts = explode(',', $this->getPrivacyContexts());
+			$newPrivacyContext = explode(',', $privacyContext);
+			
+			$unique = array_unique($privacyContexts, $newPrivacyContext);
+			
+			if(count($unique) > 1)
+			{
+				throw new kCoreException("Only one privacy context allowed when Disable Category Limit feature turned on", kCoreException::DISABLE_CATEGORY_LIMIT_MULTI_PRIVACY_CONTEXT_FORBIDDEN);
+			}
+		}
+		return true;
+	}
 }

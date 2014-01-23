@@ -52,6 +52,7 @@ enabledWorkers.KAsyncConvertLiveSegment				= 1
 enabledWorkers.KAsyncConcat							= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
+enabledWorkers.KAsyncTagIndex						= 1
 
 
 [mainTemplate : template]
@@ -662,3 +663,10 @@ friendlyName										= Sync Category Privacy Context
 type												= KAsyncSyncCategoryPrivacyContext
 maximumExecutionTime								= 12000
 scriptPath											= batches/SyncCategoryPrivacyContext/KAsyncSyncCategoryPrivacyContextExe.php
+
+[KAsyncTagIndex : JobHandlerWorker]
+id													= 500
+friendlyName										= Re-index tags
+type												= KAsyncTagIndex
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php

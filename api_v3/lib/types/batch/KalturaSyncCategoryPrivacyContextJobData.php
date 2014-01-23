@@ -18,6 +18,14 @@ class KalturaSyncCategoryPrivacyContextJobData extends KalturaJobData
      */
     public $lastUpdatedCategoryEntryCreatedAt;
     
+    /**
+     * Saves the last sub category creation date that was updated
+     * In case of crash the batch will restart from that point
+     * @var int
+     */
+    public $lastUpdatedCategoryCreatedAt;
+    
+    
       
 	private static $map_between_objects = array
 	(
