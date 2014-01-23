@@ -1362,6 +1362,33 @@ class kJobsManager
 		return self::addJob($batchJob, $moveCategoryEntriesData, BatchJobType::MOVE_CATEGORY_ENTRIES);
 	}
 	
+	/**
+	 * Update privacy context on category entries and entries
+	 * 
+	 * @param BatchJob $parentJob
+	 * @param int $partnerId
+	 * @param int $categoryId
+	 */
+	public static function addSyncCategoryPrivacyContextJob(BatchJob $parentJob = null, $partnerId, $categoryId)
+	{
+		$syncPrivacyContextData = new kSyncCategoryPrivacyContextJobData();
+	    $syncPrivacyContextData->setCategoryId($categoryId);
+		
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild(BatchJobType::SYNC_CATEGORY_PRIVACY_CONTEXT, null, false);
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setPartnerId($partnerId);
+		}
+		
+		return self::addJob($batchJob, $syncPrivacyContextData, BatchJobType::SYNC_CATEGORY_PRIVACY_CONTEXT);
+		
+	}
+	
 	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
 		$netStorageDeleteData = kStorageDeleteJobData::getInstance($storage->getProtocol());
@@ -1384,7 +1411,7 @@ class kJobsManager
 		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
-	
+		
 	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $syncKey, $localFileSyncPath, $dc)
 	{
 		$deleteFileData = new kDeleteFileJobData();

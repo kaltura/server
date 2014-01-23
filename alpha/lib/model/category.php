@@ -106,6 +106,12 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
+		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY_CONTEXT))
+		{
+			$this->addSyncCategoryPrivacyContextJob();
+		}
+		
+		
 		// save the childs for action category->delete - delete category is not done by async batch.
 		foreach($this->childs_for_save as $child)
 		{
@@ -563,6 +569,12 @@ class category extends Basecategory implements IIndexable
 	{
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, false, false, $this->getFullIds());
 	}
+	
+	protected function addSyncCategoryPrivacyContextJob()
+	{
+		kJobsManager::addSyncCategoryPrivacyContextJob(null, $this->getPartnerId(), $this->getId());
+	}
+	
 	
 	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
 	{

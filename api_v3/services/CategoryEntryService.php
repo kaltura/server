@@ -437,4 +437,32 @@ class CategoryEntryService extends KalturaBaseService
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
 		$dbCategoryEntry->save();
 	}
+	
+	/**
+	 * update privacy context from the category
+	 * 
+	 * @action syncPrivacyContext
+	 * @param string $entryId
+	 * @param int $categoryId
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
+	 */
+	function syncPrivacyContextAction($entryId, $categoryId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+			
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if (!$category)
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+		
+		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
+		if(!$dbCategoryEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+		
+		$dbCategoryEntry->setPrivacyContext($category->getPrivacyContexts());
+		$dbCategoryEntry->save();
+	}
 }
