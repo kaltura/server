@@ -11,6 +11,15 @@ class CaptionAssetService extends KalturaAssetService
 {
 	const MAX_SERVE_WEBVTT_FILE_SIZE = 1048576;
 	
+	protected function getEnabledMediaTypes()
+	{
+		$mediaClipTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
+		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
+		$mediaTypes = array_merge($mediaClipTypes, $liveStreamTypes);
+		$mediaTypes = array_unique($mediaTypes);
+		return $mediaTypes;
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -60,7 +69,7 @@ class CaptionAssetService extends KalturaAssetService
     function addAction($entryId, KalturaCaptionAsset $captionAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
 		
@@ -108,7 +117,7 @@ class CaptionAssetService extends KalturaAssetService
    			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbCaptionAsset->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
 		
 		
@@ -152,7 +161,7 @@ class CaptionAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbCaptionAsset->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
 		
 		
@@ -603,7 +612,7 @@ class CaptionAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
 		$entry = $captionAsset->getentry();
-    	if(!$entry || !in_array($entry->getType(), $this->mediaTypes) || !in_array($entry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$entry || !in_array($entry->getType(), $this->getEnabledMediaTypes()) || !in_array($entry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
 		
 		
@@ -701,7 +710,7 @@ class CaptionAssetService extends KalturaAssetService
 // 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_DEFAULT, $captionAssetId);
 		
 		$dbEntry = $captionAssetDb->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAssetDb->getEntryId());
 		
 		
