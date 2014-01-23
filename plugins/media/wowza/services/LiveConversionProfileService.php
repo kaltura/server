@@ -110,7 +110,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	{
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = 'PassThru';
+		$audioCodec = 'AAC';
 		$profile = 'main';
 		
 		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
