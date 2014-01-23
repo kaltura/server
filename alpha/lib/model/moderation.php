@@ -40,19 +40,8 @@ class moderation extends Basemoderation
 			$entry = $this->getObject();
 			if ( $entry )
 			{
-				if ( $this->isNew() )
-				{
-					// a new moderation - update the moderation_count of the entry
-					$entry->incModerationCount ( );
-				}
-				// whether new or not - update the moderation_status of the entry to be the current status	
-				// TODO - decide what status should effect the entry !!
 				$entry->setModerationStatus( $this->getStatus() );	
 				$entry->save();		
-			}
-			else
-			{
-				// Big problem !			
 			}
 		}
 		$res = parent::save( $con );
