@@ -188,7 +188,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		else
 			$cmdStr .= " -c:a libfdk_aac";
 		
-		$cmdStr .= " $clipStr -f mp4 -y $outFilename";
+		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 		
 		KalturaLog::debug("Executing [$cmdStr]");
 		$output = system($cmdStr, $rv);

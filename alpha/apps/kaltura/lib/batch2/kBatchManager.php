@@ -274,7 +274,7 @@ class kBatchManager
 		
 		if($mediaInfoDb->getVideoWidth() && $mediaInfoDb->getVideoHeight())
 		{
-        		$entry->setDimensions($mediaInfoDb->getVideoWidth(), $mediaInfoDb->getVideoHeight());
+        		$entry->setDimensionsIfBigger($mediaInfoDb->getVideoWidth(), $mediaInfoDb->getVideoHeight());
 		}
 				
 		$entry->save();

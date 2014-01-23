@@ -501,13 +501,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			}
 		}
 
-		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
-		{
-			if($object->getFlavorParamsId())
-				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+		 if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
+        {
+                if($object->getFlavorParamsId())
+                        kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+                else
+                        if ($object->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+                                kBusinessConvertDL::setAsDefaultThumbAsset($object);
+                return true;
+        }
 
-			return true;
-		}
 
 		if($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
 		{

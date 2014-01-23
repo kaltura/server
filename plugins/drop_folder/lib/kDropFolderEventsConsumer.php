@@ -3,6 +3,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 {
 	const REFERENCE_ID_WILDCARD = 'referenceId';
 	const FLAVOR_NAME_WILDCARD  = 'flavorName';
+	const USER_ID_WILDCARD = 'userId';
 	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>.+)[.]\w{3,}/';
 	
 	/* (non-PHPdoc)
@@ -371,12 +372,14 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	{
 		$parsedSlug = null;
 		$parsedFlavor = null;
-		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getNameForParsing(), $parsedSlug, $parsedFlavor);
+		$parsedUserId = null;
+		$isMatch = $this->parseRegex($folder->getFileHandlerConfig(), $file->getNameForParsing(), $parsedSlug, $parsedFlavor, $parsedUserId);
 
  		if($isMatch)
  		{
  			$file->setParsedSlug($parsedSlug);
  			$file->setParsedFlavor($parsedFlavor);	
+			$file->setParsedUserId($parsedUserId);
  			$file->save();	
  			return $file;		
   		}    		
@@ -391,10 +394,10 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 * The following expressions are currently recognized and used:
 	 * 	- (?P<referenceId>\w+) - will be used as the drop folder file's parsed slug.
 	 *  - (?P<flavorName>\w+)  - will be used as the drop folder file's parsed flavor. 
-	 * 
+	 *  - (?P<userId>\[\w\@\.]+) - will be used as the drop folder file entry's parsed user id.
 	 * @return bool true if file name matches the slugRegex or false otherwise
 	 */
-	private function parseRegex(DropFolderContentFileHandlerConfig $fileHandlerConfig, $fileName, &$parsedSlug, &$parsedFlavor)
+	private function parseRegex(DropFolderContentFileHandlerConfig $fileHandlerConfig, $fileName, &$parsedSlug, &$parsedFlavor, &$parsedUserId)
 	{
 		$matches = null;
 		$slugRegex = $fileHandlerConfig->getSlugRegex();
@@ -408,8 +411,8 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		{
 			$parsedSlug   = isset($matches[self::REFERENCE_ID_WILDCARD]) ? $matches[self::REFERENCE_ID_WILDCARD] : null;
 			$parsedFlavor = isset($matches[self::FLAVOR_NAME_WILDCARD])  ? $matches[self::FLAVOR_NAME_WILDCARD]  : null;
-				
-			KalturaLog::debug('Parsed slug ['.$parsedSlug.'], Parsed flavor ['.$parsedFlavor.']');
+			$parsedUserId = isset($matches[self::USER_ID_WILDCARD])  ? $matches[self::USER_ID_WILDCARD]  : null;
+			KalturaLog::debug('Parsed slug ['.$parsedSlug.'], Parsed flavor ['.$parsedFlavor.'], parsed user id ['. $parsedUserId .']');
 		}
 		if(!$parsedSlug)
 			$matchFound = false;

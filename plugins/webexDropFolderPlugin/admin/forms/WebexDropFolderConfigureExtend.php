@@ -37,25 +37,12 @@ class Form_WebexDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigu
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'metadataProfileId', array(
-			'label'			=> 'Metadata Profile ID:',
-			'filters'		=> array('StringTrim'),
-		));
 		
 		$this->addElement('text', 'webexHostIdMetadataFieldName', array(
 			'label'			=> 'Host ID Metadata Field Name:',
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'categoriesMetadataFieldName', array(
-			'label'			=> 'Categories Metadata Field Name:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('checkbox', 'enforceEntitlement', array(
-			'label'	  => 'Enforce Entitlement',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'rememeber')))
-		));
 	}
 	
 }

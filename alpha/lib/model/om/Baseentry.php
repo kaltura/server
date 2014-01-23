@@ -369,6 +369,26 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	protected $aconversionProfile2;
 
 	/**
+	 * @var        array LiveChannelSegment[] Collection to store aggregation of LiveChannelSegment objects.
+	 */
+	protected $collLiveChannelSegmentsRelatedByChannelId;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collLiveChannelSegmentsRelatedByChannelId.
+	 */
+	private $lastLiveChannelSegmentRelatedByChannelIdCriteria = null;
+
+	/**
+	 * @var        array LiveChannelSegment[] Collection to store aggregation of LiveChannelSegment objects.
+	 */
+	protected $collLiveChannelSegmentsRelatedByEntryId;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collLiveChannelSegmentsRelatedByEntryId.
+	 */
+	private $lastLiveChannelSegmentRelatedByEntryIdCriteria = null;
+
+	/**
 	 * @var        array kvote[] Collection to store aggregation of kvote objects.
 	 */
 	protected $collkvotes;
@@ -2965,7 +2985,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		entryPeer::setUseCriteriaFilter(false);
-		$stmt = entryPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		entryPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -2980,6 +3002,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->akuser = null;
 			$this->aaccessControl = null;
 			$this->aconversionProfile2 = null;
+			$this->collLiveChannelSegmentsRelatedByChannelId = null;
+			$this->lastLiveChannelSegmentRelatedByChannelIdCriteria = null;
+
+			$this->collLiveChannelSegmentsRelatedByEntryId = null;
+			$this->lastLiveChannelSegmentRelatedByEntryIdCriteria = null;
+
 			$this->collkvotes = null;
 			$this->lastkvoteCriteria = null;
 
@@ -3083,18 +3111,58 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con, $skipReload);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				entryPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(entryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(entryPeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						if ($namespace)
+						{
+							$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						$this->putInCustomData($name, $newValue, $namespace);
+					}
+                   }
+                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			entryPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -3185,6 +3253,22 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
+			}
+
+			if ($this->collLiveChannelSegmentsRelatedByChannelId !== null) {
+				foreach ($this->collLiveChannelSegmentsRelatedByChannelId as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collLiveChannelSegmentsRelatedByEntryId !== null) {
+				foreach ($this->collLiveChannelSegmentsRelatedByEntryId as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
 			}
 
 			if ($this->collkvotes !== null) {
@@ -3315,8 +3399,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -3505,6 +3588,22 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
+
+				if ($this->collLiveChannelSegmentsRelatedByChannelId !== null) {
+					foreach ($this->collLiveChannelSegmentsRelatedByChannelId as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collLiveChannelSegmentsRelatedByEntryId !== null) {
+					foreach ($this->collLiveChannelSegmentsRelatedByEntryId as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
 
 				if ($this->collkvotes !== null) {
 					foreach ($this->collkvotes as $referrerFK) {
@@ -4193,17 +4292,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 		$criteria->add(entryPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(entryPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != entryPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = entryPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if ($this->isColumnModified(entryPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(entryPeer::CUSTOM_DATA, "MD5(cast(" . entryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(entryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(entryPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != entryPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = entryPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -4350,6 +4461,18 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			// important: temporarily setNew(false) because this affects the behavior of
 			// the getter/setter methods for fkey referrer objects.
 			$copyObj->setNew(false);
+
+			foreach ($this->getLiveChannelSegmentsRelatedByChannelId() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addLiveChannelSegmentRelatedByChannelId($relObj->copy($deepCopy));
+				}
+			}
+
+			foreach ($this->getLiveChannelSegmentsRelatedByEntryId() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addLiveChannelSegmentRelatedByEntryId($relObj->copy($deepCopy));
+				}
+			}
 
 			foreach ($this->getkvotes() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -4664,6 +4787,502 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			 */
 		}
 		return $this->aconversionProfile2;
+	}
+
+	/**
+	 * Clears out the collLiveChannelSegmentsRelatedByChannelId collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addLiveChannelSegmentsRelatedByChannelId()
+	 */
+	public function clearLiveChannelSegmentsRelatedByChannelId()
+	{
+		$this->collLiveChannelSegmentsRelatedByChannelId = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collLiveChannelSegmentsRelatedByChannelId collection (array).
+	 *
+	 * By default this just sets the collLiveChannelSegmentsRelatedByChannelId collection to an empty array (like clearcollLiveChannelSegmentsRelatedByChannelId());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initLiveChannelSegmentsRelatedByChannelId()
+	{
+		$this->collLiveChannelSegmentsRelatedByChannelId = array();
+	}
+
+	/**
+	 * Gets an array of LiveChannelSegment objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this entry has previously been saved, it will retrieve
+	 * related LiveChannelSegmentsRelatedByChannelId from storage. If this entry is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array LiveChannelSegment[]
+	 * @throws     PropelException
+	 */
+	public function getLiveChannelSegmentsRelatedByChannelId($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collLiveChannelSegmentsRelatedByChannelId === null) {
+			if ($this->isNew()) {
+			   $this->collLiveChannelSegmentsRelatedByChannelId = array();
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+				LiveChannelSegmentPeer::addSelectColumns($criteria);
+				$this->collLiveChannelSegmentsRelatedByChannelId = LiveChannelSegmentPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+				LiveChannelSegmentPeer::addSelectColumns($criteria);
+				if (!isset($this->lastLiveChannelSegmentRelatedByChannelIdCriteria) || !$this->lastLiveChannelSegmentRelatedByChannelIdCriteria->equals($criteria)) {
+					$this->collLiveChannelSegmentsRelatedByChannelId = LiveChannelSegmentPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastLiveChannelSegmentRelatedByChannelIdCriteria = $criteria;
+		return $this->collLiveChannelSegmentsRelatedByChannelId;
+	}
+
+	/**
+	 * Returns the number of related LiveChannelSegment objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related LiveChannelSegment objects.
+	 * @throws     PropelException
+	 */
+	public function countLiveChannelSegmentsRelatedByChannelId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collLiveChannelSegmentsRelatedByChannelId === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+				$count = LiveChannelSegmentPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+				if (!isset($this->lastLiveChannelSegmentRelatedByChannelIdCriteria) || !$this->lastLiveChannelSegmentRelatedByChannelIdCriteria->equals($criteria)) {
+					$count = LiveChannelSegmentPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collLiveChannelSegmentsRelatedByChannelId);
+				}
+			} else {
+				$count = count($this->collLiveChannelSegmentsRelatedByChannelId);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a LiveChannelSegment object to this object
+	 * through the LiveChannelSegment foreign key attribute.
+	 *
+	 * @param      LiveChannelSegment $l LiveChannelSegment
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addLiveChannelSegmentRelatedByChannelId(LiveChannelSegment $l)
+	{
+		if ($this->collLiveChannelSegmentsRelatedByChannelId === null) {
+			$this->initLiveChannelSegmentsRelatedByChannelId();
+		}
+		if (!in_array($l, $this->collLiveChannelSegmentsRelatedByChannelId, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collLiveChannelSegmentsRelatedByChannelId, $l);
+			$l->setentryRelatedByChannelId($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this entry is new, it will return
+	 * an empty collection; or if this entry has previously
+	 * been saved, it will retrieve related LiveChannelSegmentsRelatedByChannelId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in entry.
+	 */
+	public function getLiveChannelSegmentsRelatedByChannelIdJoinLiveChannelSegmentRelatedByTriggerSegmentId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collLiveChannelSegmentsRelatedByChannelId === null) {
+			if ($this->isNew()) {
+				$this->collLiveChannelSegmentsRelatedByChannelId = array();
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+				$this->collLiveChannelSegmentsRelatedByChannelId = LiveChannelSegmentPeer::doSelectJoinLiveChannelSegmentRelatedByTriggerSegmentId($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+			if (!isset($this->lastLiveChannelSegmentRelatedByChannelIdCriteria) || !$this->lastLiveChannelSegmentRelatedByChannelIdCriteria->equals($criteria)) {
+				$this->collLiveChannelSegmentsRelatedByChannelId = LiveChannelSegmentPeer::doSelectJoinLiveChannelSegmentRelatedByTriggerSegmentId($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastLiveChannelSegmentRelatedByChannelIdCriteria = $criteria;
+
+		return $this->collLiveChannelSegmentsRelatedByChannelId;
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this entry is new, it will return
+	 * an empty collection; or if this entry has previously
+	 * been saved, it will retrieve related LiveChannelSegmentsRelatedByChannelId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in entry.
+	 */
+	public function getLiveChannelSegmentsRelatedByChannelIdJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collLiveChannelSegmentsRelatedByChannelId === null) {
+			if ($this->isNew()) {
+				$this->collLiveChannelSegmentsRelatedByChannelId = array();
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+				$this->collLiveChannelSegmentsRelatedByChannelId = LiveChannelSegmentPeer::doSelectJoinPartner($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(LiveChannelSegmentPeer::CHANNEL_ID, $this->id);
+
+			if (!isset($this->lastLiveChannelSegmentRelatedByChannelIdCriteria) || !$this->lastLiveChannelSegmentRelatedByChannelIdCriteria->equals($criteria)) {
+				$this->collLiveChannelSegmentsRelatedByChannelId = LiveChannelSegmentPeer::doSelectJoinPartner($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastLiveChannelSegmentRelatedByChannelIdCriteria = $criteria;
+
+		return $this->collLiveChannelSegmentsRelatedByChannelId;
+	}
+
+	/**
+	 * Clears out the collLiveChannelSegmentsRelatedByEntryId collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addLiveChannelSegmentsRelatedByEntryId()
+	 */
+	public function clearLiveChannelSegmentsRelatedByEntryId()
+	{
+		$this->collLiveChannelSegmentsRelatedByEntryId = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collLiveChannelSegmentsRelatedByEntryId collection (array).
+	 *
+	 * By default this just sets the collLiveChannelSegmentsRelatedByEntryId collection to an empty array (like clearcollLiveChannelSegmentsRelatedByEntryId());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initLiveChannelSegmentsRelatedByEntryId()
+	{
+		$this->collLiveChannelSegmentsRelatedByEntryId = array();
+	}
+
+	/**
+	 * Gets an array of LiveChannelSegment objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this entry has previously been saved, it will retrieve
+	 * related LiveChannelSegmentsRelatedByEntryId from storage. If this entry is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array LiveChannelSegment[]
+	 * @throws     PropelException
+	 */
+	public function getLiveChannelSegmentsRelatedByEntryId($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collLiveChannelSegmentsRelatedByEntryId === null) {
+			if ($this->isNew()) {
+			   $this->collLiveChannelSegmentsRelatedByEntryId = array();
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+				LiveChannelSegmentPeer::addSelectColumns($criteria);
+				$this->collLiveChannelSegmentsRelatedByEntryId = LiveChannelSegmentPeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+				LiveChannelSegmentPeer::addSelectColumns($criteria);
+				if (!isset($this->lastLiveChannelSegmentRelatedByEntryIdCriteria) || !$this->lastLiveChannelSegmentRelatedByEntryIdCriteria->equals($criteria)) {
+					$this->collLiveChannelSegmentsRelatedByEntryId = LiveChannelSegmentPeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastLiveChannelSegmentRelatedByEntryIdCriteria = $criteria;
+		return $this->collLiveChannelSegmentsRelatedByEntryId;
+	}
+
+	/**
+	 * Returns the number of related LiveChannelSegment objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related LiveChannelSegment objects.
+	 * @throws     PropelException
+	 */
+	public function countLiveChannelSegmentsRelatedByEntryId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collLiveChannelSegmentsRelatedByEntryId === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+				$count = LiveChannelSegmentPeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+				if (!isset($this->lastLiveChannelSegmentRelatedByEntryIdCriteria) || !$this->lastLiveChannelSegmentRelatedByEntryIdCriteria->equals($criteria)) {
+					$count = LiveChannelSegmentPeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collLiveChannelSegmentsRelatedByEntryId);
+				}
+			} else {
+				$count = count($this->collLiveChannelSegmentsRelatedByEntryId);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a LiveChannelSegment object to this object
+	 * through the LiveChannelSegment foreign key attribute.
+	 *
+	 * @param      LiveChannelSegment $l LiveChannelSegment
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addLiveChannelSegmentRelatedByEntryId(LiveChannelSegment $l)
+	{
+		if ($this->collLiveChannelSegmentsRelatedByEntryId === null) {
+			$this->initLiveChannelSegmentsRelatedByEntryId();
+		}
+		if (!in_array($l, $this->collLiveChannelSegmentsRelatedByEntryId, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collLiveChannelSegmentsRelatedByEntryId, $l);
+			$l->setentryRelatedByEntryId($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this entry is new, it will return
+	 * an empty collection; or if this entry has previously
+	 * been saved, it will retrieve related LiveChannelSegmentsRelatedByEntryId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in entry.
+	 */
+	public function getLiveChannelSegmentsRelatedByEntryIdJoinLiveChannelSegmentRelatedByTriggerSegmentId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collLiveChannelSegmentsRelatedByEntryId === null) {
+			if ($this->isNew()) {
+				$this->collLiveChannelSegmentsRelatedByEntryId = array();
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+				$this->collLiveChannelSegmentsRelatedByEntryId = LiveChannelSegmentPeer::doSelectJoinLiveChannelSegmentRelatedByTriggerSegmentId($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+			if (!isset($this->lastLiveChannelSegmentRelatedByEntryIdCriteria) || !$this->lastLiveChannelSegmentRelatedByEntryIdCriteria->equals($criteria)) {
+				$this->collLiveChannelSegmentsRelatedByEntryId = LiveChannelSegmentPeer::doSelectJoinLiveChannelSegmentRelatedByTriggerSegmentId($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastLiveChannelSegmentRelatedByEntryIdCriteria = $criteria;
+
+		return $this->collLiveChannelSegmentsRelatedByEntryId;
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this entry is new, it will return
+	 * an empty collection; or if this entry has previously
+	 * been saved, it will retrieve related LiveChannelSegmentsRelatedByEntryId from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in entry.
+	 */
+	public function getLiveChannelSegmentsRelatedByEntryIdJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(entryPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collLiveChannelSegmentsRelatedByEntryId === null) {
+			if ($this->isNew()) {
+				$this->collLiveChannelSegmentsRelatedByEntryId = array();
+			} else {
+
+				$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+				$this->collLiveChannelSegmentsRelatedByEntryId = LiveChannelSegmentPeer::doSelectJoinPartner($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(LiveChannelSegmentPeer::ENTRY_ID, $this->id);
+
+			if (!isset($this->lastLiveChannelSegmentRelatedByEntryIdCriteria) || !$this->lastLiveChannelSegmentRelatedByEntryIdCriteria->equals($criteria)) {
+				$this->collLiveChannelSegmentsRelatedByEntryId = LiveChannelSegmentPeer::doSelectJoinPartner($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastLiveChannelSegmentRelatedByEntryIdCriteria = $criteria;
+
+		return $this->collLiveChannelSegmentsRelatedByEntryId;
 	}
 
 	/**
@@ -6581,6 +7200,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
+			if ($this->collLiveChannelSegmentsRelatedByChannelId) {
+				foreach ((array) $this->collLiveChannelSegmentsRelatedByChannelId as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
+			if ($this->collLiveChannelSegmentsRelatedByEntryId) {
+				foreach ((array) $this->collLiveChannelSegmentsRelatedByEntryId as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 			if ($this->collkvotes) {
 				foreach ((array) $this->collkvotes as $o) {
 					$o->clearAllReferences($deep);
@@ -6628,6 +7257,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			}
 		} // if ($deep)
 
+		$this->collLiveChannelSegmentsRelatedByChannelId = null;
+		$this->collLiveChannelSegmentsRelatedByEntryId = null;
 		$this->collkvotes = null;
 		$this->collconversions = null;
 		$this->collWidgetLogs = null;
@@ -6649,6 +7280,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -6706,8 +7343,17 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -6754,6 +7400,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}

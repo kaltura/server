@@ -626,6 +626,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		);
 	}
 	
+	protected function getObjectPropertyName($propertyName)
+	{
+		if ($propertyName == 'creatorId')
+			return 'creatorPuserId';
+		return parent::getObjectPropertyName($propertyName);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IFilterable::getFilterDocs()
 	 */

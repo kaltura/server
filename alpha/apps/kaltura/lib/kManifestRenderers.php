@@ -219,6 +219,7 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 		}
 		
 		$this->flavor['url'] = self::urlJoin($this->flavor['urlPrefix'], $url);
+		unset($this->flavor['urlPrefix']);	// no longer need the prefix
 	}
 }
 
@@ -266,6 +267,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 					$url = $this->tokenizer->tokenizeSingleUrl($url);
 				}
 				$flavor['url'] = self::urlJoin($flavor['urlPrefix'], $url);
+				unset($flavor['urlPrefix']);		// no longer need the prefix
 			}
 		}
 	}
@@ -610,5 +612,38 @@ class kRedirectManifestRenderer extends kSingleUrlManifestRenderer
 	{
 		$url = str_replace(" ", "%20", $this->flavor['url']);
 		return array("location:{$url}");
+	}
+}
+
+class kJSONPManifestRenderer extends kMultiFlavorManifestRenderer
+{
+	/**
+	 * @return array<string>
+	 */
+	protected function getHeaders()
+	{
+		return array(
+			header("Content-Type: application/javascript"),
+		);
+	}
+
+
+	/* (non-PHPdoc)
+	 * @see kManifestRenderer::getManifestFlavors()
+	 */
+	protected function getManifestFlavors()
+	{
+		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
+		if (is_null($callback))
+			die("Expecting \"callback\" parameter for jsonp format");
+		
+		$result = array(
+			'entryId' => $this->entryId,
+			'duration' => $this->duration,
+			'baseUrl' => $this->baseUrl,
+			'flavors' => $this->flavors,
+		);
+		
+		return array($callback . '(' . json_encode($result) . ')');
 	}
 }

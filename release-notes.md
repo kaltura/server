@@ -1,4 +1,25 @@
 ----------
+
+# IX-9.9.0 #
+
+## Media Server - DVR with edge-origin ##
+
+*Data Migration*
+
+- deployment/updates/scripts/2014_01_22_fix_broadcast_urls.php
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
+
+
+## Media Server - live stream recording ##
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_15_conversionprofileassetparams_permission_media_partner.php
+
+----------
  
 # IX-9.9.0 #
 
@@ -160,6 +181,7 @@ Deployment instructions:
 	* The directory owner should be apache and its group should be kaltura.
 * Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
 * Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
+* Open the file studio.ini (within the studio project files) and update "html5_version" to include the rc version.
 * Execute deployment script on studio.ini file (located in studio project root):
 From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
 

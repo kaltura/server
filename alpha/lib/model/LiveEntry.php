@@ -431,10 +431,10 @@ abstract class LiveEntry extends entry
 	/**
 	 * @param entry $entry
 	 */
-	public function attachPendingMediaEntry(entry $entry, $requiredDuration)
+	public function attachPendingMediaEntry(entry $entry, $requiredDuration, $offset, $duration)
 	{
 		$attachedPendingMediaEntries = $this->getAttachedPendingMediaEntries();
-		$attachedPendingMediaEntries[$entry->getId()] = new kPendingMediaEntry($entry->getId(), kDataCenterMgr::getCurrentDcId(), $requiredDuration);
+		$attachedPendingMediaEntries[$entry->getId()] = new kPendingMediaEntry($entry->getId(), kDataCenterMgr::getCurrentDcId(), $requiredDuration, $offset, $duration);
 		
 		$this->setAttachedPendingMediaEntries($attachedPendingMediaEntries);
 	}

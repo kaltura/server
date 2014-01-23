@@ -510,6 +510,10 @@ class KalturaErrors extends APIErrors
 	/*
 	 * MediaServer Service
 	 */
-	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server \"@MEDIA_SERVER_ID@\" not found";
+	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server [@MEDIA_SERVER_ID@] not found";
+	
+	const NO_MEDIA_SERVER_FOUND = "NO_MEDIA_SERVER_FOUND;ENTRY_ID;No media server found for entry [@ENTRY_ID@]";
+	
+	const MEDIA_SERVER_SERVICE_NOT_FOUND = "MEDIA_SERVER_SERVICE_NOT_FOUND;MEDIA_SERVER_ID,SERVICE;Media server [@MEDIA_SERVER_ID@] service [@SERVICE@] not found";
 	
 }
