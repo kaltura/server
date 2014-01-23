@@ -13,6 +13,10 @@ class AttachmentAssetService extends KalturaAssetService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
+		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
+		$this->mediaTypes = array_merge($this->mediaTypes, $liveStreamTypes);
+		$this->mediaTypes = array_unique($this->mediaTypes);
+		
 		$this->applyPartnerFilterForClass('conversionProfile2');
 		$this->applyPartnerFilterForClass('assetParamsOutput');
 		$this->applyPartnerFilterForClass('asset');

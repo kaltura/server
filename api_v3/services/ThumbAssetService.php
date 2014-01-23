@@ -9,6 +9,15 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+	
+		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
+		$this->mediaTypes = array_merge($this->mediaTypes, $liveStreamTypes);
+		$this->mediaTypes = array_unique($this->mediaTypes);
+	}
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -62,7 +71,7 @@ class ThumbAssetService extends KalturaAssetService
     function addAction($entryId, KalturaThumbAsset $thumbAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO, KalturaMediaType::LIVE_STREAM_FLASH)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
     	if($thumbAsset->thumbParamsId)
