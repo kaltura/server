@@ -107,7 +107,7 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		return "$protocol://$domain:$port/$app/p/";
+		return "$protocol://$domain:$port/$app/";
 	}
 	
 	/**
