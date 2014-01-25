@@ -11,15 +11,6 @@ class CaptionAssetService extends KalturaAssetService
 {
 	const MAX_SERVE_WEBVTT_FILE_SIZE = 1048576;
 	
-	protected function getEnabledMediaTypes()
-	{
-		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
-		
-		$mediaTypes = array_merge($mediaClipTypes, parent::getEnabledMediaTypes());
-		$mediaTypes = array_unique($mediaTypes);
-		return $mediaTypes;
-	}
-	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
