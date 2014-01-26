@@ -1,6 +1,6 @@
 ----------
 
-# IX-9.9.0 #
+# IX-9.9.1 #
 
 ## Media Server - DVR with edge-origin ##
 
@@ -12,6 +12,10 @@
 
 - deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
 
+
+----------
+
+# IX-9.9.0 #
 
 ## Media Server - live stream recording ##
 
