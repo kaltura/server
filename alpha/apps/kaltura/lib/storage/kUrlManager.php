@@ -600,7 +600,7 @@ class kUrlManager
 	protected function checkIfValidUrl($urlToCheck, $parentURL)
 	{
 		$urlToCheck = trim($urlToCheck);
-		if(!filter_var($urlToCheck, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED))
+		if (strpos($urlToCheck, '://') === false)
 		{
 			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
 		}
