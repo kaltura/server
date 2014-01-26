@@ -1118,6 +1118,7 @@ return array(
 
 	'Kaltura_Client_Drm_Enum_DrmProfileStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE' => 'Widevine',
+	'Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY' => 'Play Ready',
 );
 
 

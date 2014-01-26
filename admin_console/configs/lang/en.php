@@ -1184,6 +1184,7 @@ return array(
 	'drm profile list intro text' => 'Here you can manage the Drm profiles of your Kaltura video platform deployment',
 	'Kaltura_Client_Drm_Enum_DrmProfileStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE' => 'Widevine',
+	'Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY' => 'Play Ready',
 );
 
 

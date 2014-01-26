@@ -17,56 +17,14 @@ class serveIsmAction extends sfAction
 		list($objectId, $type) = @explode(".", $objectIdStr);
 		
 		if (!$type || !$objectId)
-			die;
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER);
 			
 		$ks = $this->getRequestParameter( "ks" );
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
-			
-		if ($type == "ism" || $type == "ismc")
-		{
-			// backward compatiblity - to be removed once ismc is created with pure objectId.ext instead of entryId_flavorId_version.ext
-			if (strlen($objectId) != 10)
-			{
-				$version = substr($objectId, 13);
-				$objectId = substr($objectId, 0, 10);
-			}
-			else
-				$version = null;
-			
-			$entry = entryPeer::retrieveByPK($objectId);
-			if (is_null($entry))
-				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-				
-			$syncKey = $entry->getSyncKey($type == "ism" ? entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM : entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $version);
-		}
-		else if ($type == "ismv")
-		{
-			// backward compatiblity - to be removed once ismc is created with pure objectId.ext instead of entryId_flavorId_version.ext
-			if (strlen($objectId) != 10)
-			{
-				$version = substr($objectId, 22);
-				$objectId = substr($objectId, 11, 10);
-			}
-			else
-				$version = null;
-				
-			$flavorAsset = assetPeer::retrieveById($objectId);
-			if (is_null($flavorAsset))
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-				
-			$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-			if (is_null($entry))
-				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-				
-			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
-		}
-		else
-		{
-			die;
-		}
-				
+						
+		$syncKey = $this->getFileSyncKey($objectId, $type);
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
@@ -84,5 +42,75 @@ class serveIsmAction extends sfAction
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
 		
 		kFileUtils::dumpFile($path);
+	}
+	private function getFileSyncKey($objectId, $type)
+	{
+		$key = null;
+		$hasVersion = strlen($objectId) != 10;
+		$version = null;
+		$object = null;
+		$subType = null;
+		if($type == 'ism' || $type == 'ismc')
+		{
+			if ($hasVersion)
+			{
+				$version = substr($objectId, 13);
+				$subType = substr($objectId, 11, 12);
+				$objectId = substr($objectId, 0, 10);
+				KalturaLog::debug('objectId: '.$objectId.', subType: '.$subType.', version: '.$version);
+			}
+			if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM || $subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
+			{
+				$object = $this->getObject($objectId, true);
+			}	
+			else
+			{
+				$subType = $type == "ism" ? entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM : entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
+				$object = $this->getObject($objectId, false);
+			}		
+		}
+		else if ($type == 'ismv')
+		{
+			if ($hasVersion)
+			{
+				$version = substr($objectId, 22);
+				$objectId = substr($objectId, 11, 10);
+			}
+			$subType = flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET;
+			$object = $this->getObject($objectId, true);
+		}
+		else
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_ISM_FILE_TYPE);
+		}
+		if(!$object)
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			
+		$key = $object->getSyncKey($subType, $version);
+		return $key;
+	}
+	
+	private function getObject($objectId, $isAsset)
+	{
+		if($isAsset)
+		{
+			$flavorAsset = assetPeer::retrieveById($objectId);
+			if (is_null($flavorAsset))
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+				
+			$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+			if (is_null($entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+				
+			return $flavorAsset;
+		}	
+		else
+		{
+			$entry = entryPeer::retrieveByPK($objectId);
+			if (is_null($entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+				
+				return $entry;
+		}				
 	}
 }

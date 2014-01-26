@@ -458,7 +458,12 @@ class kBusinessPreConvertDL
 		$flavorAssetId = $flavorAsset->getId();
 	
 		$collectionTag = $flavor->getCollectionTag();
-		if($collectionTag)
+			/*
+			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
+			 * to allow FFmpeg/ISMV processing
+			 */
+		KalturaLog::log("Check for collection case - asset(".$flavorAssetId."),engines(".$flavor->getConversionEngines().")");
+		if($collectionTag && $flavor->getConversionEngines()==conversionEngineType::EXPRESSION_ENCODER3)
 		{
 			$entry = entryPeer::retrieveByPK($entryId);
 			if(!$entry)
@@ -1134,7 +1139,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 			
 			$collectionTag = $flavor->getCollectionTag();
-			if($collectionTag)
+			/*
+			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
+			 * to allow FFmpeg/ISMV processing
+			 */
+			KalturaLog::log("Check for collection case - engines(".$flavor->getConversionEngines().")");
+			if($collectionTag && $flavor->getConversionEngines()==conversionEngineType::EXPRESSION_ENCODER3)
 			{
 				$flavorsCollections[$collectionTag][] = $flavor;
 			}
