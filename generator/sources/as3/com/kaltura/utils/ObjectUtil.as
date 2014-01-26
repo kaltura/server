@@ -126,40 +126,56 @@ package com.kaltura.utils
 		 * this function deliberately ignors the property uid. 
 		 * @param object1
 		 * @param object2
-		 * @return 
-		 * 
+		 * @return true if objects are equal
 		 */		
-		public static function compareObjects(object1:Object,object2:Object):Boolean
-		{
+		public static function compareObjects(object1:Object,object2:Object):Boolean {
+			var result:Boolean = compareObjectsOneSide(object1, object2);
+			result &&= compareObjectsOneSide(object2, object1);
+			
+			return result;
+		}
+		
+		
+		/**
+		 * run on obj1, check if the value exist in ob2 and check its value 
+		 * @param object1
+		 * @param object2
+		 * @return true if obj2 has all properties of obj1 with matching values
+		 */
+		private static function compareObjectsOneSide(object1:Object,object2:Object):Boolean {
 			var ob1:Object = describeObject(object1);
 			var ob2:Object = describeObject(object2);
 			//run on obj1, check if the value exist in ob2 and check its value
-			for (var o:Object in ob1)
-			{
-				if (ob2.hasOwnProperty(o))
-				{
-					if(ob1[o] != ob2[o] && o!="uid")
-						return false;
+			for (var o:Object in ob1) {
+				if (ob2.hasOwnProperty(o)) {
+					if(ob1[o] != ob2[o] && o!="uid") {
+						if (ob1[o] is Array && ob2[o] is Array) {
+							// compare arrays
+							if (ob1[o].length == ob2[o].length) {
+								var res:Boolean = true;
+								// compare array elements
+								for (var i:int = 0; i<ob1[o].length; i++) {
+									res &&= compareObjects(ob1[o][i], ob2[o][i]);
+								}
+								if (!res) {
+									return false;
+								}
+							}
+							else {
+								// array length is different
+								return false;
+							}
+						}
+						else {
+							return false;
+						}
+					}
 					
-				} else 
-				{
+				} 
+				else {
 					return false;
 				}
 			} 
-			//run on obj2, check if the value exist in ob1 and check its value
-			for (var p:Object in ob2)
-			{
-				if (ob1.hasOwnProperty(p))
-				{
-					if(ob2[p] != ob1[p] && p!="uid")
-						return false;
-					
-				} else 
-				{
-					return false;
-				}
-			} 
-			
 			return true;
 		}
 		

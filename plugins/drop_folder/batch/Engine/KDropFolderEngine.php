@@ -2,7 +2,7 @@
 /**
  * 
  */
-abstract class KDropFolderEngine
+abstract class KDropFolderEngine implements IKalturaLogger
 {
 	protected $dropFolder;
 	
@@ -167,4 +167,94 @@ abstract class KDropFolderEngine
 		return $resource;		
 	}
 
+	protected function createCategoryAssociations (KalturaDropFolder $folder, $userId, $entryId)
+	{
+		if ($folder->metadataProfileId && $folder->categoriesMetadataFieldName)
+		{
+			$filter = new KalturaMetadataFilter();
+			$filter->metadataProfileIdEqual = $folder->metadataProfileId;
+			$filter->objectIdEqual = $userId;
+			$filter->metadataObjectTypeEqual = KalturaMetadataObjectType::USER;
+			
+			try
+			{
+				$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+				//Expect only one result
+				$res = $metadataPlugin->metadata->listAction($filter, new KalturaFilterPager());
+				$metadataObj = $res->objects[0];
+				$xmlElem = new SimpleXMLElement($metadataObj->xml);
+				$categoriesXPathRes = $xmlElem->xpath($folder->categoriesMetadataFieldName);
+				$categories = array();
+				foreach ($categoriesXPathRes as $catXPath)
+				{
+					$categories[] = strval($catXPath);
+				}
+				
+				$categoryFilter = new KalturaCategoryFilter();
+				$categoryFilter->idIn = implode(',', $categories);
+				$categoryListResponse = KBatchBase::$kClient->category->listAction ($categoryFilter, new KalturaFilterPager());
+				if ($categoryListResponse->objects && count($categoryListResponse->objects))
+				{
+					if (!$folder->enforceEntitlement)
+					{
+						//easy
+						$this->createCategoryEntriesNoEntitlement ($categoryListResponse->objects, $entryId);
+					}
+					else {
+						//write your will
+						$this->createCategoryEntriesWithEntitlement ($categoryListResponse->objects, $entryId, $userId);
+					}
+				}
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err('Error encountered. Code: ['. $e->getCode() . '] Message: [' . $e->getMessage() . ']');
+			}
+		}
+	}
+
+	private function createCategoryEntriesNoEntitlement (array $categoriesArr, $entryId)
+	{
+		KBatchBase::$kClient->startMultiRequest();
+		foreach ($categoriesArr as $category)
+		{
+			$categoryEntry = new KalturaCategoryEntry();
+			$categoryEntry->entryId = $entryId;
+			$categoryEntry->categoryId = $category->id;
+			KBatchBase::$kClient->categoryEntry->add($categoryEntry);
+		}
+		KBatchBase::$kClient->doMultiRequest();
+	}
+	
+	private function createCategoryEntriesWithEntitlement (array $categoriesArr, $entryId, $userId)
+	{
+		$partnerInfo = KBatchBase::$kClient->partner->get(KBatchBase::$kClientConfig->partnerId);
+		
+		$clientConfig = new KalturaConfiguration($partnerInfo->id);
+		$clientConfig->serviceUrl = KBatchBase::$kClient->getConfig()->serviceUrl;
+		$clientConfig->setLogger($this);
+		$client = new KalturaClient($clientConfig);
+		foreach ($categoriesArr as $category)
+		{
+			/* @var $category KalturaCategory */
+			$ks = $client->generateSessionV2($partnerInfo->adminSecret, $userId, KalturaSessionType::ADMIN, $partnerInfo->id, 86400, 'enableentitlement,privacycontext:'.$category->privacyContexts);
+			$client->setKs($ks);
+			$categoryEntry = new KalturaCategoryEntry();
+			$categoryEntry->categoryId = $category->id;
+			$categoryEntry->entryId = $entryId;
+			try
+			{
+				$client->categoryEntry->add ($categoryEntry);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err("Could not add entry $entryId to category {$category->id}. Exception thrown.");
+			}
+		}
+	}
+	
+	function log($message)
+	{
+		KalturaLog::log($message);
+	}
 }

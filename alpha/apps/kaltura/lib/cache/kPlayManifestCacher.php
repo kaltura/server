@@ -25,6 +25,8 @@ class kPlayManifestCacher extends kApiCache
 		if (!parent::init())
 			return false;
 
+		unset($this->_params['callback']);
+		
 		$this->_playbackContext = isset($this->_params['playbackContext']) ? $this->_params['playbackContext'] : null;
 		unset($this->_params['playbackContext']);
 

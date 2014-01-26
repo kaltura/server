@@ -11,11 +11,6 @@ class kWebexDropFolderContentProcessorJobData extends kDropFolderContentProcesso
 	 */
 	protected $webexHostId;
 	
-	/**
-	 * @var int
-	 */
-	protected $dropFolderId;
-
 	
 	public function getDescription ()
 	{
@@ -37,21 +32,11 @@ class kWebexDropFolderContentProcessorJobData extends kDropFolderContentProcesso
 		$this->webexHostId = $v;
 	}
 	
-	public function getDropFolderId ()
-	{
-		return $this->dropFolderId;
-	}
-	
-	public function setDropFolderId ($v)
-	{
-		$this->dropFolderId = $v;
-	}
 	
 	public function setData (DropFolder $folder, DropFolderFile $dropFolderFileForObject, $dropFolderFileIds)
 	{
 		/* @var $dropFolderFileForObject WebexDropFolderFile */
 		parent::setData ($folder, $dropFolderFileForObject, $dropFolderFileIds);
-		$this->dropFolderId = $folder->getId();
 		$this->description = $dropFolderFileForObject->getDescription();
 		$this->webexHostId = $dropFolderFileForObject->getWebexHostId();
 	}
