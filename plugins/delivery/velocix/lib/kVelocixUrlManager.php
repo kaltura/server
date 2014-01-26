@@ -70,19 +70,46 @@ class kVelocixUrlManager extends kUrlManager
 		if(!$data)
 		{
 			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
-			return $data;
+			return false;
 		}
+		KalturaLog::debug("url return data:[$data]");
+		$explodedLine = explode("\n", $data);
 
-		$segments = explode("#EXTINF:", $data);
-		if(preg_match('/.+\.ts.*/', array_pop($segments), $matches))
+		foreach ($explodedLine as $streamUrl)
 		{
-			$tsUrl = $matches[0];
-			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			$tsUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0') !== false)
-				return true;
+			$streamUrl = trim($streamUrl);
+			if (!$streamUrl || (strpos($streamUrl, '#')===0)) continue;
+			//multi level manifest
+			if (pathinfo($streamUrl, PATHINFO_EXTENSION) == 'm3u8')
+			{
+				$manifestUrl = $this->checkIfValidUrl($streamUrl, $url);
+				$manifestUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+				$data = $this->urlExists($manifestUrl, kConf::get("hls_live_stream_content_type"));
+				if (!$data)
+					continue;
+				if ($this->checkSegments($data, $token, $url)){
+					return true;
+				}
+			}
+			//single level manifest (single bitrate)
+			else return $this->checkSegments($data, $token, $url);
 		}
-		
+		return false;
+	}
+	
+	private function checkSegments($data, $token, $url){
+		$segments = explode("\n", $data);
+		foreach ($segments as $segment)
+		{
+			$segment = trim($segment);
+			if (!$segment || (strpos($segment, '#')===0)) continue;
+			$segmentUrl = $this->checkIfValidUrl($segment, $url);
+			$segmentUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+			if ($this->urlExists($segmentUrl, kConf::get("hls_live_stream_content_type"),'0-0')){
+				KalturaLog::info("is live:[$segmentUrl]");
+				return true;
+			}
+		}
 		return false;
 	}
 }
