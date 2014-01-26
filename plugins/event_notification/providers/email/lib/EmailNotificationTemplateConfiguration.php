@@ -40,33 +40,33 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				else
 					throw new Exception(KalturaEventNotificationErrors::INVALID_TO_EMAIL);
 			}
-			if(isset($properties['cc_email']) && strlen(trim($properties['cc_email'])))
-			{
-				if (kString::isEmailString($properties['cc_email']) || $properties['cc_email']=='{creator_email}' || $properties['cc_email']=='{owner_email}')
-				{
-				$CCemail = new Kaltura_Client_Type_StringValue();
-				$CCemail->value = $properties['cc_email'];
+			
+		// here we have the possiblity to make CC an empty field
+		if(isset($properties['cc_email']) && strlen(trim($properties['cc_email'])))
+		{
+			if (!kString::isEmailString($properties['cc_email']) && $properties['cc_email'] !== '{creator_email}' && $properties['cc_email'] !== '{owner_email}')
+				throw new Exception(KalturaEventNotificationErrors::INVALID_CC_EMAIL);
+		}
 		
-				$CCname = null;
-				if(isset($properties['cc_name']) && strlen(trim($properties['cc_name'])))
-				{
-					$CCname = new Kaltura_Client_Type_StringValue();
-					$CCname->value = $properties['cc_name'];
-				}
+		$CCemail = new Kaltura_Client_Type_StringValue();
+		$CCemail->value = $properties['cc_email'];
 		
-				$CCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
-				$CCrecipient->email = $CCemail;
-				$CCrecipient->name = $CCname;
+		$CCname = null;
+		if(isset($properties['cc_name']) && strlen(trim($properties['cc_name'])))
+		{
+			$CCname = new Kaltura_Client_Type_StringValue();
+			$CCname->value = $properties['cc_name'];
+		}
 		
-				$CCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
-				$CCrecipientProvider->emailRecipients = array();
-				$CCrecipientProvider->emailRecipients[] = $CCrecipient;
+		$CCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+		$CCrecipient->email = $CCemail;
+		$CCrecipient->name = $CCname;
 		
-				$object->cc = $CCrecipientProvider;
-				}
-				else
-					throw new Exception(KalturaEventNotificationErrors::INVALID_CC_EMAIL);
-			}
+		$CCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+		$CCrecipientProvider->emailRecipients = array();
+		$CCrecipientProvider->emailRecipients[] = $CCrecipient;
+		
+		$object->cc = $CCrecipientProvider;
 		}
 		return $object;
 	}
