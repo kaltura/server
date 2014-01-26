@@ -337,7 +337,7 @@ function remove(partnerId)
 
 function changeStatusPopup( userPrompt, partnerId, status, successCallback )
 {
-	var reason = prompt( userPrompt );
+	var reason = prompt( userPrompt, "" );
 	if (reason)
 	{
 		changeStatus( partnerId, status, reason, successCallback );
