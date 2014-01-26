@@ -114,23 +114,52 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	{
 		if($job->executionAttempts > 1) // is a retry
 		{
-			if(strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath))
+			if(	strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath) 
+				&& $this->checkExtraDestFileSyncsFetched($data->extraDestFileSyncs))
 			{
 				return $this->moveFile($job, $data);
 			}
 		}
 		// creates a temp file path
 		$uniqid = uniqid('convert_');
-		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
-		$err = null;
-		if(!$this->fetchFile($data->destFileSyncRemoteUrl, $data->destFileSyncLocalPath, $err))
+		if($data->destFileSyncLocalPath)
 		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, $err, KalturaBatchJobStatus::ALMOST_DONE);
+			$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
+			$err = null;
+			if(!$this->fetchFile($data->destFileSyncRemoteUrl, $data->destFileSyncLocalPath, $err))
+			{
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, $err, KalturaBatchJobStatus::ALMOST_DONE);
+			}
+		}
+		if(count($data->extraDestFileSyncs))
+		{
+			foreach ($data->extraDestFileSyncs as $destFileSync) 
+			{
+				$ext = pathinfo($destFileSync->fileSyncLocalPath, PATHINFO_EXTENSION);
+				$destFileSync->fileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid.'.'.$ext;
+				$err = null;
+				if(!$this->fetchFile($destFileSync->fileSyncRemoteUrl, $destFileSync->fileSyncLocalPath, $err))
+				{
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, $err, KalturaBatchJobStatus::ALMOST_DONE);
+				}
+			}
 		}
 		$this->fetchFile($data->logFileSyncRemoteUrl, $data->logFileSyncLocalPath);
 		
 		return $this->moveFile($job, $data);
 		
+	}
+	
+	private function checkExtraDestFileSyncsFetched($extraDestFileSyncs = null)
+	{
+		if(!$extraDestFileSyncs || !count($extraDestFileSyncs))
+			return true;
+		foreach ($extraDestFileSyncs as $fileSync) 
+		{
+			if(!$fileSync->fileSyncLocalPath || !file_exists($fileSync->fileSyncLocalPath))
+				return false;
+		}
+		return true;
 	}
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
@@ -151,15 +180,19 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		
 		clearstatcache();
 		$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
-		rename($data->destFileSyncLocalPath, $sharedFile);
-		if(!file_exists($sharedFile) || kFile::fileSize($sharedFile) != $fileSize)
-		{
-			KalturaLog::err("Error: moving file failed");
-			die();
-		}
+		$this->moveSingleFile($data->destFileSyncLocalPath, $sharedFile);
 		
 		$data->destFileSyncLocalPath = $sharedFile;
 		$data->logFileSyncLocalPath = "$sharedFile.log";
+		
+		if(count($data->extraDestFileSyncs))
+		{
+			foreach ($data->extraDestFileSyncs as $destFileSync) 
+			{
+				$newFileName = $this->moveSingleFile($destFileSync->fileSyncLocalPath, $sharedFile, true);
+				$destFileSync->fileSyncLocalPath = $newFileName;
+			}
+		}
 		
 		if($this->checkFileExists($sharedFile, $fileSize))
 		{
@@ -174,7 +207,26 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		$updateData = new KalturaConvertJobData();
 		$updateData->destFileSyncLocalPath = $data->destFileSyncLocalPath;
 		$updateData->logFileSyncLocalPath = $data->logFileSyncLocalPath;
+		$updateData->extraDestFileSyncs = $data->extraDestFileSyncs;
+		
 		return $this->closeJob($job, null, null, $job->message, $job->status, $updateData);
+	}
+	
+	private function moveSingleFile($oldName, $newName, $setExt = false)
+	{
+		if($setExt)
+		{
+			$ext = pathinfo($oldName, PATHINFO_EXTENSION);
+			$newName = $newName.'.'.$ext;
+		}
+		$fileSize = kFile::fileSize($oldName);
+		rename($oldName, $newName);
+		if(!file_exists($newName) || kFile::fileSize($newName) != $fileSize)
+		{
+			KalturaLog::err("Error: moving file failed: ".$oldName);
+			die();
+		}
+		return $newName;
 	}
 	
 	/**
