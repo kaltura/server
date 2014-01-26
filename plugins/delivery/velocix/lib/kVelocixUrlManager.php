@@ -74,36 +74,37 @@ class kVelocixUrlManager extends kUrlManager
 		}
 		KalturaLog::debug("url return data:[$data]");
 		$explodedLine = explode("\n", $data);
-
-		foreach ($explodedLine as $streamUrl)
-		{
-			$streamUrl = trim($streamUrl);
-			if (!$streamUrl || (strpos($streamUrl, '#')===0)) continue;
-			//multi level manifest
-			if (pathinfo($streamUrl, PATHINFO_EXTENSION) == 'm3u8')
+		if (strpos($data,'#EXT-X-STREAM-INF')){
+			//handle master manifest
+			foreach ($explodedLine as $streamUrl)
 			{
+				$streamUrl = trim($streamUrl);
+				if (!$streamUrl || $streamUrl[0]=='#') continue;
 				$manifestUrl = $this->checkIfValidUrl($streamUrl, $url);
 				$manifestUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
 				$data = $this->urlExists($manifestUrl, kConf::get("hls_live_stream_content_type"));
-				if (!$data)
-					continue;
-				if ($this->checkSegments($data, $token, $url)){
+				if (!$data) continue;
+				//handle flavor manifest
+				if ($this->checkSegments($data, $token, $manifestUrl)){
 					return true;
 				}
 			}
-			//single level manifest (single bitrate)
-			else return $this->checkSegments($data, $token, $url);
+		}
+		else if (strpos($data,'#EXTINF'))
+		{
+			//handle flavor manifest
+			return $this->checkSegments($data, $token, $url);
 		}
 		return false;
 	}
 	
-	private function checkSegments($data, $token, $url){
+	private function checkSegments($data, $token, $manifestUrl){
 		$segments = explode("\n", $data);
 		foreach ($segments as $segment)
 		{
 			$segment = trim($segment);
-			if (!$segment || (strpos($segment, '#')===0)) continue;
-			$segmentUrl = $this->checkIfValidUrl($segment, $url);
+			if (!$segment || $segment[0]=='#') continue;
+			$segmentUrl = $this->checkIfValidUrl($segment, $manifestUrl);
 			$segmentUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
 			if ($this->urlExists($segmentUrl, kConf::get("hls_live_stream_content_type"),'0-0')){
 				KalturaLog::info("is live:[$segmentUrl]");
