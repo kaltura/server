@@ -21,7 +21,7 @@ class KalturaCategoryEntryAdvancedFilter extends KalturaSearchItem
 	public $orderBy;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
 	public $categoryIdEqual;
 	
@@ -73,14 +73,7 @@ class KalturaCategoryEntryAdvancedFilter extends KalturaSearchItem
 				throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoryEntryStatusIn" );
 			}
 
-			if ( $this->categoryIdEqual )
-			{
-				if ( ! is_numeric( trim( $this->categoryIdEqual ) ) )
-				{
-					throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_NUMERIC_VALUE, "categoryIdEqual" );
-				}
-			}
-			else
+			if ( ! $this->categoryIdEqual )
 			{
 				throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoryIdEqual" );
 			}

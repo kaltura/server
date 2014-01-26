@@ -24,7 +24,7 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	protected $orderBy = null;
 
 	/**
-	 * @var string
+	 * @var int
 	 */
 	protected $categoryIdEqual = null;
 
@@ -53,7 +53,7 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 
 			if ( $orderByField == self::CREATED_AT )
 			{
-				$categoryId = trim( $this->categoryIdEqual );
+				$categoryId = $this->categoryIdEqual;
 
 				// NOTE: Currently supporting a single ACTIVE status. That is the
 				//       reason why we take the categoryEntryStatusIn value as is.
@@ -126,17 +126,17 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @param string $categoryIdEqual
+	 * @param int $categoryIdEqual
 	 */
-	public function setcategoryIdEqual($categoryIdEqual)
+	public function setCategoryIdEqual($categoryIdEqual)
 	{
 		$this->categoryIdEqual = $categoryIdEqual;
 	}
 	
 	/**
-	 * @return string $categoryIdEqual
+	 * @return int $categoryIdEqual
 	 */
-	public function getcategoryIdEqual()
+	public function getCategoryIdEqual()
 	{
 		return $this->categoryIdEqual;
 	}
