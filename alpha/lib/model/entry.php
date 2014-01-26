@@ -1146,7 +1146,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$createdAt = $categoryEntry->getCreatedAt( null ); // Passing null in order to get a numerical Unix Time Stamp instead of a string
 			
 			// Get the dyn. attrib. name in the format of: cat_{cat id}_{status} (e.g.: cat_123_2)
-			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryDynamicAttributeName( $categoryEntry->getCategoryId(), $categoryEntry->getCategoryId() );
+			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryDynamicAttributeName( $categoryEntry->getCategoryId(), $categoryEntry->getStatus() );
 			
 			$dynamicAttributes[$dynAttribName] = $createdAt;
 		}
