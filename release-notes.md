@@ -25,6 +25,27 @@ Fixed broadcast path to use query string instead of slashed parameters.
 
 - deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
 
+## PlayReady, ISM Index, Smooth Protect - regression only ##
+Initial version of PlayReady, Ism Index and Smooth Protect. PlayReady and SmoothProtect plugins will not be activated. 
+This version deployed for regression purposes only.
+
+*DB Changes*
+
+- deployment/updates/sql/2013_10_22_add_drm_policy_table.sql
+- deployment/updates/sql/2013_12_10_add_drm_device_table.sql
+- deployment/updates/sql/2013_12_31_add_drm_key_table.sql
+
+*Configuration Changes*
+- update plugins.ini
+- update batch.ini
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+- deployment/updates/scripts/add_permissions/2013_12_10_add_drm_device_permissions.php 
 
 ----------
 
