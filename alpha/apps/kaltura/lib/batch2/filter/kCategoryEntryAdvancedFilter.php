@@ -30,7 +30,7 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 
 	/**
 	 * Compose a dynamic attribute field name
-	 * E.g.: dynamic_attributes.cat_32_2
+	 * E.g.: cat_32_2
 	 *
 	 * @param int $categoryId
 	 * @param int $categoryEntryStatus
@@ -38,7 +38,7 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public static function getCategoryDynamicAttributeName( $categoryId, $categoryEntryStatus )
 	{
-		return self::DYNAMIC_ATTRIBUTES . '.' . "cat_{$categoryId}_{$categoryEntryStatus}";
+		return "cat_{$categoryId}_{$categoryEntryStatus}";
 	}
 
 	/* (non-PHPdoc)
@@ -60,8 +60,8 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 				//       (*) See KalturaCategoryEntryAdvancedFilter::validateForUsage()
 				$categoryEntryStatus = trim( $this->categoryEntryStatusIn );
 		
-				$dynAttribFieldName = self::getCategoryDynamicAttributeName( $categoryId, $categoryEntryStatus );
-				$query->addNumericOrderBy( $dynAttribFieldName, $orderBy);
+				$dynAttribCriteriaFieldName = self::DYNAMIC_ATTRIBUTES . '.' . self::getCategoryDynamicAttributeName( $categoryId, $categoryEntryStatus );
+				$query->addNumericOrderBy( $dynAttribCriteriaFieldName, $orderBy);
 
 				$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryId, KalturaCriteria::IN_LIKE);
 			}
