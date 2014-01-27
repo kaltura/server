@@ -96,14 +96,14 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				/* @var $to Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient */
 				
 				$this->addElement('text', 'to_email', array(
-					'label'			=> 'Head Recipient e-mail:',
+					'label'			=> 'Recipient e-mail (TO):',
 					'value'			=> $to->email->value,
 					'filters'		=> array('StringTrim'),
 					'validators'	=> array('EmailAddress'),
 				));
 				
 				$this->addElement('text', 'to_name', array(
-					'label'			=> 'Head Recipient name:',
+					'label'			=> 'Recipient name (TO):',
 					'value'			=> $to->name->value,
 					'filters'		=> array('StringTrim'),
 				));
@@ -137,14 +137,14 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		}
 		
 		$this->addElement('text', 'cc_email', array(
-				'label'                 => 'CC Recipient e-mail:',
+				'label'                 => 'Recipient e-mail (CC):',
 				'value'                 => $CCEmailValue,
 				'filters'               => array('StringTrim'),
 				'validators'    => array('EmailAddress'),
 		));
 		
 		$this->addElement('text', 'cc_name', array(
-				'label'                 => 'CC Recipient name:',
+				'label'                 => 'Recipient name (CC):',
 				'value'                 => $CCNameValue,
 				'filters'               => array('StringTrim'),
 		));
