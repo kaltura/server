@@ -10,10 +10,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		KalturaLog::debug("Loading object type [" . get_class($object) . "] for type [$objectType]");
 		
 		if($object instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate)
-		{
-			if (!kString::isEmailString($properties['to_email']) && $properties['to_email'] !== '{creator_email}' && $properties['to_email'] !== '{owner_email}')
-				throw new Exception(KalturaEventNotificationErrors::INVALID_TO_EMAIL);
-			
+		{			
 			KalturaLog::debug("Search properties [" . print_r($properties, true) . "]");
 
 			if(isset($properties['to_email']) && strlen(trim($properties['to_email'])))
@@ -42,10 +39,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		
 		// here we have the possiblity to make CC an empty field
 		if(isset($properties['cc_email']) && strlen(trim($properties['cc_email'])))
-		{
-			if (!kString::isEmailString($properties['cc_email']) && $properties['cc_email'] !== '{creator_email}' && $properties['cc_email'] !== '{owner_email}')
-				throw new Exception(KalturaEventNotificationErrors::INVALID_CC_EMAIL);
-		
+		{	
 			$CCemail = new Kaltura_Client_Type_StringValue();
 			$CCemail->value = $properties['cc_email'];
 		
@@ -98,6 +92,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				$this->addElement('text', 'to_email', array(
 					'label'			=> 'Recipient e-mail (TO):',
 					'value'			=> $to->email->value,
+					'size'                  => 60,
 					'filters'		=> array('StringTrim'),
 					'validators'	=> array('EmailAddress'),
 				));
@@ -105,6 +100,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				$this->addElement('text', 'to_name', array(
 					'label'			=> 'Recipient name (TO):',
 					'value'			=> $to->name->value,
+					'size'                  => 60,
 					'filters'		=> array('StringTrim'),
 				));
 			}
@@ -139,6 +135,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		$this->addElement('text', 'cc_email', array(
 				'label'                 => 'Recipient e-mail (CC):',
 				'value'                 => $CCEmailValue,
+				'size'                  => 60,
 				'filters'               => array('StringTrim'),
 				'validators'    => array('EmailAddress'),
 		));
@@ -146,6 +143,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		$this->addElement('text', 'cc_name', array(
 				'label'                 => 'Recipient name (CC):',
 				'value'                 => $CCNameValue,
+				'size'                  => 60,
 				'filters'               => array('StringTrim'),
 		));
 	}
