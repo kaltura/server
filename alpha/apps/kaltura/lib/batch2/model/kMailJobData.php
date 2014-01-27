@@ -295,7 +295,7 @@ class kMailJobData extends kJobData
 		$paramsstring = '';
 		if ( is_array( $paramsArray ) ) foreach( $paramsArray as $param )
 		{
-			$paramsstring =  ( $paramsstring ? $paramsstring.'|' : '' ).$param; 
+			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param; 
 		}
 		$this->setBodyParams( $paramsstring );
 	}
@@ -314,7 +314,7 @@ class kMailJobData extends kJobData
 		$paramsstring = '';
 		if ( is_array( $paramsArray ) ) foreach( $paramsArray as $param )
 		{
-			$paramsstring =  ( $paramsstring ? $paramsstring.'|' : '' ).$param; 
+			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param; 
 		}
 		$this->setSubjectParams( $paramsstring );
 	}

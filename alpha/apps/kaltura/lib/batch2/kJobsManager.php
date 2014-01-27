@@ -200,10 +200,13 @@ class kJobsManager
 	  	$jobData = new kMailJobData();
 		$jobData->setMailPriority($mailPriority);
 	 	$jobData->setMailType($mailType);
-	 	
+		
 	 	$jobData->setFromEmail($fromEmail);
 	 	$jobData->setFromName($fromName);
 	 	
+		if ($separator)
+			$jobData->setSeparator($separator);
+		
 	 	$jobData->setBodyParamsArray($bodyParams);
 		$jobData->setSubjectParamsArray($subjectParams);
 		
@@ -218,8 +221,6 @@ class kJobsManager
 	 	$partner = PartnerPeer::retrieveByPK($partnerId);
 		$jobData->setLanguage($partner->getLanguage()); 
 	 	
-		if ($separator)
-			$jobData->separator = $separator;
 		
 		$batchJob = null;
 		if($parentJob)

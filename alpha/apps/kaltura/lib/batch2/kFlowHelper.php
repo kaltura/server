@@ -1964,10 +1964,10 @@ class kFlowHelper
 		if(!$adminName)
 			$adminName = $recipientEmail;
 
+		$jobData->setSeparator(self::BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR);
 		$jobData->setBodyParamsArray(array($adminName, $linksHtml));
 		$jobData->setRecipientEmail($recipientEmail);
 		$jobData->setSubjectParamsArray(array());
-		$jobData->setSeparator(self::BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR);
 
 		kJobsManager::addJob($dbBatchJob->createChild(BatchJobType::MAIL, $jobData->getMailType()), $jobData, BatchJobType::MAIL, $jobData->getMailType());
 
