@@ -5,7 +5,9 @@
  */
 class kVelocixUrlManager extends kUrlManager
 {
+	//limit the number of urls we check as there could be a gazillion of them
 	const MAX_SEGMENTS_TO_CHECK = 3;
+	const MAX_FLAVORS_TO_CHECK = 3;
 
 	/**
 	 * @return kUrlTokenizer
@@ -75,6 +77,7 @@ class kVelocixUrlManager extends kUrlManager
 		}
 		KalturaLog::debug("url return data:[$data]");
 		$explodedLine = explode("\n", $data);
+		$flavorsChecked = 0;
 		if (strpos($data,'#EXT-X-STREAM-INF') !== false)
 		{
 			//handle master manifest
@@ -84,6 +87,10 @@ class kVelocixUrlManager extends kUrlManager
 				if (!$streamUrl || $streamUrl[0]=='#')
 				{
 					continue;
+				}
+				if ($flavorsChecked == self::MAX_FLAVORS_TO_CHECK)
+				{
+					break;
 				}
 				$manifestUrl = $this->checkIfValidUrl($streamUrl, $url);
 				$manifestUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
@@ -97,6 +104,7 @@ class kVelocixUrlManager extends kUrlManager
 				{
 					return true;
 				}
+				++$flavorsChecked;
 			}
 		}
 		else if (strpos($data,'#EXTINF') !== false)
@@ -110,12 +118,15 @@ class kVelocixUrlManager extends kUrlManager
 	private function checkSegments($data, $token, $manifestUrl)
 	{
 		$segments = explode("\n", $data);
-		for($i=0 ; $i < self::MAX_SEGMENTS_TO_CHECK ; ++$i)
-		{
-			$segment = trim($segments[$i]);
+		$segmentsChecked = 0;
+		foreach ($segments as $segment){
 			if (!$segment || $segment[0]=='#')
 			{
 				continue;
+			}
+			if ($segmentsChecked == self::MAX_SEGMENTS_TO_CHECK)
+			{
+				break;
 			}
 			$segmentUrl = $this->checkIfValidUrl($segment, $manifestUrl);
 			$segmentUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
@@ -124,6 +135,7 @@ class kVelocixUrlManager extends kUrlManager
 				KalturaLog::info("is live:[$segmentUrl]");
 				return true;
 			}
+			++$segmentsChecked;
 		}
 		return false;
 	}
