@@ -5,6 +5,7 @@
  */
 class kVelocixUrlManager extends kUrlManager
 {
+	const MAX_SEGMENTS_TO_CHECK = 3;
 
 	/**
 	 * @return kUrlTokenizer
@@ -74,23 +75,31 @@ class kVelocixUrlManager extends kUrlManager
 		}
 		KalturaLog::debug("url return data:[$data]");
 		$explodedLine = explode("\n", $data);
-		if (strpos($data,'#EXT-X-STREAM-INF')){
+		if (strpos($data,'#EXT-X-STREAM-INF') !== false)
+		{
 			//handle master manifest
 			foreach ($explodedLine as $streamUrl)
 			{
 				$streamUrl = trim($streamUrl);
-				if (!$streamUrl || $streamUrl[0]=='#') continue;
+				if (!$streamUrl || $streamUrl[0]=='#')
+				{
+					continue;
+				}
 				$manifestUrl = $this->checkIfValidUrl($streamUrl, $url);
 				$manifestUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
 				$data = $this->urlExists($manifestUrl, kConf::get("hls_live_stream_content_type"));
-				if (!$data) continue;
+				if (!$data)
+				{
+					continue;
+				}
 				//handle flavor manifest
-				if ($this->checkSegments($data, $token, $manifestUrl)){
+				if ($this->checkSegments($data, $token, $manifestUrl))
+				{
 					return true;
 				}
 			}
 		}
-		else if (strpos($data,'#EXTINF'))
+		else if (strpos($data,'#EXTINF') !== false)
 		{
 			//handle flavor manifest
 			return $this->checkSegments($data, $token, $url);
@@ -98,15 +107,20 @@ class kVelocixUrlManager extends kUrlManager
 		return false;
 	}
 	
-	private function checkSegments($data, $token, $manifestUrl){
+	private function checkSegments($data, $token, $manifestUrl)
+	{
 		$segments = explode("\n", $data);
-		foreach ($segments as $segment)
+		for($i=0 ; $i < self::MAX_SEGMENTS_TO_CHECK ; ++$i)
 		{
-			$segment = trim($segment);
-			if (!$segment || $segment[0]=='#') continue;
+			$segment = trim($segments[$i]);
+			if (!$segment || $segment[0]=='#')
+			{
+				continue;
+			}
 			$segmentUrl = $this->checkIfValidUrl($segment, $manifestUrl);
 			$segmentUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			if ($this->urlExists($segmentUrl, kConf::get("hls_live_stream_content_type"),'0-0')){
+			if ($this->urlExists($segmentUrl, kConf::get("hls_live_stream_content_type"),'0-0'))
+			{
 				KalturaLog::info("is live:[$segmentUrl]");
 				return true;
 			}
