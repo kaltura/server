@@ -91,6 +91,11 @@ class kMailJobData extends kJobData
  	* @var bool
  	*/
     private $isHtml = true;
+	
+	/**
+	 * @var string
+	 */
+	private $separator = '|';
     
 	/**
 	 * @return the $mailType
@@ -213,6 +218,14 @@ class kMailJobData extends kJobData
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getSeparator()
+	{
+		return $this->separator;
+	}
+	
+	/**
 	 * @param $mailType the $mailType to set
 	 */
 	public function setMailType($mailType)
@@ -282,7 +295,7 @@ class kMailJobData extends kJobData
 		$paramsstring = '';
 		if ( is_array( $paramsArray ) ) foreach( $paramsArray as $param )
 		{
-			$paramsstring =  ( $paramsstring ? $paramsstring.'|' : '' ).$param; 
+			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param; 
 		}
 		$this->setBodyParams( $paramsstring );
 	}
@@ -301,7 +314,7 @@ class kMailJobData extends kJobData
 		$paramsstring = '';
 		if ( is_array( $paramsArray ) ) foreach( $paramsArray as $param )
 		{
-			$paramsstring =  ( $paramsstring ? $paramsstring.'|' : '' ).$param; 
+			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param; 
 		}
 		$this->setSubjectParams( $paramsstring );
 	}
@@ -352,5 +365,13 @@ class kMailJobData extends kJobData
 	public function setIsHtml($isHtml)
 	{
 		$this->isHtml = $isHtml;
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setSeparator ($v)
+	{
+		$this->separator = $v;
 	}
 }

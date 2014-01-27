@@ -12,6 +12,8 @@ class kFlowHelper
 		flavorParams::VIDEO_CODEC_VP8,
 	);
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
+	
+	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
 	/**
 	 * @param int $partnerId
@@ -1962,6 +1964,7 @@ class kFlowHelper
 		if(!$adminName)
 			$adminName = $recipientEmail;
 
+		$jobData->setSeparator(self::BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR);
 		$jobData->setBodyParamsArray(array($adminName, $linksHtml));
 		$jobData->setRecipientEmail($recipientEmail);
 		$jobData->setSubjectParamsArray(array());
