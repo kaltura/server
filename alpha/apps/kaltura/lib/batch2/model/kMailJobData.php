@@ -91,6 +91,11 @@ class kMailJobData extends kJobData
  	* @var bool
  	*/
     private $isHtml = true;
+	
+	/**
+	 * @var string
+	 */
+	private $separator = '|';
     
 	/**
 	 * @return the $mailType
@@ -212,6 +217,14 @@ class kMailJobData extends kJobData
 		return $this->isHtml;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getSeparator()
+	{
+		return $this->separator;
+	}
+	
 	/**
 	 * @param $mailType the $mailType to set
 	 */
@@ -352,5 +365,13 @@ class kMailJobData extends kJobData
 	public function setIsHtml($isHtml)
 	{
 		$this->isHtml = $isHtml;
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setSeparator ($v)
+	{
+		$this->separator = $v;
 	}
 }
