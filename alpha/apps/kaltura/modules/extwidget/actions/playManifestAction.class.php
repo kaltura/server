@@ -1497,7 +1497,7 @@ class playManifestAction extends kalturaAction
 		{
 		case PlaybackProtocol::SILVER_LIGHT:
 			return array(
-				array(assetParams::TAG_SLWEB),
+				array(assetParams::TAG_ISM),
 			);
 			
 		case PlaybackProtocol::APPLE_HTTP:
