@@ -30,6 +30,8 @@ class category extends Basecategory implements IIndexable
 	
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
+	const MAX_NUMBER_OF_ENTRIES_PER_CATEGORY = 10000;
+	
 	/**
 	 * Array of entries that decremented in the current session and maybe not indexed yet
 	 * @var array
@@ -1302,22 +1304,48 @@ class category extends Basecategory implements IIndexable
 		return $this->getId();
 	}
 	
+	protected function countEntriesByCriteria($entryIds) {
+		
+		// Try to retrieve from cache
+		$cacheKey = "DONT_COUNT_ENTRIES_CAT_" . $this->getId();
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
+		if ($cacheStore)
+		{
+			$countExceeded = $cacheStore->get($cacheKey);
+			if ($countExceeded)
+				return category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY;
+		}
+		
+		// Query for entry count
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		$filter->setCategoryAncestorId($this->getId());
+		$filter->setIdNotIn($entryIds);
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
+		
+		// Save the result within the cache		
+		if($count >= category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY) {
+			if ($cacheStore)
+				$cacheStore->set($cacheKey, true);
+			return category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY;
+		}
+		
+		return $count;
+	}
+	
 	/**
 	 * reset category's entriesCount by calculate it.
 	 */
 	public function reSetEntriesCount()
 	{
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
-		$filter->setLimit(1);
-		$filter->attachToCriteria($baseCriteria);
-		
-		$baseCriteria->applyFilters();
-		
-		$count = $baseCriteria->getRecordsCount();
-
+		$count = $this->countEntriesByCriteria(null);
+		if($count == category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY)
+			return;
 		$this->setEntriesCount($count);
 	}
 	
@@ -1347,16 +1375,9 @@ class category extends Basecategory implements IIndexable
 		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
 			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
 		
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn(self::$decrementedEntryIds[$this->getId()]);
-		$filter->setLimit(1);
-		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->applyFilters();
-		
-		$count = $baseCriteria->getRecordsCount();
+		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()]);
+		if($count == category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY)
+			return;
 
 		$this->setEntriesCount($count);
 	
@@ -1384,16 +1405,9 @@ class category extends Basecategory implements IIndexable
 		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
 			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
 		
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn(self::$incrementedEntryIds[$this->getId()]);
-		$filter->setLimit(1);
-		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->applyFilters();
-		
-		$count = $baseCriteria->getRecordsCount();
+		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()]);
+		if($count == category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY)
+			return;
 		$count += count(self::$incrementedEntryIds[$this->getId()]);
 		
 		$this->setEntriesCount($count);
