@@ -1308,7 +1308,7 @@ class category extends Basecategory implements IIndexable
 		
 		// Try to retrieve from cache
 		$cacheKey = "DONT_COUNT_ENTRIES_CAT_" . $this->getId();
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_EXECUTED_SERVER);
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if ($cacheStore)
 		{
 			$countExceeded = $cacheStore->get($cacheKey);
