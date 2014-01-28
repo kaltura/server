@@ -194,7 +194,7 @@ class KalturaFrontController
 	        foreach($currentParams as $key => &$val)
 	        {
 	        	if(isset($pastResults[$val]))
-					$val = $pastResults[$pastResultsIndex];
+					$val = $pastResults[$val];
 	        }
 	        
 			// cached parameters should be different when the request is part of a multirequest
