@@ -37,7 +37,7 @@ This version deployed for regression purposes only.
 
 *Configuration Changes*
 - update plugins.ini
-- update batch.ini
+  add IsmIndex plugin
 
 *Scripts*
 - run installPlugins
