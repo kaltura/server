@@ -39,8 +39,11 @@ class CategoryEntryService extends KalturaBaseService
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
 		
-		if (count($categoryEntries) >= entry::MAX_CATEGORIES_PER_ENTRY)
-			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
+		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $entry->getPartnerId()))
+			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+		if (count($categoryEntries) >= $maxCategoriesPerEntry)
+			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
 			
 		//validate user is entiteld to assign entry to this category 
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)

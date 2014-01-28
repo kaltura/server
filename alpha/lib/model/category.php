@@ -1178,19 +1178,24 @@ class category extends Basecategory implements IIndexable
 	
 	public function setPrivacyContext($v)
 	{
-		$this->validatePrivacyContextBeforeSet($v);
+		$privacyContexts = $this->buildPrivacyContexts($v);
+		$this->setPrivacyContexts($privacyContexts);
+		parent::setPrivacyContext($v);
+	}
+	
+	private function buildPrivacyContexts($privacyContext)
+	{
 		if (!$this->getParentId())
 		{
-			$this->setPrivacyContexts($v);
-			parent::setPrivacyContext($v);
-			return;
+			$this->validatePrivacyContexts(explode(',',$privacyContext));
+			return $privacyContext;
 		}
-
+		
 		$privacyContexts = array();
 		$parentCategory = $this->getParentCategory();
 		if($parentCategory)
 			$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
-		$privacyContexts[] = $v;
+		$privacyContexts[] = $privacyContext;
 		
 		$privacyContextsTrimed = array();
 		foreach($privacyContexts as $privacyContext)
@@ -1200,11 +1205,11 @@ class category extends Basecategory implements IIndexable
 		}
 
 		$privacyContextsTrimed = array_unique($privacyContextsTrimed);
+		$this->validatePrivacyContexts($privacyContextsTrimed);
 		
-		$this->setPrivacyContexts(trim(implode(',', $privacyContextsTrimed)));
-		parent::setPrivacyContext($v);
+		return trim(implode(',', $privacyContextsTrimed));		
 	}
-	
+		
 	/**
 	 * @param int $v
 	 */
@@ -1640,16 +1645,11 @@ class category extends Basecategory implements IIndexable
 		return $this->display_in_search . "P" . $this->getPartnerId();
 	}
 	
-	private function validatePrivacyContextBeforeSet($privacyContext)
+	public function validatePrivacyContexts($privacyContexts)
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 		{
-			$privacyContexts = explode(',', $this->getPrivacyContexts());
-			$newPrivacyContext = explode(',', $privacyContext);
-			
-			$unique = array_unique($privacyContexts, $newPrivacyContext);
-			
-			if(count($unique) > 1)
+			if(count($privacyContexts) > 1)
 			{
 				throw new kCoreException("Only one privacy context allowed when Disable Category Limit feature turned on", kCoreException::DISABLE_CATEGORY_LIMIT_MULTI_PRIVACY_CONTEXT_FORBIDDEN);
 			}
