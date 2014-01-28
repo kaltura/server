@@ -1,5 +1,20 @@
 ----------
 
+# IX-9.9.1 #
+
+## Media Server - DVR with edge-origin ##
+
+*Data Migration*
+
+- deployment/updates/scripts/2014_01_22_fix_broadcast_urls.php
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
+
+
+----------
+
 # IX-9.9.0 #
 
 ## Media Server - live stream recording ##
