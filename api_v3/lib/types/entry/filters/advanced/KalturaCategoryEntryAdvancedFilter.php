@@ -61,14 +61,7 @@ class KalturaCategoryEntryAdvancedFilter extends KalturaSearchItem
 				throw new KalturaAPIException( APIErrors::INVALID_FIELD_VALUE, "orderBy" );
 			}
 			
-			if ( $this->categoryEntryStatusIn )
-			{
-				if ( trim( $this->categoryEntryStatusIn ) != CategoryEntryStatus::ACTIVE )
-				{
-					throw new KalturaAPIException( APIErrors::INVALID_FIELD_VALUE, "status" );
-				}
-			}
-			else
+			if ( ! $this->categoryEntryStatusIn )
 			{
 				throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoryEntryStatusIn" );
 			}

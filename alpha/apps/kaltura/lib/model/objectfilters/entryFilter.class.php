@@ -440,7 +440,45 @@ class entryFilter extends baseObjectFilter
 
 		return implode(",", $categoryFullNamesToIds);
 	}	
-	
+
+	/**
+	 * Compose a category + status combined filter
+	 * @param mixed $commaSeparatedCatIds One or more, comma separated, numeric (not names) category ids
+	 * @param mixed|null $commaSeparatedStatuses One or more, comma separated, status ids (null will be converted to ACTIVE status)
+	 */
+	public static function categoryIdsToSphinxIds($commaSeparatedCatIds, $commaSeparatedStatuses = null)
+	{
+		$sphinxCategoryIdAndStatuses = array();
+
+		if ($commaSeparatedCatIds === "")
+		{
+			$catIds = array();
+		}
+		else
+		{
+			$catIds = explode(",", $commaSeparatedCatIds);
+		}
+
+		kArray::trim($catIds);
+
+		if($commaSeparatedStatuses == null || trim($commaSeparatedStatuses) == '')
+		{
+			$statuses = CategoryEntryStatus::ACTIVE;
+		}
+
+		$statuses = explode(',', trim($commaSeparatedStatuses));
+
+		foreach($catIds as $catId)
+		{
+			foreach ($statuses as $status)
+			{
+				$sphinxCategoryIdAndStatuses[] = entry::CATEGORY_SEARCH_PERFIX . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
+			}
+		}
+
+		return $sphinxCategoryIdAndStatuses;
+	}
+
 	/**
 	 * Convert the flavor params ids to indexed flavor params string
 	 * 

@@ -55,15 +55,12 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 			{
 				$categoryId = $this->categoryIdEqual;
 
-				// NOTE: Currently supporting a single ACTIVE status. That is the
-				//       reason why we take the categoryEntryStatusIn value as is.
-				//       (*) See KalturaCategoryEntryAdvancedFilter::validateForUsage()
-				$categoryEntryStatus = trim( $this->categoryEntryStatusIn );
-		
+				$categoryEntryStatusIn = trim( $this->categoryEntryStatusIn );
+				$categoryEntryWithStatuses = entryFilter::categoryIdsToSphinxIds( $categoryId, $categoryEntryStatusIn );
+				$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntryWithStatuses, KalturaCriteria::IN_LIKE);
+
 				$dynAttribCriteriaFieldName = self::DYNAMIC_ATTRIBUTES . '.' . self::getCategoryCreatedAtDynamicAttributeName( $categoryId );
 				$query->addNumericOrderBy( $dynAttribCriteriaFieldName, $orderBy);
-
-				$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryId, KalturaCriteria::IN_LIKE);
 			}
 		}
 		else if ( !is_null($this->categoriesMatchOr) && !is_null($this->categoryEntryStatusIn))
