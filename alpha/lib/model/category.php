@@ -30,6 +30,11 @@ class category extends Basecategory implements IIndexable
 	
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
+	const EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX = "DONT_COUNT_ENTRIES_CAT_";
+	
+	// Cache expires after 4 hours.
+	const CACHE_EXPIRY = 14400; 
+	
 	const MAX_NUMBER_OF_ENTRIES_PER_CATEGORY = 10000;
 	
 	/**
@@ -1307,13 +1312,13 @@ class category extends Basecategory implements IIndexable
 	protected function countEntriesByCriteria($entryIds) {
 		
 		// Try to retrieve from cache
-		$cacheKey = "DONT_COUNT_ENTRIES_CAT_" . $this->getId();
+		$cacheKey =  category::EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX . $this->getId();
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if ($cacheStore)
 		{
 			$countExceeded = $cacheStore->get($cacheKey);
 			if ($countExceeded)
-				return category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY;
+				return null;
 		}
 		
 		// Query for entry count
@@ -1321,7 +1326,8 @@ class category extends Basecategory implements IIndexable
 		$filter = new entryFilter();
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn($entryIds);
+		if($entryIds)
+			$filter->setIdNotIn($entryIds);
 		$filter->setLimit(1);
 		$filter->attachToCriteria($baseCriteria);
 		$baseCriteria->applyFilters();
@@ -1331,8 +1337,7 @@ class category extends Basecategory implements IIndexable
 		// Save the result within the cache		
 		if($count >= category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY) {
 			if ($cacheStore)
-				$cacheStore->set($cacheKey, true);
-			return category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY;
+				$cacheStore->set($cacheKey, true, category::CACHE_EXPIRY);
 		}
 		
 		return $count;
@@ -1344,7 +1349,7 @@ class category extends Basecategory implements IIndexable
 	public function reSetEntriesCount()
 	{
 		$count = $this->countEntriesByCriteria(null);
-		if($count == category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY)
+		if(is_null($count))
 			return;
 		$this->setEntriesCount($count);
 	}
@@ -1376,7 +1381,7 @@ class category extends Basecategory implements IIndexable
 			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
 		
 		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()]);
-		if($count == category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY)
+		if(is_null($count))
 			return;
 
 		$this->setEntriesCount($count);
@@ -1406,7 +1411,7 @@ class category extends Basecategory implements IIndexable
 			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
 		
 		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()]);
-		if($count == category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY)
+		if(is_null($count))
 			return;
 		$count += count(self::$incrementedEntryIds[$this->getId()]);
 		
