@@ -33,7 +33,7 @@ class category extends Basecategory implements IIndexable
 	const EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX = "DONT_COUNT_ENTRIES_CAT_";
 	
 	// Cache expires after 4 hours.
-	const CACHE_EXPIRY = 14400; 
+	const EXCEEDED_ENTRIES_COUNT_CACHE_EXPIRY = 14400; 
 	
 	const MAX_NUMBER_OF_ENTRIES_PER_CATEGORY = 10000;
 	
@@ -1337,7 +1337,7 @@ class category extends Basecategory implements IIndexable
 		// Save the result within the cache		
 		if($count >= category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY) {
 			if ($cacheStore)
-				$cacheStore->set($cacheKey, true, category::CACHE_EXPIRY);
+				$cacheStore->set($cacheKey, true, category::EXCEEDED_ENTRIES_COUNT_CACHE_EXPIRY);
 		}
 		
 		return $count;
@@ -1381,11 +1381,9 @@ class category extends Basecategory implements IIndexable
 			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
 		
 		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()]);
-		if(is_null($count))
-			return;
+		if(!is_null($count))
+			$this->setEntriesCount($count);
 
-		$this->setEntriesCount($count);
-	
 		if($this->getParentId())
 		{
 			$parentCat = $this->getParentCategory();
@@ -1411,11 +1409,10 @@ class category extends Basecategory implements IIndexable
 			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
 		
 		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()]);
-		if(is_null($count))
-			return;
-		$count += count(self::$incrementedEntryIds[$this->getId()]);
-		
-		$this->setEntriesCount($count);
+		if(!is_null($count)) {
+			$count += count(self::$incrementedEntryIds[$this->getId()]);
+			$this->setEntriesCount($count);
+		}
 	
 		if($this->getParentId())
 		{
