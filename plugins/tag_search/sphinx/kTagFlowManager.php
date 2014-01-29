@@ -160,9 +160,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         $tagsForUpdate = implode(',', array_diff(explode(',', $newTags), explode(',', $oldTags)));
         
         if ($oldTags && $oldTags != "")
-            self::decrementExistingTagsInstanceCount($tagsForDelete, $object->getPartnerId(), get_class($object), $privacyContexts);
+            self::decrementExistingTagsInstanceCount($tagsForDelete, $object->getPartnerId(), get_class($object), isset($privacyContexts) ? $privacyContexts : null);
 
-        self::addOrIncrementTags($tagsForUpdate, $object->getPartnerId(), get_class($object), $privacyContexts);
+        self::addOrIncrementTags($tagsForUpdate, $object->getPartnerId(), get_class($object), isset($privacyContexts) ? $privacyContexts : null);
     }
 
 	/* (non-PHPdoc)
