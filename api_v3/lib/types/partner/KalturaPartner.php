@@ -303,12 +303,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $partnerParentId;
 
-	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $statusChangeReason;
-
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
@@ -317,7 +311,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks', 
-		'host', 'cdnHost', 'rtmpUrl', 'isFirstLogin', 'logoutUrl', 'partnerParentId', 'statusChangeReason',
+		'host', 'cdnHost', 'rtmpUrl', 'isFirstLogin', 'logoutUrl', 'partnerParentId',
 	);
 	
 	public function getMapBetweenObjects ( )
