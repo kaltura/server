@@ -11,15 +11,13 @@ abstract class KalturaAssetService extends KalturaBaseService
 	/**
 	 * @var array of all entry types that extend from media
 	 */
-	protected $mediaTypes;
 	
-	public function initService($serviceId, $serviceName, $actionName)
+	protected function getEnabledMediaTypes()
 	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		
-    	$this->mediaTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
+		$mediaTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::MEDIA_CLIP);
+		return $mediaTypes;
 	}
-	
+		
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::setPartnerFilters()
 	 */

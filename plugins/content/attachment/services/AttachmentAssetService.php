@@ -19,6 +19,15 @@ class AttachmentAssetService extends KalturaAssetService
 		$this->applyPartnerFilterForClass('assetParams');
 	}
 	
+	protected function getEnabledMediaTypes()
+	{
+		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
+		
+		$mediaTypes = array_merge($mediaClipTypes, parent::getEnabledMediaTypes());
+		$mediaTypes = array_unique($mediaTypes);
+		return $mediaTypes;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerRequired()
 	 */
@@ -67,7 +76,7 @@ class AttachmentAssetService extends KalturaAssetService
     function addAction($entryId, KalturaAttachmentAsset $attachmentAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
 		
@@ -108,7 +117,7 @@ class AttachmentAssetService extends KalturaAssetService
    			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
 		
 		
@@ -151,7 +160,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
 		
 		
@@ -532,7 +541,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 	
 		$dbEntry = $attachmentAssetDb->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->mediaTypes))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $attachmentAssetDb->getEntryId());
 		
 		
