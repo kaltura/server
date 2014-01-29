@@ -488,7 +488,80 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return true;
 	}
 	
-	
+	public static function getRoleIds($ksString, $ksPartnerId, Partner $operatingPartner = null, kuser $kuser = null, $isAdminSession)
+	{
+		$roleIds = null;
+
+		$ks = ks::fromSecureString($ksString);
+		$ksSetRoleId = $ks->getSetRole();
+
+		if ($ksSetRoleId)
+		{
+			if ($ksSetRoleId == 'null')
+			{
+				return null;
+			}
+			//check if role exists
+			$c = new Criteria();
+			$c->addAnd(is_numeric($ksSetRoleId) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME
+				, $ksSetRoleId, Criteria::EQUAL);
+			$c->addAnd(UserRolePeer::PARTNER_ID, array($ksPartnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$roleId = UserRolePeer::doSelectOne($c);
+
+			if ($roleId){
+				$roleIds = $roleId->getId();
+			}else{
+				KalturaLog::debug("Role id [$ksSetRoleId] does not exists");
+				throw new kCoreException("Unknown role Id [$ksSetRoleId]", kCoreException::ID_NOT_FOUND);
+			}
+		}
+
+		// if user is defined -> get his role IDs
+		if (!$roleIds && $kuser) {
+			$roleIds = $kuser->getRoleIds();
+		}
+
+		// if user has no defined roles or no user is defined -> get default role IDs according to session type (admin/not)
+		if (!$roleIds)
+		{
+			if (!$operatingPartner)
+			{
+				// use system default roles
+				if ($ks->isWidgetSession()) {
+					$strId = UserRoleId::WIDGET_SESSION_ROLE;
+				}
+				elseif ($isAdminSession) {
+					$strId = UserRoleId::PARTNER_ADMIN_ROLE;
+				}
+				else {
+					$strId = UserRoleId::BASE_USER_SESSION_ROLE;
+				}
+
+				$roleIds = UserRolePeer::getIdByStrId ($strId);
+			}
+			else
+			{
+				if ($ks->isWidgetSession()){
+					//there is only one partner widget role defined in the system
+					$roleIds = $operatingPartner->getWidgetSessionRoleId();
+				}
+				elseif ($isAdminSession) {
+					// there is only one partner admin role defined in the system
+					$roleIds = $operatingPartner->getAdminSessionRoleId();
+				}
+				else {
+					// a partner may have special defined user session roles - get them from partner object
+					$roleIds = $operatingPartner->getUserSessionRoleId();
+				}
+			}
+		}
+
+		if ($roleIds) {
+			$roleIds = explode(',', trim($roleIds, ','));
+		}
+
+		return $roleIds;
+	}
 	
 	private static function initRoleIds()
 	{
@@ -499,78 +572,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			return;		// no partner or session -> no role
 		}
-		
-		$roleIds = null;
 
-		$ks = ks::fromSecureString(self::$ksString);
-		$ksSetRoleId = $ks->getSetRole();
-
-		if ($ksSetRoleId)
-		{
-			if ($ksSetRoleId == 'null')
-			{
-				return;
-			}
-			//check if role exists
-			$c = new Criteria();
-			$c->addAnd(is_numeric($ksSetRoleId) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME
-				, $ksSetRoleId, Criteria::EQUAL);
-			$c->addAnd(UserRolePeer::PARTNER_ID, array(self::$ksPartnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
-			$roleId = UserRolePeer::doSelectOne($c);
-			
-			if ($roleId){
-				$roleIds = $roleId->getId();
-			}else{
-				KalturaLog::debug("Role id [$ksSetRoleId] does not exists");
-				throw new kCoreException("Unknown role Id [$ksSetRoleId]", kCoreException::ID_NOT_FOUND);
-			}
-		}
-		
-		// if user is defined -> get his role IDs
-		if (!$roleIds && self::$kuser) {
-			$roleIds = self::$kuser->getRoleIds();
-		}
-		
-		// if user has no defined roles or no user is defined -> get default role IDs according to session type (admin/not)
-		if (!$roleIds)
-		{
-			if (!self::$operatingPartner)
-			{
-				// use system default roles
-				if ($ks->isWidgetSession()) {
-					$strId = UserRoleId::WIDGET_SESSION_ROLE;
-				}
-				elseif (self::$adminSession) {
-					$strId = UserRoleId::PARTNER_ADMIN_ROLE;
-				}
-				else {
-					$strId = UserRoleId::BASE_USER_SESSION_ROLE;
-				}
-				
-				$roleIds = UserRolePeer::getIdByStrId ($strId);
-			}
-			else
-			{
-				if ($ks->isWidgetSession()){
-					//there is only one partner widget role defined in the system
-                    $roleIds = self::$operatingPartner->getWidgetSessionRoleId();
-				}
-				elseif (self::$adminSession) {
-					// there is only one partner admin role defined in the system
-					$roleIds = self::$operatingPartner->getAdminSessionRoleId();
-				}
-				else {
-					// a partner may have special defined user session roles - get them from partner object
-					$roleIds = self::$operatingPartner->getUserSessionRoleId();
-				}
-			}
-		}
-		
-		if ($roleIds) {
-			$roleIds = explode(',', trim($roleIds, ','));
-		}
-		
-		self::$roleIds = $roleIds;
+		self::$roleIds = self::getRoleIds(self::$ksString, self::$ksPartnerId, self::$operatingPartner, self::$kuser, self::$adminSession);
 	}
 	
 	
