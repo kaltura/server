@@ -24,6 +24,8 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 	{
 		if($this->actionName == 'list' && $peer == 'assetParams')
 			return $this->partnerGroup . ',0';
+		if($this->actionName == 'update' && $peer == 'assetParams')	
+			return $this->partnerGroup . ',0';
 			
 		return $this->partnerGroup;
 	}
