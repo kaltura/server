@@ -35,36 +35,38 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 				
 				$object->to = $recipientProvider;
 			}
-		}
-		
-		// here we have the possiblity to make CC an empty field
-		if(isset($properties['cc_email']) && strlen(trim($properties['cc_email'])))
-		{	
-			$CCemail = new Kaltura_Client_Type_StringValue();
-			$CCemail->value = $properties['cc_email'];
-		
-			$CCname = null;
-			if(isset($properties['cc_name']) && strlen(trim($properties['cc_name'])))
+			else   //return special null so we can update to null
 			{
-				$CCname = new Kaltura_Client_Type_StringValue();
-				$CCname->value = $properties['cc_name'];
+				$object->to =  Kaltura_Client_ClientBase::getKalturaNullValue();
 			}
+			
+			if(isset($properties['cc_email']) && strlen(trim($properties['cc_email'])))
+			{	
+				$CCemail = new Kaltura_Client_Type_StringValue();
+				$CCemail->value = $properties['cc_email'];
 		
-			$CCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
-			$CCrecipient->email = $CCemail;
-			$CCrecipient->name = $CCname;
+				$CCname = null;
+				if(isset($properties['cc_name']) && strlen(trim($properties['cc_name'])))
+				{
+					$CCname = new Kaltura_Client_Type_StringValue();
+					$CCname->value = $properties['cc_name'];
+				}
+			
+				$CCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+				$CCrecipient->email = $CCemail;
+				$CCrecipient->name = $CCname;
 		
-			$CCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
-			$CCrecipientProvider->emailRecipients = array();
-			$CCrecipientProvider->emailRecipients[] = $CCrecipient;
+				$CCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+				$CCrecipientProvider->emailRecipients = array();
+				$CCrecipientProvider->emailRecipients[] = $CCrecipient;
 		
-			$object->cc = $CCrecipientProvider;
+				$object->cc = $CCrecipientProvider;
+			}
+			else   //return special null so we can update to null
+			{
+				$object->cc =  Kaltura_Client_ClientBase::getKalturaNullValue();
+			}
 		}
-		else   //return special null so we can update to null
-		{
-			$object->cc =  Kaltura_Client_ClientBase::getKalturaNullValue();
-		}
-		
 		return $object;
 	}
 	
@@ -78,6 +80,8 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if(!($object instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate))
 			return;
 		
+		$to = null;
+		
 		if($object->to && $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
 			if(count($object->to->emailRecipients) > 1)
@@ -88,23 +92,35 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			{
 				$to = reset($object->to->emailRecipients);
 				/* @var $to Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient */
-				
-				$this->addElement('text', 'to_email', array(
-					'label'			=> 'Recipient e-mail (TO):',
-					'value'			=> $to->email->value,
-					'size'                  => 60,
-					'filters'		=> array('StringTrim'),
-					'validators'	=> array('EmailAddress'),
-				));
-				
-				$this->addElement('text', 'to_name', array(
-					'label'			=> 'Recipient name (TO):',
-					'value'			=> $to->name->value,
-					'size'                  => 60,
-					'filters'		=> array('StringTrim'),
-				));
 			}
 		}
+		
+		if ($to)
+		{
+			$TOEmailValue = $to->email->value ;
+			$TONameValue = $to->name->value ;
+		}
+		else
+		{
+			$TOEmailValue = '' ;
+			$TONameValue = '' ;
+		}
+				
+		$this->addElement('text', 'to_email', array(
+				'label'			=> 'Recipient e-mail (TO):',
+				'value'			=> $TOEmailValue,
+				'size'                  => 60,
+				'filters'		=> array('StringTrim'),
+				'validators'	=> array('EmailAddress'),
+		));
+				
+		$this->addElement('text', 'to_name', array(
+				'label'			=> 'Recipient name (TO):',
+				'value'			=> $TONameValue,
+				'size'                  => 60,
+				'filters'		=> array('StringTrim'),
+		));
+		
 		
 		$cc = null;
 		
