@@ -74,7 +74,11 @@ class kMemcacheCacheWrapper extends kBaseCacheWrapper
 			self::safeLog("got timeout error while connecting to memcache...");
 		}
 
-		self::safeLog("connect took - ". (microtime(true) - $connStart). " seconds to {$this->hostName}:{$this->port} attempts {$this->connectAttempts}");
+		$connTook = microtime(true) - $connStart;
+		self::safeLog("connect took - {$connTook} seconds to {$this->hostName}:{$this->port} attempts {$this->connectAttempts}");
+		
+		if (class_exists("KalturaMonitorClient"))
+			KalturaMonitorClient::monitorConnTook($this->hostName, $connTook);
 
 		if (!$connectResult)
 		{
