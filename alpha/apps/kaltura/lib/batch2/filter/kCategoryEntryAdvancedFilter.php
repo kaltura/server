@@ -46,31 +46,33 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public function applyCondition(IKalturaDbQuery $query)
 	{
+		// Fetch the list of categories
+		// (*) If categoryEntryStatusIn is null it will default to ACTIVE
+		$categoryEntries = null;
+		if ( $this->categoriesMatchOr )
+		{
+			$categoryEntries = entryFilter::categoryFullNamesToIdsParsed ($this->categoriesMatchOr, $this->categoryEntryStatusIn );
+		}
+		else
+		{
+			$categoryEntries = entryFilter::categoryIdsToSphinxIds( $this->categoryIdEqual, $this->categoryEntryStatusIn );
+		}
+
+		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntries, KalturaCriteria::IN_LIKE);
+
+
 		if ( $this->orderBy )
 		{
 			$orderByField = substr($this->orderBy, 1);
 			$orderBy = $this->orderBy[0] == '+' ? Criteria::ASC : Criteria::DESC;
 
-			if ( $orderByField == self::CREATED_AT )
+			if ( $orderByField != self::CREATED_AT )
 			{
-				$categoryId = $this->categoryIdEqual;
-
-				$categoryEntryStatusIn = trim( $this->categoryEntryStatusIn );
-				$categoryEntryWithStatuses = entryFilter::categoryIdsToSphinxIds( $categoryId, $categoryEntryStatusIn );
-				$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntryWithStatuses, KalturaCriteria::IN_LIKE);
-
-				$dynAttribCriteriaFieldName = self::DYNAMIC_ATTRIBUTES . '.' . self::getCategoryCreatedAtDynamicAttributeName( $categoryId );
-				$query->addNumericOrderBy( $dynAttribCriteriaFieldName, $orderBy);
+				throw new kCoreException( "Unsupported orderBy criteria [$orderByField]" );
 			}
-		}
-		else if ( !is_null($this->categoriesMatchOr) && !is_null($this->categoryEntryStatusIn))
-		{
-			$categoriesTocategoryEntryStatus = entryFilter::categoryFullNamesToIdsParsed ($this->categoriesMatchOr, $this->categoryEntryStatusIn );
 
-			if($categoriesTocategoryEntryStatus == '')
-				$categoriesTocategoryEntryStatus = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
-		
-		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, explode(',', $categoriesTocategoryEntryStatus), KalturaCriteria::IN_LIKE);
+			$dynAttribCriteriaFieldName = self::DYNAMIC_ATTRIBUTES . '.' . self::getCategoryCreatedAtDynamicAttributeName( $this->categoryIdEqual );
+			$query->addNumericOrderBy( $dynAttribCriteriaFieldName, $orderBy);
 		}
 	}
 	

@@ -54,34 +54,22 @@ class KalturaCategoryEntryAdvancedFilter extends KalturaSearchItem
 	{
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 
-		if ( $this->orderBy )
-		{
-			$orderByField = substr($this->orderBy, 1);
-			if ( $orderByField !== kCategoryEntryAdvancedFilter::CREATED_AT )
-			{
-				throw new KalturaAPIException( APIErrors::INVALID_FIELD_VALUE, "orderBy" );
-			}
-			
-			if ( ! $this->categoryEntryStatusIn )
-			{
-				throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoryEntryStatusIn" );
-			}
+		$categoriesMatchOrIsNull = is_null($this->categoriesMatchOr);
+		$categoryIdEqualIsNull = is_null($this->categoryIdEqual);
+		$orderByIsNull = is_null( $this->orderBy );
 
-			if ( ! $this->categoryIdEqual )
-			{
-				throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoryIdEqual" );
-			}
-		}
-		else if ( !is_null($this->categoriesMatchOr) && !is_null($this->categoryEntryStatusIn))
+		if ( $categoriesMatchOrIsNull && $categoryIdEqualIsNull )
 		{
-			if ( $categoryIdEqual )
-			{
-				throw new KalturaAPIException( APIErrors::INVALID_FIELD_VALUE, "categoryIdEqual" ); // Must be null in this scenario
-			}
+			throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoriesMatchOr / categoryIdEqual" );
 		}
-		else
+		else if ( !$categoriesMatchOrIsNull && !$categoryIdEqualIsNull )
 		{
-			throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoriesMatchOr / orderBy" );
+			throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, "categoriesMatchOr / categoryIdEqual" );
+		}
+		else if ( !$orderByIsNull && !$categoriesMatchOrIsNull )
+		{
+			// categoriesMatchOr may yield a hierarchy of category entries, thus may not be used in conjunction with orderBy
+			throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, "categoriesMatchOr / orderBy" );
 		}
 	}
 }
