@@ -7276,8 +7276,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
     public function getSourceType()
   	{
-   		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
-   	 	$constants = $reflect->getConstantsValues();
    	 	$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getSource());
    	 	
    	 	return (string)$sourceApi;
