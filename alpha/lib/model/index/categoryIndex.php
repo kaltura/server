@@ -5,6 +5,14 @@
 */
 class categoryIndex extends BaseIndexObject
 {
+	const FREE_TEXT = "free_text";
+
+	const NAME_REFERENCE_ID = "name_reference_id";
+
+	const PLUGINS_DATA = "plugins_data";
+
+	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
+
 	public static function getObjectName()
 	{
 		return 'category';

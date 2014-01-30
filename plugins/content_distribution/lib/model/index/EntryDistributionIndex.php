@@ -5,6 +5,12 @@
 */
 class EntryDistributionIndex extends BaseIndexObject
 {
+	const NEXT_REPORT = "next_report";
+
+	const STR_ENTRY_ID = "str_entry_id";
+
+	const INT_ENTRY_ID = "int_entry_id";
+
 	public static function getObjectName()
 	{
 		return 'entry_distribution';
