@@ -445,6 +445,7 @@ class entryFilter extends baseObjectFilter
 	 * Compose a category + status combined filter
 	 * @param mixed $commaSeparatedCatIds One or more, comma separated, numeric (not names) category ids
 	 * @param mixed|null $commaSeparatedStatuses One or more, comma separated, status ids (null will be converted to ACTIVE status)
+	 * @return string Comma separated Sphinx IDs
 	 */
 	public static function categoryIdsToSphinxIds($commaSeparatedCatIds, $commaSeparatedStatuses = null)
 	{
@@ -463,7 +464,7 @@ class entryFilter extends baseObjectFilter
 
 		if($commaSeparatedStatuses == null || trim($commaSeparatedStatuses) == '')
 		{
-			$statuses = CategoryEntryStatus::ACTIVE;
+			$commaSeparatedStatuses = CategoryEntryStatus::ACTIVE;
 		}
 
 		$statuses = explode(',', trim($commaSeparatedStatuses));
@@ -476,7 +477,7 @@ class entryFilter extends baseObjectFilter
 			}
 		}
 
-		return $sphinxCategoryIdAndStatuses;
+		return implode(",", $sphinxCategoryIdAndStatuses);
 	}
 
 	/**
