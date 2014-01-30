@@ -507,15 +507,21 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
-		$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $dbBatchJob->getMessage());
+		$shouldSave = false;
+		if(!is_null($data->getEngineMessage())) {
+			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$shouldSave = true;
+		}
 
 		$flavorParamsOutput = $data->getFlavorParamsOutput();
 		
-		if($data->getDestFileSyncLocalPath())
-		{
-		$flavorAsset->incrementVersion();
-		$flavorAsset->save();
-		}
+		if($data->getDestFileSyncLocalPath()) {
+			$flavorAsset->incrementVersion();
+			$shouldSave = true;
+		}		
+		
+		if($shouldSave)
+			$flavorAsset->save();
 		
 		if(count($data->getExtraDestFileSyncs()))
 		{
@@ -940,10 +946,10 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		$description = $flavorAsset->getDescription();
-		$description .= "\n" . $dbBatchJob->getMessage();
-		$flavorAsset->setDescription($description);
-		$flavorAsset->save();
+		if(!is_null($data->getEngineMessage())) {
+			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$flavorAsset->save();
+		}
 
 		// creats the file sync
 		if(file_exists($data->getLogFileSyncLocalPath()))

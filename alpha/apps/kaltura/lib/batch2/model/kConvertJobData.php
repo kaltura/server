@@ -55,6 +55,11 @@ class kConvertJobData extends kConvartableJobData
 	private $extraDestFileSyncs;	
 	
 	/**
+	 * @var string
+	 */
+	private $engineMessage;
+	
+	/**
 	 * @return the $destFileSyncLocalPath
 	 */
 	public function getDestFileSyncLocalPath()
@@ -287,5 +292,22 @@ class kConvertJobData extends kConvartableJobData
 	 */
 	public function setExtraDestFileSyncs($destFileSyncs) {
 		$this->extraDestFileSyncs = $destFileSyncs;
-	}	
+	}
+	
+	/**
+	 * @return the $engineMessage
+	 */
+	public function getEngineMessage() {
+		return $this->engineMessage;
+	}
+
+	/**
+	 * @param string $engineMessage
+	 */
+	public function setEngineMessage($engineMessage) {
+		$this->engineMessage = $engineMessage;
+	}
+	
+	
+	
 }

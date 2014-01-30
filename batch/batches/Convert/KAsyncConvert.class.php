@@ -207,9 +207,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			$this->stopMonitor();
 				
 			$jobMessage = "engine [" . get_class($this->operationEngine) . "] converted successfully. ";
-			if($this->operationEngine->getMessage())
-				$jobMessage =  " Engine message [ " . $jobMessage.$this->operationEngine->getMessage() . "]";
-				
+			
 			if(!$isDone)
 			{
 				return $this->closeJob($job, null, null, $jobMessage, KalturaBatchJobStatus::ALMOST_DONE, $data);
@@ -222,6 +220,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		}
 		catch(KOperationEngineException $e)
 		{
+			$data = $this->operationEngine->getData();
 			$log = $this->operationEngine->getLogData();
 			//removing unsuported XML chars
 			$log  = preg_replace('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u','',$log);
@@ -237,9 +236,8 @@ class KAsyncConvert extends KJobHandlerWorker
 				}
 			}
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
-			if($this->operationEngine->getMessage())
-				$err .= " Engine message [ " . $this->operationEngine->getMessage() . "]";
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED);
+		
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED, $data);
 		}
 	}
 
@@ -328,11 +326,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			$data->logFileSyncLocalPath = '';
 		}
 		
-		$jobMessage = $job->message;
-		if($this->operationEngine->getMessage())
-				$jobMessage .=  " Engine message [ " . $this->operationEngine->getMessage() . "]";
-		
-		return $this->closeJob($job, null, null, $jobMessage, $job->status, $data);
+		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
 	
 	private function moveExtraFiles(KalturaConvertJobData &$data, $sharedFile)

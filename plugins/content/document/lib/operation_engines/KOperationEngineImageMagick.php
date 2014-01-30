@@ -71,11 +71,11 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		// - Test file type
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
 		if(!is_null($errorMsg))
-			$this->message = $errorMsg;
+			$this->data->engineMessage = $errorMsg;
 		
 		// Test password required
 		if($this->testPasswordRequired($realInFilePath)) {
-			$this->message = "Password required.";
+			$this->data->engineMessage = "Password required.";
 		}
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
@@ -87,7 +87,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		$firstImage = $outDirPath . DIRECTORY_SEPARATOR . $imagesList[0];
 		$errorMsg = $this->testBlackImage($identifyExe, $firstImage, $errorMsg);
 		if(!is_null($errorMsg)) {
-			$this->message = $errorMsg;
+			$this->data->engineMessage = $errorMsg;
 		}
 		
 		$imagesListXML = $this->createImagesListXML($imagesList);
