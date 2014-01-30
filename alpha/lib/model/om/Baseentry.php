@@ -7268,28 +7268,21 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collwidgets = null;
 		$this->collassetParamsOutputs = null;
 		$this->collassets = null;
-			$this->akshow = null;
-			$this->akuser = null;
-			$this->aaccessControl = null;
-			$this->aconversionProfile2 = null;
+		$this->akshow = null;
+		$this->akuser = null;
+		$this->aaccessControl = null;
+		$this->aconversionProfile2 = null;
 	}
 
-	protected function getSourceType(entry $entry)
-	{
-		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
-		$constants = $reflect->getConstantsValues();
-		$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $entry->getSource());
-		if(! in_array($sourceApi, $constants))
-		{
-			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
-			$this->searchProviderType = $sourceApi;
-		}
-		else
-		{
-			$this->sourceType = $sourceApi;
-			$this->searchProviderType = null;
-		}
-	}
+    public function getSourceType()
+  	{
+   		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
+   	 	$constants = $reflect->getConstantsValues();
+   	 	$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getSource());
+   	 	
+   	 	return (string)$sourceApi;
+    }
+	
 	
 	/* ---------------------- CustomData functions ------------------------- */
 
