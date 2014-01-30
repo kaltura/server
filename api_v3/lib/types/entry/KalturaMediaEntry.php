@@ -126,6 +126,14 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 		return $entry;
 	}
 	
+	//adding source field to props_to_skip because of setter & getter different return value
+	public function toUpdatableObject( $object_to_fill , $props_to_skip = array() )
+	{
+		$props_to_skip[] = 'source';
+			
+		return parent::toUpdatableObject($object_to_fill , $props_to_skip);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject($object_to_fill, $props_to_skip)
 	 */
