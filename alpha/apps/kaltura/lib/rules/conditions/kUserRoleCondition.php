@@ -24,6 +24,8 @@ class kUserRoleCondition extends kCondition
 	 */
 	public function setRoleIds($roleIds)
 	{
+		if (is_string($roleIds))
+			$roleIds = array_map('trim', explode(',', $roleIds));
 		$this->roleIds = $roleIds;
 	}
 
