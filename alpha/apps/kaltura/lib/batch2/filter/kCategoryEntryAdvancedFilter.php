@@ -58,6 +58,14 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 			$categoryEntries = entryFilter::categoryIdsToSphinxIds( $this->categoryIdEqual, $this->categoryEntryStatusIn );
 		}
 
+		if ( $categoryEntries == '' )
+		{
+			// Set a non-exiting cat. id. in order to return empty results (instead of throwing an exception)
+			$categoryEntries = category::CATEGORY_ID_THAT_DOES_NOT_EXIST;
+		}
+
+		$categoryEntries = explode( ',', $categoryEntries );
+
 		$query->addColumnWhere(entryPeer::CATEGORIES_IDS, $categoryEntries, KalturaCriteria::IN_LIKE);
 
 
