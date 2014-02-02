@@ -23,7 +23,7 @@ class AttachmentAssetService extends KalturaAssetService
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
 		
-		$mediaTypes = array_merge($mediaClipTypes, parent::getEnabledMediaTypes());
+		$mediaTypes = array_merge($liveStreamTypes, parent::getEnabledMediaTypes());
 		$mediaTypes = array_unique($mediaTypes);
 		return $mediaTypes;
 	}
