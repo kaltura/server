@@ -45,6 +45,5 @@ class KalturaUserRoleCondition extends KalturaCondition
 	{
 		/** @var $srcObj kUserRoleCondition */
 		parent::fromObject($srcObj);
-		$this->roleIds = implode(',', $srcObj->getRoleIds());
 	}
 }

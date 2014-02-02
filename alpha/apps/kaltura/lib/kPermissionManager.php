@@ -488,9 +488,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return true;
 	}
 	
-	public static function getRoleIds($ksString, $ksPartnerId, Partner $operatingPartner = null, kuser $kuser = null, $isAdminSession)
+	public static function getRoleIds(Partner $operatingPartner = null, kuser $kuser = null)
 	{
 		$roleIds = null;
+		$ksString = kCurrentContext::$ks;
+		$isAdminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 
 		$ks = ks::fromSecureString($ksString);
 		$ksSetRoleId = $ks->getSetRole();
@@ -501,6 +503,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			{
 				return null;
 			}
+			$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
 			//check if role exists
 			$c = new Criteria();
 			$c->addAnd(is_numeric($ksSetRoleId) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME
@@ -573,7 +576,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return;		// no partner or session -> no role
 		}
 
-		self::$roleIds = self::getRoleIds(self::$ksString, self::$ksPartnerId, self::$operatingPartner, self::$kuser, self::$adminSession);
+		self::$roleIds = self::getRoleIds(self::$operatingPartner, self::$kuser);
 	}
 	
 	

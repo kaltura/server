@@ -15,22 +15,20 @@ class kUserRoleCondition extends kCondition
 	}
 	
 	/**
-	 * @var array
+	 * @var string
 	 */
 	protected $roleIds;
 
 	/**
-	 * @param array $roleIds
+	 * @param string $roleIds
 	 */
 	public function setRoleIds($roleIds)
 	{
-		if (is_string($roleIds))
-			$roleIds = array_map('trim', explode(',', $roleIds));
 		$this->roleIds = $roleIds;
 	}
 
 	/**
-	 * @return array
+	 * @return string
 	 */
 	public function getRoleIds()
 	{
@@ -43,12 +41,12 @@ class kUserRoleCondition extends kCondition
 	protected function internalFulfilled(kScope $scope)
 	{
 		$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
-		$roleIds = kPermissionManager::getRoleIds(kCurrentContext::$ks, kCurrentContext::$ks_partner_id, $partner, kCurrentContext::$ks_kuser, kCurrentContext::$is_admin_session);
+		$roleIds = kPermissionManager::getRoleIds($partner, kCurrentContext::$ks_kuser);
+		$conditionRoleIds = array_map('trim', explode(',', $this->roleIds));
 
-		// all defined roles must exist in current session for the condition to fulfill
-		foreach($this->roleIds as $roleId)
+		foreach($roleIds as $roleId)
 		{
-			if (!in_array($roleId, $roleIds))
+			if (!in_array($roleId, $conditionRoleIds))
 			{
 				return false;
 			}
