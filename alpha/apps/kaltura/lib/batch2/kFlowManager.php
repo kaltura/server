@@ -563,6 +563,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return true;
 			}
 			
+		if($object instanceof FileSync
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED)
+			{
+				return true;
+			}
 		return false;
 	}
 
@@ -613,6 +619,22 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$filter = new kuserFilter();
 			$filter->set('_eq_role_ids', $object->getId());
 			kJobsManager::addIndexJob($object->getPartnerId(), IndexObjectType::USER, $filter, false);
+			return true;
+		}
+		
+		if($object instanceof FileSync)
+		{
+			$c = new Criteria();
+			$c->add ( BatchJobPeer::OBJECT_ID , $object->getId() );
+			$c->add ( BatchJobPeer::OBJECT_TYPE , BatchJobObjectType::FILE_SYNC );
+			$c->add ( BatchJobPeer::JOB_TYPE , BatchJobType::FILESYNC_IMPORT );
+			$c->add (BatchJobPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_PENDING), Criteria::IN);		
+			$fileSyncImportJobs = BatchJobPeer::doSelect( $c );
+
+			foreach ($fileSyncImportJobs as $fileSyncImportJob) 
+			{
+				kJobsManager::abortDbBatchJob($fileSyncImportJob);
+			}
 			return true;
 		}
 		
