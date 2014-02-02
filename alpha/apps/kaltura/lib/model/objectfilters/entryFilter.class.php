@@ -456,7 +456,7 @@ class entryFilter extends baseObjectFilter
 	/**
 	 * Compose a category + status combined filter
 	 * @param mixed $commaSeparatedCatIds One or more, comma separated, numeric (not names) category ids
-	 * @param mixed|null $commaSeparatedStatuses One or more, comma separated, status ids (null will be converted to ACTIVE status)
+	 * @param mixed|null $commaSeparatedStatuses One or more, comma separated, status ids. null = no status filtering (default criteria still applies)
 	 * @return string Comma separated Sphinx IDs
 	 */
 	public static function categoryIdsToSphinxIds($commaSeparatedCatIds, $commaSeparatedStatuses = null)
@@ -474,18 +474,28 @@ class entryFilter extends baseObjectFilter
 
 		kArray::trim($catIds);
 
-		if($commaSeparatedStatuses == null || trim($commaSeparatedStatuses) == '')
+		$commaSeparatedStatuses = trim( $commaSeparatedStatuses );
+		if ( empty( $commaSeparatedStatuses ) )
 		{
-			$commaSeparatedStatuses = CategoryEntryStatus::ACTIVE;
+			$statuses = null;
+		}
+		else
+		{
+			$statuses = explode( ",", $commaSeparatedStatuses );
 		}
 
-		$statuses = explode(',', trim($commaSeparatedStatuses));
-
-		foreach($catIds as $catId)
+		foreach ( $catIds as $catId )
 		{
-			foreach ($statuses as $status)
+			if ( $statuses )
 			{
-				$sphinxCategoryIdAndStatuses[] = entry::CATEGORY_SEARCH_PERFIX . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
+				foreach ( $statuses as $status )
+				{
+					$sphinxCategoryIdAndStatuses[] = entry::CATEGORY_SEARCH_PERFIX . $catId . entry::CATEGORY_SEARCH_STATUS . $status;
+				}
+			}
+			else
+			{
+				$sphinxCategoryIdAndStatuses[] = $catId; // The cat. id AS-IS, no status filtering applied
 			}
 		}
 
