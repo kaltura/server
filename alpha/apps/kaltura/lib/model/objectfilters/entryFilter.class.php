@@ -391,10 +391,10 @@ class entryFilter extends baseObjectFilter
 	 * If baseEntry->list with filter categoriesMatchOr= "111>" you need to search for match p111
 	 * 	  
 	 * @param string $cats Categories full names
-	 * @param string $statuses comma seperated
+	 * @param string $statuses comma seperated statuses.null = no status filtering (default criteria still applies)
 	 * @return string Categogories indexes ids
 	 */
-	public static function categoryFullNamesToIdsParsed($cats, $statuses = null)
+	public static function categoryFullNamesToIdsParsed($cats, $commaSeparatedStatuses = null)
 	{
 		if ($cats === "")
 			$cats = array();
@@ -402,11 +402,16 @@ class entryFilter extends baseObjectFilter
 			$cats = explode(",", $cats);
 		kArray::trim($cats);
 		
-		if($statuses == null || trim($statuses) == '')
-			$statuses = CategoryEntryStatus::ACTIVE;
-			
-		$statuses = explode(',', trim($statuses));
-		
+		$commaSeparatedStatuses = trim( $commaSeparatedStatuses );
+		if ( empty( $commaSeparatedStatuses ) )
+		{
+			$statuses = null;
+		}
+		else
+		{
+			$statuses = explode( ",", $commaSeparatedStatuses );
+		}
+
 		$categoryFullNamesToIds = array();
 		foreach($cats as $cat)
 		{
@@ -431,10 +436,17 @@ class entryFilter extends baseObjectFilter
 			else
 				$categoryId = $category->getId();
 			
-			foreach ($statuses as $status)
+			if ( $statuses )
 			{
-				$categoryFullNamesToIds[] = $categorySearchPrefix . $categoryId .
-						entry::CATEGORY_SEARCH_STATUS . $status;
+				foreach ($statuses as $status)
+				{
+					$categoryFullNamesToIds[] = $categorySearchPrefix . $categoryId .
+							entry::CATEGORY_SEARCH_STATUS . $status;
+				}
+			}
+			else
+			{
+				$categoryFullNamesToIds[] = $categoryId; // The cat. id AS-IS, no status filtering applied
 			}
 		}
 
