@@ -7273,14 +7273,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->aaccessControl = null;
 		$this->aconversionProfile2 = null;
 	}
-
-    public function getSourceType()
-  	{
-   	 	$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getSource());
-   	 	
-   	 	return (string)$sourceApi;
-    }
-	
 	
 	/* ---------------------- CustomData functions ------------------------- */
 
