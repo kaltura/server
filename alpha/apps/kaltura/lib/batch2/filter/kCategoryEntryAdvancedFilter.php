@@ -5,7 +5,6 @@
  */
 class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 {
-	const DYNAMIC_ATTRIBUTES = 'dynamic_attributes';
 	const CREATED_AT = 'createdAt';
 
 	/**
@@ -30,11 +29,9 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 
 	/**
 	 * Compose a dynamic attribute field name
-	 * E.g.: cat_32_createdAt
 	 *
 	 * @param int $categoryId
-	 * @param int $categoryEntryStatus
-	 * @return string dynamic_attributes.cat_{cat id}_createdAt (e.g. dynamic_attributes.cat_32_createdAt)
+	 * @return string cat_{cat id}_createdAt (e.g. cat_32_createdAt)
 	 */
 	public static function getCategoryCreatedAtDynamicAttributeName( $categoryId )
 	{
@@ -47,7 +44,6 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	public function applyCondition(IKalturaDbQuery $query)
 	{
 		// Fetch the list of categories
-		// (*) If categoryEntryStatusIn is null it will default to ACTIVE
 		$categoryEntries = null;
 		if ( $this->categoriesMatchOr )
 		{
@@ -79,7 +75,7 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 				throw new kCoreException( "Unsupported orderBy criteria [$orderByField]" );
 			}
 
-			$dynAttribCriteriaFieldName = self::DYNAMIC_ATTRIBUTES . '.' . self::getCategoryCreatedAtDynamicAttributeName( $this->categoryIdEqual );
+			$dynAttribCriteriaFieldName = entryIndex::DYNAMIC_ATTRIBUTES . '.' . self::getCategoryCreatedAtDynamicAttributeName( $this->categoryIdEqual );
 			$query->addNumericOrderBy( $dynAttribCriteriaFieldName, $orderBy);
 		}
 	}

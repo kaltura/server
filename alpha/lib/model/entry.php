@@ -1139,13 +1139,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		$dynamicAttributes = array();
 
-		// Fetch ACTIVE catrgories only and map to creation date
-		$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($this->getId());
+		// Map catrgories to creation date
+		$categoryEntries = categoryEntryPeer::selectByEntryId( $this->getId() );
 		foreach ( $categoryEntries as $categoryEntry )
 		{
 			$createdAt = $categoryEntry->getCreatedAt( null ); // Passing null in order to get a numerical Unix Time Stamp instead of a string
 			
-			// Get the dyn. attrib. name in the format of: cat_{cat id}_{status} (e.g.: cat_123_2)
+			// Get the dyn. attrib. name in the format of: cat_{cat id}_createdAt (e.g.: cat_123_createdAt)
 			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryCreatedAtDynamicAttributeName( $categoryEntry->getCategoryId() );
 			
 			$dynamicAttributes[$dynAttribName] = $createdAt;
