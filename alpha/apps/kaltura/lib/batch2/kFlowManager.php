@@ -625,15 +625,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if($object instanceof FileSync)
 		{
 			$c = new Criteria();
-			$c->add ( BatchJobPeer::OBJECT_ID , $object->getId() );
-			$c->add ( BatchJobPeer::OBJECT_TYPE , BatchJobObjectType::FILE_SYNC );
-			$c->add ( BatchJobPeer::JOB_TYPE , BatchJobType::FILESYNC_IMPORT );
-			$c->add (BatchJobPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_PENDING), Criteria::IN);		
-			$fileSyncImportJobs = BatchJobPeer::doSelect( $c );
+			$c->add ( BatchJobLockPeer::OBJECT_ID , $object->getId() );
+			$c->add ( BatchJobLockPeer::OBJECT_TYPE , BatchJobObjectType::FILE_SYNC );
+			$c->add ( BatchJobLockPeer::JOB_TYPE , BatchJobType::FILESYNC_IMPORT );
+			$c->add (BatchJobLockPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_PENDING), Criteria::IN);		
+			$fileSyncImportJobs = BatchJobLockPeer::doSelect( $c );
 
 			foreach ($fileSyncImportJobs as $fileSyncImportJob) 
 			{
-				kJobsManager::abortDbBatchJob($fileSyncImportJob);
+				kJobsManager::abortDbBatchJob(BatchJobPeer::retrieveByPK($fileSyncImportJob->getId()));
 			}
 			return true;
 		}
