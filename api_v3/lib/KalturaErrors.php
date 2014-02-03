@@ -516,4 +516,8 @@ class KalturaErrors extends APIErrors
 	
 	const MEDIA_SERVER_SERVICE_NOT_FOUND = "MEDIA_SERVER_SERVICE_NOT_FOUND;MEDIA_SERVER_ID,SERVICE;Media server [@MEDIA_SERVER_ID@] service [@SERVICE@] not found";
 	
+	/*
+    * Delivery Service
+    */
+	const DELIVERY_ID_NOT_FOUND = 'DELIVERY_ID_NOT_FOUND;DELIVERY_ID;delivery id [@DELIVERY_ID@] not found';
 }
