@@ -1,7 +1,18 @@
 <?php
 
-class kUrlTokenizer
+abstract class kUrlTokenizer
 {
+	
+	/**
+	 * @var int
+	 */
+	protected $window;
+	
+	/**
+	 * @var string
+	 */
+	protected $key;
+	
 	/**
 	 * @var string
 	 */
@@ -39,4 +50,35 @@ class kUrlTokenizer
 	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
 	{
 	}
+	
+	/**
+	 * @return the $window
+	 */
+	public function getWindow() {
+		return $this->window;
+	}
+
+	/**
+	 * @return the $key
+	 */
+	public function getKey() {
+		return $this->key;
+	}
+
+	/**
+	 * @param number $window
+	 */
+	public function setWindow($window) {
+		$this->window = $window;
+	}
+
+	/**
+	 * @param string $key
+	 */
+	public function setKey($key) {
+		$this->key = $key;
+	}
+
+	
+	
 }
