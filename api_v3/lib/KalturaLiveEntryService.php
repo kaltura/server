@@ -33,12 +33,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @action appendRecording
 	 * @param string $entryId Live entry id
 	 * @param KalturaMediaServerIndex $mediaServerIndex
-	 * @param KalturaServerFileResource $resource
+	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $mediaServerIndex, KalturaServerFileResource $resource, $duration)
+	function appendRecordingAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
