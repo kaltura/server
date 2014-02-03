@@ -22,7 +22,7 @@ class kLevel3UrlManager extends kUrlManager
 			if ($entry && $entry->getSecurityPolicy())
 				$window = 30;
 			if ($name && $key !== false && $gen !== false)
-				return new kLevel3UrlTokenizer($name, $key, $gen, false, $expiryName, $window);
+				return $this->createTokenizer($name, $key, $gen, false, $expiryName, $window);
 			break;
 
 		case PlaybackProtocol::RTMP:
@@ -32,7 +32,7 @@ class kLevel3UrlManager extends kUrlManager
    		    $expiryName = isset($this->params['rtmp_auth_expiry_name']) ? $this->params['rtmp_auth_expiry_name'] : "etime";
 		    $window = isset($this->params['rtmp_auth_window']) ? $this->params['rtmp_auth_window'] : 0;
 		    if ($name && $key !== false && $gen !== false)
-				return new kLevel3UrlTokenizer($name, $key, $gen, true, $expiryName, $window);
+				return $this->createTokenizer($name, $key, $gen, true, $expiryName, $window);
 			break;
 
 		case PlaybackProtocol::APPLE_HTTP:
@@ -42,10 +42,21 @@ class kLevel3UrlManager extends kUrlManager
 			$expiryName = isset($this->params['applehttp_auth_expiry_name']) ? $this->params['applehttp_auth_expiry_name'] : "etime";
 			$window = isset($this->params['applehttp_auth_window']) ? $this->params['applehttp_auth_window'] : 0;
 			if ($name && $key !== false && $gen !== false)
-				return new kLevel3UrlTokenizer($name, $key, $gen, true, $expiryName, $window);
+				return $this->createTokenizer($name, $key, $gen, true, $expiryName, $window);
 			break;
 		}
 		return null;
+	}
+	
+	protected function createTokenizer($name, $key, $gen, $includeExtension, $expiryName = null, $window = 0) {
+		$tokenizer = new kLevel3UrlTokenizer();
+		$tokenizer->setName($name);
+		$tokenizer->setKey($key);
+		$tokenizer->setGen($gen);
+		$tokenizer->setIncludeExtension($includeExtension);
+		$tokenizer->setExpiryName($expiryName);
+		$tokenizer->setWindow($window);
+		return $tokenizer;
 	}
 	
 	/**

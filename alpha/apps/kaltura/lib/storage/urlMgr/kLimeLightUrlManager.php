@@ -13,9 +13,10 @@ class kLimeLightUrlManager extends kUrlManager
 		if($this->protocol != PlaybackProtocol::RTMP)
 		{
 			if (isset($this->params['http_auth_key']) && $this->params['http_auth_key'])
-				return new kLimeLightUrlTokenizer(
-					$this->protocol . '://' . $this->domain,
-					$this->params['http_auth_key']);
+				$tokenizer = new kLimeLightUrlTokenizer();
+				$tokenizer->setUrlPrefix($this->protocol . '://' . $this->domain);
+				$tokenizer->setKey($this->params['http_auth_key']);
+				return $tokenizer;
 		}
 				
 		return null;

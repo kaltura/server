@@ -17,40 +17,45 @@ class kAkamaiUrlManager extends kUrlManager
 		case PlaybackProtocol::HTTP:
 			if (isset($this->params['http_auth_salt']) && $this->params['http_auth_salt'])
 			{
-				return new kAkamaiHttpUrlTokenizer(
-					$this->params['http_auth_seconds'],
-					$this->params['http_auth_param'],
-					$this->params['http_auth_salt'],
-					isset($this->params['http_auth_root_dir']) ? $this->params['http_auth_root_dir'] : '');
+				$rootDir = $this->params['http_auth_root_dir'] ? $this->params['http_auth_root_dir'] : '';
+				$tokenizer = new kAkamaiHttpUrlTokenizer();
+				$tokenizer->setWindow($this->params['http_auth_seconds']);
+				$tokenizer->setParam($this->params['http_auth_param']);
+				$tokenizer->setKey($this->params['http_auth_param']);
+				$tokenizer->setRootDir($rootDir);
+				return $tokenizer;
 			}
 			break;
 			
 		case PlaybackProtocol::RTMP:
 			if (isset($this->params['rtmp_auth_salt']) && $this->params['rtmp_auth_salt'])
 			{
-				return new kAkamaiRtmpUrlTokenizer(
-					$this->params['rtmp_auth_profile'],
-					$this->params['rtmp_auth_type'],
-					$this->params['rtmp_auth_salt'],
-					$this->params['rtmp_auth_seconds'],
-					$this->params['rtmp_auth_aifp'],
-					@$this->params['rtmp_auth_slist_find_prefix']);
+				$tokenizer = new kAkamaiRtmpUrlTokenizer();
+				$tokenizer->setProfile($this->params['rtmp_auth_profile']);
+				$tokenizer->setType($this->params['rtmp_auth_type']);
+				$tokenizer->setKey($this->params['rtmp_auth_salt']);
+				$tokenizer->setWindow($this->params['rtmp_auth_seconds']);
+				$tokenizer->setAifp($this->params['rtmp_auth_aifp']);
+				$tokenizer->setUsePrefix($this->params['rtmp_auth_slist_find_prefix']);
+				return $tokenizer;
 			}
 			break;
 		
 		case PlaybackProtocol::RTSP:
-			return new kAkamaiRtspUrlTokenizer(
-				$this->params["rtsp_host"],
-				$this->params["rtsp_cpcode"]);
-
+			$tokenizer = new kAkamaiRtspUrlTokenizer();
+			$tokenizer->setHost($this->params["rtsp_host"]);
+			$tokenizer->setCpcode($this->params["rtsp_cpcode"]);
+			return $tokenizer;
+			
 		case PlaybackProtocol::SILVER_LIGHT:
 			if (isset($this->params['smooth_auth_salt']) && $this->params['smooth_auth_salt'])
 			{
-				return new kAkamaiHttpUrlTokenizer(
-					$this->params['smooth_auth_seconds'],
-					$this->params['smooth_auth_param'],
-					$this->params['smooth_auth_salt'],
-					'');
+				$tokenizer = new kAkamaiHttpUrlTokenizer();
+				$tokenizer->setWindow($this->params['smooth_auth_seconds']);
+				$tokenizer->setParam($this->params['smooth_auth_param']);
+				$tokenizer->setKey($this->params['smooth_auth_salt']);
+				$tokenizer->setRootDir('');
+				return $tokenizer;
 			}
 			break;
 
@@ -63,12 +68,13 @@ class kAkamaiUrlManager extends kUrlManager
 		case PlaybackProtocol::AKAMAI_HDS:
 			if (isset($this->params['secure_hd_auth_salt']) && $this->params['secure_hd_auth_salt'])
 			{
-				return new kAkamaiSecureHDUrlTokenizer(
-					$this->params['secure_hd_auth_seconds'],
-					$this->params['secure_hd_auth_param'],
-					self::SECURE_HD_AUTH_ACL_REGEX,
-					$this->params['secure_hd_auth_acl_postfix'],
-					$this->params['secure_hd_auth_salt']);
+				$tokenizer = new kAkamaiSecureHDUrlTokenizer();
+				$tokenizer->setWindow($this->params['secure_hd_auth_seconds']);
+				$tokenizer->setParam($this->params['secure_hd_auth_param']);
+				$tokenizer->setAclRegex(self::SECURE_HD_AUTH_ACL_REGEX);
+				$tokenizer->setAclPostfix($this->params['secure_hd_auth_acl_postfix']);
+				$tokenizer->setKey($this->params['secure_hd_auth_salt']);
+				return $tokenizer;
 			}
 			break;
 		}
@@ -159,6 +165,7 @@ class kAkamaiUrlManager extends kUrlManager
 	
 	/**
 	 * @return boolean
+	 * @_!! Deprecated?
 	 */
 	public function authenticateRequest($url)
 	{

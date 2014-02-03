@@ -221,10 +221,6 @@ class Akamai_EdgeAuth_Generate {
 
 class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 {
-	/**
-	 * @var int
-	 */
-	protected $window;
 
 	/**
 	 * @var string
@@ -240,27 +236,6 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 * @var string
 	 */
 	protected $aclPostfix;
-	
-	/**
-	 * @var string
-	 */
-	protected $salt;
-
-	/**
-	 * @param int $window
-	 * @param string $param
-	 * @param string $aclRegex
-	 * @param string $aclPostfix
-	 * @param string $salt
-	 */
-	public function __construct($window, $param, $aclRegex, $aclPostfix, $salt)
-	{
-		$this->window = $window;
-		$this->param = $param;
-		$this->aclRegex = $aclRegex;
-		$this->aclPostfix = $aclPostfix;
-		$this->salt = $salt;
-	}
 	
 	/**
 	 * @param string $url
@@ -285,7 +260,7 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		$c->set_acl($acl);
 		$c->set_window($this->window);
 		$c->set_start_time(time());		# The time from which the token will start
-		$c->set_key($this->salt);
+		$c->set_key($this->key);
 
 		$g = new Akamai_EdgeAuth_Generate();		
 		$token = $g->generate_token($c);
@@ -296,4 +271,49 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 			$url .= '&';
 		return $url . "{$this->param}=$token";
 	}
+	
+	/**
+	 * @return the $param
+	 */
+	public function getParam() {
+		return $this->param;
+	}
+
+	/**
+	 * @return the $aclRegex
+	 */
+	public function getAclRegex() {
+		return $this->aclRegex;
+	}
+
+	/**
+	 * @return the $aclPostfix
+	 */
+	public function getAclPostfix() {
+		return $this->aclPostfix;
+	}
+
+	/**
+	 * @param string $param
+	 */
+	public function setParam($param) {
+		$this->param = $param;
+	}
+
+	/**
+	 * @param string $aclRegex
+	 */
+	public function setAclRegex($aclRegex) {
+		$this->aclRegex = $aclRegex;
+	}
+
+	/**
+	 * @param string $aclPostfix
+	 */
+	public function setAclPostfix($aclPostfix) {
+		$this->aclPostfix = $aclPostfix;
+	}
+
+	
+	
 }
