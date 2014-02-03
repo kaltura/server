@@ -345,9 +345,11 @@ class kUrlManager
 		$flavorAssetId = $asset->getId();
 		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
 		
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost";
 		if($this->storageProfileId)
 			$url .= "/storageId/$this->storageProfileId";
+		
+		$url .= "?clientTag=$clientTag";
 		
 		return $url;
 	}
