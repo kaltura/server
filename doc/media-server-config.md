@@ -55,12 +55,13 @@ media_servers.ini is optional and needed only for custom configurations.
 
 
 ## For all wowza machine (origin and edge): ##
-- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.2.0.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+- Copy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.2.5.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
 - Copy additional jar files (available in Kaltura Java client library) to @WOWZA_DIR@/lib/
  - [commons-codec-1.4.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-codec-1.4.jar "commons-codec-1.4.jar")
  - [commons-httpclient-3.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-httpclient-3.1.jar "commons-httpclient-3.1.jar")
  - [commons-logging-1.1.1.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-logging-1.1.1.jar "commons-logging-1.1.1.jar") 
- - [commons-lang-2.6.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-lang-2.6.jar "commons-lang-2.6.jar")
+ - [commons-lang-
+ - 2.6.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/commons-lang-2.6.jar "commons-lang-2.6.jar")
 - Delete all directories under @WOWZA_DIR@/applications, but not the applications directory itself.
 - Create @WOWZA_DIR@/applications/kLive directory.
 - Delete all directories under @WOWZA_DIR@/conf, but not the conf directory itself.
@@ -162,16 +163,16 @@ media_servers.ini is optional and needed only for custom configurations.
 
 **Edit @WOWZA_DIR@/conf/log4j.properties:**
 
- - Add `log4j.category.KalturaClientBase.class` = DEBUG
+ - Add `log4j.logger.com.kaltura` = `DEBUG`
  - Change `log4j.appender.serverAccess.File` = @LOG_DIR@/kaltura\_mediaserver\_access.log
  - Change `log4j.appender.serverError.File` = @LOG_DIR@/kaltura\_mediaserver\_error.log
  - Change `log4j.appender.serverStats.File` = @LOG_DIR@/kaltura\_mediaserver\_stats.log
  - Comment out `log4j.appender.serverError.layout` and its sub values `log4j.appender.serverError.layout.*` 
  - Add `log4j.appender.serverError.layout` = `org.apache.log4j.PatternLayout`
- - Add `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}] %p - "%m" - (%F:%L) %n` 
+ - Add `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
  - Comment out `log4j.appender.serverAccess.layout` and its sub values `log4j.appender.serverAccess.layout.*` 
  - Add `log4j.appender.serverAccess.layout` = `org.apache.log4j.PatternLayout`
- - Add `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}] %p - "%m" - (%F:%L) %n`
+ - Add `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n`
 
 
 

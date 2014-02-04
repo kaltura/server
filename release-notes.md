@@ -3,6 +3,19 @@
 # IX-9.10.0 #
 
 
+## Enhanced media server logging level ##
+
+**Configuration**
+
+*Edit @WOWZA_DIR@/conf/log4j.properties:*
+
+ - Change `log4j.rootCategory` = `INFO, stdout, serverAccess, serverError` 
+ - Remove `log4j.category.KalturaServer.class`
+ - Add `log4j.logger.com.kaltura` = `DEBUG`
+ - Change `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+ - Change `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+
+
 ## Live stream multiple flavors ingestion ##
 
 Enable streaming more than one source.
