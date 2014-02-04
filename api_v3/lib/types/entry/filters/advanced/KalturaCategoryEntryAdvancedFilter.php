@@ -60,7 +60,8 @@ class KalturaCategoryEntryAdvancedFilter extends KalturaSearchItem
 
 		if ( $categoriesMatchOrIsNull && $categoryIdEqualIsNull )
 		{
-			throw new KalturaAPIException( KalturaErrors::MANDATORY_PARAMETER_MISSING, "categoriesMatchOr / categoryIdEqual" );
+			// Leaving the condition here in order to emphasis that it is allowed
+			// in order not to break backward-compatibility
 		}
 		else if ( !$categoriesMatchOrIsNull && !$categoryIdEqualIsNull )
 		{
