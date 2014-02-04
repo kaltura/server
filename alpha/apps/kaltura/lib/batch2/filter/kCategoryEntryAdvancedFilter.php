@@ -43,6 +43,11 @@ class kCategoryEntryAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	public function applyCondition(IKalturaDbQuery $query)
 	{
+		if ( is_null( $this->categoriesMatchOr ) && is_null( $this->categoryIdEqual ) )
+		{
+			return;
+		}
+
 		// Fetch the list of categories
 		$categoryEntries = null;
 		if ( $this->categoriesMatchOr )
