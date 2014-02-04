@@ -41,7 +41,7 @@ class kUserRoleCondition extends kCondition
 	protected function internalFulfilled(kScope $scope)
 	{
 		$partner = PartnerPeer::retrieveByPK(kCurrentContext::$ks_partner_id);
-		$roleIds = kPermissionManager::getRoleIds($partner, kCurrentContext::$ks_kuser);
+		$roleIds = kPermissionManager::getRoleIds($partner, kCurrentContext::getCurrentKsKuser());
 		$conditionRoleIds = array_map('trim', explode(',', $this->roleIds));
 
 		foreach($roleIds as $roleId)
