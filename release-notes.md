@@ -64,6 +64,7 @@ This version deployed for regression purposes only.
 - deployment/updates/sql/2013_10_22_add_drm_policy_table.sql
 - deployment/updates/sql/2013_12_10_add_drm_device_table.sql
 - deployment/updates/sql/2013_12_31_add_drm_key_table.sql
+- deployment/updates/sql/2014_01_14_audit_trail_config_admin_console_partner_updates.sql
 
 *Configuration Changes*
 - update plugins.ini
