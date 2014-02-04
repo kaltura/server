@@ -425,7 +425,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		return array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		
+		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
 	
 	/**
