@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.drm
+ * @package plugins.playReady
  * @subpackage api.filters
  */
 class KalturaPlayReadyPolicyFilter extends KalturaPlayReadyPolicyBaseFilter
