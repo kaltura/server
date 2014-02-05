@@ -1839,9 +1839,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function incrementIsmVersion (  )
 	{
-		$version = kDataCenterMgr::incrementVersion($this->getIsmVersion());
-		$this->setIsmVersion($version);
-		return $version;
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getIsmVersion(), FileSyncObjectType::ENTRY, self::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+
+		$this->setIsmVersion($newVersion);
+		
+		return $newVersion;
 	}
 	
 	public function getHeight()

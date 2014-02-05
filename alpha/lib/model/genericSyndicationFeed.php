@@ -80,7 +80,9 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	
 	public function incrementVersion()
 	{
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::SYNDICATION_FEED, self::FILE_SYNC_SYNDICATION_FEED_XSLT);
+		
+		$this->setVersion($newVersion);
 	}
 	
 	/* (non-PHPdoc)

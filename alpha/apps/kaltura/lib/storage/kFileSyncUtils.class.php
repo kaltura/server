@@ -9,6 +9,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	const MAX_CACHED_FILE_SIZE = 2097152;		// 2MB
 	const CACHE_KEY_PREFIX = 'fileSyncContent_';
 	const FILE_SYNC_CACHE_EXPIRY = 2592000;		// 30 days
+	
+	//File sync Insert limitation consts
+	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
 	protected static $uncachedObjectTypes = array(
 		FileSyncObjectType::ASSET,				// should not cache conversion logs since they can change (batch.logConversion)
@@ -1368,6 +1371,41 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function retrieveObjectForSyncKey ( FileSyncKey  $sync_key )
 	{
 		return kFileSyncObjectManager::retrieveObject( $sync_key->object_type, $sync_key->object_id );
+	}
+	
+	public static function calcObjectNewVersion($object_id, $version, $object_type, $object_sub_type)
+	{
+		if(self::wasFileSyncLimitationReached($object_id, $version, $object_type, $object_sub_type))
+		{
+			throw new kCoreException("File sync limitation per single object per day was reached for object id " . $object_id
+									, kCoreException::MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED, $object_id);
+		}
+
+		return kDataCenterMgr::incrementVersion($version);
+	}
+	
+	public static function wasFileSyncLimitationReached($object_id, $version, $object_type, $object_sub_type)
+	{		
+		if($version > self::FILE_SYNC_MIN_VERSION_VALIDATE)
+		{			
+			$c = new Criteria();
+			$c->add(FileSyncPeer::OBJECT_ID, $object_id);
+			$c->add(FileSyncPeer::OBJECT_TYPE, $object_type);
+			$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $object_sub_type);
+			$c->add(FileSyncPeer::VERSION, $version-self::FILE_SYNC_MIN_VERSION_VALIDATE, Criteria::LESS_EQUAL);
+			$c->addDescendingOrderByColumn(FileSyncPeer::CREATED_AT);
+			
+			FileSyncPeer::setUseCriteriaFilter(false);
+			$res = FileSyncPeer::doSelectOne($c);
+			FileSyncPeer::setUseCriteriaFilter(true);
+			if($res)
+			{
+				if($res->getCreatedAt(null) > (time()-86400))
+					return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/* (non-PHPdoc)

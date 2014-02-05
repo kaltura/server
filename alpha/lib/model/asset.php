@@ -209,7 +209,9 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incrementVersion()
 	{
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		
+		$this->setVersion($newVersion);
 	}
 	
 	public function addTags(array $newTags)
@@ -575,8 +577,8 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incLogFileVersion()
 	{
-		$version = kDataCenterMgr::incrementVersion($this->getLogFileVersion());
-		$this->putInCustomData("logFileVersion", $version);
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getLogFileVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
+		$this->putInCustomData("logFileVersion", $newVersion);
 	}
 
 	public function getCacheInvalidationKeys()

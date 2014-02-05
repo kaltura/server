@@ -56,7 +56,9 @@ class Metadata extends BaseMetadata implements ISyncableFile
 
 	public function incrementVersion()
 	{
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA, self::FILE_SYNC_METADATA_DATA);
+		
+		$this->setVersion($newVersion);
 	}
 	
 	/**

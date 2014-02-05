@@ -58,17 +58,23 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 
 	public function incrementVersion()
 	{
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_DEFINITION);
+		
+		$this->setVersion($newVersion);
 	}
 
 	public function incrementViewsVersion()
 	{
-		$this->setViewsVersion(kDataCenterMgr::incrementVersion($this->getViewsVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getViewsVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_VIEWS);
+		
+		$this->setViewsVersion($newVersion);
 	}
 	
     public function incrementXsltVersion()
 	{
-		$this->setXsltVersion(kDataCenterMgr::incrementVersion($this->getXsltVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getXsltVersion(), FileSyncObjectType::METADATA_PROFILE, self::FILE_SYNC_METADATA_XSLT);
+		
+		$this->setXsltVersion($newVersion);
 	}
 	
 	protected function setXsltVersion($version)
