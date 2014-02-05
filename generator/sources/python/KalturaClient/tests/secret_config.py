@@ -1,0 +1,6 @@
+
+PARTNER_ID = 54321
+SECRET = "YOUR_USER_SECRET"
+ADMIN_SECRET = "YOUR_ADMIN_SECRET"
+SERVICE_URL = "http://www.kaltura.com"
+USER_NAME = "testUser"
