@@ -138,7 +138,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		}
 		
 		$CCEmailValue = $cc ? $cc->email->value : '';
-        $CCNameValue = $cc && $cc->name ? $cc->name->value : '';
+		$CCNameValue = $cc && $cc->name ? $cc->name->value : '';
 		
 		$this->addElement('text', 'cc_email', array(
 				'label'                 => 'Recipient e-mail (CC):',
