@@ -325,13 +325,14 @@ class LiveStreamService extends KalturaLiveEntryService
 		kApiCache::disableConditionalCache();
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			
 		}
 		else
 		{
