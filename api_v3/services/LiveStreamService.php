@@ -99,15 +99,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kDataCenterMgr::getCurrentDcId(), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
-			
-			$otherDCs = kDataCenterMgr::getAllDcs();
-			if(count($otherDCs))
-			{
-				$otherDc = reset($otherDCs);
-				$otherDcId = $otherDc['id'];
-				$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, $otherDcId, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
-			}
+			$broadcastUrlManager->setEntryBroadcastingUrls ($dbEntry);
 		}
 		
 		return $dbEntry;
@@ -325,13 +317,13 @@ class LiveStreamService extends KalturaLiveEntryService
 		kApiCache::disableConditionalCache();
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
 		}
 		else
 		{
