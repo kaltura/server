@@ -13,5 +13,6 @@ if (!$partnerId)
 }
 
 $partner = PartnerPeer::retrieveByPK($partnerId);
+$partner->setBroadcastUrlManager('kPartnerBroadcastUrlManager');
 $partner->setPrimaryBroadcastUrl($primaryBroadcastUrl);
 $partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
