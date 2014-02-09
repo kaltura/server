@@ -73,11 +73,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
-		if (!$dbMediaServer)
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-			
-		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer);
+		$dbEntry->setMediaServer($mediaServerIndex, $hostname);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
@@ -110,11 +106,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
-		if (!$dbMediaServer)
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-			
-		$dbEntry->unsetMediaServer($mediaServerIndex, $dbMediaServer->getId());
+		$dbEntry->unsetMediaServer($mediaServerIndex, $hostname);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());

@@ -55,6 +55,11 @@ class kBroadcastUrlManager
 	
 	protected function getBroadcastUrl(LiveStreamEntry $entry, $hostname, $mediaServerIndex)
 	{
+		if (!$hostname)
+		{
+			return '';
+		}
+		
 		$url = 'rtmp://' . $hostname;
 		
 		$params = array(
