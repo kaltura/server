@@ -695,10 +695,10 @@ class kJobsManager
 	private static function contributeToConvertJobData($conversionEngineId, kConvertJobData &$convertData)
 	{
 		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
-		if($plugin && $plugin instanceof IKalturaConvertContributor)
+		if($plugin && $plugin instanceof IKalturaBatchJobDataContributor)
 		{
 			KalturaLog::log("Setting additional data by plugin");
-			$convertData = $plugin->contributeToConvertJobData($conversionEngineId, $convertData);
+			$convertData = $plugin->contributeToConvertJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
 		}
 	}
 	

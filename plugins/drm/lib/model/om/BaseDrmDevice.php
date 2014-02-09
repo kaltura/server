@@ -747,7 +747,9 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		DrmDevicePeer::setUseCriteriaFilter(false);
-		$stmt = DrmDevicePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		DrmDevicePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -844,7 +846,7 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(DrmDevicePeer::CUSTOM_DATA);
-                $stmt = DrmDevicePeer::doSelectStmt($criteria, $con);
+                $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
                 
@@ -991,8 +993,7 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1039,7 +1040,7 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *
