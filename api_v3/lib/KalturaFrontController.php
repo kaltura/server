@@ -132,7 +132,8 @@ class KalturaFrontController
 		// arrange the parameters by request index
 		$commonParams = array();
 		$listOfRequests = array();
-		$dependencies = array(); 
+		$dependencies = array();
+		$allDependencies = array();
 		$pastResults = array();
 		foreach ($this->params as $paramName => $paramValue)
 		{
@@ -159,6 +160,7 @@ class KalturaFrontController
 				$resultKey = $matches[2];
 				if(!isset($dependencies[$requestIndex][$pastResultsIndex]))
 					$dependencies[$resultIndex][$pastResultsIndex] =  $resultKey;
+				$allDependencies[$pastResultsIndex] = true;
 			}
 		}
 			
@@ -195,6 +197,8 @@ class KalturaFrontController
 	        {
 	        	if(isset($pastResults[$val]))
 					$val = $pastResults[$val];
+				else if (isset($allDependencies[$val]))
+					$val = null;
 	        }
 	        
 			// cached parameters should be different when the request is part of a multirequest
