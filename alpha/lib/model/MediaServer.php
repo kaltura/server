@@ -92,6 +92,20 @@ class MediaServer extends BaseMediaServer {
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
 				
+			if (isset ($mediaServers['dc-'.$this->getDc()]))
+		    {
+		    	$mediaServer = $mediaServers['dc-'.$this->getDc()];
+		    
+		    	if(isset($mediaServer[$portField]))
+		     		$port = $mediaServer[$portField];
+		    
+		    	if(isset($mediaServer['application']))
+		     		$app = $mediaServer['application'];
+		     
+		    	if(isset($mediaServer['domain']))
+		     		$domain = $mediaServer['domain'];
+		    }
+				
 			if(isset($mediaServers[$this->getHostname()]))
 			{
 				$mediaServer = $mediaServers[$this->getHostname()];
