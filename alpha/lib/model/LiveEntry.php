@@ -310,11 +310,9 @@ abstract class LiveEntry extends entry
 		$kMediaServer = reset($kMediaServers);
 		if($kMediaServer instanceof kLiveMediaServer)
 			return $kMediaServer->getMediaServer();
-		else
-		{
-			KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
-			return null;
-		}
+			
+		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
+		return null;
 	}
 	
 	/**
