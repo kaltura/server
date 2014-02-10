@@ -19,6 +19,7 @@ class DrmPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdmin
 	 */
 	public static function getServicesMap() {
 		$map = array(
+			'drmPolicy' => 'DrmPolicyService',
 			'drmProfile' => 'DrmProfileService',
 		);
 		return $map;	

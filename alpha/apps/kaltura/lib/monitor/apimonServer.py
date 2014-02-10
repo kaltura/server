@@ -35,6 +35,12 @@ class ReaderThread(Thread):
             for curMessage in data.split('\0'):
                 curSlot.append(json.loads(curMessage))
 
+def safeFloat(num):
+    try:
+        return float(num)
+    except ValueError:
+        return float('nan')
+                
 class CommandHandler(SocketServer.BaseRequestHandler):
     FIELD_EXECUTION_TIME = 'x'
     
@@ -102,6 +108,14 @@ class CommandHandler(SocketServer.BaseRequestHandler):
                     operatorResult = (refValue == fieldValue)
                 elif operator == '~':
                     operatorResult = (refValue in fieldValue)
+                elif operator == '>':
+                    refValue = safeFloat(refValue)
+                    fieldValue = safeFloat(fieldValue)
+                    operatorResult = (not isnan(refValue) and not isnan(fieldValue) and fieldValue > refValue)
+                elif operator == '<':
+                    refValue = safeFloat(refValue)
+                    fieldValue = safeFloat(fieldValue)
+                    operatorResult = (not isnan(refValue) and not isnan(fieldValue) and fieldValue < refValue)
                 if negated:
                     operatorResult = not operatorResult
                 if not operatorResult:

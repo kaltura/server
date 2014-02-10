@@ -11,6 +11,7 @@ class KalturaMonitorClient
 	const EVENT_API_END = 	'end';
 	const EVENT_DATABASE = 	'db';
 	const EVENT_SPHINX = 	'sphinx';
+	const EVENT_CONNTOOK =  'conn';
 	
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
@@ -213,5 +214,29 @@ class KalturaMonitorClient
 		));
 		
 		self::writeDeferredEvent($data);
+	}
+	
+	public static function monitorConnTook($dsn, $connTook)
+	{
+		if (!self::$stream)
+			return;
+		
+		$hostName = $dsn;
+		$hostStart = strpos($dsn, 'host=');
+		if ($hostStart !== false)
+		{
+			$hostStart += 5;
+			$hostEnd = strpos($dsn, ';', $hostStart);
+			if ($hostEnd !== false)
+				$hostName = substr($dsn, $hostStart, $hostEnd - $hostStart);
+		}
+		
+		$data = array_merge(self::$basicEventInfo, array(
+				self::FIELD_EVENT_TYPE 		=> self::EVENT_CONNTOOK,
+				self::FIELD_DATABASE		=> $hostName,
+				self::FIELD_EXECUTION_TIME	=> $connTook,
+		));
+		
+		self::writeDeferredEvent($data);		
 	}
 }

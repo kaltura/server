@@ -99,7 +99,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$broadcastUrlManager->setEntryBroadcastingUrls ($dbEntry);
+			$broadcastUrlManager->setEntryBroadcastingUrls($dbEntry);
 		}
 		
 		return $dbEntry;

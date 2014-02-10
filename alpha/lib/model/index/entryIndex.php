@@ -5,8 +5,12 @@
 */
 class entryIndex extends BaseIndexObject
 {
-	const DYNAMIC_ATTRIBUTES = 'dynamic_attributes';
-		
+	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
+
+	const PLUGINS_DATA = "plugins_data";
+
+	const SEARCH_TEXT = "search_text";
+
 	public static function getObjectName()
 	{
 		return 'entry';

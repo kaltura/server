@@ -36,6 +36,7 @@ class flavorParamsAction extends kalturaSystemAction
 			if ($this->getRequestParameter("clone"))
 			{
 				$newFalvorParams = $this->editFlavorParam->copy();
+				$newFalvorParams->setSourceAssetParamsIds($this->editFlavorParam->getSourceAssetParamsIds());
 				$newFalvorParams->setAspectRatioProcessingMode($this->editFlavorParam->getAspectRatioProcessingMode());
 				$newFalvorParams->setForceFrameToMultiplication16($this->editFlavorParam->getForceFrameToMultiplication16());
 				$newFalvorParams->setIsGopInSec($this->editFlavorParam->getIsGopInSec());
@@ -85,6 +86,7 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setIsDefault($this->getRequestParameter("is-default", false));
 						$this->editFlavorParam->setReadyBehavior($this->getRequestParameter("ready-behavior"));
 						$this->editFlavorParam->setTags($this->getRequestParameter("tags"));
+						$this->editFlavorParam->setSourceAssetParamsIds($this->getRequestParameter("sourceAssetParamsIds"));
 						$this->editFlavorParam->setFormat($this->getRequestParameter("format"));
 						$this->editFlavorParam->setTwoPass($this->getRequestParameter("two-pass", false));
 						$this->editFlavorParam->setRotate($this->getRequestParameter("rotate", false));

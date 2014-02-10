@@ -733,6 +733,10 @@ class Partner extends BasePartner
 	// logout url for partners integrating a single sign on solution
 	public function getLogoutUrl() { return $this->getFromCustomData('logoutUrl', null); }
 	public function setLogoutUrl($v) { $this->putInCustomData('logoutUrl', $v); }
+
+	// Status change reason for audit logs
+	public function getStatusChangeReason() { return $this->getFromCustomData('statusChangeReason'); }	
+	public function setStatusChangeReason( $v ) { return $this->putInCustomData('statusChangeReason', $v); }
 	
 	//kmc language
 	public function setKMCLanguage($v) { $this->putInCustomData('language', $v, 'KMC');}

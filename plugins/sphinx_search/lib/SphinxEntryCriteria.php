@@ -126,7 +126,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($matchAndCats !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchAndCats );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchAndCats, CategoryEntryStatus::ACTIVE );
 			if ( $categoriesParsed !=='' || $matchAndCats =='')
 				$filter->set ( "_matchand_categories_ids", $categoriesParsed );
 			else
@@ -138,7 +138,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($matchOrCats !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchOrCats );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchOrCats, CategoryEntryStatus::ACTIVE );
 			if( $categoriesParsed !=='' || $matchOrCats=='')
 				$filter->set("_matchor_categories_ids", $categoriesParsed);
 			else
@@ -163,7 +163,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($CatFullNameIn !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn, CategoryEntryStatus::ACTIVE );
 			if( $categoriesParsed !=='' || $CatFullNameIn=='')
 				$filter->set("_matchor_categories_ids", $categoriesParsed);
 			else

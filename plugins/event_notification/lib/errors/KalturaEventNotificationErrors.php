@@ -6,6 +6,11 @@
  */
 class KalturaEventNotificationErrors extends KalturaErrors
 {
+	
+	const INVALID_TO_EMAIL = 'INVALID_TO_EMAIL';
+	
+	const INVALID_CC_EMAIL = 'INVALID_CC_EMAIL';
+	
 	const EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND = "EVENT_NOTIFICATION_TEMPLATE_NOT_FOUND;ID;Event notification template id [@ID@] not found";
 
 	const EVENT_NOTIFICATION_WRONG_TYPE = "EVENT_NOTIFICATION_WRONG_TYPE;ID,TYPE;Event notification template id [@ID@] is of type [@TYPE@]";

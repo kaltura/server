@@ -2,6 +2,36 @@
 
 # IX-9.10.0 #
 
+
+## Enhanced media server logging level ##
+
+**Configuration**
+
+*Edit @WOWZA_DIR@/conf/log4j.properties:*
+
+ - Change `log4j.rootCategory` = `INFO, stdout, serverAccess, serverError` 
+ - Remove `log4j.category.KalturaServer.class`
+ - Add `log4j.logger.com.kaltura` = `DEBUG`
+ - Change `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+ - Change `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+
+
+## Live stream multiple flavors ingestion ##
+
+Enable streaming more than one source.
+
+**Deployment:**
+
+*Shared Content*
+
+- Add source LiveParams using deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+
+*Media Server*
+
+- Change transcoding template to `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/streamName/${SourceStreamName}/f/transcode.xml`
+
+
+
 ## Entry redirect moderation ##
 The moderation status is copied to the redirected entry from the original entry when the redirect defined.
 
@@ -25,6 +55,28 @@ Fixed broadcast path to use query string instead of slashed parameters.
 
 - deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
 
+## PlayReady, ISM Index, Smooth Protect - regression only ##
+Initial version of PlayReady, Ism Index and Smooth Protect. PlayReady and SmoothProtect plugins will not be activated. 
+This version deployed for regression purposes only.
+
+*DB Changes*
+
+- deployment/updates/sql/2013_10_22_add_drm_policy_table.sql
+- deployment/updates/sql/2013_12_10_add_drm_device_table.sql
+- deployment/updates/sql/2013_12_31_add_drm_key_table.sql
+- deployment/updates/sql/2014_01_14_audit_trail_config_admin_console_partner_updates.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add IsmIndex plugin
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+- deployment/updates/scripts/add_permissions/2013_12_10_add_drm_device_permissions.php 
 
 ----------
 
@@ -35,21 +87,6 @@ Fixed broadcast path to use query string instead of slashed parameters.
 *Permissions*
 
 - deployment/updates/scripts/add_permissions/2014_01_15_conversionprofileassetparams_permission_media_partner.php
-
-----------
- 
-# IX-9.9.0 #
-
-## Live stream multiple flavors ingestion ##
-
-Enable streaming more than one source.
-
-**Deployment:**
-
-*Shared Content*
-
-- Add source LiveParams using deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
-
 
 ----------
  
