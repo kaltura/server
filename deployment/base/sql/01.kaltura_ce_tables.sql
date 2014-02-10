@@ -368,21 +368,23 @@ CREATE TABLE IF NOT EXISTS `category` (
 
 /*Table structure for table `category_entry` */
 
-CREATE TABLE IF NOT EXISTS `category_entry` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `partner_id` int(11) NOT NULL,
-  `entry_id` varchar(20) DEFAULT NULL,
-  `category_id` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `custom_data` text,
-  `updated_at` datetime DEFAULT NULL,
-  `category_full_ids` text NOT NULL,
-  `status` int(11) DEFAULT '2',
-  PRIMARY KEY (`id`),
-  KEY `partner_id_index` (`partner_id`),
-  KEY `category_id_index` (`category_id`),
-  KEY `entry_id_index` (`entry_id`),
-  KEY `updated_at` (`updated_at`)
+CREATE TABLE `category_entry`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`entry_id` VARCHAR(20),
+	`category_id` INTEGER,
+	`category_full_ids` TEXT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	`status` INTEGER default 2,
+	`privacy_context` VARCHAR(255),
+	PRIMARY KEY (`id`),
+	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
+	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`),
+	KEY `category_entry_updated_at`(`updated_at`),
+	KEY `partner_id_privacy_context_index`(`partner_id`, `privacy_context`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `category_kuser` */
