@@ -1,5 +1,48 @@
 ----------
 
+# IX-9.11.0 #
+
+## PlayReady, ISM Index, Smooth Protect##
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_02_09_change_drm_key_key_column_name.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add plugins: PlayReady, SmoothProtect
+  
+- update admin.ini:
+add
+moduls.drmPlayReady.enabled = true
+moduls.drmPlayReady.permissionType = 3
+moduls.drmPlayReady.label = DRM - PlayReady
+moduls.drmPlayReady.permissionName = PLAYREADY_PLUGIN_PERMISSION
+moduls.drmPlayReady.basePermissionType = 3
+moduls.drmPlayReady.basePermissionName = DRM_PLUGIN_PERMISSION
+moduls.drmPlayReady.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- update batch.ini
+1. add under KAsyncConvertWorker 
+params.ismIndexCmd									= @BIN_DIR@/ismIndex
+2. update under KAsyncConvert
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+
+*Binaries*
+- Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+- The ffmpeg-aux remains unchanged.
+
+
+
+----------
+
 # IX-9.10.0 #
 
 
