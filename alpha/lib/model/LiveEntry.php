@@ -231,9 +231,10 @@ abstract class LiveEntry extends entry
 		{
 			$manifestUrl = $mediaServer->getManifestUrl($protocol);
 		}
-		elseif ($this->getPartner()->getLiveStreamPlaybackUrl())
+		elseif (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
-			$manifestUrl = $this->getPartner()->getLiveStreamPlaybackUrl();
+			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
+			$manifestUrl = $partnerConfigurations[$protocol];
 		}
 		
 		if ($manifestUrl)

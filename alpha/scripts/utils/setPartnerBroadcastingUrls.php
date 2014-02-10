@@ -16,3 +16,7 @@ $partner = PartnerPeer::retrieveByPK($partnerId);
 $partner->setBroadcastUrlManager('kPartnerBroadcastUrlManager');
 $partner->setPrimaryBroadcastUrl($primaryBroadcastUrl);
 $partner->setSecondaryBroadcastUrl($secondaryBroadcastUrl);
+
+$liveStreamConfigurations = array ('{playback format}' => '{url}');
+$partner->setLiveStreamPlaybackUrlConfigurations($liveStreamConfigurations);
+$partner->save();
