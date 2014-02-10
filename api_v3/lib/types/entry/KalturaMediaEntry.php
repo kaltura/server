@@ -86,7 +86,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public $flavorParamsIds;
 	
-	private static $map_between_objects = array ("mediaType", "conversionQuality", //"sourceType", // see special logic for this field below
+	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType", // see special logic for this field below
 	//"searchProviderType", // see special logic for this field below
 	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds" );
 	
