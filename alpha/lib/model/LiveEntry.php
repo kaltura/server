@@ -345,7 +345,7 @@ abstract class LiveEntry extends entry
 			return $lastUpdate <= $expiry;
 		}
 		
-		$key = $this->getId() . '_' . $kMediaServer->getMediaServerId() . '_' . $kMediaServer->getIndex();
+		$key = $this->getId() . '_' . $kMediaServer->getHostname() . '_' . $kMediaServer->getIndex();
 		KalturaLog::debug("Get cache key [$key] from store [$cacheType]");
 		return $cacheStore->get($key);
 	}
@@ -365,14 +365,19 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, MediaServer $mediaServer)
+	public function setMediaServer($index, $hostname)
 	{
-		$serverId = $mediaServer->getId();
-		$key = $this->getId() . "_{$serverId}_{$index}";
-		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
+		$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
+		if (!$mediaServer)
+		{
+			KalturaLog::info("External media server with hostname [$hostname] is being used to stream this entry");
+		}
+		
+		$key = $this->getId() . "_{$hostname}_{$index}";
+		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
-		$server = new kLiveMediaServer($index, $mediaServer);
+		$server = new kLiveMediaServer($index, $mediaServer ? $mediaServer->getId() : null, $hostname, $mediaServer ? $mediaServer->getDc() : null);
 		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	
@@ -385,10 +390,10 @@ abstract class LiveEntry extends entry
 		return false;
 	}
 	
-	public function unsetMediaServer($index, $serverId)
+	public function unsetMediaServer($index, $hostname)
 	{
 		$server = $this->getFromCustomData("server-$index", 'mediaServers');
-		if($server && $server->getMediaServerId() == $serverId)
+		if($server && $server->getHostname() == $hostname)
 			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
 	}
 	
