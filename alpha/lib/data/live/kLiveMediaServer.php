@@ -33,12 +33,12 @@ class kLiveMediaServer
 	 */
 	protected $time;
 	
-	public function __construct($index, MediaServer $mediaServer)
+	public function __construct($index, $id, $hostname, $dc)
 	{
 		$this->index = $index;
-		$this->mediaServerId = $mediaServer->getId();
-		$this->hostname = $mediaServer->getHostname();
-		$this->dc = $mediaServer->getDc();
+		$this->mediaServerId = $id;
+		$this->hostname = $hostname;
+		$this->dc = $dc;
 		$this->time = time();
 	}
 	
