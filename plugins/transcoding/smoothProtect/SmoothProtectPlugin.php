@@ -2,7 +2,7 @@
 /**
  * @package plugins.smoothProtect
  */
-class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaPending, IKalturaConvertContributor
+class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaPending, IKalturaBatchJobDataContributor
 {
 	const PLUGIN_NAME = 'smoothProtect';
 	const PARAMS_STUB = '__params__';
@@ -95,8 +95,11 @@ class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader,
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
-	public static function contributeToConvertJobData ($enumValue, kConvertJobData $jobData)
+	public static function contributeToConvertJobData ($jobType, $jobSubType, kConvertJobData $jobData)
 	{
-		return IsmIndexPlugin::addIsmManifestsToSrcFileSyncDesc($jobData);
+		if($jobType == BatchJobType::CONVERT && $jobSubType == self::getApiValue(SmoothProtectConversionEngineType::SMOOTHPROTECT))
+			return IsmIndexPlugin::addIsmManifestsToSrcFileSyncDesc($jobData);
+		else 
+			return $jobData;
 	}
 }

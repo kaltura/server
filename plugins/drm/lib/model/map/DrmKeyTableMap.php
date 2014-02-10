@@ -42,7 +42,8 @@ class DrmKeyTableMap extends TableMap {
 		$this->addColumn('PROVIDER', 'Provider', 'INTEGER', true, null, null);
 		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', true, 20, null);
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'TINYINT', true, null, null);
-		$this->addColumn('KEY', 'Key', 'VARCHAR', true, 128, null);
+		$this->addColumn('DRM_KEY', 'DrmKey', 'VARCHAR', true, 128, null);
+		$this->addColumn('PARENT_ID', 'ParentId', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		// validators
