@@ -2211,6 +2211,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return myContentStorage::isTemplate( $thumb );
 	}
 	
+
+	public function getSourceType()
+	{
+		$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getSource());
+	
+		return (string)$sourceApi;
+	}
+	
 	public function setKuserId($v)
 	{
 		// if we set the kuserId when not needed - this causes the kuser object to be reset (even if the joinKuser was done properly)

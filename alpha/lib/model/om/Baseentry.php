@@ -7268,12 +7268,12 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collwidgets = null;
 		$this->collassetParamsOutputs = null;
 		$this->collassets = null;
-			$this->akshow = null;
-			$this->akuser = null;
-			$this->aaccessControl = null;
-			$this->aconversionProfile2 = null;
+		$this->akshow = null;
+		$this->akuser = null;
+		$this->aaccessControl = null;
+		$this->aconversionProfile2 = null;
 	}
-
+	
 	/* ---------------------- CustomData functions ------------------------- */
 
 	/**
