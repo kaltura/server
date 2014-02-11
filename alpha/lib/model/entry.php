@@ -330,6 +330,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this->getStatus();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see Baseentry::setModerationStatus()
+	 */
+	public function setModerationStatus($v)
+	{
+		if($v == $this->getModerationStatus())
+			return $this;
+			
+		if($v == entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION || $v == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW)
+			$this->incModerationCount();
+		
+		parent::setModerationStatus($v);
+	}
+	
 	public function setDefaultModerationStatus()
 	{
 		$should_moderate = false;
@@ -1123,7 +1137,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getDynamicAttributes()
 	{
-		return null;
+		$dynamicAttributes = array();
+
+		// Map catrgories to creation date
+		$categoryEntries = categoryEntryPeer::selectByEntryId( $this->getId() );
+		foreach ( $categoryEntries as $categoryEntry )
+		{
+			$createdAt = $categoryEntry->getCreatedAt( null ); // Passing null in order to get a numerical Unix Time Stamp instead of a string
+			
+			// Get the dyn. attrib. name in the format of: cat_{cat id}_createdAt (e.g.: cat_123_createdAt)
+			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryCreatedAtDynamicAttributeName( $categoryEntry->getCategoryId() );
+			
+			$dynamicAttributes[$dynAttribName] = $createdAt;
+		}
+
+		return $dynamicAttributes;
 	}
 	
 	/**
@@ -1873,6 +1901,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->putInCustomData( "width" , $width );
 	}
 	
+	public function setDimensionsIfBigger ($width, $height)
+	{
+		if( (is_null($this->getFromCustomData("width")) && is_null($this->getFromCustomData("height"))) 
+			|| ($width>$this->getFromCustomData("width") && $height>$this->getFromCustomData("height")) )
+			$this->setDimensions($width, $height);
+	}
+	
 	public function updateDimensions ( )
 	{
 		if ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
@@ -1915,10 +1950,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if( $this->getDisplayInSearch() == 0 ) return "";
 		if( $this->getDisplayInSearch() == 1 ) return "_PRIVATE_";
-		if( $this->getDisplayInSearch() >= 2 ) return "_KN_";
+		if ($this->getDisplayInSearch () >= 2)
+			return "_KN_";
 	}
 	
-	public function incModerationCount()	{		$this->setModerationCount( $this->getModerationCount() + 1 );	}
+	protected function incModerationCount()
+	{
+		$this->setModerationCount($this->getModerationCount() + 1);
+	}
 		
 	/**
 	 * @return partner
@@ -2437,17 +2476,53 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			entryPeer::KUSER_ID,
 			entryPeer::CREATOR_KUSER_ID,
 			entryPeer::ACCESS_CONTROL_ID,
+			
+			'' => array(
+				'replacementStatus',
+				'replacingEntryId',
+				'replacedEntryId',
+				'redirectEntryId',
+			)
 		);
 		
 		$changedProperties = array();
-		foreach($trackColumns as $trackColumn)
+		foreach($trackColumns as $namespace => $trackColumn)
 		{
-			if($this->isColumnModified($trackColumn))
+			if(is_array($trackColumn))
+			{
+				if(isset($this->oldCustomDataValues[$namespace]))
+				{
+					foreach($trackColumn as $trackCustomData)
+					{
+						if(isset($this->oldCustomDataValues[$namespace][$trackCustomData]))
+						{
+							$column = $trackCustomData;
+							if($namespace)
+								$column = "$namespace.$trackCustomData";
+								
+							$previousValue = $this->oldCustomDataValues[$namespace][$trackCustomData];
+							$newValue = $this->getFromCustomData($trackCustomData, $namespace);
+							$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
+						}
+					}
+				}
+			}
+			elseif($this->isColumnModified($trackColumn))
 			{
 				$column = entryPeer::translateFieldName($trackColumn, BasePeer::TYPE_COLNAME, BasePeer::TYPE_STUDLYPHPNAME);
 				$previousValue = $this->getColumnsOldValue($trackColumn);
 				$newValue = $this->getByName($trackColumn, BasePeer::TYPE_COLNAME);
 				$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
+			}
+		}
+		
+		if($this->getRedirectEntryId() && array_key_exists('', $this->oldCustomDataValues) && array_key_exists('redirectEntryId', $this->oldCustomDataValues['']))
+		{
+			$redirectEntry = entryPeer::retrieveByPK($this->getRedirectEntryId());
+			if($redirectEntry)
+			{
+				$redirectEntry->setModerationStatus($this->getModerationStatus());
+				$redirectEntry->save();
 			}
 		}
 		

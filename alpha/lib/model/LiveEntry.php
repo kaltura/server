@@ -197,7 +197,7 @@ abstract class LiveEntry extends entry
 	}
 	
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
 	
 	public function setLiveStreamConfigurations(array $v)
@@ -228,7 +228,7 @@ abstract class LiveEntry extends entry
 		$mediaServer = $this->getMediaServer();
 		if($mediaServer)
 		{
-			$streamName = $this->getStreamName();
+			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
@@ -425,16 +425,18 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		return array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		
+		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
 	
 	/**
 	 * @param entry $entry
 	 */
-	public function attachPendingMediaEntry(entry $entry, $requiredDuration)
+	public function attachPendingMediaEntry(entry $entry, $requiredDuration, $offset, $duration)
 	{
 		$attachedPendingMediaEntries = $this->getAttachedPendingMediaEntries();
-		$attachedPendingMediaEntries[$entry->getId()] = new kPendingMediaEntry($entry->getId(), kDataCenterMgr::getCurrentDcId(), $requiredDuration);
+		$attachedPendingMediaEntries[$entry->getId()] = new kPendingMediaEntry($entry->getId(), kDataCenterMgr::getCurrentDcId(), $requiredDuration, $offset, $duration);
 		
 		$this->setAttachedPendingMediaEntries($attachedPendingMediaEntries);
 	}

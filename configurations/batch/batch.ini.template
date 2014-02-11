@@ -77,7 +77,7 @@ enabledWorkers.KAsyncCopyPartner					= 1
 maximumExecutionTime			= 300
 params.tempDirectoryPath		= @TMP_DIR@
 engineOptions.asperaTempFolder	= @TMP_DIR@/aspera_upload
-
+;clientConfig.verifySSL = false
 
 [JobHandlerWorker : Worker]
 fileExistReties			= 3
@@ -209,6 +209,7 @@ params.avidemuxCmd									= @BIN_DIR@/avidemux2_cli
 params.segmenterCmd									= @BIN_DIR@/segmenter
 params.pdf2SwfCmd									= @BIN_DIR@/pdf2swf
 params.ImageMagickCmd								= @BIN_DIR@/convert
+params.ismIndexCmd									= @BIN_DIR@/ismIndex
 
 params.EncodingComUserId							= should-fail
 params.EncodingComUserKey							= should-fail
@@ -227,7 +228,7 @@ params.sharedTempPath 								= @WEB_DIR@/tmp/convert
 [KAsyncConvert : KAsyncConvertWorker]
 id													= 70
 friendlyName										= Convert
-filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
 ;affinity											= 
 
 ;params.minFileSize									= 

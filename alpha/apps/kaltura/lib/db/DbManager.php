@@ -9,6 +9,8 @@ class DbManager
 	
 	const EXTRA_DB_CONFIG_KEY = 'extra_db_configs';
 	
+	const STICKY_SESSION_PREFIX = 'StickySessionIndex:';
+	
 	/**
 	 * @var array
 	 */
@@ -175,13 +177,23 @@ class DbManager
 		self::$sphinxCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SPHINX_STICKY_SESSIONS);
 		if (!self::$sphinxCache)
 			return false;
-
-		self::$stickySessionKey = 'StickySessionIndex:'.infraRequestUtils::getRemoteAddress();	
+		
+		self::$stickySessionKey = self::getStickySessionKey();
 		$preferredIndex = self::$sphinxCache->get(self::$stickySessionKey);
 		if ($preferredIndex === false)
 			return false;
 		self::$cachedConnIndex = (int) $preferredIndex; //$preferredIndex returns from self::$sphinxCache->get(..) in type string
 		return $preferredIndex;
+	}
+	
+	protected static function getStickySessionKey() 
+	{
+		$ksObject = kCurrentContext::$ks_object;
+
+		if($ksObject && $ksObject->hasPrivilege(kSessionBase::PRIVILEGE_SESSION_KEY)) 
+			return self::STICKY_SESSION_PREFIX . kCurrentContext::getCurrentPartnerId() . "_" . $ksObject->getPrivilegeValue(kSessionBase::PRIVILEGE_SESSION_KEY);
+		
+		return self::STICKY_SESSION_PREFIX . infraRequestUtils::getRemoteAddress();
 	}
 	
 	/**

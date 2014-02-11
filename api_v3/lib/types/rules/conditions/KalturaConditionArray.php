@@ -46,6 +46,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaFieldMatchCondition();
 			case ConditionType::ASSET_PROPERTIES_COMPARE:
 				return new KalturaAssetPropertiesCompareCondition();
+			case ConditionType::USER_ROLE:
+				return new KalturaUserRoleCondition();
 			default:
 				return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}

@@ -31,7 +31,7 @@
  *
  * @author     Hans Lellelid <hans@xmpl.rg> (Propel)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @author     Magnús Þór Torfason <magnus@handtolvur.is> (Torque)
+ * @author     Magnus or Torfason <magnus@handtolvur.is> (Torque)
  * @author     Jason van Zyl <jvanzyl@apache.org> (Torque)
  * @author     Rafal Krzewski <Rafal.Krzewski@e-point.pl> (Torque)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
@@ -649,10 +649,15 @@ class Propel
 					throw new PropelException("Unable to open PDO connection dsn[$dsn] user[$user] password[$password]", $e);
 			}
 		}
+		
+		$totalConnTook = microtime(true) - $connStartTime;
 
 		if (class_exists("KalturaLog"))
-			KalturaLog::Log("total conn took ".(microtime(true) - $connStartTime)." $dsn");
+			KalturaLog::Log("total conn took $totalConnTook $dsn");
 
+		if (class_exists("KalturaMonitorClient"))
+			KalturaMonitorClient::monitorConnTook($dsn, $totalConnTook);
+		
 		// load any connection options from the config file
 		// connection attributes are those PDO flags that have to be set on the initialized connection
 		if (isset($conparams['attributes']) && is_array($conparams['attributes'])) {

@@ -197,14 +197,7 @@ class StorageProfile extends BaseStorageProfile
 			KalturaLog::debug('Flavor is not ready for export');
 			return false;
 		}
-
-		$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		if($this->isExported($key))
-		{
-			KalturaLog::debug('Flavor was already exported');
-			return false;
-		}
-			
+					
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
 			KalturaLog::debug('Flavor asset is not configured for export');
@@ -219,13 +212,22 @@ class StorageProfile extends BaseStorageProfile
 			return false;
 		}
 			
+		KalturaLog::debug('Flavor should be exported');
+		return true;	    
+	}
+	
+	public function shoudlExportFileSync(FileSyncKey $key)
+	{
+		if($this->isExported($key))
+		{
+			KalturaLog::debug('Flavor was already exported');
+			return false;
+		}
 		if(!$this->isValidFileSync($key))
 		{
 			KalturaLog::debug('File sync is not valid for export');
 			return false;
 		}
-
-		KalturaLog::debug('Flavor should be exported');
 		return true;	    
 	}
 	
@@ -249,9 +251,8 @@ class StorageProfile extends BaseStorageProfile
 	}
 	
 	
-	public function isPendingExport(asset $asset)
+	public function isPendingExport(FileSyncKey $key)
 	{
-	    $key = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 	    $c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		$c->addAnd(FileSyncPeer::DC, $this->getId(), Criteria::EQUAL);
 		$fileSync = FileSyncPeer::doSelectOne($c);

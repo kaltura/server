@@ -1,4 +1,137 @@
 ----------
+
+# IX-9.11.0 #
+
+## PlayReady, ISM Index, Smooth Protect##
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_02_09_change_drm_key_key_column_name.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add plugins: PlayReady, SmoothProtect
+  
+- update admin.ini:
+add
+moduls.drmPlayReady.enabled = true
+moduls.drmPlayReady.permissionType = 3
+moduls.drmPlayReady.label = DRM - PlayReady
+moduls.drmPlayReady.permissionName = PLAYREADY_PLUGIN_PERMISSION
+moduls.drmPlayReady.basePermissionType = 3
+moduls.drmPlayReady.basePermissionName = DRM_PLUGIN_PERMISSION
+moduls.drmPlayReady.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- update batch.ini
+1. add under KAsyncConvertWorker 
+params.ismIndexCmd									= @BIN_DIR@/ismIndex
+2. update under KAsyncConvert
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+
+*Binaries*
+- Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+- The ffmpeg-aux remains unchanged.
+
+
+
+----------
+
+# IX-9.10.0 #
+
+
+## Enhanced media server logging level ##
+
+**Configuration**
+
+*Edit @WOWZA_DIR@/conf/log4j.properties:*
+
+ - Change `log4j.rootCategory` = `INFO, stdout, serverAccess, serverError` 
+ - Remove `log4j.category.KalturaServer.class`
+ - Add `log4j.logger.com.kaltura` = `DEBUG`
+ - Change `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+ - Change `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+
+
+## Live stream multiple flavors ingestion ##
+
+Enable streaming more than one source.
+
+**Deployment:**
+
+*Shared Content*
+
+- Add source LiveParams using deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+
+*Media Server*
+
+- Change transcoding template to `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/streamName/${SourceStreamName}/f/transcode.xml`
+
+
+
+## Entry redirect moderation ##
+The moderation status is copied to the redirected entry from the original entry when the redirect defined.
+
+## Media Server - support multiple sources ingestion ##
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+- deployment/updates/scripts/add_permissions/2014_01_14_conversion_profile_asset_params_media_server.php
+- deployment/updates/scripts/add_permissions/2014_01_21_media_server_partner_live.php
+
+
+## Media Server - DVR with edge-origin ##
+Fixed broadcast path to use query string instead of slashed parameters.
+
+*Data Migration*
+
+- deployment/updates/scripts/2014_01_22_fix_broadcast_urls.php
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
+
+## PlayReady, ISM Index, Smooth Protect - regression only ##
+Initial version of PlayReady, Ism Index and Smooth Protect. PlayReady and SmoothProtect plugins will not be activated. 
+This version deployed for regression purposes only.
+
+*DB Changes*
+
+- deployment/updates/sql/2013_10_22_add_drm_policy_table.sql
+- deployment/updates/sql/2013_12_10_add_drm_device_table.sql
+- deployment/updates/sql/2013_12_31_add_drm_key_table.sql
+- deployment/updates/sql/2014_01_14_audit_trail_config_admin_console_partner_updates.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add IsmIndex plugin
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+- deployment/updates/scripts/add_permissions/2013_12_10_add_drm_device_permissions.php 
+
+----------
+
+# IX-9.9.0 #
+
+## Media Server - live stream recording ##
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_15_conversionprofileassetparams_permission_media_partner.php
+
+----------
  
 # IX-9.8.0 #
 
@@ -145,6 +278,7 @@ Deployment instructions:
 	* The directory owner should be apache and its group should be kaltura.
 * Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
 * Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
+* Open the file studio.ini (within the studio project files) and update "html5_version" to include the rc version.
 * Execute deployment script on studio.ini file (located in studio project root):
 From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
 

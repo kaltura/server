@@ -106,12 +106,13 @@ class KAsyncMailer extends KJobHandlerWorker
 		
 		try
 		{
+			$separator = $data->separator;
  			$result = $this->sendEmail( 
  				$data->recipientEmail,
  				$data->recipientName,
  				$data->mailType,
- 				explode ( "|" , $data->subjectParams ) ,
- 				explode ( "|" , $data->bodyParams ),
+ 				explode ( $separator , $data->subjectParams ) ,
+ 				explode ( $separator , $data->bodyParams ),
  				$data->fromEmail ,
  				$data->fromName,
  				$data->language,

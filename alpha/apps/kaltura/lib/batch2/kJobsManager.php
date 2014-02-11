@@ -195,15 +195,18 @@ class kJobsManager
 		}
 	}
 	
-	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null)
+	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null)
 	{
 	  	$jobData = new kMailJobData();
 		$jobData->setMailPriority($mailPriority);
 	 	$jobData->setMailType($mailType);
-	 	
+		
 	 	$jobData->setFromEmail($fromEmail);
 	 	$jobData->setFromName($fromName);
 	 	
+		if ($separator)
+			$jobData->setSeparator($separator);
+		
 	 	$jobData->setBodyParamsArray($bodyParams);
 		$jobData->setSubjectParamsArray($subjectParams);
 		
@@ -218,6 +221,7 @@ class kJobsManager
 	 	$partner = PartnerPeer::retrieveByPK($partnerId);
 		$jobData->setLanguage($partner->getLanguage()); 
 	 	
+		
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -303,6 +307,7 @@ class kJobsManager
 				$srcFileSyncDescriptor->setFileSyncLocalPath($fileSync->getFullPath());
 			$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($entry->getId()));
 			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());			
+			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());		
 		}
 		
 		// increment entry version
@@ -490,6 +495,7 @@ class kJobsManager
 				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId()));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
 				$srcFileSyncDescriptor->setAssetParamsId($srcFlavorAsset->getFlavorParamsId());
+				$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());
 				$srcFileSyncs[] = $srcFileSyncDescriptor;
 			}
 		}
@@ -578,7 +584,7 @@ class kJobsManager
 		return $fileSync;		
 	}
 	
-	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData $convertData)
+	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData &$convertData)
 	{
 		KalturaLog::log("Conversion engines string: '" . $flavor->getConversionEngines() . "'");
 		
@@ -672,9 +678,28 @@ class kJobsManager
 			}
 		}
 		KalturaLog::log("Using conversion engine [$currentConversionEngine]");
+		
+		self::contributeToConvertJobData($currentConversionEngine, $convertData);
+		
 		$dbCurrentConversionEngine = kPluginableEnumsManager::apiToCore('conversionEngineType', $currentConversionEngine);
 		
 		return $dbCurrentConversionEngine;
+	}
+	/**
+	 * 
+	 * Allow plugin to set additional information on ConvertJobData object
+	 * 
+	 * @param string $conversionEngineId
+	 * @param kConvertJobData $convertData
+	 */
+	private static function contributeToConvertJobData($conversionEngineId, kConvertJobData &$convertData)
+	{
+		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
+		if($plugin && $plugin instanceof IKalturaBatchJobDataContributor)
+		{
+			KalturaLog::log("Setting additional data by plugin");
+			$convertData = $plugin->contributeToConvertJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
+		}
 	}
 	
 	/**

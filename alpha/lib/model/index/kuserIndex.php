@@ -5,6 +5,14 @@
 */
 class kuserIndex extends BaseIndexObject
 {
+	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
+
+	const FIRST_NAME_OR_LAST_NAME = "first_name_or_last_name";
+
+	const PUSER_ID_OR_SCREEN_NAME = "puser_id_or_screen_name";
+
+	const PLUGINS_DATA = "plugins_data";
+
 	public static function getObjectName()
 	{
 		return 'kuser';

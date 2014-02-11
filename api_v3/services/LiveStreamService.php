@@ -99,8 +99,15 @@ class LiveStreamService extends KalturaLiveEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
-			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kDataCenterMgr::getCurrentDcId(), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+			
+			$otherDCs = kDataCenterMgr::getAllDcs();
+			if(count($otherDCs))
+			{
+				$otherDc = reset($otherDCs);
+				$otherDcId = $otherDc['id'];
+				$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, $otherDcId, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			}
 		}
 		
 		return $dbEntry;
@@ -160,14 +167,6 @@ class LiveStreamService extends KalturaLiveEntryService
 		$filter->attachToCriteria($baseCriteria);
 		
 		$entries = entryPeer::doSelect($baseCriteria);
-		$liveParamsInputs = count($entries) + 1;
-		$maxLiveStreamInputs = $this->getPartner()->getMaxLiveStreamInputs();
-		if(is_null($maxLiveStreamInputs))
-			$maxLiveStreamInputs = kConf::get('partner_max_live_stream_inputs', 'local', 10);
-			
-		KalturaLog::debug("live params inputs [$liveParamsInputs], max live stream inputs [$maxLiveStreamInputs]");
-		if($liveParamsInputs > $maxLiveStreamInputs)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_INPUTS, $entryId);
 			
 		foreach($entries as $liveEntry)
 		{
@@ -184,17 +183,31 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 			
 		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($liveParamsCounts));
+		$liveParamsInputs = 0;
 		$liveParamsOutputs = 0;
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem LiveParams */
-			if(!$liveParamsItem->hasTag(liveParams::TAG_SOURCE))
+			if($liveParamsItem->hasTag(liveParams::TAG_INGEST))
+			{
+				KalturaLog::debug("Input live params [" . $liveParamsItem->getId() . "] [" . $liveParamsItem->getSystemName() . "]: " . $liveParamsCounts[$liveParamsItem->getId()]);
+				$liveParamsInputs += $liveParamsCounts[$liveParamsItem->getId()];
+			}
+			else
 			{
 				KalturaLog::debug("Output live params [" . $liveParamsItem->getId() . "] [" . $liveParamsItem->getSystemName() . "]: " . $liveParamsCounts[$liveParamsItem->getId()]);
 				$liveParamsOutputs += $liveParamsCounts[$liveParamsItem->getId()];
 			}
 		}
 		
+		$maxLiveStreamInputs = $this->getPartner()->getMaxLiveStreamInputs();
+		if(is_null($maxLiveStreamInputs))
+			$maxLiveStreamInputs = kConf::get('partner_max_live_stream_inputs', 'local', 30);
+			
+		KalturaLog::debug("live params inputs [$liveParamsInputs], max live stream inputs [$maxLiveStreamInputs]");
+		if($liveParamsInputs > $maxLiveStreamInputs)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_INPUTS, $entryId);
+			
 		$maxLiveStreamOutputs = $this->getPartner()->getMaxLiveStreamOutputs();
 		if(is_null($maxLiveStreamOutputs))
 			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', 'local', 30);
@@ -312,13 +325,14 @@ class LiveStreamService extends KalturaLiveEntryService
 		kApiCache::disableConditionalCache();
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			
 		}
 		else
 		{

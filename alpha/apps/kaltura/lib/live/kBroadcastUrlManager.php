@@ -31,14 +31,20 @@ class kBroadcastUrlManager
 		return new kBroadcastUrlManager($partnerId);
 	}
 	
-	public function getBroadcastUrl(entry $entry, $mediaServerIndex)
+	public function getBroadcastUrl(entry $entry, $dc, $mediaServerIndex)
 	{
-		$mediaServerConfig = kConf::get($mediaServerIndex, 'broadcast');
+		$mediaServerConfig = kConf::get($dc, 'broadcast');
 		$url = 'rtmp://' . $mediaServerConfig['domain'];
 		$app = $mediaServerConfig['application'];
-		$partnerId = $this->partnerId;
-		$entryId = $entry->getId();
-		$token = $entry->getStreamPassword();
-		return "$url/$app/p/$partnerId/e/$entryId/i/$mediaServerIndex/t/$token"; 
+		
+		$params = array(
+			'p' => $this->partnerId,
+			'e' => $entry->getId(),
+			'i' => $mediaServerIndex,
+			't' => $entry->getStreamPassword(),
+		);
+		$paramsStr = http_build_query($params);
+		
+		return "$url/$app?$paramsStr"; 
 	}
 }

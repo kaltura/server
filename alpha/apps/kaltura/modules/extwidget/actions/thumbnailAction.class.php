@@ -5,23 +5,6 @@
  */
 class thumbnailAction extends sfAction
 {
-	private static function notifyProxy($msg)
-	{
-        $server = kConf::get ( "image_proxy_url" );
-        
-        if ($server && (requestUtils::getRemoteAddress() != $server ))
-        {
-			$sock = socket_create(AF_INET,SOCK_DGRAM,SOL_UDP);
-	        if ($sock)
-	        {
-	                $secret = kConf::get ( "image_proxy_secret" );
-	                $port = kConf::get ( "image_proxy_port" );
-	                $data = md5($secret.$msg).$msg;
-	                socket_sendto($sock, $data, strlen($data),0 , $server, $port);
-	                socket_close($sock);
-	        }
-        }
-	}
 	
 	static private $extensions = array(
 		'jpg',
@@ -400,12 +383,6 @@ class thumbnailAction extends sfAction
 			$cacheAge = 60;
 		else
 			$cacheAge = 8640000;
-		
-		// notify external proxy, so it'll cache this url
-		if (!$nocache && requestUtils::getHost() == kConf::get ( "apphome_url" )  && file_exists($tempThumbPath))
-		{
-			self::notifyProxy($_SERVER["REQUEST_URI"]);
-		}
 		
 		// cache result
 		if (!$nocache)

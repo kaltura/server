@@ -48,6 +48,8 @@ class assetParams extends BaseassetParams
 	const TAG_SLWEB = "slweb";
 	const TAG_APPLEMBR = "applembr";
 	const TAG_THUMBSOURCE = "thumbsource";
+	const TAG_INGEST = "ingest";
+	const TAG_ISM_MANIFEST = "ism_manifest";
 	
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	

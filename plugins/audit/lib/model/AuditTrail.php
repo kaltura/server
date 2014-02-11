@@ -148,8 +148,17 @@ class AuditTrail extends BaseAuditTrail
 		kuserPeer::setUseCriteriaFilter(false);
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->puserId, true);
 		kuserPeer::setUseCriteriaFilter(true);
+		
+		if ( !$kuser )
+		{
+			// Associate new kuser for the specified partner
+			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $v);
+		}
+		
 		if($kuser)
+		{
 			return $this->setKuserId($kuser->getId());
+		}
 	}
 	
 	/* (non-PHPdoc)

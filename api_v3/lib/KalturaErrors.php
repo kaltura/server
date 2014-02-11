@@ -212,6 +212,8 @@ class KalturaErrors extends APIErrors
 
 	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND;ID;Asset id \"@ID@\" not found";
 
+	const ASSET_PARAMS_ORIGIN_NOT_SUPPORTED = "LIVE_PARAMS_ORIGIN_NOT_SUPPORTED;ID,TYPE,ORIGIN;Asset params @ID@ of type @TYPE@ does not support origin @ORIGIN@";
+
 	/**
 	 * FlavorAsset Service
 	 */
@@ -508,6 +510,10 @@ class KalturaErrors extends APIErrors
 	/*
 	 * MediaServer Service
 	 */
-	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server \"@MEDIA_SERVER_ID@\" not found";
+	const MEDIA_SERVER_NOT_FOUND = "MEDIA_SERVER_NOT_FOUND;MEDIA_SERVER_ID;Media server [@MEDIA_SERVER_ID@] not found";
+	
+	const NO_MEDIA_SERVER_FOUND = "NO_MEDIA_SERVER_FOUND;ENTRY_ID;No media server found for entry [@ENTRY_ID@]";
+	
+	const MEDIA_SERVER_SERVICE_NOT_FOUND = "MEDIA_SERVER_SERVICE_NOT_FOUND;MEDIA_SERVER_ID,SERVICE;Media server [@MEDIA_SERVER_ID@] service [@SERVICE@] not found";
 	
 }

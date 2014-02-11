@@ -986,7 +986,13 @@ class kuser extends Basekuser implements IIndexable
 		}
 		
 		$this->setLoginDataId($loginData->getId());
-				
+
+		//Email notification on user creation is sent while using kuser email so make sure this field is set before enabling login
+		//if not than set the email to be the $loginId provided to this action (we now know this is a valid email since "addLoginData" verifies this)
+		if(!$this->getEmail()) {
+			$this->setEmail($loginId);
+		}
+		
 		if ($sendEmail)
 		{
 			if ($loginDataExisted) {

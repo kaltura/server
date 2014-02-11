@@ -15,4 +15,22 @@ class KalturaJsonSerializer extends KalturaSerializer
 		$object = parent::prepareSerializedObject($object);
 		return json_encode($object);
 	}
+
+	public function getItemFooter($lastItem = false)
+	{
+		if(!$lastItem)
+			return ',';
+		
+		return '';
+	}
+	
+	public function getMulitRequestHeader($itemsCount = null)
+	{
+		return '[';
+	}
+	
+	public function getMulitRequestFooter()
+	{
+		return ']';
+	}
 }

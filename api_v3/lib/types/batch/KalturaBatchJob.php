@@ -7,7 +7,7 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 {
 	
 	/**
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 * @filter eq,gte
 	 */

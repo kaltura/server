@@ -280,7 +280,7 @@ class ConversionProfileService extends KalturaBaseService
 			$fpc->setSystemName($assetParams->getSystemName());
 			$fpc->setForceNoneComplied(false);
 			
-			if($assetParams->hasTag(assetParams::TAG_SOURCE))
+			if($assetParams->hasTag(assetParams::TAG_SOURCE) || $assetParams->hasTag(assetParams::TAG_INGEST))
 				$fpc->setOrigin(assetParamsOrigin::INGEST);
 			else
 				$fpc->setOrigin(assetParamsOrigin::CONVERT);
