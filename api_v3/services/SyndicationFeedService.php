@@ -79,23 +79,25 @@ class SyndicationFeedService extends KalturaBaseService
 			{
 				$assetParams = assetParamsPeer::retrieveByPK($syndicationFeed->flavorParamId);
 				
-				$fpc = new flavorParamsConversionProfile();
-				$fpc->setConversionProfileId($partner->getDefaultConversionProfileId());
-				$fpc->setFlavorParamsId($syndicationFeed->flavorParamId);
-				
 				if($assetParams)
 				{
-					$fpc->setReadyBehavior($assetParams->getReadyBehavior());
-					$fpc->setSystemName($assetParams->getSystemName());
+					$fpc = new flavorParamsConversionProfile();
+					$fpc->setConversionProfileId($partner->getDefaultConversionProfileId());
+					$fpc->setFlavorParamsId($syndicationFeed->flavorParamId);
+					
+					if($assetParams)
+					{
+						$fpc->setReadyBehavior($assetParams->getReadyBehavior());
+						$fpc->setSystemName($assetParams->getSystemName());
+					}
+					
+					if($assetParams->hasTag(assetParams::TAG_SOURCE) || $assetParams->hasTag(assetParams::TAG_INGEST))
+						$fpc->setOrigin(assetParamsOrigin::INGEST);
+					else
+						$fpc->setOrigin(assetParamsOrigin::CONVERT);
+					
+					$fpc->save();
 				}
-				
-				if($assetParams->hasTag(assetParams::TAG_SOURCE) || $assetParams->hasTag(assetParams::TAG_INGEST))
-					$fpc->setOrigin(assetParamsOrigin::INGEST);
-				else
-					$fpc->setOrigin(assetParamsOrigin::CONVERT);
-				
-				
-				$fpc->save();
 			}
 		}
 		
