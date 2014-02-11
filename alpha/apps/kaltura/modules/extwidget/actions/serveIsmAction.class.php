@@ -55,7 +55,7 @@ class serveIsmAction extends sfAction
 			if ($hasVersion)
 			{
 				$version = substr($objectId, 13);
-				$subType = substr($objectId, 11, 12);
+				$subType = substr($objectId, 11, 1);
 				$objectId = substr($objectId, 0, 10);
 				KalturaLog::debug('objectId: '.$objectId.', subType: '.$subType.', version: '.$version);
 			}
