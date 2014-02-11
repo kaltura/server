@@ -128,6 +128,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function objectChanged (BaseObject $object, array $modifiedColumns)
     {
+    	$privacyContexts = null;
         if ($object instanceof entry)
         {
         	$criteria = new Criteria();
@@ -160,9 +161,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         $tagsForUpdate = implode(',', array_diff(explode(',', $newTags), explode(',', $oldTags)));
         
         if ($oldTags && $oldTags != "")
-            self::decrementExistingTagsInstanceCount($tagsForDelete, $object->getPartnerId(), get_class($object), isset($privacyContexts) ? $privacyContexts : null);
+            self::decrementExistingTagsInstanceCount($tagsForDelete, $object->getPartnerId(), get_class($object), $privacyContexts);
 
-        self::addOrIncrementTags($tagsForUpdate, $object->getPartnerId(), get_class($object), isset($privacyContexts) ? $privacyContexts : null);
+        self::addOrIncrementTags($tagsForUpdate, $object->getPartnerId(), get_class($object), $privacyContexts);
     }
 
 	/* (non-PHPdoc)
