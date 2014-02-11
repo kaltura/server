@@ -356,48 +356,12 @@ class KalturaRequestDeserializer
 			case "bigint":
 				return (double)$var;
 			case "time":
-				// empty fields should be treated as 0 and not the current time
-				if (strlen($var) == 0)
-					return 0;
-				$maxRelativeTime = kConf::get('max_relative_time');
-				$relativeTimeEnabled = $this->isRelativeTimeEnabled();
-				$var = (int)$var;
-				if ($relativeTimeEnabled && -$maxRelativeTime <= $var && $var <= $maxRelativeTime)
-				{
-					$time = $this->getTime();
-					$var = $time + $var;
-				}
+				if (!$this->disableRelativeTime)
+					$var = kTime::getRelativeTime($var);
+
 				return $var;
 		}
 		
 		return null;
-	}
-
-	/**
-	 * Looks for the time that is stored under ks privilege as reference time.
-	 * If not found, returns time().
-	 *
-	 * @return int
-	 */
-	private function getTime()
-	{
-		if (kCurrentContext::$ks_object)
-		{
-			$referenceTime = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_REFERENCE_TIME);
-			if ($referenceTime)
-				return (int)$referenceTime;
-		}
-		return kApiCache::getTime();
-	}
-
-	private function isRelativeTimeEnabled()
-	{
-		if ($this->disableRelativeTime)
-			return false;
-
-		if (!kConf::hasParam('disable_relative_time_partners'))
-			return true;
-
-		return !in_array(kCurrentContext::getCurrentPartnerId(), kConf::get('disable_relative_time_partners'));
 	}
 }

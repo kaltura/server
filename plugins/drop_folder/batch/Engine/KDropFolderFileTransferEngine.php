@@ -29,6 +29,20 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			/* @var $physicalFile FileObject */	
 			$physicalFileName = $physicalFile->filename;
+			$utfFileName = kString::stripUtf8InvalidChars($physicalFileName);
+			
+			if($physicalFileName != $utfFileName)
+			{
+				KalturaLog::info("File name [$physicalFileName] is not utf-8 compatible, Skipping file...");
+				continue;
+			}
+			
+			if(!kXml::isXMLValidContent($utfFileName))
+			{
+				KalturaLog::info("File name [$physicalFileName] contains invalid XML characters, Skipping file...");
+				continue;
+			}
+			
 			if ($this->dropFolder->incremental && $physicalFile->modificationTime < $this->dropFolder->lastFileTimestamp)
 			{
 				KalturaLog::info("File modification time [" . $physicalFile->modificationTime ."] predates drop folder last timestamp [". $this->dropFolder->lastFileTimestamp ."]. Skipping.");

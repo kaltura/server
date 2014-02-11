@@ -25,8 +25,12 @@ configurations/google_auth.ini
 configurations/var.ini
 configurations/widevine.ini
 tests/lib/
+configurations/batch/config.ini
 plugins/.buildpath
 plugins/.settings/*
 alpha/.settings/
 .idea
 .DS_Store
+admin_console/lib/Kaltura/Client/
+cache/
+batch/client/

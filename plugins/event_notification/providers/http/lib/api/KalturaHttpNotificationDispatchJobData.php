@@ -146,12 +146,6 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 	public $customHeaders;
 	
 	/**
-	 * Define the content dynamic parameters
-	 * @var KalturaKeyValueArray
-	 */
-	public $contentParameters;
-	
-	/**
 	 * The secret to sign the notification with
 	 * @var string
 	 */
@@ -177,7 +171,6 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		'sslKey',
 		'sslKeyPassword',
 		'customHeaders',
-		'contentParameters',
 		'signSecret',
 	);
 
