@@ -45,6 +45,10 @@ class LiveStreamService extends KalturaLiveEntryService
 		if($sourceType)
 			$liveStreamEntry->sourceType = $sourceType;
 	
+		// TODO remove this hack after the default dvrWindow in the KMC changed or removed
+		if($liveStreamEntry->dvrWindow == 1440)
+			$liveStreamEntry->dvrWindow = 120;
+			
 		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
 		$dbEntry->save();
 		
