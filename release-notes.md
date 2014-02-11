@@ -24,7 +24,7 @@ moduls.drmPlayReady.group = GROUP_ENABLE_DISABLE_FEATURES
 
 - update batch.ini
 1. add under KAsyncConvertWorker 
-params.ismIndexCmd									= @BIN_DIR@/ismIndex
+params.ismIndexCmd									= @BIN_DIR@/ismindex
 2. update under KAsyncConvert
 filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
 
