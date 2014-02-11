@@ -849,7 +849,7 @@ class playManifestAction extends kalturaAction
 	private function getFlavorAssetInfo($url, $urlPrefix = '', $flavor = null)
 	{
 		$ext = null;
-		if ($flavor && $flavor instanceof asset)
+		if ($flavor && is_callable(array($flavor, 'getFileExt')))
 		{
 			$ext = $flavor->getFileExt();
 		}
