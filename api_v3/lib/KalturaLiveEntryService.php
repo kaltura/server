@@ -45,7 +45,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$kResource = $resource->toObject();
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath(), $duration);
+		if ($kResource instanceof kUploadedFileTokenResource)
+		{
+			$target = kConf::get('uploaded_segment_destination') . basename($kResource->getLocalFilePath());
+			kFile::moveFile($kResource->getLocalFilePath(), $target);
+			chgrp($target, kConf::get('content_group'));
+			chmod($target, 0775);
+		}
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex,$target, $duration);
 	}
 
 	/**
