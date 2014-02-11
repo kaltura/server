@@ -2,7 +2,7 @@
 /**
  * @package plugins.ismIndex
  */
-class IsmIndexPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers, IKalturaConvertContributor
+class IsmIndexPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers, IKalturaBatchJobDataContributor
 {
 	const PLUGIN_NAME = 'ismIndex';
 	const ISM_INDEX_EVENTS_CONSUMER = 'kIsmIndexEventsConsumer';
@@ -106,9 +106,9 @@ class IsmIndexPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
-	public static function contributeToConvertJobData ($enumValue, kConvertJobData $jobData)
+	public static function contributeToConvertJobData ($jobType, $jobSubType, kConvertJobData $jobData)
 	{
-		if($enumValue == self::getApiValue(IsmIndexConversionEngineType::ISM_MANIFEST))
+		if($jobType == BatchJobType::CONVERT && $jobSubType == self::getApiValue(IsmIndexConversionEngineType::ISM_MANIFEST))
 			return self::addIsmManifestsToSrcFileSyncDesc($jobData);
 		else
 			return $jobData;

@@ -3,31 +3,29 @@
  * @package api
  * @subpackage objects
  */
-class KalturaSourceFileSyncDescriptor extends KalturaFileSyncDescriptor
+class KalturaFileSyncDescriptor extends KalturaObject
 {
+	/**
+	 * @var string
+	 */
+	public $fileSyncLocalPath;
+	
 	/**
 	 * The translated path as used by the scheduler
 	 * @var string
 	 */
-	public $actualFileSyncLocalPath;
+	public $fileSyncRemoteUrl;
 	
 	/**
-	 * 
-	 * @var string
-	 */
-	public $assetId;
-	
-	/**
-	 * 
 	 * @var int
 	 */
-	public $assetParamsId;
+	public $fileSyncObjectSubType;
 	
 	private static $map_between_objects = array
 	(
-		"actualFileSyncLocalPath" ,
-		"assetId" ,
-		"assetParamsId" ,
+		"fileSyncLocalPath" ,
+		"fileSyncRemoteUrl" ,
+		"fileSyncObjectSubType" ,
 	);
 
 
@@ -39,7 +37,7 @@ class KalturaSourceFileSyncDescriptor extends KalturaFileSyncDescriptor
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kSourceFileSyncDescriptor();
+			$dbObject = new kFileSyncDescriptor();
 			
 		return parent::toObject($dbObject, $skip);
 	}

@@ -50,10 +50,16 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 	protected $object_type;
 
 	/**
-	 * The value for the key field.
+	 * The value for the drm_key field.
 	 * @var        string
 	 */
-	protected $key;
+	protected $drm_key;
+
+	/**
+	 * The value for the parent_id field.
+	 * @var        int
+	 */
+	protected $parent_id;
 
 	/**
 	 * The value for the created_at field.
@@ -163,13 +169,23 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [key] column value.
+	 * Get the [drm_key] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getKey()
+	public function getDrmKey()
 	{
-		return $this->key;
+		return $this->drm_key;
+	}
+
+	/**
+	 * Get the [parent_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getParentId()
+	{
+		return $this->parent_id;
 	}
 
 	/**
@@ -368,27 +384,50 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 	} // setObjectType()
 
 	/**
-	 * Set the value of [key] column.
+	 * Set the value of [drm_key] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     DrmKey The current object (for fluent API support)
 	 */
-	public function setKey($v)
+	public function setDrmKey($v)
 	{
-		if(!isset($this->oldColumnsValues[DrmKeyPeer::KEY]))
-			$this->oldColumnsValues[DrmKeyPeer::KEY] = $this->key;
+		if(!isset($this->oldColumnsValues[DrmKeyPeer::DRM_KEY]))
+			$this->oldColumnsValues[DrmKeyPeer::DRM_KEY] = $this->drm_key;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->key !== $v) {
-			$this->key = $v;
-			$this->modifiedColumns[] = DrmKeyPeer::KEY;
+		if ($this->drm_key !== $v) {
+			$this->drm_key = $v;
+			$this->modifiedColumns[] = DrmKeyPeer::DRM_KEY;
 		}
 
 		return $this;
-	} // setKey()
+	} // setDrmKey()
+
+	/**
+	 * Set the value of [parent_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DrmKey The current object (for fluent API support)
+	 */
+	public function setParentId($v)
+	{
+		if(!isset($this->oldColumnsValues[DrmKeyPeer::PARENT_ID]))
+			$this->oldColumnsValues[DrmKeyPeer::PARENT_ID] = $this->parent_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->parent_id !== $v) {
+			$this->parent_id = $v;
+			$this->modifiedColumns[] = DrmKeyPeer::PARENT_ID;
+		}
+
+		return $this;
+	} // setParentId()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -525,9 +564,10 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 			$this->provider = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->object_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->object_type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->key = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->drm_key = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->parent_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -537,7 +577,7 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 8; // 8 = DrmKeyPeer::NUM_COLUMNS - DrmKeyPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = DrmKeyPeer::NUM_COLUMNS - DrmKeyPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DrmKey object", $e);
@@ -590,7 +630,9 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		DrmKeyPeer::setUseCriteriaFilter(false);
-		$stmt = DrmKeyPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		DrmKeyPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -790,8 +832,7 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -838,7 +879,7 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1000,12 +1041,15 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 				return $this->getObjectType();
 				break;
 			case 5:
-				return $this->getKey();
+				return $this->getDrmKey();
 				break;
 			case 6:
-				return $this->getCreatedAt();
+				return $this->getParentId();
 				break;
 			case 7:
+				return $this->getCreatedAt();
+				break;
+			case 8:
 				return $this->getUpdatedAt();
 				break;
 			default:
@@ -1034,9 +1078,10 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 			$keys[2] => $this->getProvider(),
 			$keys[3] => $this->getObjectId(),
 			$keys[4] => $this->getObjectType(),
-			$keys[5] => $this->getKey(),
-			$keys[6] => $this->getCreatedAt(),
-			$keys[7] => $this->getUpdatedAt(),
+			$keys[5] => $this->getDrmKey(),
+			$keys[6] => $this->getParentId(),
+			$keys[7] => $this->getCreatedAt(),
+			$keys[8] => $this->getUpdatedAt(),
 		);
 		return $result;
 	}
@@ -1084,12 +1129,15 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 				$this->setObjectType($value);
 				break;
 			case 5:
-				$this->setKey($value);
+				$this->setDrmKey($value);
 				break;
 			case 6:
-				$this->setCreatedAt($value);
+				$this->setParentId($value);
 				break;
 			case 7:
+				$this->setCreatedAt($value);
+				break;
+			case 8:
 				$this->setUpdatedAt($value);
 				break;
 		} // switch()
@@ -1121,9 +1169,10 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setProvider($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setObjectId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setObjectType($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setKey($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[5], $arr)) $this->setDrmKey($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setParentId($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
 	}
 
 	/**
@@ -1140,7 +1189,8 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DrmKeyPeer::PROVIDER)) $criteria->add(DrmKeyPeer::PROVIDER, $this->provider);
 		if ($this->isColumnModified(DrmKeyPeer::OBJECT_ID)) $criteria->add(DrmKeyPeer::OBJECT_ID, $this->object_id);
 		if ($this->isColumnModified(DrmKeyPeer::OBJECT_TYPE)) $criteria->add(DrmKeyPeer::OBJECT_TYPE, $this->object_type);
-		if ($this->isColumnModified(DrmKeyPeer::KEY)) $criteria->add(DrmKeyPeer::KEY, $this->key);
+		if ($this->isColumnModified(DrmKeyPeer::DRM_KEY)) $criteria->add(DrmKeyPeer::DRM_KEY, $this->drm_key);
+		if ($this->isColumnModified(DrmKeyPeer::PARENT_ID)) $criteria->add(DrmKeyPeer::PARENT_ID, $this->parent_id);
 		if ($this->isColumnModified(DrmKeyPeer::CREATED_AT)) $criteria->add(DrmKeyPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DrmKeyPeer::UPDATED_AT)) $criteria->add(DrmKeyPeer::UPDATED_AT, $this->updated_at);
 
@@ -1220,7 +1270,9 @@ abstract class BaseDrmKey extends BaseObject  implements Persistent {
 
 		$copyObj->setObjectType($this->object_type);
 
-		$copyObj->setKey($this->key);
+		$copyObj->setDrmKey($this->drm_key);
+
+		$copyObj->setParentId($this->parent_id);
 
 		$copyObj->setCreatedAt($this->created_at);
 
