@@ -463,6 +463,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				{
 					$this->createLiveConversionProfiles($object_to_fill);
 				}
+				if($dbPermission->getStatus() == PermissionStatus::ACTIVE)
+					$this->enablePermissionForPlugins($object_to_fill->getId(), $dbPermission->getName());
 			}
 		}
 		
@@ -484,5 +486,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
 		
 		return $object_to_fill;
+	}
+	
+	private function enablePermissionForPlugins($partnerId, $permissionName)
+	{
+		if(strstr($permissionName, '_PLUGIN_PERMISSION'))
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPermissionsEnabler');
+			foreach($pluginInstances as $pluginInstance)
+			{
+				$pluginInstance->permissionEnabled($partnerId, $permissionName);
+			}					
+		}
 	}
 }
