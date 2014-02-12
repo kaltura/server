@@ -43,6 +43,7 @@ class serveIsmAction extends sfAction
 		
 		kFileUtils::dumpFile($path);
 	}
+	
 	private function getFileSyncKey($objectId, $type)
 	{
 		$key = null;
@@ -50,42 +51,51 @@ class serveIsmAction extends sfAction
 		$version = null;
 		$object = null;
 		$subType = null;
-		if($type == 'ism' || $type == 'ismc')
+		$isAsset = false;
+		
+		if($hasVersion)
 		{
-			if ($hasVersion)
+			$parts = explode('_', $objectId);
+			if(count($parts) == 4)
 			{
-				$version = substr($objectId, 13);
-				$subType = substr($objectId, 11, 1);
-				$objectId = substr($objectId, 0, 10);
+				$objectId = $parts[0].'_'.$parts[1];
+				$subType = $parts[2];
+				$version = $parts[3];
+				
 				KalturaLog::debug('objectId: '.$objectId.', subType: '.$subType.', version: '.$version);
 			}
-			if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM || $subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
+			else if(count($parts) == 5)
 			{
-				$object = $this->getObject($objectId, true);
-			}	
-			else
-			{
-				$subType = $type == "ism" ? entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM : entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
-				$object = $this->getObject($objectId, false);
-			}		
+				$entryId = $parts[0].'_'.$parts[1];
+				$objectId = $parts[2].'_'.$parts[3];
+				$version = $parts[4];
+				$isAsset = true;
+				
+				KalturaLog::debug('objectId: '.$objectId.', version: '.$version);
+			}				
 		}
-		else if ($type == 'ismv')
-		{
-			if ($hasVersion)
-			{
-				$version = substr($objectId, 22);
-				$objectId = substr($objectId, 11, 10);
-			}
-			$subType = flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET;
-			$object = $this->getObject($objectId, true);
-		}
-		else
-		{
-			KExternalErrors::dieError(KExternalErrors::INVALID_ISM_FILE_TYPE);
-		}
+
+		$object = $this->getObject($objectId, $isAsset);
 		if(!$object)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			
+		switch ($type)
+		{
+			case 'ism':
+				if($subType != flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM;
+				break;
+			case 'ismc':
+				if($subType != flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
+					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
+				break;
+			case 'ismv':
+				$subType = flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET;
+				break;
+			default:
+				KExternalErrors::dieError(KExternalErrors::INVALID_ISM_FILE_TYPE);
+		}
+		
 		$key = $object->getSyncKey($subType, $version);
 		return $key;
 	}
