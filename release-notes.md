@@ -27,6 +27,20 @@ moduls.drmPlayReady.group = GROUP_ENABLE_DISABLE_FEATURES
 params.ismIndexCmd									= @BIN_DIR@/ismindex
 2. update under KAsyncConvert
 filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+3. Add KAsyncConvertSmoothProtect  worker section, place it following other Windows  transcoding workers.
+	[KAsyncConvertSmoothProtect: KAsyncDistributedConvert]
+	id                       = $WORKER_ID
+	filter.jobSubTypeI	 = smoothProtect.SmoothProtect
+	params.smoothProtectCmd  = $SMOOTHPROTECT_BIN
+	params.isRemoteOutput    = $IS_REMOTE_OUTPUT
+	params.isRemoteInput     = $IS_REMOTE_INPUT
+	• $WORKER_ID – set to match existing Testing QA settings
+	• $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect'
+	• $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker)
+	• $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
+4. Add 'worker enabler' to template section of your Windows server:  
+	• enabledWorkers.KAsyncConvertSmoothProtect  = 1
+
 
 *Scripts*
 - run installPlugins
@@ -36,8 +50,11 @@ filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp
 - deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
 
 *Binaries*
-- Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
-- The ffmpeg-aux remains unchanged.
+- Linux
+- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+- -The ffmpeg-aux remains unchanged.
+- Windows
+- -Install 'SmoothProtect.exe' binary
 
 
 
