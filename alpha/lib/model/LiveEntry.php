@@ -234,7 +234,9 @@ abstract class LiveEntry extends entry
 		elseif (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
 			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
-			$manifestUrl = $partnerConfigurations[$protocol];
+			
+			if (isset($partnerConfigurations[$protocol]))
+				$manifestUrl = $partnerConfigurations[$protocol];
 		}
 		
 		if ($manifestUrl)
@@ -387,7 +389,7 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
-		$server = new kLiveMediaServer($index, $mediaServer ? $mediaServer->getId() : null, $hostname, $mediaServer ? $mediaServer->getDc() : null);
+		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
 		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	

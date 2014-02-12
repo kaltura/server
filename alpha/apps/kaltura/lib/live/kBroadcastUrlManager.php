@@ -47,7 +47,7 @@ class kBroadcastUrlManager
 	protected function getHostname ($dc)
 	{
 		$mediaServerConfig = kConf::get($dc, 'broadcast');
-		$url = 'rtmp://' . $mediaServerConfig['domain'];
+		$url = $mediaServerConfig['domain'];
 		$app = $mediaServerConfig['application'];
 		
 		return "$url/$app";

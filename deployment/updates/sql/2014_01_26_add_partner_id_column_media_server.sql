@@ -1,1 +1,0 @@
-ALTER TABLE media_server ADD COLUMN partner_id INT (11) AFTER dc;
