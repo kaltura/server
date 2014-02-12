@@ -232,6 +232,7 @@ abstract class LiveEntry extends entry
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
+			$mediaServerHostname = $mediaServer->getHostname();
 			$manifestUrl = $mediaServer->getManifestUrl($protocol);
 			if($tag)
 				$streamName = "smil:{$streamName}_{$tag}.smil";
@@ -241,14 +242,20 @@ abstract class LiveEntry extends entry
 			$manifestUrl .= $streamName;
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			$slStreamUrl = "$manifestUrl/Manifest";
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd?m=$mediaServerHostname";
 			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
-				$hlsStreamUrl .= "?DVR";
-				$hdsStreamUrl .= "?DVR";
-				$slStreamUrl .= "?dvr";
+				$hlsStreamUrl .= "?DVR&m=$mediaServerHostname";
+				$hdsStreamUrl .= "?DVR&m=$mediaServerHostname";
+				$slStreamUrl .= "?dvr&m=$mediaServerHostname";
+			}
+			else 
+			{
+				$hlsStreamUrl .= "?m=$mediaServerHostname";
+				$hdsStreamUrl .= "?m=$mediaServerHostname";
+				$slStreamUrl .= "?m=$mediaServerHostname";
 			}
 			
 			$configuration = new kLiveStreamConfiguration();
