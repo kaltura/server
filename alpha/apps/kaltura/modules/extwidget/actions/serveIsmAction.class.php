@@ -66,35 +66,39 @@ class serveIsmAction extends sfAction
 			}
 			else if(count($parts) == 5)
 			{
-				$entryId = $parts[0].'_'.$parts[1];
 				$objectId = $parts[2].'_'.$parts[3];
 				$version = $parts[4];
-				$isAsset = true;
 				
 				KalturaLog::debug('objectId: '.$objectId.', version: '.$version);
 			}				
 		}
 
-		$object = $this->getObject($objectId, $isAsset);
-		if(!$object)
-			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
-			
 		switch ($type)
 		{
 			case 'ism':
-				if($subType != flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+					$isAsset = true;
+				else 
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM;
 				break;
 			case 'ismc':
-				if($subType != flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
+				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
+					$isAsset = true;			
+				else
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
 				break;
 			case 'ismv':
 				$subType = flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET;
+				$isAsset = true;
 				break;
 			default:
 				KExternalErrors::dieError(KExternalErrors::INVALID_ISM_FILE_TYPE);
 		}
+		
+		$object = $this->getObject($objectId, $isAsset);
+		if(!$object)
+			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			
 		
 		$key = $object->getSyncKey($subType, $version);
 		return $key;
