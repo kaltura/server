@@ -95,7 +95,7 @@ CREATE TABLE `drm_key`
 	`object_id` VARCHAR(20)  NOT NULL,
 	`object_type` TINYINT  NOT NULL,
 	`drm_key` VARCHAR(128)  NOT NULL,
-	`parent_id` INTEGER  NOT NULL,
+	`parent_id` INTEGER,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),
