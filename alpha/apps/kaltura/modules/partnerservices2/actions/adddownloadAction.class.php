@@ -135,7 +135,9 @@ class adddownloadAction extends defPartnerservices2Action
 			$flavorParamsId = $flavorParams->getId();
 		}
 		
-		$job = kJobsManager::addBulkDownloadJob($partner_id, $puser_id, $entry->getId(), $flavorParamsId);
+		$jobs = kJobsManager::addBulkDownloadJob($partner_id, $puser_id, $entry->getId(), $flavorParamsId);
+        $job = $jobs[0];
+		
 	
 		// remove kConvertJobData object from batchJob.data
 		$job->setData(null);
