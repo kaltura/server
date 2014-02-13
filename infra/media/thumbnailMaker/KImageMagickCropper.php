@@ -81,6 +81,7 @@ class KImageMagickCropper extends KBaseCropper
 						
 			case 4: // vertical flip
 				$attributes[] = "-flip";
+				$attributes[] = "-flop";
 			break;
 					
 			case 5: // vertical flip + 90 rotate right
