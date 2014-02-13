@@ -10,6 +10,16 @@ class KImageMagickCropper extends KBaseCropper
 	const CROP = 3;
 	const CROP_FROM_TOP = 4;
 	const RESIZE_WITH_FORCE = 5;
+
+	/**
+	 * Crop the image after resizing (as opposed to the other types, which crop first and resize afterwards)
+	 * This crop type makes use of the following vars from getCommand():
+	 * @param $width|$height The target resize dimensions
+	 * @param $cropWidth|$cropHeight The crop dimensions after resize was applied
+	 * @param $cropX|$cropY Gravity indicators (see getGravityByXY() for usage)
+	 * 
+	 */
+	const CROP_AFTER_RESIZE = 6;
 	
 	protected $cmdPath;
 	protected $srcWidth;
@@ -20,6 +30,13 @@ class KImageMagickCropper extends KBaseCropper
 		IMAGETYPE_PNG => 'png',
 		IMAGETYPE_BMP => 'png',
 		IMAGETYPE_JPEG => 'jpg',
+	);
+
+	// @see getGravityByXY()
+	private static $gravityArray = array(
+			"NorthWest", "North",  "NorthEast",
+			"West",      "Center", "East",
+			"SouthWest", "South",  "SouthEast",
 	);
 	
 	/**
@@ -247,6 +264,17 @@ class KImageMagickCropper extends KBaseCropper
 					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
 					$attributes[] = "-resize {$w}x{$h}";
 					break;
+
+				case self::CROP_AFTER_RESIZE:
+					$w = $width ? $width : $height;
+					$h = $height ? $height : $width;
+					$gravity = self::getGravityByXY( $cropX, $cropY );
+
+					$attributes[] = "-gravity $gravity";
+					$attributes[] = "-resize {$w}x{$h}"; // Resize first
+					$attributes[] = "-crop {$cropWidth}x{$cropHeight}+0+0"; // Then crop
+					break;
+
 				case self::RESIZE_WITH_FORCE:
 				    $w = $width ? $width : '';
 					$h = $height ? $height : '';
@@ -288,5 +316,33 @@ class KImageMagickCropper extends KBaseCropper
 			return array($out[1], $out[2]);
 		else
 			return array(null, null);
+	}
+
+	/**
+	 * Get a gravity value based on X/Y values
+	 * <pre>
+	 * >              (x, y)                       Array Index                  Result Gravity
+	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
+	 * | (-1, -1) |  (0, -1)  |  (1, -1)  |       | 0 | 1 | 2 |       | NorthWest | North  | NorthEast |
+	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
+	 * | (-1, 0)  |  (0, 0)   |  (1, 0)   |  ==>  | 3 | 4 | 5 |  ==>  |    West   | Center |   East    |
+	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
+	 * | (-1, 1)  |  (0, 1)   |  (1, 1)   |       | 6 | 7 | 8 |       | SouthWest | South  | SouthEast |
+	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
+	 * </pre>
+	 * @param number $x < 0 = West, 0 = Center, > 0 = East
+	 * @param number $y < 0 = North, 0 = Center, > 0 = South
+	 * @return Gravity string (e.g. center)
+	 */
+	public static function getGravityByXY( $x, $y )
+	{
+		$eastWest   = ($x == 0) ? 1 : (($x < 0) ? 0 : 2);
+		$northSouth = ($y == 0) ? 1 : (($y < 0) ? 0 : 2);
+			
+		$gravityIndex = ($northSouth * 3) + $eastWest;
+			
+		$gravity = self::$gravityArray[ $gravityIndex ];
+		
+		return $gravity;
 	}
 }
