@@ -121,7 +121,10 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		return "$protocol://$domain:$port/$app/";
+		$url = "$protocol://$domain:$port/$app/";
+		$url = str_replace("{hostName}", $this->getHostname(), $url);
+		return $url;
+		
 	}
 	
 	/**
