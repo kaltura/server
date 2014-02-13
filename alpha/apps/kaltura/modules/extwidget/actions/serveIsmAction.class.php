@@ -86,7 +86,7 @@ class serveIsmAction extends sfAction
 				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
 					$isAsset = true;
 				if($isAsset)
-					$subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC;
+					$subType = flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC;
 				else
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
 				break;
@@ -97,6 +97,8 @@ class serveIsmAction extends sfAction
 			default:
 				KExternalErrors::dieError(KExternalErrors::INVALID_ISM_FILE_TYPE);
 		}
+		
+		KalturaLog::debug('subType: '.$subType);
 		
 		$object = $this->getObject($objectId, $isAsset);
 		if(!$object)
