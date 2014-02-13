@@ -87,12 +87,13 @@ filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp
 4. Add 'worker enabler' to template section of your Windows server:  
 	• enabledWorkers.KAsyncConvertSmoothProtect  = 1
 
+- create playReady.ini from playReady.template.ini
+change @PLAYREADY_LICENSE_SERVER_HOST@ to the relevant host 
 
 *Scripts*
 - run installPlugins
 
 *Permissions*
-
 - deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
 
 *Binaries*

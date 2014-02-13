@@ -87,7 +87,7 @@ class PlayReadyDrmService extends KalturaBaseService
 			$drmKey->setObjectType(DrmKeyObjectType::ENTRY);
 			$drmKey->setProvider(PlayReadyPlugin::getPlayReadyProviderCoreValue());
 			$keyId = kPlayReadyAESContentKeyGenerator::generatePlayReadyKeyId();
-			$drmKey->setKey($keyId);
+			$drmKey->setDrmKey($keyId);
 			try 
 			{
 				$drmKey->save();
