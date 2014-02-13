@@ -68,6 +68,7 @@ class serveIsmAction extends sfAction
 			{
 				$objectId = $parts[2].'_'.$parts[3];
 				$version = $parts[4];
+				$isAsset = true;
 				
 				KalturaLog::debug('objectId: '.$objectId.', version: '.$version);
 			}				
@@ -83,7 +84,9 @@ class serveIsmAction extends sfAction
 				break;
 			case 'ismc':
 				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
-					$isAsset = true;			
+					$isAsset = true;
+				if($isAsset)
+					$subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC;
 				else
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
 				break;
