@@ -46,7 +46,7 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
 - /deployment/updates/scripts/add_permissions/2014_01_20_categoryentry_syncprivacycontext_action.php
 
 *Migration*
-- /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php
+- /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
 
 ## PlayReady, ISM Index, Smooth Protect##
 
