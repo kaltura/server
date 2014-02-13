@@ -2516,7 +2516,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 		
-		if($this->getRedirectEntryId() && isset($this->oldCustomDataValues['']) && isset($this->oldCustomDataValues['']['redirectEntryId']))
+		if($this->getRedirectEntryId() && array_key_exists('', $this->oldCustomDataValues) && array_key_exists('redirectEntryId', $this->oldCustomDataValues['']))
 		{
 			$redirectEntry = entryPeer::retrieveByPK($this->getRedirectEntryId());
 			if($redirectEntry)

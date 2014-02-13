@@ -139,9 +139,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 									break;
 							}
 						}
-							
+
+						if ($xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE)
+							$value = kTime::getRelativeTime($value);
+
 						$newCondition = $metadataField . $comparison . $value;
-						
+
 						if ($item->getComparison() != KalturaSearchConditionComparison::EQUAL)
 							$newCondition = "($newCondition AND $metadataField <> 0)";
 							

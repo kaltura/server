@@ -695,10 +695,10 @@ class kJobsManager
 	private static function contributeToConvertJobData($conversionEngineId, kConvertJobData &$convertData)
 	{
 		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
-		if($plugin && $plugin instanceof IKalturaConvertContributor)
+		if($plugin && $plugin instanceof IKalturaBatchJobDataContributor)
 		{
 			KalturaLog::log("Setting additional data by plugin");
-			$convertData = $plugin->contributeToConvertJobData($conversionEngineId, $convertData);
+			$convertData = $plugin->contributeToConvertJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
 		}
 	}
 	
@@ -1410,12 +1410,12 @@ class kJobsManager
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
 	
-	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $syncKey, $localFileSyncPath, $dc)
+	public static function addDeleteFileJob(BatchJob $parentJob = null, $entryId = null, $partnerId, $syncKey, $localFileSyncPath, $dc)
 	{
 		$deleteFileData = new kDeleteFileJobData();
 		$deleteFileData->setLocalFileSyncPath($localFileSyncPath);
 		$deleteFileData->setSyncKey($syncKey);
-		
+
 		if ($parentJob)
 		{
 			$batchJob = $parentJob->createChild(BatchJobType::DELETE_FILE, null, false);
@@ -1424,14 +1424,12 @@ class kJobsManager
 		{
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
-			$batchJob->setPartnerId($partner->getId());
+			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-		$batchJob->setCheckAgainTimeout(12*60*60);
 		$batchJob->setDc($dc);
 		
-		KalturaLog::log("Creating File Delete job, from data center id: ". $deleteFileData->getDC() ." with source file: " . $deleteFileData->getLocalFileSyncPath()); 
+		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
 	}
 	

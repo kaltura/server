@@ -26,7 +26,7 @@ abstract class BaseDrmKeyPeer {
 	const TM_CLASS = 'DrmKeyTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 8;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -46,8 +46,11 @@ abstract class BaseDrmKeyPeer {
 	/** the column name for the OBJECT_TYPE field */
 	const OBJECT_TYPE = 'drm_key.OBJECT_TYPE';
 
-	/** the column name for the KEY field */
-	const KEY = 'drm_key.KEY';
+	/** the column name for the DRM_KEY field */
+	const DRM_KEY = 'drm_key.DRM_KEY';
+
+	/** the column name for the PARENT_ID field */
+	const PARENT_ID = 'drm_key.PARENT_ID';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'drm_key.CREATED_AT';
@@ -71,11 +74,11 @@ abstract class BaseDrmKeyPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Provider', 'ObjectId', 'ObjectType', 'Key', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'provider', 'objectId', 'objectType', 'key', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::PROVIDER, self::OBJECT_ID, self::OBJECT_TYPE, self::KEY, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'provider', 'object_id', 'object_type', 'key', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Provider', 'ObjectId', 'ObjectType', 'DrmKey', 'ParentId', 'CreatedAt', 'UpdatedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'provider', 'objectId', 'objectType', 'drmKey', 'parentId', 'createdAt', 'updatedAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::PROVIDER, self::OBJECT_ID, self::OBJECT_TYPE, self::DRM_KEY, self::PARENT_ID, self::CREATED_AT, self::UPDATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'provider', 'object_id', 'object_type', 'drm_key', 'parent_id', 'created_at', 'updated_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -85,11 +88,11 @@ abstract class BaseDrmKeyPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Provider' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'Key' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'provider' => 2, 'objectId' => 3, 'objectType' => 4, 'key' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::PROVIDER => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::KEY => 5, self::CREATED_AT => 6, self::UPDATED_AT => 7, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'provider' => 2, 'object_id' => 3, 'object_type' => 4, 'key' => 5, 'created_at' => 6, 'updated_at' => 7, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Provider' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'DrmKey' => 5, 'ParentId' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'provider' => 2, 'objectId' => 3, 'objectType' => 4, 'drmKey' => 5, 'parentId' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::PROVIDER => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::DRM_KEY => 5, self::PARENT_ID => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'provider' => 2, 'object_id' => 3, 'object_type' => 4, 'drm_key' => 5, 'parent_id' => 6, 'created_at' => 7, 'updated_at' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -164,7 +167,8 @@ abstract class BaseDrmKeyPeer {
 		$criteria->addSelectColumn(DrmKeyPeer::PROVIDER);
 		$criteria->addSelectColumn(DrmKeyPeer::OBJECT_ID);
 		$criteria->addSelectColumn(DrmKeyPeer::OBJECT_TYPE);
-		$criteria->addSelectColumn(DrmKeyPeer::KEY);
+		$criteria->addSelectColumn(DrmKeyPeer::DRM_KEY);
+		$criteria->addSelectColumn(DrmKeyPeer::PARENT_ID);
 		$criteria->addSelectColumn(DrmKeyPeer::CREATED_AT);
 		$criteria->addSelectColumn(DrmKeyPeer::UPDATED_AT);
 	}
@@ -299,7 +303,7 @@ abstract class BaseDrmKeyPeer {
 			}
 		}
 	}
-	
+						
 	/**
 	 * Adds the supplied object array to the instance pool.
 	 *  
@@ -307,9 +311,15 @@ abstract class BaseDrmKeyPeer {
 	 */
 	public static function addInstancesToPool($queryResult)
 	{
-		foreach ($queryResult as $curResult)
+		if (Propel::isInstancePoolingEnabled())
 		{
-			DrmKeyPeer::addInstanceToPool($curResult);
+			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
+			{  
+				foreach ($queryResult as $curResult)
+				{
+					DrmKeyPeer::addInstanceToPool($curResult);
+				}
+			}
 		}
 	}
 	
@@ -592,12 +602,20 @@ abstract class BaseDrmKeyPeer {
 	 */
 	public static function addInstanceToPool(DrmKey $obj, $key = null)
 	{
-		if (Propel::isInstancePoolingEnabled()) {
-			if ($key === null) {
+		if ( Propel::isInstancePoolingEnabled() )
+		{
+			if ( $key === null )
+			{
 				$key = (string) $obj->getId();
-			} // if key === null
-			self::$instances[$key] = $obj;
-			kMemoryManager::registerPeer('DrmKeyPeer');
+			}
+				
+			if ( isset( self::$instances[$key] )											// Instance is already mapped?
+					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+				)
+			{
+				self::$instances[$key] = $obj;
+				kMemoryManager::registerPeer('DrmKeyPeer');
+			}
 		}
 	}
 

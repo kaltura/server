@@ -277,7 +277,7 @@ class PlayReadyDrmService extends KalturaBaseService
 	{
 		$drmKey = DrmKeyPeer::retrieveByUniqueKey($entryId, DrmKeyObjectType::ENTRY, PlayReadyPlugin::getPlayReadyProviderCoreValue());
 		if($drmKey)
-			return $drmKey->getKey();
+			return $drmKey->getDrmKey();
 		else
 			return null;
 	}

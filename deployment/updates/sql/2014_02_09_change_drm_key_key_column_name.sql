@@ -1,0 +1,1 @@
+alter table `drm_key` change `key` `drm_key` VARCHAR(128)  NOT NULL;

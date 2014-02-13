@@ -2367,6 +2367,8 @@ class kFlowHelper
 		}
 		
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		if(!$conversionProfile)
+			return;
 		
 		$criteria = new Criteria();
 		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId());
