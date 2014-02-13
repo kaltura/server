@@ -122,6 +122,16 @@ class KCurlWrapper
 		$length = strlen ( $string );
 		return $length;
 	}
+	
+	private static function read_header_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
+	
+	private static function read_body_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
 
 	/**
 	 * @param string $url
@@ -368,10 +378,27 @@ class KCurlWrapper
 			}
 		}
 
+		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header_do_nothing');
+		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
+		
 		return $curlHeaderResponse;
+	}
+	
+	/**
+	 * This function needs to be executed when you are re-using the same curl to execute multiple getHeader/exec requests
+	 * @param string $sourceUrl
+	 * @param string $destFile
+	 * @return boolean
+	 */
+	public function fetchFromRemoteUrl($sourceUrl, $destFile = null)
+	{
+		curl_setopt($this->ch, CURLOPT_RANGE, '0-');
+		
+		return $this->exec($sourceUrl, $destFile);
 	}
 
 	/**
+	 * @param string $sourceUrl
 	 * @param string $destFile
 	 * @return boolean
 	 */
