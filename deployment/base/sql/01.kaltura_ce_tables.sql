@@ -378,11 +378,13 @@ CREATE TABLE IF NOT EXISTS `category_entry` (
   `updated_at` datetime DEFAULT NULL,
   `category_full_ids` text NOT NULL,
   `status` int(11) DEFAULT '2',
+  `privacy_context` VARCHAR(255),
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `category_id_index` (`category_id`),
   KEY `entry_id_index` (`entry_id`),
-  KEY `updated_at` (`updated_at`)
+  KEY `updated_at` (`updated_at`),
+  KEY `partner_id_privacy_context_index`(`partner_id`, `privacy_context`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `category_kuser` */

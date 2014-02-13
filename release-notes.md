@@ -2,6 +2,52 @@
 
 # IX-9.11.0 #
 
+## Remove limitation of 32 categories per entry##
+
+The limitation will be removed for partners that have a Disable Category Limit feature enabled.
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_01_19_category_entry_add_privacy_context.sql
+
+*Configuration Changes*
+
+- update admin.ini:
+add
+moduls.categoryLimit.enabled = true
+moduls.categoryLimit.permissionType = 2
+moduls.categoryLimit.label = Disble Category Limit
+moduls.categoryLimit.permissionName = FEATURE_DISABLE_CATEGORY_LIMIT
+moduls.categoryLimit.basePermissionType =
+moduls.categoryLimit.basePermissionName =
+moduls.categoryLimit.group = GROUP_ENABLE_DISABLE_FEATURES
+ 
+- update batch.ini
+add 
+enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
+enabledWorkers.KAsyncTagIndex						= 1
+  
+[KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
+id													= 530
+friendlyName										= Sync Category Privacy Context
+type												= KAsyncSyncCategoryPrivacyContext
+maximumExecutionTime								= 12000
+scriptPath											= batches/SyncCategoryPrivacyContext/KAsyncSyncCategoryPrivacyContextExe.php
+
+[KAsyncTagIndex : JobHandlerWorker]
+id													= 500
+friendlyName										= Re-index tags
+type												= KAsyncTagIndex
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
+
+*Permissions*
+
+- /deployment/updates/scripts/add_permissions/2014_01_20_categoryentry_syncprivacycontext_action.php
+
+*Migration*
+- /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php
+
 ## PlayReady, ISM Index, Smooth Protect##
 
 *DB Changes*
