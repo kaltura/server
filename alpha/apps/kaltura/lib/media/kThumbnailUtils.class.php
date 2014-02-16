@@ -89,17 +89,14 @@ class kThumbnailUtils
 		{
 			$fileSyncKey = $thumbAsset->getSyncKey( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
 				
-			if ( $fileSyncKey )
-			{
-				$thumbPath = kFileSyncUtils::getReadyLocalFilePathForKey( $fileSyncKey );
-	
-				$thumbWidth = $thumbAsset->getWidth();
-				$thumbHeight = $thumbAsset->getHeight();
-	
-				$descriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $thumbPath, false );
-	
-				$thumbDescriptors[] = $descriptor;
-			}
+			$thumbPath = kFileSyncUtils::getReadyLocalFilePathForKey( $fileSyncKey );
+
+			$thumbWidth = $thumbAsset->getWidth();
+			$thumbHeight = $thumbAsset->getHeight();
+
+			$descriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $thumbPath, false );
+
+			$thumbDescriptors[] = $descriptor;
 		}
 		
 		// Sort the array according to priorities
