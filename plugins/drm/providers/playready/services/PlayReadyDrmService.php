@@ -175,6 +175,8 @@ class PlayReadyDrmService extends KalturaBaseService
 	{
 		$entry = null;
 		
+		$keyId = strtolower($keyId);
+		
 		if(!$keyId)
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "keyId");
 		
