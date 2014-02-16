@@ -6,7 +6,7 @@ class kPlayReadyAESContentKeyGenerator
 	private static function generateGuid($prefix)
 	{
 		mt_srand((double) microtime() * 10000);
-		$charid = strtoupper(md5(uniqid($prefix, true)));
+		$charid = strtolower(md5(uniqid($prefix, true)));
 			     
 		$guid = substr($charid,  0, 8) . '-' .
 				substr($charid,  8, 4) . '-' .
