@@ -96,26 +96,17 @@ class kThumbnailUtils
 				$thumbWidth = $thumbAsset->getWidth();
 				$thumbHeight = $thumbAsset->getHeight();
 	
-				// Calc. aspect ratio as well as the delta between this ratio and the original one
-				$curAspectRatio = $thumbWidth / $thumbHeight;
-	
 				$descriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $thumbPath, false );
 	
 				$thumbDescriptors[] = $descriptor;
 			}
 		}
 		
-		KalturaLog::log( ">>> Before" . print_r($thumbDescriptors,true) );
-
 		// Sort the array according to priorities
 		usort( $thumbDescriptors, array( get_class(), 'compareThumbAssetItems' ) );
 
-		KalturaLog::log( ">>> After" . print_r($thumbDescriptors,true) );
-
 		// And pick the best option
 		$chosenThumbnailDescriptor = $thumbDescriptors[0];
-
-		KalturaLog::log( ">>> Selected" . print_r($chosenThumbnailDescriptor,true) );
 
 		return $chosenThumbnailDescriptor;
 	}
