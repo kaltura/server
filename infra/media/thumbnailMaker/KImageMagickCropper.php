@@ -32,13 +32,6 @@ class KImageMagickCropper extends KBaseCropper
 		IMAGETYPE_JPEG => 'jpg',
 	);
 
-	// @see getGravityByXY()
-	private static $gravityArray = array(
-			"NorthWest", "North",  "NorthEast",
-			"West",      "Center", "East",
-			"SouthWest", "South",  "SouthEast",
-	);
-	
 	/**
 	 * @param string $filePath
 	 * @param string $cmdPath
@@ -321,14 +314,14 @@ class KImageMagickCropper extends KBaseCropper
 	/**
 	 * Get a gravity value based on X/Y values
 	 * <pre>
-	 * >              (x, y)                       Array Index                  Result Gravity
-	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
-	 * | (-1, -1) |  (0, -1)  |  (1, -1)  |       | 0 | 1 | 2 |       | NorthWest | North  | NorthEast |
-	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
-	 * | (-1, 0)  |  (0, 0)   |  (1, 0)   |  ==>  | 3 | 4 | 5 |  ==>  |    West   | Center |   East    |
-	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
-	 * | (-1, 1)  |  (0, 1)   |  (1, 1)   |       | 6 | 7 | 8 |       | SouthWest | South  | SouthEast |
-	 * +----------+-----------+-----------+       +---+---+---+       +-----------+--------+-----------+
+	 * >              (x, y)                               Result Gravity
+	 * +----------+-----------+-----------+       +-----------+--------+-----------+
+	 * | (-1, -1) |  (0, -1)  |  (1, -1)  |       | NorthWest | North  | NorthEast |
+	 * +----------+-----------+-----------+       +-----------+--------+-----------+
+	 * | (-1, 0)  |  (0, 0)   |  (1, 0)   |  ==>  |    West   | Center |   East    |
+	 * +----------+-----------+-----------+       +-----------+--------+-----------+
+	 * | (-1, 1)  |  (0, 1)   |  (1, 1)   |       | SouthWest | South  | SouthEast |
+	 * +----------+-----------+-----------+       +-----------+--------+-----------+
 	 * </pre>
 	 * @param number $x < 0 = West, 0 = Center, > 0 = East
 	 * @param number $y < 0 = North, 0 = Center, > 0 = South
@@ -336,13 +329,14 @@ class KImageMagickCropper extends KBaseCropper
 	 */
 	public static function getGravityByXY( $x, $y )
 	{
-		$eastWest   = ($x == 0) ? 1 : (($x < 0) ? 0 : 2);
-		$northSouth = ($y == 0) ? 1 : (($y < 0) ? 0 : 2);
-			
-		$gravityIndex = ($northSouth * 3) + $eastWest;
-			
-		$gravity = self::$gravityArray[ $gravityIndex ];
+		$gravity = ($y < 0) ? "North" : (($y > 0) ? "South" : ""); // Start with North/South
+		$gravity .= ($x < 0) ? "West" : (($x > 0) ? "East" : ""); // Add/Set East/West as needed
 		
+		if ( ! $gravity ) // None of the above apply?
+		{
+			$gravity = "Center";
+		}
+			
 		return $gravity;
 	}
 }
