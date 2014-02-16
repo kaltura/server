@@ -75,9 +75,9 @@ params.ismIndexCmd									= @BIN_DIR@/ismindex
 filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
 3. Add KAsyncConvertSmoothProtect  worker section, place it following other Windows  transcoding workers.
 	[KAsyncConvertSmoothProtect: KAsyncDistributedConvert]
-
 	id                       = $WORKER_ID
-	filter.jobSubTypeI	 = smoothProtect.SmoothProtect
+	filter.jobSubTypeIn	 = smoothProtect.SmoothProtect
+
 	params.smoothProtectCmd  = $SMOOTHPROTECT_BIN
 	params.isRemoteOutput    = $IS_REMOTE_OUTPUT
 	params.isRemoteInput     = $IS_REMOTE_INPUT
