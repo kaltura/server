@@ -116,9 +116,15 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			 * Because many ui-conf objects have hard-coded id, the auto-incremented id of new ui-conf could exist in the db.
 			 * Just retry to save the ui-conf with a different auto-inceremented id.
 			 */
-			
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+
+			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			{
 				$res = parent::save( $con );
+			}
+			else
+			{
+				throw $e; // Rethrow the unfamiliar exception
+			}
 		}
 		
 		if($this->shouldSetContent())
