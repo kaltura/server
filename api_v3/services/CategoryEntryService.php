@@ -39,11 +39,8 @@ class CategoryEntryService extends KalturaBaseService
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
 		
-		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $entry->getPartnerId()))
-			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
-		if (count($categoryEntries) >= $maxCategoriesPerEntry)
-			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
+		if (count($categoryEntries) >= entry::MAX_CATEGORIES_PER_ENTRY)
+			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
 			
 		//validate user is entiteld to assign entry to this category 
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
@@ -438,34 +435,6 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REJECT_CATEGORY_ENTRY_SINCE_IT_IS_NOT_PENDING);
 			
 		$dbCategoryEntry->setStatus(CategoryEntryStatus::REJECTED);
-		$dbCategoryEntry->save();
-	}
-	
-	/**
-	 * update privacy context from the category
-	 * 
-	 * @action syncPrivacyContext
-	 * @param string $entryId
-	 * @param int $categoryId
-	 * @throws KalturaErrors::INVALID_ENTRY_ID
-	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
-	 * @throws KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY
-	 */
-	function syncPrivacyContextAction($entryId, $categoryId)
-	{
-		$entry = entryPeer::retrieveByPK($entryId);
-		if (!$entry)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
-			
-		$category = categoryPeer::retrieveByPK($categoryId);
-		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
-		
-		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
-		if(!$dbCategoryEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
-		
-		$dbCategoryEntry->setPrivacyContext($category->getPrivacyContexts());
 		$dbCategoryEntry->save();
 	}
 }
