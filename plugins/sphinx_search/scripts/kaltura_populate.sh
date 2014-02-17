@@ -19,11 +19,11 @@ echo `date`
 # Short-Description: Start/stop Kaltura populate daemon
 # Description:       Control the Kaltura populate daemon
 ### END INIT INFO
-
 # Source function library.
 #. /etc/rc.d/init.d/functions
 
-# Directory containing the populate php files SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
+# Directory containing the populate php files 
+SCRIPTDIR=$APP_DIR/plugins/sphinx_search/scripts
 
 SCRIPTEXE=populateFromLog.php
 
@@ -66,7 +66,7 @@ start() {
 	echo -n $"Starting:"
 	KP=$(pgrep -P 1 -f $SCRIPTEXE)
 	if ! kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then 
-		echo_failure
+		#echo_failure
 		echo
 		if [ "X$KP" != "X" ]; then
 			echo "Service populate already running"
@@ -107,7 +107,7 @@ show_status() {
 	echo "Populate is running as $KP ..."
 	return 0
 	else
-		echo "Service populate isn't running"
+		echo "Service populate isn't running."
 		return 3
 	fi
 }
@@ -125,9 +125,9 @@ stop() {
 		echo
 		RC=0
 	else
-		echo_failure
-		echo
-		echo "Service populate not running"
+		#echo_failure
+		echo "
+			Service populate isn't currently running."
 		RC=0
 	fi
 	rm -f $LOCKFILE
