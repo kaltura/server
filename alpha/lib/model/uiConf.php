@@ -59,6 +59,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	private $swf_url_version = null;
 
+	//UI_CONF_TYPE_KSR:: This is a general path value the actual jar file should be symlinked under each KSR version dir
 	private static $swf_names = array ( self::UI_CONF_TYPE_WIDGET => "kdp.swf" ,
 										self::UI_CONF_TYPE_CW => "ContributionWizard.swf" ,
 										self::UI_CONF_TYPE_EDITOR => "simpleeditor.swf" ,
@@ -76,7 +77,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_KMC_GENERAL => "kmc.swf",
 										self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
 										self::UI_CONF_CLIPPER => "",
-										self::UI_CONF_TYPE_KSR => "ScreencastOMaticRun-1.0.32.jar",
+										self::UI_CONF_TYPE_KSR => "ScreencastOMaticRun.jar",
 										self::UI_CONF_TYPE_KRECORD => "KRecord.swf",
 										self::UI_CONF_TYPE_KUPLOAD => "KUpload.swf",
 									);
