@@ -101,12 +101,17 @@ class kThumbnailUtils
 				$chosenThumbnailDescriptor = ($res <= 0) ? $chosenThumbnailDescriptor : $descriptor;
 			}
 		}
-		
+
 		return $chosenThumbnailDescriptor;
 	}
 
 	/**
-	 * Look for the smaller delta from original aspect ratio. If the deltas match, look for the asset with larger dimensions.
+	 * Look for the smallest delta from original aspect ratio.
+	 * If the deltas match:
+	 *    If the dimensions match - give priority to the default thumbnail (if any).
+	 *    Otherwise:
+	 *       Give priority to the thumbnail the exactly matches the required dimensions.
+	 *            If none exist - prefer the asset with larger dimensions.
 	 *  
 	 * @param kThumbnailDescriptor $a @see getNearestAspectRatioThumbnailDescriptorFromThumbAssets()
 	 * @param kThumbnailDescriptor $b @see getNearestAspectRatioThumbnailDescriptorFromThumbAssets()
@@ -114,31 +119,47 @@ class kThumbnailUtils
 	 */
 	private static function compareThumbnailDescriptors( $a, $b )
 	{
+		$aDelta = $a->getDeltaFromOrigAspectRatio();
+		$bDelta = $b->getDeltaFromOrigAspectRatio();
+
 		// Look for the smaller delta
-		if ( $a->getDeltaFromOrigAspectRatio() < $b->getDeltaFromOrigAspectRatio() )
+		if ( $aDelta < $bDelta )
 		{
 			return -1;
 		}
-		else if ( $a->getDeltaFromOrigAspectRatio() > $b->getDeltaFromOrigAspectRatio() )
+		else if ( $aDelta > $bDelta )
 		{
 			return 1;
 		}
-		else
+		else // Same delta (i.e. same aspect ratio)
 		{
-			// Boost the priority of the larger asset for the sake of better quality
-			// by looking for the asset with the bigger dimensions
-			// (*) Because the aspect ratio is identical, it's enough to check just one dimension (we'll check the width)
-			if ( $a->getWidth() > $b->getWidth() )
+			// Note: Because the aspect ratio is identical, it's enough to check just one dimension (we'll check the width)
+			$aWidth = $a->getWidth();
+			$bWidth = $b->getWidth();
+
+			if ( $aWidth != $bWidth ) // Dimensions don't match
 			{
-				return -1;
+				$requiredWidth = kThumbnailDescriptor::getRequiredWidth();
+
+				// Give priority to exact-match dimensions
+				if ( $aWidth == $requiredWidth )
+				{
+					return -1;
+				}
+				else if ( $bWidth == $requiredWidth )
+				{
+					return 1;
+				}
+				else // No exact match
+				{
+					// Give priority to the one the the larger dimensions
+					return $bWidth - $aWidth; // < 0 = $a has priority, > 0 = $b has priority, 0 = equal
+				}
 			}
-			else if ( $a->getWidth() < $b->getWidth() )
+			else // Same dimensions
 			{
-				return 1;
-			}
-			else
-			{
-				// Give priority to the default thumbnail (if any)
+				// Boost the priority of the larger asset for the sake of better quality
+				// by looking for the asset with the bigger dimensions
 				return $b->getIsDefault() - $a->getIsDefault(); // -1 = $a has priority, 1 = $b has priority, 0 = equal
 			}
 		}
