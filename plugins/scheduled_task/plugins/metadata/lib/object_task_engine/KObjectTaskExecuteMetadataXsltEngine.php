@@ -27,7 +27,17 @@ class KObjectTaskExecuteMetadataXsltEngine extends KObjectTaskEntryEngineBase
 		$filter->objectIdEqual = $entryId;
 		$filter->metadataProfileIdEqual = $metadataProfileId;
 		$filter->metadataObjectTypeEqual = $metadataObjectType;
-		$metadataResult = $metadataPlugin->metadata->listAction($filter);
+		try
+		{
+			$this->impersonate($object->partnerId);
+			$metadataResult = $metadataPlugin->metadata->listAction($filter);
+			$this->unimpersonate();
+		}
+		catch(Exception $ex)
+		{
+			$this->unimpersonate();
+			throw $ex;
+		}
 		if (!count($metadataResult->objects))
 		{
 			KalturaLog::info(sprintf('Metadata object was not found for entry %s, profile id %s and object type %s', $entryId, $metadataProfileId, $metadataObjectType));
@@ -38,7 +48,17 @@ class KObjectTaskExecuteMetadataXsltEngine extends KObjectTaskEntryEngineBase
 		file_put_contents($xsltFilePath, $xslt);
 
 		$metadataId = $metadataResult->objects[0]->id;
-		$metadataPlugin->metadata->updateFromXSL($metadataId, $xsltFilePath);
+		try
+		{
+			$this->impersonate($object->partnerId);
+			$metadataPlugin->metadata->updateFromXSL($metadataId, $xsltFilePath);
+			$this->unimpersonate();
+		}
+		catch(Exception $ex)
+		{
+			$this->unimpersonate();
+			throw $ex;
+		}
 		unlink($xsltFilePath);
 	}
 }
