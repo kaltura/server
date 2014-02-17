@@ -31,17 +31,6 @@ class categoryEntry extends BasecategoryEntry {
 			
 		return parent::preSave();
 	}
-
-	/*
-	 * set privacy context from category object before the insert
-	 */
-	public function preInsert(PropelPDO $con = null)
-	{
-		$category = categoryPeer::retrieveByPK($this->getCategoryId());
-		if($category)
-			$this->setPrivacyContext($category->getPrivacyContexts());		
-		return parent::preInsert($con);
-	}
 	
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basecategory#postInsert()

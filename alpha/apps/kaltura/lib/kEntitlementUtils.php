@@ -80,86 +80,9 @@ class kEntitlementUtils
 			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disble entitlement for this entry');
 			return true;
 		}
-					
-		$kuserId = self::getKuserIdForEntitlement($kuserId, $ks);
-
-		if($ks && $kuserId)
-		{
-			// kuser is set on the entry as creator or uploader
-			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
-			{
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
-				return true;
-			}
-				
-			// kuser is set on the entry entitled users edit or publish
-			$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
-			if(in_array($kuserId, $entitledKusers))
-			{
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
-				return true;
-			}
-		}
-
-		if(!$ks)
-		{
-			// entry that doesn't belong to any category is public
-			//when ks is not provided - the entry is still public (for example - download action)		
-			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
-			if(!$categoryEntry)
-			{
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
-				return true;
-			}			
-		}
-				
-		$ksPrivacyContexts = null;
-		if($ks)
-			$ksPrivacyContexts = $ks->getPrivacyContext();
-			
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partner->getId()))
-		{ 
-			if(!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
-			{
-				$categoryEntry = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId(), array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE));
-				if($categoryEntry)
-				{
-					KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
-					return true;				
-				}
-			}
-			else
-				$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryIdAndPrivacyContext($entry->getId(), $ksPrivacyContexts);
-		}
-		else
-		{			
-			$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
-			if($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
-			{
-				// entry that doesn't belong to any category is public
-				KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
-				return true;
-			}
-		}
-				
-		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);			
-	}
-	
-	private static function getKuserIdForEntitlement($kuserId = null, $ks = null)
-	{
-		if($ks && !$kuserId)
-		{
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
-			if($kuser)
-				$kuserId = $kuser->getId();
-		}
-
-		return $kuserId;
-	}
-	
-	private static function isMemberOfCategory($allCategoriesEntry, entry $entry, Partner $partner, $kuserId = null, $ks = null, $ksPrivacyContexts = null)
-	{
+		
+		$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
+		
 		$categories = array();
 		foreach($allCategoriesEntry as $categoryEntry)
 			$categories[] = $categoryEntry->getCategoryId();
@@ -169,20 +92,68 @@ class kEntitlementUtils
 			
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
 		$c->add(categoryPeer::ID, $categories, Criteria::IN);
-						
+		
+				
 		$privacy = array(category::formatPrivacy(PrivacyType::ALL, $partner->getId()));
 		if($ks && !$ks->isAnonymousSession())
 			$privacy[] = category::formatPrivacy(PrivacyType::AUTHENTICATED_USERS, $partner->getId());
 			
 		$crit = $c->getNewCriterion (categoryPeer::PRIVACY, $privacy, Criteria::IN);
-						
+		
+		$ksPrivacyContexts = null;
+		
+		// entry that doesn't belong to any category is public
+		//when ks is not provided - the entry is still public (for example - download action)
+		$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+		if(!count($categoryEntries) && !$ks)
+		{
+			KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
+			return true;
+		}
+		
 		if($ks)
 		{
+			$ksPrivacyContexts = $ks->getPrivacyContext();
 			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
-				$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partner->getId();				
+			{
+				$ksPrivacyContexts = self::DEFAULT_CONTEXT . $partner->getId();
+				
+				if(!count($allCategoriesEntry))
+				{
+					// entry that doesn't belong to any category is public
+					KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
+					return true;
+				}
+			}
 			
 			$c->add(categoryPeer::PRIVACY_CONTEXTS, $ksPrivacyContexts, KalturaCriteria::IN_LIKE);
-
+			
+			if(!$kuserId)
+			{
+				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+				$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
+				if($kuser)
+					$kuserId = $kuser->getId();
+			}
+			
+			if($kuserId)
+			{
+				// kuser is set on the entry as creator or uploader
+				if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
+				{
+					KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
+					return true;
+				}
+				
+				// kuser is set on the entry entitled users edit or publish
+				$entitledKusers = array_merge(explode(',', $entry->getEntitledKusersEdit()), explode(',', $entry->getEntitledKusersPublish()));
+				if(in_array($kuserId, $entitledKusers))
+				{
+					KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish');
+					return true;
+				}
+			}
+			
 			// kuser is set on the category as member
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
 			if($kuserId)
@@ -190,7 +161,8 @@ class kEntitlementUtils
 				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::LIKE);
 				$membersCrit->addOr($crit);
 				$crit = $membersCrit;
-			}			
+			}
+			
 		}
 		else
 		{
@@ -212,9 +184,9 @@ class kEntitlementUtils
 		}
 		
 		KalturaLog::debug('Entry [' . print_r($entry->getId(), true) . '] not entitled');
-		return false;				
+		return false;
 	}
-		
+	
 	/**
 	 * Set Entitlement Enforcement - if entitelement is enabled \ disabled in this session
 	 * @param int $categoryId
@@ -334,14 +306,44 @@ class kEntitlementUtils
 	public static function getPrivacyContextForEntry(entry $entry)
 	{
 		$privacyContexts = array();
+		$entryPrivacy = null;
+		$categories = array();
 		
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $entry->getPartnerId()))
-			$privacyContexts = self::getPrivacyContextsByCategoryEntries($entry);
-		else 
-			$privacyContexts = self::getPrivacyContextsByAllCategoryIds($entry);
+		$allCategoriesIds = $entry->getAllCategoriesIds(true);
+		if (count($allCategoriesIds))
+		{
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			$c->add(categoryPeer::ID, $allCategoriesIds, Criteria::IN);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			$c->dontCount();
+						
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			$categories = categoryPeer::doSelect($c);
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+			
+			foreach ($categories as $category)
+			{
+				$categoryPrivacy = $category->getPrivacy();
+				$categoryPrivacyContexts = $category->getPrivacyContexts();
+				if(!$categoryPrivacyContexts)
+					$categoryPrivacyContexts = self::DEFAULT_CONTEXT . $entry->getPartnerId();
+				
+				$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
+				
+				foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
+				{
+					if(trim($categoryPrivacyContext) == '')
+						 $categoryPrivacyContext = self::DEFAULT_CONTEXT . $entry->getPartnerId();
+						 
+					if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
+						$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
+				}
+			}
+		}
 		
 		//Entry That doesn't assinged to any category is public.
-		if (!count($privacyContexts))
+		if (!count($categories))
 			$privacyContexts[self::DEFAULT_CONTEXT . $entry->getPartnerId()] = PrivacyType::ALL ;
 		
 		$entryPrivacyContexts = array();
@@ -351,87 +353,6 @@ class kEntitlementUtils
 		KalturaLog::debug('Privacy by context: ' . print_r($entryPrivacyContexts,true));
 			
 		return $entryPrivacyContexts;
-	}
-	
-	private static function getCategoriesByIds($categoriesIds)
-	{
-		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$c->add(categoryPeer::ID, $categoriesIds, Criteria::IN);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$c->dontCount();
-						
-		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		$categories = categoryPeer::doSelect($c);
-		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-		
-		return $categories;
-	}
-	
-	private static function getPrivacyContextsByAllCategoryIds(entry $entry)
-	{
-		$defaultPrivacyContext = self::DEFAULT_CONTEXT . $entry->getPartnerId();
-		$privacyContexts = array();
-		
-		$allCategoriesIds = $entry->getAllCategoriesIds(true);
-		if (count($allCategoriesIds))
-		{
-			$categories = self::getCategoriesByIds($allCategoriesIds);
-			foreach ($categories as $category)
-			{
-				$categoryPrivacy = $category->getPrivacy();
-				$categoryPrivacyContexts = $category->getPrivacyContexts();
-				if($categoryPrivacyContexts)
-				{
-					$categoryPrivacyContexts = explode(',', $categoryPrivacyContexts);
-				
-					foreach ($categoryPrivacyContexts as $categoryPrivacyContext)
-					{
-						if(trim($categoryPrivacyContext) == '')
-						 	$categoryPrivacyContext = $defaultPrivacyContext;
-						 
-						if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
-							$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;
-					}
-				}
-				else 
-				{
-					$privacyContexts[$defaultPrivacyContext] = PrivacyType::ALL;
-				}			
-			}
-		}	
-
-		return $privacyContexts;
-	}
-	
-	private static function getPrivacyContextsByCategoryEntries(entry $entry)
-	{
-		$defaultPrivacyContext = self::DEFAULT_CONTEXT . $entry->getPartnerId();
-		
-		$privacyContexts = array();		
-		$categoriesIds = array();
-		
-		//get category entries that have privacy context
-		$categoryEntries = categoryEntryPeer::retrieveByEntryIdStatusPrivacyContextExistance($entry->getId(), null, true);
-		foreach ($categoryEntries as $categoryEntry) 
-		{
-			$categoriesIds[] = $categoryEntry->getCategoryId();				
-		}
-		
-		$categories = self::getCategoriesByIds($categoriesIds);
-		foreach ($categories as $category) 
-		{
-			$categoryPrivacy = $category->getPrivacy();
-			$categoryPrivacyContext = $category->getPrivacyContexts();
-			if(!isset($privacyContexts[$categoryPrivacyContext]) || $privacyContexts[$categoryPrivacyContext] > $categoryPrivacy)
-				$privacyContexts[trim($categoryPrivacyContext)] = $categoryPrivacy;					
-		}
-		
-		$noPrivacyContextCategory = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId());
-		if($noPrivacyContextCategory)
-			$privacyContexts[$defaultPrivacyContext] = PrivacyType::ALL;
-			
-		return $privacyContexts;
 	}
 	
 	public static function getEntitledKuserByPrivacyContext()

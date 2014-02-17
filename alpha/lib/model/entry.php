@@ -100,7 +100,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const MAX_NORMALIZED_RANK = 5;
 
 	const MAX_CATEGORIES_PER_ENTRY = 32;
-	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 200;
 	
 	const FILE_SYNC_ENTRY_SUB_TYPE_DATA = 1;
 	const FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT = 2;
@@ -1162,9 +1161,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function setCategories($newCats)
 	{
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			return;
-			
 		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
 		
 		$this->trimCategories($newCats);
@@ -1183,9 +1179,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setCategoriesIds($v)
 	{
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			return;
-		
 		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $v);
 		
 		$this->trimCategories($newCats);
@@ -1199,20 +1192,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->new_categories_ids = implode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
 		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
-	}
-	
-	public function getCategories()
-	{
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			return null;
-		return parent::getCategories();
-	}
-
-	public function getCategoriesIds()
-	{
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			return null;
-		return parent::getCategoriesIds();
 	}
 		
 	/*public function renameCategory($oldFullName, $newFullName)
