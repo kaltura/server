@@ -52,7 +52,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
         case "classes":
 
           $this->echoLine ($this->voClasses, "var util = require('util');");
-          $this->echoLine ($this->voClasses, "var kcb = require('./KalturaClientBase');");
+          $this->echoLine ($this->voClasses, "var kaltura = require('./KalturaClientBase');");
+          $this->echoLine ($this->voClasses, "");
 
           //create object classes
           foreach($reflectionType->children() as $classes_node)
@@ -63,7 +64,8 @@ class NodeClientGenerator extends ClientGeneratorFromXml
         case "services":
 
           $this->echoLine ($this->serviceClasses, "var util = require('util');");
-          $this->echoLine ($this->serviceClasses, "var kcb = require('./KalturaClientBase');");
+          $this->echoLine ($this->serviceClasses, "var kaltura = require('./KalturaClientBase');");
+          $this->echoLine ($this->serviceClasses, "");
 
           //implement services (api actions)
           foreach($reflectionType->children() as $services_node)
@@ -161,7 +163,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
       $parentClass = $classNode->attributes()->base;
       $this->echoLine ($this->voClasses, "util.inherits($clasName, $parentClass);");
     } else {
-      $this->echoLine ($this->voClasses, "util.inherits($clasName, kcb.KalturaObjectBase);");
+      $this->echoLine ($this->voClasses, "util.inherits($clasName, kaltura.KalturaObjectBase);");
     }
     $this->echoLine ($this->voClasses, "\n");
   }
@@ -178,8 +180,10 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $serviceClass .= "  $serviceClassName.super_.call(this);\n";
     $serviceClass .= "  this.init(client);\n";
     $serviceClass .= "};\n";
-    $serviceClass .= "util.inherits($serviceClassName, kcb.KalturaServiceBase);\n";
+    $serviceClass .= "\n";
+    $serviceClass .= "util.inherits($serviceClassName, kaltura.KalturaServiceBase);\n";
     $serviceClass .= "module.exports.$serviceClassName = $serviceClassName;\n";
+    $serviceClass .= "\n";
     
     $serviceClassDesc = "/**\n";
     $serviceClassDesc .= " *Class definition for the Kaltura service: $serviceName.\n";
@@ -306,14 +310,14 @@ class NodeClientGenerator extends ClientGeneratorFromXml
             $actionClass .= "{$extraTab}for(var index in $paramName)\n";
             $actionClass .= "{$extraTab}{\n";
             $actionClass .= "{$extraTab}  var obj = ${paramName}[index];\n";
-            $actionClass .= "{$extraTab}  this.client.addParam(kparams, \"$paramName:\" + index, kcb.toParams(obj));\n";
+            $actionClass .= "{$extraTab}  this.client.addParam(kparams, \"$paramName:\" + index, kaltura.toParams(obj));\n";
             $actionClass .= "$extraTab}\n";
             break;
           default: //is Object
             if ($actionParam->attributes()->optional == '1') {
               $actionClass .= "  if ($paramName != null)\n  ";
             }
-            $actionClass .= "  this.client.addParam(kparams, \"$paramName\", kcb.toParams($paramName));\n";
+            $actionClass .= "  this.client.addParam(kparams, \"$paramName\", kaltura.toParams($paramName));\n";
             break;
         }
       }
@@ -345,22 +349,26 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $this->echoLine($this->mainClass, " * @param config the Kaltura configuration object holding partner credentials (type: KalturaConfiguration).");
     $this->echoLine($this->mainClass, " */");
     $this->echoLine($this->mainClass, "var util = require('util');");
-    $this->echoLine($this->mainClass, "var kcb = require('./KalturaClientBase');");
-    $this->echoLine($this->mainClass, "var kvo = require('./KalturaVO');");
-    $this->echoLine($this->mainClass, "var ksvc = require('./KalturaServices');");
-    $this->echoLine($this->mainClass, "var ktypes = require('./KalturaTypes');");
+    $this->echoLine($this->mainClass, "var kaltura = require('./KalturaClientBase');");
+    $this->echoLine($this->mainClass, "kaltura.objects = require('./KalturaVO');");
+    $this->echoLine($this->mainClass, "kaltura.services = require('./KalturaServices');");
+    $this->echoLine($this->mainClass, "kaltura.enums = require('./KalturaTypes');");
+    $this->echoLine($this->mainClass, "");
     $this->echoLine($this->mainClass, "function KalturaClient(config) {");
     $this->echoLine($this->mainClass, "  this.init(config);");
     $this->echoLine($this->mainClass, "};");
+    $this->echoLine($this->mainClass, "");
+    $this->echoLine($this->mainClass, "module.exports = kaltura;");
     $this->echoLine($this->mainClass, "module.exports.KalturaClient = KalturaClient;");
-    $this->echoLine ($this->mainClass, "util.inherits(KalturaClient, kcb.KalturaClientBase);");
+    $this->echoLine($this->mainClass, "");
+    $this->echoLine ($this->mainClass, "util.inherits(KalturaClient, kaltura.KalturaClientBase);");
     $this->echoLine ($this->mainClass, "KalturaClient.prototype.apiVersion = \"$apiVersion\";");
-    $this->echoLine ($this->mainClass, "module.exports.KalturaConfiguration = kcb.KalturaConfiguration;");
+    $this->echoLine($this->mainClass, "");
     
     foreach($servicesNodes as $service_node)
     {
       $serviceName = $service_node->attributes()->name;
-      $serviceClassName = "ksvc.Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+      $serviceClassName = "kaltura.services.Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
       $this->echoLine($this->mainClass, "/**");
       $description = str_replace("\n", "\n *  ", $service_node->attributes()->description); // to format multi-line descriptions
       $this->echoLine($this->mainClass, " * " . $description);
@@ -374,15 +382,15 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     $this->echoLine($this->mainClass, " */");
     $this->echoLine($this->mainClass, "KalturaClient.prototype.init = function(config){");
     $this->echoLine($this->mainClass, "  //call the super constructor:");
-    $this->echoLine($this->mainClass, "  kcb.KalturaClientBase.prototype.init.apply(this, arguments);");
+    $this->echoLine($this->mainClass, "  kaltura.KalturaClientBase.prototype.init.apply(this, arguments);");
     $this->echoLine($this->mainClass, "  //initialize client services:");
     foreach($servicesNodes as $service_node)
     {
       $serviceName = $service_node->attributes()->name;
-      $serviceClassName = "ksvc.Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+      $serviceClassName = "kaltura.services.Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
       $this->echoLine($this->mainClass, "  this.$serviceName = new $serviceClassName(this);");
     }
-    $this->echoLine($this->mainClass, "}");
+    $this->echoLine($this->mainClass, "};");
   }
   
   /**
