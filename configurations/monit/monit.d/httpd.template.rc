@@ -1,7 +1,7 @@
         check process apache
            with pidfile "/var/run/httpd/httpd.pid"
-           start program = "service @APACHE_SERVICE@ start" with timeout 60 seconds
-           stop program = "service @APACHE_SERVICE@ stop"
+           start program = "/sbin/service httpd start" with timeout 60 seconds
+           stop program = "/sbin/service httpd stop"
            #if 10 restarts within 10 cycles then timeout
            #if totalmem > 100 Mb then alert
            #if children > 255 for 5 cycles then stop
