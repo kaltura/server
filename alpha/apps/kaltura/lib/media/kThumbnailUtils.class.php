@@ -70,9 +70,8 @@ class kThumbnailUtils
 
 		$requiredAspectRatio = $requiredWidth / $requiredHeight;
 
-		// Calc aspect ratio + distance from requiredAspectRatio and insert to an array
-		$thumbDescriptors = array();
-
+		// Calc aspect ratio + distance from requiredAspectRatio
+		$chosenThumbnailDescriptor = null;
 
 		if ( $fallbackThumbnailPath )
 		{
@@ -81,10 +80,10 @@ class kThumbnailUtils
 			$thumbWidth = $imageSizeArray[0];
 			$thumbHeight = $imageSizeArray[1];
 
-			$descriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $fallbackThumbnailPath, true );
-			$thumbDescriptors[] = $descriptor;
+			$chosenThumbnailDescriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $fallbackThumbnailPath, true );
 		}
 
+		// Loop all available thumb assets and choose the best match
 		foreach ( $thumbAssets as $thumbAsset )
 		{
 			$fileSyncKey = $thumbAsset->getSyncKey( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
@@ -96,15 +95,20 @@ class kThumbnailUtils
 
 			$descriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $thumbPath, false );
 
-			$thumbDescriptors[] = $descriptor;
+			if ( ! $chosenThumbnailDescriptor ) // First descriptor
+			{
+				$chosenThumbnailDescriptor = $descriptor;
+			}
+			else
+			{
+				// Compare the last best-match with the current descriptor
+				$res = self::compareThumbAssetItems( $chosenThumbnailDescriptor, $descriptor );
+				
+				// Keep the last best-match unless it needs to go down the ranks (in case $res > 0)
+				$chosenThumbnailDescriptor = ($res <= 0) ? $chosenThumbnailDescriptor : $descriptor;
+			}
 		}
 		
-		// Sort the array according to priorities
-		usort( $thumbDescriptors, array( get_class(), 'compareThumbAssetItems' ) );
-
-		// And pick the best option
-		$chosenThumbnailDescriptor = $thumbDescriptors[0];
-
 		return $chosenThumbnailDescriptor;
 	}
 
