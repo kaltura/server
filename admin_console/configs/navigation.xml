@@ -127,4 +127,9 @@
 			</xsd-doc>
 		</pages>
 	</developer>
+	<monitoring>
+		<label>Monitoring</label>
+		<controller>index</controller>
+		<action>monit</action>
+	</monitoring>
 </configdata>
