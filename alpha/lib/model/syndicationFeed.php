@@ -60,7 +60,8 @@ class syndicationFeed extends BasesyndicationFeed
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		if($this->isNew())
+		//no playmanifest redirection in itunes
+		if($this->isNew() && $this->type != syndicationFeedType::ITUNES)
 			$this->setServePlayManifest(true);
 		
 		return parent::preSave($con);
