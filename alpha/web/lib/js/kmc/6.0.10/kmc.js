@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-02-11
+/*! KMC - v6.0.10 - 2014-02-17
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Ran Yefet; Licensed GNU */
 /**
@@ -4321,7 +4321,7 @@ kmc.mediator =  {
 
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
-	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
+	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, duration, thumbnailUrl) {
 		var embedOptions = {
 			'previewOnly': previewOnly
 		};
@@ -4336,7 +4336,9 @@ kmc.preview_embed = {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
 				'name': name,
-				'description': description
+				'description': description,
+                'duration': duration.toString(),
+                'thumbnailUrl': thumbnailUrl
 			};
 			if( live_bitrates ) {
 				embedOptions.liveBitrates = live_bitrates;
