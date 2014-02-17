@@ -42,10 +42,10 @@ class kThumbnailUtils
 	 * @param int $requiredHeight Thumbnail's requested height
 	 * @return string|null The path to the physical thumbnail file
 	 */
-	public static function getNearestAspectRatioThumbnailFilePathByEntryId( $entryId, $requiredWidth, $requiredHeight, $fallbackThumbnailPath )
+	public static function getNearestAspectRatioThumbnailDescriptorByEntryId( $entryId, $requiredWidth, $requiredHeight, $fallbackThumbnailPath )
 	{
 		$thumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId( $entryId );
-		return self::getNearestAspectRatioThumbnailFilePathFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath );
+		return self::getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath );
 	}
 
 	/**
@@ -61,7 +61,7 @@ class kThumbnailUtils
 	 *                                   aspect ratio to the required, or null
 	 *                                   if the entry doesn't contain thumbnails.
 	 */
-	public static function getNearestAspectRatioThumbnailFilePathFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath = null )
+	public static function getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath = null )
 	{
 		// Calc aspect ratio + distance from requiredAspectRatio
 		$chosenThumbnailDescriptor = null;
@@ -95,7 +95,7 @@ class kThumbnailUtils
 			else
 			{
 				// Compare the last best-match with the current descriptor
-				$res = self::compareThumbAssetItems( $chosenThumbnailDescriptor, $descriptor );
+				$res = self::compareThumbnailDescriptors( $chosenThumbnailDescriptor, $descriptor );
 				
 				// Keep the last best-match unless it needs to go down the ranks (in case $res > 0)
 				$chosenThumbnailDescriptor = ($res <= 0) ? $chosenThumbnailDescriptor : $descriptor;
@@ -108,11 +108,11 @@ class kThumbnailUtils
 	/**
 	 * Look for the smaller delta from original aspect ratio. If the deltas match, look for the asset with larger dimensions.
 	 *  
-	 * @param stdClass $a @see getNearestAspectRatioThumbnailFilePathFromThumbAssets()
-	 * @param stdClass $b @see getNearestAspectRatioThumbnailFilePathFromThumbAssets()
+	 * @param kThumbnailDescriptor $a @see getNearestAspectRatioThumbnailDescriptorFromThumbAssets()
+	 * @param kThumbnailDescriptor $b @see getNearestAspectRatioThumbnailDescriptorFromThumbAssets()
 	 * @return int 	(-1) = a before b, (+1) = a after b, (0) = don't care (equal)
 	 */
-	private static function compareThumbAssetItems( $a, $b )
+	private static function compareThumbnailDescriptors( $a, $b )
 	{
 		// Look for the smaller delta
 		if ( $a->getDeltaFromOrigAspectRatio() < $b->getDeltaFromOrigAspectRatio() )
