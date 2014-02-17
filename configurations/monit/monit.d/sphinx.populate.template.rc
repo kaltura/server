@@ -7,7 +7,7 @@
            depends on sphinx_populate.conf, sphinx_populate_script
 
         check file sphinx_populate.conf
-            with path "@APP_DIR@/configurations/sphinx/populate/@INSTALLED_HOSNAME@.ini"
+            with path "@APP_DIR@/configurations/sphinx/populate/@INSTALLED_HOSTNAME@.ini"
             # Reload populate if the server-sphinx.php file was changed
             if changed checksum
                then exec "/etc/init.d/kaltura_populate restart"
