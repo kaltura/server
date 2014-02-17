@@ -264,7 +264,9 @@ class KImageMagickCropper extends KBaseCropper
 					$gravity = self::getGravityByXY( $cropX, $cropY );
 
 					$attributes[] = "-gravity $gravity";
-					$attributes[] = "-resize {$w}x{$h}"; // Resize first
+					$attributes[] = "-resize {$w}x{$h}!";	// Resize first
+															// Note the "!" addition, which will force resizing to required dimensions.
+															// This will solve a case where, for example, resizing 331x197 to 350x208 will result as 349x208.
 					$attributes[] = "-crop {$cropWidth}x{$cropHeight}+0+0"; // Then crop
 					break;
 
