@@ -101,7 +101,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		}
 		
 		$TOEmailValue = $to ? $to->email->value : '';
-		$TONameValue = $to ? $to->name->value : '';
+		$TONameValue = $to && $to->name ? $to->name->value : '';
 		
 		if (!$object->to || $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
