@@ -13,58 +13,64 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		{			
 			KalturaLog::debug("Search properties [" . print_r($properties, true) . "]");
 
-			if(isset($properties['to_email']) && strlen(trim($properties['to_email'])))
+			if(isset($properties['to_email']))
 			{
-				$email = new Kaltura_Client_Type_StringValue();
-				$email->value = $properties['to_email'];
-				
-				$name = null;
-				if(isset($properties['to_name']) && strlen(trim($properties['to_name'])))
+				if (strlen(trim($properties['to_email'])))
 				{
-					$name = new Kaltura_Client_Type_StringValue();
-					$name->value = $properties['to_name'];
+					$email = new Kaltura_Client_Type_StringValue();
+					$email->value = $properties['to_email'];
+				
+					$name = null;
+					if(isset($properties['to_name']) && strlen(trim($properties['to_name'])))
+					{
+						$name = new Kaltura_Client_Type_StringValue();
+						$name->value = $properties['to_name'];
+					}
+				
+					$recipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+					$recipient->email = $email; 
+					$recipient->name = $name; 
+				
+					$recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+					$recipientProvider->emailRecipients = array();
+					$recipientProvider->emailRecipients[] = $recipient;
+				
+					$object->to = $recipientProvider;
 				}
-				
-				$recipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
-				$recipient->email = $email; 
-				$recipient->name = $name; 
-				
-				$recipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
-				$recipientProvider->emailRecipients = array();
-				$recipientProvider->emailRecipients[] = $recipient;
-				
-				$object->to = $recipientProvider;
-			}
-			else   //return special null so we can update to null
-			{
-				$object->to =  Kaltura_Client_ClientBase::getKalturaNullValue();
+				else //return special null so we can update to null
+				{
+					$object->to =  Kaltura_Client_ClientBase::getKalturaNullValue();
+				}
 			}
 			
-			if(isset($properties['cc_email']) && strlen(trim($properties['cc_email'])))
-			{	
-				$CCemail = new Kaltura_Client_Type_StringValue();
-				$CCemail->value = $properties['cc_email'];
-		
-				$CCname = null;
-				if(isset($properties['cc_name']) && strlen(trim($properties['cc_name'])))
-				{
-					$CCname = new Kaltura_Client_Type_StringValue();
-					$CCname->value = $properties['cc_name'];
-				}
-			
-				$CCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
-				$CCrecipient->email = $CCemail;
-				$CCrecipient->name = $CCname;
-		
-				$CCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
-				$CCrecipientProvider->emailRecipients = array();
-				$CCrecipientProvider->emailRecipients[] = $CCrecipient;
-		
-				$object->cc = $CCrecipientProvider;
-			}
-			else   //return special null so we can update to null
+			if(isset($properties['cc_email']))
 			{
-				$object->cc =  Kaltura_Client_ClientBase::getKalturaNullValue();
+				if (strlen(trim($properties['cc_email'])))
+				{	
+					$CCemail = new Kaltura_Client_Type_StringValue();
+					$CCemail->value = $properties['cc_email'];
+			
+					$CCname = null;
+					if(isset($properties['cc_name']) && strlen(trim($properties['cc_name'])))
+					{
+						$CCname = new Kaltura_Client_Type_StringValue();
+						$CCname->value = $properties['cc_name'];
+					}
+			
+					$CCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+					$CCrecipient->email = $CCemail;
+					$CCrecipient->name = $CCname;
+		
+					$CCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+					$CCrecipientProvider->emailRecipients = array();
+					$CCrecipientProvider->emailRecipients[] = $CCrecipient;
+			
+					$object->cc = $CCrecipientProvider;
+				}
+				else //return special null so we can update to null
+				{
+					$object->cc =  Kaltura_Client_ClientBase::getKalturaNullValue();
+				}
 			}
 		}
 		return $object;
@@ -80,8 +86,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if(!($object instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationTemplate))
 			return;
 		
-		$to = null;
-		
+		$to = null;	
 		if($object->to && $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
 			if(count($object->to->emailRecipients) > 1)
@@ -95,35 +100,29 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			}
 		}
 		
-		if ($to)
+		$TOEmailValue = $to ? $to->email->value : '';
+		$TONameValue = $to ? $to->name->value : '';
+		
+		if (!$object->to || $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
-			$TOEmailValue = $to->email->value ;
-			$TONameValue = $to->name->value ;
-		}
-		else
-		{
-			$TOEmailValue = '' ;
-			$TONameValue = '' ;
-		}
+			$this->addElement('text', 'to_email', array(
+					'label'			=> 'Recipient e-mail (TO):',
+					'value'			=> $TOEmailValue,
+					'size'                  => 60,
+					'filters'		=> array('StringTrim'),
+					'validators'	=> array('EmailAddress'),
+			));
 				
-		$this->addElement('text', 'to_email', array(
-				'label'			=> 'Recipient e-mail (TO):',
-				'value'			=> $TOEmailValue,
-				'size'                  => 60,
-				'filters'		=> array('StringTrim'),
-				'validators'	=> array('EmailAddress'),
-		));
-				
-		$this->addElement('text', 'to_name', array(
-				'label'			=> 'Recipient name (TO):',
-				'value'			=> $TONameValue,
-				'size'                  => 60,
-				'filters'		=> array('StringTrim'),
-		));
+			$this->addElement('text', 'to_name', array(
+					'label'			=> 'Recipient name (TO):',
+					'value'			=> $TONameValue,
+					'size'                  => 60,
+					'filters'		=> array('StringTrim'),
+			));
+		}
 		
 		
 		$cc = null;
-		
 		if($object->cc && $object->cc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
 			if(count($object->cc->emailRecipients) > 1)
@@ -140,20 +139,23 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		$CCEmailValue = $cc ? $cc->email->value : '';
 		$CCNameValue = $cc && $cc->name ? $cc->name->value : '';
 		
-		$this->addElement('text', 'cc_email', array(
-				'label'                 => 'Recipient e-mail (CC):',
-				'value'                 => $CCEmailValue,
-				'size'                  => 60,
-				'filters'               => array('StringTrim'),
-				'validators'    => array('EmailAddress'),
-		));
+		if(!$object->cc || $object->cc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
+		{
+			$this->addElement('text', 'cc_email', array(
+					'label'                 => 'Recipient e-mail (CC):',
+					'value'                 => $CCEmailValue,
+					'size'                  => 60,
+					'filters'               => array('StringTrim'),
+					'validators'    => array('EmailAddress'),
+			));
 		
-		$this->addElement('text', 'cc_name', array(
-				'label'                 => 'Recipient name (CC):',
-				'value'                 => $CCNameValue,
-				'size'                  => 60,
-				'filters'               => array('StringTrim'),
-		));
+			$this->addElement('text', 'cc_name', array(
+					'label'                 => 'Recipient name (CC):',
+					'value'                 => $CCNameValue,
+					'size'                  => 60,
+					'filters'               => array('StringTrim'),
+			));
+		}
 	}
 	
 	/* (non-PHPdoc)
