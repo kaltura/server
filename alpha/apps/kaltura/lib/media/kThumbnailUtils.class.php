@@ -61,17 +61,12 @@ class kThumbnailUtils
 	 *                                   aspect ratio to the required, or null
 	 *                                   if the entry doesn't contain thumbnails.
 	 */
-	public static function getNearestAspectRatioThumbnailFilePathFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath )
+	public static function getNearestAspectRatioThumbnailFilePathFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath = null )
 	{
-		if ( empty( $thumbAssets ) )
-		{
-			return $fallbackThumbnailPath;
-		}
-
-		$requiredAspectRatio = $requiredWidth / $requiredHeight;
-
 		// Calc aspect ratio + distance from requiredAspectRatio
 		$chosenThumbnailDescriptor = null;
+
+		kThumbnailDescriptor::initDimensions( $requiredWidth, $requiredHeight );
 
 		if ( $fallbackThumbnailPath )
 		{
@@ -80,20 +75,18 @@ class kThumbnailUtils
 			$thumbWidth = $imageSizeArray[0];
 			$thumbHeight = $imageSizeArray[1];
 
-			$chosenThumbnailDescriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $fallbackThumbnailPath, true );
+			$chosenThumbnailDescriptor = kThumbnailDescriptor::fromParams( $thumbWidth, $thumbHeight, $fallbackThumbnailPath, true );
+		}
+
+		if ( empty( $thumbAssets ) )
+		{
+			return $chosenThumbnailDescriptor;
 		}
 
 		// Loop all available thumb assets and choose the best match
 		foreach ( $thumbAssets as $thumbAsset )
 		{
-			$fileSyncKey = $thumbAsset->getSyncKey( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
-				
-			$thumbPath = kFileSyncUtils::getReadyLocalFilePathForKey( $fileSyncKey );
-
-			$thumbWidth = $thumbAsset->getWidth();
-			$thumbHeight = $thumbAsset->getHeight();
-
-			$descriptor = new kThumbnailDescriptor( $requiredAspectRatio, $thumbWidth, $thumbHeight, $thumbPath, false );
+			$descriptor = kThumbnailDescriptor::fromThumbAsset( $thumbAsset );
 
 			if ( ! $chosenThumbnailDescriptor ) // First descriptor
 			{
