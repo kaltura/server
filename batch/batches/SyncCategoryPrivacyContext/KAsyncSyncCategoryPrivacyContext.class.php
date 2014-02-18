@@ -62,11 +62,12 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 			foreach ($categoryList->objects as $category) 
 			{
 				$data->lastUpdatedCategoryCreatedAt = $category->createdAt;
+				$data->lastUpdatedCategoryEntryCreatedAt = null;
 				KBatchBase::unimpersonate();
 				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
 				KBatchBase::impersonate($job->partnerId);
 				
-				KalturaLog::debug('handling sub category '.$category->categoryId);
+				KalturaLog::debug('handling sub category '.$category->id);
 				$this->syncCategoryPrivacyContext($job, $data, $category->id);				
 			}
 			$pager->pageIndex++;
