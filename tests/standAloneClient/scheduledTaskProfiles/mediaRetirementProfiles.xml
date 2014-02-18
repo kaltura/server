@@ -208,6 +208,10 @@
 									<field>/*[local-name()='metadata']/*[local-name()='LegalHold']</field>
 									<value>-1</value>
 								</item>
+								<item objectType="KalturaSearchCondition">
+									<field>/*[local-name()='metadata']/*[local-name()='PurgeNotificationStatus']</field>
+									<value>Not Sent</value>
+								</item>
 							</items>
 						</item>
 					</items>
@@ -216,6 +220,29 @@
 			<objectTasks objectType="array">
 				<item objectType="KalturaDispatchEventNotificationObjectTask">
 					<eventNotificationTemplateId>{variable:eventNotificationTemplateId}</eventNotificationTemplateId>
+				</item>
+				<item objectType="KalturaExecuteMetadataXsltObjectTask">
+					<metadataProfileId>{variable:metadataProfileId}</metadataProfileId>
+					<metadataObjectType>1</metadataObjectType><!-- ENTRY -->
+					<xslt>
+						<![CDATA[
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:output method="xml" encoding="utf-8" indent="no"/>
+	<xsl:template match="@*|node()">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="PurgeNotificationStatus" />
+	<xsl:template match="metadata">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" />
+			<PurgeNotificationStatus>Sent</PurgeNotificationStatus>
+		</xsl:copy>
+	</xsl:template>
+</xsl:stylesheet>
+						]]>
+					</xslt>
 				</item>
 			</objectTasks>
 		</scheduledTaskProfile>
