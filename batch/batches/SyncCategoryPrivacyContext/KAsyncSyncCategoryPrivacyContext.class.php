@@ -66,7 +66,7 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
 				KBatchBase::impersonate($job->partnerId);
 				
-				KalturaLog::debug('handling sub category '.$category->categoryId);
+				KalturaLog::debug('handling sub category '.$category->id);
 				$this->syncCategoryPrivacyContext($job, $data, $category->id);				
 			}
 			$pager->pageIndex++;
@@ -81,13 +81,17 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 	
 	private function syncCategoryPrivacyContext(KalturaBatchJob $job, KalturaSyncCategoryPrivacyContextJobData $data, $categoryId)
 	{
-			    
+
+		KalturaLog::debug('Last updated category entry created at: '.$data->lastUpdatedCategoryEntryCreatedAt);
 		$categoryEntryPager = $this->getFilterPager();
 	    $categoryEntryFilter = new KalturaCategoryEntryFilter();
 		$categoryEntryFilter->orderBy = KalturaCategoryEntryOrderBy::CREATED_AT_ASC;
 		$categoryEntryFilter->categoryIdEqual = $categoryId;
-		if($data->lastUpdatedCategoryEntryCreatedAt)
-			$categoryEntryFilter->createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryEntryCreatedAt;		
+		if($data->lastUpdatedCategoryEntryCreatedAt && $data->lastUpdatedCategoryCreatedAt != '')
+		{
+			KalturaLog::debug('setting createdAtGreaterThanOrEqual on the filter' );
+			$categoryEntryFilter->createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryEntryCreatedAt;
+		}		
 		$categoryEntryList = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $categoryEntryPager);
 		
 		while(count($categoryEntryList->objects))
