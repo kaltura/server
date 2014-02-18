@@ -14,7 +14,8 @@ class serveIsmAction extends sfAction
 		
 		$objectId = $type = null;
 		$objectIdStr = $this->getRequestParameter( "objectId" );
-		list($objectId, $type) = @explode(".", $objectIdStr);
+		if($objectIdStr)
+			list($objectId, $type) = @explode(".", $objectIdStr);
 		
 		if (!$type || !$objectId)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER);
