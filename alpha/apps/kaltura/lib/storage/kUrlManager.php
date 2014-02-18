@@ -350,8 +350,8 @@ class kUrlManager
 			$url .= "/storageId/$this->storageProfileId";
 				
 		$ext = '';
-		if ($asset && $asset->file_ext)   
-			$ext ='/a.' .  $asset->file_ext;
+		if ($asset && $asset->getFileExt())   
+			$ext ='/a.' .  $asset->getFileExt();
 		$url .= $ext . "?clientTag=$clientTag";
 		
 		return $url;
