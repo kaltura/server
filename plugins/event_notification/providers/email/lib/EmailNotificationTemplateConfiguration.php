@@ -90,7 +90,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if (!$object->to || $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{
 			$to = null;	
-			if($object->to && $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
+			if($object->to)
 			{
 				if(count($object->to->emailRecipients) > 1)
 				{
@@ -125,7 +125,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 		if(!$object->cc || $object->cc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
 		{	
 			$cc = null;
-			if($object->cc && $object->cc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
+			if($object->cc)
 			{
 				if(count($object->cc->emailRecipients) > 1)
 				{
