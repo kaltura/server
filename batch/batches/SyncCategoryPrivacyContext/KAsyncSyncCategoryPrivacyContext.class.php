@@ -62,6 +62,7 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 			foreach ($categoryList->objects as $category) 
 			{
 				$data->lastUpdatedCategoryCreatedAt = $category->createdAt;
+				$data->lastUpdatedCategoryEntryCreatedAt = null;
 				KBatchBase::unimpersonate();
 				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
 				KBatchBase::impersonate($job->partnerId);
