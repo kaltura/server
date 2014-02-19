@@ -62,8 +62,8 @@ change @PLAYREADY_LICENSE_SERVER_HOST@ to the relevant host
 
 *Binaries*
 - Linux
-- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
-- -The ffmpeg-aux remains unchanged.
+- -Install ismindex  from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+- -The ffmpeg and ffmpeg-aux remains unchanged. The ffmpeg will be switched to the new version on the next deployment.
 - Windows
 - -Install 'SmoothProtect.exe' binary
 
