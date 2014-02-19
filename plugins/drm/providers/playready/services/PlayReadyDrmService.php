@@ -96,9 +96,13 @@ class PlayReadyDrmService extends KalturaBaseService
 			}
 			catch(PropelException $e)
 			{
-				if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+				if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 				{
 					$keyId = $this->getEntryKeyId($entry->getId());
+				}
+				else
+				{
+					throw $e; // Rethrow the unfamiliar exception
 				}
 			}
 		}

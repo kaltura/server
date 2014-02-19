@@ -230,7 +230,7 @@ class DropFolderFileService extends KalturaBaseService
 		}
 		catch(PropelException $e)
 		{
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 			{
 				$existingDropFolderFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName);
 				KalturaLog::debug('drop folder file exists ['.$existingDropFolderFile->getId().']');
