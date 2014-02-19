@@ -1018,6 +1018,17 @@ $plannedDur = 0;
 				$targetAud->_sampleRate=max(KDLConstants::MinAudioSampleRate,min(KDLConstants::MaxAudioSampleRate,$targetAud->_sampleRate));
 			}
 		}
+		
+			/*
+			 * For following cases the audio should be resampled with ffmpeg 'aresample' filter
+			 * - Nellimoser audio source
+			 * - Low sample-rate audio (<16000hz)
+			 * - target other than OGG/Vorbis
+			 */
+		if(!$target->_container->IsFormatOf(array(KDLContainerTarget::OGG,KDLContainerTarget::OGV))
+		&& ($source->IsFormatOf(array('nellymoser'))||($source->_sampleRate && $source->_sampleRate>0 && $source->_sampleRate<16000))) {
+			$targetAud->_useResampleFilter = true;
+		}
 
 		return $targetAud;
 	}
