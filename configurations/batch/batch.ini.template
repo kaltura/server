@@ -682,6 +682,7 @@ params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 type												= KScheduledTaskRunner
 maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
+sleepBetweenStopStart								= 21600
 
 [KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
 id													= 550
