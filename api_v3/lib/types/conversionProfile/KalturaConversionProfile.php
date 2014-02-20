@@ -223,8 +223,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::SYSTEM_NAME_ALREADY_EXISTS, $this->systemName);
 		}
 		
-		if (!is_null($this->flavorParamsIds) && !($this->flavorParamsIds instanceof KalturaNullField)) 
-			$this->validateFlavorParamsIds();
+		$this->validateFlavorParamsIds();
 		
 		$this->validateDefaultEntry();
 		
@@ -264,6 +263,11 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public function validateFlavorParamsIds()
 	{
 		$flavorParamsIds = $this->getFlavorParamsAsArray();
+		if ( empty($flavorParamsIds) )
+		{
+			return; // Nothing to validate
+		}
+
 		$flavorParams = assetParamsPeer::retrieveByPKs($flavorParamsIds);
 		
 		$sourceFound = false;
