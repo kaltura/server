@@ -289,9 +289,13 @@ class KCurlWrapper
 		self::$headers = "";
         self::$lastHeader = false;
         curl_exec($this->ch);
+        
+        //Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
+        if(!$noBody)
+			curl_setopt($this->ch, CURLOPT_RANGE, '0-');
+        
         if(!self::$headers)
            return false;
-
 
 		self::$headers = explode("\r\n", self::$headers);
 
@@ -382,19 +386,6 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
 		
 		return $curlHeaderResponse;
-	}
-	
-	/**
-	 * This function needs to be executed when you are re-using the same curl to execute multiple getHeader/exec requests
-	 * @param string $sourceUrl
-	 * @param string $destFile
-	 * @return boolean
-	 */
-	public function fetchFromRemoteUrl($sourceUrl, $destFile = null)
-	{
-		curl_setopt($this->ch, CURLOPT_RANGE, '0-');
-		
-		return $this->exec($sourceUrl, $destFile);
 	}
 
 	/**

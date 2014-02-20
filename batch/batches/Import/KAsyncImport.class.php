@@ -93,6 +93,7 @@ class KAsyncImport extends KJobHandlerWorker
     			if(!$curlHeaderResponse->isGoodCode())
     			{
     				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "Failed while reading file. HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
+    				$curlWrapper->close();
     				return $job;
     			}
 
@@ -116,13 +117,18 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
-			$curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
 
 			if(is_null($fileSize)) {
 				// Read file size
 				$curlHeaderResponse = $curlWrapper->getHeader($sourceUrl, true);
 				if($curlHeaderResponse && count($curlHeaderResponse->headers) && !$curlWrapper->getError() && isset($curlHeaderResponse->headers['content-length']))
 					$fileSize = $curlHeaderResponse->headers['content-length'];
+				
+				//Close the curl used to fetch the header and create a new one. 
+				//When fetching headers we set curl options that than are not reset once header is fetched. 
+				//Not all servers support all the options so we need to remove them from our headers.
+				$curlWrapper->close();
+				$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 			}
 
 			if($resumeOffset)

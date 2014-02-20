@@ -147,7 +147,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		
 		// get directory contents
 		KalturaLog::debug('Executing CURL to get directory contents for ['.$sourceUrl.']');	
-		$contents = $this->curlWrapper->fetchFromRemoteUrl($sourceUrl);
+		$contents = $this->curlWrapper->exec($sourceUrl);
 		$curlError = $this->curlWrapper->getError();
 		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
 		
@@ -223,9 +223,6 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	{
 		KalturaLog::debug('fetchFile - job id ['.$job->id.'], source url ['.$sourceUrl.'], destination ['.$fileDestination.']');
 		
-		//If we run mutiple file sync import using the same curl we nned to reset the offset each time before fetching the file 
-		$this->curlWrapper->setResumeOffset(0);
-		
 		if (!$fileSize)
 		{
 			// fetch header if not given
@@ -271,6 +268,9 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		else
 		{
+			//If we run mutiple file sync import using the same curl we nned to reset the offset each time before fetching the file 
+			$this->curlWrapper->setResumeOffset(0);
+			
 			// create destination directory if doesn't already exist
 			$res = self::createDir(dirname($fileDestination));
 			if ( !$res )
@@ -286,7 +286,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 			
 		KalturaLog::debug("Executing curl for downloading file at [$sourceUrl]");
-		$res = $this->curlWrapper->fetchFromRemoteUrl($sourceUrl, $fileDestination); // download file
+		$res = $this->curlWrapper->exec($sourceUrl, $fileDestination); // download file
 		$curlError = $this->curlWrapper->getError();
 		$curlErrorNumber = $this->curlWrapper->getErrorNumber();
 		
