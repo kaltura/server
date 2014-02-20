@@ -84,6 +84,12 @@ class KAsyncNotifier extends KJobHandlerWorker
 				if(! $partner)
 					continue;
 				
+				if(!$partner->notificationUrl)
+				{
+					KalturaLog::info("Trying to send notification to partner [$partner_id] with undefined notification url skipping notification");
+					continue;
+				}
+				
 				KalturaLog::info("Sending multi-notifications to partner [$partner_id]");
 				
 				// we assume that the partner wants notificatins or else it would have not appeared in the list	
@@ -98,6 +104,12 @@ class KAsyncNotifier extends KJobHandlerWorker
 				$partner = $this->getPartner($not->partnerId);
 				if(! $partner)
 					continue;
+					
+				if(!$partner->notificationUrl)
+				{
+					KalturaLog::info("Trying to send notification to partner [$partner_id] with undefined notification url skipping notification");
+					continue;
+				}
 				
 				KalturaLog::info("Sending single-notifications to partner [{$partner->id}]");
 				// we assume that the partner wants notificatins or else it would have not appeared in the DB			
