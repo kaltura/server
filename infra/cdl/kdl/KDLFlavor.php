@@ -666,7 +666,7 @@ $plannedDur = 0;
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
-	private static function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
+	private function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
 	{
 		$shrinkToSource = $target->_isShrinkFramesizeToSource;
 		
@@ -807,14 +807,104 @@ $plannedDur = 0;
 		/*
 		 * x16 - make sure both hgt/wid comply to x16
 		 * - if the frame size is an 'industry-standard', skip x16 constraint 
+		 * - for h264 targets force MOD 2 for width & height, otherwise x264 crashes.
 		 */
+		$modVal = 16;
 		if((isset($target->_forceMult16) && $target->_forceMult16 == 0)
 		|| (($target->_width == 640 || $target->_width == 480) && $target->_height == 360) || ($target->_width == 1920 && $target->_height == 1080)){
-			;
+			$h264targets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H);
+			if(in_array($target->_id, $h264targets)) {
+				$modVal = 2;
 		}
 		else {
-			$target->_height = $target->_height -($target->_height%16);
-			$target->_width  = $target->_width  -($target->_width%16);
+				return;
+			}
+		}
+
+		$this->matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, $target);
+	}
+	
+	/* ---------------------------
+	 * matchBestModConstrainedVideoFramesize
+	 *  The goal is to conform with frame-size 'mod' constraint (mostly mod16) 
+	 *  while attempting to match as close as possible the required aspect ratio - 
+	 *  - Evaluating the all 4 possible setups (mod-up/mod-down for vid/hgt)
+	 *  - Compare each of them to the required AR
+	 *  - Find the setup that is closest 
+	 */
+	function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
+	{ 
+			/*
+			 * Calculate hgt & wid 'mod down' value. If not set - assign 0 
+			 */
+		$h_dw = ($target->_height>0)? $target->_height - ($target->_height%$modVal): 0;
+		$w_dw = ($target->_width>0)? $target->_width - ($target->_width%$modVal): 0;
+		
+			/*
+			 * If 'mod-down' vals equal to original trg val 
+			 * ==> leave, further calcs are redundant 
+			 * If one of 'mod-down' ==0
+			 * ==> assign and leave, further calcs are redundant
+			 */
+		if($target->_height==$h_dw && $target->_width==$w_dw){
+			return;
+		}
+		else if($h_dw==0 || $w_dw==0){
+			$target->_width  = $w_dw;
+			$target->_height = $h_dw;
+			return;
+		}
+
+			/*
+			 * Calc 'mod-up' values
+			 * Make sure not to exceed the source dims 
+			 * and original flavor dims
+			 */
+		$h_up = $target->_height -($target->_height%$modVal) + $modVal;
+		if($h_up>$hgtSrc || ($this->_video->_height>0 && $h_up>$this->_video->_height)) {
+			$h_up = $h_dw;
+		}
+		$w_up = $target->_width  -($target->_width%$modVal) + $modVal;
+		if($w_up>$widSrc || ($this->_video->_width>0 && $w_up>$this->_video->_width)) {
+			$w_up = $w_dw;
+		}
+		
+			/*
+			 * Calc difference between source AR and AR's of various mod-up/down cases.
+			 * The target is to find the option that is closest to the source AR.
+			 * Array keys notation - 'd' for 'down', 'u' for 'up'
+			 */
+		$arArr["dd"] = abs($darSrcFrame-$w_dw/$h_dw);
+		$arArr["du"] = abs($darSrcFrame-$w_dw/$h_up);
+		$arArr["ud"] = abs($darSrcFrame-$w_up/$h_dw);
+		$arArr["uu"] = abs($darSrcFrame-$w_up/$h_up);
+		
+			/*
+			 * Sort the array with AR-diffs to find the smallest (closest to source AR)
+			 */
+		asort($arArr);
+		$kAr = key($arArr);
+		
+			/*
+			 * Assign the best match to target dims.
+			 */
+		switch ($kAr){
+		case "dd":
+			$target->_width  = $w_dw;
+			$target->_height = $h_dw;
+			break;
+		case "du":
+			$target->_width  = $w_dw;
+			$target->_height = $h_up;
+			break;
+		case "ud":
+			$target->_width  = $w_up;
+			$target->_height = $h_dw;
+			break;
+		case "uu":
+			$target->_width  = $w_up;
+			$target->_height = $h_up;
+			break;
 		}
 	}
 
