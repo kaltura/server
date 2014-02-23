@@ -488,60 +488,51 @@ class myPartnerUtils
 	 */
 	public static function entryConversionProfileHasFlavors( $entry_id  )
 	{
-		$entry = entryPeer::retrieveByPK( $entry_id );
-		if ( ! $entry ) return null;
-		
-		// conversion quality is an alias for conersion_profile_type ('low' , 'med' , 'hi' , 'hd' ... )
-		$conversion_profile_2_id = $entry->getConversionProfileId();
-		$conversion_quality = "";
+		$result = null;
 
-		if ( $conversion_profile_2_id < 0 )
+		$entry = entryPeer::retrieveByPK( $entry_id );
+		if ( $entry )
 		{
-			// this is assumed to be the old conversion profile
-			$conversion_quality = $entry->getConversionQuality();
-			$partner_id = $entry->getPartnerId();
-	
-			// try to extract the conversion profile from the partner
-			$partner = PartnerPeer::retrieveByPK( $partner_id );
-			if ( $partner ) 
+			// Try to get the entrt's conversion profile id
+			$conversionProfileId = $entry->getConversionProfileId();
+
+			// Doesn't exist? ==> Try to get conversion quality
+			if ( is_null( $conversionProfileId ) )
 			{
-				$partner_kmc_version = $partner->getKmcVersion();
-				if ( $partner_kmc_version && version_compare( $partner_kmc_version , "2" , ">=" ) ) // >= 2 because V1 is not supported
+				// conversion quality is an alias for conersion_profile_type ('low' , 'med' , 'hi' , 'hd' ... )
+				$conversionProfileId = $entry->getConversionQuality();
+			}
+
+			// Doesn't exist? ==> Try to get default (partner level) conversion profile id
+			if ( is_null( $conversionProfileId ) )
+			{
+				$partner = $entry->getPartner();
+				if ( $partner )
 				{
-					// new kmc_version
-					// the fallback conversion_quality is the one on the partner->getDefaultConversionProfileId
-		            if ( is_null($conversion_quality) || $conversion_quality < 0 )
-					{
-						// search for the default one on the partner
-						$conversion_quality = $partner->getDefaultConversionProfileId();
-					}
-	
-					// partner with new KMC version - use the $conversion_quality as if it was the conversionProfile2 id
-					$new_conversion_profile = conversionProfile2Peer::retrieveByPk ( $conversion_quality );
+					// search for the default one on the partner
+					$conversionProfileId = $partner->getDefaultConversionProfileId();
 				}
 			}
-		}
-		else
-		{
-			$new_conversion_profile = conversionProfile2Peer::retrieveByPk( $conversion_profile_2_id );
-		}
 
-		if ( $new_conversion_profile ) 
-		{
-			$flavorParams2 = $new_conversion_profile->getflavorParamsConversionProfiles();
-			
-			if ( ! empty( $flavorParams2 ) )
+			// Reach a conslusion
+			if ( ! is_null( $conversionProfileId ) )
 			{
-				$result = true;				
+				$conversionProfile = conversionProfile2Peer::retrieveByPk( $conversionProfileId );
+
+				if ( $conversionProfile )
+				{
+					$flavorParams = $conversionProfile->getflavorParamsConversionProfiles();
+
+					if ( ! empty( $flavorParams ) )
+					{
+						$result = true;
+					}
+					else
+					{
+						$result = false;
+					}
+				}
 			}
-			else
-			{
-				$result = false;
-			}
-		}
-		else
-		{
-			$result = null; // V1 related data
 		}
 
 		return $result;		
