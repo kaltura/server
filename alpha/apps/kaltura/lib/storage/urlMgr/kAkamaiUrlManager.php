@@ -224,9 +224,17 @@ class kAkamaiUrlManager extends kUrlManager
 			return $urlPrefix. '/' . ltrim($urlSuffix, '/');
 		}
 		
-		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
-			return parent::doGetFileSyncUrl($fileSync);
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+			return $this->doGetServeIsmUrl($fileSync, $partnerPath);
 
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $fileSync->getObjectSubType() == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+			return $this->doGetServeIsmUrl($fileSync, $partnerPath);
+				
+		return parent::doGetFileSyncUrl($fileSync);
+	}
+	
+	private function doGetServeIsmUrl(FileSync $fileSync, $partnerPath)
+	{
 		$serverUrl = myPartnerUtils::getIisHost($fileSync->getPartnerId(), "http");	
 		
 		$path = $partnerPath.'/serveIsm/objectId/' . $fileSync->getObjectId() . '_' . $fileSync->getObjectSubType() . '_' . $fileSync->getVersion() . '.' . pathinfo(kFileSyncUtils::resolve($fileSync)->getFilePath(), PATHINFO_EXTENSION) . '/manifest';
@@ -237,7 +245,6 @@ class kAkamaiUrlManager extends kUrlManager
 		}
 		
 		$path = str_replace('//', '/', $path);
-	
 		return $path;
 	}
 

@@ -1,5 +1,156 @@
 ----------
 
+# IX-9.11.0 #
+
+## Remove limitation of 32 categories per entry - db changes only##
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_01_19_category_entry_add_privacy_context.sql
+
+## PlayReady, ISM Index, Smooth Protect##
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_02_09_change_drm_key_key_column_name.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add plugins: PlayReady, SmoothProtect
+  
+- update admin.ini:
+add
+moduls.drmPlayReady.enabled = true
+moduls.drmPlayReady.permissionType = 3
+moduls.drmPlayReady.label = DRM - PlayReady
+moduls.drmPlayReady.permissionName = PLAYREADY_PLUGIN_PERMISSION
+moduls.drmPlayReady.basePermissionType = 3
+moduls.drmPlayReady.basePermissionName = DRM_PLUGIN_PERMISSION
+moduls.drmPlayReady.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- update batch.ini
+1. add under KAsyncConvertWorker 
+params.ismIndexCmd									= @BIN_DIR@/ismindex
+2. update under KAsyncConvert
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+3. Add KAsyncConvertSmoothProtect  worker section, place it following other Windows  transcoding workers.
+	[KAsyncConvertSmoothProtect: KAsyncDistributedConvert]
+	id                       = $WORKER_ID
+	baseLocalPath            = $BASE_LOACL_PATH
+	params.sharedTempPath    = $SHARED_TEMP_PATH
+	filter.jobSubTypeIn	 = smoothProtect.SmoothProtect
+	params.smoothProtectCmd  = $SMOOTHPROTECT_BIN
+	params.isRemoteOutput    = $IS_REMOTE_OUTPUT
+	params.isRemoteInput     = $IS_REMOTE_INPUT
+	• $WORKER_ID – set to match existing Testing QA settings
+	• $BASE_LOACL_PATH – follow other windows workers (aka Webex worker)
+	• $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker)
+	• $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect'
+	• $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker)
+	• $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
+4. Add 'worker enabler' to template section of your Windows server:  
+	• enabledWorkers.KAsyncConvertSmoothProtect  = 1
+
+- create playReady.ini from playReady.template.ini
+change @PLAYREADY_LICENSE_SERVER_HOST@ to the relevant host 
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+
+*Binaries*
+- Linux
+- -Install ismindex  from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+- -The ffmpeg and ffmpeg-aux remains unchanged. The ffmpeg will be switched to the new version on the next deployment.
+- Windows
+- -Install 'SmoothProtect.exe' binary
+
+
+
+----------
+
+# IX-9.10.0 #
+
+
+## Enhanced media server logging level ##
+
+**Configuration**
+
+*Edit @WOWZA_DIR@/conf/log4j.properties:*
+
+ - Change `log4j.rootCategory` = `INFO, stdout, serverAccess, serverError` 
+ - Remove `log4j.category.KalturaServer.class`
+ - Add `log4j.logger.com.kaltura` = `DEBUG`
+ - Change `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+ - Change `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+
+
+## Live stream multiple flavors ingestion ##
+
+Enable streaming more than one source.
+
+**Deployment:**
+
+*Shared Content*
+
+- Add source LiveParams using deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+
+*Media Server*
+
+- Change transcoding template to `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/streamName/${SourceStreamName}/f/transcode.xml`
+
+
+
+## Entry redirect moderation ##
+The moderation status is copied to the redirected entry from the original entry when the redirect defined.
+
+## Media Server - support multiple sources ingestion ##
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+- deployment/updates/scripts/add_permissions/2014_01_14_conversion_profile_asset_params_media_server.php
+- deployment/updates/scripts/add_permissions/2014_01_21_media_server_partner_live.php
+
+
+## Media Server - DVR with edge-origin ##
+Fixed broadcast path to use query string instead of slashed parameters.
+
+*Data Migration*
+
+- deployment/updates/scripts/2014_01_22_fix_broadcast_urls.php
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
+
+## PlayReady, ISM Index, Smooth Protect - regression only ##
+Initial version of PlayReady, Ism Index and Smooth Protect. PlayReady and SmoothProtect plugins will not be activated. 
+This version deployed for regression purposes only.
+
+*DB Changes*
+
+- deployment/updates/sql/2013_10_22_add_drm_policy_table.sql
+- deployment/updates/sql/2013_12_10_add_drm_device_table.sql
+- deployment/updates/sql/2013_12_31_add_drm_key_table.sql
+- deployment/updates/sql/2014_01_14_audit_trail_config_admin_console_partner_updates.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add IsmIndex plugin
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+- deployment/updates/scripts/add_permissions/2013_12_10_add_drm_device_permissions.php 
+
+----------
+
 # IX-9.9.0 #
 
 ## Media Server - live stream recording ##

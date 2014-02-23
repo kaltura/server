@@ -10,8 +10,13 @@ configurations/plugins.ini
 configurations/system.ini
 configurations/url_managers.ini
 configurations/google_auth.ini
+configurations/var.ini
+configurations/batch/config.ini
 plugins/.buildpath
 plugins/.settings/*
 alpha/.settings/
 .idea
 .DS_Store
+admin_console/lib/Kaltura/Client/
+cache/
+batch/client/

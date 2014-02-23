@@ -340,7 +340,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('text', 'extended_free_trail_expiry_reason', array(
-			'label'		=> 'Free Trial Extension Expiry Reason:',
+			'label'		=> 'Free Trial Extension Reason:',
 		));
 		
 		$this->addElement('button', 'monitor_usage_history', array(

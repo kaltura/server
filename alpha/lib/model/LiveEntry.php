@@ -197,7 +197,7 @@ abstract class LiveEntry extends entry
 	}
 	
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
 	
 	public function setLiveStreamConfigurations(array $v)
@@ -228,7 +228,7 @@ abstract class LiveEntry extends entry
 		$mediaServer = $this->getMediaServer();
 		if($mediaServer)
 		{
-			$streamName = $this->getStreamName();
+			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
@@ -241,8 +241,8 @@ abstract class LiveEntry extends entry
 			$manifestUrl .= $streamName;
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			$slStreamUrl = "$manifestUrl/Manifest";
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
@@ -425,7 +425,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		return array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		
+		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
 	
 	/**

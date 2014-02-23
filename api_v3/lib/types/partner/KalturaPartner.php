@@ -302,8 +302,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $partnerParentId;
-	
-	
+
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,

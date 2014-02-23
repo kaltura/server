@@ -501,13 +501,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			}
 		}
 
-		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
-		{
-			if($object->getFlavorParamsId())
-				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+		 if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
+        {
+                if($object->getFlavorParamsId())
+                        kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+                else
+                        if ($object->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+                                kBusinessConvertDL::setAsDefaultThumbAsset($object);
+                return true;
+        }
 
-			return true;
-		}
 
 		if($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
 		{
@@ -560,6 +563,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return true;
 			}
 			
+		if($object instanceof FileSync
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED)
+			{
+				return true;
+			}
 		return false;
 	}
 
@@ -610,6 +619,22 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$filter = new kuserFilter();
 			$filter->set('_eq_role_ids', $object->getId());
 			kJobsManager::addIndexJob($object->getPartnerId(), IndexObjectType::USER, $filter, false);
+			return true;
+		}
+		
+		if($object instanceof FileSync)
+		{
+			$c = new Criteria();
+			$c->add ( BatchJobLockPeer::OBJECT_ID , $object->getId() );
+			$c->add ( BatchJobLockPeer::OBJECT_TYPE , BatchJobObjectType::FILE_SYNC );
+			$c->add ( BatchJobLockPeer::JOB_TYPE , BatchJobType::FILESYNC_IMPORT );
+			$c->add (BatchJobLockPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_RETRY, BatchJob::BATCHJOB_STATUS_PENDING), Criteria::IN);		
+			$fileSyncImportJobs = BatchJobLockPeer::doSelect( $c );
+
+			foreach ($fileSyncImportJobs as $fileSyncImportJob) 
+			{
+				kJobsManager::abortDbBatchJob(BatchJobPeer::retrieveByPK($fileSyncImportJob->getId()));
+			}
 			return true;
 		}
 		

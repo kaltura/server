@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-01-16
+/*! KMC - v6.0.10 - 2014-02-17
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Ran Yefet; Licensed GNU */
 /**
@@ -4134,13 +4134,23 @@ kmc.utils = {
 					subtab : subtab
 				};
                 $("#kcms")[0].gotoPage(go_to);
+                kmc.utils.verifyUploadVisible(go_to.moduleName);
                 return false;
 			});
 		} else {
-			alert('Error geting tabs');
+			alert('Error getting tabs');
 		}
 	},
-		
+	verifyUploadVisible: function(module){
+        if (module == "add" && $("#server_wrap").css("display") == "block"){
+            var res = confirm("You must close the studio to upload files.\nClose now?");
+            if (res == true)
+            {
+                $("#kcms")[0].gotoPage({"moduleName":"content", "subtab":"manage"});
+                $("#kcms")[0].gotoPage({"moduleName":"add"});
+            }
+        }
+    },
 	setTab : function(module, resetAll){
 		if( resetAll ) {$("#kmcHeader ul li a").removeClass("active");}
 		$("a#" + module).addClass("active");
@@ -4213,7 +4223,6 @@ kmc.utils = {
 	getClientIP: function() {
 		return kmc.vars.clientIP;
 	}
-		
 };
 
 kmc.mediator =  {
@@ -4312,8 +4321,7 @@ kmc.mediator =  {
 
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
-	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
-
+	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, duration, thumbnailUrl) {
 		var embedOptions = {
 			'previewOnly': previewOnly
 		};
@@ -4328,7 +4336,9 @@ kmc.preview_embed = {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
 				'name': name,
-				'description': description
+				'description': description,
+                'duration': duration.toString(),
+                'thumbnailUrl': thumbnailUrl
 			};
 			if( live_bitrates ) {
 				embedOptions.liveBitrates = live_bitrates;

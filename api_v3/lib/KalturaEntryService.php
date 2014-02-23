@@ -1625,7 +1625,6 @@ class KalturaEntryService extends KalturaBaseService
 		$dbModerationFlag->save();
 		
 		$dbEntry->setModerationStatus(KalturaEntryModerationStatus::FLAGGED_FOR_REVIEW);
-		$dbEntry->incModerationCount();
 		$dbEntry->save();
 		
 		$moderationFlag = new KalturaModerationFlag();

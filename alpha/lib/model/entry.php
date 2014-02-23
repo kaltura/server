@@ -330,6 +330,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $this->getStatus();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see Baseentry::setModerationStatus()
+	 */
+	public function setModerationStatus($v)
+	{
+		if($v == $this->getModerationStatus())
+			return $this;
+			
+		if($v == entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION || $v == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW)
+			$this->incModerationCount();
+		
+		parent::setModerationStatus($v);
+	}
+	
 	public function setDefaultModerationStatus()
 	{
 		$should_moderate = false;
@@ -1123,7 +1137,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function getDynamicAttributes()
 	{
-		return null;
+		$dynamicAttributes = array();
+
+		// Map catrgories to creation date
+		$categoryEntries = categoryEntryPeer::selectByEntryId( $this->getId() );
+		foreach ( $categoryEntries as $categoryEntry )
+		{
+			$createdAt = $categoryEntry->getCreatedAt( null ); // Passing null in order to get a numerical Unix Time Stamp instead of a string
+			
+			// Get the dyn. attrib. name in the format of: cat_{cat id}_createdAt (e.g.: cat_123_createdAt)
+			$dynAttribName = kCategoryEntryAdvancedFilter::getCategoryCreatedAtDynamicAttributeName( $categoryEntry->getCategoryId() );
+			
+			$dynamicAttributes[$dynAttribName] = $createdAt;
+		}
+
+		return $dynamicAttributes;
 	}
 	
 	/**
@@ -1922,10 +1950,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if( $this->getDisplayInSearch() == 0 ) return "";
 		if( $this->getDisplayInSearch() == 1 ) return "_PRIVATE_";
-		if( $this->getDisplayInSearch() >= 2 ) return "_KN_";
+		if ($this->getDisplayInSearch () >= 2)
+			return "_KN_";
 	}
 	
-	public function incModerationCount()	{		$this->setModerationCount( $this->getModerationCount() + 1 );	}
+	protected function incModerationCount()
+	{
+		$this->setModerationCount($this->getModerationCount() + 1);
+	}
 		
 	/**
 	 * @return partner
@@ -2484,6 +2516,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 		
+		if($this->getRedirectEntryId() && array_key_exists('', $this->oldCustomDataValues) && array_key_exists('redirectEntryId', $this->oldCustomDataValues['']))
+		{
+			$redirectEntry = entryPeer::retrieveByPK($this->getRedirectEntryId());
+			if($redirectEntry)
+			{
+				$redirectEntry->setModerationStatus($this->getModerationStatus());
+				$redirectEntry->save();
+			}
+		}
+		
 		$ret = parent::postUpdate($con);
 	
 		if($objectDeleted)
@@ -2880,6 +2922,47 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setCategoriesWithNoSync()
 	{
 		
+	}
+	
+	static public function isSearchProviderSource($source)
+	{
+		$refClass = new ReflectionClass('EntrySourceType');
+		$coreConstants = $refClass->getConstants();
+		if (in_array($source, array_values($coreConstants)))
+			return false;
+	
+		$typeMap = kPluginableEnumsManager::getCoreMap('EntrySourceType');
+		if (isset($typeMap[$source]))
+			return false;
+	
+		return true;
+	}
+	
+	public function getSourceType()
+	{
+		if (self::isSearchProviderSource($this->getSource()))
+			return (string)EntrySourceType::SEARCH_PROVIDER;
+	
+		return (string)$this->getSource();
+	}
+	
+	public function getSearchProviderType()
+	{
+		if (self::isSearchProviderSource($this->getSource()))
+			return (string)$this->getSource();
+	
+		return null;
+	}
+	
+	public function setSourceType($value)
+	{
+		if ($value != EntrySourceType::SEARCH_PROVIDER)
+			$this->setSource($value);
+	}
+	
+	public function setSearchProviderType($value)
+	{
+		$this->setSource($value);
 	}
 	
 /**

@@ -182,13 +182,13 @@ class KAsyncConcat extends KJobHandlerWorker
 			$videoParams = "copy";
 		
 		$concateStr = implode("|", $filesArr);
-		$cmdStr = "$ffmpegBin -i concat:\"$concateStr\" -c:v $videoParams -bsf:a aac_adtstoasc";
+		$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i concat:\"$concateStr\" -c:v $videoParams -bsf:a aac_adtstoasc";
 		if($isAac)
 			$cmdStr .= " -c:a copy";
 		else
 			$cmdStr .= " -c:a libfdk_aac";
 		
-		$cmdStr .= " $clipStr -f mp4 -y $outFilename";
+		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 		
 		KalturaLog::debug("Executing [$cmdStr]");
 		$output = system($cmdStr, $rv);

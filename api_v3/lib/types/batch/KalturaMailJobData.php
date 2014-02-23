@@ -80,6 +80,11 @@ class KalturaMailJobData extends KalturaJobData
      * @var bool
      */
     public $isHtml=true;
+	
+	/**
+     * @var string
+     */
+    public $separator = '|';
     
 	private static $map_between_objects = array
 	(
@@ -98,6 +103,7 @@ class KalturaMailJobData extends KalturaJobData
 	    "campaignId" ,
 	    "minSendDate" ,
 		"isHtml" ,
+		"separator",
 	);
 
 	public function getMapBetweenObjects ( )

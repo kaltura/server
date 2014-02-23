@@ -9,10 +9,17 @@ class KalturaEventNotificationDispatchJobData extends KalturaJobData
 	 * @var int
 	 */
 	public $templateId;
+
+	/**
+	 * Define the content dynamic parameters
+	 * @var KalturaKeyValueArray
+	 */
+	public $contentParameters;
 	
 	private static $map_between_objects = array
 	(
 		'templateId' ,
+		'contentParameters',
 	);
 
 	public function getMapBetweenObjects ( )

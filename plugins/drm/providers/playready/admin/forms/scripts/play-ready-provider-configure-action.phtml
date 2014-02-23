@@ -1,0 +1,8 @@
+<script type="text/javascript">
+
+function generateKeySeed() {
+	var keySeedGen = '<?php echo bin2hex(mcrypt_create_iv(30)); ?>';
+	jQuery('#extensionSubForm-keySeed').val(keySeedGen);
+}
+
+</script>

@@ -113,7 +113,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 		// Test file type 
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
 		if(!is_null($errorMsg))
-			$this->message = $errorMsg;
+			$this->data->engineMessage = $errorMsg;
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 
@@ -202,7 +202,7 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 			$outputNum = $this->getNumberOfPages($outputPdfInfo);
 			if($inputNum != $outputNum) {
 				$errorMsg = "Output file doesn't match expected page count (input: $inputNum, output: $outputNum)";
-				$this->message = $errorMsg;
+				$this->data->engineMessage = $errorMsg;
 			}
 		}
 	}

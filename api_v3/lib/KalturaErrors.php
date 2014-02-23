@@ -212,6 +212,8 @@ class KalturaErrors extends APIErrors
 
 	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND;ID;Asset id \"@ID@\" not found";
 
+	const ASSET_PARAMS_ORIGIN_NOT_SUPPORTED = "LIVE_PARAMS_ORIGIN_NOT_SUPPORTED;ID,TYPE,ORIGIN;Asset params @ID@ of type @TYPE@ does not support origin @ORIGIN@";
+
 	/**
 	 * FlavorAsset Service
 	 */
@@ -294,6 +296,8 @@ class KalturaErrors extends APIErrors
 	const CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set user join policy when category is set to inherit";
 
 	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set default permission level when category is set to inherit";
+	
+	const CANNOT_SET_MULTI_PRIVACY_CONTEXT = "CANNOT_SET_MULTI_PRIVACY_CONTEXT;; Cannot set multiple privacy context when Disable Category Limit feature is turned on";
 
 	/**
 	 * Batch Service

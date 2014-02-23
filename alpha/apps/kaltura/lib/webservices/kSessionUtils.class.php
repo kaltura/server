@@ -634,6 +634,31 @@ class ks extends kSessionBase
 			}
 		}
 	}
+
+	public function hasPrivilege($privilegeName)
+	{
+		if (!is_array($this->parsedPrivileges))
+			return false;
+
+		return isset($this->parsedPrivileges[$privilegeName]);
+	}
+
+	public function getPrivilegeValues($privilegeName, $default = array())
+	{
+		if ($this->hasPrivilege($privilegeName))
+			return $this->parsedPrivileges[$privilegeName];
+		else
+			return $default;
+	}
+
+	public function getPrivilegeValue($privilegeName, $default = null)
+	{
+		$values = $this->getPrivilegeValues($privilegeName);
+		if (isset($values[0]))
+			return $values[0];
+		else
+			return $default;
+	}
 	
 	private function expired ( )
 	{

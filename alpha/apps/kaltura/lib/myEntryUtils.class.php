@@ -675,9 +675,7 @@ class myEntryUtils
 		
 		if($orig_image_path === null || !file_exists($orig_image_path))
 		{
-			$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
-			$orig_image_key = $entry->getSyncKey($sub_type, $version);
-			$orig_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($orig_image_key);
+			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
 		
 		
@@ -830,6 +828,15 @@ class myEntryUtils
 		return $convertedImagePath;
 	}
 	
+	public static function getLocalImageFilePathByEntry( $entry, $version = null )
+	{
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$entry_image_key = $entry->getSyncKey($sub_type, $version);
+		$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
+		
+		return $entry_image_path;
+	} 
+	
 	//
 	// sets the type and media_type of an entry according to the file extension
 	// in case the media_type is entry::ENTRY_MEDIA_TYPE_AUTOMATIC we find the media_type from the extension
@@ -951,6 +958,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		}
 		
 		foreach($entrySyncKeys as $syncKey)

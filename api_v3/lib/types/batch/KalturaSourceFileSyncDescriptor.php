@@ -3,23 +3,13 @@
  * @package api
  * @subpackage objects
  */
-class KalturaSourceFileSyncDescriptor extends KalturaObject
+class KalturaSourceFileSyncDescriptor extends KalturaFileSyncDescriptor
 {
-	/**
-	 * @var string
-	 */
-	public $fileSyncLocalPath;
-	
 	/**
 	 * The translated path as used by the scheduler
 	 * @var string
 	 */
 	public $actualFileSyncLocalPath;
-	
-	/**
-	 * @var string
-	 */
-	public $fileSyncRemoteUrl;
 	
 	/**
 	 * 
@@ -35,9 +25,7 @@ class KalturaSourceFileSyncDescriptor extends KalturaObject
 	
 	private static $map_between_objects = array
 	(
-		"fileSyncLocalPath" ,
 		"actualFileSyncLocalPath" ,
-		"fileSyncRemoteUrl" ,
 		"assetId" ,
 		"assetParamsId" ,
 	);

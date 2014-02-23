@@ -128,7 +128,13 @@ class KalturaFlavorAsset extends KalturaAsset
 	static function getInstanceByType ($type = null)
 	{
 		if(!$type || $type == KalturaAssetType::FLAVOR)
+		{
 			$obj = new KalturaFlavorAsset();
+		}
+		elseif($type == KalturaAssetType::LIVE)
+		{
+			$obj = new KalturaLiveAsset();
+		}
 		else 
 		{
 			$obj = KalturaPluginManager::loadObject('KalturaFlavorAsset', $type);	

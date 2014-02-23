@@ -168,4 +168,31 @@ class KalturaXmlSerializer extends KalturaSerializer
 		echo $value;
 		echo '</'.$tag.'>';
 	}
+	
+	public function getHeader()
+	{
+		return '<?xml version="1.0" encoding="utf-8"?>' .
+						'<xml>' .
+							'<result>' ;
+	}
+	
+	public function getFooter($execTime = null)
+	{
+		if(is_null($execTime))
+			$execTime = 0;
+		
+		return '</result>' .
+							'<executionTime>' . $execTime . '</executionTime>' .
+						'</xml>';
+	}
+	
+	public function getItemHeader($itemIndex = null)
+	{
+		return '<item>';
+	}
+	
+	public function getItemFooter($lastItem = false)
+	{
+		return '</item>';
+	}
 }
