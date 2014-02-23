@@ -123,7 +123,7 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		$hostname = preg_replace('/\.kaltura\.com$/', '', $this->getHostname());
+		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
 		$url = "$protocol://$domain:$port/$app/";
 		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
