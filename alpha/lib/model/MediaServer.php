@@ -21,9 +21,11 @@ class MediaServer extends BaseMediaServer {
 	const DEFAULT_GPUID = -1;
 	
 	const WEB_SERVICE_LIVE = 'live';
+	const WEB_SERVICE_CUE_POINTS = 'cuePoints';
 	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
+		self::WEB_SERVICE_CUE_POINTS => 'KalturaMediaServerCuePointsService',
 	);
 	
 	
@@ -121,8 +123,9 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
+		$hostname = preg_replace('/\.kaltura\.com$/', '', $this->getHostname());
 		$url = "$protocol://$domain:$port/$app/";
-		$url = str_replace("{hostName}", $this->getHostname(), $url);
+		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
 		
 	}
