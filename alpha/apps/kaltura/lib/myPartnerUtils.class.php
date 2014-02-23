@@ -486,7 +486,7 @@ class myPartnerUtils
 	 * @return bool|null true = the entry has flavors; false the entry does not have flavors;
 	 *                   null = Undetermined (e.g. V1 conversion profile / flavor params)
 	 */
-	public static function entryHasFlavors( $entry_id  )
+	public static function entryConversionProfileHasFlavors( $entry_id  )
 	{
 		$entry = entryPeer::retrieveByPK( $entry_id );
 		if ( ! $entry ) return null;

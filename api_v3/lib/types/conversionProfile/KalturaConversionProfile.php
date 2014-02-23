@@ -302,7 +302,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 */
 	public function getFlavorParamsAsArray()
 	{
-		if ( empty( $this->flavorParamsIds ) || ($this->flavorParamsIds instanceof KalturaNullField))
+		if ( $this->isNull( 'flavorParamsIds' ) || empty( $this->flavorParamsIds ) )
 		{
 			return array();
 		}
