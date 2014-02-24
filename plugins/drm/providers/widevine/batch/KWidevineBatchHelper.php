@@ -72,8 +72,8 @@ class KWidevineBatchHelper
 	* Send register asset request to Widevine license server
 	* If asset name is not passed call getAsset first to get asset by id
 	* 
-	* https://register.uat.widevine.com/widevine/cypherpc/sign/cgi-bin/RegisterAsset.cgi?asset=test1155&owner=kaltura&provider=name:kaltura,policy:default&replace=1
-	* https://register.uat.widevine.com/widevine/cypherpc/cgi-bin/GetAsset.cgi?asset=test537&owner=kaltura&provider=kaltura
+	* https://register.uat.widevine.com/registerasset/kaltura?asset=test1155&owner=kaltura&provider=name:kaltura,policy:default&replace=1
+	* https://register.uat.widevine.com/getasset/kaltura?asset=test537&owner=kaltura&provider=kaltura
 	*/
 	public static function sendRegisterAssetRequest(
 							$wvRegServerHost, $assetName = null, $assetId = null, $portal = null, 
@@ -96,7 +96,7 @@ class KWidevineBatchHelper
 			$params[self::OWNER] = $portal;
 			$params[self::PROVIDER] = $portal;
 			
-			$response = self::sendHttpRequest($wvRegServerHost, WidevinePlugin::GET_ASSET_CGI, $params);
+			$response = self::sendHttpRequest($wvRegServerHost.WidevinePlugin::GET_ASSET_URL_PART.$portal, $params);
 			if($response[self::STATUS] == 1)
 			{
 				$assetName = $response[self::ASSET_NAME];
@@ -128,7 +128,7 @@ class KWidevineBatchHelper
 		if($licenseEndDate)
 			$providerParams[self::LICEND] = $licenseEndDate;
 				
-		$response = self::sendHttpRequest($wvRegServerHost, WidevinePlugin::REGISTER_ASSET_CGI, $params, $providerParams);
+		$response = self::sendHttpRequest($wvRegServerHost.WidevinePlugin::REGISTER_ASSET_URL_PART.$portal, $params, $providerParams);
 		
 		if($response[self::STATUS] == 1)
 		{
@@ -141,9 +141,9 @@ class KWidevineBatchHelper
 		}
 	}
 	
-	private static function sendHttpRequest($wvRegServerHost, $cgiUrl, $params, $providerParams = null)
+	private static function sendHttpRequest($wvRegServerUrl, $params, $providerParams = null)
 	{
-		$url = $wvRegServerHost.$cgiUrl.'?';
+		$url = $wvRegServerUrl.'?';
 		
 		if($providerParams && count($providerParams))
 			$params[self::PROVIDER] = self::providerRequestEncode($providerParams);

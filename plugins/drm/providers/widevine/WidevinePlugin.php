@@ -10,8 +10,8 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	const WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC_PERMISSION = 'WIDEVINE_ENABLE_DISTRIBUTION_DATES_SYNC';
 	const SEARCH_DATA_SUFFIX = 's';
 	
-	const REGISTER_ASSET_CGI = '/widevine/cypherpc/sign/cgi-bin/RegisterAsset.cgi';
-	const GET_ASSET_CGI = '/widevine/cypherpc/cgi-bin/GetAsset.cgi';
+	const REGISTER_ASSET_URL_PART = '/registerasset/';
+	const GET_ASSET_URL_PART = '/getasset/';
 	
 	//Default values
 	const KALTURA_PROVIDER = 'kaltura';
