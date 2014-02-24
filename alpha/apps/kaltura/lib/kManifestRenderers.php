@@ -120,7 +120,7 @@ abstract class kManifestRenderer
 		if (kApiCache::hasExtraFields() && !$this->forceCachingHeaders)
 			$this->cachingHeadersAge = 0;
 		
-		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge);
+		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge, true);
 
 		$header = $this->getManifestHeader();
 		$footer = $this->getManifestFooter();
