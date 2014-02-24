@@ -253,8 +253,8 @@ abstract class LiveEntry extends entry
 			$manifestUrl .= $streamName;
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			$slStreamUrl = "$manifestUrl/Manifest";
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{

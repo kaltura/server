@@ -2924,6 +2924,47 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 	}
 	
+	static public function isSearchProviderSource($source)
+	{
+		$refClass = new ReflectionClass('EntrySourceType');
+		$coreConstants = $refClass->getConstants();
+		if (in_array($source, array_values($coreConstants)))
+			return false;
+	
+		$typeMap = kPluginableEnumsManager::getCoreMap('EntrySourceType');
+		if (isset($typeMap[$source]))
+			return false;
+	
+		return true;
+	}
+	
+	public function getSourceType()
+	{
+		if (self::isSearchProviderSource($this->getSource()))
+			return (string)EntrySourceType::SEARCH_PROVIDER;
+	
+		return (string)$this->getSource();
+	}
+	
+	public function getSearchProviderType()
+	{
+		if (self::isSearchProviderSource($this->getSource()))
+			return (string)$this->getSource();
+	
+		return null;
+	}
+	
+	public function setSourceType($value)
+	{
+		if ($value != EntrySourceType::SEARCH_PROVIDER)
+			$this->setSource($value);
+	}
+	
+	public function setSearchProviderType($value)
+	{
+		$this->setSource($value);
+	}
+	
 /**
 	 * will create thumbnail according to the entry type
 	 * @return the thumbnail path.

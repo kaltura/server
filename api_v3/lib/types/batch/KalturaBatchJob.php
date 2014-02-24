@@ -396,6 +396,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaCopyPartnerJobData();
 				break;
 				
+			case 'kSyncCategoryPrivacyContextJobData':
+				$this->data = new KalturaSyncCategoryPrivacyContextJobData();
+				break;
+				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 				{

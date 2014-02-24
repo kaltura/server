@@ -49,11 +49,13 @@ enabledWorkers.KAsyncDeleteFile						= 1
 enabledWorkers.KAsyncMoveCategoryEntries			= 4
 enabledWorkers.KAsyncCopy							= 4
 enabledWorkers.KAsyncParseCaptionAsset				= 1
-enabledWorkers.KScheduledTaskRunner					= 1
-enabledWorkers.KScheduledTaskDryRunner				= 1
+enabledWorkers.KScheduledTaskRunner					= 0
+enabledWorkers.KScheduledTaskDryRunner				= 0
 enabledWorkers.KAsyncConvertLiveSegment				= 1
 enabledWorkers.KAsyncConcat							= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
+enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
+enabledWorkers.KAsyncTagIndex						= 1
 
 
 [mainTemplate : template]
@@ -680,3 +682,18 @@ params.sharedTempPath 								= @TMP_DIR@/scheduledtasks
 type												= KScheduledTaskRunner
 maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
+sleepBetweenStopStart								= 21600
+
+[KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
+id													= 550
+friendlyName										= Sync Category Privacy Context
+type												= KAsyncSyncCategoryPrivacyContext
+maximumExecutionTime								= 12000
+scriptPath											= batches/SyncCategoryPrivacyContext/KAsyncSyncCategoryPrivacyContextExe.php
+
+[KAsyncTagIndex : JobHandlerWorker]
+id													= 560
+friendlyName										= Re-index tags
+type												= KAsyncTagIndex
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php

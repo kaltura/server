@@ -19,7 +19,7 @@
 			<objectFilterEngineType>1</objectFilterEngineType>
 			<objectFilter objectType="KalturaMediaEntryFilter">
 				<lastPlayedAtLessThanOrEqual>{php:return -18*30*24*60*60;}</lastPlayedAtLessThanOrEqual>
-				<categoriesNotContains>Retired</categoriesNotContains>
+				<categoriesIdsNotContains>{variable:retiredCategoryId}</categoriesIdsNotContains>
 			</objectFilter>
 			<objectTasks objectType="array">
 				<item objectType="KalturaModifyCategoriesObjectTask">

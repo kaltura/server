@@ -75,6 +75,12 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
+	 * The value for the privacy_context field.
+	 * @var        string
+	 */
+	protected $privacy_context;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -288,6 +294,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	public function getStatus()
 	{
 		return $this->status;
+	}
+
+	/**
+	 * Get the [privacy_context] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPrivacyContext()
+	{
+		return $this->privacy_context;
 	}
 
 	/**
@@ -547,6 +563,29 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	} // setStatus()
 
 	/**
+	 * Set the value of [privacy_context] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     categoryEntry The current object (for fluent API support)
+	 */
+	public function setPrivacyContext($v)
+	{
+		if(!isset($this->oldColumnsValues[categoryEntryPeer::PRIVACY_CONTEXT]))
+			$this->oldColumnsValues[categoryEntryPeer::PRIVACY_CONTEXT] = $this->privacy_context;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->privacy_context !== $v) {
+			$this->privacy_context = $v;
+			$this->modifiedColumns[] = categoryEntryPeer::PRIVACY_CONTEXT;
+		}
+
+		return $this;
+	} // setPrivacyContext()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -591,6 +630,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->custom_data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->privacy_context = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -600,7 +640,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = categoryEntryPeer::NUM_COLUMNS - categoryEntryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating categoryEntry object", $e);
@@ -653,7 +693,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		categoryEntryPeer::setUseCriteriaFilter(false);
-		$stmt = categoryEntryPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		categoryEntryPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -735,18 +777,58 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				categoryEntryPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(categoryEntryPeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						if ($namespace)
+						{
+							$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						$this->putInCustomData($name, $newValue, $namespace);
+					}
+                   }
+                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			categoryEntryPeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -857,8 +939,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1089,6 +1170,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			case 8:
 				return $this->getStatus();
 				break;
+			case 9:
+				return $this->getPrivacyContext();
+				break;
 			default:
 				return null;
 				break;
@@ -1119,6 +1203,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			$keys[6] => $this->getUpdatedAt(),
 			$keys[7] => $this->getCustomData(),
 			$keys[8] => $this->getStatus(),
+			$keys[9] => $this->getPrivacyContext(),
 		);
 		return $result;
 	}
@@ -1177,6 +1262,9 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 			case 8:
 				$this->setStatus($value);
 				break;
+			case 9:
+				$this->setPrivacyContext($value);
+				break;
 		} // switch()
 	}
 
@@ -1210,6 +1298,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setCustomData($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setPrivacyContext($arr[$keys[9]]);
 	}
 
 	/**
@@ -1230,6 +1319,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(categoryEntryPeer::UPDATED_AT)) $criteria->add(categoryEntryPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA)) $criteria->add(categoryEntryPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(categoryEntryPeer::STATUS)) $criteria->add(categoryEntryPeer::STATUS, $this->status);
+		if ($this->isColumnModified(categoryEntryPeer::PRIVACY_CONTEXT)) $criteria->add(categoryEntryPeer::PRIVACY_CONTEXT, $this->privacy_context);
 
 		return $criteria;
 	}
@@ -1248,17 +1338,29 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 
 		$criteria->add(categoryEntryPeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(categoryEntryPeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != categoryEntryPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = categoryEntryPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if ($this->isColumnModified(categoryEntryPeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(categoryEntryPeer::CUSTOM_DATA, "MD5(cast(" . categoryEntryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(categoryEntryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(categoryEntryPeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != categoryEntryPeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = categoryEntryPeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1311,6 +1413,8 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		$copyObj->setCustomData($this->custom_data);
 
 		$copyObj->setStatus($this->status);
+
+		$copyObj->setPrivacyContext($this->privacy_context);
 
 
 		$copyObj->setNew(true);
@@ -1397,6 +1501,12 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -1454,8 +1564,17 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -1502,6 +1621,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}

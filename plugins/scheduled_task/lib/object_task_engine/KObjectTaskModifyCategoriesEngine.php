@@ -19,6 +19,8 @@ class KObjectTaskModifyCategoriesEngine extends KObjectTaskEntryEngineBase
 		$entryId = $object->id;
 		$addRemoveType = $objectTask->addRemoveType;
 		$taskCategoryIds = array();
+		if (!is_array($objectTask->categoryIds))
+			$objectTask->categoryIds = array();
 		foreach($objectTask->categoryIds as $categoryIntValue)
 		{
 			/** @var KalturaString $categoryIntValue */

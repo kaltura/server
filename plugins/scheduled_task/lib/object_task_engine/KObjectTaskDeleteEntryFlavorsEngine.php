@@ -21,7 +21,17 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		$pager->pageSize = 500; // use max size, throw exception in case we got more than 500 flavors where pagination is not supported
 		$filter = new KalturaFlavorAssetFilter();
 		$filter->entryIdEqual = $object->id;
-		$flavorsResponse = $client->flavorAsset->listAction($filter);
+		$this->impersonate($object->partnerId);
+		try
+		{
+			$flavorsResponse = $client->flavorAsset->listAction($filter);
+			$this->unimpersonate();
+		}
+		catch(Exception $ex)
+		{
+			$this->unimpersonate();
+			throw $ex;
+		}
 		if ($flavorsResponse->totalCount > $pager->pageSize)
 			throw new Exception('Too many flavors were found where pagination is not supported');
 
