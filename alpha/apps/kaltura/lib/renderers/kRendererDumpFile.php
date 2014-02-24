@@ -19,7 +19,7 @@ class kRendererDumpFile implements kRendererBase
 	protected $maxAge;
 	protected $xSendFileAllowed;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $fileData = null)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
@@ -39,7 +39,10 @@ class kRendererDumpFile implements kRendererBase
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			$this->fileData = file_get_contents($this->filePath);
+			if($fileData)
+				$this->fileData = $fileData;
+			else
+				$this->fileData = file_get_contents($this->filePath);
 		}
 	}
 	
