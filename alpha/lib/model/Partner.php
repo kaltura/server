@@ -459,6 +459,13 @@ class Partner extends BasePartner
 	public function getEnforceHttpsApi()	{		return $this->getFromCustomData( "enforceHttpsApi" , null, false  );	}
 	public function setEnforceHttpsApi( $v )	{		return $this->putInCustomData( "enforceHttpsApi", $v );	}
 	
+	public function getEnforceDelivery()	{
+		return $this->getFromCustomData( "enforceDelivery" , null, false  );
+	}
+	public function setEnforceDelivery( $v )	{
+		return $this->putInCustomData( "enforceDelivery", $v );
+	}
+	
 	public function getAssetsPerEntryLimitation()    		{	return $this->getFromCustomData( "assetsPerEntryAllowed" , null, false  ); 	}
 	public function setAssetsPerEntryLimitation( $v )       {	return $this->putInCustomData( "assetsPerEntryAllowed", $v ); 				}
 	
@@ -627,7 +634,7 @@ class Partner extends BasePartner
 	/** added deliveryRestrictions param for having per-partner ability to block serving of files to specific cdns and protocols **/
 	public function getDeliveryRestrictions() { return $this->getFromCustomData("deliveryRestrictions", null); }
 	public function setDeliveryRestrictions( $v ) { $this->putInCustomData("deliveryRestrictions", $v); }
-			
+	
 	/** added disableAkamaiHDNetwork param for having per-partner ability to disable Akamai HD Network feature (GUI in KMC preview & embed) **/
 	public function getDisableAkamaiHDNetwork() { return $this->getFromCustomData("disableAkamaiHDNetwork", null); }
 	public function setDisableAkamaiHDNetwork( $v ) { $this->putInCustomData("disableAkamaiHDNetwork", $v); }
@@ -671,6 +678,21 @@ class Partner extends BasePartner
 			
 		return $deliveryTypes;
 	} 
+	
+	public function setDeliveryIds($params)
+	{
+		$this->putInCustomData('delivery_ids', serialize($params));
+	}
+	
+	public function getDeliveryIds()
+	{
+		$params = $this->getFromCustomData('delivery_ids');
+		$params = unserialize($params);
+		if (!$params) {
+			return array();
+		}
+		return $params;
+	}
 	
 	public function getEmbedCodeTypes()
 	{
@@ -1397,7 +1419,6 @@ class Partner extends BasePartner
 	public function setLiveStreamEnabled( $v ) {
 		$this->setEnabledService($v, PermissionName::FEATURE_LIVE_STREAM);
 	}
-	
 	
 	// ----------------------------------
 	// -- end of enabled special features

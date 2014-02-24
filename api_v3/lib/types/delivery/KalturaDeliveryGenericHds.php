@@ -3,19 +3,18 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDeliveryAkamaiRtsp extends KalturaDelivery {
-
+class KalturaDeliveryGenericHds extends KalturaDelivery {
+	
 	/**
-	 * CP-code
-	 *
-	 * @var int
+	 * @var string
 	 * @filter eq,in
 	 */
-	public $cpCode;
+	public $pattern;
+	
 	
 	private static $map_between_objects = array
 	(
-			"cpCode",
+			"pattern"
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -25,12 +24,8 @@ class KalturaDeliveryAkamaiRtsp extends KalturaDelivery {
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if (is_null($dbObject))
-			$dbObject = new DeliveryAkamaiRtsp();
-	
-		$this->type = KalturaDeliveryType::AKAMAI_RTSP;
-		parent::toObject($dbObject, $skip);
-		return $dbObject;
+		$this->type = KalturaDeliveryType::GENERIC_HDS;
+		return parent::toObject($dbObject,$skip);
 	}
 }
 

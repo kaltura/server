@@ -424,8 +424,8 @@ class asset extends Baseasset implements ISyncableFile
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $this->getEntryId());
-		$urlManager->setFileExtension($this->getFileExt());
+		$urlManager = DeliveryPeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $this->getEntryId());
+		$urlManager->initDeliveryDynamicAttribtues($this);
 		
 		$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 		return $url;
@@ -484,26 +484,11 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function isKsNeededForDownload()
 	{
-		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getPartnerId()))
-			return true;
-
-		$invalidModerationStatuses = array(
-			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
-			entry::ENTRY_MODERATION_STATUS_REJECTED
-		);
-		
 		$entry = $this->getentry();
-		if (!$entry ||
-			in_array($entry->getModerationStatus(), $invalidModerationStatuses) ||
-			($entry->getStartDate() !== null && $entry->getStartDate(null) >= time()) ||
-			($entry->getEndDate() !== null && $entry->getEndDate(null) <= time() + 86400))
+		if(!entry)
 			return true;
 		
-		$accessControl = $entry->getaccessControl();
-		if (!$accessControl || $accessControl->getRulesArray())
-			return true;
-
-		return false;
+		return $entry->isSecuredEntry();
 	}
 	
 	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false)

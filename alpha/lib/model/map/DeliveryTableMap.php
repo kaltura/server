@@ -53,7 +53,8 @@ class DeliveryTableMap extends TableMap {
 		$this->addColumn('RECOGNIZER', 'Recognizer', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('TOKENIZER', 'Tokenizer', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DELIVERY_STATUS', 'DeliveryStatus', 'INTEGER', false, null, null);
-		$this->addColumn('PROTOCOL', 'Protocol', 'VARCHAR', false, 30, null);
+		$this->addColumn('STREAMER_TYPE', 'StreamerType', 'VARCHAR', false, 30, null);
+		$this->addColumn('MEDIA_PROTOCOLS', 'MediaProtocols', 'VARCHAR', false, 256, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

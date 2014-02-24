@@ -2,7 +2,6 @@
 /**
  * @package Core
  * @subpackage model.enum
- * @_!! Name???
  */ 
 interface DeliveryStatus extends BaseEnum
 {

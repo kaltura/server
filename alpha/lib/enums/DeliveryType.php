@@ -2,45 +2,46 @@
 /**
  * @package Core
  * @subpackage model.enum
- * @_!! Name???
  */ 
 interface DeliveryType extends BaseEnum
 {
-		// TODO @_!! Edit the plugin. f.i. VlcPlugin
-	const AKAMAI_HTTP = 0;
-	const AKAMAI_RTMP = 1;
-	const AKAMAI_RTSP = 2;
-	const AKAMAI_HD = 3;
-	const AKAMAI_HLS_DIRECT = 4;		// returns a manifest with index_0_av.m3u8
-	const AKAMAI_HLS_MANIFEST = 5;		// redirects to /i.../master.m3u8
-	const AKAMAI_HDS = 6;
-	const AKAMAI_SS = 6;
+	const APPLE_HTTP = 1;
+	const HD = 2;
+	const HDS = 3;
+	const HTTP = 4;
+	const RTMP = 5;
+	const RTSP = 6;
+	const SILVER_LIGHT = 7;
 	
-	const LEVEL3_HTTP = 6;
-	const LEVEL3_RTMP = 6;
-	const LEVEL3_HLS = 6;
+	const AKAMAI_HLS_DIRECT = 11;
+	const AKAMAI_HLS_MANIFEST = 11;
+	const AKAMAI_HD = 12;
+	const AKAMAI_HDS = 13;
+	const AKAMAI_HTTP = 14;
+	const AKAMAI_RTMP = 15;
+	const AKAMAI_RTSP = 16;
+	const AKAMAI_SS = 17;
 	
-	const LIMELIGHT_HTTP = 6;
-	const LIMELIGHT_RTMP = 6;
+	const GENERIC_HLS = 21;
+	const GENERIC_HDS = 23;
+	const GENERIC_HTTP = 24;
 	
-	const UPLYNK_HTTP = 6;
-	const UPLYNK_RTMP = 6;
+	const LEVEL3_HLS = 31;
+	const LEVEL3_HTTP = 34;
+	const LEVEL3_RTMP = 35;
 	
-	const EDGECAST_HTTP = 6;
-	const EDGECAST_RTMP = 6;
+	const LIMELIGHT_HTTP = 44;
+	const LIMELIGHT_RTMP = 45;
 	
-	const MIRRORIMAGE_HTTP = 6;		// seems unused
-	const MIRRORIMAGE_RTMP = 6;		// seems unused
+	const LOCAL_PATH_APPLE_HTTP = 51;
+	const LOCAL_PATH_HTTP = 54;
+	const LOCAL_PATH_RTMP = 55;
 	
-	const KONTIKI_HTTP = 6;
+	const LIVE_HLS = 1001;
+	const LIVE_HDS = 1002;
+	const LIVE_RTMP = 1005;
 	
-	const GENERIC_HTTP = 6;			// formerly kFmsUrlManager, has a pattern URL with tokens (e.g. hds_pattern = '/hds-vod/{url}.f4m')
-	const GENERIC_HLS = 6;
-	const GENERIC_HDS = 6;
-	
-	const LIVE_HDS = 6;
-	const LIVE_HLS_MANIFEST = 6;
-	const LIVE_RTMP = 6;
+	const LIVE_AKAMAI_HDS = 1013;
 }
 
 

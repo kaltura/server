@@ -1,19 +1,12 @@
 <?php
 
-/**
- * @package Core
- * @subpackage model
- */
-class DeliveryAkamaiRtsp extends Delivery {
-
-	public function setCpCode($v)
+class DeliveryAkamaiRtsp extends DeliveryRtsp {
+	
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
-		$this->putInCustomData("cpCode", $v);
-	}
-	public function getCpCode()
-	{
-		return $this->getFromCustomData("cpCode");
+		return $this->getBaseUrl($flavorAsset);
 	}
 	
+	// doGetFileSyncUrl - Inherited from parent
 }
 

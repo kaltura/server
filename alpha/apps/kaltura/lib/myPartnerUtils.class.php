@@ -1474,7 +1474,7 @@ class myPartnerUtils
 		$deliveryRestrictions = $partner->getDeliveryRestrictions();
 		$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
 		
-		$delivery = kUrlManager::getUrlManagerIdentifyRequest();
+		$delivery = DeliveryPeer::getUrlManagerIdentifyRequest($partner);
 		
 		$restricted = true;
 		foreach($deliveryRestrictionsArr as $deliveryRestriction)

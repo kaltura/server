@@ -26,7 +26,7 @@ abstract class BaseDeliveryPeer {
 	const TM_CLASS = 'DeliveryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 18;
+	const NUM_COLUMNS = 19;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -79,8 +79,11 @@ abstract class BaseDeliveryPeer {
 	/** the column name for the DELIVERY_STATUS field */
 	const DELIVERY_STATUS = 'delivery.DELIVERY_STATUS';
 
-	/** the column name for the PROTOCOL field */
-	const PROTOCOL = 'delivery.PROTOCOL';
+	/** the column name for the STREAMER_TYPE field */
+	const STREAMER_TYPE = 'delivery.STREAMER_TYPE';
+
+	/** the column name for the MEDIA_PROTOCOLS field */
+	const MEDIA_PROTOCOLS = 'delivery.MEDIA_PROTOCOLS';
 
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'delivery.CUSTOM_DATA';
@@ -101,11 +104,11 @@ abstract class BaseDeliveryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Description', 'Url', 'HostName', 'IsDefault', 'IsSecure', 'ParentId', 'Recognizer', 'Tokenizer', 'DeliveryStatus', 'Protocol', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'description', 'url', 'hostName', 'isDefault', 'isSecure', 'parentId', 'recognizer', 'tokenizer', 'deliveryStatus', 'protocol', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::URL, self::HOST_NAME, self::IS_DEFAULT, self::IS_SECURE, self::PARENT_ID, self::RECOGNIZER, self::TOKENIZER, self::DELIVERY_STATUS, self::PROTOCOL, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'description', 'url', 'host_name', 'is_default', 'is_secure', 'parent_id', 'recognizer', 'tokenizer', 'delivery_status', 'protocol', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Description', 'Url', 'HostName', 'IsDefault', 'IsSecure', 'ParentId', 'Recognizer', 'Tokenizer', 'DeliveryStatus', 'StreamerType', 'MediaProtocols', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'description', 'url', 'hostName', 'isDefault', 'isSecure', 'parentId', 'recognizer', 'tokenizer', 'deliveryStatus', 'streamerType', 'mediaProtocols', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::URL, self::HOST_NAME, self::IS_DEFAULT, self::IS_SECURE, self::PARENT_ID, self::RECOGNIZER, self::TOKENIZER, self::DELIVERY_STATUS, self::STREAMER_TYPE, self::MEDIA_PROTOCOLS, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'description', 'url', 'host_name', 'is_default', 'is_secure', 'parent_id', 'recognizer', 'tokenizer', 'delivery_status', 'streamer_type', 'media_protocols', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
 	);
 
 	/**
@@ -115,11 +118,11 @@ abstract class BaseDeliveryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'PartnerId' => 4, 'Name' => 5, 'SystemName' => 6, 'Description' => 7, 'Url' => 8, 'HostName' => 9, 'IsDefault' => 10, 'IsSecure' => 11, 'ParentId' => 12, 'Recognizer' => 13, 'Tokenizer' => 14, 'DeliveryStatus' => 15, 'Protocol' => 16, 'CustomData' => 17, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'partnerId' => 4, 'name' => 5, 'systemName' => 6, 'description' => 7, 'url' => 8, 'hostName' => 9, 'isDefault' => 10, 'isSecure' => 11, 'parentId' => 12, 'recognizer' => 13, 'tokenizer' => 14, 'deliveryStatus' => 15, 'protocol' => 16, 'customData' => 17, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::PARTNER_ID => 4, self::NAME => 5, self::SYSTEM_NAME => 6, self::DESCRIPTION => 7, self::URL => 8, self::HOST_NAME => 9, self::IS_DEFAULT => 10, self::IS_SECURE => 11, self::PARENT_ID => 12, self::RECOGNIZER => 13, self::TOKENIZER => 14, self::DELIVERY_STATUS => 15, self::PROTOCOL => 16, self::CUSTOM_DATA => 17, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'created_at' => 2, 'updated_at' => 3, 'partner_id' => 4, 'name' => 5, 'system_name' => 6, 'description' => 7, 'url' => 8, 'host_name' => 9, 'is_default' => 10, 'is_secure' => 11, 'parent_id' => 12, 'recognizer' => 13, 'tokenizer' => 14, 'delivery_status' => 15, 'protocol' => 16, 'custom_data' => 17, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'PartnerId' => 4, 'Name' => 5, 'SystemName' => 6, 'Description' => 7, 'Url' => 8, 'HostName' => 9, 'IsDefault' => 10, 'IsSecure' => 11, 'ParentId' => 12, 'Recognizer' => 13, 'Tokenizer' => 14, 'DeliveryStatus' => 15, 'StreamerType' => 16, 'MediaProtocols' => 17, 'CustomData' => 18, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'partnerId' => 4, 'name' => 5, 'systemName' => 6, 'description' => 7, 'url' => 8, 'hostName' => 9, 'isDefault' => 10, 'isSecure' => 11, 'parentId' => 12, 'recognizer' => 13, 'tokenizer' => 14, 'deliveryStatus' => 15, 'streamerType' => 16, 'mediaProtocols' => 17, 'customData' => 18, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::PARTNER_ID => 4, self::NAME => 5, self::SYSTEM_NAME => 6, self::DESCRIPTION => 7, self::URL => 8, self::HOST_NAME => 9, self::IS_DEFAULT => 10, self::IS_SECURE => 11, self::PARENT_ID => 12, self::RECOGNIZER => 13, self::TOKENIZER => 14, self::DELIVERY_STATUS => 15, self::STREAMER_TYPE => 16, self::MEDIA_PROTOCOLS => 17, self::CUSTOM_DATA => 18, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'created_at' => 2, 'updated_at' => 3, 'partner_id' => 4, 'name' => 5, 'system_name' => 6, 'description' => 7, 'url' => 8, 'host_name' => 9, 'is_default' => 10, 'is_secure' => 11, 'parent_id' => 12, 'recognizer' => 13, 'tokenizer' => 14, 'delivery_status' => 15, 'streamer_type' => 16, 'media_protocols' => 17, 'custom_data' => 18, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
 	);
 
 	/**
@@ -205,7 +208,8 @@ abstract class BaseDeliveryPeer {
 		$criteria->addSelectColumn(DeliveryPeer::RECOGNIZER);
 		$criteria->addSelectColumn(DeliveryPeer::TOKENIZER);
 		$criteria->addSelectColumn(DeliveryPeer::DELIVERY_STATUS);
-		$criteria->addSelectColumn(DeliveryPeer::PROTOCOL);
+		$criteria->addSelectColumn(DeliveryPeer::STREAMER_TYPE);
+		$criteria->addSelectColumn(DeliveryPeer::MEDIA_PROTOCOLS);
 		$criteria->addSelectColumn(DeliveryPeer::CUSTOM_DATA);
 	}
 

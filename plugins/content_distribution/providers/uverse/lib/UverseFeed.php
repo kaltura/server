@@ -188,8 +188,7 @@ class UverseFeed
 	{
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
-		$urlManager->setDomain($cdnHost);
+		$urlManager = DeliveryPeer::getLocalDeliveryByPartner($asset->getEntryId());
 		$url = $urlManager->getAssetUrl($asset);
 		$url = $cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);

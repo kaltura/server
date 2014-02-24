@@ -361,6 +361,28 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 		return $this->buildFlavorsArray();
 	}
 	
+	/**
+	 * @param array $flavors
+	 * @return string
+	 */
+	protected function getMimeType()
+	{
+		$entry = entryPeer::retrieveByPK($this->entryId);
+		if ($entry->getType() == entryType::MEDIA_CLIP && count($this->flavors))
+		{
+			$isMp3 = true;
+			foreach($this->flavors as $flavor)
+			{
+				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
+					$isMp3 = false;
+			}
+				
+			if ($isMp3)
+				return 'audio/mpeg';
+		}
+	
+		return 'video/x-flv';
+	}
 	
 }
 	

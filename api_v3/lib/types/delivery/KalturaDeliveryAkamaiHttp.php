@@ -25,13 +25,8 @@ class KalturaDeliveryAkamaiHttp extends KalturaDelivery {
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if (is_null($dbObject))
-			$dbObject = new DeliveryAkamaiHttp();
-	
 		$this->type = KalturaDeliveryType::AKAMAI_HTTP;
-		parent::toObject($dbObject, $skip);
-		
-		return $dbObject;
+		return parent::toObject($dbObject, $skip);
 	}
 	
 	public function fromObject($sourceObject) {

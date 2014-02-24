@@ -36,12 +36,8 @@ class KalturaDeliveryRtmp extends KalturaDelivery {
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if (is_null($dbObject))
-			$dbObject = new DeliveryRtmp();
-	
-		$this->type = KalturaDeliveryType::AKAMAI_RTMP;
-		parent::toObject($dbObject, $skip);
-		return $dbObject;
+		$this->type = KalturaDeliveryType::RTMP;
+		return parent::toObject($dbObject, $skip);
 	}
 	
 }

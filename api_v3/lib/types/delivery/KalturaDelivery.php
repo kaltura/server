@@ -69,7 +69,7 @@ class KalturaDelivery extends KalturaObject implements IFilterable
 	/**
 	 * @var KalturaPlaybackProtocol
 	 */
-	public $protocol;
+	public $streamerType;
 	
 	/**
 	 * @var string
@@ -80,7 +80,7 @@ class KalturaDelivery extends KalturaObject implements IFilterable
 	 * the host part of the url
 	 * @var string
 	 */
-	public $host;
+	public $hostName;
 
 	/**
 	 * @var KalturaDeliveryStatus
@@ -118,18 +118,24 @@ class KalturaDelivery extends KalturaObject implements IFilterable
 	 */
 	public $parentId;			
 	
+	/**
+	 * Comma separated list of supported media protocols. f.i. rtmpe
+	 * @car string
+	 */
+	public $mediaProtocols;
+	
 	private static $map_between_objects = array
 	(
 			"createdAt",
 			"description",
-			"host" => "hostName",
+			"hostName",
 			"id",
 			"isDefault",
 			"isSecure",
 			"name",
 			"parentId",
 			"partnerId",
-			"protocol",
+			"streamerType",
 			"recognizer",
 			"status" => "deliveryStatus",
 			"systemName",
@@ -137,6 +143,7 @@ class KalturaDelivery extends KalturaObject implements IFilterable
 			"updatedAt",
 			"url",
 			"type",
+			"mediaProtocols",
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -148,8 +155,7 @@ class KalturaDelivery extends KalturaObject implements IFilterable
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
-			// @_!! TODO Generate the right object type based on Peer.
-			$dbObject = new Delivery();
+			$dbObject = KalturaDeliveryFactory::getCoreDeliveryInstanceByType($this->type);
 	
 		parent::toObject($dbObject, $skip);
 		return $dbObject;
