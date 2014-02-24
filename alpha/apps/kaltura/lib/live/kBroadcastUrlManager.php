@@ -31,11 +31,36 @@ class kBroadcastUrlManager
 		return new kBroadcastUrlManager($partnerId);
 	}
 	
-	public function getBroadcastUrl(entry $entry, $dc, $mediaServerIndex)
+	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
+	{
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry,  $this->getHostname(kDataCenterMgr::getCurrentDcId()), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+			
+		$otherDCs = kDataCenterMgr::getAllDcs();
+		if(count($otherDCs))
+		{
+			$otherDc = reset($otherDCs);
+			$otherDcId = $otherDc['id'];
+			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $this->getHostname($otherDcId), kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+		}
+	}
+	
+	protected function getHostname ($dc)
 	{
 		$mediaServerConfig = kConf::get($dc, 'broadcast');
-		$url = 'rtmp://' . $mediaServerConfig['domain'];
+		$url = $mediaServerConfig['domain'];
 		$app = $mediaServerConfig['application'];
+		
+		return "$url/$app";
+	}
+	
+	protected function getBroadcastUrl(LiveStreamEntry $entry, $hostname, $mediaServerIndex)
+	{
+		if (!$hostname)
+		{
+			return '';
+		}
+		
+		$url = 'rtmp://' . $hostname;
 		
 		$params = array(
 			'p' => $this->partnerId,
@@ -45,6 +70,7 @@ class kBroadcastUrlManager
 		);
 		$paramsStr = http_build_query($params);
 		
-		return "$url/$app?$paramsStr"; 
+		return "$url/?$paramsStr"; 
 	}
+	
 }

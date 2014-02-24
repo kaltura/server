@@ -897,6 +897,9 @@ class Partner extends BasePartner
     public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
     public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
     public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
+    public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
+	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
+	public function setLiveStreamPlaybackUrlConfigurations($v)		{$this->putInCustomData('live_stream_playback_url_configurations', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -937,6 +940,9 @@ class Partner extends BasePartner
 	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
     public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
     public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
+	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
+	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
+	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
 	
 	
 	/**
