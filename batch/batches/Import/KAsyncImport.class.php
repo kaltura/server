@@ -207,6 +207,8 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		catch(Exception $ex)
 		{
+			if($ex->getMessage() == KCurlWrapper::COULD_NOT_CONNECT_TO_HOST_ERROR)
+				throw new kTemporaryException($ex->getMessage(), $ex->getCode());
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		return $job;
