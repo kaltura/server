@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'delivery' table.
+ * This class defines the structure of the 'delivery_profile' table.
  *
  *
  *
@@ -14,12 +14,12 @@
  * @package Core
  * @subpackage model.map
  */
-class DeliveryTableMap extends TableMap {
+class deliveryTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'Core.DeliveryTableMap';
+	const CLASS_NAME = 'Core.deliveryTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -31,9 +31,9 @@ class DeliveryTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('delivery');
-		$this->setPhpName('Delivery');
-		$this->setClassname('Delivery');
+		$this->setName('delivery_profile');
+		$this->setPhpName('delivery');
+		$this->setClassname('delivery');
 		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
@@ -66,4 +66,4 @@ class DeliveryTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // DeliveryTableMap
+} // deliveryTableMap

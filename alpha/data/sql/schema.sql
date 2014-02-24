@@ -1927,13 +1927,13 @@ CREATE TABLE `storage_profile`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
-#-- delivery
+#-- delivery_profile
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `delivery`;
+DROP TABLE IF EXISTS `delivery_profile`;
 
 
-CREATE TABLE `delivery`
+CREATE TABLE `delivery_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`type` INTEGER default 0 NOT NULL,

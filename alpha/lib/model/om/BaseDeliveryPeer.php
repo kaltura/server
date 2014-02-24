@@ -1,29 +1,29 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'delivery' table.
+ * Base static class for performing query and update operations on the 'delivery_profile' table.
  *
  * 
  *
  * @package Core
  * @subpackage model.om
  */
-abstract class BaseDeliveryPeer {
+abstract class BasedeliveryPeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'delivery';
+	const TABLE_NAME = 'delivery_profile';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'Delivery';
+	const OM_CLASS = 'delivery';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'Core.Delivery';
+	const CLASS_DEFAULT = 'Core.delivery';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'DeliveryTableMap';
+	const TM_CLASS = 'deliveryTableMap';
 	
 	/** The total number of columns. */
 	const NUM_COLUMNS = 19;
@@ -32,67 +32,67 @@ abstract class BaseDeliveryPeer {
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'delivery.ID';
+	const ID = 'delivery_profile.ID';
 
 	/** the column name for the TYPE field */
-	const TYPE = 'delivery.TYPE';
+	const TYPE = 'delivery_profile.TYPE';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'delivery.CREATED_AT';
+	const CREATED_AT = 'delivery_profile.CREATED_AT';
 
 	/** the column name for the UPDATED_AT field */
-	const UPDATED_AT = 'delivery.UPDATED_AT';
+	const UPDATED_AT = 'delivery_profile.UPDATED_AT';
 
 	/** the column name for the PARTNER_ID field */
-	const PARTNER_ID = 'delivery.PARTNER_ID';
+	const PARTNER_ID = 'delivery_profile.PARTNER_ID';
 
 	/** the column name for the NAME field */
-	const NAME = 'delivery.NAME';
+	const NAME = 'delivery_profile.NAME';
 
 	/** the column name for the SYSTEM_NAME field */
-	const SYSTEM_NAME = 'delivery.SYSTEM_NAME';
+	const SYSTEM_NAME = 'delivery_profile.SYSTEM_NAME';
 
 	/** the column name for the DESCRIPTION field */
-	const DESCRIPTION = 'delivery.DESCRIPTION';
+	const DESCRIPTION = 'delivery_profile.DESCRIPTION';
 
 	/** the column name for the URL field */
-	const URL = 'delivery.URL';
+	const URL = 'delivery_profile.URL';
 
 	/** the column name for the HOST_NAME field */
-	const HOST_NAME = 'delivery.HOST_NAME';
+	const HOST_NAME = 'delivery_profile.HOST_NAME';
 
 	/** the column name for the IS_DEFAULT field */
-	const IS_DEFAULT = 'delivery.IS_DEFAULT';
+	const IS_DEFAULT = 'delivery_profile.IS_DEFAULT';
 
 	/** the column name for the IS_SECURE field */
-	const IS_SECURE = 'delivery.IS_SECURE';
+	const IS_SECURE = 'delivery_profile.IS_SECURE';
 
 	/** the column name for the PARENT_ID field */
-	const PARENT_ID = 'delivery.PARENT_ID';
+	const PARENT_ID = 'delivery_profile.PARENT_ID';
 
 	/** the column name for the RECOGNIZER field */
-	const RECOGNIZER = 'delivery.RECOGNIZER';
+	const RECOGNIZER = 'delivery_profile.RECOGNIZER';
 
 	/** the column name for the TOKENIZER field */
-	const TOKENIZER = 'delivery.TOKENIZER';
+	const TOKENIZER = 'delivery_profile.TOKENIZER';
 
 	/** the column name for the DELIVERY_STATUS field */
-	const DELIVERY_STATUS = 'delivery.DELIVERY_STATUS';
+	const DELIVERY_STATUS = 'delivery_profile.DELIVERY_STATUS';
 
 	/** the column name for the STREAMER_TYPE field */
-	const STREAMER_TYPE = 'delivery.STREAMER_TYPE';
+	const STREAMER_TYPE = 'delivery_profile.STREAMER_TYPE';
 
 	/** the column name for the MEDIA_PROTOCOLS field */
-	const MEDIA_PROTOCOLS = 'delivery.MEDIA_PROTOCOLS';
+	const MEDIA_PROTOCOLS = 'delivery_profile.MEDIA_PROTOCOLS';
 
 	/** the column name for the CUSTOM_DATA field */
-	const CUSTOM_DATA = 'delivery.CUSTOM_DATA';
+	const CUSTOM_DATA = 'delivery_profile.CUSTOM_DATA';
 
 	/**
-	 * An identiy map to hold any loaded instances of Delivery objects.
+	 * An identiy map to hold any loaded instances of delivery objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array Delivery[]
+	 * @var        array delivery[]
 	 */
 	public static $instances = array();
 
@@ -171,12 +171,12 @@ abstract class BaseDeliveryPeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. DeliveryPeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. deliveryPeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(DeliveryPeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(deliveryPeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -192,25 +192,25 @@ abstract class BaseDeliveryPeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(DeliveryPeer::ID);
-		$criteria->addSelectColumn(DeliveryPeer::TYPE);
-		$criteria->addSelectColumn(DeliveryPeer::CREATED_AT);
-		$criteria->addSelectColumn(DeliveryPeer::UPDATED_AT);
-		$criteria->addSelectColumn(DeliveryPeer::PARTNER_ID);
-		$criteria->addSelectColumn(DeliveryPeer::NAME);
-		$criteria->addSelectColumn(DeliveryPeer::SYSTEM_NAME);
-		$criteria->addSelectColumn(DeliveryPeer::DESCRIPTION);
-		$criteria->addSelectColumn(DeliveryPeer::URL);
-		$criteria->addSelectColumn(DeliveryPeer::HOST_NAME);
-		$criteria->addSelectColumn(DeliveryPeer::IS_DEFAULT);
-		$criteria->addSelectColumn(DeliveryPeer::IS_SECURE);
-		$criteria->addSelectColumn(DeliveryPeer::PARENT_ID);
-		$criteria->addSelectColumn(DeliveryPeer::RECOGNIZER);
-		$criteria->addSelectColumn(DeliveryPeer::TOKENIZER);
-		$criteria->addSelectColumn(DeliveryPeer::DELIVERY_STATUS);
-		$criteria->addSelectColumn(DeliveryPeer::STREAMER_TYPE);
-		$criteria->addSelectColumn(DeliveryPeer::MEDIA_PROTOCOLS);
-		$criteria->addSelectColumn(DeliveryPeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(deliveryPeer::ID);
+		$criteria->addSelectColumn(deliveryPeer::TYPE);
+		$criteria->addSelectColumn(deliveryPeer::CREATED_AT);
+		$criteria->addSelectColumn(deliveryPeer::UPDATED_AT);
+		$criteria->addSelectColumn(deliveryPeer::PARTNER_ID);
+		$criteria->addSelectColumn(deliveryPeer::NAME);
+		$criteria->addSelectColumn(deliveryPeer::SYSTEM_NAME);
+		$criteria->addSelectColumn(deliveryPeer::DESCRIPTION);
+		$criteria->addSelectColumn(deliveryPeer::URL);
+		$criteria->addSelectColumn(deliveryPeer::HOST_NAME);
+		$criteria->addSelectColumn(deliveryPeer::IS_DEFAULT);
+		$criteria->addSelectColumn(deliveryPeer::IS_SECURE);
+		$criteria->addSelectColumn(deliveryPeer::PARENT_ID);
+		$criteria->addSelectColumn(deliveryPeer::RECOGNIZER);
+		$criteria->addSelectColumn(deliveryPeer::TOKENIZER);
+		$criteria->addSelectColumn(deliveryPeer::DELIVERY_STATUS);
+		$criteria->addSelectColumn(deliveryPeer::STREAMER_TYPE);
+		$criteria->addSelectColumn(deliveryPeer::MEDIA_PROTOCOLS);
+		$criteria->addSelectColumn(deliveryPeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -229,27 +229,27 @@ abstract class BaseDeliveryPeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(DeliveryPeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(deliveryPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			DeliveryPeer::addSelectColumns($criteria);
+			deliveryPeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		DeliveryPeer::attachCriteriaFilter($criteria);
+		deliveryPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
-			'DeliveryPeer', 
+			'deliveryPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
@@ -258,7 +258,7 @@ abstract class BaseDeliveryPeer {
 		}
 		
 		// select the connection for the query
-		$con = DeliveryPeer::alternativeCon ($con, $queryDB);
+		$con = deliveryPeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -282,7 +282,7 @@ abstract class BaseDeliveryPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     Delivery
+	 * @return     delivery
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -290,7 +290,7 @@ abstract class BaseDeliveryPeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = DeliveryPeer::doSelect($critcopy, $con);
+		$objects = deliveryPeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -332,10 +332,10 @@ abstract class BaseDeliveryPeer {
 	{
 		foreach ($queryResult as $curIndex => $curObject)
 		{
-			$objFromPool = DeliveryPeer::getInstanceFromPool($curObject->getPrimaryKey());
+			$objFromPool = deliveryPeer::getInstanceFromPool($curObject->getPrimaryKey());
 			if ($objFromPool === null)
 			{
-				DeliveryPeer::addInstanceToPool($curObject);
+				deliveryPeer::addInstanceToPool($curObject);
 			}
 			else
 			{
@@ -357,7 +357,7 @@ abstract class BaseDeliveryPeer {
 			{  
 				foreach ($queryResult as $curResult)
 				{
-					DeliveryPeer::addInstanceToPool($curResult);
+					deliveryPeer::addInstanceToPool($curResult);
 				}
 			}
 		}
@@ -374,27 +374,27 @@ abstract class BaseDeliveryPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{		
-		$criteriaForSelect = DeliveryPeer::prepareCriteriaForSelect($criteria);
+		$criteriaForSelect = deliveryPeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteriaForSelect, 
 			kQueryCache::QUERY_TYPE_SELECT,
-			'DeliveryPeer', 
+			'deliveryPeer', 
 			$cacheKey, 
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			$cacheKey = null;
-			DeliveryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
-			DeliveryPeer::updateInstancePool($cachedResult);
+			deliveryPeer::filterSelectResults($cachedResult, $criteriaForSelect);
+			deliveryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
 		
-		$con = DeliveryPeer::alternativeCon($con, $queryDB);
+		$con = deliveryPeer::alternativeCon($con, $queryDB);
 		
-		$queryResult = DeliveryPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
+		$queryResult = deliveryPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
 		
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
@@ -405,9 +405,9 @@ abstract class BaseDeliveryPeer {
 			$cacheKey = null;
 		}
 		
-		DeliveryPeer::filterSelectResults($queryResult, $criteria);
+		deliveryPeer::filterSelectResults($queryResult, $criteria);
 		
-		DeliveryPeer::addInstancesToPool($queryResult);
+		deliveryPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
 
@@ -431,7 +431,7 @@ abstract class BaseDeliveryPeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -443,7 +443,7 @@ abstract class BaseDeliveryPeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = DeliveryPeer::getCriteriaFilter();
+		$criteria_filter = deliveryPeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -457,12 +457,12 @@ abstract class BaseDeliveryPeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			DeliveryPeer::setDefaultCriteriaFilter();
+			deliveryPeer::setDefaultCriteriaFilter();
 		
-		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('Delivery');
+		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('delivery');
 		if ($partnerCriteria)
 		{
-			call_user_func_array(array('DeliveryPeer','addPartnerToCriteria'), $partnerCriteria);
+			call_user_func_array(array('deliveryPeer','addPartnerToCriteria'), $partnerCriteria);
 		}
 		
 		return self::$s_criteria_filter;
@@ -489,7 +489,7 @@ abstract class BaseDeliveryPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		DeliveryPeer::getCriteriaFilter()->applyFilter($criteria);
+		deliveryPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
@@ -571,10 +571,10 @@ abstract class BaseDeliveryPeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		DeliveryPeer::attachCriteriaFilter($criteria);
+		deliveryPeer::attachCriteriaFilter($criteria);
 		
 		// select the connection for the query
-		$con = DeliveryPeer::alternativeCon ( $con );
+		$con = deliveryPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -588,20 +588,20 @@ abstract class BaseDeliveryPeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				DeliveryPeer::addSelectColumns($criteria);
+				deliveryPeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			DeliveryPeer::addSelectColumns($criteria);
+			deliveryPeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		DeliveryPeer::attachCriteriaFilter($criteria);
+		deliveryPeer::attachCriteriaFilter($criteria);
 
 		return $criteria;
 	}
@@ -621,9 +621,9 @@ abstract class BaseDeliveryPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = DeliveryPeer::alternativeCon($con);
+		$con = deliveryPeer::alternativeCon($con);
 		
-		$criteria = DeliveryPeer::prepareCriteriaForSelect($criteria);
+		$criteria = deliveryPeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -637,10 +637,10 @@ abstract class BaseDeliveryPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      Delivery $value A Delivery object.
+	 * @param      delivery $value A delivery object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(Delivery $obj, $key = null)
+	public static function addInstanceToPool(delivery $obj, $key = null)
 	{
 		if ( Propel::isInstancePoolingEnabled() )
 		{
@@ -654,7 +654,7 @@ abstract class BaseDeliveryPeer {
 				)
 			{
 				self::$instances[$key] = $obj;
-				kMemoryManager::registerPeer('DeliveryPeer');
+				kMemoryManager::registerPeer('deliveryPeer');
 			}
 		}
 	}
@@ -667,18 +667,18 @@ abstract class BaseDeliveryPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A Delivery object or a primary key value.
+	 * @param      mixed $value A delivery object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof Delivery) {
+			if (is_object($value) && $value instanceof delivery) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Delivery object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or delivery object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -693,7 +693,7 @@ abstract class BaseDeliveryPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     Delivery Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     delivery Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -721,7 +721,7 @@ abstract class BaseDeliveryPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to delivery
+	 * Method to invalidate the instance pool of all tables related to delivery_profile
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -760,15 +760,15 @@ abstract class BaseDeliveryPeer {
 	
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = DeliveryPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = DeliveryPeer::getInstanceFromPool($key))) {
+			$key = deliveryPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = deliveryPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
 				// class must be set each time from the record row
-				$cls = DeliveryPeer::getOMClass($row, 0);
+				$cls = deliveryPeer::getOMClass($row, 0);
 				$cls = substr('.'.$cls, strrpos('.'.$cls, '.') + 1);
 				$obj = new $cls();
 				$obj->hydrate($row);
@@ -795,10 +795,10 @@ abstract class BaseDeliveryPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseDeliveryPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseDeliveryPeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BasedeliveryPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BasedeliveryPeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new DeliveryTableMap());
+	    $dbMap->addTableObject(new deliveryTableMap());
 	  }
 	}
 
@@ -825,9 +825,9 @@ abstract class BaseDeliveryPeer {
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a Delivery or Criteria object.
+	 * Method perform an INSERT on the database, given a delivery or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or Delivery object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or delivery object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -836,17 +836,17 @@ abstract class BaseDeliveryPeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from Delivery object
+			$criteria = $values->buildCriteria(); // build Criteria from delivery object
 		}
 
-		if ($criteria->containsKey(DeliveryPeer::ID) && $criteria->keyContainsValue(DeliveryPeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.DeliveryPeer::ID.')');
+		if ($criteria->containsKey(deliveryPeer::ID) && $criteria->keyContainsValue(deliveryPeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.deliveryPeer::ID.')');
 		}
 
 
@@ -868,9 +868,9 @@ abstract class BaseDeliveryPeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a Delivery or Criteria object.
+	 * Method perform an UPDATE on the database, given a delivery or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or Delivery object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or delivery object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -879,7 +879,7 @@ abstract class BaseDeliveryPeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -887,10 +887,10 @@ abstract class BaseDeliveryPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(DeliveryPeer::ID);
-			$selectCriteria->add(DeliveryPeer::ID, $criteria->remove(DeliveryPeer::ID), $comparison);
+			$comparison = $criteria->getComparison(deliveryPeer::ID);
+			$selectCriteria->add(deliveryPeer::ID, $criteria->remove(deliveryPeer::ID), $comparison);
 
-		} else { // $values is Delivery object
+		} else { // $values is delivery object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -911,26 +911,26 @@ abstract class BaseDeliveryPeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the delivery table.
+	 * Method to DELETE all rows from the delivery_profile table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(DeliveryPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(deliveryPeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			DeliveryPeer::clearInstancePool();
-			DeliveryPeer::clearRelatedInstancePool();
+			deliveryPeer::clearInstancePool();
+			deliveryPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -940,9 +940,9 @@ abstract class BaseDeliveryPeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a Delivery or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a delivery or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or Delivery object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or delivery object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -953,27 +953,27 @@ abstract class BaseDeliveryPeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			DeliveryPeer::clearInstancePool();
+			deliveryPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof Delivery) { // it's a model object
+		} elseif ($values instanceof delivery) { // it's a model object
 			// invalidate the cache for this single object
-			DeliveryPeer::removeInstanceFromPool($values);
+			deliveryPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(DeliveryPeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(deliveryPeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				DeliveryPeer::removeInstanceFromPool($singleval);
+				deliveryPeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -988,7 +988,7 @@ abstract class BaseDeliveryPeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			DeliveryPeer::clearRelatedInstancePool();
+			deliveryPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -998,24 +998,24 @@ abstract class BaseDeliveryPeer {
 	}
 
 	/**
-	 * Validates all modified columns of given Delivery object.
+	 * Validates all modified columns of given delivery object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      Delivery $obj The object to validate.
+	 * @param      delivery $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(Delivery $obj, $cols = null)
+	public static function doValidate(delivery $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(DeliveryPeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(DeliveryPeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(deliveryPeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(deliveryPeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -1031,7 +1031,7 @@ abstract class BaseDeliveryPeer {
 
 		}
 
-		return BasePeer::doValidate(DeliveryPeer::DATABASE_NAME, DeliveryPeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(deliveryPeer::DATABASE_NAME, deliveryPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -1039,19 +1039,19 @@ abstract class BaseDeliveryPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     Delivery
+	 * @return     delivery
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = DeliveryPeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = deliveryPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(DeliveryPeer::DATABASE_NAME);
-		$criteria->add(DeliveryPeer::ID, $pk);
+		$criteria = new Criteria(deliveryPeer::DATABASE_NAME);
+		$criteria->add(deliveryPeer::ID, $pk);
 
-		$v = DeliveryPeer::doSelect($criteria, $con);
+		$v = deliveryPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1070,16 +1070,16 @@ abstract class BaseDeliveryPeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(DeliveryPeer::DATABASE_NAME);
-			$criteria->add(DeliveryPeer::ID, $pks, Criteria::IN);
-			$objs = DeliveryPeer::doSelect($criteria, $con);
+			$criteria = new Criteria(deliveryPeer::DATABASE_NAME);
+			$criteria->add(deliveryPeer::ID, $pks, Criteria::IN);
+			$objs = deliveryPeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BaseDeliveryPeer
+} // BasedeliveryPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseDeliveryPeer::buildTableMap();
+BasedeliveryPeer::buildTableMap();
 
