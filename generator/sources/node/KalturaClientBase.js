@@ -41,16 +41,16 @@ var http = require("http");
 
 
 function http_build_query (formdata, numeric_prefix, arg_separator) {
-    var value, key, tmp = [];
+    var value, tmp = [];
     var _http_build_query_helper = function (key, val, arg_separator) {
-        var k, tmp = [];
+        var tmp = [];
     if (val === true) {
             val = "1";
         } else if (val === false) {
             val = "0";
         }
     if (val !== null && typeof(val) === "object") {
-            for (k in val) {
+            for (var k in val) {
                 if (val[k] !== null) {
                     tmp.push(_http_build_query_helper(key + "[" + k + "]", val[k], arg_separator));
                 }
@@ -67,7 +67,7 @@ function http_build_query (formdata, numeric_prefix, arg_separator) {
     if (!arg_separator) {
     arg_separator = "&";
     }
-    for (key in formdata) {
+    for (var key in formdata) {
         value = formdata[key];
         if (numeric_prefix && !isNaN(key)) {
       key = String(numeric_prefix) + key;
@@ -426,7 +426,7 @@ KalturaClientBase.prototype.addParam = function(params, paramName, paramValue)
     return;
   }
 
-  var subParamName, subParamValue;
+  var subParamValue, subParamName = null;
 
   // object
   if(isNaN(paramValue.length)){
