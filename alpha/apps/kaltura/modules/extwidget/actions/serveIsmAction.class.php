@@ -172,25 +172,34 @@ class serveIsmAction extends sfAction
 			{
 				if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
 				{
-					$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
-					$fileSync = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
-					$replacingFileName = basename($fileSync->getFilePath());
-					$fileName = $asset->getEntryId().'_'.$asset->getId().'_'.$fileSync->getVersion();
-					$fileData = str_replace("content=\"$replacingFileName\"", "content=\"$newName\"", $fileData);
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, 'ismc');
+					if($replacingFileName && $fileName)
+						$fileData = str_replace("content=\"$replacingFileName\"", "content=\"$fileName\"", $fileData);			
 				}
 				else
 				{
-					$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-					$fileSync = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
-					$replacingFileName = basename($fileSync->getFilePath());
-					$fileName = $asset->getEntryId().'_'.$asset->getId().'_'.$fileSync->getVersion();
-					$fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, 'ismv');
+					if($replacingFileName && $fileName)					
+						$fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
 				}
-			}
-			
+			}			
 			return $fileData;
 		}
 		else
 			return $fileData;	
+	}
+	
+	private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType, $fileExt)
+	{
+		$replacingFileName = null;
+		$fileName = null;
+		$syncKey = $asset->getSyncKey($fileSyncObjectSubType);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
+		if($fileSync)			
+		{
+			$replacingFileName = basename($fileSync->getFilePath());
+			$fileName = $asset->getEntryId().'_'.$asset->getId().'_'.$fileSync->getVersion().'.'.$fileExt;
+		}
+		return array($replacingFileName, $fileName);
 	}
 }
