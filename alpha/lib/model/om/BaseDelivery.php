@@ -8,14 +8,14 @@
  * @package Core
  * @subpackage model.om
  */
-abstract class Basedelivery extends BaseObject  implements Persistent {
+abstract class BaseDelivery extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        deliveryPeer
+	 * @var        DeliveryPeer
 	 */
 	protected static $peer;
 
@@ -193,7 +193,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Initializes internal state of Basedelivery object.
+	 * Initializes internal state of BaseDelivery object.
 	 * @see        applyDefaults()
 	 */
 	public function __construct()
@@ -456,12 +456,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::ID]))
-			$this->oldColumnsValues[deliveryPeer::ID] = $this->id;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::ID]))
+			$this->oldColumnsValues[DeliveryPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -469,7 +469,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = deliveryPeer::ID;
+			$this->modifiedColumns[] = DeliveryPeer::ID;
 		}
 
 		return $this;
@@ -479,12 +479,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [type] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setType($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::TYPE]))
-			$this->oldColumnsValues[deliveryPeer::TYPE] = $this->type;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::TYPE]))
+			$this->oldColumnsValues[DeliveryPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -492,7 +492,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->type !== $v || $this->isNew()) {
 			$this->type = $v;
-			$this->modifiedColumns[] = deliveryPeer::TYPE;
+			$this->modifiedColumns[] = DeliveryPeer::TYPE;
 		}
 
 		return $this;
@@ -503,7 +503,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -540,7 +540,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = deliveryPeer::CREATED_AT;
+				$this->modifiedColumns[] = DeliveryPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -552,7 +552,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setUpdatedAt($v)
 	{
@@ -589,7 +589,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 					)
 			{
 				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = deliveryPeer::UPDATED_AT;
+				$this->modifiedColumns[] = DeliveryPeer::UPDATED_AT;
 			}
 		} // if either are not null
 
@@ -600,12 +600,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [partner_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setPartnerId($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::PARTNER_ID]))
-			$this->oldColumnsValues[deliveryPeer::PARTNER_ID] = $this->partner_id;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::PARTNER_ID]))
+			$this->oldColumnsValues[DeliveryPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -613,7 +613,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->partner_id !== $v) {
 			$this->partner_id = $v;
-			$this->modifiedColumns[] = deliveryPeer::PARTNER_ID;
+			$this->modifiedColumns[] = DeliveryPeer::PARTNER_ID;
 		}
 
 		return $this;
@@ -623,12 +623,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [name] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setName($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::NAME]))
-			$this->oldColumnsValues[deliveryPeer::NAME] = $this->name;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::NAME]))
+			$this->oldColumnsValues[DeliveryPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -636,7 +636,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->name !== $v) {
 			$this->name = $v;
-			$this->modifiedColumns[] = deliveryPeer::NAME;
+			$this->modifiedColumns[] = DeliveryPeer::NAME;
 		}
 
 		return $this;
@@ -646,12 +646,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [system_name] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setSystemName($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::SYSTEM_NAME]))
-			$this->oldColumnsValues[deliveryPeer::SYSTEM_NAME] = $this->system_name;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[DeliveryPeer::SYSTEM_NAME] = $this->system_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -659,7 +659,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->system_name !== $v) {
 			$this->system_name = $v;
-			$this->modifiedColumns[] = deliveryPeer::SYSTEM_NAME;
+			$this->modifiedColumns[] = DeliveryPeer::SYSTEM_NAME;
 		}
 
 		return $this;
@@ -669,12 +669,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [description] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setDescription($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::DESCRIPTION]))
-			$this->oldColumnsValues[deliveryPeer::DESCRIPTION] = $this->description;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::DESCRIPTION]))
+			$this->oldColumnsValues[DeliveryPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -682,7 +682,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->description !== $v) {
 			$this->description = $v;
-			$this->modifiedColumns[] = deliveryPeer::DESCRIPTION;
+			$this->modifiedColumns[] = DeliveryPeer::DESCRIPTION;
 		}
 
 		return $this;
@@ -692,12 +692,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [url] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setUrl($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::URL]))
-			$this->oldColumnsValues[deliveryPeer::URL] = $this->url;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::URL]))
+			$this->oldColumnsValues[DeliveryPeer::URL] = $this->url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -705,7 +705,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->url !== $v) {
 			$this->url = $v;
-			$this->modifiedColumns[] = deliveryPeer::URL;
+			$this->modifiedColumns[] = DeliveryPeer::URL;
 		}
 
 		return $this;
@@ -715,12 +715,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [host_name] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setHostName($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::HOST_NAME]))
-			$this->oldColumnsValues[deliveryPeer::HOST_NAME] = $this->host_name;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::HOST_NAME]))
+			$this->oldColumnsValues[DeliveryPeer::HOST_NAME] = $this->host_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -728,7 +728,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->host_name !== $v) {
 			$this->host_name = $v;
-			$this->modifiedColumns[] = deliveryPeer::HOST_NAME;
+			$this->modifiedColumns[] = DeliveryPeer::HOST_NAME;
 		}
 
 		return $this;
@@ -738,12 +738,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [is_default] column.
 	 * 
 	 * @param      boolean $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setIsDefault($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::IS_DEFAULT]))
-			$this->oldColumnsValues[deliveryPeer::IS_DEFAULT] = $this->is_default;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::IS_DEFAULT]))
+			$this->oldColumnsValues[DeliveryPeer::IS_DEFAULT] = $this->is_default;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -751,7 +751,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->is_default !== $v) {
 			$this->is_default = $v;
-			$this->modifiedColumns[] = deliveryPeer::IS_DEFAULT;
+			$this->modifiedColumns[] = DeliveryPeer::IS_DEFAULT;
 		}
 
 		return $this;
@@ -761,12 +761,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [is_secure] column.
 	 * 
 	 * @param      boolean $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setIsSecure($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::IS_SECURE]))
-			$this->oldColumnsValues[deliveryPeer::IS_SECURE] = $this->is_secure;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::IS_SECURE]))
+			$this->oldColumnsValues[DeliveryPeer::IS_SECURE] = $this->is_secure;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -774,7 +774,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->is_secure !== $v) {
 			$this->is_secure = $v;
-			$this->modifiedColumns[] = deliveryPeer::IS_SECURE;
+			$this->modifiedColumns[] = DeliveryPeer::IS_SECURE;
 		}
 
 		return $this;
@@ -784,12 +784,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [parent_id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setParentId($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::PARENT_ID]))
-			$this->oldColumnsValues[deliveryPeer::PARENT_ID] = $this->parent_id;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::PARENT_ID]))
+			$this->oldColumnsValues[DeliveryPeer::PARENT_ID] = $this->parent_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -797,7 +797,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->parent_id !== $v || $this->isNew()) {
 			$this->parent_id = $v;
-			$this->modifiedColumns[] = deliveryPeer::PARENT_ID;
+			$this->modifiedColumns[] = DeliveryPeer::PARENT_ID;
 		}
 
 		return $this;
@@ -807,12 +807,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [recognizer] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setRecognizer($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::RECOGNIZER]))
-			$this->oldColumnsValues[deliveryPeer::RECOGNIZER] = $this->recognizer;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::RECOGNIZER]))
+			$this->oldColumnsValues[DeliveryPeer::RECOGNIZER] = $this->recognizer;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -820,7 +820,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->recognizer !== $v) {
 			$this->recognizer = $v;
-			$this->modifiedColumns[] = deliveryPeer::RECOGNIZER;
+			$this->modifiedColumns[] = DeliveryPeer::RECOGNIZER;
 		}
 
 		return $this;
@@ -830,12 +830,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [tokenizer] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setTokenizer($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::TOKENIZER]))
-			$this->oldColumnsValues[deliveryPeer::TOKENIZER] = $this->tokenizer;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::TOKENIZER]))
+			$this->oldColumnsValues[DeliveryPeer::TOKENIZER] = $this->tokenizer;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -843,7 +843,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->tokenizer !== $v) {
 			$this->tokenizer = $v;
-			$this->modifiedColumns[] = deliveryPeer::TOKENIZER;
+			$this->modifiedColumns[] = DeliveryPeer::TOKENIZER;
 		}
 
 		return $this;
@@ -853,12 +853,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [delivery_status] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setDeliveryStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::DELIVERY_STATUS]))
-			$this->oldColumnsValues[deliveryPeer::DELIVERY_STATUS] = $this->delivery_status;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::DELIVERY_STATUS]))
+			$this->oldColumnsValues[DeliveryPeer::DELIVERY_STATUS] = $this->delivery_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -866,7 +866,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->delivery_status !== $v) {
 			$this->delivery_status = $v;
-			$this->modifiedColumns[] = deliveryPeer::DELIVERY_STATUS;
+			$this->modifiedColumns[] = DeliveryPeer::DELIVERY_STATUS;
 		}
 
 		return $this;
@@ -876,12 +876,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [streamer_type] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setStreamerType($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::STREAMER_TYPE]))
-			$this->oldColumnsValues[deliveryPeer::STREAMER_TYPE] = $this->streamer_type;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::STREAMER_TYPE]))
+			$this->oldColumnsValues[DeliveryPeer::STREAMER_TYPE] = $this->streamer_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -889,7 +889,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->streamer_type !== $v) {
 			$this->streamer_type = $v;
-			$this->modifiedColumns[] = deliveryPeer::STREAMER_TYPE;
+			$this->modifiedColumns[] = DeliveryPeer::STREAMER_TYPE;
 		}
 
 		return $this;
@@ -899,12 +899,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [media_protocols] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setMediaProtocols($v)
 	{
-		if(!isset($this->oldColumnsValues[deliveryPeer::MEDIA_PROTOCOLS]))
-			$this->oldColumnsValues[deliveryPeer::MEDIA_PROTOCOLS] = $this->media_protocols;
+		if(!isset($this->oldColumnsValues[DeliveryPeer::MEDIA_PROTOCOLS]))
+			$this->oldColumnsValues[DeliveryPeer::MEDIA_PROTOCOLS] = $this->media_protocols;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -912,7 +912,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->media_protocols !== $v) {
 			$this->media_protocols = $v;
-			$this->modifiedColumns[] = deliveryPeer::MEDIA_PROTOCOLS;
+			$this->modifiedColumns[] = DeliveryPeer::MEDIA_PROTOCOLS;
 		}
 
 		return $this;
@@ -922,7 +922,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     delivery The current object (for fluent API support)
+	 * @return     Delivery The current object (for fluent API support)
 	 */
 	public function setCustomData($v)
 	{
@@ -932,7 +932,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 
 		if ($this->custom_data !== $v) {
 			$this->custom_data = $v;
-			$this->modifiedColumns[] = deliveryPeer::CUSTOM_DATA;
+			$this->modifiedColumns[] = DeliveryPeer::CUSTOM_DATA;
 		}
 
 		return $this;
@@ -1006,10 +1006,10 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 19; // 19 = deliveryPeer::NUM_COLUMNS - deliveryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 19; // 19 = DeliveryPeer::NUM_COLUMNS - DeliveryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating delivery object", $e);
+			throw new PropelException("Error populating Delivery object", $e);
 		}
 	}
 
@@ -1052,17 +1052,17 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		deliveryPeer::setUseCriteriaFilter(false);
+		DeliveryPeer::setUseCriteriaFilter(false);
 		$criteria = $this->buildPkeyCriteria();
 		entryPeer::addSelectColumns($criteria);
 		$stmt = BasePeer::doSelect($criteria, $con);
-		deliveryPeer::setUseCriteriaFilter(true);
+		DeliveryPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -1091,14 +1091,14 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			if ($ret) {
-				deliveryPeer::doDelete($this, $con);
+				DeliveryPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				$this->setDeleted(true);
 				$con->commit();
@@ -1131,7 +1131,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(deliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(DeliveryPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -1152,12 +1152,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
 			{
                $affectedRows = $this->doSave($con);
-                if ($affectedRows || !$this->isColumnModified(deliveryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                if ($affectedRows || !$this->isColumnModified(DeliveryPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
                 	break;
 
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
-				$criteria->addSelectColumn(deliveryPeer::CUSTOM_DATA);
+				$criteria->addSelectColumn(DeliveryPeer::CUSTOM_DATA);
                 $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
@@ -1193,7 +1193,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 				$this->postUpdate($con);
 			}
 			$this->postSave($con);
-			deliveryPeer::addInstanceToPool($this);
+			DeliveryPeer::addInstanceToPool($this);
 			
 			$con->commit();
 			return $affectedRows;
@@ -1226,14 +1226,14 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 			$this->alreadyInSave = true;
 
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = deliveryPeer::ID;
+				$this->modifiedColumns[] = DeliveryPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = deliveryPeer::doInsert($this, $con);
+					$pk = DeliveryPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -1243,7 +1243,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 					$this->setNew(false);
 					$this->objectSaved = true;
 				} else {
-					$affectedObjects = deliveryPeer::doUpdate($this, $con);
+					$affectedObjects = DeliveryPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
 						
@@ -1460,7 +1460,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = deliveryPeer::doValidate($this, $columns)) !== true) {
+			if (($retval = DeliveryPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -1483,7 +1483,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = deliveryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = DeliveryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -1574,7 +1574,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = deliveryPeer::getFieldNames($keyType);
+		$keys = DeliveryPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getType(),
@@ -1611,7 +1611,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = deliveryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = DeliveryPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -1705,7 +1705,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = deliveryPeer::getFieldNames($keyType);
+		$keys = DeliveryPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setType($arr[$keys[1]]);
@@ -1735,27 +1735,27 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(deliveryPeer::DATABASE_NAME);
+		$criteria = new Criteria(DeliveryPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(deliveryPeer::ID)) $criteria->add(deliveryPeer::ID, $this->id);
-		if ($this->isColumnModified(deliveryPeer::TYPE)) $criteria->add(deliveryPeer::TYPE, $this->type);
-		if ($this->isColumnModified(deliveryPeer::CREATED_AT)) $criteria->add(deliveryPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(deliveryPeer::UPDATED_AT)) $criteria->add(deliveryPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(deliveryPeer::PARTNER_ID)) $criteria->add(deliveryPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(deliveryPeer::NAME)) $criteria->add(deliveryPeer::NAME, $this->name);
-		if ($this->isColumnModified(deliveryPeer::SYSTEM_NAME)) $criteria->add(deliveryPeer::SYSTEM_NAME, $this->system_name);
-		if ($this->isColumnModified(deliveryPeer::DESCRIPTION)) $criteria->add(deliveryPeer::DESCRIPTION, $this->description);
-		if ($this->isColumnModified(deliveryPeer::URL)) $criteria->add(deliveryPeer::URL, $this->url);
-		if ($this->isColumnModified(deliveryPeer::HOST_NAME)) $criteria->add(deliveryPeer::HOST_NAME, $this->host_name);
-		if ($this->isColumnModified(deliveryPeer::IS_DEFAULT)) $criteria->add(deliveryPeer::IS_DEFAULT, $this->is_default);
-		if ($this->isColumnModified(deliveryPeer::IS_SECURE)) $criteria->add(deliveryPeer::IS_SECURE, $this->is_secure);
-		if ($this->isColumnModified(deliveryPeer::PARENT_ID)) $criteria->add(deliveryPeer::PARENT_ID, $this->parent_id);
-		if ($this->isColumnModified(deliveryPeer::RECOGNIZER)) $criteria->add(deliveryPeer::RECOGNIZER, $this->recognizer);
-		if ($this->isColumnModified(deliveryPeer::TOKENIZER)) $criteria->add(deliveryPeer::TOKENIZER, $this->tokenizer);
-		if ($this->isColumnModified(deliveryPeer::DELIVERY_STATUS)) $criteria->add(deliveryPeer::DELIVERY_STATUS, $this->delivery_status);
-		if ($this->isColumnModified(deliveryPeer::STREAMER_TYPE)) $criteria->add(deliveryPeer::STREAMER_TYPE, $this->streamer_type);
-		if ($this->isColumnModified(deliveryPeer::MEDIA_PROTOCOLS)) $criteria->add(deliveryPeer::MEDIA_PROTOCOLS, $this->media_protocols);
-		if ($this->isColumnModified(deliveryPeer::CUSTOM_DATA)) $criteria->add(deliveryPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(DeliveryPeer::ID)) $criteria->add(DeliveryPeer::ID, $this->id);
+		if ($this->isColumnModified(DeliveryPeer::TYPE)) $criteria->add(DeliveryPeer::TYPE, $this->type);
+		if ($this->isColumnModified(DeliveryPeer::CREATED_AT)) $criteria->add(DeliveryPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(DeliveryPeer::UPDATED_AT)) $criteria->add(DeliveryPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(DeliveryPeer::PARTNER_ID)) $criteria->add(DeliveryPeer::PARTNER_ID, $this->partner_id);
+		if ($this->isColumnModified(DeliveryPeer::NAME)) $criteria->add(DeliveryPeer::NAME, $this->name);
+		if ($this->isColumnModified(DeliveryPeer::SYSTEM_NAME)) $criteria->add(DeliveryPeer::SYSTEM_NAME, $this->system_name);
+		if ($this->isColumnModified(DeliveryPeer::DESCRIPTION)) $criteria->add(DeliveryPeer::DESCRIPTION, $this->description);
+		if ($this->isColumnModified(DeliveryPeer::URL)) $criteria->add(DeliveryPeer::URL, $this->url);
+		if ($this->isColumnModified(DeliveryPeer::HOST_NAME)) $criteria->add(DeliveryPeer::HOST_NAME, $this->host_name);
+		if ($this->isColumnModified(DeliveryPeer::IS_DEFAULT)) $criteria->add(DeliveryPeer::IS_DEFAULT, $this->is_default);
+		if ($this->isColumnModified(DeliveryPeer::IS_SECURE)) $criteria->add(DeliveryPeer::IS_SECURE, $this->is_secure);
+		if ($this->isColumnModified(DeliveryPeer::PARENT_ID)) $criteria->add(DeliveryPeer::PARENT_ID, $this->parent_id);
+		if ($this->isColumnModified(DeliveryPeer::RECOGNIZER)) $criteria->add(DeliveryPeer::RECOGNIZER, $this->recognizer);
+		if ($this->isColumnModified(DeliveryPeer::TOKENIZER)) $criteria->add(DeliveryPeer::TOKENIZER, $this->tokenizer);
+		if ($this->isColumnModified(DeliveryPeer::DELIVERY_STATUS)) $criteria->add(DeliveryPeer::DELIVERY_STATUS, $this->delivery_status);
+		if ($this->isColumnModified(DeliveryPeer::STREAMER_TYPE)) $criteria->add(DeliveryPeer::STREAMER_TYPE, $this->streamer_type);
+		if ($this->isColumnModified(DeliveryPeer::MEDIA_PROTOCOLS)) $criteria->add(DeliveryPeer::MEDIA_PROTOCOLS, $this->media_protocols);
+		if ($this->isColumnModified(DeliveryPeer::CUSTOM_DATA)) $criteria->add(DeliveryPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1770,29 +1770,29 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(deliveryPeer::DATABASE_NAME);
+		$criteria = new Criteria(DeliveryPeer::DATABASE_NAME);
 
-		$criteria->add(deliveryPeer::ID, $this->id);
+		$criteria->add(DeliveryPeer::ID, $this->id);
 		
 		if($this->alreadyInSave)
 		{
-			if ($this->isColumnModified(deliveryPeer::CUSTOM_DATA))
+			if ($this->isColumnModified(DeliveryPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
-					$criteria->add(deliveryPeer::CUSTOM_DATA, "MD5(cast(" . deliveryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					$criteria->add(DeliveryPeer::CUSTOM_DATA, "MD5(cast(" . DeliveryPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
 				else 
-					$criteria->add(deliveryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+					$criteria->add(DeliveryPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
 			
-			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(deliveryPeer::UPDATED_AT))
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(DeliveryPeer::UPDATED_AT))
 			{
 				$theModifiedColumn = null;
 				foreach($this->modifiedColumns as $modifiedColumn)
-					if($modifiedColumn != deliveryPeer::UPDATED_AT)
+					if($modifiedColumn != DeliveryPeer::UPDATED_AT)
 						$theModifiedColumn = $modifiedColumn;
 						
-				$atomicColumns = deliveryPeer::getAtomicColumns();
+				$atomicColumns = DeliveryPeer::getAtomicColumns();
 				if(in_array($theModifiedColumn, $atomicColumns))
 					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 			}
@@ -1827,7 +1827,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of delivery (or compatible) type.
+	 * @param      object $copyObj An object of Delivery (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
@@ -1886,7 +1886,7 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     delivery Clone of current object.
+	 * @return     Delivery Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1902,16 +1902,16 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @var     delivery Clone of current object.
+	 * @var     Delivery Clone of current object.
 	 */
 	protected $copiedFrom = null;
 	
 	/**
 	 * Stores the source object that this object copied from 
 	 *
-	 * @param      delivery $copiedFrom Clone of current object.
+	 * @param      Delivery $copiedFrom Clone of current object.
 	 */
-	public function setCopiedFrom(delivery $copiedFrom)
+	public function setCopiedFrom(Delivery $copiedFrom)
 	{
 		$this->copiedFrom = $copiedFrom;
 	}
@@ -1923,12 +1923,12 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     deliveryPeer
+	 * @return     DeliveryPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new deliveryPeer();
+			self::$peer = new DeliveryPeer();
 		}
 		return self::$peer;
 	}
@@ -2082,4 +2082,4 @@ abstract class Basedelivery extends BaseObject  implements Persistent {
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
-} // Basedelivery
+} // BaseDelivery

@@ -14,12 +14,12 @@
  * @package Core
  * @subpackage model.map
  */
-class deliveryTableMap extends TableMap {
+class DeliveryTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'Core.deliveryTableMap';
+	const CLASS_NAME = 'Core.DeliveryTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -32,8 +32,8 @@ class deliveryTableMap extends TableMap {
 	{
 	  // attributes
 		$this->setName('delivery_profile');
-		$this->setPhpName('delivery');
-		$this->setClassname('delivery');
+		$this->setPhpName('Delivery');
+		$this->setClassname('Delivery');
 		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
@@ -66,4 +66,4 @@ class deliveryTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // deliveryTableMap
+} // DeliveryTableMap
