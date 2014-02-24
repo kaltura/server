@@ -11,6 +11,10 @@
 class kJobsManager
 {
 	
+	const BULK_DOWNLOAD_TOTAL_ENTRIES_AMOUNT_RESTRICTION = 1000;
+	
+	const BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT = 100;
+	
 	// helper function for setting the error description and status of a batchJob
 	public static function failBatchJob(BatchJob $batchJob, $errDescription)
 	{
@@ -1131,6 +1135,10 @@ class kJobsManager
 	public static function addBulkDownloadJob($partnerId, $puserId, $entryIds, $flavorParamsId)
 	{
 		$entryIds = explode(",", $entryIds);
+		
+		if (count($entryIds) > self::BULK_DOWNLOAD_TOTAL_ENTRIES_AMOUNT_RESTRICTION)
+			throw new APIException(APIErrors::ENTRIES_AMOUNT_EXCEEDED);
+		
 		foreach($entryIds as $entryId)
 		{
 			$dbEntry = entryPeer::retrieveByPK($entryId);
@@ -1138,15 +1146,23 @@ class kJobsManager
 				throw new APIException(APIErrors::INVALID_ENTRY_ID, $entryId);
 		}
 		
-		$jobDb = new BatchJob();
-		$jobDb->setPartnerId($partnerId);
-		$data = new kBulkDownloadJobData();
+		$chunksOfEntries = array_chunk($entryIds, self::BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT);	
+		KalturaLog::debug("about to create " . count($chunksOfEntries) . " jobs");	
+		$jobs = array();
+			
+		foreach($chunksOfEntries as $chunk)
+		{
+			$jobDb = new BatchJob();
+			$jobDb->setPartnerId($partnerId);
+			$data = new kBulkDownloadJobData();
 		
-		$data->setEntryIds(implode(",", $entryIds));
-		$data->setFlavorParamsId($flavorParamsId);
-		$data->setPuserId($puserId);
+			$data->setEntryIds(implode(",", $chunk));
+			$data->setFlavorParamsId($flavorParamsId);
+			$data->setPuserId($puserId);
 		
-		return self::addJob($jobDb, $data, BatchJobType::BULKDOWNLOAD);
+			$jobs[] = self::addJob($jobDb, $data, BatchJobType::BULKDOWNLOAD);
+        }
+        return $jobs;
 	}
 	
 	/**
