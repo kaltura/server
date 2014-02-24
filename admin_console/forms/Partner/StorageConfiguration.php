@@ -90,14 +90,14 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('playback_info', 'deliveryIisBaseUrl'); 
 		 		 
-		$this->addElement('textarea', 'pathManagerParamsJson', array(
+		$this->addElement('textarea', 'pathManagerParams', array(
 			'label'			=> 'Path Manager Params (JSON):',
 			'cols'			=> 48,
 			'rows'			=> 2,
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElementToDisplayGroup('advanced', 'pathManagerParamsJson'); 
+		$this->addElementToDisplayGroup('advanced', 'pathManagerParams'); 
 
 	}
 	
@@ -109,15 +109,15 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 	    $this->addMultiOptionIfMissing('pathManagerClass', $object->pathManagerClass);
 	    
 	    parent::populateFromObject($object, $add_underscore);
-	    $this->setDefault('urlManagerParamsJson', json_encode($object->urlManagerParams));
-	    $this->setDefault('pathManagerParamsJson', json_encode($object->pathManagerParams));
+	    $this->setDefault('urlManagerParams', json_encode($object->urlManagerParams));
+	    $this->setDefault('pathManagerParams', json_encode($object->pathManagerParams));
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
-		$object->urlManagerParams = json_decode($properties['urlManagerParamsJson'], true);
-		$object->pathManagerParams = json_decode($properties['pathManagerParamsJson'], true);
+		$object->urlManagerParams = json_decode($properties['urlManagerParams'], true);
+		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
 		return $object;
 	}
 	
