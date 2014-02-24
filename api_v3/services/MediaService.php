@@ -59,7 +59,17 @@ class MediaService extends KalturaEntryService
     		$entry->conversionProfileId = $entry->conversionQuality;
 
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
-		$dbEntry->setStatus(entryStatus::NO_CONTENT);
+
+    	$entryStatus = entryStatus::NO_CONTENT;
+    	$entryConversionProfileHasFlavors = myPartnerUtils::entryConversionProfileHasFlavors( $dbEntry->getId() );
+    	if ( ! $entryConversionProfileHasFlavors )
+    	{
+	    	// If the entry's conversion profile dones't contain any flavors, mark the entry as READY
+    		$entryStatus = entryStatus::READY;
+    	}
+    	
+    	$dbEntry->setStatus( $entryStatus );
+
 		$dbEntry->save();
 
 		$trackEntry = new TrackEntry();
