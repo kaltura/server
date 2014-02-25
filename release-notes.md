@@ -41,6 +41,12 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
 *Migration*
 - /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
 
+## New FFMpeg 2.1.3##
+The limitation will be removed for partners that have a Disable Category Limit feature enabled.
+
+*Configuration Changes*
+
+
 ----------
 
 # IX-9.11.0 #
