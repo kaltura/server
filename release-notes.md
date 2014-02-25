@@ -47,6 +47,18 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
  -- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
  -- -The ffmpeg-aux remains unchanged.
 
+## Create Draft Entries as Ready ##
+Assign a Ready status to draft entries that were created using a conversion profile which contains no flavor params.
+
+- update admin.ini
+
+	moduls.draftEntryConversionProfileSelection.enabled = true
+	moduls.draftEntryConversionProfileSelection.permissionType = 2
+	moduls.draftEntryConversionProfileSelection.label = Enable KMC transcoding profile selection for draft entries
+	moduls.draftEntryConversionProfileSelection.permissionName = FEATURE_DRAFT_ENTRY_CONV_PROF_SELECTION
+	moduls.draftEntryConversionProfileSelection.basePermissionType =
+	moduls.draftEntryConversionProfileSelection.basePermissionName =
+	moduls.draftEntryConversionProfileSelection.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ----------
 
