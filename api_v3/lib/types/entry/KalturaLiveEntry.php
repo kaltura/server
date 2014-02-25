@@ -46,6 +46,15 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $recordedEntryId;
 	
+
+	/**
+	 * Flag denoting whether entry should be published by the media server
+	 * 
+	 * @var bool
+	 * @requiresPermission all
+	 */
+	public $pushPublishEnabled;
+	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -54,6 +63,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	    "dvrWindow",
 		"liveStreamConfigurations",
 		"recordedEntryId",
+		"pushPublishEnabled",
 	);
 	
 	/* (non-PHPdoc)
