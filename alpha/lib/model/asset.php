@@ -206,7 +206,7 @@ class asset extends Baseasset implements ISyncableFile
 		
 		if ( $status == flavorAsset::ASSET_STATUS_READY )
 		{
-			$this->onAssetModified( $con );
+			$this->onAssetContentModified();
 		}
 		
 		return $ret;
@@ -247,7 +247,7 @@ class asset extends Baseasset implements ISyncableFile
 			
 		if ( $statusChangedToReady || $versionModified || $objectDeleted )
 		{
-			$this->onAssetModified( $con );
+			$this->onAssetContentModified();
 		}
 		
 		return $ret;
@@ -256,11 +256,11 @@ class asset extends Baseasset implements ISyncableFile
 	/**
 	 * Notify the associated entry that an asset was modified
 	 */	
-	protected function onAssetModified( PropelPDO $con = null )
+	protected function onAssetContentModified()
 	{
-		$entry = $this->getentry( $con );
-		$entry->onAssetModified();
-		$entry->save( $con );
+		$entry = $this->getentry();
+		$entry->onAssetContentModified();
+		$entry->save();
 	}
 		
 	public function incrementVersion()

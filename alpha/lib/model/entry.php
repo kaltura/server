@@ -1133,7 +1133,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		else
 			$data = myContentStorage::generateRandomFileName($filename, $this->getThumbnail());
 
-		$this->onAssetModified();
+		$this->onAssetContentModified();
 
 		parent::setThumbnail($data);
 		return $this->getThumbnail();
