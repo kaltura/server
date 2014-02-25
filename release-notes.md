@@ -15,8 +15,6 @@ moduls.categoryLimit.basePermissionType =
 moduls.categoryLimit.basePermissionName =
 moduls.categoryLimit.group = GROUP_ENABLE_DISABLE_FEATURES
 
-access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
-
 - update batch.ini
 add 
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
@@ -42,6 +40,12 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
 
 *Migration*
 - /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
+
+## Allow "View History" for any Admin Console users ##
+The monitor's View History permission is lowered from System Admin user to any Admin Console user.      
+
+- update admin.ini:
+<br>access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
 
 ----------
 
