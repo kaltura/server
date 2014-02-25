@@ -153,6 +153,20 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		}
 		return $cmdStr;
 	}
-	
+
+	/* ---------------------------
+	 * CheckConstraints
+	*/
+	public function CheckConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
+	{
+		$vidCodecArr = array("g2m3", "g2m4", "gotomeeting3", "gotomeeting4", "gotomeeting","icod","intermediate codec");
+		if(isset($source->_video) && $source->_video->IsFormatOf($vidCodecArr)){
+			return false;
+		}
+		
+		if(parent::CheckConstraints($source, $target, $errors, $warnings)==true)
+			return true;
+		return false;
+	}
 }
 	
