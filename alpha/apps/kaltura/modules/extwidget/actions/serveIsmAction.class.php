@@ -5,6 +5,8 @@
  */
 class serveIsmAction extends sfAction
 {
+	private $entry;
+	
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
 	 */
@@ -42,7 +44,17 @@ class serveIsmAction extends sfAction
 		
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
 		
-		kFileUtils::dumpFile($path);
+		if($type == 'ism')
+		{
+			$fileData = $this->fixIsmManifestForReplacedEntry($path);		
+			kFileUtils::dumpFile($path, null, null ,0, $fileData);
+		}
+		else 
+		{
+			kFileUtils::dumpFile($path);
+		}
+		
+		
 	}
 	
 	private function getFileSyncKey($objectId, $type)
@@ -53,26 +65,11 @@ class serveIsmAction extends sfAction
 		$object = null;
 		$subType = null;
 		$isAsset = false;
+		$entryId = null;
 		
 		if($hasVersion)
 		{
-			$parts = explode('_', $objectId);
-			if(count($parts) == 4)
-			{
-				$objectId = $parts[0].'_'.$parts[1];
-				$subType = $parts[2];
-				$version = $parts[3];
-				
-				KalturaLog::debug('objectId: '.$objectId.', subType: '.$subType.', version: '.$version);
-			}
-			else if(count($parts) == 5)
-			{
-				$objectId = $parts[2].'_'.$parts[3];
-				$version = $parts[4];
-				$isAsset = true;
-				
-				KalturaLog::debug('objectId: '.$objectId.', version: '.$version);
-			}				
+			list($objectId, $version, $subType, $isAsset, $entryId) = $this->parseObjectId($objectId);
 		}
 
 		switch ($type)
@@ -110,6 +107,32 @@ class serveIsmAction extends sfAction
 		return $key;
 	}
 	
+	private function parseObjectId($objectIdStr)
+	{
+		$objectId = $version = $subType = $isAsset = $entryId = null;
+		
+		$parts = explode('_', $objectIdStr);
+		if(count($parts) == 4)
+		{
+			$objectId = $parts[0].'_'.$parts[1];
+			$subType = $parts[2];
+			$version = $parts[3];
+				
+			KalturaLog::debug('objectId: '.$objectId.', subType: '.$subType.', version: '.$version);
+		}
+		else if(count($parts) == 5)
+		{
+			$entryId = $parts[0].'_'.$parts[1];
+			$objectId = $parts[2].'_'.$parts[3];
+			$version = $parts[4];
+			$isAsset = true;
+				
+			KalturaLog::debug('objectId: '.$objectId.', version: '.$version);
+		}	
+
+		return array($objectId, $version, $subType, $isAsset, $entryId);
+	}
+	
 	private function getObject($objectId, $isAsset)
 	{
 		if($isAsset)
@@ -118,19 +141,65 @@ class serveIsmAction extends sfAction
 			if (is_null($flavorAsset))
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				
-			$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-			if (is_null($entry))
+			$this->entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+			if (is_null($this->entry))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 				
 			return $flavorAsset;
 		}	
 		else
 		{
-			$entry = entryPeer::retrieveByPK($objectId);
-			if (is_null($entry))
+			$this->entry = entryPeer::retrieveByPK($objectId);
+			if (is_null($this->entry))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 				
-				return $entry;
+				return $this->entry;
 		}				
+	}
+	
+	private function fixIsmManifestForReplacedEntry($path)
+	{
+		$fileData = file_get_contents($path);
+		$xml = new SimpleXMLElement($fileData);
+		$ismcFileName = $xml->head->meta['content'];
+		list($ismcObjectId, $version, $subType, $isAsset, $entryId) = $this->parseObjectId($ismcFileName);
+		
+		if($entryId != $this->entry->getId())
+		{
+			//replacement flow
+			$flavorAssets = assetPeer::retrieveByEntryIdAndStatus($this->entry->getId(), asset::ASSET_STATUS_READY);
+			foreach ($flavorAssets as $asset) 
+			{
+				if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
+				{
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, 'ismc');
+					if($replacingFileName && $fileName)
+						$fileData = str_replace("content=\"$replacingFileName\"", "content=\"$fileName\"", $fileData);			
+				}
+				else
+				{
+					list($replacingFileName, $fileName) = $this->getReplacedAndReplacingFileNames($asset, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, 'ismv');
+					if($replacingFileName && $fileName)					
+						$fileData = str_replace("src=\"$replacingFileName\"", "src=\"$fileName\"", $fileData);
+				}
+			}			
+			return $fileData;
+		}
+		else
+			return $fileData;	
+	}
+	
+	private function getReplacedAndReplacingFileNames($asset, $fileSyncObjectSubType, $fileExt)
+	{
+		$replacingFileName = null;
+		$fileName = null;
+		$syncKey = $asset->getSyncKey($fileSyncObjectSubType);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
+		if($fileSync)			
+		{
+			$replacingFileName = basename($fileSync->getFilePath());
+			$fileName = $asset->getEntryId().'_'.$asset->getId().'_'.$fileSync->getVersion().'.'.$fileExt;
+		}
+		return array($replacingFileName, $fileName);
 	}
 }
