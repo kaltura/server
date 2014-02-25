@@ -280,7 +280,7 @@ class myPartnerUtils
 		
 		if ( !$partner ) 
 			return array ( false , null );
-		if( !$partner->getUrl2() ) 
+		if( !$partner->getNotificationUrl() ) 
 			return array ( false , null );
 		
 		return array ( $partner->getNotify() , $partner->getNotificationsConfig() ) ;
