@@ -35,6 +35,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaMediaServerIndex $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration
+	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
@@ -44,6 +45,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$currentDuration = $dbEntry->getLengthInMsecs();
+		if(!$currentDuration)
+			$currentDuration = 0;
+			
+		$currentDuration += $duration;
+		$dbEntry->setLengthInMsecs($currentDuration);
+		$dbEntry->save();
+			
 		$kResource = $resource->toObject();
 		$target = $kResource->getLocalFilePath();
 		if (!($resource instanceof KalturaServerFileResource))
@@ -53,7 +62,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($target, kConf::get('content_group'));
 			chmod($target, 0640);
 		}
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $target, $duration);
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $target, $currentDuration);
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		return $entry;
 	}
 
 	/**
