@@ -47,6 +47,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	{
 		$map = array(
 			'cuePoint' => 'CuePointService',
+			'liveCuePoint' => 'LiveCuePointService',
 		);
 		return $map;
 	}
