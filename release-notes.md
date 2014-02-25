@@ -14,7 +14,9 @@ moduls.categoryLimit.permissionName = FEATURE_DISABLE_CATEGORY_LIMIT
 moduls.categoryLimit.basePermissionType =
 moduls.categoryLimit.basePermissionName =
 moduls.categoryLimit.group = GROUP_ENABLE_DISABLE_FEATURES
- 
+
+access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
+
 - update batch.ini
 add 
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
