@@ -42,9 +42,10 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
 - /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
 
 ## New FFMpeg 2.1.3##
-The limitation will be removed for partners that have a Disable Category Limit feature enabled.
-
-*Configuration Changes*
+ *Binaries*
+  - Linux
+ -- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+ -- -The ffmpeg-aux remains unchanged.
 
 
 ----------
