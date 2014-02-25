@@ -196,6 +196,23 @@ class asset extends Baseasset implements ISyncableFile
 	}
 
 	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseAsset#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		$status = $this->getStatus();
+
+		$ret = parent::postInsert( $con );
+		
+		if ( $status == flavorAsset::ASSET_STATUS_READY )
+		{
+			$this->onAssetModified( $con );
+		}
+		
+		return $ret;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseflavorAsset#postUpdate()
 	 */
 	public function postUpdate(PropelPDO $con = null)
@@ -203,6 +220,18 @@ class asset extends Baseasset implements ISyncableFile
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
+		$statusChangedToReady = false;
+		if ( $this->isColumnModified(assetPeer::STATUS) && ($this->getStatus() == self::FLAVOR_ASSET_STATUS_READY) )
+		{
+			$statusChangedToReady = true;
+		}
+		
+		$versionModified = false;
+		if ( $this->isColumnModified(assetPeer::VERSION ) )
+		{
+			$versionModified = true;
+		}
+
 		$objectDeleted = false;
 		if(
 			($this->isColumnModified(assetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
@@ -216,9 +245,24 @@ class asset extends Baseasset implements ISyncableFile
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
+		if ( $statusChangedToReady || $versionModified || $objectDeleted )
+		{
+			$this->onAssetModified( $con );
+		}
+		
 		return $ret;
 	}
-	
+
+	/**
+	 * Notify the associated entry that an asset was modified
+	 */	
+	protected function onAssetModified( PropelPDO $con = null )
+	{
+		$entry = $this->getentry( $con );
+		$entry->onAssetModified();
+		$entry->save( $con );
+	}
+		
 	public function incrementVersion()
 	{
 		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
