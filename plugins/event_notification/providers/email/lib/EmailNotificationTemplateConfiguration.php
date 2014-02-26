@@ -87,7 +87,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			return;
 		
 		
-		if (!$object->to || $object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
+		if (!$object->to || ($object->to instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider &&  $object->to->emailRecipients[0] &&  get_class($object->to->emailRecipients[0]->email) == 'Kaltura_Client_Type_StringValue'))
 		{
 			$to = null;	
 			if($object->to)
@@ -122,7 +122,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			));
 		}
 		
-		if(!$object->cc || $object->cc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider)
+		if(!$object->cc || ($object->cc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider &&  $object->cc->emailRecipients[0] &&  get_class($object->cc->emailRecipients[0]->email) == 'Kaltura_Client_Type_StringValue'))
 		{	
 			$cc = null;
 			if($object->cc)
