@@ -990,7 +990,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	/**
 	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
 	 */
-	public function onAssetModified()
+	public function onAssetContentModified()
 	{
 		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
 		$this->setAssetCacheVersion($assetCacheVersion);
