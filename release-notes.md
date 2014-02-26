@@ -41,6 +41,12 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
 *Migration*
 - /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
 
+## New FFMpeg 2.1.3##
+ *Binaries*
+  - Linux
+ -- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+ -- -The ffmpeg-aux remains unchanged.
+
 ## Allow "View History" for any Admin Console users ##
 The monitor's View History permission is lowered from System Admin user to any Admin Console user.      
 
