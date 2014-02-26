@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS delivery;
-CREATE TABLE delivery
+DROP TABLE IF EXISTS delivery_profile;
+CREATE TABLE delivery_profile
 (
         id BIGINT  NOT NULL AUTO_INCREMENT,
         partner_id INTEGER,
@@ -17,7 +17,6 @@ CREATE TABLE delivery
 		media_protocols VARCHAR(255),
 		streamer_type VARCHAR(30),
 		is_default tinyint(4),
-		is_secure tinyint(4),
 		parent_id bigint(20),
 		custom_data text,
         PRIMARY KEY (id),

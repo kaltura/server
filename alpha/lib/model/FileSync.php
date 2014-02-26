@@ -69,7 +69,7 @@ class FileSync extends BaseFileSync
 		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 			
-		$urlManager = DeliveryPeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId);
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId);
 		$url = $urlManager->getFileSyncUrl($this);
 		
 		if ($format == PlaybackProtocol::RTMP)

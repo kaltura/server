@@ -542,7 +542,7 @@ class KalturaSyndicationFeedRenderer
 		if(!$storage)
 			return null;
 			
-		$urlManager = DeliveryPeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId());
 		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
@@ -578,7 +578,7 @@ class KalturaSyndicationFeedRenderer
 		
 		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId);
 		
-		$urlManager = DeliveryPeer::getLocalDeliveryByPartner($flavorAsset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($flavorAsset->getEntryId());
 		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{

@@ -4,27 +4,27 @@
  * @package api
  * @subpackage objects.factory
  */
-class KalturaDeliveryFactory {
+class KalturaDeliveryProfileFactory {
 	
-	public static function getCoreDeliveryInstanceByType($type) {
-		$class = DeliveryPeer::getClassByDeliveryType($type);
+	public static function getCoreDeliveryProfileInstanceByType($type) {
+		$class = DeliveryProfilePeer::getClassByDeliveryProfileType($type);
 		return new $class();
 	}
 	
-	public static function getDeliveryInstanceByType($type) {
+	public static function getDeliveryProfileInstanceByType($type) {
 		switch ($type) {
-			case DeliveryType::GENERIC_HLS:
-				return new KalturaDeliveryGenericAppleHttp();
-			case KalturaDeliveryType::GENERIC_HDS:
-				return new KalturaDeliveryGenericHds();
-			case KalturaDeliveryType::GENERIC_HTTP:
-					return new KalturaDeliveryGenericHttp();
-			case KalturaDeliveryType::RTMP:
-				return new KalturaDeliveryRtmp();
-			case KalturaDeliveryType::AKAMAI_HTTP:
-				return new KalturaDeliveryAkamaiHttp();
+			case KalturaDeliveryProfileType::GENERIC_HLS:
+				return new KalturaDeliveryProfileGenericAppleHttp();
+			case KalturaDeliveryProfileType::GENERIC_HDS:
+				return new KalturaDeliveryProfileGenericHds();
+			case KalturaDeliveryProfileType::GENERIC_HTTP:
+					return new KalturaDeliveryProfileGenericHttp();
+			case KalturaDeliveryProfileType::RTMP:
+				return new KalturaDeliveryProfileRtmp();
+			case KalturaDeliveryProfileType::AKAMAI_HTTP:
+				return new KalturaDeliveryProfileAkamaiHttp();
 			default:
-				return new KalturaDelivery();
+				return new KalturaDeliveryProfile();
 		}
 	}
 	

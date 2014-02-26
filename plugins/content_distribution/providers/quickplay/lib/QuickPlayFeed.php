@@ -270,7 +270,7 @@ class QuickPlayFeed
 	{
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = DeliveryPeer::getLocalDeliveryByPartner($asset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($asset->getEntryId());
 		$url = $urlManager->getAssetUrl($asset);
 		$url = $cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);

@@ -106,7 +106,7 @@ class playManifestAction extends kalturaAction
 	private $duration = null;
 	
 	/**
-	 * @var DeliveryDynamicAttributes
+	 * @var DeliveryProfileDynamicAttributes
 	 */
 	private $deliveryAttributes = null;
 	
@@ -604,11 +604,11 @@ class playManifestAction extends kalturaAction
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
-			$this->urlManager = DeliveryPeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, $this->deliveryAttributes->getFormat());
+			$this->urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, $this->deliveryAttributes->getFormat());
 			return;
 		}
 		
-		$this->urlManager = DeliveryPeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat());
+		$this->urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), $this->protocol);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -639,11 +639,17 @@ class playManifestAction extends kalturaAction
 		
 		$this->initStorageProfile();
 		
-		KalturaLog::err("@_!! Format " . $this->deliveryAttributes->getFormat());
-		if($this->deliveryAttributes->getFormat() == self::URL)
+		$serveUrl = false;
+		if($this->deliveryAttributes->getFormat() == self::URL) {
+			$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
+			$serveUrl = true;
+		}
 		
 		$this->initUrlManager();
+		
+		if($serveUrl)
+			$this->deliveryAttributes->setFormat(self::URL);
 		
 		$this->enforceAudioVideoEntry();
 		
@@ -687,7 +693,8 @@ class playManifestAction extends kalturaAction
 		
 		$baseUrl = $this->getLiveEntryBaseUrl();
 			
-		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
+		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
+		// TODO @_!! Should be selected by host	
 		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
 		
 		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);
@@ -740,7 +747,7 @@ class playManifestAction extends kalturaAction
 	
 	public function execute()
 	{
-		$this->deliveryAttributes = new DeliveryDynamicAttributes();
+		$this->deliveryAttributes = new DeliveryProfileDynamicAttributes();
 		// Parse input parameters
 		$this->deliveryAttributes->setSeekFromTime($this->getRequestParameter ( "seekFrom" , -1));
 		if ($this->deliveryAttributes->getSeekFromTime() <= 0)

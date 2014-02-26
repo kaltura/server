@@ -1709,7 +1709,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_priority" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="integer" />
 	</table>
-	<table skipSql="false" abstract="false" name="delivery_profile" phpName="Delivery">
+	<table skipSql="false" abstract="false" name="delivery_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
@@ -1721,7 +1721,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="url" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_default" type="boolean" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_secure" type="boolean" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recognizer" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tokenizer" type="longvarchar" />
