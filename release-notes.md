@@ -14,7 +14,7 @@ moduls.categoryLimit.permissionName = FEATURE_DISABLE_CATEGORY_LIMIT
 moduls.categoryLimit.basePermissionType =
 moduls.categoryLimit.basePermissionName =
 moduls.categoryLimit.group = GROUP_ENABLE_DISABLE_FEATURES
- 
+
 - update batch.ini
 add 
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
@@ -47,6 +47,11 @@ scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexE
  -- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
  -- -The ffmpeg-aux remains unchanged.
 
+## Allow "View History" for any Admin Console users ##
+The monitor's View History permission is lowered from System Admin user to any Admin Console user.      
+
+- update admin.ini:
+<br>access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
 
 ----------
 

@@ -534,6 +534,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$configureAccountsGroup = array('groupAssociation'); // EAGLE PRD group 3
 		$configureAccountPackagesService = array('accountPackagesService'); // EAGLE PRD group 4
 		$configureAccountsOptionsMonitorUsage = array('accountOptionsMonitorUsage'); // EAGLE PRD group 5
+		$configureAccountsOptionsMonitorView = array('accountOptionsMonitorView');
 		$configureAccountsOptions = array('accountPackages','accountOptions','includedUsage', 'includedUsageSecondPart', 'enableDisableFeatures'); // EAGLE PRD group 6
 		$configureKmcUsers = array('configureKmcUsers');
 		
@@ -559,6 +560,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-usage'))){
 			$this->setPermissionGroupElementsToDisabled($configureAccountsOptionsMonitorUsage);
+		}
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-view'))){
+			$this->setPermissionGroupElementsToDisabled($configureAccountsOptionsMonitorView);
 		}
 		
 	}
@@ -768,7 +772,8 @@ class Form_PartnerConfiguration extends Infra_Form
 									 'passwordSecurity', array('legend' => 'Password Security'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
-		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason', 'monitor_usage_history'), 'accountOptionsMonitorUsage', array('legend' => 'New Account Options'));
+		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
+		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason'), 'accountOptionsMonitorUsage');
 		$this->addDisplayGroup(array('is_first_login','crossLine'), 'accountOptions');
 				
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',
