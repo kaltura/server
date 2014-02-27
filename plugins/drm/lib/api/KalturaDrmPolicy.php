@@ -8,7 +8,6 @@ class KalturaDrmPolicy extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in,order
 	 */
 	public $id;
 	
@@ -21,13 +20,13 @@ class KalturaDrmPolicy extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
-	 * @filter like,order
+	 * @filter like
 	 */
 	public $name;
 	
 	/**
 	 * @var string
-	 * @filter like,order
+	 * @filter like
 	 */
 	public $systemName;
 	
@@ -42,12 +41,6 @@ class KalturaDrmPolicy extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 */
 	public $provider;
-
-	/**
-	 * @var int
-	 * @filter eq,in
-	 */
-	public $profileId;
 	
 	/**
 	 * @var KalturaDrmPolicyStatus
@@ -99,7 +92,6 @@ class KalturaDrmPolicy extends KalturaObject implements IFilterable
 		'systemName',
 		'description',
 		'provider',
-		'profileId',
 		'status',
 		'scenario',
 		'licenseType',

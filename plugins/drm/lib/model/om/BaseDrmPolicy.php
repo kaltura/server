@@ -32,12 +32,6 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 	protected $partner_id;
 
 	/**
-	 * The value for the profile_id field.
-	 * @var        int
-	 */
-	protected $profile_id;
-
-	/**
 	 * The value for the name field.
 	 * @var        string
 	 */
@@ -194,16 +188,6 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 	public function getPartnerId()
 	{
 		return $this->partner_id;
-	}
-
-	/**
-	 * Get the [profile_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getProfileId()
-	{
-		return $this->profile_id;
 	}
 
 	/**
@@ -431,29 +415,6 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setPartnerId()
-
-	/**
-	 * Set the value of [profile_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     DrmPolicy The current object (for fluent API support)
-	 */
-	public function setProfileId($v)
-	{
-		if(!isset($this->oldColumnsValues[DrmPolicyPeer::PROFILE_ID]))
-			$this->oldColumnsValues[DrmPolicyPeer::PROFILE_ID] = $this->profile_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->profile_id !== $v) {
-			$this->profile_id = $v;
-			$this->modifiedColumns[] = DrmPolicyPeer::PROFILE_ID;
-		}
-
-		return $this;
-	} // setProfileId()
 
 	/**
 	 * Set the value of [name] column.
@@ -818,19 +779,18 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->profile_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->system_name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->description = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->provider = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->scenario = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->license_type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->license_expiration_policy = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->duration = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->custom_data = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->system_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->description = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->provider = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->scenario = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->license_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->license_expiration_policy = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->duration = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -840,7 +800,7 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 15; // 15 = DrmPolicyPeer::NUM_COLUMNS - DrmPolicyPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = DrmPolicyPeer::NUM_COLUMNS - DrmPolicyPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DrmPolicy object", $e);
@@ -1339,42 +1299,39 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 				return $this->getPartnerId();
 				break;
 			case 2:
-				return $this->getProfileId();
-				break;
-			case 3:
 				return $this->getName();
 				break;
-			case 4:
+			case 3:
 				return $this->getSystemName();
 				break;
-			case 5:
+			case 4:
 				return $this->getDescription();
 				break;
-			case 6:
+			case 5:
 				return $this->getProvider();
 				break;
-			case 7:
+			case 6:
 				return $this->getStatus();
 				break;
-			case 8:
+			case 7:
 				return $this->getScenario();
 				break;
-			case 9:
+			case 8:
 				return $this->getLicenseType();
 				break;
-			case 10:
+			case 9:
 				return $this->getLicenseExpirationPolicy();
 				break;
-			case 11:
+			case 10:
 				return $this->getDuration();
 				break;
-			case 12:
+			case 11:
 				return $this->getCreatedAt();
 				break;
-			case 13:
+			case 12:
 				return $this->getUpdatedAt();
 				break;
-			case 14:
+			case 13:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1400,19 +1357,18 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getPartnerId(),
-			$keys[2] => $this->getProfileId(),
-			$keys[3] => $this->getName(),
-			$keys[4] => $this->getSystemName(),
-			$keys[5] => $this->getDescription(),
-			$keys[6] => $this->getProvider(),
-			$keys[7] => $this->getStatus(),
-			$keys[8] => $this->getScenario(),
-			$keys[9] => $this->getLicenseType(),
-			$keys[10] => $this->getLicenseExpirationPolicy(),
-			$keys[11] => $this->getDuration(),
-			$keys[12] => $this->getCreatedAt(),
-			$keys[13] => $this->getUpdatedAt(),
-			$keys[14] => $this->getCustomData(),
+			$keys[2] => $this->getName(),
+			$keys[3] => $this->getSystemName(),
+			$keys[4] => $this->getDescription(),
+			$keys[5] => $this->getProvider(),
+			$keys[6] => $this->getStatus(),
+			$keys[7] => $this->getScenario(),
+			$keys[8] => $this->getLicenseType(),
+			$keys[9] => $this->getLicenseExpirationPolicy(),
+			$keys[10] => $this->getDuration(),
+			$keys[11] => $this->getCreatedAt(),
+			$keys[12] => $this->getUpdatedAt(),
+			$keys[13] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1451,42 +1407,39 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 				$this->setPartnerId($value);
 				break;
 			case 2:
-				$this->setProfileId($value);
-				break;
-			case 3:
 				$this->setName($value);
 				break;
-			case 4:
+			case 3:
 				$this->setSystemName($value);
 				break;
-			case 5:
+			case 4:
 				$this->setDescription($value);
 				break;
-			case 6:
+			case 5:
 				$this->setProvider($value);
 				break;
-			case 7:
+			case 6:
 				$this->setStatus($value);
 				break;
-			case 8:
+			case 7:
 				$this->setScenario($value);
 				break;
-			case 9:
+			case 8:
 				$this->setLicenseType($value);
 				break;
-			case 10:
+			case 9:
 				$this->setLicenseExpirationPolicy($value);
 				break;
-			case 11:
+			case 10:
 				$this->setDuration($value);
 				break;
-			case 12:
+			case 11:
 				$this->setCreatedAt($value);
 				break;
-			case 13:
+			case 12:
 				$this->setUpdatedAt($value);
 				break;
-			case 14:
+			case 13:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1515,19 +1468,18 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setProfileId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setSystemName($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setDescription($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setProvider($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setScenario($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setLicenseType($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setLicenseExpirationPolicy($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setDuration($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setCustomData($arr[$keys[14]]);
+		if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setSystemName($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setProvider($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setScenario($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setLicenseType($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setLicenseExpirationPolicy($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDuration($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
 	}
 
 	/**
@@ -1541,7 +1493,6 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 
 		if ($this->isColumnModified(DrmPolicyPeer::ID)) $criteria->add(DrmPolicyPeer::ID, $this->id);
 		if ($this->isColumnModified(DrmPolicyPeer::PARTNER_ID)) $criteria->add(DrmPolicyPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(DrmPolicyPeer::PROFILE_ID)) $criteria->add(DrmPolicyPeer::PROFILE_ID, $this->profile_id);
 		if ($this->isColumnModified(DrmPolicyPeer::NAME)) $criteria->add(DrmPolicyPeer::NAME, $this->name);
 		if ($this->isColumnModified(DrmPolicyPeer::SYSTEM_NAME)) $criteria->add(DrmPolicyPeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(DrmPolicyPeer::DESCRIPTION)) $criteria->add(DrmPolicyPeer::DESCRIPTION, $this->description);
@@ -1633,8 +1584,6 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 	{
 
 		$copyObj->setPartnerId($this->partner_id);
-
-		$copyObj->setProfileId($this->profile_id);
 
 		$copyObj->setName($this->name);
 
