@@ -348,8 +348,11 @@ class kUrlManager
 		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost";
 		if($this->storageProfileId)
 			$url .= "/storageId/$this->storageProfileId";
-		
-		$url .= "?clientTag=$clientTag";
+				
+		$ext = '';
+		if ($asset && $asset->getFileExt())   
+			$ext ='/a.' .  $asset->getFileExt();
+		$url .= $ext . "?clientTag=$clientTag";
 		
 		return $url;
 	}
