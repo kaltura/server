@@ -143,6 +143,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     //parse the class properties
     foreach($classNode->children() as $classProperty) {
       $propType = $classProperty->attributes()->type;
+			$propType = $this->getJSType($propType);
       $propName = $classProperty->attributes()->name;
       $description = str_replace("\n", "\n *  ", $classProperty->attributes()->description); // to format multi-line descriptions
       $vardesc = " * @param  $propName  $propType    $description";
@@ -175,6 +176,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
   protected function writeService(SimpleXMLElement $serviceNodes)
   {
     $serviceName = $serviceNodes->attributes()->name;
+    $serviceId = $serviceNodes->attributes()->id;
     $serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
     $serviceClass = "function $serviceClassName(client){\n";
     $serviceClass .= "  $serviceClassName.super_.call(this);\n";
@@ -203,6 +205,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
       foreach($action->children() as $actionParam) {
         if($actionParam->getName() == "param" ) {
           $paramType = $actionParam->attributes()->type;
+          $paramType = $this->getJSType($paramType);
           $paramName = $actionParam->attributes()->name;
           $optionalp = (boolean)$actionParam->attributes()->optional;
           $defaultValue = trim($actionParam->attributes()->default);
@@ -238,7 +241,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
       $paramNames = join(', ', $paramNames);
       
       // action method signature
-      if (in_array($actionName, array("list", "clone", "delete"))) // because list & clone are preserved in PHP
+      if (in_array($actionName, array("list", "clone", "delete", "export"))) // because list & clone are preserved in PHP
         $actionSignature = "$serviceClassName.prototype.".$actionName."Action = function($paramNames)";
       else
         $actionSignature = "$serviceClassName.prototype.".$actionName." = function($paramNames)";
@@ -258,6 +261,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
           case "string":
           case "float":
           case "int":
+          case "bigint":
           case "bool":
           case "array":
             $defaultValue = strtolower($actionParam->attributes()->default);
@@ -295,6 +299,7 @@ class NodeClientGenerator extends ClientGeneratorFromXml
           case "string":
           case "float":
           case "int":
+          case "bigint":
           case "bool":
             $actionClass .= "  this.client.addParam(kparams, \"$paramName\", $paramName);\n";
             break;
@@ -322,9 +327,9 @@ class NodeClientGenerator extends ClientGeneratorFromXml
         }
       }
       if ($haveFiles)
-        $actionClass .= "  this.client.queueServiceActionCall(\"$serviceName\", \"$actionName\", kparams, kfiles);\n";
+        $actionClass .= "  this.client.queueServiceActionCall(\"$serviceId\", \"$actionName\", kparams, kfiles);\n";
       else
-        $actionClass .= "  this.client.queueServiceActionCall(\"$serviceName\", \"$actionName\", kparams);\n";
+        $actionClass .= "  this.client.queueServiceActionCall(\"$serviceId\", \"$actionName\", kparams);\n";
       $actionClass .= "  if (!this.client.isMultiRequest())\n";
       $actionClass .= "    this.client.doQueue(callback);\n";
       $actionClass .= "};";
@@ -402,4 +407,16 @@ class NodeClientGenerator extends ClientGeneratorFromXml
     //to add a new file, use: $this->addFile('path to new file', 'file contents');
     //echo "Create Project File.\n";
   }
+	
+	public function getJSType($propType)
+	{		
+		switch ($propType) 
+		{	
+			case "bigint" :
+				return "int";
+				
+			default :
+				return $propType;
+		}
+	}
 }
