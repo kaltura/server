@@ -2948,8 +2948,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getSearchProviderType()
 	{
-		if (self::isSearchProviderSource($this->getSource()))
-			return (string)$this->getSource();
+		$sourceValue = $this->getSource();
+		
+		if(is_null($sourceValue))
+			return null;
+		
+		if (self::isSearchProviderSource($sourceValue))
+			return (string)$sourceValue;
 	
 		return null;
 	}
