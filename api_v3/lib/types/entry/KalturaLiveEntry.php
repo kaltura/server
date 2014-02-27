@@ -50,7 +50,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	/**
 	 * Flag denoting whether entry should be published by the media server
 	 * 
-	 * @var bool
+	 * @var KalturaLivePublishStatus
 	 * @requiresPermission all
 	 */
 	public $pushPublishEnabled;
