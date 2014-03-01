@@ -1485,34 +1485,34 @@ class kFlowHelper
 		if($data->getCreateThumb())
 		{
 			$errorCounter = 0;
-        	$finishThumbCreation = false ;
-        	while (!$finishThumbCreation )
-        	{
-        		try
-        		{
-        			self::createThumbnail($dbBatchJob, $data);
-        		    $finishThumbCreation = true;
-        		}
-        		catch (Exception $e)
-        		{
-        			KalturaLog::err($e->getMessage());
-        			$errorCounter++;
+			$finishThumbCreation = false ;
+			while (!$finishThumbCreation )
+			{
+				try
+				{
+					self::createThumbnail($dbBatchJob, $data);
+					$finishThumbCreation = true;
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err($e->getMessage());
+					$errorCounter++;
 
-	        		$isFileSyncInsertError = strpos($e->getMessage() , 'execute INSERT statement');
-	        	    if ($isFileSyncInsertError)
-	        	    {
-	        	    	$sleepTime = rand (0,self::POST_CONVET_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
-	        	        KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
-	        	        usleep($sleepTime);
-	        	    }
+					$isFileSyncInsertError = strpos($e->getMessage() , 'execute INSERT statement');
+					if ($isFileSyncInsertError)
+					{
+						$sleepTime = rand (0,self::POST_CONVET_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
+						KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
+						usleep($sleepTime);
+					}
 
-	        	    if (!$isFileSyncInsertError || $errorCounter == self::POST_CONVET_THUMBNAIL_CREATION_ITERATION_AMMOUNT)
-	        	    {
-        	    		$dbBatchJob->reload();
-        	    		return $dbBatchJob;
-        	    	}
-        		}
-            }
+					if (!$isFileSyncInsertError || $errorCounter == self::POST_CONVET_THUMBNAIL_CREATION_ITERATION_AMMOUNT)
+					{
+						$dbBatchJob->reload();
+						return $dbBatchJob;
+					}
+				}
+			}
 		}
 
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
