@@ -10,6 +10,8 @@ class KalturaErrors extends APIErrors
 	 *
 	 */
 
+	const FLAVOR_ASSET_EXPORT_FAILED = "FLAVOR_ASSET_EXPORT_FAILED;; Flavor asset export failed";
+	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
 

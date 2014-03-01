@@ -13,6 +13,10 @@ class kFlowHelper
 	);
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
+	const POST_CONVET_THUMBNAIL_CREATION_ITERATION_AMMOUNT = 5;
+	
+	const POST_CONVET_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR = 3000;
+	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
 	/**
@@ -1485,21 +1489,35 @@ class kFlowHelper
 
 		if($data->getCreateThumb())
 		{
-			try
-			{
-				self::createThumbnail($dbBatchJob, $data);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::err($e->getMessage());
+			$errorCounter = 0;
+        	$finishThumbCreation = false ;
+        	while (!$finishThumbCreation )
+        	{
+        		try
+        		{
+        			self::createThumbnail($dbBatchJob, $data);
+        		    $finishThumbCreation = true;
+        		}
+        		catch (Exception $e)
+        		{
+        			KalturaLog::err($e->getMessage());
+        			$errorCounter++;
 
-				// sometimes, because of disc IO load, it takes long time for the thumb to be moved.
-				// in such cases, the entry thumb version may be increased by other process.
-				// retry the job, it solves the issue.
-				kJobsManager::retryJob($dbBatchJob->getId(), $dbBatchJob->getJobType(), true);
-				$dbBatchJob->reload();
-				return $dbBatchJob;
-			}
+	        		$isFileSyncInsertError = strpos($e->getMessage() , 'execute INSERT statement');
+	        	    if ($isFileSyncInsertError)
+	        	    {
+	        	    	$sleepTime = rand (0,self::POST_CONVET_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
+	        	        KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
+	        	        usleep($sleepTime);
+	        	    }
+
+	        	    if (!$isFileSyncInsertError || $errorCounter == self::POST_CONVET_THUMBNAIL_CREATION_ITERATION_AMMOUNT)
+	        	    {
+        	    		$dbBatchJob->reload();
+        	    		return $dbBatchJob;
+        	    	}
+        		}
+            }
 		}
 
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
