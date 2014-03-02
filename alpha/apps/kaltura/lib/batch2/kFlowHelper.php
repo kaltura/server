@@ -1486,13 +1486,13 @@ class kFlowHelper
 
 		if($data->getCreateThumb())
 		{
-			$thumbCreationSucces = false;
+			$thumbCreationSuccess = false;
 			for($errorCounter = 0; $errorCounter < self::POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT ; $errorCounter++)
 			{
 				try
 				{
 					self::createThumbnail($dbBatchJob, $data);
-					$thumbCreationSucces = true;
+					$thumbCreationSuccess = true;
 					break;
 				}
 				catch (Exception $e)
@@ -1509,7 +1509,7 @@ class kFlowHelper
 					$dbBatchJob->reload();
 				}
 			}
-			if(!$thumbCreationSucces)
+			if(!$thumbCreationSuccess)
 			{
 				$dbBatchJob->setDescription('failed to create thumbnail');
 				kJobsManager::updateBatchJob($dbBatchJob , BatchJob::BATCHJOB_STATUS_FAILED);
