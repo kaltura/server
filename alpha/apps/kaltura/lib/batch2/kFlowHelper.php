@@ -1499,14 +1499,16 @@ class kFlowHelper
 				{
 					KalturaLog::err($e->getMessage());
 
-					if($e->getCause() && $e->getCause()->getCode() != self::MYSQL_CODE_DUPLICATE_KEY)
+					if($e instanceof PropelException &&  $e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY)
+					{
+						$sleepTime = rand (100000 , self::POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
+						KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
+						usleep($sleepTime);
+
+						$dbBatchJob->reload();
+					}
+					else
 						break;
-
-					$sleepTime = rand (100000 , self::POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
-					KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
-					usleep($sleepTime);
-
-					$dbBatchJob->reload();
 				}
 			}
 			if(!$thumbCreationSuccess)
