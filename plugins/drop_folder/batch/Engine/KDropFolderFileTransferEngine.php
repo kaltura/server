@@ -4,7 +4,7 @@
  */
 class KDropFolderFileTransferEngine extends KDropFolderEngine
 {
-	const IGNORE_PATTERNS_DEFAULT_VALUE  = '*.cache,*.aspx';
+	const IGNORE_PATTERNS_DEFAULT_VALUE  = '*.cache,*.aspx,.,..';
 	
 	/**
 	 * @var kFileTransferMgr
