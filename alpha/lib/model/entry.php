@@ -2960,8 +2960,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 	
 	public function isSecuredEntry() {
-		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getPartnerId()))
-			return true;
 		
 		$invalidModerationStatuses = array(
 				entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,

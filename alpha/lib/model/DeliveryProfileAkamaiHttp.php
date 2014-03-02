@@ -16,8 +16,8 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
 			$url .= "/clipTo/" . $this->params->getClipTo();
-		if($this->params->getExtention())
-			$url .= "/name/a." . $this->params->getExtention();
+		if($this->params->getFileExtention())
+			$url .= "/name/a." . $this->params->getFileExtention();
 		if($this->params->getSeekFromTime() > 0)
 		{
 			$fromTime = floor($this->params->getSeekFromTime() / 1000);

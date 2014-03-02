@@ -3,7 +3,7 @@
 /**
  * delivery service is used to control delivery objects
  *
- * @service delivery
+ * @service deliveryProfile
  * @package api
  * @subpackage services
  */

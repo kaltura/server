@@ -34,11 +34,5 @@ class KalturaDeliveryProfileRtmp extends KalturaDeliveryProfile {
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function toObject($dbObject = null, $skip = array())
-	{
-		$this->type = KalturaDeliveryProfileType::RTMP;
-		return parent::toObject($dbObject, $skip);
-	}
-	
 }
 

@@ -79,6 +79,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	/**
 	 * the host part of the url
 	 * @var string
+	 * @readonly
 	 */
 	public $hostName;
 
@@ -105,13 +106,6 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	public $isDefault;
 
 	/**
-	 * True if this delivery is appropriate for protected entries (access control/entitlement)
-	 *
-	 * @var KalturaNullableBoolean
-	 */
-	public $isSecure;
-	
-	/**
 	 * the object from which this object was cloned (or 0)
 	 * @var int
 	 * @readonly
@@ -120,7 +114,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	
 	/**
 	 * Comma separated list of supported media protocols. f.i. rtmpe
-	 * @car string
+	 * @var string
 	 */
 	public $mediaProtocols;
 	
@@ -131,7 +125,6 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"hostName",
 			"id",
 			"isDefault",
-			"isSecure",
 			"name",
 			"parentId",
 			"partnerId",

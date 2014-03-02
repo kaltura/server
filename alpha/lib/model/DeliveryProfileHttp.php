@@ -30,7 +30,9 @@ class DeliveryProfileHttp extends DeliveryProfileVod {
 	{
 		// Work with response format instead.
 		if($this->params->getFormat() == 'url') {
-			$flavorInfo = $this->getFlavorHttpUrl(reset($this->flavorAssets));
+			$flavorAssets = $this->params->getFlavorAssets();
+			$flavorAsset = reset($flavorAssets);
+			$flavorInfo = $this->getFlavorHttpUrl($flavorAsset);
 			return $this->getRenderer(array($flavorInfo));
 		}
 	

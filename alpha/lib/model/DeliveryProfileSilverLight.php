@@ -1,6 +1,6 @@
 <?php
 
-class DeliveryProfileSilverLight extends DeliveryVod {
+class DeliveryProfileSilverLight extends DeliveryProfileVod {
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kSilverLightManifestRenderer';
 	

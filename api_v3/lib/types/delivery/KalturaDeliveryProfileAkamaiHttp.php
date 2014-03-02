@@ -23,12 +23,6 @@ class KalturaDeliveryProfileAkamaiHttp extends KalturaDeliveryProfile {
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function toObject($dbObject = null, $skip = array())
-	{
-		$this->type = KalturaDeliveryProfileType::AKAMAI_HTTP;
-		return parent::toObject($dbObject, $skip);
-	}
-	
 	public function fromObject($sourceObject) {
 		parent::fromObject($sourceObject);
 	}

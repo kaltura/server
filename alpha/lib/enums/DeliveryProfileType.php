@@ -13,7 +13,7 @@ interface DeliveryProfileType extends BaseEnum
 	const RTSP = 6;
 	const SILVER_LIGHT = 7;
 	
-	const AKAMAI_HLS_DIRECT = 11;
+	const AKAMAI_HLS_DIRECT = 10;
 	const AKAMAI_HLS_MANIFEST = 11;
 	const AKAMAI_HD = 12;
 	const AKAMAI_HDS = 13;

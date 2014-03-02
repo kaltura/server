@@ -48,7 +48,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 			$this->params->setFileExtention(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
 	}
 	
-	public function setDynamicAttribtues(DeliveryDynamicAttributes $params) {
+	public function setDynamicAttribtues(DeliveryProfileDynamicAttributes $params) {
 		$this->params->cloneAttributes($params);
 	}
 	// -------------------------------------
@@ -192,9 +192,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 			$delivery = @$_SERVER['HTTP_HOST'];
 		
 		$hosts = array();
-		if(!is_null($this->getRecognizer())) 
-			$hosts = explode(",", $this->getRecognizer()->getHosts());
-		
+		if(!is_null($this->getRecognizer())) {
+			$hostsList = $this->getRecognizer()->getHosts();
+			if(is_null($hostsList))
+				return false;
+			$hosts = explode(",",$hostsList );
+		}
+			
 		if (!in_array($delivery, $hosts))
 			return false;
 		

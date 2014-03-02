@@ -154,7 +154,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * --------------------*/
 	public function serve() {
 		$flavors = $this->buildFlavors();
-		$this->retrieveRenderer($flavors);
+		return $this->retrieveRenderer($flavors);
 	}
 	
 	/**
@@ -199,7 +199,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
 				$urlPrefix = requestUtils::getRequestHost();
 			else
-				$urlPrefix = $this->host_name;
+				$urlPrefix = $this->url;
 		}
 	
 		$urlPrefix = preg_replace('/^https?:\/\//', '', $urlPrefix);

@@ -488,6 +488,9 @@ class asset extends Baseasset implements ISyncableFile
 		if(!entry)
 			return true;
 		
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getPartnerId()))
+			return true;
+		
 		return $entry->isSecuredEntry();
 	}
 	

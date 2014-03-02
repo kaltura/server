@@ -98,12 +98,19 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
 		
 		$deliveries = array();
-		
 		$entry = entryPeer::retrieveByPK($entryId);
-		$isSecured = $entry->isSecuredEntry();
-		
 		$partnerId = $entry->getPartnerId();
-		$partner = PartnerPeer::retrieveByPK($partnerId);		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$ks = kCurrentContext::$ks;
+		
+		$isSecured = false;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
+				($partner->getDefaultEntitlementEnforcement() || ($ks && $ks->getEnableEntitlement())))
+			$isSecured = true;
+		if(!isSecured) 
+			$isSecured = $entry->isSecuredEntry();
+		
+			
 		$deliveryIds = $partner->getDeliveryIds();
 		
 		// if the partner has an override for the required format on the partner object - use that
