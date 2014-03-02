@@ -13,9 +13,11 @@ class kFlowHelper
 	);
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
-	const POST_CONVET_THUMBNAIL_CREATION_ITERATION_AMMOUNT = 5;
+	const POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT = 5;
 	
-	const POST_CONVET_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR = 3000;
+	const POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR = 300000;
+	
+	const MYSQL_CODE_DUPLICATE_KEY = 23000;
 	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
@@ -1484,34 +1486,34 @@ class kFlowHelper
 
 		if($data->getCreateThumb())
 		{
-			$errorCounter = 0;
-			$finishThumbCreation = false ;
-			while (!$finishThumbCreation )
+			$thumbCreationSucces = false;
+			for($errorCounter = 0; $errorCounter < self::POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT ; $errorCounter++)
 			{
 				try
 				{
 					self::createThumbnail($dbBatchJob, $data);
-					$finishThumbCreation = true;
+					$thumbCreationSucces = true;
+					break;
 				}
 				catch (Exception $e)
 				{
 					KalturaLog::err($e->getMessage());
-					$errorCounter++;
 
-					$isFileSyncInsertError = strpos($e->getMessage() , 'execute INSERT statement');
-					if ($isFileSyncInsertError)
-					{
-						$sleepTime = rand (0,self::POST_CONVET_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
-						KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
-						usleep($sleepTime);
-					}
+					if($e->getCause() && $e->getCause()->getCode() != self::MYSQL_CODE_DUPLICATE_KEY)
+						break;
 
-					if (!$isFileSyncInsertError || $errorCounter == self::POST_CONVET_THUMBNAIL_CREATION_ITERATION_AMMOUNT)
-					{
-						$dbBatchJob->reload();
-						return $dbBatchJob;
-					}
+					$sleepTime = rand (100000 , self::POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
+					KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
+					usleep($sleepTime);
+
+					$dbBatchJob->reload();
 				}
+			}
+			if(!$thumbCreationSucces)
+			{
+				$dbBatchJob->setDescription('failed to create thumbnail');
+				kJobsManager::updateBatchJob($dbBatchJob , BatchJob::BATCHJOB_STATUS_FAILED);
+				return $dbBatchJob;
 			}
 		}
 
