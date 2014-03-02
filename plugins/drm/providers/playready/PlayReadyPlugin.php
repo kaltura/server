@@ -2,10 +2,11 @@
 /**
  * @package plugins.playReady
  */
-class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaConfigurator
+class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaServices , IKalturaPermissionsEnabler, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaPending, IKalturaApplicationPartialView, IKalturaConfigurator, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'playReady';
 	const SEARCH_DATA_SUFFIX = 's';
+	const PLAY_READY_EVENTS_CONSUMER = 'kPlayReadyEventsConsumer';
 	
 	const ENTRY_CUSTOM_DATA_PLAY_READY_KEY_ID = 'play_ready_key_id';
 	const PLAY_READY_TAG = 'playready';
@@ -189,6 +190,16 @@ class PlayReadyPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalt
 		if(!$partner)
 			return false;
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);			
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::PLAY_READY_EVENTS_CONSUMER,
+		);
 	}
 	
 	public static function getPlayReadyKeyIdSearchData($keyId)
