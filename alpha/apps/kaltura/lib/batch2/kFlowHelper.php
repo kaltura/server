@@ -1509,8 +1509,6 @@ class kFlowHelper
 						$sleepTime = rand (100000 , self::POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
 						KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
 						usleep($sleepTime);
-
-						$dbBatchJob->reload();
 					}
 					else
 						break;
@@ -1518,6 +1516,7 @@ class kFlowHelper
 			}
 			if(!$thumbCreationSuccess)
 			{
+				$dbBatchJob->reload();
 				$dbBatchJob->setDescription('failed to create thumbnail');
 				kJobsManager::updateBatchJob($dbBatchJob , BatchJob::BATCHJOB_STATUS_FAILED);
 				return $dbBatchJob;
