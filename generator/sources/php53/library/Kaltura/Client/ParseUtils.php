@@ -68,7 +68,7 @@ class ParseUtils
 
 	public static function checkIfError(\SimpleXMLElement $xml, $throwException = true) 
 	{
-		if($xml->error)
+		if(($xml->error) && (count($xml->children()) == 1))
 		{
 			$code = "{$xml->error->code}";
 			$message = "{$xml->error->message}";
