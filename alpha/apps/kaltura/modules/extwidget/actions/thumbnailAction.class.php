@@ -264,7 +264,7 @@ class thumbnailAction extends sfAction
 		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
 		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
 		{
-			if ($partner->getEnabledService(PermissionName::FEATURE_DISALLOW_FRAME_CAPTURE))
+			if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
 			{
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
