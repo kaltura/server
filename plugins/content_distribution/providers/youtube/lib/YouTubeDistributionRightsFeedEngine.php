@@ -181,6 +181,8 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	{
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+		$captionAssetsids = $providerData->captionAssetIds;
+		
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
@@ -202,6 +204,8 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
 		}
+		
+		$this->addCaptions($providerData, $sftpManager);
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
@@ -244,7 +248,36 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
-
+	
+	protected function addCaptions(KalturaYouTubeDistributionJobProviderData $providerData, $sftpManager)
+	{
+		$assetIdsArray = explode ( ',', $providerData->captionAssetIds);
+		
+		if (empty($assetIdsArray)) 
+			return;
+			
+		$assets = assetPeer::retrieveByIds($assetIdsArray);
+		foreach ($assets as $asset)
+		{
+			$assetType = $asset->getType();
+			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ))
+			{
+				/* @var $asset CaptionAsset */
+				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				if(kFileSyncUtils::fileSync_exists($syncKey))
+				{
+			    	$captionFileUrl = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
+					if (file_exists($captionFileUrl))
+					{
+						$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFileUrl, PATHINFO_BASENAME);
+						$sftpManager->putFile($captionSFTPPath, $captionFileUrl);
+					}
+			    	break;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaYouTubeDistributionProfile $distributionProfile

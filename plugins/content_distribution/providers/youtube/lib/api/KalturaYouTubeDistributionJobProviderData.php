@@ -18,6 +18,11 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	/**
 	 * @var string
 	 */
+	public $captionAssetIds;
+	
+	/**
+	 * @var string
+	 */
 	public $sftpDirectory;
 	
 	/**
@@ -96,6 +101,9 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			    $this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
+		//Add caption Asset id's
+		$this->captionAssetIds = explode ( ',', $distributionJobData->entryDistribution->assetIds );
+		
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		if ($entryDistributionDb)
 			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
@@ -112,12 +120,13 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 			
 		$videoFilePath = $this->videoAssetFilePath;
 		$thumbnailFilePath = $this->thumbAssetFilePath;
+		$captionAssetIds = $this->captionAssetIds;
 
 		$feed = null;
 		$fieldValues = unserialize($this->fieldValues);
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath);
+			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
 			$this->submitXml = $feed->getXml();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
@@ -149,6 +158,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 	(
 		"videoAssetFilePath",
 		"thumbAssetFilePath",
+		"captionAssetIds",
 		"sftpDirectory",
 		"sftpMetadataFilename",
 		"currentPlaylists",
