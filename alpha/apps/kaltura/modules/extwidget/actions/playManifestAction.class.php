@@ -305,7 +305,7 @@ class playManifestAction extends kalturaAction
 		{
 			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted manifest request - forbidden');
-			if (strtolower($this->protocol) != 'https')
+			if (strtolower($this->deliveryAttributes->getMediaProtocol()) != 'https')
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
 		}
 	}
@@ -608,7 +608,7 @@ class playManifestAction extends kalturaAction
 			return;
 		}
 		
-		$this->urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), $this->protocol);
+		$this->urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -619,11 +619,11 @@ class playManifestAction extends kalturaAction
 		$this->initFlavorIds();
 				
 		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
-			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->deliveryAttributes->getMediaProtocol());
 
 		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
 		if($playbackCdnHost)
-			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
+			$this->cdnHost = preg_replace('/^https?/', $this->deliveryAttributes->getMediaProtocol(), $playbackCdnHost);
 				
 		$this->initFlavorAssetArray();
 		
@@ -663,7 +663,7 @@ class playManifestAction extends kalturaAction
 		if(count($this->deliveryAttributes->getTags()) == 1)
 			$tag = reset($this->deliveryAttributes->getTags());
 			
-		$protocol = $this->protocol; 
+		$protocol = $this->deliveryAttributes->getMediaProtocol(); 
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
 			$protocol = requestUtils::getProtocol();
 			
@@ -676,8 +676,8 @@ class playManifestAction extends kalturaAction
 			case PlaybackProtocol::RTMP:
 				$baseUrl = $this->entry->getStreamUrl();
 				$baseUrl = rtrim($baseUrl, '/');
-				if (strpos($this->protocol, "rtmp") === 0)
-					$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+				if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
+					$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 				return $baseUrl;
 					
 			case PlaybackProtocol::APPLE_HTTP:
@@ -757,16 +757,16 @@ class playManifestAction extends kalturaAction
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );
-		$this->protocol = $this->getRequestParameter ( "protocol", null );
-		if(!$this->protocol || $this->protocol === "null")
-			$this->protocol = PlaybackProtocol::HTTP;
+		$this->deliveryAttributes->setMediaProtocol($this->getRequestParameter ( "protocol", null ));
+		if(!$this->deliveryAttributes->getMediaProtocol() || $this->deliveryAttributes->getMediaProtocol() === "null")
+			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
 		
 		$this->deliveryAttributes->setFormat($this->getRequestParameter ( "format" ));
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 			
 		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL || $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
-			$this->protocol = PlaybackProtocol::HTTP; // Akamai HD doesn't support any other protocol
+			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP); // Akamai HD doesn't support any other protocol
 			
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)

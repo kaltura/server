@@ -15,7 +15,7 @@ class DeliveryProfileSilverLight extends DeliveryProfileVod {
 	 */
 	protected function getSmoothStreamUrl()
 	{
-		$urlPrefix = myPartnerUtils::getIisHost($this->getPartnerId(), $this->getStreamerType());
+		$urlPrefix = myPartnerUtils::getIisHost($this->getPartnerId(), $this->deliveryAttributes->getMediaProtocol());
 	
 		$matches = null;
 		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))

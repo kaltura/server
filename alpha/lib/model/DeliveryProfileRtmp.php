@@ -133,7 +133,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 			}
 		}
 
-		$baseUrl = $this->getStreamerType() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+		$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 		$this->finalizeUrls($baseUrl, $flavors);
 
 		return $flavors;

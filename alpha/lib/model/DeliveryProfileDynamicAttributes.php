@@ -81,6 +81,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $responseFormat;
 	
 	/**
+	 * @var string
+	 */
+	protected $mediaProtocol;
+	
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -274,6 +279,20 @@ class DeliveryProfileDynamicAttributes {
 	 */
 	public function setTags($tags) {
 		$this->tags = $tags;
+	}
+	
+	/**
+	 * @return the $mediaProtocol
+	 */
+	public function getMediaProtocol() {
+		return $this->mediaProtocol;
+	}
+
+	/**
+	 * @param string $mediaProtocol
+	 */
+	public function setMediaProtocol($mediaProtocol) {
+		$this->mediaProtocol = $mediaProtocol;
 	}
 
 	/**

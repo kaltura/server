@@ -207,12 +207,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 		if ($urlPrefix)
 		{
-			$urlPrefix = $this->getStreamerType() . '://' . $urlPrefix;
+			$urlPrefix = $this->params->getMediaProtocol() . '://' . $urlPrefix;
 			$urlPrefix = rtrim($urlPrefix, "/") . "/";
 		}
 		else
 		{
-			$url = $this->getStreamerType() . '://' . $url;
+			$url = $this->params->getMediaProtocol() . '://' . $url;
 		}
 	
 		$url = ltrim($url, "/");
@@ -238,7 +238,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		if (strpos($url, "://") === false)
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageProfileId());
-			if($this->getStreamerType() == 'https' && $storageProfile->getDeliveryHttpsBaseUrl())
+			if($this->params->getMediaProtocol() == 'https' && $storageProfile->getDeliveryHttpsBaseUrl())
 				$urlPrefix = rtrim($storageProfile->getDeliveryHttpsBaseUrl(), "/") . "/";
 			else
 				$urlPrefix = rtrim($storageProfile->getDeliveryHttpBaseUrl(), "/") . "/";

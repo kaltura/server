@@ -101,13 +101,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$ks = kCurrentContext::$ks;
+		$ks = kCurrentContext::$ks_object;
 		
 		$isSecured = false;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
 				($partner->getDefaultEntitlementEnforcement() || ($ks && $ks->getEnableEntitlement())))
 			$isSecured = true;
-		if(!isSecured) 
+		if(!$isSecured) 
 			$isSecured = $entry->isSecuredEntry();
 		
 			

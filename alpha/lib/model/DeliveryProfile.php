@@ -134,7 +134,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	public function setStorageProfileId($storageProfileId) {
 		return $this->params->setStorageProfileId($storageProfileId);
 	}
-
+	
 	// -------------------------------------
 	// -----  DeliveryProfile functionality--------
 	// -------------------------------------
