@@ -4172,14 +4172,14 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
-				$("#flash_wrap object").css("visibility","hidden");
+                $("#flash_wrap object").css("width",0+"px");
 			}
 		} else {
 			if( ltIE8 ) {
 				$("#flash_wrap").css("margin-right","0");
 			} else {
 				$("#flash_wrap").css("visibility","visible");
-				$("#flash_wrap object").css("visibility","visible");
+                $("#flash_wrap object").css("width",100+"%");
 			}
 		}
 	},
