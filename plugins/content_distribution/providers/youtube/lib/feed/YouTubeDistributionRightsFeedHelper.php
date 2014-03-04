@@ -75,7 +75,7 @@ class YouTubeDistributionRightsFeedHelper
 				$captionTag = $captionTag . '-' . $captionAssetInfo['language'];
 				$feed->appendFileElement('timed_text', false, pathinfo($captionAssetInfo['fileUrl'], PATHINFO_BASENAME), $captionTag);
 				$feed->appendCaptionElement($captionTag, $captionAssetInfo['fileExt'], $captionAssetInfo['language']);
-				$this->appendRelationship(array("/feed/caption[@tag='$captionTag']", "/feed/file[@tag='$captionTag']"), array("/feed/video[@tag='$videoTag']"));
+				$feed->appendRelationship(array("/feed/caption[@tag='$captionTag']", "/feed/file[@tag='$captionTag']"), array("/feed/video[@tag='$videoTag']"));
 			}
 		}
 		
