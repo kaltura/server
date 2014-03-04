@@ -28,5 +28,7 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 			if($this->currentDc == KalturaNullableBoolean::TRUE_VALUE)
 				$this->dcEqual = kDataCenterMgr::getCurrentDcId();
 		}
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
