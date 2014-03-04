@@ -34,6 +34,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import junit.framework.TestCase;
 
 import com.kaltura.client.KalturaApiException;
@@ -47,7 +49,6 @@ import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
 import com.kaltura.client.types.KalturaUploadToken;
 import com.kaltura.client.types.KalturaUploadedFileTokenResource;
-import com.kaltura.client.KalturaLogger;
 
 public class BaseTest extends TestCase {
 	public KalturaConfiguration kalturaConfig = new KalturaConfiguration();
@@ -59,7 +60,7 @@ public class BaseTest extends TestCase {
 
 	protected boolean doCleanup = true;
 
-	private static KalturaLogger logger = KalturaLogger.getLogger(BaseTest.class);
+	private static Logger logger = Logger.getLogger(BaseTest.class);
 
 	@Override
 	protected void setUp() throws Exception {
@@ -79,19 +80,18 @@ public class BaseTest extends TestCase {
 		
 		if (!doCleanup) return;
 		
-		if (logger.isEnabled())
+		if (logger.isInfoEnabled())
 			logger.info("Cleaning up test entries after test");
 		
 		KalturaMediaService mediaService = this.client.getMediaService();
 		for (String id : this.testIds) {
-			if (logger.isEnabled())
+			if (logger.isInfoEnabled())
 				logger.info("Deleting " + id);
 			try {
 				getProcessedEntry(client, id);
 				mediaService.delete(id);			
 			} catch (Exception e) {
-				if (logger.isEnabled())
-					logger.error("Couldn't delete " + id, e);
+				logger.error("Couldn't delete " + id, e);
 				fail();
 			}
 		} //next id
@@ -113,7 +113,7 @@ public class BaseTest extends TestCase {
 
 		String sessionId = sessionService.start(secret, "admin", type,
 				kalturaConfig.getPartnerId(), 86400, "");
-		if (logger.isEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("Session id:" + sessionId);
 		client.setSessionId(sessionId);
 	}
@@ -174,7 +174,7 @@ public class BaseTest extends TestCase {
 				throw new RuntimeException("Max retries (" + maxTries
 						+ ") when retrieving entry:" + id);
 			} else {
-				if (logger.isEnabled())
+				if (logger.isInfoEnabled())
 					logger.info("On try: " + counter + ", clip not ready. waiting "
 						+ (sleepInterval / 1000) + " seconds...");
 				try {

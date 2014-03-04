@@ -71,6 +71,7 @@ import org.apache.commons.httpclient.methods.multipart.PartSource;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 
 import com.kaltura.client.enums.KalturaSessionType;
@@ -104,7 +105,7 @@ abstract public class KalturaClientBase {
     protected List<Class<?>> requestReturnType;
     protected KalturaParams multiRequestParamsMap;
 
-	private static KalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
+	protected static Logger logger = Logger.getLogger(KalturaClientBase.class);
     
     private Header[] responseHeaders = null; 
     
@@ -249,7 +250,7 @@ abstract public class KalturaClientBase {
 	public Element doQueue() throws KalturaApiException {
 		if (this.callsQueue.isEmpty()) return null;
 
-		if (logger.isEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("service url: [" + this.kalturaConfiguration.getEndpoint() + "]");
 
 		KalturaParams kparams = new KalturaParams();
@@ -257,7 +258,7 @@ abstract public class KalturaClientBase {
 
 		String url = extractParamsFromCallQueue(kparams, kfiles);
 
-		if (logger.isEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
 
 		HttpClient client = createHttpClient();
@@ -306,14 +307,14 @@ abstract public class KalturaClientBase {
 			// Execute the method.
 			int statusCode = client.executeMethod(method);
 
-			if (logger.isEnabled())
+			if (logger.isDebugEnabled())
 			{
 				Header[] headers = method.getRequestHeaders();
 				for(Header header : headers)
 					logger.debug("Header [" + header.getName() + " value [" + header.getValue() + "]");
 			}
 			
-			if (logger.isEnabled() && statusCode != HttpStatus.SC_OK) {
+			if (logger.isDebugEnabled() && statusCode != HttpStatus.SC_OK) {
 				logger.error("Method failed: " + method.getStatusLine ( ));
 				throw new KalturaApiException("Unexpected Http return code: " + statusCode);
 			}
@@ -322,10 +323,10 @@ abstract public class KalturaClientBase {
             InputStream responseBodyIS = null;
             if (isGzipResponse(method)) {
                 responseBodyIS = new GZIPInputStream(method.getResponseBodyAsStream());
-                if (logger.isEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
+                if (logger.isDebugEnabled()) logger.debug("Using gzip compression to handle response for: "+method.getName()+" "+method.getPath()+"?"+method.getQueryString());
             } else {
                 responseBodyIS = method.getResponseBodyAsStream();
-                if (logger.isEnabled()) logger.debug("No gzip compression for this response");
+                if (logger.isDebugEnabled()) logger.debug("No gzip compression for this response");
             }
             String responseBody = readRemoteInvocationResult(responseBodyIS);
             responseHeaders = method.getResponseHeaders();
@@ -346,7 +347,7 @@ abstract public class KalturaClientBase {
 			// Deal with the response.
 			// Use caution: ensure correct character encoding and is not binary data
 			responseString = new String (responseBody.getBytes(), UTF8_CHARSET); // Unicon: this MUST be set to UTF-8 charset -AZ
-			if (logger.isEnabled())
+			if (logger.isDebugEnabled())
 			{
 				if(responseString.length() < MAX_DEBUG_RESPONSE_STRING_LENGTH) {
 					logger.debug(responseString);
@@ -358,20 +359,16 @@ abstract public class KalturaClientBase {
 			return responseString;
 			
 		} catch ( HttpException e ) {
-			if (logger.isEnabled())
-				logger.error( "Fatal protocol violation: " + e.getMessage ( ) ,e);
+			logger.error( "Fatal protocol violation: " + e.getMessage ( ) ,e);
 			throw new KalturaApiException("Protocol exception occured while executing request");
 		} catch ( SocketTimeoutException e) {
-			if (logger.isEnabled())
-				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
+			logger.error( "Fatal transport error: " + e.getMessage ( ), e);
 			throw new KalturaApiException("Request was timed out");
 		} catch ( ConnectTimeoutException e) {
-			if (logger.isEnabled())
-				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
+			logger.error( "Fatal transport error: " + e.getMessage ( ), e);
 			throw new KalturaApiException("Connection to server was timed out");
 		} catch ( IOException e ) {
-			if (logger.isEnabled())
-				logger.error( "Fatal transport error: " + e.getMessage ( ), e);
+			logger.error( "Fatal transport error: " + e.getMessage ( ), e);
 			throw new KalturaApiException("I/O exception occured while reading request response");
 		}  finally {
 			// Release the connection.
@@ -413,8 +410,7 @@ abstract public class KalturaClientBase {
 				try {
 					proxyPort = Integer.parseInt( proxyPortStr );
 				} catch (NumberFormatException e) {
-					if (logger.isEnabled())
-						logger.warn("Invalid number for system property http.proxyPort ("+proxyPortStr+"), using default port instead");
+					logger.warn("Invalid number for system property http.proxyPort ("+proxyPortStr+"), using default port instead");
 				}
 			}
 			ProxyHost proxy = new ProxyHost( proxyHost, proxyPort );
@@ -642,18 +638,17 @@ abstract public class KalturaClientBase {
 				// use the file
 				File file = kFile.getFile();
 	 		try {
-					parts.add(new FilePart(key, file));
+				parts.add(new FilePart(key, file));
 	 		} catch (FileNotFoundException e) {
-					// TODO this sort of leaves the submission in a weird state... -AZ
-				if (logger.isEnabled())
-					logger.error("Exception while iterating over kfiles", e);		  
+				// TODO this sort of leaves the submission in a weird state... -AZ
+				logger.error("Exception while iterating over kfiles", e);		  
 	 		}
-			} else {
+		} else {
 				// use the input stream
 				PartSource fisPS = new PartSource() {
 					public long getLength() {
 						return kFile.getSize();
- 		}
+					}
 					public String getFileName() {
 						return kFile.getName();
 					}
