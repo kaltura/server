@@ -136,6 +136,7 @@ class PlayReadyDrmService extends KalturaBaseService
 	public function getLicenseDetailsAction($keyId, $deviceId, $deviceType, $entryId = null, $referrer = null)
 	{
 		KalturaLog::debug('Get Play Ready license details for keyID: '.$keyId);
+		
 		$entry = $this->getLicenseRequestEntry($keyId, $entryId);		
 		
 		$policyId = $this->validateAccessControl($entry, $referrer); 
