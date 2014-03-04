@@ -71,7 +71,7 @@ CREATE TABLE `drm_device`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `device_id_unique` (`device_id`),
+	UNIQUE KEY `device_id_partner_id_unique` (`device_id`, `partner_id`),
 	KEY `partner_id_provider_status`(`partner_id`, `provider`)
 )Type=InnoDB;
 

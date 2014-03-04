@@ -20,7 +20,7 @@ class KalturaDrmDevice extends KalturaObject implements IFilterable
 		
 	/**
 	 * @var string
-	 * @filter eq,in
+	 * @filter like
 	 */
 	public $deviceId;
 	
@@ -51,7 +51,6 @@ class KalturaDrmDevice extends KalturaObject implements IFilterable
 		'partnerId',
 		'provider',
 		'deviceId',
-		'version',
 		'createdAt',
 		'updatedAt',
 	 );
