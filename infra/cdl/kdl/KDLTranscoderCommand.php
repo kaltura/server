@@ -146,7 +146,7 @@ class KDLTranscoderCommand {
 	 */
 	public function FFMpeg($extra=null)
 	{
-		$transcoder = new KDLOperatorFfmpeg2_1_3(KDLTranscoders::FFMPEG); 
+		$transcoder = new KDLOperatorFfmpeg1_1_1(KDLTranscoders::FFMPEG); 
 		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
