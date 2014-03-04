@@ -297,9 +297,9 @@ class YouTubeDistributionRightsFeedHelper
 				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
-			    	$captionAssetInfo['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
-			    	$captionAssetInfo['fileExt'] = $asset->getFileExt();
-			    	$captionAssetInfo['language'] = $asset->getLanguage();
+			    	$captionAssetInfo[$asset->getId()]['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
+			    	$captionAssetInfo[$asset->getId()]['fileExt'] = $asset->getFileExt();
+			    	$captionAssetInfo[$asset->getId()]['language'] = $asset->getLanguage();
 			    	break;
 				}
 			}
