@@ -485,7 +485,7 @@ class asset extends Baseasset implements ISyncableFile
 	public function isKsNeededForDownload()
 	{
 		$entry = $this->getentry();
-		if(!entry)
+		if(!$entry)
 			return true;
 		
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getPartnerId()))

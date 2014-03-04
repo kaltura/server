@@ -605,10 +605,9 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getStorageId())
 		{
 			$this->urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, $this->deliveryAttributes->getFormat());
-			return;
+		} else {		
+			$this->urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 		}
-		
-		$this->urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -644,6 +643,12 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 			$serveUrl = true;
+		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HD) {
+			// This is a hack to return an f4m that has a URL of a smil
+			return $this->serveHDNetwork();
+		} else if($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) {
+			// Translate to playback protocol format 	
+			$this->deliveryAttributes->setFormat(PlaybackProtocol::AKAMAI_HD);
 		}
 		
 		$this->initUrlManager();
@@ -655,6 +660,17 @@ class playManifestAction extends kalturaAction
 		
 		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);	
 		return $this->urlManager->serve();
+	}
+	
+	private function serveHDNetwork()
+	{
+		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
+		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
+
+		$renderer = new kF4MManifestRenderer();
+		$renderer->flavor = reset(array());
+		$renderer->mediaUrl = $mediaUrl;
+		return $renderer;
 	}
 	
 	private function getLiveEntryBaseUrl()
@@ -765,9 +781,9 @@ class playManifestAction extends kalturaAction
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 			
-		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL || $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
+		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL || $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS) 
 			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP); // Akamai HD doesn't support any other protocol
-			
+		
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
 		{

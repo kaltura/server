@@ -4,6 +4,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	protected $FLAVOR_FALLBACK = "flv";
+	protected $REDUNDANT_EXTENSIONS = array('.mp4','.flv');
 	
 	public function setEnforceRtmpe($v)
 	{
@@ -58,8 +59,8 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 		}
 		$url = $this->formatByExtension($url); 
 		
-		// when serving files directly via RTMP fms doesnt expect to get the file extension
-		$url = str_replace('.mp4', '', str_replace('.flv','',$url));
+		$url = str_replace($this->REDUNDANT_EXTENSIONS, '', $url);
+		return $url;
 	}
 	
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
@@ -133,7 +134,9 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 			}
 		}
 
-		$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+		if(strpos($this->params->getMediaProtocol(), "rtmp") === 0)
+			$baseUrl = $this->params->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+		
 		$this->finalizeUrls($baseUrl, $flavors);
 
 		return $flavors;

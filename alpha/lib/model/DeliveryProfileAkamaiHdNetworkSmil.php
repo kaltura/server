@@ -1,8 +1,34 @@
 <?php
 
-class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileHd {
+class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	protected $DEFAULT_RENDERER_CLASS = 'kSmilManifestRenderer';
+	
+	/**
+	 * @return kManifestRenderer
+	 */
+	public function serve()
+	{
+		$flavors = $this->buildHttpFlavorsArray();
+	
+		// When playing HDS with Akamai HD the bitrates in the manifest must be unique
+		$this->ensureUniqueBitrates($flavors);
+	
+		return $this->getRenderer($flavors);
+	}
+	
+	protected function ensureUniqueBitrates(array &$flavors)
+	{
+		$seenBitrates = array();
+		foreach ($flavors as &$flavor)
+		{
+			while (in_array($flavor['bitrate'], $seenBitrates))
+			{
+				$flavor['bitrate']++;
+			}
+			$seenBitrates[] = $flavor['bitrate'];
+		}
+	}
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
@@ -26,20 +52,6 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileHd {
 		}
 	
 		return $path;
-	}
-	
-	/**
-	 * @return kManifestRenderer
-	 */
-	public function serve()
-	{
-		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
-		
-		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
-
-		$renderer = $this->getRenderer(array());
-		$renderer->mediaUrl = $mediaUrl;
-		return $renderer;
 	}
 }
 

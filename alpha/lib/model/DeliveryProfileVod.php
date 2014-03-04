@@ -230,7 +230,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$remoteFileSyncs = $this->params->getRemoteFileSyncs();
 		$fileSync = $remoteFileSyncs[$flavorAsset->getId()];
 	
-		$this->initDeliveryDynamicAttribtues($flavorAsset);
+		$this->initDeliveryDynamicAttribtues(null, $flavorAsset);
 		$url = $this->getFileSyncUrl($fileSync, false);
 		$url = ltrim($url, "/");
 	

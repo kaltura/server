@@ -6,7 +6,6 @@
 interface DeliveryProfileType extends BaseEnum
 {
 	const APPLE_HTTP = 1;
-	const HD = 2;
 	const HDS = 3;
 	const HTTP = 4;
 	const RTMP = 5;

@@ -57,7 +57,7 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var array
 	 */
-	protected $flavorAssets;
+	protected $flavorAssets = array();
 	
 	/**
 	 * @var array
@@ -335,6 +335,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->manifestFileSync = $newObj->getManifestFileSync();
 		$this->preferredBitrate = $newObj->getPreferredBitrate();
 		$this->responseFormat = $newObj->getResponseFormat();
+		$this->mediaProtocol = $newObj->getMediaProtocol();
 	}
 }
 

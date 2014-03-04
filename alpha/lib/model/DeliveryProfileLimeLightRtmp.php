@@ -3,6 +3,7 @@
 class DeliveryProfileLimeLightRtmp extends DeliveryProfileRtmp {
 	
 	protected $FLAVOR_FALLBACK = null;
+	protected $REDUNDANT_EXTENSIONS = array();
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{

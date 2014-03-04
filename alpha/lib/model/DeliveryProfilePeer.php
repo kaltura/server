@@ -12,7 +12,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	protected static $class_types_cache = array(
 			
 			DeliveryProfileType::APPLE_HTTP => 'DeliveryProfileAppleHttp',
-			DeliveryProfileType::HD => 'DeliveryProfileHds',
 			DeliveryProfileType::HDS => 'DeliveryProfileHds',
 			DeliveryProfileType::HTTP => 'DeliveryProfileHttp',
 			DeliveryProfileType::RTMP => 'DeliveryProfileRtmp',

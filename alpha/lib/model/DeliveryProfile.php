@@ -7,10 +7,12 @@
  */
 abstract class DeliveryProfile extends BaseDeliveryProfile {
 	
+	// @_!! TODO Set 82 back to be default!
+	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	
 	/**
-	 * @var DeliveryDynamicAttributes
+	 * @var DeliveryProfileDynamicAttributes
 	 */
 	protected $params;
 
@@ -125,6 +127,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		{
 			KalturaLog::err('Given input is not an instance of kUrlTokenizer - ignoring');
 		}
+	}
+	
+	public function setUrl($url) {
+		$hostName = parse_url($url, PHP_URL_HOST);
+		if(is_null($hostName)) {
+			$path = explode("/", $url);
+			$hostName = $path[0];
+		}
+		$this->setHostName($hostName);
+		parent::setUrl($url);
 	}
 	
 	public function setEntryId($entryId) {
