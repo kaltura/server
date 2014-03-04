@@ -46,7 +46,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	/**
 	 * 
 	 * @var string
-	 * @filter eq,in
+	 * @filter eq,in,order
 	 * @readonly
 	 */
 	public $version;
