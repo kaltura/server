@@ -67,7 +67,7 @@ class YouTubeDistributionRightsFeedHelper
 		}
 		
 		// Handle addition of caption asset items
-		$captionAssetInfo = self::getCaptionAssetInfo($captionAssetIds); 
+		$captionAssetInfo = $feed->getCaptionAssetInfo($captionAssetIds);
 		foreach($captionAssetInfo as $captionInfo)
 		{
 			if(file_exists($captionInfo['fileUrl']))
