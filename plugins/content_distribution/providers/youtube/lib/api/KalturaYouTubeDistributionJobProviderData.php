@@ -102,7 +102,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		}
 		
 		//Add caption Asset id's
-		$this->captionAssetIds = explode ( ',', $distributionJobData->entryDistribution->assetIds );
+		$this->captionAssetIds = $distributionJobData->entryDistribution->assetIds;
 		
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
 		if ($entryDistributionDb)
