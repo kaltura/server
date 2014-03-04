@@ -245,7 +245,7 @@ class kAkamaiUrlManager extends kUrlManager
 			{
 				$serverUrl = $storage->getDeliveryIisBaseUrl();
 			}
-			$path = $partnerPath.'/'.$fileSync->getFilePath(). '/manifest';
+			$path = '/'.$fileSync->getFilePath(). '/manifest';
 		}
 		
 		$matches = null;
