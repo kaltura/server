@@ -70,11 +70,11 @@ class YouTubeDistributionRightsFeedHelper
 		$captionAssetInfo = self::getCaptionAssetInfo($captionAssetIds); 
 		foreach($captionAssetInfo as $captionInfo)
 		{
-			if(file_exists($captionAssetInfo['fileUrl']))
+			if(file_exists($captionInfo['fileUrl']))
 			{
-				$captionTag = $captionTag . '-' . $captionAssetInfo['language'];
-				$feed->appendFileElement('timed_text', false, pathinfo($captionAssetInfo['fileUrl'], PATHINFO_BASENAME), $captionTag);
-				$feed->appendCaptionElement($captionTag, $captionAssetInfo['fileExt'], $captionAssetInfo['language']);
+				$captionTag = $captionTag . '-' . $captionInfo['language'];
+				$feed->appendFileElement('timed_text', false, pathinfo($captionInfo['fileUrl'], PATHINFO_BASENAME), $captionTag);
+				$feed->appendCaptionElement($captionTag, $captionInfo['fileExt'], $captionInfo['language']);
 				$feed->appendRelationship(array("/feed/caption[@tag='$captionTag']", "/feed/file[@tag='$captionTag']"), array("/feed/video[@tag='$videoTag']"));
 			}
 		}
