@@ -448,7 +448,8 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			$this->storageId = $remoteFileSync->getDc();
+			if($remoteFileSync)
+				$this->storageId = $remoteFileSync->getDc();
 			$this->manifestFileSync = $remoteFileSync;
 		}
 		
