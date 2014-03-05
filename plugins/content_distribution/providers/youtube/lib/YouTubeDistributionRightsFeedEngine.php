@@ -249,7 +249,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
-	protected function getFileUrl( $asset, $entryId )
+	protected function getFilePath( $asset, $entryId )
 	{
 		$filter = new KalturaFileSyncFilter();
 		$filter->orderBy = '-version';
@@ -268,7 +268,8 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$result = $filesyncPlugin->fileSync->listAction($filter, $pager);
 		if ( ! empty( $result->objects ) )
 		{
-			return $result->objects[0]->fileUrl;
+			$fileSync = $result->objects[0];
+			return $fileSync->fileRoot . $fileSync->filePath;
 		}
 
 		return "";
@@ -300,11 +301,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		{
 			if ( $asset instanceof KalturaCaptionAsset )
 			{
-				$captionFileUrl = $this->getFileUrl($asset, $entryId);
-				if (file_exists($captionFileUrl))
+				$captionFilePath = $this->getFilePath($asset, $entryId);
+				if (file_exists($captionFilePath))
 				{
-					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFileUrl, PATHINFO_BASENAME);
-					$sftpManager->putFile($captionSFTPPath, $captionFileUrl);
+					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
+					$sftpManager->putFile($captionSFTPPath, $captionFilePath);
 				}
 			}
 		}
