@@ -255,7 +255,12 @@ class kMrssManager
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
 			$urlManager->setDomain($cdnHost);
 			
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
+			if (!$storage->getDeliveryHttpsBaseUrl())
+				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
+			else
+				$url = requestUtils::getApiCdnHost();
+
+        	$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
