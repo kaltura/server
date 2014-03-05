@@ -260,7 +260,7 @@ class kMrssManager
 			else
 				$url = requestUtils::getApiCdnHost();
 
-        	$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
+			$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
