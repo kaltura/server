@@ -4163,31 +4163,27 @@ kmc.utils = {
 		$("a#" + module).removeClass("active");
 	},
 
-    flashWrapHeight: $("#flash_wrap").height(),
-    // we should combine the two following functions into one
-    hideFlash : function(hide) {
-        var ltIE8 = $('html').hasClass('lt-ie8');
-        if(hide) {
-            if( ltIE8 ) {
-                // For IE7 only we're positioning outside of the screen
-                $("#flash_wrap").css("margin-right","3333px");
-            } else {
-                if ($('html').hasClass('lt-ie10')){
-                    this.flashWrapHeight = $("#flash_wrap").height();
-                    $("#flash_wrap").height(0);
-                }
-            }
-        } else {
-            if( ltIE8 ) {
-                $("#flash_wrap").css("margin-right","0");
-            } else {
-                if ($('html').hasClass('lt-ie10')){
-                    $("#flash_wrap").height(this.flashWrapHeight);
-                }
-            }
-        }
-    },
-
+	// we should combine the two following functions into one
+	hideFlash : function(hide) {
+		var ltIE8 = $('html').hasClass('lt-ie8');
+		if(hide) {
+			if( ltIE8 ) {
+				// For IE only we're positioning outside of the screen
+				$("#flash_wrap").css("margin-right","3333px");
+			} else {
+				// For other browsers we're just make it
+				$("#flash_wrap").css("visibility","hidden");
+                $("#flash_wrap object").css("width",0+"px");
+			}
+		} else {
+			if( ltIE8 ) {
+				$("#flash_wrap").css("margin-right","0");
+			} else {
+				$("#flash_wrap").css("visibility","visible");
+                $("#flash_wrap object").css("width",100+"%");
+			}
+		}
+	},
 	showFlash : function() {
 		$("#server_wrap").hide();
 		$("#server_frame").removeAttr('src');
