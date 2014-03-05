@@ -3024,7 +3024,8 @@ if ( window.XDomainRequest ) {
   ZeroClipboard.prototype.reposition = function() {
     if (!currentElement) return false;
     var pos = _getDOMObjectPosition(currentElement);
-        this.htmlBridge.style.top = pos.top - $(".form-horizontal").scrollTop() + "px";
+    var topOffset = $(currentElement).hasClass("pullright") ? $(".form-horizontal").scrollTop() : 0;
+    this.htmlBridge.style.top = pos.top - topOffset + "px";
     this.htmlBridge.style.left = pos.left + "px";
     this.htmlBridge.style.width = pos.width + "px";
     this.htmlBridge.style.height = pos.height + "px";
