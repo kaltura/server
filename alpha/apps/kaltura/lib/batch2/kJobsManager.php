@@ -1404,7 +1404,7 @@ class kJobsManager
 	}
 	
 	/**
-	 * Update privacy context on category entries and entries
+	 * Update privacy context on category entries
 	 * 
 	 * @param BatchJob $parentJob
 	 * @param int $partnerId

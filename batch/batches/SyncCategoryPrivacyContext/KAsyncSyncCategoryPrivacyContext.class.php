@@ -5,7 +5,7 @@
  */
 
 /**
- * Will sync category privacy context on category entries and entries
+ * Will sync category privacy context on category entries
  *
  * @package Scheduler
  * @subpackage SyncCategoryPrivacyContext
@@ -29,7 +29,7 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 	}
 	
 	/**
-	 * sync category privacy context on category entries and entries
+	 * sync category privacy context on category entries
 	 * 
 	 * @param KalturaBatchJob $job
 	 * @param KalturaSyncCategoryPrivacyContextJobData $data
@@ -42,39 +42,10 @@ class KAsyncSyncCategoryPrivacyContext extends KJobHandlerWorker
 		
 	    KBatchBase::impersonate($job->partnerId);
 	    
-	    if(!$data->lastUpdatedCategoryCreatedAt)
-	    {
-	    	//sync root category
-	    	$this->syncCategoryPrivacyContext($job, $data, $data->categoryId);
-	    }
-	    
-	    //sync sub categories	    
-	    $categoryFilter = new KalturaCategoryFilter();
-		$categoryFilter->orderBy = KalturaCategoryOrderBy::CREATED_AT_ASC;
-		$categoryFilter->ancestorIdIn = $data->categoryId;
-		if($data->lastUpdatedCategoryCreatedAt)
-			$categoryFilter->$createdAtGreaterThanOrEqual = $data->lastUpdatedCategoryCreatedAt;	    
-		$pager = $this->getFilterPager();		
-		$categoryList = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
-	    
-		while(count($categoryList->objects))
-		{
-			foreach ($categoryList->objects as $category) 
-			{
-				$data->lastUpdatedCategoryCreatedAt = $category->createdAt;
-				$data->lastUpdatedCategoryEntryCreatedAt = null;
-				KBatchBase::unimpersonate();
-				$this->updateJob($job, null, KalturaBatchJobStatus::PROCESSING, $data);
-				KBatchBase::impersonate($job->partnerId);
-				
-				KalturaLog::debug('handling sub category '.$category->id);
-				$this->syncCategoryPrivacyContext($job, $data, $category->id);				
-			}
-			$pager->pageIndex++;
-			$categoryList = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
-		}
+	    $this->syncCategoryPrivacyContext($job, $data, $data->categoryId);
 		
 		KBatchBase::unimpersonate();
+		
 		$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 		
 		return $job;
