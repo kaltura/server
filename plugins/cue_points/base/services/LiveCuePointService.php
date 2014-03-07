@@ -60,7 +60,7 @@ class LiveCuePointService extends KalturaBaseService
 		$mediaServerCuePointsService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_CUE_POINTS);
 		if($mediaServerCuePointsService && $mediaServerCuePointsService instanceof KalturaMediaServerCuePointsService)
 		{
-			$mediaServerCuePointsService->splitRecordingNow($entryId, $interval, $duration);
+			$mediaServerCuePointsService->createTimeCuePoints($entryId, $interval, $duration);
 		}
 		else 
 		{
