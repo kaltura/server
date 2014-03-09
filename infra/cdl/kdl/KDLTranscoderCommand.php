@@ -33,9 +33,8 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 	 */
 	public function CheckConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
 	{
-//No need for 'global' check, each engine can check for itself
-//		if(parent::CheckConstraints($source, $target, $errors, $warnings)==true)
-//			return true;
+		if(parent::CheckConstraints($source, $target, $errors, $warnings)==true)
+			return true;
 
 		if($this->_id==KDLTranscoders::FFMPEG_AUX) {
 			$transcoder = new KDLOperatorFfmpeg($this->_id);
@@ -44,7 +43,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		}
 			
 		if($this->_id==KDLTranscoders::FFMPEG) {
-			$transcoder = new KDLOperatorFfmpeg2_1_3($this->_id);
+			$transcoder = new KDLOperatorFfmpeg1_1_1($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
@@ -147,7 +146,7 @@ class KDLTranscoderCommand {
 	 */
 	public function FFMpeg($extra=null)
 	{
-		$transcoder = new KDLOperatorFfmpeg2_1_3(KDLTranscoders::FFMPEG); 
+		$transcoder = new KDLOperatorFfmpeg1_1_1(KDLTranscoders::FFMPEG); 
 		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 

@@ -8,10 +8,11 @@ interface kObjectReplacedEventConsumer extends KalturaEventConsumer
 {
 	/**
 	 * @param BaseObject $object
+	 * @param BaseObject $replacingObject
 	 * @param BatchJob $raisedJob
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function objectReplaced(BaseObject $object, BatchJob $raisedJob = null);
+	public function objectReplaced(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null);
 	
 	/**
 	 * @param BaseObject $object

@@ -6,7 +6,18 @@
  */
 class kObjectReplacedEvent extends kApplicativeEvent
 {
+	/**
+	 * @var BaseObject
+	 */
+	protected $replacingObject;
+
 	const EVENT_CONSUMER = 'kObjectReplacedEventConsumer';
+	
+	public function __construct(BaseObject $object, BaseObject $replacingObject, BatchJob $raisedJob = null)
+	{
+		$this->replacingObject = $replacingObject;
+		parent::__construct($object, $raisedJob);
+	}
 	
 	public function getConsumerInterface()
 	{
@@ -27,7 +38,7 @@ class kObjectReplacedEvent extends kApplicativeEvent
 			$additionalLog .= 'id [' . $this->object->getId() . ']';
 			
 		KalturaLog::debug('consumer [' . get_class($consumer) . '] started handling [' . get_class($this) . '] object type [' . get_class($this->object) . '] ' . $additionalLog);
-		$result = $consumer->objectReplaced($this->object, $this->raisedJob);
+		$result = $consumer->objectReplaced($this->object, $this->replacingObject, $this->raisedJob);
 		KalturaLog::debug('consumer [' . get_class($consumer) . '] finished handling [' . get_class($this) . '] object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $result;
 	}

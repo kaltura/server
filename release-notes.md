@@ -66,6 +66,38 @@ The monitor's View History permission is lowered from System Admin user to any A
 - update admin.ini:
 <br>access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
 
+## Support hybrid eCDN architecture
+
+- Update scripts
+	
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_01_26_add_media_server_partner_level_permission.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_partner_0.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_01_26_update_live_stream_service_permissions.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_live_asset_parameters.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_live_entry_parameters.php
+
+- Update admin.ini
+
+	moduls.hybridCdn.enabled = true
+	moduls.hybridCdn.permissionType = 2
+	moduls.hybridCdn.label = Hybrid CDN
+	moduls.hybridCdn.permissionName = FEATURE_HYBRID_ECDN
+	moduls.hybridCdn.basePermissionType = 2
+	moduls.hybridCdn.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+	moduls.hybridCdn.group = GROUP_ENABLE_DISABLE_FEATURES
+	
+	moduls.pushPublish.enabled = true
+	moduls.pushPublish.permissionType = 2
+	moduls.pushPublish.label = Push Publish Feature
+	moduls.pushPublish.permissionName = FEATURE_PUSH_PUBLISH
+	moduls.pushPublish.basePermissionType = 2
+	moduls.pushPublish.basePermissionName = FEATURE_HYBRID_ECDN
+	moduls.pushPublish.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- Update local.ini
+
+	uploaded_segment_destination = @WEB_DIR@/tmp/convert/
+
 ----------
 
 # IX-9.11.0 #
