@@ -46,8 +46,10 @@ class serveIsmAction extends sfAction
 		
 		if($type == 'ism')
 		{
-			$fileData = $this->fixIsmManifestForReplacedEntry($path);		
-			kFileUtils::dumpFile($path, null, null ,0, $fileData);
+			$fileData = $this->fixIsmManifestForReplacedEntry($path);	
+			$renderer = new kRendererString($fileData, 'image/ism');
+			$renderer->output();
+            KExternalErrors::dieGracefully();	
 		}
 		else 
 		{

@@ -113,7 +113,7 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
-		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY_CONTEXT))
+		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS))
 		{
 			$this->addSyncCategoryPrivacyContextJob();
 		}

@@ -3024,7 +3024,8 @@ if ( window.XDomainRequest ) {
   ZeroClipboard.prototype.reposition = function() {
     if (!currentElement) return false;
     var pos = _getDOMObjectPosition(currentElement);
-    this.htmlBridge.style.top = pos.top + "px";
+    var topOffset = $(currentElement).hasClass("pullright") ? $(".form-horizontal").scrollTop() : 0;
+    this.htmlBridge.style.top = pos.top - topOffset + "px";
     this.htmlBridge.style.left = pos.left + "px";
     this.htmlBridge.style.width = pos.width + "px";
     this.htmlBridge.style.height = pos.height + "px";
@@ -3827,6 +3828,7 @@ kmc.functions = {
 			openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
 			openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 			openCw				: "kmc.functions.openKcw",
+            maxUploadSize       : "2047",
 			language			: (kmc.vars.language || "")
 		};
 		// Disable analytics
@@ -4171,14 +4173,14 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
-				$("#flash_wrap object").css("visibility","hidden");
+                $("#flash_wrap object").css("width",0+"px");
 			}
 		} else {
 			if( ltIE8 ) {
 				$("#flash_wrap").css("margin-right","0");
 			} else {
 				$("#flash_wrap").css("visibility","visible");
-				$("#flash_wrap object").css("visibility","visible");
+                $("#flash_wrap object").css("width",100+"%");
 			}
 		}
 	},

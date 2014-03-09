@@ -448,7 +448,8 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			$this->storageId = $remoteFileSync->getDc();
+			if($remoteFileSync)
+				$this->storageId = $remoteFileSync->getDc();
 			$this->manifestFileSync = $remoteFileSync;
 		}
 		
@@ -974,7 +975,14 @@ class playManifestAction extends kalturaAction
 	 */
 	private function getSmoothStreamUrl()
 	{
-		$urlPrefix = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+		if($this->manifestFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
+		{
+			$urlPrefix = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+		}
+		else if($this->storageProfile)
+		{
+			$urlPrefix = $this->storageProfile->getDeliveryIisBaseUrl();
+		}
 		
 		$matches = null;
 		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))

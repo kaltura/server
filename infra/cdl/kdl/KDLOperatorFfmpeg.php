@@ -14,9 +14,23 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 	 */
     public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
+	$cmdStr = null;
 // rem ffmpeg -i <infilename> -vcodec flv   -r 25 -b 500k  -ar 22050 -ac 2 -acodec libmp3lame -f flv -t 60 -y <outfilename>
 
-		$cmdStr = " -i ".KDLCmdlinePlaceholders::InFileName;
+	$clipStr = null;
+		if(isset($target->_clipStart) && $target->_clipStart>0){
+			$clipStr.= " -ss ".$target->_clipStart/1000;
+		}
+		
+		if(isset($target->_clipDur) && $target->_clipDur>0){
+			$clipStr.= " -t ".$target->_clipDur/1000;
+		}
+		
+		if(isset($clipStr) && $target->_fastSeekTo==true){
+			$cmdStr.= $clipStr;
+		}
+		
+		$cmdStr.= " -i ".KDLCmdlinePlaceholders::InFileName;
 		
 		$cmdStr.= $this->generateVideoParams($design, $target);
 		$cmdStr.= $this->generateAudioParams($design, $target);
@@ -39,7 +53,13 @@ class KDLOperatorFfmpeg extends KDLOperatorBase {
 			}
 		}
 		*/
-		$cmdStr = $this->processClipping($target, $cmdStr);
+		/*
+		 * Following 'dummy' seek-to setting is done to ensure preciseness
+		 * of the main seek command that is done at the beginning o fthe command line
+		 */
+		if(isset($clipStr)){
+			$cmdStr.= $target->_fastSeekTo==true? " -ss 0.01": $clipStr;
+		}
 		
 		if($extra)
 			$cmdStr.= " ".$extra;
@@ -274,35 +294,6 @@ $con = $target->_container;
 		}
 		$cmdStr.= " -f ".$format;
 
-		return $cmdStr;
-	}
-	
-	/* ---------------------------
-	 * processClipping 
-	 */
-	protected function processClipping(KDLFlavor $target, $cmdStr)
-	{
-		$clipStr=null;
-		if(isset($target->_clipStart) && $target->_clipStart>0){
-			$clipStr.= " -ss ".$target->_clipStart/1000;
-		}
-		if(isset($target->_clipDur) && $target->_clipDur>0){
-			$clipStr.= " -t ".$target->_clipDur/1000;
-		}
-		if(!isset($clipStr))
-			return $cmdStr;
-		/*
-		 * Following 'dummy' seek-to setting is done to ensure preciseness
-		 * of the main seek command that is done at the beginning of the command line
-		 */
-		if($target->_fastSeekTo==true){
-			$cmdStr = $clipStr.$cmdStr;
-			$cmdStr.= " -ss 0.01";
-		}
-		else {
-			$cmdStr.= $clipStr;
-		}
-		
 		return $cmdStr;
 	}
 	
