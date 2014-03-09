@@ -15,3 +15,6 @@ passthru("php $script $config");
 $config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/service.livestream.ini';
 passthru("php $script $config");
 
+$config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/service.cuepoint.livecuepoint.ini';
+passthru("php $script $config");
+
