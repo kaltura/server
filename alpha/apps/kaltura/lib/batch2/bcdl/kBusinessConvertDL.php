@@ -146,7 +146,7 @@ class kBusinessConvertDL
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
 
-		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry));
+		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry, $tempEntry));
 
 		myEntryUtils::deleteEntry($tempEntry,null,true);
 

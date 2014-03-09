@@ -752,8 +752,9 @@ class kFlowHelper
 	private static function handleAdditionalFilesConvertFinished(flavorAsset $flavorAsset, BatchJob $dbBatchJob, kConvertJobData $data)
 	{
 		KalturaLog::debug("Convert finished, creating additional file syncs ");
-		if(!$flavorAsset->getVersion())
+		if(!$flavorAsset->getVersion() || !kFileSyncUtils::fileSync_exists($flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)))
 		{
+			KalturaLog::debug("Incrementing version");
 			$flavorAsset->incrementVersion();
 			$flavorAsset->save();
 		}

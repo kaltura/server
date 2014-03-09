@@ -100,6 +100,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const MAX_NORMALIZED_RANK = 5;
 
 	const MAX_CATEGORIES_PER_ENTRY = 32;
+	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 200;
 	
 	const FILE_SYNC_ENTRY_SUB_TYPE_DATA = 1;
 	const FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT = 2;
@@ -133,6 +134,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const PARTNER_STATUS_FORMAT = 'P%sST%s';
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
+	const DEFAULT_ASSETCACHEVERSION = 1;
 	
 	private $appears_in = null;
 
@@ -976,6 +978,24 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 		return "";
 	}
+
+	/**
+	 * AssetCacheVersion will get incremented every time an asset is added/modified
+	 * @return int Asset update version (default = entry::DEFAULT_ASSETCACHEVERSION)
+	 */
+	public function getAssetCacheVersion()			{ return $this->getFromCustomData( "assetCacheVersion", null, entry::DEFAULT_ASSETCACHEVERSION ); }
+
+	protected function setAssetCacheVersion( $v )	{ $this->putInCustomData( "assetCacheVersion" , $v ); }
+	
+	/**
+	 * Increment an internal version counter in order to invalidate cached thumbnails (see getThumbnailUrl())
+	 */
+	public function onAssetContentModified()
+	{
+		$assetCacheVersion = kDataCenterMgr::incrementVersion($this->getAssetCacheVersion());
+		$this->setAssetCacheVersion($assetCacheVersion);
+		return $assetCacheVersion;
+	}
 	
 	public function getThumbnail()
 	{
@@ -1064,6 +1084,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$path .= "/version/$version";
 		else
 			$path .= "/version/$current_version";
+
+		$assetCacheVersion = $this->getAssetCacheVersion();
+		if ( $assetCacheVersion != self::DEFAULT_ASSETCACHEVERSION )
+		{
+			// If the version is not the default, include it as part of the URL in order
+			// to bypass existing image cache and produce a fresh thumbnail (which will
+			// persist until assetCacheVersion is modified again)
+			$path .= "/acv/$assetCacheVersion";
+		}
+
 		$url = myPartnerUtils::getThumbnailHost($this->getPartnerId(), $protocol) . $path ;
 		return $url;
 	}
@@ -1102,7 +1132,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$data = $filename;
 		else
 			$data = myContentStorage::generateRandomFileName($filename, $this->getThumbnail());
-		
+
+		$this->onAssetContentModified();
+
 		parent::setThumbnail($data);
 		return $this->getThumbnail();
 	}
@@ -1161,6 +1193,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	 */
 	public function setCategories($newCats)
 	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			return;
+			
 		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
 		
 		$this->trimCategories($newCats);
@@ -1179,6 +1214,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setCategoriesIds($v)
 	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			return;
+		
 		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $v);
 		
 		$this->trimCategories($newCats);
@@ -1192,6 +1230,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->new_categories_ids = implode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
 		$this->modifiedColumns[] = entryPeer::CATEGORIES;
 		$this->is_categories_modified = true;
+	}
+	
+	public function getCategories()
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			return null;
+		return parent::getCategories();
+	}
+
+	public function getCategoriesIds()
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+			return null;
+		return parent::getCategoriesIds();
 	}
 		
 	/*public function renameCategory($oldFullName, $newFullName)
@@ -2948,8 +3000,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getSearchProviderType()
 	{
-		if (self::isSearchProviderSource($this->getSource()))
-			return (string)$this->getSource();
+		$sourceValue = $this->getSource();
+		
+		if(is_null($sourceValue))
+			return null;
+		
+		if (self::isSearchProviderSource($sourceValue))
+			return (string)$sourceValue;
 	
 		return null;
 	}

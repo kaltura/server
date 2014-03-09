@@ -14,6 +14,8 @@ use Kaltura\Client\Enum\UploadTokenStatus;
 use Kaltura\Client\Type\UploadToken;
 use Kaltura\Client\Type\MixEntry;
 use Kaltura\Client\Enum\EditorType;
+use Kaltura\Client\ApiException;
+use Exception;
 
 class Zend2ClientTester
 {
@@ -83,8 +85,8 @@ class Zend2ClientTester
 		$response = $this->_client->doMultiRequest();
 
 		foreach( $response as $subResponse)
-			if($subResponse instanceof KalturaException)
-				throw new \Exception("Error occurred: " + $subResponse.message);
+			if($subResponse instanceof ApiException) 
+				throw new Exception("Error occurred: " . $subResponse->getMessage());
 
 		# when accessing the response object we will use an index and not the response number (response number - 1)
 		$this->assertTrue($response[0] instanceof MixEntry);

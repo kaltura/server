@@ -66,7 +66,7 @@ class kFileUtils extends kFile
 		
 		KExternalErrors::dieGracefully();
 	}
-
+	
 	public static function dumpApiRequest($host)
 	{
 		if (kCurrentContext::$multiRequest_index > 1)

@@ -33,19 +33,40 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @action appendRecording
 	 * @param string $entryId Live entry id
 	 * @param KalturaMediaServerIndex $mediaServerIndex
-	 * @param KalturaServerFileResource $resource
+	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration
+	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $mediaServerIndex, KalturaServerFileResource $resource, $duration)
+	function appendRecordingAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$currentDuration = $dbEntry->getLengthInMsecs();
+		if(!$currentDuration)
+			$currentDuration = 0;
+			
+		$currentDuration += $duration;
+		$dbEntry->setLengthInMsecs($currentDuration);
+		$dbEntry->save();
+			
 		$kResource = $resource->toObject();
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath(), $duration);
+		$target = $kResource->getLocalFilePath();
+		if (!($resource instanceof KalturaServerFileResource))
+		{
+			$target = kConf::get('uploaded_segment_destination') . basename($kResource->getLocalFilePath());
+			kFile::moveFile($kResource->getLocalFilePath(), $target);
+			chgrp($target, kConf::get('content_group'));
+			chmod($target, 0640);
+		}
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $target, $currentDuration);
+		
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
+		return $entry;
 	}
 
 	/**
@@ -73,11 +94,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
-		if (!$dbMediaServer)
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-			
-		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer);
+		$dbEntry->setMediaServer($mediaServerIndex, $hostname);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
@@ -110,11 +127,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
-		if (!$dbMediaServer)
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-			
-		$dbEntry->unsetMediaServer($mediaServerIndex, $dbMediaServer->getId());
+		$dbEntry->unsetMediaServer($mediaServerIndex, $hostname);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());

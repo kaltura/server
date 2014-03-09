@@ -34,7 +34,7 @@ $nullDev ="/dev/null";
 	
 	/* ---------------------------
 	 * generateH264params
-	*/
+	 */
 	protected function generateH264params($videoObject)
 	{
 		$h264params=null;

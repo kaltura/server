@@ -113,6 +113,12 @@ class category extends Basecategory implements IIndexable
 			}
 		}
 		
+		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS))
+		{
+			$this->addSyncCategoryPrivacyContextJob();
+		}
+		
+		
 		// save the childs for action category->delete - delete category is not done by async batch.
 		foreach($this->childs_for_save as $child)
 		{
@@ -570,6 +576,12 @@ class category extends Basecategory implements IIndexable
 	{
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, false, false, $this->getFullIds());
 	}
+	
+	protected function addSyncCategoryPrivacyContextJob()
+	{
+		kJobsManager::addSyncCategoryPrivacyContextJob(null, $this->getPartnerId(), $this->getId());
+	}
+	
 	
 	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
 	{
@@ -1173,18 +1185,24 @@ class category extends Basecategory implements IIndexable
 	
 	public function setPrivacyContext($v)
 	{
+		$privacyContexts = $this->buildPrivacyContexts($v);
+		$this->setPrivacyContexts($privacyContexts);
+		parent::setPrivacyContext($v);
+	}
+	
+	private function buildPrivacyContexts($privacyContext)
+	{
 		if (!$this->getParentId())
 		{
-			$this->setPrivacyContexts($v);
-			parent::setPrivacyContext($v);
-			return;
+			$this->validatePrivacyContexts(explode(',',$privacyContext));
+			return $privacyContext;
 		}
-
+		
 		$privacyContexts = array();
 		$parentCategory = $this->getParentCategory();
 		if($parentCategory)
 			$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
-		$privacyContexts[] = $v;
+		$privacyContexts[] = $privacyContext;
 		
 		$privacyContextsTrimed = array();
 		foreach($privacyContexts as $privacyContext)
@@ -1194,11 +1212,11 @@ class category extends Basecategory implements IIndexable
 		}
 
 		$privacyContextsTrimed = array_unique($privacyContextsTrimed);
+		$this->validatePrivacyContexts($privacyContextsTrimed);
 		
-		$this->setPrivacyContexts(trim(implode(',', $privacyContextsTrimed)));
-		parent::setPrivacyContext($v);
+		return trim(implode(',', $privacyContextsTrimed));		
 	}
-	
+		
 	/**
 	 * @param int $v
 	 */
@@ -1643,4 +1661,15 @@ class category extends Basecategory implements IIndexable
 		return $this->display_in_search . "P" . $this->getPartnerId();
 	}
 	
+	public function validatePrivacyContexts($privacyContexts)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+		{
+			if(count($privacyContexts) > 1)
+			{
+				throw new kCoreException("Only one privacy context allowed when Disable Category Limit feature turned on", kCoreException::DISABLE_CATEGORY_LIMIT_MULTI_PRIVACY_CONTEXT_FORBIDDEN);
+			}
+		}
+		return true;
+	}
 }

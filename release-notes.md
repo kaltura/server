@@ -1,3 +1,103 @@
+# IX-9.12.0 #
+
+## Remove limitation of 32 categories per entry##
+The limitation will be removed for partners that have a Disable Category Limit feature enabled.
+
+*Configuration Changes*
+
+- update admin.ini:
+add
+moduls.categoryLimit.enabled = true
+moduls.categoryLimit.permissionType = 2
+moduls.categoryLimit.label = Disble Category Limit
+moduls.categoryLimit.permissionName = FEATURE_DISABLE_CATEGORY_LIMIT
+moduls.categoryLimit.basePermissionType =
+moduls.categoryLimit.basePermissionName =
+moduls.categoryLimit.group = GROUP_ENABLE_DISABLE_FEATURES
+ 
+- update batch.ini
+add 
+enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
+enabledWorkers.KAsyncTagIndex						= 1
+  
+[KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
+id													= 530
+friendlyName										= Sync Category Privacy Context
+type												= KAsyncSyncCategoryPrivacyContext
+maximumExecutionTime								= 12000
+scriptPath											= batches/SyncCategoryPrivacyContext/KAsyncSyncCategoryPrivacyContextExe.php
+
+[KAsyncTagIndex : JobHandlerWorker]
+id													= 500
+friendlyName										= Re-index tags
+type												= KAsyncTagIndex
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
+
+*Permissions*
+
+- /deployment/updates/scripts/add_permissions/2014_01_20_categoryentry_syncprivacycontext_action.php
+
+*Migration*
+- /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
+
+## New FFMpeg 2.1.3##
+ *Binaries*
+  - Linux
+ -- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+ -- -The ffmpeg-aux remains unchanged.
+
+## Create Draft Entries as Ready ##
+Assign a Ready status to draft entries that were created using a conversion profile which contains no flavor params.
+
+- update admin.ini
+
+	moduls.draftEntryConversionProfileSelection.enabled = true
+	moduls.draftEntryConversionProfileSelection.permissionType = 2
+	moduls.draftEntryConversionProfileSelection.label = Enable KMC transcoding profile selection for draft entries
+	moduls.draftEntryConversionProfileSelection.permissionName = FEATURE_DRAFT_ENTRY_CONV_PROF_SELECTION
+	moduls.draftEntryConversionProfileSelection.basePermissionType =
+	moduls.draftEntryConversionProfileSelection.basePermissionName =
+	moduls.draftEntryConversionProfileSelection.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Allow "View History" for any Admin Console users ##
+The monitor's View History permission is lowered from System Admin user to any Admin Console user.      
+
+- update admin.ini:
+<br>access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
+
+## Support hybrid eCDN architecture
+
+- Update scripts
+	
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_01_26_add_media_server_partner_level_permission.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_partner_0.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_01_26_update_live_stream_service_permissions.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_live_asset_parameters.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_live_entry_parameters.php
+
+- Update admin.ini
+
+	moduls.hybridCdn.enabled = true
+	moduls.hybridCdn.permissionType = 2
+	moduls.hybridCdn.label = Hybrid CDN
+	moduls.hybridCdn.permissionName = FEATURE_HYBRID_ECDN
+	moduls.hybridCdn.basePermissionType = 2
+	moduls.hybridCdn.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+	moduls.hybridCdn.group = GROUP_ENABLE_DISABLE_FEATURES
+	
+	moduls.pushPublish.enabled = true
+	moduls.pushPublish.permissionType = 2
+	moduls.pushPublish.label = Push Publish Feature
+	moduls.pushPublish.permissionName = FEATURE_PUSH_PUBLISH
+	moduls.pushPublish.basePermissionType = 2
+	moduls.pushPublish.basePermissionName = FEATURE_HYBRID_ECDN
+	moduls.pushPublish.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- Update local.ini
+
+	uploaded_segment_destination = @WEB_DIR@/tmp/convert/
+
 ----------
 
 # IX-9.11.0 #
@@ -7,6 +107,7 @@
 *DB Changes*
 
 - /deployment/updates/sql/2014_01_19_category_entry_add_privacy_context.sql
+
 
 ## PlayReady, ISM Index, Smooth Protect##
 

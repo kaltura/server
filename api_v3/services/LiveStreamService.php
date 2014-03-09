@@ -42,8 +42,13 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function addAction(KalturaLiveStreamEntry $liveStreamEntry, $sourceType = null)
 	{
-		if($sourceType)
-			$liveStreamEntry->sourceType = $sourceType;
+		if($sourceType) {
+			$liveStreamEntry->sourceType = $sourceType;	
+		}
+		else {
+			// default sourceType is AKAMAI_LIVE
+			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
+		}
 	
 		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
 		$dbEntry->save();
@@ -99,15 +104,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kDataCenterMgr::getCurrentDcId(), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
-			
-			$otherDCs = kDataCenterMgr::getAllDcs();
-			if(count($otherDCs))
-			{
-				$otherDc = reset($otherDCs);
-				$otherDcId = $otherDc['id'];
-				$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, $otherDcId, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
-			}
+			$broadcastUrlManager->setEntryBroadcastingUrls($dbEntry);
 		}
 		
 		return $dbEntry;
@@ -332,7 +329,6 @@ class LiveStreamService extends KalturaLiveEntryService
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			
 		}
 		else
 		{
