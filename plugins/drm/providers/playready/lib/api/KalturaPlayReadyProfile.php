@@ -29,5 +29,23 @@ class KalturaPlayReadyProfile extends KalturaDrmProfile
 		return $dbObject;
 	}
 	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if (!PlayReadyPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !PlayReadyPlugin::isAllowedPartner($this->partnerId))
+		{
+			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the PlayReady feature.');
+		}
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateForUpdate ($sourceObject, $propertiesToSkip = array())
+	{
+		if (!PlayReadyPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !PlayReadyPlugin::isAllowedPartner($sourceObject->getPartnerId()))
+		{
+			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the PlayReady feature.');
+		}
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
 }
 
