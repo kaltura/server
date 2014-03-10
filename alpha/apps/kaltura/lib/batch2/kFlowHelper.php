@@ -13,7 +13,7 @@ class kFlowHelper
 	);
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
-	const POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT = 5;
+	const POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMOUNT = 5;
 	
 	const POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR = 300000;
 	
@@ -1487,7 +1487,7 @@ class kFlowHelper
 		if($data->getCreateThumb())
 		{
 			$thumbCreationSuccess = false;
-			for($errorCounter = 0; $errorCounter < self::POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT ; $errorCounter++)
+			for($errorCounter = 0; $errorCounter < self::POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMOUNT ; $errorCounter++)
 			{
 				try
 				{
