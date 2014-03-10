@@ -1,6 +1,6 @@
-/*! KMC - v6.0.10 - 2014-02-17
+/*! KMC - v6.0.10 - 2014-03-10
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2014 Ran Yefet; Licensed GNU */
+* Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -3492,7 +3492,8 @@ kmcApp.config(['$translateProvider', function ($translateProvider) {
 		prefix: '/locales/locale-',
 		suffix: '.json'
 	});
-	var lang = kmc.vars.language || 'en';
+
+	var lang = localStorage["lang"] || 'en';
 	// take the first two characters
 	if( lang.length > 2 ){
 		lang = lang.toLowerCase().substr(0,2);
@@ -3802,7 +3803,7 @@ kmc.log = function() {
 
 kmc.functions = {
 
-	loadSwf : function() {
+	loadSwf : function(lang) {
 
 		var kmc_swf_url = window.location.protocol + '//' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
 		var flashvars = {
@@ -3829,7 +3830,7 @@ kmc.functions = {
 			openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 			openCw				: "kmc.functions.openKcw",
             maxUploadSize       : "2047",
-			language			: (kmc.vars.language || "")
+			language			: lang
 		};
 		// Disable analytics
 		if( kmc.vars.disable_analytics ) {
@@ -4009,7 +4010,7 @@ kmc.utils = {
 				"width": 0,
 				"visibility": 'visible',
 				"top": '6px',
-				"right": '6px'
+				"right": '29px'
 			};
 
 			var menu_animation_css = {
@@ -4164,6 +4165,7 @@ kmc.utils = {
 	},
 
 	// we should combine the two following functions into one
+    kmcHeight: $("#flash_wrap").height(),
 	hideFlash : function(hide) {
 		var ltIE8 = $('html').hasClass('lt-ie8');
 		if(hide) {
@@ -4173,14 +4175,15 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
-                $("#flash_wrap object").css("width",0+"px");
+                this.kmcHeight = $("#flash_wrap").height();
+				$("#flash_wrap").height(0);
 			}
 		} else {
 			if( ltIE8 ) {
 				$("#flash_wrap").css("margin-right","0");
 			} else {
 				$("#flash_wrap").css("visibility","visible");
-                $("#flash_wrap object").css("width",100+"%");
+                $("#flash_wrap").height(this.kmcHeight);
 			}
 		}
 	},
@@ -4189,7 +4192,9 @@ kmc.utils = {
 		$("#server_frame").removeAttr('src');
 		if( !kmc.layout.modal.isOpen() ) {
 			$("#flash_wrap").css("visibility","visible");
-            $("#flash_wrap object").css("visibility","visible");
+            if (this.kmcHeight > 0){
+                $("#flash_wrap").height(this.kmcHeight);
+            }
             var ltIE8 = $('html').hasClass('lt-ie8');
             if( ltIE8 ) {
                 $("#flash_wrap").css("margin-right","0");
@@ -4332,14 +4337,13 @@ kmc.preview_embed = {
 		if( uiconf_id ) {
 			embedOptions.uiConfId = parseInt(uiconf_id);
 		}
-
 		// Single entry
 		if( ! is_playlist ) {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
 				'name': name,
 				'description': description,
-                'duration': duration.toString(),
+                'duration': duration,
                 'thumbnailUrl': thumbnailUrl
 			};
 			if( live_bitrates ) {
@@ -4355,7 +4359,6 @@ kmc.preview_embed = {
 				embedOptions.playlistName = name;
 			}
 		}
-
 		kmc.Preview.openPreviewEmbed( embedOptions, kmc.Preview.Service );
 	}, // doPreviewEmbed
 
@@ -4792,9 +4795,10 @@ function playerAdded() {kmc.preview_embed.updateList(false);}
 
 // When page ready initilize KMC
 $(function() {
+
 	kmc.layout.init();
 	kmc.utils.handleMenu();
-	kmc.functions.loadSwf();
+	kmc.functions.loadSwf(window.lang);
 
 	// Set resize event to update the flash object size
 	$(window).wresize(kmc.utils.resize);
@@ -4806,6 +4810,7 @@ $(function() {
 
 	// Set client IP
 	kmc.utils.setClientIP();
+
 });
 
 // Auto resize modal windows

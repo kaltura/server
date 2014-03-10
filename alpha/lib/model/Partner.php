@@ -15,6 +15,7 @@ class Partner extends BasePartner
 	const HOSTED_PAGES_PARTNER_ID = -3;
 	const MONITORING_PARTNER_ID = -4;
 	const MEDIA_SERVER_PARTNER_ID = -5;
+	const PLAY_SERVER_PARTNER_ID = -6;
 	
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
@@ -1478,5 +1479,10 @@ class Partner extends BasePartner
 			}
 		}
 		return true;
+	}
+	
+	public function getNotificationUrl()
+	{
+		return $this->getUrl2();
 	}
 }
