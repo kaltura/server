@@ -675,9 +675,7 @@ class myEntryUtils
 		
 		if($orig_image_path === null || !file_exists($orig_image_path))
 		{
-			$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
-			$orig_image_key = $entry->getSyncKey($sub_type, $version);
-			$orig_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($orig_image_key);
+			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
 		
 		
@@ -830,6 +828,15 @@ class myEntryUtils
 		return $convertedImagePath;
 	}
 	
+	public static function getLocalImageFilePathByEntry( $entry, $version = null )
+	{
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$entry_image_key = $entry->getSyncKey($sub_type, $version);
+		$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
+		
+		return $entry_image_path;
+	} 
+	
 	//
 	// sets the type and media_type of an entry according to the file extension
 	// in case the media_type is entry::ENTRY_MEDIA_TYPE_AUTOMATIC we find the media_type from the extension
@@ -951,6 +958,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		}
 		
 		foreach($entrySyncKeys as $syncKey)
@@ -1190,6 +1199,53 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$categoryEntries = categoryEntryPeer::doSelect($c);
 		categoryEntryPeer::setUseCriteriaFilter(true);
 		
+		// Create srcCategoryIdToDstCategoryIdMap - a map of source partner category ids -> dst. partner category ids
+		//
+		// Build src category IDs set
+		$srcCategoryIdSet = array();
+		foreach($categoryEntries as $categoryEntry)
+		{
+			$srcCategoryIdSet[] = $categoryEntry->getCategoryId();
+		}
+
+		$illegalCategoryStatus = array( CategoryStatus::DELETED, CategoryStatus::PURGED );
+
+		// Get src category objects
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->add(categoryPeer::ID, $srcCategoryIdSet, Criteria::IN);
+		$c->addAnd(categoryPeer::PARTNER_ID, $entry->getPartnerId());
+		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
+		categoryPeer::setUseCriteriaFilter(false);
+		$srcCategories = categoryPeer::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		// Map the category names to their IDs
+		$fullNamesToSrcCategoryIdMap = array();
+		foreach ( $srcCategories as $category )
+		{
+			$fullNamesToSrcCategoryIdMap[ $category->getFullName() ] = $category->getId();
+		}
+
+		// Get dst. partner categories based on src. category full-names
+		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+		$c->add(categoryPeer::FULL_NAME, array_keys( $fullNamesToSrcCategoryIdMap ), KalturaCriteria::IN);
+		$c->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
+		$c->addAnd(categoryPeer::STATUS, $illegalCategoryStatus, Criteria::NOT_IN);
+		categoryPeer::setUseCriteriaFilter(false);
+		$dstCategories = categoryPeer::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
+
+		$srcCategoryIdToDstCategoryIdMap = array();
+		foreach ( $dstCategories as $dstCategory )
+		{
+			$fullName = $dstCategory->getFullName();
+			if ( array_key_exists( $fullName, $fullNamesToSrcCategoryIdMap ) )
+			{
+				$srcCategoryId = $fullNamesToSrcCategoryIdMap[ $fullName ];
+				$srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ] = $dstCategory->getId();
+			}
+		}
+
 		foreach($categoryEntries as $categoryEntry)
 		{
 			/* @var $categoryEntry categoryEntry */
@@ -1197,10 +1253,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newCategoryEntry->setPartnerId($newEntry->getPartnerId());
 			$newCategoryEntry->setEntryId($newEntry->getId());
 		
-			$categoryId = kObjectCopyHandler::getMappedId('category', $newCategoryEntry->getCategoryId());
-			if($categoryId)
-				$newCategoryEntry->setCategoryId($categoryId);
-			
+			$srcCategoryId = $categoryEntry->getCategoryId();
+			if ( ! array_key_exists( $srcCategoryId, $srcCategoryIdToDstCategoryIdMap ) )
+			{
+				continue; // Skip the category_entry's creation
+			}
+
+			$dstCategoryId = $srcCategoryIdToDstCategoryIdMap[ $srcCategoryId ];
+			$newCategoryEntry->setCategoryId( $dstCategoryId );
+
 			categoryPeer::setUseCriteriaFilter(false);
 			entryPeer::setUseCriteriaFilter(false);
 			$newCategoryEntry->save();
@@ -1210,6 +1271,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return $newEntry;
  	} 	
+ 	
  	/*
  	 * re-index to search index, and recalculate fields.
  	 */

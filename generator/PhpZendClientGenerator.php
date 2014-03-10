@@ -406,7 +406,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					
 				case "bigint" :
 					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = (int)\$xml->$propName;");
+					$this->appendLine("			\$this->$propName = (string)\$xml->$propName;");
 					break;
 					
 				case "bool" :
@@ -419,15 +419,17 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					break;
 					
 				case "array" :
+					$arrayType = $propertyNode->getAttribute ( "arrayType" );
 					$this->appendLine("		if(empty(\$xml->{$propName}))");
 					$this->appendLine("			\$this->$propName = array();");
 					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalItem(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalArray(\$xml->$propName, \"$arrayType\");");
 					break;
 					
 				default : // sub object
+					$fallback = $propertyNode->getAttribute("type");
 					$this->appendLine("		if(!empty(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalItem(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_ParseUtils::unmarshalObject(\$xml->$propName, \"$fallback\");");
 					break;
 			}
 			
@@ -529,6 +531,8 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
+	    $arrayObjectType = ($resultType == 'array') ? $resultNode->getAttribute ( "arrayType" ) : null;
+	    
 		
 		// method signature
 		$signature = "";
@@ -601,47 +605,57 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		
 	    if($resultType == 'file')
 	    {
-			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', \$kparams);");
+			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', null, \$kparams);");
 			$this->appendLine('		$resultObject = $this->client->getServeUrl();');
 	    }
 	    else
 	    {
+	    	$fallbackClass = 'null';
+	    	if($resultType == 'array')
+	    		$fallbackClass = "\"$arrayObjectType\"";
+	    	else if($resultType && !$this->isSimpleType($resultType))
+	    		$fallbackClass = "\"$resultType\"";
+	    	
 			if ($haveFiles)
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\",  $fallbackClass, \$kparams, \$kfiles);");
 			else
-				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", $fallbackClass, \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
 			$this->appendLine("			return \$this->client->getMultiRequestResult();");
-			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
-			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
+			$this->appendLine("		\$resultXml = \$this->client->doQueue();");
+			$this->appendLine("		\$resultXmlObject = new \\SimpleXMLElement(\$resultXml);");
+			$this->appendLine("		Kaltura_Client_ParseUtils::checkIfError(\$resultXmlObject->result);");
 			
 			switch($resultType)
 			{
 				case 'int':
-					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"integer\");");
+					$this->appendLine("		\$resultObject = (int)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				
 				case 'bool':
-					$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+					$this->appendLine("		\$resultObject = (bool)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				
 				case 'string':
+					$this->appendLine("		\$resultObject = (string)Kaltura_Client_ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
+					break;
 				case 'array':
-					$this->appendLine("		if(!\$resultObject)");
-					$this->appendLine("			\$resultObject = array();");
+					$this->appendLine("		\$resultObject = Kaltura_Client_ParseUtils::unmarshalArray(\$resultXmlObject->result, \"$arrayObjectType\");");
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					break;
 				
 				default:
 					if ($resultType)
 					{
+						$this->appendLine("		\$resultObject = Kaltura_Client_ParseUtils::unmarshalObject(\$resultXmlObject->result, \"$resultType\");");
 						$resultType = $this->getTypeClass($resultType);
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					}
 			}
 	    }
 			
-		$this->appendLine("		return \$resultObject;");
+		if($resultType)
+			$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");
 	}
 	

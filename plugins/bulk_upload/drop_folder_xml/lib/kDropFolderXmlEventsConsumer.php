@@ -65,7 +65,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		try 
 		{
 			$coreBulkUploadType = DropFolderXmlBulkUploadPlugin::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML);
-			$jobStatuses = array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL);
+			$jobStatuses = array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_QUEUED,);
 			$isMatch =  $dbBatchJob->getJobType() == BatchJobType::BULKUPLOAD && 
 						$dbBatchJob->getJobSubType() == $coreBulkUploadType &&
 						in_array($dbBatchJob->getStatus(), $jobStatuses);
@@ -102,6 +102,28 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		KalturaLog::debug('object id '.$dbBatchJob->getObjectId());
 		switch($dbBatchJob->getStatus())
 		{
+			case BatchJob::BATCHJOB_STATUS_QUEUED:
+				$jobData = $dbBatchJob->getData();
+				if(!is_null($jobData->getFilePath()))
+				{
+					$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+					try{
+						kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
+					}
+					catch(Exception $e)
+					{
+						KalturaLog::err($e);
+						throw new APIException(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+					}
+					
+					$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+					$jobData->setFilePath($filePath);
+					
+					//save new info on the batch job
+					$dbBatchJob->setData($jobData);
+					$dbBatchJob->save();
+				}
+				break;
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 			case BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY:
 				KalturaLog::debug("Handling Bulk Upload finished");
@@ -120,6 +142,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 				}			
 				break;				
 		}		
+		
 	}
 			
 	private function setFileProcessing(DropFolderFile $file, array $relatedFiles)
@@ -326,7 +349,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		}
 		catch(PropelException $e)
 		{
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 			{
 				$existingFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($folder->getId(), $fileName);
 				if($existingFile)

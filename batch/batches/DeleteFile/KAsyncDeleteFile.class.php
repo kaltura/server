@@ -27,7 +27,7 @@ class KAsyncDeleteFile extends KJobHandlerWorker
 		if (!$result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to delete file from disk", KalturaBatchJobStatus::FAILED);
 		
-		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
+		return $this->closeJob($job, null, null, 'File deleted successfully', KalturaBatchJobStatus::FINISHED);
 		
 	}
 

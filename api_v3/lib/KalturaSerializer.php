@@ -15,7 +15,15 @@ abstract class KalturaSerializer
 	
 	public function setHttpHeaders() {}
 	
-	public function serialize($object) { return ''; }
+	abstract public function serialize($object);
+	
+	public function getHeader() { return '';}
+	public function getMulitRequestHeader($itemsCount = null) { return '';}
+	public function getItemHeader($itemIndex = null) { return '';}
+	
+	public function getFooter($execTime = null) { return '';}
+	public function getMulitRequestFooter() { return '';}
+	public function getItemFooter($lastItem = false) { return '';}
 	
 	protected function convertExceptionsToPhpArrays($object)
 	{

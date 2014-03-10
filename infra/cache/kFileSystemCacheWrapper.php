@@ -12,18 +12,16 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 
 	protected $baseFolder;
 	protected $keyFolderChars;
-	protected $serializeData;
 	protected $defaultExpiry;
 	protected $supportExpiry;
 
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()
 	 */
-	public function init($config)
+	protected function doInit($config)
 	{		
 		$this->baseFolder = rtrim($config['rootFolder'], '/') . '/' . rtrim($config['baseFolder'], '/') . '/';
 		$this->keyFolderChars = $config['keyFolderChars'];
-		$this->serializeData = isset($config['serializeData']) ? $config['serializeData'] : false;
 		$this->defaultExpiry = $config['defaultExpiry'];
 		$this->supportExpiry = isset($config['supportExpiry']) ? $config['supportExpiry'] : false;
 		return true;
@@ -72,7 +70,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::get()
 	 */
-	public function get($key)
+	protected function doGet($key)
 	{
 		$filePath = $this->getFilePath($key);
 		if (!file_exists($filePath))
@@ -95,21 +93,16 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 		}
 		
 		$result = self::safeFileGetContents($filePath);
-		if ($result === false)
-			return false;
-		if ($this->serializeData)
-			$result = @unserialize($result);
+
 		return $result;
 	}
 		
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::set()
 	 */
-	public function set($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0)
 	{
 		$filePath = $this->getFilePath($key);
-		if ($this->serializeData)
-			$var = serialize($var);
 		
 		self::createDirForPath($filePath);
 		
@@ -126,7 +119,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::add()
 	 */
-	public function add($key, $var, $expiry = 0)
+	protected function doAdd($key, $var, $expiry = 0)
 	{
 		return false;
 	}
@@ -134,7 +127,7 @@ class kFileSystemCacheWrapper extends kBaseCacheWrapper
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::delete()
 	 */
-	public function delete($key)
+	protected function doDelete($key)
 	{
 		$filePath = $this->getFilePath($key);
 		if ($this->supportExpiry)

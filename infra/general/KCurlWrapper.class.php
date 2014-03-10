@@ -88,6 +88,7 @@ class KCurlWrapper
 {
 	const HTTP_PROTOCOL_HTTP = 1;
 	const HTTP_PROTOCOL_FTP = 2;
+	const COULD_NOT_CONNECT_TO_HOST_ERROR = "couldn't connect to host";
 
 	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
 
@@ -119,6 +120,16 @@ class KCurlWrapper
 		if (self::$lastHeader) // if we read the last header abort the curl
 			return 0;
 
+		$length = strlen ( $string );
+		return $length;
+	}
+	
+	private static function read_header_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
+	
+	private static function read_body_do_nothing($ch, $string) {
 		$length = strlen ( $string );
 		return $length;
 	}
@@ -279,9 +290,13 @@ class KCurlWrapper
 		self::$headers = "";
         self::$lastHeader = false;
         curl_exec($this->ch);
+        
+        //Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
+        if(!$noBody)
+			curl_setopt($this->ch, CURLOPT_RANGE, '0-');
+        
         if(!self::$headers)
            return false;
-
 
 		self::$headers = explode("\r\n", self::$headers);
 
@@ -368,10 +383,14 @@ class KCurlWrapper
 			}
 		}
 
+		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header_do_nothing');
+		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
+		
 		return $curlHeaderResponse;
 	}
 
 	/**
+	 * @param string $sourceUrl
 	 * @param string $destFile
 	 * @return boolean
 	 */

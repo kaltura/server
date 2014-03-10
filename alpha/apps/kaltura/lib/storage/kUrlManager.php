@@ -235,9 +235,12 @@ class kUrlManager
 	{
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
-		if($fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
 			return $fileSync->getSmoothStreamUrl();
 		
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $fileSync->getObjectSubType() == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+			return $fileSync->getSmoothStreamUrl();
+			
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
 	
@@ -342,9 +345,14 @@ class kUrlManager
 		$flavorAssetId = $asset->getId();
 		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
 		
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost";
 		if($this->storageProfileId)
 			$url .= "/storageId/$this->storageProfileId";
+				
+		$ext = '';
+		if ($asset && $asset->getFileExt())   
+			$ext ='/a.' .  $asset->getFileExt();
+		$url .= $ext . "?clientTag=$clientTag";
 		
 		return $url;
 	}
@@ -597,7 +605,7 @@ class kUrlManager
 	protected function checkIfValidUrl($urlToCheck, $parentURL)
 	{
 		$urlToCheck = trim($urlToCheck);
-		if(!filter_var($urlToCheck, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED))
+		if (strpos($urlToCheck, '://') === false)
 		{
 			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
 		}

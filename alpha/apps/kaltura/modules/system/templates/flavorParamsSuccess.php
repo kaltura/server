@@ -96,9 +96,9 @@ and "" that are placed arround editFlavorParam->getMultiStream
 			<br />
 			<br />
 			<label for="conversion-engines"><b>Conversion engines:</b></label> <label>(Delimited with ",")</label>
-			<span style="color: white; background:white;><label for="name">.....................................</label>
-			<label for="conversion-engines-extra-params">Extra params:(Delimited with "|") </label>
-			</span>
+			<span style="color: white; background:white;><label for="name">.......................</label></span>
+			<label for="conversion-engines-extra-params"><b>Extra params:(Delimited with "|") </b></label>
+			
 			<br />
 			 
 			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/>
@@ -106,6 +106,9 @@ and "" that are placed arround editFlavorParam->getMultiStream
 			<br />
 			<label for="operators"><b>Operators:</b></label><br />
 			<textarea id="operators" name="operators" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getOperators(); ?></textarea><br/>
+			<label for="sourceAssetParamsIds"><b>SourceAssetParamsIds: </b></label>
+			<input type="text" id="sourceAssetParamsIds" name="sourceAssetParamsIds" value="<?php echo $editFlavorParam->getSourceAssetParamsIds(); ?>" size="40" <?php echo $disabled; ?>/>	
+			<br />
 			<label for="is-default">Is Default: </label><input type="checkbox" id="is-default" name="is-default" value="1" <?php echo ($editFlavorParam->getIsDefault()) ? 'checked="checked"' : ''; ?> <?php echo $disabled; ?>/>
 			<label for="ready-behavior">Ready Behavior:</label>
 			<select id="ready-behavior" name="ready-behavior" <?php echo $disabled; ?>>

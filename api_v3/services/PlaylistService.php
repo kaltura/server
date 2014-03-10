@@ -150,9 +150,9 @@ class PlaylistService extends KalturaEntryService
 		$tmpDbPlaylist = $playlist->toUpdatableObject($tmpDbPlaylist);
 		
 		$playlistUpdate = null;
-		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
+		$playlistUpdate = $playlist->toObject($playlistUpdate);
 		
-		$this->checkAndSetValidUserUpdate($playlist, $playlistUpdate);
+		$this->checkAndSetValidUserUpdate($playlist, $dbPlaylist);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
 		$this->validateEntryScheduleDates($playlist, $dbPlaylist);

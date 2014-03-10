@@ -56,13 +56,14 @@ class syndicationFeed extends BasesyndicationFeed
 	}
 
 	/* (non-PHPdoc)
-	 * @see BasesyndicationFeed::preInsert()
+	 * @see BasesyndicationFeed::preSave()
 	 */
-	public function preInsert(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
-		$this->setServePlayManifest(true);
+		if($this->isNew())
+			$this->setServePlayManifest(true);
 		
-		return parent::preInsert($con);
+		return parent::preSave($con);
 	}
 	
 	/* (non-PHPdoc)

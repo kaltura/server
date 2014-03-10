@@ -47,7 +47,7 @@ namespace Kaltura
         private string _KS;
         private bool _ShouldLog;
         private List<KalturaServiceActionCall> _CallsQueue;
-        private bool _IsMultiRequest;
+        private List<string> _MultiRequestReturnType;
         private KalturaParams _MultiRequestParamsMap;
 		private WebHeaderCollection _ResponseHeaders;
 
@@ -63,8 +63,7 @@ namespace Kaltura
 
         public bool IsMultiRequest
         {
-            get { return _IsMultiRequest; }
-            set { _IsMultiRequest = value; }
+            get { return (_MultiRequestReturnType != null); }
         }
 
 		public WebHeaderCollection ResponseHeaders
@@ -91,12 +90,12 @@ namespace Kaltura
 
         #region Methods
 
-        public void QueueServiceCall(string service, string action, KalturaParams kparams)
+        public void QueueServiceCall(string service, string action, string fallbackClass, KalturaParams kparams)
         {
-            this.QueueServiceCall(service, action, kparams, new KalturaFiles());
+            this.QueueServiceCall(service, action, fallbackClass, kparams, new KalturaFiles());
         }
 
-        public void QueueServiceCall(string service, string action, KalturaParams kparams, KalturaFiles kfiles)
+        public void QueueServiceCall(string service, string action, string fallbackClass, KalturaParams kparams, KalturaFiles kfiles)
         {
             // in start session partner id is optional (default -1). if partner id was not set, use the one in the config
             if (!kparams.ContainsKey("partnerId"))
@@ -108,6 +107,8 @@ namespace Kaltura
             kparams.AddStringIfNotNull("ks", this._KS);
 
             KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
+            if (_MultiRequestReturnType != null)
+                _MultiRequestReturnType.Add(fallbackClass);
             this._CallsQueue.Add(call);
         }
 
@@ -115,7 +116,8 @@ namespace Kaltura
         {
             if (_CallsQueue.Count == 0)
             {
-            	_IsMultiRequest = false;
+                _MultiRequestReturnType.Clear();
+                _MultiRequestReturnType = null;
                 return null;
             }
 
@@ -133,7 +135,7 @@ namespace Kaltura
 
             string url = this._Config.ServiceUrl + "/api_v3/index.php?service=";
 
-            if (_IsMultiRequest)
+            if (_MultiRequestReturnType != null)
             {
                 url += "multirequest";
                 int i = 1;
@@ -168,7 +170,6 @@ namespace Kaltura
 
             // cleanup
             _CallsQueue.Clear();
-            _IsMultiRequest = false;
             _MultiRequestParamsMap.Clear();
 
             kparams.Add("kalsig", this.Signature(kparams));
@@ -255,7 +256,7 @@ namespace Kaltura
 
         public void StartMultiRequest()
         {
-            _IsMultiRequest = true;
+            _MultiRequestReturnType = new List<string>();
         }
 
         public KalturaMultiResponse DoMultiRequest()
@@ -267,17 +268,21 @@ namespace Kaltura
 			{
 				return multiResponse;
 			}
+            int i = 0;
             foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
             {
 				XmlElement error = arrayNode["error"];
 				if (error != null && error["code"] != null && error["message"] != null)
                     multiResponse.Add(new KalturaAPIException(error["code"].InnerText, error["message"].InnerText));
                 else if (arrayNode["objectType"] != null)
-                    multiResponse.Add(KalturaObjectFactory.Create(arrayNode));
+                    multiResponse.Add(KalturaObjectFactory.Create(arrayNode, _MultiRequestReturnType[i]));
                 else
                     multiResponse.Add(arrayNode.InnerText);
+                i++;
             }
 
+            _MultiRequestReturnType.Clear();
+            _MultiRequestReturnType = null;
             return multiResponse;
         }
 

@@ -41,6 +41,10 @@ class KalturaEntryFactory
 				}
 				break;
 				
+			case KalturaEntryType::LIVE_CHANNEL:
+				$obj = new KalturaLiveChannel();
+				break;
+				
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaBaseEntry', $type);
 				

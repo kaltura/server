@@ -1,4 +1,3 @@
-
 /*Table structure for table `access_control` */
 
 CREATE TABLE IF NOT EXISTS `access_control` (
@@ -379,11 +378,12 @@ CREATE TABLE IF NOT EXISTS `category_entry` (
   `updated_at` datetime DEFAULT NULL,
   `category_full_ids` text NOT NULL,
   `status` int(11) DEFAULT '2',
+  `privacy_context` VARCHAR(255),
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `category_id_index` (`category_id`),
-  KEY `entry_id_index` (`entry_id`),
-  KEY `updated_at` (`updated_at`)
+  KEY `updated_at` (`updated_at`),
+  KEY `entry_id_privacy_context_index`(`entry_id`, `privacy_context`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `category_kuser` */
@@ -765,6 +765,34 @@ CREATE TABLE IF NOT EXISTS `entry` (
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_created_at` (`partner_id`,`created_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+
+/*Table structure for table `live_channel_segment` */
+
+CREATE TABLE live_channel_segment
+(
+        id BIGINT  NOT NULL AUTO_INCREMENT,
+        partner_id INTEGER,
+        created_at DATETIME,
+        updated_at DATETIME,
+        name VARCHAR(255),
+        description TEXT,
+        tags TEXT,
+        type INTEGER,
+        status INTEGER,
+        channel_id VARCHAR(20),
+        entry_id VARCHAR(20),
+        trigger_type INTEGER,
+        trigger_segment_id BIGINT,
+        start_time FLOAT,
+        duration FLOAT,
+        custom_data TEXT,
+        PRIMARY KEY (id),
+        KEY partner_index(partner_id),
+        KEY live_channel_segment_FI_1 (trigger_segment_id),
+        Key live_channel_segment_FI_3 (channel_id,status),
+        Key live_channel_segment_FI_4 (entry_id,status)
+)Engine=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `entry_distribution` */
 
@@ -2216,5 +2244,59 @@ CREATE TABLE `drm_profile`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY partner_id_provider_status (partner_id, provider, status)
+	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `drm_policy`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`profile_id` INTEGER  NOT NULL,
+	`name` TEXT  NOT NULL,
+	`system_name` VARCHAR(128) default '' NOT NULL,
+	`description` TEXT,
+	`provider` INTEGER  NOT NULL,
+	`status` INTEGER  NOT NULL,
+	`scenario` INTEGER  NOT NULL,
+	`license_type` INTEGER,
+	`license_expiration_policy` INTEGER,
+	`duration` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `drm_device`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`profile_id` INTEGER  NOT NULL,
+	`userId` VARCHAR(128)  NOT NULL,
+	`deviceId` VARCHAR(128)  NOT NULL,
+	`version` VARCHAR(128),
+	`platformDescriptor` TEXT,
+	`provider` INTEGER  NOT NULL,
+	`status` INTEGER  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `drm_key`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`provider` INTEGER  NOT NULL,
+	`object_id` VARCHAR(20)  NOT NULL,
+	`object_type` TINYINT  NOT NULL,
+	`drm_key` VARCHAR(128)  NOT NULL,
+	`parent_id` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `partner_id_object_id_object_type_provider` (`partner_id`, `object_id`, `object_type`, `provider`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

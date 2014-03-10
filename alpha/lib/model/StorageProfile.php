@@ -33,6 +33,7 @@ class StorageProfile extends BaseStorageProfile
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
+	const CUSTOM_DATA_HTTPS_DELIVERY_URL ='https_delivery_url';
 	
 	/**
 	 * @var kStorageProfileScope
@@ -119,6 +120,16 @@ class StorageProfile extends BaseStorageProfile
 	    $this->putInCustomData(self::CUSTOM_DATA_CREATE_FILE_LINK, $v);
 	}
 	
+	public function getDeliveryHttpsBaseUrl()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL);
+	}
+
+	public function setDeliveryHttpsBaseUrl($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL, $v);
+	}
+	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
 	
 	/* URL Manager Params */
@@ -186,14 +197,7 @@ class StorageProfile extends BaseStorageProfile
 			KalturaLog::debug('Flavor is not ready for export');
 			return false;
 		}
-
-		$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		if($this->isExported($key))
-		{
-			KalturaLog::debug('Flavor was already exported');
-			return false;
-		}
-			
+					
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
 			KalturaLog::debug('Flavor asset is not configured for export');
@@ -208,13 +212,22 @@ class StorageProfile extends BaseStorageProfile
 			return false;
 		}
 			
+		KalturaLog::debug('Flavor should be exported');
+		return true;	    
+	}
+	
+	public function shoudlExportFileSync(FileSyncKey $key)
+	{
+		if($this->isExported($key))
+		{
+			KalturaLog::debug('Flavor was already exported');
+			return false;
+		}
 		if(!$this->isValidFileSync($key))
 		{
 			KalturaLog::debug('File sync is not valid for export');
 			return false;
 		}
-
-		KalturaLog::debug('Flavor should be exported');
 		return true;	    
 	}
 	
@@ -238,9 +251,8 @@ class StorageProfile extends BaseStorageProfile
 	}
 	
 	
-	public function isPendingExport(asset $asset)
+	public function isPendingExport(FileSyncKey $key)
 	{
-	    $key = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 	    $c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		$c->addAnd(FileSyncPeer::DC, $this->getId(), Criteria::EQUAL);
 		$fileSync = FileSyncPeer::doSelectOne($c);

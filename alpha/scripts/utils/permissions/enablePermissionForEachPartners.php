@@ -23,7 +23,6 @@ if ($argc == 5){
 }
 	
 $countLimitEachLoop = 500;
-$offset = $countLimitEachLoop;
 //------------------------------------------------------
 
 
@@ -32,16 +31,20 @@ require_once (dirname ( __FILE__ ) . '/../../bootstrap.php');
 $con = myDbHelper::getConnection ( myDbHelper::DB_HELPER_CONN_PROPEL2 );
 KalturaStatement::setDryRun ( $dryRun );
 
-$c = new Criteria ();
-$c->add ( PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL );
-$c->add ( PartnerPeer::ID, 0, Criteria::GREATER_THAN );
-if(!$includeTemplatePartners)
-	$c->add (PartnerPeer::PARTNER_GROUP_TYPE, PartnerGroupType::TEMPLATE, Criteria::NOT_EQUAL);
-$c->setLimit ( $countLimitEachLoop );
+$lastPartnerId = 0;
 
-$partners = PartnerPeer::doSelect ( $c, $con );
+while ( 1 ) {
+	$c = new Criteria ();
+	$c->add ( PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL );
+	$c->add ( PartnerPeer::ID, $lastPartnerId, Criteria::GREATER_THAN );
+	if(!$includeTemplatePartners)
+		$c->add (PartnerPeer::PARTNER_GROUP_TYPE, PartnerGroupType::TEMPLATE, Criteria::NOT_EQUAL);
+	$c->addAscendingOrderByColumn ( PartnerPeer::ID );
+	$c->setLimit ( $countLimitEachLoop );
+	$partners = PartnerPeer::doSelect ( $c, $con );
+        if (!count($partners))
+                break;
 
-while ( count ( $partners ) ) {
 	foreach ( $partners as $partner ) {
 		/* @var $partner partner */
 		KalturaLog::debug("Set permission [$permissionName] for partner id [" . $partner->getId () . "]");
@@ -57,13 +60,11 @@ while ( count ( $partners ) ) {
 		
 		$dbPermission->setStatus ( PermissionStatus::ACTIVE );
 		$dbPermission->save ();
+                $lastPartnerId = $partner->getId();
 	}
 
 	kMemoryManager::clearMemory();
-	$c->setOffset($offset);
-	$partners = PartnerPeer::doSelect ( $c, $con );
 	sleep ( 1 );
-	$offset += $countLimitEachLoop;
 }
 
 KalturaLog::debug("Done");

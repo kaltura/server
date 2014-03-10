@@ -10,7 +10,10 @@ class KalturaSyndicationFeedRenderer
 	const STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY = 500;
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
 	const CACHE_CREATION_MARGIN = 30;
-
+	
+	const CACHE_VERSION = 1;
+	const CACHE_EXPIRY = 2592000;		// 30 days
+	
 	/**
 	 * Maximum number of items to list
 	 * @var int
@@ -472,7 +475,7 @@ class KalturaSyndicationFeedRenderer
 			$updatedAt = max($feedUpdatedAt,  $entry->getUpdatedAt(null));
 
 			if ($cacheStore) {	
-				$cacheKey = $cachePrefix.str_replace("_", "-", $entry->getId()); // replace _ with - so cache folders will be created with random entry id and not 0_/1_
+				$cacheKey = $cachePrefix.str_replace("_", "-", $entry->getId()).self::CACHE_VERSION; // replace _ with - so cache folders will be created with random entry id and not 0_/1_
 				$cacheTime = $cacheStore->get($cacheKey.self::CACHE_CREATION_TIME_SUFFIX);
 				if ($cacheTime !== false && $cacheTime > $updatedAt + self::CACHE_CREATION_MARGIN)
 					$xml = $cacheStore->get($cacheKey);
@@ -497,8 +500,8 @@ class KalturaSyndicationFeedRenderer
 
 			if ($cacheStore)
 			{
-				$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time());
-				$cacheStore->set($cacheKey, $xml);
+				$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
+				$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
 			}
 			
 			echo $renderer->finalize($xml, $nextEntry !== false);

@@ -150,6 +150,16 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 */
 	public $metadataProfileId;
 	
+	/**
+	 * @var string
+	 */
+	public $categoriesMetadataFieldName;
+	
+	/**
+	* @var bool
+	*/
+	public $enforceEntitlement;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -178,6 +188,8 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'incremental',
 		'lastFileTimestamp',
 		'metadataProfileId',
+		'categoriesMetadataFieldName',
+		'enforceEntitlement',
 	 );
 		 
 	public function getMapBetweenObjects()

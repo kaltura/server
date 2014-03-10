@@ -21,9 +21,11 @@ class MediaServer extends BaseMediaServer {
 	const DEFAULT_GPUID = -1;
 	
 	const WEB_SERVICE_LIVE = 'live';
+	const WEB_SERVICE_CUE_POINTS = 'cuePoints';
 	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
+		self::WEB_SERVICE_CUE_POINTS => 'KalturaMediaServerCuePointsService',
 	);
 	
 	
@@ -92,6 +94,20 @@ class MediaServer extends BaseMediaServer {
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
 				
+			if (isset ($mediaServers['dc-'.$this->getDc()]))
+		    {
+		    	$mediaServer = $mediaServers['dc-'.$this->getDc()];
+		    
+		    	if(isset($mediaServer[$portField]))
+		     		$port = $mediaServer[$portField];
+		    
+		    	if(isset($mediaServer['application']))
+		     		$app = $mediaServer['application'];
+		     
+		    	if(isset($mediaServer['domain']))
+		     		$domain = $mediaServer['domain'];
+		    }
+				
 			if(isset($mediaServers[$this->getHostname()]))
 			{
 				$mediaServer = $mediaServers[$this->getHostname()];
@@ -107,7 +123,11 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		return "$protocol://$domain:$port/$app/p/";
+		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
+		$url = "$protocol://$domain:$port/$app/";
+		$url = str_replace("{hostName}", $hostname, $url);
+		return $url;
+		
 	}
 	
 	/**
@@ -128,8 +148,8 @@ class MediaServer extends BaseMediaServer {
 		if(kConf::hasMap('media_servers'))
 		{
 			$mediaServers = kConf::getMap('media_servers');
-			if(isset($mediaServers['port']))
-				$port = $mediaServers['port'];
+			if(isset($mediaServers['service-port']))
+				$port = $mediaServers['service-port'];
 				
 			if(isset($mediaServers['protocol']))
 				$protocol = $mediaServers['protocol'];
@@ -143,8 +163,8 @@ class MediaServer extends BaseMediaServer {
 			{
 				$mediaServer = $mediaServers[$this->getHostname()];
 				
-				if(isset($mediaServer['port']))
-					$port = $mediaServer['port'];
+				if(isset($mediaServer['service-port']))
+					$port = $mediaServer['service-port'];
 				
 				if(isset($mediaServer['protocol']))
 					$protocol = $mediaServer['protocol'];
@@ -155,6 +175,7 @@ class MediaServer extends BaseMediaServer {
 		}
 		
 		$url = "$protocol://$domain:$port/$service?wsdl";
+		KalturaLog::debug("Service URL: $url");
 		return new $serviceClass($url);
 	}
 	

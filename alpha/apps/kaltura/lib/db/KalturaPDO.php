@@ -56,7 +56,11 @@ class KalturaPDO extends PropelPDO
 
 		parent::__construct($dsn, $username, $password, $driver_options);
 
-		KalturaLog::debug("conn took - ". (microtime(true) - $connStart). " seconds to $dsn");
+		$connTook = microtime(true) - $connStart;
+		
+		KalturaLog::debug("conn took - $connTook seconds to $dsn");
+		
+		KalturaMonitorClient::monitorConnTook($dsn, $connTook);		
 
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('KalturaStatement'));
 	}

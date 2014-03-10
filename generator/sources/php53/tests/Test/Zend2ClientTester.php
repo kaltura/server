@@ -12,6 +12,10 @@ use Kaltura\Client\Enum\MediaType;
 use Kaltura\Client\Type\MediaEntry;
 use Kaltura\Client\Enum\UploadTokenStatus;
 use Kaltura\Client\Type\UploadToken;
+use Kaltura\Client\Type\MixEntry;
+use Kaltura\Client\Enum\EditorType;
+use Kaltura\Client\ApiException;
+use Exception;
 
 class Zend2ClientTester
 {
@@ -51,6 +55,45 @@ class Zend2ClientTester
 			}
 		}
 		echo "\nFinished running client library tests\n";
+	}
+	
+	public function testMultiRequest() {
+		
+		$this->_client->startMultiRequest();
+
+		$mixEntry = new MixEntry();
+		$mixEntry->name = ".Net Mix";
+		$mixEntry->editorType = EditorType::SIMPLE;
+
+		# Request 1
+		$mixEntry = $this->_client->getMixingService()->add($mixEntry);
+
+		# Request 2
+		$uploadFilePath = dirname(__FILE__) . '/../resources/' . self::UPLOAD_VIDEO_FILENAME;
+    	$uploadTokenId = $this->_client->getMediaService()->upload($uploadFilePath);
+
+		$mediaEntry = new MediaEntry();
+		$mediaEntry->name = "Media Entry For Mix";
+		$mediaEntry->mediaType = MediaType::VIDEO;
+
+		# Request 3
+		$mediaEntry = $this->_client->getMediaService()->addFromUploadedFile($mediaEntry, $uploadTokenId);
+
+		# Request 4
+		$this->_client->getMixingService()->appendMediaEntry($mixEntry->id, $mediaEntry->id);
+
+		$response = $this->_client->doMultiRequest();
+
+		foreach( $response as $subResponse)
+			if($subResponse instanceof ApiException) 
+				throw new Exception("Error occurred: " . $subResponse->getMessage());
+
+		# when accessing the response object we will use an index and not the response number (response number - 1)
+		$this->assertTrue($response[0] instanceof MixEntry);
+		$mixEntry = $response[0];
+		
+		if(is_null($mixEntry->id))
+			throw new \Exception("Failed to add entry within multi request");
 	}
 	
 	public function testSyncFlow()

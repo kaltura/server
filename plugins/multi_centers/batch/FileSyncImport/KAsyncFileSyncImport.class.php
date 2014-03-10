@@ -11,8 +11,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 
 	public function run($jobs = null)
 	{
-		$this->curlWrapper = new KCurlWrapper();
-		$this->curlWrapper->setTimeout(self::$taskConfig->params->curlTimeout);
+		$this->curlWrapper = new KCurlWrapper(self::$taskConfig->params);
 		
 		$retJobs = parent::run($jobs);
 		
@@ -269,6 +268,9 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 		}
 		else
 		{
+			//If we run mutiple file sync import using the same curl we nned to reset the offset each time before fetching the file 
+			$this->curlWrapper->setResumeOffset(0);
+			
 			// create destination directory if doesn't already exist
 			$res = self::createDir(dirname($fileDestination));
 			if ( !$res )

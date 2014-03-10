@@ -18,11 +18,24 @@ class SphinxEntryCriteria extends SphinxCriteria
 
 		if ( $filter->is_set('_eq_redirect_from_entry_id' ) )
 		{
+			$partnerGroup = array(kCurrentContext::getCurrentPartnerId(), PartnerPeer::GLOBAL_PARTNER);
+			$criteriaFilter = entryPeer::getCriteriaFilter();
+			$defaultCriteria = $criteriaFilter->getFilter();
+			$defaultCriteria->remove(entryPeer::PARTNER_ID);
+			$defaultCriteria->add(entryPeer::PARTNER_ID, $partnerGroup, Criteria::IN);
+						
 			$origEntryId = $filter->get( '_eq_redirect_from_entry_id' );
-			$origEntry = entryPeer::retrieveByPK( $origEntryId );
+			$origEntry = entryPeer::retrieveByPK($origEntryId);				
 			
 			if ( ! empty( $origEntry ) )
 			{
+				if ( $origEntry->getType() == entryType::LIVE_STREAM )
+				{
+					// Set a relatively short expiry value in order to reduce the wait-time
+					// until the cache is refreshed and a redirection kicks-in. 
+					kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
+				}
+								
 				// Get the id of the entry id that is being redirected from the original entry
 				$redirectEntryId = $origEntry->getRedirectEntryId(); 
 				
@@ -113,7 +126,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($matchAndCats !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchAndCats );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchAndCats, CategoryEntryStatus::ACTIVE );
 			if ( $categoriesParsed !=='' || $matchAndCats =='')
 				$filter->set ( "_matchand_categories_ids", $categoriesParsed );
 			else
@@ -125,7 +138,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($matchOrCats !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchOrCats );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $matchOrCats, CategoryEntryStatus::ACTIVE );
 			if( $categoriesParsed !=='' || $matchOrCats=='')
 				$filter->set("_matchor_categories_ids", $categoriesParsed);
 			else
@@ -150,7 +163,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if ($CatFullNameIn !== null)
 		{
 			//if the category exist or the category name is an empty string
-			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn );
+			$categoriesParsed = $filter->categoryFullNamesToIdsParsed ( $CatFullNameIn, CategoryEntryStatus::ACTIVE );
 			if( $categoriesParsed !=='' || $CatFullNameIn=='')
 				$filter->set("_matchor_categories_ids", $categoriesParsed);
 			else

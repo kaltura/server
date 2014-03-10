@@ -7,7 +7,7 @@
  * @package api
  * @subpackage services
  */
-class LiveStreamService extends KalturaEntryService
+class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY = 30;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
@@ -18,10 +18,6 @@ class LiveStreamService extends KalturaEntryService
 
 		if($this->getPartnerId() > 0 && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM, $this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
-			
-		// KAsyncValidateLiveMediaServers lists all live entries of all partners
-		if($this->getPartnerId() == Partner::BATCH_PARTNER_ID && $actionName == 'list')
-			myPartnerUtils::resetPartnerFilter('entry');
 	}
 	
 	
@@ -46,8 +42,13 @@ class LiveStreamService extends KalturaEntryService
 	 */
 	function addAction(KalturaLiveStreamEntry $liveStreamEntry, $sourceType = null)
 	{
-		if($sourceType)
-			$liveStreamEntry->sourceType = $sourceType;
+		if($sourceType) {
+			$liveStreamEntry->sourceType = $sourceType;	
+		}
+		else {
+			// default sourceType is AKAMAI_LIVE
+			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
+		}
 	
 		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
 		$dbEntry->save();
@@ -103,8 +104,7 @@ class LiveStreamService extends KalturaEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
-			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$broadcastUrlManager->setEntryBroadcastingUrls($dbEntry);
 		}
 		
 		return $dbEntry;
@@ -125,57 +125,6 @@ class LiveStreamService extends KalturaEntryService
 		return $this->getEntry($entryId, $version, KalturaEntryType::LIVE_STREAM);
 	}
 	
-	/**
-	 * Append recorded video to live stream entry
-	 * 
-	 * @action appendRecording
-	 * @param string $entryId Live stream entry id
-	 * @param KalturaMediaServerIndex $mediaServerIndex
-	 * @param KalturaServerFileResource $resource
-	 * @param float $duration
-	 * 
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 */
-	function appendRecordingAction($entryId, $mediaServerIndex, KalturaServerFileResource $resource, $duration)
-	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		$kResource = $resource->toObject();
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $kResource->getLocalFilePath(), $duration);
-	}
-
-	/**
-	 * Register media server to live-stream entry
-	 * 
-	 * @action registerMediaServer
-	 * @param string $entryId Live stream entry id
-	 * @param string $hostname Media server host name
-	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
-	 * @return KalturaLiveStreamEntry The updated live stream entry
-	 * 
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
-	 */
-	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex)
-	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
-		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
-		if (!$dbMediaServer)
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-			
-		$dbEntry->setMediaServer($mediaServerIndex, $dbMediaServer->getId(), $hostname);
-		$dbEntry->save();
-		
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
-		return $entry;
-	}
-
 	/**
 	 * Authenticate live-stream entry against stream token and partner limitations
 	 * 
@@ -210,18 +159,11 @@ class LiveStreamService extends KalturaEntryService
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
 		$filter->setIsLive(true);
+		$filter->setIdNotIn(array($entryId));
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($baseCriteria);
 		
 		$entries = entryPeer::doSelect($baseCriteria);
-		$liveParamsInputs = count($entries) + 1;
-		$maxLiveStreamInputs = $this->getPartner()->getMaxLiveStreamInputs();
-		if(is_null($maxLiveStreamInputs))
-			$maxLiveStreamInputs = kConf::get('partner_max_live_stream_inputs', null, 10);
-			
-		KalturaLog::debug("live params inputs [$liveParamsInputs], max live stream inputs [$maxLiveStreamInputs]");
-		if($liveParamsInputs > $maxLiveStreamInputs)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_INPUTS, $entryId);
 			
 		foreach($entries as $liveEntry)
 		{
@@ -238,20 +180,34 @@ class LiveStreamService extends KalturaEntryService
 		}
 			
 		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($liveParamsCounts));
+		$liveParamsInputs = 0;
 		$liveParamsOutputs = 0;
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem LiveParams */
-			if(!$liveParamsItem->hasTag(liveParams::TAG_SOURCE))
+			if($liveParamsItem->hasTag(liveParams::TAG_INGEST))
+			{
+				KalturaLog::debug("Input live params [" . $liveParamsItem->getId() . "] [" . $liveParamsItem->getSystemName() . "]: " . $liveParamsCounts[$liveParamsItem->getId()]);
+				$liveParamsInputs += $liveParamsCounts[$liveParamsItem->getId()];
+			}
+			else
 			{
 				KalturaLog::debug("Output live params [" . $liveParamsItem->getId() . "] [" . $liveParamsItem->getSystemName() . "]: " . $liveParamsCounts[$liveParamsItem->getId()]);
 				$liveParamsOutputs += $liveParamsCounts[$liveParamsItem->getId()];
 			}
 		}
 		
+		$maxLiveStreamInputs = $this->getPartner()->getMaxLiveStreamInputs();
+		if(is_null($maxLiveStreamInputs))
+			$maxLiveStreamInputs = kConf::get('partner_max_live_stream_inputs', 'local', 30);
+			
+		KalturaLog::debug("live params inputs [$liveParamsInputs], max live stream inputs [$maxLiveStreamInputs]");
+		if($liveParamsInputs > $maxLiveStreamInputs)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_INPUTS, $entryId);
+			
 		$maxLiveStreamOutputs = $this->getPartner()->getMaxLiveStreamOutputs();
 		if(is_null($maxLiveStreamOutputs))
-			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', null, 10);
+			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', 'local', 30);
 			
 		KalturaLog::debug("live params outputs [$liveParamsOutputs], max live stream outputs [$maxLiveStreamOutputs]");
 		if($liveParamsOutputs > $maxLiveStreamOutputs)
@@ -262,55 +218,6 @@ class LiveStreamService extends KalturaEntryService
 		return $entry;
 	}
 
-	/**
-	 * Unregister media server from live-stream entry
-	 * 
-	 * @action unregisterMediaServer
-	 * @param string $entryId Live stream entry id
-	 * @param string $hostname Media server host name
-	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
-	 * @return KalturaLiveStreamEntry The updated live stream entry
-	 * 
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
-	 */
-	function unregisterMediaServerAction($entryId, $hostname, $mediaServerIndex)
-	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
-		$dbMediaServer = MediaServerPeer::retrieveByHostname($hostname);
-		if (!$dbMediaServer)
-			throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_NOT_FOUND, $hostname);
-			
-		$dbEntry->unsetMediaServer($mediaServerIndex, $dbMediaServer->getId());
-		$dbEntry->save();
-		
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry);
-		return $entry;
-	}
-
-	/**
-	 * Validates all registered media servers
-	 * 
-	 * @action validateRegisteredMediaServers
-	 * @param string $entryId Live stream entry id
-	 * 
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 */
-	function validateRegisteredMediaServersAction($entryId)
-	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
-		/* @var $dbEntry LiveEntry */
-		if($dbEntry->validateMediaServers())
-			$dbEntry->save();	
-	}
-	
 	/**
 	 * Update live stream entry. Only the properties that were set will be updated.
 	 * 
@@ -415,13 +322,13 @@ class LiveStreamService extends KalturaEntryService
 		kApiCache::disableConditionalCache();
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
 		}
 		else
 		{

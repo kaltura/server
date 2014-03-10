@@ -1743,10 +1743,12 @@ CREATE TABLE `category_entry`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	`status` INTEGER default 2,
+	`privacy_context` VARCHAR(255),
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`),
-	KEY `category_entry_updated_at`(`updated_at`)
+	KEY `category_entry_updated_at`(`updated_at`),
+	KEY `partner_id_privacy_context_index`(`partner_id`, `privacy_context`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
@@ -2291,7 +2293,7 @@ DROP TABLE IF EXISTS `file_asset`;
 
 CREATE TABLE `file_asset`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` BIGINT  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`version` INTEGER,
@@ -2302,9 +2304,10 @@ CREATE TABLE `file_asset`
 	`name` VARCHAR(255),
 	`system_name` VARCHAR(255),
 	`file_ext` VARCHAR(4),
-	`size` INTEGER,
+	`size` BIGINT,
 	PRIMARY KEY (`id`),
-	KEY `partner_object_status`(`partner_id`, `object_id`, `object_type`, `status`)
+	KEY `partner_object_status`(`partner_id`, `object_id`, `object_type`, `status`),
+	KEY `updated_at`(`updated_at`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

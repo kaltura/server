@@ -45,7 +45,7 @@ class objdetailsAction extends defPartnerservices2Action
 		}
 		else
 		{
-			$this->addError( "Cannot find object fo type [$clazz_name]");
+			$this->addError( APIErrors::ERROR_CREATING_NOTIFICATION, $clazz_name );
 		}
 	}
 }

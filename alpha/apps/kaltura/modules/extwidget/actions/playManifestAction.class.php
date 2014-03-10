@@ -9,6 +9,23 @@ class playManifestAction extends kalturaAction
 	
 	const HDNETWORKSMIL = 'hdnetworksmil';
 	
+	
+	static protected $httpProtocols = array(
+		'http',
+		'https',
+	);
+
+	static protected $httpFormats = array(
+		PlaybackProtocol::HTTP,
+		PlaybackProtocol::SILVER_LIGHT,
+		PlaybackProtocol::APPLE_HTTP,
+		PlaybackProtocol::HDS,
+		PlaybackProtocol::HLS,	
+		PlaybackProtocol::AKAMAI_HDS,
+		PlaybackProtocol::AKAMAI_HD,
+		PlaybackProtocol::MPEG_DASH,
+	);
+	
 	/**
 	 * Short names for action arguments
 	 * @var array
@@ -41,6 +58,11 @@ class playManifestAction extends kalturaAction
 	 * @var string
 	 */
 	private $format;
+
+	/**
+	 * @var string
+	 */
+	private $responseFormat;
 	
 	/**
 	 * may contain several fallbacks options, each one with a set of tags 
@@ -399,9 +421,24 @@ class playManifestAction extends kalturaAction
 		return false;
 	}
 	
-	protected function initSilverLightManifest()
+	protected function initSilverLightManifest($flavorAssets)
 	{
-		$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$key = null;
+		if($flavorAssets)
+		{
+			foreach ($flavorAssets as $flavorAsset) 
+			{
+				if($flavorAsset->hasTag(assetParams::TAG_ISM_MANIFEST))
+				{
+					$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+					break;
+				}
+			}
+		}
+		
+		if(!$key)
+			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			
 		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
@@ -411,7 +448,8 @@ class playManifestAction extends kalturaAction
 		}
 		else
 		{
-			$this->storageId = $remoteFileSync->getDc();
+			if($remoteFileSync)
+				$this->storageId = $remoteFileSync->getDc();
 			$this->manifestFileSync = $remoteFileSync;
 		}
 		
@@ -481,28 +519,29 @@ class playManifestAction extends kalturaAction
 		return $returnedFlavors;
 	}
 	
+	protected function shouldInitFlavorAssetsArray()
+	{
+		if ($this->entry->getType() == entryType::LIVE_STREAM)
+			return false;
+			
+		if($this->format == "hdnetwork")
+			return false;
+	
+		if ($this->entry instanceof LiveEntry)
+			return false;			// live stream entries don't have flavors
+		
+		return true;
+	}
+	
 	protected function initFlavorAssetArray()
 	{
-		// check whether the flavor asset list is needed
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
-			return;			// live stream entries don't have flavors
+		if(!$this->shouldInitFlavorAssetsArray())
+			return;
 		
 		$oneOnly = false;
-		switch($this->format)
-		{
-			case PlaybackProtocol::HTTP:
-			case "url":
-			case "rtsp":
-				$oneOnly = true;	// single flavor delivery formats
-				break;
-				
-			case PlaybackProtocol::SILVER_LIGHT:
-				$this->initSilverLightManifest();
-				// no break here
-			case "hdnetwork":
-				return;				// manifest-based delivery formats
-		}
-				
+		if($this->format == PlaybackProtocol::HTTP || $this->format == "url" || $this->format == "rtsp")
+			$oneOnly = true;
+								
 		// get initial flavor list by input
 		$flavorAssets = array();
 		if ($this->flavorIds)
@@ -518,6 +557,11 @@ class playManifestAction extends kalturaAction
 			$flavorAssets = $this->removeNotAllowedFlavors($flavorAssets);
 			$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 		}		
+		if($this->format == PlaybackProtocol::SILVER_LIGHT)
+		{
+			$this->initSilverLightManifest($flavorAssets);
+			return;
+		}
 					
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
@@ -800,15 +844,15 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
-	 * @param flavorAsset $flavorAsset
+	 * @param flavorAsset|flavorParams $flavorAsset
 	 * @return array
 	 */
-	private function getFlavorAssetInfo($url, $urlPrefix = '', flavorAsset $flavorAsset = null)
+	private function getFlavorAssetInfo($url, $urlPrefix = '', $flavor = null)
 	{
 		$ext = null;
-		if ($flavorAsset)
+		if ($flavor && is_callable(array($flavor, 'getFileExt')))
 		{
-			$ext = $flavorAsset->getFileExt();
+			$ext = $flavor->getFileExt();
 		}
 		if (!$ext)
 		{
@@ -816,9 +860,9 @@ class playManifestAction extends kalturaAction
 			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
 		}
 
-		$bitrate = ($flavorAsset ? $flavorAsset->getBitrate() : 0);
-		$width =   ($flavorAsset ? $flavorAsset->getWidth()   : 0);
-		$height =  ($flavorAsset ? $flavorAsset->getHeight()  : 0);
+		$bitrate = ($flavor ? $flavor->getVideoBitrate() : 0);
+		$width =   ($flavor ? $flavor->getWidth()   : 0);
+		$height =  ($flavor ? $flavor->getHeight()  : 0);
 		
 		return array(
 			'url' => $url,
@@ -867,7 +911,12 @@ class playManifestAction extends kalturaAction
 		
 		$urlPrefix = '';					
 		if (strpos($url, "://") === false)
-			$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpBaseUrl(), "/") . "/";
+		{
+			if($this->protocol == 'https' && $this->storageProfile->getDeliveryHttpsBaseUrl())
+				$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpsBaseUrl(), "/") . "/";
+			else 
+				$urlPrefix = rtrim($this->storageProfile->getDeliveryHttpBaseUrl(), "/") . "/";
+		}
 		 			
 		return $this->getFlavorAssetInfo($url, $urlPrefix, $flavorAsset);
 	}
@@ -926,7 +975,14 @@ class playManifestAction extends kalturaAction
 	 */
 	private function getSmoothStreamUrl()
 	{
-		$urlPrefix = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+		if($this->manifestFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
+		{
+			$urlPrefix = myPartnerUtils::getIisHost($this->entry->getPartnerId(), $this->protocol);
+		}
+		else if($this->storageProfile)
+		{
+			$urlPrefix = $this->storageProfile->getDeliveryIisBaseUrl();
+		}
 		
 		$matches = null;
 		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))
@@ -1052,16 +1108,9 @@ class playManifestAction extends kalturaAction
 	 */
 	private function buildRtmpLiveStreamFlavorsArray()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
 		{
-			$flavors = array(
-				0 => array(
-					'url' => $this->entry->getStreamName(),
-					'bitrate' => 0,
-					'width' => 0,
-					'height' => 0,
-				)
-			);
+			$flavors = array( 0 => $this->getFlavorAssetInfo($this->entry->getStreamName()) );
 			
 			$conversionProfileId = $this->entry->getConversionProfileId();
 			if($conversionProfileId)
@@ -1075,12 +1124,7 @@ class playManifestAction extends kalturaAction
 					foreach($liveParams as $index => $liveParamsItem)
 					{
 						/* @var $liveParamsItem liveParams */
-						$flavors[$index] = array(
-							'url' => $this->entry->getStreamName() . '_' . $liveParamsItem->getId(),
-							'bitrate' => $liveParamsItem->getVideoBitrate(),
-							'width' => $liveParamsItem->getWidth(),
-							'height' => $liveParamsItem->getHeight(),
-						);
+						$flavors[$index] = $this->getFlavorAssetInfo($this->entry->getStreamName() . '_' . $liveParamsItem->getId(), '', $liveParamsItem);
 					}
 				}
 			}
@@ -1088,24 +1132,20 @@ class playManifestAction extends kalturaAction
 			return $flavors;
 		}
 			
-		$flavors = $this->entry->getStreamBitrates();
-		if(count($flavors))
+		$tmpFlavors  = $this->entry->getStreamBitrates();
+		if(count($tmpFlavors))
 		{
-			foreach($flavors as $index => $flavor)
+			$flavors = array();
+			foreach($tmpFlavors as $index => $flavor)
 			{
 				$brIndex = $index + 1;
-				$flavors[$index] = $flavor;
-				$flavors[$index]['url'] = str_replace('%i', $brIndex, $this->entry->getStreamName());
+				$flavors[$index] = $this->getFlavorAssetInfo(str_replace('%i', $brIndex, $this->entry->getStreamName()));
+				$flavors[$index] = array_merge($flavors[$index], $flavor);
 			}
 		}
 		else
 		{
-			$flavors[0] = array(
-				'url' => str_replace('%i', '1', $this->entry->getStreamName()),
-				'bitrate' => 0,
-				'width' => 0,
-				'height' => 0,
-			);
+			$flavors[0] = $this->getFlavorAssetInfo(str_replace('%i', '1', $this->entry->getStreamName()));
 		}
 		
 		return $flavors;
@@ -1116,7 +1156,25 @@ class playManifestAction extends kalturaAction
 	
 	private function getRenderer($defaultClass, $flavors)
 	{
-		$class = $this->urlManager->getRendererClass();
+		$class = null;
+		if ($this->responseFormat)
+		{
+			$formatMapping = array(
+				'f4m' => 	'kF4MManifestRenderer',
+				'f4mv2' => 	'kF4Mv2ManifestRenderer',
+				'smil' => 	'kSmilManifestRenderer',
+				'm3u8' => 	'kM3U8ManifestRenderer',
+				'jsonp' => 	'kJSONPManifestRenderer',
+				'redirect' => 'kRedirectManifestRenderer',
+			);
+
+			if (isset($formatMapping[$this->responseFormat]))
+				$class = $formatMapping[$this->responseFormat];
+		}
+		
+		if (!$class)
+			$class = $this->urlManager->getRendererClass();
+		
 		if (!$class)
 			$class = $defaultClass;
 		
@@ -1281,6 +1339,7 @@ class playManifestAction extends kalturaAction
 			$this->cdnHost = preg_replace('/^https?/', $this->protocol, $playbackCdnHost);
 				
 		$this->initFlavorAssetArray();
+		
 		$this->initEntryDuration();
 		
 		if ($this->duration && $this->duration < 10 && $this->format == PlaybackProtocol::AKAMAI_HDS)
@@ -1336,7 +1395,11 @@ class playManifestAction extends kalturaAction
 		if(count($this->tags) == 1)
 			$tag = reset($this->tags);
 			
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $this->protocol, $tag);
+		$protocol = $this->protocol; 
+		if(in_array($this->format, self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
+			$protocol = requestUtils::getProtocol();
+			
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $protocol, $tag);
 		if ($liveStreamConfig)
 			return $liveStreamConfig->getUrl();
 		
@@ -1357,8 +1420,13 @@ class playManifestAction extends kalturaAction
 	
 	private function serveLiveEntry()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM && !$this->entry->hasMediaServer())
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
+		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
+		{
+			if (!$this->entry->hasMediaServer())
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
+			
+			kApiCache::setExpiry(120);
+		}
 		
 		$baseUrl = $this->getLiveEntryBaseUrl();
 			
@@ -1426,7 +1494,7 @@ class playManifestAction extends kalturaAction
 		{
 		case PlaybackProtocol::SILVER_LIGHT:
 			return array(
-				array(assetParams::TAG_SLWEB),
+				array(assetParams::TAG_ISM),
 			);
 			
 		case PlaybackProtocol::APPLE_HTTP:
@@ -1489,6 +1557,8 @@ class playManifestAction extends kalturaAction
 
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
+
+		$this->responseFormat = $this->getRequestParameter ( "responseFormat", null );
 		
 		// Initialize
 		$this->initEntry();
@@ -1504,7 +1574,8 @@ class playManifestAction extends kalturaAction
 			$renderer = $this->serveVodEntry();
 			break;
 			
-		case entryType::LIVE_STREAM:
+		case entryType::LIVE_STREAM:			
+		case entryType::LIVE_CHANNEL:
 			// Live stream
 			$renderer = $this->serveLiveEntry();
 			break;

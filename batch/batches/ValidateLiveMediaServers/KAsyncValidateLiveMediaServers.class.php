@@ -31,6 +31,13 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$filter->isLive = KalturaNullableBoolean::TRUE_VALUE;
 		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_ASC;
 		
+		$filter->moderationStatusIn = 
+			KalturaEntryModerationStatus::PENDING_MODERATION . ',' .
+			KalturaEntryModerationStatus::APPROVED . ',' .
+			KalturaEntryModerationStatus::REJECTED . ',' .
+			KalturaEntryModerationStatus::FLAGGED_FOR_REVIEW . ',' .
+			KalturaEntryModerationStatus::AUTO_APPROVED;
+		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;

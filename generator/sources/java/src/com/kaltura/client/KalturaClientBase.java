@@ -74,6 +74,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.w3c.dom.Element;
 
 import com.kaltura.client.enums.KalturaSessionType;
+import com.kaltura.client.utils.ParseUtils;
 import com.kaltura.client.utils.XmlUtils;
 
 /**
@@ -100,7 +101,7 @@ abstract public class KalturaClientBase {
 	protected KalturaConfiguration kalturaConfiguration;
     protected String sessionId;
     protected List<KalturaServiceActionCall> callsQueue;
-    protected boolean isMultiRequest;
+    protected List<Class<?>> requestReturnType;
     protected KalturaParams multiRequestParamsMap;
 
 	private static KalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
@@ -196,11 +197,7 @@ abstract public class KalturaClientBase {
 	}
 					
 	public boolean isMultiRequest() {
-		return isMultiRequest;
-	}
-
-	public void setMultiRequest(boolean isMultiRequest) {
-		this.isMultiRequest = isMultiRequest;
+		return (requestReturnType != null);
 	}
 
 	public void setKalturaConfiguration(KalturaConfiguration kalturaConfiguration) {
@@ -212,10 +209,18 @@ abstract public class KalturaClientBase {
 	}
 	
 	public void queueServiceCall(String service, String action, KalturaParams kparams) {
-		this.queueServiceCall(service, action, kparams, new KalturaFiles());
+		this.queueServiceCall(service, action, kparams, new KalturaFiles(), null);
+	}
+	
+	public void queueServiceCall(String service, String action, KalturaParams kparams, Class<?> expectedClass) {
+		this.queueServiceCall(service, action, kparams, new KalturaFiles(), expectedClass);
+	}
+	
+	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles) {
+		this.queueServiceCall(service, action, kparams, kfiles, null);
 	}
 
-	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles) {
+	public void queueServiceCall(String service, String action, KalturaParams kparams, KalturaFiles kfiles, Class<?> expectedClass) {
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
 		if (!kparams.containsKey(PARTNER_ID_PARAM_NAME))
 			kparams.add(PARTNER_ID_PARAM_NAME, this.kalturaConfiguration.getPartnerId());
@@ -226,6 +231,8 @@ abstract public class KalturaClientBase {
 		kparams.add("ks", this.sessionId);
 
 		KalturaServiceActionCall call = new KalturaServiceActionCall(service, action, kparams, kfiles);
+		if(requestReturnType != null)
+			requestReturnType.add(expectedClass);
 		this.callsQueue.add(call);
 	}
 	
@@ -308,6 +315,7 @@ abstract public class KalturaClientBase {
 			
 			if (logger.isEnabled() && statusCode != HttpStatus.SC_OK) {
 				logger.error("Method failed: " + method.getStatusLine ( ));
+				throw new KalturaApiException("Unexpected Http return code: " + statusCode);
 			}
 
 			// Read the response body
@@ -457,7 +465,7 @@ abstract public class KalturaClientBase {
 		kparams.add("format", this.kalturaConfiguration.getServiceFormat());
 		kparams.add("ignoreNull", true);
 		
-		if (isMultiRequest) {
+		if (requestReturnType != null) {
 			url += "multirequest";
 			int i = 1;
 			for (KalturaServiceActionCall call : this.callsQueue) {
@@ -479,7 +487,6 @@ abstract public class KalturaClientBase {
 			}
 			
 			// Clean
-			this.isMultiRequest = false;
 			this.multiRequestParamsMap.clear();
 			
 		} else {
@@ -497,7 +504,7 @@ abstract public class KalturaClientBase {
 	}
 
 	public void startMultiRequest() {
-		isMultiRequest = true;
+		requestReturnType = new ArrayList<Class<?>>();
 	}
 
 	public Element getElementByXPath(Element element, String xPath) throws KalturaApiException
@@ -510,17 +517,6 @@ abstract public class KalturaClientBase {
 		{
 			throw new KalturaApiException("XPath expression exception evaluating result");
 		}
-	}
-	
-	public List<KalturaObjectBase> createArray(Element arrayNode) throws KalturaApiException
-	{
-		List<KalturaObjectBase> list = new ArrayList<KalturaObjectBase>();
-		for(int i = 0; i < arrayNode.getChildNodes().getLength(); i++)
-		{
-			Element node = (Element)arrayNode.getChildNodes().item(i);
-			list.add((KalturaObjectBase)KalturaObjectFactory.create(node));
-		}
-		return list;
 	}
 	
 	public KalturaMultiResponse doMultiRequest() throws KalturaApiException
@@ -542,11 +538,11 @@ abstract public class KalturaClientBase {
 				}	
 				else if (getElementByXPath(arrayNode, "objectType") != null)
 				{
-			   		multiResponse.add(KalturaObjectFactory.create(arrayNode));
+			   		multiResponse.add(KalturaObjectFactory.create(arrayNode, requestReturnType.get(i)));
 				}
 				else if (getElementByXPath(arrayNode, "item/objectType") != null)
 				{
-			   		multiResponse.add(createArray(arrayNode));
+			   		multiResponse.add(ParseUtils.parseArray(requestReturnType.get(i), arrayNode));
 				}
 				else
 				{
@@ -558,7 +554,10 @@ abstract public class KalturaClientBase {
 				multiResponse.add(e);
 			}
 	   }
-	   return multiResponse;
+		
+		// Cleanup
+		this.requestReturnType = null;
+		return multiResponse;
 	}
 	
 	

@@ -4,7 +4,7 @@
  * @package plugins.document
  * @subpackage lib
  */
-class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
+class KOperationEnginePdfCreator extends KOperationEngineDocument
 {
 	/**
 	 * @var string
@@ -29,6 +29,19 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	
 	// this will be the default value if it is not set in task's configuration under - killPopupsPath
 	const DEFAULT_KILL_POPUPS_PATH = "c:/temp/killWindowsPopupsLog.txt";
+	
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+			'Composite Document File V2 Document',
+			'CDF V2 Document',
+			'Microsoft Word',
+			'Microsoft PowerPoint',
+			'Microsoft Excel',
+			'OpenDocument Text',
+			'PDF document',
+			'Rich Text Format data',
+			'Zip archive data',
+	);
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
@@ -97,6 +110,11 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		if(file_exists($killPopupsPath))
 			unlink($killPopupsPath);
 		
+		// Test file type 
+		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
+		if(!is_null($errorMsg))
+			$this->data->engineMessage = $errorMsg;
+		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 
 		$this->outFilePath = $finalOutputPath;
@@ -125,9 +143,14 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		// Read popup log file
 		if(file_exists($killPopupsPath)) {
 			$data = file_get_contents($killPopupsPath);
-			KalturaLog::notice("Convert popups warnings - " . $data);
-			$this->message = $data;
-
+			$data = trim($data);
+			if(!empty($data)){
+				KalturaLog::notice("Convert popups warnings - " . $data);
+				if(is_null($this->message))
+					$this->message = $data;
+				else 
+					$this->message .= $data;
+			}
 			unlink($killPopupsPath);
 		}
 		
@@ -138,8 +161,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			KalturaLog::notice('document temp  found ['.$tmpFile.'] output file ['.$this->outFilePath.']'); 
 		}
 		
-		
-		// $this->validateOutput($inFilePath, $tmpFile);
+		$this->validateOutput($inFilePath, realpath($tmpFile));
 		
 		$fileUnlockRetries = KBatchBase::$taskConfig->params->fileUnlockRetries ;
 		if(!$fileUnlockRetries){
@@ -163,28 +185,31 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 			}
 			throw new KOperationEngineException('Cannot rename file ['.$tmpFile.'] to ['.$this->outFilePath.'] - ['.$error.']');
 		}
-		
 		return true;
-		
 	}
 	
 	private function validateOutput($inFilePath, $outFilePath)
 	{
-		$pdfInfo = KBatchBase::$taskConfig->params->pdfInfo;
+		$errorMsg = null;
+
+		// Check Page count
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
 		if($inputExtension == 'pdf') {
-			$inputNum = $this->getNumberOfPages($pdfInfo, $inFilePath);
-			$outputNum = $this->getNumberOfPages($pdfInfo, $outFilePath);
-			if($inputNum != $outputNum)
-				throw new KOperationEngineException("Output file doesn't match expected page count (input: $inputNum, output: $outputNum) ");
+			$inputPdfInfo = $this->getPdfInfo($inFilePath);
+			$inputNum = $this->getNumberOfPages($inputPdfInfo);
+			
+			$outputPdfInfo = $this->getPdfInfo($outFilePath);
+			$outputNum = $this->getNumberOfPages($outputPdfInfo);
+			if($inputNum != $outputNum) {
+				$errorMsg = "Output file doesn't match expected page count (input: $inputNum, output: $outputNum)";
+				$this->data->engineMessage = $errorMsg;
+			}
 		}
 	}
 	
-	private function getNumberOfPages($pdfInfo, $file) 
+	private function getNumberOfPages($pdfInfo) 
 	{
-		$cmd = $pdfInfo . " " . realpath($file);
-		exec($cmd, $output);
-		foreach($output as $cur) {
+		foreach($pdfInfo as $cur) {
 			if(preg_match('/Pages:\s*(\d+)/' , $cur, $matches))
 				return $matches[1];
 		}

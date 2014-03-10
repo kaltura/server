@@ -1,7 +1,344 @@
+# IX-9.13.0 #
+
+## Live sync points ##
+Enable sending periodic live sync points on Kaltura live stream.
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_live_stream_create_sync_points.php
+
+*Media Server*
+
+- Version 3.0.3 [KalturaWowzaServer.jar](https://github.com/kaltura/media-server/releases/download/rel-3.0.3/KalturaWowzaServer-3.0.3.jar "KalturaWowzaServer.jar")
+ 
+
+# IX-9.12.0 #
+
+## Remove limitation of 32 categories per entry##
+The limitation will be removed for partners that have a Disable Category Limit feature enabled.
+
+*Configuration Changes*
+
+- update admin.ini:
+add
+moduls.categoryLimit.enabled = true
+moduls.categoryLimit.permissionType = 2
+moduls.categoryLimit.label = Disble Category Limit
+moduls.categoryLimit.permissionName = FEATURE_DISABLE_CATEGORY_LIMIT
+moduls.categoryLimit.basePermissionType =
+moduls.categoryLimit.basePermissionName =
+moduls.categoryLimit.group = GROUP_ENABLE_DISABLE_FEATURES
+ 
+- update batch.ini
+add 
+enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
+enabledWorkers.KAsyncTagIndex						= 1
+  
+[KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
+id													= 530
+friendlyName										= Sync Category Privacy Context
+type												= KAsyncSyncCategoryPrivacyContext
+maximumExecutionTime								= 12000
+scriptPath											= batches/SyncCategoryPrivacyContext/KAsyncSyncCategoryPrivacyContextExe.php
+
+[KAsyncTagIndex : JobHandlerWorker]
+id													= 500
+friendlyName										= Re-index tags
+type												= KAsyncTagIndex
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
+
+*Permissions*
+
+- /deployment/updates/scripts/add_permissions/2014_01_20_categoryentry_syncprivacycontext_action.php
+
+*Migration*
+- /alpha/scripts/utils/setCategoryEntriesPrivacyContext.php realrun
+
+## New FFMpeg 2.1.3##
+ *Binaries*
+  - Linux
+ -- -Install the new ffmpeg 2.1.3 as a 'main' ffmpeg - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+ -- -The ffmpeg-aux remains unchanged.
+
+## Create Draft Entries as Ready ##
+Assign a Ready status to draft entries that were created using a conversion profile which contains no flavor params.
+
+- update admin.ini
+
+	moduls.draftEntryConversionProfileSelection.enabled = true
+	moduls.draftEntryConversionProfileSelection.permissionType = 2
+	moduls.draftEntryConversionProfileSelection.label = Enable KMC transcoding profile selection for draft entries
+	moduls.draftEntryConversionProfileSelection.permissionName = FEATURE_DRAFT_ENTRY_CONV_PROF_SELECTION
+	moduls.draftEntryConversionProfileSelection.basePermissionType =
+	moduls.draftEntryConversionProfileSelection.basePermissionName =
+	moduls.draftEntryConversionProfileSelection.group = GROUP_ENABLE_DISABLE_FEATURES
+
+## Allow "View History" for any Admin Console users ##
+The monitor's View History permission is lowered from System Admin user to any Admin Console user.      
+
+- update admin.ini:
+<br>access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_BASE 
+
+## Support hybrid eCDN architecture
+
+- Update scripts
+	
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_01_26_add_media_server_partner_level_permission.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_partner_0.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_01_26_update_live_stream_service_permissions.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_live_asset_parameters.php
+	/opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_02_25_add_push_publish_permission_to_live_entry_parameters.php
+
+- Update admin.ini
+
+	moduls.hybridCdn.enabled = true
+	moduls.hybridCdn.permissionType = 2
+	moduls.hybridCdn.label = Hybrid CDN
+	moduls.hybridCdn.permissionName = FEATURE_HYBRID_ECDN
+	moduls.hybridCdn.basePermissionType = 2
+	moduls.hybridCdn.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+	moduls.hybridCdn.group = GROUP_ENABLE_DISABLE_FEATURES
+	
+	moduls.pushPublish.enabled = true
+	moduls.pushPublish.permissionType = 2
+	moduls.pushPublish.label = Push Publish Feature
+	moduls.pushPublish.permissionName = FEATURE_PUSH_PUBLISH
+	moduls.pushPublish.basePermissionType = 2
+	moduls.pushPublish.basePermissionName = FEATURE_HYBRID_ECDN
+	moduls.pushPublish.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- Update local.ini
+
+	uploaded_segment_destination = @WEB_DIR@/tmp/convert/
+
+----------
+
+# IX-9.11.0 #
+
+## Remove limitation of 32 categories per entry - db changes only##
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_01_19_category_entry_add_privacy_context.sql
+
+
+## PlayReady, ISM Index, Smooth Protect##
+
+*DB Changes*
+
+- /deployment/updates/sql/2014_02_09_change_drm_key_key_column_name.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add plugins: PlayReady, SmoothProtect
+  
+- update admin.ini:
+add
+moduls.drmPlayReady.enabled = true
+moduls.drmPlayReady.permissionType = 3
+moduls.drmPlayReady.label = DRM - PlayReady
+moduls.drmPlayReady.permissionName = PLAYREADY_PLUGIN_PERMISSION
+moduls.drmPlayReady.basePermissionType = 3
+moduls.drmPlayReady.basePermissionName = DRM_PLUGIN_PERMISSION
+moduls.drmPlayReady.group = GROUP_ENABLE_DISABLE_FEATURES
+
+- update batch.ini
+1. add under KAsyncConvertWorker 
+params.ismIndexCmd									= @BIN_DIR@/ismindex
+2. update under KAsyncConvert
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+3. Add KAsyncConvertSmoothProtect  worker section, place it following other Windows  transcoding workers.
+	[KAsyncConvertSmoothProtect: KAsyncDistributedConvert]
+	id                       = $WORKER_ID
+	baseLocalPath            = $BASE_LOACL_PATH
+	params.sharedTempPath    = $SHARED_TEMP_PATH
+	filter.jobSubTypeIn	 = smoothProtect.SmoothProtect
+	params.smoothProtectCmd  = $SMOOTHPROTECT_BIN
+	params.isRemoteOutput    = $IS_REMOTE_OUTPUT
+	params.isRemoteInput     = $IS_REMOTE_INPUT
+	• $WORKER_ID – set to match existing Testing QA settings
+	• $BASE_LOACL_PATH – follow other windows workers (aka Webex worker)
+	• $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker)
+	• $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect'
+	• $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker)
+	• $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
+4. Add 'worker enabler' to template section of your Windows server:  
+	• enabledWorkers.KAsyncConvertSmoothProtect  = 1
+
+- create playReady.ini from playReady.template.ini
+change @PLAYREADY_LICENSE_SERVER_HOST@ to the relevant host 
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+
+*Binaries*
+- Linux
+- -Install ismindex  from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+- -The ffmpeg and ffmpeg-aux remains unchanged. The ffmpeg will be switched to the new version on the next deployment.
+- Windows
+- -Install 'SmoothProtect.exe' binary
+
+
+
+----------
+
+# IX-9.10.0 #
+
+
+## Enhanced media server logging level ##
+
+**Configuration**
+
+*Edit @WOWZA_DIR@/conf/log4j.properties:*
+
+ - Change `log4j.rootCategory` = `INFO, stdout, serverAccess, serverError` 
+ - Remove `log4j.category.KalturaServer.class`
+ - Add `log4j.logger.com.kaltura` = `DEBUG`
+ - Change `log4j.appender.serverAccess.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+ - Change `log4j.appender.serverError.layout.ConversionPattern` = `[%d{yyyy-MM-dd HH:mm:ss}][%t][%C:%M] %p - %m - (%F:%L) %n` 
+
+
+## Live stream multiple flavors ingestion ##
+
+Enable streaming more than one source.
+
+**Deployment:**
+
+*Shared Content*
+
+- Add source LiveParams using deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+
+*Media Server*
+
+- Change transcoding template to `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/streamName/${SourceStreamName}/f/transcode.xml`
+
+
+
+## Entry redirect moderation ##
+The moderation status is copied to the redirected entry from the original entry when the redirect defined.
+
+## Media Server - support multiple sources ingestion ##
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_14_add_ingest_live_params.php
+- deployment/updates/scripts/add_permissions/2014_01_14_conversion_profile_asset_params_media_server.php
+- deployment/updates/scripts/add_permissions/2014_01_21_media_server_partner_live.php
+
+
+## Media Server - DVR with edge-origin ##
+Fixed broadcast path to use query string instead of slashed parameters.
+
+*Data Migration*
+
+- deployment/updates/scripts/2014_01_22_fix_broadcast_urls.php
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_22_live_stream_entry_broadcast_url.php
+
+## PlayReady, ISM Index, Smooth Protect - regression only ##
+Initial version of PlayReady, Ism Index and Smooth Protect. PlayReady and SmoothProtect plugins will not be activated. 
+This version deployed for regression purposes only.
+
+*DB Changes*
+
+- deployment/updates/sql/2013_10_22_add_drm_policy_table.sql
+- deployment/updates/sql/2013_12_10_add_drm_device_table.sql
+- deployment/updates/sql/2013_12_31_add_drm_key_table.sql
+- deployment/updates/sql/2014_01_14_audit_trail_config_admin_console_partner_updates.sql
+
+*Configuration Changes*
+- update plugins.ini
+  add IsmIndex plugin
+
+*Scripts*
+- run installPlugins
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_10_22_add_drm_policy_permissions.php
+- deployment/updates/scripts/add_permissions/2013_12_10_add_drm_device_permissions.php 
+
+----------
+
+# IX-9.9.0 #
+
+## Media Server - live stream recording ##
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_15_conversionprofileassetparams_permission_media_partner.php
 
 ----------
  
 # IX-9.8.0 #
+
+## Update live-params permissions ##
+
+Enable only to partners with live-stream permission to list live-params as part of flavor-params lists.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
+## VOD to Live ##
+Demo version only, enables broadcasting a live-channel base on playlist.
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_01_01_live_channel_services.php
+
+*DB*
+
+- Add live_channel_segment table - deployment/updates/sql/2014_01_01_create_live_channel_segment_table.sql
+
+
+*Media Server*
+- Update  [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer-2.0.1.jar "KalturaWowzaServer.jar")
+
+
+*Configuration*
+
+- Add FEATURE_LIVE_CHANNEL permission according to admin.template.ini.
+- Update Bulkupload worker configuration. Added parameters sharedTempPath and fileOwner. The value for sharedTempPath is /web/tmp/bulkupload and needs to be created on the machine.
+ 
+
+*File System*
+
+- Create a symbolic link of @WEB_DIR@/content under @WEB_DIR@/content/recorded:
+  ln –s @WEB_DIR@/content @WEB_DIR@/content/recorded/content 
+ 
+
+
+
+## Enforce max concurrent streams ##
+- New partner configuration fields in admin console.
+- New API action liveStream.authenticate.
+- New media server version - 1.1.0
+
+**Deployment:**
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2013_12_30_liveStream_authenticate.php
+
+*Media Server*
+
+- Redeploy [KalturaWowzaServer.jar](https://github.com/kaltura/server-bin-linux-64bit/raw/master/wowza/KalturaWowzaServer.jar "KalturaWowzaServer.jar") to @WOWZA_DIR@/lib/
+
+
+
+
+
 
 ## Admin console boost entry jobs ##
 A new button was added to the Admin page which allows you to boost the jobs of the entry.
@@ -67,13 +404,67 @@ Add support for intermediate flow to on-prem installations as well.
 - Repopulate sphinx entries
 
 
-## Bulk Upload from Filter � infrastructure ##
+## Bulk Upload from Filter – infrastructure ##
 
 Deployment instructions:
 
 1. Update the code and clients
-2. Update plugins.ini � add BulkUploadFilter plugin
+2. Update plugins.ini – add BulkUploadFilter plugin
 3. Run installPlugins.php
+
+
+
+
+
+## HTML5 Studio Deployment ##
+* Located the studio directory: @BASE_DIR@/apps/studio/ (create it if it doesn't exist)
+	* The directory owner should be apache and its group should be kaltura.
+* Create a sub directory within the studio folder. Name it by the version of the studio (for example: v0.1)
+* Fetch latest studio project files into apps/studio/v0.1 from https://github.com/kaltura/player-studio/releases.
+* Open the file studio.ini (within the studio project files) and update "html5_version" to include the rc version.
+* Execute deployment script on studio.ini file (located in studio project root):
+From studio root, run: php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --ini=studio.ini
+
+## Fixed a security hole in media.addFromUploaded file ##
+Restricting webcam and uploaded to their designated directories and blocking attempts to access outer directories, with ../../some_sensitive_data_file for example.
+
+## Fixed Animated GIF thumbnail cropping ##
+Bug fix: When cropping a .gif thumbnail, black margins appear around the crop are not removed.
+Bug fix: File extension of downloaded thumbnails is hardcoded to .jpg instead of the original file's ext.
+
+##  Client libraries update
+Part of PLAT-528.
+The updated client libraries are - 
+
+- java
+- php53
+- phpzend
+- python
+- ruby
+
+The change included the following - 
+
+1. Changed client libraries to have a fallback class in case of object de-serialization. supported both for regular request and multi request. 
+2.  Check the http return code and throw an exception in case it isn't 200
+
+##  Batch changes
+Contains the following improvements:
+
+1. Don't create lock object if not needed (#plat-718)
+2. Use less save commands when creating a new batch (#PLAT-661)
+
+
+## Sphinx
+Merged into the code changes that were hot-fixed at the beginning of the sprint. Including :
+
+- Addition of 'getObjectName' and use it in fixing field name
+- Numerical ordering of Json attributes. 
+
+## Minor issues
+
+- #PLAT-526: Sort the event consumers alphabetically if not requested otherwise.
+- #PLAT-681: In case an empty ui-conf filter is used, filter at least by the partner
+- #PLAT-489: Extract delayed job types to kconf. <b><u> requires updateding base.ini </u></b>
 
 ---------
  
@@ -191,6 +582,4 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
-
-
 

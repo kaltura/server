@@ -8,20 +8,35 @@ class KDLOperatorFfmpeg1_1_1 extends KDLOperatorFfmpeg0_10 {
 	/* ---------------------------
 	 * generateContainerParams
 	 * 
-	 * Right now the fastart option don't act properly 
-	
+	 */
 	protected function generateContainerParams(KDLFlavor $design, KDLFlavor $target)
 	{
-		$cmdStr = parent::generateContainerParams($design, $target);
 		if(!isset($target->_container))
 			return null;
 		
+$con = $target->_container;
+		switch($con->_id){
+	/*
+		case KDLContainerTarget::APPLEHTTP:
+			$cmdStr = " -hls_list_size 100000 -f hls";
+			break;
+	 */
+		case KDLContainerTarget::ISMV:
+			$cmdStr = " -movflags frag_keyframe -f ismv";
+			break;
+		default:
+			$cmdStr = parent::generateContainerParams($design, $target);
+			break;
+		}
+	/*		
+	 * Right now the fastart option don't act properly, the resultant files are not complianr with QTP
 		if($target->_container->_id==KDLContainerTarget::MP4){
 			$cmdStr.= " -movflags +faststart";
 		}
+	*/
 		return $cmdStr;
 	}
-*/
+
 	/* ---------------------------
 	 * generateAudioParams
 	 */

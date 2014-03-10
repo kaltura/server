@@ -3,7 +3,7 @@
  * @package plugins.document
  * @subpackage lib
  */
-class KOperationEngineImageMagick extends KSingleOutputOperationEngine
+class KOperationEngineImageMagick extends KOperationEngineDocument
 {
 	const PDF_FORMAT = 'PDF document';
 	const JPG_FORMAT = 'JPEG image data';
@@ -19,6 +19,14 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 	const IMAGES_LIST_XML_ATTRIBUTE_COUNT = 'count';
 	
 	const LEADING_ZEROS_PADDING = '-%03d';
+	
+	// This is the value that underneath the image is suspected as being a black image
+	const BLACK_IMAGE_STD_LIMIT = 50;
+	
+	// List of supported file types
+	private $SUPPORTED_FILE_TYPES = array(
+			'PDF document',
+	);
 	
 	public function __construct($cmd, $outFilePath)
 	{
@@ -57,19 +65,40 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		
 		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::linkFile($inFilePath, "$inFilePath.jpg"))
 			$inFilePath = "$inFilePath.jpg";
-			
-		parent::operate($operator, realpath($inFilePath), $configFilePath);
-		$imagesListXML = $this->createImagesListXML($outDirPath);
+		
+		$realInFilePath = realpath($inFilePath);
+		// Test input
+		// - Test file type
+		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
+		if(!is_null($errorMsg))
+			$this->data->engineMessage = $errorMsg;
+		
+		// Test password required
+		if($this->testPasswordRequired($realInFilePath)) {
+			$this->data->engineMessage = "Password required.";
+		}
+		
+		parent::operate($operator, $realInFilePath, $configFilePath);
+		
+		$imagesList = kFile::dirList($outDirPath,false);
+		// Test output
+		// - Test black Image
+		$identifyExe = KBatchBase::$taskConfig->params->identify;
+		$firstImage = $outDirPath . DIRECTORY_SEPARATOR . $imagesList[0];
+		$errorMsg = $this->testBlackImage($identifyExe, $firstImage, $errorMsg);
+		if(!is_null($errorMsg)) {
+			$this->data->engineMessage = $errorMsg;
+		}
+		
+		$imagesListXML = $this->createImagesListXML($imagesList);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
 	    return true;
 	}
 	
-
 	// The returned xml will be stored in the images directory. it than can be downloaded by he user with serveFlavorAction and provide him
 	// information about the created images.
-	private function createImagesListXML($outDirPath){
-		$imagesList = kFile::dirList($outDirPath,false);
+	private function createImagesListXML($imagesList){
 		sort($imagesList);
 		$imagesListXML = new SimpleXMLElement('<'.self::IMAGES_LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
@@ -80,4 +109,35 @@ class KOperationEngineImageMagick extends KSingleOutputOperationEngine
 		return $imagesListXML;	
 	}
 	
+	private function testPasswordRequired($file) {
+		$matches = null;
+		$pdfInfo = $this->getPdfInfo($file);
+		foreach($pdfInfo as $cur) {
+			if(preg_match('/Error: Incorrect password/', $cur, $matches))
+				return true;
+		}
+		return false;
+	}
+	
+	private function testBlackImage($identifyExe, $filePath ) {
+		$returnValue = null;
+		$output = null;
+		$command = $identifyExe . " -verbose '{$filePath}' 2>&1";
+		KalturaLog::debug("Executing: $command");
+		exec($command, $output, $returnValue);
+	
+		$std = -1;
+		$outputString = implode("\n",$output);
+	
+		if(preg_match_all('/standard deviation: ([\d\.]*)/', $outputString, $matches)) {
+			foreach($matches[1] as $std) {
+				if(intval($std) < self::BLACK_IMAGE_STD_LIMIT) {
+					return "Image is suspected to be black. Score ($std)";
+				}
+			}
+		} else {
+			return "Failed to test Image.";
+		}
+		return null;
+	}
 }

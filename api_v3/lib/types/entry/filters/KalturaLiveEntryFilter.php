@@ -5,6 +5,11 @@
  */
 class KalturaLiveEntryFilter extends KalturaLiveEntryBaseFilter
 {
+	public function __construct()
+	{
+		$this->typeIn = KalturaEntryType::LIVE_CHANNEL . ',' . KalturaEntryType::LIVE_STREAM;
+	}
+	
 	static private $map_between_objects = array
 	(
 		"isLive" => "_is_live",

@@ -986,7 +986,13 @@ class kuser extends Basekuser implements IIndexable
 		}
 		
 		$this->setLoginDataId($loginData->getId());
-				
+
+		//Email notification on user creation is sent while using kuser email so make sure this field is set before enabling login
+		//if not than set the email to be the $loginId provided to this action (we now know this is a valid email since "addLoginData" verifies this)
+		if(!$this->getEmail()) {
+			$this->setEmail($loginId);
+		}
+		
 		if ($sendEmail)
 		{
 			if ($loginDataExisted) {
@@ -1042,13 +1048,18 @@ class kuser extends Basekuser implements IIndexable
 	 */
 	public function getUserRoleNames()
 	{		
+		if (!$this->getRoleIds())
+			return '';
+		
 		$c = new Criteria();
-		$c->addSelectColumn(UserRolePeer::NAME);
 		$c->add(UserRolePeer::ID, explode(',',$this->getRoleIds()), Criteria::IN);
-		$stmt = UserRolePeer::doSelectStmt($c);
-		$names = $stmt->fetchAll(PDO::FETCH_COLUMN);
-		$names = implode(',', $names);
-		return $names;
+		$roles = UserRolePeer::doSelect($c);
+		$names = array();
+		foreach ($roles as $role)
+		{
+			$names[] = $role->getName();
+		}
+		return implode(',', $names);
 	}
 	
 	/**

@@ -174,14 +174,16 @@ class SystemPartnerService extends KalturaBaseService
 	 * @action updateStatus
 	 * @param int $partnerId
 	 * @param KalturaPartnerStatus $status
+	 * @param string $reason
 	 */
-	public function updateStatusAction($partnerId, $status)
+	public function updateStatusAction($partnerId, $status, $reason)
 	{
 		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
 			
 		$dbPartner->setStatus($status);
+		$dbPartner->setStatusChangeReason( $reason );
 		$dbPartner->save();
 		PartnerPeer::removePartnerFromCache($partnerId);
 	}
@@ -337,7 +339,10 @@ class SystemPartnerService extends KalturaBaseService
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				$passwordRules = $userLoginData->getInvalidPasswordStructureMessage();
+				$passwordRules = str_replace( "\\n", "<br>", $passwordRules );
+				$passwordRules = "<br>" . $passwordRules; // Add a newline prefix
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID, $passwordRules);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);

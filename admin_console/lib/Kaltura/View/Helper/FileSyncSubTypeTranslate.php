@@ -87,6 +87,12 @@ class Kaltura_View_Helper_FileSyncSubTypeTranslate extends Zend_View_Helper_Abst
 			case 2: // FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::FLAVOR_ASSET::CONVERT_LOG');
 				
+			case 3: // FILE_SYNC_ASSET_SUB_TYPE_CONVERT_ISM = 3;
+				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::FLAVOR_ASSET::ISM');
+				
+			case 4: // FILE_SYNC_ASSET_SUB_TYPE_ISMC = 4;
+				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::FLAVOR_ASSET::ISMC');
+								
 			default:
 				return $this->view->translate("unknown asset sub type [$objectSubType]");
 		}

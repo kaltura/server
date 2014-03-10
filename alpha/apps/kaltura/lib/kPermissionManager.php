@@ -488,36 +488,35 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return true;
 	}
 	
-	
-	
-	private static function initRoleIds()
+	public static function getRoleIds(Partner $operatingPartner = null, kuser $kuser = null)
 	{
-		self::$roleIds = null;
-
-		if (!self::$ksString ||
-			(!self::$operatingPartner && self::$ksPartnerId != Partner::BATCH_PARTNER_ID))
-		{
-			return;		// no partner or session -> no role
-		}
-		
 		$roleIds = null;
+		$ksString = kCurrentContext::$ks;
+		$isAdminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 
-		$ks = ks::fromSecureString(self::$ksString);
+		if (!$ksString ||
+			(!$operatingPartner && kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID))
+		{
+			return null; // no partner or session -> no role
+		}
+
+		$ks = ks::fromSecureString($ksString);
 		$ksSetRoleId = $ks->getSetRole();
 
 		if ($ksSetRoleId)
 		{
 			if ($ksSetRoleId == 'null')
 			{
-				return;
+				return null;
 			}
+			$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
 			//check if role exists
 			$c = new Criteria();
 			$c->addAnd(is_numeric($ksSetRoleId) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME
 				, $ksSetRoleId, Criteria::EQUAL);
-			$c->addAnd(UserRolePeer::PARTNER_ID, array(self::$ksPartnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$c->addAnd(UserRolePeer::PARTNER_ID, array($ksPartnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 			$roleId = UserRolePeer::doSelectOne($c);
-			
+
 			if ($roleId){
 				$roleIds = $roleId->getId();
 			}else{
@@ -525,52 +524,57 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				throw new kCoreException("Unknown role Id [$ksSetRoleId]", kCoreException::ID_NOT_FOUND);
 			}
 		}
-		
+
 		// if user is defined -> get his role IDs
-		if (!$roleIds && self::$kuser) {
-			$roleIds = self::$kuser->getRoleIds();
+		if (!$roleIds && $kuser) {
+			$roleIds = $kuser->getRoleIds();
 		}
-		
+
 		// if user has no defined roles or no user is defined -> get default role IDs according to session type (admin/not)
 		if (!$roleIds)
 		{
-			if (!self::$operatingPartner)
+			if (!$operatingPartner)
 			{
 				// use system default roles
 				if ($ks->isWidgetSession()) {
 					$strId = UserRoleId::WIDGET_SESSION_ROLE;
 				}
-				elseif (self::$adminSession) {
+				elseif ($isAdminSession) {
 					$strId = UserRoleId::PARTNER_ADMIN_ROLE;
 				}
 				else {
 					$strId = UserRoleId::BASE_USER_SESSION_ROLE;
 				}
-				
+
 				$roleIds = UserRolePeer::getIdByStrId ($strId);
 			}
 			else
 			{
 				if ($ks->isWidgetSession()){
 					//there is only one partner widget role defined in the system
-                    $roleIds = self::$operatingPartner->getWidgetSessionRoleId();
+					$roleIds = $operatingPartner->getWidgetSessionRoleId();
 				}
-				elseif (self::$adminSession) {
+				elseif ($isAdminSession) {
 					// there is only one partner admin role defined in the system
-					$roleIds = self::$operatingPartner->getAdminSessionRoleId();
+					$roleIds = $operatingPartner->getAdminSessionRoleId();
 				}
 				else {
 					// a partner may have special defined user session roles - get them from partner object
-					$roleIds = self::$operatingPartner->getUserSessionRoleId();
+					$roleIds = $operatingPartner->getUserSessionRoleId();
 				}
 			}
 		}
-		
+
 		if ($roleIds) {
 			$roleIds = explode(',', trim($roleIds, ','));
 		}
-		
-		self::$roleIds = $roleIds;
+
+		return $roleIds;
+	}
+	
+	private static function initRoleIds()
+	{
+		self::$roleIds = self::getRoleIds(self::$operatingPartner, self::$kuser);
 	}
 	
 	

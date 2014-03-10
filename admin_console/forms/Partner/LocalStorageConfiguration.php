@@ -43,6 +43,12 @@ class Form_Partner_LocalStorageConfiguration extends Form_Partner_BaseStorageCon
 			'filters'		=> array('StringTrim'),
 		));
 		$this->addElementToDisplayGroup('playback_info', 'deliveryHttpBaseUrl'); 
+		
+		$this->addElement('text', 'deliveryHttpsBaseUrl', array(
+			'label'			=> 'HTTPS Delivery Base URL:',
+			'filters'		=> array('StringTrim'),
+		));
+		$this->addElementToDisplayGroup('playback_info', 'deliveryHttpsBaseUrl'); 
 
 		$this->addElement('text', 'deliveryRmpBaseUrl', array(
 			'label'			=> 'RTMP Delivery Base URL:',

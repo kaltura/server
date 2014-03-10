@@ -294,14 +294,17 @@ class kContextDataHelper
 		{
 			$this->mediaProtocol = $this->mediaProtocol ? $this->mediaProtocol : $this->streamerType;
 		}
-		elseif ($this->entry->getType() == entryType::LIVE_STREAM)
+		elseif ($this->entry instanceof LiveEntry)
 		{
 			$protocols = array();
 			
-			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM)
+			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM && $this->entry->getSource() != EntrySourceType::LIVE_CHANNEL)
 				$protocols[] = PlaybackProtocol::AKAMAI_HDS;
 				
 			$protocols[] = PlaybackProtocol::HDS;
+
+			if ($this->entry->getStreamName())
+				$this->streamerType = PlaybackProtocol::RTMP;
 			
 			foreach ($protocols as $protocol)
 			{
@@ -337,11 +340,21 @@ class kContextDataHelper
 			
 			if(!$deliveryType)
 				$deliveryType = array();
+				
 			$this->streamerType = kDeliveryUtils::getStreamerType($deliveryType);
 			$this->mediaProtocol = kDeliveryUtils::getMediaProtocol($deliveryType);
-			if ($this->streamerType == PlaybackProtocol::HTTP && infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS)
-				$this->mediaProtocol = 'https';
 		}
+		
+		$httpStreamerTypes = array(
+			PlaybackProtocol::HTTP,
+			PlaybackProtocol::HDS,
+			PlaybackProtocol::HLS,
+			PlaybackProtocol::SILVER_LIGHT,
+			PlaybackProtocol::MPEG_DASH,
+		);
+		
+		if (in_array($this->streamerType, $httpStreamerTypes))
+			$this->mediaProtocol = infraRequestUtils::getProtocol();
 		
 		if ($this->streamerType == PlaybackProtocol::AKAMAI_HD || $this->streamerType == PlaybackProtocol::AKAMAI_HDS)
 			$this->mediaProtocol = PlaybackProtocol::HTTP;
@@ -386,11 +399,15 @@ class kContextDataHelper
 			reset($enabledDeliveryTypes);
 			$deliveryTypeName = key($enabledDeliveryTypes);
 			foreach ($deliveryTypeKeys as $deliveryTypeKey){
-				$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
-	            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
-	            {
-	             	$deliveryTypeName = $deliveryTypeToValidate;
-	                break;
+				$deliveryTypesToValidate = kConf::get($deliveryTypeKey);
+				$deliveryTypesToValidate = explode(',', $deliveryTypesToValidate);
+				foreach ($deliveryTypesToValidate as $deliveryTypeToValidate)
+				{
+		            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
+		            {
+		             	$deliveryTypeName = $deliveryTypeToValidate;
+		                break;
+					}
 				}
 			}		
 			$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	

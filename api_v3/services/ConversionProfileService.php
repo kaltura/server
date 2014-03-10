@@ -106,7 +106,11 @@ class ConversionProfileService extends KalturaBaseService
 			
 		$conversionProfileDb->save();
 		
-		$this->addFlavorParamsRelation($conversionProfileDb, $conversionProfile->getFlavorParamsAsArray());
+		$flavorParamsArray = $conversionProfile->getFlavorParamsAsArray();
+		if ( ! empty( $flavorParamsArray ) )
+		{
+			$this->addFlavorParamsRelation($conversionProfileDb, $flavorParamsArray);
+		}
 		
 		if($conversionProfile->xslTransformation)
 		{
@@ -173,7 +177,11 @@ class ConversionProfileService extends KalturaBaseService
 		if ($conversionProfile->flavorParamsIds !== null) 
 		{
 			$this->deleteFlavorParamsRelation($conversionProfileDb, $conversionProfile->flavorParamsIds);
-			$this->addFlavorParamsRelation($conversionProfileDb, $conversionProfile->getFlavorParamsAsArray());
+			$flavorParamsArray = $conversionProfile->getFlavorParamsAsArray();
+			if ( ! empty( $flavorParamsArray ) )
+			{
+				$this->addFlavorParamsRelation($conversionProfileDb, $flavorParamsArray);
+			}
 		}
 		
 		if($conversionProfile->xslTransformation)
@@ -280,7 +288,7 @@ class ConversionProfileService extends KalturaBaseService
 			$fpc->setSystemName($assetParams->getSystemName());
 			$fpc->setForceNoneComplied(false);
 			
-			if($assetParams->hasTag(assetParams::TAG_SOURCE))
+			if($assetParams->hasTag(assetParams::TAG_SOURCE) || $assetParams->hasTag(assetParams::TAG_INGEST))
 				$fpc->setOrigin(assetParamsOrigin::INGEST);
 			else
 				$fpc->setOrigin(assetParamsOrigin::CONVERT);

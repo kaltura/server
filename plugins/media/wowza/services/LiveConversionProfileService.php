@@ -23,14 +23,22 @@ class LiveConversionProfileService extends KalturaBaseService
 	 * Allows you to add a new KalturaDropFolderFile object
 	 * 
 	 * @action serve
-	 * @param string $entryId the id of the live entry to be converted
+	 * @param string $streamName the id of the live entry with it's stream suffix
 	 * @param string $hostname the media server host name
 	 * @return file
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws WowzaErrors::INVALID_STREAM_NAME
 	 */
-	public function serveAction($entryId, $hostname = null)
+	public function serveAction($streamName, $hostname = null)
 	{
+		$matches = null;
+		if(!preg_match('/^(\d_.{8})_(.+)$/', $streamName, $matches))
+			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
+			
+		$entryId = $matches[1];
+		$suffix = $matches[2];
+		
 		$entry = null;
 		if (!kCurrentContext::$ks)
 		{
@@ -57,6 +65,35 @@ class LiveConversionProfileService extends KalturaBaseService
 		$conversionProfileId = $entry->getConversionProfileId();
 		$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
 		
+		$liveParamsInput = null;
+		$disableIngested = true;
+		foreach($liveParams as $liveParamsItem)
+		{
+			/* @var $liveParamsItem liveParams */
+			if($liveParamsItem->getStreamSuffix() == $suffix)
+			{
+				$liveParamsInput = $liveParamsItem;
+				if(!$liveParamsInput->hasTag(assetParams::TAG_SOURCE))
+				{
+					$liveParams = array($liveParamsInput);
+					$disableIngested = false;
+				}
+				break;
+			}
+		}
+		
+		$ignoreLiveParamsIds = array();
+		if($disableIngested)
+		{
+			$conversionProfileAssetParams = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
+			foreach($conversionProfileAssetParams as $conversionProfileAssetParamsItem)
+			{
+				/* @var $conversionProfileAssetParamsItem flavorParamsConversionProfile */
+				if($conversionProfileAssetParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+					$ignoreLiveParamsIds[] = $conversionProfileAssetParamsItem->getFlavorParamsId();
+			}
+		}
+		
 		// translate the $liveParams to XML according to doc: http://www.wowza.com/forums/content.php?304#configTemplate
 		
 		$root = new SimpleXMLElement('<Root/>');
@@ -68,6 +105,9 @@ class LiveConversionProfileService extends KalturaBaseService
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem liveParams */
+			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
+				continue;
+				
 			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
 			$tags = $liveParamsItem->getTagsArray();
 			$tags[] = 'all';
@@ -110,53 +150,56 @@ class LiveConversionProfileService extends KalturaBaseService
 	{
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = 'PassThru';
+		$audioCodec = 'AAC';
 		$profile = 'main';
 		
-		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
+		if(!$liveParams->hasTag(liveParams::TAG_INGEST))
 		{
-			switch ($liveParams->getVideoCodec())
+			if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
 			{
-				case flavorParams::VIDEO_CODEC_COPY:
-					$videoCodec = 'PassThru';
-					break;
-					
-				case flavorParams::VIDEO_CODEC_FLV:
-				case flavorParams::VIDEO_CODEC_VP6:
-				case flavorParams::VIDEO_CODEC_H263:
-					$profile = 'baseline';
-					$videoCodec = 'H.263';
-					break;
-					
-				case flavorParams::VIDEO_CODEC_H264:
-				case flavorParams::VIDEO_CODEC_H264B:
-					$profile = 'baseline';
-					// don't break
-					
-				case flavorParams::VIDEO_CODEC_H264H:
-				case flavorParams::VIDEO_CODEC_H264M:
-					$streamName = "mp4:$streamName";
-					$videoCodec = 'H.264';
-					break;
-					
-				default:
-					KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
-					break;
+				switch ($liveParams->getVideoCodec())
+				{
+					case flavorParams::VIDEO_CODEC_COPY:
+						$videoCodec = 'PassThru';
+						break;
+						
+					case flavorParams::VIDEO_CODEC_FLV:
+					case flavorParams::VIDEO_CODEC_VP6:
+					case flavorParams::VIDEO_CODEC_H263:
+						$profile = 'baseline';
+						$videoCodec = 'H.263';
+						break;
+						
+					case flavorParams::VIDEO_CODEC_H264:
+					case flavorParams::VIDEO_CODEC_H264B:
+						$profile = 'baseline';
+						// don't break
+						
+					case flavorParams::VIDEO_CODEC_H264H:
+					case flavorParams::VIDEO_CODEC_H264M:
+						$streamName = "mp4:$streamName";
+						$videoCodec = 'H.264';
+						break;
+						
+					default:
+						KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
+						break;
+				}
 			}
-		}
 		
-		if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
-		{
-			switch ($liveParams->getAudioCodec())
+			if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
 			{
-				case flavorParams::AUDIO_CODEC_AAC:
-				case flavorParams::AUDIO_CODEC_AACHE:
-					$audioCodec = 'AAC';
-					break;
-				
-				default:
-					KalturaLog::err("Live params audio codec id [" . $liveParams->getAudioCodec() . "] is not expected");
-					break;
+				switch ($liveParams->getAudioCodec())
+				{
+					case flavorParams::AUDIO_CODEC_AAC:
+					case flavorParams::AUDIO_CODEC_AACHE:
+						$audioCodec = 'AAC';
+						break;
+					
+					default:
+						KalturaLog::err("Live params audio codec id [" . $liveParams->getAudioCodec() . "] is not expected");
+						break;
+				}
 			}
 		}
 		
@@ -172,7 +215,11 @@ class LiveConversionProfileService extends KalturaBaseService
 		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : MediaServer::DEFAULT_GPUID);
 		$frameSize = $video->addChild('FrameSize');
 	
-		if($liveParams->getWidth() && $liveParams->getHeight())
+		if($liveParams->hasTag(liveParams::TAG_INGEST) || (!$liveParams->getWidth() && !$liveParams->getHeight()))
+		{
+			$frameSize->addChild('FitMode', 'match-source');
+		}
+		elseif($liveParams->getWidth() && $liveParams->getHeight())
 		{
 			$frameSize->addChild('FitMode', 'fit-height');
 			$frameSize->addChild('Width', $liveParams->getWidth());
@@ -188,19 +235,15 @@ class LiveConversionProfileService extends KalturaBaseService
 			$frameSize->addChild('FitMode', 'fit-height');
 			$frameSize->addChild('Height', $liveParams->getHeight());
 		}
-		else
-		{
-			$frameSize->addChild('FitMode', 'match-source');
-		}
 		
 		$video->addChild('Profile', $profile);
-		$video->addChild('Bitrate', $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * 1024 : '${SourceVideoBitrate}');
+		$video->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getVideoBitrate()) ? $liveParams->getVideoBitrate() * 1024 : '${SourceVideoBitrate}');
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'false');
 		$keyFrameInterval->addChild('Interval', 60);
 		
 		$audio = $encode->addChild('Audio');
 		$audio->addChild('Codec', $audioCodec);
-		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : '${SourceAudioBitrate}');
+		$audio->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getAudioBitrate()) ? $liveParams->getAudioBitrate() * 1024 : '${SourceAudioBitrate}');
 	}
 }

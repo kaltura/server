@@ -6,6 +6,12 @@
 class KalturaEntryService extends KalturaBaseService 
 {
 	
+	  //amount of time for attempting to grab kLock
+	  const KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT = 0.1;
+	
+	  //amount of time for holding kLock
+	  const KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT = 7;
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
@@ -306,17 +312,24 @@ class KalturaEntryService extends KalturaBaseService
 		if($requiredDuration)
 		{
 			$mediaServer = $dbLiveEntry->getMediaServer(true);
-			if($mediaServer)
+			if(!$mediaServer)
+				throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $dbLiveEntry->getId());
+				
+			$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
+			if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
 			{
-				$mediaServerLiveService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_LIVE);
-				if($mediaServerLiveService && $mediaServerLiveService instanceof KalturaMediaServerLiveService)
-					$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
-			} 
+				$mediaServerLiveService->splitRecordingNow($dbLiveEntry->getId());
+				$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration, $offset, $duration);
+				$dbLiveEntry->save();
+			}
+			else 
+			{
+				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
+			}
 		}
-		
-		if($dbLiveEntry->isConvertingSegments())
+		elseif($dbLiveEntry->isConvertingSegments())
 		{
-			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration);
+			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration, $offset, $duration);
 			$dbLiveEntry->save();
 		}
 		else
@@ -736,7 +749,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$url = $resource->getUrl();
 		
-		if (!$resource->forceAsyncDownload())
+		if (!$resource->getForceAsyncDownload())
 		{
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -1128,8 +1141,12 @@ class KalturaEntryService extends KalturaBaseService
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
 	
-		$this->setDefaultStatus($filter);
-		$this->setDefaultModerationStatus($filter);
+		if( $filter->idEqual == null && $filter->redirectFromEntryId == null )
+        {
+        	$this->setDefaultStatus($filter);
+            $this->setDefaultModerationStatus($filter);
+		}
+		
 		$this->fixFilterUserId($filter);
 		$this->fixFilterDuration($filter);
 		
@@ -1608,7 +1625,6 @@ class KalturaEntryService extends KalturaBaseService
 		$dbModerationFlag->save();
 		
 		$dbEntry->setModerationStatus(KalturaEntryModerationStatus::FLAGGED_FOR_REVIEW);
-		$dbEntry->incModerationCount();
 		$dbEntry->save();
 		
 		$moderationFlag = new KalturaModerationFlag();

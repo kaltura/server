@@ -238,18 +238,7 @@ class kBusinessPreConvertDL
 			if($syncFile)
 			{
 				// removes the DEFAULT_THUMB tag from all other thumb assets
-				$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
-				foreach($entryThumbAssets as $entryThumbAsset)
-				{
-					if($entryThumbAsset->getId() == $thumbAsset->getId())
-						continue;
-						
-					if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-						continue;
-						
-					$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-					$entryThumbAsset->save();
-				}
+				assetPeer::removeThumbAssetDeafultTags($entry->getId(), $thumbAsset->getId());
 			}
 		}
 		
@@ -341,6 +330,14 @@ class kBusinessPreConvertDL
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 			
+			if($srcAsset->getType() == assetType::THUMBNAIL)
+			{
+				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
+				if(!file_exists($tempDir))
+					mkdir($tempDir, 0700, true);
+				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . "." . $srcAsset->getFileExt();
+			}
+
 			$quality = $destThumbParamsOutput->getQuality();
 			$cropType = $destThumbParamsOutput->getCropType();
 			$cropX = $destThumbParamsOutput->getCropX();
@@ -461,7 +458,12 @@ class kBusinessPreConvertDL
 		$flavorAssetId = $flavorAsset->getId();
 	
 		$collectionTag = $flavor->getCollectionTag();
-		if($collectionTag)
+			/*
+			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
+			 * to allow FFmpeg/ISMV processing
+			 */
+		KalturaLog::log("Check for collection case - asset(".$flavorAssetId."),engines(".$flavor->getConversionEngines().")");
+		if($collectionTag && $flavor->getConversionEngines()==conversionEngineType::EXPRESSION_ENCODER3)
 		{
 			$entry = entryPeer::retrieveByPK($entryId);
 			if(!$entry)
@@ -1137,7 +1139,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 			
 			$collectionTag = $flavor->getCollectionTag();
-			if($collectionTag)
+			/*
+			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
+			 * to allow FFmpeg/ISMV processing
+			 */
+			KalturaLog::log("Check for collection case - engines(".$flavor->getConversionEngines().")");
+			if($collectionTag && $flavor->getConversionEngines()==conversionEngineType::EXPRESSION_ENCODER3)
 			{
 				$flavorsCollections[$collectionTag][] = $flavor;
 			}
