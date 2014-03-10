@@ -10,6 +10,8 @@ class KalturaErrors extends APIErrors
 	 *
 	 */
 
+	const NO_FILES_TO_EXPORT = "NO_FILES_TO_EXPORT;; no files to export";
+	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
 

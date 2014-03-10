@@ -13,6 +13,12 @@ class kFlowHelper
 	);
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
+	const POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT = 5;
+	
+	const POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR = 300000;
+	
+	const MYSQL_CODE_DUPLICATE_KEY = 23000;
+	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
 	/**
@@ -1480,19 +1486,34 @@ class kFlowHelper
 
 		if($data->getCreateThumb())
 		{
-			try
+			$thumbCreationSuccess = false;
+			for($errorCounter = 0; $errorCounter < self::POST_CONVERT_THUMBNAIL_CREATION_ITERATION_AMMOUNT ; $errorCounter++)
 			{
-				self::createThumbnail($dbBatchJob, $data);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::err($e->getMessage());
+				try
+				{
+					self::createThumbnail($dbBatchJob, $data);
+					$thumbCreationSuccess = true;
+					break;
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err($e->getMessage());
 
-				// sometimes, because of disc IO load, it takes long time for the thumb to be moved.
-				// in such cases, the entry thumb version may be increased by other process.
-				// retry the job, it solves the issue.
-				kJobsManager::retryJob($dbBatchJob->getId(), $dbBatchJob->getJobType(), true);
+					if($e instanceof PropelException &&  $e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY)
+					{
+						$sleepTime = rand (100000 , self::POST_CONVERT_THUMBNAIL_CREATION_SLEEP_TIME_IF_ERROR);
+						KalturaLog::debug('about to sleep for ' . $sleepTime . ' microseconds');
+						usleep($sleepTime);
+					}
+					else
+						break;
+				}
+			}
+			if(!$thumbCreationSuccess)
+			{
 				$dbBatchJob->reload();
+				$dbBatchJob->setDescription('failed to create thumbnail');
+				kJobsManager::updateBatchJob($dbBatchJob , BatchJob::BATCHJOB_STATUS_FAILED);
 				return $dbBatchJob;
 			}
 		}

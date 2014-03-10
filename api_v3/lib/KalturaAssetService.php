@@ -138,7 +138,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 	    if ($exported !== true)
 	    {
 	        //TODO: implement export errors
-	        throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+	        throw new KalturaAPIException(KalturaErrors::NO_FILES_TO_EXPORT);
 	    }
 	    
 	    return $this->getAction($assetId);
