@@ -123,6 +123,16 @@ class KCurlWrapper
 		$length = strlen ( $string );
 		return $length;
 	}
+	
+	private static function read_header_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
+	
+	private static function read_body_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
 
 	/**
 	 * @param string $url
@@ -280,9 +290,13 @@ class KCurlWrapper
 		self::$headers = "";
         self::$lastHeader = false;
         curl_exec($this->ch);
+        
+        //Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
+        if(!$noBody)
+			curl_setopt($this->ch, CURLOPT_RANGE, '0-');
+        
         if(!self::$headers)
            return false;
-
 
 		self::$headers = explode("\r\n", self::$headers);
 
@@ -369,10 +383,14 @@ class KCurlWrapper
 			}
 		}
 
+		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header_do_nothing');
+		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
+		
 		return $curlHeaderResponse;
 	}
 
 	/**
+	 * @param string $sourceUrl
 	 * @param string $destFile
 	 * @return boolean
 	 */
