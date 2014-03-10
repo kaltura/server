@@ -277,7 +277,12 @@ class myPartnerUtils
 	public static function shouldNotify ( $partner_id )
 	{
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner ) return array ( false , null );
+		
+		if ( !$partner ) 
+			return array ( false , null );
+		if( !$partner->getNotificationUrl() ) 
+			return array ( false , null );
+		
 		return array ( $partner->getNotify() , $partner->getNotificationsConfig() ) ;
 	}
 
