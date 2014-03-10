@@ -332,6 +332,7 @@ abstract class LiveEntry extends entry
 		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 			return $kMediaServer->getMediaServer();
 			
+		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
 	}
 	
@@ -346,9 +347,12 @@ abstract class LiveEntry extends entry
 		
 		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $kMediaServer kLiveMediaServer */
-			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-				return true;
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				/* @var $kMediaServer kLiveMediaServer */
+				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+					return true;
+			}
 		}
 		
 		return !$currentDcOnly;
