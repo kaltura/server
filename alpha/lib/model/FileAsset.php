@@ -104,7 +104,9 @@ class FileAsset extends BaseFileAsset implements ISyncableFile
 
 	public function incrementVersion()
 	{
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::FILE_ASSET, self::FILE_SYNC_ASSET);
+									
+		$this->setVersion($newVersion);
 	}
 	
 } // FileAsset
