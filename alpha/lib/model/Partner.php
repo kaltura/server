@@ -1480,4 +1480,9 @@ class Partner extends BasePartner
 		}
 		return true;
 	}
+	
+	public function getNotificationUrl()
+	{
+		return $this->getUrl2();
+	}
 }
