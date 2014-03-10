@@ -1,3 +1,17 @@
+# IX-9.13.0 #
+
+## Live sync points ##
+Enable sending periodic live sync points on Kaltura live stream.
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_live_stream_create_sync_points.php
+
+*Media Server*
+
+- Version 3.0.3 [KalturaWowzaServer.jar](https://github.com/kaltura/media-server/releases/download/rel-3.0.3/KalturaWowzaServer-3.0.3.jar "KalturaWowzaServer.jar")
+ 
+
 # IX-9.12.0 #
 
 ## Remove limitation of 32 categories per entry##
