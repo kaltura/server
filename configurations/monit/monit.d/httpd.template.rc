@@ -1,7 +1,7 @@
         check process apache
-           with pidfile "/var/run/httpd/httpd.pid"
-           start program = "service @APACHE_SERVICE@ start" with timeout 60 seconds
-           stop program = "service @APACHE_SERVICE@ stop"
+           with pidfile "@APACHE_PID_PATH@"
+           start program = "/sbin/service @APACHE_SERVICE@ start" with timeout 60 seconds
+           stop program = "/sbin/service @APACHE_SERVICE@ stop"
            #if 10 restarts within 10 cycles then timeout
            #if totalmem > 100 Mb then alert
            #if children > 255 for 5 cycles then stop
@@ -17,7 +17,7 @@
                then exec "/usr/sbin/apachectl graceful"
 
         check file httpd
-            with path "/usr/sbin/httpd"
+            with path "@APACHE_BINARY@"
             # Run /watch/dog in the case that the binary was changed
             # and alert in the case that the checksum value recovered
             # later
