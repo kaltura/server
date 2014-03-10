@@ -1862,8 +1862,9 @@ class kFlowHelper
 				}
 				else
 				{
-					$jobIsFinished = false;
-					$entry->createDownloadAsset($dbBatchJob, $flavorParamsId, $data->getPuserId());
+					$conversionJob = $entry->createDownloadAsset($dbBatchJob, $flavorParamsId, $data->getPuserId());
+					if (!is_null($conversionJob))
+						$jobIsFinished = false;
 				}
 			}
 		}
