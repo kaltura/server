@@ -380,4 +380,70 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
 	}
+	
+	/**
+	 * Add new pushPublish configuration to entry
+	 * 
+	 * @action addLiveStreamPushPublishConfiguration
+	 * @param string $entryId
+	 * @param KalturaPlaybackProtocol $protocol
+	 * @param string $url
+	 * @return KalturaLiveStreamEntry
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+		
+		/* @var $entry LiveEntry */
+		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol($protocol);
+		$configuration->setUrl($url);
+		
+		$pushPublishConfigurations[] = $configuration;
+		$entry->setPushPublishConfigurations($pushPublishConfigurations);
+		$entry->save();
+		
+		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
+		$apiEntry->fromObject($entry);
+		return $apiEntry;
+	}
+	
+/**
+	 *Remove push publish configuration from entry
+	 * 
+	 * @action removeLiveStreamPushPublishConfiguration
+	 * @param string $entryId
+	 * @param KalturaPlaybackProtocol $protocol
+	 * @return KalturaLiveStreamEntry
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+		
+		/* @var $entry LiveEntry */
+		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		foreach ($pushPublishConfigurations as $index => $config)
+		{
+			/* @var $config kLiveStreamConfiguration */
+			if ($config->getProtocol() == $protocol)
+			{
+				unset ($pushPublishConfigurations[$index]);
+			}
+		}
+
+		$entry->setPushPublishConfigurations($pushPublishConfigurations);
+		$entry->save();
+		
+		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
+		$apiEntry->fromObject($entry);
+		return $apiEntry;
+	}
 }
