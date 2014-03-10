@@ -5,6 +5,8 @@
  */
 class KalturaFileSyncOrderBy extends KalturaStringEnum
 {
+	const VERSION_ASC = "+version";
+	const VERSION_DESC = "-version";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";

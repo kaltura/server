@@ -181,6 +181,8 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	{
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+		$captionAssetsids = $providerData->captionAssetIds;
+		
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
@@ -202,6 +204,8 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
 		}
+		
+		$this->addCaptions($providerData, $sftpManager, $data);
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
@@ -243,6 +247,68 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		}
 
 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
+	}
+	
+	protected function getFilePath( $asset, $entryId )
+	{
+		$filter = new KalturaFileSyncFilter();
+		$filter->orderBy = '-version';
+		$filter->fileObjectTypeEqual = KalturaFileSyncObjectType::ASSET;
+		$filter->objectIdEqual = $asset->id;
+		$filter->objectSubTypeEqual = 1;
+		$filter->statusEqual = KalturaFileSyncStatus::READY;
+		$filter->entryIdEqual = $entryId;
+		$filter->currentDc = KalturaNullableBoolean::TRUE_VALUE;
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1;
+		$pager->pageIndex = 1;
+		
+		$filesyncPlugin = KalturaFilesyncClientPlugin::get( KBatchBase::$kClient );
+		$result = $filesyncPlugin->fileSync->listAction($filter, $pager);
+		if ( ! empty( $result->objects ) )
+		{
+			$fileSync = $result->objects[0];
+			return $fileSync->fileRoot . $fileSync->filePath;
+		}
+
+		return "";
+	}
+	
+	protected function addCaptions(KalturaYouTubeDistributionJobProviderData $providerData, $sftpManager, KalturaDistributionJobData $data)
+	{
+		if ( $providerData->captionAssetIds == "" ) 
+			return;
+	
+		$entryId = $data->entryDistribution->entryId;
+		$filter = new KalturaAssetFilter();
+		$filter->idIn = $providerData->captionAssetIds;
+		$filter->entryIdEqual = $entryId;
+		KBatchBase::impersonate($data->entryDistribution->partnerId);
+		
+		try{
+			$captionPlugin = KalturaCaptionClientPlugin::get( KBatchBase::$kClient );
+			$result = $captionPlugin->captionAsset->listAction( $filter );
+		}
+		catch(Exception $e){
+			KBatchBase::unimpersonate();
+			throw $e;
+		}
+		
+		KBatchBase::unimpersonate();
+	
+		foreach ($result->objects as $asset)
+		{
+			if ( $asset instanceof KalturaCaptionAsset )
+			{
+				$captionFilePath = $this->getFilePath($asset, $entryId);
+				if (file_exists($captionFilePath))
+				{
+					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
+					$sftpManager->putFile($captionSFTPPath, $captionFilePath);
+				}
+			}
+		}
 	}
 
 	/**
