@@ -893,7 +893,9 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		DrmPolicyPeer::setUseCriteriaFilter(false);
-		$stmt = DrmPolicyPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		DrmPolicyPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -990,7 +992,7 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
                 KalturaLog::debug("was unable to save! retrying for the $retries time");
                 $criteria = $this->buildPkeyCriteria();
 				$criteria->addSelectColumn(DrmPolicyPeer::CUSTOM_DATA);
-                $stmt = DrmPolicyPeer::doSelectStmt($criteria, $con);
+                $stmt = BasePeer::doSelect($criteria, $con);
                 $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 $newCustomData = $cutsomDataArr[0];
                 
@@ -1137,8 +1139,7 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1185,7 +1186,7 @@ abstract class BaseDrmPolicy extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *

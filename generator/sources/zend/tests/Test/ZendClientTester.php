@@ -68,8 +68,8 @@ class ZendClientTester
 		$response = $this->_client->doMultiRequest();
 
 		foreach( $response as $subResponse)
-			if($subResponse instanceof KalturaException)
-				throw new Exception("Error occurred: " + $subResponse.message);
+			if($subResponse instanceof Kaltura_Client_Exception) 
+				throw new Exception("Error occurred: " . $subResponse->getMessage());
 
 		# when accessing the response object we will use an index and not the response number (response number - 1)
 		$this->assertTrue($response[0] instanceof Kaltura_Client_Type_MixEntry);

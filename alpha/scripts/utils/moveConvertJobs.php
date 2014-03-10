@@ -79,7 +79,10 @@ $c->add(BatchJobLockPeer::JOB_TYPE, $jobType);
 if (!is_null($jobSubType))
 	$c->add(BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType);
 if (!is_null($partnerId))
-	$c->add(BatchJobLockPeer::PARTNER_ID, $partnerId);
+	if ($partnerId[0] == '!')
+		$c->add(BatchJobLockPeer::PARTNER_ID, substr($partnerId, 1), Criteria::NOT_EQUAL);
+	else
+		$c->add(BatchJobLockPeer::PARTNER_ID, $partnerId);
 $c->setLimit(CHUNK_SIZE);
 
 $movedJobsCount = 0;

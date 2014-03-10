@@ -87,12 +87,12 @@ class SyndicationFeedService extends KalturaBaseService
 				{
 					$fpc->setReadyBehavior($assetParams->getReadyBehavior());
 					$fpc->setSystemName($assetParams->getSystemName());
+					
+					if($assetParams->hasTag(assetParams::TAG_SOURCE) || $assetParams->hasTag(assetParams::TAG_INGEST))
+						$fpc->setOrigin(assetParamsOrigin::INGEST);
+					else
+						$fpc->setOrigin(assetParamsOrigin::CONVERT);
 				}
-				
-				if($assetParams->hasTag(assetParams::TAG_SOURCE) || $assetParams->hasTag(assetParams::TAG_INGEST))
-					$fpc->setOrigin(assetParamsOrigin::INGEST);
-				else
-					$fpc->setOrigin(assetParamsOrigin::CONVERT);
 				
 				
 				$fpc->save();

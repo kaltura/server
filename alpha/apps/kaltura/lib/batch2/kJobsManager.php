@@ -11,6 +11,10 @@
 class kJobsManager
 {
 	
+	const BULK_DOWNLOAD_TOTAL_ENTRIES_AMOUNT_RESTRICTION = 1000;
+	
+	const BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT = 100;
+	
 	// helper function for setting the error description and status of a batchJob
 	public static function failBatchJob(BatchJob $batchJob, $errDescription)
 	{
@@ -695,10 +699,10 @@ class kJobsManager
 	private static function contributeToConvertJobData($conversionEngineId, kConvertJobData &$convertData)
 	{
 		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
-		if($plugin && $plugin instanceof IKalturaConvertContributor)
+		if($plugin && $plugin instanceof IKalturaBatchJobDataContributor)
 		{
 			KalturaLog::log("Setting additional data by plugin");
-			$convertData = $plugin->contributeToConvertJobData($conversionEngineId, $convertData);
+			$convertData = $plugin->contributeToConvertJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
 		}
 	}
 	
@@ -1131,6 +1135,10 @@ class kJobsManager
 	public static function addBulkDownloadJob($partnerId, $puserId, $entryIds, $flavorParamsId)
 	{
 		$entryIds = explode(",", $entryIds);
+		
+		if (count($entryIds) > self::BULK_DOWNLOAD_TOTAL_ENTRIES_AMOUNT_RESTRICTION)
+			throw new APIException(APIErrors::ENTRIES_AMOUNT_EXCEEDED);
+		
 		foreach($entryIds as $entryId)
 		{
 			$dbEntry = entryPeer::retrieveByPK($entryId);
@@ -1138,15 +1146,23 @@ class kJobsManager
 				throw new APIException(APIErrors::INVALID_ENTRY_ID, $entryId);
 		}
 		
-		$jobDb = new BatchJob();
-		$jobDb->setPartnerId($partnerId);
-		$data = new kBulkDownloadJobData();
+		$chunksOfEntries = array_chunk($entryIds, self::BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT);	
+		KalturaLog::debug("about to create " . count($chunksOfEntries) . " jobs");	
+		$jobs = array();
+			
+		foreach($chunksOfEntries as $chunk)
+		{
+			$jobDb = new BatchJob();
+			$jobDb->setPartnerId($partnerId);
+			$data = new kBulkDownloadJobData();
 		
-		$data->setEntryIds(implode(",", $entryIds));
-		$data->setFlavorParamsId($flavorParamsId);
-		$data->setPuserId($puserId);
+			$data->setEntryIds(implode(",", $chunk));
+			$data->setFlavorParamsId($flavorParamsId);
+			$data->setPuserId($puserId);
 		
-		return self::addJob($jobDb, $data, BatchJobType::BULKDOWNLOAD);
+			$jobs[] = self::addJob($jobDb, $data, BatchJobType::BULKDOWNLOAD);
+        }
+        return $jobs;
 	}
 	
 	/**
@@ -1387,6 +1403,33 @@ class kJobsManager
 		return self::addJob($batchJob, $moveCategoryEntriesData, BatchJobType::MOVE_CATEGORY_ENTRIES);
 	}
 	
+	/**
+	 * Update privacy context on category entries
+	 * 
+	 * @param BatchJob $parentJob
+	 * @param int $partnerId
+	 * @param int $categoryId
+	 */
+	public static function addSyncCategoryPrivacyContextJob(BatchJob $parentJob = null, $partnerId, $categoryId)
+	{
+		$syncPrivacyContextData = new kSyncCategoryPrivacyContextJobData();
+	    $syncPrivacyContextData->setCategoryId($categoryId);
+		
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild(BatchJobType::SYNC_CATEGORY_PRIVACY_CONTEXT, null, false);
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setPartnerId($partnerId);
+		}
+		
+		return self::addJob($batchJob, $syncPrivacyContextData, BatchJobType::SYNC_CATEGORY_PRIVACY_CONTEXT);
+		
+	}
+	
 	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSync $fileSync)
 	{
 		$netStorageDeleteData = kStorageDeleteJobData::getInstance($storage->getProtocol());
@@ -1410,12 +1453,12 @@ class kJobsManager
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
 	
-	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $syncKey, $localFileSyncPath, $dc)
+	public static function addDeleteFileJob(BatchJob $parentJob = null, $entryId = null, $partnerId, $syncKey, $localFileSyncPath, $dc)
 	{
 		$deleteFileData = new kDeleteFileJobData();
 		$deleteFileData->setLocalFileSyncPath($localFileSyncPath);
 		$deleteFileData->setSyncKey($syncKey);
-		
+
 		if ($parentJob)
 		{
 			$batchJob = $parentJob->createChild(BatchJobType::DELETE_FILE, null, false);
@@ -1424,14 +1467,12 @@ class kJobsManager
 		{
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
-			$batchJob->setPartnerId($partner->getId());
+			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
-		$batchJob->setCheckAgainTimeout(12*60*60);
 		$batchJob->setDc($dc);
 		
-		KalturaLog::log("Creating File Delete job, from data center id: ". $deleteFileData->getDC() ." with source file: " . $deleteFileData->getLocalFileSyncPath()); 
+		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
 	}
 	

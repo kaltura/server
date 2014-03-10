@@ -44,6 +44,7 @@ class KExternalErrors
 	const INVALID_FEED_ID = 35;
 	const ENTRY_NOT_LIVE = 36;
 	const INVALID_ISM_FILE_TYPE = 37;
+	const NOT_ALLOWED_PARAMETER = 38;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -88,6 +89,8 @@ class KExternalErrors
 			self::EXCEEDED_RESTRICTED_IP => "ip address is out of the restricted ip range",
 			self::INVALID_FEED_ID => "The given feed id is illegal",
 			self::ENTRY_NOT_LIVE => "The given entry is not broadcasting",
+			self::INVALID_ISM_FILE_TYPE => "The given ism file type is invalid",
+			self::NOT_ALLOWED_PARAMETER => "The provided parameter is not allowed",
 	);
 	
 	public static function dieError($errorCode, $message = null)

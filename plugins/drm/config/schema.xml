@@ -67,7 +67,8 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="provider" type="integer" inheritance="single" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="object_id" type="varchar" size="20"  />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="object_type" type="tinyint" />		
-		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="key" type="varchar" size="128" />		
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="drm_key" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" type="integer" />		
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<unique name="partner_id_object_id_object_type_provider">

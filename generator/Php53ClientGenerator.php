@@ -471,7 +471,7 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 
 				case "bigint" :
 					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = (int)\$xml->$propName;");
+					$this->appendLine("			\$this->$propName = (string)\$xml->$propName;");
 					break;
 					
 				case "bool" :
@@ -725,13 +725,14 @@ class Php53ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("		\\Kaltura\\Client\\ParseUtils::checkIfError(\$resultXmlObject->result);");
 			switch($resultType)
 			{
-				case 'bigint':	
+				
 				case 'int':
 					$this->appendLine("		\$resultObject = (int)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
 				case 'bool':
 					$this->appendLine("		\$resultObject = (bool)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;
+				case 'bigint':
 				case 'string':
 					$this->appendLine("		\$resultObject = (String)\\Kaltura\\Client\\ParseUtils::unmarshalSimpleType(\$resultXmlObject->result);");
 					break;

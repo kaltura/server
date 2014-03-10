@@ -87,7 +87,7 @@ class PlayReadyDrmService extends KalturaBaseService
 			$drmKey->setObjectType(DrmKeyObjectType::ENTRY);
 			$drmKey->setProvider(PlayReadyPlugin::getPlayReadyProviderCoreValue());
 			$keyId = kPlayReadyAESContentKeyGenerator::generatePlayReadyKeyId();
-			$drmKey->setKey($keyId);
+			$drmKey->setDrmKey($keyId);
 			try 
 			{
 				$drmKey->save();
@@ -96,9 +96,13 @@ class PlayReadyDrmService extends KalturaBaseService
 			}
 			catch(PropelException $e)
 			{
-				if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+				if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 				{
 					$keyId = $this->getEntryKeyId($entry->getId());
+				}
+				else
+				{
+					throw $e; // Rethrow the unfamiliar exception
 				}
 			}
 		}
@@ -174,6 +178,8 @@ class PlayReadyDrmService extends KalturaBaseService
 	private function getLicenseRequestEntry($keyId, $entryId = null)
 	{
 		$entry = null;
+		
+		$keyId = strtolower($keyId);
 		
 		if(!$keyId)
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "keyId");
@@ -277,7 +283,7 @@ class PlayReadyDrmService extends KalturaBaseService
 	{
 		$drmKey = DrmKeyPeer::retrieveByUniqueKey($entryId, DrmKeyObjectType::ENTRY, PlayReadyPlugin::getPlayReadyProviderCoreValue());
 		if($drmKey)
-			return $drmKey->getKey();
+			return $drmKey->getDrmKey();
 		else
 			return null;
 	}

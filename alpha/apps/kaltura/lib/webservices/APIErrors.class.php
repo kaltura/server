@@ -144,6 +144,8 @@ class APIErrors
 	// ENTRY_ID entry_id
 	const INVALID_ENTRY_ID = "INVALID_ENTRY_ID;ENTRY_TYPE,ENTRY_ID;Unknown @ENTRY_TYPE@ [@ENTRY_ID@]" ;
 	
+	const ENTRIES_AMOUNT_EXCEEDED = "ENTRIES_AMOUNT_EXCEEDED" ;
+	
 	const INVALID_ENTRY_IDS = "INVALID_ENTRY_IDS;ENTRY_IDS;Unknown entry ids [@ENTRY_IDS@]" ;
 	
 	// ENTRY_TYPE - the type (string) of the entry dvdProject / bubbles , ...

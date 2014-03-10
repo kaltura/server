@@ -44,6 +44,9 @@ class kUserRoleCondition extends kCondition
 		$roleIds = kPermissionManager::getRoleIds($partner, kCurrentContext::getCurrentKsKuser());
 		$conditionRoleIds = array_map('trim', explode(',', $this->roleIds));
 
+		if (!is_array($roleIds))
+			$roleIds = array();
+
 		foreach($roleIds as $roleId)
 		{
 			if (!in_array($roleId, $conditionRoleIds))

@@ -1,6 +1,6 @@
-/*! KMC - v6.0.10 - 2014-01-16
+/*! KMC - v6.0.10 - 2014-03-10
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2014 Ran Yefet; Licensed GNU */
+* Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -3024,7 +3024,8 @@ if ( window.XDomainRequest ) {
   ZeroClipboard.prototype.reposition = function() {
     if (!currentElement) return false;
     var pos = _getDOMObjectPosition(currentElement);
-    this.htmlBridge.style.top = pos.top + "px";
+    var topOffset = $(currentElement).hasClass("pullright") ? $(".form-horizontal").scrollTop() : 0;
+    this.htmlBridge.style.top = pos.top - topOffset + "px";
     this.htmlBridge.style.left = pos.left + "px";
     this.htmlBridge.style.width = pos.width + "px";
     this.htmlBridge.style.height = pos.height + "px";
@@ -3491,7 +3492,8 @@ kmcApp.config(['$translateProvider', function ($translateProvider) {
 		prefix: '/locales/locale-',
 		suffix: '.json'
 	});
-	var lang = kmc.vars.language || 'en';
+
+	var lang = localStorage["lang"] || 'en';
 	// take the first two characters
 	if( lang.length > 2 ){
 		lang = lang.toLowerCase().substr(0,2);
@@ -3801,7 +3803,7 @@ kmc.log = function() {
 
 kmc.functions = {
 
-	loadSwf : function() {
+	loadSwf : function(lang) {
 
 		var kmc_swf_url = window.location.protocol + '//' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
 		var flashvars = {
@@ -3827,7 +3829,8 @@ kmc.functions = {
 			openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
 			openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 			openCw				: "kmc.functions.openKcw",
-			language			: (kmc.vars.language || "")
+            maxUploadSize       : "2047",
+			language			: lang
 		};
 		// Disable analytics
 		if( kmc.vars.disable_analytics ) {
@@ -4007,7 +4010,7 @@ kmc.utils = {
 				"width": 0,
 				"visibility": 'visible',
 				"top": '6px',
-				"right": '6px'
+				"right": '29px'
 			};
 
 			var menu_animation_css = {
@@ -4134,13 +4137,23 @@ kmc.utils = {
 					subtab : subtab
 				};
                 $("#kcms")[0].gotoPage(go_to);
+                kmc.utils.verifyUploadVisible(go_to.moduleName);
                 return false;
 			});
 		} else {
-			alert('Error geting tabs');
+			alert('Error getting tabs');
 		}
 	},
-		
+	verifyUploadVisible: function(module){
+        if (module == "add" && $("#server_wrap").css("display") == "block"){
+            var res = confirm("You must close the studio to upload files.\nClose now?");
+            if (res == true)
+            {
+                $("#kcms")[0].gotoPage({"moduleName":"content", "subtab":"manage"});
+                $("#kcms")[0].gotoPage({"moduleName":"add"});
+            }
+        }
+    },
 	setTab : function(module, resetAll){
 		if( resetAll ) {$("#kmcHeader ul li a").removeClass("active");}
 		$("a#" + module).addClass("active");
@@ -4152,6 +4165,7 @@ kmc.utils = {
 	},
 
 	// we should combine the two following functions into one
+    kmcHeight: $("#flash_wrap").height(),
 	hideFlash : function(hide) {
 		var ltIE8 = $('html').hasClass('lt-ie8');
 		if(hide) {
@@ -4161,14 +4175,15 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
-				$("#flash_wrap object").css("visibility","hidden");
+                this.kmcHeight = $("#flash_wrap").height();
+				$("#flash_wrap").height(0);
 			}
 		} else {
 			if( ltIE8 ) {
 				$("#flash_wrap").css("margin-right","0");
 			} else {
 				$("#flash_wrap").css("visibility","visible");
-				$("#flash_wrap object").css("visibility","visible");
+                $("#flash_wrap").height(this.kmcHeight);
 			}
 		}
 	},
@@ -4177,7 +4192,9 @@ kmc.utils = {
 		$("#server_frame").removeAttr('src');
 		if( !kmc.layout.modal.isOpen() ) {
 			$("#flash_wrap").css("visibility","visible");
-            $("#flash_wrap object").css("visibility","visible");
+            if (this.kmcHeight > 0){
+                $("#flash_wrap").height(this.kmcHeight);
+            }
             var ltIE8 = $('html').hasClass('lt-ie8');
             if( ltIE8 ) {
                 $("#flash_wrap").css("margin-right","0");
@@ -4213,7 +4230,6 @@ kmc.utils = {
 	getClientIP: function() {
 		return kmc.vars.clientIP;
 	}
-		
 };
 
 kmc.mediator =  {
@@ -4312,8 +4328,7 @@ kmc.mediator =  {
 
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
-	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
-
+	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, duration, thumbnailUrl) {
 		var embedOptions = {
 			'previewOnly': previewOnly
 		};
@@ -4322,13 +4337,14 @@ kmc.preview_embed = {
 		if( uiconf_id ) {
 			embedOptions.uiConfId = parseInt(uiconf_id);
 		}
-
 		// Single entry
 		if( ! is_playlist ) {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
 				'name': name,
-				'description': description
+				'description': description,
+                'duration': duration,
+                'thumbnailUrl': thumbnailUrl
 			};
 			if( live_bitrates ) {
 				embedOptions.liveBitrates = live_bitrates;
@@ -4343,7 +4359,6 @@ kmc.preview_embed = {
 				embedOptions.playlistName = name;
 			}
 		}
-
 		kmc.Preview.openPreviewEmbed( embedOptions, kmc.Preview.Service );
 	}, // doPreviewEmbed
 
@@ -4780,9 +4795,10 @@ function playerAdded() {kmc.preview_embed.updateList(false);}
 
 // When page ready initilize KMC
 $(function() {
+
 	kmc.layout.init();
 	kmc.utils.handleMenu();
-	kmc.functions.loadSwf();
+	kmc.functions.loadSwf(window.lang);
 
 	// Set resize event to update the flash object size
 	$(window).wresize(kmc.utils.resize);
@@ -4794,6 +4810,7 @@ $(function() {
 
 	// Set client IP
 	kmc.utils.setClientIP();
+
 });
 
 // Auto resize modal windows

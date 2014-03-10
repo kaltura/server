@@ -200,6 +200,16 @@ abstract class LiveEntry extends entry
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
 	
+	public function getPushPublishEnabled()
+	{
+		return $this->getFromCustomData("push_publish_enabled", null, false);
+	}
+	
+	public function setPushPublishEnabled($v)
+	{
+		$this->putInCustomData("push_publish_enabled", $v);
+	}
+	
 	public function setLiveStreamConfigurations(array $v)
 	{
 		$this->putInCustomData('live_stream_configurations', $v);
@@ -225,14 +235,26 @@ abstract class LiveEntry extends entry
 			return $configurations;
 		
 		$configurations = array();
+		$manifestUrl = null;
 		$mediaServer = $this->getMediaServer();
 		if($mediaServer)
+		{
+			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+		}
+		elseif (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
+		{
+			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
+			
+			if (isset($partnerConfigurations[$protocol]))
+				$manifestUrl = $partnerConfigurations[$protocol];
+		}
+		
+		if ($manifestUrl)
 		{
 			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
 			
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
 			if($tag)
 				$streamName = "smil:{$streamName}_{$tag}.smil";
 			
@@ -241,8 +263,8 @@ abstract class LiveEntry extends entry
 			$manifestUrl .= $streamName;
 			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			$slStreamUrl = "$manifestUrl/Manifest";
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
@@ -296,9 +318,8 @@ abstract class LiveEntry extends entry
 		
 		foreach($kMediaServers as $kMediaServer)
 		{
-			if($kMediaServer instanceof kLiveMediaServer)
+			if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 			{
-				/* @var $kMediaServer kLiveMediaServer */
 				KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
 				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
 					return $kMediaServer->getMediaServer();
@@ -308,7 +329,7 @@ abstract class LiveEntry extends entry
 			return null;
 		
 		$kMediaServer = reset($kMediaServers);
-		if($kMediaServer instanceof kLiveMediaServer)
+		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 			return $kMediaServer->getMediaServer();
 			
 		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
@@ -355,7 +376,7 @@ abstract class LiveEntry extends entry
 			return $lastUpdate <= $expiry;
 		}
 		
-		$key = $this->getId() . '_' . $kMediaServer->getMediaServerId() . '_' . $kMediaServer->getIndex();
+		$key = $this->getId() . '_' . $kMediaServer->getHostname() . '_' . $kMediaServer->getIndex();
 		KalturaLog::debug("Get cache key [$key] from store [$cacheType]");
 		return $cacheStore->get($key);
 	}
@@ -375,14 +396,19 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, MediaServer $mediaServer)
+	public function setMediaServer($index, $hostname)
 	{
-		$serverId = $mediaServer->getId();
-		$key = $this->getId() . "_{$serverId}_{$index}";
-		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $serverId))
+		$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
+		if (!$mediaServer)
+		{
+			KalturaLog::info("External media server with hostname [$hostname] is being used to stream this entry");
+		}
+		
+		$key = $this->getId() . "_{$hostname}_{$index}";
+		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
-		$server = new kLiveMediaServer($index, $mediaServer);
+		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
 		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	
@@ -395,10 +421,10 @@ abstract class LiveEntry extends entry
 		return false;
 	}
 	
-	public function unsetMediaServer($index, $serverId)
+	public function unsetMediaServer($index, $hostname)
 	{
 		$server = $this->getFromCustomData("server-$index", 'mediaServers');
-		if($server && $server->getMediaServerId() == $serverId)
+		if($server && $server->getHostname() == $hostname)
 			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
 	}
 	

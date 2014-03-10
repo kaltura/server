@@ -20,7 +20,17 @@ class CuePointService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		$this->applyPartnerFilterForClass('CuePoint');
+		
+
+		// Play server lists entries of all partners
+		if($this->getPartnerId() == Partner::PLAY_SERVER_PARTNER_ID && $actionName == 'list')
+		{
+			myPartnerUtils::resetPartnerFilter('entry');
+		}
+		else 
+		{	
+			$this->applyPartnerFilterForClass('CuePoint');
+		}
 
 		// when session is not admin, allow access to user entries only
 		if (!$this->getKs() || !$this->getKs()->isAdmin())

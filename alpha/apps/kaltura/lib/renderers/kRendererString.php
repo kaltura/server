@@ -30,6 +30,7 @@ class kRendererString implements kRendererBase
 		header('Content-Length: '.strlen($this->content));
 		if ($this->contentType)
 			header('Content-Type: '.$this->contentType);
+		header("Access-Control-Allow-Origin:*");
 		
 		infraRequestUtils::sendCachingHeaders($this->maxAge);
 

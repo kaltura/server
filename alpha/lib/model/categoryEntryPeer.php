@@ -87,6 +87,16 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		return categoryEntryPeer::doSelect($c);
 	}
 	
+	public static function retrieveOneActiveByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+		
+		return categoryEntryPeer::doSelectOne($c);
+	}
+	
+	
 	public static function retrieveActiveAndPendingByEntryId($entryId)
 	{
 		$c = new Criteria();
@@ -94,6 +104,48 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		$c->addAnd(categoryEntryPeer::STATUS, array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE), Criteria::IN);
 		
 		return categoryEntryPeer::doSelect($c);
+	}
+	
+	public static function retrieveActiveAndPendingByEntryIdAndPrivacyContext($entryId, $privacyContext)
+	{
+		$c = new Criteria();
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		$c->addAnd(categoryEntryPeer::STATUS, array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE), Criteria::IN);
+		$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, $privacyContext, Criteria::IN);
+		
+		return categoryEntryPeer::doSelect($c);
+	}
+
+	public static function retrieveByEntryIdStatusPrivacyContextExistance($entryId, array $statuses = null, $hasPrivacyContext = false)
+	{
+		$c = new Criteria();
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		if(!$statuses)
+			$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+		else
+			$c->addAnd(categoryEntryPeer::STATUS, $statuses, Criteria::IN);
+		if($hasPrivacyContext)
+			$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, null, Criteria::ISNOTNULL);
+		else 
+			$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, null, Criteria::ISNULL);
+			
+		return categoryEntryPeer::doSelect($c);
+	}
+	
+	public static function retrieveOneByEntryIdStatusPrivacyContextExistance($entryId, array $statuses = null, $hasPrivacyContext = false)
+	{
+		$c = new Criteria();
+		$c->addAnd(categoryEntryPeer::ENTRY_ID, $entryId);
+		if(!$statuses)
+			$c->addAnd(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+		else
+			$c->addAnd(categoryEntryPeer::STATUS, $statuses, Criteria::IN);
+		if($hasPrivacyContext)
+			$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, null, Criteria::ISNOTNULL);
+		else 
+			$c->addAnd(categoryEntryPeer::PRIVACY_CONTEXT, null, Criteria::ISNULL);
+			
+		return categoryEntryPeer::doSelectOne($c);
 	}
 	
 	public static function selectByEntryId($entryId)

@@ -349,7 +349,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		}
 		catch(PropelException $e)
 		{
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 			{
 				$existingFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($folder->getId(), $fileName);
 				if($existingFile)
