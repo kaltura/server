@@ -1,3 +1,14 @@
+# IX-9.13.0 #
+
+## Live sync points ##
+Enable sending periodic live sync points on Kaltura live stream.
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_live_stream_create_sync_points.php
+
+
+
 # IX-9.12.0 #
 
 ## Remove limitation of 32 categories per entry##
