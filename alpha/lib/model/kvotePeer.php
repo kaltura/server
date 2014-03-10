@@ -57,7 +57,7 @@ class kvotePeer extends BasekvotePeer
 	        $affectedLines = $kvote->save();
 	    }
 	    
-	    return $affectedLines;
+	    return isset($affectedLines) ? $affectedLines : 0;
 	}
 	
     public static function disableExistingKVote ($entryId, $partnerId, $puserId)
@@ -69,7 +69,7 @@ class kvotePeer extends BasekvotePeer
     	    $affectedLines = $kvote->save();
 	    }
 	    
-	    return $affectedLines;
+	    return isset($affectedLines) ? $affectedLines : 0;
 	    
 	}
 	
