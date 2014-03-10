@@ -296,16 +296,23 @@ abstract class LiveEntry extends entry
 		
 		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $kMediaServer kLiveMediaServer */
-			KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-				return $kMediaServer->getMediaServer();
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				/* @var $kMediaServer kLiveMediaServer */
+				KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+					return $kMediaServer->getMediaServer();
+			}
 		}
 		if($currentDcOnly)
 			return null;
 		
 		$kMediaServer = reset($kMediaServers);
-		return $kMediaServer->getMediaServer();
+		if($kMediaServer instanceof kLiveMediaServer)
+			return $kMediaServer->getMediaServer();
+			
+		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
+		return null;
 	}
 	
 	/**
@@ -319,9 +326,12 @@ abstract class LiveEntry extends entry
 		
 		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $kMediaServer kLiveMediaServer */
-			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-				return true;
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				/* @var $kMediaServer kLiveMediaServer */
+				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+					return true;
+			}
 		}
 		
 		return !$currentDcOnly;
