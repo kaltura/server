@@ -12,6 +12,18 @@ Enable sending periodic live sync points on Kaltura live stream.
 - Version 3.0.3 [KalturaWowzaServer.jar](https://github.com/kaltura/media-server/releases/download/rel-3.0.3/KalturaWowzaServer-3.0.3.jar "KalturaWowzaServer.jar")
  
 
+## Allow "View History" for any Admin Console users (revisited) ##
+The monitor's View History permission is lowered from System Admin user to any Admin Console user.
+
+- update admin.ini:
+access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_PUBLISHER_CONFIG
+access.partner.exteneded-free-trail-history = SYSTEM_ADMIN_PUBLISHER_CONFIG
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_add_system_admin_publisher_config_to_audittrail.php
+ 
+
 # IX-9.12.0 #
 
 ## Remove limitation of 32 categories per entry##
