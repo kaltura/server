@@ -261,4 +261,9 @@ class flavorAsset extends asset
 		}
 		return $obj;
 	}
+	
+	public function getVideoBitrate()
+	{
+		return $this->getBitrate();
+	}
 }

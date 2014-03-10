@@ -843,15 +843,15 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
-	 * @param flavorAsset $flavorAsset
+	 * @param flavorAsset|flavorParams $flavorAsset
 	 * @return array
 	 */
-	private function getFlavorAssetInfo($url, $urlPrefix = '', flavorAsset $flavorAsset = null)
+	private function getFlavorAssetInfo($url, $urlPrefix = '', $flavor = null)
 	{
 		$ext = null;
-		if ($flavorAsset)
+		if ($flavor && is_callable(array($flavor, 'getFileExt')))
 		{
-			$ext = $flavorAsset->getFileExt();
+			$ext = $flavor->getFileExt();
 		}
 		if (!$ext)
 		{
@@ -859,9 +859,9 @@ class playManifestAction extends kalturaAction
 			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
 		}
 
-		$bitrate = ($flavorAsset ? $flavorAsset->getBitrate() : 0);
-		$width =   ($flavorAsset ? $flavorAsset->getWidth()   : 0);
-		$height =  ($flavorAsset ? $flavorAsset->getHeight()  : 0);
+		$bitrate = ($flavor ? $flavor->getVideoBitrate() : 0);
+		$width =   ($flavor ? $flavor->getWidth()   : 0);
+		$height =  ($flavor ? $flavor->getHeight()  : 0);
 		
 		return array(
 			'url' => $url,
@@ -1102,14 +1102,7 @@ class playManifestAction extends kalturaAction
 	{		
 		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
 		{
-			$flavors = array(
-				0 => array(
-					'url' => $this->entry->getStreamName(),
-					'bitrate' => 0,
-					'width' => 0,
-					'height' => 0,
-				)
-			);
+			$flavors = array( 0 => $this->getFlavorAssetInfo($this->entry->getStreamName()) );
 			
 			$conversionProfileId = $this->entry->getConversionProfileId();
 			if($conversionProfileId)
@@ -1123,12 +1116,7 @@ class playManifestAction extends kalturaAction
 					foreach($liveParams as $index => $liveParamsItem)
 					{
 						/* @var $liveParamsItem liveParams */
-						$flavors[$index] = array(
-							'url' => $this->entry->getStreamName() . '_' . $liveParamsItem->getId(),
-							'bitrate' => $liveParamsItem->getVideoBitrate(),
-							'width' => $liveParamsItem->getWidth(),
-							'height' => $liveParamsItem->getHeight(),
-						);
+						$flavors[$index] = $this->getFlavorAssetInfo($this->entry->getStreamName() . '_' . $liveParamsItem->getId(), '', $liveParamsItem);
 					}
 				}
 			}
@@ -1136,24 +1124,20 @@ class playManifestAction extends kalturaAction
 			return $flavors;
 		}
 			
-		$flavors = $this->entry->getStreamBitrates();
-		if(count($flavors))
+		$tmpFlavors  = $this->entry->getStreamBitrates();
+		if(count($tmpFlavors))
 		{
-			foreach($flavors as $index => $flavor)
+			$flavors = array();
+			foreach($tmpFlavors as $index => $flavor)
 			{
 				$brIndex = $index + 1;
-				$flavors[$index] = $flavor;
-				$flavors[$index]['url'] = str_replace('%i', $brIndex, $this->entry->getStreamName());
+				$flavors[$index] = $this->getFlavorAssetInfo(str_replace('%i', $brIndex, $this->entry->getStreamName()));
+				$flavors[$index] = array_merge($flavors[$index], $flavor);
 			}
 		}
 		else
 		{
-			$flavors[0] = array(
-				'url' => str_replace('%i', '1', $this->entry->getStreamName()),
-				'bitrate' => 0,
-				'width' => 0,
-				'height' => 0,
-			);
+			$flavors[0] = $this->getFlavorAssetInfo(str_replace('%i', '1', $this->entry->getStreamName()));
 		}
 		
 		return $flavors;
