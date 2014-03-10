@@ -1461,6 +1461,7 @@ class playManifestAction extends kalturaAction
 			
 			case PlaybackProtocol::HDS:
 			case PlaybackProtocol::AKAMAI_HDS:
+			case PlaybackProtocol::MULTICAST_SL:
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 				$renderer = $this->getRenderer('kF4MManifestRenderer', array($flavor));
 				break;

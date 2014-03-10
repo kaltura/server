@@ -302,6 +302,12 @@ abstract class LiveEntry extends entry
 			$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
 			$configuration->setUrl($mpdStreamUrl);
 			$configurations[] = $configuration;
+			
+			if ($this->getPushPublishEnabled())
+			{
+				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$configurations = array_merge($configurations, $pushPublishConfigurations);
+			}
 		}
 		
 		return $configurations;
@@ -499,6 +505,16 @@ abstract class LiveEntry extends entry
 	public function getAttachedPendingMediaEntries()
 	{
 		return $this->getFromCustomData('attached_pending_media_entries', null, array());
+	}
+	
+	public function getPushPublishConfigurations ()
+	{
+		return $this->getFromCustomData('push_publish_configurations',null, array());
+	}
+	
+	public function setPushPublishConfigurations ($v)
+	{
+		$this->putInCustomData('push_publish_configurations', $v);
 	}
 	
 	/**
