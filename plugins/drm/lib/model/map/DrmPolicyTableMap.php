@@ -39,7 +39,6 @@ class DrmPolicyTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('PROFILE_ID', 'ProfileId', 'INTEGER', true, null, null);
 		$this->addColumn('NAME', 'Name', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', true, 128, '');
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);

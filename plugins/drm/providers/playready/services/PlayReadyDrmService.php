@@ -122,6 +122,8 @@ class PlayReadyDrmService extends KalturaBaseService
 	 * 
 	 * @action getLicenseDetails
 	 * @param string $keyId
+	 * @param string $deviceId
+	 * @param int $deviceType
 	 * @param string $entryId
 	 * @param string $referrer 64base encoded  
 	 * @return KalturaPlayReadyLicenseDetails $response
@@ -131,12 +133,13 @@ class PlayReadyDrmService extends KalturaBaseService
 	 * @throws KalturaPlayReadyErrors::ENTRY_NOT_FOUND_BY_KEY_ID
 	 * @throws KalturaPlayReadyErrors::PLAYREADY_POLICY_NOT_FOUND
 	 */
-	public function getLicenseDetailsAction($keyId, $entryId = null, $referrer = null)
+	public function getLicenseDetailsAction($keyId, $deviceId, $deviceType, $entryId = null, $referrer = null)
 	{
 		KalturaLog::debug('Get Play Ready license details for keyID: '.$keyId);
+		
 		$entry = $this->getLicenseRequestEntry($keyId, $entryId);		
 		
-		$policyId = $this->validateAccessControl($entry, $referrer); //TODO: check what policy returned for admin
+		$policyId = $this->validateAccessControl($entry, $referrer); 
 		$dbPolicy = DrmPolicyPeer::retrieveByPK($policyId);
 		if(!$dbPolicy)
 			throw new KalturaAPIException(KalturaPlayReadyErrors::PLAYREADY_POLICY_OBJECT_NOT_FOUND, $policyId);
@@ -146,13 +149,43 @@ class PlayReadyDrmService extends KalturaBaseService
 		$policy = new KalturaPlayReadyPolicy();
 		$policy->fromObject($dbPolicy);
 		
+		$this->registerDevice($deviceId, $deviceType);
+		
 		$response = new KalturaPlayReadyLicenseDetails();
 		$response->policy = $policy;
 		$response->beginDate = $beginDate;
 		$response->expirationDate = $expirationDate;
 		$response->removalDate = $removalDate;
-		
+				
 		return $response;
+	}
+	
+	private function registerDevice($deviceId, $deviceType)
+	{
+		KalturaLog::debug("device id: ".$deviceId." device type: ".$deviceType);
+		//TODO: log for BI
+		if($deviceType != 1 && $deviceType != 7) //TODO: verify how to identify the silverlight client
+		{
+			try 
+			{
+				$drmDevice = new DrmDevice();
+				$drmDevice->setPartnerId($this->getPartnerId());
+				$drmDevice->setDeviceId($deviceId);
+				$drmDevice->setProvider(PlayReadyPlugin::getPlayReadyProviderCoreValue());				
+				$drmDevice->save();
+			}
+			catch(PropelException $e)
+			{
+				if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+				{
+					KalturaLog::debug("device already registered");
+				}
+				else
+				{
+					throw $e; // Rethrow the unfamiliar exception
+				}
+			}
+		}
 	}
 	
 	private function validateAccessControl(entry $entry, $referrer64base)

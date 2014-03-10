@@ -26,7 +26,7 @@ abstract class BaseDrmPolicyPeer {
 	const TM_CLASS = 'DrmPolicyTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 15;
+	const NUM_COLUMNS = 14;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -36,9 +36,6 @@ abstract class BaseDrmPolicyPeer {
 
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'drm_policy.PARTNER_ID';
-
-	/** the column name for the PROFILE_ID field */
-	const PROFILE_ID = 'drm_policy.PROFILE_ID';
 
 	/** the column name for the NAME field */
 	const NAME = 'drm_policy.NAME';
@@ -92,11 +89,11 @@ abstract class BaseDrmPolicyPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'ProfileId', 'Name', 'SystemName', 'Description', 'Provider', 'Status', 'Scenario', 'LicenseType', 'LicenseExpirationPolicy', 'Duration', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'profileId', 'name', 'systemName', 'description', 'provider', 'status', 'scenario', 'licenseType', 'licenseExpirationPolicy', 'duration', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::PROFILE_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::PROVIDER, self::STATUS, self::SCENARIO, self::LICENSE_TYPE, self::LICENSE_EXPIRATION_POLICY, self::DURATION, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'profile_id', 'name', 'system_name', 'description', 'provider', 'status', 'scenario', 'license_type', 'license_expiration_policy', 'duration', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'SystemName', 'Description', 'Provider', 'Status', 'Scenario', 'LicenseType', 'LicenseExpirationPolicy', 'Duration', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'systemName', 'description', 'provider', 'status', 'scenario', 'licenseType', 'licenseExpirationPolicy', 'duration', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::PROVIDER, self::STATUS, self::SCENARIO, self::LICENSE_TYPE, self::LICENSE_EXPIRATION_POLICY, self::DURATION, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'system_name', 'description', 'provider', 'status', 'scenario', 'license_type', 'license_expiration_policy', 'duration', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -106,11 +103,11 @@ abstract class BaseDrmPolicyPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'ProfileId' => 2, 'Name' => 3, 'SystemName' => 4, 'Description' => 5, 'Provider' => 6, 'Status' => 7, 'Scenario' => 8, 'LicenseType' => 9, 'LicenseExpirationPolicy' => 10, 'Duration' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'CustomData' => 14, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'profileId' => 2, 'name' => 3, 'systemName' => 4, 'description' => 5, 'provider' => 6, 'status' => 7, 'scenario' => 8, 'licenseType' => 9, 'licenseExpirationPolicy' => 10, 'duration' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'customData' => 14, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::PROFILE_ID => 2, self::NAME => 3, self::SYSTEM_NAME => 4, self::DESCRIPTION => 5, self::PROVIDER => 6, self::STATUS => 7, self::SCENARIO => 8, self::LICENSE_TYPE => 9, self::LICENSE_EXPIRATION_POLICY => 10, self::DURATION => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::CUSTOM_DATA => 14, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'profile_id' => 2, 'name' => 3, 'system_name' => 4, 'description' => 5, 'provider' => 6, 'status' => 7, 'scenario' => 8, 'license_type' => 9, 'license_expiration_policy' => 10, 'duration' => 11, 'created_at' => 12, 'updated_at' => 13, 'custom_data' => 14, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'SystemName' => 3, 'Description' => 4, 'Provider' => 5, 'Status' => 6, 'Scenario' => 7, 'LicenseType' => 8, 'LicenseExpirationPolicy' => 9, 'Duration' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, 'CustomData' => 13, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'systemName' => 3, 'description' => 4, 'provider' => 5, 'status' => 6, 'scenario' => 7, 'licenseType' => 8, 'licenseExpirationPolicy' => 9, 'duration' => 10, 'createdAt' => 11, 'updatedAt' => 12, 'customData' => 13, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::SYSTEM_NAME => 3, self::DESCRIPTION => 4, self::PROVIDER => 5, self::STATUS => 6, self::SCENARIO => 7, self::LICENSE_TYPE => 8, self::LICENSE_EXPIRATION_POLICY => 9, self::DURATION => 10, self::CREATED_AT => 11, self::UPDATED_AT => 12, self::CUSTOM_DATA => 13, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'system_name' => 3, 'description' => 4, 'provider' => 5, 'status' => 6, 'scenario' => 7, 'license_type' => 8, 'license_expiration_policy' => 9, 'duration' => 10, 'created_at' => 11, 'updated_at' => 12, 'custom_data' => 13, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
 	/**
@@ -182,7 +179,6 @@ abstract class BaseDrmPolicyPeer {
 	{
 		$criteria->addSelectColumn(DrmPolicyPeer::ID);
 		$criteria->addSelectColumn(DrmPolicyPeer::PARTNER_ID);
-		$criteria->addSelectColumn(DrmPolicyPeer::PROFILE_ID);
 		$criteria->addSelectColumn(DrmPolicyPeer::NAME);
 		$criteria->addSelectColumn(DrmPolicyPeer::SYSTEM_NAME);
 		$criteria->addSelectColumn(DrmPolicyPeer::DESCRIPTION);
@@ -799,7 +795,7 @@ abstract class BaseDrmPolicyPeer {
 	{
 		try {
 
-			$omClass = $row[$colnum + 6];
+			$omClass = $row[$colnum + 5];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {
