@@ -128,6 +128,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function objectChanged (BaseObject $object, array $modifiedColumns)
     {
+    	$privacyContexts = null;
         if ($object instanceof entry)
         {
         	$criteria = new Criteria();
