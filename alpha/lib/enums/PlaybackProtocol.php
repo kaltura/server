@@ -16,4 +16,5 @@ interface PlaybackProtocol extends BaseEnum
 	const AKAMAI_HDS = 'hdnetworkmanifest';
 	const AKAMAI_HD = 'hdnetwork';
 	const MPEG_DASH = 'mpegdash';
+	const MULTICAST_SL = 'multicast_silverlight';
 }

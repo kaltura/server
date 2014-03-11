@@ -23,6 +23,12 @@ Enable sending periodic live sync points on Kaltura live stream.
 2. copy dll's from PlayReadyLicenseServer/vdir/bin to the license server under: C:\Program Files\PlayReady Server SDK 2.9\vdir\bin
 3. restart IIS
 
+## Multicast ##
+
+*Permissions*
+
+- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestreamservice.php
+
 
 # IX-9.12.0 #
 

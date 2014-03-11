@@ -41,6 +41,8 @@ abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 
 	static private $order_by_map = array
 	(
+		"+version" => "+version",
+		"-version" => "-version",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
