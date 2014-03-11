@@ -22,7 +22,22 @@ $con = $target->_container;
 			break;
 	 */
 		case KDLContainerTarget::ISMV:
-			$cmdStr = " -movflags frag_keyframe -f ismv";
+				/*
+				 * ISMV/SmoothStreaming needs following in order to support adptive-bitrate management
+				 * - frag_keyframe - the media control meta data is written for each chunk/packet, 
+				 * rather than appeares only at the end/beginning of the file
+				 * - min_frag_duration (micro sec) - causes the fragmentation to be alligned cross 
+				 * the various assets. Evaluated from gop and fr, if missing set to 2 sec. Relates to KF positioning 
+				 */
+			if(isset($target->_video) 
+			&& (isset($target->_video->_gop) && $target->_video->_gop>0)
+			&& (isset($target->_video->_frameRate) && $target->_video->_frameRate>0)){
+				$min_frag = round(($target->_video->_gop/$target->_video->_frameRate)*1000000);
+			}
+			else {
+				$min_frag = 20000000;
+			}
+			$cmdStr = " -movflags +frag_keyframe -min_frag_duration $min_frag -f ismv";
 			break;
 		default:
 			$cmdStr = parent::generateContainerParams($design, $target);
