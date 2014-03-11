@@ -259,8 +259,11 @@ class asset extends Baseasset implements ISyncableFile
 	protected function onAssetContentModified()
 	{
 		$entry = $this->getentry();
-		$entry->onAssetContentModified();
-		$entry->save();
+		if($entry)
+		{
+			$entry->onAssetContentModified();
+			$entry->save();
+		}
 	}
 		
 	public function incrementVersion()
