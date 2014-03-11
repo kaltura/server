@@ -1,3 +1,29 @@
+# IX-9.13.0 #
+
+## Live sync points ##
+Enable sending periodic live sync points on Kaltura live stream.
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_live_stream_create_sync_points.php
+
+*Media Server*
+
+- Version 3.0.3 [KalturaWowzaServer.jar](https://github.com/kaltura/media-server/releases/download/rel-3.0.3/KalturaWowzaServer-3.0.3.jar "KalturaWowzaServer.jar")
+ 
+*Play Ready*
+1. upgrade PR license server to v2.9
+2. device registration flow
+
+*DB Changes*
+/deployment/updates/sql/2014_03_04_update_drm_device_table.sql
+
+*PR license server update*
+1. clone git repository: https://github.com/kaltura/playready-server
+2. copy dll's from PlayReadyLicenseServer/vdir/bin to the license server under: C:\Program Files\PlayReady Server SDK 2.9\vdir\bin
+3. restart IIS
+
+
 # IX-9.12.0 #
 
 ## Remove limitation of 32 categories per entry##

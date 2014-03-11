@@ -8,16 +8,12 @@ abstract class KalturaDrmPolicyBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
-		"idEqual" => "_eq_id",
-		"idIn" => "_in_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
 		"nameLike" => "_like_name",
 		"systemNameLike" => "_like_system_name",
 		"providerEqual" => "_eq_provider",
 		"providerIn" => "_in_provider",
-		"profileIdEqual" => "_eq_profile_id",
-		"profileIdIn" => "_in_profile_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"scenarioEqual" => "_eq_scenario",
@@ -26,12 +22,6 @@ abstract class KalturaDrmPolicyBaseFilter extends KalturaFilter
 
 	static private $order_by_map = array
 	(
-		"+id" => "+id",
-		"-id" => "-id",
-		"+name" => "+name",
-		"-name" => "-name",
-		"+systemName" => "+system_name",
-		"-systemName" => "-system_name",
 	);
 
 	public function getMapBetweenObjects()
@@ -43,16 +33,6 @@ abstract class KalturaDrmPolicyBaseFilter extends KalturaFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
-
-	/**
-	 * @var int
-	 */
-	public $idEqual;
-
-	/**
-	 * @var string
-	 */
-	public $idIn;
 
 	/**
 	 * @var int
@@ -84,16 +64,6 @@ abstract class KalturaDrmPolicyBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $providerIn;
-
-	/**
-	 * @var int
-	 */
-	public $profileIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $profileIdIn;
 
 	/**
 	 * @var KalturaDrmPolicyStatus

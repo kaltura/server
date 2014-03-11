@@ -10,26 +10,17 @@ class KDLOperatorFfmpeg0_10 extends KDLOperatorFfmpeg {
 	 */
     public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
-		$cmdStr = parent::GenerateCommandLine($design, $target, $extra);
-		if($target->_isTwoPass) {
-	$pass2params = "-passlogfile ".KDLCmdlinePlaceholders::OutFileName.".2pass.log -pass";
-
-$nullDev = "NUL";
-$nullDev ="/dev/null";
-			$pass1cmdLine =
-				str_replace ( 
-					array(KDLCmdlinePlaceholders::OutFileName, " -y"), 
-					array($nullDev, " -an $pass2params 1 -fastfirstpass 1 -y"),
-					$cmdStr);
-
-			$pass2cmdLine =
-				str_replace ( 
-					array(" -y"), 
-					array(" $pass2params 2 -y"),
-					$cmdStr);
-			$cmdStr = "$pass1cmdLine && ".KDLCmdlinePlaceholders::BinaryName." $pass2cmdLine ";
-		}
+		$cmdStr = $this->generateSinglePassCommandLine($design, $target, $extra);
+		$cmdStr = $this->processTwoPass($target, $cmdStr);
 		return $cmdStr;
+	}
+	
+	/* ---------------------------
+	 * generateSinglePassCommandLine
+	 */
+	protected function generateSinglePassCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
+	{
+		return parent::GenerateCommandLine($design, $target, $extra);
 	}
 	
 	/* ---------------------------
@@ -186,6 +177,34 @@ $paramsStr = null;
 		default:
 			return parent::getVideoCodecSpecificParams($design, $target)." -pix_fmt yuv420p";
 		}
+	}
+	
+	/* ---------------------------
+	 * processTwoPass
+	 */
+    protected function processTwoPass(KDLFlavor $target, $cmdStr)
+	{
+		if(!isset($target->_isTwoPass) || $target->_isTwoPass==0)
+			return $cmdStr;
+
+		$pass2params = "-passlogfile ".KDLCmdlinePlaceholders::OutFileName.".2pass.log -pass";
+
+$nullDev = "NUL";
+$nullDev ="/dev/null";
+		$pass1cmdLine =
+			str_replace ( 
+				array(KDLCmdlinePlaceholders::OutFileName, " -y"), 
+				array($nullDev, " -an $pass2params 1 -fastfirstpass 1 -y"),
+				$cmdStr);
+
+		$pass2cmdLine =
+			str_replace ( 
+				array(" -y"), 
+				array(" $pass2params 2 -y"),
+				$cmdStr);
+		$cmdStr = "$pass1cmdLine && ".KDLCmdlinePlaceholders::BinaryName." $pass2cmdLine ";
+			
+		return $cmdStr;
 	}
 	
 	/* ---------------------------

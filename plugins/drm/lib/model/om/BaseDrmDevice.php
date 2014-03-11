@@ -32,46 +32,16 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 	protected $partner_id;
 
 	/**
-	 * The value for the profile_id field.
-	 * @var        int
-	 */
-	protected $profile_id;
-
-	/**
-	 * The value for the userid field.
+	 * The value for the device_id field.
 	 * @var        string
 	 */
-	protected $userid;
-
-	/**
-	 * The value for the deviceid field.
-	 * @var        string
-	 */
-	protected $deviceid;
-
-	/**
-	 * The value for the version field.
-	 * @var        string
-	 */
-	protected $version;
-
-	/**
-	 * The value for the platformdescriptor field.
-	 * @var        string
-	 */
-	protected $platformdescriptor;
+	protected $device_id;
 
 	/**
 	 * The value for the provider field.
 	 * @var        int
 	 */
 	protected $provider;
-
-	/**
-	 * The value for the status field.
-	 * @var        int
-	 */
-	protected $status;
 
 	/**
 	 * The value for the created_at field.
@@ -157,53 +127,13 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [profile_id] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getProfileId()
-	{
-		return $this->profile_id;
-	}
-
-	/**
-	 * Get the [userid] column value.
+	 * Get the [device_id] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getUserid()
+	public function getDeviceId()
 	{
-		return $this->userid;
-	}
-
-	/**
-	 * Get the [deviceid] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDeviceid()
-	{
-		return $this->deviceid;
-	}
-
-	/**
-	 * Get the [version] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getVersion()
-	{
-		return $this->version;
-	}
-
-	/**
-	 * Get the [platformdescriptor] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getPlatformdescriptor()
-	{
-		return $this->platformdescriptor;
+		return $this->device_id;
 	}
 
 	/**
@@ -214,16 +144,6 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 	public function getProvider()
 	{
 		return $this->provider;
-	}
-
-	/**
-	 * Get the [status] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getStatus()
-	{
-		return $this->status;
 	}
 
 	/**
@@ -363,119 +283,27 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 	} // setPartnerId()
 
 	/**
-	 * Set the value of [profile_id] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     DrmDevice The current object (for fluent API support)
-	 */
-	public function setProfileId($v)
-	{
-		if(!isset($this->oldColumnsValues[DrmDevicePeer::PROFILE_ID]))
-			$this->oldColumnsValues[DrmDevicePeer::PROFILE_ID] = $this->profile_id;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->profile_id !== $v) {
-			$this->profile_id = $v;
-			$this->modifiedColumns[] = DrmDevicePeer::PROFILE_ID;
-		}
-
-		return $this;
-	} // setProfileId()
-
-	/**
-	 * Set the value of [userid] column.
+	 * Set the value of [device_id] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     DrmDevice The current object (for fluent API support)
 	 */
-	public function setUserid($v)
+	public function setDeviceId($v)
 	{
-		if(!isset($this->oldColumnsValues[DrmDevicePeer::USERID]))
-			$this->oldColumnsValues[DrmDevicePeer::USERID] = $this->userid;
+		if(!isset($this->oldColumnsValues[DrmDevicePeer::DEVICE_ID]))
+			$this->oldColumnsValues[DrmDevicePeer::DEVICE_ID] = $this->device_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->userid !== $v) {
-			$this->userid = $v;
-			$this->modifiedColumns[] = DrmDevicePeer::USERID;
+		if ($this->device_id !== $v) {
+			$this->device_id = $v;
+			$this->modifiedColumns[] = DrmDevicePeer::DEVICE_ID;
 		}
 
 		return $this;
-	} // setUserid()
-
-	/**
-	 * Set the value of [deviceid] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     DrmDevice The current object (for fluent API support)
-	 */
-	public function setDeviceid($v)
-	{
-		if(!isset($this->oldColumnsValues[DrmDevicePeer::DEVICEID]))
-			$this->oldColumnsValues[DrmDevicePeer::DEVICEID] = $this->deviceid;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->deviceid !== $v) {
-			$this->deviceid = $v;
-			$this->modifiedColumns[] = DrmDevicePeer::DEVICEID;
-		}
-
-		return $this;
-	} // setDeviceid()
-
-	/**
-	 * Set the value of [version] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     DrmDevice The current object (for fluent API support)
-	 */
-	public function setVersion($v)
-	{
-		if(!isset($this->oldColumnsValues[DrmDevicePeer::VERSION]))
-			$this->oldColumnsValues[DrmDevicePeer::VERSION] = $this->version;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->version !== $v) {
-			$this->version = $v;
-			$this->modifiedColumns[] = DrmDevicePeer::VERSION;
-		}
-
-		return $this;
-	} // setVersion()
-
-	/**
-	 * Set the value of [platformdescriptor] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     DrmDevice The current object (for fluent API support)
-	 */
-	public function setPlatformdescriptor($v)
-	{
-		if(!isset($this->oldColumnsValues[DrmDevicePeer::PLATFORMDESCRIPTOR]))
-			$this->oldColumnsValues[DrmDevicePeer::PLATFORMDESCRIPTOR] = $this->platformdescriptor;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->platformdescriptor !== $v) {
-			$this->platformdescriptor = $v;
-			$this->modifiedColumns[] = DrmDevicePeer::PLATFORMDESCRIPTOR;
-		}
-
-		return $this;
-	} // setPlatformdescriptor()
+	} // setDeviceId()
 
 	/**
 	 * Set the value of [provider] column.
@@ -499,29 +327,6 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setProvider()
-
-	/**
-	 * Set the value of [status] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     DrmDevice The current object (for fluent API support)
-	 */
-	public function setStatus($v)
-	{
-		if(!isset($this->oldColumnsValues[DrmDevicePeer::STATUS]))
-			$this->oldColumnsValues[DrmDevicePeer::STATUS] = $this->status;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->status !== $v) {
-			$this->status = $v;
-			$this->modifiedColumns[] = DrmDevicePeer::STATUS;
-		}
-
-		return $this;
-	} // setStatus()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -675,16 +480,11 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->profile_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->userid = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->deviceid = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->version = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->platformdescriptor = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->provider = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->device_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->provider = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->custom_data = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -694,7 +494,7 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = DrmDevicePeer::NUM_COLUMNS - DrmDevicePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = DrmDevicePeer::NUM_COLUMNS - DrmDevicePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DrmDevice object", $e);
@@ -1193,33 +993,18 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 				return $this->getPartnerId();
 				break;
 			case 2:
-				return $this->getProfileId();
+				return $this->getDeviceId();
 				break;
 			case 3:
-				return $this->getUserid();
-				break;
-			case 4:
-				return $this->getDeviceid();
-				break;
-			case 5:
-				return $this->getVersion();
-				break;
-			case 6:
-				return $this->getPlatformdescriptor();
-				break;
-			case 7:
 				return $this->getProvider();
 				break;
-			case 8:
-				return $this->getStatus();
-				break;
-			case 9:
+			case 4:
 				return $this->getCreatedAt();
 				break;
-			case 10:
+			case 5:
 				return $this->getUpdatedAt();
 				break;
-			case 11:
+			case 6:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1245,16 +1030,11 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getPartnerId(),
-			$keys[2] => $this->getProfileId(),
-			$keys[3] => $this->getUserid(),
-			$keys[4] => $this->getDeviceid(),
-			$keys[5] => $this->getVersion(),
-			$keys[6] => $this->getPlatformdescriptor(),
-			$keys[7] => $this->getProvider(),
-			$keys[8] => $this->getStatus(),
-			$keys[9] => $this->getCreatedAt(),
-			$keys[10] => $this->getUpdatedAt(),
-			$keys[11] => $this->getCustomData(),
+			$keys[2] => $this->getDeviceId(),
+			$keys[3] => $this->getProvider(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getUpdatedAt(),
+			$keys[6] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1293,33 +1073,18 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 				$this->setPartnerId($value);
 				break;
 			case 2:
-				$this->setProfileId($value);
+				$this->setDeviceId($value);
 				break;
 			case 3:
-				$this->setUserid($value);
-				break;
-			case 4:
-				$this->setDeviceid($value);
-				break;
-			case 5:
-				$this->setVersion($value);
-				break;
-			case 6:
-				$this->setPlatformdescriptor($value);
-				break;
-			case 7:
 				$this->setProvider($value);
 				break;
-			case 8:
-				$this->setStatus($value);
-				break;
-			case 9:
+			case 4:
 				$this->setCreatedAt($value);
 				break;
-			case 10:
+			case 5:
 				$this->setUpdatedAt($value);
 				break;
-			case 11:
+			case 6:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1348,16 +1113,11 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setProfileId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setUserid($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setDeviceid($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setVersion($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setPlatformdescriptor($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setProvider($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
+		if (array_key_exists($keys[2], $arr)) $this->setDeviceId($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setProvider($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setCustomData($arr[$keys[6]]);
 	}
 
 	/**
@@ -1371,13 +1131,8 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 
 		if ($this->isColumnModified(DrmDevicePeer::ID)) $criteria->add(DrmDevicePeer::ID, $this->id);
 		if ($this->isColumnModified(DrmDevicePeer::PARTNER_ID)) $criteria->add(DrmDevicePeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(DrmDevicePeer::PROFILE_ID)) $criteria->add(DrmDevicePeer::PROFILE_ID, $this->profile_id);
-		if ($this->isColumnModified(DrmDevicePeer::USERID)) $criteria->add(DrmDevicePeer::USERID, $this->userid);
-		if ($this->isColumnModified(DrmDevicePeer::DEVICEID)) $criteria->add(DrmDevicePeer::DEVICEID, $this->deviceid);
-		if ($this->isColumnModified(DrmDevicePeer::VERSION)) $criteria->add(DrmDevicePeer::VERSION, $this->version);
-		if ($this->isColumnModified(DrmDevicePeer::PLATFORMDESCRIPTOR)) $criteria->add(DrmDevicePeer::PLATFORMDESCRIPTOR, $this->platformdescriptor);
+		if ($this->isColumnModified(DrmDevicePeer::DEVICE_ID)) $criteria->add(DrmDevicePeer::DEVICE_ID, $this->device_id);
 		if ($this->isColumnModified(DrmDevicePeer::PROVIDER)) $criteria->add(DrmDevicePeer::PROVIDER, $this->provider);
-		if ($this->isColumnModified(DrmDevicePeer::STATUS)) $criteria->add(DrmDevicePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DrmDevicePeer::CREATED_AT)) $criteria->add(DrmDevicePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DrmDevicePeer::UPDATED_AT)) $criteria->add(DrmDevicePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(DrmDevicePeer::CUSTOM_DATA)) $criteria->add(DrmDevicePeer::CUSTOM_DATA, $this->custom_data);
@@ -1461,19 +1216,9 @@ abstract class BaseDrmDevice extends BaseObject  implements Persistent {
 
 		$copyObj->setPartnerId($this->partner_id);
 
-		$copyObj->setProfileId($this->profile_id);
-
-		$copyObj->setUserid($this->userid);
-
-		$copyObj->setDeviceid($this->deviceid);
-
-		$copyObj->setVersion($this->version);
-
-		$copyObj->setPlatformdescriptor($this->platformdescriptor);
+		$copyObj->setDeviceId($this->device_id);
 
 		$copyObj->setProvider($this->provider);
-
-		$copyObj->setStatus($this->status);
 
 		$copyObj->setCreatedAt($this->created_at);
 
