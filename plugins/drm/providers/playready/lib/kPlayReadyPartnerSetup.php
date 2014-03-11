@@ -98,7 +98,8 @@ class kPlayReadyPartnerSetup
 		if($scenario == PlayReadyPlugin::getCoreValue('DrmLicenseScenario', PlayReadyLicenseScenario::PURCHASE))
 		{
 			$copyRight = new PlayReadyCopyRight();
-			$copyRight->setCopyEnablers(array(PlayReadyCopyEnablerType::DEVICE, PlayReadyCopyEnablerType::PC));			
+			$copyRight->setCopyEnablers(array(PlayReadyCopyEnablerType::DEVICE, PlayReadyCopyEnablerType::PC));
+			$copyRight->setCopyCount(100);			
 			$dbPolicy->setRights(array($copyRight));
 		}
 		$dbPolicy->setStatus(DrmPolicyStatus::ACTIVE);
