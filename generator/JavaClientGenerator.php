@@ -303,6 +303,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			
 			if ($propType == "array")
 				$needsArrayList = true;
+				
+			if ($propType == "KalturaObjectBase")
+				$imports.= "import com.kaltura.client.KalturaObjectBase;\n";
 						
 			$propertyLine = "public $javaType $propName";
 			
@@ -787,6 +790,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				continue;
 			}
 			
+			if (strpos($paramType, 'Kaltura') == 0 && !$isEnum)
+				$serviceImports[] = "com.kaltura.client.types.*";
+			
 			$javaType = $this->getJavaType($paramNode);
 			
 			$signature[] = "$javaType $paramName";
@@ -908,6 +914,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			
 		case "array" :
 			$serviceImports[] = "java.util.List";
+			if (strpos($arrayType, 'Kaltura') == 0)
+				$serviceImports[] = "com.kaltura.client.types.*";
+				
 			return ("List<" . $arrayType . ">");
 			
 		case "bool" :
