@@ -1,3 +1,13 @@
+# IX-9.12.0-YouTubeCaptionsHotfix #
+
+## YouTube Captions Upload via SFTP ##
+
+*Permissions*
+
+* deployment/updates/scripts/add_permissions/2014_03_11_add_filesync_list_to_batch_partner.php
+
+----
+
 # IX-9.12.0 #
 
 ## Remove limitation of 32 categories per entry##
