@@ -10,6 +10,7 @@ abstract class ClientGeneratorFromXml
 	protected $generateDocs = false;
 	protected $package = 'External';
 	protected $subpackage = 'Kaltura';
+	protected $excludeSourcePaths = array();
 	
 	public function setGenerateDocs($generateDocs)
 	{
@@ -24,6 +25,11 @@ abstract class ClientGeneratorFromXml
 	public function setSubpackage($subpackage)
 	{
 		$this->subpackage = $subpackage;
+	}
+	
+	public function setExcludeSourcePaths ($excludeSourcePaths)
+	{
+		$this->excludeSourcePaths = explode(',', $excludeSourcePaths);
 	}
 
 	public function ClientGeneratorFromXml($xmlFile, $sourcePath = null)
@@ -86,6 +92,14 @@ abstract class ClientGeneratorFromXml
 	
 	protected function addSourceFiles($directory, $rootSourceFolder, $rootDestFolder)
 	{
+		//if excluded- return without adding
+		foreach ($this->excludeSourcePaths as $excludePath)
+		{
+			if (realpath($directory) == realpath("$rootSourceFolder/$excludePath"))
+			{
+				return;
+			}
+		}
 		// add if file
 		if (is_file($directory)) 
 		{
@@ -93,6 +107,7 @@ abstract class ClientGeneratorFromXml
 			$this->addFile($file, file_get_contents($directory), false);
 			return;
 		}
+		
 		
 		// loop through the folder
 		$dir = dir($directory);
@@ -109,6 +124,7 @@ abstract class ClientGeneratorFromXml
 			{
 				continue;
 			} 
+			
 			$sourceFilesPaths[] = realpath("$directory/$entry");
 		}
 		// clean up
