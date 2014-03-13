@@ -21,7 +21,8 @@ Enable sending periodic live sync points on Kaltura live stream.
 *PR license server update*
 - 1. clone git repository: https://github.com/kaltura/playready-server
 - 2. copy dll's from PlayReadyLicenseServer/vdir/bin to the license server under: C:\Program Files\PlayReady Server SDK 2.9\vdir\bin
-- 3. restart IIS
+- 3.  update web.xml - add <add key="RemoteAddrHeaderSalt" value="@REMOTE_ADDR_HEADER_SALT_LOCAL_INI@" /> under appSettings. Change @REMOTE_ADDR_HEADER_SALT_LOCAL_INI@ to the value of remote_addr_header_salt in local.ini
+- 4. restart IIS
 
 ## Multicast ##
 
