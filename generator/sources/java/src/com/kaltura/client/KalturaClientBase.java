@@ -104,7 +104,7 @@ abstract public class KalturaClientBase {
     protected List<Class<?>> requestReturnType;
     protected KalturaParams multiRequestParamsMap;
 
-	private static KalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
+	private static IKalturaLogger logger = KalturaLogger.getLogger(KalturaClientBase.class);
     
     private Header[] responseHeaders = null; 
     

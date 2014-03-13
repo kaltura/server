@@ -24,12 +24,21 @@ Enable sending periodic live sync points on Kaltura live stream.
 - 3.  update web.xml - add <add key="RemoteAddrHeaderSalt" value="@REMOTE_ADDR_HEADER_SALT_LOCAL_INI@" /> under appSettings. Change @REMOTE_ADDR_HEADER_SALT_LOCAL_INI@ to the value of remote_addr_header_salt in local.ini
 - 4. restart IIS
 
+
 ## Multicast ##
 
 *Permissions*
 
 - deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestreamservice.php
 
+
+## YouTube Captions Upload via SFTP ##
+
+*Permissions*
+
+* deployment/updates/scripts/add_permissions/2014_03_11_add_filesync_list_to_batch_partner.php
+
+----
 
 # IX-9.12.0 #
 

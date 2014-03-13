@@ -385,8 +385,9 @@ abstract class ClientGeneratorFromPhp
 			$this->loadTypesRecursive($subTypeReflector);
 		}
 		
-		if ($typeReflector->getType() != 'KalturaObject')
+		if ($typeReflector->getType() != 'KalturaObject' && $typeReflector->getType() != 'KalturaFilter')
 			$this->loadChildTypes($typeReflector);
+
 	}
 	
 	protected function getTypesClassMapPath()
@@ -572,6 +573,7 @@ abstract class ClientGeneratorFromPhp
 				else
 					$includeList[$service][$action] = true;
 			}
+			
 		}
 		else if ($exclude !== null)
 		{

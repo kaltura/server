@@ -553,7 +553,13 @@ class KalturaSyndicationFeedRenderer
 			$urlManager->setDomain($cdnHost);
 			
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
+			
+			if (!$storage->getDeliveryHttpsBaseUrl())
+				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
+			else
+				$url = requestUtils::getApiCdnHost();
+
+			$url .= $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
 		}
 		else
 		{

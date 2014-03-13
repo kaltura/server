@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-03-10
+/*! KMC - v6.0.10 - 2014-03-12
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -3493,7 +3493,10 @@ kmcApp.config(['$translateProvider', function ($translateProvider) {
 		suffix: '.json'
 	});
 
-	var lang = localStorage["lang"] || 'en';
+	var lang = 'en';
+    if (typeof localStorage != "unknown" && typeof localStorage["lang"] !== "undefined"){
+        localStorage["lang"];
+    }
 	// take the first two characters
 	if( lang.length > 2 ){
 		lang = lang.toLowerCase().substr(0,2);
@@ -4175,7 +4178,9 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
-                this.kmcHeight = $("#flash_wrap").height();
+                if ($("#flash_wrap").height() > 0){
+                    this.kmcHeight = $("#flash_wrap").height();
+                }
 				$("#flash_wrap").height(0);
 			}
 		} else {
@@ -4633,6 +4638,7 @@ kmc.user = {
 	openSupport: function(el) {
 		var href = el.href;
 		// Show overlay
+        this.kmcHeight = $("#flash_wrap").height();
 		kmc.utils.hideFlash(true);
 		kmc.layout.overlay.show();
 
