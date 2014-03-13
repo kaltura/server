@@ -228,6 +228,11 @@ foreach($config as $name => $item)
 				$instance->setParam($key, $val);
 			}
 		}
+		
+		if (isset ($item->excludeSourcePaths))
+		{
+			$instance->setExcludeSourcePaths ($item->excludeSourcePaths);
+		}
 	}
 	//if it's a native php based schema generator
 	else if ($fromPhp)
