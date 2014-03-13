@@ -773,6 +773,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 
 			if ($paramType == "array")
 				$serviceImports[] = "java.util.ArrayList";
+				$serviceImports[] = "com.kaltura.client.types.*";
 				
 			if ($isEnum)
 				$serviceImports[] = "com.kaltura.client.enums.*";
@@ -914,8 +915,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			
 		case "array" :
 			$serviceImports[] = "java.util.List";
-			if (strpos($arrayType, 'Kaltura') === 0)
-				$serviceImports[] = "com.kaltura.client.types.*";
+			$serviceImports[] = "com.kaltura.client.types.*";
 				
 			return ("List<" . $arrayType . ">");
 			
