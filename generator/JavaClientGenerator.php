@@ -772,9 +772,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$isEnum = $paramNode->hasAttribute ( "enumType" );
 
 			if ($paramType == "array")
+			{
 				$serviceImports[] = "java.util.ArrayList";
 				$serviceImports[] = "com.kaltura.client.types.*";
-				
+			}	
 			if ($isEnum)
 				$serviceImports[] = "com.kaltura.client.enums.*";
 			
