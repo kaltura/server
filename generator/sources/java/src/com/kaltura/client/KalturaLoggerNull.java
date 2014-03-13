@@ -27,10 +27,10 @@
 // ===================================================================================================
 package com.kaltura.client;
 
-public class KalturaLoggerNull extends KalturaLogger
+public class KalturaLoggerNull implements IKalturaLogger
 {
 	// Creation & retrieval methods:
-	public static KalturaLogger getLogger(String name)
+	public static IKalturaLogger getLogger(String name)
 	{
 		return new KalturaLoggerNull(name);
 	}
