@@ -33,13 +33,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.kaltura.client.IKalturaLogger;
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaObjectFactory;
 import com.kaltura.client.KalturaLogger;
 
 public final class ParseUtils {
 	
-	private static KalturaLogger logger = KalturaLogger.getLogger(ParseUtils.class);
+	private static IKalturaLogger logger = KalturaLogger.getLogger(ParseUtils.class);
 	
 	public static String parseString(String txt) {
 		 return txt;
