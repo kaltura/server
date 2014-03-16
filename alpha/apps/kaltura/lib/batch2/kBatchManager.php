@@ -93,7 +93,14 @@ class kBatchManager
 
 				$vidCodec=$flavor->getVideoCodec();
 				$audCodec=$flavor->getAudioCodec();
-				if(($flavor->_isRedundant) && !isset($vidCodec) && isset($audCodec))
+				$sourceAssetParamsIds=$flavor->getSourceAssetParamsIds();
+				/*
+				 * Added 'sourceAssetParamsIds' to set 'FLAVOR_ASSET_STATUS_NOT_APPLICABLE' - 
+				 * - flavors that are dependent on other assets/sources can not be 'KDL'/bitrate redundant, 
+				 * they should be activated upon completion of dependee asset 
+				 * The usecase - PlayReady audio-only flavors
+				 */
+				if(($flavor->_isRedundant) && !isset($vidCodec) && isset($audCodec) && !isset($sourceAssetParamsIds))
 				{
 					KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is redandant audio-only");
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
