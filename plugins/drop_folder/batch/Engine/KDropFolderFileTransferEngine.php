@@ -213,11 +213,17 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		try 
 		{
 			$fullPath = $this->dropFolder->path.'/'.$physicalFile;
-			if (empty($physicalFile) || $physicalFile === '.' || $physicalFile === '..')
+			if ($physicalFile === '.' || $physicalFile === '..')
+			{
+				KalturaLog::debug("Skipping linux current and parent folder indicators");
+				$isValid = false;
+			}
+			else if (empty($physicalFile))
 			{
 				KalturaLog::err("File name is not set");
 				$isValid = false;
 			}
+
 			else if(!$fullPath || !$this->fileTransferMgr->fileExists($fullPath))
 			{
 				KalturaLog::err("Cannot access physical file in path [$fullPath]");
