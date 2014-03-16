@@ -31,15 +31,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.enums.KalturaUiConfCreationMode;
 import com.kaltura.client.services.KalturaUiConfService;
 import com.kaltura.client.types.KalturaUiConf;
 import com.kaltura.client.types.KalturaUiConfListResponse;
-import com.kaltura.client.KalturaLogger;
 
 public class UiConfServiceTest extends BaseTest {
-	private KalturaLogger logger = KalturaLogger.getLogger(UiConfServiceTest.class);
+	private static Logger logger = Logger.getLogger(UiConfServiceTest.class);
 
 	// keeps track of test vids we upload so they can be cleaned up at the end
 	protected List<Integer> testUiConfIds = new ArrayList<Integer>();
@@ -67,7 +68,7 @@ public class UiConfServiceTest extends BaseTest {
 	}
 	
 	public void testAddUiConf() {
-		if (logger.isEnabled())
+		if (logger.isInfoEnabled())
 			logger.info("Starting ui conf add test");
 		
 		try {			
@@ -77,15 +78,14 @@ public class UiConfServiceTest extends BaseTest {
 			assertNotNull(addedConf);
 			
 		} catch (KalturaApiException kae) {
-			if (logger.isEnabled())
-				logger.error(kae);
+			logger.error(kae);
 			fail();
 		}
 		
 	}
 	
 	public void testGetUiConf() {
-		if (logger.isEnabled())
+		if (logger.isInfoEnabled())
 			logger.info("Starting ui get test");
 		
 		try {			
@@ -99,15 +99,14 @@ public class UiConfServiceTest extends BaseTest {
 			assertEquals(retrievedConf.id, addedConfId);
 			
 		} catch (KalturaApiException kae) {
-			if (logger.isEnabled())
-				logger.error(kae);
+			logger.error(kae);
 			fail();
 		}
 		
 	}
 	
 	public void testDeleteUiConf() {
-		if (logger.isEnabled())
+		if (logger.isInfoEnabled())
 			logger.info("Starting ui conf delete test");
 		
 		try {			
@@ -132,14 +131,13 @@ public class UiConfServiceTest extends BaseTest {
 			}
 						
 		} catch (KalturaApiException kae) {
-			if (logger.isEnabled())
-				logger.error(kae);
+			logger.error(kae);
 			fail();
 		}
 	}
 
 	public void testListUiConf() {
-		if (logger.isEnabled())
+		if (logger.isInfoEnabled())
 			logger.info("Starting ui conf list test");
 		
 		try {
@@ -151,13 +149,12 @@ public class UiConfServiceTest extends BaseTest {
 			assertNotNull(listResponse);
 			
 			for (KalturaUiConf uiConf : listResponse.objects) {
-				if (logger.isEnabled())
+				if (logger.isDebugEnabled())
 					logger.debug("uiConf id:" + uiConf.id + " name:" + uiConf.name);
 			}
 			
 		} catch (KalturaApiException kae) {
-			if (logger.isEnabled())
-				logger.error(kae);
+			logger.error(kae);
 			fail();
 		}
 	}
@@ -169,18 +166,17 @@ public class UiConfServiceTest extends BaseTest {
 		
 		if (!doCleanup) return;
 		
-		if (logger.isEnabled())
+		if (logger.isInfoEnabled())
 			logger.info("Cleaning up test UI Conf entries after test");
 		
 		KalturaUiConfService uiConfService = this.client.getUiConfService();
 		for (Integer id : this.testUiConfIds) {
-			if (logger.isEnabled())
+			if (logger.isDebugEnabled())
 				logger.debug("Deleting UI conf " + id);
 			try {
 				uiConfService.delete(id);			
 			} catch (Exception e) {
-				if (logger.isEnabled())
-					logger.error("Couldn't delete " + id, e);
+				logger.error("Couldn't delete " + id, e);
 			}
 		} //next id
 	}

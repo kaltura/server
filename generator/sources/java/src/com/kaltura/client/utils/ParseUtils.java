@@ -29,17 +29,17 @@ package com.kaltura.client.utils;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaObjectFactory;
-import com.kaltura.client.KalturaLogger;
 
 public final class ParseUtils {
-	
-	private static KalturaLogger logger = KalturaLogger.getLogger(ParseUtils.class);
+
+	protected static Logger logger = Logger.getLogger(ParseUtils.class);
 	
 	public static String parseString(String txt) {
 		 return txt;
@@ -50,8 +50,7 @@ public final class ParseUtils {
 			try {
 				return Integer.parseInt(txt);
 			} catch (NumberFormatException nfe) {
-				if (logger.isEnabled())
-					logger.warn("Failed to parse [" + txt + "] as int", nfe);
+				logger.warn("Failed to parse [" + txt + "] as int", nfe);
 			}
 		}
 		return 0;
@@ -62,8 +61,7 @@ public final class ParseUtils {
 			try {
 				return Long.parseLong(txt);
 			} catch (NumberFormatException nfe) {
-				if (logger.isEnabled())
-					logger.warn("Failed to parse [" + txt + "] as long", nfe);
+				logger.warn("Failed to parse [" + txt + "] as long", nfe);
 			}
 		}
 		return 0;
@@ -74,8 +72,7 @@ public final class ParseUtils {
 			try {
 				return Float.parseFloat(txt);
 			} catch (NumberFormatException nfe) {
-				if (logger.isEnabled())
-					logger.warn("Failed to parse [" + txt + "] as float", nfe);
+				logger.warn("Failed to parse [" + txt + "] as float", nfe);
 			}
 		}
 		return 0;
@@ -85,7 +82,6 @@ public final class ParseUtils {
 		 return txt.equals("0") ? false : true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T> ArrayList<T> parseArray(Class<T> clz, Node aNode) throws KalturaApiException{
 		ArrayList<T> tmpList = new ArrayList<T>();
 		NodeList subNodeList = aNode.getChildNodes();
@@ -96,7 +92,6 @@ public final class ParseUtils {
 		return tmpList;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T parseObject(Class<T> clz, Node aNode) throws KalturaApiException{
 		 return (T) KalturaObjectFactory.create((Element)aNode, clz);
 	}
