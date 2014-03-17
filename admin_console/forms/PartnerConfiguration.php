@@ -330,6 +330,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 //--------------------------- New Account Options ---------------------------
 												
+		$this->addElement('button', 'monitor_usage_history', array(
+			'label'	  => 'View History',
+		));
+
 		$this->addElement('checkbox', 'extended_free_trail', array(
 			'label'	  => 'Extended Free Trial',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -341,10 +345,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('text', 'extended_free_trail_expiry_reason', array(
 			'label'		=> 'Free Trial Extension Reason:',
-		));
-		
-		$this->addElement('button', 'monitor_usage_history', array(
-			'label'	  => 'View History',
 		));
 		
 		
