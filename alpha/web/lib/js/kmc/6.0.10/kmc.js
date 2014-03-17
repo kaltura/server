@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-03-16
+/*! KMC - v6.0.10 - 2014-03-17
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4013,9 +4013,9 @@ kmc.utils = {
 				"width": 0,
 				"visibility": 'visible',
 				"top": '6px',
-				"right": '6px'
+				"right": '29px'
 			};
-            // change right to 29px to show language menu
+            // change right to 6px to hide language menu
 
 			var menu_animation_css = {
 				"width": menu_width + 'px',

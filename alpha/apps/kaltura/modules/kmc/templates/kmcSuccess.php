@@ -9,7 +9,7 @@ div#login { width:500px; margin: 0 auto; text-align:center;}
 	<?php } else { ?>
 	<img src="/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
 	<?php } ?>
-	<!--div id="langIcon"></div-->
+	<div id="langIcon"></div>
 	<div id="user_links" style="right: 36px">
     	<a href="/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
 	</div> 
