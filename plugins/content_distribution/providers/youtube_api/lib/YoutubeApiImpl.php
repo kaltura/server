@@ -358,6 +358,85 @@ class YouTubeApiImpl
 		$url = "http://gdata.youtube.com/feeds/api/videos/$videoRemoteId/captions/$captionRemoteId";
 		$this->yt->delete($url,null);
 	}
-}
 
-?>
+	/**
+	 * 
+	 * @param string $videoEntryId
+	 * @param Zend_Gdata_YouTube_PlaylistListEntry $playlistEntry
+	 * @return boolean
+	 */
+	public function isVideoEntryPartOfPlaylist( $videoEntryId, $playlistEntry ) {
+		$done = false;
+		while ( ! $done ) {
+			$playlistVideoFeed = $this->yt->getPlaylistVideoFeed($playlistEntry->getPlaylistVideoFeedUrl());
+			foreach ($playlistVideoFeed as $playlistVideoEntry) {
+				if ($playlistVideoEntry->getVideoId() == $videoEntryId) {
+					return true;
+				}
+			}
+
+			// Try to get the feed's next page of results 
+			try {
+				$playlistVideoFeed = $playlistVideoFeed->getNextFeed();
+			}
+			catch ( Exception $e ) {
+				$done = true; // No more results
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Add a video entry to all specified youtube playlist IDs.
+	 * Note: The video will not be added if it is already a part of a playlist.
+	 * 
+	 * Playlist Id example: PLuZdKFy9k0mMdYHeXLd_h7ymC_ayXU9ga
+	 * 
+	 * @param string $videoEntryId
+	 * @param atring|array $playlistIds Comma separated string or an array of YouTube playlist IDs
+	 */
+	public function attachVideoEntryToPlaylistIds( $videoEntryId, $playlistIds ) {
+		if ( is_string( $playlistIds ) ) {
+			$playlistIds = explode(',', $playlistIds);
+		}
+
+		if ( empty( $playlistIds ) || !is_array( $playlistIds ) ) {
+			return; // Do nothing
+		}
+
+		// Trim potential whitespace in playlist IDs 
+		$playlistIds = array_map( 'trim', $playlistIds );
+
+		// Fetch and loop YT's playlists - attach the video entry to any playlist
+		// that matches a given playlist id.
+		$playlistFeed = $this->yt->getPlaylistListFeed( "default" );
+
+		$done = false;
+		while ( ! $done ) {
+			foreach ( $playlistFeed as $playlistEntry ) {
+				$playlistId = $playlistEntry->getPlaylistId();
+				if ( in_array( $playlistEntry->getPlaylistId(), $playlistIds ) ) {
+	 				$partOfPlaylist = $this->isVideoEntryPartOfPlaylist( $videoEntryId, $playlistEntry );
+	
+					if ( ! $partOfPlaylist ) {
+						KalturaLog::log( "Adding video entry $videoEntryId to playlist $playlistId" );
+	 					$videoEntry = $this->yt->getVideoEntry( $videoEntryId );
+						$this->updatePlaylist($playlistEntry, $videoEntry);
+					}
+					else {
+						KalturaLog::debug( "Video entry $videoEntryId already exists in playlist $playlistId" );
+					}					
+				}
+			}
+			
+			// Try to get the feed's next page of results 
+			try {
+				$playlistFeed = $playlistFeed->getNextFeed();
+			}
+			catch ( Exception $e ) {
+				$done = true; // No more results
+			}
+		}
+	}
+}
