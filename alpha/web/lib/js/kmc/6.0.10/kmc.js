@@ -3495,7 +3495,7 @@ kmcApp.config(['$translateProvider', function ($translateProvider) {
 
 	var lang = 'en';
     if (typeof localStorage != "unknown" && typeof localStorage["lang"] !== "undefined"){
-        localStorage["lang"];
+        lang = localStorage["lang"];
     }
 	// take the first two characters
 	if( lang.length > 2 ){
