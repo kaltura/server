@@ -11,7 +11,7 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 - Version 3.0.3 [KalturaWowzaServer.jar](https://github.com/kaltura/media-server/releases/download/rel-3.0.3/KalturaWowzaServer-3.0.3.jar "KalturaWowzaServer.jar")
  
-*Play Ready*
+## Play Ready ##
 - 1. upgrade PR license server to v2.9
 - 2. device registration flow
 
