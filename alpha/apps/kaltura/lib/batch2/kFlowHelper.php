@@ -1638,8 +1638,11 @@ class kFlowHelper
 
 		// if an asset was exported - check if should set its status to READY
 		$asset = assetPeer::retrieveByFileSync($fileSync);
-		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR)))
+			
+		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR))
+			&& $this->isAssetExportFinished($fileSync, $asset))
 		{
+			
             $asset->setStatusLocalReady();
             $asset->save();
 
@@ -1647,20 +1650,44 @@ class kFlowHelper
             {
                 kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
             }
-		}
-
+		}		
 		// check if all exports finished and delete local file sync according to configuration
 		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
 		{
 			$partner = $dbBatchJob->getPartner();
 			if($partner && $partner->getStorageDeleteFromKaltura())
 			{
-				$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
-				kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+				$this->deleteAssetLocalFileSyncs($fileSync, $asset);
 			}
 		}
 
 		return $dbBatchJob;
+	}
+	
+	private function isAssetExportFinished(FileSync $fileSync, asset $asset)
+	{
+		$c = new Criteria();
+		$c->addAnd ( FileSyncPeer::OBJECT_ID , $fileSync->getObjectId() );
+		$c->addAnd ( FileSyncPeer::OBJECT_TYPE , $fileSync->getObjectType() );
+		$c->addAnd ( FileSyncPeer::VERSION , $fileSync->getVersion() );
+		$c->addAnd(FileSyncPeer::STATUS, Filesync::FILE_SYNC_STATUS_PENDING);
+		$pendingFileSync = FileSyncPeer::doSelectOne($c);
+		if($pendingFileSync)
+			return false;
+		else
+			return true;
+	}
+	
+	private function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
+	{
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+		
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+		
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);		
 	}
 
 	/**
