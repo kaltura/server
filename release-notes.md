@@ -37,12 +37,12 @@ Enable sending periodic live sync points on Kaltura live stream.
 		- params.smoothProtectCmd = $SMOOTHPROTECT_BIN 
 		- params.isRemoteOutput = $IS_REMOTE_OUTPUT 
 		- params.isRemoteInput = $IS_REMOTE_INPUT 
-- $WORKER_ID – set to match existing Testing QA settings 
-- $BASE_LOACL_PATH – follow other windows workers (aka Webex worker) 
-- $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker) 
-- $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect' 
-- $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker) 
-- $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
+	- $WORKER_ID – set to match existing Testing QA settings 
+	- $BASE_LOACL_PATH – follow other windows workers (aka Webex worker) 
+	- $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker) 
+	- $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect' 
+	- $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker) 
+	- $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
 
 *Binaries*
 - Linux
