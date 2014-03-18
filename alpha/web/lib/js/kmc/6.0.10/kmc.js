@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-03-17
+/*! KMC - v6.0.10 - 2014-03-18
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4122,6 +4122,10 @@ kmc.utils = {
 				tab_class;
 			for( var i = 0; i < arr_len; i++ ) {
 				tab_class = (arr[i].type == "action") ? 'class="menu" ' : '';
+                // fix for French and Japanese in which we don't have enough space to show the arrow down icon
+                if (localStorage["lang"] == "fr_FR" || localStorage["lang"] == "ja_JP"){
+                    tab_class = '';
+                }
 				tabs_html += '<li><a id="'+ arr[i].module_name +'" ' + tab_class + ' rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
 			}
 				
@@ -4142,6 +4146,7 @@ kmc.utils = {
 				};
                 $("#kcms")[0].gotoPage(go_to);
                 kmc.utils.verifyUploadVisible(go_to.moduleName);
+                window.closeLangMenu();
                 return false;
 			});
 		} else {
