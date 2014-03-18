@@ -2,7 +2,6 @@
 
 class DeliveryProfileGenericHds extends DeliveryProfileHds {
 	
-	// @_!! Externalize
 	public function setPattern($v)
 	{
 		$this->putInCustomData("pattern", $v);

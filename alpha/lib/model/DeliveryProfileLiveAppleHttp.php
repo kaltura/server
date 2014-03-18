@@ -2,7 +2,17 @@
 
 class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
-	public function isHlsLive ($url)
+	public function setDisableExtraAttributes($v)
+	{
+		$this->putInCustomData("disableExtraAttributes", $v);
+	}
+	
+	public function getDisableExtraAttributes()
+	{
+		return $this->getFromCustomData("disableExtraAttributes");
+	}
+	
+	public function isLive ($url)
 	{
 		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
 		if(!$data)
@@ -46,6 +56,18 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 	
 		return false;
+	}
+	
+	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
+	{
+		if($this->getDisableExtraAttributes() == 1) {
+			$parsedUrl = parse_url($baseUrl);
+			if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+				$baseUrl .= '&';
+			else
+				$baseUrl .= '?';
+			$baseUrl .= "attributes=off";
+		}
 	}
 	
 }

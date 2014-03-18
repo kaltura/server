@@ -73,11 +73,6 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @var string
 	 */
-	private $cdnHost = null;
-	
-	/**
-	 * @var string
-	 */
 	private $protocol = null;
 	
 	/**
@@ -91,7 +86,7 @@ class playManifestAction extends kalturaAction
 	private $flavorIds = null;
 	
 	/**
-	 * @var kUrlManager
+	 * @var DeliveryProfile
 	 */
 	private $urlManager = null;
 	
@@ -617,13 +612,6 @@ class playManifestAction extends kalturaAction
 	{
 		$this->initFlavorIds();
 				
-		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
-			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->deliveryAttributes->getMediaProtocol());
-
-		$playbackCdnHost = $this->entry->getPartner()->getPlaybackCdnHost();
-		if($playbackCdnHost)
-			$this->cdnHost = preg_replace('/^https?/', $this->deliveryAttributes->getMediaProtocol(), $playbackCdnHost);
-				
 		$this->initFlavorAssetArray();
 		
 		$this->initEntryDuration();
@@ -632,11 +620,14 @@ class playManifestAction extends kalturaAction
 		{
 			// videos shorter than 10 seconds cannot be played with HDS, fall back to HTTP
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
-			$flavorAsset = reset($this->deliveryAttributes->getFlavorAssets());
-			$this->deliveryAttributes->getFlavorAssets(array($flavorAsset));
+			$flavorAssets = $this->deliveryAttributes->getFlavorAssets();
+			$flavorAsset = reset($flavorAssets);
+			$this->deliveryAttributes->setFlavorAssets(array($flavorAsset));
 		}
 		
 		$this->initStorageProfile();
+		
+		// Fixing ALL kinds of historical bugs.
 		
 		$serveUrl = false;
 		if($this->deliveryAttributes->getFormat() == self::URL) {
@@ -649,7 +640,12 @@ class playManifestAction extends kalturaAction
 		} else if($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) {
 			// Translate to playback protocol format 	
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::AKAMAI_HD);
+		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::RTMP) {
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0)
+				$this->deliveryAttributes->setMediaProtocol("rtmp");
 		}
+
+		// <-- 
 		
 		$this->initUrlManager();
 		
@@ -668,7 +664,7 @@ class playManifestAction extends kalturaAction
 		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
 
 		$renderer = new kF4MManifestRenderer();
-		$renderer->flavor = reset(array());
+		$renderer->flavor = array();
 		$renderer->mediaUrl = $mediaUrl;
 		return $renderer;
 	}
@@ -710,11 +706,12 @@ class playManifestAction extends kalturaAction
 		$baseUrl = $this->getLiveEntryBaseUrl();
 			
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
-		// TODO @_!! Should be selected by host	
-		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
 		
-		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);
-		return $this->urlManager->serve($deliveryAttributes);
+		$this->urlManager = DeliveryProfilePeer::getDeliveryProfileByHostName($cdnHost, $this->entryId, 
+				$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+		
+		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);	
+		return $this->urlManager->serve($baseUrl);
 	}
 	
 	/* (non-PHPdoc)
@@ -807,7 +804,6 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
-		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 		

@@ -2,7 +2,6 @@
 
 class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 	
-	// @_!! Externalize
 	public function setPattern($v)
 	{
 		$this->putInCustomData("pattern", $v);

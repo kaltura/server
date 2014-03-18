@@ -29,10 +29,13 @@ class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('VelocixLiveEntrySourceType');
+			return array('VelocixLiveEntrySourceType', 'VelocixDeliveryProfileType');
 			
 		if($baseEnumName == 'EntrySourceType')
 			return array('VelocixLiveEntrySourceType');
+		
+		if($baseEnumName == 'DeliveryProfileType')
+			return array('VelocixDeliveryProfileType');
 			
 		return array();
 	}

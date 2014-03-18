@@ -104,7 +104,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 * @var KalturaNullableBoolean
 	 */
 	public $isDefault;
-
+	
 	/**
 	 * the object from which this object was cloned (or 0)
 	 * @var int
@@ -137,6 +137,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"url",
 			"type",
 			"mediaProtocols",
+			"isLive",
 	);
 	
 	public function getMapBetweenObjects ( )

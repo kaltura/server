@@ -8,6 +8,13 @@
  */
 class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	
+	const LIVE_DELIVERY_PROFILE = 'LIVE';
+	public static $LIVE_DELIVERY_PROFILES = 
+		array(	DeliveryProfileType::LIVE_AKAMAI_HDS, 
+				DeliveryProfileType::LIVE_HDS, 
+				DeliveryProfileType::LIVE_HLS, 
+				DeliveryProfileType::LIVE_RTMP);
+	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 			
@@ -100,16 +107,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$ks = kCurrentContext::$ks_object;
 		
-		$isSecured = false;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
-				($partner->getDefaultEntitlementEnforcement() || ($ks && $ks->getEnableEntitlement())))
-			$isSecured = true;
-		if(!$isSecured) 
-			$isSecured = $entry->isSecuredEntry();
-		
-			
+		$isSecured = self::isSecured($partner, $entry);
 		$deliveryIds = $partner->getDeliveryIds();
 		
 		// if the partner has an override for the required format on the partner object - use that
@@ -123,12 +122,16 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
 			$c->add(DeliveryProfilePeer::IS_DEFAULT, true);
 			$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
+			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
 			
 			if($isSecured)
 				$c->addDescendingOrderByColumn(DeliveryProfilePeer::TOKENIZER);
 			else
 				$c->addAscendingOrderByColumn(DeliveryProfilePeer::TOKENIZER);
-				
+			
+			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
+			$c->addAscendingOrderByColumn($orderBy);
+			
 			$deliveries = self::doSelect($c);
 		}
 		
@@ -140,6 +143,17 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			throw new Exception('Delivery ID can\'t be determined for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType);
 		}
 		return $delivery;
+	}
+	
+	protected static function isSecured($partner, $entry) {
+		$ks = kCurrentContext::$ks_object;
+		$isSecured = false;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partner->getId()) &&
+				($partner->getDefaultEntitlementEnforcement() || ($ks && $ks->getEnableEntitlement())))
+			$isSecured = true;
+		if(!$isSecured)
+			$isSecured = $entry->isSecuredEntry();
+		return $isSecured;
 	}
 	
 	/**
@@ -181,6 +195,35 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return null;
 	}
 	
+	public static function getDeliveryProfileByHostName($cdnHost, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
+		$entry = entryPeer::retrieveByPK($entryId);
+		$partnerId = $entry->getPartnerId();
+		
+		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partnerId), Criteria::IN); 
+		$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::IN);
+		
+		$hostCond = $c->getNewCriterion(DeliveryProfilePeer::HOST_NAME, $cdnHost);
+		$hostCond->addOr($c->getNewCriterion(DeliveryProfilePeer::HOST_NAME, null, Criteria::ISNULL));
+		
+		$c->addAnd($hostCond);
+		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
+		
+		$c->addDescendingOrderByColumn(DeliveryProfilePeer::HOST_NAME);
+		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
+		$c->addAscendingOrderByColumn($orderBy);
+			
+		$deliveries = self::doSelect($c);
+		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
+		if($delivery) {
+			KalturaLog::debug('Delivery ID for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType . ' is ' . $delivery->getId());
+			$delivery->setEntryId($entryId);
+		} else {
+			throw new Exception('Delivery ID can\'t be determined for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType);
+		}
+		return $delivery;
+		
+	}
 
 	public static function getUrlManagerIdentifyRequest(Partner $partner) {
 		$deliveries =
@@ -203,5 +246,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				return true;
 		}
 		return false;
+	}
+	
+	
+	public static function getAllLiveDeliveryProfileTypes()
+	{
+		$deliveryProfileTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, self::LIVE_DELIVERY_PROFILE);
+		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);
+		return $deliveryProfileTypes;
 	}
 } // DeliveryProfilePeer

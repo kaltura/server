@@ -7,7 +7,8 @@
 class KalturaDeliveryProfileFactory {
 	
 	public static function getCoreDeliveryProfileInstanceByType($type) {
-		$class = DeliveryProfilePeer::getClassByDeliveryProfileType($type);
+		$coreType = kPluginableEnumsManager::apiToCore('DeliveryProfile', $type); 
+		$class = DeliveryProfilePeer::getClassByDeliveryProfileType($coreType);
 		return new $class();
 	}
 	
@@ -20,9 +21,12 @@ class KalturaDeliveryProfileFactory {
 			case KalturaDeliveryProfileType::GENERIC_HTTP:
 					return new KalturaDeliveryProfileGenericHttp();
 			case KalturaDeliveryProfileType::RTMP:
+			case KalturaDeliveryProfileType::LIVE_RTMP:
 				return new KalturaDeliveryProfileRtmp();
 			case KalturaDeliveryProfileType::AKAMAI_HTTP:
 				return new KalturaDeliveryProfileAkamaiHttp();
+			case KalturaDeliveryProfileType::LIVE_HLS:
+				return new KalturaDeliveryProfileLiveAppleHttp();
 			default:
 				return new KalturaDeliveryProfile();
 		}

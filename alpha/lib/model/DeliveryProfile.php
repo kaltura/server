@@ -28,7 +28,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$newObject->setCopiedFrom($this);
 	
 		$all_fields = DeliveryProfilePeer::getFieldNames ();
-		$ignore_list = array ( "Id" , "ParentId");
+		$ignore_list = array ( "Id" , "ParentId", "IsDefault");
 		
 		// clone from current
 		baseObjectUtils::fillObjectFromObject( $all_fields ,
@@ -157,17 +157,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
-		// 
-// 		TODO @_!! Ask EranK - we can add it as boolean on akamai hls live		
-// 		if (isset($this->params['extra_params']) && $this->params['extra_params'] && !$flavorsUrls)
-// 		{
-// 			$parsedUrl = parse_url($baseUrl);
-// 			if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
-// 				$baseUrl .= '&';
-// 			else
-// 				$baseUrl .= '?';
-// 			$baseUrl .= $this->params['extra_params'];
-// 		}
+		return;
 	}
 	
 	/**
@@ -184,9 +174,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$flavorAssetId = $asset->getId();
 		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
 	
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
-		if($this->storageProfileId)
-			$url .= "/storageId/$this->storageProfileId";
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->params->getMediaProtocol()}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		if($this->params->getStorageProfileId())
+			$url .= "/storageId/" . $this->params->getStorageProfileId();
 	
 		return $url;
 	}
@@ -227,8 +217,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	protected function getMimeType($flavors)
 	{
-		if ($this->entry->getType() == entryType::MEDIA_CLIP &&
-				count($flavors))
+		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
+		if ($entry->getType() == entryType::MEDIA_CLIP && count($flavors))
 		{
 			$isMp3 = true;
 			foreach($flavors as $flavor)
@@ -313,4 +303,5 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 				'width' => $width,
 				'height' => $height);
 	}
+	
 } 

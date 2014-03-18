@@ -1,9 +1,18 @@
 <?php
 
 class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
-	// @_!! Ask EranK should we have enforceRtmpe for rtmp live as well. I think yes.
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	
+	public function setEnforceRtmpe($v)
+	{
+		$this->putInCustomData("enforceRtmpe", $v);
+	}
+	
+	public function getEnforceRtmpe()
+	{
+		return $this->getFromCustomData("enforceRtmpe");
+	}
 	
 	public function serve($baseUrl) {
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
@@ -14,6 +23,16 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		$renderer->baseUrl = $baseUrl;
 		$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 		return $renderer;
+	}
+	
+	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
+	{
+		if ($this->getEnforceRtmpe())
+		{
+			$baseUrl = preg_replace('/^rtmp:\/\//', 'rtmpe://', $baseUrl);
+			$baseUrl = preg_replace('/^rtmpt:\/\//', 'rtmpte://', $baseUrl);
+		}
+		parent::finalizeUrls($baseUrl, $flavorsUrls);
 	}
 	
 	/**

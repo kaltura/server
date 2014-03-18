@@ -10,14 +10,18 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 		return $this->getRenderer(array($flavor));
 	}
 	
+	protected function doGetFileSyncUrl(FileSync $fileSync)
+	{
+		$fileSync = kFileSyncUtils::resolve($fileSync);
+		$url = $fileSync->getFilePath();
+		return $url;
+	}
+	
 	/**
 	 * @return array
 	 */
 	protected function getSecureHdUrl()
 	{
-		// @_!!
-		//		Check function exist - getManifestUrl
-	
 		$originalFormat = $this->params->getFormat();
 		$this->params->setFormat(PlaybackProtocol::HTTP);
 		$flavors = $this->buildHttpFlavorsArray();
@@ -27,7 +31,7 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 	
 		$this->initDeliveryDynamicAttribtues();
 	
-		$flavor = $this->getManifestUrl($flavors);
+		$flavor = AkamaiDeliveryUtils::getManifestUrl($flavors, $this->getUrl(), '/master.m3u8', '/i');
 		if (!$flavor)
 		{
 			KalturaLog::debug(get_class() . ' failed to find flavor');

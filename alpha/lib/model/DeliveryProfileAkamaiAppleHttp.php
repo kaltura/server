@@ -19,22 +19,8 @@ abstract class DeliveryProfileAkamaiAppleHttp extends DeliveryProfileAppleHttp {
 			return parent::doGetFlavorAssetUrl($flavorAsset);
 	}
 	
-	protected function doGetFileSyncUrl(FileSync $fileSync)
-	{
-		$path = parent::doGetFileSyncUrl($fileSync);
-		
-		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-		if(!$storage)
-			return $path;
-		
-		if(!is_null($this->getHdIos()))
-			return $this->formatHdIos($path);	
-		
-		return $path;
-	}
-	
 	protected function formatHdIos($path) {
-		$urlPrefix = "http://".$this->getUrl().'/i/';
+		$urlPrefix = "http://".$this->getHostName().'/i/';
 		$urlSuffix = str_replace('\\', '/', $path)."/index_0_av.m3u8";
 		
 		return $urlPrefix.ltrim($urlSuffix, '/');

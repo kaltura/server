@@ -32,7 +32,7 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 
 			// add offset only of intelliseek option is enabled
 			$useIntelliseek = $this->getUseIntelliseek();
-			if(!is_null($useIntelliseek))
+			if(!is_null($useIntelliseek) && $useIntelliseek)
 				$url .= "?aktimeoffset=$fromTime";
 		}
 		return $url;

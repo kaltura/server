@@ -3,72 +3,41 @@
  * @package plugins.velocix
  * @subpackage storage
  */
-class kVelocixUrlManager extends kUrlManager
+class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 {
 	//limit the number of urls we check as there could be a gazillion of them
 	const MAX_SEGMENTS_TO_CHECK = 3;
 	const MAX_FLAVORS_TO_CHECK = 3;
+	
+	// TODO @_!! Externalize
+	public function setParamName($v)
+	{
+		$this->putInCustomData("paramName", $v);
+	}
+	
+	public function getParamName()
+	{
+		return $this->getFromCustomData("paramName");
+	}
 
 	/**
 	 * @return kUrlTokenizer
 	 */
 	public function getTokenizer()
 	{
-		$liveEntry = entryPeer::retrieveByPK($this->entryId);
+		$liveEntry = entryPeer::retrieveByPK($this->params->getEntryId());
 		//if stream name doesn't start with 'auth' than the url stream is not tokenized
-		if (substr($liveEntry->getStreamName(), 0, 4) == 'auth'){
-			$secret = $this->params['shared_secret'];
-			$window = $this->params['access_window_seconds'];
-			$hdsPaths = array();
-			$hdsPaths[] = $this->params['hdsBitratesManifestPath'];
-			$hdsPaths[] = $this->params['hdsSegmentsPath'];
-			$tokenParamName = $this->params['tokenParamName'];
-			$protocol = $this->protocol;
-			return new kVelocixUrlTokenizer($window, $secret, $protocol, $liveEntry->getStreamName(), $hdsPaths, $tokenParamName);
-		}
+		if (substr($liveEntry->getStreamName(), 0, 4) == 'auth')
+			return parent::getTokenizer;
 		
 		return null;
 	}
 	
-	
-	
-	public function isHdsLive($url){
-		KalturaLog::info('url to check:'.$url);
-		$parts = parse_url($url);
-		parse_str($parts['query'], $query);
-		$token = $query[$this->params['tokenParamName']];
-		$data = $this->urlExists($url, array($this->params['hdsManifestContentType']));
-		if(!$data)
-		{
-			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
-			return false;
-		}
-		KalturaLog::info('Velocix HDS manifest data:'.$data);
-		$dom = new KDOMDocument();
-		$dom->loadXML($data);
-		$element = $dom->getElementsByTagName('baseURL')->item(0);
-		if(!$element){
-			KalturaLog::Info("No base url was given");
-			return false;
-		}
-		$baseUrl = $element->nodeValue;
-		foreach ($dom->getElementsByTagName('media') as $media){
-			$href = $media->getAttribute('href');
-			$streamUrl = $baseUrl.$href;
-			$streamUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
-			if($this->urlExists($streamUrl, array(),'0-0')  !== false){
-				KalturaLog::info('is live:'.$streamUrl);
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public function isHlsLive ($url)
+	public function isLive ($url)
 	{
 		$parts = parse_url($url);
 		parse_str($parts['query'], $query);
-		$token = $query[$this->params['tokenParamName']];
+		$token = $query[$this->getParamName()];
 		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
 		if(!$data)
 		{
@@ -93,7 +62,7 @@ class kVelocixUrlManager extends kUrlManager
 					break;
 				}
 				$manifestUrl = $this->checkIfValidUrl($streamUrl, $url);
-				$manifestUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+				$manifestUrl .= $token ? '?'.$this->getParamName()."=$token" : '' ;
 				$data = $this->urlExists($manifestUrl, kConf::get("hls_live_stream_content_type"));
 				if (!$data)
 				{
@@ -129,7 +98,7 @@ class kVelocixUrlManager extends kUrlManager
 				break;
 			}
 			$segmentUrl = $this->checkIfValidUrl($segment, $manifestUrl);
-			$segmentUrl .= $token ? '?'.$this->params['tokenParamName']."=$token" : '' ;
+			$segmentUrl .= $token ? '?'.$this->getParamName()."=$token" : '' ;
 			if ($this->urlExists($segmentUrl, kConf::get("hls_live_stream_content_type"),'0-0'))
 			{
 				KalturaLog::info("is live:[$segmentUrl]");

@@ -37,7 +37,9 @@ class DeliveryProfileHttp extends DeliveryProfileVod {
 		}
 	
 		$flavors = $this->buildHttpFlavorsArray();
-		return $this->getRenderer($flavors);
+		$renderer = $this->getRenderer($flavors);
+		$renderer->mimeType = $this->getMimeType($flavors);
+		return $renderer;
 	}
 	
 }

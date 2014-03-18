@@ -1,5 +1,5 @@
 <?php
-class kKontikiUrlManager extends kUrlManager
+class DeliveryProfileKontikiHttp extends DeliveryProfileHttp
 {
     public function getFileSyncUrl(FileSync $fileSync, $tokenizeUrl = true)
     {
@@ -9,7 +9,7 @@ class kKontikiUrlManager extends kUrlManager
     
     protected function doGetFileSyncUrl(FileSync $fileSync)
     {
-        $storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+        $storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageProfileId());
 		/* @var $storageProfile KontikiStorageProfile */
 		$kontikiAPIWrapper = new KontikiAPIWrapper($storageProfile->getStorageUrl());
         $playbackResource = $kontikiAPIWrapper->getPlaybackResource(KontikiPlugin::SERVICE_TOKEN_PREFIX.base64_encode($storageProfile->getServiceToken()), $fileSync->getFilePath());

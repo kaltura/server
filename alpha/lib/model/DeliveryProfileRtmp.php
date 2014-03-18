@@ -40,6 +40,9 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 		if( $extension && strtolower($extension) != 'flv' ||
 				$containerFormat && strtolower($containerFormat) != 'flash video') {
 			$url = "mp4:".ltrim($url,'/');
+			if(!is_null($fallback))
+				$url .= "/name/a.mp4"; 
+			
 		} else if($fallback) {
 			$url .= "/name/a." . $fallback;
 		}
@@ -118,7 +121,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 		}
 		else
 		{
-			$baseUrl = myPartnerUtils::getRtmpUrl($this->getPartnerId());
+			$baseUrl = $this->getUrl();
 
 			// get all flavors with kaltura urls
 			foreach($flavorAssets as $flavorAsset)

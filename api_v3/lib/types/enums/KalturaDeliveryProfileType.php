@@ -10,6 +10,6 @@ class KalturaDeliveryProfileType extends KalturaDynamicEnum implements DeliveryP
 	 */
 	public static function getEnumClass()
 	{
-		return 'DeliveryType';
+		return 'DeliveryProfileType';
 	}
 }

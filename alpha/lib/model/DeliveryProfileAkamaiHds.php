@@ -9,8 +9,8 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
 
-		if($this->params->getExtention())
-			$url .= "/name/a." . $this->params->getExtention();
+		if($this->params->getFileExtention())
+			$url .= "/name/a." . $this->params->getFileExtention();
 		return $url;
 	}
 	
@@ -31,14 +31,10 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 	 */
 	protected function getSecureHdUrl()
 	{
-		// Similar to AppleHttp
-		// @_!!
-		//		Check function exist - getManifestUrl
-	
 		$flavors = $this->buildHttpFlavorsArray();
 		$this->initDeliveryDynamicAttribtues();
 
-		$flavor = $this->getManifestUrl($flavors);
+		$flavor = AkamaiDeliveryUtils::getManifestUrl($flavors, $this->getHostName(), '/manifest.f4m', '/z');
 		if (!$flavor)
 		{
 			KalturaLog::debug(get_class() . ' failed to find flavor');
@@ -46,9 +42,10 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		}
 
 		if (strpos($flavor['urlPrefix'], '://') === false)
-			$flavor['urlPrefix'] = $this->getStreamerType() . '://' . $flavor['urlPrefix'];
+			$flavor['urlPrefix'] = $this->params->getMediaProtocol() . '://' . $flavor['urlPrefix'];
 
 		return $flavor;
 	}
+	
 }
 
