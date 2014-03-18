@@ -26,8 +26,8 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 *Configuartion Changes*
 - update batch.ini
-- - add under KAsyncConvertWorker params.ismIndexCmd = @BIN_DIR@/ismindex
-- - update under KAsyncConvert filter.jobSubTypeIn = 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+	- - add under KAsyncConvertWorker params.ismIndexCmd = @BIN_DIR@/ismindex
+	- - update under KAsyncConvert filter.jobSubTypeIn = 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
 Add KAsyncConvertSmoothProtect worker section, place it following other Windows transcoding workers. [KAsyncConvertSmoothProtect: KAsyncDistributedConvert] 
 id = $WORKER_ID 
 baseLocalPath = $BASE_LOACL_PATH 
