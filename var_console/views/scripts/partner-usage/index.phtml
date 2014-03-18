@@ -64,7 +64,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $item->partnerStatus); ?></td>
 				<td><?php echo $item->partnerName;  if ($this->partnerId == $item->partnerId) echo ' (Parent Account)';?></td>
 				<td><?php echo $item->partnerId; ?></td>
-				<td><?php echo $item->referenceId; ?></td>
+				<td><?php echo $item->referenceId ? $item->referenceId : "N/A"; ?></td>
 				<td><?php $d = (new Zend_Date($item->partnerCreatedAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->bandwidth); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->avgStorage); ?> </td>

@@ -30,7 +30,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $partner->status); ?></td>
 				<td><?php echo $partner->id; ?></td>
 				<td><?php echo $partner->name; if ($partner->id == $this->currentPartnerId) echo ' (Parent Account)'?></td>
-				<td><?php echo $partner->referenceId; ?></td>
+				<td><?php echo $partner->referenceId ? $partner->referenceId : "N/A"; ?></td>
 				<td><?php echo $partner->website ? $partner->website : "N/A"; ?></td>
 				<td><?php echo $partner->adminName; ?></td>
 				<td><?php echo $partner->adminEmail; ?></td>
