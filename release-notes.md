@@ -46,11 +46,17 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 *Binaries*
 - Linux
-	- Install ffmpeg and ismindex from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+	- Install ffmpeg binary and ismindex binary from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
 	- Switch the ffmpeg allias to work with the new ffmpeg-2.1.3
 	- The ffmpeg-aux remains unchanged. 
 - Windows
 	- Install 'SmoothProtect.exe' binary
+
+## H265/FFmpeg 2.2 ##
+
+*Binaries*
+- Install ffmpeg-2.2 from http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.2-bin.tar.gz
+- Don't assign ffmpeg-2.2 to neither 'ffmpeg' nor to 'ffmpeg-aux'
 
 ## Multicast ##
 
