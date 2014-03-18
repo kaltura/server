@@ -9,8 +9,6 @@ class kFmsUrlManager extends kUrlManager
 
 	const PARAM_PATTERN_URL_PATTERN_HTTPS = '%s_pattern_https';
 
-	const PARAM_PATTERN_APPEND_FILENAME = '%s_append_filename';
-
 	const PARAM_PATTERN_TOKENIZER_CLASS = 'tokenizer_%s_class';
 
 	const PARAM_PATTERN_TOKENIZER_ARG = 'tokenizer_%s_arg%s';
@@ -74,24 +72,19 @@ class kFmsUrlManager extends kUrlManager
 		if($this->clipTo)
 			$url .= "/clipTo/$this->clipTo";
 
-		$appendFilenameKey = $this->getParamsKey(self::PARAM_PATTERN_APPEND_FILENAME, $this->protocol);
-		$appendFilename = isset($this->params[$appendFilenameKey]) ? (bool)$this->params[$appendFilenameKey] : true;
 		switch($this->protocol)
 		{
 			case PlaybackProtocol::RTMP:
 				$url .= '/forceproxy/true';
-				if ($appendFilename)
-				{
-					$flvExtension = $this->extention && strtolower($this->extention) == 'flv';
-					$containerFlash = $this->containerFormat && strtolower($this->containerFormat) == 'flash video';
-					if ($flvExtension || $containerFlash)
-						$url .= "/name/a.flv";
-					else
-						$url .= "/name/a.mp4";
-				}
+				$flvExtension = $this->extention && strtolower($this->extention) == 'flv';
+				$containerFlash = $this->containerFormat && strtolower($this->containerFormat) == 'flash video';
+				if ($flvExtension || $containerFlash)
+					$url .= "/name/a.flv";
+				else
+					$url .= "/name/a.mp4";
 				break;
 			default:
-				if ($appendFilename && $this->extention)
+				if ($this->extention)
 					$url .= "/name/a.".$this->extention;
 				break;
 		}
