@@ -10,6 +10,7 @@
 				<th><?php echo $this->translate('Status'); ?></th>
 				<th><?php echo $this->translate('ID'); ?></th>
 				<th><?php echo $this->translate('Account Name'); ?></th>
+				<th><?php echo $this->translate('Reference ID'); ?></th>
 				<th><?php echo $this->translate('Website URL'); ?></th>
 				<th><?php echo $this->translate('Administrator'); ?></th>
 				<th><?php echo $this->translate('Admin Email'); ?></th>
@@ -29,6 +30,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $partner->status); ?></td>
 				<td><?php echo $partner->id; ?></td>
 				<td><?php echo $partner->name; if ($partner->id == $this->currentPartnerId) echo ' (Parent Account)'?></td>
+				<td><?php echo $partner->referenceId; ?></td>
 				<td><?php echo $partner->website ? $partner->website : "N/A"; ?></td>
 				<td><?php echo $partner->adminName; ?></td>
 				<td><?php echo $partner->adminEmail; ?></td>
