@@ -1640,16 +1640,16 @@ class kFlowHelper
 		$asset = assetPeer::retrieveByFileSync($fileSync);
 			
 		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR))
-			&& $this->isAssetExportFinished($fileSync, $asset))
+			&& self::isAssetExportFinished($fileSync, $asset))
 		{
 			
-            $asset->setStatusLocalReady();
-            $asset->save();
+			$asset->setStatusLocalReady();
+			$asset->save();
 
-            if ( ($asset instanceof flavorAsset) && ($asset->getStatus() == asset::ASSET_STATUS_READY) )
-            {
-                kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
-            }
+			if ( ($asset instanceof flavorAsset) && ($asset->getStatus() == asset::ASSET_STATUS_READY) )
+			{
+				kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
+			}
 		}		
 		// check if all exports finished and delete local file sync according to configuration
 		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
@@ -1657,14 +1657,14 @@ class kFlowHelper
 			$partner = $dbBatchJob->getPartner();
 			if($partner && $partner->getStorageDeleteFromKaltura())
 			{
-				$this->deleteAssetLocalFileSyncs($fileSync, $asset);
+				self::deleteAssetLocalFileSyncs($fileSync, $asset);
 			}
 		}
 
 		return $dbBatchJob;
 	}
 	
-	private function isAssetExportFinished(FileSync $fileSync, asset $asset)
+	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
 	{
 		$c = new Criteria();
 		$c->addAnd ( FileSyncPeer::OBJECT_ID , $fileSync->getObjectId() );
@@ -1678,16 +1678,19 @@ class kFlowHelper
 			return true;
 	}
 	
-	private function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
+	private static function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
 	{
-		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
-		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
-		
-		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
-		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
-		
-		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
-		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);		
+		if(self::isAssetExportFinished($fileSync, $asset))
+		{
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
+			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
+			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
+			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+		}		
 	}
 
 	/**
