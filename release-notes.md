@@ -37,17 +37,18 @@ filter.jobSubTypeIn = smoothProtect.SmoothProtect
 params.smoothProtectCmd = $SMOOTHPROTECT_BIN 
 params.isRemoteOutput = $IS_REMOTE_OUTPUT 
 params.isRemoteInput = $IS_REMOTE_INPUT 
-• $WORKER_ID – set to match existing Testing QA settings 
-• $BASE_LOACL_PATH – follow other windows workers (aka Webex worker) 
-• $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker) 
-• $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect' 
-• $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker) 
-• $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
+- $WORKER_ID – set to match existing Testing QA settings 
+- $BASE_LOACL_PATH – follow other windows workers (aka Webex worker) 
+- $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker) 
+- $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect' 
+- $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker) 
+- $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
 
 *Binaries*
 - Linux
-	- Install ismindex from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
-	- The ffmpeg and ffmpeg-aux remains unchanged. The ffmpeg will be switched to the new version on the next deployment.
+	- Install ffmpeg and ismindex from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+	- Switch the ffmpeg allias to work with the new ffmpeg-2.1.3
+	- The ffmpeg-aux remains unchanged. 
 - Windows
 	- Install 'SmoothProtect.exe' binary
 
