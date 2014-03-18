@@ -4013,9 +4013,9 @@ kmc.utils = {
 				"width": 0,
 				"visibility": 'visible',
 				"top": '6px',
-				"right": '29px'
+				"right": '6px'
 			};
-            // change right to 6px to hide language menu
+            // change right to 29px to show language menu
 
 			var menu_animation_css = {
 				"width": menu_width + 'px',
