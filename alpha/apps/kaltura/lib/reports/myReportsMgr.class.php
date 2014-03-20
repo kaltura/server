@@ -1014,7 +1014,7 @@ class myReportsMgr
 			),
 			"live" => array (
 				"count_plays"
-			}
+			)
 		);
 		
 		$valid_field  = false;
