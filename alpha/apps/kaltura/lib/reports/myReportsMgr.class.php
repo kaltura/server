@@ -38,6 +38,7 @@ class myReportsMgr
 	const REPORT_TYPE_PLATFORMS = 21;
 	const REPORT_TYPE_OPERATION_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
+	const REPORT_TYPE_LIVE = 24;
 	
 	
 	const REPORTS_COUNT_CACHE = 60;
@@ -816,6 +817,7 @@ class myReportsMgr
 		self::REPORT_TYPE_PLATFORMS => 'platforms',
 		self::REPORT_TYPE_OPERATION_SYSTEM => 'os',
 		self::REPORT_TYPE_BROWSERS => 'browsers',
+		self::REPORT_TYPE_LIVE => "live" ,
 	
 	);
 	
@@ -1009,7 +1011,10 @@ class myReportsMgr
 				"count_loads" ,
 				"load_play_ratio" ,	
 				"avg_view_drop_off",
-			)
+			),
+			"live" => array (
+				"count_plays"
+			}
 		);
 		
 		$valid_field  = false;
