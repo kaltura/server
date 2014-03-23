@@ -414,13 +414,16 @@ class kFlowHelper
 			try {
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
-			catch (kCoreException $ex) {
+			catch (Exception $ex) {
+				if ($ex->getCode() == KDLErrors::NoMediaContent)
+					return $dbBatchJob;
+				 
 				//This was added so the all the assets prior to reaching the limit would still be created
 				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
 					throw $ex;
 				
 				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
-			}
+			}			
 
 			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
 			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
