@@ -144,7 +144,7 @@ class kFmsUrlManager extends kUrlManager
 	 */
 	public function identifyRequest()
 	{
-		if (!$this->params['secure_prefix'])
+		if (!isset($this->params['secure_prefix']) || !$this->params['secure_prefix'])
 			return false;
 
 		$securedUrl = $this->params['secure_prefix'];
