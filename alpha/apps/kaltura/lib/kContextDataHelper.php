@@ -399,15 +399,11 @@ class kContextDataHelper
 			reset($enabledDeliveryTypes);
 			$deliveryTypeName = key($enabledDeliveryTypes);
 			foreach ($deliveryTypeKeys as $deliveryTypeKey){
-				$deliveryTypesToValidate = kConf::get($deliveryTypeKey);
-				$deliveryTypesToValidate = explode(',', $deliveryTypesToValidate);
-				foreach ($deliveryTypesToValidate as $deliveryTypeToValidate)
-				{
-		            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
-		            {
-		             	$deliveryTypeName = $deliveryTypeToValidate;
-		                break;
-					}
+				$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
+	            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
+	            {
+	             	$deliveryTypeName = $deliveryTypeToValidate;
+	                break;
 				}
 			}		
 			$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	
