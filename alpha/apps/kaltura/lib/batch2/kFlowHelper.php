@@ -415,6 +415,7 @@ class kFlowHelper
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
 			catch (Exception $ex) {
+				//If exception code is NoValidMediaStream return the job to avoid continuing with the code below
 				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
 					return $dbBatchJob;
 				 
