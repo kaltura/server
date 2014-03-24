@@ -16,6 +16,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	const METADATA_FIELD_DESCRIPTION = 'YoutubeDescription';
 	const METADATA_FIELD_CATEGORY = 'YoutubeCategory';
 	const METADATA_FIELD_TAGS = 'YoutubeKeywords';
+	const METADATA_FIELD_PLAYLIST_IDS = 'YoutubePlaylistIds';
 	
 	const MEDIA_TITLE_MAXIMUM_LENGTH = 100;
 	const MEDIA_DESCRIPTION_MAXIMUM_LENGTH = 5000;
@@ -217,6 +218,16 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='default_category']","/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_CATEGORY."']"));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeApiDistributionField::MEDIA_PLAYLIST_IDS);
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_PLAYLIST_IDS);
+	    $fieldConfig->setEntryMrssXslt(
+					'<xsl:if test="customData/metadata/'.self::METADATA_FIELD_PLAYLIST_IDS.' != \'\'">'
+						.'<xsl:value-of select="normalize-space(customData/metadata/'.self::METADATA_FIELD_PLAYLIST_IDS.')" />'
+					.'</xsl:if>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    

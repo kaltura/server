@@ -9,6 +9,7 @@ interface YouTubeApiDistributionField extends BaseEnum
 	const MEDIA_DESCRIPTION  = 'MEDIA_DESCRIPTION';
 	const MEDIA_KEYWORDS  = 'MEDIA_KEYWORDS';
     const MEDIA_CATEGORY  = 'MEDIA_CATEGORY';
+    const MEDIA_PLAYLIST_IDS  = 'MEDIA_PLAYLIST_IDS';
     
     const START_DATE  = 'START_DATE';
 	const END_DATE  = 'END_DATE';	

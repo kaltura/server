@@ -255,12 +255,18 @@ class kUrlManager
 			    }
 			    $url = $storageProfile->getRTMPPrefix(). $url;
 			}
-			if (($this->extention && strtolower($this->extention) != 'flv' ||
-				$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
-				$url = "mp4:".ltrim($url,'/');
-				
-			// when serving files directly via RTMP fms doesnt expect to get the file extension
-			$url = str_replace('.mp4', '', str_replace('.flv','',$url));
+
+			// the default is to remove the file extension, if we want to keep it, "rtmp_append_filename" param should be
+			// added to the remote storage json params
+			if (!isset($this->params['rtmp_append_filename']) || !$this->params['rtmp_append_filename'])
+			{
+				if (($this->extention && strtolower($this->extention) != 'flv' ||
+					$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
+					$url = "mp4:".ltrim($url,'/');
+
+				// when serving files directly via RTMP fms doesnt expect to get the file extension
+				$url = str_replace('.mp4', '', str_replace('.flv','',$url));
+			}
 		}
 				
 		return $url;

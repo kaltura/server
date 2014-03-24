@@ -11,7 +11,7 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 - Version 3.0.3 [KalturaWowzaServer.jar](https://github.com/kaltura/media-server/releases/download/rel-3.0.3/KalturaWowzaServer-3.0.3.jar "KalturaWowzaServer.jar")
  
-*Play Ready*
+## Play Ready ##
 - 1. upgrade PR license server to v2.9
 - 2. device registration flow
 
@@ -24,6 +24,39 @@ Enable sending periodic live sync points on Kaltura live stream.
 - 3.  update web.xml - add <add key="RemoteAddrHeaderSalt" value="@REMOTE_ADDR_HEADER_SALT_LOCAL_INI@" /> under appSettings. Change @REMOTE_ADDR_HEADER_SALT_LOCAL_INI@ to the value of remote_addr_header_salt in local.ini
 - 4. restart IIS
 
+*Configuartion Changes*
+- update batch.ini/worker.ini
+	- add under KAsyncConvertWorker params.ismIndexCmd = @BIN_DIR@/ismindex
+	- update under KAsyncConvert filter.jobSubTypeIn = 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+	- Add KAsyncConvertSmoothProtect worker section, place it following other Windows transcoding workers.
+		- [KAsyncConvertSmoothProtect: KAsyncDistributedConvert] 
+		- id = $WORKER_ID 
+		- baseLocalPath = $BASE_LOACL_PATH 
+		- params.sharedTempPath = $SHARED_TEMP_PATH 
+		- filter.jobSubTypeIn = smoothProtect.SmoothProtect 
+		- params.smoothProtectCmd = $SMOOTHPROTECT_BIN 
+		- params.isRemoteOutput = $IS_REMOTE_OUTPUT 
+		- params.isRemoteInput = $IS_REMOTE_INPUT 
+	- $WORKER_ID – set to match existing Testing QA settings 
+	- $BASE_LOACL_PATH – follow other windows workers (aka Webex worker) 
+	- $SHARED_TEMP_PATH – follow other windows workers (aka Webex worker) 
+	- $SMOOTHPROTECT_BIN – full path to the 'smoothprotect.exe', typically '/opt/kaltura/bin/smoothprotect' 
+	- $IS_REMOTE_OUTPUT – should match other Windows workers (aka Webex worker) 
+	- $IS_REMOTE_INPUT – should match other Windows workers (aka Webex worker)
+
+*Binaries*
+- Linux
+	- Install ffmpeg binary and ismindex binary from - http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.1.3-bin.tar.gz
+	- Switch the ffmpeg allias to work with the new ffmpeg-2.1.3
+	- The ffmpeg-aux remains unchanged. 
+- Windows
+	- Install 'SmoothProtect.exe' binary
+
+## H265/FFmpeg 2.2 ##
+
+*Binaries*
+- Install ffmpeg-2.2 from http://ny-www.kaltura.com/content/shared/bin/ffmpeg-2.2-bin.tar.gz
+- Don't assign ffmpeg-2.2 to neither 'ffmpeg' nor to 'ffmpeg-aux'
 
 ## Multicast ##
 
@@ -39,6 +72,26 @@ Enable sending periodic live sync points on Kaltura live stream.
 * deployment/updates/scripts/add_permissions/2014_03_11_add_filesync_list_to_batch_partner.php
 
 ----
+
+## Allow "View History" for any Admin Console users (revisited) ##
+The monitor's View History permission is lowered from System Admin user to any Admin Console user.
+
+- update admin.ini:
+access.partner.configure-account-options-monitor-view = SYSTEM_ADMIN_PUBLISHER_CONFIG
+access.partner.exteneded-free-trail-history = SYSTEM_ADMIN_PUBLISHER_CONFIG
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_add_system_admin_publisher_config_to_audittrail.php
+
+## Fix duplicate permission names in Admin Console ##
+Many Admin Console permissions carry the same name.
+Run the following SQL script in order to make them unique:
+
+*DB Changes*
+
+- deployment/updates/sql/2014_03_19_fix_admin_console_permission_names.sql
+
 
 # IX-9.12.0 #
 

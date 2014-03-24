@@ -18,7 +18,7 @@ class updateLoginDataAction extends kalturaAction
 
 		$validTypes = array('name', 'email' ,'password');
 		if(! in_array($this->type, $validTypes))
-			KExternalErrors::dieError('INVALID_TYPE', 'Invalid setting type');
+			KExternalErrors::dieError( KExternalErrors::INVALID_SETTING_TYPE );
 
 		$ks = $this->getP ( "kmcks" );
 		if(!$ks)

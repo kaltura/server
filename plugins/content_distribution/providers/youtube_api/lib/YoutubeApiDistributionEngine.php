@@ -67,6 +67,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props['title'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE);
 		$props['category'] = $this->translateCategory($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY));
 		$props['description'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION);
+		$props['playlistIds'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_PLAYLIST_IDS);
 		
 		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
 		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
@@ -152,6 +153,11 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				$data->mediaFiles[] = $this->submitCaption($youTubeApiImpl, $captionInfo, $data->remoteId);
 			}
 		}
+		
+		if ( $props['playlistIds'] ) {
+			$youTubeApiImpl->attachVideoEntryToPlaylistIds( $remoteId, $props['playlistIds'] );
+		} 
+		
 		return true;
 	}
 	

@@ -43,7 +43,8 @@ var flashVars = {
 	loginF: "loginF",
 	closeF: "closeLoginF",
 	urchinNumber: "UA-12055206-1",
-	srvurl: "api_v3/index.php"
+	srvurl: "api_v3/index.php",
+    language: localStorage["lang"]
 }
 
 $.extend( flashVars, options.flashVars );
