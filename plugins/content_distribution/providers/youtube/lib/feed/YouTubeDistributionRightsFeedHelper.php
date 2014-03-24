@@ -42,11 +42,12 @@ class YouTubeDistributionRightsFeedHelper
 		$this->_metadataTempFileName = 'youtube_xml20_' . $timestampName . '.xml';
 	}
 
-	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath)
+	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)
 	{
 		$identifier= $fieldValues[KalturaYouTubeDistributionField::ASSET_CUSTOM_ID];
 		$videoTag = $identifier.'-video';
 		$thumbnailTag = $identifier.'-thumbnail';
+		$captionTag = $identifier.'-caption';
 
 		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
 		$feed->setNotificationEmail($fieldValues);
@@ -64,7 +65,20 @@ class YouTubeDistributionRightsFeedHelper
 			$feed->appendFileElement('image', false, pathinfo($thumbnailFilePath, PATHINFO_BASENAME), $thumbnailTag);
 			$feed->appendVideoArtworkElement('custom_thumbnail', $thumbnailTag);
 		}
-
+		
+		// Handle addition of caption asset items
+		$captionAssetInfo = $feed->getCaptionAssetInfo($captionAssetIds);
+		foreach($captionAssetInfo as $captionInfo)
+		{
+			if(file_exists($captionInfo['fileUrl']))
+			{
+				$captionTag = $captionTag . '-' . $captionInfo['language'];
+				$feed->appendFileElement('timed_text', false, pathinfo($captionInfo['fileUrl'], PATHINFO_BASENAME), $captionTag);
+				$feed->appendCaptionElement($captionTag, $captionInfo['fileExt'], $captionInfo['language']);
+				$feed->appendRelationship(array("/feed/caption[@tag='$captionTag']", "/feed/file[@tag='$captionTag']"), array("/feed/video[@tag='$videoTag']"));
+			}
+		}
+		
 		$feed->appendVideoAssetFileRelationship($fieldValues, $videoTag);
 		$feed->setAdParamsByFieldValues($fieldValues, $videoTag, $distributionProfile->enableAdServer);
 		$feed->appendRightsAdminByFieldValues($fieldValues, $videoTag);
@@ -262,6 +276,37 @@ class YouTubeDistributionRightsFeedHelper
 			return;
 		$this->setByXpath($xpath, $value);
 	}
+	
+	public function getCaptionAssetInfo($captionAssetIds)
+	{
+		$captionAssetInfo = array();
+		
+		$assetIdsArray = explode ( ',', $captionAssetIds );
+			
+		if (empty($assetIdsArray)) 
+			return;
+				
+		$assets = assetPeer::retrieveByIds($assetIdsArray);
+			
+		foreach ($assets as $asset)
+		{
+			$assetType = $asset->getType();
+			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ))
+			{
+				/* @var $asset CaptionAsset */
+				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				if(kFileSyncUtils::fileSync_exists($syncKey))
+				{
+			    	$captionAssetInfo[$asset->getId()]['fileUrl'] = kFileSyncUtils::getLocalFilePathForKey ( $syncKey, false );
+			    	$captionAssetInfo[$asset->getId()]['fileExt'] = $asset->getFileExt();
+			    	$captionAssetInfo[$asset->getId()]['language'] = $asset->getLanguage();
+			    	break;
+				}
+			}
+		}
+		
+		return $captionAssetInfo;
+	}
 
 	public function appendFileElement($type, $urgentReference, $filename, $tag)
 	{
@@ -273,6 +318,20 @@ class YouTubeDistributionRightsFeedHelper
 		$file->appendChild($this->_doc->createElement('filename', $filename));
 		$this->_doc->firstChild->appendChild($file);
 		return $file;
+	}
+	
+	public function appendCaptionElement($tag, $fileExt, $language)
+	{
+		$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
+		
+		$captionElem = $this->_doc->createElement('caption');
+		$captionElem->setAttribute('tag', $tag);
+		$captionElem->appendChild($this->_doc->createElement('format', $fileExt));
+		$captionElem->appendChild($this->_doc->createElement('language', $languageReflector->getConstantName($language)));
+		
+		$this->_doc->firstChild->appendChild($captionElem);
+		
+		return $captionElem;
 	}
 
 	public function appendVideoArtworkElement($type, $fileTag)

@@ -39,13 +39,8 @@ class DrmDeviceTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
-		$this->addColumn('PROFILE_ID', 'ProfileId', 'INTEGER', true, null, null);
-		$this->addColumn('USERID', 'Userid', 'VARCHAR', true, 128, null);
-		$this->addColumn('DEVICEID', 'Deviceid', 'VARCHAR', true, 128, null);
-		$this->addColumn('VERSION', 'Version', 'VARCHAR', false, 128, null);
-		$this->addColumn('PLATFORMDESCRIPTOR', 'Platformdescriptor', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('DEVICE_ID', 'DeviceId', 'VARCHAR', true, 128, null);
 		$this->addColumn('PROVIDER', 'Provider', 'INTEGER', true, null, null);
-		$this->addColumn('STATUS', 'Status', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

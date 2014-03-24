@@ -34,7 +34,6 @@ class DrmPolicyService extends KalturaBaseService
 		$drmPolicy->validatePropertyNotNull('systemName');
 		$drmPolicy->validatePropertyNotNull('scenario');
 		$drmPolicy->validatePropertyNotNull('partnerId');
-		$drmPolicy->validatePropertyNotNull('profileId');
 		
 		// validate values
 		$drmPolicy->validatePolicy();

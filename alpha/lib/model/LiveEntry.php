@@ -302,6 +302,12 @@ abstract class LiveEntry extends entry
 			$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
 			$configuration->setUrl($mpdStreamUrl);
 			$configurations[] = $configuration;
+			
+			if ($this->getPushPublishEnabled())
+			{
+				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$configurations = array_merge($configurations, $pushPublishConfigurations);
+			}
 		}
 		
 		return $configurations;
@@ -318,16 +324,22 @@ abstract class LiveEntry extends entry
 		
 		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $kMediaServer kLiveMediaServer */
-			KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
-			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-				return $kMediaServer->getMediaServer();
+			if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+			{
+				KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+					return $kMediaServer->getMediaServer();
+			}
 		}
 		if($currentDcOnly)
 			return null;
 		
 		$kMediaServer = reset($kMediaServers);
-		return $kMediaServer->getMediaServer();
+		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+			return $kMediaServer->getMediaServer();
+			
+		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
+		return null;
 	}
 	
 	/**
@@ -341,9 +353,12 @@ abstract class LiveEntry extends entry
 		
 		foreach($kMediaServers as $kMediaServer)
 		{
-			/* @var $kMediaServer kLiveMediaServer */
-			if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-				return true;
+			if($kMediaServer instanceof kLiveMediaServer)
+			{
+				/* @var $kMediaServer kLiveMediaServer */
+				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+					return true;
+			}
 		}
 		
 		return !$currentDcOnly;
@@ -494,6 +509,16 @@ abstract class LiveEntry extends entry
 	public function getAttachedPendingMediaEntries()
 	{
 		return $this->getFromCustomData('attached_pending_media_entries', null, array());
+	}
+	
+	public function getPushPublishConfigurations ()
+	{
+		return $this->getFromCustomData('push_publish_configurations',null, array());
+	}
+	
+	public function setPushPublishConfigurations ($v)
+	{
+		$this->putInCustomData('push_publish_configurations', $v);
 	}
 	
 	/**

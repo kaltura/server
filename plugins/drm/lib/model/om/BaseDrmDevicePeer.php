@@ -26,7 +26,7 @@ abstract class BaseDrmDevicePeer {
 	const TM_CLASS = 'DrmDeviceTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 12;
+	const NUM_COLUMNS = 7;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -37,26 +37,11 @@ abstract class BaseDrmDevicePeer {
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'drm_device.PARTNER_ID';
 
-	/** the column name for the PROFILE_ID field */
-	const PROFILE_ID = 'drm_device.PROFILE_ID';
-
-	/** the column name for the USERID field */
-	const USERID = 'drm_device.USERID';
-
-	/** the column name for the DEVICEID field */
-	const DEVICEID = 'drm_device.DEVICEID';
-
-	/** the column name for the VERSION field */
-	const VERSION = 'drm_device.VERSION';
-
-	/** the column name for the PLATFORMDESCRIPTOR field */
-	const PLATFORMDESCRIPTOR = 'drm_device.PLATFORMDESCRIPTOR';
+	/** the column name for the DEVICE_ID field */
+	const DEVICE_ID = 'drm_device.DEVICE_ID';
 
 	/** the column name for the PROVIDER field */
 	const PROVIDER = 'drm_device.PROVIDER';
-
-	/** the column name for the STATUS field */
-	const STATUS = 'drm_device.STATUS';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'drm_device.CREATED_AT';
@@ -83,11 +68,11 @@ abstract class BaseDrmDevicePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'ProfileId', 'Userid', 'Deviceid', 'Version', 'Platformdescriptor', 'Provider', 'Status', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'profileId', 'userid', 'deviceid', 'version', 'platformdescriptor', 'provider', 'status', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::PROFILE_ID, self::USERID, self::DEVICEID, self::VERSION, self::PLATFORMDESCRIPTOR, self::PROVIDER, self::STATUS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'profile_id', 'userId', 'deviceId', 'version', 'platformDescriptor', 'provider', 'status', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'DeviceId', 'Provider', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'deviceId', 'provider', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::DEVICE_ID, self::PROVIDER, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'device_id', 'provider', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -97,11 +82,11 @@ abstract class BaseDrmDevicePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'ProfileId' => 2, 'Userid' => 3, 'Deviceid' => 4, 'Version' => 5, 'Platformdescriptor' => 6, 'Provider' => 7, 'Status' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, 'CustomData' => 11, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'profileId' => 2, 'userid' => 3, 'deviceid' => 4, 'version' => 5, 'platformdescriptor' => 6, 'provider' => 7, 'status' => 8, 'createdAt' => 9, 'updatedAt' => 10, 'customData' => 11, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::PROFILE_ID => 2, self::USERID => 3, self::DEVICEID => 4, self::VERSION => 5, self::PLATFORMDESCRIPTOR => 6, self::PROVIDER => 7, self::STATUS => 8, self::CREATED_AT => 9, self::UPDATED_AT => 10, self::CUSTOM_DATA => 11, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'profile_id' => 2, 'userId' => 3, 'deviceId' => 4, 'version' => 5, 'platformDescriptor' => 6, 'provider' => 7, 'status' => 8, 'created_at' => 9, 'updated_at' => 10, 'custom_data' => 11, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'DeviceId' => 2, 'Provider' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'CustomData' => 6, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'deviceId' => 2, 'provider' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'customData' => 6, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::DEVICE_ID => 2, self::PROVIDER => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::CUSTOM_DATA => 6, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'device_id' => 2, 'provider' => 3, 'created_at' => 4, 'updated_at' => 5, 'custom_data' => 6, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -173,13 +158,8 @@ abstract class BaseDrmDevicePeer {
 	{
 		$criteria->addSelectColumn(DrmDevicePeer::ID);
 		$criteria->addSelectColumn(DrmDevicePeer::PARTNER_ID);
-		$criteria->addSelectColumn(DrmDevicePeer::PROFILE_ID);
-		$criteria->addSelectColumn(DrmDevicePeer::USERID);
-		$criteria->addSelectColumn(DrmDevicePeer::DEVICEID);
-		$criteria->addSelectColumn(DrmDevicePeer::VERSION);
-		$criteria->addSelectColumn(DrmDevicePeer::PLATFORMDESCRIPTOR);
+		$criteria->addSelectColumn(DrmDevicePeer::DEVICE_ID);
 		$criteria->addSelectColumn(DrmDevicePeer::PROVIDER);
-		$criteria->addSelectColumn(DrmDevicePeer::STATUS);
 		$criteria->addSelectColumn(DrmDevicePeer::CREATED_AT);
 		$criteria->addSelectColumn(DrmDevicePeer::UPDATED_AT);
 		$criteria->addSelectColumn(DrmDevicePeer::CUSTOM_DATA);
@@ -787,7 +767,7 @@ abstract class BaseDrmDevicePeer {
 	{
 		try {
 
-			$omClass = $row[$colnum + 7];
+			$omClass = $row[$colnum + 3];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {

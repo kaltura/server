@@ -114,20 +114,14 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 	}
 	
 	/* ---------------------------
-	 * generateVideoParams
+	 * getVideoCodecSpecificParams
 	 */
-	protected function generateVideoParams(KDLFlavor $design, KDLFlavor $target)
+	protected function getVideoCodecSpecificParams(KDLFlavor $design, KDLFlavor $target)
 	{
-		if(!isset($target->_video)) {
-			return " -vn";
+		if($target->_video->_id==KDLVideoTarget::VP9) {
+			return "libvpx-vp9";
 		}
-	
-		$vid = $target->_video;
-		if($vid->_id==KDLVideoTarget::VP9) {
-			$cmdStr = " -c:v libvpx-vp9";
-			return $cmdStr;
-		}
-		return parent::generateVideoParams($design, $target);
+		return parent::getVideoCodecSpecificParams($design, $target);
 	}
 	
 	/* ---------------------------

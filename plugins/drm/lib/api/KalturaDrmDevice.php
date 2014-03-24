@@ -8,7 +8,6 @@ class KalturaDrmDevice extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in,order
 	 */
 	public $id;
 	
@@ -18,52 +17,23 @@ class KalturaDrmDevice extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 */
 	public $partnerId;
-	
+		
 	/**
 	 * @var string
-	 * @filter like,order
-	 */
-	public $userId;
-	
-	/**
-	 * @var string
-	 * @filter like,order
+	 * @filter like
 	 */
 	public $deviceId;
-	
-	/**
-	 * @var string
-	 * @filter like,order
-	 */
-	public $version;
-	
-	
-	/**
-	 * @var string
-	 */
-	public $platformDescriptor;
 	
 	/**
 	 * @var KalturaDrmProviderType
 	 * @filter eq,in
 	 */
 	public $provider;
-
-	/**
-	 * @var int
-	 * @filter eq,in
-	 */
-	public $profileId;
-	
-	/**
-	 * @var KalturaDrmPolicyStatus
-	 * @filter eq,in
-	 */
-	public $status;
 		
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter order
 	 */
 	public $createdAt;
 
@@ -80,12 +50,7 @@ class KalturaDrmDevice extends KalturaObject implements IFilterable
 		'id',
 		'partnerId',
 		'provider',
-		'profileId',
-		'userId',
 		'deviceId',
-		'version',
-		'platformDescriptor',
-		'status',
 		'createdAt',
 		'updatedAt',
 	 );

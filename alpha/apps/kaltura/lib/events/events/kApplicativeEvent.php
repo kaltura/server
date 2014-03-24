@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage events
  */
-abstract class kApplicativeEvent extends KalturaEvent implements IKalturaContinualEvent
+abstract class kApplicativeEvent extends KalturaEvent implements IKalturaContinualEvent,  IKalturaObjectRelatedEvent
 {
 	/**
 	 * @var BaseObject

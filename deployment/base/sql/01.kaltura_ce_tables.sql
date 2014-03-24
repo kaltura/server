@@ -2230,7 +2230,7 @@ CREATE TABLE `file_asset`
 	KEY (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `drm_profile`
+CREATE TABLE  IF NOT EXISTS `drm_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,
@@ -2247,11 +2247,10 @@ CREATE TABLE `drm_profile`
 	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `drm_policy`
+CREATE TABLE  IF NOT EXISTS `drm_policy`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,
-	`profile_id` INTEGER  NOT NULL,
 	`name` TEXT  NOT NULL,
 	`system_name` VARCHAR(128) default '' NOT NULL,
 	`description` TEXT,
@@ -2268,25 +2267,21 @@ CREATE TABLE `drm_policy`
 	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `drm_device`
+CREATE TABLE  IF NOT EXISTS `drm_device`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,
-	`profile_id` INTEGER  NOT NULL,
-	`userId` VARCHAR(128)  NOT NULL,
-	`deviceId` VARCHAR(128)  NOT NULL,
-	`version` VARCHAR(128),
-	`platformDescriptor` TEXT,
+	`device_id` VARCHAR(128)  NOT NULL,
 	`provider` INTEGER  NOT NULL,
-	`status` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
+	UNIQUE KEY `device_id_partner_id_unique` (`device_id`, `partner_id`),
+	KEY `partner_id_provider_status`(`partner_id`, `provider`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `drm_key`
+CREATE TABLE  IF NOT EXISTS `drm_key`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,

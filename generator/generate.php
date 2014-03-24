@@ -228,6 +228,11 @@ foreach($config as $name => $item)
 				$instance->setParam($key, $val);
 			}
 		}
+		
+		if (isset ($item->excludeSourcePaths))
+		{
+			$instance->setExcludeSourcePaths ($item->excludeSourcePaths);
+		}
 	}
 	//if it's a native php based schema generator
 	else if ($fromPhp)
@@ -270,13 +275,15 @@ foreach($config as $name => $item)
 			
 		if($clearPath || file_exists($outputPath))
 		{
-			KalturaLog::info("Delete old files [$outputPath" . ($clearPath ? ", $clearPath" : "") . "]");
 			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 			{
-				passthru("rmdir /Q /S $outputPath $clearPath");
+				$winOutputPath = realpath($outputPath);
+				KalturaLog::info("Delete old files [$winOutputPath" . ($clearPath ? ", $clearPath" : "") . "]");
+				passthru("rmdir /Q /S $winOutputPath $clearPath");
 			}
 			else
 			{
+				KalturaLog::info("Delete old files [$outputPath" . ($clearPath ? ", $clearPath" : "") . "]");
 				passthru("rm -fr $outputPath $clearPath");
 			}
 		}

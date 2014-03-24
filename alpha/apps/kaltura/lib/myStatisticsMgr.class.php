@@ -422,6 +422,9 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 	{
 		if ( ! is_numeric ( $num )) $num = 0;
 		$num -= $delta;
+		
+		if($num < 0)
+			$num = 0;
 	}	
 	
 	

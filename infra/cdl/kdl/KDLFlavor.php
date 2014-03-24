@@ -482,9 +482,18 @@ $plannedDur = 0;
 			}
 			else {
 				if($target->_container && $target->_container->_id==KDLContainerTarget::ISMV) {
-					$target->_warnings[KDLConstants::ContainerIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
-						KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
-					$target->_container->_id=KDLContainerTarget::WMA;
+					/*
+					 * EE cannot generate audio only ISMV, therefore switch to WMA
+					 */
+					foreach ($this->_transcoders as $trns){
+						$rv = strstr($trns->_id,"expressionEncoder.ExpressionEncoder");
+						if($rv!=false) {
+							$target->_warnings[KDLConstants::ContainerIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
+								KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
+							$target->_container->_id=KDLContainerTarget::WMA;
+							break;
+						}
+					}
 				}
 			}
 		}

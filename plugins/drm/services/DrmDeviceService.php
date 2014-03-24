@@ -30,12 +30,8 @@ class DrmDeviceService extends KalturaBaseService
 		// check for required parameters
 		$drmDevice->validatePropertyNotNull('name');
 		$drmDevice->validatePropertyNotNull('provider');
-		$drmDevice->validatePropertyNotNull('userId');
 		$drmDevice->validatePropertyNotNull('deviceId');
-		$drmDevice->validatePropertyNotNull('version');
-		$drmDevice->validatePropertyNotNull('platformDescriptor');
 		$drmDevice->validatePropertyNotNull('partnerId');
-		$drmDevice->validatePropertyNotNull('profileId');
 		
 		
 		if (!PartnerPeer::retrieveByPK($drmDevice->partnerId)) {
