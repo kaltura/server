@@ -596,7 +596,10 @@ class assetPeer extends BaseassetPeer
 		if ($fileSync->getObjectType() != FileSyncObjectType::ASSET) {
 	        return null;
 	    }
-	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET) {
+	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET &&
+	    	$fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ISM &&
+	    	$fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC) 
+	    {
 	        return null;
 	    }
 	    $asset = assetPeer::retrieveById($fileSync->getObjectId());
