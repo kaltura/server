@@ -728,7 +728,8 @@ class playManifestAction extends kalturaAction
 		if ($baseUrl)
 			$cdnHost = parse_url($baseUrl, PHP_URL_HOST);
 
-		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
+		$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
+		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHostOnly, $this->entryId);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
