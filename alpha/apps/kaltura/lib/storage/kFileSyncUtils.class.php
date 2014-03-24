@@ -1393,6 +1393,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->add(FileSyncPeer::OBJECT_ID, $object_id);
 			$c->add(FileSyncPeer::OBJECT_TYPE, $object_type);
 			$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $object_sub_type);
+			//Version in the db is of type varchar so to avoid string compare we need to add this as custom 
 			$c->add(FileSyncPeer::VERSION, FileSyncPeer::VERSION . " <= $queryVersion", Criteria::CUSTOM);
 			$c->addDescendingOrderByColumn(FileSyncPeer::CREATED_AT);
 			
