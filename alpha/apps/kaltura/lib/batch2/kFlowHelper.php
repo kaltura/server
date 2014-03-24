@@ -415,7 +415,7 @@ class kFlowHelper
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
 			catch (Exception $ex) {
-				if ($ex->getCode() == KDLErrors::NoMediaContent)
+				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
 					return $dbBatchJob;
 				 
 				//This was added so the all the assets prior to reaching the limit would still be created

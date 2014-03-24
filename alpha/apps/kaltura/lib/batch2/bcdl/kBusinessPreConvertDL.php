@@ -4,7 +4,6 @@ class kBusinessPreConvertDL
 {
 
 	const SAVE_ORIGINAL_SOURCE_FLAVOR_PARAM_SYS_NAME = 'save_original_source_flavor_params';
-	const INVALID_SOURCE_FILE_NO_MEDIA_CONTENT = 'Invalid File - No media content';
 	
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
@@ -1120,8 +1119,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$convertProfileJob->setDescription($err);
 			$convertProfileJob->save();
 			
-			if(strpos($errDescription, self::INVALID_SOURCE_FILE_NO_MEDIA_CONTENT) != false)
-				throw new Exception(self::INVALID_SOURCE_FILE_NO_MEDIA_CONTENT, KDLErrors::NoMediaContent);
+			if(strpos($errDescription, KDLErrors::ToString(KDLErrors::NoValidMediaStream)) != false)
+				throw new Exception(KDLErrors::ToString(KDLErrors::NoValidMediaStream), KDLErrors::NoValidMediaStream);
 		}
 				
 		$conversionsCreated = 0;
