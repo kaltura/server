@@ -73,7 +73,7 @@ enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
-
+enabledWorkers.KAsyncEntryStatistics				= 1
 
 [Worker]
 maximumExecutionTime			= 300
@@ -697,3 +697,15 @@ friendlyName										= Re-index tags
 type												= KAsyncTagIndex
 maximumExecutionTime								= 12000
 scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
+
+[KAsyncEntryStatistics : JobHandlerWorker]
+id													= 570
+friendlyName										= Entry Statistics
+type												= KAsyncEntryStatistics
+sleepBetweenStopStart								= 86400
+maximumExecutionTime								= 10800
+scriptPath											= batches/EntryStatistics/KAsyncEntryStatisticsExe.php
+params.dbHost										=
+params.dbPort										=
+params.dbName										=
+params.dbTableName									=
