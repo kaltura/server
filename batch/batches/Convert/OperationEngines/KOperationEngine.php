@@ -115,6 +115,7 @@ abstract class KOperationEngine
 			 * will copy the source to the output, rather than fail and halt the flavor execution 
 			 */	
 		if($return_value != 0) {
+			$this->handleOperationFailure();
 			if(isset($this->operator) && isset($this->operator->isOptional) && $this->operator->isOptional>0){
 				$msg = "Operator failed with return value: [$return_value]";
 				if(isset($this->message)) $msg.= ", message :[".$this->message."]"; 
@@ -122,10 +123,14 @@ abstract class KOperationEngine
 				$this->message = $msg;
 				copy($this->inFilePath, $this->outFilePath);
 			}
-			else
+			else 
 				throw new KOperationEngineException("return value: [$return_value]");
 		}
 		$this->logMediaInfo($this->outFilesPath);
+	}
+	
+	protected function handleOperationFailure() {
+		return;	
 	}
 	
 	protected function doCloseOperation()
