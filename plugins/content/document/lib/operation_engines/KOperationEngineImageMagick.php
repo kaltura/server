@@ -109,12 +109,14 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 	    return true;
 	}
 	
-	protected function handleOperationFailure() {
-		$output = file_get_contents($this->logFilePath);
-		foreach($this->SUSPECTED_AS_FAILURE as $possibleFailure) {
-			if(strpos($output, $possibleFailure) !== false) {
-				$this->data->engineMessage = "Suspected as corrupted file";
-				break;
+	protected function operationComplete($rc, $output) {
+		if($rc != 0) {
+			$logOutput = file_get_contents($this->logFilePath);
+			foreach($this->SUSPECTED_AS_FAILURE as $possibleFailure) {
+				if(strpos($logOutput, $possibleFailure) !== false) {
+					$this->data->engineMessage = "Suspected as corrupted file";
+					break;
+				}
 			}
 		}
 	}
