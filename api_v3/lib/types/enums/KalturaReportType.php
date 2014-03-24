@@ -32,5 +32,6 @@ class KalturaReportType extends KalturaEnum
 	const PLATFORMS = 21;
 	const OPERATION_SYSTEM = 22;
 	const BROWSERS = 23;
+	const LIVE = 24;
 	
 }
