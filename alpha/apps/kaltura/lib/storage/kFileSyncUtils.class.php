@@ -1388,11 +1388,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{		
 		if($version > self::FILE_SYNC_MIN_VERSION_VALIDATE)
 		{			
+			$queryVersion = $version-self::FILE_SYNC_MIN_VERSION_VALIDATE;		
 			$c = new Criteria();
 			$c->add(FileSyncPeer::OBJECT_ID, $object_id);
 			$c->add(FileSyncPeer::OBJECT_TYPE, $object_type);
 			$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $object_sub_type);
-			$c->add(FileSyncPeer::VERSION, $version-self::FILE_SYNC_MIN_VERSION_VALIDATE, Criteria::LESS_EQUAL);
+			$c->add(FileSyncPeer::VERSION, FileSyncPeer::VERSION . " <= $queryVersion", Criteria::CUSTOM);
 			$c->addDescendingOrderByColumn(FileSyncPeer::CREATED_AT);
 			
 			FileSyncPeer::setUseCriteriaFilter(false);
