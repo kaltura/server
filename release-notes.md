@@ -1,3 +1,8 @@
+# IX-9.14.0 #
+
+## Image magick ##
+* In case of GS failure that indicates a corrupted file, update the flavor accordingly. 
+
 # IX-9.13.0 #
 
 ## Live sync points ##
