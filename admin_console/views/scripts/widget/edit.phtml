@@ -132,8 +132,9 @@ jQuery(function() {
 
 	updateSwfUrl();
 
-	jQuery('#conf_file, #conf_file_features').parent().find('.open-editor').click(openEditor);
-	jQuery('#conf_file, #conf_file_features').parent().find('.open-visual-editor').click(openVisualEditor);
+	jQuery('#conf_file, #conf_file_features, #config').parent().find('.open-editor').click(openEditor);
+	jQuery('#conf_file, #conf_file_features, #config').parent().find('.open-visual-editor').click(openVisualEditor);
+	
 });
 
 jQuery(document).ready(function() {
