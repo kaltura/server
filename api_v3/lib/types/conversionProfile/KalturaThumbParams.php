@@ -93,6 +93,13 @@ class KalturaThumbParams extends KalturaAssetParams
 	 * @var bool
 	 */
 	public $stripProfiles;
+
+    /**
+     * Create thumbnail from the videoLength*percentage second
+     *
+     * @var int
+     */
+    public $videoOffsetInPercentage;
 	
 	
 //	Maybe support will be added in the future
@@ -126,6 +133,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		"format",
 		"density",
 		"stripProfiles",
+        "videoOffsetInPercentage",
 	
 //		Maybe support will be added in the future
 //		"cropProvider",
@@ -156,6 +164,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		$this->validatePropertyMinMaxValue('scaleHeight', 0, 10, true);
 		$this->validatePropertyMinValue('density', 0, true);
 		$this->validatePropertyMinValue('videoOffset', 0, true);
+        $this->validatePropertyMinMaxValue('videoOffsetInPercentage', 0, 100, true);
 		
 		$this->validatePropertyMinMaxLength('backgroundColor', 1, 6, true);
 		if(!is_null($this->backgroundColor) && !preg_match('/^[0-9a-fA-F]{1,6}$/', $this->backgroundColor))
