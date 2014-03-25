@@ -698,14 +698,12 @@ type												= KAsyncTagIndex
 maximumExecutionTime								= 12000
 scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
 
-[KAsyncEntryStatistics : JobHandlerWorker]
+[KAsyncEntryStatistics : PeriodicWorker]
 id													= 570
 friendlyName										= Entry Statistics
 type												= KAsyncEntryStatistics
 sleepBetweenStopStart								= 86400
 maximumExecutionTime								= 10800
 scriptPath											= batches/EntryStatistics/KAsyncEntryStatisticsExe.php
-params.dbHost										=
-params.dbPort										=
-params.dbName										=
-params.dbTableName									=
+;Additional script params may be added in the following format
+;params.key											= value

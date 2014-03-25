@@ -30,17 +30,12 @@ class KAsyncEntryStatistics extends KPeriodicWorker
 	{
 		KalturaLog::info("EntryStatistics is running");
 
-		$dbHost = $this->getAdditionalParams("dbHost");
-		$dbPort = $this->getAdditionalParams("dbPort");
-		$dbName = $this->getAdditionalParams("dbName");
-		$dbTableName = $this->getAdditionalParams("dbTableName");
-
-		$this->aggregateEntryStatistics( $dbHost, $dbPort, $dbName, $dbTableName );
+		$this->aggregateEntryStatistics( self::$taskConfig->params );
 	}
 
-	private function aggregateEntryStatistics( $dbHost, $dbPort, $dbName, $dbTableName )
+	private function aggregateEntryStatistics( $params )
 	{
-		$aggregatorConfigurationEnumerator = new AggregatorConfigurationEnumerator( $dbHost, $dbPort, $dbName, $dbTableName );
+		$aggregatorConfigurationEnumerator = new AggregatorConfigurationEnumerator( $params );
 		$configs = $aggregatorConfigurationEnumerator->getConfigurations();
 		$entryStatisticsAggregator = new EntryStatisticsAggregator();
 		foreach ( $configs as $config )
