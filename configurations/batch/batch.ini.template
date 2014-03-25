@@ -73,7 +73,6 @@ enabledWorkers.KAsyncDistributeDeleteCloser			= 1
 enabledWorkers.KAsyncDistributeFetchReportCloser	= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncCopyPartner					= 1
-enabledWorkers.KAsyncEntryStatistics				= 1
 
 [Worker]
 maximumExecutionTime			= 300
