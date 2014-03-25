@@ -40,7 +40,12 @@ class KAsyncEntryStatistics extends KPeriodicWorker
 		$entryStatisticsAggregator = new EntryStatisticsAggregator();
 		foreach ( $configs as $config )
 		{
-			$entryStatisticsAggregator->run( $config );
+			try {
+				$entryStatisticsAggregator->run( $config );
+			}
+			catch ( Exception $e ) {
+				KalturaLog::err( $e ); // Log and continue to the next
+			}
 		}
 	}
 }

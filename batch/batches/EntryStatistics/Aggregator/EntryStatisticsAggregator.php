@@ -484,27 +484,20 @@ class EntryStatisticsAggregator implements IKalturaLogger, IAggregatorData
 	/**
 	 * Class entry point method.
 	 * @param AggregatorConfiguration $aggregatorConfig
+	 * @throws Exception
 	 */
 	public function run( AggregatorConfiguration $aggregatorConfig )
 	{
-		try
-		{
-			$this->log( "--------------------------------------------------------------" );
-			$this->log( "AggregatorConfiguration: " . print_r( $aggregatorConfig, true ) );
-			$this->aggregatorConfig = $aggregatorConfig;
-			$this->client = $this->createClient();
+		$this->log( "--------------------------------------------------------------" );
+		$this->log( "AggregatorConfiguration: " . print_r( $aggregatorConfig, true ) );
+		$this->aggregatorConfig = $aggregatorConfig;
+		$this->client = $this->createClient();
 
-			// Process Movies
-			EntriesAggregator::processEntries( new MoviesAggregator( $this ) );
+		// Process Movies
+		EntriesAggregator::processEntries( new MoviesAggregator( $this ) );
 
-			// Process Series, which in turn will process related episodes
-			EntriesAggregator::processEntries( new SeriesAggregator( $this ) );
-		}
-		catch ( Exception $e )
-		{
-			$this->log( $e->getMessage() );
-			throw $e;
-		}
+		// Process Series, which in turn will process related episodes
+		EntriesAggregator::processEntries( new SeriesAggregator( $this ) );
 	}
 
 	/**

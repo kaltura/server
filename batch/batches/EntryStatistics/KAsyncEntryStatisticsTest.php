@@ -32,8 +32,6 @@ class KAsyncEntryStatisticsTest extends PHPUnit_Framework_TestCase
 				$config = $taskConfig;
 		}
 
-		$this->assertNotNull($config);
-
 		$config->setTaskIndex(1);
 		$instance = new $config->type($config);
 		$instance->setUnitTest(true);
