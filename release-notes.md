@@ -15,8 +15,10 @@
         sleepBetweenStopStart                               = 86400
         maximumExecutionTime                                = 10800
         scriptPath                                          = batches/EntryStatistics/KAsyncEntryStatisticsExe.php
-        ;Additional script params may be added in the following format
-        ;params.key                                         = value
+        ;params.dbHost                                      =
+        ;params.dbPort                                      =
+        ;params.dbName                                      =
+        ;params.dbTableName                                 =
 
 - Enable the worker on an appropriate machine (one per data center):
 
