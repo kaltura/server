@@ -1243,7 +1243,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $flavorAsset->getEntryId());
-		$c->add(assetPeer::STATUS, array(flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_NOT_APPLICABLE), Criteria::IN);
+		$c->add(assetPeer::STATUS, array(flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_NOT_APPLICABLE, flavorAsset::ASSET_STATUS_EXPORTING), Criteria::IN);
 		$c->add(assetPeer::FLAVOR_PARAMS_ID, $srcFlavorParamsIds, Criteria::IN);
 		
 		$readyAndNonApplicableAssetsCount = assetPeer::doCount($c);
@@ -1259,7 +1259,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			return false;
 		}
 		
-		$srcFlavors = assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
+		$srcFlavors = assetPeer::retrieveLocalReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
 		if(!count($srcFlavors))
 		{
 			//assuming all source flavors are Not Applicable
