@@ -558,12 +558,16 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 			"live" => array (
 				"graph" => "graph",
 				"graph_without_filter" => "graph",
+				"graph_no_text" => "graph",
 				"total" => "total",
 				"total_without_filter" => "total",
+				"total_no_text" => "total",
 				"detail" => "detail",
 				"detail_without_filter" => "detail",
+				"detail_no_text" => "detail",
 				"count" => "count",
 				"count_without_filter" => "count",
+				"count_no_text" => "count",
 			),
 			
 		);
@@ -587,6 +591,7 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				$flavor_str = $flavor_str . $for_objects;
 		
 		
+		echo "Orly: $flavor_str "; . PHP_EOL;
 		if ( isset ( $report_type_mapping[$flavor_str ]))
 			return $report_type_mapping[$flavor_str];
 		else
