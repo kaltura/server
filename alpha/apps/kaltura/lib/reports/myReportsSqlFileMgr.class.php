@@ -591,7 +591,6 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				$flavor_str = $flavor_str . $for_objects;
 		
 		
-		echo "Orly: $flavor_str "; . PHP_EOL;
 		if ( isset ( $report_type_mapping[$flavor_str ]))
 			return $report_type_mapping[$flavor_str];
 		else
