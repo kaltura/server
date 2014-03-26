@@ -838,14 +838,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setScaleHeight($thumbParams->getScaleHeight());
 		$thumbParamsOutput->setBackgroundColor($thumbParams->getBackgroundColor());
 		
-		if($mediaInfo)
+		if($mediaInfo && $mediaInfo->getVideoDuration())
 		{
-			if($thumbParamsOutput->getVideoOffset() && $mediaInfo->getVideoDuration())
-			{
-				$videoDurationSec = floor($mediaInfo->getVideoDuration() / 1000);
+            $videoDurationSec = floor($mediaInfo->getVideoDuration() / 1000);
+            if($thumbParamsOutput->getVideoOffset())
+            {
 				if($thumbParamsOutput->getVideoOffset() > $videoDurationSec)
 					$thumbParamsOutput->setVideoOffset($videoDurationSec);
 			}
+
+            elseif(!is_null($thumbParams->getVideoOffsetInPercentage()))
+            {
+                $percentage = $thumbParams->getVideoOffsetInPercentage() / 100;
+                $thumbParamsOutput->setVideoOffset(floor($videoDurationSec * $percentage));
+            }
 		}
 		
 		return $thumbParamsOutput;
