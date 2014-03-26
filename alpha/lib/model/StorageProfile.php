@@ -189,10 +189,10 @@ class StorageProfile extends BaseStorageProfile
 	 * @param flavorAsset $flavorAsset
 	 * @return boolean true if the given flavor asset is configured to be exported or false otherwise
 	 */
-	public function shouldExportFlavorAsset(flavorAsset $flavorAsset)
+	public function shouldExportFlavorAsset(flavorAsset $flavorAsset, $skipFlavorAssetStatusValidation = false)
 	{
 		KalturaLog::debug('Checking if flavor asset ['.$flavorAsset->getId().'] should be exported to ['.$this->getId().']');
-		if(!$flavorAsset->isLocalReadyStatus())
+		if(!$skipFlavorAssetStatusValidation && !$flavorAsset->isLocalReadyStatus())
 		{
 			KalturaLog::debug('Flavor is not ready for export');
 			return false;
