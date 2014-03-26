@@ -95,7 +95,7 @@
 			),
 			KDLTranscoders::FFMPEG => array(
 //				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
-				KDLConstants::VideoIndex=>array("iv41","iv50","icod","intermediate codec"),
+				KDLConstants::VideoIndex=>array("iv41","iv50"), //"icod","intermediate codec"),
 //				KDLConstants::AudioIndex=>array("vorbis"),
 			),
 			KDLTranscoders::FFMPEG_AUX => array(
