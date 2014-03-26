@@ -847,7 +847,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 					$thumbParamsOutput->setVideoOffset($videoDurationSec);
 			}
 
-            elseif($thumbParams->getVideoOffsetInPercentage())
+            elseif(!is_null($thumbParams->getVideoOffsetInPercentage()))
             {
                 $percentage = $thumbParams->getVideoOffsetInPercentage() / 100;
                 $thumbParamsOutput->setVideoOffset(floor($videoDurationSec * $percentage));
