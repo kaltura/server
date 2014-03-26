@@ -3,6 +3,29 @@
 ## Image magick ##
 * In case of GS failure that indicates a corrupted file, update the flavor accordingly. 
 
+## Entry Statistics Aggregation ##
+*Configuartion Changes in batch.ini/worker.ini*
+
+- Add KAsyncEntryStatistics section
+
+        [KAsyncEntryStatistics : PeriodicWorker]
+        id                                                  = 570
+        friendlyName                                        = Entry Statistics
+        type                                                = KAsyncEntryStatistics
+        sleepBetweenStopStart                               = 86400
+        maximumExecutionTime                                = 10800
+        scriptPath                                          = batches/EntryStatistics/KAsyncEntryStatisticsExe.php
+        ;params.dbHost                                      =
+        ;params.dbPort                                      =
+        ;params.dbName                                      =
+        ;params.dbTableName                                 =
+
+- Enable the worker on an appropriate machine (one per data center):
+
+        enabledWorkers.KAsyncEntryStatistics                = 1
+
+----
+
 # IX-9.13.0 #
 
 ## Live sync points ##
@@ -76,8 +99,6 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 * deployment/updates/scripts/add_permissions/2014_03_11_add_filesync_list_to_batch_partner.php
 
-----
-
 ## Allow "View History" for any Admin Console users (revisited) ##
 The monitor's View History permission is lowered from System Admin user to any Admin Console user.
 
@@ -97,6 +118,7 @@ Run the following SQL script in order to make them unique:
 
 - deployment/updates/sql/2014_03_19_fix_admin_console_permission_names.sql
 
+----
 
 # IX-9.12.0 #
 
