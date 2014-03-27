@@ -229,7 +229,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		 */
 		if(!(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
 		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false)) {
-			return false;
+			return null;
 		}
 		
 		$ffmpegBin = KBatchBase::$taskConfig->params->FFMpegCmd;
