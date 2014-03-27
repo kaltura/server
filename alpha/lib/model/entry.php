@@ -1692,6 +1692,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
+
+	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
+	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions" );	}
 	
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
