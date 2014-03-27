@@ -236,8 +236,25 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initSession()
 	{
+		$this->bootstrap('config');
+
+		$settings = $this->getConfig()->settings;
 		$resources = $this->getConfig()->resources;
-		Zend_Session::setOptions(array('cookie_path' => dirname($resources->frontController->baseurl)));
+		$sessionOptions = $settings->sessionOptions;
+
+		$sessionOptionsArray = $sessionOptions->toArray();
+		$sessionOptionsArray['cookie_path'] = dirname($resources->frontController->baseurl);
+
+		if ( $settings->secure_cookie_upon_https )
+		{
+			$isHttps = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
+			if ( $isHttps )
+			{
+				$sessionOptionsArray['cookie_secure'] = true;
+			}
+		}
+
+		Zend_Session::setOptions( $sessionOptionsArray );
 	}
 	
 	protected function _initAcl()
