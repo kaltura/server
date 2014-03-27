@@ -36,3 +36,7 @@ $application = new Zend_Application(
 );
 $application->bootstrap()
             ->run();
+
+// Prevent opening from within an iFrame (for browsers that respect this header)
+// (*) main.js contains a JavaScript counterpart for browsers that don't respect this header.
+header("X-Frame-Options: DENY");
