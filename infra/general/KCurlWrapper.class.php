@@ -89,6 +89,10 @@ class KCurlWrapper
 	const HTTP_PROTOCOL_HTTP = 1;
 	const HTTP_PROTOCOL_FTP = 2;
 	const COULD_NOT_CONNECT_TO_HOST_ERROR = "couldn't connect to host";
+	
+	//curl idle const configuration
+	const LOW_SPEED_BYTE_LIMIT = 1; //1 byte per sec
+	const LOW_SPEED_TIME_LIMIT = 595; //595 sec + 5 sec until it is detected total is 600 sec = 10 min
 
 	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
 
@@ -145,6 +149,19 @@ class KCurlWrapper
 		// set appropriate options - these can be overriden with the setOpt function if desired
 		curl_setopt($this->ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
 		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+		
+		//Add curl idle check options in this chase we check if for the past 10 min the avg transfer rate is over 1 byte per sec
+		//These configurations can be overriden with the setOpt function if desired
+		$curlLowSpeedByteLimit = self::LOW_SPEED_BYTE_LIMIT;
+		if($params && isset($params->curlLowSpeedByteLimit) && $params->curlLowSpeedByteLimit)
+			$curlLowSpeedByteLimit = $params->curlLowSpeedByteLimit;
+		
+		$curlLowSpeedTimeLimit = self::LOW_SPEED_TIME_LIMIT;
+		if($params && isset($params->curlLowSpeedTimeLimit) && $params->curlLowSpeedTimeLimit)
+			$curlLowSpeedTimeLimit = $params->curlLowSpeedTimeLimit;
+			
+		curl_setopt($this->ch, CURLOPT_LOW_SPEED_LIMIT, $curlLowSpeedByteLimit);
+		curl_setopt($this->ch, CURLOPT_LOW_SPEED_TIME, $curlLowSpeedTimeLimit);
 
 		curl_setopt($this->ch, CURLOPT_NOSIGNAL, true);
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
