@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-03-18
+/*! KMC - v6.0.10 - 2014-03-27
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4146,7 +4146,6 @@ kmc.utils = {
 				};
                 $("#kcms")[0].gotoPage(go_to);
                 kmc.utils.verifyUploadVisible(go_to.moduleName);
-                window.closeLangMenu();
                 return false;
 			});
 		} else {
