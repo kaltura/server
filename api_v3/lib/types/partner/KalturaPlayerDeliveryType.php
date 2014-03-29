@@ -24,11 +24,17 @@ class KalturaPlayerDeliveryType extends KalturaObject
 	 * @var string
 	 */
 	public $minVersion;
+
+	/**
+	 * @var bool
+	 */
+	public $enabledByDefault = false;
 	
 	private static $map_between_objects = array(
 		'label', 
 		'flashvars',
 		'minVersion',
+		'enabledByDefault'
 	);
 	
 	/* (non-PHPdoc)
