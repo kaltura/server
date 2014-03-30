@@ -19,6 +19,10 @@ class KalturaPlayerDeliveryTypesArray extends KalturaTypedArray
 			$obj->id = $id;
 			$obj->fromArray($item);
 			$obj->enabledByDefault = (bool)$obj->enabledByDefault;
+				
+			if(isset($item['flashvars']))
+				$obj->flashvars = KalturaKeyValueArray::fromDbArray($item['flashvars']);
+				
 			$ret[] = $obj;
 		}
 		return $ret;
