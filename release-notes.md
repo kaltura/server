@@ -3,6 +3,24 @@
 ## Image magick ##
 * In case of GS failure that indicates a corrupted file, update the flavor accordingly. 
 
+## Admin Console security tightening ##
+
+*Configuartion Changes*
+Update admin.ini:
+
+- Remove the line (will be readded in the next item)
+
+        settings.cookieNameSpace = Zend_Auth_AdminConsole"
+
+- Add the following block right under the "settings.enableKCWVisualEditor" line:
+
+        ; cookie options
+        settings.cookieNameSpace = Zend_Auth_AdminConsole
+        settings.secure_cookie_upon_https = true
+        settings.sessionOptions.cookie_httponly = true
+
+---
+
 # IX-9.13.0 #
 
 ## Live sync points ##
