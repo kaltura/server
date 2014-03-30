@@ -275,6 +275,12 @@ abstract class LiveEntry extends entry
 				$slStreamUrl .= "?dvr";
 			}
 			
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->getPartnerId()))
+			{
+				$entryId = $this->getId();
+				$hlsStreamUrl = infraRequestUtils::getProtocol() . '://' . kConf::get('play_server_host') . "/manifest/master/entryId/$entryId/name/$entryId.m3u8?url=$hlsStreamUrl";
+			}
+			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::RTMP);
 			$configuration->setUrl($rtmpStreamUrl);

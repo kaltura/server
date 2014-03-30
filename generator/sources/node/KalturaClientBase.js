@@ -26,86 +26,124 @@
 //
 // @ignore
 // ===================================================================================================
-
-var crypto = require("crypto");
-var http = require("http");
+var crypto = require('crypto');
+var http = require('http');
 
 /**
- * Generates a URL-encoded query string from the associative (or indexed) array provided.
- * Ported from PHP. 
- * @param formdata			May be an array or object containing properties. 
- * @param numeric_prefix	If numeric indices are used in the base array and this parameter is provided, it will be prepended to the numeric index for elements in the base array only. 
- * @param arg_separator		arg_separator.output	is used to separate arguments, unless this parameter is specified, and is then used. 
- * @return	Returns a URL-encoded string. 
+ * Generates a URL-encoded query string from the associative (or indexed) array
+ * provided. Ported from PHP.
+ * 
+ * @param formdata
+ *            May be an array or object containing properties.
+ * @param numeric_prefix
+ *            If numeric indices are used in the base array and this parameter
+ *            is provided, it will be prepended to the numeric index for
+ *            elements in the base array only.
+ * @param arg_separator
+ *            arg_separator.output is used to separate arguments, unless this
+ *            parameter is specified, and is then used.
+ * @return Returns a URL-encoded string.
  */
 
-
-function http_build_query (formdata, numeric_prefix, arg_separator) {
-		var value, tmp = [];
-		var _http_build_query_helper = function (key, val, arg_separator) {
-				var tmp = [];
+function http_build_query(formdata, numeric_prefix, arg_separator) {
+	var value, tmp = [];
+	var _http_build_query_helper = function(key, val, arg_separator) {
+		var tmp = [];
 		if (val === true) {
-						val = "1";
-				} else if (val === false) {
-						val = "0";
+			val = '1';
+		} else if (val === false) {
+			val = '0';
+		}
+		if (val !== null && typeof (val) === 'object') {
+			for ( var k in val) {
+				if (val[k] !== null) {
+					tmp.push(_http_build_query_helper(key + '[' + k + ']', val[k], arg_separator));
 				}
-		if (val !== null && typeof(val) === "object") {
-						for (var k in val) {
-								if (val[k] !== null) {
-										tmp.push(_http_build_query_helper(key + "[" + k + "]", val[k], arg_separator));
-								}
 			}
-						return tmp.join(arg_separator);
-				} else if (typeof(val) !== "function") {
-						return key + "=" + encodeURIComponent(val);
-				} else { 
-				//throw new Error('There was an error processing for http_build_query().');
-						return "";
-				}
-		};
- 
-		if (!arg_separator) {
-		arg_separator = "&";
+			return tmp.join(arg_separator);
+		} else if (typeof (val) !== 'function') {
+			return key + '=' + encodeURIComponent(val);
+		} else {
+			// throw new Error('There was an error processing for
+			// http_build_query().');
+			return '';
 		}
-		for (var key in formdata) {
-				value = formdata[key];
-				if (numeric_prefix && !isNaN(key)) {
+	};
+
+	if (!arg_separator) {
+		arg_separator = '&';
+	}
+	for ( var key in formdata) {
+		value = formdata[key];
+		if (numeric_prefix && !isNaN(key)) {
 			key = String(numeric_prefix) + key;
-				}
-				tmp.push(_http_build_query_helper(key, value, arg_separator));
 		}
-		return tmp.join(arg_separator);
+		tmp.push(_http_build_query_helper(key, value, arg_separator));
+	}
+	return tmp.join(arg_separator);
 }
 
 /**
- * Getting the name of the constructor if the constructor hasn't been modified, 
- * which if it has modified (and is therfor invalid to use), it falls back to using Object.prototype.toString 
- * to get the class though it won't return the name of the constructor function that created it then. 
- * If you absolutely need the constructor's name, pass true as the second argument, 
- * and it will reset the constructor if it has been modified, to get the real constructor.
- * @param obj	The object to get the constructor of.
- * @param forceConstructor	preform a deep lookup for the real constructor.
- * @return	The constructor of the given class.
+ * Getting the name of the constructor if the constructor hasn't been modified,
+ * which if it has modified (and is therfor invalid to use), it falls back to
+ * using Object.prototype.toString to get the class though it won't return the
+ * name of the constructor function that created it then. If you absolutely need
+ * the constructor's name, pass true as the second argument, and it will reset
+ * the constructor if it has been modified, to get the real constructor.
+ * 
+ * @param obj
+ *            The object to get the constructor of.
+ * @param forceConstructor
+ *            preform a deep lookup for the real constructor.
+ * @return The constructor of the given class.
  */
 function getClass(obj, forceConstructor) {
-	if ( typeof obj == "undefined" ) { return "undefined"; }
-	if ( obj === null ) { return "null"; }
-	if ( forceConstructor === true && obj.hasOwnProperty("constructor") ) { delete obj.constructor; } // reset constructor
-	if ( forceConstructor !== false && !obj.hasOwnProperty("constructor") ) { return obj.constructor.name; }
-	return Object.prototype.toString.call(obj)
-		.match(/^\[object\s(.*)\]$/)[1];
+	if (typeof obj === 'undefined') {
+		return 'undefined';
+	}
+	if (obj === null) {
+		return 'null';
+	}
+	if (forceConstructor === true && obj.hasOwnProperty('constructor')) {
+		delete obj.constructor;
+	} // reset constructor
+	if (forceConstructor !== false && !obj.hasOwnProperty('constructor')) {
+		return obj.constructor.name;
+	}
+	return Object.prototype.toString.call(obj).match(/^\[object\s(.*)\]$/)[1];
 }
 
 /**
- * validate a paramter's value is not null, if not null, add the parameter to the collection.
- * @param	params		the collection of parameters to send in a service action request.
- * @param	paramName	the new parameter name to add.
- * @param	paramValue	the new parameter value to add.
+ * Serializes new object's parameters.
+ * 
+ * @param obj
+ *            The object who's members to serialize.
+ * @return a serialized object.
  */
-function addIfNotNull(obj, params, paramName, paramValue)
-{
+var toParams = module.exports.toParams = function(obj) {
+	var params = {};
+	params.objectType = getClass(obj);
+	for ( var prop in obj) {
+		var val = obj[prop];
+		addIfNotNull(obj, params, prop, val);
+	}
+	return params;
+};
+
+/**
+ * validate a paramter's value is not null, if not null, add the parameter to
+ * the collection.
+ * 
+ * @param params
+ *            the collection of parameters to send in a service action request.
+ * @param paramName
+ *            the new parameter name to add.
+ * @param paramValue
+ *            the new parameter value to add.
+ */
+function addIfNotNull(obj, params, paramName, paramValue) {
 	if (paramValue !== null) {
-		if(paramValue instanceof KalturaObjectBase) {
+		if (typeof paramValue === 'object') {
 			params[paramName] = toParams(paramValue);
 		} else {
 			params[paramName] = paramValue;
@@ -114,54 +152,46 @@ function addIfNotNull(obj, params, paramName, paramValue)
 }
 
 /**
- * Serializes new object's parameters.
- * @param obj	The object who's members to serialize.
- * @return		a serialized object.
- */
-module.exports.toParams = toParams = function(obj)
-{
-	var params = {};
-	params["objectType"] = getClass(obj);
-		for(var prop in obj) {
-			var val = obj[prop];
-			addIfNotNull(obj, params, prop, val);
-	}
-	return params;
-};
-
-/**
- * Sorts an array by key, maintaining key to data correlations. This is useful mainly for associative arrays. 
- * @param arr The array to sort.
- * @return		The sorted array.
+ * Sorts an array by key, maintaining key to data correlations. This is useful
+ * mainly for associative arrays.
+ * 
+ * @param arr
+ *            The array to sort.
+ * @return The sorted array.
  */
 function ksort(arr) {
 	var sArr = [];
 	var tArr = [];
 	var n = 0;
-	for (var i in arr) {
-		tArr[n++] = i+"|"+arr[i];
+	for ( var i in arr) {
+		tArr[n++] = i + '|' + arr[i];
 	}
 	tArr = tArr.sort();
-	for (var j=0; j<tArr.length; j++) {
-		var x = tArr[j].split("|");
+	for (var j = 0; j < tArr.length; j++) {
+		var x = tArr[j].split('|');
 		sArr[x[0]] = x[1];
 	}
 	return sArr;
 }
 
 /**
- * Construct new Kaltura service action call, if params array contain sub-arrays (for objects), it will be flattened.
- * @param string	service		The Kaltura service to use.
- * @param string	action			The service action to execute.
- * @param array		params			The parameters to pass to the service action.
- * @param array	 files		 Files to upload or manipulate.
+ * Construct new Kaltura service action call, if params array contain sub-arrays
+ * (for objects), it will be flattened.
+ * 
+ * @param string
+ *            service The Kaltura service to use.
+ * @param string
+ *            action The service action to execute.
+ * @param array
+ *            params The parameters to pass to the service action.
+ * @param array
+ *            files Files to upload or manipulate.
  */
-function KalturaServiceActionCall(service, action, params, files)
-{
-	if(!params) {
+function KalturaServiceActionCall(service, action, params, files) {
+	if (!params) {
 		params = {};
 	}
-	if(!files) {
+	if (!files) {
 		files = {};
 	}
 
@@ -173,15 +203,16 @@ function KalturaServiceActionCall(service, action, params, files)
 
 /**
  * Parse params array and sub arrays (clone objects)
- * @param array params	the object to clone.
+ * 
+ * @param array
+ *            params the object to clone.
  * @return the newly cloned object from the input object.
  */
-KalturaServiceActionCall.prototype.parseParams = function(params)
-{
+KalturaServiceActionCall.prototype.parseParams = function(params) {
 	var newParams = {};
-	for(var key in params) {
+	for ( var key in params) {
 		var val = params[key];
-		if (typeof(val) == "object") {
+		if (typeof (val) === 'object') {
 			newParams[key] = this.parseParams(val);
 		} else {
 			newParams[key] = val;
@@ -192,30 +223,32 @@ KalturaServiceActionCall.prototype.parseParams = function(params)
 
 /**
  * Create params object for a multirequest call.
- * @param int multiRequestIndex		the index of the call inside the multirequest.
+ * 
+ * @param int
+ *            multiRequestIndex the index of the call inside the multirequest.
  */
-KalturaServiceActionCall.prototype.getParamsForMultiRequest = function(multiRequestIndex)
-{
+KalturaServiceActionCall.prototype.getParamsForMultiRequest = function(multiRequestIndex) {
 	var multiRequestParams = {};
-	multiRequestParams[multiRequestIndex + ":service"] = this.service;
-	multiRequestParams[multiRequestIndex + ":action"] = this.action;
-	for(var key in this.params) {
+	multiRequestParams[multiRequestIndex + ':service'] = this.service;
+	multiRequestParams[multiRequestIndex + ':action'] = this.action;
+	for ( var key in this.params) {
 		var val = this.params[key];
-		multiRequestParams[multiRequestIndex + ":" + key] = val;
+		multiRequestParams[multiRequestIndex + ':' + key] = val;
 	}
 	return multiRequestParams;
 };
 
 /**
  * Create files object for a multirequest call.
- * @param int multiRequestIndex		the index of the call inside the multirequest.
+ * 
+ * @param int
+ *            multiRequestIndex the index of the call inside the multirequest.
  */
-KalturaServiceActionCall.prototype.getFilesForMultiRequest = function(multiRequestIndex)
-{
+KalturaServiceActionCall.prototype.getFilesForMultiRequest = function(multiRequestIndex) {
 	var multiRequestFiles = {};
-	for(var key in this.files) {
+	for ( var key in this.files) {
 		var val = this.files[key];
-		multiRequestFiles[multiRequestIndex + ":" + key] = val;
+		multiRequestFiles[multiRequestIndex + ':' + key] = val;
 	}
 	return multiRequestFiles;
 };
@@ -224,9 +257,10 @@ KalturaServiceActionCall.prototype.getFilesForMultiRequest = function(multiReque
  * Implement to get Kaltura Client logs
  * 
  */
-var IKalturaLogger = module.exports.IKalturaLogger = function() {};
-IKalturaLogger.prototype.log = function(msg){
-	if (console && console.log){
+var IKalturaLogger = module.exports.IKalturaLogger = function() {
+};
+IKalturaLogger.prototype.log = function(msg) {
+	if (console && console.log) {
 		console.log(msg);
 	}
 };
@@ -235,14 +269,16 @@ IKalturaLogger.prototype.log = function(msg){
  * Kaltura client constructor
  * 
  */
-var KalturaClientBase = module.exports.KalturaClientBase = function() {};
+var KalturaClientBase = module.exports.KalturaClientBase = function() {
+};
 
 /**
  * Kaltura client init
- * @param KalturaConfiguration config
+ * 
+ * @param KalturaConfiguration
+ *            config
  */
-KalturaClientBase.prototype.init = function(config)
-{
+KalturaClientBase.prototype.init = function(config) {
 	this.config = config;
 
 	this.apiVersion = null;
@@ -265,13 +301,14 @@ KalturaClientBase.KALTURA_SERVICE_FORMAT_JSONP = 9;
 
 /**
  * Set logger to get kaltura client debug logs.
- * @param IKalturaLogger log
+ * 
+ * @param IKalturaLogger
+ *            log
  */
-KalturaClientBase.prototype.setLogger = function(logger)
-{
+KalturaClientBase.prototype.setLogger = function(logger) {
 	this.logger = logger;
 	this.logEnabled = true;
-	if(typeof logger.debug === 'function'){
+	if (typeof logger.debug === 'function') {
 		this.debugEnabled = true;
 	}
 };
@@ -279,13 +316,13 @@ KalturaClientBase.prototype.setLogger = function(logger)
 /**
  * prepare a call for service action (queue the call and wait for doQueue).
  */
-KalturaClientBase.prototype.queueServiceActionCall = function (service, action, params, files)
-{
-	// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
-	if (!params.hasOwnProperty("partnerId") || params["partnerId"] == -1) {
-		params["partnerId"] = this.config.partnerId;
+KalturaClientBase.prototype.queueServiceActionCall = function(service, action, params, files) {
+	// in start session partner id is optional (default -1). if partner id was
+	// not set, use the one in the config
+	if (!params.hasOwnProperty('partnerId') || params.partnerId === -1) {
+		params.partnerId = this.config.partnerId;
 	}
-	this.addParam(params, "ks", this.ks);
+	this.addParam(params, 'ks', this.ks);
 	var call = new KalturaServiceActionCall(service, action, params, files);
 	this.callsQueue.push(call);
 };
@@ -293,133 +330,137 @@ KalturaClientBase.prototype.queueServiceActionCall = function (service, action, 
 /**
  * executes the actions queue.
  */
-KalturaClientBase.prototype.doQueue = function(callback)
-{
+KalturaClientBase.prototype.doQueue = function(callback) {
 	if (this.callsQueue.length === 0) {
 		return null;
 	}
 	var params = {};
 	var files = {};
-	this.log("Service url: [" + this.config.serviceUrl + "]");
+	this.log('Service url: [' + this.config.serviceUrl + ']');
 	// append the basic params
-	this.addParam(params, "apiVersion", this.apiVersion);
-	this.addParam(params, "format", this.config.format);
-	this.addParam(params, "clientTag", this.config.clientTag);
+	this.addParam(params, 'apiVersion', this.apiVersion);
+	this.addParam(params, 'format', this.config.format);
+	this.addParam(params, 'clientTag', this.config.clientTag);
 	var url = this.config.serviceUrl + this.config.serviceBase;
 	var call = null;
-	if (this.useMultiRequest){
-		url += "multirequest";
-		$i = 1;
-		for(var v in this.callsQueue){
+	if (this.useMultiRequest) {
+		url += 'multirequest';
+		var $i = 1;
+		for ( var v in this.callsQueue) {
 			call = this.callsQueue[v];
 			var callParams = call.getParamsForMultiRequest($i);
-			for(var sv1 in callParams) {
+			for ( var sv1 in callParams) {
 				params[sv1] = callParams[sv1];
 			}
 			var callFiles = call.getFilesForMultiRequest($i);
-			for(var sv2 in callFiles) {
+			for ( var sv2 in callFiles) {
 				files[sv2] = call.files[sv2];
 			}
 			$i++;
 		}
 	} else {
 		call = this.callsQueue[0];
-		url += call.service + "&action=" + call.action;
-		for(var sv3 in call.params) {
+		url += call.service + '&action=' + call.action;
+		for ( var sv3 in call.params) {
 			params[sv3] = call.params[sv3];
 		}
-		for(var sv4 in call.files) {
+		for ( var sv4 in call.files) {
 			files[sv4] = call.files[sv4];
 		}
 	}
 	// reset
 	this.callsQueue = [];
-	this.useMultiRequest = false; 
+	this.useMultiRequest = false;
 	var signature = this.signature(params);
-	this.addParam(params, "kalsig", signature);
+	this.addParam(params, 'kalsig', signature);
 	this.doHttpRequest(callback, url, params, files);
 	return true;
 };
 
 /**
  * Sign array of parameters for requests validation (CRC).
- * @param array params		service action call parameters that will be sent on the request.
- * @return string			a hashed signed signature that can identify the sent request parameters.
+ * 
+ * @param array
+ *            params service action call parameters that will be sent on the
+ *            request.
+ * @return string a hashed signed signature that can identify the sent request
+ *         parameters.
  */
-KalturaClientBase.prototype.signature = function(params)
-{
+KalturaClientBase.prototype.signature = function(params) {
 	params = ksort(params);
-	var str = "";
-	for(var v in params) {
+	var str = '';
+	for ( var v in params) {
 		var k = params[v];
 		str += k + v;
 	}
-	var md5sum = crypto.createHash("md5");
+	var md5sum = crypto.createHash('md5');
 	md5sum.update(str);
-	return md5sum.digest("hex");
+	return md5sum.digest('hex');
 };
 
 KalturaClientBase.requestIndex = 1;
 /**
  * send the http request.
- * @param string url						the url to call.
- * @param parameters params					the parameters to pass.
- * @return array							 the results and errors inside an array.
+ * 
+ * @param string
+ *            url the url to call.
+ * @param parameters
+ *            params the parameters to pass.
+ * @return array the results and errors inside an array.
  */
-KalturaClientBase.prototype.doHttpRequest = function (callCompletedCallback, url, params, files)
-{
+KalturaClientBase.prototype.doHttpRequest = function(callCompletedCallback, url, params, files) {
 	var This = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
-	url += "&" + http_build_query(params);
-	this.log("Request [" + requestIndex + "]: " + url);
-	http.get(url, function(response){
-			var data = "";
-			response.on("data", function(chunk) {
-				data += chunk;
-			});
-			response.on("end", function() {
-				var headers = [];
-				for(var header in response.headers){
-					headers.push(header + ": " + response.headers[header]);
-				}
-				This.debug("Headers [" + requestIndex + "]: \n\t" + headers.join("\n\t"));
-				This.debug("Response [" + requestIndex + "]: " + data);
-				callCompletedCallback(JSON.parse(data));
-			});
+	url += '&' + http_build_query(params);
+	this.log('Request [' + requestIndex + ']: ' + url);
+	http.get(url, function(response) {
+		var data = '';
+		response.on('data', function(chunk) {
+			data += chunk;
+		});
+		response.on('end', function() {
+			var headers = [];
+			for ( var header in response.headers) {
+				headers.push(header + ': ' + response.headers[header]);
+			}
+			This.debug('Headers [' + requestIndex + ']: \n\t' + headers.join('\n\t'));
+			This.debug('Response [' + requestIndex + ']: ' + data);
+			callCompletedCallback(JSON.parse(data));
+		});
 	});
 };
 
 /**
  * getter for the Kaltura session.
- * @return string	KS
+ * 
+ * @return string KS
  */
-KalturaClientBase.prototype.getKs = function()
-{
+KalturaClientBase.prototype.getKs = function() {
 	return this.ks;
 };
 
 /**
- * @param string ks	setter for the Kaltura session.
+ * @param string
+ *            ks setter for the Kaltura session.
  */
-KalturaClientBase.prototype.setKs = function(ks)
-{
+KalturaClientBase.prototype.setKs = function(ks) {
 	this.ks = ks;
 };
 
 /**
- * getter for the referenced configuration object. 
+ * getter for the referenced configuration object.
+ * 
  * @return KalturaConfiguration
  */
-KalturaClientBase.prototype.getConfig = function()
-{
+KalturaClientBase.prototype.getConfig = function() {
 	return this.config;
 };
 
 /**
- * @param KalturaConfiguration config	setter for the referenced configuration object.
+ * @param KalturaConfiguration
+ *            config setter for the referenced configuration object.
  */
-KalturaClientBase.prototype.setConfig = function(config)
-{
+KalturaClientBase.prototype.setConfig = function(config) {
 	this.config = config;
 
 	var logger = config.getLogger();
@@ -430,18 +471,21 @@ KalturaClientBase.prototype.setConfig = function(config)
 
 /**
  * Add parameter to array of parameters that is passed by reference
- * @param array params			array of parameters to pass to a call.
- * @param string paramName		the name of the new parameter to add.
- * @param string paramValue		the value of the new parameter to add.
+ * 
+ * @param array
+ *            params array of parameters to pass to a call.
+ * @param string
+ *            paramName the name of the new parameter to add.
+ * @param string
+ *            paramValue the value of the new parameter to add.
  */
-KalturaClientBase.prototype.addParam = function(params, paramName, paramValue)
-{
+KalturaClientBase.prototype.addParam = function(params, paramName, paramValue) {
 	if (paramValue === null) {
 		return;
 	}
-	
+
 	// native
-	if(typeof(paramValue) != "object") {
+	if (typeof (paramValue) !== 'object') {
 		params[paramName] = paramValue;
 		return;
 	}
@@ -449,65 +493,61 @@ KalturaClientBase.prototype.addParam = function(params, paramName, paramValue)
 	var subParamValue, subParamName = null;
 
 	// object
-	if(isNaN(paramValue.length)){
-		for(subParamName in paramValue) {
+	if (isNaN(paramValue.length)) {
+		for (subParamName in paramValue) {
 			subParamValue = paramValue[subParamName];
-			this.addParam(params, paramName + ":" + subParamName, subParamValue);
+			this.addParam(params, paramName + ':' + subParamName, subParamValue);
 		}
 		return;
 	}
-	
+
 	// array
-	if(paramValue.length){
-		for(subParamName in paramValue) {
+	if (paramValue.length) {
+		for (subParamName in paramValue) {
 			subParamValue = paramValue[subParamName];
-			this.addParam(params, paramName + ":" + subParamName, subParamValue);
+			this.addParam(params, paramName + ':' + subParamName, subParamValue);
 		}
-	}
-	else{
-		this.addParam(params, paramName + ":-", "");
+	} else {
+		this.addParam(params, paramName + ':-', '');
 	}
 };
 
 /**
  * set to true to indicate a multirequest is being defined.
  */
-KalturaClientBase.prototype.startMultiRequest = function()
-{
+KalturaClientBase.prototype.startMultiRequest = function() {
 	this.useMultiRequest = true;
 };
 
 /**
  * execute a multirequest.
  */
-KalturaClientBase.prototype.doMultiRequest = function(callback)
-{
+KalturaClientBase.prototype.doMultiRequest = function(callback) {
 	return this.doQueue(callback);
 };
 
 /**
  * indicate if current mode is constructing a multirequest or single requests.
  */
-KalturaClientBase.prototype.isMultiRequest = function()
-{
-	return this.useMultiRequest;	
+KalturaClientBase.prototype.isMultiRequest = function() {
+	return this.useMultiRequest;
 };
 
 /**
- * @param string msg	client logging utility. 
+ * @param string
+ *            msg client logging utility.
  */
-KalturaClientBase.prototype.log = function(msg)
-{
+KalturaClientBase.prototype.log = function(msg) {
 	if (this.logEnabled) {
 		this.logger.log(msg);
 	}
 };
 
 /**
- * @param string msg	client logging utility. 
+ * @param string
+ *            msg client logging utility.
  */
-KalturaClientBase.prototype.debug = function(msg)
-{
+KalturaClientBase.prototype.debug = function(msg) {
 	if (this.debugEnabled) {
 		this.logger.debug(msg);
 	}
@@ -516,17 +556,20 @@ KalturaClientBase.prototype.debug = function(msg)
 /**
  * Abstract base class for all client objects
  */
-var KalturaObjectBase = module.exports.KalturaObjectBase = function() {};
+var KalturaObjectBase = module.exports.KalturaObjectBase = function() {
+};
 
 /**
- * Abstract base class for all client services
- * Initialize the service keeping reference to the KalturaClient
- * @param KalturaClientm client
+ * Abstract base class for all client services Initialize the service keeping
+ * reference to the KalturaClient
+ * 
+ * @param KalturaClientm
+ *            client
  */
-var KalturaServiceBase = module.exports.KalturaServiceBase = function () {};
+var KalturaServiceBase = module.exports.KalturaServiceBase = function() {
+};
 
-KalturaServiceBase.prototype.init = function(client)
-{
+KalturaServiceBase.prototype.init = function(client) {
 	this.client = client;
 };
 /**
@@ -536,39 +579,41 @@ KalturaServiceBase.prototype.client = null;
 
 /**
  * Constructs new Kaltura configuration object
- * @param partnerId		a valid Kaltura partner id.
+ * 
+ * @param partnerId
+ *            a valid Kaltura partner id.
  */
-var KalturaConfiguration = module.exports.KalturaConfiguration = function (partnerId)
-{
-	if(!partnerId) {
+var KalturaConfiguration = module.exports.KalturaConfiguration = function(partnerId) {
+	if (!partnerId) {
 		partnerId = -1;
 	}
-	if (typeof(partnerId) != "number") {
-		throw "Invalid partner id - partnerId must be numeric!";
+	if (typeof (partnerId) !== 'number') {
+		throw 'Invalid partner id - partnerId must be numeric!';
 	}
 	this.partnerId = partnerId;
 
-	this.serviceUrl = "http://www.kaltura.com";
-	this.serviceBase = "/api_v3/index.php?service=";
+	this.serviceUrl = 'http://www.kaltura.com';
+	this.serviceBase = '/api_v3/index.php?service=';
 	this.format = KalturaClientBase.KALTURA_SERVICE_FORMAT_JSON;
-	this.clientTag = "node";
+	this.clientTag = 'node';
 	this.logger = null;
 };
 
 /**
  * Set logger to get kaltura client debug logs.
- * @param IKalturaLogger log
+ * 
+ * @param IKalturaLogger
+ *            log
  */
-KalturaConfiguration.prototype.setLogger = function(logger)
-{
+KalturaConfiguration.prototype.setLogger = function(logger) {
 	this.logger = logger;
 };
 
 /**
  * Gets the logger (Internal client use)
+ * 
  * @return IKalturaLogger
  */
-KalturaConfiguration.prototype.getLogger = function()
-{
+KalturaConfiguration.prototype.getLogger = function() {
 	return this.logger;
 };
