@@ -122,7 +122,12 @@ function getClass(obj, forceConstructor) {
  */
 var toParams = module.exports.toParams = function(obj) {
 	var params = {};
-	params.objectType = getClass(obj);
+	
+	// not an array
+	if (typeof obj.length === 'undefined') {
+		params.objectType = getClass(obj);
+	}
+	
 	for ( var prop in obj) {
 		var val = obj[prop];
 		addIfNotNull(obj, params, prop, val);
