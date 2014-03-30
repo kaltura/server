@@ -1,5 +1,5 @@
 Some (ok, most...) Tests require you to connect to a working Kaltura Server.
-To specify credentials, see "secret_config_example.py"
+To specify credentials, see "secret_config.py"
 
 Take the time to make sure your .gitignore file is correct, 
  so you don't commit your 'secret' credentials.
@@ -26,7 +26,7 @@ To see an example of a very simple test case, look at test_media MediaTests.test
  This test will simply exercise the 'list' method off of media, and make sure that the client receives a 'MediaListResponse' object, and validates that every object in the returned list is an instance of a KalturaMediaEntry
  
 Many tests will create Objects on the server for testing purposes.
- For example, the tests in test_playlist will create playlists and media entries on the remote server, then exercise these playlists and check for the existance (or lack thereof) of media entries in the playlists
+ For example, the tests in test_playlist will create playlists and media entries on the remote server, then exercise these playlists and check for the existence (or lack thereof) of media entries in the playlists
  When creating objects on the remote server, you will typically see a call to 'addCleanup':
  
     self.addCleanup(<function or method>, parameters)
@@ -43,7 +43,3 @@ Many tests will create Objects on the server for testing purposes.
  
  Without it, your test case will leave test (garbage) on the server - That's just not very polite.
  
-
-
-More info here:
-

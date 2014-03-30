@@ -21,7 +21,7 @@ class UiConfTests(KalturaBaseTest):
     def test_get_players(self):
         filt = KalturaUiConfFilter()
         
-        players = [KalturaUiConfObjType.HTML5_PLAYER, 
+        players = [
                    KalturaUiConfObjType.PLAYER_V3,
                    KalturaUiConfObjType.PLAYER,
                    KalturaUiConfObjType.PLAYER_SL,
@@ -38,7 +38,7 @@ class UiConfTests(KalturaBaseTest):
         """Until I find a better way... this gets all uiconfs that are 'playlist players'
            not sure if this is the right way"""
         filt = KalturaUiConfFilter()
-        players = [KalturaUiConfObjType.HTML5_PLAYER, 
+        players = [
                    KalturaUiConfObjType.PLAYER_V3,
                    KalturaUiConfObjType.PLAYER,
                    KalturaUiConfObjType.PLAYER_SL,
