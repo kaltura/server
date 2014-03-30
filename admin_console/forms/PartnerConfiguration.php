@@ -312,7 +312,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('select', 'vertical_clasiffication', array(
-			'label'			=> 'Vertical Clasiffication:',
+			'label'			=> 'Vertical Classification:',
 			'filters'		=> array('StringTrim'),
 		));
 		
