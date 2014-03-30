@@ -12,3 +12,6 @@ function autoSizeIframe(){
 	$('iframe.auto-height').height(height);
 	$('#wrapper').height(height); // fixes weird scrolling
 }
+
+// Prevent the page from being contained inside a frame
+if ( top != window ) { top.location = window.location; }

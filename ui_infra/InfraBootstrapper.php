@@ -227,6 +227,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$front = Zend_Controller_Front::getInstance();
 		
 		$front->registerPlugin(new Infra_AuthPlugin());
+		$front->registerPlugin(new Infra_PreventFramesPlugin());
 		
 		$acl = Zend_Registry::get('acl');
 		$config = $this->getConfig();
@@ -235,8 +236,27 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initSession()
 	{
+		$this->bootstrap('config');
+
+		$settings = $this->getConfig()->settings;
 		$resources = $this->getConfig()->resources;
-		Zend_Session::setOptions(array('cookie_path' => dirname($resources->frontController->baseurl)));
+		$sessionOptions = $settings->sessionOptions;
+
+		$sessionOptionsArray = $sessionOptions->toArray();
+		$sessionOptionsArray['cookie_path'] = dirname($resources->frontController->baseurl);
+
+		// Force 'cookie_secure = true' if the request arrived via HTTPS
+		if ( $settings->secure_cookie_upon_https )
+		{
+			$isHttps = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
+			if ( $isHttps )
+			{
+				$sessionOptionsArray['cookie_secure'] = true;
+			}
+		}
+
+		// Set cookie options
+		Zend_Session::setOptions( $sessionOptionsArray );
 	}
 	
 	protected function _initAcl()
