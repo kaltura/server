@@ -126,11 +126,7 @@ class kJobsSuspender {
 		$c->setLimit($limit);
 	
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
-		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
-		$jobIds = array();
-		foreach ($rows as $row)
-			$jobIds[] = $row['ID'];
+		$jobIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	
 		// Suspend chosen ids
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_SUSPEND, BatchJob::BATCHJOB_STATUS_PENDING, true);
@@ -162,11 +158,7 @@ class kJobsSuspender {
 		$c->setLimit($limit);
 	
 		$stmt = BatchJobLockSuspendPeer::doSelectStmt($c);
-		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
-		$jobIds = array();
-		foreach ($rows as $row)
-			$jobIds[] = $row['ID'];
+		$jobIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	
 		// Return the jobs from batch_job_lock_suspend table
 		self::moveFromSuspendedJobsTable($jobIds);
@@ -209,6 +201,9 @@ class kJobsSuspender {
 	}
 	
 	private static function suspendRootJobs($jobIds) {
+		if(empty($jobIds))
+			return array();
+		
 		// Retrieve root jobs ids 
 		$c = new Criteria();
 		$c->addSelectColumn(BatchJobLockPeer::ROOT_JOB_ID);
@@ -216,11 +211,7 @@ class kJobsSuspender {
 		$c->add(BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_SUSPEND);
 		$c->setDistinct();
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
-		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
-		$rootIds = array();
-		foreach ($rows as $row)
-			$rootIds[] = $row['ROOT_JOB_ID'];
+		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
 		// Update root jobs status to be almost done 
 		$suspenderUpdateChunk = self::getSuspenderUpdateChunk();
@@ -246,32 +237,31 @@ class kJobsSuspender {
 	
 	
 	private static function unsuspendRootJob($jobIds) {
+		if(empty($jobIds))
+			return array();
+		
 		// Get possible root job ids
 		// select root_job_id from batch_job_lock where id in (unsuspended jobs)
 		$c = new Criteria();
 		$c->addSelectColumn(BatchJobLockPeer::ROOT_JOB_ID);
-		$c->add(BatchJobLockPeer::ID, $jobIds, Criteria::IN);
 		$c->setDistinct();
+		$c->add(BatchJobLockPeer::ID, $jobIds, Criteria::IN);
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
-		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$rootIds = array();
-		foreach ($rows as $row)
-			$rootIds[] = $row['ROOT_JOB_ID'];
+		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
 		// Select only root ids that has no other suspended descendats
-		// 
 		$c = new Criteria();
-		$c->addSelectColumn(BatchJobLockPeer::ROOT_JOB_ID);
-		$c->add(BatchJobLockPeer::ROOT_JOB_ID, $rootIds, Criteria::IN);
-		$c->addGroupByColumn(BatchJobLockPeer::ROOT_JOB_ID);
-		$c->addHaving($c->getNewCriterion(BatchJobLockPeer::ROOT_JOB_ID, BatchJobLockPeer::COUNT . '!=0', Criteria::CUSTOM));
-		$rows= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$usedRootIds = array();
-		foreach ($rows as $row)
-			$usedRootIds[] = $row['ROOT_JOB_ID'];
+		$c->addSelectColumn(BatchJobLockSuspendPeer::ROOT_JOB_ID);
+		$c->add(BatchJobLockSuspendPeer::ROOT_JOB_ID, $rootIds, Criteria::IN);
+		$c->add(BatchJobLockSuspendPeer::ID, '(batch_job_lock_suspend.ID != batch_job_lock_suspend.ROOT_JOB_ID)', Criteria::CUSTOM);
+		$c->addGroupByColumn(BatchJobLockSuspendPeer::ROOT_JOB_ID);
+		$c->addHaving($c->getNewCriterion(BatchJobLockSuspendPeer::ROOT_JOB_ID, 'COUNT(batch_job_lock_suspend.ID)>0', Criteria::CUSTOM));
+		$stmt = BatchJobLockSuspendPeer::doSelectStmt($c);
+		$usedRootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		
 		$unsuspendedRootJobs = array_diff($rootIds, $usedRootIds);
 		self::moveFromSuspendedJobsTable($unsuspendedRootJobs);
+		return $unsuspendedRootJobs;
 	}
 	
 	/**
@@ -302,12 +292,9 @@ class kJobsSuspender {
 			
 			// Delete from batch_job_lock table
 			$deleteQuery = "DELETE FROM " . BatchJobLockPeer::TABLE_NAME .
-				" WHERE (" . 
-				"(" . BatchJobLockPeer::STATUS . " = " . BatchJob::BATCHJOB_STATUS_SUSPEND . ") OR ".
-				"(" . BatchJobLockPeer::STATUS . " = " . BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE . ") ". 
-				") AND " . BatchJobLockPeer::ID . " IN ( " .
-				implode(",", array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start))) .
-				")";
+				" WHERE " . 
+				BatchJobLockPeer::STATUS . " IN (" . BatchJob::BATCHJOB_STATUS_SUSPEND .  ", " . BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE . ") ". 
+				" AND " . BatchJobLockPeer::ID . " IN ( " . implode(",", array_slice($jobIds, $start, min($suspenderUpdateChunk, $end - $start))) . ")";
 				
 			$con->exec($deleteQuery);
 			$start += $suspenderUpdateChunk;
