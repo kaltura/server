@@ -245,6 +245,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		$sessionOptionsArray = $sessionOptions->toArray();
 		$sessionOptionsArray['cookie_path'] = dirname($resources->frontController->baseurl);
 
+		// Force 'cookie_secure = true' if the request arrived via HTTPS
 		if ( $settings->secure_cookie_upon_https )
 		{
 			$isHttps = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
@@ -254,6 +255,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 			}
 		}
 
+		// Set cookie options
 		Zend_Session::setOptions( $sessionOptionsArray );
 	}
 	
