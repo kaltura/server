@@ -19,6 +19,6 @@ class Infra_PreventFramesPlugin extends Zend_Controller_Plugin_Abstract
 		}
 		
 		// Prevent opening from within an iFrame (valid for browsers that respect this header)
-		$response->setHeader("X-Frame-Options", "DENY");
+		$response->setHeader("X-Frame-Options", "SAMEORIGIN");
 	}
 }
