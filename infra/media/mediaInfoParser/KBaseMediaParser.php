@@ -72,6 +72,175 @@ abstract class KBaseMediaParser
 	}
 	
 	/**
+	 * 
+	 * @param KalturaMediaInfo $mediaInfo
+	 * @return KalturaMediaInfo
+	 */
+	public static function removeUnsetFields(KalturaMediaInfo $mediaInfo)
+	{
+		foreach($mediaInfo as $key => $value) {
+           	if(!isset($value)){
+          		unset($mediaInfo->$key);
+           	}
+       	}
+		return $mediaInfo;
+	}
+	
+	/**
+	 * 
+	 * @param KalturaMediaInfo $mIn
+	 * @param KalturaMediaInfo $mOut
+	 * @return KalturaMediaInfo
+	 */
+	public static function copyFields(KalturaMediaInfo $mIn, KalturaMediaInfo $mOut)
+	{
+		foreach($mIn as $key => $value) {
+			$mOut->$key = $mIn->$key;
+       	}
+		return $mOut;
+	}
+
+	/**
+	 * 
+	 * @param KalturaMediaInfo $m1
+	 * @param KalturaMediaInfo $m2
+	 */
+	public static function compareFields(KalturaMediaInfo $m1, KalturaMediaInfo $m2)
+	{
+		$fields = array(
+"fileSize",
+"containerFormat",
+"containerId",
+"containerDuration",
+"containerBitRate",
+
+"audioFormat",
+"audioCodecId",
+"audioDuration",
+"audioBitRate",
+"audioChannels",
+"audioSamplingRate",
+"audioResolution",
+
+"videoFormat",
+"videoCodecId",
+"videoDuration",
+"videoBitRate",
+"videoBitRateMode",
+"videoWidth",
+"videoHeight",
+"videoFrameRate",
+"videoDar",
+"videoRotation",
+"scanType",
+		);
+$h264_synonyms = array("h264","avc","avc1");
+$mp4_synonyms = array("mp4","mpeg4");
+$mp4visual_synonyms = array("mpeg4 visual","mpeg4");
+$flv_synonyms = array("flv","sorenson spark","flash video");
+$mp3_synonyms = array("mpeg audio","mp3");
+		$msg = null;
+		foreach ($fields as $f){
+			if(isset($m1->$f) && isset($m2->$f)){
+				$f1 = str_replace(array(".","-"),array("",""), $m1->$f);
+				$f2 = str_replace(array(".","-"),array("",""), $m2->$f);
+				if($f1==$f2)
+					continue;
+				
+				if(is_numeric($m1->$f) && is_numeric($m1->$f)){
+					if($m1->$f>0) {
+						if(abs(1-$m2->$f/$m1->$f)<0.01)
+							continue;
+					}
+				}
+				if($f=="videoFormat") {
+					if(in_array($f1, $h264_synonyms) && in_array($f2, $h264_synonyms))
+						continue;
+					if(in_array($f1, $mp4_synonyms) && in_array($f2, $mp4_synonyms))
+						continue;
+					if(in_array($f1, $mp4visual_synonyms) && in_array($f2, $mp4visual_synonyms))
+						continue;
+					if(in_array($f1, $flv_synonyms) && in_array($f2, $flv_synonyms))
+						continue;
+				}
+				if($f=="containerFormat"){
+					if(in_array($f1, $mp4_synonyms) && in_array($f2, $mp4_synonyms))
+						continue;
+					if(in_array($f1, $flv_synonyms) && in_array($f2, $flv_synonyms))
+						continue;
+				}
+				
+				if($f=="audioFormat"){
+					if(in_array($f1, $mp3_synonyms) && in_array($f2, $mp3_synonyms))
+						continue;
+				}
+				$msg.="$f(".$m1->$f.",".$m2->$f."),";
+			}
+			else if(!(isset($m1->$f) && isset($m2->$f))){
+				continue;
+			}
+		}
+		if(isset($msg)) {
+			KalturaLog::log($msg);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param KalturaMediaInfo $mediaInfo
+	 * @return boolean
+	 */
+	public static function isVideoSet(KalturaMediaInfo $mediaInfo)
+	{
+		if(isset($mediaInfo->videoCodecId))
+			return true;
+		if(isset($mediaInfo->videoFormat))
+			return true;
+		if(isset($mediaInfo->videoDuration))
+			return true;
+		if(isset($mediaInfo->videoBitRate))
+			return true;
+		
+		
+		if(isset($mediaInfo->videoWidth))
+			return true;
+		if(isset($mediaInfo->videoHeight))
+			return true;
+		if(isset($mediaInfo->videoFrameRate))
+			return true;
+		if(isset($mediaInfo->videoDar))
+			return true;
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param KalturaMediaInfo $mediaInfo
+	 * @return boolean
+	 */
+	public static function isAudioSet(KalturaMediaInfo $mediaInfo)
+	{
+		if(isset($mediaInfo->audioCodecId))
+			return true;
+		if(isset($mediaInfo->audioFormat))
+			return true;
+		if(isset($mediaInfo->audioDuration))
+			return true;
+		if(isset($mediaInfo->audioBitRate))
+			return true;
+	
+		if(isset($mediaInfo->audioSamplingRate))
+			return true;
+		if(isset($mediaInfo->audioResolution))
+			return true;
+		if(isset($mediaInfo->audioChannels))
+			return true;
+		
+		return false;
+	}
+	
+	/**
 	 * @return string
 	 */
 	protected abstract function getCommand();
@@ -83,3 +252,4 @@ abstract class KBaseMediaParser
 	 */
 	protected abstract function parseOutput($output);
 }
+
