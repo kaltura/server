@@ -183,7 +183,7 @@ media_servers.ini is optional and needed only for custom configurations.
      - mpegdashstreamingpacketizer
      - dvrstreamingpacketizer 
  - /Root/Application/Transcoder/LiveStreamTranscoder - transcoder
- - /Root/Application/Transcoder/Templates - `http://@WWW\_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/entryId/${SourceStreamName}/f/transcode.xml`
+ - /Root/Application/Transcoder/Templates - `http://@WWW\_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/streamName/${SourceStreamName}/f/transcode.xml`
  - /Root/Application/DVR/Recorders - dvrrecorder
  - /Root/Application/DVR/Store - dvrfilestorage
  - /Root/Application/HTTPStreamers:
