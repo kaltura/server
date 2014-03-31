@@ -18,6 +18,15 @@ Update admin.ini:
         settings.cookieNameSpace = Zend_Auth_AdminConsole
         settings.secure_cookie_upon_https = true
         settings.sessionOptions.cookie_httponly = true
+		
+## TagIndex job ##
+* Enable TagIndex job
+
+*Configuartion Changes*
+- Update batch.ini and workers.ini, done on saas tag (added KAsyncTagIndex)
+
+*Data update*
+- Before applying the batch configuration delete all pending jobs from batch_job_lock, will be done by Eran K. 
 
 ---
 
