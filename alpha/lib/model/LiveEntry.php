@@ -18,9 +18,44 @@ abstract class LiveEntry extends entry
 			KalturaLog::log("rejected live stream entry - not serving thumbnail");
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
-		
 		$contentPath = myContentStorage::getFSContentRootPath();
-		$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
+		
+		$liveEntryExist = false;
+		
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		$entryId = $partner->getLiveThumbEntryId();
+		
+		if($entryId)
+			$entry = entryPeer::retrieveByPK($entryId);
+		
+		if ($entry && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$fileSyncVersion = $partner->getLiveThumbEntryVersion();
+
+			$c = new Criteria();
+			$c->add (FileSyncPeer::OBJECT_ID , $entryId );
+			$c->add (FileSyncPeer::OBJECT_TYPE , FileSyncObjectType::ENTRY );
+			$c->add (FileSyncPeer::OBJECT_SUB_TYPE , entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+			$c->add (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
+			$c->add (FileSyncPeer::DC , kDataCenterMgr::getCurrentDcId());
+
+			if ($fileSyncVersion && is_numeric($fileSyncVersion))
+				$c->add(FileSyncPeer::VERSION , $fileSyncVersion);
+			
+			$fileSync = FileSyncPeer::doSelectOne($c);
+			
+			if ($fileSync && file_exists($fileSync->getFullPath()))
+			{
+				$msgPath = $fileSync->getFullPath();
+				$liveEntryExist = true;
+			}
+			else
+				KalturaLog::err('no local file sync for audio entry id');
+		}
+		
+		if (!$liveEntryExist)
+			$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
+		
 		return myEntryUtils::resizeEntryImage($this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 	}
 	

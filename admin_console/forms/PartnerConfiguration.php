@@ -11,6 +11,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const GROUP_REMOTE_STORAGE = 'GROUP_REMOTE_STORAGE';
     const GROUP_NOTIFICATION_CONFIG = 'GROUP_NOTIFICATION_CONFIG';
     const GROUP_ACCESS_CONTROL = 'GROUP_ACCESS_CONTROL';
+    const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
    	
     protected $limitSubForms = array();
     
@@ -38,6 +39,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_REMOTE_STORAGE] = array();
 		$permissionNames[self::GROUP_NOTIFICATION_CONFIG] = array();
 		$permissionNames[self::GROUP_ACCESS_CONTROL] = array();
+		$permissionNames[self::THUMBNAIL_CONFIGURATION] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -441,7 +443,20 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		//adding display group to all features
 		
+		$this->addElement('text', 'audioThumbEntryId', array(
+				'label'   => 'Image Entry ID For Audio Entry Thumbnails:',
+				'filters'             => array('StringTrim'),
+		));
 		
+		$this->addElement('text', 'liveThumbEntryId', array(
+				'label'   => 'Image Entry ID For Live Entry Thumbnails:',
+				'filters'             => array('StringTrim'),
+		));
+		
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Audio Thumbnail Entry Id:'] = 'audioThumbEntryId';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Live Thumbnail Entry Id:'] = 'liveThumbEntryId';
+		
+		$this->addDisplayGroup(array('audioThumbEntryId','liveThumbEntryId','crossLine'),'thumbnailConfiguration',array('legend' => 'Thumbnail Configuration:'));
 		$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
 			
 		//removing decorators from display groups
@@ -614,7 +629,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			KalturaLog::debug("Set Permission: "  . $permission->name . " status: " . $permission->status);
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
-	
+
+		if($object->audioThumbEntryId)
+			$this->setDefault('audioThumbEntryId',$object->audioThumbEntryId);
+		
+		if($object->liveThumbEntryId)
+			$this->setDefault('liveThumbEntryId',$object->liveThumbEntryId);
+		
 		// partner is set to free trail package
 		if(intval($object->partnerPackage) == PartnerController::PARTNER_PACKAGE_FREE)
 		{
@@ -715,6 +736,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 		}
 
+		if(isset($properties["audioThumbEntryId"]))
+			$systemPartnerConfiguration->audioThumbEntryId=$properties["audioThumbEntryId"];
+		
+		if(isset($properties["liveThumbEntryId"]))
+			$systemPartnerConfiguration->liveThumbEntryId=$properties["liveThumbEntryId"];
+		
 		return $systemPartnerConfiguration;
 	}
 		

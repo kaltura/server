@@ -310,6 +310,18 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $language;
 	
+	/**
+	 * @var string
+	 */
+	public $audioThumbEntryId;
+
+	/**
+	 * @var string
+	 */
+	public $liveThumbEntryId;
+
+	
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -369,6 +381,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"defaultEmbedCodeType",
 		"customDeliveryTypes",
 		"language",
+		"audioThumbEntryId",
+		"liveThumbEntryId",		
 	);
 
 	public function getMapBetweenObjects()

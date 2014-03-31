@@ -1079,7 +1079,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		//$path = $this->getThumbnailPath ( $version );
 		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/thumbnail/entry_id/" . $this->getId() ;
-		$current_version = $this->getThumbnailVersion();
+
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());		
+		if ($this->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
+			$current_version = $partner->getAudioThumbEntryVersion() ? $partner->getAudioThumbEntryVersion() : 0 ;
+		
+		elseif  (in_array($this->getType(), array(entryType::LIVE_STREAM , entryType::LIVE_CHANNEL)))
+			$current_version = $partner->getLiveThumbEntryVersion()? $partner->getLiveThumbEntryVersion() : 0 ;
+		
+		else
+			$current_version = $this->getThumbnailVersion();
+		
 		if ( $version )
 			$path .= "/version/$version";
 		else
@@ -2523,7 +2533,27 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$objectDeleted = false;
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
 			$objectDeleted = true;
-			
+
+		if ($this->isColumnModified(entryPeer::DATA) && $this->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+			$dataArr = explode('.',$this->getData());
+			$id = $this->getId();
+
+			if ($id == $partner->getAudioThumbEntryId())
+			{
+				$partner->setAudioThumbEntryVersion($dataArr[0]);
+				$partner->save();
+			}
+
+			if ($id == $partner->getLiveThumbEntryId())
+			{
+				$partner->setLiveThumbEntryVersion($dataArr[0]);
+				$partner->save();
+			}
+		}
+		
+		
 		$trackColumns = array(
 			entryPeer::STATUS,
 			entryPeer::MODERATION_STATUS,
@@ -3038,7 +3068,41 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				KalturaLog::log ( "rejected audio entry - not serving thumbnail" );
 				KExternalErrors::dieError ( KExternalErrors::ENTRY_DELETED_MODERATED );
 			}
-			$msgPath = $contentPath . "content/templates/entry/thumbnail/audio_thumb.jpg";
+			
+			$audioEntryExist = false;
+
+			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+			$entryId = $partner->getAudioThumbEntryId();
+			if($entryId)
+				$entry = entryPeer::retrieveByPK($entryId);
+
+			if ($entry && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+			{
+				$fileSyncVersion = $partner->getAudioThumbEntryVersion();
+
+				$c = new Criteria();
+				$c->add (FileSyncPeer::OBJECT_ID , $entryId );
+				$c->add (FileSyncPeer::OBJECT_TYPE , FileSyncObjectType::ENTRY );
+				$c->add (FileSyncPeer::OBJECT_SUB_TYPE , entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+				$c->add (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
+				$c->add (FileSyncPeer::DC , kDataCenterMgr::getCurrentDcId());
+
+				if ($fileSyncVersion && is_numeric($fileSyncVersion))
+					$c->add(FileSyncPeer::VERSION , $fileSyncVersion);
+				
+				$fileSync = FileSyncPeer::doSelectOne($c);
+				if ($fileSync && file_exists($fileSync->getFullPath()))
+				{
+					$msgPath = $fileSync->getFullPath();
+					$audioEntryExist = true;
+				}
+				else
+					KalturaLog::err('no local file sync for entry id');
+			}
+
+			if (!$audioEntryExist)
+				$msgPath = $contentPath . "content/templates/entry/thumbnail/audio_thumb.jpg";
+			
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		
 		} elseif ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_SHOW) { // roughcut without any thumbnail, probably just created
