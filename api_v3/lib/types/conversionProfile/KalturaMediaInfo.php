@@ -231,6 +231,13 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 */
 	public $multiStream;
 
+	/**
+	 * @var int
+	 * 	Relevant for MP4 files, when set indicates that 
+	 *  the media headers are placed at the beginning of the file 
+	 */
+	public $isFastStart;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -264,6 +271,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 		"multiStreamInfo",
 		"scanType",
 		"multiStream",
+		"isFastStart",
 	);
 	
 	public function getMapBetweenObjects ( )
