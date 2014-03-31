@@ -1124,6 +1124,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$err = $convertProfileJob->getDescription() . $errDescription;
 			$convertProfileJob->setDescription($err);
 			$convertProfileJob->save();
+			
+			//Check if the error thrown is invalid file - no media content
+			if(strpos($errDescription, KDLErrors::ToString(KDLErrors::NoValidMediaStream)) !== false)
+				throw new Exception(KDLErrors::ToString(KDLErrors::NoValidMediaStream), KDLErrors::NoValidMediaStream);
 		}
 				
 		$conversionsCreated = 0;
