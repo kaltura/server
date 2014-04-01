@@ -233,8 +233,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 
 	/**
 	 * @var int
-	 * 	Relevant for MP4 files, when set indicates that 
-	 *  the media headers are placed at the beginning of the file 
+	 * @requiresPermission read
 	 */
 	public $isFastStart;
 	
