@@ -138,7 +138,7 @@
 		 */
 		public $_fileSize=0;
 		public $_fileName=0;
-		public $_isFastStart=0;
+		public $_isFastStart=1;
 		
 		public function GetSectionEnum() { return KDLConstants::ContainerIndex; }
 		
