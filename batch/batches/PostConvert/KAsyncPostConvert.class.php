@@ -218,7 +218,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 * @param KalturaPostConvertJobData $data
 	 * $param $mediaFile
 	 * #param KalturaMediaInfo $mediaInfo
-	 * @return bool
+	 * @return string
 	 */
 	private function checkForSilentAudioAndBlackVideo(KalturaBatchJob $job, KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo)
 	{
@@ -232,76 +232,11 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			return null;
 		}
 		
-		$ffmpegBin = KBatchBase::$taskConfig->params->FFMpegCmd;
+		list($silenceDetect, $blackDetect) = KFFMpegMediaParser::checkForSilentAudioAndBlackVideo(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
 		
-		/*
-		 * Evaluate vid/aud detection durations
-		 */
-		if(isset($mediaInfo->videoDuration) && $mediaInfo->videoDuration>4000)
-			$vidDetectDur = round($mediaInfo->videoDuration/2000,2);
-		else if(isset($mediaInfo->containerDuration) && $mediaInfo->containerDuration>4000)
-			$vidDetectDur = round($mediaInfo->containerDuration/2000,2);
-		else
-			$vidDetectDur = 0;
-			
-		if(isset($mediaInfo->audioDuration) && $mediaInfo->audioDuration>4000)
-			$audDetectDur = round($mediaInfo->audioDuration/2000,2);
-		else if(isset($mediaInfo->containerDuration) && $mediaInfo->containerDuration>4000)
-			$audDetectDur = round($mediaInfo->containerDuration/2000,2);
-		else
-			$audDetectDur = 0;
-
-		/*
-		 * Set appropriate detection filters
-		 */
-$detectFiltersStr=null;
-		// ~/ffmpeg-2.1.3 -i /web//content/r71v1/entry/data/321/479/1_u076unw9_1_wprx637h_21.copy -vf blackdetect=d=2500 -af silencedetect=noise=0.0001:d=2500 -f null dummyfilename 2>&1
-		if($vidDetectDur>0) {
-			$detectFiltersStr = "-vf blackdetect=d=$vidDetectDur";
-		}
-		if($audDetectDur>0) {
-			$detectFiltersStr.= " -af silencedetect=noise=0.0001:d=$audDetectDur";
-		}
-		
-		if(empty($detectFiltersStr)){
-			KalturaLog::log("No duration values in the source file metadata. Cannot run black/silence detection for the $srcFileName");
-			return null;
-		}
-
-		/*
-		 * Execute the black/silence detection 
-		 */
-		$cmdLine = "$ffmpegBin -i $srcFileName $detectFiltersStr -nostats -f null dummyfilename 2>&1";
-		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
-		if($rv!=0) {
-			KalturaLog::log("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
-			return null;
-		}
-		
-		$outputStr = implode($outputArr);
-		
-		/*
-		 * Searce the ffmpeg printout for 
-		 * - blackdetect or black_start
-		 * - silencedetect or silence_start
-		 */
-$detectMsg=null;
-		if(strstr($outputStr,"blackdetect")!=false || strstr($outputStr,"black_start")!=false) {
-			$detectMsg = "black frame content for at least $vidDetectDur sec";
-			KalturaLog::log("Detected $detectMsg");
-		}
-		
-		if(strstr($outputStr,"silencedetect")!=false || strstr($outputStr,"silence_start")!=false) {
-			$silenceDetectMsg = "silent content for at least $audDetectDur sec";
-			KalturaLog::log("Detected $silenceDetectMsg");
-			$detectMsg = isset($detectMsg)?"$detectMsg,$silenceDetectMsg":$silenceDetectMsg;
-		}
-
-		if(empty($detectMsg))
-			KalturaLog::log("No black frame or silent content in $srcFileName");
-		else
-			KalturaLog::log("Detected - $detectMsg, in $srcFileName");
+		$detectMsg = $silenceDetect;
+		if(isset($blackDetect))
+			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetect":$blackDetect;
 		return $detectMsg;
 	}
 }
