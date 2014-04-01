@@ -308,7 +308,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 * - blackdetect or black_start
 		 * - silencedetect or silence_start
 		 */
-		$blackDetectMsg = "1";
+		$blackDetectMsg = null;
 		if(strstr($outputStr,"blackdetect")!=false || strstr($outputStr,"black_start")!=false) {
 			$blackDetectMsg = "black frame content for at least $vidDetectDur sec";
 			KalturaLog::log("Detected $blackDetectMsg");
