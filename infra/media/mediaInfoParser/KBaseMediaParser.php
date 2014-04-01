@@ -105,7 +105,7 @@ abstract class KBaseMediaParser
 	 * @param KalturaMediaInfo $m1
 	 * @param KalturaMediaInfo $m2
 	 */
-	public static function compareFields(KalturaMediaInfo $m1, KalturaMediaInfo $m2)
+	public static function compareFields($m1, $m2)
 	{
 		$fields = array(
 "fileSize",
@@ -134,11 +134,45 @@ abstract class KBaseMediaParser
 "videoRotation",
 "scanType",
 		);
-$h264_synonyms = array("h264","avc","avc1");
-$mp4_synonyms = array("mp4","mpeg4");
-$mp4visual_synonyms = array("mpeg4 visual","mpeg4");
-$flv_synonyms = array("flv","sorenson spark","flash video");
-$mp3_synonyms = array("mpeg audio","mp3");
+
+$container_format_synonyms = array(
+	array("mp4","mpeg4"),
+	array("flv","sorenson spark","flash video"),
+	array("asf","windows media"),
+	array("mpeg","mpegps"),
+);
+$video_format_synonyms = array(
+	array("h264","avc","avc1"),
+	array("mp4","mpeg4"),
+	array("mpeg4 visual","mpeg4"),
+	array("flv","sorenson spark","flash video"),
+	array("vc1","wmv3"),
+	array("mpeg video","mpeg2video","mpegps"),
+);
+$audio_format_synonyms = array(
+	array("mpeg audio","mp3", "mp2"),
+	array("wma","wmapro"),
+	array("wma","wmav2"),
+);
+$audio_codec_id_synonyms = array(
+	array("aac","40","mp4a"),
+	array("161","a[1][0][0]"),
+	array("50","p[0][0][0]"),
+	array("162","b[1][0][0]"),
+);
+
+		if(!isset($m1) && !isset($m2)) {
+			return;
+		}
+		else if(!isset($m1)) {
+			KalturaLog::log("(missing,exists)");
+			return;
+		}
+		else if(!isset($m2)) {
+			KalturaLog::log("(exists,missing)");		
+			return;
+		}
+		
 		$msg = null;
 		foreach ($fields as $f){
 			if(isset($m1->$f) && isset($m2->$f)){
@@ -152,37 +186,62 @@ $mp3_synonyms = array("mpeg audio","mp3");
 						if(abs(1-$m2->$f/$m1->$f)<0.01)
 							continue;
 					}
-				}
-				if($f=="videoFormat") {
-					if(in_array($f1, $h264_synonyms) && in_array($f2, $h264_synonyms))
-						continue;
-					if(in_array($f1, $mp4_synonyms) && in_array($f2, $mp4_synonyms))
-						continue;
-					if(in_array($f1, $mp4visual_synonyms) && in_array($f2, $mp4visual_synonyms))
-						continue;
-					if(in_array($f1, $flv_synonyms) && in_array($f2, $flv_synonyms))
-						continue;
-				}
-				if($f=="containerFormat"){
-					if(in_array($f1, $mp4_synonyms) && in_array($f2, $mp4_synonyms))
-						continue;
-					if(in_array($f1, $flv_synonyms) && in_array($f2, $flv_synonyms))
-						continue;
+					if(stristr($f, "duration")!=false){
+						$a1 = $m1->$f - $m1->$f%1000;
+						$a2 = $m2->$f - $m2->$f%1000;
+						if($a1==$a2)
+							continue;
+					}
 				}
 				
-				if($f=="audioFormat"){
-					if(in_array($f1, $mp3_synonyms) && in_array($f2, $mp3_synonyms))
-						continue;
+				if($f=="containerFormat" && self::isSynonym($f1, $f2, $container_format_synonyms)==true){
+					continue;
 				}
+				
+				if($f=="videoFormat" && self::isSynonym($f1, $f2, $video_format_synonyms)==true){
+					continue;
+				}
+				
+				if($f=="audioFormat" && self::isSynonym($f1, $f2, $audio_format_synonyms)==true){
+					continue;
+				}
+				
+				if($f=="audioCodecId" && self::isSynonym($f1, $f2, $audio_codec_id_synonyms)==true){
+					continue;
+				}
+				
 				$msg.="$f(".$m1->$f.",".$m2->$f."),";
 			}
 			else if(!(isset($m1->$f) && isset($m2->$f))){
 				continue;
 			}
+			else if(isset($m1->$f)) {
+				$msg.="$f(".$m1->$f.",missing),";
+			}
+			else {
+				$msg.="$f(missing,".$m2->$f."),";	
+			}
 		}
 		if(isset($msg)) {
 			KalturaLog::log($msg);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $f1
+	 * @param unknown_type $f2
+	 * @param unknown_type $synonyms
+	 * @return boolean
+	 */
+	private static function isSynonym($f1, $f2, $synonyms)
+	{
+		foreach($synonyms as $syn){
+			if(in_array($f1, $syn) && in_array($f2, $syn)){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
