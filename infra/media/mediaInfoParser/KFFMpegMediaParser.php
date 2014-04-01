@@ -71,6 +71,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
+		$mediaInfo->multiStream = json_encode($mediaInfo->multiStream);
 		return $mediaInfo;
 	}
 	
