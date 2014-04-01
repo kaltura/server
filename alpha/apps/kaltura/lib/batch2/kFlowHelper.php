@@ -534,7 +534,7 @@ class kFlowHelper
 		}
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
+		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey, true);
 		if($fileSync) {
 			$dbBatchJob->putInCustomData("flavor_size", $fileSync->getFileSize());
 			$dbBatchJob->save();
@@ -548,6 +548,7 @@ class kFlowHelper
 		if(!$data->getDestFileSyncLocalPath() && $fileSync) 
 		{
 			//no flavors were created in the last conversion, updating the DestFileSyncLocalPath to the path of the last created flavor
+			KalturaLog::debug('Setting destFileSyncLocalPath with: '.$fileSync->getFullPath());
 			$data->setDestFileSyncLocalPath($fileSync->getFullPath());		
 		}
 		$nextJob = self::createNextJob($flavorParamsOutput, $dbBatchJob, $data, $syncKey); //todo validate sync key
