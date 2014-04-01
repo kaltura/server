@@ -232,8 +232,14 @@ abstract class LiveEntry extends entry
 	{
 		$configurations = $this->getFromCustomData('live_stream_configurations');
 		if($configurations)
+		{
+			if ($this->getPushPublishEnabled())
+			{
+				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$configurations = array_merge($configurations, $pushPublishConfigurations);
+			}
 			return $configurations;
-		
+		}
 		$configurations = array();
 		$manifestUrl = null;
 		$mediaServer = $this->getMediaServer();
