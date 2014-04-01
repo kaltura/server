@@ -72,6 +72,8 @@ class kmc4Action extends kalturaAction
 		$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 		$ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 		$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
+		$showFlashStudio = PermissionPeer::isValidForPartner(PermissionName::FEATURE_SHOW_FLASH_STUDIO, $this->partner_id);
+		$showHTMLStudio = PermissionPeer::isValidForPartner(PermissionName::FEATURE_SHOW_HTML_STUDIO, $this->partner_id);
 		$deliveryTypes = $partner->getDeliveryTypes();
 		$embedCodeTypes = $partner->getEmbedCodeTypes();
 		$defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
@@ -199,6 +201,8 @@ class kmc4Action extends kalturaAction
                 'version'				=> kConf::get("studio_version"),
                 'uiConfID'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getId() : '',
                 'config'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getConfig() : '',
+                'showFlashStudio'		=> $showFlashStudio,
+                'showHTMLStudio'		=> $showHTMLStudio,
             ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
