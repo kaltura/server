@@ -23,7 +23,19 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	 * @return array<DistributionFieldConfig> An array of the default DistributionFieldConfig configurations
 	 * The key of each item in the array MUST be the field name!
 	 */
-	abstract protected function getDefaultFieldConfigArray();
+	protected function getDefaultFieldConfigArray()
+	{
+		$fieldConfigArray = array();
+		
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(ConfigurableDistributionField::AUTOMATIC_DISTRIBUTION_CONDITIONS);
+		$fieldConfig->setUserFriendlyFieldName('Automatic Distribution Conditions');
+		$fieldConfig->setUpdateOnChange(true);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		return $fieldConfigArray;
+	}
 	
 	/**
 	 * @return array<DistributionFieldConfig> An array of DistributionFieldConfig objects
