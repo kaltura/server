@@ -427,6 +427,27 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, ConversionProfileType::LIVE_STREAM);
 	}
 	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$audioThumbEntryId = $this->audioThumbEntryId;
+		if ($audioThumbEntryId)
+		{
+			$audioThumbEntry = entryPeer::retrieveByPK($audioThumbEntryId);
+			if (!$audioThumbEntry || $audioThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_AUDIO_THUMB_ENTRY_ID_ERROR, $audioThumbEntryId);
+		}
+
+		$liveThumbEntryId = $this->liveThumbEntryId;
+		if ($liveThumbEntryId)
+		{
+			$liveThumbEntry = entryPeer::retrieveByPK($liveThumbEntryId);
+			if (!$liveThumbEntry || $liveThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_LIVE_THUMB_ENTRY_ID_ERROR, $liveThumbEntryId);
+		}
+	
+		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
+	}
+	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);

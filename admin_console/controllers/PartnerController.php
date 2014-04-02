@@ -441,7 +441,20 @@ class PartnerController extends Zend_Controller_Action
 					$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
 				}
 				catch (Exception $e){
-					$this->view->errMessage = $e->getMessage();
+					if ($e->getMessage() == 'partner_audio_thumb_entry_id_error')
+					{
+						$this->view->formValid = false;
+						$form->populate($request->getPost());
+						$form->getElement('audio_thumb_entry_id')->addError('wrong entry id or not a \'ready\' image entry');
+					}
+					elseif ($e->getMessage() == 'partner_live_thumb_entry_id_error')
+					{
+						$this->view->formValid = false;
+						$form->populate($request->getPost());
+						$form->getElement('live_thumb_entry_id')->addError('wrong entry id or not a \'ready\' image entry');
+					}
+					else
+						$this->view->errMessage = $e->getMessage();
 				}
 				
 				$extentFreeTrail = $this->_getParam('extended_free_trail');

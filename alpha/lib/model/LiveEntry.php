@@ -21,38 +21,27 @@ abstract class LiveEntry extends entry
 		$contentPath = myContentStorage::getFSContentRootPath();
 		
 		$liveEntryExist = false;
-		
-		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		$entryId = $partner->getLiveThumbEntryId();
-		
-		if($entryId)
-			$entry = entryPeer::retrieveByPK($entryId);
-		
-		if ($entry && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+
+		$partner = $this->getPartner();
+		if ($partner)
+			$liveThumbEntryId = $partner->getLiveThumbEntryId();
+		if ($liveThumbEntryId)
+			$liveThumbEntry = entryPeer::retrieveByPK($liveThumbEntryId);
+
+		if ($liveThumbEntry && $liveThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
 			$fileSyncVersion = $partner->getLiveThumbEntryVersion();
-
-			$c = new Criteria();
-			$c->add (FileSyncPeer::OBJECT_ID , $entryId );
-			$c->add (FileSyncPeer::OBJECT_TYPE , FileSyncObjectType::ENTRY );
-			$c->add (FileSyncPeer::OBJECT_SUB_TYPE , entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
-			$c->add (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
-			$c->add (FileSyncPeer::DC , kDataCenterMgr::getCurrentDcId());
-
-			if ($fileSyncVersion && is_numeric($fileSyncVersion))
-				$c->add(FileSyncPeer::VERSION , $fileSyncVersion);
-			
-			$fileSync = FileSyncPeer::doSelectOne($c);
-			
-			if ($fileSync && file_exists($fileSync->getFullPath()))
+			$liveEntryKey = $liveThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+			$contentPath = kFileSyncUtils::getLocalFilePathForKey($liveEntryKey);
+			if ($contentPath)
 			{
-				$msgPath = $fileSync->getFullPath();
+				$msgPath = $contentPath;
 				$liveEntryExist = true;
 			}
 			else
 				KalturaLog::err('no local file sync for audio entry id');
 		}
-		
+
 		if (!$liveEntryExist)
 			$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
 		

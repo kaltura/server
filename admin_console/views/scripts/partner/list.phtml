@@ -279,6 +279,15 @@ function changeEmptyStringsTo0(){
 		}
 	});
 
+	$("#fieldset-thumbnailConfiguration input").each(function(inx, value){
+		var $input = $(value);
+		if( $input.attr('type') == 'text') {
+				if ($input.val() == '') {
+						$input.val("0");
+			}
+		}
+	});
+	
 	$("#extended_free_trail").each(function(inx, value){
 		var $input = $(value);
 

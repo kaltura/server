@@ -443,20 +443,30 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		//adding display group to all features
 		
-		$this->addElement('text', 'audioThumbEntryId', array(
+		$this->addElement('checkbox', 'checkbox_audio_thumb_entry_id', array(
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
+		
+		$this->addElement('text', 'audio_thumb_entry_id', array(
 				'label'   => 'Image Entry ID For Audio Entry Thumbnails:',
 				'filters'             => array('StringTrim'),
 		));
+
+		$this->addElement('checkbox', 'checkbox_live_thumb_entry_id', array(
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
 		
-		$this->addElement('text', 'liveThumbEntryId', array(
+		$this->addElement('text', 'live_thumb_entry_id', array(
 				'label'   => 'Image Entry ID For Live Entry Thumbnails:',
 				'filters'             => array('StringTrim'),
 		));
 		
-		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Audio Thumbnail Entry Id:'] = 'audioThumbEntryId';
-		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Live Thumbnail Entry Id:'] = 'liveThumbEntryId';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['checkbox audio thumb entry id'] = 'checkbox_audio_thumb_entry_id';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Audio Thumbnail Entry Id:'] = 'audio_thumb_entry_id';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['checkbox live  thumb entry id'] = 'checkbox_live_thumb_entry_id';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Live Thumbnail Entry Id:'] = 'live_thumb_entry_id';
 		
-		$this->addDisplayGroup(array('audioThumbEntryId','liveThumbEntryId','crossLine'),'thumbnailConfiguration',array('legend' => 'Thumbnail Configuration:'));
+		$this->addDisplayGroup(array('checkbox_audio_thumb_entry_id','audio_thumb_entry_id','checkbox_live_thumb_entry_id','live_thumb_entry_id','crossLine'),'thumbnailConfiguration',array('legend' => 'Thumbnail Configuration:'));
 		$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
 			
 		//removing decorators from display groups
@@ -629,12 +639,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			KalturaLog::debug("Set Permission: "  . $permission->name . " status: " . $permission->status);
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
-
-		if($object->audioThumbEntryId)
-			$this->setDefault('audioThumbEntryId',$object->audioThumbEntryId);
-		
-		if($object->liveThumbEntryId)
-			$this->setDefault('liveThumbEntryId',$object->liveThumbEntryId);
 		
 		// partner is set to free trail package
 		if(intval($object->partnerPackage) == PartnerController::PARTNER_PACKAGE_FREE)
@@ -735,12 +739,6 @@ class Form_PartnerConfiguration extends Infra_Form
 				}
 			}
 		}
-
-		if(isset($properties["audioThumbEntryId"]))
-			$systemPartnerConfiguration->audioThumbEntryId=$properties["audioThumbEntryId"];
-		
-		if(isset($properties["liveThumbEntryId"]))
-			$systemPartnerConfiguration->liveThumbEntryId=$properties["liveThumbEntryId"];
 		
 		return $systemPartnerConfiguration;
 	}

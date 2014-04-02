@@ -1082,10 +1082,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());		
 		if ($this->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
-			$current_version = $partner->getAudioThumbEntryVersion() ? $partner->getAudioThumbEntryVersion() : 0 ;
+			$current_version = $partner->getAudioThumbEntryVersion() ? $partner->getAudioThumbEntryVersion() : $this->getThumbnailVersion() ;
 		
 		elseif  (in_array($this->getType(), array(entryType::LIVE_STREAM , entryType::LIVE_CHANNEL)))
-			$current_version = $partner->getLiveThumbEntryVersion()? $partner->getLiveThumbEntryVersion() : 0 ;
+			$current_version = $partner->getLiveThumbEntryVersion()? $partner->getLiveThumbEntryVersion() : $this->getThumbnailVersion() ;
 		
 		else
 			$current_version = $this->getThumbnailVersion();
@@ -2536,20 +2536,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		if ($this->isColumnModified(entryPeer::DATA) && $this->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-			$dataArr = explode('.',$this->getData());
-			$id = $this->getId();
-
-			if ($id == $partner->getAudioThumbEntryId())
+			$partner = $this->getPartner();
+			
+			if ($partner)
 			{
-				$partner->setAudioThumbEntryVersion($dataArr[0]);
-				$partner->save();
-			}
+				$dataArr = explode('.',$this->getData());
+				$id = $this->getId();
+				if ($id == $partner->getAudioThumbEntryId())
+				{
+					$partner->setAudioThumbEntryVersion($dataArr[0]);
+					$partner->save();
+				}
 
-			if ($id == $partner->getLiveThumbEntryId())
-			{
-				$partner->setLiveThumbEntryVersion($dataArr[0]);
-				$partner->save();
+				if ($id == $partner->getLiveThumbEntryId())
+				{
+					$partner->setLiveThumbEntryVersion($dataArr[0]);
+					$partner->save();
+				}
 			}
 		}
 		
@@ -3070,30 +3073,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 			
 			$audioEntryExist = false;
+                        
+			$partner = $this->getPartner();
+			if ($partner)
+				$audioThumbEntryId = $partner->getAudioThumbEntryId();
+			if($audioThumbEntryId)
+				$audioThumbEntry = entryPeer::retrieveByPK($audioThumbEntryId);
 
-			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-			$entryId = $partner->getAudioThumbEntryId();
-			if($entryId)
-				$entry = entryPeer::retrieveByPK($entryId);
-
-			if ($entry && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+			if ($audioThumbEntry && $audioThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			{
 				$fileSyncVersion = $partner->getAudioThumbEntryVersion();
-
-				$c = new Criteria();
-				$c->add (FileSyncPeer::OBJECT_ID , $entryId );
-				$c->add (FileSyncPeer::OBJECT_TYPE , FileSyncObjectType::ENTRY );
-				$c->add (FileSyncPeer::OBJECT_SUB_TYPE , entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
-				$c->add (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
-				$c->add (FileSyncPeer::DC , kDataCenterMgr::getCurrentDcId());
-
-				if ($fileSyncVersion && is_numeric($fileSyncVersion))
-					$c->add(FileSyncPeer::VERSION , $fileSyncVersion);
-				
-				$fileSync = FileSyncPeer::doSelectOne($c);
-				if ($fileSync && file_exists($fileSync->getFullPath()))
+				$audioEntryKey = $audioThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+				$contentPath = kFileSyncUtils::getLocalFilePathForKey($audioEntryKey);
+				if ($contentPath)
 				{
-					$msgPath = $fileSync->getFullPath();
+					$msgPath = $contentPath;
 					$audioEntryExist = true;
 				}
 				else

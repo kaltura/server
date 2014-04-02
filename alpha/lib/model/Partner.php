@@ -1279,8 +1279,7 @@ class Partner extends BasePartner
 	
 	public function setAudioThumbEntryId($v)
 	{
-		$entry = entryPeer::retrieveByPK($v);
-		if ($entry && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		if ($v && $entry = entryPeer::retrieveByPK($v))
 		{
 			$this->putInCustomData('audioThumbEntryId', $v);
 			$dataArr = explode('.',$entry->getData());
@@ -1288,10 +1287,11 @@ class Partner extends BasePartner
 		}
 		else
 		{
-			$this->putInCustomData('audioThumbEntryId','');
-			$this->setAudioThumbEntryVersion('');
+			$this->removeFromCustomData('audioThumbEntryId');
+			$this->removeFromCustomData('audioThumbEntryVersion');
 		}
 	}
+	
 	
 	public function getAudioThumbEntryId()
 	{
@@ -1310,8 +1310,7 @@ class Partner extends BasePartner
 	
 	public function setLiveThumbEntryId($v)
 	{
-		$entry = entryPeer::retrieveByPK($v);
-		if ($entry && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		if ($v && $entry = entryPeer::retrieveByPK($v))
 		{
 			$this->putInCustomData('liveThumbEntryId', $v);
 			$dataArr = explode('.',$entry->getData());
@@ -1319,10 +1318,11 @@ class Partner extends BasePartner
 		}
 		else
 		{
-			$this->putInCustomData('liveThumbEntryId','');
-			$this->setLiveThumbEntryVersion('');
+			$this->removeFromCustomData('liveThumbEntryId');
+			$this->removeFromCustomData('liveThumbEntryVersion');
 		}
 	}
+	
 	
 	public function getLiveThumbEntryId()
 	{
