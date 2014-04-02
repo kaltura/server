@@ -166,7 +166,7 @@ class assetParams extends BaseassetParams
 		if(is_array($requiredPermissions))
 			return $requiredPermissions;
 			
-		return array($requiredPermissions);
+		return array_map('trim', explode(',', $requiredPermissions));
 	}
 	
 	public function setSourceRemoteStorageProfileId($sourceRemoteStorageProfileId)
