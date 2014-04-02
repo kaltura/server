@@ -1,3 +1,4 @@
+import time
 import os, sys, inspect
 import unittest
 
@@ -54,3 +55,15 @@ class KalturaBaseTest(unittest.TestCase):
         del(self.client)
         del(self.config)
         
+
+    def readyWait(self, mediaId):
+        """ Block until a 'ready' state is returned from server on the provided mediaId """
+        sleeptime=5
+        while True:
+            print "checking if media id %s is ready" % (mediaId,)
+            mediaEntry = self.client.media.get(mediaId)
+            if mediaEntry.getStatus().getValue() == '2':
+                break
+            else:
+                time.sleep(sleeptime)
+            
