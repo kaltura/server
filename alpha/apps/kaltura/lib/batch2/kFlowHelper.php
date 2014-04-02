@@ -1683,18 +1683,59 @@ class kFlowHelper
 			return true;
 	}
 	
+	private static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, asset $asset, $assetSubType)
+	{	
+		$c = new Criteria();
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$c->add(FileSyncPeer::OBJECT_TYPE, $fileSync->getObjectType());
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $fileSync->getObjectSubType());
+		$c->add(FileSyncPeer::PARTNER_ID, $fileSync->getPartnerId());
+		$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
+		
+		$fileSyncToDelete = FileSyncPeer::doSelectOne($c);
+		if($fileSyncToDelete)
+		{
+			$assetToDelete = assetPeer::retrieveById($fileSyncToDelete->getObjectId());
+			
+			if($assetToDelete)
+			{
+				$syncKeyToDelete = $assetToDelete->getSyncKey($assetSubType);
+				kFileSyncUtils::deleteSyncFileForKey($syncKeyToDelete, false, true);
+			}
+			else 
+			{
+				KalturaLog::debug("Could not find asset matching file sync object id " . $fileSyncToDelete->getObjectId());
+			}
+		}
+		else
+		{
+			KalturaLog::debug("Origianl entry file sync not found with the following details: [object_type, object_sub_type, Partner_id, Linked_id] [" . $fileSync->getObjectType() 
+							. ", " . $fileSync->getObjectSubType() . ", " . $fileSync->getPartnerId() . ", " . $fileSync->getId() . "]");
+		}
+	}
+	
 	private static function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
 	{
 		if(self::isAssetExportFinished($fileSync, $asset))
 		{
+			$isInReplacement = false;
+			if(!is_null($asset->getentry()->getReplacedEntryId()))
+				$isInReplacement = true;
+			
 			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
 			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			if($isInReplacement)
+				self::handleEntryReplacementFileSyncDeletion($fileSync, $asset, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			
 			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
 			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			if($isInReplacement)
+				self::handleEntryReplacementFileSyncDeletion($fileSync, $asset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
 			
 			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
 			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			if($isInReplacement)
+				self::handleEntryReplacementFileSyncDeletion($fileSync, $asset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		}		
 	}
 
