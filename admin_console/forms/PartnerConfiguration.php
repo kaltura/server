@@ -692,8 +692,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
 			{
 				$limitType = $subForm->getName();
-				$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
-				$systemPartnerConfiguration->limits[] = $limit;
+				if(isset($properties[$limitType]))
+				{
+					$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
+					$systemPartnerConfiguration->limits[] = $limit;
+				}
 			}
 		}
 
