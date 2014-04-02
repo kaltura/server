@@ -90,9 +90,9 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 		{
 			$isPermitted = false;
 			$requiredPartnerPermissions = array_flip($this->requiredPartnerPermissions);
-			if($object->permissions && count($object->permissions))
+			if($partnerConfiguration->permissions && count($partnerConfiguration->permissions))
 			{
-				foreach($object->permissions as $permission)
+				foreach($partnerConfiguration->permissions as $permission)
 				{
 					if(isset($requiredPartnerPermissions[$permission->name]) && $permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
 					{
