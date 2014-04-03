@@ -1279,9 +1279,10 @@ class Partner extends BasePartner
 	
 	public function setAudioThumbEntryId($v)
 	{
-		if ($v && $entry = entryPeer::retrieveByPK($v))
+		if ($v)
 		{
 			$this->putInCustomData('audioThumbEntryId', $v);
+			$entry = entryPeer::retrieveByPK($v);
 			$dataArr = explode('.',$entry->getData());
 			$this->setAudioThumbEntryVersion($dataArr[0]);
 		}
@@ -1310,9 +1311,10 @@ class Partner extends BasePartner
 	
 	public function setLiveThumbEntryId($v)
 	{
-		if ($v && $entry = entryPeer::retrieveByPK($v))
+		if ($v)
 		{
 			$this->putInCustomData('liveThumbEntryId', $v);
+			$entry = entryPeer::retrieveByPK($v);
 			$dataArr = explode('.',$entry->getData());
 			$this->setLiveThumbEntryVersion($dataArr[0]);
 		}
