@@ -206,8 +206,8 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 			
 		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($usedLiveParamsIds));
-		$passthruEntries = array();
-		$transcodedEntries = array();
+		$passthruEntries = $entries;
+		$transcodedEntries = $entries;
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem LiveParams */
@@ -227,7 +227,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
 		if($transcodedEntriesCount > $maxTranscodedStreams)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_OUTPUTS, $entryId);
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $entryId);
 		
 		$maxInputStreams += ($maxTranscodedStreams - $transcodedEntriesCount);
 		KalturaLog::debug("Live params inputs [$passthruEntriesCount], max live stream inputs [$maxInputStreams]");
