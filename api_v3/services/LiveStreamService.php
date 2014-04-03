@@ -208,18 +208,18 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 			
 		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($usedLiveParamsIds));
-		$passthruEntries = $entryIds;
-		$transcodedEntries = $entryIds;
+		$passthruEntries = null;
+		$transcodedEntries = null;
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem LiveParams */
 			if($liveParamsItem->hasTag(liveParams::TAG_INGEST))
 			{
-				$passthruEntries = array_intersect($passthruEntries, $usedLiveParamsIds[$liveParamsItem->getId()]);
+				$passthruEntries = array_intersect(is_array($passthruEntries) ? $passthruEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
 			}
 			else
 			{
-				$transcodedEntries = array_intersect($transcodedEntries, $usedLiveParamsIds[$liveParamsItem->getId()]);
+				$transcodedEntries = array_intersect(is_array($transcodedEntries) ? $transcodedEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
 			}
 		}
 		$passthruEntries = array_diff($passthruEntries, $transcodedEntries);
