@@ -148,29 +148,30 @@ $video_format_synonyms = array(
 	array("flv","sorenson spark","flash video"),
 	array("vc1","wmv3"),
 	array("mpeg video","mpeg2video","mpegps"),
+	array("intermediate codec","apple intermediate codec","icod","aic"),
 );
 $audio_format_synonyms = array(
 	array("mpeg audio","mp3", "mp2"),
 	array("wma","wmapro"),
 	array("wma","wmav2"),
+	array("pcm","pcm_s16le","pcm_s16be"),
 );
 $audio_codec_id_synonyms = array(
 	array("aac","40","mp4a"),
 	array("161","a[1][0][0]"),
 	array("50","p[0][0][0]"),
 	array("162","b[1][0][0]"),
+	array("55","u[0][0][0]"),
 );
 
 		if(!isset($m1) && !isset($m2)) {
-			return;
+			return("(missing,missing)");
 		}
 		else if(!isset($m1)) {
-			KalturaLog::log("(missing,exists)");
-			return;
+			return("(missing,exists)");
 		}
 		else if(!isset($m2)) {
-			KalturaLog::log("(exists,missing)");		
-			return;
+			return("(exists,missing)");
 		}
 		
 		$msg = null;
@@ -222,9 +223,7 @@ $audio_codec_id_synonyms = array(
 				$msg.="$f(missing,".$m2->$f."),";	
 			}
 		}
-		if(isset($msg)) {
-			KalturaLog::log($msg);
-		}
+		return ($msg);
 	}
 	
 	/**
