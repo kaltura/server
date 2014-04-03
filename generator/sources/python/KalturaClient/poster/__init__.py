@@ -26,7 +26,7 @@ New releases of poster will always have a version number that compares greater
 than an older version of poster.
 New in version 0.6."""
 
-import streaminghttp
-import encode
+import poster.streaminghttp
+import poster.encode
 
 version = (0, 8, 0) # Thanks JP!
