@@ -179,6 +179,15 @@ class KalturaSystemPartnerOveragedLimit extends KalturaSystemPartnerLimit
 	 */
 	public function apply(Partner $partner)
 	{
+		if($this->isNull($this->max) || $this->max === '')
+			$this->max = null;
+			
+		if($this->isNull($this->overagePrice) || $this->overagePrice === '')
+			$this->overagePrice = null;
+			
+		if($this->isNull($this->overageUnit) || $this->overageUnit === '')
+			$this->overageUnit = null;
+			
 		switch($this->type)
 		{
 			case KalturaSystemPartnerLimitType::ENTRIES:
