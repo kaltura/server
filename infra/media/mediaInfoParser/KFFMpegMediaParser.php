@@ -53,6 +53,17 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$outputlower = strtolower($output);
 		$jsonObj = json_decode($outputlower);
 		if(!(isset($jsonObj) && isset($jsonObj->format))){
+			/*
+			 * For ARF (webex) files - simulate container ID and format.
+			 * On no-content return null
+			 */
+			if(strstr($this->filePath,".arf")){
+				$mediaInfo = new KalturaMediaInfo();
+				$mediaInfo->containerFormat = "arf";
+				$mediaInfo->containerId = "arf";
+				$mediaInfo->fileSize = round(filesize($this->filePath)/1024);
+				return $mediaInfo;
+			}
 			return null;
 		}
 		
@@ -298,7 +309,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
-			KalturaLog::log("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
+			KalturaLog::err("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
 		}
 	
@@ -334,11 +345,58 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	
 	/**
 	 * 
+	 * @param unknown_type $ffprobeBin
+	 * @param unknown_type $srcFileName
+	 * @return array of scene cuts
+	 */
+	public static function retrieveSceneCuts($ffprobeBin, $srcFileName)
+	{
+		KalturaLog::log("retrieveScenCuts");
+	
+		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time";
+		KalturaLog::log("$cmdLine");
+		$lastLine=exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::err("SceneCuts detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
+			return null;
+		}
+		/*
+		 * The resultant array contains in sequential lines - pairs of time & scene-cut value 
+		 */
+		$sceneCutArr = array();
+		for($i=1; $i<count($outputArr); $i+=2){
+			$sceneCutArr[$outputArr[$i-1]] = $outputArr[$i];
+		}
+		return $sceneCutArr;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $ffprobeBin
+	 * @param unknown_type $srcFileName
+	 * @return array of keyframes
+	 */
+	public static function retrieveKeyFrames($ffprobeBin, $srcFileName)
+	{
+		KalturaLog::log("retrieveKeyFrames");
+	
+		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)\" -show_entries frame=pkt_pts_time";
+		KalturaLog::log("$cmdLine");
+		$lastLine=exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
+			return null;
+		}
+		return $outputArr;
+	}
+	
+	/**
+	 * 
 	 * @param $ffmpegBin
 	 * @param $srcFileName
 	 * @return number
 	 */
-	private static function checkForScanType($ffmpegBin, $srcFileName)
+	private static function checkForScanType($ffmpegBin, $srcFileName, $frames=100)
 	{
 /*
 	ffmpeg-2.1.3 -filter:v idet -frames:v 100 -an -f rawvideo -y /dev/null -nostats -i /mnt/shared/Media/114141.flv
@@ -346,15 +404,14 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	[Parsed_idet_0 @ 0000000000331de0] Multi frame detection: TFF:0 BFF:100 Progressive:0 Undetermined:0	
 	$mediaInfo->scanType=1; 
 */
-		$frames = 100;
 		if(stristr(PHP_OS,'win')) $nullDev = "NULL";
 		else $nullDev = "/dev/null";
 
 		$cmdLine = "$ffmpegBin -filter:v idet -frames:v $frames -an -f rawvideo -y $nullDev -i $srcFileName -nostats  2>&1";
-		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
+		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
-			KalturaLog::log("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
+			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
 		$scanType = 0; // Default would be 'progressive'
