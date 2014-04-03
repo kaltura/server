@@ -28,6 +28,12 @@ Update admin.ini:
 *Data update*
 - Before applying the batch configuration delete all pending jobs from batch_job_lock, will be done by Eran K. 
 
+## Admin Console "View History" Permission Fix ##
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_add_system_admin_publisher_config_to_audittrail.php
+
 ---
 
 # IX-9.13.0 #
