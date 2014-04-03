@@ -66,7 +66,7 @@ class KalturaSystemPartnerLimit extends KalturaObject
 	 */
 	public function apply(Partner $partner)
 	{
-		if($this->isNull($this->max) || $this->max === '')
+		if($this->isNull('max'))
 			$this->max = null;
 			
 		switch($this->type)
