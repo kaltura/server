@@ -190,7 +190,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		foreach($entries as $liveEntry)
 		{
 			/* @var $liveEntry LiveEntry */
-			$liveParamsIds = explode(',', $liveEntry->getFlavorParamsIds());
+			$liveParamsIds = array_map('intval', explode(',', $liveEntry->getFlavorParamsIds()));
 			
 			foreach($liveParamsIds as $liveParamsId)
 			{
