@@ -1147,25 +1147,25 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$source_file_syncs = array();
 		foreach($file_sync_list as $file_sync)
 		{
-			$file_sync = self::resolve($file_sync); // we only want to link to a source and not to a link.
-			$source_file_syncs[] = $file_sync;
+			$resolved_file_sync = self::resolve($file_sync); // we only want to link to a source and not to a link.
+			$source_file_syncs[$file_sync->getDc()] = $resolved_file_sync;
 		}
 
 		// find the current dc file sync
 		$current_dc_source_file = null;
-		foreach ( $source_file_syncs as $source_file_sync )
+		foreach ( $source_file_syncs as $dc => $source_file_sync )
 		{
-			if ($source_file_sync->getDc() == $dc_id)
+			if ($dc == $dc_id)
 				$current_dc_source_file = $source_file_sync;
 		}
 		if (!$current_dc_source_file)
 			$current_dc_source_file = reset($source_file_syncs);
 
 		// create the remote file syncs
-		foreach ( $source_file_syncs as $source_file_sync )
+		foreach ( $source_file_syncs as $dc => $source_file_sync )
 		{
 			$remote_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
-			$remote_dc_file_sync->setDc( $source_file_sync->getDc() );
+			$remote_dc_file_sync->setDc( $dc );
 			$remote_dc_file_sync->setStatus( $source_file_sync->getStatus() );
 			$remote_dc_file_sync->setOriginal ( $current_dc_source_file == $source_file_sync );
 			$remote_dc_file_sync->setFileSize ( -1 );
