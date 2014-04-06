@@ -43,7 +43,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(ConfigurableDistributionField::AUTOMATIC_DISTRIBUTION_CONDITIONS);
 		$fieldConfig->setUserFriendlyFieldName('Automatic Distribution Conditions');
-	    $fieldConfig->setEntryMrssXslt('Replace with XSL condition tests');
+		$fieldConfig->setEntryMrssXslt('Replace with XSL condition tests');
 		$fieldConfig->setUpdateOnChange(false); // Update trigger is not relevant for the initial distribution scenario
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
@@ -482,10 +482,18 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	    {
     	    $value = isset($allFieldValues[$fieldName]) ? $allFieldValues[$fieldName] : null;
     		if (strlen($value) <= 0) {
-    		    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
-    			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-    			$validationErrors[] = $validationError;
-    		}
+    			if ( $this->fieldConfigArray[$fieldName]->getIsRequired() == DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION
+		    			&& $this->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC ) {
+    				$validationError = $this->createValidationError($action, DistributionErrorType::CONDITION_NOT_MET, $this->getUserFriendlyFieldName($fieldName));
+    				$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+    				$validationErrors[] = $validationError;
+    			}
+    			else {
+	    		    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
+	    			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+	    			$validationErrors[] = $validationError;
+	    		}
+		    }
 	    }
 	    return $validationErrors;
 	}
