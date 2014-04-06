@@ -1013,6 +1013,7 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::NOT_REQUIRED' => 'Not Required',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PARTNER' => 'Required By Partner',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER' => 'Required By Provider',
+	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION' => 'Required for Automatic Distribution',
 	
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::UPLOADED_FILE' => 'Uploaded File',
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::WEBCAM_COMPLETED' => 'Webcam Completed',
