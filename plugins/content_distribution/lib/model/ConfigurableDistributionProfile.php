@@ -26,11 +26,25 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	protected function getDefaultFieldConfigArray()
 	{
 		$fieldConfigArray = array();
-		
+
+		// Automatic Distribution Conditions
+		// Any non-empty XSL text will be considered valid, otherwise (empty string)
+		// will yield a validation error.
+		//
+		// The goal is to replace this text with XSL code that checks if some category is
+		// assigned to the entry or if some metadata tag exists.
+		// Here's an example that checks for the exitence if either:
+		//	1. The custom metadata 'DistributionTargets' contains the value 'Youtube', or
+		//	2. The entry is assigned to the category named 'YoutubeAutoDistTrigger'.
+		// 		<xsl:choose>
+		// 			<xsl:when test="customData/metadata/DistributionTargets='Youtube'">youtube_from_metadata</xsl:when>
+		// 			<xsl:when test='category/category_item[name="YoutubeAutoDistTrigger"]'>youtube_from_category</xsl:when>
+		// 		</xsl:choose>
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(ConfigurableDistributionField::AUTOMATIC_DISTRIBUTION_CONDITIONS);
 		$fieldConfig->setUserFriendlyFieldName('Automatic Distribution Conditions');
-		$fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setEntryMrssXslt('Replace with XSL condition tests');
+		$fieldConfig->setUpdateOnChange(false); // Update trigger is not relevant for the initial distribution scenario
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
