@@ -150,7 +150,7 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{	    
-	    $fieldConfigArray = array();
+	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 	    
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeApiDistributionField::MEDIA_TITLE);

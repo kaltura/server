@@ -140,7 +140,7 @@ class CrossKalturaDistributionProfile extends ConfigurableDistributionProfile
 	 */
 	protected function getDefaultFieldConfigArray()
 	{	    
-	    $fieldConfigArray = array();
+	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 
 	    // entry name
 	    $fieldConfig = new DistributionFieldConfig();

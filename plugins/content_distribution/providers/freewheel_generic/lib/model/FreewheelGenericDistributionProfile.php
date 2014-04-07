@@ -29,7 +29,7 @@ class FreewheelGenericDistributionProfile extends ConfigurableDistributionProfil
 	
 	protected function getDefaultFieldConfigArray()
 	{
-		$fieldConfigArray = array();
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(FreewheelGenericDistributionField::VIDEO_ID);
