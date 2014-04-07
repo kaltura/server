@@ -591,7 +591,8 @@ class Form_PartnerConfiguration extends Infra_Form
 				if (isset($this->limitSubForms[$limit->type]))
 				{
 					$subFormObject = $this->limitSubForms[$limit->type];
-					$subFormObject->populateFromObject($this, $limit, false);
+					/* @var $subFormObject Form_PartnerConfigurationLimitSubForm */
+					$subFormObject->populateFromObject($this, $object, $limit, false);
 				}
 			}
 		}
@@ -696,8 +697,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
 			{
 				$limitType = $subForm->getName();
-				$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
-				$systemPartnerConfiguration->limits[] = $limit;
+				if(isset($properties[$limitType]))
+				{
+					$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
+					$systemPartnerConfiguration->limits[] = $limit;
+				}
 			}
 		}
 
@@ -737,7 +741,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		$monthlyStorageAndBandwidthSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH, 'Streaming + Storage (GB):');
 		$this->addLimitSubForm($monthlyStorageAndBandwidthSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH);
 		
-		
 		$adminLoginUsersSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, 'Number of administrative (KMC) users:');
 		$this->addLimitSubForm($adminLoginUsersSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS);
 		
@@ -756,10 +759,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		$accessControlsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS, 'Maximum access control profiles:', false);
 		$this->addLimitSubForm($accessControlsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS);
 		
-		$liveStreamInputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS, 'Maximum concurrent live stream inputs:', false);
+		$liveStreamInputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS, 'Concurrent Live passthrough streams:', false);
+		$liveStreamInputsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_KALTURA_LIVE_STREAM);
 		$this->addLimitSubForm($liveStreamInputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS);
 		
-		$liveStreamOutputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS, 'Maximum concurrent live stream conversions:', false);
+		$liveStreamOutputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS, 'Concurrent Live-Plus streams purchased:', false);
+		$liveStreamOutputsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE);
 		$this->addLimitSubForm($liveStreamOutputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS);
 				
 	}
