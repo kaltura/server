@@ -25,7 +25,14 @@
 				<?php if (@$audit->data->changedItems){
 					foreach($audit->data->changedItems as $changedItems){
 						if ($changedItems->descriptor == 'extendedFreeTrailExpiryDate'){
-							echo 'Extended until: ' . date('m/d/y',$changedItems->newValue);
+							$extensionDate = $changedItems->newValue;
+							if ( is_int( $extensionDate ) ) {
+								$extensionDate = date('m/d/y',$extensionDate);
+							}
+							else {
+								$extensionDate = print_r($extensionDate,true); // Transform any contained type to a string
+							}
+							echo 'Extended until: ' . $extensionDate;
 							break;
 						}
 						else if ($changedItems->descriptor == 'partner.STATUS'){
