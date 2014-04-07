@@ -114,17 +114,10 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock` (
   `batch_job_id` bigint(20) NOT NULL,
   `custom_data` text,
   `batch_version` int(11) DEFAULT NULL,
+  `root_job_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `lock_index` (`scheduler_id`,`worker_id`,`batch_index`),
-  KEY `partner_urgency_type_index` (`partner_id`,`job_type`,`worker_id`,`urgency`),
-  KEY `partner+type_status_index` (`job_type`,`status`,`dc`,`partner_id`),
-  KEY `urgency_type_status_index` (`job_type`,`status`,`dc`,`urgency`),
-  KEY `execution_attempts_index` (`job_type`,`execution_attempts`,`dc`),
-  KEY `processor_expiration_index` (`job_type`,`execution_attempts`,`expiration`),
-  KEY `dc_job_type_status_job_sub_type` (`dc`,`job_type`,`status`,`job_sub_type`),
-  KEY `dc_job_type_status_attempts_job_sub_type` (`dc`,`job_type`,`status`,`execution_attempts`,`job_sub_type`),
-  KEY `dc_job_type_status_attempts_created` (`dc`,`job_type`,`status`,`execution_attempts`,`created_at`),
-  KEY `dc_status` (`dc`,`status`)
+  KEY `dc_job_type_status` (`dc`,`job_type`,`status`),
+  KEY `root_job_id_index` (`root_job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `batch_job_log` */
@@ -253,8 +246,10 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock_suspend` (
   `batch_job_id` bigint(20) NOT NULL,
   `custom_data` text,
   `batch_version` int(11) DEFAULT NULL,
+  `root_job_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
+  KEY `root_job_id_index` (`root_job_id`),
   INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
   CONSTRAINT `batch_job_lock_suspend_FK_1`
   FOREIGN KEY (`batch_job_id`)
