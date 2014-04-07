@@ -1,3 +1,10 @@
+# IX-9.15.0 #
+
+## Allow disabling new user created email to KMC Admins ##
+If adding this permission to a partner, creating a new user in the KMC will not trigger email notification to all KMC admin users only to the newly created user. (replace PARTNER_ID with the actual partner id).
+
+	INSERT INTO permission(`ID`,`TYPE`,`NAME`,`FRIENDLY_NAME`,`DESCRIPTION`,`PARTNER_ID`,`STATUS`,`DEPENDS_ON_PERMISSION_NAMES`,`TAGS`,`CREATED_AT`,`UPDATED_AT`,`CUSTOM_DATA`) VALUES (NULL,'1',' FEATURE_DISABLE_NEW_USER_EMAIL','disablel_new_user_emai','','PARTNER_ID','1','','',now(),now(),'a:1:{s:13:"partner_group";s:0:"";}') 
+
 # IX-9.14.0 #
 
 ## Image magick ##
