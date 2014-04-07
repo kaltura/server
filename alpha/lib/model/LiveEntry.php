@@ -18,9 +18,33 @@ abstract class LiveEntry extends entry
 			KalturaLog::log("rejected live stream entry - not serving thumbnail");
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
-		
 		$contentPath = myContentStorage::getFSContentRootPath();
-		$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
+		
+		$liveEntryExist = false;
+
+		$partner = $this->getPartner();
+		if ($partner)
+			$liveThumbEntryId = $partner->getLiveThumbEntryId();
+		if ($liveThumbEntryId)
+			$liveThumbEntry = entryPeer::retrieveByPK($liveThumbEntryId);
+
+		if ($liveThumbEntry && $liveThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$fileSyncVersion = $partner->getLiveThumbEntryVersion();
+			$liveEntryKey = $liveThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+			$contentPath = kFileSyncUtils::getLocalFilePathForKey($liveEntryKey);
+			if ($contentPath)
+			{
+				$msgPath = $contentPath;
+				$liveEntryExist = true;
+			}
+			else
+				KalturaLog::err('no local file sync for audio entry id');
+		}
+
+		if (!$liveEntryExist)
+			$msgPath = $contentPath . "content/templates/entry/thumbnail/live_thumb.jpg";
+		
 		return myEntryUtils::resizeEntryImage($this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 	}
 	

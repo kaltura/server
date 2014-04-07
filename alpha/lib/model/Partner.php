@@ -1276,10 +1276,76 @@ class Partner extends BasePartner
 		$this->getFromCustomData('i18n_template_partner_id');
 	}
 	
+	
+	public function setAudioThumbEntryId($v)
+	{
+		if ($v)
+		{
+			$this->putInCustomData('audioThumbEntryId', $v);
+			$entry = entryPeer::retrieveByPK($v);
+			$dataArr = explode('.',$entry->getData());
+			$this->setAudioThumbEntryVersion($dataArr[0]);
+		}
+		else
+		{
+			$this->removeFromCustomData('audioThumbEntryId');
+			$this->removeFromCustomData('audioThumbEntryVersion');
+		}
+	}
+	
+	
+	public function getAudioThumbEntryId()
+	{
+		return $this->getFromCustomData('audioThumbEntryId');
+	}
+	
+	public function setAudioThumbEntryVersion($v)
+	{
+		$this->putInCustomData('audioThumbEntryVersion', $v);
+	}
+	
+	public function getAudioThumbEntryVersion()
+	{
+		return $this->getFromCustomData('audioThumbEntryVersion');
+	}
+	
+	public function setLiveThumbEntryId($v)
+	{
+		if ($v)
+		{
+			$this->putInCustomData('liveThumbEntryId', $v);
+			$entry = entryPeer::retrieveByPK($v);
+			$dataArr = explode('.',$entry->getData());
+			$this->setLiveThumbEntryVersion($dataArr[0]);
+		}
+		else
+		{
+			$this->removeFromCustomData('liveThumbEntryId');
+			$this->removeFromCustomData('liveThumbEntryVersion');
+		}
+	}
+	
+	
+	public function getLiveThumbEntryId()
+	{
+		return $this->getFromCustomData('liveThumbEntryId');
+	}
+	
+	public function setLiveThumbEntryVersion($v)
+	{
+		$this->putInCustomData('liveThumbEntryVersion', $v);
+	}
+	
+	public function getLiveThumbEntryVersion()
+	{
+		return $this->getFromCustomData('liveThumbEntryVersion');
+	}
+	
+	
+	
 	// -------------------------------------------------
 	// -- start of account owner kuser related functions
 	// -------------------------------------------------
-		
 	
 	/**
 	 * @throws kUserException::USER_NOT_FOUND
