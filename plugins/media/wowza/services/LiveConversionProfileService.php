@@ -148,8 +148,8 @@ class LiveConversionProfileService extends KalturaBaseService
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, MediaServer $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
 	{
-		$streamName = $entry->getId() . '_' . $liveParams->getId();
-		$videoCodec = 'PassThru';
+		$streamName = 'mp4:' . $entry->getId() . '_' . $liveParams->getId();
+		$videoCodec = 'H.264';
 		$audioCodec = 'AAC';
 		$profile = 'main';
 		
@@ -160,7 +160,7 @@ class LiveConversionProfileService extends KalturaBaseService
 				switch ($liveParams->getVideoCodec())
 				{
 					case flavorParams::VIDEO_CODEC_COPY:
-						$videoCodec = 'PassThru';
+						$videoCodec = 'H.264';
 						break;
 						
 					case flavorParams::VIDEO_CODEC_FLV:
@@ -237,13 +237,13 @@ class LiveConversionProfileService extends KalturaBaseService
 		}
 		
 		$video->addChild('Profile', $profile);
-		$video->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getVideoBitrate()) ? $liveParams->getVideoBitrate() * 1024 : '${SourceVideoBitrate}');
+		$video->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getVideoBitrate()) ? $liveParams->getVideoBitrate() * 1000 : '10000000');
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
 		$keyFrameInterval->addChild('FollowSource', 'false');
 		$keyFrameInterval->addChild('Interval', 60);
 		
 		$audio = $encode->addChild('Audio');
 		$audio->addChild('Codec', $audioCodec);
-		$audio->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getAudioBitrate()) ? $liveParams->getAudioBitrate() * 1024 : '${SourceAudioBitrate}');
+		$audio->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getAudioBitrate()) ? $liveParams->getAudioBitrate() * 1000 : '96000');
 	}
 }
