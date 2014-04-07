@@ -299,6 +299,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Parent Account Id:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement ('text','reference_id', array(
+			'label'			=> 'Reference Id:',
+			'filters'		=> array('StringTrim'),
+		));
 //--------------------------- Service Packages ---------------------------
 		$this->addElement('select', 'partner_package', array(
 			'label'			=> 'Service Edition Type:',
@@ -766,7 +771,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		//adding display groups
 		
 		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
-		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
+		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','reference_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		$this->addDisplayGroup(array_merge(array('checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_rtmp_url', 'rtmp_url', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_delivery_restrictions', 'delivery_restrictions', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
