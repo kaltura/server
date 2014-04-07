@@ -1001,7 +1001,8 @@ class kuser extends Basekuser implements IIndexable
 			else {
 				kuserPeer::sendNewUserMail($this, false);
 			}
-			kuserPeer::sendNewUserMailToAdmins($this);			
+			if(!PermissionPeer::isValidForPartner(PermissionName::DISABLE_SEND_NEW_USER_CREATED_EMAIL, $this->getPartnerId()))
+				kuserPeer::sendNewUserMailToAdmins($this);
 		}	
 		return $this;
 	}
