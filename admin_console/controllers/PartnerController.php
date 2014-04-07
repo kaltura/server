@@ -411,11 +411,14 @@ class PartnerController extends Zend_Controller_Action
 		$systemPartnerPlugin->systemPartner->getPlayerDeliveryTypes();
 		list($packages, $packagesVertical, $packagesClassOfService, $playerEmbedCodeTypes, $playerDeliveryTypes) = $client->doMultiRequest();
 
-		$systemDefaults = new stdClass();
+		$systemDefaults = new Kaltura_Client_Type_PlayerEmbedCodeType();
 		$systemDefaults->id = '';
 		$systemDefaults->label = 'Use System Defaults';
-		
 		$playerEmbedCodeTypes[] = $systemDefaults;
+
+		$systemDefaults = new Kaltura_Client_Type_PlayerDeliveryType();
+		$systemDefaults->id = '';
+		$systemDefaults->label = 'Use System Defaults';
 		$playerDeliveryTypes[] = $systemDefaults;
 		
 		$form = new Form_PartnerConfiguration(array('playerDeliveryTypes' => $playerDeliveryTypes));

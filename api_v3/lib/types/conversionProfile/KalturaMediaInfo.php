@@ -231,6 +231,12 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 */
 	public $multiStream;
 
+	/**
+	 * @var int
+	 * @requiresPermission read
+	 */
+	public $isFastStart;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -264,6 +270,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 		"multiStreamInfo",
 		"scanType",
 		"multiStream",
+		"isFastStart",
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -595,7 +595,7 @@ class kUrlManager
 			
 			$tsUrl = $matches[0];
 			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0') !== false)
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-1') !== false)
 				return true;
 		}
 			

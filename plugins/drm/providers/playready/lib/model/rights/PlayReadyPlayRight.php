@@ -59,7 +59,7 @@ class PlayReadyPlayRight extends PlayReadyRight
 	private $uncompressedDigitalVideoOPL; 
 	
     /**
-	 * @var int
+	 * @var int configured in hours
 	 */
 	private $firstPlayExpiration;
 	

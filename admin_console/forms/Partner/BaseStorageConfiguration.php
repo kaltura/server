@@ -40,7 +40,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('textarea', 'description', array(
+		$this->addElement('textarea', 'desciption', array(
 			'label'			=> 'Description:',
 			'cols'			=> 60,
 			'rows'			=> 3,
@@ -99,14 +99,14 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$readyBehavior->setLabel('Ready Behavior:');
 		$this->addElements(array($readyBehavior));
 		
-		$this->addElement('textarea', 'urlManagerParamsJson', array(
+		$this->addElement('textarea', 'urlManagerParams', array(
 			'label'			=> 'URL Manager Params (JSON):',
 			'cols'			=> 48,
 			'rows'			=> 2,
 			'filters'		=> array('StringTrim'),
 		));
 				
-		$this->addDisplayGroup(array('partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'description'), 'general_info', array(
+		$this->addDisplayGroup(array('partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'desciption'), 'general_info', array(
 			'legend' => 'General',
 		));
 		
@@ -146,7 +146,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		$this->addDisplayGroup(array('urlManagerParamsJson'), 'advanced', array(
+		$this->addDisplayGroup(array('urlManagerParams'), 'advanced', array(
 			'legend' => 'Advanced',
 
 		));

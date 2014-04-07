@@ -296,9 +296,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $defaultEmbedCodeType;
 	
 	/**
-	 * @var KalturaStringArray
+	 * @var KalturaKeyBooleanValueArray
 	 */
-	public $disabledDeliveryTypes;
+	public $customDeliveryTypes;
 	
 	/**
 	 * @var bool
@@ -367,7 +367,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"apiAccessControlId",
 		"defaultDeliveryType",
 		"defaultEmbedCodeType",
-		"disabledDeliveryTypes",
+		"customDeliveryTypes",
 		"language",
 	);
 

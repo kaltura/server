@@ -102,7 +102,14 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		/* @var $mediaInfo KalturaMediaInfo */
 		if(is_null($mediaInfo))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
-		
+
+		/* Look for silent/black conversions. Cuurently checked only for Webex/ARF products */
+		$detectMsg = $this->checkForSilentAudioAndBlackVideo($job, $data, realpath($mediaFile), $mediaInfo);
+		if(isset($detectMsg)){
+			$job->data->engineMessage = $detectMsg;
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::BLACK_OR_SILENT_CONTENT, $detectMsg, KalturaBatchJobStatus::FAILED);
+		}
+				
 		try
 		{
 			$mediaInfo->flavorAssetId = $data->flavorAssetId;
@@ -200,5 +207,36 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$data->thumbPath = $sharedFile;
 		$job->data = $data;
 		return $job;
+	}
+	
+	/**
+	 * Check for invalidly generated content files -
+	 * - Silent or black content for at least 50% of the total duration
+	 * - The detection duration - at least 2 sec
+	 * - Applicable only to Webex sources
+	 * @param KalturaBatchJob $job
+	 * @param KalturaPostConvertJobData $data
+	 * $param $mediaFile
+	 * #param KalturaMediaInfo $mediaInfo
+	 * @return string
+	 */
+	private function checkForSilentAudioAndBlackVideo(KalturaBatchJob $job, KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo)
+	{
+		KalturaLog::debug("checkForSilentAudioAndBlackVideo(contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration)");
+
+		/*
+		 * Check for Webex, other sources should not be checked
+		 */
+		if(!(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
+		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false)) {
+			return null;
+		}
+		
+		list($silenceDetect, $blackDetect) = KFFMpegMediaParser::checkForSilentAudioAndBlackVideo(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
+		
+		$detectMsg = $silenceDetect;
+		if(isset($blackDetect))
+			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetect":$blackDetect;
+		return $detectMsg;
 	}
 }

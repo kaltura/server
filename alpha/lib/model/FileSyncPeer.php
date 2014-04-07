@@ -47,9 +47,11 @@ class FileSyncPeer extends BaseFileSyncPeer
 	 * @param FileSyncKey $key
 	 * @return FileSync
 	 */
-	public static function retrieveByFileSyncKey(FileSyncKey $key)
+	public static function retrieveByFileSyncKey(FileSyncKey $key, $current_dc_only = false)
 	{
 		$c = self::getCriteriaForFileSyncKey($key);
+		if($current_dc_only)
+			$c->add(self::DC, kDataCenterMgr::getCurrentDcId());
 		return self::doSelectOne($c);
 	}
 	

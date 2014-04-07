@@ -195,15 +195,18 @@ class Form_PartnerConfiguration extends Infra_Form
 		foreach($this->playerDeliveryTypes as $playerDeliveryType)
 		{
 			/* @var $playerDeliveryType Kaltura_Client_Type_PlayerDeliveryType */
+			$systemDefault = ($playerDeliveryType->enabledByDefault) ? 'Enabled' : 'Disabled';
+			$description = ($playerDeliveryType->id) ? "(<b>$systemDefault</b> as system default)" : '';
 			$this->addElement('checkbox', 'delivery_type_' . $playerDeliveryType->id, array(
 				'label'		=> "Enable $playerDeliveryType->label",
-				'data-checked' => true,
+				'description' => $description ,
+				'data-checked' => $playerDeliveryType->enabledByDefault,
 				'disabled'	=> true,
-				'checked'	=> true,
+				'checked'	=> $playerDeliveryType->enabledByDefault,
 				'class'		=> 'delivery_type',
-				'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+				'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('Description', array('escape' => false)), array('HtmlTag',  array('tag' => 'dt')))
 			));
-		
+
 			$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][$playerDeliveryType->label] = 'delivery_type_' . $playerDeliveryType->id;
 		}
 		
@@ -309,7 +312,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('select', 'vertical_clasiffication', array(
-			'label'			=> 'Vertical Clasiffication:',
+			'label'			=> 'Vertical Classification:',
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -589,15 +592,18 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		
         $element = $this->getElement('use_default_streamers');
-        $element->setAttrib('checked', is_null($object->disabledDeliveryTypes) || !count($object->disabledDeliveryTypes));
-		if(!is_null($object->disabledDeliveryTypes))
+        $element->setAttrib('checked', is_null($object->customDeliveryTypes) || !count($object->customDeliveryTypes));
+		if(!is_null($object->customDeliveryTypes))
 		{
-			foreach($object->disabledDeliveryTypes as $disabledDeliveryType)
+			foreach($object->customDeliveryTypes as $customDeliveryType)
 			{
-				/* @var $disabledDeliveryType Kaltura_Client_Type_String */
-		        $element = $this->getElement('delivery_type_' . $disabledDeliveryType->value);
-		        $element->setAttrib('data-checked', false);
-        		KalturaLog::debug("delivery_type_{$disabledDeliveryType->value} checked [false]");
+				/* @var $customDeliveryType Kaltura_Client_Type_KeyBooleanValue */
+		        $element = $this->getElement('delivery_type_' . $customDeliveryType->key);
+				if ($customDeliveryType->value)
+					$element->setAttrib('data-checked', true);
+				else
+			        $element->setAttrib('data-checked', false);
+        		KalturaLog::debug("delivery_type_{$customDeliveryType->key} was set to [".$customDeliveryType->value."]");
 			}
 		}
 		
@@ -690,20 +696,25 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 		}
 
-		$systemPartnerConfiguration->disabledDeliveryTypes = array();
+		$systemPartnerConfiguration->customDeliveryTypes = array();
 		if(!isset($properties['use_default_streamers']) || !$properties['use_default_streamers'])
 		{
 			foreach($this->playerDeliveryTypes as $playerDeliveryType)
 			{
-				if(!isset($properties["delivery_type_{$playerDeliveryType->id}"]) || !$properties["delivery_type_{$playerDeliveryType->id}"])
+				/** @var Kaltura_Client_Type_PlayerDeliveryType $playerDeliveryType */
+				$deliveryEnabled = isset($properties["delivery_type_{$playerDeliveryType->id}"]) && $properties["delivery_type_{$playerDeliveryType->id}"];
+
+				// save custom delivery type only if it's different than system's default
+				if ($deliveryEnabled != $playerDeliveryType->enabledByDefault)
 				{
-					$disabledDeliveryType = new Kaltura_Client_Type_String();
-					$disabledDeliveryType->value = $playerDeliveryType->id;
-					$systemPartnerConfiguration->disabledDeliveryTypes[] = $disabledDeliveryType;
+					$customDeliveryType = new Kaltura_Client_Type_KeyBooleanValue();
+					$customDeliveryType->key = $playerDeliveryType->id;
+					$customDeliveryType->value = $deliveryEnabled;
+					$systemPartnerConfiguration->customDeliveryTypes[] = $customDeliveryType;
 				}
 			}
 		}
-		
+
 		return $systemPartnerConfiguration;
 	}
 		

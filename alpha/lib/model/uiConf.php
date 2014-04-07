@@ -105,6 +105,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_TYPE_KUPLOAD => "kupload",
 	);
 
+	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
+	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
+	
 	public function save(PropelPDO $con = null, $isClone = false)
 	{
 		try
@@ -130,7 +133,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		
 		if($this->shouldSetContent())
 		{
-			$this->incrementVersion();
 			foreach ($this->content as $contentItem) 
 			{
 				$confFile = $this->getConfFileBySuffix($contentItem['suffix']);
@@ -242,7 +244,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		$key->object_id = $this->getId();
 //		if ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA )
 		// TODO - add version to the DB
-		$key->version = $this->getVersion();
+		$key->version = $this->getVersion($sub_type);
 
 		$key->partner_id=$this->getPartnerId();
 		return $key;
@@ -319,7 +321,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		{
 			throw new Exception ( "Should not edit MANUAL ui_confs via the API!! Only via the SVN" );
 		}
+		
 		$subType = $this->getSubTypeBySuffix($file_suffix);
+		$this->incrementVersion($subType);
 		$sync_key = $this->getSyncKey( $subType );
 		
 		$this->setUpdatedAt( time() ); // make sure will be updated in the DB
@@ -677,6 +681,13 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function getAutomuted ()	{		return $this->getFromCustomData( "automuted" , null , false );	}
 	public function setAutomuted( $v )	{		return $this->putInCustomData( "automuted", $v );	}
+	
+	public function getConfFileVersion ()	 {	return $this->getFromCustomData( self::CUSTOM_DATA_CON_FILE_VERSION, null, 0);	}
+	public function setConfFileVersion( $v ) {	return $this->putInCustomData( self::CUSTOM_DATA_CON_FILE_VERSION, $v );	}
+	
+	public function getConfFileFeaturesVersion ()	 {	return $this->getFromCustomData( self::CUSTOM_DATA_CONF_FILE_FEATURES_VERSION, null, 0);	}
+	public function setConfFileFeaturesVersion( $v ) {	return $this->putInCustomData( self::CUSTOM_DATA_CONF_FILE_FEATURES_VERSION, $v );	}
+	
 
 	public function getCacheInvalidationKeys()
 	{
@@ -713,13 +724,62 @@ class uiConf extends BaseuiConf implements ISyncableFile
 			return self::FILE_NAME_CONFIG;			
 	}
 
-	public function incrementVersion()
+	public function incrementVersion($subType = self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG)
 	{
-		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::UICONF, self::FILE_SYNC_UICONF_SUB_TYPE_DATA);
+		$version = $this->getVersion($subType);
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $version, FileSyncObjectType::UICONF, $subType);
+		if($subType == self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG)
+		{
+			if(!$this->getConfFileVersion() && $this->getConfFileBySuffix())
+			{
+				$this->setConfFileVersion($version);
+			}
+			if(!$this->getConfFileFeaturesVersion() && $this->getConfFileBySuffix(self::FILE_NAME_FEATURES))
+			{
+				$this->setConfFileFeaturesVersion($version);
+			}
+		}
+											
+		$this->setVersion($newVersion, $subType);
+	}
+	
+	//by default version of the config file is returned
+	public function getVersion($subType = self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG)
+	{
+		switch ($subType)
+		{
+			case self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG:
+				return parent::getVersion();
+			case self::FILE_SYNC_UICONF_SUB_TYPE_DATA:
+				$version = $this->getConfFileVersion();
+				if($version)
+					return $version;
+				else
+					return parent::getVersion();
+			case self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES:
+				$version = $this->getConfFileFeaturesVersion();
+				if($version)
+					return $version;
+				else
+					return parent::getVersion();
+					
+		}
 		
-		//No need to calc the version again it will be the same one
-		kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::UICONF, self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG);
-									
-		$this->setVersion($newVersion);
+		return parent::getVersion();
+	}
+	
+	public function setVersion($v, $subType = self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG)
+	{
+		switch ($subType)
+		{
+			case self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG:
+				return parent::setVersion($v);
+			case self::FILE_SYNC_UICONF_SUB_TYPE_DATA:
+				return $this->setConfFileVersion($v);
+			case self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES:
+				return $this->setConfFileFeaturesVersion($v);					
+		}
+		
+		return parent::setVersion($v);
 	}
 }

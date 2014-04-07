@@ -1,3 +1,41 @@
+# IX-9.14.0 #
+
+## Image magick ##
+* In case of GS failure that indicates a corrupted file, update the flavor accordingly. 
+
+## Admin Console security tightening ##
+
+*Configuartion Changes*
+Update admin.ini:
+
+- Remove the line (will be readded in the next item)
+
+        settings.cookieNameSpace = Zend_Auth_AdminConsole"
+
+- Add the following block right under the "settings.enableKCWVisualEditor" line:
+
+        ; cookie options
+        settings.cookieNameSpace = Zend_Auth_AdminConsole
+        settings.secure_cookie_upon_https = true
+        settings.sessionOptions.cookie_httponly = true
+		
+## TagIndex job ##
+* Enable TagIndex job
+
+*Configuartion Changes*
+- Update batch.ini and workers.ini, done on saas tag (added KAsyncTagIndex)
+
+*Data update*
+- Before applying the batch configuration delete all pending jobs from batch_job_lock, will be done by Eran K. 
+
+## Admin Console "View History" Permission Fix ##
+
+*Permissions*
+
+- deployment/updates/scripts/add_permissions/2014_03_09_add_system_admin_publisher_config_to_audittrail.php
+
+---
+
 # IX-9.13.0 #
 
 ## Live sync points ##
