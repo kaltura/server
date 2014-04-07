@@ -207,6 +207,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $crmId;
+
+	/**
+	 * @var string
+	 */
+	public $referenceId;
 	
 	/**
 	 * @var string
@@ -353,6 +358,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"supportAnimatedThumbnails",
 		"crmLink",
 		"crmId",
+		"referenceId",
 		"verticalClasiffication",
 		"partnerPackageClassOfService",
 		"enableBulkUploadNotificationsEmails",

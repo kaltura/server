@@ -1526,4 +1526,7 @@ class Partner extends BasePartner
 	{
 		return $this->getUrl2();
 	}
+
+	public function getReferenceId() { return $this->getFromCustomData("referenceId", null); }
+	public function setReferenceId( $v ) { $this->putInCustomData("referenceId", $v); }
 }
