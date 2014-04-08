@@ -76,12 +76,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param string $entryId Live entry id
 	 * @param string $hostname Media server host name
 	 * @param KalturaMediaServerIndex $mediaServerIndex Media server index primary / secondary
+	 * @param string $application Media server application name
 	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::MEDIA_SERVER_NOT_FOUND
 	 */
-	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex)
+	function registerMediaServerAction($entryId, $hostname, $mediaServerIndex, $application = null)
 	{
 		$entryDc = substr($entryId, 0, 1);
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
@@ -94,7 +95,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$dbEntry->setMediaServer($mediaServerIndex, $hostname);
+		$dbEntry->setMediaServer($mediaServerIndex, $hostname, $application);
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
