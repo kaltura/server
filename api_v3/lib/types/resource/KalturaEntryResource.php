@@ -95,7 +95,8 @@ class KalturaEntryResource extends KalturaContentResource
     		if($srcEntry->getSource() != EntrySourceType::LIVE_STREAM)
     			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
     			
-    		$mediaServer = $srcEntry->getMediaServer();
+			$kMediaServer = $srcEntry->getMediaServer();
+			$mediaServer = $kMediaServer ? $kMediaServer->getMediaServer() : null;
     		if($mediaServer && !is_null($mediaServer->getDc()) && $mediaServer->getDc() != kDataCenterMgr::getCurrentDcId())
     		{
 				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($mediaServer->getDc());
