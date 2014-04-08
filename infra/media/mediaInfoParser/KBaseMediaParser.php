@@ -140,6 +140,7 @@ $container_format_synonyms = array(
 	array("flv","sorenson spark","flash video"),
 	array("asf","windows media"),
 	array("mpeg","mpegps"),
+	array("mpeg audio","mp3"),
 );
 $video_format_synonyms = array(
 	array("h264","avc","avc1"),
@@ -149,12 +150,20 @@ $video_format_synonyms = array(
 	array("vc1","wmv3"),
 	array("mpeg video","mpeg2video","mpegps"),
 	array("intermediate codec","apple intermediate codec","icod","aic"),
+	array("vp6","vp6f"),
+);
+$video_codec_id_synonyms = array(
+	array("4","[0][0][0][0]"),
+	array("2","[0][0][0][0]"),
+	array("20","mp4v"),
+	array("v_vp8","[0][0][0][0])"),
 );
 $audio_format_synonyms = array(
 	array("mpeg audio","mp3", "mp2"),
 	array("wma","wmapro"),
-	array("wma","wmav2"),
+	array("wma","wmav2","a[1][0][0]"),
 	array("pcm","pcm_s16le","pcm_s16be"),
+	array("2","[0][0][0][0]"),
 );
 $audio_codec_id_synonyms = array(
 	array("aac","40","mp4a"),
@@ -162,6 +171,9 @@ $audio_codec_id_synonyms = array(
 	array("50","p[0][0][0]"),
 	array("162","b[1][0][0]"),
 	array("55","u[0][0][0]"),
+	array("2","[0][0][0][0]"),
+	array("a_vorbis","[0][0][0][0]"),
+	array("5","[0][0][0][0]"),
 );
 
 		if(!isset($m1) && !isset($m2)) {
@@ -200,6 +212,10 @@ $audio_codec_id_synonyms = array(
 				}
 				
 				if($f=="videoFormat" && self::isSynonym($f1, $f2, $video_format_synonyms)==true){
+					continue;
+				}
+				
+				if($f=="videoCodecId" && self::isSynonym($f1, $f2, $video_codec_id_synonyms)==true){
 					continue;
 				}
 				

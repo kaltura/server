@@ -396,7 +396,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param $srcFileName
 	 * @return number
 	 */
-	private static function checkForScanType($ffmpegBin, $srcFileName, $frames=100)
+	private static function checkForScanType($ffmpegBin, $srcFileName, $frames=1000)
 	{
 /*
 	ffmpeg-2.1.3 -filter:v idet -frames:v 100 -an -f rawvideo -y /dev/null -nostats -i /mnt/shared/Media/114141.flv
@@ -414,16 +414,18 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
-		$scanType = 0; // Default would be 'progressive'
+		$tff=0; $bff=0; $progessive=0; $undermined=0;
 		foreach($outputArr as $line){
 			if(strstr($line, "Parsed_idet")==false)
 				continue;
 			KalturaLog::log($line);
 			$str = strstr($line, "TFF");
-			sscanf($str,"TFF:%d BFF:%d Progressive:%d Undetermined:%d", $tff, $bff, $progessive, $undermined);
-			if($progessive<$tff+$bff)
-				$scanType = 1;
+			sscanf($str,"TFF:%d BFF:%d Progressive:%d Undetermined:%d", $t, $b, $p, $u);
+			$tff+=$t; $bff+=$b; $progessive+=$p; $undermined+=$u;
 		}
+		$scanType = 0; // Default would be 'progressive'
+		if($progessive<$tff+$bff)
+			$scanType = 1;
 		KalturaLog::log("ScanType: $scanType");
 		return $scanType;
 	}
