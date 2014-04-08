@@ -75,7 +75,11 @@ class kBitGravityUrlTokenizer extends kUrlTokenizer
 
 			$hashData = $this->_secret.'/'.ltrim($hashit, '/').'?e='.$expiryTime;
 			$hash = md5($hashData);
-			return $url.'?e='.$expiryTime.'&h='.$hash;
+			if (strpos($url, '?') !== false)
+				$s = '&';
+			else
+				$s = '?';
+			return $url.$s.'e='.$expiryTime.'&h='.$hash;
 		}
 		return $url;
 	}

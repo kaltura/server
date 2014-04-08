@@ -94,7 +94,11 @@ class kFmsUrlManager extends kUrlManager
 		$pattern = $this->getUrlPatternForProtocol($this->protocol);
 
 		if ($pattern)
-			return str_replace('{url}', $url, $pattern);
+		{
+			$pattern = str_replace('{url}', $url, $pattern);
+			$pattern = str_replace('{seekFromSec}', $this->seekFromTime / 1000, $pattern);
+			return $pattern;
+		}
 		else
 			return '/'.$url; // the trailing slash will force adding the host name to the url
 	}
