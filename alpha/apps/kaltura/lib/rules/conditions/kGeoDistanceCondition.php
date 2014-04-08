@@ -47,7 +47,7 @@ class kGeoDistanceCondition extends kMatchCondition
 
 		$ip = $scope->getIp();
 		$ipGeo = kGeoCoderManager::getGeoCoder($this->getGeoCoderType());
-		return $ipGeo->getCoordinates($ip);
+		return array($ipGeo->getCoordinates($ip)); // wrap in an array since otherwise the coordinates will be perceived as a list of two values
 	}
 	
 	/* (non-PHPdoc)
