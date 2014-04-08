@@ -124,6 +124,16 @@ class StorageProfile extends BaseStorageProfile
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL);
 	}
+	
+	//Since the addition of configuring https base url on remote storages we need to take into consideration when to return the https base url
+	//and when to return the http. This adds this logic.
+	public function getDeliveryHttpBaseUrl($forceHttps = false)
+	{
+		if ($forceHttps && isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && $this->getDeliveryHttpsBaseUrl())
+			return $this->getDeliveryHttpsBaseUrl();
+		
+		return $this->delivery_http_base_url;
+	}
 
 	public function setDeliveryHttpsBaseUrl($v)
 	{

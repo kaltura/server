@@ -476,7 +476,7 @@ class asset extends Baseasset implements ISyncableFile
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $this->getEntryId());
 		$urlManager->setFileExtension($this->getFileExt());
 		
-		$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		$url = rtrim($storage->getDeliveryHttpBaseUrl(true), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 		return $url;
 	}
 	
