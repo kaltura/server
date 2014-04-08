@@ -29,16 +29,22 @@ class kLiveMediaServer
 	protected $hostname;
 	
 	/**
+	 * @var string
+	 */
+	protected $application;
+	
+	/**
 	 * @var int
 	 */
 	protected $time;
 	
-	public function __construct($index, $hostname, $dc = null, $id = null)
+	public function __construct($index, $hostname, $dc = null, $id = null, $application = null)
 	{
 		$this->index = $index;
 		$this->mediaServerId = $id;
 		$this->hostname = $hostname;
 		$this->dc = $dc;
+		$this->application = $application;
 		$this->time = time();
 	}
 	
@@ -88,5 +94,13 @@ class kLiveMediaServer
 	public function getTime()
 	{
 		return $this->time;
+	}
+	
+	/**
+	 * @return the $application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
 	}
 }
