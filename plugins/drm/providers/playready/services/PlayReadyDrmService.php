@@ -10,6 +10,7 @@ class PlayReadyDrmService extends KalturaBaseService
 	const PLAY_READY_BEGIN_DATE_PARAM = 'playReadyBeginDate';
 	const PLAY_READY_EXPIRATION_DATE_PARAM = 'playReadyExpirationDate';
 	const MYSQL_CODE_DUPLICATE_KEY = 23000;
+	const LOG_TYPE_PLAYREADY_ANALYTICS = 'LOG_TYPE_PLAYREADY_ANALYTICS';
 	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -137,25 +138,26 @@ class PlayReadyDrmService extends KalturaBaseService
 	{
 		KalturaLog::debug('Get Play Ready license details for keyID: '.$keyId);
 		
-		$entry = $this->getLicenseRequestEntry($keyId, $entryId);		
-		
-		$policyId = $this->validateAccessControl($entry, $referrer); 
-		$dbPolicy = DrmPolicyPeer::retrieveByPK($policyId);
-		if(!$dbPolicy)
-			throw new KalturaAPIException(KalturaPlayReadyErrors::PLAYREADY_POLICY_OBJECT_NOT_FOUND, $policyId);
-			
-		list($beginDate, $expirationDate, $removalDate) = $this->calculateLicenseDates($dbPolicy, $entry);
-		
-		$policy = new KalturaPlayReadyPolicy();
-		$policy->fromObject($dbPolicy);
-		
-		$this->registerDevice($deviceId, $deviceType);
+//		$entry = $this->getLicenseRequestEntry($keyId, $entryId);		
+//		
+//		$policyId = $this->validateAccessControl($entry, $referrer); 
+//		$dbPolicy = DrmPolicyPeer::retrieveByPK($policyId);
+//		if(!$dbPolicy)
+//			throw new KalturaAPIException(KalturaPlayReadyErrors::PLAYREADY_POLICY_OBJECT_NOT_FOUND, $policyId);
+//			
+//		list($beginDate, $expirationDate, $removalDate) = $this->calculateLicenseDates($dbPolicy, $entry);
+//		
+//		$policy = new KalturaPlayReadyPolicy();
+//		$policy->fromObject($dbPolicy);
+//		
+//		$this->registerDevice($deviceId, $deviceType);
+		$this->logAnalytics($deviceId);
 		
 		$response = new KalturaPlayReadyLicenseDetails();
-		$response->policy = $policy;
-		$response->beginDate = $beginDate;
-		$response->expirationDate = $expirationDate;
-		$response->removalDate = $removalDate;
+//		$response->policy = $policy;
+//		$response->beginDate = $beginDate;
+//		$response->expirationDate = $expirationDate;
+//		$response->removalDate = $removalDate;
 				
 		return $response;
 	}
@@ -163,7 +165,6 @@ class PlayReadyDrmService extends KalturaBaseService
 	private function registerDevice($deviceId, $deviceType)
 	{
 		KalturaLog::debug("device id: ".$deviceId." device type: ".$deviceType);
-		//TODO: log for BI
 		if($deviceType != 1 && $deviceType != 7) //TODO: verify how to identify the silverlight client
 		{
 			try 
@@ -319,5 +320,16 @@ class PlayReadyDrmService extends KalturaBaseService
 			return $drmKey->getDrmKey();
 		else
 			return null;
+	}
+	
+	private function logAnalytics($deviceId)
+	{
+		//log for analytics
+		$data = array(
+			'playready_license',
+			'partnerId' => $this->getPartnerId(),
+			'deviceId' => $deviceId
+		);
+		KalturaLog::logByType(implode(',', $data), self::LOG_TYPE_PLAYREADY_ANALYTICS, KalturaLog::NOTICE);						
 	}
 }
