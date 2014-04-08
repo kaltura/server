@@ -266,10 +266,11 @@ abstract class LiveEntry extends entry
 		}
 		$configurations = array();
 		$manifestUrl = null;
-		$mediaServer = $this->getMediaServer();
+		$kMediaServer = $this->getMediaServer();
+		$mediaServer = $kMediaServer ? $kMediaServer->getMediaServer() : null;
 		if($mediaServer)
 		{
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol, $kMediaServer->getApplication());
 		}
 		elseif (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
@@ -283,7 +284,7 @@ abstract class LiveEntry extends entry
 		{
 			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
-				$tag = 'all';
+				$tag = 'mbr';
 			
 			if($tag)
 				$streamName = "smil:{$streamName}_{$tag}.smil";
@@ -344,7 +345,7 @@ abstract class LiveEntry extends entry
 	}
 	
 	/**
-	 * @return MediaServer
+	 * @return kLiveMediaServer
 	 */
 	public function getMediaServer($currentDcOnly = false)
 	{
@@ -358,7 +359,7 @@ abstract class LiveEntry extends entry
 			{
 				KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
 				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
-					return $kMediaServer->getMediaServer();
+					return $kMediaServer;
 			}
 		}
 		if($currentDcOnly)
@@ -366,7 +367,7 @@ abstract class LiveEntry extends entry
 		
 		$kMediaServer = reset($kMediaServers);
 		if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
-			return $kMediaServer->getMediaServer();
+			return $kMediaServer;
 			
 		KalturaLog::debug("No Valid Media Servers Were Found For Current Live Entry [" . $this->getEntryId() . "]" );
 		return null;
@@ -432,7 +433,7 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, $hostname)
+	public function setMediaServer($index, $hostname, $app)
 	{
 		$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
 		if (!$mediaServer)
@@ -444,7 +445,7 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
-		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
+		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, $app);
 		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	

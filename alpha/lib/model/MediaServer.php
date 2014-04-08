@@ -71,7 +71,7 @@ class MediaServer extends BaseMediaServer {
 		return MediaServer::DEFAULT_GPUID;
 	}
 	
-	public function getManifestUrl($protocol = 'http')
+	public function getManifestUrl($protocol = 'http', $registeredApp)
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
@@ -121,6 +121,11 @@ class MediaServer extends BaseMediaServer {
 				if(isset($mediaServer['domain']))
 					$domain = $mediaServer['domain'];
 			}
+		}
+		
+		if($registeredApp)
+		{
+			$app = $registeredApp;
 		}
 		
 		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
