@@ -143,7 +143,12 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$properties = $transcode->addChild('Properties');
 		
-		return new kRendererString($root->asXML(), 'text/xml');
+		$dom = new DOMDocument("1.0");
+		$dom->preserveWhiteSpace = false;
+		$dom->formatOutput = true;
+		$dom->loadXML($root->asXML());
+		
+		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
 	
 	protected function appendLiveParams(LiveStreamEntry $entry, MediaServer $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
@@ -152,39 +157,59 @@ class LiveConversionProfileService extends KalturaBaseService
 		$videoCodec = 'PassThru';
 		$audioCodec = 'AAC';
 		$profile = 'main';
+		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
 		
-		if(!$liveParams->hasTag(liveParams::TAG_INGEST))
+		$encode = $encodes->addChild('Encode');
+		$encode->addChild('Enable', 'true');
+		$encode->addChild('Name', $systemName);
+		$encode->addChild('StreamName', $streamName);
+		$video = $encode->addChild('Video');
+		$audio = $encode->addChild('Audio');
+		
+		if($liveParams->hasTag(liveParams::TAG_SOURCE))
 		{
-			if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
+			$video->addChild('Codec', 'PassThru');
+			$audio->addChild('Codec', 'AAC');
+			$audio->addChild('Bitrate', 96000);
+			return;
+		}
+		
+		if($liveParams->hasTag(liveParams::TAG_INGEST))
+		{
+			$video->addChild('Codec', 'PassThru');
+			$audio->addChild('Codec', 'PassThru');
+			return;
+		}
+		
+		if($liveParams->getWidth() || $liveParams->getHeight() || $liveParams->getFrameRate())
+		{
+			switch ($liveParams->getVideoCodec())
 			{
-				switch ($liveParams->getVideoCodec())
-				{
-					case flavorParams::VIDEO_CODEC_COPY:
-						$videoCodec = 'PassThru';
-						break;
-						
-					case flavorParams::VIDEO_CODEC_FLV:
-					case flavorParams::VIDEO_CODEC_VP6:
-					case flavorParams::VIDEO_CODEC_H263:
-						$profile = 'baseline';
-						$videoCodec = 'H.263';
-						break;
-						
-					case flavorParams::VIDEO_CODEC_H264:
-					case flavorParams::VIDEO_CODEC_H264B:
-						$profile = 'baseline';
-						// don't break
-						
-					case flavorParams::VIDEO_CODEC_H264H:
-					case flavorParams::VIDEO_CODEC_H264M:
-						$streamName = "mp4:$streamName";
-						$videoCodec = 'H.264';
-						break;
-						
-					default:
-						KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
-						break;
-				}
+				case flavorParams::VIDEO_CODEC_COPY:
+					$videoCodec = 'PassThru';
+					break;
+					
+				case flavorParams::VIDEO_CODEC_FLV:
+				case flavorParams::VIDEO_CODEC_VP6:
+				case flavorParams::VIDEO_CODEC_H263:
+					$profile = 'baseline';
+					$videoCodec = 'H.263';
+					break;
+					
+				case flavorParams::VIDEO_CODEC_H264:
+				case flavorParams::VIDEO_CODEC_H264B:
+					$profile = 'baseline';
+					// don't break
+					
+				case flavorParams::VIDEO_CODEC_H264H:
+				case flavorParams::VIDEO_CODEC_H264M:
+					$streamName = "mp4:$streamName";
+					$videoCodec = 'H.264';
+					break;
+					
+				default:
+					KalturaLog::err("Live params video codec id [" . $liveParams->getVideoCodec() . "] is not expected");
+					break;
 			}
 		
 			if($liveParams->getAudioSampleRate() || $liveParams->getAudioChannels())
@@ -203,19 +228,11 @@ class LiveConversionProfileService extends KalturaBaseService
 			}
 		}
 		
-		$systemName = $liveParams->getSystemName() ? $liveParams->getSystemName() : $liveParams->getId();
-		
-		$encode = $encodes->addChild('Encode');
-		$encode->addChild('Enable', 'true');
-		$encode->addChild('Name', $systemName);
-		$encode->addChild('StreamName', $streamName);
-		$video = $encode->addChild('Video');
-		$video->addChild('Codec', $videoCodec);
 		$video->addChild('Transcoder', $mediaServer ? $mediaServer->getTranscoder() : MediaServer::DEFAULT_TRANSCODER);
 		$video->addChild('GPUID', $mediaServer ? $mediaServer->getGPUID() : MediaServer::DEFAULT_GPUID);
 		$frameSize = $video->addChild('FrameSize');
 	
-		if($liveParams->hasTag(liveParams::TAG_INGEST) || (!$liveParams->getWidth() && !$liveParams->getHeight()))
+		if(!$liveParams->getWidth() && !$liveParams->getHeight())
 		{
 			$frameSize->addChild('FitMode', 'match-source');
 		}
@@ -236,14 +253,14 @@ class LiveConversionProfileService extends KalturaBaseService
 			$frameSize->addChild('Height', $liveParams->getHeight());
 		}
 		
+		$video->addChild('Codec', $videoCodec);
 		$video->addChild('Profile', $profile);
-		$video->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getVideoBitrate()) ? $liveParams->getVideoBitrate() * 1024 : '${SourceVideoBitrate}');
+		$video->addChild('Bitrate', $liveParams->getVideoBitrate() ? $liveParams->getVideoBitrate() * 1024 : 240000);
 		$keyFrameInterval = $video->addChild('KeyFrameInterval');
-		$keyFrameInterval->addChild('FollowSource', 'false');
+		$keyFrameInterval->addChild('FollowSource', 'true');
 		$keyFrameInterval->addChild('Interval', 60);
 		
-		$audio = $encode->addChild('Audio');
 		$audio->addChild('Codec', $audioCodec);
-		$audio->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getAudioBitrate()) ? $liveParams->getAudioBitrate() * 1024 : '${SourceAudioBitrate}');
+		$audio->addChild('Bitrate', $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000);
 	}
 }
