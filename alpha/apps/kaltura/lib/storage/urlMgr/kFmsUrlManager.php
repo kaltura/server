@@ -96,7 +96,7 @@ class kFmsUrlManager extends kUrlManager
 		if ($pattern)
 		{
 			$pattern = str_replace('{url}', $url, $pattern);
-			$pattern = str_replace('{seek}', $this->seekFromTime / 1000, $pattern);
+			$pattern = str_replace('{seekFromSec}', $this->seekFromTime / 1000, $pattern);
 			return $pattern;
 		}
 		else
