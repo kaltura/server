@@ -20,17 +20,18 @@ class LiveConversionProfileService extends KalturaBaseService
 	}
 	
 	/**
-	 * Allows you to add a new KalturaDropFolderFile object
+	 * Returns Wowza transcoding template
 	 * 
 	 * @action serve
 	 * @param string $streamName the id of the live entry with it's stream suffix
 	 * @param string $hostname the media server host name
+	 * @param KalturaWowzaTemplateOptions $options Wowza template additional options
 	 * @return file
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws WowzaErrors::INVALID_STREAM_NAME
 	 */
-	public function serveAction($streamName, $hostname = null)
+	public function serveAction($streamName, $hostname = null, KalturaWowzaTemplateOptions $options = null)
 	{
 		$matches = null;
 		if(!preg_match('/^(\d_.{8})_(.+)$/', $streamName, $matches))
@@ -100,6 +101,19 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$transcode = $root->addChild('Transcode');
 		
+		$addSourceToAll = true;
+		if($options && $options->convertSourceAudio)
+		{
+			foreach($liveParams as $liveParamsItem)
+			{
+				if($liveParamsItem->hasTag(assetParams::TAG_MBR))
+				{
+					$addSourceToAll = false;
+					break;
+				}
+			}
+		}
+		
 		$encodes = $transcode->addChild('Encodes');
 		$groups = array();
 		foreach($liveParams as $liveParamsItem)
@@ -108,9 +122,13 @@ class LiveConversionProfileService extends KalturaBaseService
 			if(!$liveParamsItem->hasTag(assetParams::TAG_SOURCE) && in_array($liveParamsItem->getId(), $ignoreLiveParamsIds))
 				continue;
 				
-			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem);
+			$this->appendLiveParams($entry, $mediaServer, $encodes, $liveParamsItem, $options);
 			$tags = $liveParamsItem->getTagsArray();
-			$tags[] = 'all';
+			if($liveParamsItem->hasTag(assetParams::TAG_MBR) || ($addSourceToAll && $liveParamsItem->hasTag(assetParams::TAG_SOURCE)))
+			{
+				$tags[] = 'all';
+			}
+			
 			foreach($tags as $tag)
 			{
 				if(!isset($groups[$tag]))
@@ -143,15 +161,28 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$properties = $transcode->addChild('Properties');
 		
-		return new kRendererString($root->asXML(), 'text/xml');
+		$dom = new DOMDocument("1.0");
+		$dom->preserveWhiteSpace = false;
+		$dom->formatOutput = true;
+		$dom->loadXML($root->asXML());
+		
+		return new kRendererString($dom->saveXML(), 'text/xml');
 	}
 	
-	protected function appendLiveParams(LiveStreamEntry $entry, MediaServer $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams)
+	protected function appendLiveParams(LiveStreamEntry $entry, MediaServer $mediaServer = null, SimpleXMLElement $encodes, liveParams $liveParams, KalturaWowzaTemplateOptions $options = null)
 	{
+		$profile = 'main';
 		$streamName = $entry->getId() . '_' . $liveParams->getId();
 		$videoCodec = 'PassThru';
-		$audioCodec = 'AAC';
-		$profile = 'main';
+		
+		$audioCodec = 'PassThru';
+		$audioBitrate = '${SourceAudioBitrate}';
+		
+		if($options && $options->convertSourceAudio && $liveParams->hasTag(liveParams::TAG_SOURCE))
+		{
+			$audioCodec = 'AAC';
+			$audioBitrate = '96000';
+		}
 		
 		if(!$liveParams->hasTag(liveParams::TAG_INGEST))
 		{
@@ -194,6 +225,7 @@ class LiveConversionProfileService extends KalturaBaseService
 					case flavorParams::AUDIO_CODEC_AAC:
 					case flavorParams::AUDIO_CODEC_AACHE:
 						$audioCodec = 'AAC';
+						$audioBitrate = $liveParams->getAudioBitrate() ? $liveParams->getAudioBitrate() * 1024 : 96000;
 						break;
 					
 					default:
@@ -244,6 +276,6 @@ class LiveConversionProfileService extends KalturaBaseService
 		
 		$audio = $encode->addChild('Audio');
 		$audio->addChild('Codec', $audioCodec);
-		$audio->addChild('Bitrate', (!$liveParams->hasTag(liveParams::TAG_INGEST) && $liveParams->getAudioBitrate()) ? $liveParams->getAudioBitrate() * 1024 : '${SourceAudioBitrate}');
+		$audio->addChild('Bitrate', $audioBitrate);
 	}
 }
