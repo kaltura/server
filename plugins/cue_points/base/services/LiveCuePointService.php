@@ -53,10 +53,14 @@ class LiveCuePointService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		/* @var $dbEntry LiveStreamEntry */
-		$mediaServer = $dbEntry->getMediaServer(true);
-		if(!$mediaServer)
+		$kMediaServer = $dbEntry->getMediaServer(true);
+		if(!$kMediaServer)
 			throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $entryId);
 			
+		$mediaServer = $dbEntry->getMediaServer();
+		if(!$mediaServer)
+			throw new KalturaAPIException(KalturaErrors::NO_MEDIA_SERVER_FOUND, $entryId);
+		
 		$mediaServerCuePointsService = $mediaServer->getWebService(MediaServer::WEB_SERVICE_CUE_POINTS);
 		if($mediaServerCuePointsService && $mediaServerCuePointsService instanceof KalturaMediaServerCuePointsService)
 		{
