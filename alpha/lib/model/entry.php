@@ -3076,7 +3076,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 			
 			$audioEntryExist = false;
-                        
+			$audioThumbEntry = null;
+			$audioThumbEntryId = null;
+			
 			$partner = $this->getPartner();
 			if ($partner)
 				$audioThumbEntryId = $partner->getAudioThumbEntryId();
