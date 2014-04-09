@@ -21,7 +21,9 @@ abstract class LiveEntry extends entry
 		$contentPath = myContentStorage::getFSContentRootPath();
 		
 		$liveEntryExist = false;
-
+		$liveThumbEntry = null;
+		$liveThumbEntryId = null;
+		
 		$partner = $this->getPartner();
 		if ($partner)
 			$liveThumbEntryId = $partner->getLiveThumbEntryId();
