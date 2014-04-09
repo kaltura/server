@@ -8,7 +8,7 @@ class kGeoUtils
 	public static function isInGeoDistance($coordinates, $range)
 	{
 		list($latitude1, $longitude1) = $coordinates;
-		list($latitude2, $longitude2, $radius) = explode(":", $range);
+		list($latitude2, $longitude2, $radius) = explode(",", $range);
 		$latitudate2 = (double)$latitude2;
 		$longitude2 = (double)$longitude2;
 		$radius = (double)$radius;
