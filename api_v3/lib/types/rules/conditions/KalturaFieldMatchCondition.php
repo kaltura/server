@@ -57,6 +57,10 @@ class KalturaFieldMatchCondition extends KalturaMatchCondition
 				$this->field = new KalturaUserAgentContextField();
 				break;
 				
+			case 'kCoordinatesContextField':
+				$this->field = new KalturaCoordinatesContextField();
+				break;
+				
 			default:
 				$this->field = KalturaPluginManager::loadObject('KalturaStringField', $fieldType);
 				break;
