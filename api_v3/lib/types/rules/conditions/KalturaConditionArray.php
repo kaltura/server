@@ -48,7 +48,9 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaAssetPropertiesCompareCondition();
 			case ConditionType::USER_ROLE:
 				return new KalturaUserRoleCondition();
-			default:
+			case ConditionType::GEO_DISTANCE:
+				return new KalturaGeoDistanceCondition();
+				default:
 				return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
 	}

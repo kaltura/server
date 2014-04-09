@@ -6,6 +6,7 @@ require_once(dirname(__FILE__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
+require_once(dirname(__FILE__) . '/../request/kGeoUtils.php');
 require_once(dirname(__FILE__) . '/../monitor/KalturaMonitorClient.php');
 
 /**
@@ -81,6 +82,7 @@ class kApiCache extends kApiCacheBase
 	// extra fields
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
+	protected static $_coordinates = null;			// caches the latitude and longitude of the user issuing this request
 	
 	protected $clientTag = null;
 	
@@ -237,6 +239,17 @@ class kApiCache extends kApiCacheBase
 		return self::$_country;
 	}
 
+	static protected function getCoordinates()
+	{
+		if (is_null(self::$_coordinates))
+		{
+			require_once(dirname(__FILE__) . '/../request/kIP2Location.php');
+			$ipAddress = infraRequestUtils::getRemoteAddress();
+			self::$_coordinates = kIP2Location::ipToCoordinates($ipAddress);
+		}
+		return self::$_coordinates;
+	}
+
 	protected function getFieldValues($extraField)
 	{
 		switch ($extraField)
@@ -258,7 +271,10 @@ class kApiCache extends kApiCacheBase
 		case self::ECF_COUNTRY:
 			return array(self::getCountry());
 
-		case self::ECF_IP:
+		case self::ECF_COORDINATES:
+			return array(self::getCoordinates());
+
+			case self::ECF_IP:
 			return array(infraRequestUtils::getRemoteAddress());
 		}
 
@@ -306,6 +322,16 @@ class kApiCache extends kApiCacheBase
 					return true;
 			}
 			return false;
+			
+		case self::COND_GEO_DISTANCE:
+			if (!count($refValue))
+				return null;
+			foreach($refValue as $curRefValue)
+			{
+				if (kGeoUtils::isInGeoDistance($fieldValue, $curRefValue))
+					return true;
+			}
+			return false;
 		}
 		return $strippedFieldValue;
 	}
@@ -317,6 +343,7 @@ class kApiCache extends kApiCacheBase
 		case self::COND_REGEX:
 		case self::COND_MATCH:
 		case self::COND_SITE_MATCH:
+		case self::COND_GEO_DISTANCE:
 			return "_{$condition}_" . implode(',', $refValue);
 		case self::COND_IP_RANGE:
 			return "_{$condition}_" . implode(',', str_replace('/', '_', $refValue)); // ip range can contain slashes
