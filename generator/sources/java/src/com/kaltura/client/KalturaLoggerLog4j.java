@@ -27,16 +27,31 @@
 // ===================================================================================================
 package com.kaltura.client;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
 
 public class KalturaLoggerLog4j extends Logger implements IKalturaLogger
 {
 	protected Logger logger;
-
+	static protected LoggerFactory loggerFactory = new KalturaLoggerFactory();
+	
+	static class KalturaLoggerFactory implements LoggerFactory {
+		@Override
+		public Logger makeNewLoggerInstance(String name) {
+			return new KalturaLoggerLog4j(name);
+		}
+	}
+	
 	// Creation & retrieval methods:
 	public static IKalturaLogger get(String name)
 	{
-		return new KalturaLoggerLog4j(name);
+		Logger logger = LogManager.getLogger(name, loggerFactory);
+		if(logger instanceof Logger){
+			return (KalturaLoggerLog4j) logger;
+		}
+		
+		return null;
 	}
 	
 	protected KalturaLoggerLog4j(String name)
