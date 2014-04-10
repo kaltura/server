@@ -2560,20 +2560,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 		
 		
-		$trackColumns = array(
-			entryPeer::STATUS,
-			entryPeer::MODERATION_STATUS,
-			entryPeer::KUSER_ID,
-			entryPeer::CREATOR_KUSER_ID,
-			entryPeer::ACCESS_CONTROL_ID,
-			
-			'' => array(
-				'replacementStatus',
-				'replacingEntryId',
-				'replacedEntryId',
-				'redirectEntryId',
-			)
-		);
+		$trackColumns = $this->getTrackColumns();
 		
 		$changedProperties = array();
 		foreach($trackColumns as $namespace => $trackColumn)
@@ -2591,7 +2578,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 								$column = "$namespace.$trackCustomData";
 								
 							$previousValue = $this->oldCustomDataValues[$namespace][$trackCustomData];
+							$previousValue = is_scalar ($previousValue) ? $previousValue : $this->getTrackEntryString($namespace, $trackCustomData, $previousValue);
 							$newValue = $this->getFromCustomData($trackCustomData, $namespace);
+							$newValue = is_scalar ($newValue) ? $newValue : $this->getTrackEntryString($namespace, $trackCustomData, $newValue);
 							$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
 						}
 					}
@@ -3058,6 +3047,32 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	public function setSearchProviderType($value)
 	{
 		$this->setSource($value);
+	}
+	
+	/**
+	 * 
+	 * @return array
+	 */
+	protected function getTrackColumns ()
+	{
+		return array(
+			entryPeer::STATUS,
+			entryPeer::MODERATION_STATUS,
+			entryPeer::KUSER_ID,
+			entryPeer::CREATOR_KUSER_ID,
+			entryPeer::ACCESS_CONTROL_ID,
+			'' => array(
+				'replacementStatus',
+				'replacingEntryId',
+				'replacedEntryId',
+				'redirectEntryId',
+			)
+		);
+	}
+	
+	protected function getTrackEntryString ($namespace, $customDataColumn, $value)
+	{
+		//No need for implementation - for example, see extending logic in class LiveEntry
 	}
 	
 /**

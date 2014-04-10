@@ -570,4 +570,22 @@ abstract class LiveEntry extends entry
 			
 		return false;
 	}
+	
+	protected function getTrackColumns ()
+	{
+		$basicColumns = parent::getTrackColumns();
+		return array_merge($basicColumns, array ('mediaServers' => array('server-0'),));
+	}
+	
+	/**
+	 * 
+	 * This function returns the tracking object's string value
+	 */
+	protected function getTrackEntryString ($namespace, $customDataColumn, $value)
+	{
+		if ($namespace == 'mediaServers' && $value instanceof kLiveMediaServer)
+		{
+			return $value->getHostname();
+		}
+	}
 }
