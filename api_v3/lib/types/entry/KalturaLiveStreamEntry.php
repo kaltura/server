@@ -186,6 +186,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
 		}
+		
+		parent::validateForInsert($propertiesToSkip);
 	}
 	
 	protected function validateEncodingIP ($ip)
