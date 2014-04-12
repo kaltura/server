@@ -322,6 +322,14 @@ function xmlToArray($xmlstring)
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
 	$array = json_decode($json,TRUE);
+	if (!$array) {
+		// failed to parse as XML try JSON (for feeds)
+		$xmlstring = preg_replace ( '/,\s*\]/', ']', $xmlstring );
+		$xmlstring = preg_replace ( '/,\s*\}/', '}', $xmlstring );
+		$array = json_decode ( $xmlstring, TRUE );
+		if ($array)
+			echo "\nSuccessfully parsed as json";
+	}
 	return $array;
 }
 
@@ -381,7 +389,7 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 					break;		// id is different, all other fields will be different as well
 			}
 		}
-		else
+		else if ($newValue !== $oldValue)
 		{
 			$errors[$subPath] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
 		}
@@ -1294,6 +1302,9 @@ class LogProcessorUriList implements LogProcessor
 			$action = $matches[1];
 
 		$fullActionName = "$service.$action";
+		if ($fullActionName == '.')
+			$fullActionName = $uri;
+		
 		testAction(null, $fullActionName, array(), $uri);
 	}
 }
