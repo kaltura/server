@@ -45,7 +45,7 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 		if(!$storage)
 			return $path;
 	
-		if(!$this->getHostName()) {
+		if($this->getHostName()) {
 			$urlSuffix = str_replace('\\', '/', $path);
 			$urlPrefix = "http://" . $this->getHostName();
 			return $urlPrefix. '/' . ltrim($urlSuffix, '/');

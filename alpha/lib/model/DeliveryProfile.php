@@ -7,8 +7,6 @@
  */
 abstract class DeliveryProfile extends BaseDeliveryProfile {
 	
-	// @_!! TODO Set 82 back to be default!
-	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	
 	/**
@@ -172,12 +170,17 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$subpId = $asset->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $asset->getId();
-		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
+		$cdnHost = parse_url($this->host_name, PHP_URL_HOST);
+		$this->initDeliveryDynamicAttribtues(null, $asset);
 	
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->params->getMediaProtocol()}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->params->getMediaProtocol()}/format/url/cdnHost/$cdnHost";
 		if($this->params->getStorageProfileId())
 			$url .= "/storageId/" . $this->params->getStorageProfileId();
-	
+		
+		if ($asset && $asset->getFileExt())
+			$url .= "/a." . $asset->getFileExt();
+		
+		$url .= "?clientTag=$clientTag";
 		return $url;
 	}
 	

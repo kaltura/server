@@ -9,7 +9,8 @@ class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 	const MAX_SEGMENTS_TO_CHECK = 3;
 	const MAX_FLAVORS_TO_CHECK = 3;
 	
-	// TODO @_!! Externalize
+	// TODO Once we found someone who uses this tokenizer parameters, 
+	// These should be externalized.
 	public function setParamName($v)
 	{
 		$this->putInCustomData("paramName", $v);

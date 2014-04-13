@@ -5,7 +5,8 @@
  */
 class DeliveryProfileVelocixLiveHds extends DeliveryProfileLiveHds
 {
-	// TODO @_!! Externalize
+	// TODO Once we found someone who uses this tokenizer parameters, 
+	// These should be externalized.
 	public function setParamName($v)
 	{
 		$this->putInCustomData("paramName", $v);

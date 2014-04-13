@@ -7,7 +7,7 @@
 class KalturaDeliveryProfileFactory {
 	
 	public static function getCoreDeliveryProfileInstanceByType($type) {
-		$coreType = kPluginableEnumsManager::apiToCore('DeliveryProfile', $type); 
+		$coreType = kPluginableEnumsManager::apiToCore('DeliveryProfileType', $type); 
 		$class = DeliveryProfilePeer::getClassByDeliveryProfileType($coreType);
 		return new $class();
 	}

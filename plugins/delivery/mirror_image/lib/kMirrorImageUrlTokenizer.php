@@ -1,9 +1,11 @@
 <?php
-// @_!! Extenalize
+
 class kMirrorImageUrlTokenizer extends kUrlTokenizer
 {
     const DEFAULT_START_TIME_PAST_OFFSET = 86400; // yesterday
 
+    // TODO Once we found someone who uses this tokenizer parameters,
+    // These should be externalized.
 	protected $useDummyHost;
 	protected $baseUrl;
 	

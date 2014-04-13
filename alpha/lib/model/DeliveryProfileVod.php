@@ -1,9 +1,5 @@
 <?php
 
-/**
- * 
- * TODO @_!! Extract interface
- */
 abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 	/**

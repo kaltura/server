@@ -2,7 +2,8 @@
 class kVelocixUrlTokenizer extends kUrlTokenizer
 {
 
-	// TODO @_!! Externalize
+	// TODO Once we found someone who uses this tokenizer parameters, 
+	// These should be externalized.
 	protected $protocol;
 	protected $streamName;
 	protected $hdsPaths;

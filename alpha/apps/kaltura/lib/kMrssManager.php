@@ -249,14 +249,27 @@ class kMrssManager
 			return null;
 			
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttribtues(null, $asset);
 		
 		if($servePlayManifest)
 		{
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
+			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+			
+			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
+			$urlManager->setHostName($cdnHost);
+			$urlManager->setDynamicAttribtues($dynamicAttrs);
+
+			if (!$storage->getDeliveryHttpsBaseUrl())
+				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
+			else
+				$url = requestUtils::getApiCdnHost();
+
+			$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
-			$urlManager->initDeliveryDynamicAttribtues($asset);
+			$urlManager->setFileExtension($asset->getFileExt());
 			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
@@ -285,6 +298,12 @@ class kMrssManager
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
 		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($asset->getEntryId());
+		$dynamicAttrs = new DeliveryProfileDynamicAttributes();
+		$urlManager->setHostName($cdnHost);
+		$urlManager->setDynamicAttribtues($dynamicAttrs);
+		
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttribtues(null, $asset);
 		
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{

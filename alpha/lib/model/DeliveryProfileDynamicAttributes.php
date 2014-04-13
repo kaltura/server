@@ -83,7 +83,7 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var string
 	 */
-	protected $mediaProtocol;
+	protected $mediaProtocol = PlaybackProtocol::HTTP;
 	
 	/**
 	 * @return the $format
