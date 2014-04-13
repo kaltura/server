@@ -418,19 +418,18 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 	}
 	
-	private function createLiveConversionProfiles(Partner $partner)
+	private function copyMissingConversionProfiles(Partner $partner)
 	{
 		$c = new Criteria();
 		$c->add(conversionProfile2Peer::PARTNER_ID, $partner->getId());
-		$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
 		$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 		
 		if(conversionProfile2Peer::doCount($c))
 			return;
 			
-		$templatePartner = PartnerPeer::retrieveByPK(kConf::get('template_partner_id'));
+		$templatePartner = PartnerPeer::retrieveByPK($partner->getI18nTemplatePartnerId() ? $partner->getI18nTemplatePartnerId() : kConf::get('template_partner_id'));
 		if($templatePartner)
-			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, ConversionProfileType::LIVE_STREAM);
+			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, true);
 	}
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
@@ -482,13 +481,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				$dbPermission = PermissionPeer::getByNameAndPartner($permission->name, array($object_to_fill->getId()));
 				if($dbPermission)
 				{
-					KalturaLog::debug("add permissions: exists; set status; " . $permission->status);
+					KalturaLog::debug("add permission: exists in DB; set status; " . $permission->status);
 					KalturaLog::debug("db permissions:  " . print_r($dbPermission,true));
 					$dbPermission->setStatus($permission->status);
 				}
 				else
 				{
-					KalturaLog::debug("add permissions: didn't exists");
+					KalturaLog::debug("add permissions: does not exist in DB");
 					$dbPermission = new Permission();
 					$dbPermission->setType($permission->type);
 					$dbPermission->setPartnerId($object_to_fill->getId());
@@ -500,13 +499,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				KalturaLog::debug("add permissions: save" . print_r($dbPermission,true));
 				$dbPermission->save();
 				
-				if($dbPermission->getName() == PermissionName::FEATURE_LIVE_STREAM && $dbPermission->getStatus() == PermissionStatus::ACTIVE)
-				{
-					$this->createLiveConversionProfiles($object_to_fill);
-				}
+				
 				if($dbPermission->getStatus() == PermissionStatus::ACTIVE)
 					$this->enablePermissionForPlugins($object_to_fill->getId(), $dbPermission->getName());
 			}
+			
+			//Raise template partner's conversion profiles (so far) and check whether the partner now has permissions for them.
+			$this->copyMissingConversionProfiles($object_to_fill);
+		
 		}
 		
 		if (!is_null($this->limits))

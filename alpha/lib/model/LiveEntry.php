@@ -269,16 +269,16 @@ abstract class LiveEntry extends entry
 		$configurations = array();
 		$manifestUrl = null;
 		$mediaServer = $this->getMediaServer();
-		if($mediaServer)
-		{
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
-		}
-		elseif (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
+		if (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
 			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
 			
 			if (isset($partnerConfigurations[$protocol]))
 				$manifestUrl = $partnerConfigurations[$protocol];
+		}
+		elseif($mediaServer)
+		{
+			$manifestUrl = $mediaServer->getManifestUrl($protocol);
 		}
 		
 		if ($manifestUrl)
