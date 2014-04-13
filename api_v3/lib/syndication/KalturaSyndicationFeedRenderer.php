@@ -132,7 +132,7 @@ class KalturaSyndicationFeedRenderer
 		
 		myPartnerUtils::resetPartnerFilter('entry');
 
-		$this->baseCriteria = entryPeer::getDefaultCriteriaFilter();
+		$this->baseCriteria = clone entryPeer::getDefaultCriteriaFilter();
 		
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
 		$startDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::START_DATE, null));
@@ -142,15 +142,12 @@ class KalturaSyndicationFeedRenderer
 		$endDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::END_DATE, null));
 		$this->baseCriteria->addAnd($endDateCriterion);
 		
-		$entryFilter = new entryFilter();
-		$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
-		$entryFilter->setStatusEquel(entryStatus::READY);
-		$entryFilter->setTypeIn(array(entryType::MEDIA_CLIP, entryType::MIX));
-		$entryFilter->setModerationStatusNotIn(array(
+		$this->baseCriteria->addAnd(entryPeer::PARTNER_ID, $this->syndicationFeed->partnerId);
+		$this->baseCriteria->addAnd(entryPeer::STATUS, entryStatus::READY);
+		$this->baseCriteria->addAnd(entryPeer::TYPE, array(entryType::MEDIA_CLIP, entryType::MIX), Criteria::IN);
+		$this->baseCriteria->addAnd(entryPeer::MODERATION_STATUS, array(
 			entry::ENTRY_MODERATION_STATUS_REJECTED, 
-			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION));
-			
-		$entryFilter->attachToCriteria($this->baseCriteria);
+			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION), Criteria::NOT_IN);
 			
 		if($this->syndicationFeed->playlistId)
 		{
@@ -391,7 +388,7 @@ class KalturaSyndicationFeedRenderer
 			reset($this->entryFilters);
 			
 		$this->executed = true;
-		
+
 		$c = clone $this->baseCriteria;
 		
 		if($this->staticPlaylist)
@@ -452,7 +449,8 @@ class KalturaSyndicationFeedRenderer
 		if($renderer->shouldEnableCache())
 			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
 		
-		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry_";
+		$protocol = infraRequestUtils::getProtocol();
+		$cachePrefix = "feed_{$this->syndicationFeed->id}/{$protocol}/entry_";
 		$feedUpdatedAt = $this->syndicationFeedDb->getUpdatedAt(null);
 
 		$e = null;
