@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-03-18
+/*! KMC - v6.0.10 - 2014-04-01
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4146,7 +4146,6 @@ kmc.utils = {
 				};
                 $("#kcms")[0].gotoPage(go_to);
                 kmc.utils.verifyUploadVisible(go_to.moduleName);
-                window.closeLangMenu();
                 return false;
 			});
 		} else {
@@ -4176,7 +4175,7 @@ kmc.utils = {
 	// we should combine the two following functions into one
     kmcHeight: $("#flash_wrap").height(),
 	hideFlash : function(hide) {
-		var ltIE8 = $('html').hasClass('lt-ie8');
+		var ltIE8 = $('html').hasClass('lt-ie9');
 		if(hide) {
 			if( ltIE8 ) {
 				// For IE only we're positioning outside of the screen
@@ -4206,7 +4205,7 @@ kmc.utils = {
             if (this.kmcHeight > 0){
                 $("#flash_wrap").height(this.kmcHeight);
             }
-            var ltIE8 = $('html').hasClass('lt-ie8');
+            var ltIE8 = $('html').hasClass('lt-ie9');
             if( ltIE8 ) {
                 $("#flash_wrap").css("margin-right","0");
             }
@@ -4216,7 +4215,6 @@ kmc.utils = {
 
 	// HTML Tab iframe
 	openIframe : function(url) {
-		$("#flash_wrap").css("visibility","hidden");
 		$("#server_frame").attr("src", url);
 		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();

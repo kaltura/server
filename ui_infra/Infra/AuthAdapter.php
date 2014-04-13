@@ -95,6 +95,11 @@ class Infra_AuthAdapter implements Zend_Auth_Adapter_Interface
 	 */
 	public function authenticate()
 	{
+		// Whether the authntication succeeds or fails - generate a fresh session ID
+		// This will assist in preventing session hijacking
+		// This will also apply session options and cookie updates (e.g. cookie_secure)
+		Zend_Session::regenerateId();
+
 		if($this->ks)
 		{
 			$client = Infra_ClientHelper::getClient();

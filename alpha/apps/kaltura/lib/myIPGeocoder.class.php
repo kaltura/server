@@ -12,6 +12,14 @@ class myIPGeocoder extends kGeoCoder
 		return $this->iptocountry($ip);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kGeoCoder::getCoordinates()
+	 */
+	public function getCoordinates($ip)
+	{
+		return kIP2Location::ipToCoordinates($ip);
+	}
+
 	function iptocountry($ip) 
 	{   
 		return kIP2Location::ipToCountry($ip);

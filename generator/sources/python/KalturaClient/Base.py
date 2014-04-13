@@ -87,6 +87,8 @@ class KalturaParams(object):
     def put(self, key, value = None):
         if value == None:
             self.params[key + '__null'] = ''
+        elif isinstance(value, unicode):
+            self.params[key] = value.encode('utf8')
         else:
             self.params[key] = str(value)
 

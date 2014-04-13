@@ -124,18 +124,18 @@ class flavorAsset extends asset
 	    $externalStorages = StorageProfilePeer::retrieveExternalByPartnerId($this->getPartnerId());
 	    foreach($externalStorages as $externalStorage)
 	    {
-	    	if($this->shouldExportFlavor($externalStorage))
-		{
-			KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
-			$newStatus = asset::ASSET_STATUS_EXPORTING;
-			break;			
-		}			
+	    	if($this->requiredToExportFlavor($externalStorage))
+			{
+				KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
+				$newStatus = asset::ASSET_STATUS_EXPORTING;
+				break;			
+			}			
 	    }
-            KalturaLog::debug('Setting status to ['.$newStatus.']');
+        KalturaLog::debug('Setting status to ['.$newStatus.']');
 	    $this->setStatus($newStatus);
 	}
 	
-	private function shouldExportFlavor(StorageProfile $storage)
+	private function requiredToExportFlavor(StorageProfile $storage)
 	{
 		// check if storage profile should affect the asset ready status
 		if ($storage->getReadyBehavior() != StorageProfileReadyBehavior::REQUIRED)
@@ -147,15 +147,15 @@ class flavorAsset extends asset
 		// check if export should happen now or wait for another trigger
 		if (!$storage->triggerFitsReadyAsset($this->getEntryId())) {
 			KalturaLog::debug('Asset id ['.$this->getId().'] is not ready to export to profile ['.$storage->getId().']');
-		        return false;
+		    return false;
 		}
 		    
 		// check if asset needs to be exported to the remote storage
-		if (!$storage->shouldExportFlavorAsset($this))
+		if (!$storage->shouldExportFlavorAsset($this, true))
 		{
 			KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$storage->getId().']');
-    			return false;
-    		}
+    		return false;
+    	}
 		    
 		$keys = array(
 		    		$this->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET), 
@@ -165,18 +165,18 @@ class flavorAsset extends asset
 		foreach ($keys as $key) 
 		{
 			if($storage->shoudlExportFileSync($key))
-    		    	{
+    		{
 				return true;
-    		    	}
+    		}
 		}
 		    
 		foreach ($keys as $key) 
 		{
 			// check if asset is currently being exported to the remote storage
-    			if ($storage->isPendingExport($key))
-    			{
-    		   		KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$storage->getId().']');
-		      		return true;
+    		if ($storage->isPendingExport($key))
+    		{
+    		   	KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$storage->getId().']');
+		      	return true;
 			}
 		}
 		return false;			

@@ -494,9 +494,10 @@ class KalturaErrors extends APIErrors
 	
 	const LIVE_STREAM_INVALID_TOKEN = "LIVE_STREAM_INVALID_TOKEN;ENTRY_ID;Invalid token supplied for live entry [@ENTRY_ID@]";
 	
-	const LIVE_STREAM_EXCEEDED_MAX_INPUTS = "LIVE_STREAM_EXCEEDED_MAX_INPUTS;ENTRY_ID;Partner exceeded max concurrent input live streams in entry[@ENTRY_ID@]";
+	const LIVE_STREAM_EXCEEDED_MAX_PASSTHRU = "LIVE_STREAM_EXCEEDED_MAX_PASSTHRU;ENTRY_ID;Partner exceeded max pass-through live streams in entry[@ENTRY_ID@]";
 	
-	const LIVE_STREAM_EXCEEDED_MAX_OUTPUTS = "LIVE_STREAM_EXCEEDED_MAX_OUTPUTS;ENTRY_ID;Partner exceeded max concurrent output live streams in entry[@ENTRY_ID@]";
+	const LIVE_STREAM_EXCEEDED_MAX_TRANSCODED = "LIVE_STREAM_EXCEEDED_MAX_TRANSCODED;ENTRY_ID;Partner exceeded max concurrent transcoded live streams in entry[@ENTRY_ID@]";
+	
 	/*
 	 * BaseEntry Service
 	 */

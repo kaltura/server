@@ -52,7 +52,6 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 		if($c instanceof KalturaCriteria)
 		{
 			$c->applyFilters();
-			return $c->getRecordsCount();
 		}
 			
 		return parent::doCount($c, $con);

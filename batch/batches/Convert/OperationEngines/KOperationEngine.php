@@ -109,7 +109,7 @@ abstract class KOperationEngine
 						 
 		$this->addToLogFile(get_class($this) . ": [$return_value] took [$duration] seconds", KalturaLog::INFO);
 		$this->addToLogFile($output);
-
+		$this->operationComplete($return_value, $output);
 			/*
 	 		 * If operator is defined as 'optional', upon execution failure the operator 
 			 * will copy the source to the output, rather than fail and halt the flavor execution 
@@ -122,10 +122,14 @@ abstract class KOperationEngine
 				$this->message = $msg;
 				copy($this->inFilePath, $this->outFilePath);
 			}
-			else
+			else 
 				throw new KOperationEngineException("return value: [$return_value]");
 		}
 		$this->logMediaInfo($this->outFilesPath);
+	}
+	
+	protected function operationComplete($rc, $output) {
+		return;	
 	}
 	
 	protected function doCloseOperation()

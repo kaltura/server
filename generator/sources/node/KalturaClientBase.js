@@ -28,6 +28,7 @@
 // ===================================================================================================
 var crypto = require('crypto');
 var http = require('http');
+var url = require('url');
 
 /**
  * Generates a URL-encoded query string from the associative (or indexed) array
@@ -346,10 +347,10 @@ KalturaClientBase.prototype.doQueue = function(callback) {
 	this.addParam(params, 'apiVersion', this.apiVersion);
 	this.addParam(params, 'format', this.config.format);
 	this.addParam(params, 'clientTag', this.config.clientTag);
-	var url = this.config.serviceUrl + this.config.serviceBase;
+	var path = this.config.serviceBase;
 	var call = null;
 	if (this.useMultiRequest) {
-		url += 'multirequest';
+		path += 'multirequest';
 		var $i = 1;
 		for ( var v in this.callsQueue) {
 			call = this.callsQueue[v];
@@ -365,7 +366,7 @@ KalturaClientBase.prototype.doQueue = function(callback) {
 		}
 	} else {
 		call = this.callsQueue[0];
-		url += call.service + '&action=' + call.action;
+		path += call.service + '&action=' + call.action;
 		for ( var sv3 in call.params) {
 			params[sv3] = call.params[sv3];
 		}
@@ -378,7 +379,7 @@ KalturaClientBase.prototype.doQueue = function(callback) {
 	this.useMultiRequest = false;
 	var signature = this.signature(params);
 	this.addParam(params, 'kalsig', signature);
-	this.doHttpRequest(callback, url, params, files);
+	this.doHttpRequest(callback, path, params, files);
 	return true;
 };
 
@@ -408,17 +409,38 @@ KalturaClientBase.requestIndex = 1;
  * send the http request.
  * 
  * @param string
- *            url the url to call.
+ *            path the url path to call.
  * @param parameters
  *            params the parameters to pass.
  * @return array the results and errors inside an array.
  */
-KalturaClientBase.prototype.doHttpRequest = function(callCompletedCallback, url, params, files) {
+KalturaClientBase.prototype.doHttpRequest = function(callCompletedCallback, path, params, files) {
 	var This = this;
 	var requestIndex = KalturaClientBase.requestIndex++;
-	url += '&' + http_build_query(params);
-	this.log('Request [' + requestIndex + ']: ' + url);
-	http.get(url, function(response) {
+	var data = http_build_query(params);
+	var debugUrl = this.config.serviceUrl + path + '&' + data;
+	this.log('Request [' + requestIndex + ']: ' + debugUrl);
+
+	var contentType = 'application/x-www-form-urlencoded';
+	if (files.length) {
+		contentType = 'multipart/form-data';
+		// TODO
+	}
+	
+	var parsedUrl = url.parse(this.config.serviceUrl);
+	var options = {
+		hostname : parsedUrl.hostname,
+		port : parsedUrl.port,
+		path : path,
+		method : 'POST',
+		headers : {
+			'Content-Type' : contentType,
+			'Content-Length' : Buffer.byteLength(data)
+		}
+	};
+	
+	var request = http.request(options, function(response) {
+		response.setEncoding('utf8');
 		var data = '';
 		response.on('data', function(chunk) {
 			data += chunk;
@@ -433,6 +455,8 @@ KalturaClientBase.prototype.doHttpRequest = function(callCompletedCallback, url,
 			callCompletedCallback(JSON.parse(data));
 		});
 	});
+	request.write(data);
+	request.end();
 };
 
 /**

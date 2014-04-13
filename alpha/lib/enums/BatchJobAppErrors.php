@@ -13,6 +13,7 @@ interface BatchJobAppErrors extends BaseEnum
 	const NFS_FILE_DOESNT_EXIST = 21;
 	
 	const EXTRACT_MEDIA_FAILED = 31;
+	const BLACK_OR_SILENT_CONTENT = 32;
 	
 	const CLOSER_TIMEOUT = 41;
 	

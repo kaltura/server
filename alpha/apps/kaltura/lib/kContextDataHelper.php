@@ -398,12 +398,18 @@ class kContextDataHelper
 	
 			reset($enabledDeliveryTypes);
 			$deliveryTypeName = key($enabledDeliveryTypes);
-			foreach ($deliveryTypeKeys as $deliveryTypeKey){
-				$deliveryTypeToValidate = kConf::get($deliveryTypeKey);
-	            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
-	            {
-	             	$deliveryTypeName = $deliveryTypeToValidate;
-	                break;
+			foreach ($deliveryTypeKeys as $deliveryTypeKey)
+			{
+				$deliveryTypesToValidate = kConf::get($deliveryTypeKey);
+				$deliveryTypesToValidate = explode(',', $deliveryTypesToValidate);
+				foreach ($deliveryTypesToValidate as $deliveryTypeToValidate)
+				{
+		            if (isset ($enabledDeliveryTypes[$deliveryTypeToValidate]))
+		            {
+		             	$deliveryTypeName = $deliveryTypeToValidate;
+		             	//When match is found break this loop and outer loop as well (http://www.php.net/manual/en/control-structures.break.php)
+		                break 2;
+					}
 				}
 			}		
 			$deliveryType = $enabledDeliveryTypes[$deliveryTypeName];	

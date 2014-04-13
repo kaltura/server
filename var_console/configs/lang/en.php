@@ -829,6 +829,7 @@ return array(
 	'partner-usage table partnerStatus' => 'Status',
 	'partner-usage table partnerName' => 'Account Name',
 	'partner-usage table partnerId' => 'ID',
+	'partner-usage table referenceId' => 'Reference ID',
 	'partner-usage table partnerCreatedAt' => 'Account Creation Date',
 	'partner-usage table partnerPackage' => 'Usage Package',
 	'partner-usage table views' => 'Player Loads',
@@ -852,6 +853,7 @@ return array(
 	'partner-usage table partnerStatus tooltip' => 'The status of the Publisher account can be either active or blocked',
 	'partner-usage table partnerName tooltip' => 'The name of the Publisher',
 	'partner-usage table partnerId tooltip' => 'The internal unique identifier of the Publisher account',
+	'partner-usage table referenceId tooltip' => 'An optional external reference ID',
 	'partner-usage table partnerCreatedAt tooltip' => 'The date on which the Publisher account was created',
 	'partner-usage table partnerPackage tooltip' => 'The name of the Usage Package associated with the specific Publisher account',
 	'partner-usage table views tooltip' => 'The total number of times a page containing a player was loaded during the given date range and for the specific Publisher account',
@@ -920,6 +922,7 @@ return array(
 	'partner-create form create' => 'Create',
     'partner-create from copy partner' => 'Copy Content from Template Account:',
     'partner-create default copy partner' => 'Default Template Account',   
+    'partner-create referenceId' => 'Reference ID:',
 
 	// partner-kmc-users
 	'partner-kmc-users intro text' => 'From here you can log into the KMC as a specific user of this publisher account.',

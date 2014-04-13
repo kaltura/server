@@ -232,6 +232,8 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"allowAutoDelete",
 		"createFileLink",
 		"rules",
+		"urlManagerParams",
+		"pathManagerParams",		
 	);
 	
 	/* (non-PHPdoc)
