@@ -8,6 +8,7 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 	protected $limitType;
 	protected $label;
 	protected $withOverage;
+	protected $requiredPartnerPermissions = array();
 		
 	public function __construct($limitType, $label, $withOverage = true)
 	{
@@ -15,6 +16,11 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 		$this->label = $label;
 		$this->withOverage = $withOverage;
 		parent::__construct();
+	}
+	
+	public function requirePartnerPermission($permissionName)
+	{
+		$this->requiredPartnerPermissions[] = $permissionName;
 	}
 	
 	public function init()
@@ -77,8 +83,29 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 		}
 	}
 	
-	public function populateFromObject($form, $object, $add_underscore = true)
+	public function populateFromObject(Form_PartnerConfiguration $form, Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration $partnerConfiguration, Kaltura_Client_SystemPartner_Type_SystemPartnerLimit $object, $add_underscore = true)
 	{
+		$isPermitted = true;
+		if(count($this->requiredPartnerPermissions))
+		{
+			$isPermitted = false;
+			$requiredPartnerPermissions = array_flip($this->requiredPartnerPermissions);
+			if($partnerConfiguration->permissions && count($partnerConfiguration->permissions))
+			{
+				foreach($partnerConfiguration->permissions as $permission)
+				{
+					if(isset($requiredPartnerPermissions[$permission->name]) && $permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
+					{
+						unset($requiredPartnerPermissions[$permission->name]);
+					}
+				}
+			}
+			if(!count($requiredPartnerPermissions))
+			{
+				$isPermitted = true;
+			}
+		}
+		
 		$props = $object;
 		if(is_object($object))
 			$props = get_object_vars($object);
@@ -91,7 +118,14 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 				$replacement = '\1_\2'; 
 				$prop = strtolower(preg_replace($pattern, $replacement, $prop));
 			}
-			$form->setDefault($this->limitType.'_'.$prop, $value);
+			$elementName = $this->limitType.'_'.$prop;
+			$form->setDefault($elementName, $value);
+			
+			if(!$isPermitted)
+			{
+				$element = $form->getElement($elementName);
+				$element->setOptions(array('disabled' => true));
+			}
 		}
 	}
 	

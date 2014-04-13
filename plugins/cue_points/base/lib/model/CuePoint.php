@@ -17,6 +17,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 {
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
 	const CUSTOM_DATA_FIELD_ROOT_PARENT_ID = 'rootParentId';
+	const CUSTOM_DATA_FIELD_TRIGGERED_AT = 'triggeredAt';
 	
 	public function getIndexObjectName() {
 		return "CuePointIndex";
@@ -223,10 +224,12 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		
 	} // setDuration()
 	
-	
-	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}	
+
+	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}
+	public function getTriggeredAt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT);}	
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
+	public function setTriggeredAt($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_TRIGGERED_AT, (int)$v);}
 	
 	public function getCacheInvalidationKeys()
 	{

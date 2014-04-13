@@ -11,6 +11,7 @@ class kApiCacheBase
 	const ECF_USER_AGENT = 'userAgent';
 	const ECF_COUNTRY = 'country';
 	const ECF_IP = 'ip';
+	const ECF_COORDINATES = 'coordinates';
 
 	// extra cache fields conditions
 	// 	the conditions will be applied on the extra fields when generating the cache key
@@ -22,7 +23,8 @@ class kApiCacheBase
 	const COND_REGEX = 'regex';					// used by kUserAgentCondition
 	const COND_SITE_MATCH = 'siteMatch';		// used by kSiteCondition
 	const COND_IP_RANGE = 'ipRange';			// used by kIpAddressCondition
-
+	const COND_GEO_DISTANCE = 'geoDistance';	// used by kGeoDistanceCondition
+	
 	// cache statuses
 	const CACHE_STATUS_ACTIVE = 0;				// cache was not explicitly disabled
 	const CACHE_STATUS_ANONYMOUS_ONLY = 1;		// conditional cache was explicitly disabled by calling DisableConditionalCache (e.g. a database query that is not handled by the query cache was issued)

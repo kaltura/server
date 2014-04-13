@@ -207,6 +207,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $crmId;
+
+	/**
+	 * @var string
+	 */
+	public $referenceId;
 	
 	/**
 	 * @var string
@@ -296,9 +301,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $defaultEmbedCodeType;
 	
 	/**
-	 * @var KalturaStringArray
+	 * @var KalturaKeyBooleanValueArray
 	 */
-	public $disabledDeliveryTypes;
+	public $customDeliveryTypes;
 	
 	/**
 	 * @var bool
@@ -309,6 +314,18 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var KalturaLanguageCode
 	 */
 	public $language;
+	
+	/**
+	 * @var string
+	 */
+	public $audioThumbEntryId;
+
+	/**
+	 * @var string
+	 */
+	public $liveThumbEntryId;
+
+	
 	
 	private static $map_between_objects = array
 	(
@@ -353,6 +370,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"supportAnimatedThumbnails",
 		"crmLink",
 		"crmId",
+		"referenceId",
 		"verticalClasiffication",
 		"partnerPackageClassOfService",
 		"enableBulkUploadNotificationsEmails",
@@ -367,8 +385,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"apiAccessControlId",
 		"defaultDeliveryType",
 		"defaultEmbedCodeType",
-		"disabledDeliveryTypes",
+		"customDeliveryTypes",
 		"language",
+		"audioThumbEntryId",
+		"liveThumbEntryId",		
 	);
 
 	public function getMapBetweenObjects()
@@ -411,6 +431,27 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$templatePartner = PartnerPeer::retrieveByPK(kConf::get('template_partner_id'));
 		if($templatePartner)
 			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, ConversionProfileType::LIVE_STREAM);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$audioThumbEntryId = $this->audioThumbEntryId;
+		if ($audioThumbEntryId)
+		{
+			$audioThumbEntry = entryPeer::retrieveByPK($audioThumbEntryId);
+			if (!$audioThumbEntry || $audioThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_AUDIO_THUMB_ENTRY_ID_ERROR, $audioThumbEntryId);
+		}
+
+		$liveThumbEntryId = $this->liveThumbEntryId;
+		if ($liveThumbEntryId)
+		{
+			$liveThumbEntry = entryPeer::retrieveByPK($liveThumbEntryId);
+			if (!$liveThumbEntry || $liveThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_LIVE_THUMB_ENTRY_ID_ERROR, $liveThumbEntryId);
+		}
+	
+		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

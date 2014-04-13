@@ -432,6 +432,16 @@ class assetPeer extends BaseassetPeer
 		return assetPeer::doSelectAscendingBitrate($c);
 	}
 	
+	public static function retrieveLocalReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_EXPORTING), Criteria::IN);
+		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::IN);
+		
+		return assetPeer::doSelectAscendingBitrate($c);
+	}
+	
 	public static function doSelectAscendingBitrate(Criteria $criteria, PropelPDO $con = null)
 	{
 		$assets = assetPeer::doSelect($criteria);
@@ -596,7 +606,10 @@ class assetPeer extends BaseassetPeer
 		if ($fileSync->getObjectType() != FileSyncObjectType::ASSET) {
 	        return null;
 	    }
-	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET) {
+	    if ($fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET &&
+	    	$fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ISM &&
+	    	$fileSync->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC) 
+	    {
 	        return null;
 	    }
 	    $asset = assetPeer::retrieveById($fileSync->getObjectId());

@@ -1,0 +1,4 @@
+
+ALTER TABLE storage_profile
+MODIFY name VARCHAR(64) DEFAULT NULL,
+MODIFY storage_username VARCHAR(64) DEFAULT NULL;
