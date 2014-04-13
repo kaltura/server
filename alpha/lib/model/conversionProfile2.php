@@ -269,4 +269,14 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		return array("conversionProfile2:partnerId=".strtolower($this->getPartnerId()));
 	}
+	
+	public function getRequiredCopyTemplatePermissions ()
+	{
+		return $this->getFromCustomData('requiredCopyTemplatePermissions', null, array());
+	}
+	
+	public function setRequiredCopyTemplatePermissions ($v)
+	{
+		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
+	}
 }

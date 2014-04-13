@@ -1383,7 +1383,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $conversionProfileType = null)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $checkPermissions = false)
  	{
 		$copiedList = array();
 		
@@ -1398,6 +1398,13 @@ class myPartnerUtils
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
  		{
+ 			/* @var $conversionProfile conversionProfile2 */
+ 			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
+ 				continue;
+ 			
+ 			if (!self::isPartnerPermittedForCopy ($toPartner, $conversionProfile->getRequiredCopyTemplatePermissions()))
+ 				continue;
+ 				
  			$newConversionProfile = $conversionProfile->copy();
  			$newConversionProfile->setPartnerId($toPartner->getId());
  			$newConversionProfile->save();
@@ -1573,5 +1580,25 @@ class myPartnerUtils
 			}
 		}
 		return $ret;
+	}
+	
+	/**
+	 * 
+	 * @param Partner $toPartner
+	 * @param array $permissionArray
+	 * 
+	 * @return bool
+	 */
+	public static function isPartnerPermittedForCopy (Partner $toPartner, array $permissionArray)
+	{
+		foreach ($permissionArray as $permission)
+		{
+			if (!PermissionPeer::isValidForPartner($permission, $toPartner->getId()))
+			{
+				return false;
+			}
+			
+			return true;
+		}	
 	}
 }
