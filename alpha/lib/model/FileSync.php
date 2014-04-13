@@ -75,7 +75,7 @@ class FileSync extends BaseFileSync
 		if ($format == PlaybackProtocol::RTMP)
 			$baseUrl = $storage->getDeliveryRmpBaseUrl();
 		else 
-			$baseUrl = $storage->getDeliveryHttpBaseUrl(true);
+			$baseUrl = $storage->getDeliveryBaseUrlByProtocol(true);
 		
 		return rtrim($baseUrl, '/') . '/' . ltrim($url, '/');
 	}

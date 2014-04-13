@@ -127,12 +127,12 @@ class StorageProfile extends BaseStorageProfile
 	
 	//Since the addition of configuring https base url on remote storages we need to take into consideration when to return the https base url
 	//and when to return the http. This adds this logic.
-	public function getDeliveryHttpBaseUrl($forceHttps = false)
+	public function getDeliveryBaseUrlByProtocol($allowHttps = false)
 	{
-		if ($forceHttps && isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' && $this->getDeliveryHttpsBaseUrl())
+		if ($allowHttps && infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS && $this->getDeliveryHttpsBaseUrl())
 			return $this->getDeliveryHttpsBaseUrl();
 		
-		return $this->delivery_http_base_url;
+		return $this->getDeliveryHttpBaseUrl();
 	}
 
 	public function setDeliveryHttpsBaseUrl($v)
