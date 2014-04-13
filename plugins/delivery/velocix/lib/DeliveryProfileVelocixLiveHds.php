@@ -32,10 +32,18 @@ class DeliveryProfileVelocixLiveHds extends DeliveryProfileLiveHds
 	 */
 	public function getTokenizer()
 	{
+		// For configuration purposes. 
+		if(is_null($this->params->getEntryId())) 
+			return parent::getTokenizer();
+				
 		$liveEntry = entryPeer::retrieveByPK($this->params->getEntryId());
 		//if stream name doesn't start with 'auth' than the url stream is not tokenized
-		if (substr($liveEntry->getStreamName(), 0, 4) == 'auth')
-			return parent::getTokenizer;
+		if ($liveEntry && substr($liveEntry->getStreamName(), 0, 4) == 'auth') {
+			$token = parent::getTokenizer();
+			$token->setStreamName($liveEntry->getStreamName());
+			$token->setProtocol('hds');
+			return $token;
+		}
 		
 		return null;
 	}

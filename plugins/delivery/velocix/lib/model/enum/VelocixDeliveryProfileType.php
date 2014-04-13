@@ -6,13 +6,15 @@
  */ 
 class VelocixDeliveryProfileType implements IKalturaPluginEnum, DeliveryProfileType
 {
-	const VELOCIX = 'Velocix';
+	const VELOCIX_HDS = 'VELOCIX_HDS';
+	const VELOCIX_HLS = 'VELOCIX_HLS';
 	
 	public static function getAdditionalValues()
 	{
 		return array
 		(
-			'VELOCIX' => self::VELOCIX,
+			'VELOCIX_HDS' => self::VELOCIX_HDS,
+			'VELOCIX_HLS' => self::VELOCIX_HLS,
 		);
 	}
 	

@@ -2,8 +2,6 @@
 class kVelocixUrlTokenizer extends kUrlTokenizer
 {
 
-	// TODO Once we found someone who uses this tokenizer parameters, 
-	// These should be externalized.
 	protected $protocol;
 	protected $streamName;
 	protected $hdsPaths;
@@ -28,7 +26,8 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$message = "pathURI=" . rawurlencode($path);
 		if ($this->protocol == 'hds')
 		{
-			foreach ($this->hdsPaths as $path){
+			$paths = explode(",", $this->hdsPaths);
+			foreach ($paths as $path){
 				$path =  preg_replace('/@STREAM_NAME@/', $this->streamName, $path);
 				$message.= "&pathURI=" . rawurlencode($path);
 			}
