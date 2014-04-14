@@ -1080,13 +1080,22 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		//$path = $this->getThumbnailPath ( $version );
 		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/thumbnail/entry_id/" . $this->getId() ;
 
-		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());		
-		if ($this->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
-			$current_version = $partner->getAudioThumbEntryVersion() ? $partner->getAudioThumbEntryVersion() : $this->getThumbnailVersion() ;
-		
-		elseif  (in_array($this->getType(), array(entryType::LIVE_STREAM , entryType::LIVE_CHANNEL)))
-			$current_version = $partner->getLiveThumbEntryVersion()? $partner->getLiveThumbEntryVersion() : $this->getThumbnailVersion() ;
-		
+		$partner = $this->getPartner();
+				
+		if ($partner && $this->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO && $partner->getAudioThumbEntryId()  && $partner->getAudioThumbEntryVersion())
+		{
+			$thumbEntryId = $partner->getAudioThumbEntryId();
+			$thumbVersion = $partner->getAudioThumbEntryVersion();
+
+			$current_version = "$thumbVersion/thumb_entry_id/$thumbEntryId";
+		}
+		elseif  ($partner && in_array($this->getType(), array(entryType::LIVE_STREAM , entryType::LIVE_CHANNEL)) && $partner->getLiveThumbEntryId()  && $partner->getLiveThumbEntryVersion())
+		{
+			$thumbEntryId = $partner->getLiveThumbEntryId();
+			$thumbVersion = $partner->getLiveThumbEntryVersion();
+
+			$current_version = "$thumbVersion/thumb_entry_id/$thumbEntryId";
+		}
 		else
 			$current_version = $this->getThumbnailVersion();
 		
