@@ -453,16 +453,6 @@ class kAkamaiRtspUrlTokenizer extends kUrlTokenizer
 	protected $cpcode;
 	
 	/**
-	 * @param string $host
-	 * @param int $cpcode
-	 */
-	public function __construct($host, $cpcode)
-	{
-		$this->host = $host;
-		$this->cpcode = $cpcode;
-	}
-
-	/**
 	 * @param string $url
 	 * @return string
 	 */
@@ -470,5 +460,36 @@ class kAkamaiRtspUrlTokenizer extends kUrlTokenizer
 	{
 		return Akamaizer::generateARL($this->host . $url . "/a.mov", $this->cpcode, 0, 0, true);
 	}
+	
+	/**
+	 * @return the $host
+	 */
+	public function getHost() {
+		return $this->host;
+	}
+
+	/**
+	 * @return the $cpcode
+	 */
+	public function getCpcode() {
+		return $this->cpcode;
+	}
+
+	/**
+	 * @param string $host
+	 */
+	public function setHost($host) {
+		$this->host = $host;
+	}
+
+	/**
+	 * @param number $cpcode
+	 */
+	public function setCpcode($cpcode) {
+		$this->cpcode = $cpcode;
+	}
+
+	
+	
 }
 

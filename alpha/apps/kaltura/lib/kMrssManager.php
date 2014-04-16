@@ -248,13 +248,18 @@ class kMrssManager
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $asset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttribtues(null, $asset);
 		
 		if($servePlayManifest)
 		{
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$urlManager->setDomain($cdnHost);
 			
+			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
+			$urlManager->setHostName($cdnHost);
+			$urlManager->setDynamicAttribtues($dynamicAttrs);
+
 			if (!$storage->getDeliveryHttpsBaseUrl())
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 			else
@@ -292,8 +297,13 @@ class kMrssManager
 		
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
-		$urlManager->setDomain($cdnHost);
+		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($asset->getEntryId());
+		$dynamicAttrs = new DeliveryProfileDynamicAttributes();
+		$urlManager->setHostName($cdnHost);
+		$urlManager->setDynamicAttribtues($dynamicAttrs);
+		
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttribtues(null, $asset);
 		
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
@@ -437,11 +447,9 @@ class kMrssManager
 			$urlPrefix = $matches[1];
 		}
 		$urlPrefix = rtrim($urlPrefix,'/').'/';
-		$urlManager = kUrlManager::getUrlManagerByCdn($iisHost, $entry->getId());
-		if ($kalturaFileSync)
-			$urlManager->setFileExtension(pathinfo($kalturaFileSync->getFilePath(), PATHINFO_EXTENSION));
-		$urlManager->setProtocol(PlaybackProtocol::SILVER_LIGHT);
 		
+		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
+		$urlManager->initDeliveryDynamicAttribtues($kalturaFileSync);
 		
 		$partner = $entry->getPartner();
 		if(!$partner->getStorageServePriority() ||
@@ -465,9 +473,8 @@ class kMrssManager
 		$externalFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 		if($externalFileSync)
 		{
-			$urlManager = kUrlManager::getUrlManagerByStorageProfile($externalFileSync->getDc(), $entry->getId());
-			$urlManager->setFileExtension(pathinfo($externalFileSync->getFilePath(), PATHINFO_EXTENSION));
-			$urlManager->setProtocol(PlaybackProtocol::SILVER_LIGHT);
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($externalFileSync->getDc(), $entry->getId(), PlaybackProtocol::SILVER_LIGHT);
+			$urlManager->initDeliveryDynamicAttribtues($asset);
 			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
 			$url = ltrim($url,'/');
         	if (strpos($url, "://") !== false)

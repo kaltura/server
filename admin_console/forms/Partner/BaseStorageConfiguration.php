@@ -70,6 +70,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'filters'		=> array('Digits'),
 		));
 		
+		// TODO - remove these.
 		$this->addElement('select', 'urlManagerClass', array(
 			'label'			=> 'Delivery URL format :',
 			'filters'		=> array('StringTrim'),

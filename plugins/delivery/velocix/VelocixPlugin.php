@@ -2,7 +2,7 @@
 /**
  * @package plugins.velocix
  */
-class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaEventConsumers, IKalturaObjectLoader
+class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaTypeExtender
 {
 	const PLUGIN_NAME = 'velocix';
 	const VELOCIX_LIVE_EVENT_CONSUMER = 'kVelocixLiveFlowManager';
@@ -29,10 +29,13 @@ class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('VelocixLiveEntrySourceType');
+			return array('VelocixLiveEntrySourceType', 'VelocixDeliveryProfileType');
 			
 		if($baseEnumName == 'EntrySourceType')
 			return array('VelocixLiveEntrySourceType');
+		
+		if($baseEnumName == 'DeliveryProfileType')
+			return array('VelocixDeliveryProfileType');
 			
 		return array();
 	}
@@ -73,14 +76,43 @@ class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		if ($baseClass == 'KProvisionEngine' && $enumValue == KalturaSourceType::VELOCIX_LIVE)
 			return new KProvisionEngineVelocix();
 		
+		if(($baseClass == 'KalturaTokenizer') && ($enumValue == 'kVelocixUrlTokenizer'))
+			return new KalturaUrlTokenizerVelocix();
+		
+		return null;
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDeliveryProfileType($valueName)
+	{
+		$apiValue = self::getApiValue($valueName);
+		return kPluginableEnumsManager::apiToCore('DeliveryProfileType', $apiValue);
 	}
 
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue) {
-		// TODO Auto-generated method stub
+		if ($baseClass == 'DeliveryProfile') {
+			if($enumValue == self::getDeliveryProfileType(VelocixDeliveryProfileType::VELOCIX_HDS))
+				return 'DeliveryProfileVelocixLiveHds';
+			if($enumValue == self::getDeliveryProfileType(VelocixDeliveryProfileType::VELOCIX_HLS))
+				return 'DeliveryProfileVelocixLiveHls';
+		}
+		return null;
 		
+	}
+	
+	public static function getExtendedTypes($baseClass, $enumValue) {
+		
+		if(($baseClass == 'DeliveryProfile') && ($enumValue == 'LIVE')) {
+			return array(self::getDeliveryProfileType(VelocixDeliveryProfileType::VELOCIX_HDS),
+					self::getDeliveryProfileType(VelocixDeliveryProfileType::VELOCIX_HLS));
+		}
+		
+		return null;
 	}
 	
 }

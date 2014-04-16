@@ -3150,4 +3150,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
+	
+	public function isSecuredEntry() {
+		
+		$invalidModerationStatuses = array(
+				entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
+				entry::ENTRY_MODERATION_STATUS_REJECTED
+		);
+		
+		if (in_array($this->getModerationStatus(), $invalidModerationStatuses) ||
+				($this->getStartDate() !== null && $this->getStartDate(null) >= time()) ||
+				($this->getEndDate() !== null && $this->getEndDate(null) <= time() + 86400))
+			return true;
+		
+		$accessControl = $this->getaccessControl();
+		if (!$accessControl || $accessControl->getRulesArray())
+			return true;
+		
+		return false;
+	}
 }

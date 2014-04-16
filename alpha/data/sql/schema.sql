@@ -1933,6 +1933,37 @@ CREATE TABLE `storage_profile`
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
+#-- delivery_profile
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_profile`;
+
+
+CREATE TABLE `delivery_profile`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`type` INTEGER default 0 NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`partner_id` INTEGER,
+	`name` VARCHAR(128),
+	`system_name` VARCHAR(128),
+	`description` VARCHAR(128),
+	`url` VARCHAR(256),
+	`host_name` VARCHAR(127),
+	`is_default` TINYINT,
+	`is_live` TINYINT default 0,
+	`parent_id` INTEGER default 0,
+	`recognizer` TEXT,
+	`tokenizer` TEXT,
+	`delivery_status` INTEGER,
+	`streamer_type` VARCHAR(30),
+	`media_protocols` VARCHAR(256),
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
 #-- email_ingestion_profile
 #-----------------------------------------------------------------------------
 

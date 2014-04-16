@@ -1,26 +1,13 @@
 <?php
+
 class kMirrorImageUrlTokenizer extends kUrlTokenizer
 {
     const DEFAULT_START_TIME_PAST_OFFSET = 86400; // yesterday
 
-	protected $window;
-	protected $secret;
+    // TODO Once we found someone who uses this tokenizer parameters,
+    // These should be externalized.
 	protected $useDummyHost;
 	protected $baseUrl;
-	
-	/**
-	 * @param int window
-	 * @param string $secret
-	 * @param bool $useDummyHost
-	 * @param string $baseUrl
-	 */
-	public function __construct($window, $secret, $useDummyHost, $baseUrl)
-	{
-		$this->window = $window;
-		$this->secret = $secret;
-		$this->useDummyHost = $useDummyHost;
-		$this->baseUrl = $baseUrl;
-	}
 	
 	/**
 	 * @param string $url
@@ -35,7 +22,7 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 		$urlToDecorate = $this->baseUrl.'/'. ltrim($url, '/');
 		
 		// decorate URLs
-		$decoratedUrl = self::decorateUrl($urlToDecorate, $this->secret, time(), $this->window, $this->useDummyHost);
+		$decoratedUrl = self::decorateUrl($urlToDecorate, $this->key, time(), $this->window, $this->useDummyHost);
 		
 		// remove the base URL from the decorated URL
 		return substr($decoratedUrl, strlen($this->baseUrl.'/'));
@@ -51,7 +38,7 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 		foreach($flavors as &$flavor)
 		{			    
 			$bareUrl = $baseUrl.'/'.ltrim($flavor["url"],'/');
-			$decoratedUrl = self::decorateUrl($bareUrl, $this->secret, $startTime, $this->window, $this->useDummyHost);
+			$decoratedUrl = self::decorateUrl($bareUrl, $this->key, $startTime, $this->window, $this->useDummyHost);
 			$flavor["url"] = substr($decoratedUrl, strlen($baseUrl.'/'));
 		}
 	}
@@ -59,12 +46,12 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
 	/**
 	 * Decorate guardian URL
 	 * @param unknown_type $bareUrl
-	 * @param unknown_type $secret
+	 * @param unknown_type $key
 	 * @param unknown_type $startTime in seconds
 	 * @param unknown_type $window in seconds
 	 * @param unknown_type $useDummyHost
 	 */
-	private static function decorateUrl($bareUrl, $secret, $startTime, $window, $useDummyHost)
+	private static function decorateUrl($bareUrl, $key, $startTime, $window, $useDummyHost)
 	{
         // extract url prefix
         if ($useDummyHost)
@@ -113,7 +100,7 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
         $miiAuth = $hasQuery ? $miiAuth = "&MIIAuth=" : $miiAuth = "?MIIAuth=";
     	$miiAuthValue = 'a'.$endTime.';b'.$startTime.';';
 		
-		$hashSource = $dummyHost.$prepUrl.$miiAuth.$miiAuthValue.$secret;
+		$hashSource = $dummyHost.$prepUrl.$miiAuth.$miiAuthValue.$key;
 		
         $prepUrl .= $miiAuth;     
         $prepUrl .= urlencode($miiAuthValue);
@@ -158,4 +145,38 @@ class kMirrorImageUrlTokenizer extends kUrlTokenizer
         
         return $b64;
     }
+    
+
+
+	/**
+	 * @return the $useDummyHost
+	 */
+	public function getUseDummyHost() {
+		return $this->useDummyHost;
+	}
+
+	/**
+	 * @return the $baseUrl
+	 */
+	public function getBaseUrl() {
+		return $this->baseUrl;
+	}
+	
+	/**
+	 * @param field_type $useDummyHost
+	 */
+	public function setUseDummyHost($useDummyHost) {
+		$this->useDummyHost = $useDummyHost;
+	}
+
+	/**
+	 * @param field_type $baseUrl
+	 */
+	public function setBaseUrl($baseUrl) {
+		$this->baseUrl = $baseUrl;
+	}
+
+
+    
+    
 }

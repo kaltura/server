@@ -9,11 +9,6 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 	/**
 	 * @var string
 	 */
-	public $key = false;
-
-	/**
-	 * @var string
-	 */
 	public $gen = false;
 
 	/**
@@ -22,31 +17,9 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 	public $includeExtension = false;
 
 	/**
-	 * @var int
-	 */
-	public $window = 0;
-	
-	/**
 	 * @var string
 	 */
 	public $expiryName = false;
-	
-	/**
-	 * @param string $name
-	 * @param string $key
-	 * @param string $gen
-	 * @param bool $includeExtension
-	 * @param int $window
-	 */
-	public function __construct($name, $key, $gen, $includeExtension, $expiryName = null, $window = 0)
-	{
-		$this->name = $name;
-		$this->key = $key;
-		$this->gen = $gen;
-		$this->includeExtension = $includeExtension;
-		$this->expiryName = $expiryName;
-		$this->window = $window;
-	}
 	
 	static private function hmac($hashfunc, $key, $data)
 	{
@@ -142,5 +115,64 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 		
 		$url = $this->addQueryStringParameter($url, "{$this->name}={$this->gen}".$token);
 		return $url;
-	}	
+	}
+	
+	/**
+	 * @return the $name
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * @return the $gen
+	 */
+	public function getGen() {
+		return $this->gen;
+	}
+
+	/**
+	 * @return the $includeExtension
+	 */
+	public function getIncludeExtension() {
+		return $this->includeExtension;
+	}
+
+	/**
+	 * @return the $expiryName
+	 */
+	public function getExpiryName() {
+		return $this->expiryName;
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	/**
+	 * @param string $gen
+	 */
+	public function setGen($gen) {
+		$this->gen = $gen;
+	}
+
+	/**
+	 * @param boolean $includeExtension
+	 */
+	public function setIncludeExtension($includeExtension) {
+		$this->includeExtension = $includeExtension;
+	}
+
+	/**
+	 * @param string $expiryName
+	 */
+	public function setExpiryName($expiryName) {
+		$this->expiryName = $expiryName;
+	}
+	
+	
+	
 }
