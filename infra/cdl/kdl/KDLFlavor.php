@@ -672,12 +672,29 @@ $plannedDur = 0;
 		return $targetVid;
 	}
 	
+	function invertVideoDimensions(KDLVideoData $video)
+	{
+		$temp = $video->_height;
+		$video->_height = $video->_width;
+		$video->_width = $temp;
+		if ($video->_dar)
+			$video->_dar = 1/$video->_dar;
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
 	private function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
 	{
 		$shrinkToSource = $target->_isShrinkFramesizeToSource;
+		$invertedVideo = false;
+		
+		if ($source->_dar < 1)
+		{
+			KalturaLog::debug('inverting video');
+			self::invertVideoDimensions($source);
+			$invertedVideo = true;
+		}
 		
 		$widSrc = $source->_width;
 		$hgtSrc = $source->_height;
@@ -831,6 +848,12 @@ $plannedDur = 0;
 		}
 
 		$this->matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, $target);
+		if ($invertedVideo)
+		{
+			self::invertVideoDimensions($source);
+			self::invertVideoDimensions($target);
+			KalturaLog::debug('inverting back both source and target');
+		}
 	}
 	
 	/* ---------------------------
