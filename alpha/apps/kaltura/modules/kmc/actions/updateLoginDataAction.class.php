@@ -213,6 +213,7 @@ class updateLoginDataAction extends kalturaAction
 				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 				$loginData = UserLoginDataPeer::doSelectOne($c);
 				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
+				$invalidPasswordStructureMessage = str_replace('\n', "\n", $invalidPasswordStructureMessage);
 				throw new KalturaLoginDataException(APIErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
