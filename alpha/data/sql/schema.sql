@@ -1952,7 +1952,6 @@ CREATE TABLE `delivery_profile`
 	`url` VARCHAR(256),
 	`host_name` VARCHAR(127),
 	`is_default` TINYINT,
-	`is_live` TINYINT default 0,
 	`parent_id` INTEGER default 0,
 	`recognizer` TEXT,
 	`tokenizer` TEXT,
