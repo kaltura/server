@@ -420,13 +420,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	private function copyMissingConversionProfiles(Partner $partner)
 	{
-		$c = new Criteria();
-		$c->add(conversionProfile2Peer::PARTNER_ID, $partner->getId());
-		$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
-		
-		if(conversionProfile2Peer::doCount($c))
-			return;
-			
 		$templatePartner = PartnerPeer::retrieveByPK($partner->getI18nTemplatePartnerId() ? $partner->getI18nTemplatePartnerId() : kConf::get('template_partner_id'));
 		if($templatePartner)
 			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, true);
