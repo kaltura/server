@@ -1392,13 +1392,11 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
  		
- 		if(!is_null($conversionProfileType))
- 			$c->add(conversionProfile2Peer::TYPE, $conversionProfileType);
- 		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
  		{
  			/* @var $conversionProfile conversionProfile2 */
+ 			KalturaLog::debug('copying conversion profile with id ' . $conversionProfile->getId());
  			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
  				continue;
  			
@@ -1598,7 +1596,7 @@ class myPartnerUtils
 				return false;
 			}
 			
-			return true;
 		}	
+		return true;
 	}
 }
