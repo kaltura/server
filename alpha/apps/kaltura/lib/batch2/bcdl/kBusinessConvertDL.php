@@ -467,6 +467,12 @@ class kBusinessConvertDL
 			$liveAsset->save();
 		}
 		
+		if(!count($streamBitrates))
+		{
+			$streamBitrate = array('bitrate' => 900, 'width' => 640, 'height' => 480);
+			$streamBitrates[] = $streamBitrate;
+		}
+		
 		$entry->setStreamBitrates($streamBitrates);
 		$entry->save();
 	}
