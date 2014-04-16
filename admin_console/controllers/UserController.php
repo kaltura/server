@@ -152,7 +152,12 @@ class UserController extends Zend_Controller_Action
 			
 			$adapter = new Kaltura_AdminAuthAdapter();
 			$adapter->setPrivileges('disableentitlement');
-			$adapter->setCredentials($request->getPost('email'), $request->getPost('password'));
+
+			$safeEmailFieldValue = strip_Tags($request->getPost('email')); // Strip HTML Tags to prevent a potential XSS attack
+			$passwordFieldValue = $request->getPost('password'); // DO NOT strip 'password' HTML Tags in order not to invalidate passwords (e.g. "<b>BoldPassword</b>")
+			$adapter->setCredentials($safeEmailFieldValue, $passwordFieldValue);
+			$loginForm->getElement('email')->setValue( $safeEmailFieldValue ); // Update the "safe" value onto the form
+
 			$adapter->setTimezoneOffset($request->getPost('timezone_offset'));
 			$auth = Infra_AuthHelper::getAuthInstance();
 			$result = $auth->authenticate($adapter);
