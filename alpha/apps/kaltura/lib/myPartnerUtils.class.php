@@ -1396,7 +1396,6 @@ class myPartnerUtils
  		foreach($conversionProfiles as $conversionProfile)
  		{
  			/* @var $conversionProfile conversionProfile2 */
- 			KalturaLog::debug('copying conversion profile with id ' . $conversionProfile->getId());
  			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
  				continue;
  			
