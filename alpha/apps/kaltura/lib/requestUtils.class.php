@@ -51,6 +51,14 @@ class requestUtils extends infraRequestUtils
 		return "$protocol://$host";
 	}
 	
+	public static function getPlayServerHost ($protocol = 'http')
+	{
+		if ($protocol == 'https' && kConf::hasParam('play_server_host_https'))
+			return "$protocol://" . kConf::get('play_server_host_https');
+			
+		return "$protocol://" . kConf::get('play_server_host');
+	}
+	
 	public static function getCdnHost ($protocol = 'http')
 	{
 		if ($protocol == "https")

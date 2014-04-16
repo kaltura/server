@@ -106,6 +106,16 @@ class playManifestAction extends kalturaAction
 	private $protocol = null;
 	
 	/**
+	 * @var boolean
+	 */
+	private $usePlayServer = false;
+	
+	/**
+	 * @var string
+	 */
+	private $playerConfig = null;
+	
+	/**
 	 * @var int
 	 */
 	private $maxBitrate = null;
@@ -1451,6 +1461,11 @@ class playManifestAction extends kalturaAction
 				break;
 			
 			case PlaybackProtocol::APPLE_HTTP:
+				if($this->usePlayServer)
+				{
+					$this->urlManager = new kPlayServerUrlManager($this->entryId, $this->urlManager, $this->playerConfig);
+				}
+				
 			case PlaybackProtocol::SILVER_LIGHT:
 			case PlaybackProtocol::MPEG_DASH:
 				$flavors = array();
@@ -1565,6 +1580,13 @@ class playManifestAction extends kalturaAction
 		// Initialize
 		$this->initEntry();
 
+		$this->usePlayServer = ((bool) $this->getRequestParameter("usePlayServer", 0) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
+		if($this->usePlayServer)
+		{
+			$this->playerConfig = $this->getRequestParameter("playerConfig");
+			// TODO validate is base64 and is JSON?
+		}
+		
 		$this->enforceEncryption();
 		
 		$renderer = null;

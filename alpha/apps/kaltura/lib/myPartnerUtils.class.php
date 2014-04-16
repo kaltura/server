@@ -335,6 +335,22 @@ class myPartnerUtils
 		return $cdnHost;
 	}
 	
+	
+	public static function getPlayServerHost($partner_id, $protocol = null)
+	{
+		if(is_null($protocol))
+			$protocol = infraRequestUtils::getProtocol();
+
+		$partner = PartnerPeer::retrieveByPK( $partner_id );
+		if (!$partner || !$partner->getPlayServerHost()) 
+			return requestUtils::getPlayServerHost($protocol);
+
+		$playServerHost = $partner->getPlayServerHost();
+		$playServerHost = preg_replace('/^https?/', $protocol, $playServerHost);
+			
+		return $playServerHost;
+	}
+	
 	public static function getThumbnailHost ($partner_id, $protocol = null)
 	{
 	    $partner = PartnerPeer::retrieveByPK( $partner_id );
