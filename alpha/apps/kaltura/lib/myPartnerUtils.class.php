@@ -1404,7 +1404,14 @@ class myPartnerUtils
  				
  			$newConversionProfile = $conversionProfile->copy();
  			$newConversionProfile->setPartnerId($toPartner->getId());
- 			$newConversionProfile->save();
+ 			try {
+ 				$newConversionProfile->save();
+ 			}
+ 			catch (Exception $e)
+ 			{
+ 				KalturaLog::info("Exception occured, conversion profile was not copied. Message: [" . $e->getMessage() . "]");
+ 				continue;
+ 			}
  			
  			KalturaLog::log("Copied [".$conversionProfile->getId()."], new id is [".$newConversionProfile->getId()."]");
 			$copiedList[$conversionProfile->getId()] = $newConversionProfile->getId();

@@ -226,11 +226,14 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		if ($this->alreadyInSave)
 			return parent::preInsert($con);
-			
-		$existingConversionProfile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($this->getPartnerId(), $this->getSystemName());
-		if ($existingConversionProfile)
+
+		if ($this->getSystemName())
 		{
-			throw new kCoreException("Conversion profile with system name [" . $this->getSystemName() . "] already exists");
+			$existingConversionProfile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($this->getPartnerId(), $this->getSystemName(), $this->getType());
+			if ($existingConversionProfile)
+			{
+				throw new kCoreException("Conversion profile with system name [" . $this->getSystemName() . "] already exists");
+			}
 		}
 		
 		return parent::preInsert($con);
