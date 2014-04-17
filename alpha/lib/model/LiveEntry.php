@@ -475,10 +475,10 @@ abstract class LiveEntry extends entry
 		$kMediaServers = $this->getFromCustomData(null, 'mediaServers', array());
 		foreach($kMediaServers as $key => $kMediaServer)
 		{
-			if(! $this->isCacheValid($kMediaServer))
+			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
-				KalturaLog::debug("Removing media server [" . $kMediaServer->getHostname() . "]");
+				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
 				$this->removeFromCustomData($key, 'mediaServers');
 			}
 		}
