@@ -212,7 +212,8 @@ abstract class LiveEntry extends entry
 	
 	public function setLiveStreamConfigurations(array $v)
 	{
-		$this->putInCustomData('live_stream_configurations', $v);
+		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)) )
+			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
 	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null)
@@ -230,15 +231,18 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
 	{
-		$configurations = $this->getFromCustomData('live_stream_configurations');
-		if($configurations)
+		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)) )
 		{
-			if ($this->getPushPublishEnabled())
+			$configurations = $this->getFromCustomData('live_stream_configurations');
+			if($configurations)
 			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
-				$configurations = array_merge($configurations, $pushPublishConfigurations);
+				if ($this->getPushPublishEnabled())
+				{
+					$pushPublishConfigurations = $this->getPushPublishConfigurations();
+					$configurations = array_merge($configurations, $pushPublishConfigurations);
+				}
+				return $configurations;
 			}
-			return $configurations;
 		}
 		$configurations = array();
 		$manifestUrl = null;
