@@ -10,6 +10,7 @@ echo "Test started [" . __FILE__ . "]\n";
 
 
 $logrotate = $config['dwh']['logRotateBin'];
+$kitchen_script= $config['dwh']['kitchenScript'];
 $appDir = $config['global']['appDir'];
 $dwhDir = $config['dwh']['baseDir'];
 $kalturaUser = $config['os']['kalturaUser'];
@@ -196,7 +197,7 @@ echo " log rotated\n";
 /**
  * Run hourly scripts.
  */
-$cmd = "su $kalturaUser -c '$dwhDir/etlsource/execute/etl_hourly.sh -p $dwhDir'";
+$cmd = "su $kalturaUser -c '$dwhDir/etlsource/execute/etl_hourly.sh -p $dwhDir  -k $kitchen_script '";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
@@ -210,7 +211,7 @@ echo " OK\n";
 /**
  * Run update dimensions.
  */
-$cmd = "su $kalturaUser -c '$dwhDir/etlsource/execute/etl_update_dims.sh -p $dwhDir'";
+$cmd = "su $kalturaUser -c '$dwhDir/etlsource/execute/etl_update_dims.sh -p $dwhDir -k $kitchen_script'";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 //if($returnedValue !== 0)
@@ -225,7 +226,7 @@ echo " OK\n";
 /**
  * Run daily scripts.
  */
-$cmd = "su $kalturaUser -c '$dwhDir/etlsource/execute/etl_daily.sh -p $dwhDir'";
+$cmd = "su $kalturaUser -c '$dwhDir/etlsource/execute/etl_daily.sh -p $dwhDir -k $kitchen_script'";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
