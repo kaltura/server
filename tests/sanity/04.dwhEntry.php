@@ -59,6 +59,7 @@ $entriesFilter = new KalturaMediaEntryFilter();
 $entriesFilter->mediaTypeEqual = KalturaMediaType::VIDEO;
 $entriesFilter->statusEqual = KalturaEntryStatus::READY;
 $entriesFilter->orderBy = KalturaMediaEntryOrderBy::DURATION_ASC;
+$entriesFilter->partnerId=$partnerId;
 
 $entriesPager = new KalturaFilterPager();
 $entriesPager->pageSize = 1;
@@ -322,12 +323,12 @@ $reloadedEntry = $client->media->get($entry->id);
 
 if($reloadedEntry->plays <= $entry->plays)
 {
-	echo "Entry [$entry->id] plays [$reloadedEntry->plays] did not incremented\n";
+	echo "Entry [$entry->id] plays [$reloadedEntry->plays] was not incremented\n";
 	exit(-1);
 }
 if($reloadedEntry->views <= $entry->views)
 {
-	echo "Entry [$entry->id] views [$reloadedEntry->views] did not incremented\n";
+	echo "Entry [$entry->id] views [$reloadedEntry->views] was not incremented\n";
 	exit(-1);
 }
 echo "Plays and views OK\n";
