@@ -19,7 +19,7 @@
  dateext
  notifempty
  lastaction
- mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz
+ mv @LOG_DIR@/kaltura_apache_access.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access.log-`/bin/date +%Y%m%d-%H`.gz
  service @APACHE_SERVICE@ reload
  endscript
 }
@@ -45,7 +45,7 @@
  dateext
  notifempty
  lastaction
- mv @LOG_DIR@/kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz
+ mv @LOG_DIR@/kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d`.gz @EVENTS_LOGS_DIR@/`hostname`-kaltura_apache_access_ssl.log-`/bin/date +%Y%m%d-%H`.gz
  service @APACHE_SERVICE@ reload
  endscript
 }
