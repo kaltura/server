@@ -182,7 +182,7 @@ $client->getConfig()->method = KalturaClientBase::METHOD_POST;
  * Rotate logs.
  */
 $returnedValue = null;
-$cmd = "$logrotate -f -vv $appDir/tests/sanity/lib/logrotate.ini";
+$cmd = "$logrotate -f -vv $appDir/configurations/logrotate/kaltura_apache";
 echo "Executing [$cmd]";
 passthru($cmd, $returnedValue);
 if($returnedValue !== 0)
