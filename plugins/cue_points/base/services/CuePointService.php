@@ -22,8 +22,14 @@ class CuePointService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 
-		// Play server lists entries of all partners
-		if($this->getPartnerId() == Partner::PLAY_SERVER_PARTNER_ID && $actionName == 'list')
+		// Play-Server and Media-Server list entries of all partners
+		// This is not too expensive as the requests are cached conditionally and performed on sphinx
+		$allowedSystemPartners = array(
+			Partner::MEDIA_SERVER_PARTNER_ID,
+			Partner::PLAY_SERVER_PARTNER_ID,
+		);
+		
+		if(in_array($this->getPartnerId(), $allowedSystemPartners) && $actionName == 'list')
 		{
 			myPartnerUtils::resetPartnerFilter('entry');
 		}
