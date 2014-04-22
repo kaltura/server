@@ -23,7 +23,7 @@ $partnerId = $config['session']['partnerId'];
  * Delete the partner
  */
 $systemPartnerClient = KalturaSystemPartnerClientPlugin::get($client);
-$systemPartnerClient->systemPartner->updateStatus($partnerId, KalturaPartnerStatus::FULL_BLOCK,'Sanity test partner');
+$systemPartnerClient->systemPartner->updateStatus($partnerId, KalturaPartnerStatus::FULL_BLOCK);
 echo "Partner [$partnerId] deleted\n";
 
 /**
