@@ -9,7 +9,7 @@ div#login { width:500px; margin: 0 auto; text-align:center;}
 	<?php } else { ?>
 	<img src="/lib/images/kmc/logo_kmc.png" alt="Kaltura CMS" />
 	<?php } ?>
-	<!--div id="langIcon"></div-->
+	<div id="langIcon" style="display: none"></div>
 	<div id="user_links" style="right: 36px">
     	<a href="/content/docs/pdf/KMC_User_Manual.pdf" target="_blank">User Manual</a>
 	</div> 
@@ -28,6 +28,7 @@ if(top != window) { top.location = window.location; }
 // Options
 var options = {
 	secureLogin: <?php echo ($securedLogin) ? 'true' : 'false'; ?>,
+	enableLanguageMenu: "<?php echo (kConf::get('enableLanguageMenu'))? 'true': 'false'; ?>",
 	swfUrl: "<?php echo $swfUrl; ?>",
 	flashVars: {
 		host: "<?php echo $www_host; ?>",

@@ -240,7 +240,8 @@ abstract class LiveEntry extends entry
 	
 	public function setLiveStreamConfigurations(array $v)
 	{
-		$this->putInCustomData('live_stream_configurations', $v);
+		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)) )
+			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
 	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null)
@@ -258,29 +259,32 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
 	{
-		$configurations = $this->getFromCustomData('live_stream_configurations');
-		if($configurations)
+		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
 		{
-			if ($this->getPushPublishEnabled())
+			$configurations = $this->getFromCustomData('live_stream_configurations');
+			if($configurations)
 			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
-				$configurations = array_merge($configurations, $pushPublishConfigurations);
+				if ($this->getPushPublishEnabled())
+				{
+					$pushPublishConfigurations = $this->getPushPublishConfigurations();
+					$configurations = array_merge($configurations, $pushPublishConfigurations);
+				}
+				return $configurations;
 			}
-			return $configurations;
 		}
 		$configurations = array();
 		$manifestUrl = null;
 		$mediaServer = $this->getMediaServer();
-		if($mediaServer)
-		{
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
-		}
-		elseif (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
+		if (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
 			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
 			
 			if (isset($partnerConfigurations[$protocol]))
 				$manifestUrl = $partnerConfigurations[$protocol];
+		}
+		elseif($mediaServer)
+		{
+			$manifestUrl = $mediaServer->getManifestUrl($protocol);
 		}
 		
 		if ($manifestUrl)
@@ -483,10 +487,10 @@ abstract class LiveEntry extends entry
 		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
 		{
-			if(! $this->isCacheValid($kMediaServer))
+			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
-				KalturaLog::debug("Removing media server [" . $kMediaServer->getHostname() . "]");
+				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
 				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			}
 		}

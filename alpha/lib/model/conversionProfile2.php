@@ -219,6 +219,26 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		return $ret;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseconversionProfile2#preInsert()
+	 */
+	public function preInsert (PropelPDO $con = null)
+	{
+		if ($this->alreadyInSave)
+			return parent::preInsert($con);
+
+		if ($this->getSystemName())
+		{
+			$existingConversionProfile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($this->getPartnerId(), $this->getSystemName(), $this->getType());
+			if ($existingConversionProfile)
+			{
+				throw new kCoreException("Conversion profile with system name [" . $this->getSystemName() . "] already exists");
+			}
+		}
+		
+		return parent::preInsert($con);
+	}
+	
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 		/* @var $copyObj conversionProfile2 */
@@ -268,5 +288,18 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	public function getCacheInvalidationKeys()
 	{
 		return array("conversionProfile2:partnerId=".strtolower($this->getPartnerId()));
+	}
+	
+	public function getRequiredCopyTemplatePermissions ()
+	{
+		return $this->getFromCustomData('requiredCopyTemplatePermissions', null, array());
+	}
+	
+	public function setRequiredCopyTemplatePermissions ($v)
+	{
+		if(!is_array($v))
+			$v = array_map('trim', explode(',', $v));
+			
+		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
 	}
 }

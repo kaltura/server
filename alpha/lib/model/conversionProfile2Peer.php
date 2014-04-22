@@ -54,4 +54,15 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 	{
 		return array(array("conversionProfile2:partnerId=%s", self::PARTNER_ID));		
 	}
+	
+	public static function retrieveByPartnerIdAndSystemName ($partnerId, $systemName, $type)
+	{
+		$c = new Criteria();
+		$c->addAnd(conversionProfile2Peer::PARTNER_ID, $partnerId);
+		$c->addAnd(conversionProfile2Peer::SYSTEM_NAME, $systemName);
+		$c->addAnd(conversionProfile2Peer::TYPE, $type);
+		
+		return conversionProfile2Peer::doSelectOne($c);
+	}
+	
 }
