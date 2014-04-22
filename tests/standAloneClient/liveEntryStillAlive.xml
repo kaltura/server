@@ -15,7 +15,7 @@
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Is Live Entry Still Alive</name>
                 <systemName>EMAIL_LIVE_ENTRY_NOT_ALIVE</systemName>
-                <description>Email notification template to be sent when a 24/7 live entry stops working.</description>
+                <description>Email notification template to be sent when a 24/7 live entry stopped broadcasting.</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
                 <eventObjectType>1</eventObjectType><!-- EventNotificationEventObjectType::ENTRY -->
@@ -23,13 +23,13 @@
                     <item objectType="KalturaEventFieldCondition">
                         <description>name field modified</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code> ($scope->getEvent()->getObject()->hasMediaServer())? (($scope->getEvent()->getObject()->isCustomDataModified('mediaServers'))?true:false):false </code>
+                            <code>$scope->getEvent()->getObject() instanceof LiveEntry &amp;&amp; !$scope->getEvent()->getObject()->hasMediaServer() &amp;&amp; $scope->getEvent()->getObject()->isCustomDataModified(null, 'mediaServers')	</code>
                         </field>
                     </item>
                 </eventConditions>
                 <format>1</format>
-                <subject>[Kaltura] - Live Entry Streaming Failed</subject>
-                <body>Live entry with ID {entry_id} failed streaming.</body>
+                <subject>[Kaltura] - Live Entry stopped broadcasting.</subject>
+                <body>Live entry with ID: {entry_id} stopped broadcasting.</body>
                 <fromEmail>{from_email}</fromEmail>
                 <fromName>{from_name}</fromName>
                 <to objectType="KalturaEmailNotificationStaticRecipientProvider">
@@ -39,7 +39,7 @@
                                 <value>{to_email}</value>
                             </email>
                             <name objectType="KalturaEvalStringField">
-                                <code>$scope->getEvent()->getObject() instanceof LiveEntry &amp;&amp; !$scope->getEvent()->getObject()->hasMediaServer() &amp;&amp; $scope->getEvent()->getObject()->isCustomDataModified(null, 'mediaServers')	</code>
+                                <code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
                             </name>
                         </item>
                     </emailRecipients>
