@@ -297,6 +297,9 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	
 	public function setRequiredCopyTemplatePermissions ($v)
 	{
+		if(!is_array($v))
+			$v = array_map('trim', explode(',', $v));
+			
 		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
 	}
 }
