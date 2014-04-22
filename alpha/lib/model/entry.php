@@ -3080,26 +3080,30 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
      *
      * @return     boolean True if $index has been modified.
      */
-    public function isCustomDataModified($name=null,$nameSpace=null)
+    public function isCustomDataModified($name = null,$nameSpace = null)
     {
         $oldCustomData = $this->oldCustomDataValues;
-        $result = false;
-        if(!is_null($nameSpace))
+
+        if(is_null($nameSpace))
         {
-            if(isset($oldCustomData[$nameSpace]) )
-            {
-                $result = true;
-            }
+            $nameSpace = '';
         }
-        elseif(!is_null($name) && isset($oldCustomData[$name]))
+
+        if(!isset($oldCustomData[$nameSpace]))
         {
-            $result  = true;
+            return false;
         }
-        return $result;
+
+        if(is_null($name))
+        {
+            return true;
+        }
+
+        if(isset($oldCustomData[$nameSpace][$name]))
+        {
+            return true;
+        }
+
+        return false;
     }
-
-
-
-
-
 }
