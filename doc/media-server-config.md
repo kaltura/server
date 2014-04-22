@@ -226,7 +226,7 @@ media_servers.ini is optional and needed only for custom configurations.
 ```xml
 <Module>
 	<Name>LiveStreamEntry</Name>
-	<Description>LiveStreamEntry</Description                        
+	<Description>LiveStreamEntry</Description>
 	<Class>com.kaltura.media.server.wowza.listeners.LiveStreamEntry</Class>
 </Module>
 ```
