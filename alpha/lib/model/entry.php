@@ -3082,30 +3082,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
      */
     public function isCustomDataModified($name=null,$nameSpace=null)
     {
-        $tmp = array("a"=>'1');
-        KalturaLog::debug ('##########isCustomDataModified##'.print_r($tmp,1));
         $oldCustomData = $this->oldCustomDataValues;
-        KalturaLog::debug ('##########isCustomDataModified##'.print_r($oldCustomData,1));
         $result = false;
         if(!is_null($nameSpace))
         {
-            if(isset($oldCustomData['nameSpace']) )
+            if(isset($oldCustomData[$nameSpace]) )
             {
-                if(is_array($oldCustomData['nameSpace']))
-                {
-                    foreach($oldCustomData['nameSpace'] as $customDataSubArray)
-                    {
-                        KalturaLog::debug ('##########isCustomDataModified##'.print_r($customDataSubArray,1));
-                        if($oldCustomData['nameSpace'][$name])
-                        {
-                            $result  = true;
-                        }
-                    }
-                }
-                elseif( isset($oldCustomData['nameSpace'][$name]))
-                {
-                    $result  = true;
-                }
+                $result = true;
             }
         }
         elseif(!is_null($name) && isset($oldCustomData[$name]))
@@ -3114,6 +3097,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
         }
         return $result;
     }
+
 
 
 
