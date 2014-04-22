@@ -59,7 +59,6 @@ $entriesFilter = new KalturaMediaEntryFilter();
 $entriesFilter->mediaTypeEqual = KalturaMediaType::VIDEO;
 $entriesFilter->statusEqual = KalturaEntryStatus::READY;
 $entriesFilter->orderBy = KalturaMediaEntryOrderBy::DURATION_ASC;
-$entriesFilter->partnerId=$partnerId;
 
 $entriesPager = new KalturaFilterPager();
 $entriesPager->pageSize = 1;
