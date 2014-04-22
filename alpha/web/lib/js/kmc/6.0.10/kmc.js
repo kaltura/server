@@ -4081,12 +4081,12 @@ kmc.utils = {
 		offset = $.browser.mozilla ? 37 : 74;
 		doc_height = (doc_height-offset);
 		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
-		if ($("#flash_wrap").css("visibility") == "visible"){
+		//if ($("#flash_wrap").css("visibility") == "visible"){
 			$("#flash_wrap").height(doc_height + "px");
-		}else{
+		//}else{
 			$("#server_wrap iframe").height(doc_height + "px");
 			$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
-		}
+		//}
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
