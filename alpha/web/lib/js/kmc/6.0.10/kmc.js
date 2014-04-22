@@ -1,4 +1,4 @@
-/*! KMC - v6.0.10 - 2014-04-01
+/*! KMC - v6.0.10 - 2014-04-22
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4081,9 +4081,12 @@ kmc.utils = {
 		offset = $.browser.mozilla ? 37 : 74;
 		doc_height = (doc_height-offset);
 		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
-		$("#flash_wrap").height(doc_height + "px");
-		$("#server_wrap iframe").height(doc_height + "px");
-		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
+		if ($("#flash_wrap").css("visibility") == "visible"){
+			$("#flash_wrap").height(doc_height + "px");
+		}else{
+			$("#server_wrap iframe").height(doc_height + "px");
+			$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
+		}
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
