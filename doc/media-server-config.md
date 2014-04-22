@@ -81,54 +81,60 @@ media_servers.ini is optional and needed only for custom configurations.
 	 - smoothstreamingpacketizer
 	 - dvrstreamingpacketizer
  - /Root/Application/Streams/Properties:
-> 	<Property>
-> 		<Name>sortPackets</Name>
-> 		<Value>true</Value>
-> 		<Type>Boolean</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>sortBufferSize</Name>
-> 		<Value>6000</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
+```xml
+<Property>
+	<Name>sortPackets</Name>
+	<Value>true</Value>
+	<Type>Boolean</Type>
+</Property>
+<Property>
+	<Name>sortBufferSize</Name>
+	<Value>6000</Value>
+	<Type>Integer</Type>
+</Property>
+```
 
  - /Root/Application/Transcoder/LiveStreamTranscoder - transcoder
  - /Root/Application/Transcoder/Templates - `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/entryId/${SourceStreamName}/f/transcode.xml`
  - /Root/Application/Transcoder/Properties:
-> 	<Property>
-> 		<Name>sortPackets</Name>
-> 		<Value>true</Value>
-> 		<Type>Boolean</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>sortBufferSize</Name>
-> 		<Value>4000</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
+```xml
+<Property>
+	<Name>sortPackets</Name>
+	<Value>true</Value>
+	<Type>Boolean</Type>
+</Property>
+<Property>
+	<Name>sortBufferSize</Name>
+	<Value>4000</Value>
+	<Type>Integer</Type>
+</Property>
+```
 
  - /Root/Application/DVR/Recorders - dvrrecorder
  - /Root/Application/DVR/Store - dvrfilestorage
  - /Root/Application/DVR/Properties:
-> 	<Property>
-> 		<Name>httpRandomizeMediaName</Name>
-> 		<Value>true</Value>
-> 		<Type>Boolean</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>dvrAudioOnlyChunkTargetDuration</Name>
-> 		<Value>10000</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>dvrChunkDurationMinimum</Name>
-> 		<Value>1000</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>dvrMinimumAvailableChunks</Name>
-> 		<Value>5</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
+```xml
+<Property>
+	<Name>httpRandomizeMediaName</Name>
+	<Value>true</Value>
+	<Type>Boolean</Type>
+</Property>
+<Property>
+	<Name>dvrAudioOnlyChunkTargetDuration</Name>
+	<Value>10000</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>dvrChunkDurationMinimum</Name>
+	<Value>1000</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>dvrMinimumAvailableChunks</Name>
+	<Value>5</Value>
+	<Type>Integer</Type>
+</Property>
+```
 
  - /Root/Application/HTTPStreamers:
 	 - cupertinostreaming
@@ -137,171 +143,182 @@ media_servers.ini is optional and needed only for custom configurations.
 	 - mpegdashstreaming
 	 - dvrchunkstreaming
  - /Root/Application/LiveStreamPacketizer/Properties:
-> 	<Property>
-> 		<Name>httpRandomizeMediaName</Name>
-> 		<Value>true</Value>
-> 		<Type>Boolean</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>cupertinoPlaylistChunkCount</Name>
-> 		<Value>10</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>cupertinoRepeaterChunkCount</Name>
-> 		<Value>10</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>sanjoseChunkDurationTarget</Name>
-> 		<Value>10000</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>sanjoseMaxChunkCount</Name>
-> 		<Value>10</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>sanjosePlaylistChunkCount</Name>
-> 		<Value>4</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>sanjoseRepeaterChunkCount</Name>
-> 		<Value>4</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-
+```xml
+<Property>
+	<Name>httpRandomizeMediaName</Name>
+	<Value>true</Value>
+	<Type>Boolean</Type>
+</Property>
+<Property>
+	<Name>cupertinoPlaylistChunkCount</Name>
+	<Value>10</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>cupertinoRepeaterChunkCount</Name>
+	<Value>10</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>sanjoseChunkDurationTarget</Name>
+	<Value>10000</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>sanjoseMaxChunkCount</Name>
+	<Value>10</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>sanjosePlaylistChunkCount</Name>
+	<Value>4</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>sanjoseRepeaterChunkCount</Name>
+	<Value>4</Value>
+	<Type>Integer</Type>
+</Property>
+```
 
  - /Root/Application/HTTPStreamer/Properties:
-> 	<Property>
-> 		<Name>httpOriginMode</Name>
-> 		<Value>on</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>cupertinoCacheControlPlaylist</Name>
-> 		<Value>max-age=3</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>cupertinoCacheControlMediaChunk</Name>
-> 		<Value>max-age=86400</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>cupertinoOnChunkStartResetCounter</Name>
-> 		<Value>true</Value>
-> 		<Type>Boolean</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>smoothCacheControlPlaylist</Name>
-> 		<Value>max-age=3</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>smoothCacheControlMediaChunk</Name>
-> 		<Value>max-age=86400</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>smoothCacheControlDataChunk</Name>
-> 		<Value>max-age=86400</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>sanjoseCacheControlPlaylist</Name>
-> 		<Value>max-age=3</Value>
-> 	</Property>
-> 	<Property>
-> 		<Name>sanjoseCacheControlMediaChunk</Name>
-> 		<Value>max-age=86400</Value>
-> 	</Property>
+```xml
+<Property>
+	<Name>httpOriginMode</Name>
+	<Value>on</Value>
+</Property>
+<Property>
+	<Name>cupertinoCacheControlPlaylist</Name>
+	<Value>max-age=3</Value>
+</Property>
+<Property>
+	<Name>cupertinoCacheControlMediaChunk</Name>
+	<Value>max-age=86400</Value>
+</Property>
+<Property>
+	<Name>cupertinoOnChunkStartResetCounter</Name>
+	<Value>true</Value>
+	<Type>Boolean</Type>
+</Property>
+<Property>
+	<Name>smoothCacheControlPlaylist</Name>
+	<Value>max-age=3</Value>
+</Property>
+<Property>
+	<Name>smoothCacheControlMediaChunk</Name>
+	<Value>max-age=86400</Value>
+</Property>
+<Property>
+	<Name>smoothCacheControlDataChunk</Name>
+	<Value>max-age=86400</Value>
+</Property>
+<Property>
+	<Name>sanjoseCacheControlPlaylist</Name>
+	<Value>max-age=3</Value>
+</Property>
+<Property>
+	<Name>sanjoseCacheControlMediaChunk</Name>
+	<Value>max-age=86400</Value>
+</Property>
+```
 
  - /Root/Application/Modules, add:
-> 	<Module>
-> 		<Name>LiveStreamEntry</Name>
-> 		<Description>LiveStreamEntry</Description>                             
-> 		<Class>com.kaltura.media.server.wowza.listeners.LiveStreamEntry</Class>
-> 	</Module>
+```xml
+<Module>
+	<Name>LiveStreamEntry</Name>
+	<Description>LiveStreamEntry</Description>
+	<Class>com.kaltura.media.server.wowza.listeners.LiveStreamEntry</Class>
+</Module>
+```
  
  - /Root/Application/Properties, add new Property:
-> 	<Property>
-> 		<Name>streamTimeout</Name>
-> 		<Value>200</Value>
-> 		<Type>Integer</Type>
-> 	</Property>
-> 	<Property>
-> 		<Name>securityPublishRequirePassword</Name>
-> 		<Value>false</Value>
-> 		<Type>Boolean</Type>
-> 	</Property>
+```xml
+<Property>
+	<Name>streamTimeout</Name>
+	<Value>200</Value>
+	<Type>Integer</Type>
+</Property>
+<Property>
+	<Name>securityPublishRequirePassword</Name>
+	<Value>false</Value>
+	<Type>Boolean</Type>
+</Property>
+```
 
 
 
 **Edit @WOWZA_DIR@/conf/Server.xml:**
 
  - /Root/Server/ServerListeners:
-> 	<ServerListener>
-> 		<BaseClass>com.kaltura.media.server.wowza.listeners.ServerListener</BaseClass>
-> 	</ServerListener>
+```xml
+<ServerListener>
+	<BaseClass>com.kaltura.media.server.wowza.listeners.ServerListener</BaseClass>
+</ServerListener>
+```
 
  - /Root/Server/Properties:
-> 	<Property>
-> 		<Name>KalturaServerURL</Name>
-> 		<Value>http://@WWW_DIR@</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura media server partner (-5) admin secret -->
-> 		<Name>KalturaServerAdminSecret</Name>
-> 		<Value>@MEDIA_PARTNER_ADMIN_SECRET@</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura API http timeout -->
-> 		<Name>KalturaServerTimeout</Name>
-> 		<Value>30</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura server managers to be loaded -->
-> 		<Name>KalturaServerManagers</Name>
-> 		<Value>com.kaltura.media.server.wowza.StatusManager, com.kaltura.media.server.wowza.LiveStreamManager</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura web services to be loaded -->
-> 		<Name>KalturaServerWebServices</Name>
-> 		<Value>com.kaltura.media.server.api.services.KalturaLiveService</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura server status reporting interval, in seconds -->
-> 		<Name>KalturaServerStatusInterval</Name>
-> 		<Value>300</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura interval to update that live stream entry is still broadcasting, in seconds -->
-> 		<Name>KalturaLiveStreamKeepAliveInterval</Name>
-> 		<Value>60</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura maximum DVR window, in seconds, should be 24 hours -->
-> 		<Name>KalturaLiveStreamMaxDvrWindow</Name>
-> 		<Value>86400</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura maximum recorded chunk duration, in minutes, should be an hour -->
-> 		<Name>KalturaRecordedChunckMaxDuration</Name>
-> 		<Value>60</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura web services http port -->
-> 		<Name>KalturaServerWebServicesPort</Name>
-> 		<Value>888</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura web services binding host name -->
-> 		<Name>KalturaServerWebServicesHost</Name>
-> 		<Value>0.0.0.0</Value>
-> 	</Property>
-> 	<Property>
-> 		<!-- Kaltura recorded file group -->
-> 		<Name>KalturaRecordedFileGroup</Name>
-> 		<!-- kaltura (gid = 613) or any other group that apache user is associated with. -->
-> 		<Value>kaltura</Value>
-> 	</Property>
+```xml
+<Property>
+	<Name>KalturaServerURL</Name>
+	<Value>http://@WWW_DIR@</Value>
+</Property>
+<Property>
+	<!-- Kaltura media server partner (-5) admin secret -->
+	<Name>KalturaServerAdminSecret</Name>
+	<Value>@MEDIA_PARTNER_ADMIN_SECRET@</Value>
+</Property>
+<Property>
+	<!-- Kaltura API http timeout -->
+	<Name>KalturaServerTimeout</Name>
+	<Value>30</Value>
+</Property>
+<Property>
+	<!-- Kaltura server managers to be loaded -->
+	<Name>KalturaServerManagers</Name>
+	<Value>com.kaltura.media.server.wowza.StatusManager, com.kaltura.media.server.wowza.LiveStreamManager</Value>
+</Property>
+<Property>
+	<!-- Kaltura web services to be loaded -->
+	<Name>KalturaServerWebServices</Name>
+	<Value>com.kaltura.media.server.api.services.KalturaLiveService</Value>
+</Property>
+<Property>
+	<!-- Kaltura server status reporting interval, in seconds -->
+	<Name>KalturaServerStatusInterval</Name>
+	<Value>300</Value>
+</Property>
+<Property>
+	<!-- Kaltura interval to update that live stream entry is still broadcasting, in seconds -->
+	<Name>KalturaLiveStreamKeepAliveInterval</Name>
+	<Value>60</Value>
+</Property>
+<Property>
+	<!-- Kaltura maximum DVR window, in seconds, should be 24 hours -->
+	<Name>KalturaLiveStreamMaxDvrWindow</Name>
+	<Value>86400</Value>
+</Property>
+<Property>
+	<!-- Kaltura maximum recorded chunk duration, in minutes, should be an hour -->
+	<Name>KalturaRecordedChunckMaxDuration</Name>
+	<Value>60</Value>
+</Property>
+<Property>
+	<!-- Kaltura web services http port -->
+	<Name>KalturaServerWebServicesPort</Name>
+	<Value>888</Value>
+</Property>
+<Property>
+	<!-- Kaltura web services binding host name -->
+	<Name>KalturaServerWebServicesHost</Name>
+	<Value>0.0.0.0</Value>
+</Property>
+<Property>
+	<!-- Kaltura recorded file group -->
+	<Name>KalturaRecordedFileGroup</Name>
+	<!-- kaltura (gid = 613) or any other group that apache user is associated with. -->
+	<Value>kaltura</Value>
+</Property>
+```
 
 
 **Edit @WOWZA_DIR@/conf/log4j.properties:**
@@ -351,38 +368,40 @@ media_servers.ini is optional and needed only for custom configurations.
 
  - Create @WOWZA_DIR@/transcoder/templates/hdfvr.xml template:
 
->     <Root>
->     	<Transcode>
->     		<Encodes>
->     			<!-- Example Encode block for source, not required unless Member of StreamNameGroup. -->
->     			<Encode>
->     				<Enable>true</Enable>
->     				<Name>aac</Name>
->     				<StreamName>mp4:${SourceStreamName}</StreamName>
->     				<Video>
->     					<!-- H.264, PassThru, Disable -->
->     					<Codec>PassThru</Codec>
->     					<Bitrate>${SourceVideoBitrate}</Bitrate>
->     					<Parameters>
->     					</Parameters>
->     				</Video>
->     				<Audio>
->     					<!-- AAC, PassThru, Disable -->
->     					<Codec>AAC</Codec>
->     					<Bitrate>48000</Bitrate>
->     				</Audio>
->     				<Properties>
->     				</Properties>
->     			</Encode>
->     		</Encodes>
->     		<Decode>
->     		</Decode>
->     		<StreamNameGroups>
->     		</StreamNameGroups>
->     		<Properties>
->     		</Properties>
->     	</Transcode>
->     </Root>
+```xml
+<Root>
+	<Transcode>
+		<Encodes>
+			<!-- Example Encode block for source, not required unless Member of StreamNameGroup. -->
+			<Encode>
+				<Enable>true</Enable>
+				<Name>aac</Name>
+				<StreamName>mp4:${SourceStreamName}</StreamName>
+				<Video>
+					<!-- H.264, PassThru, Disable -->
+					<Codec>PassThru</Codec>
+					<Bitrate>${SourceVideoBitrate}</Bitrate>
+					<Parameters>
+					</Parameters>
+				</Video>
+				<Audio>
+					<!-- AAC, PassThru, Disable -->
+					<Codec>AAC</Codec>
+					<Bitrate>48000</Bitrate>
+				</Audio>
+				<Properties>
+				</Properties>
+			</Encode>
+		</Encodes>
+		<Decode>
+		</Decode>
+		<StreamNameGroups>
+		</StreamNameGroups>
+		<Properties>
+		</Properties>
+	</Transcode>
+</Root>
+```
 
 **Configure file system**
 
