@@ -8,6 +8,8 @@ abstract class LiveEntry extends entry
 	const IS_LIVE = 'isLive';
 	const DEFAULT_CACHE_EXPIRY = 70;
 	
+	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
+	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
 	 */
@@ -122,7 +124,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['mediaServers']))
+		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS]))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
@@ -309,6 +311,12 @@ abstract class LiveEntry extends entry
 				$slStreamUrl .= "?dvr";
 			}
 			
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->getPartnerId()))
+			{
+				$entryId = $this->getId();
+				$hlsStreamUrl = infraRequestUtils::getProtocol() . '://' . kConf::get('play_server_host') . "/manifest/master/entryId/$entryId/name/$entryId.m3u8?url=$hlsStreamUrl";
+			}
+			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::RTMP);
 			$configuration->setUrl($rtmpStreamUrl);
@@ -451,12 +459,12 @@ abstract class LiveEntry extends entry
 			return;
 		
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
-		$this->putInCustomData("server-$index", $server, 'mediaServers');
+		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
 	protected function isMediaServerRegistered($index, $serverId)
 	{
-		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getMediaServerId() == $serverId)
 			return true;
 		
@@ -465,9 +473,9 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $hostname)
 	{
-		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getHostname() == $hostname)
-			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
+			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
 	/**
@@ -476,14 +484,14 @@ abstract class LiveEntry extends entry
 	public function validateMediaServers()
 	{
 		$listChanged = false;
-		$kMediaServers = $this->getFromCustomData(null, 'mediaServers', array());
+		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
 		{
 			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
 				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
-				$this->removeFromCustomData($key, 'mediaServers');
+				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			}
 		}
 		
@@ -495,7 +503,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServers()
 	{
-		return $this->getFromCustomData(null, 'mediaServers', array());
+		return $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 	}
 	
 	/* (non-PHPdoc)

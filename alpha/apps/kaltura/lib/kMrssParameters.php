@@ -28,7 +28,7 @@ class kMrssParameters
 	
 	private $encoding;
 	
-	private $servePlayManifest;
+	private $playbackType;
 	
 	private $playManifestClientTag;
 	
@@ -141,18 +141,18 @@ class kMrssParameters
 	}
 	
 	/**
-	 * @return field_type $servePlayManifest
+	 * @return field_type $playbackType
 	 */
-	public function getServePlayManifest()
+	public function getPlaybackType()
 	{
-		return $this->servePlayManifest;
+		return $this->playbackType;
 	}
 
 	/**
-	 * @param field_type $servePlayManifest
+	 * @param field_type $playbackType
 	 */
-	public function setServePlayManifest($servePlayManifest)
+	public function setPlaybackType($playbackType)
 	{
-		$this->servePlayManifest = $servePlayManifest;
+		$this->playbackType = $playbackType;
 	}
 }

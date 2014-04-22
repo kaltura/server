@@ -340,9 +340,10 @@ class kUrlManager
 	/**
 	 * @param flavorAsset $asset
 	 * @param string $clientTag
+	 * @param syndicationFeedPlaybackType $playbackType
 	 * @return string
 	 */
-	public function getPlayManifestUrl(flavorAsset $asset, $clientTag)
+	public function getPlayManifestUrl(flavorAsset $asset, $clientTag, $playbackType)
 	{
 		$entryId = $asset->getEntryId();
 		$partnerId = $asset->getPartnerId();
@@ -355,6 +356,9 @@ class kUrlManager
 		if($this->storageProfileId)
 			$url .= "/storageId/$this->storageProfileId";
 				
+		if($playbackType == syndicationFeedPlaybackType::PLAY_SERVER_MANIFEST)
+			$url .= "/usePlayServer/1";
+		
 		$ext = '';
 		if ($asset && $asset->getFileExt())   
 			$ext ='/a.' .  $asset->getFileExt();
