@@ -14,14 +14,14 @@ require_once (__DIR__ . '/../../bootstrap.php');
 $realRun = isset($argv[1]) && $argv[1] == 'realrun';
 KalturaStatement::setDryRun(!$realRun);
 
-function isLivePassThruConversionProfileExists($partnerId)
+function isLiveConversionProfileExists($partnerId)
 {
 	$c = new Criteria();
 	$c->add(conversionProfile2Peer::PARTNER_ID, $partnerId);
 	$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
 	$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 	
-	return conversionProfile2Peer::doCount($c) > 1;
+	return conversionProfile2Peer::doCount($c);
 }
 
 function createLivePassThruConversionProfile($partnerId)
@@ -83,7 +83,7 @@ function handleLivePartners($partnerIds)
 	foreach($partners as $partner)
 	{
 		/* @var $partner Partner */
-		if(isLivePassThruConversionProfileExists($partner->getId()))
+		if(isLiveConversionProfileExists($partner->getId()))
 		{
 			handleCloudTranscodeProfiles($partner->getId(), $partner->getPartnerGroupType() == PartnerGroupType::TEMPLATE);
 		}
