@@ -225,12 +225,12 @@ class kMrssManager
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, kMrssParameters $mrssParams = null)
 	{
 		$storageId = null;
-		$servePlayManifest = false;
+		$playbackType = syndicationFeedPlaybackType::SERVE_FLAVOR;
 		
 		if($mrssParams)
 		{
 			$storageId = $mrssParams->getStorageId();
-			$servePlayManifest = $mrssParams->getServePlayManifest();
+			$playbackType = $mrssParams->getPlaybackType();
 		}
 		
 		if(!$partner->getStorageServePriority() || $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
@@ -249,23 +249,25 @@ class kMrssManager
 			return null;
 			
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $asset->getEntryId());
-		
-		if($servePlayManifest)
+		switch($playbackType)
 		{
-			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$urlManager->setDomain($cdnHost);
-			
-			if (!$storage->getDeliveryHttpsBaseUrl())
-				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
-			else
-				$url = requestUtils::getApiCdnHost();
-
-			$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
-		}
-		else
-		{
-			$urlManager->setFileExtension($asset->getFileExt());
-			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			case syndicationFeedPlaybackType::PLAY_SERVER_MANIFEST:
+			case syndicationFeedPlaybackType::PLAY_MANIFEST:
+				$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+				$urlManager->setDomain($cdnHost);
+				
+				if (!$storage->getDeliveryHttpsBaseUrl())
+					$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
+				else
+					$url = requestUtils::getApiCdnHost();
+	
+				$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag(), $playbackType);
+				break;
+				
+			case syndicationFeedPlaybackType::SERVE_FLAVOR:
+				$urlManager->setFileExtension($asset->getFileExt());
+				$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+				break;
 		}
 		
 		return $url;
@@ -295,9 +297,9 @@ class kMrssManager
 		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
 		$urlManager->setDomain($cdnHost);
 		
-		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
+		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getPlaybackType())
 		{
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
+			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag(), $mrssParams->getPlaybackType());
 		}
 		else
 		{

@@ -61,7 +61,7 @@ class syndicationFeed extends BasesyndicationFeed
 	public function preSave(PropelPDO $con = null)
 	{
 		if($this->isNew())
-			$this->setServePlayManifest(true);
+			$this->setPlaybackType(syndicationFeedPlaybackType::PLAY_MANIFEST);
 		
 		return parent::preSave($con);
 	}
@@ -153,18 +153,18 @@ class syndicationFeed extends BasesyndicationFeed
 	}
 	
 	/**
-	 * @param boolean $servePlayManifest
+	 * @param syndicationFeedPlaybackType $playbackType
 	 */
-	public function setServePlayManifest($servePlayManifest)
+	public function setPlaybackType($playbackType)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, $servePlayManifest);
+		$this->putInCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, $playbackType);
 	}
 	
 	/**
-	 * @return boolean
+	 * @return syndicationFeedPlaybackType
 	 */
-	public function getServePlayManifest()
+	public function getPlaybackType()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, null, false);
+		return (int) $this->getFromCustomData(self::CUSTOM_DATA_SERVE_PLAY_MANIFEST, null, syndicationFeedPlaybackType::SERVE_FLAVOR);
 	}
 }

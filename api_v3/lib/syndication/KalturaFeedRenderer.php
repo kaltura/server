@@ -159,7 +159,7 @@ class KalturaFeedRenderer extends SyndicationFeedRenderer{
 		$mrssParams->setIncludePlayerTag(true);
 		$mrssParams->setPlayerUiconfId($syndicationFeed->getPlayerUiconfId());
 		$mrssParams->setStorageId($syndicationFeed->getStorageId());
-		$mrssParams->setServePlayManifest($syndicationFeed->getServePlayManifest());
+		$mrssParams->setPlaybackType($syndicationFeed->getPlaybackType());
 		$mrssParams->setPlayManifestClientTag('feed:' . $syndicationFeed->getId());
 	
 		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams);

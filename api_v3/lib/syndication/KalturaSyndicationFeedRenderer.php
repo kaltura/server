@@ -545,25 +545,27 @@ class KalturaSyndicationFeedRenderer
 			
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $flavorAsset->getEntryId());
 		
-		if($this->syndicationFeedDb->getServePlayManifest())
+		switch($this->syndicationFeedDb->getPlaybackType())
 		{
-			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$urlManager->setDomain($cdnHost);
-			
-			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			
-			if (!$storage->getDeliveryHttpsBaseUrl())
-				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
-			else
-				$url = requestUtils::getApiCdnHost();
-
-			$url .= $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
-		}
-		else
-		{
-			$urlManager->setFileExtension($flavorAsset->getFileExt());
-			
-			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			case syndicationFeedPlaybackType::PLAY_MANIFEST:
+			case syndicationFeedPlaybackType::PLAY_SERVER_MANIFEST:
+				$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+				$urlManager->setDomain($cdnHost);
+				
+				$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
+				
+				if (!$storage->getDeliveryHttpsBaseUrl())
+					$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
+				else
+					$url = requestUtils::getApiCdnHost();
+	
+				$url .= $urlManager->getPlayManifestUrl($flavorAsset, $clientTag, $this->syndicationFeedDb->getPlaybackType());
+				break;
+				
+			case syndicationFeedPlaybackType::SERVE_FLAVOR:
+				$urlManager->setFileExtension($flavorAsset->getFileExt());
+				$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+				break;
 		}
 		
 		return $url;
@@ -592,15 +594,18 @@ class KalturaSyndicationFeedRenderer
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
 		$urlManager->setDomain($this->cdnHost);
 		
-		if($this->syndicationFeedDb->getServePlayManifest())
+		switch($this->syndicationFeedDb->getPlaybackType())
 		{
-			$cdnHost = requestUtils::getApiCdnHost();
-			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
-		}
-		else
-		{
-			$url = $this->cdnHost . $urlManager->getAssetUrl($flavorAsset);
+			case syndicationFeedPlaybackType::PLAY_MANIFEST:
+			case syndicationFeedPlaybackType::PLAY_SERVER_MANIFEST:
+				$cdnHost = requestUtils::getApiCdnHost();
+				$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
+				$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag, $this->syndicationFeedDb->getPlaybackType());
+				break;
+				
+			case syndicationFeedPlaybackType::SERVE_FLAVOR:
+				$url = $this->cdnHost . $urlManager->getAssetUrl($flavorAsset);
+				break;
 		}
 		
 		return $url;
