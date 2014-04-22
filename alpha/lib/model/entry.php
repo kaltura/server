@@ -3072,4 +3072,50 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
+    /**
+     * Has specified name in the custom data
+     *
+     * @param      string $name
+     * @param      string $nameSpace - default null
+     *
+     * @return     boolean True if $index has been modified.
+     */
+    public function isCustomDataModified($name=null,$nameSpace=null)
+    {
+        $tmp = array("a"=>'1');
+        KalturaLog::debug ('##########isCustomDataModified##'.print_r($tmp,1));
+        $oldCustomData = $this->oldCustomDataValues;
+        KalturaLog::debug ('##########isCustomDataModified##'.print_r($oldCustomData,1));
+        $result = false;
+        if(!is_null($nameSpace))
+        {
+            if(isset($oldCustomData['nameSpace']) )
+            {
+                if(is_array($oldCustomData['nameSpace']))
+                {
+                    foreach($oldCustomData['nameSpace'] as $customDataSubArray)
+                    {
+                        KalturaLog::debug ('##########isCustomDataModified##'.print_r($customDataSubArray,1));
+                        if($oldCustomData['nameSpace'][$name])
+                        {
+                            $result  = true;
+                        }
+                    }
+                }
+                elseif( isset($oldCustomData['nameSpace'][$name]))
+                {
+                    $result  = true;
+                }
+            }
+        }
+        elseif(!is_null($name) && isset($oldCustomData[$name]))
+        {
+            $result  = true;
+        }
+        return $result;
+    }
+
+
+
+
 }
