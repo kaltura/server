@@ -58,7 +58,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	/**
 	 * @var time
 	 * @filter gte,lte,order
-	 * @readonly
 	 */
 	public $triggeredAt;
 	
