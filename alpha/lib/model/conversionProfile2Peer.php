@@ -60,6 +60,7 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 		$c = new Criteria();
 		$c->addAnd(conversionProfile2Peer::PARTNER_ID, $partnerId);
 		$c->addAnd(conversionProfile2Peer::SYSTEM_NAME, $systemName);
+		$c->addAnd(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 		$c->addAnd(conversionProfile2Peer::TYPE, $type);
 		
 		return conversionProfile2Peer::doSelectOne($c);
