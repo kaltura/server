@@ -681,7 +681,7 @@ $plannedDur = 0;
 		$temp = $video->_height;
 		$video->_height = $video->_width;
 		$video->_width = $temp;
-		if ($video->_dar)
+		if (isset($video->_dar) && $video->_dar != 0)
 			$video->_dar = 1/$video->_dar;
 	}
 	
