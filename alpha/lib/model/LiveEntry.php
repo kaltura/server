@@ -282,7 +282,7 @@ abstract class LiveEntry extends entry
 		}
 		elseif($mediaServer)
 		{
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
 		}
 		
 		if ($manifestUrl)
