@@ -38,23 +38,25 @@ function gotoSignup() {
 	window.location = baseUrl + "/index.php/kmc/signup";
 }
 
-// Show login form
-var flashVars = {
-	loginF: "loginF",
-	closeF: "closeLoginF",
-	urchinNumber: "UA-12055206-1",
-	srvurl: "api_v3/index.php",
-    language: window.lang
-}
+$(function() {
+	// Show login form
+	var flashVars = {
+		loginF: "loginF",
+		closeF: "closeLoginF",
+		urchinNumber: "UA-12055206-1",
+		srvurl: "api_v3/index.php",
+	    language: window.lang
+	}
 
-$.extend( flashVars, options.flashVars );
+	$.extend( flashVars, options.flashVars );
 
-var params = {
-	allowscriptaccess: "always",
-	allownetworking: "all",
-	bgcolor: "#272929",
-	quality: "high",
-	wmode: "window" ,
-	movie: options.swfUrl
-};
-swfobject.embedSWF(options.swfUrl, "login_swf", "384", "350", "10.0.0", baseUrl + "/expressInstall.swf", flashVars, params);
+	var params = {
+		allowscriptaccess: "always",
+		allownetworking: "all",
+		bgcolor: "#272929",
+		quality: "high",
+		wmode: "window" ,
+		movie: options.swfUrl
+	};
+	swfobject.embedSWF(options.swfUrl, "login_swf", "384", "350", "10.0.0", baseUrl + "/expressInstall.swf", flashVars, params);
+});
