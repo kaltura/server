@@ -282,7 +282,7 @@ abstract class LiveEntry extends entry
 		}
 		elseif($mediaServer)
 		{
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+			$manifestUrl = $mediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
 		}
 		
 		if ($manifestUrl)
@@ -454,10 +454,11 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("server-$index", $server, 'mediaServers');
 	}
 	
-	protected function isMediaServerRegistered($index, $serverId)
+	protected function isMediaServerRegistered($index, $hostname)
 	{
 		$server = $this->getFromCustomData("server-$index", 'mediaServers');
-		if($server && $server->getMediaServerId() == $serverId)
+		/* @var $server kLiveMediaServer */
+		if($server && $server->getHostname() == $hostname)
 			return true;
 		
 		return false;
