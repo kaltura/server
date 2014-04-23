@@ -654,7 +654,7 @@ class Partner extends BasePartner
 	
 	private function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
 	private function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
-
+	
 	public function getCustomDeliveryTypes()
 	{
 		$customDeliveryTypes = array();
@@ -713,6 +713,16 @@ class Partner extends BasePartner
 
 		return $deliveryTypes;
 	} 
+	
+	public function getMediaServersConfiguration ()
+	{
+		return $this->getFromCustomData('mediaServersConfiguration', null, null);
+	}
+	
+	public function setMediaServersConfiguration ($v)
+	{
+		$this->putInCustomData('mediaServersConfiguration', $v);
+	}
 	
 	public function getEmbedCodeTypes()
 	{
