@@ -696,6 +696,7 @@ class ks extends kSessionBase
 
 		$ksVersion = $partner->getKSVersion();
 
+		$cacheKey = self::getSecretsCacheKey($partnerId);
 		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
 		foreach ($cacheSections as $cacheSection)
 		{
@@ -703,7 +704,7 @@ class ks extends kSessionBase
 			if (!$cacheStore)
 				continue;
 			
-			$cacheStore->set(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
 		}
 		
 		return array($ksVersion, $partner->getAdminSecret());
