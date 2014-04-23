@@ -71,7 +71,7 @@ class MediaServer extends BaseMediaServer {
 		return MediaServer::DEFAULT_GPUID;
 	}
 	
-	public function getManifestUrl($protocol = 'http')
+	public function getManifestUrl($protocol = 'http', $partnerMediaServerConfigurations = null)
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
@@ -83,6 +83,9 @@ class MediaServer extends BaseMediaServer {
 		if(kConf::hasMap('media_servers'))
 		{
 			$mediaServers = kConf::getMap('media_servers');
+			if ($partnerMediaServerConfigurations)
+				$mediaServers = array_merge($mediaServers, $partnerMediaServerConfigurations);
+			
 			if(isset($mediaServers[$portField]))
 				$port = $mediaServers[$portField];
 				
