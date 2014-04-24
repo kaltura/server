@@ -676,7 +676,7 @@ $plannedDur = 0;
 	 *	switch frame sizes & inverse display aspect ratio for a certain video.
 	 */
 	
-	function invertVideoDimensions(KDLVideoData $video)
+	private static function invertVideoDimensions(KDLVideoData $video)
 	{
 		$temp = $video->_height;
 		$video->_height = $video->_width;
@@ -700,7 +700,8 @@ $plannedDur = 0;
 		 *	in this case the source-target frame-sizes ratio after converting should be the same as if the source had a regular height < width.
 		 *	boolean flag invertedVideo - for inverting back the source & target later on.
 		 */
-		if ((isset($source->_dar) && $source->_dar < 1) || (isset($source->_height) && isset($source->_width) && $source->_height > $source->_width))
+		if ((isset($source->_dar) && $source->_dar < 1) ||
+		(isset($source->_height) && isset($source->_width) && $source->_height > 0 && $source->_width > 0 && $source->_height > $source->_width))
 		{
 			KalturaLog::debug('inverting source');
 			self::invertVideoDimensions($source);
