@@ -295,7 +295,7 @@ media_servers.ini is optional and needed only for custom configurations.
 <Property>
 	<!-- Kaltura maximum DVR window, in seconds, should be 24 hours -->
 	<Name>KalturaLiveStreamMaxDvrWindow</Name>
-	<Value>86400</Value>
+	<Value>7200</Value>
 </Property>
 <Property>
 	<!-- Kaltura maximum recorded chunk duration, in minutes, should be an hour -->
@@ -317,6 +317,11 @@ media_servers.ini is optional and needed only for custom configurations.
 	<Name>KalturaRecordedFileGroup</Name>
 	<!-- kaltura (gid = 613) or any other group that apache user is associated with. -->
 	<Value>kaltura</Value>
+</Property>
+<Property>
+	<!-- Minimum buffering time before registering entry as is-live (in seconds) -->
+	<Name>KalturaIsLiveRegistrationMinBufferTime</Name>
+	<Value>60</Value>
 </Property>
 ```
 
