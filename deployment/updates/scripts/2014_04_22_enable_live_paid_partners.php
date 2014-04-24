@@ -21,7 +21,7 @@ function isLivePassThruConversionProfileExists($partnerId)
 	$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
 	$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 	
-	return conversionProfile2Peer::doCount($c) > 1;
+	return conversionProfile2Peer::doCount($c) > 0;
 }
 
 function createLivePassThruConversionProfile($partnerId)
