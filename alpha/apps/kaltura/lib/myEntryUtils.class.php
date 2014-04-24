@@ -646,31 +646,42 @@ class myEntryUtils
 			
 		$entry_status = $entry->getStatus();
 		 
-		$tempThumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 			
 		if ($orig_image_path)
-			$tempThumbName.= '_oip_'.basename($orig_image_path);
+			$thumbName.= '_oip_'.basename($orig_image_path);
 		if ($density)
-			$tempThumbName.= "_dns_{$density}";
+			$thumbName.= "_dns_{$density}";
 		if($stripProfiles)
-			$tempThumbName .= "_stp_{$stripProfiles}";
+			$thumbName .= "_stp_{$stripProfiles}";
 				
 		$entryThumbFilename = ($entry->getThumbnail() ? $entry->getThumbnail() : "0.jpg");
 		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
-			$tempThumbName .= "_NOCACHE_";
+			$thumbName .= "_NOCACHE_";
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
-		$basePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $tempThumbName, $entryThumbFilename , $version );
-		$tempThumbPath = $contentPath.$basePath;
+		
+		//create final path for thumbnail created
+		$finalBasePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+		$finalThumbPath = $contentPath.$finalBasePath;
+		
+		//Add unique id to the proccesing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
+		$thumbName .= "_" . uniqid() . "_";
+		//create path for processing thumbnail request
+		$processingBasePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+		$processingThumbPath = $contentPath.$processingBasePath;
 		
 		if(!is_null($format))
-			$tempThumbPath = kFile::replaceExt($tempThumbPath, $format);
-		
-		if (file_exists($tempThumbPath) && @filesize($tempThumbPath))
 		{
-			header("X-Kaltura:cached-thumb-exists,".md5($tempThumbPath));
-			return $tempThumbPath;
+			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
+			$processingThumbPath == kFile::replaceExt($processingThumbPath, $format);
+		}
+		
+		if (file_exists($finalThumbPath) && @filesize($finalThumbPath))
+		{
+			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
+			return $finalThumbPath;
 		}
 		
 		if($orig_image_path === null || !file_exists($orig_image_path))
@@ -781,10 +792,10 @@ class myEntryUtils
 			if ($processing)
 				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 
-			kFile::fullMkdir($tempThumbPath);
+			kFile::fullMkdir($processingThumbPath);
 			if ($crop_provider)
 			{
-				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $tempThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
+				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles);
 			}
 			else
 			{
@@ -793,9 +804,12 @@ class myEntryUtils
 					
 				$imageSizeArray = getimagesize($orig_image_path);
 				if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
-					$tempThumbPath = kFile::replaceExt($tempThumbPath, "gif");
+				{
+					$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
+					$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
+				}
 
-				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format);
+				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format);
 			}
 			
 			// die if resize operation failed and add failed resizing to cache
@@ -809,7 +823,7 @@ class myEntryUtils
 						
 			if ($multi)
 			{
-				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($tempThumbPath);
+				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
 				if (!$im)
 					$im = imagecreatetruecolor($w * $vid_slices, $h);
 					
@@ -822,10 +836,13 @@ class myEntryUtils
 		
 		if ($multi)
 		{
-			imagejpeg($im, $tempThumbPath);
+			imagejpeg($im, $processingThumbPath);
 			imagedestroy($im);
-		}		
-		return $convertedImagePath;
+		}
+		
+		kFile::fullMkdir($finalThumbPath);
+		kFile::moveFile($processingThumbPath, $finalThumbPath);
+		return $finalThumbPath;
 	}
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
