@@ -62,7 +62,7 @@ class YoutubeApiDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isMediaUpdateEnabled()
 	{
-		return true;
+		return false;
 	}	
 	
 	/* (non-PHPdoc)
