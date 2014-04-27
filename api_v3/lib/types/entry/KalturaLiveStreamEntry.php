@@ -147,6 +147,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	public function toInsertableObject ( $dbObject = null , $props_to_skip = array() )
 	{
 		/* @var $dbObject LiveStreamEntry */
+		
+		//This if-statement is required for backward compatibility support of api calls in KMS
 		if (!count ($props_to_skip))
 		{
 			$props_to_skip = array("id");
@@ -181,6 +183,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
+		//This if-statement is required for backward compatibility support of api calls in KMS
 		if (!count ($propertiesToSkip))
 		{
 			$propertiesToSkip = array("id");
