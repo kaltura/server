@@ -213,6 +213,7 @@ class updateLoginDataAction extends kalturaAction
 				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 				$loginData = UserLoginDataPeer::doSelectOne($c);
 				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
+				$invalidPasswordStructureMessage = str_replace('\n', "\n", $invalidPasswordStructureMessage);
 				throw new KalturaLoginDataException(APIErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
 			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
@@ -233,22 +234,18 @@ class KalturaLoginDataException extends Exception
 {
 	protected $code;
 	
-	
 	public function KalturaLoginDataException($errorString)
 	{
-		$pos = strpos($errorString, ",");
-		if ($pos === false)
-		{
-			$errorString = APIErrors::INTERNAL_SERVERL_ERROR;
-			$pos = strpos($errorString, ",");
-		}
-		$this->code = substr($errorString, 0, $pos);
-		$message = substr($errorString, $pos + 1);
-		
-		$args = func_get_args();
-		array_shift($args);
-		$this->message = @call_user_func_array('sprintf', array_merge(array($message), $args)); 
+		$errorArgs = func_get_args();
+        array_shift( $errorArgs );
+        
+        $errorData = APIErrors::getErrorData( $errorString, $errorArgs );
+        
+        $this->code = $errorData['code'];
+        $this->args = $errorData['args'];
+        $this->message = @call_user_func_array('sprintf', array_merge(array($errorData['message']), $errorArgs));
 	}
+	
 	
 	public function __sleep()
 	{

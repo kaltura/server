@@ -32,6 +32,8 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const BATCHJOB_STATUS_FATAL = 10;
 	const BATCHJOB_STATUS_DONT_PROCESS = 11;
 	const BATCHJOB_STATUS_FINISHED_PARTIALLY = 12;
+	const BATCHJOB_STATUS_SUSPEND = 13;
+	const BATCHJOB_STATUS_SUSPEND_ALMOST_DONE = 14;
 	
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
@@ -100,6 +102,8 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		self::BATCHJOB_STATUS_RETRY => 'Retry',
 		self::BATCHJOB_STATUS_FATAL => 'Fatal',
 		self::BATCHJOB_STATUS_DONT_PROCESS => 'Dont Process',
+		self::BATCHJOB_STATUS_SUSPEND => 'Suspended',
+		self::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE => 'Suspended',
 	);
 	
 	

@@ -379,12 +379,13 @@ class BaseEntryService extends KalturaEntryService
 	 * @param string $entryId Entry id to update
 	 * @param KalturaResource $resource Resource to be used to replace entry content
 	 * @param int $conversionProfileId The conversion profile id to be used on the entry
+	 * @param KalturaEntryReplacementOptions $advancedOptions Additional update content options
 	 * @return KalturaBaseEntry The updated entry
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @validateUser entry entryId edit
 	 */
-	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null)
+	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null, $advancedOptions = null)
 	{
     	$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -400,7 +401,7 @@ class BaseEntryService extends KalturaEntryService
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
-				$service->replaceResource($resource, $dbEntry, $conversionProfileId);
+				$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		    	$baseEntry->fromObject($dbEntry);
     			return $baseEntry;
 				

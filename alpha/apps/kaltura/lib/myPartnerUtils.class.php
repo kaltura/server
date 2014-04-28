@@ -1383,7 +1383,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $conversionProfileType = null)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $checkPermissions = false)
  	{
 		$copiedList = array();
 		
@@ -1392,15 +1392,26 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
  		
- 		if(!is_null($conversionProfileType))
- 			$c->add(conversionProfile2Peer::TYPE, $conversionProfileType);
- 		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
  		{
+ 			/* @var $conversionProfile conversionProfile2 */
+ 			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
+ 				continue;
+ 			
+ 			if (!self::isPartnerPermittedForCopy ($toPartner, $conversionProfile->getRequiredCopyTemplatePermissions()))
+ 				continue;
+ 				
  			$newConversionProfile = $conversionProfile->copy();
  			$newConversionProfile->setPartnerId($toPartner->getId());
- 			$newConversionProfile->save();
+ 			try {
+ 				$newConversionProfile->save();
+ 			}
+ 			catch (Exception $e)
+ 			{
+ 				KalturaLog::info("Exception occured, conversion profile was not copied. Message: [" . $e->getMessage() . "]");
+ 				continue;
+ 			}
  			
  			KalturaLog::log("Copied [".$conversionProfile->getId()."], new id is [".$newConversionProfile->getId()."]");
 			$copiedList[$conversionProfile->getId()] = $newConversionProfile->getId();
@@ -1573,5 +1584,25 @@ class myPartnerUtils
 			}
 		}
 		return $ret;
+	}
+	
+	/**
+	 * 
+	 * @param Partner $toPartner
+	 * @param array $permissionArray
+	 * 
+	 * @return bool
+	 */
+	public static function isPartnerPermittedForCopy (Partner $toPartner, array $permissionArray)
+	{
+		foreach ($permissionArray as $permission)
+		{
+			if (!PermissionPeer::isValidForPartner($permission, $toPartner->getId()))
+			{
+				return false;
+			}
+			
+		}	
+		return true;
 	}
 }

@@ -14,4 +14,5 @@ interface ConditionType extends BaseEnum
 	const FIELD_COMPARE = 7;
 	const ASSET_PROPERTIES_COMPARE = 8;
 	const USER_ROLE = 9;
+	const GEO_DISTANCE = 10;
 }

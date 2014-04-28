@@ -56,7 +56,7 @@ echo_failure() {
 	[ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
 	echo -n "]"
 	echo -ne "\r"
-	return 0
+	return 1
 }
 
 
@@ -80,7 +80,7 @@ start() {
 			echo "Removing stale lock file at $LOCKFILE"
 			rm -f $LOCKFILE
 			start_scheduler
-			return 0
+			return 1
 		fi
 	else
 		if [ "X$KP" != "X" ]; then
@@ -112,7 +112,7 @@ show_status() {
 		return 0
 		else
 			echo "Service Batch isn't running"
-			return 0
+			return 1
 		fi
 }
 

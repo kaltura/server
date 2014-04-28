@@ -207,6 +207,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $crmId;
+
+	/**
+	 * @var string
+	 */
+	public $referenceId;
 	
 	/**
 	 * @var string
@@ -310,6 +315,18 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $language;
 	
+	/**
+	 * @var string
+	 */
+	public $audioThumbEntryId;
+
+	/**
+	 * @var string
+	 */
+	public $liveThumbEntryId;
+
+	
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -353,6 +370,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"supportAnimatedThumbnails",
 		"crmLink",
 		"crmId",
+		"referenceId",
 		"verticalClasiffication",
 		"partnerPackageClassOfService",
 		"enableBulkUploadNotificationsEmails",
@@ -369,6 +387,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"defaultEmbedCodeType",
 		"customDeliveryTypes",
 		"language",
+		"audioThumbEntryId",
+		"liveThumbEntryId",		
 	);
 
 	public function getMapBetweenObjects()
@@ -398,19 +418,32 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 	}
 	
-	private function createLiveConversionProfiles(Partner $partner)
+	private function copyMissingConversionProfiles(Partner $partner)
 	{
-		$c = new Criteria();
-		$c->add(conversionProfile2Peer::PARTNER_ID, $partner->getId());
-		$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
-		$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
-		
-		if(conversionProfile2Peer::doCount($c))
-			return;
-			
-		$templatePartner = PartnerPeer::retrieveByPK(kConf::get('template_partner_id'));
+		$templatePartner = PartnerPeer::retrieveByPK($partner->getI18nTemplatePartnerId() ? $partner->getI18nTemplatePartnerId() : kConf::get('template_partner_id'));
 		if($templatePartner)
-			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, ConversionProfileType::LIVE_STREAM);
+			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, true);
+	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$audioThumbEntryId = $this->audioThumbEntryId;
+		if ($audioThumbEntryId)
+		{
+			$audioThumbEntry = entryPeer::retrieveByPK($audioThumbEntryId);
+			if (!$audioThumbEntry || $audioThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_AUDIO_THUMB_ENTRY_ID_ERROR, $audioThumbEntryId);
+		}
+
+		$liveThumbEntryId = $this->liveThumbEntryId;
+		if ($liveThumbEntryId)
+		{
+			$liveThumbEntry = entryPeer::retrieveByPK($liveThumbEntryId);
+			if (!$liveThumbEntry || $liveThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_LIVE_THUMB_ENTRY_ID_ERROR, $liveThumbEntryId);
+		}
+	
+		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -441,13 +474,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				$dbPermission = PermissionPeer::getByNameAndPartner($permission->name, array($object_to_fill->getId()));
 				if($dbPermission)
 				{
-					KalturaLog::debug("add permissions: exists; set status; " . $permission->status);
+					KalturaLog::debug("add permission: exists in DB; set status; " . $permission->status);
 					KalturaLog::debug("db permissions:  " . print_r($dbPermission,true));
 					$dbPermission->setStatus($permission->status);
 				}
 				else
 				{
-					KalturaLog::debug("add permissions: didn't exists");
+					KalturaLog::debug("add permissions: does not exist in DB");
 					$dbPermission = new Permission();
 					$dbPermission->setType($permission->type);
 					$dbPermission->setPartnerId($object_to_fill->getId());
@@ -459,13 +492,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				KalturaLog::debug("add permissions: save" . print_r($dbPermission,true));
 				$dbPermission->save();
 				
-				if($dbPermission->getName() == PermissionName::FEATURE_LIVE_STREAM && $dbPermission->getStatus() == PermissionStatus::ACTIVE)
-				{
-					$this->createLiveConversionProfiles($object_to_fill);
-				}
+				
 				if($dbPermission->getStatus() == PermissionStatus::ACTIVE)
 					$this->enablePermissionForPlugins($object_to_fill->getId(), $dbPermission->getName());
 			}
+			
+			//Raise template partner's conversion profiles (so far) and check whether the partner now has permissions for them.
+			$this->copyMissingConversionProfiles($object_to_fill);
+		
 		}
 		
 		if (!is_null($this->limits))

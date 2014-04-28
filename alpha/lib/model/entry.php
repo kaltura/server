@@ -1079,7 +1079,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		//$path = $this->getThumbnailPath ( $version );
 		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/thumbnail/entry_id/" . $this->getId() ;
-		$current_version = $this->getThumbnailVersion();
+
+		$partner = $this->getPartner();
+				
+		if ($partner && $this->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO && $partner->getAudioThumbEntryId()  && $partner->getAudioThumbEntryVersion())
+		{
+			$thumbEntryId = $partner->getAudioThumbEntryId();
+			$thumbVersion = $partner->getAudioThumbEntryVersion();
+
+			$current_version = "$thumbVersion/thumb_entry_id/$thumbEntryId";
+		}
+		elseif  ($partner && in_array($this->getType(), array(entryType::LIVE_STREAM , entryType::LIVE_CHANNEL)) && $partner->getLiveThumbEntryId()  && $partner->getLiveThumbEntryVersion())
+		{
+			$thumbEntryId = $partner->getLiveThumbEntryId();
+			$thumbVersion = $partner->getLiveThumbEntryVersion();
+
+			$current_version = "$thumbVersion/thumb_entry_id/$thumbEntryId";
+		}
+		else
+			$current_version = $this->getThumbnailVersion();
+		
 		if ( $version )
 			$path .= "/version/$version";
 		else
@@ -1692,6 +1711,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
+
+	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
+	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions", null, new kEntryReplacementOptions() );	}
 	
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
@@ -2523,21 +2545,31 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$objectDeleted = false;
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
 			$objectDeleted = true;
+
+		if ($this->isColumnModified(entryPeer::DATA) && $this->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$partner = $this->getPartner();
 			
-		$trackColumns = array(
-			entryPeer::STATUS,
-			entryPeer::MODERATION_STATUS,
-			entryPeer::KUSER_ID,
-			entryPeer::CREATOR_KUSER_ID,
-			entryPeer::ACCESS_CONTROL_ID,
-			
-			'' => array(
-				'replacementStatus',
-				'replacingEntryId',
-				'replacedEntryId',
-				'redirectEntryId',
-			)
-		);
+			if ($partner)
+			{
+				$dataArr = explode('.',$this->getData());
+				$id = $this->getId();
+				if ($id == $partner->getAudioThumbEntryId())
+				{
+					$partner->setAudioThumbEntryVersion($dataArr[0]);
+					$partner->save();
+				}
+
+				if ($id == $partner->getLiveThumbEntryId())
+				{
+					$partner->setLiveThumbEntryVersion($dataArr[0]);
+					$partner->save();
+				}
+			}
+		}
+		
+		
+		$trackColumns = $this->getTrackColumns();
 		
 		$changedProperties = array();
 		foreach($trackColumns as $namespace => $trackColumn)
@@ -2555,7 +2587,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 								$column = "$namespace.$trackCustomData";
 								
 							$previousValue = $this->oldCustomDataValues[$namespace][$trackCustomData];
+							$previousValue = is_scalar ($previousValue) ? $previousValue : $this->getTrackEntryString($namespace, $trackCustomData, $previousValue);
 							$newValue = $this->getFromCustomData($trackCustomData, $namespace);
+							$newValue = is_scalar ($newValue) ? $newValue : $this->getTrackEntryString($namespace, $trackCustomData, $newValue);
 							$changedProperties[] = "$column [{$previousValue}]->[{$newValue}]";
 						}
 					}
@@ -3024,6 +3058,32 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$this->setSource($value);
 	}
 	
+	/**
+	 * 
+	 * @return array
+	 */
+	protected function getTrackColumns ()
+	{
+		return array(
+			entryPeer::STATUS,
+			entryPeer::MODERATION_STATUS,
+			entryPeer::KUSER_ID,
+			entryPeer::CREATOR_KUSER_ID,
+			entryPeer::ACCESS_CONTROL_ID,
+			'' => array(
+				'replacementStatus',
+				'replacingEntryId',
+				'replacedEntryId',
+				'redirectEntryId',
+			)
+		);
+	}
+	
+	protected function getTrackEntryString ($namespace, $customDataColumn, $value)
+	{
+		//No need for implementation - for example, see extending logic in class LiveEntry
+	}
+	
 /**
 	 * will create thumbnail according to the entry type
 	 * @return the thumbnail path.
@@ -3038,7 +3098,34 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 				KalturaLog::log ( "rejected audio entry - not serving thumbnail" );
 				KExternalErrors::dieError ( KExternalErrors::ENTRY_DELETED_MODERATED );
 			}
-			$msgPath = $contentPath . "content/templates/entry/thumbnail/audio_thumb.jpg";
+			
+			$audioEntryExist = false;
+			$audioThumbEntry = null;
+			$audioThumbEntryId = null;
+			
+			$partner = $this->getPartner();
+			if ($partner)
+				$audioThumbEntryId = $partner->getAudioThumbEntryId();
+			if($audioThumbEntryId)
+				$audioThumbEntry = entryPeer::retrieveByPK($audioThumbEntryId);
+
+			if ($audioThumbEntry && $audioThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+			{
+				$fileSyncVersion = $partner->getAudioThumbEntryVersion();
+				$audioEntryKey = $audioThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+				$contentPath = kFileSyncUtils::getLocalFilePathForKey($audioEntryKey);
+				if ($contentPath)
+				{
+					$msgPath = $contentPath;
+					$audioEntryExist = true;
+				}
+				else
+					KalturaLog::err('no local file sync for entry id');
+			}
+
+			if (!$audioEntryExist)
+				$msgPath = $contentPath . "content/templates/entry/thumbnail/audio_thumb.jpg";
+			
 			return myEntryUtils::resizeEntryImage ( $this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles );
 		
 		} elseif ($this->getMediaType () == entry::ENTRY_MEDIA_TYPE_SHOW) { // roughcut without any thumbnail, probably just created

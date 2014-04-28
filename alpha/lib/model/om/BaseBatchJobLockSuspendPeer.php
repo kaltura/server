@@ -26,7 +26,7 @@ abstract class BaseBatchJobLockSuspendPeer {
 	const TM_CLASS = 'BatchJobLockSuspendTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 23;
+	const NUM_COLUMNS = 24;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -100,6 +100,9 @@ abstract class BaseBatchJobLockSuspendPeer {
 	/** the column name for the BATCH_VERSION field */
 	const BATCH_VERSION = 'batch_job_lock_suspend.BATCH_VERSION';
 
+	/** the column name for the ROOT_JOB_ID field */
+	const ROOT_JOB_ID = 'batch_job_lock_suspend.ROOT_JOB_ID';
+
 	/**
 	 * An identiy map to hold any loaded instances of BatchJobLockSuspend objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -116,11 +119,11 @@ abstract class BaseBatchJobLockSuspendPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'JobType', 'JobSubType', 'ObjectId', 'ObjectType', 'EstimatedEffort', 'Status', 'StartAt', 'CreatedAt', 'Priority', 'Urgency', 'EntryId', 'PartnerId', 'SchedulerId', 'WorkerId', 'BatchIndex', 'Expiration', 'ExecutionAttempts', 'Version', 'Dc', 'BatchJobId', 'CustomData', 'BatchVersion', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'jobType', 'jobSubType', 'objectId', 'objectType', 'estimatedEffort', 'status', 'startAt', 'createdAt', 'priority', 'urgency', 'entryId', 'partnerId', 'schedulerId', 'workerId', 'batchIndex', 'expiration', 'executionAttempts', 'version', 'dc', 'batchJobId', 'customData', 'batchVersion', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::JOB_TYPE, self::JOB_SUB_TYPE, self::OBJECT_ID, self::OBJECT_TYPE, self::ESTIMATED_EFFORT, self::STATUS, self::START_AT, self::CREATED_AT, self::PRIORITY, self::URGENCY, self::ENTRY_ID, self::PARTNER_ID, self::SCHEDULER_ID, self::WORKER_ID, self::BATCH_INDEX, self::EXPIRATION, self::EXECUTION_ATTEMPTS, self::VERSION, self::DC, self::BATCH_JOB_ID, self::CUSTOM_DATA, self::BATCH_VERSION, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'job_type', 'job_sub_type', 'object_id', 'object_type', 'estimated_effort', 'status', 'start_at', 'created_at', 'priority', 'urgency', 'entry_id', 'partner_id', 'scheduler_id', 'worker_id', 'batch_index', 'expiration', 'execution_attempts', 'version', 'dc', 'batch_job_id', 'custom_data', 'batch_version', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'JobType', 'JobSubType', 'ObjectId', 'ObjectType', 'EstimatedEffort', 'Status', 'StartAt', 'CreatedAt', 'Priority', 'Urgency', 'EntryId', 'PartnerId', 'SchedulerId', 'WorkerId', 'BatchIndex', 'Expiration', 'ExecutionAttempts', 'Version', 'Dc', 'BatchJobId', 'CustomData', 'BatchVersion', 'RootJobId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'jobType', 'jobSubType', 'objectId', 'objectType', 'estimatedEffort', 'status', 'startAt', 'createdAt', 'priority', 'urgency', 'entryId', 'partnerId', 'schedulerId', 'workerId', 'batchIndex', 'expiration', 'executionAttempts', 'version', 'dc', 'batchJobId', 'customData', 'batchVersion', 'rootJobId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::JOB_TYPE, self::JOB_SUB_TYPE, self::OBJECT_ID, self::OBJECT_TYPE, self::ESTIMATED_EFFORT, self::STATUS, self::START_AT, self::CREATED_AT, self::PRIORITY, self::URGENCY, self::ENTRY_ID, self::PARTNER_ID, self::SCHEDULER_ID, self::WORKER_ID, self::BATCH_INDEX, self::EXPIRATION, self::EXECUTION_ATTEMPTS, self::VERSION, self::DC, self::BATCH_JOB_ID, self::CUSTOM_DATA, self::BATCH_VERSION, self::ROOT_JOB_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'job_type', 'job_sub_type', 'object_id', 'object_type', 'estimated_effort', 'status', 'start_at', 'created_at', 'priority', 'urgency', 'entry_id', 'partner_id', 'scheduler_id', 'worker_id', 'batch_index', 'expiration', 'execution_attempts', 'version', 'dc', 'batch_job_id', 'custom_data', 'batch_version', 'root_job_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
 	);
 
 	/**
@@ -130,11 +133,11 @@ abstract class BaseBatchJobLockSuspendPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'JobType' => 1, 'JobSubType' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'EstimatedEffort' => 5, 'Status' => 6, 'StartAt' => 7, 'CreatedAt' => 8, 'Priority' => 9, 'Urgency' => 10, 'EntryId' => 11, 'PartnerId' => 12, 'SchedulerId' => 13, 'WorkerId' => 14, 'BatchIndex' => 15, 'Expiration' => 16, 'ExecutionAttempts' => 17, 'Version' => 18, 'Dc' => 19, 'BatchJobId' => 20, 'CustomData' => 21, 'BatchVersion' => 22, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'jobType' => 1, 'jobSubType' => 2, 'objectId' => 3, 'objectType' => 4, 'estimatedEffort' => 5, 'status' => 6, 'startAt' => 7, 'createdAt' => 8, 'priority' => 9, 'urgency' => 10, 'entryId' => 11, 'partnerId' => 12, 'schedulerId' => 13, 'workerId' => 14, 'batchIndex' => 15, 'expiration' => 16, 'executionAttempts' => 17, 'version' => 18, 'dc' => 19, 'batchJobId' => 20, 'customData' => 21, 'batchVersion' => 22, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::JOB_TYPE => 1, self::JOB_SUB_TYPE => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::ESTIMATED_EFFORT => 5, self::STATUS => 6, self::START_AT => 7, self::CREATED_AT => 8, self::PRIORITY => 9, self::URGENCY => 10, self::ENTRY_ID => 11, self::PARTNER_ID => 12, self::SCHEDULER_ID => 13, self::WORKER_ID => 14, self::BATCH_INDEX => 15, self::EXPIRATION => 16, self::EXECUTION_ATTEMPTS => 17, self::VERSION => 18, self::DC => 19, self::BATCH_JOB_ID => 20, self::CUSTOM_DATA => 21, self::BATCH_VERSION => 22, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'job_type' => 1, 'job_sub_type' => 2, 'object_id' => 3, 'object_type' => 4, 'estimated_effort' => 5, 'status' => 6, 'start_at' => 7, 'created_at' => 8, 'priority' => 9, 'urgency' => 10, 'entry_id' => 11, 'partner_id' => 12, 'scheduler_id' => 13, 'worker_id' => 14, 'batch_index' => 15, 'expiration' => 16, 'execution_attempts' => 17, 'version' => 18, 'dc' => 19, 'batch_job_id' => 20, 'custom_data' => 21, 'batch_version' => 22, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'JobType' => 1, 'JobSubType' => 2, 'ObjectId' => 3, 'ObjectType' => 4, 'EstimatedEffort' => 5, 'Status' => 6, 'StartAt' => 7, 'CreatedAt' => 8, 'Priority' => 9, 'Urgency' => 10, 'EntryId' => 11, 'PartnerId' => 12, 'SchedulerId' => 13, 'WorkerId' => 14, 'BatchIndex' => 15, 'Expiration' => 16, 'ExecutionAttempts' => 17, 'Version' => 18, 'Dc' => 19, 'BatchJobId' => 20, 'CustomData' => 21, 'BatchVersion' => 22, 'RootJobId' => 23, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'jobType' => 1, 'jobSubType' => 2, 'objectId' => 3, 'objectType' => 4, 'estimatedEffort' => 5, 'status' => 6, 'startAt' => 7, 'createdAt' => 8, 'priority' => 9, 'urgency' => 10, 'entryId' => 11, 'partnerId' => 12, 'schedulerId' => 13, 'workerId' => 14, 'batchIndex' => 15, 'expiration' => 16, 'executionAttempts' => 17, 'version' => 18, 'dc' => 19, 'batchJobId' => 20, 'customData' => 21, 'batchVersion' => 22, 'rootJobId' => 23, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::JOB_TYPE => 1, self::JOB_SUB_TYPE => 2, self::OBJECT_ID => 3, self::OBJECT_TYPE => 4, self::ESTIMATED_EFFORT => 5, self::STATUS => 6, self::START_AT => 7, self::CREATED_AT => 8, self::PRIORITY => 9, self::URGENCY => 10, self::ENTRY_ID => 11, self::PARTNER_ID => 12, self::SCHEDULER_ID => 13, self::WORKER_ID => 14, self::BATCH_INDEX => 15, self::EXPIRATION => 16, self::EXECUTION_ATTEMPTS => 17, self::VERSION => 18, self::DC => 19, self::BATCH_JOB_ID => 20, self::CUSTOM_DATA => 21, self::BATCH_VERSION => 22, self::ROOT_JOB_ID => 23, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'job_type' => 1, 'job_sub_type' => 2, 'object_id' => 3, 'object_type' => 4, 'estimated_effort' => 5, 'status' => 6, 'start_at' => 7, 'created_at' => 8, 'priority' => 9, 'urgency' => 10, 'entry_id' => 11, 'partner_id' => 12, 'scheduler_id' => 13, 'worker_id' => 14, 'batch_index' => 15, 'expiration' => 16, 'execution_attempts' => 17, 'version' => 18, 'dc' => 19, 'batch_job_id' => 20, 'custom_data' => 21, 'batch_version' => 22, 'root_job_id' => 23, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
 	);
 
 	/**
@@ -227,6 +230,7 @@ abstract class BaseBatchJobLockSuspendPeer {
 		$criteria->addSelectColumn(BatchJobLockSuspendPeer::BATCH_JOB_ID);
 		$criteria->addSelectColumn(BatchJobLockSuspendPeer::CUSTOM_DATA);
 		$criteria->addSelectColumn(BatchJobLockSuspendPeer::BATCH_VERSION);
+		$criteria->addSelectColumn(BatchJobLockSuspendPeer::ROOT_JOB_ID);
 	}
 
 	/**

@@ -1676,7 +1676,8 @@ class kFlowHelper
 		$c->addAnd ( FileSyncPeer::OBJECT_TYPE , $fileSync->getObjectType() );
 		$c->addAnd ( FileSyncPeer::VERSION , $fileSync->getVersion() );
 		$c->addAnd ( FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$c->addAnd(FileSyncPeer::STATUS, Filesync::FILE_SYNC_STATUS_PENDING);
+		$c->addAnd ( FileSyncPeer::DC, $fileSync->getDc());
+		$c->addAnd ( FileSyncPeer::STATUS, Filesync::FILE_SYNC_STATUS_PENDING);
 		$pendingFileSync = FileSyncPeer::doSelectOne($c);
 		if($pendingFileSync)
 			return false;

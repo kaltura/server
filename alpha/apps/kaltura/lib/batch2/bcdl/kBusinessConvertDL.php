@@ -55,6 +55,7 @@ class kBusinessConvertDL
 		}
 
 		$defaultThumbAssetNew = null;
+		$defaultThumbAssetOld = null;
 		foreach($oldAssets as $oldAsset)
 		{
 			/* @var $oldAsset asset */
@@ -95,11 +96,22 @@ class kBusinessConvertDL
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
-				KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
-
-				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-				$oldAsset->setDeletedAt(time());
-				$oldAsset->save();
+				if($entry->getReplacementOptions()->getKeepManualThumbnails() && $oldAsset instanceof thumbAsset && !$oldAsset->getFlavorParamsId())
+				{
+					KalturaLog::debug("KeepManualThumbnails ind is set, manual thumbnail is not deleted [" . $oldAsset->getId() . "]");
+					if($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+					{
+						$defaultThumbAssetOld = $oldAsset;
+					}
+				}
+				else 
+				{
+					KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
+	
+					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+					$oldAsset->setDeletedAt(time());
+					$oldAsset->save();
+				}
 			}
 		}
 
@@ -117,8 +129,13 @@ class kBusinessConvertDL
 				}
 			}
 		}
-
-		if ($defaultThumbAssetNew)
+		
+		
+		if($defaultThumbAssetOld)
+		{
+			KalturaLog::debug("Kepping ThumbAsset [". $defaultThumbAssetOld->getId() ."] as the default ThumbAsset");
+		}
+		elseif ($defaultThumbAssetNew)
 		{
 			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
 			KalturaLog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
@@ -134,12 +151,14 @@ class kBusinessConvertDL
 		}
 
 		self::createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $entry);
+		
 		$entry->setDimensions($tempEntry->getWidth(), $tempEntry->getHeight());
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
 		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
 		$entry->setConversionQuality($tempEntry->getConversionQuality());
 		$entry->setReplacingEntryId(null);
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);
+		$entry->setReplacementOptions(null);
 		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
 
@@ -465,6 +484,12 @@ class kBusinessConvertDL
 			$liveAsset->setDeletedAt(time());
 			$liveAsset->setStatus(asset::ASSET_STATUS_DELETED);
 			$liveAsset->save();
+		}
+		
+		if(!count($streamBitrates))
+		{
+			$streamBitrate = array('bitrate' => 900, 'width' => 640, 'height' => 480);
+			$streamBitrates[] = $streamBitrate;
 		}
 		
 		$entry->setStreamBitrates($streamBitrates);

@@ -14,7 +14,7 @@ var kmc = {
 	 <ul id="hTabs">
 	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
-	 <!--div id="langIcon"></div-->
+	 <div id="langIcon" style="display: none"></div>
 	 <div id="user"><span class="left-arrow"></span><?php echo $full_name; ?></div>
 	 <div id="user_links">
 	  <span id="closeMenu"></span> &nbsp;&nbsp;

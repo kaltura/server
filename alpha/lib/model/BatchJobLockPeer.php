@@ -159,6 +159,7 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		$batchJobLock->setJobSubType($batchJob->getJobSubType());
 		$batchJobLock->setExecutionAttempts(0);
 		$batchJobLock->setBatchVersion(self::getBatchVersion($batchJob->getJobType()));
+		$batchJobLock->setRootJobId($batchJob->getRootJobId());
 		
 		self::commonLockObjectUpdate($batchJob, $batchJobLock);
 		
