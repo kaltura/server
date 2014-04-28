@@ -364,7 +364,7 @@ class myReportsMgr
 			{
 				$end = microtime(true);
 				KalturaLog::log( "getTable took [" . ( $end - $start ) . "]" );			
-				return array ( null , null , 0 );
+				return array ( array() , array() , 0 );
 			}
 		}
 		if ( ! $page_size || $page_size < 0 ) $page_size = 10;
@@ -400,7 +400,7 @@ class myReportsMgr
 		}
 		else
 		{
-			$res =  array ( null , null , 0 );
+			$res =  array ( array() , array() , 0 );
 		}
 		
 		$end = microtime(true);
