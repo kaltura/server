@@ -49,8 +49,8 @@ class kJobsManager
 		$dbBatchJobLocks = BatchJobLockPeer::retrieveByEntryId($entryId);
 		
 		foreach($dbBatchJobLocks as $dbBatchJobLock) {
-			$dbBatchJobId = $dbBatchJobLock->getBatchJobId();
-			$dbBatchJob = BatchJobPeer::retrieveByPK($dbBatchJobId);
+			/* @var $dbBatchJobLock BatchJobLock */
+			$dbBatchJob = $dbBatchJobLock->getBatchJob();
 			$dbBatchJob->setMessage("Aborted entry");
 			self::abortDbBatchJob($dbBatchJob);
 		}

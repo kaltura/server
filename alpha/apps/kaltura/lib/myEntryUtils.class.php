@@ -330,8 +330,8 @@ class myEntryUtils
 			KalturaLog::DEBUG("onlyIfAllJobsDone = ". (int)$onlyIfAllJobsDone);
 			$dbEntryBatchJobLocks = BatchJobLockPeer::retrieveByEntryId($entry->getId());
 			foreach($dbEntryBatchJobLocks as $jobLock) {
-				$jobId = $jobLock->getBatchJobId();
-				$job = BatchJobPeer::retrieveByPK($jobId);
+				/* @var $jobLock BatchJobLock */
+				$job = $jobLock->getBatchJob();
 				/* @var $job BatchJob */
 				if (in_array($job->getStatus(), BatchJobPeer::getUnClosedStatusList()))	{
 					KalturaLog::DEBUG("Entry [". $entry->getId() ."] still has an unhandled batchjob [". $job->getId()."] with status [". $job->getStatus()."] - aborting deletion process.");
