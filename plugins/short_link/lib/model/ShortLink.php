@@ -28,6 +28,9 @@ class ShortLink extends BaseShortLink {
 				return null;
 				
 			$kuser = kuserPeer::retrieveByPK($this->getKuserId());
+			if(!$kuser)
+				return null;
+				
 			$this->puserId = $kuser->getPuserId();
 		}
 		
