@@ -132,7 +132,7 @@ class KWidevineOperationEngine extends KOperationEngine
 			
 			// in some cases this specific Widevine error needs a simple job retry in order to convert successfully  
 			if ($returnValue == self::SYNC_FRAME_OFFSET_MATCH_ERROR)
-				$this->setShouldRetry(true);
+				throw new kTemporaryException ($logMessage);
 			throw new KOperationEngineException($logMessage);
 		}										
 	}

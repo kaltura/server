@@ -48,11 +48,6 @@ abstract class KOperationEngine
 	protected $mediaInfoEnabled = false;
 	
 	/**
-	 * @var bool
-	 */
-	protected $shouldRetry = false;
-	
-	/**
 	 * @var KalturaConvartableJobData
 	 */
 	protected $data = null;
@@ -148,19 +143,6 @@ abstract class KOperationEngine
 	public function setMediaInfoEnabled($enabled)
 	{
 		$this->mediaInfoEnabled = $enabled;
-	}
-	
-	/**
-	 * @param bool $v
-	 */
-	public function setShouldRetry($v)
-	{
-		$this->shouldRetry = $v;
-	}
-
-	public function getShouldRetry()
-	{
-		return $this->shouldRetry;
 	}
 	
 	/**

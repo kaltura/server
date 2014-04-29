@@ -236,9 +236,12 @@ class KAsyncConvert extends KJobHandlerWorker
 				}
 			}
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
-			if ($this->operationEngine->getShouldRetry())
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::RETRY, $data);
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED, $data);
+			$jobStatus = null;
+			if ($e instanceof kTemporaryException)
+				$jobStatus = KalturaBatchJobStatus::RETRY;
+			if ($e instanceof KOperationEngineException)
+				$jobStatus = KalturaBatchJobStatus::FAILED;
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, $jobStatus , $data);
 		}
 	}
 
