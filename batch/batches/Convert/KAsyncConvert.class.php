@@ -218,7 +218,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				return $this->moveFile($job, $data);
 			}
 		}
-		catch(KOperationEngineException $e)
+		catch (Exception $e)
 		{
 			$data = $this->operationEngine->getData();
 			$log = $this->operationEngine->getLogData();
