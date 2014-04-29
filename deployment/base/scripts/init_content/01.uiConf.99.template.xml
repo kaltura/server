@@ -22,7 +22,7 @@
 			<name>Player with captions</name>
 			<width>560</width>
 			<height>395</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>kdp3,player</tags>
@@ -37,7 +37,7 @@
 			<name>Hovering controllers player</name>
 			<width>560</width>
 			<height>315</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>kdp3,player</tags>
@@ -52,7 +52,7 @@
 			<name>Widescreen player</name>
 			<width>460</width>
 			<height>290</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>kdp3,player</tags>
@@ -67,7 +67,7 @@
 			<name>Multiple vertical playlist</name>
 			<width>525</width>
 			<height>665</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>kdp3,playlist</tags>
@@ -82,7 +82,7 @@
 			<name>Player with custom watermark - with live support</name>
 			<width>400</width>
 			<height>330</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags></tags>
@@ -96,7 +96,7 @@
 			<name>Player with no share button - live stream support</name>
 			<width>400</width>
 			<height>360</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags></tags>
@@ -110,7 +110,7 @@
 			<name>Widescreen playlist player - dark skin, minimal - with live support</name>
 			<width>740</width>
 			<height>255</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags></tags>
@@ -124,7 +124,7 @@
 			<name>Widescreen player - light skin - with live support</name>
 			<width>400</width>
 			<height>285</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags></tags>
@@ -138,7 +138,7 @@
 			<name>Widescreen playlist player - dark skin, minimal</name>
 			<width>740</width>
 			<height>255</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>kdp3,playlist</tags>
@@ -153,7 +153,7 @@
 			<name>Player with no share button</name>
 			<width>560</width>
 			<height>395</height>
-			<swfUrl>/flash/kdp3/v3.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
 			<html5Url>/html5/html5lib/v1.8.2/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>kdp3,player</tags>
