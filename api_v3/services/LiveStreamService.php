@@ -10,6 +10,7 @@
 class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY = 30;
+	const ISLIVE_ACTION_CONDITIONAL_CACHE_EXPIRY = 10;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -342,7 +343,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	public function isLiveAction ($id, $protocol)
 	{
 		KalturaResponseCacher::setExpiry(self::ISLIVE_ACTION_CACHE_EXPIRY);
-		kApiCache::disableConditionalCache();
+		KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_CONDITIONAL_CACHE_EXPIRY);
 		if (!kCurrentContext::$ks)
 		{
 			kEntitlementUtils::initEntitlementEnforcement(null, false);
