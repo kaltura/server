@@ -137,7 +137,6 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"url",
 			"type",
 			"mediaProtocols",
-			"isLive",
 	);
 	
 	public function getMapBetweenObjects ( )

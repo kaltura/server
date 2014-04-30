@@ -67,4 +67,18 @@ class kDeliveryUtils {
 		}
 		return null;
 	}
+	
+	public static function formatGenericUrl($url, $pattern = null, DeliveryProfileDynamicAttributes $params) {
+		if ($pattern)
+		{
+			$seekFromSec = $params->getSeekFromTime() > 0 ? $params->getSeekFromTime() / 1000 : 0;
+			$pattern = str_replace('{url}', $url, $pattern);
+			$pattern = str_replace('{seekFromSec}', $seekFromSec, $pattern);
+			return $pattern;
+		}
+		else
+		{
+			return '/'.$url; // the trailing slash will force adding the host name to the url
+		}
+	}
 }

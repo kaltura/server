@@ -95,26 +95,37 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	// ------ Retrieval functionality ------
 	// -------------------------------------
 	
+	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
+	{
+		return self::getLocalDeliveryByPartner($entryId, $streamerType, null, null, null, false);	
+	}
+	
 	/**
 	 * This function returns the matching delivery object for a given partner and delivery protocol. 
 	 * @var string $entryId - The entry ID
 	 * @var PlaybackProtocol $streamerType - The protocol
 	 * @var string $mediaProtocol - rtmp/rtmpe/https...
 	 */
-	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
+	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $checkSecured = true) {
 		
 		$deliveries = array();
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		
-		$isSecured = self::isSecured($partner, $entry);
+		$isSecured = false;
+		if($checkSecured)
+			$isSecured = self::isSecured($partner, $entry);
 		$deliveryIds = $partner->getDeliveryIds();
 		
 		// if the partner has an override for the required format on the partner object - use that
 		if(array_key_exists($streamerType, $deliveryIds)) {
 			$deliveryIds = $deliveryIds[$streamerType];
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
+			
+			$cmp = new DeliveryProfileCdnHostComparator($isSecured, $cdnHost);
+			array_walk($deliveries, array($cmp,"decorateWithUserOrder"));
+			uasort($deliveries, array($cmp, "compare"));
 		} 
 		// Else catch the default by the protocol
 		else {
@@ -140,7 +151,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			KalturaLog::debug('Delivery ID for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType . ' is ' . $delivery->getId());
 			$delivery->setEntryId($entryId);
 		} else {
-			throw new Exception('Delivery ID can\'t be determined for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType);
+			KalturaLog::err('Delivery ID can\'t be determined for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType);
 		}
 		return $delivery;
 	}
@@ -158,7 +169,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	
 	/**
 	 * This function returns the delivery object that matches a given storage profile and format
-	 * If one not found - throws an exception.
+	 * If one not found - returns null
 	 * @var int $storageProfileId - The storage profile ID
 	 * @var string $entryId - The entry ID
 	 * @var PlaybackProtocol $streamerType - The protocol
@@ -169,7 +180,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 		$deliveryIds = $storageProfile->getDeliveryIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
-			throw new Exception('Delivery ID can\'t be determined for storageId: '. $storageProfileId . ' and streamer type: ' . $streamerType);
+			KalturaLog::err('Delivery ID can\'t be determined for storageId: '. $storageProfileId . ' and streamer type: ' . $streamerType);
+			return null;
 		}
 		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
@@ -219,7 +231,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			KalturaLog::debug('Delivery ID for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType . ' is ' . $delivery->getId());
 			$delivery->setEntryId($entryId);
 		} else {
-			throw new Exception('Delivery ID can\'t be determined for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType);
+			KalturaLog::err('Delivery ID can\'t be determined for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType);
 		}
 		return $delivery;
 		
@@ -256,3 +268,4 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return $deliveryProfileTypes;
 	}
 } // DeliveryProfilePeer
+

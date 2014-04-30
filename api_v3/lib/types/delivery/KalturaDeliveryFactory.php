@@ -46,6 +46,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaUrlTokenizerAkamaiRtsp();
 			case 'kAkamaiSecureHDUrlTokenizer':
 				return new KalturaUrlTokenizerAkamaiSecureHd();
+			case 'kBitGravityUrlTokenizer':
+				return new KalturaUrlTokenizerBitGravity();
 			// Add other tokenizers here
 			default:
 				$apiObject = KalturaPluginManager::loadObject('KalturaTokenizer', $type);

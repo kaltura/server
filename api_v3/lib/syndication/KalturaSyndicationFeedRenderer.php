@@ -589,7 +589,7 @@ class KalturaSyndicationFeedRenderer
 			return null;
 		
 		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId);
-		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($flavorAsset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
 		$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 		$urlManager->setHostName($this->cdnHost);
 		$urlManager->setDynamicAttribtues($dynamicAttrs);

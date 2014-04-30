@@ -7,14 +7,21 @@ class KalturaDeliveryProfileGenericHds extends KalturaDeliveryProfile {
 	
 	/**
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $pattern;
 	
 	
+	/**
+	 * rendererClass
+	 * @var string
+	 */
+	public $rendererClassParam;
+	
+	
 	private static $map_between_objects = array
 	(
-			"pattern"
+			"pattern",
+			"rendererClassParam",
 	);
 	
 	public function getMapBetweenObjects ( )

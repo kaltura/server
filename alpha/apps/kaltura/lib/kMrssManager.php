@@ -269,7 +269,10 @@ class kMrssManager
 		}
 		else
 		{
-			$urlManager->setFileExtension($asset->getFileExt());
+			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
+			$dynamicAttrs->setFileExtention($asset->getFileExt());
+			$urlManager->setDynamicAttribtues($dynamicAttrs);
+			
 			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
@@ -297,7 +300,7 @@ class kMrssManager
 		
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($asset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 		$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 		$urlManager->setHostName($cdnHost);
 		$urlManager->setDynamicAttribtues($dynamicAttrs);
@@ -448,7 +451,7 @@ class kMrssManager
 		}
 		$urlPrefix = rtrim($urlPrefix,'/').'/';
 		
-		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
 		$urlManager->initDeliveryDynamicAttribtues($kalturaFileSync);
 		
 		$partner = $entry->getPartner();

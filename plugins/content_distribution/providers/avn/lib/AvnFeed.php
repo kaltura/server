@@ -181,7 +181,7 @@ class AvnFeed
 	{
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($asset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 		$url = $urlManager->getAssetUrl($asset);
 		$url = $cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);

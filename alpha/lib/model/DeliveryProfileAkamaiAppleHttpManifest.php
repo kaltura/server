@@ -39,7 +39,7 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 		}
 	
 		if (strpos($flavor['urlPrefix'], '://') === false)
-			$flavor['urlPrefix'] = $this->deliveryAttributes->getMediaProtocol() . '://' . $flavor['urlPrefix'];
+			$flavor['urlPrefix'] = $this->params->getMediaProtocol() . '://' . $flavor['urlPrefix'];
 	
 		return $flavor;
 	}

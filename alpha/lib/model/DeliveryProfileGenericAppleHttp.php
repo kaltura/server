@@ -11,7 +11,14 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 		return $this->getFromCustomData("pattern");
 	}
 	
-	// doGetFlavorAssetUrl - Use parent implementation
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
+	{
+		$url = $this->getBaseUrl($flavorAsset);
+		if ($this->params->getFileExtention())
+			$url .= "/name/a." . $this->params->getFileExtention();
+		
+		return kDeliveryUtils::formatGenericUrl($url, $this->getPattern(), $this->params);
+	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
@@ -19,7 +26,7 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 		$pattern = $this->getPattern();
 		if(is_null($pattern))
 			$pattern = '/hls-vod/{url}.m3u8';
-		return str_replace('{url}', $url, $pattern);
+		return kDeliveryUtils::formatGenericUrl($url, $pattern, $this->params);
 	}
 }
 

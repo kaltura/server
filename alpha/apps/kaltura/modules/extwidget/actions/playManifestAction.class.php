@@ -76,6 +76,11 @@ class playManifestAction extends kalturaAction
 	private $protocol = null;
 	
 	/**
+	 * @var string
+	 */
+	private $cdnHost = null;
+	
+	/**
 	 * @var int
 	 */
 	private $maxBitrate = null;
@@ -88,7 +93,7 @@ class playManifestAction extends kalturaAction
 	/**
 	 * @var DeliveryProfile
 	 */
-	private $urlManager = null;
+	private $deliveryProfile = null;
 	
 	/**
 	 * @var KSecureEntryHelper
@@ -596,13 +601,17 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
-	protected function initUrlManager()
+	protected function initDeliveryProfile($cdnHost = null)
 	{
 		if ($this->deliveryAttributes->getStorageId())
 		{
-			$this->urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, $this->deliveryAttributes->getFormat());
+			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes->getStorageId(),$this->entryId, $this->deliveryAttributes->getFormat());
 		} else {		
-			$this->urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
+			$cdnHost = $this->cdnHost;
+			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
+			
+			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
+					$this->deliveryAttributes->getMediaProtocol(), $cdnHostOnly);
 		}
 	}
 
@@ -612,7 +621,10 @@ class playManifestAction extends kalturaAction
 	private function serveVodEntry()
 	{
 		$this->initFlavorIds();
-				
+		
+		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
+			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+		
 		$this->initFlavorAssetArray();
 		
 		$this->initEntryDuration();
@@ -648,15 +660,17 @@ class playManifestAction extends kalturaAction
 
 		// <-- 
 		
-		$this->initUrlManager();
+		$this->deliveryProfile = $this->initDeliveryProfile();
+		if(!$this->deliveryProfile)
+			return null;
 		
 		if($serveUrl)
 			$this->deliveryAttributes->setFormat(self::URL);
 		
 		$this->enforceAudioVideoEntry();
 		
-		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);	
-		return $this->urlManager->serve();
+		$this->deliveryProfile->setDynamicAttribtues($this->deliveryAttributes);	
+		return $this->deliveryProfile->serve();
 	}
 	
 	private function serveHDNetwork()
@@ -712,11 +726,14 @@ class playManifestAction extends kalturaAction
 		$baseUrl = $this->getLiveEntryBaseUrl();
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
-		$this->urlManager = DeliveryProfilePeer::getDeliveryProfileByHostName($cdnHost, $this->entryId, 
+		$this->deliveryProfile = DeliveryProfilePeer::getDeliveryProfileByHostName($cdnHost, $this->entryId, 
 				$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 		
-		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);	
-		return $this->urlManager->serve($baseUrl);
+		if(!$this->deliveryProfile)
+			return null;
+		
+		$this->deliveryProfile->setDynamicAttribtues($this->deliveryAttributes);	
+		return $this->deliveryProfile->serve($baseUrl);
 	}
 	
 	/* (non-PHPdoc)
@@ -809,6 +826,7 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
 
 		$this->deliveryAttributes->setStorageId($this->getRequestParameter ( "storageId", null ));
+		$this->cdnHost = $this->getRequestParameter ( "cdnHost", null );
 
 		$this->deliveryAttributes->setResponseFormat($this->getRequestParameter ( "responseFormat", null ));
 		
@@ -821,19 +839,19 @@ class playManifestAction extends kalturaAction
 		
 		switch($this->entry->getType())
 		{
-		case entryType::MEDIA_CLIP:
-			// VOD
-			$renderer = $this->serveVodEntry();
-			break;
+			case entryType::MEDIA_CLIP:
+				// VOD
+				$renderer = $this->serveVodEntry();
+				break;
+				
+			case entryType::LIVE_STREAM:			
+			case entryType::LIVE_CHANNEL:
+				// Live stream
+				$renderer = $this->serveLiveEntry();
+				break;
 			
-		case entryType::LIVE_STREAM:			
-		case entryType::LIVE_CHANNEL:
-			// Live stream
-			$renderer = $this->serveLiveEntry();
-			break;
-		
-		default:
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+			default:
+				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 		}
 				
 		if (!$renderer)
@@ -854,8 +872,8 @@ class playManifestAction extends kalturaAction
 			
 		$renderer->entryId = $this->entryId;
 		$renderer->duration = $this->duration;
-		if ($this->urlManager)
-			$renderer->tokenizer = $this->urlManager->getTokenizer();
+		if ($this->deliveryProfile)
+			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
 		
 		// Handle caching

@@ -15,14 +15,14 @@ class DeliveryProfileSilverLight extends DeliveryProfileVod {
 	 */
 	protected function getSmoothStreamUrl()
 	{
-		
-		if($this->deliveryAttributes->getManifestFileSync()->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
+		if($this->params->getManifestFileSync()->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
 		{
-			$urlPrefix = myPartnerUtils::getIisHost($this->deliveryAttributes->getPartnerId(), $this->deliveryAttributes->getMediaProtocol());
+			$entry = entryPeer::retrieveByPK($this->params->getEntryId());
+			$urlPrefix = myPartnerUtils::getIisHost($entry->getPartnerId(), $this->params->getMediaProtocol());
 		}
-		else if($this->deliveryAttributes->getStorageId())
+		else if($this->params->getStorageId())
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($this->deliveryAttributes->getStorageId());
+			$storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageId());
 			$urlPrefix = $storageProfile->getDeliveryIisBaseUrl();
 		}
 	

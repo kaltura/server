@@ -11,7 +11,11 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 		return $this->getFromCustomData("pattern");
 	}
 	
-	// doGetFlavorAssetUrl - Use parent implementation
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
+	{
+		$url = parent::doGetFlavorAssetUrl($flavorAsset);
+		return kDeliveryUtils::formatGenericUrl($url, $this->getPattern(), $this->params);
+	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
@@ -19,7 +23,7 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 		$pattern = $this->getPattern();
 		if(is_null($pattern))
 			$pattern = '{url}';
-		return str_replace('{url}', $url, $pattern);
+		return kDeliveryUtils::formatGenericUrl($url, $pattern, $this->params);
 	}
 }
 

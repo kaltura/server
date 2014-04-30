@@ -383,7 +383,7 @@ class LiveStreamService extends KalturaLiveEntryService
 					}
 				}
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-				$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($id, $protocol);
+				$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($id, $protocol, null, parse_url($url, PHP_URL_HOST));
 				return $urlManager->isLive($url);
 				
 			case KalturaPlaybackProtocol::HDS:
@@ -393,7 +393,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				{
 					$url = $config->getUrl();
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($id, $protocol);
+					$urlManager = DeliveryProfilePeer::getLocalDeliveryByPartner($id, $protocol, null, parse_url($url, PHP_URL_HOST));
 					return $urlManager->isLive($url);
 				}
 				break;

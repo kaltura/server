@@ -3,7 +3,7 @@
  * Enable serving live conversion profile to the Wowza servers as XML
  * @package plugins.wowza
  */
-class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServices, IKalturaConfigurator, IKalturaObjectLoader, IKalturaEnumerator
+class WowzaPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'wowza';
 	
