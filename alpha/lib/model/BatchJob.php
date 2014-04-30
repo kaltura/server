@@ -374,38 +374,29 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		if (!in_array($sub_type, $valid_sub_types))
 			throw new FileSyncException(FileSyncObjectType::BATCHJOB, $sub_type, $valid_sub_types);		
 	}
-	
-	public function getChildJobs(Criteria $c = null,$criteriaArr=array())
-	{
-		if($c) {
-			$c = clone $c;
-		} else {
-			$c = new Criteria();
-		}
-		
-		BatchJobPeer::setUseCriteriaFilter(false);
-		// Get by root
-		$c1 = clone $c;
-		$c1->addAnd($c1->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id));
-		$c1->addAnd($c1->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id, Criteria::NOT_EQUAL));
-        $c->addAnd($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
-        foreach($criteriaArr as $criteriaKey => $criteriaVal)
-        {
-            if(defined("BatchJobPeer::$criteriaKey"))
-            {
-                $c->addAnd($c->getNewCriterion(constant('BatchJobPeer::'.$criteriaKey), $criteriaVal['val'], constant('Criteria::'.$criteriaVal['condition'])));
-                $c1->addAnd($c1->getNewCriterion(constant('BatchJobPeer::'.$criteriaKey), $criteriaVal['val'], constant('Criteria::'.$criteriaVal['condition'])));
-            }
+
+    public function getChildJobs(Criteria $c = null)
+    {
+        if($c) {
+            $c = clone $c;
+        } else {
+            $c = new Criteria();
         }
+        BatchJobPeer::setUseCriteriaFilter(false);
+        // Get by root
+        $c1 = clone $c;
+        $c1->addAnd($c1->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id));
+        $c1->addAnd($c1->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id, Criteria::NOT_EQUAL));
+        // Get by parent
+        $c->addAnd($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
+
         $result1 = BatchJobPeer::doSelect($c1, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
-		// Get by parent
-		$result2 = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
-		
-		// Unite
-		BatchJobPeer::setUseCriteriaFilter(true);
-		return array_merge($result1, $result2);
-	}
-	
+        $result2 = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+        BatchJobPeer::setUseCriteriaFilter(true);
+        // Unite
+        return array_merge($result1, $result2);
+    }
+
 	public function getDirectChildJobs()
 	{
 		$c = new Criteria();
