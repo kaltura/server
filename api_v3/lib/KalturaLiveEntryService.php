@@ -48,8 +48,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$currentDuration = $dbEntry->getLengthInMsecs();
 		if(!$currentDuration)
 			$currentDuration = 0;
-			
 		$currentDuration += $duration;
+		
+		$maxRecordingDuration = kConf::get('max_live_recording_duration_hours') * 60 * 60 * 1000;
+		if($currentDuration > $maxRecordingDuration)
+		{
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
+		}
+		
 		$dbEntry->setLengthInMsecs($currentDuration);
 		$dbEntry->save();
 			
