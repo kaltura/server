@@ -675,7 +675,7 @@ class myEntryUtils
 		if(!is_null($format))
 		{
 			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
-			$processingThumbPath == kFile::replaceExt($processingThumbPath, $format);
+			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 		
 		if (file_exists($finalThumbPath) && @filesize($finalThumbPath))
