@@ -234,6 +234,8 @@ class APIErrors
 	
 	const SERVICE_FORBIDDEN_PARTNER_DELETED = "SERVICE_FORBIDDEN_PARTNER_DELETED;;The access to this service is forbidden since the specified partner is deleted";
 
+	const USER_BLOCKED = "USER_BLOCKED;;this user is blocked";
+
 	const SERVICE_ACCESS_CONTROL_RESTRICTED = "SERVICE_ACCESS_CONTROL_RESTRICTED;SERVICE;The access to service [@SERVICE@] is forbidden due to access control restriction";
 	
 	const PARTNER_ACCESS_FORBIDDEN = "PARTNER_ACCESS_FORBIDDEN;ACCESSING_PID,ACCESSED_PID;Partner [@ACCESSING_PID@] cannot access partner [@ACCESSED_PID@]";

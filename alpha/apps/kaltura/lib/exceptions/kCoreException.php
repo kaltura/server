@@ -78,6 +78,8 @@ class kCoreException extends Exception
 	
 	const PARTNER_BLOCKED = 'PARTNER_BLOCKED';
 	
+	const USER_BLOCKED = 'USER_BLOCKED';
+
 	const INVALID_XSLT = 'INVALID_XSLT';
 	
 	const LOCK_TIMED_OUT = 'LOCK_TIMED_OUT';
