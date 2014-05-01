@@ -285,7 +285,7 @@ class KalturaMonitorClient
 		if (!self::$stream)
 			return;
 		
-		$fileSize = getRangeLength($fileSize);
+		$fileSize = self::getRangeLength($fileSize);
 		if (is_null($fileSize))
 			return;
 		
