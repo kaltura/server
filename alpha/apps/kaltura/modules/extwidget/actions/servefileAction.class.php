@@ -19,7 +19,17 @@ class servefileAction extends sfAction
 			$file_name = base64_decode($file_name);
 		}
 	
-		kDataCenterMgr::serveFileToRemoteDataCenter ( $file_sync_id , $hash, $file_name ); 
+		$file_sync = FileSyncPeer::retrieveByPk ( $file_sync_id );
+		if ( ! $file_sync )
+		{
+			$error = "DC[$current_dc_id]: Cannot find FileSync with id [$file_sync_id]";
+			KalturaLog::err($error);
+			throw new Exception ($error);
+		}
+		
+		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFile', $file_sync->getPartnerId());
+		
+		kDataCenterMgr::serveFileToRemoteDataCenter ( $file_sync , $hash, $file_name ); 
 		die();
 	}
 }
