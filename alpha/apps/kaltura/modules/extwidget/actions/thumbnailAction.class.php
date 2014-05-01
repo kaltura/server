@@ -152,6 +152,9 @@ class thumbnailAction extends sfAction
 				$partnerId = $upload_token->getPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
 				
+				if ($partner)
+					KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $partner->getId());
+				
 				if($density == 0)
 					$density = $partner->getDefThumbDensity();
 				
@@ -232,6 +235,8 @@ class thumbnailAction extends sfAction
 			}
 		}
 
+		KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $entry->getPartnerId());
+		
 		if ( $nearest_aspect_ratio )
 		{
 			// Get the entry's default thumbnail path (if any)

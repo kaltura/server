@@ -41,6 +41,8 @@ class serveFlavorAction extends kalturaAction
 //		{
 //			$securyEntryHelper->validateForPlay($entry, $ks);
 //		}
+
+		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFlavor', $flavorAsset->getPartnerId());
 			
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
 		myPartnerUtils::enforceDelivery($flavorAsset->getPartnerId());
@@ -133,6 +135,7 @@ class serveFlavorAction extends kalturaAction
 			}
 			
 			$renderer = kFileUtils::getDumpFileRenderer($path, null, null, $limit_file_size);
+			$renderer->partnerId = $flavorAsset->getPartnerId();
 			if (function_exists('apc_store') && $_SERVER["REQUEST_METHOD"] == "GET")
 			{
 				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
