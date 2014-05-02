@@ -217,6 +217,11 @@ class KalturaRequestDeserializer
 	
 	private function validateFile($fileData) 
 	{
+		$disableValidationToken = kConf::get('disable_validation_token', 'local', 'disable_validation');
+		if(isset($fileData['disable_validation']) && $fileData['disable_validation'] == $disableValidationToken){
+			return;
+		}
+			
 		if (!isset($fileData['tmp_name']) || !is_uploaded_file($fileData['tmp_name'])) {
 			$msg = "An error occured while uploading file.";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
