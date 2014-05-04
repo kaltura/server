@@ -41,6 +41,11 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		$values = fgetcsv($fileHandle);
 		while($values)
 		{
+            if (array(null) == $values) 
+            {
+                $values = fgetcsv($fileHandle);
+                continue;
+            }
 			//removing UTF-8 BOM if exists
 			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) {
        			 $values[0]=substr($values[0], 3);
