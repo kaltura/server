@@ -18,12 +18,33 @@ class kLiveStreamConfiguration
 	 */
 	protected $url;
 	
+	/**
+	 * @var string
+	 */
+	protected $backupUrl;
+	
 	
 	/**
 	 * @var string
 	 */
 	protected $publishUrl;
 	
+	/**
+	 * @return the $backupUrl
+	 */
+	public function getBackupUrl()
+	{
+		return $this->backupUrl;
+	}
+
+	/**
+	 * @param string $backupUrl
+	 */
+	public function setBackupUrl($backupUrl)
+	{
+		$this->backupUrl = $backupUrl;
+	}
+
 	/**
 	 * @return string $protocol
 	 */
