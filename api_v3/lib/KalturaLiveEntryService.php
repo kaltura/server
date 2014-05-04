@@ -56,8 +56,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 		}
 		
-		$dbEntry->setLengthInMsecs($currentDuration);
-		$dbEntry->save();
+		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		{
+			$dbEntry->setLengthInMsecs($currentDuration);
+			$dbEntry->save();
+		}
 			
 		$kResource = $resource->toObject();
 		$target = $kResource->getLocalFilePath();
