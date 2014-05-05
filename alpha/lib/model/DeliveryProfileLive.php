@@ -61,7 +61,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $urlToCheck;
 	}
 	
-	public function serve($baseUrl) {
+	public function serve($baseUrl, $backupUrl) {
 		$flavors = array();
 		$this->finalizeUrls($baseUrl, $flavors);
 		

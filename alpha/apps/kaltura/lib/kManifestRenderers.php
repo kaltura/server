@@ -4,6 +4,7 @@ abstract class kManifestRenderer
 {
 	const PLAY_STREAM_TYPE_LIVE = 'live';
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
+	const PLAY_STREAM_TYPE_DVR = 'dvr';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
 	/**
@@ -291,6 +292,16 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	public $mimeType = 'video/x-flv';
 	
 	/**
+	 * @var array
+	 */
+	public $bootstrapInfos = array();
+	
+	/**
+	 * @var int
+	 */
+	public $dvrWindow = null;
+	
+	/**
 	 * @return array<string>
 	 */
 	protected function getHeaders()
@@ -322,7 +333,17 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 			$height		= isset($flavor['height'])	? $flavor['height']		: 0;
 			
 			$url = htmlspecialchars($url . $deliveryCodeStr);
-			$flavorsArray[] = "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"/>";
+			
+			$mediaElement = "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"";
+			if(isset($flavor['bootstrapInfoId']) && isset($this->bootstrapInfos[$flavor['bootstrapInfoId']]))
+			{
+				$bootstrapInfo = $this->bootstrapInfos[$flavor['bootstrapInfoId']];
+				$bootstrapInfoElement = '<bootstrapInfo id="' . $bootstrapInfo['id'] . '" profile="named" url="' . $bootstrapInfo['url'] . '" />';
+				$mediaElement = $bootstrapInfoElement . $mediaElement . ' bootstrapInfoId="' . $flavor['bootstrapInfoId'] . '"';
+			}
+			$mediaElement .= ' />';
+			
+			$flavorsArray[] = $mediaElement;
 		}		
 		
 		return $flavorsArray;
@@ -332,12 +353,15 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
 		$baseUrlXml = ($this->baseUrl ? "<baseURL>".htmlspecialchars($this->baseUrl)."</baseURL>" : '');
+		$dvrXml = ($this->dvrWindow ? "<dvrInfo windowDuration=\"{$this->dvrWindow}\"></dvrInfo>" : '');
+		
 		return 
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 	<manifest xmlns=\"http://ns.adobe.com/f4m/1.0\">
 		<id>{$this->entryId}</id>
 		<mimeType>{$this->mimeType}</mimeType>
-		<streamType>{$this->streamType}</streamType>					
+		<streamType>{$this->streamType}</streamType>	
+		{$dvrXml}				
 		{$durationXml}
 		{$baseUrlXml}";
 	}

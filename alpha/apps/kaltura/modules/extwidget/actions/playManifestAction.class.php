@@ -670,7 +670,10 @@ class playManifestAction extends kalturaAction
 		return $renderer;
 	}
 	
-	private function getLiveEntryBaseUrl()
+	/**
+	 * @return array primary URL and backup URL
+	 */
+	private function getLiveEntryBaseUrls()
 	{
 		$tag = null;
 		if(count($this->deliveryAttributes->getTags()) == 1)
@@ -681,8 +684,9 @@ class playManifestAction extends kalturaAction
 			$protocol = requestUtils::getProtocol();
 			
 		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag);
+		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
-			return $liveStreamConfig->getUrl();
+			return array($liveStreamConfig->getUrl(), $liveStreamConfig->getBackupUrl());
 		
 		switch($this->deliveryAttributes->getFormat())
 		{
@@ -691,12 +695,12 @@ class playManifestAction extends kalturaAction
 				$baseUrl = rtrim($baseUrl, '/');
 				if (strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") === 0)
 					$baseUrl = $this->deliveryAttributes->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-				return $baseUrl;
+				return array($baseUrl, null);
 					
 			case PlaybackProtocol::APPLE_HTTP:
-				return $this->entry->getHlsStreamUrl(); // TODO pass single tag
+				return array($this->entry->getHlsStreamUrl(), null); // TODO pass single tag
 		}
-		return null;
+		return array(null, null);
 	}
 	
 	private function serveLiveEntry()
@@ -709,14 +713,15 @@ class playManifestAction extends kalturaAction
  			kApiCache::setExpiry(120);
  		}
 		
-		$baseUrl = $this->getLiveEntryBaseUrl();
+		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
+			
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
 		$this->urlManager = DeliveryProfilePeer::getDeliveryProfileByHostName($cdnHost, $this->entryId, 
 				$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 		
 		$this->urlManager->setDynamicAttribtues($this->deliveryAttributes);	
-		return $this->urlManager->serve($baseUrl);
+		return $this->urlManager->serve($baseUrl, $backupUrl);
 	}
 	
 	/* (non-PHPdoc)
@@ -814,6 +819,7 @@ class playManifestAction extends kalturaAction
 		
 		// Initialize
 		$this->initEntry();
+		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->enforceEncryption();
 		
