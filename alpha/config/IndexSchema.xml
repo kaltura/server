@@ -114,7 +114,7 @@
 	<index format="%s">
 		<value field="id" />
 	</index>
-	<index format="live%s">
+	<index format="isLive%s">
 		<value field="dynamic_attributes.isLive"/>
 	</index>
 </object>
