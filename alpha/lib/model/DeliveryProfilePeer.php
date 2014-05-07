@@ -5,17 +5,29 @@
  *
  * @package Core
  * @subpackage model
+ * 
  */
 class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	
 	const LIVE_DELIVERY_PROFILE = 'LIVE';
+	
+	/**
+	 * This array describe all known live delivery profiles types.
+	 * It can be extended by the plugins - DeliveryProfile-live.
+	 * 
+	 * @var array
+	 */
 	public static $LIVE_DELIVERY_PROFILES = 
 		array(	DeliveryProfileType::LIVE_AKAMAI_HDS, 
 				DeliveryProfileType::LIVE_HDS, 
 				DeliveryProfileType::LIVE_HLS, 
 				DeliveryProfileType::LIVE_RTMP);
 	
-	// cache classes by their type
+	/**
+	 * Static cache for mapping between delivery profile type to delivery profile type. 
+	 * Can be extended by the plugins.
+	 * @var unknown_type
+	 */
 	protected static $class_types_cache = array(
 			
 			DeliveryProfileType::APPLE_HTTP => 'DeliveryProfileAppleHttp',
@@ -56,6 +68,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryLiveAkamaiHds',
 	);
 	
+	/**
+	 * Returns the matching delivery profile class by the delivery profile type.
+	 * @param DeliveryProfileType $deliveryType
+	 * @return string representing the delivery object class
+	 */
 	public static function getClassByDeliveryProfileType($deliveryType) {
 		if(isset(self::$class_types_cache[$deliveryType]))
 			return self::$class_types_cache[$deliveryType];
@@ -95,6 +112,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	// ------ Retrieval functionality ------
 	// -------------------------------------
 	
+	/**
+	 * Returns the delivery profile that matches the entryID and the streamer type.
+	 * @param string $entryId The entry id
+	 * @param PlayBackProtocol $streamerType the streamer type
+	 * @return DeliveryProfile
+	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
 		return self::getLocalDeliveryByPartner($entryId, $streamerType, null, null, null, false);	
@@ -102,9 +125,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	
 	/**
 	 * This function returns the matching delivery object for a given partner and delivery protocol. 
-	 * @var string $entryId - The entry ID
-	 * @var PlaybackProtocol $streamerType - The protocol
-	 * @var string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param string $entryId - The entry ID
+	 * @param PlaybackProtocol $streamerType - The protocol
+	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
+	 * @param boolean $checkSecured whether we should prefer secured delivery profiles.
+	 * @return DeliveryProfile
 	 */
 	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $checkSecured = true) {
 		
@@ -170,10 +196,11 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	/**
 	 * This function returns the delivery object that matches a given storage profile and format
 	 * If one not found - returns null
-	 * @var int $storageProfileId - The storage profile ID
-	 * @var string $entryId - The entry ID
-	 * @var PlaybackProtocol $streamerType - The protocol
-	 * @var string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param int $storageProfileId - The storage profile ID
+	 * @param string $entryId - The entry ID
+	 * @param PlaybackProtocol $streamerType - The protocol
+	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @return DeliveryProfile
 	 */
 	public static function getRemoteDeliveryByStorageId($storageProfileId, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
 	
@@ -194,6 +221,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return $delivery;
 	}
 	
+	/**
+	 * Selects between a list of deliveries by a requested media protocol
+	 * @param array $deliveries list of deliveries
+	 * @param string $mediaProtocol requested media protocol
+	 * @return The matching DeliveryProfile if exists, or null otherwise
+	 */
 	protected static function selectByMediaProtocol($deliveries, $mediaProtocol = null) {
 		foreach ($deliveries as $delivery) {
 			if(is_null($delivery->getMediaProtocols()))
@@ -207,6 +240,14 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		return null;
 	}
 	
+	/**
+	 * Returns the delivery profile by host name (or returns one of the defaults)
+	 * @param string $cdnHost The host we're looking for
+	 * @param string $entryId The entry for which we search for the delivery profile
+	 * @param PlaybackProtocol $streamerType - The protocol
+	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @return DeliveryProfile
+	 */
 	public static function getDeliveryProfileByHostName($cdnHost, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
@@ -237,31 +278,56 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 	}
 
-	public static function getUrlManagerIdentifyRequest(Partner $partner) {
-		$deliveries =
+	/**
+	 * Checks whether a the current request is restricted by the partner.
+	 * @param Partner $partner The partner we want to verify it for.
+	 * @return true if the request is should be blocked, flase otherwise
+	 */
+	public static function isRequestRestricted(Partner $partner) {
 		$enforceDelivery = $partner->getEnforceDelivery();
 		if($enforceDelivery) {
-			//  use only the delivery ids as described on partner.
+			
+			// Retrieve request origin
+			$requestOrigin = @$_SERVER['HTTP_X_FORWARDED_HOST'];
+			if(!$requestOrigin)
+				$requestOrigin = @$_SERVER['HTTP_HOST'];
+			
+			$deliveryRestrictions = $partner->getDeliveryRestrictions();
+			$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
+				
+			// If the partner described the origin as valid - the request isn't restricted.
+			if(in_array($requestOrigin, $deliveryRestrictionsArr))
+				return false;
+			
+			//  Otherwise, check the partner delivery profiles
 			$deliveryIds = array();
 			$deliveryIdsMap = $partner->getDeliveryIds();
-			foreach($deliveryIdsMap as $deliveriesByFormat) 
-				$deliveryIds = array_merge ( $deliveryIds, $deliveriesByFormat);
-			$deliveries = $this->retrieveByPKs($deliveryIds);
-		} else {
-			$c = new Criteria();
-			$c->add(DeliveryProfilePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER);
-			$deliveries = $this->doSelect($c);
-		}
-		
-		foreach($deliveries as $delivery) {
-			if($delivery->identifyRequest())
-				return true;
-		}
+			foreach($deliveryIdsMap as $deliveriesByFormat) {
+				if(is_array($deliveriesByFormat))
+					$deliveryIds = array_merge ( $deliveryIds, $deliveriesByFormat);
+				else 
+					$deliveryIds[] = $deliveriesByFormat;
+			}
+			$deliveries = self::retrieveByPKs($deliveryIds);
+			
+			foreach($deliveries as $delivery) {
+				if(!is_null($delivery->getRecognizer())) {
+					if($delivery->getRecognizer()->isRestricted($partner, $requestOrigin) == false)
+						return false;					
+				}
+			}
+			
+			return true;
+		} 
+
 		return false;
 	}
 	
-	
-	public static function getAllLiveDeliveryProfileTypes()
+	/**
+	 * Returns all live delivery profile types
+	 * @return array supported live types
+	 */
+	protected static function getAllLiveDeliveryProfileTypes()
 	{
 		$deliveryProfileTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, self::LIVE_DELIVERY_PROFILE);
 		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);

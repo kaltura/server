@@ -20,6 +20,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$this->params = new DeliveryProfileDynamicAttributes();
 	}
 	
+	/**
+	 * This function clones a delivery profile and create a new one out of it.
+	 * @param DeliveryProfile $newObject The delivery profile we'd like to fill.
+	 */
 	public function cloneToNew ( $newObject )
 	{
 		// TODO @_!! Asd T about fillObjectFromObject Usage
@@ -38,6 +42,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		return $newObject;
 	}
 	
+	/**
+	 * Derives the delivery profile dynamic attribtues from the file sync and the flavor asset.
+	 * @param FileSync $fileSync
+	 * @param flavorAsset $flavorAsset
+	 */
 	public function initDeliveryDynamicAttribtues(FileSync $fileSync = null, flavorAsset $flavorAsset = null) {
 		if ($flavorAsset)
 			$this->params->setContainerFormat($flavorAsset->getContainerFormat());
@@ -48,14 +57,20 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 			$this->params->setFileExtention(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
 	}
 	
+	/**
+	 * Copies the parameters from a given DeliveryProfileDynamicAttributes object to the current object params 
+	 * @param DeliveryProfileDynamicAttributes $params 
+	 */
 	public function setDynamicAttribtues(DeliveryProfileDynamicAttributes $params) {
 		$this->params->cloneAttributes($params);
 	}
+	
 	// -------------------------------------
 	// -- Override base methods ------------
 	// -------------------------------------
 	
 	/**
+	 * This function returns the recognizer this delivery profile is working with
 	 * @return kUrlRecognizer
 	 */
 	public function getRecognizer()
@@ -91,6 +106,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	}	
 	
 	/**
+	 * This function returns the tokenizer this delivery profile is working with
 	 * @return kUrlRecognizer
 	 */
 	public function getTokenizer()
@@ -127,6 +143,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		}
 	}
 	
+	/**
+	 * Host name is derived from the URL object.
+	 * @see BaseDeliveryProfile::setUrl()
+	 */
 	public function setUrl($url) {
 		$hostName = parse_url($url, PHP_URL_HOST);
 		if(is_null($hostName)) {
@@ -182,36 +202,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		
 		$url .= "?clientTag=$clientTag";
 		return $url;
-	}
-	
-	/**
-	 * check whether this url manager sent the current request.
-	 * if so, return a string describing the usage. e.g. cdn.acme.com+token for
-	 * using cdn.acme.com with secure token delivery. This string can be matched to the
-	 * partner settings in order to enforce a specific delivery method.
-	 * @return string
-	 */
-	public function identifyRequest() {
-		$delivery = @$_SERVER['HTTP_X_FORWARDED_HOST'];
-		if (!$delivery)
-			$delivery = @$_SERVER['HTTP_HOST'];
-		
-		$hosts = array();
-		if(!is_null($this->getRecognizer())) {
-			$hostsList = $this->getRecognizer()->getHosts();
-			if(is_null($hostsList))
-				return false;
-			$hosts = explode(",",$hostsList );
-		}
-			
-		if (!in_array($delivery, $hosts))
-			return false;
-		
-		$uri = $_SERVER["REQUEST_URI"];
-		if (strpos($uri, "/s/") === 0)
-			$delivery .= "+token";
-		
-		return $delivery;
 	}
 	
 	/**

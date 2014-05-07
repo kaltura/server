@@ -11,6 +11,9 @@ require_once(dirname(__FILE__).'/../bootstrap.php');
  */
 $urlManagersFilename = dirname(__FILE__) . "/../../../configurations/url_managers.prod.ini";
 
+// Set this flag if you really want to execute it.
+$dryRun = true;
+
 /**
  *	All these parameters are unsupported. If your configuration uses them -
  * you will have to configure them yourself. 
@@ -183,7 +186,7 @@ function createDelivery($key, $type, &$urlManager) {
 
 function handleUrlManager($key, $urlManager) {
 	
-	global $unsupportedToken;
+	global $unsupportedToken, $dryRun;
 	
 	$clazz = find("class", $urlManager);
 	if(!in_array($clazz, array("kAkamaiUrlManager", "kUrlManager"))) {
@@ -198,7 +201,8 @@ function handleUrlManager($key, $urlManager) {
 		$delivery = createDelivery($key, $type, $urlManager);
 		
 		print "\t Saving delivery profile $key : $type[0]\n";
-		$delivery->save();	
+		if(!$dryRun)
+			$delivery->save();	
 	}
 	
 	$missingParams = array_diff_key($urlManager,array_flip($unsupportedToken));

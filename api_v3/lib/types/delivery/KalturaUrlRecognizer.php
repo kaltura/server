@@ -12,9 +12,16 @@ class KalturaUrlRecognizer extends KalturaObject {
 	 */
 	public $hosts;
 	
+	/**
+	 * The URI prefix we use for security
+	 * @var string
+	 */
+	public $uriPrefix;
+	
 	private static $map_between_objects = array
 	(
 			"hosts",
+			"uriPrefix"
 	);
 	
 	public function getMapBetweenObjects ( )

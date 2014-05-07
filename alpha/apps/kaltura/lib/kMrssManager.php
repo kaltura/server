@@ -477,7 +477,6 @@ class kMrssManager
 		if($externalFileSync)
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($externalFileSync->getDc(), $entry->getId(), PlaybackProtocol::SILVER_LIGHT);
-			$urlManager->initDeliveryDynamicAttribtues($asset);
 			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
 			$url = ltrim($url,'/');
         	if (strpos($url, "://") !== false)

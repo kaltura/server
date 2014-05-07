@@ -1540,21 +1540,8 @@ class myPartnerUtils
 		$partner = PartnerPeer::retrieveByPK( $partnerId );
 		if ( !$partner || (! $partner->getDeliveryRestrictions() ) )
 			return;
-
-		$deliveryRestrictions = $partner->getDeliveryRestrictions();
-		$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
 		
-		$delivery = DeliveryProfilePeer::getUrlManagerIdentifyRequest($partner);
-		
-		$restricted = true;
-		foreach($deliveryRestrictionsArr as $deliveryRestriction)
-		{
-			if ($deliveryRestriction === $delivery)
-			{
-				$restricted = false;
-				break;
-			}
-		}
+		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		
 		if ($restricted)
 		{

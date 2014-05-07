@@ -10,6 +10,13 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 		return $this->getRenderer(array($flavor));
 	}
 	
+	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) {
+		$url = $this->getBaseUrl($flavorAsset);
+		if($this->params->getFileExtention())
+			$url .= "/name/a." . $this->params->getFileExtention();
+		return $url;
+	}
+	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
 		$fileSync = kFileSyncUtils::resolve($fileSync);

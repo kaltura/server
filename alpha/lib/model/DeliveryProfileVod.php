@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * This class is an abstract implementation for VOD delivery profiles  
+ */
 abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 	/**
@@ -11,6 +14,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 * Functionality 
 	 * --------------------*/
 	
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @return string representing the basic url.
+	 */
 	protected function getBaseUrl(flavorAsset $flavorAsset) {
 		$partnerId = $flavorAsset->getPartnerId();
 		$subpId = $flavorAsset->getentry()->getSubpId();
@@ -22,6 +29,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $url;
 	}
 	
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @return string representing the version string
+	 */
 	protected function getFlavorVersionString(flavorAsset $flavorAsset)
 	{
 		$entry = $flavorAsset->getentry();
