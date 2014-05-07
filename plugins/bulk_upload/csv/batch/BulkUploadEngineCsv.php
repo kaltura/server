@@ -41,7 +41,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		$values = fgetcsv($fileHandle);
 		while($values)
 		{
-            if (array(null) == $values) 
+            if(is_null(reset($values)))
             {
                 $values = fgetcsv($fileHandle);
                 continue;
