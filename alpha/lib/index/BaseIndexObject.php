@@ -164,16 +164,16 @@ abstract class BaseIndexObject
 			$curOptimization = array();
 			foreach($optimization as $curGetter) {
 				$getters = explode(".", $curGetter);
-				$curValue = call_user_func(array($object,$getters[0]));
-				if(count($getters) > 1)
-					if(array_key_exists($getters[1], $curValue))
-						$curValue = $curValue[$getters[1]];
-					else 
-						$curValue = null;
+				$curValue = call_user_func(array($object,array_shift($getters)));
+				while(!empty($getters)) {
+					$curValue = $curValue[array_shift($getters)];
+				}
 				if(!is_null($curValue))
 					$curOptimization[] = $curValue;
 			}
-			$optimizations[] = vsprintf($format,$curOptimization);
+			
+			if(!empty($curOptimization))
+				$optimizations[] = vsprintf($format,$curOptimization);
 		}
 		return implode(" ", $optimizations);
 	}

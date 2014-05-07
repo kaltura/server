@@ -371,7 +371,7 @@ class entryIndex extends BaseIndexObject
 		return array(
 			array("P%sST%s","entry.PARTNER_ID","entry.STATUS"),
 			array("%s","entry.ID"),
-			array("isLive%s","entry.DYNAMIC_ATTRIBUTES.ISLIVE"),
+			array("isLive%s","dynamic_attributes.isLive"),
 		);
 	}
 

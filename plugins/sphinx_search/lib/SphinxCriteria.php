@@ -298,14 +298,14 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		} else {
 			
 			// Hack to support retrieval from hand-specific conditions
-			$possibleValues = array();
 			if(empty($possibleValues)) {
-				list($objectClz, $fieldName) = explode('.', $fieldName, 2);
 				if($fieldName) {
-					foreach($this->conditionClause as $condition) {
-						list($condFieldName, $value) = explode("=", $condition,2);
-						if (strcasecmp(trim($condFieldName), $fieldName) == 0)
-							$possibleValues[] = SphinxUtils::escapeString(trim($value));
+					$regex = '/' . $fieldName . '\s*=\s*(\d)+/';
+ 					foreach($this->conditionClause as $condition) {
+ 						$matches = array();
+ 						if(preg_match_all($regex, $condition, $matches)) {
+ 							$possibleValues = $matches[1];
+ 						}
 					}
 				}
 			}
