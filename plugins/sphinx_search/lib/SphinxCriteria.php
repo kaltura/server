@@ -291,11 +291,23 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	}
 	
 	protected function getFieldPossibleValues(array $criterionsMap, $fieldName) {
-		if(!array_key_exists($fieldName, $criterionsMap))
-			return null;
 		
-		$criterion = $criterionsMap[$fieldName];
-		return $criterion->getPossibleValues();
+		if(array_key_exists($fieldName, $criterionsMap)) {
+			$criterion = $criterionsMap[$fieldName];
+			return $criterion->getPossibleValues();
+		} else {
+			$possibleValues = null;
+			if($fieldName) {
+				$regex = '/' . $fieldName . '\s*=\s*(\d)+/';
+ 				foreach($this->conditionClause as $condition) {
+ 					$matches = array();
+ 					if(preg_match_all($regex, $condition, $matches)) {
+ 						$possibleValues = $matches[1];
+ 					}
+				}
+			}
+			return $possibleValues;
+		}
 	}
 	
 	protected function addSphinxOptimizationMatches(array $criterionsMap) 

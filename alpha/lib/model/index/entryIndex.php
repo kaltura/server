@@ -371,6 +371,7 @@ class entryIndex extends BaseIndexObject
 		return array(
 			array("P%sST%s","entry.PARTNER_ID","entry.STATUS"),
 			array("%s","entry.ID"),
+			array("isLive%s","dynamic_attributes.isLive"),
 		);
 	}
 
@@ -379,6 +380,7 @@ class entryIndex extends BaseIndexObject
 		return array(
 			array("P%sST%s","getPartnerId","getStatus"),
 			array("%s","getId"),
+			array("isLive%s","getDynamicAttributes.isLive"),
 		);
 	}
 
