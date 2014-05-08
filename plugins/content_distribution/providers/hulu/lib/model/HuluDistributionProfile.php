@@ -477,7 +477,7 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 			else 
 			{
 				$value = isset($allFieldValues[HuluDistributionField::VIDEO_EPISODE_NUMBER]) ? intval($allFieldValues[HuluDistributionField::VIDEO_EPISODE_NUMBER]) : 0;
-				if ($value < 1 || $value > 5000)
+				if ($value < -1 || $value > 5000)
 				{
 					$errorMsg = $this->getUserFriendlyFieldName(HuluDistributionField::VIDEO_EPISODE_NUMBER).' should be between 1 and 5000';
 					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName(HuluDistributionField::VIDEO_EPISODE_NUMBER));
