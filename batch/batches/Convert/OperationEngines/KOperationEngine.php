@@ -145,7 +145,6 @@ abstract class KOperationEngine
 		$this->mediaInfoEnabled = $enabled;
 	}
 	
-	
 	/**
 	 * @param string $filePath
 	 */

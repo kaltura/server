@@ -4,6 +4,8 @@ class KWidevineOperationEngine extends KOperationEngine
 {
 	const PACKAGE_FILE_EXT = '.wvm';
 		
+	const SYNC_FRAME_OFFSET_MATCH_ERROR = 11;
+	
 	/**
 	 * @var array
 	 * batch job parameters
@@ -127,6 +129,10 @@ class KWidevineOperationEngine extends KOperationEngine
 			$errorMessage = KWidevineBatchHelper::getEncryptPackageErrorMessage($returnValue);
 			$logMessage = 'Package encryption failed, asset name: '.$this->packageName.' error: '.$errorMessage;
 			KalturaLog::err($logMessage);
+			
+			// in some cases this specific Widevine error needs a simple job retry in order to convert successfully  
+			if ($returnValue == self::SYNC_FRAME_OFFSET_MATCH_ERROR)
+				throw new kTemporaryException ($logMessage);
 			throw new KOperationEngineException($logMessage);
 		}										
 	}
