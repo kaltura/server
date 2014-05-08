@@ -296,17 +296,14 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$criterion = $criterionsMap[$fieldName];
 			return $criterion->getPossibleValues();
 		} else {
-			
-			// Hack to support retrieval from hand-specific conditions
-			if(empty($possibleValues)) {
-				if($fieldName) {
-					$regex = '/' . $fieldName . '\s*=\s*(\d)+/';
- 					foreach($this->conditionClause as $condition) {
- 						$matches = array();
- 						if(preg_match_all($regex, $condition, $matches)) {
- 							$possibleValues = $matches[1];
- 						}
-					}
+			$possibleValues = null;
+			if($fieldName) {
+				$regex = '/' . $fieldName . '\s*=\s*(\d)+/';
+ 				foreach($this->conditionClause as $condition) {
+ 					$matches = array();
+ 					if(preg_match_all($regex, $condition, $matches)) {
+ 						$possibleValues = $matches[1];
+ 					}
 				}
 			}
 			return $possibleValues;
