@@ -166,7 +166,13 @@ abstract class BaseIndexObject
 				$getters = explode(".", $curGetter);
 				$curValue = call_user_func(array($object,array_shift($getters)));
 				while(!empty($getters)) {
-					$curValue = $curValue[array_shift($getters)];
+					$getter = array_shift($getters);
+					if(isset($curValue[$getter])) {
+						$curValue = $curValue[$getter];
+					} else {
+						$curValue = null;
+						break;
+					}
 				}
 				if(!is_null($curValue))
 					$curOptimization[] = $curValue;
