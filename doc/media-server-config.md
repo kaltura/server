@@ -95,7 +95,7 @@ media_servers.ini is optional and needed only for custom configurations.
 ```
 
  - /Root/Application/Transcoder/LiveStreamTranscoder - transcoder
- - /Root/Application/Transcoder/Templates - `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/entryId/${SourceStreamName}/f/transcode.xml`
+ - /Root/Application/Transcoder/Templates - `http://@WWW_HOST@/api_v3/index.php/service/wowza_liveConversionProfile/action/serve/streamName/${SourceStreamName}/f/transcode.xml`
  - /Root/Application/Transcoder/Properties:
 ```xml
 <Property>
