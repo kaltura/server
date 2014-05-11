@@ -32,7 +32,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{
-		return array();
+		return parent::getDefaultFieldConfigArray();
 	}
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)

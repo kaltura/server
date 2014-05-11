@@ -81,7 +81,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{
-		$fieldConfigArray = array();
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(TimeWarnerDistributionField::GUID);
