@@ -90,6 +90,10 @@ class categoryEntry extends BasecategoryEntry {
 		if($this->getStatus() == CategoryEntryStatus::REJECTED &&
 			$this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::PENDING)
 			$category->decrementPendingEntriesCount();
+		
+		if($this->getStatus() == CategoryEntryStatus::PENDING &&
+			$this->getColumnsOldValue(categoryEntryPeer::STATUS) == CategoryEntryStatus::REJECTED)
+			$category->incrementPendingEntriesCount();
 			
 		if($this->getStatus() == CategoryEntryStatus::DELETED)
 		{
