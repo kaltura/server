@@ -45,7 +45,7 @@ class UverseClickToOrderDistributionProfile extends ConfigurableDistributionProf
 	
 	protected function getDefaultFieldConfigArray()
 	{
-		$fieldConfigArray = array();
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(UverseClickToOrderDistributionField::BACKGROUND_IMAGE_WIDE);
