@@ -393,11 +393,47 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
+	 * Execute before incrementing entries count or direct entries count
+	 */
+	public function preIncrement($entryId)
+	{
+		if(!isset(self::$incrementedEntryIds[$this->getId()]))
+			self::$incrementedEntryIds[$this->getId()] = array();
+		self::$incrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
+	}
+	
+	/**
+	 * Execute before decrementing entries count or direct entries count
+	 */
+	public function preDecrement($entryId)
+	{
+		if(!isset(self::$decrementedEntryIds[$this->getId()]))
+			self::$decrementedEntryIds[$this->getId()] = array();
+		self::$decrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
+	}
+	
+	/**
 	 * Increment direct entries count
 	 */
-	public function incrementDirectEntriesCount()
+	public function incrementDirectEntriesCount($entryId)
 	{
-		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);
+		KalturaLog::debug("incrementing $entryId to direct entries count " . $this->getFullName());
+		$this->preIncrement($entryId);
+		
+		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()], true);
+		if(!is_null($count))
+		{
+			$count += count(self::$incrementedEntryIds[$this->getId()]);
+			$this->setDirectEntriesCount($count);
+		}
+		else
+			$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);
 	}
       
     /**
@@ -412,9 +448,16 @@ class category extends Basecategory implements IIndexable
 	/**
 	 * Decrement direct entries count (will decrement recursively the parent categories too)
 	 */
-	public function decrementDirectEntriesCount()
+	public function decrementDirectEntriesCount($entryId)
 	{
-		$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
+		KalturaLog::debug("decrementing $entryId from direct entries count " . $this->getFullName());
+		$this->preDecrement($entryId);
+		
+		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()], true);
+		if(!is_null($count))
+			$this->setDirectEntriesCount($count);
+		else	
+			$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
 	}
       
 	/**
@@ -1327,7 +1370,7 @@ class category extends Basecategory implements IIndexable
 		return $this->getId();
 	}
 	
-	protected function countEntriesByCriteria($entryIds) {
+	protected function countEntriesByCriteria($entryIds, $directOnly = false) {
 		
 		// Try to retrieve from cache
 		$cacheKey =  category::EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX . $this->getId();
@@ -1343,7 +1386,12 @@ class category extends Basecategory implements IIndexable
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
+		
+		if($directOnly)
+			$filter->setCategoriesIdsMatchAnd($this->getId());
+		else
+			$filter->setCategoryAncestorId($this->getId());
+		
 		if($entryIds)
 			$filter->setIdNotIn($entryIds);
 		$filter->setLimit(1);
@@ -1391,12 +1439,7 @@ class category extends Basecategory implements IIndexable
 	public function decrementEntriesCount($entryId)
 	{
 		KalturaLog::debug("decrementing $entryId from " . $this->getFullName());
-		if(!isset(self::$decrementedEntryIds[$this->getId()]))
-			self::$decrementedEntryIds[$this->getId()] = array();
-		self::$decrementedEntryIds[$this->getId()][$entryId] = $entryId;
-		
-		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
-			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
+		$this->preDecrement($entryId);
 		
 		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()]);
 		if(!is_null($count))
@@ -1419,12 +1462,7 @@ class category extends Basecategory implements IIndexable
 	public function incrementEntriesCount($entryId)
 	{
 		KalturaLog::debug("incrementing $entryId to " . $this->getFullName());
-		if(!isset(self::$incrementedEntryIds[$this->getId()]))
-			self::$incrementedEntryIds[$this->getId()] = array();
-		self::$incrementedEntryIds[$this->getId()][$entryId] = $entryId;
-		
-		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
-			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
+		$this->preIncrement($entryId);
 		
 		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()]);
 		if(!is_null($count)) {
