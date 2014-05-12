@@ -292,13 +292,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			if(!$requestOrigin)
 				$requestOrigin = @$_SERVER['HTTP_HOST'];
 			
-			$deliveryRestrictions = $partner->getDeliveryRestrictions();
-			$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
-				
-			// If the partner described the origin as valid - the request isn't restricted.
-			if(in_array($requestOrigin, $deliveryRestrictionsArr))
-				return false;
-			
 			//  Otherwise, check the partner delivery profiles
 			$deliveryIds = array();
 			$deliveryIdsMap = $partner->getDeliveryIds();
@@ -312,8 +305,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			
 			foreach($deliveries as $delivery) {
 				if(!is_null($delivery->getRecognizer())) {
-					if($delivery->getRecognizer()->isRestricted($partner, $requestOrigin) == false)
+					if($delivery->getRecognizer()->isRecognized($requestOrigin)) {
 						return false;					
+					}
 				}
 			}
 			

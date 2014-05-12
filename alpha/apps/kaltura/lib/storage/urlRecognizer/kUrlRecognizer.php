@@ -18,24 +18,16 @@ class kUrlRecognizer
 		$value .= "+token";
 	}
 	
-	public function isRestricted(Partner $partner, $requestOrigin) {
-		
+	public function isRecognized($requestOrigin) {
 		// Check whether one of the hosts is similar to the request origin
 		$hosts = explode(",", $this->getHosts());
 		if(!in_array($requestOrigin, $hosts))
-			return true;
+			return false;
 			
 		$uri = $_SERVER["REQUEST_URI"];
-		if($this->getUriPrefix())
-			if(strpos($uri, $this->getUriPrefix()))
-				array_walk($hosts,"addToken");
-			
-		$deliveryRestrictions = $partner->getDeliveryRestrictions();
-		$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
-		
-		if(count(array_intersect($deliveryRestrictionsArr, $hosts)) > 0)
+		if($this->getUriPrefix() && strpos($uri, $this->getUriPrefix()) !== 0)
 			return false;
-		
+			
 		return true;
 	}
 	

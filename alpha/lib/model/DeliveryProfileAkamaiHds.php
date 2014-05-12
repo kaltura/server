@@ -34,7 +34,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		$flavors = $this->buildHttpFlavorsArray();
 		$this->initDeliveryDynamicAttribtues();
 
-		$flavor = AkamaiDeliveryUtils::getManifestUrl($flavors, $this->getHostName(), '/manifest.f4m', '/z');
+		$flavor = AkamaiDeliveryUtils::getManifestUrl($flavors, $this->getUrl(), '/manifest.f4m', '/z');
 		if (!$flavor)
 		{
 			KalturaLog::debug(get_class() . ' failed to find flavor');

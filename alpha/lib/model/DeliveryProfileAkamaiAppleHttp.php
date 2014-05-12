@@ -20,7 +20,16 @@ abstract class DeliveryProfileAkamaiAppleHttp extends DeliveryProfileAppleHttp {
 	}
 	
 	protected function formatHdIos($path) {
-		$urlPrefix = "http://".$this->getHostName().'/i/';
+		$url = $this->getUrl();
+		$host = parse_url($url, PHP_URL_HOST);
+		$urlpath = ltrim(parse_url($url, PHP_URL_PATH),"/");
+		if(is_null($host)) {
+			$url = "http://" . $url;
+			$host = parse_url($url, PHP_URL_HOST);
+			$urlpath = ltrim(parse_url($url, PHP_URL_PATH),"/");
+		}
+		
+		$urlPrefix = "http://" . $host . '/i/' . $urlpath;
 		$urlSuffix = str_replace('\\', '/', $path)."/index_0_av.m3u8";
 		
 		return $urlPrefix.ltrim($urlSuffix, '/');

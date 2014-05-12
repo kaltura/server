@@ -632,10 +632,6 @@ class Partner extends BasePartner
 	public function getInternalUse() { return $this->getFromCustomData("internalUse", false); }
 	public function setInternalUse( $v ) { $this->putInCustomData("internalUse", $v); }	
 	
-	/** added deliveryRestrictions param for having per-partner ability to block serving of files to specific cdns and protocols **/
-	public function getDeliveryRestrictions() { return $this->getFromCustomData("deliveryRestrictions", null); }
-	public function setDeliveryRestrictions( $v ) { $this->putInCustomData("deliveryRestrictions", $v); }
-	
 	/** added disableAkamaiHDNetwork param for having per-partner ability to disable Akamai HD Network feature (GUI in KMC preview & embed) **/
 	public function getDisableAkamaiHDNetwork() { return $this->getFromCustomData("disableAkamaiHDNetwork", null); }
 	public function setDisableAkamaiHDNetwork( $v ) { $this->putInCustomData("disableAkamaiHDNetwork", $v); }

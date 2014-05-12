@@ -10,10 +10,7 @@ class DeliveryProfileAkamaiAppleHttpDirect extends DeliveryProfileAkamaiAppleHtt
 		if(!$storage)
 			return $path;
 	
-		if(!is_null($this->getHostName()))
-			return $this->formatHdIos($path);
-	
-		return $path;
+		return $this->formatHdIos($path);
 	}
 }
 

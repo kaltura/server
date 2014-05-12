@@ -33,7 +33,16 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
-		$url = "http://".$this->getHostName().$url.'/forceproxy/true';
+		$deliveryUrl = $this->getUrl();
+		$host = parse_url($deliveryUrl, PHP_URL_HOST);
+		$urlpath = ltrim(parse_url($deliveryUrl, PHP_URL_PATH),"/");
+		if(is_null($host)) {
+			$deliveryUrl = "http://" . $deliveryUrl;
+			$host = parse_url($deliveryUrl, PHP_URL_HOST);
+			$urlpath = ltrim(parse_url($deliveryUrl, PHP_URL_PATH),"/");
+		}
+		
+		$url = "http://". $host . $urlpath . $url . '/forceproxy/true';
 		return $url;
 	}
 	

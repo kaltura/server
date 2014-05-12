@@ -1538,7 +1538,7 @@ class myPartnerUtils
 	public static function enforceDelivery($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK( $partnerId );
-		if ( !$partner || (! $partner->getDeliveryRestrictions() ) )
+		if ( !$partner )
 			return;
 		
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
