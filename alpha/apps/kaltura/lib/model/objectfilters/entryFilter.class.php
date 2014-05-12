@@ -336,25 +336,6 @@ class entryFilter extends baseObjectFilter
 	}
 	
 	/**
-	 * Converts the flavor params ids to index-formatted searchable flavor params id
-	 * @param string $fps flavor paras ids
-	 * @param array partnerIds
-	 */
-	public static function formatFlavorParamsIds($fps, $partnerId) {
-		if ($fps === "")
-			$fps = array();
-		else
-			$fps = explode(",", $fps);
-		
-		$formattedFps = array();
-		foreach($fps as $fp) {
-			$formattedFps[] = $partnerId . "_" . $fp;
-		}
-		
-		return implode(",", $formattedFps);
-	}
-	
-	/**
 	 * Convert the categories to categories ids
 	 * 
 	 * @param string $cats Categories full names

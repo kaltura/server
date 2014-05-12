@@ -222,14 +222,22 @@ class SphinxEntryCriteria extends SphinxCriteria
 		
 		$fps = $filter->get("_matchand_flavor_params_ids");
 		if($fps) {
+			if (empty($fps))
+				$fps = array();
+			else
+				$fps = explode(",", $fps);
 			$filter->unsetByName('_matchand_flavor_params_ids');
-			$filter->set("_matchand_flavor_params_ids", $filter->formatFlavorParamsIds($fps, kCurrentContext::getCurrentPartnerId()));
+			$filter->set("_matchand_flavor_params_ids", entry::formatFlavorParamsIds($fps, kCurrentContext::getCurrentPartnerId()));
 		}
 		
 		$fps = $filter->get("_matchor_flavor_params_ids");
 		if($fps) {
+			if (empty($fps))
+				$fps = array();
+			else
+				$fps = explode(",", $fps);
 			$filter->unsetByName('_matchor_flavor_params_ids');
-			$filter->set("_matchor_flavor_params_ids", $filter->formatFlavorParamsIds($fps, kCurrentContext::getCurrentPartnerId()));
+			$filter->set("_matchor_flavor_params_ids", entry::formatFlavorParamsIds($fps, kCurrentContext::getCurrentPartnerId()));
 		}
 
 		if($filter->get('_free_text'))
