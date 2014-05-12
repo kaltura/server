@@ -19,3 +19,5 @@ passthru("php $script $config");
 $config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/service.cuepoint.cuepoint.ini';
 passthru("php $script $config");
 
+$config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/service.caption.captionasset.ini';
+passthru("php $script $config");
