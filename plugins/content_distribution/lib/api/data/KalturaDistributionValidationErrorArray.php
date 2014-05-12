@@ -38,7 +38,11 @@ class KalturaDistributionValidationErrorArray extends KalturaTypedArray
     				else
     					$nObj = new KalturaDistributionValidationErrorInvalidData();
     				break;
-    			
+
+    				case DistributionErrorType::CONDITION_NOT_MET:
+    					$nObj = new KalturaDistributionValidationErrorConditionNotMet();
+    					break;
+
 				default:
 					break;
 			}
