@@ -336,6 +336,25 @@ class entryFilter extends baseObjectFilter
 	}
 	
 	/**
+	 * Converts the flavor params ids to index-formatted searchable flavor params id
+	 * @param string $fps flavor paras ids
+	 * @param array partnerIds
+	 */
+	public static function formatFlavorParamsIds($fps, $partnerId) {
+		if ($fps === "")
+			$fps = array();
+		else
+			$fps = explode(",", $fps);
+		
+		$formattedFps = array();
+		foreach($fps as $fp) {
+			$formattedFps[] = $partnerId . "_" . $fp;
+		}
+		
+		return implode(",", $formattedFps);
+	}
+	
+	/**
 	 * Convert the categories to categories ids
 	 * 
 	 * @param string $cats Categories full names
@@ -502,28 +521,6 @@ class entryFilter extends baseObjectFilter
 		return implode(",", $sphinxCategoryIdAndStatuses);
 	}
 
-	/**
-	 * Convert the flavor params ids to indexed flavor params string
-	 * 
-	 * @param string $flavorParamsIds
-	 * @return string
-	 */
-	public function flavorParamsIdsToIndexedStrings($flavorParamsIds)
-	{ 
-		if (is_null($flavorParamsIds) || $flavorParamsIds === "") // string "0" is valid here
-			$flavorParamsIds = array();
-		else
-			$flavorParamsIds = explode(",", $flavorParamsIds);
-		kArray::trim($flavorParamsIds);
-			
-		$flavorParamsStrings = array();
-		foreach($flavorParamsIds as $flavorParamsId)
-		{
-			$flavorParamsStrings[mySearchUtils::ENTRY_FLAVOR_PARAMS_PREFIX.$flavorParamsId] = null;
-		}
-		return implode(",", array_keys($flavorParamsStrings));
-	}
-	
 	/**
 	 * Convert the duration types to indexed duration type strings
 	 * 
