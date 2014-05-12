@@ -50,8 +50,8 @@
 // If paying customer
 if(isset($_GET['type']) && $_GET['type'] == md5('true')) {
 
-	$pid = isset($_GET['pid']) ? $_GET['pid'] : '';
-	$email = isset($_GET['email']) ? $_GET['email'] : '';
+	$pid = (isset($_GET['pid']) && is_numeric($_GET['pid'])) ? strip_tags($_GET['pid']) : '';
+	$email = isset($_GET['email']) ? strip_tags($_GET['email']) : '';
 ?>
 <script type="text/javascript"> 
 $(function() {
