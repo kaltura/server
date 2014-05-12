@@ -33,7 +33,11 @@ class kFmsUrlManager extends kUrlManager
 		case PlaybackProtocol::HDS:
 			$pattern = isset($this->params["hds_pattern"]) ? $this->params["hds_pattern"] : '/hds-vod/{url}.f4m';
 			break;
-			
+
+		case PlaybackProtocol::SILVER_LIGHT:
+			$pattern = isset($this->params["sl_pattern"]) ? $this->params["sl_pattern"] : '{url}';
+			break;
+
 		default:
 			$pattern = isset($this->params["default_pattern"]) ? $this->params["default_pattern"] : '{url}'; 
 			break;
