@@ -9,6 +9,10 @@
  */
 class CaptionAssetItemService extends KalturaBaseService
 {
+
+	const SIZE_OF_ENTRIES_CHUNK = 150;
+	const MAX_NUMBER_OF_ENTRIES = 1000;
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		$ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
