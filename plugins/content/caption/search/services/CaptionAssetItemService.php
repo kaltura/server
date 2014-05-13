@@ -217,9 +217,6 @@ class CaptionAssetItemService extends KalturaBaseService
 		}
 		$entries = array();
 		$counter = 0;
-		$pageSize = $captionAssetItemPager->pageSize;
-		$pageIndex = $captionAssetItemPager->pageIndex;
-		$numOfEntriesToReturn = $pageSize * $pageIndex;
 
 		foreach($filters as $filter)
 		{
