@@ -11,7 +11,7 @@ require_once(dirname(__FILE__).'/../bootstrap.php');
  * -------------- 
  */
 
-$partnerId = 100;
+$partnerId = 103;
 $storageId = null;
 
 /* Delivery Ids
@@ -37,7 +37,7 @@ if($partnerId) {
 	if(!$partner)
 	    die("No such partner with id [$partnerId].".PHP_EOL);
 
-	$partner->setDeliveryIds($deliveryIds);
+	$partner->setDeliveryProfileIds($deliveryIds);
 	$partner->save();
 }	
 
@@ -46,7 +46,7 @@ if($storageId) {
 	if(!$storageId)
 		die("No such storage profile with id [$storageId].".PHP_EOL);
 	
-	$storage->setDeliveryIds($deliveryIds);
+	$storage->setDeliveryProfileIds($deliveryIds);
 	$storage->save();
 }
 

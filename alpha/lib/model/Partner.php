@@ -717,14 +717,14 @@ class Partner extends BasePartner
 		return $deliveryTypes;
 	} 
 	
-	public function setDeliveryIds($params)
+	public function setDeliveryProfileIds($params)
 	{
-		$this->putInCustomData('delivery_ids', serialize($params));
+		$this->putInCustomData('delivery_profile_ids', serialize($params));
 	}
 	
-	public function getDeliveryIds()
+	public function getDeliveryProfileIds()
 	{
-		$params = $this->getFromCustomData('delivery_ids');
+		$params = $this->getFromCustomData('delivery_profile_ids', null, array());
 		$params = unserialize($params);
 		if (!$params) {
 			return array();
