@@ -456,7 +456,45 @@ class playManifestAction extends kalturaAction
 		if (!$this->manifestFileSync)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 	}
-	
+
+	protected function initSmilManifest($flavorAssets)
+	{
+		$key = null;
+		if($flavorAssets)
+		{
+			foreach ($flavorAssets as $flavorAsset)
+			{
+				if($flavorAsset->hasTag(assetParams::TAG_SMIL_MANIFEST))
+				{
+					$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+					break;
+				}
+			}
+		}
+
+		if (!$key)
+			return false;
+
+		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
+		{
+			$this->storageId = null;
+			$this->manifestFileSync = $localFileSync;
+		}
+		else
+		{
+			if($remoteFileSync)
+				$this->storageId = $remoteFileSync->getDc();
+			$this->manifestFileSync = $remoteFileSync;
+		}
+
+		if ($this->manifestFileSync)
+			return true;
+		else
+			return false;
+	}
+
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -562,7 +600,13 @@ class playManifestAction extends kalturaAction
 			$this->initSilverLightManifest($flavorAssets);
 			return;
 		}
-					
+		if($this->format == PlaybackProtocol::HDS || $this->format == PlaybackProtocol::APPLE_HTTP)
+		{
+			// try to look for a smil manifest, if it was found, we will use it for hds and hls
+			if ($this->initSmilManifest($flavorAssets))
+				return;
+		}
+
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
@@ -1240,7 +1284,7 @@ class playManifestAction extends kalturaAction
 
 		return $this->getRenderer('kSilverLightManifestRenderer', array($manifestInfo));
 	}
-	
+
 	/**
 	 * @return kManifestRenderer
 	 */
@@ -1251,7 +1295,15 @@ class playManifestAction extends kalturaAction
 		{
 			return $this->getRenderer('kRedirectManifestRenderer', array($flavor));
 		}
-		
+
+		if ($this->manifestFileSync)
+		{
+			$this->setupUrlManager($this->manifestFileSync);
+			$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
+			$manifestInfo = $this->getFlavorAssetInfo($url);
+			return $this->getRenderer('kRedirectManifestRenderer', array($manifestInfo));
+		}
+
 		$flavors = $this->buildHttpFlavorsArray();
 		
 		$flavors = $this->sortFlavors($flavors);
@@ -1264,9 +1316,18 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHds()
 	{
-		$flavors = $this->buildHttpFlavorsArray();
-		
-		$flavors = $this->sortFlavors($flavors);
+		if ($this->manifestFileSync)
+		{
+			$this->setupUrlManager($this->manifestFileSync);
+			$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
+			$manifestInfo = $this->getFlavorAssetInfo($url);
+			$flavors = array($manifestInfo);
+		}
+		else
+		{
+			$flavors = $this->buildHttpFlavorsArray();
+			$flavors = $this->sortFlavors($flavors);
+		}
 
 		return $this->getRenderer('kF4MManifestRenderer', $flavors);
 	}
@@ -1363,7 +1424,7 @@ class playManifestAction extends kalturaAction
 					
 			case PlaybackProtocol::SILVER_LIGHT:
 				return $this->serveSilverLight();
-					
+
 			case PlaybackProtocol::APPLE_HTTP:
 				return $this->serveAppleHttp();
 		
@@ -1498,7 +1559,7 @@ class playManifestAction extends kalturaAction
 			return array(
 				array(assetParams::TAG_ISM),
 			);
-			
+
 		case PlaybackProtocol::APPLE_HTTP:
 		case PlaybackProtocol::HDS:
 			return array(
