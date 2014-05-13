@@ -22,6 +22,7 @@ class servefileAction extends sfAction
 		$file_sync = FileSyncPeer::retrieveByPk ( $file_sync_id );
 		if ( ! $file_sync )
 		{
+			$current_dc_id = kDataCenterMgr::getCurrentDcId();
 			$error = "DC[$current_dc_id]: Cannot find FileSync with id [$file_sync_id]";
 			KalturaLog::err($error);
 			throw new Exception ($error);
