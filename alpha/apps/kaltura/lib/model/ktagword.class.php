@@ -33,7 +33,8 @@ class ktagword {
 			$tagword = strtolower  ( trim ( $tagword ) );
 			if (strlen($tagword) >= 2)  // check only words with 2 chars or more
 			{
-				$fixed_tag = substr ( $tagword , 0 , self::MAXIMUM_TAG_LENGTH ); // make sure not to let strings longer than the size in the DB
+                $fixed_tag = mb_substr($tagword,0,self::MAXIMUM_TAG_LENGTH,'utf-8');// make sure not to let strings longer than the size in the DB
+
 
 				// remove duplicates
 				if ( ! in_array ( $fixed_tag , $validTagwords ))
