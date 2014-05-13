@@ -188,6 +188,8 @@ class CaptionAssetItemService extends KalturaBaseService
 		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
 		
+		$filters = array($captionAssetItemCoreFilter);
+		
 		if($entryFilter || kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$entryCoreFilter = new entryFilter();
