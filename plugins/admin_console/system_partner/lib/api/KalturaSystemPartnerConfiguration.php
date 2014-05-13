@@ -237,7 +237,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string 
 	 */
-	public $deliveryRestrictions;
+	public $deliveryProfileIds;
+	
+	/**
+	 * @var bool 
+	 */
+	public $enforceDelivery;
 	
 	/**
 	 * 
@@ -359,6 +364,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"numPrevPassToKeep",
 		"passReplaceFreq",
 		"isFirstLogin",
+		"enforceDelivery",
 		"partnerGroupType",
 		"partnerParentId",
 		"streamerType",
@@ -374,7 +380,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"verticalClasiffication",
 		"partnerPackageClassOfService",
 		"enableBulkUploadNotificationsEmails",
-		"deliveryRestrictions",
 		"bulkUploadNotificationsEmail",
 		"internalUse",
 		"defaultLiveStreamEntrySourceType",
@@ -416,6 +421,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->partnerName = kString::stripUtf8InvalidChars($this->partnerName);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
+		if($this->deliveryProfileIds)
+			$this->deliveryProfileIds = serialize($this->deliveryProfileIds);
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -460,6 +467,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			KalturaLog::err('Cannot find object to fill');
 			return null;
 		}
+		
+		if($this->deliveryProfileIds)
+			$object_to_fill->setDeliveryProfileIds(unserialize($this->deliveryProfileIds));
 		
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
@@ -525,6 +535,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
+		
 		
 		return $object_to_fill;
 	}
