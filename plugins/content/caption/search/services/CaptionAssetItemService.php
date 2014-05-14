@@ -200,7 +200,7 @@ class CaptionAssetItemService extends KalturaBaseService
 				
 			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entryCoreFilter->attachToCriteria($entryCriteria);
-			$entryCriteria->setMaxRecords(self::MAX_NUMBER_OF_ENTRIES);
+			$entryCriteria->setLimit(self::MAX_NUMBER_OF_ENTRIES);
 			
 			$entryCriteria->applyFilters();
 
@@ -234,10 +234,10 @@ class CaptionAssetItemService extends KalturaBaseService
 			$counter += $captionAssetItemCriteria->getRecordsCount();
 		}
 		
-		if (count($filters) != 1)
+		if (count($filters) > 1)
 		{
 			$pageSize = $captionAssetItemPager->pageSize;
-			$pageIndex = $captionAssetItemPager->pageIndex;
+			$pageIndex = $captionAssetItemPager->pageIndex - 1;
 			$firstIndex = $pageSize * $pageIndex ;
 			$entries = array_slice ($entries , $firstIndex , $pageSize);
 		}
