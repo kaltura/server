@@ -1655,6 +1655,11 @@ class playManifestAction extends kalturaAction
 					}
 					else 
 					{
+						if(!$this->cdnHost)
+						{
+							$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+						}
+						
 						$partnerPath = myPartnerUtils::getUrlForPartner($this->entry->getPartnerId(), $this->entry->getSubpId());
 						$baseUrl = "{$this->protocol}://{$this->cdnHost}/{$partnerPath}/playManifest/entryId/{$this->entryId}/protocol/{$this->protocol}/format/hds/cdnHost/{$this->cdnHost}/proxyBackup/1/a.f4m";
 					}
