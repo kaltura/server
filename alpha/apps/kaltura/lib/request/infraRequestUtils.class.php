@@ -428,7 +428,7 @@ class infraRequestUtils
 			self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
 		}
 		
-		$parameters = clone self::$requestParams;
+		$parameters = self::$requestParams;
 		foreach($overwrites as $parameterName => $parameterValue)
 		{
 			$parameters[$parameterName] = $parameterValue;
