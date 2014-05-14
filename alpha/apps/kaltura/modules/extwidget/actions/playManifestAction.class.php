@@ -1656,7 +1656,7 @@ class playManifestAction extends kalturaAction
 							$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 						}
 						
-						$parameters = requestUtils::getRequestParams(array(
+						$parameters = array_merge(requestUtils::getRequestParams(), array(
 							'protocol' => $this->protocol,
 							'format' => 'hds',
 							'proxyBackup' => 1
