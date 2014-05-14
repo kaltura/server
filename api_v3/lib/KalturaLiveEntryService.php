@@ -50,7 +50,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$currentDuration = 0;
 		$currentDuration += ($duration * 1000);
 		
-		$maxRecordingDuration = kConf::get('max_live_recording_duration_hours') * 60 * 60 * 1000;
+		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
