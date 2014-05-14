@@ -1482,7 +1482,7 @@ class playManifestAction extends kalturaAction
 	
 	private function buildF4mFlavors($url, array &$flavors, array &$bootstrapInfos)
 	{
-		$manifest = requestUtils::getContent($url);
+		$manifest = KCurlWrapper::getContent($url);
 		if(!$manifest)
 			return;
 	
@@ -1532,9 +1532,9 @@ class playManifestAction extends kalturaAction
 		}
 	}
 	
-	private function buildM3u8Flavors($url, array $flavors)
+	private function buildM3u8Flavors($url, array &$flavors)
 	{
-		$manifest = requestUtils::getContent($url);
+		$manifest = KCurlWrapper::getContent($url);
 		if(!$manifest)
 			return;
 	
@@ -1543,7 +1543,7 @@ class playManifestAction extends kalturaAction
 		while($manifestLine)
 		{
 			$lineParts = explode(':', $manifestLine, 2);
-			if($manifestLine === '#EXT-X-STREAM-INF')
+			if($lineParts[0] === '#EXT-X-STREAM-INF')
 			{
 				$flavor = array(
 					'url' => requestUtils::resolve(next($manifestLines), $url)
@@ -1635,21 +1635,17 @@ class playManifestAction extends kalturaAction
 						$bootstrapInfos = array();
 						$this->buildF4mFlavors($baseUrl, $flavors, $bootstrapInfos);
 						$this->buildF4mFlavors($backupUrl, $flavors, $bootstrapInfos);
-						KalturaLog::debug(print_r($bootstrapInfos, true));
 						
 						$renderer = $this->getRenderer('kF4MManifestRenderer', $flavors);
 						if($renderer instanceof kF4MManifestRenderer)
 						{
 							$renderer->bootstrapInfos = $bootstrapInfos;
-							if($this->entry instanceof LiveEntry)
+							if($this->entry->getDvrStatus() == DVRStatus::ENABLED)
 							{
-								if($this->entry->getDvrStatus() == DVRStatus::ENABLED)
-								{
-									$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_DVR;
-									$renderer->dvrWindow = $this->entry->getDvrWindow() ? $this->entry->getDvrWindow() : '7200';
-								}
-								$renderer->mimeType = 'video/mp4';
+								$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_DVR;
+								$renderer->dvrWindow = $this->entry->getDvrWindow() ? $this->entry->getDvrWindow() : '7200';
 							}
+							$renderer->mimeType = 'video/mp4';
 						}
 						break;
 					}
@@ -1660,8 +1656,15 @@ class playManifestAction extends kalturaAction
 							$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 						}
 						
+						$parameters = requestUtils::getRequestParams(array(
+							'protocol' => $this->protocol,
+							'format' => 'hds',
+							'proxyBackup' => 1
+						));
+						$requestParams = requestUtils::buildRequestParams($parameters);
+						
 						$partnerPath = myPartnerUtils::getUrlForPartner($this->entry->getPartnerId(), $this->entry->getSubpId());
-						$baseUrl = "{$this->protocol}://{$this->cdnHost}/{$partnerPath}/playManifest/entryId/{$this->entryId}/protocol/{$this->protocol}/format/hds/cdnHost/{$this->cdnHost}/proxyBackup/1/a.f4m";
+						$baseUrl = "{$this->protocol}://{$this->cdnHost}/{$partnerPath}/playManifest/$requestParams/1/a.f4m";
 					}
 				}
 				
