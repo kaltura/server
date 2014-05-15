@@ -401,7 +401,10 @@ class infraRequestUtils
 		$pieces = array();
 		foreach($parameters as $key => $value)
 		{
-			$pieces[] = "$key/$value";
+			if($key && $value)
+			{
+				$pieces[] = "$key/$value";
+			}
 		}
 		return implode('/', $pieces);
 	}
