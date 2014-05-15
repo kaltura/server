@@ -93,6 +93,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $url;
 	}
 	
+	public function getFullAssetUrl(asset $asset, $tokenizeUrl = true) {
+		$assetUrl = $this->getAssetUrl($asset, $tokenizeUrl);
+		return $this->getHostName() . $assetUrl;
+	}
+	
 	protected function addSeekFromBytes($flavorAsset, $url, $prefix) {
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$seekFromBytes = $this->getSeekFromBytes(kFileSyncUtils::getLocalFilePathForKey($syncKey));
@@ -122,6 +127,11 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$seekFromBytes = myFlvHandler::FLV_HEADER_SIZE + $flvWrapper->getMetadataSize($audioOnly) + $fromByte - $firstTagByte;
 	
 		return $seekFromBytes;
+	}
+	
+	public function getFullFileSyncUrl(FileSync $fileSync, $tokenizeUrl = true) {
+		$url = $this->getFileSyncUrl($fileSync, $tokenizeUrl);
+		return $this->getHostName() . $url;
 	}
 	
 	/**

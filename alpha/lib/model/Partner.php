@@ -441,7 +441,10 @@ class Partner extends BasePartner
 	
 	public function getHost()	{		return $this->getFromCustomData( "host" , null, false  );	}
 	public function setHost( $v )	{		return $this->putInCustomData( "host", $v );	}
-		
+
+	public function getCdnHost()	{		return $this->getFromCustomData( "cdnHost" , null, false  );	}
+	public function setCdnHost( $v )	{		return $this->putInCustomData( "cdnHost", $v );	}
+
 	public function getPlaybackCdnHost()    {               return $this->getFromCustomData( "playbackCdnHost" , null, false  ); }
 	public function setPlaybackCdnHost( $v )        {               return $this->putInCustomData( "playbackCdnHost", $v ); }
 

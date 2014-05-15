@@ -267,7 +267,7 @@ class kMrssManager
 			$dynamicAttrs->setFileExtention($asset->getFileExt());
 			$urlManager->setDynamicAttribtues($dynamicAttrs);
 			
-			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = $urlManager->getHo . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
 		return $url;
@@ -292,9 +292,9 @@ class kMrssManager
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 		
-		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
+			$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 			$url =  requestUtils::getApiCdnHost() . kDeliveryUtils::getPlayManifestUrl($asset, $cdnHost, $mrssParams->getPlayManifestClientTag());
 		}
 		else
@@ -303,7 +303,7 @@ class kMrssManager
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttribtues(null, $asset);
 			
-			$url = $cdnHost . $urlManager->getAssetUrl($asset);
+			$url = $urlManager->getFullAssetUrl($asset);
 		}
 		
 		$url = preg_replace('/^https?:\/\//', '', $url);

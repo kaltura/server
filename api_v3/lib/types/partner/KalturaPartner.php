@@ -274,6 +274,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $host;
 	
 	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $cdnHost;
+	
+	/**
 	 * @var bool
 	 * @readonly
 	 */
@@ -311,7 +317,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks', 
-		'host', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId',
+		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId',
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -329,6 +335,9 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		if (!$this->host){
 			$this->host = null;
+		}
+		if (!$this->cdnHost){
+			$this->cdnHost = null;
 		}
 		
 		return $this;

@@ -211,11 +211,8 @@ class TVComFeed
 	
 	public function getAssetUrl(asset $asset)
 	{
-		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
-		
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
-		$url = $urlManager->getAssetUrl($asset);
-		$url = $cdnHost . $url;
+		$urlManager->getFullAssetUrl($asset);
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		return 'http://' . $url;
 	}

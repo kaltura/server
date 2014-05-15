@@ -39,6 +39,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
+	public $cdnHost;
+	
+	/**
+	 * @var string
+	 */
 	public $thumbnailHost;
 	
 	/**
@@ -330,6 +335,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"adminName",
 		"adminEmail",
 		"host",
+		"cdnHost",
 	    "thumbnailHost",
 		//"maxBulkSize",
 		"partnerPackage",
@@ -392,6 +398,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	public function fromObject ( $source_object  )
 	{
+		KalturaLog::err("@_!! " . print_r($source_object, true) );
 		parent::fromObject($source_object);
 		
 		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
@@ -413,6 +420,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if($this->deliveryProfileIds) {
 			$this->deliveryProfileIds = json_encode($this->deliveryProfileIds);
 		}
+		KalturaLog::err("@_!! " . $this->cdnHost);
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)

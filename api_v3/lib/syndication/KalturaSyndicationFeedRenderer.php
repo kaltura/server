@@ -595,7 +595,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
 			$urlManager->initDeliveryDynamicAttribtues(null, $flavorAsset);
-			$url = $this->cdnHost . $urlManager->getAssetUrl($flavorAsset);
+			$url = $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		
 		return $url;
