@@ -1651,9 +1651,13 @@ class playManifestAction extends kalturaAction
 					}
 					else 
 					{
-						if(!$this->cdnHost)
+						if($this->cdnHost)
 						{
-							$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+							$baseUrl = "{$this->protocol}://{$this->cdnHost}";
+						}
+						else
+						{
+							$baseUrl = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 						}
 						
 						$parameters = requestUtils::getRequestParams(array(
@@ -1664,7 +1668,7 @@ class playManifestAction extends kalturaAction
 						$requestParams = requestUtils::buildRequestParams($parameters);
 						
 						$partnerPath = myPartnerUtils::getUrlForPartner($this->entry->getPartnerId(), $this->entry->getSubpId());
-						$baseUrl = "{$this->protocol}://{$this->cdnHost}/{$partnerPath}/playManifest/$requestParams/1/a.f4m";
+						$baseUrl .= "/{$partnerPath}/playManifest/$requestParams/1/a.f4m";
 					}
 				}
 				
