@@ -248,32 +248,26 @@ class kMrssManager
 		if(!$storage)
 			return null;
 			
-		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
-		if($asset instanceof flavorAsset)
-			$urlManager->initDeliveryDynamicAttribtues(null, $asset);
-		
 		if($servePlayManifest)
 		{
-			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storageId, $asset->getEntryId(), PlaybackProtocol::HTTP, "https");
 			
-			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
-			$urlManager->setHostName($cdnHost);
-			$urlManager->setDynamicAttribtues($dynamicAttrs);
-
-			if (!$storage->getDeliveryHttpsBaseUrl())
+			if (!is_null($deliveryProfile))
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 			else
 				$url = requestUtils::getApiCdnHost();
 
-			$url .= $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
+			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
+			$url .= kDeliveryUtils::getPlayManifestUrl($asset, $cdnHost, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
 			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
 			$dynamicAttrs->setFileExtention($asset->getFileExt());
 			$urlManager->setDynamicAttribtues($dynamicAttrs);
 			
-			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
 		return $url;
@@ -299,21 +293,16 @@ class kMrssManager
 			return null;
 		
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
-		
-		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
-		$dynamicAttrs = new DeliveryProfileDynamicAttributes();
-		$urlManager->setHostName($cdnHost);
-		$urlManager->setDynamicAttribtues($dynamicAttrs);
-		
-		if($asset instanceof flavorAsset)
-			$urlManager->initDeliveryDynamicAttribtues(null, $asset);
-		
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($asset, $mrssParams->getPlayManifestClientTag());
+			$url =  requestUtils::getApiCdnHost() . kDeliveryUtils::getPlayManifestUrl($asset, $cdnHost, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
+			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
+			if($asset instanceof flavorAsset)
+				$urlManager->initDeliveryDynamicAttribtues(null, $asset);
+			
 			$url = $cdnHost . $urlManager->getAssetUrl($asset);
 		}
 		

@@ -274,18 +274,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $host;
 	
 	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $cdnHost;
-	
-	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $rtmpUrl;
-	
-	/**
 	 * @var bool
 	 * @readonly
 	 */
@@ -323,7 +311,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks', 
-		'host', 'cdnHost', 'rtmpUrl', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId',
+		'host', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId',
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -339,12 +327,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
-		if (!$this->cdnHost){
-			$this->cdnHost = null;
-		}
-		if (!$this->rtmpUrl){
-			$this->rtmpUrl = null; 
-		}
 		if (!$this->host){
 			$this->host = null;
 		}

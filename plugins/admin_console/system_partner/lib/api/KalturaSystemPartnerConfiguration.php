@@ -39,11 +39,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $cdnHost;
-	
-	/**
-	 * @var string
-	 */
 	public $thumbnailHost;
 	
 	/**
@@ -60,11 +55,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $moderateContent;
-	
-	/**
-	 * @var string 
-	 */
-	public $rtmpUrl;
 	
 	/**
 	 * @var bool
@@ -340,13 +330,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"adminName",
 		"adminEmail",
 		"host",
-		"cdnHost",
 	    "thumbnailHost",
 		//"maxBulkSize",
 		"partnerPackage",
 		"monitorUsage",
 		"moderateContent",
-		"rtmpUrl",
 		"storageDeleteFromKaltura",
 		"storageServePriority",
 		"kmcVersion",
@@ -394,6 +382,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"language",
 		"audioThumbEntryId",
 		"liveThumbEntryId",		
+		"deliveryProfileIds",
 	);
 
 	public function getMapBetweenObjects()
@@ -421,8 +410,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->partnerName = kString::stripUtf8InvalidChars($this->partnerName);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
-		if($this->deliveryProfileIds)
-			$this->deliveryProfileIds = serialize($this->deliveryProfileIds);
+		if($this->deliveryProfileIds) {
+			$this->deliveryProfileIds = json_encode($this->deliveryProfileIds);
+		}
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -469,7 +459,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		if($this->deliveryProfileIds)
-			$object_to_fill->setDeliveryProfileIds(unserialize($this->deliveryProfileIds));
+			$object_to_fill->setDeliveryProfileIds(json_decode($this->deliveryProfileIds));
 		
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{

@@ -51,14 +51,13 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync) {
 		$url = parent::doGetFileSyncUrl($fileSync);
-		$storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageProfileId());
-		if ($storageProfile->getRTMPPrefix())
+		if ($this->getPrefix())
 		{
 			if (strpos($url, '/') !== 0)
 			{
 				$url = '/'.$url;
 			}
-			$url = $storageProfile->getRTMPPrefix(). $url;
+			$url = $this->getPrefix() . $url;
 		}
 		$url = $this->formatByExtension($url); 
 		
@@ -98,13 +97,11 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 	 */
 	protected function buildRtmpFlavorsArray(&$baseUrl)
 	{
+		$baseUrl = $this->getUrl();
 		$flavorAssets = $this->params->getflavorAssets();
 		$flavors = array();
 		if($this->params->getStorageId())
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageProfileId());
-			$baseUrl = $storageProfile->getDeliveryRmpBaseUrl();
-
 			// get all flavors with external urls
 			foreach($flavorAssets as $flavorAsset)
 			{
@@ -121,8 +118,6 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 		}
 		else
 		{
-			$baseUrl = $this->getUrl();
-
 			// get all flavors with kaltura urls
 			foreach($flavorAssets as $flavorAsset)
 			{

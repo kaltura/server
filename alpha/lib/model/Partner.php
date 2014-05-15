@@ -442,9 +442,6 @@ class Partner extends BasePartner
 	public function getHost()	{		return $this->getFromCustomData( "host" , null, false  );	}
 	public function setHost( $v )	{		return $this->putInCustomData( "host", $v );	}
 		
-	public function getCdnHost()	{		return $this->getFromCustomData( "cdnHost" , null, false  );	}
-	public function setCdnHost( $v )	{		return $this->putInCustomData( "cdnHost", $v );	}
-
 	public function getPlaybackCdnHost()    {               return $this->getFromCustomData( "playbackCdnHost" , null, false  ); }
 	public function setPlaybackCdnHost( $v )        {               return $this->putInCustomData( "playbackCdnHost", $v ); }
 
@@ -552,9 +549,6 @@ class Partner extends BasePartner
 
 	public function getSupportAnimatedThumbnails()	{		return $this->getFromCustomData( "supportAnimatedThumbnails" , null, false  );	}
 	public function setSupportAnimatedThumbnails( $v )	{		return $this->putInCustomData( "supportAnimatedThumbnails", $v );	}
-		
-	public function getRtmpUrl()	{		return $this->getFromCustomData( "rtmpUrl" , null, false  );	}
-	public function setRtmpUrl( $v )	{		return $this->putInCustomData( "rtmpUrl", $v );	}	
 		
 	public function getIisHost()	{		return $this->getFromCustomData( "iisHost" , null, false  );	}
 	public function setIisHost( $v )	{		return $this->putInCustomData( "iisHost", $v );	}	

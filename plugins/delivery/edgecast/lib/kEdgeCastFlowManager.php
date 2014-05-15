@@ -100,6 +100,7 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
             $assetId = $asset->getId();            
             
             $serveFlavorUrl = "$partnerPath/serveFlavor/entryId/".$asset->getEntryId()."/flavorId/$assetId".'*'; // * wildcard should delete all serveFlavor urls
+            // TODO @_!! Talk with Eran
             $hosts = array(
                 $partner->getCdnHost(),
                 $partner->getRtmpUrl(),

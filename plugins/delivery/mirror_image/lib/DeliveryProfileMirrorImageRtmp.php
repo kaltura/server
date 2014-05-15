@@ -15,7 +15,7 @@ class DeliveryProfileMirrorImageRtmp extends DeliveryProfileRtmp
 		$storageProfile = StorageProfilePeer::retrieveByPK($this->params->getStorageProfileId());
 		$tokenizer = parent::getTokenizer();
 		$tokenizer->setUseDummuHost(true);
-		$tokenizer->setBaseUrl(rtrim($storageProfile->getDeliveryHttpBaseUrl(), '/'));
+		$tokenizer->setBaseUrl(rtrim($this->getUrl(), '/'));
 		if(is_null($tokenizer->getWindow()))
 			$tokenizer->setWindow(self::DEFAULT_ACCESS_WINDOW_SECONDS);
 		return $tokenizer;

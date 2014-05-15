@@ -179,32 +179,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	}
 	
 	/**
-	 * @param flavorAsset $asset
-	 * @param string $clientTag
-	 * @return string
-	 */
-	public function getPlayManifestUrl(flavorAsset $asset, $clientTag)
-	{
-		$entryId = $asset->getEntryId();
-		$partnerId = $asset->getPartnerId();
-		$subpId = $asset->getentry()->getSubpId();
-		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-		$flavorAssetId = $asset->getId();
-		$cdnHost = parse_url($this->host_name, PHP_URL_HOST);
-		$this->initDeliveryDynamicAttribtues(null, $asset);
-	
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->params->getMediaProtocol()}/format/url/cdnHost/$cdnHost";
-		if($this->params->getStorageProfileId())
-			$url .= "/storageId/" . $this->params->getStorageProfileId();
-		
-		if ($asset && $asset->getFileExt())
-			$url .= "/a." . $asset->getFileExt();
-		
-		$url .= "?clientTag=$clientTag";
-		return $url;
-	}
-	
-	/**
 	 * @param array $flavors
 	 * @return string
 	 */

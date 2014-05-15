@@ -124,7 +124,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	}
 	
 	/**
-	 * This function returns the matching delivery object for a given partner and delivery protocol. 
+	 * This function returns the matching delivery object for a given entry and delivery protocol. 
 	 * @param string $entryId - The entry ID
 	 * @param PlaybackProtocol $streamerType - The protocol
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
@@ -142,6 +142,19 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$isSecured = false;
 		if($checkSecured)
 			$isSecured = self::isSecured($partner, $entry);
+		return self::getDeliveryByPartner($partner, $streamerType, $mediaProtocol, $cdnHost, $isSecured);
+	}
+		
+	/**
+	 * This function returns the matching delivery object for a given partner and delivery protocol
+	 * @param Partner $partner The partner
+	 * @param PlaybackProtocol $streamerType - The protocol
+	 * @param string $mediaProtocol - rtmp/rtmpe/https...
+	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
+	 * @param boolean $isSecured whether we're interested in secured delivery profile
+	 */
+	public static function getDeliveryByPartner(Partner $partner, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $isSecured = false) {
+		
 		$deliveryIds = $partner->getDeliveryIds();
 		
 		// if the partner has an override for the required format on the partner object - use that

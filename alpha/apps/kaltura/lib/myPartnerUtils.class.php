@@ -361,9 +361,7 @@ class myPartnerUtils
 	// if the cdnHost of the partner is false or null or an empty string - ignore it	
 	public static function getRtmpUrl ( $partner_id )
 	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getRtmpUrl() ) ) return requestUtils::getRtmpUrl();
-		return $partner->getRtmpUrl();
+		return requestUtils::getRtmpUrl();
 	}
 	
 	// if the iis Host of the partner is false or null or an empty string - ignore it	

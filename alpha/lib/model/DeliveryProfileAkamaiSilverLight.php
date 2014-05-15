@@ -11,7 +11,6 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 		if(!$storage)
 			return parent::doGetFileSyncUrl($fileSync);
 		
-		$serverUrl = $storage->getDeliveryIisBaseUrl();
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
 		
 		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
@@ -31,9 +30,9 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 			$path = $partnerPath . '/serveIsm/objectId/' . $fileSync->getObjectId () . '_' . $fileSync->getObjectSubType () . '_' . $fileSync->getVersion () . '.' . pathinfo ( kFileSyncUtils::resolve ( $fileSync )->getFilePath (), PATHINFO_EXTENSION ) . '/manifest';
 		} else 
 		{
-			if ($storage && $storage->getDeliveryIisBaseUrl ()) 
+			if ($storage) 
 			{
-				$serverUrl = $storage->getDeliveryIisBaseUrl ();
+				$serverUrl = $this->getUrl();
 			}
 			$path = '/'.$fileSync->getFilePath(). '/manifest';
 		}

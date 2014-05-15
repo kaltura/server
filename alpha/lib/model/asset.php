@@ -476,7 +476,7 @@ class asset extends Baseasset implements ISyncableFile
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $this->getEntryId());
 		$urlManager->initDeliveryDynamicAttribtues($this);
 		
-		$url = rtrim($storage->getDeliveryBaseUrlByProtocol(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		$url = rtrim($urlManager->getUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 		return $url;
 	}
 	
