@@ -1,8 +1,6 @@
 #!/bin/bash
 . /etc/kaltura.d/system.ini
 
-echo `date`
-
 #
 # batchMgr		This shell script takes care of starting and stopping a Kaltura Batch Service
 #
