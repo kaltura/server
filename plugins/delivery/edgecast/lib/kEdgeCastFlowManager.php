@@ -100,12 +100,29 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
             $assetId = $asset->getId();            
             
             $serveFlavorUrl = "$partnerPath/serveFlavor/entryId/".$asset->getEntryId()."/flavorId/$assetId".'*'; // * wildcard should delete all serveFlavor urls
-            // TODO @_!! Talk with Eran
-            $hosts = array(
-                $partner->getCdnHost(),
-                $partner->getRtmpUrl(),
-                $partner->getIisHost(),
-            );
+            
+            $types = array(
+            		kPluginableEnumsManager::apiToCore(EdgeCastDeliveryProfileType::EDGE_CAST_HTTP),
+            		kPluginableEnumsManager::apiToCore(EdgeCastDeliveryProfileType::EDGE_CAST_RTMP));
+            
+            $deliveryProfile = $partner->getDeliveryProfileIds();
+            $deliveryProfileIds = array();
+            foreach($deliveryProfile as $key=>$value) {
+            	if(is_array($value)) {
+            		$deliveryProfileIds = array_merge($deliveryProfileIds, $value);
+            	} else {
+            		$deliveryProfileIds[] = $value;
+            	}
+            }
+            
+            
+			$c = new Criteria();
+			$c->add(DeliveryProfilePeer::PARTNER_ID, $partnerId);
+			$c->add(DeliveryProfilePeer::ID, $deliveryProfileIds, Criteria::IN);
+            $c->addSelectColumn(DeliveryProfilePeer::HOST_NAME);
+			$stmt = PermissionPeer::doSelectStmt($c);
+			$hosts = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
             foreach ($hosts as $host)
             {
                 if (!empty($host)) {
