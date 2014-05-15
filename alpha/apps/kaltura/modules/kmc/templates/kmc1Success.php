@@ -611,13 +611,13 @@ function openPlaylist ( embed_code , playlist_id , pl_width_str , pl_height_str 
 	global_embed_code = embed_code;
 	if ( ! ui_conf_id || ui_conf_id == 190 || ui_conf_id == 199 )
 	{
-<?php
+<?
 if (false && kConf::get('www_host') == 'www.kaltura.com'){
 ?>
 		ui_conf_id = 48206;
 		pl_width_str = 660;
 		pl_height_str = 272;
-<?php
+<?
 } else {
 ?>
 		if(sub_nav_tab == "")
@@ -644,7 +644,7 @@ if (false && kConf::get('www_host') == 'www.kaltura.com'){
 			pl_width_str = <? echo $playlist_uiconf_list[0]->getWidth();  ?>;// 660;
 			pl_height_str = <? echo $playlist_uiconf_list[0]->getHeight();  ?>;//272;
 		}
-<?php
+<?
 }
 ?>
 	}
@@ -703,7 +703,7 @@ if (false && kConf::get('www_host') != 'www.kaltura.com'){
 			ui_conf_select += createSelectUiConfAddOption ( ui_conf_id , 48207 ,724,322 , "Horizontal Compact" );
 			ui_conf_select += createSelectUiConfAddOption ( ui_conf_id , 48205 ,400,600 , "Vertical" );
 			ui_conf_select += createSelectUiConfAddOption ( ui_conf_id , 48204 ,400,600 , "Vertical Compact" );
-<?php
+<?
 }
 ?>
 	}
@@ -1009,7 +1009,7 @@ else {
 ?>
 		ui_conf_select += createSelectUiConfAddOption ( ui_conf_id , 48110,400,332 , "Dark player skin" );
 		ui_conf_select += createSelectUiConfAddOption ( ui_conf_id , 48111,400,332 , "Light player skin" );
-<?php
+<?
 }
 ?>
 	}

@@ -23,7 +23,7 @@ $status_style = array ( -1 => "red" , -2 => "red" , "0" => "orange" , "1" => "#F
 
 
 <div id='pager' style='height:30px; margin-top: 10px; font-family:verdana;font-size:11px;' >Total results: <?= $count ?> 
-<?php
+<?
 
 $str = "";
 $start_page = max ( 0 , $page - 5 );
@@ -48,7 +48,7 @@ if ( $end_page < $very_last_page ) echo createPageFor ( $very_last_page , $page 
 
 <div id='gallery' style='font-family:verdana;font-size:11px;'>
 <table style='border: solid 1px; font-family:verdana;font-size:11px;'><tr>
-<?php
+<?
 $i=0;
 foreach ( $entries as $entry ) {	 
 ?>

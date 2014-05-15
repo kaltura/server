@@ -22,7 +22,7 @@
 			<name>Widescreen player - light skin</name>
 			<width>400</width>
 			<height>285</height>
-			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.5.21/kdp3.swf</swfUrl>
 			<useCdn>1</useCdn>
 			<tags>kdp3,player</tags>
 			<creationMode>2</creationMode>
@@ -36,7 +36,7 @@
 			<name>Multiple playlists - dark skin</name>
 			<width>740</width>
 			<height>330</height>
-			<swfUrl>/flash/kdp3/v3.9.8/kdp3.swf</swfUrl>
+			<swfUrl>/flash/kdp3/v3.5.21/kdp3.swf</swfUrl>
 			<useCdn>1</useCdn>
 			<tags>kdp3,playlist</tags>
 			<creationMode>2</creationMode>

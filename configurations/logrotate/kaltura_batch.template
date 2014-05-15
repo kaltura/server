@@ -1,4 +1,4 @@
-@LOG_DIR@/kaltura_batch.log {
+@LOG_DIR@/KGenericBatchMgr.log {
     nodateext
     compress
     rotate 40
