@@ -23,7 +23,7 @@
 			<systemName>Default</systemName>
 			<description>The default set of flavors. If not specified otherwise all media uploaded will be converted based on the definition in this profile</description>
 			<isDefault>1</isDefault>
-			<flavorParamsIds>0,2,3,4,5,6,7</flavorParamsIds>
+			<flavorParamsIds>0,2,3,4,5,6,7,19</flavorParamsIds>
 		</conversionProfile>
 		<conversionProfile objectType="KalturaConversionProfile">
 			<name>Cloud transcode</name>
