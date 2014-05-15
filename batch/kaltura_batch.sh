@@ -1,8 +1,6 @@
 #!/bin/bash
 . /etc/kaltura.d/system.ini
 
-echo `date`
-
 #
 # batchMgr		This shell script takes care of starting and stopping a Kaltura Batch Service
 #
@@ -80,7 +78,7 @@ start() {
 			echo "Removing stale lock file at $LOCKFILE"
 			rm -f $LOCKFILE
 			start_scheduler
-			return 1
+			return $?
 		fi
 	else
 		if [ "X$KP" != "X" ]; then
@@ -88,7 +86,7 @@ start() {
 			return 0
 		fi		
 		start_scheduler
-		return 0
+		return $?
 	fi
 }
 
@@ -99,9 +97,11 @@ start_scheduler() {
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
+		return 0
 	else
 		echo_failure
 		echo
+		return 1
 	fi
 }
 
@@ -161,4 +161,3 @@ case "$1" in
 		exit 0
 		;;
 esac
-exit 0
