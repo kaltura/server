@@ -168,6 +168,8 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 		/* @var $object Permission */
 		$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
 		$this->partnerPermissionEnabled($partner);
+			
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -178,6 +180,8 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 		/* @var $object Permission */
 		$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
 		$this->partnerPermissionEnabled($partner);
+			
+		return true;
 	}
 
 	/* (non-PHPdoc)
