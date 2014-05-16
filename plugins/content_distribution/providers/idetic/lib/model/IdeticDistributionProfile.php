@@ -94,7 +94,7 @@ class IdeticDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{
-	    $fieldConfigArray = array();
+	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 	    
 	    //TODO: implement  
 	    

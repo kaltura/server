@@ -132,7 +132,7 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 				return null;
 			}
 			/*
-			 * Source is invlalid if Initialize() fails, unless it is an ARF
+			 * Source is invalid if Initialize() fails, unless it is an ARF
 			 */
 			if(!((isset($mediaSet->_container) && $mediaSet->_container->_format=="arf")
 			|| $mediaSet->Initialize())){
@@ -142,7 +142,7 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 			$interSrcProfile = null;
 			$forceAudioStream = false;
 			/*
-			 * For ARF ==> webex plaugin 
+			 * For ARF ==> webex plugin 
 			 */
 			if(isset($mediaSet->_container) && $mediaSet->_container->IsFormatOf(array("arf"))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::COPY,
@@ -151,23 +151,29 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 						1, "webexNbrplayer.WebexNbrplayer");
 			}
 			/*
-			 * For GotoMeeting ==> EE plaugin 
+			 * For GotoMeeting ==> EE plugin 
 			 */
-			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("g2m3","g2m4","gotomeeting3","gotomeeting3","gotomeeting"))) {
+				 		/*
+				 		 * FFmpeg 2.1 and higher handles G2M4
+				 		 */
+			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("gotomeeting","g2m3","gotomeeting3"/*,"g2m4","gotomeeting3"*/))) {
 				$interSrcProfile = $this->setProfileWithIntermediateSource(KDLContainerTarget::WMV,
 						KDLVideoTarget::WVC1A, 4000, 1080,
 						KDLAudioTarget::WMA, 128, 0,
 						1, "expressionEncoder.ExpressionEncoder");
 			}
 			/*
-			 * For MAC native (icod, qt/wmv/wma ==> MAC plaugin 
+			 * For MAC native (icod, qt/wmv/wma ==> MAC plugin 
 			 */
 			else if(isset($mediaSet->_video) 
 				 && (
-				 	$mediaSet->_video->IsFormatOf(array("icod","intermediate codec"))
-					||($mediaSet->_container->IsFormatOf(array("qt","mov")) 
-					   && $mediaSet->_video->IsFormatOf(array("wmv","wmv3","wvc1","vc1","vc-1")) 
-					   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","windows media audio","windows media audio 10 professional"))
+				 		/*
+				 		 * FFmpeg 2.1 and higher handles ICOD
+				 		 */
+				 	//$mediaSet->_video->IsFormatOf(array("icod","intermediate codec"))||
+					($mediaSet->_container->IsFormatOf(array("qt","mov")) 
+					   && $mediaSet->_video->IsFormatOf(array("wmv","wmv2","wmv3","wvc1","vc1","vc-1")) 
+					   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","wma3","windows media audio","windows media audio 10 professional"))
 					  ) 
 				    )
 				   )
@@ -178,9 +184,9 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 						1, "quickTimeTools.QuickTimeTools");
 			}
 			/*
-			 * For "red strip" on On2 ==> ffmpeg intermedite reconversion 
+			 * For "red/green strip" on On2 ==> ffmpeg intermedite reconversion 
 			 */
-			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("xdvd","xdva","xdvb","xdvc","xdve","xdvf","xdv4"))) {
+			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("xdvd","xdva","xdvb","xdvc","xdve","xdvf","xdv4","hdv2"))) {
 				foreach($profile->_flavors as $flvr){
 					foreach ($flvr->_transcoders as $trans) {
 						if($trans->_id==KDLTranscoders::ON2){

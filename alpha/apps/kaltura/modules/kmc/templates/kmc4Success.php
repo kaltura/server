@@ -14,6 +14,7 @@ var kmc = {
 	 <ul id="hTabs">
 	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
+	 <div id="langIcon" style="display: none"></div>
 	 <div id="user"><span class="left-arrow"></span><?php echo $full_name; ?></div>
 	 <div id="user_links">
 	  <span id="closeMenu"></span> &nbsp;&nbsp;
@@ -42,6 +43,7 @@ var kmc = {
 	    <?php } ?>
 	 </div>
 	</div><!-- kmcHeader -->
+	<div id="langMenu"></div>
 
 	<div id="main">
 		<div id="flash_wrap" class="flash_wrap">
@@ -139,6 +141,7 @@ var kmc = {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
+<script src="/lib/js/kmc/6.0.10/langMenu.min.js"></script>
 <script src="/lib/js/kmc/6.0.10/kmc.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?>
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>

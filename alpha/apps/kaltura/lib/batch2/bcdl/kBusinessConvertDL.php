@@ -55,6 +55,7 @@ class kBusinessConvertDL
 		}
 
 		$defaultThumbAssetNew = null;
+		$defaultThumbAssetOld = null;
 		foreach($oldAssets as $oldAsset)
 		{
 			/* @var $oldAsset asset */
@@ -71,10 +72,9 @@ class kBusinessConvertDL
 				$oldAsset->linkFromAsset($newAsset);
 				$oldAsset->save();
 
-				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$newFileSync = $newAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
-				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);
+				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+				self::createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 
 				$newFlavorMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($newAsset->getId());
 				if($newFlavorMediaInfo)
@@ -96,11 +96,22 @@ class kBusinessConvertDL
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
 			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
-				KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
-
-				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-				$oldAsset->setDeletedAt(time());
-				$oldAsset->save();
+				if($entry->getReplacementOptions()->getKeepManualThumbnails() && $oldAsset instanceof thumbAsset && !$oldAsset->getFlavorParamsId())
+				{
+					KalturaLog::debug("KeepManualThumbnails ind is set, manual thumbnail is not deleted [" . $oldAsset->getId() . "]");
+					if($oldAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+					{
+						$defaultThumbAssetOld = $oldAsset;
+					}
+				}
+				else 
+				{
+					KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
+	
+					$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+					$oldAsset->setDeletedAt(time());
+					$oldAsset->save();
+				}
 			}
 		}
 
@@ -118,8 +129,13 @@ class kBusinessConvertDL
 				}
 			}
 		}
-
-		if ($defaultThumbAssetNew)
+		
+		
+		if($defaultThumbAssetOld)
+		{
+			KalturaLog::debug("Kepping ThumbAsset [". $defaultThumbAssetOld->getId() ."] as the default ThumbAsset");
+		}
+		elseif ($defaultThumbAssetNew)
 		{
 			kBusinessConvertDL::setAsDefaultThumbAsset($defaultThumbAssetNew);
 			KalturaLog::debug("Setting ThumbAsset [". $defaultThumbAssetNew->getId() ."] as the default ThumbAsset");
@@ -134,19 +150,22 @@ class kBusinessConvertDL
 			kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 		}
 
+		self::createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $entry);
+		
 		$entry->setDimensions($tempEntry->getWidth(), $tempEntry->getHeight());
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
 		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
 		$entry->setConversionQuality($tempEntry->getConversionQuality());
 		$entry->setReplacingEntryId(null);
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);
+		$entry->setReplacementOptions(null);
 		$entry->setStatus($tempEntry->getStatus());
 		$entry->save();
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
 
-		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry));
+		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry, $tempEntry));
 
 		myEntryUtils::deleteEntry($tempEntry,null,true);
 
@@ -158,6 +177,26 @@ class kBusinessConvertDL
 		TrackEntry::addTrackEntry($te);
 	}
 
+	private static function createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, $fileSyncSubType)
+	{
+		$oldFileSync = $oldAsset->getSyncKey($fileSyncSubType);
+		$newFileSync = $newAsset->getSyncKey($fileSyncSubType);
+		if(kFileSyncUtils::fileSync_exists($newFileSync))
+			kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);		
+	}
+	private static function createIsmManifestFileSyncLinkFromReplacingEntry($tempEntry, $realEntry)
+	{
+		$tempEntryIsmSyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$tempEntryIsmcSyncKey = $tempEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		if(kFileSyncUtils::fileSync_exists($tempEntryIsmSyncKey) && kFileSyncUtils::fileSync_exists($tempEntryIsmcSyncKey))
+		{		
+			$ismVersion = $realEntry->incrementIsmVersion();
+			$realEntryIsmSyncKey = $realEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion);
+			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmSyncKey, $tempEntryIsmSyncKey);	
+			$realEntryIsmcSyncKey = $realEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmcSyncKey, $tempEntryIsmcSyncKey);
+		}
+	}
 	public static function setAsDefaultThumbAsset($thumbAsset)
 	{
 		/* @var $thumbAsset thumbAsset */
@@ -381,12 +420,14 @@ class kBusinessConvertDL
 			$liveAssetsParams[$flavorParamsId] = $liveAsset;
 		}
 		
-		$liveParamsArray = assetParamsPeer::retrieveByProfile($entry->getConversionProfileId());
+		$flavorParamsConversionProfileArray = flavorParamsConversionProfilePeer::retrieveByConversionProfile($entry->getConversionProfileId());
 		
 		$liveParamIdsArray = array();
-		/* @var $flavorAsset flavorAsset */
-		foreach ($liveParamsArray as $liveParams)
-			$liveParamIdsArray[] = $liveParams->getId();
+		foreach ($flavorParamsConversionProfileArray as $flavorParamsConversionProfile)
+		{
+			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */
+			$liveParamIdsArray[] = $flavorParamsConversionProfile->getFlavorParamsId();
+		}
 			
 		asort($liveParamIdsArray);
 		$liveParamIds = implode(",", $liveParamIdsArray);
@@ -394,40 +435,46 @@ class kBusinessConvertDL
 			return;
 		
 		$streamBitrates = array();
-		foreach ($liveParamsArray as $liveParams)
+		foreach ($flavorParamsConversionProfileArray as $flavorParamsConversionProfile)
 		{
-			/* @var $liveParams liveParams */
-			
-			$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
-			$streamBitrates[] = $streamBitrate;
-			
-			// check if asset already exists
-			if(isset($liveAssetsParams[$liveParams->getId()]))
+			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */
+			$liveParams = $flavorParamsConversionProfile->getassetParams();
+			if($liveParams instanceof liveParams)
 			{
-				$liveAsset = $liveAssetsParams[$liveParams->getId()];
-				$liveAsset->setDeletedAt(null);
-
-				// remove the asset from the list, the left assets will be deleted later
-				unset($liveAssetsParams[$liveParams->getId()]);
-			}
-			else
-			{
-				// create a new asset
-				$liveAsset = new liveAsset();
-				$liveAsset->setType(assetType::LIVE);
-				$liveAsset->setPartnerId($entry->getPartnerId());
-				$liveAsset->setFlavorParamsId($liveParams->getId());
-				$liveAsset->setFromAssetParams($liveParams);
-				$liveAsset->setEntryId($entry->getId());
-			}
-			
-			// set the status according to the entry status
-			if($entry->getStatus() == entryStatus::READY)
-				$liveAsset->setStatus( asset::ASSET_STATUS_READY);
-			else
-				$liveAsset->setStatus( asset::ASSET_STATUS_IMPORTING);
+				if($flavorParamsConversionProfile->getOrigin() == assetParamsOrigin::INGEST)
+				{
+					$streamBitrate = array('bitrate' => $liveParams->getVideoBitrate(), 'width' => $liveParams->getWidth(), 'height' => $liveParams->getHeight(), 'tags' => $liveParams->getTags());
+					$streamBitrates[] = $streamBitrate;
+				}
 				
-			$liveAsset->save();
+				// check if asset already exists
+				if(isset($liveAssetsParams[$liveParams->getId()]))
+				{
+					$liveAsset = $liveAssetsParams[$liveParams->getId()];
+					$liveAsset->setDeletedAt(null);
+	
+					// remove the asset from the list, the left assets will be deleted later
+					unset($liveAssetsParams[$liveParams->getId()]);
+				}
+				else
+				{
+					// create a new asset
+					$liveAsset = new liveAsset();
+					$liveAsset->setType(assetType::LIVE);
+					$liveAsset->setPartnerId($entry->getPartnerId());
+					$liveAsset->setFlavorParamsId($liveParams->getId());
+					$liveAsset->setFromAssetParams($liveParams);
+					$liveAsset->setEntryId($entry->getId());
+				}
+				
+				// set the status according to the entry status
+				if($entry->getStatus() == entryStatus::READY)
+					$liveAsset->setStatus( asset::ASSET_STATUS_READY);
+				else
+					$liveAsset->setStatus( asset::ASSET_STATUS_IMPORTING);
+					
+				$liveAsset->save();
+			}
 		}
 		
 		// delete all left assets
@@ -437,6 +484,12 @@ class kBusinessConvertDL
 			$liveAsset->setDeletedAt(time());
 			$liveAsset->setStatus(asset::ASSET_STATUS_DELETED);
 			$liveAsset->save();
+		}
+		
+		if(!count($streamBitrates))
+		{
+			$streamBitrate = array('bitrate' => 900, 'width' => 640, 'height' => 480);
+			$streamBitrates[] = $streamBitrate;
 		}
 		
 		$entry->setStreamBitrates($streamBitrates);

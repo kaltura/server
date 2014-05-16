@@ -38,4 +38,27 @@ class flavorParamsConversionProfile extends BaseflavorParamsConversionProfile
 	{
 		return array("flavorParamsConversionProfile:flavorParamsId=".strtolower($this->getFlavorParamsId()).",conversionProfileId=".strtolower($this->getConversionProfileId()), "flavorParamsConversionProfile:conversionProfileId=".strtolower($this->getConversionProfileId()));
 	}
+	
+	public function postSave(PropelPDO $con = null) 
+	{
+		$this->updateConversionProfileLastModified();
+		parent::postSave($con);
+	}
+	
+	public function postDelete(PropelPDO $con = null)
+	{
+		$this->updateConversionProfileLastModified();
+		parent::postDelete($con);
+	}
+	
+	private function updateConversionProfileLastModified()
+	{
+		$conversionProfile = $this->getconversionProfile2();
+		
+		if($conversionProfile)
+		{
+			$conversionProfile->setUpdatedAt(time());
+			$conversionProfile->save();
+		}
+	}
 }

@@ -28,6 +28,19 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 			'PDF document',
 	);
 	
+	// List of errors in case of corrupted file
+	private $SUSPECTED_AS_FAILURE = array(
+			"/typecheck in --run—",
+			"/undefinedresult in --run--",
+			"/VMerror in --showpage--GPL",
+			"Cannot find a 'startxref'",
+			"/ioerror in --.reusablestreamd",
+			"/ioerror in --showpage--",
+			"/undefined in --run--",
+			"Cannot find a %EOF marker",
+			"/undefinedresult in --atan--"
+	);
+	
 	public function __construct($cmd, $outFilePath)
 	{
 		parent::__construct($cmd,$outFilePath);
@@ -71,11 +84,11 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		// - Test file type
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);
 		if(!is_null($errorMsg))
-			$this->message = $errorMsg;
+			$this->data->engineMessage = $errorMsg;
 		
 		// Test password required
 		if($this->testPasswordRequired($realInFilePath)) {
-			$this->message = "Password required.";
+			$this->data->engineMessage = "Password required.";
 		}
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
@@ -87,13 +100,25 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		$firstImage = $outDirPath . DIRECTORY_SEPARATOR . $imagesList[0];
 		$errorMsg = $this->testBlackImage($identifyExe, $firstImage, $errorMsg);
 		if(!is_null($errorMsg)) {
-			$this->message = $errorMsg;
+			$this->data->engineMessage = $errorMsg;
 		}
 		
 		$imagesListXML = $this->createImagesListXML($imagesList);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
 	    return true;
+	}
+	
+	protected function operationComplete($rc, $output) {
+		if($rc != 0) {
+			$logOutput = file_get_contents($this->logFilePath);
+			foreach($this->SUSPECTED_AS_FAILURE as $possibleFailure) {
+				if(strpos($logOutput, $possibleFailure) !== false) {
+					$this->data->engineMessage = "Suspected as corrupted file";
+					break;
+				}
+			}
+		}
 	}
 	
 	// The returned xml will be stored in the images directory. it than can be downloaded by he user with serveFlavorAction and provide him

@@ -18,3 +18,7 @@ jQuery(function() {
 
 </script>
 
+<?php 
+	foreach($this->plugins as $phtml => $pluginData)
+		echo $this->partial($phtml, $pluginData);
+?>

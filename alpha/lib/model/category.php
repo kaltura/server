@@ -30,6 +30,13 @@ class category extends Basecategory implements IIndexable
 	
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
+	const EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX = "DONT_COUNT_ENTRIES_CAT_";
+	
+	// Cache expires after 4 hours.
+	const EXCEEDED_ENTRIES_COUNT_CACHE_EXPIRY = 14400; 
+	
+	const MAX_NUMBER_OF_ENTRIES_PER_CATEGORY = 10000;
+	
 	/**
 	 * Array of entries that decremented in the current session and maybe not indexed yet
 	 * @var array
@@ -105,6 +112,12 @@ class category extends Basecategory implements IIndexable
 				$this->addDeleteCategoryKuserJob($this->getId());
 			}
 		}
+		
+		if (!$this->isNew() && $this->isColumnModified(categoryPeer::PRIVACY_CONTEXTS))
+		{
+			$this->addSyncCategoryPrivacyContextJob();
+		}
+		
 		
 		// save the childs for action category->delete - delete category is not done by async batch.
 		foreach($this->childs_for_save as $child)
@@ -380,11 +393,47 @@ class category extends Basecategory implements IIndexable
 	}
 	
 	/**
+	 * Execute before incrementing entries count or direct entries count
+	 */
+	public function preIncrement($entryId)
+	{
+		if(!isset(self::$incrementedEntryIds[$this->getId()]))
+			self::$incrementedEntryIds[$this->getId()] = array();
+		self::$incrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
+	}
+	
+	/**
+	 * Execute before decrementing entries count or direct entries count
+	 */
+	public function preDecrement($entryId)
+	{
+		if(!isset(self::$decrementedEntryIds[$this->getId()]))
+			self::$decrementedEntryIds[$this->getId()] = array();
+		self::$decrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		
+		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
+			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
+	}
+	
+	/**
 	 * Increment direct entries count
 	 */
-	public function incrementDirectEntriesCount()
+	public function incrementDirectEntriesCount($entryId)
 	{
-		$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);
+		KalturaLog::debug("incrementing $entryId to direct entries count " . $this->getFullName());
+		$this->preIncrement($entryId);
+		
+		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()], true);
+		if(!is_null($count))
+		{
+			$count += count(self::$incrementedEntryIds[$this->getId()]);
+			$this->setDirectEntriesCount($count);
+		}
+		else
+			$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);
 	}
       
     /**
@@ -399,9 +448,16 @@ class category extends Basecategory implements IIndexable
 	/**
 	 * Decrement direct entries count (will decrement recursively the parent categories too)
 	 */
-	public function decrementDirectEntriesCount()
+	public function decrementDirectEntriesCount($entryId)
 	{
-		$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
+		KalturaLog::debug("decrementing $entryId from direct entries count " . $this->getFullName());
+		$this->preDecrement($entryId);
+		
+		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()], true);
+		if(!is_null($count))
+			$this->setDirectEntriesCount($count);
+		else	
+			$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
 	}
       
 	/**
@@ -563,6 +619,12 @@ class category extends Basecategory implements IIndexable
 	{
 		kJobsManager::addMoveCategoryEntriesJob(null, $this->getPartnerId(), $this->getId(), $destCategoryId, false, false, $this->getFullIds());
 	}
+	
+	protected function addSyncCategoryPrivacyContextJob()
+	{
+		kJobsManager::addSyncCategoryPrivacyContextJob(null, $this->getPartnerId(), $this->getId());
+	}
+	
 	
 	protected function addIndexCategoryJob($fullIdsStartsWithCategoryId, $categoriesIdsIn, $lock = false)
 	{
@@ -1166,18 +1228,24 @@ class category extends Basecategory implements IIndexable
 	
 	public function setPrivacyContext($v)
 	{
+		$privacyContexts = $this->buildPrivacyContexts($v);
+		$this->setPrivacyContexts($privacyContexts);
+		parent::setPrivacyContext($v);
+	}
+	
+	private function buildPrivacyContexts($privacyContext)
+	{
 		if (!$this->getParentId())
 		{
-			$this->setPrivacyContexts($v);
-			parent::setPrivacyContext($v);
-			return;
+			$this->validatePrivacyContexts(explode(',',$privacyContext));
+			return $privacyContext;
 		}
-
+		
 		$privacyContexts = array();
 		$parentCategory = $this->getParentCategory();
 		if($parentCategory)
 			$privacyContexts = explode(',', $parentCategory->getPrivacyContexts());
-		$privacyContexts[] = $v;
+		$privacyContexts[] = $privacyContext;
 		
 		$privacyContextsTrimed = array();
 		foreach($privacyContexts as $privacyContext)
@@ -1187,11 +1255,11 @@ class category extends Basecategory implements IIndexable
 		}
 
 		$privacyContextsTrimed = array_unique($privacyContextsTrimed);
+		$this->validatePrivacyContexts($privacyContextsTrimed);
 		
-		$this->setPrivacyContexts(trim(implode(',', $privacyContextsTrimed)));
-		parent::setPrivacyContext($v);
+		return trim(implode(',', $privacyContextsTrimed));		
 	}
-	
+		
 	/**
 	 * @param int $v
 	 */
@@ -1302,22 +1370,53 @@ class category extends Basecategory implements IIndexable
 		return $this->getId();
 	}
 	
+	protected function countEntriesByCriteria($entryIds, $directOnly = false) {
+		
+		// Try to retrieve from cache
+		$cacheKey =  category::EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX . $this->getId();
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if ($cacheStore)
+		{
+			$countExceeded = $cacheStore->get($cacheKey);
+			if ($countExceeded)
+				return null;
+		}
+		
+		// Query for entry count
+		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$filter = new entryFilter();
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		
+		if($directOnly)
+			$filter->setCategoriesIdsMatchAnd($this->getId());
+		else
+			$filter->setCategoryAncestorId($this->getId());
+		
+		if($entryIds)
+			$filter->setIdNotIn($entryIds);
+		$filter->setLimit(1);
+		$filter->attachToCriteria($baseCriteria);
+		$baseCriteria->applyFilters();
+		
+		$count = $baseCriteria->getRecordsCount();
+		
+		// Save the result within the cache		
+		if($count >= category::MAX_NUMBER_OF_ENTRIES_PER_CATEGORY) {
+			if ($cacheStore)
+				$cacheStore->set($cacheKey, true, category::EXCEEDED_ENTRIES_COUNT_CACHE_EXPIRY);
+		}
+		
+		return $count;
+	}
+	
 	/**
 	 * reset category's entriesCount by calculate it.
 	 */
 	public function reSetEntriesCount()
 	{
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
-		$filter->setLimit(1);
-		$filter->attachToCriteria($baseCriteria);
-		
-		$baseCriteria->applyFilters();
-		
-		$count = $baseCriteria->getRecordsCount();
-
+		$count = $this->countEntriesByCriteria(null);
+		if(is_null($count))
+			return;
 		$this->setEntriesCount($count);
 	}
 	
@@ -1340,26 +1439,12 @@ class category extends Basecategory implements IIndexable
 	public function decrementEntriesCount($entryId)
 	{
 		KalturaLog::debug("decrementing $entryId from " . $this->getFullName());
-		if(!isset(self::$decrementedEntryIds[$this->getId()]))
-			self::$decrementedEntryIds[$this->getId()] = array();
-		self::$decrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		$this->preDecrement($entryId);
 		
-		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
-			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
-		
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn(self::$decrementedEntryIds[$this->getId()]);
-		$filter->setLimit(1);
-		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->applyFilters();
-		
-		$count = $baseCriteria->getRecordsCount();
+		$count = $this->countEntriesByCriteria(self::$decrementedEntryIds[$this->getId()]);
+		if(!is_null($count))
+			$this->setEntriesCount($count);
 
-		$this->setEntriesCount($count);
-	
 		if($this->getParentId())
 		{
 			$parentCat = $this->getParentCategory();
@@ -1377,26 +1462,13 @@ class category extends Basecategory implements IIndexable
 	public function incrementEntriesCount($entryId)
 	{
 		KalturaLog::debug("incrementing $entryId to " . $this->getFullName());
-		if(!isset(self::$incrementedEntryIds[$this->getId()]))
-			self::$incrementedEntryIds[$this->getId()] = array();
-		self::$incrementedEntryIds[$this->getId()][$entryId] = $entryId;
+		$this->preIncrement($entryId);
 		
-		if(isset(self::$decrementedEntryIds[$this->getId()]) && isset(self::$decrementedEntryIds[$this->getId()][$entryId]))
-			unset(self::$decrementedEntryIds[$this->getId()][$entryId]);
-		
-		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$filter = new entryFilter();
-		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
-		$filter->setCategoryAncestorId($this->getId());
-		$filter->setIdNotIn(self::$incrementedEntryIds[$this->getId()]);
-		$filter->setLimit(1);
-		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->applyFilters();
-		
-		$count = $baseCriteria->getRecordsCount();
-		$count += count(self::$incrementedEntryIds[$this->getId()]);
-		
-		$this->setEntriesCount($count);
+		$count = $this->countEntriesByCriteria(self::$incrementedEntryIds[$this->getId()]);
+		if(!is_null($count)) {
+			$count += count(self::$incrementedEntryIds[$this->getId()]);
+			$this->setEntriesCount($count);
+		}
 	
 		if($this->getParentId())
 		{
@@ -1627,4 +1699,15 @@ class category extends Basecategory implements IIndexable
 		return $this->display_in_search . "P" . $this->getPartnerId();
 	}
 	
+	public function validatePrivacyContexts($privacyContexts)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+		{
+			if(count($privacyContexts) > 1)
+			{
+				throw new kCoreException("Only one privacy context allowed when Disable Category Limit feature turned on", kCoreException::DISABLE_CATEGORY_LIMIT_MULTI_PRIVACY_CONTEXT_FORBIDDEN);
+			}
+		}
+		return true;
+	}
 }

@@ -310,8 +310,11 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 			
 		$xmlPath = $folder->getLocalFilePath($file->getFileName(), $file->getId(), $fileTransferManager);
 		KalturaLog::debug('Local XML path ['.$xmlPath.']');
+		
+		$xmlContent = $this->getOriginalOrTransformIfNeeded($folder, $xmlPath);
+		
 		$xmlDoc = new KDOMDocument();
-		$res = $xmlDoc->load($xmlPath);
+		$res = $xmlDoc->loadXML($xmlContent);
 		
 		if(!$res)
 			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
@@ -349,7 +352,7 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		}
 		catch(PropelException $e)
 		{
-			if($e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
+			if($e->getCause() && $e->getCause()->getCode() == self::MYSQL_CODE_DUPLICATE_KEY) //unique constraint
 			{
 				$existingFile = DropFolderFilePeer::retrieveByDropFolderIdAndFileName($folder->getId(), $fileName);
 				if($existingFile)
@@ -470,4 +473,55 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 		return $isXml;
 	}
 	
+	private function getOriginalOrTransformIfNeeded(DropFolder $folder, $xmlPath)
+	{
+		if(!file_exists($xmlPath) || !filesize($xmlPath))
+			throw new Exception('Empty file supplied as input');
+		
+		if(!$folder->getConversionProfileId())
+		{
+			KalturaLog::debug('No conversion profile found on drop folder [' . $folder->getId() . '] assuming no xsl transformation is needed');
+			return file_get_contents($xmlPath);
+		}
+		
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($folder->getConversionProfileId());
+		
+		if(!$conversionProfile || (strlen($conversionProfile->getXsl()) == 0))
+		{
+			KalturaLog::debug('No conversion profile found Or no xsl transform found');
+			return file_get_contents($xmlPath);
+		}
+		
+		$originalXmlDoc = file_get_contents($xmlPath);
+		$origianlXml = new KDOMDocument();
+		if(!$origianlXml->loadXML($originalXmlDoc))
+		{
+			KalturaLog::debug('Could not load original xml');
+			$errorMessage = kXml::getLibXmlErrorDescription($originalXmlDoc);
+			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
+		}
+
+		libxml_clear_errors();
+		$proc = new XSLTProcessor;
+		$xsl = new KDOMDocument();
+		if(!$xsl->loadXML($conversionProfile->getXsl()))
+		{
+			KalturaLog::debug('Could not load xsl '. $conversionProfile->getXsl());
+			$errorMessage = kXml::getLibXmlErrorDescription($conversionProfile->getXsl());
+			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
+		}
+		
+		$proc->importStyleSheet($xsl);
+		libxml_clear_errors();
+		$transformedXml = $proc->transformToXML($origianlXml);
+		if(!$transformedXml)
+		{
+			KalturaLog::debug('Could not transform xml ' . $conversionProfile->getXsl());
+			$errorMessage = kXml::getLibXmlErrorDescription($conversionProfile->getXsl());
+			throw new Exception(DropFolderXmlBulkUploadPlugin::MALFORMED_XML_FILE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::MALFORMED_XML_FILE));
+		}
+		
+		return $transformedXml;	
+	}
+
 }

@@ -32,6 +32,7 @@ class IndexObjectsGenerator
 		
 		print "\tGenerating Index objects for $key\n";
 		$this->createFileHeader($fp, $key);
+		$this->generateConstants($fp, $key);
 		
 		$this->generateSimpleFunction("getObjectName", $fp, $this->searchableObjects[$key]);
 		$this->generateSimpleFunction("getObjectIndexName", $fp, $this->searchableObjects[$key]);
@@ -173,7 +174,8 @@ class IndexObjectsGenerator
 			$fieldName = $idxValueAttr["field"];
 			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
 				"get" . ucwords(preg_replace('/_(.?)/e',"strtoupper('$1')", $fieldName));
-			$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
+			if(strpos($fieldName, ".") === FALSE)
+				$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
 			
 			$index[] = new IndexableOptimization('"' . $fieldName . '"', '"' . $getter . '"');
 		}
@@ -222,6 +224,12 @@ class IndexObjectsGenerator
 		$this->printToFile($fp, "return self::\${$mapName};",2);
 		$this->printToFile($fp, "}",1);
 		$this->printToFile($fp, "");
+	}
+	
+	private function generateConstants($fp, $class) {
+		foreach($this->searchableFields[$class] as $key => $value)
+			if(($value->type == "json") || ($value->searchOnly))
+				$this->printToFile($fp, "const " . strtoupper($key) . " = \"$key\";\n" ,1);
 	}
 	
 	private function generateSimpleFunction($functionName, $fp, $object) {

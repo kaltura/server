@@ -89,6 +89,8 @@ class KalturaErrors extends APIErrors
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 	
+	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;OBJECT_ID;Max update limit was reached. Object ID \"@OBJECT_ID@\" will not updated with latest chnages";
+	
 	/**
 	 * Service Oriented Errors
 	 *
@@ -212,6 +214,8 @@ class KalturaErrors extends APIErrors
 
 	const ASSET_ID_NOT_FOUND = "ASSET_ID_NOT_FOUND;ID;Asset id \"@ID@\" not found";
 
+	const ASSET_PARAMS_ORIGIN_NOT_SUPPORTED = "LIVE_PARAMS_ORIGIN_NOT_SUPPORTED;ID,TYPE,ORIGIN;Asset params @ID@ of type @TYPE@ does not support origin @ORIGIN@";
+
 	/**
 	 * FlavorAsset Service
 	 */
@@ -294,6 +298,8 @@ class KalturaErrors extends APIErrors
 	const CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_USER_JOIN_POLICY_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set user join policy when category is set to inherit";
 
 	const CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS = "CANNOT_SET_DEFAULT_PERMISSION_LEVEL_WHEN_CATEGORY_INHERIT_MEMBERS;;Cannot set default permission level when category is set to inherit";
+	
+	const CANNOT_SET_MULTI_PRIVACY_CONTEXT = "CANNOT_SET_MULTI_PRIVACY_CONTEXT;; Cannot set multiple privacy context when Disable Category Limit feature is turned on";
 
 	/**
 	 * Batch Service
@@ -488,9 +494,12 @@ class KalturaErrors extends APIErrors
 	
 	const LIVE_STREAM_INVALID_TOKEN = "LIVE_STREAM_INVALID_TOKEN;ENTRY_ID;Invalid token supplied for live entry [@ENTRY_ID@]";
 	
-	const LIVE_STREAM_EXCEEDED_MAX_INPUTS = "LIVE_STREAM_EXCEEDED_MAX_INPUTS;ENTRY_ID;Partner exceeded max concurrent input live streams in entry[@ENTRY_ID@]";
+	const LIVE_STREAM_EXCEEDED_MAX_PASSTHRU = "LIVE_STREAM_EXCEEDED_MAX_PASSTHRU;ENTRY_ID;Partner exceeded max pass-through live streams in entry[@ENTRY_ID@]";
 	
-	const LIVE_STREAM_EXCEEDED_MAX_OUTPUTS = "LIVE_STREAM_EXCEEDED_MAX_OUTPUTS;ENTRY_ID;Partner exceeded max concurrent output live streams in entry[@ENTRY_ID@]";
+	const LIVE_STREAM_EXCEEDED_MAX_TRANSCODED = "LIVE_STREAM_EXCEEDED_MAX_TRANSCODED;ENTRY_ID;Partner exceeded max concurrent transcoded live streams in entry[@ENTRY_ID@]";
+	
+	const LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION = "LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION;ENTRY_ID;Entry exceeded max recorded live stream duration in entry[@ENTRY_ID@]";
+	
 	/*
 	 * BaseEntry Service
 	 */

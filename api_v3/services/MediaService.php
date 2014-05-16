@@ -59,7 +59,21 @@ class MediaService extends KalturaEntryService
     		$entry->conversionProfileId = $entry->conversionQuality;
 
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
-		$dbEntry->setStatus(entryStatus::NO_CONTENT);
+
+    	$entryStatus = entryStatus::NO_CONTENT;
+
+    	if ( PermissionPeer::isValidForPartner(PermissionName::FEATURE_DRAFT_ENTRY_CONV_PROF_SELECTION, $dbEntry->getPartnerId()) )
+    	{
+	    	$entryConversionProfileHasFlavors = myPartnerUtils::entryConversionProfileHasFlavors( $dbEntry->getId() );
+	    	if ( ! $entryConversionProfileHasFlavors )
+	    	{
+		    	// If the entry's conversion profile dones't contain any flavors, mark the entry as READY
+	    		$entryStatus = entryStatus::READY;
+	    	}
+    	}
+    	
+    	$dbEntry->setStatus( $entryStatus );
+
 		$dbEntry->save();
 
 		$trackEntry = new TrackEntry();
@@ -113,8 +127,13 @@ class MediaService extends KalturaEntryService
      * @param entry $dbEntry
      * @param int $conversionProfileId
      */
-    protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null)
+    protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null, $advancedOptions = null)
     {
+    	if($advancedOptions)
+    	{
+    		$dbEntry->setReplacementOptions($advancedOptions->toObject());
+    		$dbEntry->save();
+    	}
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->validateEntry($dbEntry);
@@ -716,13 +735,14 @@ class MediaService extends KalturaEntryService
 	 * @param string $entryId Media entry id to update
 	 * @param KalturaResource $resource Resource to be used to replace entry media content
 	 * @param int $conversionProfileId The conversion profile id to be used on the entry
+	 * @param KalturaEntryReplacementOptions $advancedOptions Additional update content options
 	 * @return KalturaMediaEntry The updated media entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
      * @throws KalturaErrors::INVALID_OBJECT_ID
      * @validateUser entry entryId edit
 	 */
-	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null)
+	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null, $advancedOptions = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
@@ -735,7 +755,7 @@ class MediaService extends KalturaEntryService
 	    if ($lock && !$lock->lock(self::KLOCK_MEDIA_UPDATECONTENT_GRAB_TIMEOUT , self::KLOCK_MEDIA_UPDATECONTENT_HOLD_TIMEOUT))
      	    throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
      	try{
-       		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
+       		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
        		$lock->unlock();

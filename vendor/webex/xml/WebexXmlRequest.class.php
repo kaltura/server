@@ -10,24 +10,24 @@ class WebexXmlRequest
 	 * @var WebexXmlRequestHeader
 	 */
 	protected $header;
-	
+
 	/**
 	 * @var WebexXmlRequestBody
 	 */
 	protected $body;
-	
+
 	/**
 	 * @var string
 	 */
 	protected $contentType;
-	
+
 	public function __construct(WebexXmlSecurityContext $securityContext, WebexXmlRequestBodyContent $bodyContent)
 	{
 		$this->header = new WebexXmlRequestHeader($securityContext);
 		$this->body = new WebexXmlRequestBody($bodyContent);
 		$this->contentType = $bodyContent->getContentType();
 	}
-	
+
 	public function __toString()
 	{
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -35,10 +35,10 @@ class WebexXmlRequest
 		$xml .= $this->header;
 		$xml .= $this->body;
 		$xml .= '</serv:message>';
-		
+
 		return $xml;
 	}
-	
+
 	public function getContentType()
 	{
 		return $this->contentType;

@@ -68,7 +68,7 @@ class KProcessWrapper
 		$logName = str_replace('kasync', '', strtolower($this->taskConfig->name));
 		$logDate = date('Y-m-d');
 		$logFileOut = "$logDir/$logName-$idx-$logDate.log";
-		$logFileErr = "$logDir/$logName-$logDate.err.log";
+		$logFileErr = "$logDir/$logName-$idx-$logDate.err.log";
 	
 		$taskConfigStr = base64_encode(gzcompress(serialize($this->taskConfig)));
 		
@@ -82,7 +82,7 @@ class KProcessWrapper
 		$cmdLine .= realpath(__DIR__ . '/../') . '/' . $this->taskConfig->scriptPath . ' ';
 		$cmdLine .= "$taskConfigStr ";
 		$cmdLine .= "'[" . mt_rand() . "]' ";
-		$cmdLine .= ">> $logFileOut 2> $logFileErr";
+		$cmdLine .= ">> $logFileOut 2>> $logFileErr";
 		
 		
 		$descriptorspec = array(); // stdin is a pipe that the child will read from

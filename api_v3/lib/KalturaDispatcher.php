@@ -130,7 +130,7 @@ class KalturaDispatcher
 		kEventsManager::flushEvents();
 		
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
-		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds, memory: ".memory_get_peak_usage(true));		
+		KalturaLog::debug("Dispatch took - " . (microtime(true) - $start) . " seconds, memory: ".memory_get_peak_usage(true));		
 				
 		
 		return $res;

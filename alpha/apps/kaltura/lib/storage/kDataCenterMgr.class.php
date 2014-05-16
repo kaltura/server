@@ -197,22 +197,16 @@ class kDataCenterMgr
 	/*
 	 * will handle the serving of the file assuming a remote DC (other than the current) requested it
 	 */
-	public static function serveFileToRemoteDataCenter ( $file_sync_id , $file_hash, $file_name )
+	public static function serveFileToRemoteDataCenter ( $file_sync , $file_hash, $file_name )
 	{
+		$file_sync_id = $file_sync->getId();
+		
 		KalturaLog::log("File sync id [$file_sync_id], file_hash [$file_hash], file_name [$file_name]");
 		// TODO - verify security
 		
 		$current_dc = self::getCurrentDc();
 		$current_dc_id = $current_dc["id"];
-		// retrieve the object
-		$file_sync = FileSyncPeer::retrieveByPk ( $file_sync_id );
-		if ( ! $file_sync )
-		{
-			$error = "DC[$current_dc_id]: Cannot find FileSync with id [$file_sync_id]";
-			KalturaLog::err($error);
-			throw new Exception ($error);
-		}
-		
+
 		if ( $file_sync->getDc() != $current_dc_id )
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] does not belong to this DC";

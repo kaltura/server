@@ -279,6 +279,15 @@ function changeEmptyStringsTo0(){
 		}
 	});
 
+	$("#fieldset-thumbnailConfiguration input").each(function(inx, value){
+		var $input = $(value);
+		if( $input.attr('type') == 'text') {
+				if ($input.val() == '') {
+						$input.val("0");
+			}
+		}
+	});
+	
 	$("#extended_free_trail").each(function(inx, value){
 		var $input = $(value);
 
@@ -301,54 +310,59 @@ function changeEmptyStringsTo0(){
 
 function block(partnerId)
 {
-	var ok = confirm('<?php echo $this->translate('are you sure block partner?'); ?>');
-	if (ok)
-	{
-		changeStatus(
+	changeStatusPopup(
+			'<?php echo $this->translate('are you sure block partner?'); ?>',
 			partnerId,
 			<?php echo Kaltura_Client_Enum_PartnerStatus::BLOCKED; ?>,
 			function() {
 				alert('<?php echo $this->translate('partner was blocked');?>');
 			}
 		);
-	}
 }
 
 function unblock(partnerId)
 {
-	var ok = confirm('<?php echo $this->translate('are you sure unblock partner?'); ?>');
-	if (ok)
-	{
-		changeStatus(
+	changeStatusPopup(
+			'<?php echo $this->translate('are you sure unblock partner?'); ?>',
 			partnerId,
 			<?php echo Kaltura_Client_Enum_PartnerStatus::ACTIVE; ?>,
 			function() {
 				alert('<?php echo $this->translate('partner was unblocked');?>');
 			}
 		);
-	}
 }
 
 function remove(partnerId)
 {
-	var ok = confirm('<?php echo $this->translate('are you sure remove partner?'); ?>');
-	if (ok)
-	{
-		changeStatus(
+	changeStatusPopup(
+			'<?php echo $this->translate('are you sure remove partner?'); ?>',
 			partnerId,
 			<?php echo Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK; ?>,
 			function() {
 				alert('<?php echo $this->translate('partner was removed');?>');
 			}
 		);
+}
+
+function changeStatusPopup( userPrompt, partnerId, status, successCallback )
+{
+	var reason = prompt( userPrompt, "" );
+	if (reason)
+	{
+		changeStatus( partnerId, status, reason, successCallback );
+	}
+	else
+	{
+		alert('<?php echo $this->translate('partner operation aborted'); ?>');
 	}
 }
 
-function changeStatus(partnerId, status, callback)
+function changeStatus(partnerId, status, reason, callback)
 {
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'update-status', 'partner_id' => 'PARTNERID', 'status' => 'STATUS')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'update-status', 'partner_id' => 'PARTNERID', 'status' => 'STATUS', 'reason' => 'REASON')); ?>';
 	url = url.replace('STATUS', status);
 	url = url.replace('PARTNERID', partnerId);
+	url = url.replace('REASON', encodeURI(reason));
 	jQuery.ajax({
 		url: url,
 		dataType: 'json',

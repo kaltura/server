@@ -39,5 +39,17 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate
 	public function setUserParameters(array $v)								{return $this->putInCustomData(self::CUSTOM_DATA_USER_PARAMETERS, $v);}
 	public function setManualDispatchEnabled($v)							{return $this->putInCustomData(self::CUSTOM_DATA_MANUAL_DISPATCH_ENABLED, $v);}
 	public function setAutomaticDispatchEnabled($v)							{return $this->putInCustomData(self::CUSTOM_DATA_AUTOMATIC_DISPATCH_ENABLED, $v);}
+
+	public function getRequiredCopyTemplatePermissions ()
+	{
+		return $this->getFromCustomData('requiredCopyTemplatePermissions', null, array());
+	}
 	
+	public function setRequiredCopyTemplatePermissions ($v)
+	{
+		if(!is_array($v))
+			$v = array_map('trim', explode(',', $v));
+			
+		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
+	}
 } // EventNotificationTemplate

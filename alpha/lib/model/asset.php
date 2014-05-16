@@ -85,7 +85,10 @@ class asset extends Baseasset implements ISyncableFile
 	
 	const FILE_SYNC_ASSET_SUB_TYPE_ASSET = 1;
 	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
-	
+	const FILE_SYNC_ASSET_SUB_TYPE_ISM = 3;
+	const FILE_SYNC_ASSET_SUB_TYPE_ISMC = 4;
+	const FILE_SYNC_ASSET_SUB_TYPE_SMIL = 5;
+
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
@@ -124,16 +127,31 @@ class asset extends Baseasset implements ISyncableFile
 		
 		$assetSyncKey = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$convertLogSyncKey = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-		
+		$ismSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+		$ismcSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+		$smilSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+
 		$newAssetSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$newConvertLogSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-		
+		$newIsmSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+		$newIsmcSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+		$newSmilSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+
 		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
 			kFileSyncUtils::softCopy($assetSyncKey, $newAssetSyncKey);
 
 		if(kFileSyncUtils::fileSync_exists($convertLogSyncKey))
 			kFileSyncUtils::softCopy($convertLogSyncKey, $newConvertLogSyncKey);
 		
+		if(kFileSyncUtils::fileSync_exists($ismSyncKey))
+			kFileSyncUtils::softCopy($ismSyncKey, $newIsmSyncKey);
+			
+		if(kFileSyncUtils::fileSync_exists($ismcSyncKey))
+			kFileSyncUtils::softCopy($ismcSyncKey, $newIsmcSyncKey);
+
+		if(kFileSyncUtils::fileSync_exists($smilSyncKey))
+			kFileSyncUtils::softCopy($smilSyncKey, $newSmilSyncKey);
+			
 		kEventsManager::raiseEvent(new kObjectAddedEvent($newFlavorAsset));
 		
 		return $newFlavorAsset;
@@ -184,6 +202,23 @@ class asset extends Baseasset implements ISyncableFile
 	}
 
 	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseAsset#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		$status = $this->getStatus();
+
+		$ret = parent::postInsert( $con );
+		
+		if ( $status == flavorAsset::ASSET_STATUS_READY )
+		{
+			$this->onAssetContentModified();
+		}
+		
+		return $ret;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see lib/model/om/BaseflavorAsset#postUpdate()
 	 */
 	public function postUpdate(PropelPDO $con = null)
@@ -191,6 +226,18 @@ class asset extends Baseasset implements ISyncableFile
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
+		$statusChangedToReady = false;
+		if ( $this->isColumnModified(assetPeer::STATUS) && ($this->getStatus() == self::FLAVOR_ASSET_STATUS_READY) )
+		{
+			$statusChangedToReady = true;
+		}
+		
+		$versionModified = false;
+		if ( $this->isColumnModified(assetPeer::VERSION ) )
+		{
+			$versionModified = true;
+		}
+
 		$objectDeleted = false;
 		if(
 			($this->isColumnModified(assetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
@@ -204,12 +251,32 @@ class asset extends Baseasset implements ISyncableFile
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
+		if ( $statusChangedToReady || $versionModified || $objectDeleted )
+		{
+			$this->onAssetContentModified();
+		}
+		
 		return $ret;
 	}
-	
+
+	/**
+	 * Notify the associated entry that an asset was modified
+	 */	
+	protected function onAssetContentModified()
+	{
+		$entry = $this->getentry();
+		if($entry)
+		{
+			$entry->onAssetContentModified();
+			$entry->save();
+		}
+	}
+		
 	public function incrementVersion()
 	{
-		$this->setVersion(kDataCenterMgr::incrementVersion($this->getVersion()));
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		
+		$this->setVersion($newVersion);
 	}
 	
 	public function addTags(array $newTags)
@@ -239,6 +306,9 @@ class asset extends Baseasset implements ISyncableFile
 		$valid_sub_types = array(
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET,
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG,
+			self::FILE_SYNC_ASSET_SUB_TYPE_ISM,
+			self::FILE_SYNC_ASSET_SUB_TYPE_ISMC,
+			self::FILE_SYNC_ASSET_SUB_TYPE_SMIL,
 		);
 		if (!in_array($sub_type, $valid_sub_types))
 			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
@@ -264,6 +334,9 @@ class asset extends Baseasset implements ISyncableFile
 			switch ($sub_type)
 			{
 				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL:
 					$key->version = $this->getVersion();
 					break;
 				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
@@ -301,6 +374,15 @@ class asset extends Baseasset implements ISyncableFile
 				
 			case self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
 				return "$fileName.conv.log";
+				
+			case self::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+				return "$fileName.ism";
+				
+			case self::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+				return "$fileName.ismc";
+
+			case self::FILE_SYNC_ASSET_SUB_TYPE_SMIL:
+				return "$fileName.smil";
 		}
 		
 		return null;
@@ -405,7 +487,7 @@ class asset extends Baseasset implements ISyncableFile
 		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $this->getEntryId());
 		$urlManager->setFileExtension($this->getFileExt());
 		
-		$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		$url = rtrim($storage->getDeliveryBaseUrlByProtocol(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 		return $url;
 	}
 	
@@ -575,8 +657,8 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function incLogFileVersion()
 	{
-		$version = kDataCenterMgr::incrementVersion($this->getLogFileVersion());
-		$this->putInCustomData("logFileVersion", $version);
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getLogFileVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
+		$this->putInCustomData("logFileVersion", $newVersion);
 	}
 
 	public function getCacheInvalidationKeys()

@@ -5,8 +5,12 @@
 */
 class entryIndex extends BaseIndexObject
 {
-	const DYNAMIC_ATTRIBUTES = 'dynamic_attributes';
-		
+	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
+
+	const PLUGINS_DATA = "plugins_data";
+
+	const SEARCH_TEXT = "search_text";
+
 	public static function getObjectName()
 	{
 		return 'entry';
@@ -367,6 +371,7 @@ class entryIndex extends BaseIndexObject
 		return array(
 			array("P%sST%s","entry.PARTNER_ID","entry.STATUS"),
 			array("%s","entry.ID"),
+			array("isLive%s","dynamic_attributes.isLive"),
 		);
 	}
 
@@ -375,6 +380,7 @@ class entryIndex extends BaseIndexObject
 		return array(
 			array("P%sST%s","getPartnerId","getStatus"),
 			array("%s","getId"),
+			array("isLive%s","getDynamicAttributes.isLive"),
 		);
 	}
 

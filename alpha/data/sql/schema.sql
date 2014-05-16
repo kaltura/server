@@ -660,6 +660,7 @@ CREATE TABLE `batch_job_lock`
 	`batch_job_id` INTEGER,
 	`custom_data` TEXT,
 	`batch_version` INTEGER,
+	`root_job_id` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `status_job_type_index`(`status`, `job_type`),
 	KEY `entry_id_index_id`(`entry_id`, `id`),
@@ -672,6 +673,7 @@ CREATE TABLE `batch_job_lock`
 	KEY `execution_attempts_index`(`job_type`, `execution_attempts`),
 	KEY `expiration_index`(`job_type`, `expiration`),
 	KEY `lock_index`(`batch_index`, `scheduler_id`, `worker_id`),
+	KEY `root_job_id_index`(`root_job_id`),
 	INDEX `batch_job_lock_FI_1` (`batch_job_id`),
 	CONSTRAINT `batch_job_lock_FK_1`
 		FOREIGN KEY (`batch_job_id`)
@@ -710,8 +712,10 @@ CREATE TABLE `batch_job_lock_suspend`
 	`batch_job_id` INTEGER,
 	`custom_data` TEXT,
 	`batch_version` INTEGER,
+	`root_job_id` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
+	KEY `root_job_id_index`(`root_job_id`),
 	INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
 	CONSTRAINT `batch_job_lock_suspend_FK_1`
 		FOREIGN KEY (`batch_job_id`)
@@ -1743,10 +1747,12 @@ CREATE TABLE `category_entry`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	`status` INTEGER default 2,
+	`privacy_context` VARCHAR(255),
 	PRIMARY KEY (`id`),
 	KEY `partner_id_category_id_index`(`partner_id`, `category_id`),
 	KEY `partner_id_entry_id_index`(`partner_id`, `entry_id`),
-	KEY `category_entry_updated_at`(`updated_at`)
+	KEY `category_entry_updated_at`(`updated_at`),
+	KEY `partner_id_privacy_context_index`(`partner_id`, `privacy_context`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------

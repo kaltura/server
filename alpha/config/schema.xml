@@ -643,6 +643,7 @@
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="integer" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>
@@ -693,6 +694,9 @@
 			<index-column name="scheduler_id" />
 			<index-column name="worker_id" />
 		</index>
+		<index name="root_job_id_index">
+			<index-column name="root_job_id" />
+		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="batch_job_lock_suspend" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="false" />
@@ -718,6 +722,7 @@
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_job_id" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="batch_version" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="root_job_id" type="integer" />
         <foreign-key foreignTable="batch_job_sep">
             <reference local="batch_job_id" foreign="id"/>
         </foreign-key>
@@ -726,6 +731,9 @@
 			<index-column name="partner_id" />
 			<index-column name="job_type" />
 			<index-column name="job_sub_type" />
+		</index>
+		<index name="root_job_id_index">
+			<index-column name="root_job_id" />
 		</index>
 	</table>
      <table skipSql="false" abstract="false" name="partner_load" raiseEvents="false">
@@ -1547,6 +1555,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" default="2"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="privacy_context" type="varchar" size="255" />
 		<index name="partner_id_category_id_index">
 			<index-column name="partner_id" />
 			<index-column name="category_id" />
@@ -1558,6 +1567,10 @@
 		<index name="category_entry_updated_at">
 			<index-column name="updated_at" />
 		</index>
+		<index name="partner_id_privacy_context_index">
+			<index-column name="partner_id" />
+			<index-column name="privacy_context" />
+		</index>	
 	</table>	
 	<table skipSql="false" abstract="false" name="category_kuser" phpName="categoryKuser" >
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />

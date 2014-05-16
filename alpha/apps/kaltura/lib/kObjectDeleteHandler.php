@@ -33,6 +33,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof kuser)
 			return true;
+
+		if($object instanceof FileSync)
+			return true;
 			
 		return false;
 	}
@@ -68,6 +71,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			
 		if($object instanceof kuser)
 			$this->kuserDelete($object);
+
+		if($object instanceof FileSync)
+			$this->fileSyncDelete($object, $raisedJob);
 			
 		return true;
 	}
@@ -219,4 +225,19 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	{
 		$this->syncableDeleted($conversionProfile->getId(), FileSyncObjectType::CONVERSION_PROFILE);
 	}
+
+	/**
+	 * @param FileSync $fileSync
+	 */
+	protected function fileSyncDelete(FileSync $fileSync, BatchJob $raisedJob = null)
+	{
+		$partnerId = $fileSync->getPartnerId();
+		$purgePermission = PermissionPeer::isValidForPartner('PURGE_FILES_ON_DELETE', $partnerId);
+		if ($purgePermission)
+		{
+			$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+			kJobsManager::addDeleteFileJob($raisedJob, null, $partnerId, $syncKey, $fileSync->getFullPath(), $fileSync->getDc());
+		}
+	}
+
 }

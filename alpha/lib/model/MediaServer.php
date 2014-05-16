@@ -21,9 +21,11 @@ class MediaServer extends BaseMediaServer {
 	const DEFAULT_GPUID = -1;
 	
 	const WEB_SERVICE_LIVE = 'live';
+	const WEB_SERVICE_CUE_POINTS = 'cuePoints';
 	
 	static protected $webServices = array(
 		self::WEB_SERVICE_LIVE => 'KalturaMediaServerLiveService',
+		self::WEB_SERVICE_CUE_POINTS => 'KalturaMediaServerCuePointsService',
 	);
 	
 	
@@ -69,7 +71,7 @@ class MediaServer extends BaseMediaServer {
 		return MediaServer::DEFAULT_GPUID;
 	}
 	
-	public function getManifestUrl($protocol = 'http')
+	public function getManifestUrl($protocol = 'http', $partnerMediaServerConfigurations = null)
 	{
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
@@ -81,6 +83,9 @@ class MediaServer extends BaseMediaServer {
 		if(kConf::hasMap('media_servers'))
 		{
 			$mediaServers = kConf::getMap('media_servers');
+			if ($partnerMediaServerConfigurations)
+				$mediaServers = array_merge($mediaServers, $partnerMediaServerConfigurations);
+			
 			if(isset($mediaServers[$portField]))
 				$port = $mediaServers[$portField];
 				
@@ -91,6 +96,20 @@ class MediaServer extends BaseMediaServer {
 				$domain = $mediaServers['domain'];
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
+				
+			if (isset ($mediaServers['dc-'.$this->getDc()]))
+		    {
+		    	$mediaServer = $mediaServers['dc-'.$this->getDc()];
+		    
+		    	if(isset($mediaServer[$portField]))
+		     		$port = $mediaServer[$portField];
+		    
+		    	if(isset($mediaServer['application']))
+		     		$app = $mediaServer['application'];
+		     
+		    	if(isset($mediaServer['domain']))
+		     		$domain = $mediaServer['domain'];
+		    }
 				
 			if(isset($mediaServers[$this->getHostname()]))
 			{
@@ -107,7 +126,11 @@ class MediaServer extends BaseMediaServer {
 			}
 		}
 		
-		return "$protocol://$domain:$port/$app/p/";
+		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
+		$url = "$protocol://$domain:$port/$app/";
+		$url = str_replace("{hostName}", $hostname, $url);
+		return $url;
+		
 	}
 	
 	/**

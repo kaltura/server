@@ -11,6 +11,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const GROUP_REMOTE_STORAGE = 'GROUP_REMOTE_STORAGE';
     const GROUP_NOTIFICATION_CONFIG = 'GROUP_NOTIFICATION_CONFIG';
     const GROUP_ACCESS_CONTROL = 'GROUP_ACCESS_CONTROL';
+    const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
    	
     protected $limitSubForms = array();
     
@@ -38,6 +39,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_REMOTE_STORAGE] = array();
 		$permissionNames[self::GROUP_NOTIFICATION_CONFIG] = array();
 		$permissionNames[self::GROUP_ACCESS_CONTROL] = array();
+		$permissionNames[self::THUMBNAIL_CONFIGURATION] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -195,15 +197,18 @@ class Form_PartnerConfiguration extends Infra_Form
 		foreach($this->playerDeliveryTypes as $playerDeliveryType)
 		{
 			/* @var $playerDeliveryType Kaltura_Client_Type_PlayerDeliveryType */
+			$systemDefault = ($playerDeliveryType->enabledByDefault) ? 'Enabled' : 'Disabled';
+			$description = ($playerDeliveryType->id) ? "(<b>$systemDefault</b> as system default)" : '';
 			$this->addElement('checkbox', 'delivery_type_' . $playerDeliveryType->id, array(
 				'label'		=> "Enable $playerDeliveryType->label",
-				'data-checked' => true,
+				'description' => $description ,
+				'data-checked' => $playerDeliveryType->enabledByDefault,
 				'disabled'	=> true,
-				'checked'	=> true,
+				'checked'	=> $playerDeliveryType->enabledByDefault,
 				'class'		=> 'delivery_type',
-				'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+				'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('Description', array('escape' => false)), array('HtmlTag',  array('tag' => 'dt')))
 			));
-		
+
 			$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][$playerDeliveryType->label] = 'delivery_type_' . $playerDeliveryType->id;
 		}
 		
@@ -296,6 +301,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Parent Account Id:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement ('text','reference_id', array(
+			'label'			=> 'Reference Id:',
+			'filters'		=> array('StringTrim'),
+		));
 //--------------------------- Service Packages ---------------------------
 		$this->addElement('select', 'partner_package', array(
 			'label'			=> 'Service Edition Type:',
@@ -309,7 +319,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('select', 'vertical_clasiffication', array(
-			'label'			=> 'Vertical Clasiffication:',
+			'label'			=> 'Vertical Classification:',
 			'filters'		=> array('StringTrim'),
 		));
 		
@@ -330,6 +340,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 //--------------------------- New Account Options ---------------------------
 												
+		$this->addElement('button', 'monitor_usage_history', array(
+			'label'	  => 'View History',
+		));
+
 		$this->addElement('checkbox', 'extended_free_trail', array(
 			'label'	  => 'Extended Free Trial',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -340,11 +354,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('text', 'extended_free_trail_expiry_reason', array(
-			'label'		=> 'Free Trial Extension Expiry Reason:',
-		));
-		
-		$this->addElement('button', 'monitor_usage_history', array(
-			'label'	  => 'View History',
+			'label'		=> 'Free Trial Extension Reason:',
 		));
 		
 		
@@ -438,7 +448,30 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		//adding display group to all features
 		
+		$this->addElement('checkbox', 'checkbox_audio_thumb_entry_id', array(
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
 		
+		$this->addElement('text', 'audio_thumb_entry_id', array(
+				'label'   => 'Image Entry ID For Audio Entry Thumbnails:',
+				'filters'             => array('StringTrim'),
+		));
+
+		$this->addElement('checkbox', 'checkbox_live_thumb_entry_id', array(
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
+		
+		$this->addElement('text', 'live_thumb_entry_id', array(
+				'label'   => 'Image Entry ID For Live Entry Thumbnails:',
+				'filters'             => array('StringTrim'),
+		));
+		
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['checkbox audio thumb entry id'] = 'checkbox_audio_thumb_entry_id';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Audio Thumbnail Entry Id:'] = 'audio_thumb_entry_id';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['checkbox live  thumb entry id'] = 'checkbox_live_thumb_entry_id';
+		$permissionNames[self::THUMBNAIL_CONFIGURATION]['Live Thumbnail Entry Id:'] = 'live_thumb_entry_id';
+		
+		$this->addDisplayGroup(array('checkbox_audio_thumb_entry_id','audio_thumb_entry_id','checkbox_live_thumb_entry_id','live_thumb_entry_id','crossLine'),'thumbnailConfiguration',array('legend' => 'Thumbnail Configuration:'));
 		$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
 			
 		//removing decorators from display groups
@@ -534,6 +567,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$configureAccountsGroup = array('groupAssociation'); // EAGLE PRD group 3
 		$configureAccountPackagesService = array('accountPackagesService'); // EAGLE PRD group 4
 		$configureAccountsOptionsMonitorUsage = array('accountOptionsMonitorUsage'); // EAGLE PRD group 5
+		$configureAccountsOptionsMonitorView = array('accountOptionsMonitorView');
 		$configureAccountsOptions = array('accountPackages','accountOptions','includedUsage', 'includedUsageSecondPart', 'enableDisableFeatures'); // EAGLE PRD group 6
 		$configureKmcUsers = array('configureKmcUsers');
 		
@@ -560,6 +594,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-usage'))){
 			$this->setPermissionGroupElementsToDisabled($configureAccountsOptionsMonitorUsage);
 		}
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-view'))){
+			$this->setPermissionGroupElementsToDisabled($configureAccountsOptionsMonitorView);
+		}
 		
 	}
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -579,21 +616,25 @@ class Form_PartnerConfiguration extends Infra_Form
 				if (isset($this->limitSubForms[$limit->type]))
 				{
 					$subFormObject = $this->limitSubForms[$limit->type];
-					$subFormObject->populateFromObject($this, $limit, false);
+					/* @var $subFormObject Form_PartnerConfigurationLimitSubForm */
+					$subFormObject->populateFromObject($this, $object, $limit, false);
 				}
 			}
 		}
 		
         $element = $this->getElement('use_default_streamers');
-        $element->setAttrib('checked', is_null($object->disabledDeliveryTypes) || !count($object->disabledDeliveryTypes));
-		if(!is_null($object->disabledDeliveryTypes))
+        $element->setAttrib('checked', is_null($object->customDeliveryTypes) || !count($object->customDeliveryTypes));
+		if(!is_null($object->customDeliveryTypes))
 		{
-			foreach($object->disabledDeliveryTypes as $disabledDeliveryType)
+			foreach($object->customDeliveryTypes as $customDeliveryType)
 			{
-				/* @var $disabledDeliveryType Kaltura_Client_Type_String */
-		        $element = $this->getElement('delivery_type_' . $disabledDeliveryType->value);
-		        $element->setAttrib('data-checked', false);
-        		KalturaLog::debug("delivery_type_{$disabledDeliveryType->value} checked [false]");
+				/* @var $customDeliveryType Kaltura_Client_Type_KeyBooleanValue */
+		        $element = $this->getElement('delivery_type_' . $customDeliveryType->key);
+				if ($customDeliveryType->value)
+					$element->setAttrib('data-checked', true);
+				else
+			        $element->setAttrib('data-checked', false);
+        		KalturaLog::debug("delivery_type_{$customDeliveryType->key} was set to [".$customDeliveryType->value."]");
 			}
 		}
 		
@@ -604,7 +645,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			KalturaLog::debug("Set Permission: "  . $permission->name . " status: " . $permission->status);
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
-	
+		
 		// partner is set to free trail package
 		if(intval($object->partnerPackage) == PartnerController::PARTNER_PACKAGE_FREE)
 		{
@@ -681,21 +722,29 @@ class Form_PartnerConfiguration extends Infra_Form
 			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
 			{
 				$limitType = $subForm->getName();
-				$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
-				$systemPartnerConfiguration->limits[] = $limit;
+				if(isset($properties[$limitType]))
+				{
+					$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
+					$systemPartnerConfiguration->limits[] = $limit;
+				}
 			}
 		}
 
-		$systemPartnerConfiguration->disabledDeliveryTypes = array();
+		$systemPartnerConfiguration->customDeliveryTypes = array();
 		if(!isset($properties['use_default_streamers']) || !$properties['use_default_streamers'])
 		{
 			foreach($this->playerDeliveryTypes as $playerDeliveryType)
 			{
-				if(!isset($properties["delivery_type_{$playerDeliveryType->id}"]) || !$properties["delivery_type_{$playerDeliveryType->id}"])
+				/** @var Kaltura_Client_Type_PlayerDeliveryType $playerDeliveryType */
+				$deliveryEnabled = isset($properties["delivery_type_{$playerDeliveryType->id}"]) && $properties["delivery_type_{$playerDeliveryType->id}"];
+
+				// save custom delivery type only if it's different than system's default
+				if ($deliveryEnabled != $playerDeliveryType->enabledByDefault)
 				{
-					$disabledDeliveryType = new Kaltura_Client_Type_String();
-					$disabledDeliveryType->value = $playerDeliveryType->id;
-					$systemPartnerConfiguration->disabledDeliveryTypes[] = $disabledDeliveryType;
+					$customDeliveryType = new Kaltura_Client_Type_KeyBooleanValue();
+					$customDeliveryType->key = $playerDeliveryType->id;
+					$customDeliveryType->value = $deliveryEnabled;
+					$systemPartnerConfiguration->customDeliveryTypes[] = $customDeliveryType;
 				}
 			}
 		}
@@ -717,7 +766,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		$monthlyStorageAndBandwidthSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH, 'Streaming + Storage (GB):');
 		$this->addLimitSubForm($monthlyStorageAndBandwidthSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH);
 		
-		
 		$adminLoginUsersSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, 'Number of administrative (KMC) users:');
 		$this->addLimitSubForm($adminLoginUsersSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS);
 		
@@ -736,10 +784,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		$accessControlsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS, 'Maximum access control profiles:', false);
 		$this->addLimitSubForm($accessControlsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS);
 		
-		$liveStreamInputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS, 'Maximum concurrent live stream inputs:', false);
+		$liveStreamInputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS, 'Concurrent Live passthrough streams:', false);
+		$liveStreamInputsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_KALTURA_LIVE_STREAM);
 		$this->addLimitSubForm($liveStreamInputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS);
 		
-		$liveStreamOutputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS, 'Maximum concurrent live stream conversions:', false);
+		$liveStreamOutputsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS, 'Concurrent Live-Plus streams purchased:', false);
+		$liveStreamOutputsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE);
 		$this->addLimitSubForm($liveStreamOutputsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS);
 				
 	}
@@ -751,7 +801,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		//adding display groups
 		
 		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
-		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
+		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','reference_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		$this->addDisplayGroup(array_merge(array('checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_rtmp_url', 'rtmp_url', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_delivery_restrictions', 'delivery_restrictions', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
@@ -768,7 +818,8 @@ class Form_PartnerConfiguration extends Infra_Form
 									 'passwordSecurity', array('legend' => 'Password Security'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
-		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason', 'monitor_usage_history'), 'accountOptionsMonitorUsage', array('legend' => 'New Account Options'));
+		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
+		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason'), 'accountOptionsMonitorUsage');
 		$this->addDisplayGroup(array('is_first_login','crossLine'), 'accountOptions');
 				
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',

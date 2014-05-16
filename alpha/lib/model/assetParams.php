@@ -27,6 +27,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_MPEGTS = "mpegts";
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	const CONTAINER_FORMAT_WAV = "wav";
+	const CONTAINER_FORMAT_HLS = "hls";
 	const CONTAINER_FORMAT_COPY = "copy";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
@@ -48,7 +49,10 @@ class assetParams extends BaseassetParams
 	const TAG_SLWEB = "slweb";
 	const TAG_APPLEMBR = "applembr";
 	const TAG_THUMBSOURCE = "thumbsource";
-	
+	const TAG_INGEST = "ingest";
+	const TAG_ISM_MANIFEST = "ism_manifest";
+	const TAG_SMIL_MANIFEST = "smil_manifest";
+
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	
 	const SYSTEM_DEFAULT = 1; 
@@ -163,7 +167,7 @@ class assetParams extends BaseassetParams
 		if(is_array($requiredPermissions))
 			return $requiredPermissions;
 			
-		return array($requiredPermissions);
+		return array_map('trim', explode(',', $requiredPermissions));
 	}
 	
 	public function setSourceRemoteStorageProfileId($sourceRemoteStorageProfileId)

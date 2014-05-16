@@ -387,6 +387,7 @@ abstract class ClientGeneratorFromPhp
 		
 		if ($typeReflector->getType() != 'KalturaObject')
 			$this->loadChildTypes($typeReflector);
+
 	}
 	
 	protected function getTypesClassMapPath()
@@ -572,6 +573,7 @@ abstract class ClientGeneratorFromPhp
 				else
 					$includeList[$service][$action] = true;
 			}
+			
 		}
 		else if ($exclude !== null)
 		{

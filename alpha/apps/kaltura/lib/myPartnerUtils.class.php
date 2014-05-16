@@ -277,7 +277,12 @@ class myPartnerUtils
 	public static function shouldNotify ( $partner_id )
 	{
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner ) return array ( false , null );
+		
+		if ( !$partner ) 
+			return array ( false , null );
+		if( !$partner->getNotificationUrl() ) 
+			return array ( false , null );
+		
 		return array ( $partner->getNotify() , $partner->getNotificationsConfig() ) ;
 	}
 
@@ -479,6 +484,64 @@ class myPartnerUtils
 		return myConversionProfileUtils::getConversionProfile ( $partner_id , $conversion_profile_quality  );
 	}	
 	
+	/**
+	 * Check if the entry has any flavor related to it
+	 * <br>NOTE: V1 conversion-profile / flavor-params are not supported
+	 * @param entry $entry_id
+	 * @return bool|null true = the entry has flavors; false the entry does not have flavors;
+	 *                   null = Undetermined (e.g. V1 conversion profile / flavor params)
+	 */
+	public static function entryConversionProfileHasFlavors( $entry_id  )
+	{
+		$result = null;
+
+		$entry = entryPeer::retrieveByPK( $entry_id );
+		if ( $entry )
+		{
+			// Try to get the entrt's conversion profile id
+			$conversionProfileId = $entry->getConversionProfileId();
+
+			// Doesn't exist? ==> Try to get conversion quality
+			if ( is_null( $conversionProfileId ) )
+			{
+				// conversion quality is an alias for conersion_profile_type ('low' , 'med' , 'hi' , 'hd' ... )
+				$conversionProfileId = $entry->getConversionQuality();
+			}
+
+			// Doesn't exist? ==> Try to get default (partner level) conversion profile id
+			if ( is_null( $conversionProfileId ) )
+			{
+				$partner = $entry->getPartner();
+				if ( $partner )
+				{
+					// search for the default one on the partner
+					$conversionProfileId = $partner->getDefaultConversionProfileId();
+				}
+			}
+
+			// Reach a conslusion
+			if ( ! is_null( $conversionProfileId ) )
+			{
+				$conversionProfile = conversionProfile2Peer::retrieveByPk( $conversionProfileId );
+
+				if ( $conversionProfile )
+				{
+					$flavorParams = $conversionProfile->getflavorParamsConversionProfiles();
+
+					if ( ! empty( $flavorParams ) )
+					{
+						$result = true;
+					}
+					else
+					{
+						$result = false;
+					}
+				}
+			}
+		}
+
+		return $result;		
+	}
 	
 	/**
 	 * return the ConversionProfile for this entry is specified on the entry or for the partner
@@ -1320,7 +1383,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $conversionProfileType = null)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $checkPermissions = false)
  	{
 		$copiedList = array();
 		
@@ -1329,15 +1392,26 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->add(conversionProfile2Peer::PARTNER_ID, $fromPartner->getId());
  		
- 		if(!is_null($conversionProfileType))
- 			$c->add(conversionProfile2Peer::TYPE, $conversionProfileType);
- 		
  		$conversionProfiles = conversionProfile2Peer::doSelect($c);
  		foreach($conversionProfiles as $conversionProfile)
  		{
+ 			/* @var $conversionProfile conversionProfile2 */
+ 			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
+ 				continue;
+ 			
+ 			if (!self::isPartnerPermittedForCopy ($toPartner, $conversionProfile->getRequiredCopyTemplatePermissions()))
+ 				continue;
+ 				
  			$newConversionProfile = $conversionProfile->copy();
  			$newConversionProfile->setPartnerId($toPartner->getId());
- 			$newConversionProfile->save();
+ 			try {
+ 				$newConversionProfile->save();
+ 			}
+ 			catch (Exception $e)
+ 			{
+ 				KalturaLog::info("Exception occured, conversion profile was not copied. Message: [" . $e->getMessage() . "]");
+ 				continue;
+ 			}
  			
  			KalturaLog::log("Copied [".$conversionProfile->getId()."], new id is [".$newConversionProfile->getId()."]");
 			$copiedList[$conversionProfile->getId()] = $newConversionProfile->getId();
@@ -1510,5 +1584,25 @@ class myPartnerUtils
 			}
 		}
 		return $ret;
+	}
+	
+	/**
+	 * 
+	 * @param Partner $toPartner
+	 * @param array $permissionArray
+	 * 
+	 * @return bool
+	 */
+	public static function isPartnerPermittedForCopy (Partner $toPartner, array $permissionArray)
+	{
+		foreach ($permissionArray as $permission)
+		{
+			if (!PermissionPeer::isValidForPartner($permission, $toPartner->getId()))
+			{
+				return false;
+			}
+			
+		}	
+		return true;
 	}
 }

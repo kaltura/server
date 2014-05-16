@@ -24,6 +24,7 @@ class Form_Login extends Infra_Form
 		$this->addElement('password', 'password', array(
 			'label'	  => 'Password:',
 			'required'   => true,
+			'autocomplete' => 'off',
 			'filters'	=> array('StringTrim'),
 			'validators' => array(),
 			'decorators' => array(

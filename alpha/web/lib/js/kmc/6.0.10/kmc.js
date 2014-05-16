@@ -1,6 +1,6 @@
-/*! KMC - v6.0.10 - 2014-01-16
+/*! KMC - v6.0.10 - 2014-05-07
 * https://github.com/kaltura/KMC_V2
-* Copyright (c) 2014 Ran Yefet; Licensed GNU */
+* Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
  * angular-translate - v1.1.1 - 2013-11-24
  * http://github.com/PascalPrecht/angular-translate
@@ -3024,7 +3024,8 @@ if ( window.XDomainRequest ) {
   ZeroClipboard.prototype.reposition = function() {
     if (!currentElement) return false;
     var pos = _getDOMObjectPosition(currentElement);
-    this.htmlBridge.style.top = pos.top + "px";
+    var topOffset = $(currentElement).hasClass("pullright") ? $(".form-horizontal").scrollTop() : 0;
+    this.htmlBridge.style.top = pos.top - topOffset + "px";
     this.htmlBridge.style.left = pos.left + "px";
     this.htmlBridge.style.width = pos.width + "px";
     this.htmlBridge.style.height = pos.height + "px";
@@ -3491,7 +3492,11 @@ kmcApp.config(['$translateProvider', function ($translateProvider) {
 		prefix: '/locales/locale-',
 		suffix: '.json'
 	});
-	var lang = kmc.vars.language || 'en';
+
+	var lang = 'en';
+    if (typeof localStorage != "unknown" && typeof localStorage["lang"] !== "undefined"){
+        lang = localStorage["lang"];
+    }
 	// take the first two characters
 	if( lang.length > 2 ){
 		lang = lang.toLowerCase().substr(0,2);
@@ -3801,7 +3806,7 @@ kmc.log = function() {
 
 kmc.functions = {
 
-	loadSwf : function() {
+	loadSwf : function(lang) {
 
 		var kmc_swf_url = window.location.protocol + '//' + kmc.vars.cdn_host + '/flash/kmc/' + kmc.vars.kmc_version + '/kmc.swf';
 		var flashvars = {
@@ -3827,7 +3832,8 @@ kmc.functions = {
 			openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
 			openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 			openCw				: "kmc.functions.openKcw",
-			language			: (kmc.vars.language || "")
+            maxUploadSize       : "2047",
+			language			: lang
 		};
 		// Disable analytics
 		if( kmc.vars.disable_analytics ) {
@@ -4007,8 +4013,9 @@ kmc.utils = {
 				"width": 0,
 				"visibility": 'visible',
 				"top": '6px',
-				"right": '6px'
+				"right": '29px'
 			};
+            // change right to 6px to hide language menu
 
 			var menu_animation_css = {
 				"width": menu_width + 'px',
@@ -4074,9 +4081,10 @@ kmc.utils = {
 		offset = $.browser.mozilla ? 37 : 74;
 		doc_height = (doc_height-offset);
 		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
-		$("#flash_wrap").height(doc_height + "px");
+		if ($("#flash_wrap").css("visibility") == "visible" || $("#flash_wrap").css("visibility") == "inherit"){
+			$("#flash_wrap").height(doc_height + "px");
+		}
 		$("#server_wrap iframe").height(doc_height + "px");
-		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
@@ -4115,6 +4123,10 @@ kmc.utils = {
 				tab_class;
 			for( var i = 0; i < arr_len; i++ ) {
 				tab_class = (arr[i].type == "action") ? 'class="menu" ' : '';
+                // fix for French and Japanese in which we don't have enough space to show the arrow down icon
+                if (localStorage["lang"] == "fr_FR" || localStorage["lang"] == "ja_JP"){
+                    tab_class = '';
+                }
 				tabs_html += '<li><a id="'+ arr[i].module_name +'" ' + tab_class + ' rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
 			}
 				
@@ -4134,13 +4146,23 @@ kmc.utils = {
 					subtab : subtab
 				};
                 $("#kcms")[0].gotoPage(go_to);
+                kmc.utils.verifyUploadVisible(go_to.moduleName);
                 return false;
 			});
 		} else {
-			alert('Error geting tabs');
+			alert('Error getting tabs');
 		}
 	},
-		
+	verifyUploadVisible: function(module){
+        if (module == "add" && $("#server_wrap").css("display") == "block"){
+            var res = confirm("You must close the studio to upload files.\nClose now?");
+            if (res == true)
+            {
+                $("#kcms")[0].gotoPage({"moduleName":"content", "subtab":"manage"});
+                $("#kcms")[0].gotoPage({"moduleName":"add"});
+            }
+        }
+    },
 	setTab : function(module, resetAll){
 		if( resetAll ) {$("#kmcHeader ul li a").removeClass("active");}
 		$("a#" + module).addClass("active");
@@ -4152,8 +4174,9 @@ kmc.utils = {
 	},
 
 	// we should combine the two following functions into one
+    kmcHeight: $("#flash_wrap").height(),
 	hideFlash : function(hide) {
-		var ltIE8 = $('html').hasClass('lt-ie8');
+		var ltIE8 = $('html').hasClass('lt-ie9');
 		if(hide) {
 			if( ltIE8 ) {
 				// For IE only we're positioning outside of the screen
@@ -4161,14 +4184,17 @@ kmc.utils = {
 			} else {
 				// For other browsers we're just make it
 				$("#flash_wrap").css("visibility","hidden");
-				$("#flash_wrap object").css("visibility","hidden");
+                if ($("#flash_wrap").height() > 0){
+                    this.kmcHeight = $("#flash_wrap").height();
+                }
+				$("#flash_wrap").height(0);
 			}
 		} else {
 			if( ltIE8 ) {
 				$("#flash_wrap").css("margin-right","0");
 			} else {
 				$("#flash_wrap").css("visibility","visible");
-				$("#flash_wrap object").css("visibility","visible");
+                $("#flash_wrap").height(this.kmcHeight);
 			}
 		}
 	},
@@ -4177,8 +4203,10 @@ kmc.utils = {
 		$("#server_frame").removeAttr('src');
 		if( !kmc.layout.modal.isOpen() ) {
 			$("#flash_wrap").css("visibility","visible");
-            $("#flash_wrap object").css("visibility","visible");
-            var ltIE8 = $('html').hasClass('lt-ie8');
+            if (this.kmcHeight > 0){
+                $("#flash_wrap").height(this.kmcHeight);
+            }
+            var ltIE8 = $('html').hasClass('lt-ie9');
             if( ltIE8 ) {
                 $("#flash_wrap").css("margin-right","0");
             }
@@ -4188,7 +4216,6 @@ kmc.utils = {
 
 	// HTML Tab iframe
 	openIframe : function(url) {
-		$("#flash_wrap").css("visibility","hidden");
 		$("#server_frame").attr("src", url);
 		$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 		$("#server_wrap").show();
@@ -4213,7 +4240,6 @@ kmc.utils = {
 	getClientIP: function() {
 		return kmc.vars.clientIP;
 	}
-		
 };
 
 kmc.mediator =  {
@@ -4312,8 +4338,7 @@ kmc.mediator =  {
 
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
-	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
-
+	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, duration, thumbnailUrl) {
 		var embedOptions = {
 			'previewOnly': previewOnly
 		};
@@ -4322,13 +4347,14 @@ kmc.preview_embed = {
 		if( uiconf_id ) {
 			embedOptions.uiConfId = parseInt(uiconf_id);
 		}
-
 		// Single entry
 		if( ! is_playlist ) {
 			embedOptions.entryId = id;
 			embedOptions.entryMeta = {
 				'name': name,
-				'description': description
+				'description': description,
+                'duration': duration,
+                'thumbnailUrl': thumbnailUrl
 			};
 			if( live_bitrates ) {
 				embedOptions.liveBitrates = live_bitrates;
@@ -4343,7 +4369,6 @@ kmc.preview_embed = {
 				embedOptions.playlistName = name;
 			}
 		}
-
 		kmc.Preview.openPreviewEmbed( embedOptions, kmc.Preview.Service );
 	}, // doPreviewEmbed
 
@@ -4618,6 +4643,7 @@ kmc.user = {
 	openSupport: function(el) {
 		var href = el.href;
 		// Show overlay
+        this.kmcHeight = $("#flash_wrap").height();
 		kmc.utils.hideFlash(true);
 		kmc.layout.overlay.show();
 
@@ -4780,9 +4806,10 @@ function playerAdded() {kmc.preview_embed.updateList(false);}
 
 // When page ready initilize KMC
 $(function() {
+
 	kmc.layout.init();
 	kmc.utils.handleMenu();
-	kmc.functions.loadSwf();
+	kmc.functions.loadSwf(window.lang);
 
 	// Set resize event to update the flash object size
 	$(window).wresize(kmc.utils.resize);
@@ -4794,6 +4821,7 @@ $(function() {
 
 	// Set client IP
 	kmc.utils.setClientIP();
+
 });
 
 // Auto resize modal windows

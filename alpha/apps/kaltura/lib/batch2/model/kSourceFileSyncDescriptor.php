@@ -3,23 +3,13 @@
  * @package Core
  * @subpackage model.data
  */
-class kSourceFileSyncDescriptor 
-{
-	/**
-	 * @var string
-	 */
-	private $fileSyncLocalPath;
-	
+class kSourceFileSyncDescriptor extends kFileSyncDescriptor
+{	
 	/**
 	 * The translated path as used by the scheduler
 	 * @var string
 	 */
 	private $actualFileSyncLocalPath;
-	
-	/**
-	 * @var string
-	 */
-	private $fileSyncRemoteUrl;
 	
 	/**
 	 * 
@@ -32,14 +22,6 @@ class kSourceFileSyncDescriptor
 	 * @var int
 	 */
 	private $assetParamsId;
-	
-	/**
-	 * @return the $fileSyncLocalPath
-	 */
-	public function getFileSyncLocalPath() 
-	{
-		return $this->fileSyncLocalPath;
-	}
 
 	/**
 	 * @return the $actualFileSyncLocalPath
@@ -47,14 +29,6 @@ class kSourceFileSyncDescriptor
 	public function getActualFileSyncLocalPath() 
 	{
 		return $this->actualFileSyncLocalPath;
-	}
-
-	/**
-	 * @return the $fileSyncRemoteUrl
-	 */
-	public function getFileSyncRemoteUrl() 
-	{
-		return $this->fileSyncRemoteUrl;
 	}
 
 	/**
@@ -74,27 +48,11 @@ class kSourceFileSyncDescriptor
 	}
 
 	/**
-	 * @param string $fileSyncLocalPath
-	 */
-	public function setFileSyncLocalPath($fileSyncLocalPath) 
-	{
-		$this->fileSyncLocalPath = $fileSyncLocalPath;
-	}
-
-	/**
 	 * @param string $actualFileSyncLocalPath
 	 */
 	public function setActualFileSyncLocalPath($actualFileSyncLocalPath) 
 	{
 		$this->actualFileSyncLocalPath = $actualFileSyncLocalPath;
-	}
-
-	/**
-	 * @param string $fileSyncRemoteUrl
-	 */
-	public function setFileSyncRemoteUrl($fileSyncRemoteUrl) 
-	{
-		$this->fileSyncRemoteUrl = $fileSyncRemoteUrl;
 	}
 
 	/**
@@ -111,5 +69,5 @@ class kSourceFileSyncDescriptor
 	public function setAssetParamsId($assetParamsId) 
 	{
 		$this->assetParamsId = $assetParamsId;
-	}	
+	}
 }

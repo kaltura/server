@@ -258,8 +258,8 @@ while(!feof($f))
 	
 	
 	// collect dispatch_duration
-	// 2009-11-29 04:23:31 [59843975] [API] [KalturaDispatcher->dispatch] DEBUG: Disptach took - 0.05302095413208 seconds
-	if ( preg_match ( "/([\d\- \:]*) \[([\d]*)].*Disptach took - ([\d\.]*)/" , $s , $matches ) )
+	// 2009-11-29 04:23:31 [59843975] [API] [KalturaDispatcher->dispatch] DEBUG: Dispatch took - 0.05302095413208 seconds
+	if ( preg_match ( "/([\d\- \:]*) \[([\d]*)].*Dispatch took - ([\d\.]*)/" , $s , $matches ) )
 	{
 		$api_e = getApiEvent ( $matches[2] );
 		if ( ! $api_e ) continue; // this is actuall an error - it should happen very few times - maybe at the beginning of a day

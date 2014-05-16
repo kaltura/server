@@ -22,6 +22,7 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const MPEGTS = "mpegts";
 	const APPLEHTTP = "applehttp";
 	const WAV = "wav";
+	const HLS = "hls";
 	const COPY = "copy";
 	
 	const SWF = 'swf';

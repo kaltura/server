@@ -35,6 +35,12 @@ class ReaderThread(Thread):
             for curMessage in data.split('\0'):
                 curSlot.append(json.loads(curMessage))
 
+def safeFloat(num):
+    try:
+        return float(num)
+    except ValueError:
+        return float('nan')
+                
 class CommandHandler(SocketServer.BaseRequestHandler):
     FIELD_EXECUTION_TIME = 'x'
     
@@ -58,7 +64,12 @@ class CommandHandler(SocketServer.BaseRequestHandler):
             # get execution time
             executionTime = float('nan')
             if obj.has_key(CommandHandler.FIELD_EXECUTION_TIME):
-                executionTime = float(obj[CommandHandler.FIELD_EXECUTION_TIME])
+                executionTime = obj[CommandHandler.FIELD_EXECUTION_TIME]
+            if type(executionTime) == str:
+                if '.' in executionTime:
+                    executionTime = float(executionTime)
+                else:
+                    executionTime = int(executionTime)
             return ('\t'.join(groupValues), '\t'.join(selectValues), executionTime)
         return result
 
@@ -102,6 +113,14 @@ class CommandHandler(SocketServer.BaseRequestHandler):
                     operatorResult = (refValue == fieldValue)
                 elif operator == '~':
                     operatorResult = (refValue in fieldValue)
+                elif operator == '>':
+                    refValue = safeFloat(refValue)
+                    fieldValue = safeFloat(fieldValue)
+                    operatorResult = (not isnan(refValue) and not isnan(fieldValue) and fieldValue > refValue)
+                elif operator == '<':
+                    refValue = safeFloat(refValue)
+                    fieldValue = safeFloat(fieldValue)
+                    operatorResult = (not isnan(refValue) and not isnan(fieldValue) and fieldValue < refValue)
                 if negated:
                     operatorResult = not operatorResult
                 if not operatorResult:
@@ -132,16 +151,20 @@ class CommandHandler(SocketServer.BaseRequestHandler):
             result = reduce(self.dictIncrement, curSlot, result)
 
         # format the result
-        hasExecTime = False
+        execTimeFormat = ''
         for _, _, _, execTime in result.values():
             if not isnan(execTime):
-                hasExecTime = True
+                if type(execTime) == float:
+                    execTimeFormat = '%.3f'
+                elif len(execTimeFormat) == 0:
+                    execTimeFormat = '%d'
                 break
 
         resultText = ''
-        if hasExecTime:
+        if len(execTimeFormat) > 0:
+            formatString = '%s\t' + execTimeFormat + '\t%s\t%s\n'
             for groupByValues, (selectValues, _, count, execTime) in result.items():
-                resultText += '%s\t%.3f\t%s\t%s\n' % (count, execTime, groupByValues, selectValues)
+                resultText += formatString % (count, execTime, groupByValues, selectValues)
         else:
             for groupByValues, (selectValues, _, count, _) in result.items():
                 resultText += '%s\t%s\t%s\n' % (count, groupByValues, selectValues)

@@ -11,6 +11,8 @@ class KalturaMonitorClient
 	const EVENT_API_END = 	'end';
 	const EVENT_DATABASE = 	'db';
 	const EVENT_SPHINX = 	'sphinx';
+	const EVENT_CONNTOOK =  'conn';
+	const EVENT_DUMPFILE = 	'file';
 	
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_SERVER = 			's';
@@ -27,6 +29,7 @@ class KalturaMonitorClient
 	const FIELD_DATABASE = 			'd';
 	const FIELD_TABLE = 			't';
 	const FIELD_QUERY_TYPE = 		'q';
+	const FIELD_FILE_PATH = 		'f';
 	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
@@ -103,7 +106,7 @@ class KalturaMonitorClient
 		self::flushPacket();
 	}
 	
-	public static function monitorApiStart($cached, $action, $partnerId, $sessionType, $clientTag, $isInMultiRequest = false)
+	public static function initApiMonitor($cached, $action, $partnerId, $clientTag = null)
 	{
 		if (is_null(self::$stream))
 			self::init();
@@ -112,7 +115,7 @@ class KalturaMonitorClient
 			return;
 		
 		self::$apiStartTime = microtime(true);
-
+		
 		self::$basicEventInfo = array(
 			self::FIELD_SERVER			=> infraRequestUtils::getHostname(),
 			self::FIELD_IP_ADDRESS		=> infraRequestUtils::getRemoteAddress(),
@@ -126,6 +129,14 @@ class KalturaMonitorClient
 			require_once(__DIR__ . '/../../../../../infra/log/UniqueId.php');
 			self::$basicEventInfo[self::FIELD_UNIQUE_ID] = UniqueId::get();
 		}
+	}
+	
+	public static function monitorApiStart($cached, $action, $partnerId, $sessionType, $clientTag, $isInMultiRequest = false)
+	{
+		self::initApiMonitor($cached, $action, $partnerId, $clientTag);
+		
+		if (!self::$stream)
+			return;
 		
 		self::$basicApiInfo = array(
 			self::FIELD_CACHED			=> $cached,
@@ -213,5 +224,77 @@ class KalturaMonitorClient
 		));
 		
 		self::writeDeferredEvent($data);
+	}
+	
+	public static function monitorConnTook($dsn, $connTook)
+	{
+		if (!self::$stream)
+			return;
+		
+		$hostName = $dsn;
+		$hostStart = strpos($dsn, 'host=');
+		if ($hostStart !== false)
+		{
+			$hostStart += 5;
+			$hostEnd = strpos($dsn, ';', $hostStart);
+			if ($hostEnd !== false)
+				$hostName = substr($dsn, $hostStart, $hostEnd - $hostStart);
+		}
+		
+		$data = array_merge(self::$basicEventInfo, array(
+				self::FIELD_EVENT_TYPE 		=> self::EVENT_CONNTOOK,
+				self::FIELD_DATABASE		=> $hostName,
+				self::FIELD_EXECUTION_TIME	=> $connTook,
+		));
+		
+		self::writeDeferredEvent($data);		
+	}
+	
+	protected static function getRangeLength($size)
+	{		
+		if (!isset($_SERVER['HTTP_RANGE']))
+			return $size;
+				
+		list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+		
+		if (strpos($range, ',') !== false)
+			return null;		// ignore multibyte range
+	
+		$end = $size - 1;
+		if ($range{0} == '-')
+		{
+			// The n-number of the last bytes is requested
+			$start = $size - substr($range, 1);
+		}
+		else
+		{
+			$range  = explode('-', $range);
+			$start = $range[0];
+			if (isset($range[1]) && is_numeric($range[1]))
+				$end = min($end, $range[1]);
+		}
+	
+		if ($start > $end || $start > $size - 1 || $end >= $size)
+			return null;		// invalid range
+
+		return $end - $start + 1;
+	}
+	
+	public static function monitorDumpFile($fileSize, $filePath)
+	{
+		if (!self::$stream)
+			return;
+		
+		$fileSize = self::getRangeLength($fileSize);
+		if (is_null($fileSize))
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_DUMPFILE,
+			self::FIELD_EXECUTION_TIME	=> $fileSize,		// use exec time since it is summed by the monitor server
+			self::FIELD_FILE_PATH		=> $filePath,
+		));
+		
+		self::writeEvent($data);
 	}
 }

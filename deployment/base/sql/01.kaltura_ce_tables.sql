@@ -114,17 +114,10 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock` (
   `batch_job_id` bigint(20) NOT NULL,
   `custom_data` text,
   `batch_version` int(11) DEFAULT NULL,
+  `root_job_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `lock_index` (`scheduler_id`,`worker_id`,`batch_index`),
-  KEY `partner_urgency_type_index` (`partner_id`,`job_type`,`worker_id`,`urgency`),
-  KEY `partner+type_status_index` (`job_type`,`status`,`dc`,`partner_id`),
-  KEY `urgency_type_status_index` (`job_type`,`status`,`dc`,`urgency`),
-  KEY `execution_attempts_index` (`job_type`,`execution_attempts`,`dc`),
-  KEY `processor_expiration_index` (`job_type`,`execution_attempts`,`expiration`),
-  KEY `dc_job_type_status_job_sub_type` (`dc`,`job_type`,`status`,`job_sub_type`),
-  KEY `dc_job_type_status_attempts_job_sub_type` (`dc`,`job_type`,`status`,`execution_attempts`,`job_sub_type`),
-  KEY `dc_job_type_status_attempts_created` (`dc`,`job_type`,`status`,`execution_attempts`,`created_at`),
-  KEY `dc_status` (`dc`,`status`)
+  KEY `dc_job_type_status` (`dc`,`job_type`,`status`),
+  KEY `root_job_id_index` (`root_job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `batch_job_log` */
@@ -253,8 +246,10 @@ CREATE TABLE IF NOT EXISTS `batch_job_lock_suspend` (
   `batch_job_id` bigint(20) NOT NULL,
   `custom_data` text,
   `batch_version` int(11) DEFAULT NULL,
+  `root_job_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `dc_partner_job_type`(`dc`, `partner_id`, `job_type`, `job_sub_type`),
+  KEY `root_job_id_index` (`root_job_id`),
   INDEX `batch_job_lock_suspend_FI_1` (`batch_job_id`),
   CONSTRAINT `batch_job_lock_suspend_FK_1`
   FOREIGN KEY (`batch_job_id`)
@@ -378,11 +373,12 @@ CREATE TABLE IF NOT EXISTS `category_entry` (
   `updated_at` datetime DEFAULT NULL,
   `category_full_ids` text NOT NULL,
   `status` int(11) DEFAULT '2',
+  `privacy_context` VARCHAR(255),
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `category_id_index` (`category_id`),
-  KEY `entry_id_index` (`entry_id`),
-  KEY `updated_at` (`updated_at`)
+  KEY `updated_at` (`updated_at`),
+  KEY `entry_id_privacy_context_index`(`entry_id`, `privacy_context`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `category_kuser` */
@@ -1860,14 +1856,14 @@ CREATE TABLE IF NOT EXISTS `storage_profile` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
-  `name` varchar(31) DEFAULT NULL,
+  `name` varchar(64) DEFAULT NULL,
   `system_name` varchar(128) NOT NULL DEFAULT '',
   `desciption` varchar(127) DEFAULT NULL,
   `status` integer DEFAULT NULL,
   `protocol` integer DEFAULT NULL,
   `storage_url` varchar(127) DEFAULT NULL,
   `storage_base_dir` varchar(127) DEFAULT NULL,
-  `storage_username` varchar(31) DEFAULT NULL,
+  `storage_username` varchar(64) DEFAULT NULL,
   `storage_password` varchar(64) DEFAULT NULL,
   `storage_ftp_passive_mode` integer DEFAULT NULL,
   `delivery_http_base_url` varchar(127) DEFAULT NULL,
@@ -2229,7 +2225,7 @@ CREATE TABLE `file_asset`
 	KEY (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `drm_profile`
+CREATE TABLE  IF NOT EXISTS `drm_profile`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,
@@ -2243,5 +2239,54 @@ CREATE TABLE `drm_profile`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY partner_id_provider_status (partner_id, provider, status)
+	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE  IF NOT EXISTS `drm_policy`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`name` TEXT  NOT NULL,
+	`system_name` VARCHAR(128) default '' NOT NULL,
+	`description` TEXT,
+	`provider` INTEGER  NOT NULL,
+	`status` INTEGER  NOT NULL,
+	`scenario` INTEGER  NOT NULL,
+	`license_type` INTEGER,
+	`license_expiration_policy` INTEGER,
+	`duration` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY partner_id_provider_status (`partner_id`, `provider`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE  IF NOT EXISTS `drm_device`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`device_id` VARCHAR(128)  NOT NULL,
+	`provider` INTEGER  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `device_id_partner_id_unique` (`device_id`, `partner_id`),
+	KEY `partner_id_provider_status`(`partner_id`, `provider`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE  IF NOT EXISTS `drm_key`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`provider` INTEGER  NOT NULL,
+	`object_id` VARCHAR(20)  NOT NULL,
+	`object_type` TINYINT  NOT NULL,
+	`drm_key` VARCHAR(128)  NOT NULL,
+	`parent_id` INTEGER,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `partner_id_object_id_object_type_provider` (`partner_id`, `object_id`, `object_type`, `provider`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

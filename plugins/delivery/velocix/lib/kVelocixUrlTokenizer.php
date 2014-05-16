@@ -8,13 +8,14 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	protected $streamName;
 	protected $hdsPaths;
 	protected $tokenParamName;
+	protected $authPrefix;
 	
 	/**
 	 * @param int $window
 	 * @param string $secret
 	 * @param array $protocol
 	 */
-	public function __construct($window, $secret, $protocol, $streamName, $hdsPaths, $tokenParamName)
+	public function __construct($window, $secret, $protocol, $streamName,  $hdsPaths = array(), $tokenParamName, $authPrefix)
 	{
 		$this->window = $window;
 		$this->secret = $secret;
@@ -22,6 +23,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$this->streamName = $streamName;
 		$this->hdsPaths = $hdsPaths;
 		$this->tokenParamName = $tokenParamName;
+		$this->authPrefix = $authPrefix;
 	}
 	
 	/**
@@ -30,6 +32,8 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($path)
 	{
+		if (strstr($path, $this->authPrefix) === false)
+			return $path;
 		$token = $this->getToken($path);
 		return $path."?$this->tokenParamName=$token";
 	}
@@ -41,7 +45,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$t_expiry = time() + $this->window;
 		// URL encode the parameters
 		$message = "pathURI=" . rawurlencode($path);
-		if ($this->protocol == 'hds')
+		if ($this->protocol == 'hds' && is_array($this->hdsPaths) && count($this->hdsPaths))
 		{
 			foreach ($this->hdsPaths as $path){
 				$path =  preg_replace('/@STREAM_NAME@/', $this->streamName, $path);

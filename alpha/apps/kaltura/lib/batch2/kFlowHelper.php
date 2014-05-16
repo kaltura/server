@@ -12,6 +12,8 @@ class kFlowHelper
 		flavorParams::VIDEO_CODEC_VP8,
 	);
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
+	
+	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 
 	/**
 	 * @param int $partnerId
@@ -412,13 +414,17 @@ class kFlowHelper
 			try {
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
-			catch (kCoreException $ex) {
+			catch (Exception $ex) {
+				//If exception code is NoValidMediaStream return the job to avoid continuing with the code below
+				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
+					return $dbBatchJob;
+				 
 				//This was added so the all the assets prior to reaching the limit would still be created
 				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
 					throw $ex;
 				
 				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
-			}
+			}			
 
 			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
 			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
@@ -491,7 +497,7 @@ class kFlowHelper
 	 */
 	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data)
 	{
-		KalturaLog::debug("Convert finished with destination file: " . $data->getDestFileSyncLocalPath());
+		KalturaLog::debug("convert finished, start handling");	
 
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
@@ -505,13 +511,66 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
-		$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $dbBatchJob->getMessage());
-		$flavorAsset->incrementVersion();
-		$flavorAsset->save();
-
-		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$shouldSave = false;
+		if(!is_null($data->getEngineMessage())) {
+			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$shouldSave = true;
+		}
 
 		$flavorParamsOutput = $data->getFlavorParamsOutput();
+		
+		if($data->getDestFileSyncLocalPath()) {
+			$flavorAsset->incrementVersion();
+			$shouldSave = true;
+		}		
+		
+		if($shouldSave)
+			$flavorAsset->save();
+		
+		if(count($data->getExtraDestFileSyncs()))
+		{
+			//operation engine creating only file assets should be the last one in the operations chain
+			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
+		}			
+		if($data->getDestFileSyncLocalPath())
+		{
+			self::handleFlavorAssetConvertFinished($flavorAsset, $flavorParamsOutput, $dbBatchJob, $data);
+		}
+		
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey, true);
+		if($fileSync) {
+			$dbBatchJob->putInCustomData("flavor_size", $fileSync->getFileSize());
+			$dbBatchJob->save();
+		}
+		
+		$entry = $dbBatchJob->getEntry();
+		if(!$entry)
+			throw new APIException(APIErrors::INVALID_ENTRY, 'entry', $dbBatchJob->getEntryId());
+
+		$rootBatchJob = $dbBatchJob->getRootJob();
+		if(!$data->getDestFileSyncLocalPath() && $fileSync) 
+		{
+			//no flavors were created in the last conversion, updating the DestFileSyncLocalPath to the path of the last created flavor
+			KalturaLog::debug('Setting destFileSyncLocalPath with: '.$fileSync->getFullPath());
+			$data->setDestFileSyncLocalPath($fileSync->getFullPath());		
+		}
+		$nextJob = self::createNextJob($flavorParamsOutput, $dbBatchJob, $data, $syncKey); //todo validate sync key
+		if(!$nextJob)
+		{
+			self::handleOperatorsProcessingFinished($flavorAsset, $flavorParamsOutput, $entry, $dbBatchJob, $data, $rootBatchJob);
+		}
+		// this logic decide when a thumbnail should be created
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
+		{
+			self::createNotificationBulkDownloadSucceeded($dbBatchJob, $entry, $flavorAsset, $syncKey);
+		}
+		return $dbBatchJob;
+	}
+	private static function handleFlavorAssetConvertFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data)
+	{
+		KalturaLog::debug("Convert finished with destination file: " . $data->getDestFileSyncLocalPath());
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
@@ -552,21 +611,46 @@ class kFlowHelper
 			$dbBatchJob->setData($data);
 			$dbBatchJob->save();
 		}
+	}
+	private static function createNextJob(flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data, FileSyncKey $syncKey)
+	{
+		$operatorSet = new kOperatorSets();
+		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
+		//		KalturaLog::debug("Operators: ".$flavorParamsOutput->getOperators()
+		//			."\ngetCurrentOperationSet:".$data->getCurrentOperationSet()
+		//			."\ngetCurrentOperationIndex:".$data->getCurrentOperationIndex());
+		//		KalturaLog::debug("Operators set: " . print_r($operatorSet, true));
+		$nextOperator = $operatorSet->getOperator($data->getCurrentOperationSet(), $data->getCurrentOperationIndex() + 1);
 
-		$entry = $dbBatchJob->getEntry();
-		if(!$entry)
-			throw new APIException(APIErrors::INVALID_ENTRY, 'entry', $dbBatchJob->getEntryId());
+		$nextJob = null;
+		if($nextOperator)
+		{
+			//			KalturaLog::debug("Found next operator");
+			//Note: consequent operators doesn't support at the moment conversion based on outputs of multiple sources
+			$nextJob = kJobsManager::addFlavorConvertJob(array($syncKey), $flavorParamsOutput, $data->getFlavorAssetId(), null,
+					$data->getMediaInfoId(), $dbBatchJob, $dbBatchJob->getJobSubType());
+		}
 
-
+		return $nextJob;
+	}
+	private static function handleOperatorsProcessingFinished(flavorAsset $flavorAsset, flavorParamsOutput $flavorParamsOutput, entry $entry, BatchJob $dbBatchJob, kConvertJobData $data, $rootBatchJob = null)
+	{
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 
 		$createThumb = $entry->getCreateThumb();
 		$extractMedia = true;
 
 		if($entry->getType() != entryType::MEDIA_CLIP) // e.g. document
+			$extractMedia = false;				
+		
+		if(!kFileSyncUtils::fileSync_exists($flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)))
+		{
 			$extractMedia = false;
-
+			$createThumb = false;
+		}
+		
 		$rootBatchJob = $dbBatchJob->getRootJob();
+
 		if($extractMedia && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
 			$rootBatchJobData = $rootBatchJob->getData();
@@ -588,110 +672,120 @@ class kFlowHelper
 		}
 		if($createThumb && in_array($flavorParamsOutput->getVideoCodec(), self::$thumbUnSupportVideoCodecs))
 			$createThumb = false;
-
-		$operatorSet = new kOperatorSets();
-		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
-		//		KalturaLog::debug("Operators: ".$flavorParamsOutput->getOperators()
-		//			."\ngetCurrentOperationSet:".$data->getCurrentOperationSet()
-		//			."\ngetCurrentOperationIndex:".$data->getCurrentOperationIndex());
-		//		KalturaLog::debug("Operators set: " . print_r($operatorSet, true));
-		$nextOperator = $operatorSet->getOperator($data->getCurrentOperationSet(), $data->getCurrentOperationIndex() + 1);
-
-		$nextJob = null;
-		if($nextOperator)
+			
+		if($createThumb || $extractMedia)
 		{
-			//			KalturaLog::debug("Found next operator");
-			//Note: consequent operators doesn't support at the moment conversion based on outputs of multiple sources
-			$nextJob = kJobsManager::addFlavorConvertJob(array($syncKey), $flavorParamsOutput, $data->getFlavorAssetId(), null,
-					$data->getMediaInfoId(), $dbBatchJob, $dbBatchJob->getJobSubType());
+			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
+			if($flavorAsset->getIsOriginal())
+				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
+
+			kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
 		}
-
-		if(!$nextJob)
+		else // no need to run post convert
 		{
-			if($createThumb || $extractMedia)
+			$flavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
+			if($flavorAsset)
 			{
-				$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
-				if($flavorAsset->getIsOriginal())
-					$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_SOURCE;
+				if($flavorAsset->hasTag(flavorParams::TAG_SOURCE))
+					kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 
-				kJobsManager::addPostConvertJob($dbBatchJob, $postConvertAssetType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
-			}
-			else // no need to run post convert
-			{
-				$flavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
-				if($flavorAsset)
+				if($flavorAsset->getType() == assetType::FLAVOR)
 				{
-					if($flavorAsset->hasTag(flavorParams::TAG_SOURCE))
-						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
-
-					if($flavorAsset->getType() == assetType::FLAVOR)
-					{
-						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate()+$flavorParamsOutput->getAudioBitrate());
-						$flavorAsset->setWidth($flavorParamsOutput->getWidth());
-						$flavorAsset->setHeight($flavorParamsOutput->getHeight());
-						$flavorAsset->setFrameRate($flavorParamsOutput->getFrameRate());
-						$flavorAsset->setIsOriginal(0);
-						$flavorAsset->save();
-					}
-
-					kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);
+					$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate()+$flavorParamsOutput->getAudioBitrate());
+					$flavorAsset->setWidth($flavorParamsOutput->getWidth());
+					$flavorAsset->setHeight($flavorParamsOutput->getHeight());
+					$flavorAsset->setFrameRate($flavorParamsOutput->getFrameRate());
+					$flavorAsset->setIsOriginal(0);
+					$flavorAsset->save();
 				}
+
+				kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);
 			}
+		}
+	}
+		
+	private static function createNotificationBulkDownloadSucceeded(BatchJob $dbBatchJob, entry $entry, flavorAsset $flavorAsset, FileSyncKey $syncKey)
+	{
+		$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		$downloadUrl = $flavorAsset->getDownloadUrl();
+
+		$notificationData = array(
+			"puserId" => $entry->getPuserId(),
+			"entryId" => $entry->getId(),
+			"entryIntId" => $entry->getIntId(),
+			"entryVersion" => $entry->getVersion(),
+			"fileFormat" => $flavorAsset->getFileExt(),
+		//				"email" => '',
+			"archivedFile" => $localPath,
+			"downoladPath" => $localPath,
+			"conversionQuality" => $entry->getConversionQuality(),
+			"downloadUrl" => $downloadUrl,
+		);
+
+		$extraData = array(
+			"data" => json_encode($notificationData),
+			"partner_id" => $entry->getPartnerId(),
+			"puser_id" => $entry->getPuserId(),
+			"entry_id" => $entry->getId(),
+			"entry_int_id" => $entry->getIntId(),
+			"entry_version" => $entry->getVersion(),
+			"file_format" => $flavorAsset->getFileExt(),
+		//				"email" => '',
+			"archived_file" => $localPath,
+			"downolad_path" => $localPath,
+			"target" => $localPath,
+			"conversion_quality" => $entry->getConversionQuality(),
+			"download_url" => $downloadUrl,
+			"status" => $entry->getStatus(),
+			"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
+			"message" => $dbBatchJob->getMessage(),
+			"description" => $dbBatchJob->getDescription(),
+			"job_type" => BatchJobType::DOWNLOAD,
+			"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
+			"progress" => 100,
+			"debug" => __LINE__,
+		);
+
+		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_BATCH_JOB_SUCCEEDED, $dbBatchJob , $dbBatchJob->getPartnerId() , null , null ,
+		$extraData, $dbBatchJob->getEntryId() );
+	}
+	
+	/**
+	 * 
+	 * Allows to create additional files in the conversion process in addition to flavor asset 
+	 */
+	private static function handleAdditionalFilesConvertFinished(flavorAsset $flavorAsset, BatchJob $dbBatchJob, kConvertJobData $data)
+	{
+		KalturaLog::debug("Convert finished, creating additional file syncs ");
+		if(!$flavorAsset->getVersion() || !kFileSyncUtils::fileSync_exists($flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)))
+		{
+			KalturaLog::debug("Incrementing version");
+			$flavorAsset->incrementVersion();
+			$flavorAsset->save();
 		}
 		
-		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
-		if($fileSync) {
-			$dbBatchJob->putInCustomData("flavor_size", $fileSync->getFileSize());
-			$dbBatchJob->save();
-		}
-
-		// this logic decide when a thumbnail should be created
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
+		foreach ($data->getExtraDestFileSyncs() as $destFileSyncDesc) 
 		{
-			$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			$downloadUrl = $flavorAsset->getDownloadUrl();
+			KalturaLog::debug("Creating file sync for destination file: ".$destFileSyncDesc->getFileSyncLocalPath());
 
-			$notificationData = array(
-				"puserId" => $entry->getPuserId(),
-				"entryId" => $entry->getId(),
-				"entryIntId" => $entry->getIntId(),
-				"entryVersion" => $entry->getVersion(),
-				"fileFormat" => $flavorAsset->getFileExt(),
-			//				"email" => '',
-				"archivedFile" => $localPath,
-				"downoladPath" => $localPath,
-				"conversionQuality" => $entry->getConversionQuality(),
-				"downloadUrl" => $downloadUrl,
-			);
+			$syncKey = $flavorAsset->getSyncKey($destFileSyncDesc->getFileSyncObjectSubType());
 
-			$extraData = array(
-				"data" => json_encode($notificationData),
-				"partner_id" => $entry->getPartnerId(),
-				"puser_id" => $entry->getPuserId(),
-				"entry_id" => $entry->getId(),
-				"entry_int_id" => $entry->getIntId(),
-				"entry_version" => $entry->getVersion(),
-				"file_format" => $flavorAsset->getFileExt(),
-			//				"email" => '',
-				"archived_file" => $localPath,
-				"downolad_path" => $localPath,
-				"target" => $localPath,
-				"conversion_quality" => $entry->getConversionQuality(),
-				"download_url" => $downloadUrl,
-				"status" => $entry->getStatus(),
-				"abort" => ($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED),
-				"message" => $dbBatchJob->getMessage(),
-				"description" => $dbBatchJob->getDescription(),
-				"job_type" => BatchJobType::DOWNLOAD,
-				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
-				"progress" => 100,
-				"debug" => __LINE__,
-			);
-
-			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_BATCH_JOB_SUCCEEDED, $dbBatchJob , $dbBatchJob->getPartnerId() , null , null ,
-			$extraData, $dbBatchJob->getEntryId() );
+			$flavorParamsOutput = $data->getFlavorParamsOutput();
+			$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
+			if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
+			{
+				kFileSyncUtils::moveFromFile($destFileSyncDesc->getFileSyncLocalPath(), $syncKey, false);
+			}
+			elseif($flavorParamsOutput->getRemoteStorageProfileIds())
+			{
+				$remoteStorageProfileIds = explode(',', $flavorParamsOutput->getRemoteStorageProfileIds());
+				foreach($remoteStorageProfileIds as $remoteStorageProfileId)
+				{
+					$storageProfile = StorageProfilePeer::retrieveByPK($remoteStorageProfileId);
+					kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $destFileSyncDesc->getFileSyncLocalPath(), $storageProfile);
+				}
+			}			
 		}
-		return $dbBatchJob;
 	}
 
 	/**
@@ -858,10 +952,10 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		$description = $flavorAsset->getDescription();
-		$description .= "\n" . $dbBatchJob->getMessage();
-		$flavorAsset->setDescription($description);
-		$flavorAsset->save();
+		if(!is_null($data->getEngineMessage())) {
+			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$flavorAsset->save();
+		}
 
 		// creats the file sync
 		if(file_exists($data->getLogFileSyncLocalPath()))
@@ -1450,7 +1544,6 @@ class kFlowHelper
 				$syncKey = $currentFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 				{
-					KalturaLog::debug("Start conversion");
 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 
 					$entry = $dbBatchJob->getEntry();
@@ -1550,29 +1643,61 @@ class kFlowHelper
 
 		// if an asset was exported - check if should set its status to READY
 		$asset = assetPeer::retrieveByFileSync($fileSync);
-		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR)))
+			
+		if ($asset && in_array($asset->getStatus(), array(asset::ASSET_STATUS_EXPORTING, asset::ASSET_STATUS_ERROR))
+			&& self::isAssetExportFinished($fileSync, $asset))
 		{
-            $asset->setStatusLocalReady();
-            $asset->save();
+			
+			$asset->setStatusLocalReady();
+			$asset->save();
 
-            if ( ($asset instanceof flavorAsset) && ($asset->getStatus() == asset::ASSET_STATUS_READY) )
-            {
-                kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
-            }
-		}
-
+			if ( ($asset instanceof flavorAsset) && ($asset->getStatus() == asset::ASSET_STATUS_READY) )
+			{
+				kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $asset);
+			}
+		}		
 		// check if all exports finished and delete local file sync according to configuration
 		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
 		{
 			$partner = $dbBatchJob->getPartner();
 			if($partner && $partner->getStorageDeleteFromKaltura())
 			{
-				$syncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
-				kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+				self::deleteAssetLocalFileSyncs($fileSync, $asset);
 			}
 		}
 
 		return $dbBatchJob;
+	}
+	
+	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
+	{
+		$c = new Criteria();
+		$c->addAnd ( FileSyncPeer::OBJECT_ID , $fileSync->getObjectId() );
+		$c->addAnd ( FileSyncPeer::OBJECT_TYPE , $fileSync->getObjectType() );
+		$c->addAnd ( FileSyncPeer::VERSION , $fileSync->getVersion() );
+		$c->addAnd ( FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$c->addAnd ( FileSyncPeer::DC, $fileSync->getDc());
+		$c->addAnd ( FileSyncPeer::STATUS, Filesync::FILE_SYNC_STATUS_PENDING);
+		$pendingFileSync = FileSyncPeer::doSelectOne($c);
+		if($pendingFileSync)
+			return false;
+		else
+			return true;
+	}
+	
+	private static function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
+	{
+		if(self::isAssetExportFinished($fileSync, $asset))
+		{
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
+			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
+			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
+			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+		}		
 	}
 
 	/**
@@ -1883,6 +2008,7 @@ class kFlowHelper
 		if(!$adminName)
 			$adminName = $recipientEmail;
 
+		$jobData->setSeparator(self::BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR);
 		$jobData->setBodyParamsArray(array($adminName, $linksHtml));
 		$jobData->setRecipientEmail($recipientEmail);
 		$jobData->setSubjectParamsArray(array());
@@ -2279,6 +2405,8 @@ class kFlowHelper
 		}
 		
 		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		if(!$conversionProfile)
+			return;
 		
 		$criteria = new Criteria();
 		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId());

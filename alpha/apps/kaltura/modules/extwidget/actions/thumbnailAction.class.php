@@ -5,23 +5,6 @@
  */
 class thumbnailAction extends sfAction
 {
-	private static function notifyProxy($msg)
-	{
-        $server = kConf::get ( "image_proxy_url" );
-        
-        if ($server && (requestUtils::getRemoteAddress() != $server ))
-        {
-			$sock = socket_create(AF_INET,SOCK_DGRAM,SOL_UDP);
-	        if ($sock)
-	        {
-	                $secret = kConf::get ( "image_proxy_secret" );
-	                $port = kConf::get ( "image_proxy_port" );
-	                $data = md5($secret.$msg).$msg;
-	                socket_sendto($sock, $data, strlen($data),0 , $server, $port);
-	                socket_close($sock);
-	        }
-        }
-	}
 	
 	static private $extensions = array(
 		'jpg',
@@ -88,6 +71,9 @@ class thumbnailAction extends sfAction
 		$width = $this->getFloatRequestParameter("width", -1, -1, 10000);
 		$height = $this->getFloatRequestParameter("height", -1, -1, 10000);
 		
+		$nearest_aspect_ratio = $this->getIntRequestParameter("nearest_aspect_ratio", 0, 0, 1);
+		$imageFilePath = null;
+
 		$crop_provider = $this->getRequestParameter("crop_provider", null);
 		$quality = $this->getIntRequestParameter("quality", 0, 0, 100);
 		$src_x = $this->getFloatRequestParameter("src_x", 0, 0, 10000);
@@ -166,6 +152,9 @@ class thumbnailAction extends sfAction
 				$partnerId = $upload_token->getPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
 				
+				if ($partner)
+					KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $partner->getId());
+				
 				if($density == 0)
 					$density = $partner->getDefThumbDensity();
 				
@@ -211,6 +200,7 @@ class thumbnailAction extends sfAction
 		if ($entry_id)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
+			
 			if ( ! $entry )
 			{
 				// problem could be due to replication lag
@@ -244,8 +234,46 @@ class thumbnailAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 		}
+
+		KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $entry->getPartnerId());
 		
+		if ( $nearest_aspect_ratio )
+		{
+			// Get the entry's default thumbnail path (if any)
+			$defaultThumbnailPath = myEntryUtils::getLocalImageFilePathByEntry( $entry, $version );
+			
+			// Get the file path of the thumbnail with the nearest  
+			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntryId( $entry_id, $width, $height, $defaultThumbnailPath );
+
+			if ( $selectedThumbnailDescriptor ) // Note: In case nothing returned, then the entry doesn't have a thumbnail to work with, so we'll do nothing.
+			{
+				$imageFilePath = $selectedThumbnailDescriptor->getImageFilePath();
+				
+				$thumbWidth = $selectedThumbnailDescriptor->getWidth();
+				$thumbHeight = $selectedThumbnailDescriptor->getHeight();
+
+				// The required width and height will serve as the final crop values
+				$src_w = $width;
+				$src_h = $height;
+
+				// Base on the thumbnail's dimensions
+				kThumbnailUtils::scaleDimensions( $thumbWidth, $thumbHeight, $width, $height, kThumbnailUtils::SCALE_UNIFORM_SMALLER_DIM, $width, $height );
+
+				// Set crop type
+				$type = KImageMagickCropper::CROP_AFTER_RESIZE;
+			}
+		}
+
 		$partner = $entry->getPartner();
+		
+		// not allow capturing frames if the partner has FEATURE_DISALLOW_FRAME_CAPTURE permission
+		if(($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
+		{
+			if ($partner->getEnabledService(PermissionName::FEATURE_BLOCK_THUMBNAIL_CAPTURE))
+			{
+				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
+			}
+		}
 		if($density == 0)
 			$density = $partner->getDefThumbDensity();
 		$thumbParams = new kThumbnailParameters();
@@ -346,7 +374,7 @@ class thumbnailAction extends sfAction
 			try
 			{
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, null, $density, $stripProfiles, $thumbParams, $format);
+						$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $imageFilePath, $density, $stripProfiles, $thumbParams, $format);
 			}
 			catch(Exception $ex)
 			{
@@ -400,12 +428,6 @@ class thumbnailAction extends sfAction
 			$cacheAge = 60;
 		else
 			$cacheAge = 8640000;
-		
-		// notify external proxy, so it'll cache this url
-		if (!$nocache && requestUtils::getHost() == kConf::get ( "apphome_url" )  && file_exists($tempThumbPath))
-		{
-			self::notifyProxy($_SERVER["REQUEST_URI"]);
-		}
 		
 		// cache result
 		if (!$nocache)

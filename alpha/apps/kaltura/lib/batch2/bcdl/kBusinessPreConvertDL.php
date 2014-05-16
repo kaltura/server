@@ -458,7 +458,12 @@ class kBusinessPreConvertDL
 		$flavorAssetId = $flavorAsset->getId();
 	
 		$collectionTag = $flavor->getCollectionTag();
-		if($collectionTag)
+			/*
+			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
+			 * to allow FFmpeg/ISMV processing
+			 */
+		KalturaLog::log("Check for collection case - asset(".$flavorAssetId."),engines(".$flavor->getConversionEngines().")");
+		if($collectionTag && $flavor->getConversionEngines()==conversionEngineType::EXPRESSION_ENCODER3)
 		{
 			$entry = entryPeer::retrieveByPK($entryId);
 			if(!$entry)
@@ -833,14 +838,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setScaleHeight($thumbParams->getScaleHeight());
 		$thumbParamsOutput->setBackgroundColor($thumbParams->getBackgroundColor());
 		
-		if($mediaInfo)
+		if($mediaInfo && $mediaInfo->getVideoDuration())
 		{
-			if($thumbParamsOutput->getVideoOffset() && $mediaInfo->getVideoDuration())
-			{
-				$videoDurationSec = floor($mediaInfo->getVideoDuration() / 1000);
+            $videoDurationSec = floor($mediaInfo->getVideoDuration() / 1000);
+            if($thumbParamsOutput->getVideoOffset())
+            {
 				if($thumbParamsOutput->getVideoOffset() > $videoDurationSec)
 					$thumbParamsOutput->setVideoOffset($videoDurationSec);
 			}
+
+            elseif(!is_null($thumbParams->getVideoOffsetInPercentage()))
+            {
+                $percentage = $thumbParams->getVideoOffsetInPercentage() / 100;
+                $thumbParamsOutput->setVideoOffset(floor($videoDurationSec * $percentage));
+            }
 		}
 		
 		return $thumbParamsOutput;
@@ -1113,6 +1124,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$err = $convertProfileJob->getDescription() . $errDescription;
 			$convertProfileJob->setDescription($err);
 			$convertProfileJob->save();
+			
+			//Check if the error thrown is invalid file - no media content
+			if(strpos($errDescription, KDLErrors::ToString(KDLErrors::NoValidMediaStream)) !== false)
+				throw new Exception(KDLErrors::ToString(KDLErrors::NoValidMediaStream), KDLErrors::NoValidMediaStream);
 		}
 				
 		$conversionsCreated = 0;
@@ -1134,7 +1149,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 			
 			$collectionTag = $flavor->getCollectionTag();
-			if($collectionTag)
+			/*
+			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
+			 * to allow FFmpeg/ISMV processing
+			 */
+			KalturaLog::log("Check for collection case - engines(".$flavor->getConversionEngines().")");
+			if($collectionTag && $flavor->getConversionEngines()==conversionEngineType::EXPRESSION_ENCODER3)
 			{
 				$flavorsCollections[$collectionTag][] = $flavor;
 			}
@@ -1233,7 +1253,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $flavorAsset->getEntryId());
-		$c->add(assetPeer::STATUS, array(flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_NOT_APPLICABLE), Criteria::IN);
+		$c->add(assetPeer::STATUS, array(flavorAsset::ASSET_STATUS_READY, flavorAsset::ASSET_STATUS_NOT_APPLICABLE, flavorAsset::ASSET_STATUS_EXPORTING), Criteria::IN);
 		$c->add(assetPeer::FLAVOR_PARAMS_ID, $srcFlavorParamsIds, Criteria::IN);
 		
 		$readyAndNonApplicableAssetsCount = assetPeer::doCount($c);
@@ -1249,7 +1269,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			return false;
 		}
 		
-		$srcFlavors = assetPeer::retrieveReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
+		$srcFlavors = assetPeer::retrieveLocalReadyByEntryIdAndFlavorParams($flavorAsset->getEntryId(), $srcFlavorParamsIds);
 		if(!count($srcFlavors))
 		{
 			//assuming all source flavors are Not Applicable

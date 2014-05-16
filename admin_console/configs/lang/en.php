@@ -100,6 +100,7 @@ return array(
 
 	'DELETED' => 'Deleted',
 
+	'Kaltura_Client_Enum_PartnerStatus::DELETED' => 'Deleted',
 	'Kaltura_Client_Enum_PartnerStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_PartnerStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK' => 'Removed',
@@ -892,13 +893,13 @@ return array(
 	
 	// partner-list
 	'partner-list intro text' => 'Here you can manage all Publisher accounts that registered on your Kaltura video platform deployment',
-	'are you sure block partner?' => 'Are you sure you want to block this publisher?',
-	'are you sure unblock partner?' => 'Are you sure you want to unblock this publisher?',
-	'are you sure remove partner?' => 'Are you sure you want to remove this publisher?',
-	'partner was blocked' => 'Publisher was blocked successfully',
+	'are you sure block partner?' => 'Enter a reason and press OK to block\nor Cancel to abort',
+	'are you sure unblock partner?' => 'Enter a reason and press OK to unblock\nor Cancel to abort',
+	'are you sure remove partner?' => 'Enter a reason and press OK to remove\nor Cancel to abort',
 	'partner was unblocked' => 'Publisher was unblocked successfully',
 	'partner was removed' => 'Publisher was successfully removed',
 	'partner-list commercial filtered' => 'Commercial partners filtered from results',
+	'partner operation aborted' => 'No reason was given, aborting.',
 
 	// partner-selector
 	'partner-selector intro text' => 'Select a partner from the list below',
@@ -1012,6 +1013,7 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::NOT_REQUIRED' => 'Not Required',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PARTNER' => 'Required By Partner',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER' => 'Required By Provider',
+	'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION' => 'Required for Automatic Distribution',
 	
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::UPLOADED_FILE' => 'Uploaded File',
 	'Kaltura_Client_AdminConsole_Enum_TrackEntryEventType::WEBCAM_COMPLETED' => 'Webcam Completed',
@@ -1184,6 +1186,7 @@ return array(
 	'drm profile list intro text' => 'Here you can manage the Drm profiles of your Kaltura video platform deployment',
 	'Kaltura_Client_Drm_Enum_DrmProfileStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE' => 'Widevine',
+	'Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY' => 'Play Ready',
 );
 
 

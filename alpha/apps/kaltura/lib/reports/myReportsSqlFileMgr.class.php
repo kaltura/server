@@ -555,6 +555,20 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"count_without_filter" => "count",
 				"count_by_app" => "count_by_app",
 			),
+			"live" => array (
+				"graph" => "graph",
+				"graph_without_filter" => "graph",
+				"graph_no_text" => "graph",
+				"total" => "total",
+				"total_without_filter" => "total",
+				"total_no_text" => "total",
+				"detail" => "detail",
+				"detail_without_filter" => "detail",
+				"detail_no_text" => "detail",
+				"count" => "count",
+				"count_without_filter" => "count",
+				"count_no_text" => "count",
+			),
 			
 		);
 

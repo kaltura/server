@@ -406,7 +406,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					
 				case "bigint" :
 					$this->appendLine("		if(count(\$xml->{$propName}))");
-					$this->appendLine("			\$this->$propName = (int)\$xml->$propName;");
+					$this->appendLine("			\$this->$propName = (string)\$xml->$propName;");
 					break;
 					
 				case "bool" :

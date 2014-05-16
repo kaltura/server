@@ -235,9 +235,12 @@ class kUrlManager
 	{
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
-		if($fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
 			return $fileSync->getSmoothStreamUrl();
 		
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $fileSync->getObjectSubType() == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+			return $fileSync->getSmoothStreamUrl();
+			
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
 	
@@ -252,12 +255,18 @@ class kUrlManager
 			    }
 			    $url = $storageProfile->getRTMPPrefix(). $url;
 			}
-			if (($this->extention && strtolower($this->extention) != 'flv' ||
-				$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
-				$url = "mp4:".ltrim($url,'/');
-				
-			// when serving files directly via RTMP fms doesnt expect to get the file extension
-			$url = str_replace('.mp4', '', str_replace('.flv','',$url));
+
+			// the default is to remove the file extension, if we want to keep it, "rtmp_append_filename" param should be
+			// added to the remote storage json params
+			if (!isset($this->params['rtmp_append_filename']) || !$this->params['rtmp_append_filename'])
+			{
+				if (($this->extention && strtolower($this->extention) != 'flv' ||
+					$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
+					$url = "mp4:".ltrim($url,'/');
+
+				// when serving files directly via RTMP fms doesnt expect to get the file extension
+				$url = str_replace('.mp4', '', str_replace('.flv','',$url));
+			}
 		}
 				
 		return $url;
@@ -342,9 +351,14 @@ class kUrlManager
 		$flavorAssetId = $asset->getId();
 		$cdnHost = parse_url($this->domain, PHP_URL_HOST);
 		
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost/clientTag/$clientTag";
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/{$this->protocol}/format/url/cdnHost/$cdnHost";
 		if($this->storageProfileId)
 			$url .= "/storageId/$this->storageProfileId";
+				
+		$ext = '';
+		if ($asset && $asset->getFileExt())   
+			$ext ='/a.' .  $asset->getFileExt();
+		$url .= $ext . "?clientTag=$clientTag";
 		
 		return $url;
 	}
@@ -581,7 +595,7 @@ class kUrlManager
 			
 			$tsUrl = $matches[0];
 			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-0') !== false)
+			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-1') !== false)
 				return true;
 		}
 			

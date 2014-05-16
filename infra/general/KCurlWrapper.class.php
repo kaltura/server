@@ -88,6 +88,11 @@ class KCurlWrapper
 {
 	const HTTP_PROTOCOL_HTTP = 1;
 	const HTTP_PROTOCOL_FTP = 2;
+	const COULD_NOT_CONNECT_TO_HOST_ERROR = "couldn't connect to host";
+	
+	//curl idle const configuration
+	const LOW_SPEED_BYTE_LIMIT = 1; //1 byte per sec
+	const LOW_SPEED_TIME_LIMIT = 595; //595 sec + 5 sec until it is detected total is 600 sec = 10 min
 
 	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
 
@@ -122,6 +127,16 @@ class KCurlWrapper
 		$length = strlen ( $string );
 		return $length;
 	}
+	
+	private static function read_header_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
+	
+	private static function read_body_do_nothing($ch, $string) {
+		$length = strlen ( $string );
+		return $length;
+	}
 
 	/**
 	 * @param string $url
@@ -134,6 +149,19 @@ class KCurlWrapper
 		// set appropriate options - these can be overriden with the setOpt function if desired
 		curl_setopt($this->ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
 		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+		
+		//Add curl idle check options in this chase we check if for the past 10 min the avg transfer rate is over 1 byte per sec
+		//These configurations can be overriden with the setOpt function if desired
+		$curlLowSpeedByteLimit = self::LOW_SPEED_BYTE_LIMIT;
+		if($params && isset($params->curlLowSpeedByteLimit) && $params->curlLowSpeedByteLimit)
+			$curlLowSpeedByteLimit = $params->curlLowSpeedByteLimit;
+		
+		$curlLowSpeedTimeLimit = self::LOW_SPEED_TIME_LIMIT;
+		if($params && isset($params->curlLowSpeedTimeLimit) && $params->curlLowSpeedTimeLimit)
+			$curlLowSpeedTimeLimit = $params->curlLowSpeedTimeLimit;
+			
+		curl_setopt($this->ch, CURLOPT_LOW_SPEED_LIMIT, $curlLowSpeedByteLimit);
+		curl_setopt($this->ch, CURLOPT_LOW_SPEED_TIME, $curlLowSpeedTimeLimit);
 
 		curl_setopt($this->ch, CURLOPT_NOSIGNAL, true);
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
@@ -279,9 +307,13 @@ class KCurlWrapper
 		self::$headers = "";
         self::$lastHeader = false;
         curl_exec($this->ch);
+        
+        //Added to support multiple curl executions using the same curl. Wince this is the same curl re-used we need to reset the range option before continuing forward
+        if(!$noBody)
+			curl_setopt($this->ch, CURLOPT_RANGE, '0-');
+        
         if(!self::$headers)
            return false;
-
 
 		self::$headers = explode("\r\n", self::$headers);
 
@@ -368,10 +400,14 @@ class KCurlWrapper
 			}
 		}
 
+		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header_do_nothing');
+		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
+		
 		return $curlHeaderResponse;
 	}
 
 	/**
+	 * @param string $sourceUrl
 	 * @param string $destFile
 	 * @return boolean
 	 */
@@ -428,6 +464,25 @@ class KCurlWrapper
 	// will destroy all the relevant handles
 	public function __destruct()
 	{
+	}
+
+	public static function getContent($url)
+	{
+		$ch = curl_init();
+		
+		// set URL and other appropriate options
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_NOBODY, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+			
+		$content = curl_exec($ch);
+		curl_close($ch);
+		
+		return $content;
 	}
 }
 

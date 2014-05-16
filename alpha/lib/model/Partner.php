@@ -15,6 +15,7 @@ class Partner extends BasePartner
 	const HOSTED_PAGES_PARTNER_ID = -3;
 	const MONITORING_PARTNER_ID = -4;
 	const MEDIA_SERVER_PARTNER_ID = -5;
+	const PLAY_SERVER_PARTNER_ID = -6;
 	
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
@@ -651,26 +652,77 @@ class Partner extends BasePartner
 	public function getDefaultEmbedCodeType() { return $this->getFromCustomData("defaultEmbedCodeType", null); }
 	public function setDefaultEmbedCodeType( $v ) { $this->putInCustomData("defaultEmbedCodeType", $v); }
 	
-	public function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
-	public function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
+	private function getDisabledDeliveryTypes() { return $this->getFromCustomData("disabledDeliveryTypes", array()); }
+	private function setDisabledDeliveryTypes(array $v ) { $this->putInCustomData("disabledDeliveryTypes", $v); }
 	
-	public function getDeliveryTypes()
+	public function getCustomDeliveryTypes()
 	{
-		$map = kConf::getMap('players');
-		$deliveryTypes = $map['delivery_types'];
-		
+		$customDeliveryTypes = array();
+
+		// take the disabled types from the old field
 		$disabledDeliveryTypes = $this->getDisabledDeliveryTypes();
-		if($disabledDeliveryTypes)
+		if (is_array($disabledDeliveryTypes))
 		{
 			foreach($disabledDeliveryTypes as $disabledDeliveryType)
 			{
-				if(isset($deliveryTypes[$disabledDeliveryType]))
-					unset($deliveryTypes[$disabledDeliveryType]);
+				$customDeliveryTypes[$disabledDeliveryType] = false;
 			}
 		}
-			
+
+		// override with the new field that supports enable/disable
+		$customDeliveryTypesCustomData = $this->getFromCustomData("customDeliveryTypes", array());
+		if (is_array($customDeliveryTypesCustomData))
+		{
+			foreach($customDeliveryTypesCustomData as $deliveryType => $enabled)
+			{
+				$customDeliveryTypes[$deliveryType] = $enabled;
+			}
+		}
+
+		return $customDeliveryTypes;
+	}
+
+	public function setCustomDeliveryTypes(array $v)
+	{
+		$this->putInCustomData("customDeliveryTypes", $v);
+		$this->setDisabledDeliveryTypes(array()); // erase the old custom data field
+	}
+
+	public function getDeliveryTypes()
+	{
+		$map = kConf::getMap('players');
+		$availableDeliveryTypes = $map['delivery_types'];
+		$customDeliveryTypes = $this->getCustomDeliveryTypes();
+		$deliveryTypes = array();
+
+		foreach($availableDeliveryTypes as $deliveryType => $deliveryInfo)
+		{
+			// if this delivery was custom configured, check if it should be used
+			if (isset($customDeliveryTypes[$deliveryType]))
+			{
+				$customDeliveryTypeEnabled = $customDeliveryTypes[$deliveryType];
+				if ($customDeliveryTypeEnabled)
+					$deliveryTypes[$deliveryType] = $deliveryInfo;
+			}
+			// if delivery was not custom configured, check if it's enabled by default
+			elseif(isset($deliveryInfo['enabledByDefault']) && $deliveryInfo['enabledByDefault'])
+			{
+				$deliveryTypes[$deliveryType] = $deliveryInfo;
+			}
+		}
+
 		return $deliveryTypes;
 	} 
+	
+	public function getMediaServersConfiguration ()
+	{
+		return $this->getFromCustomData('mediaServersConfiguration', null, null);
+	}
+	
+	public function setMediaServersConfiguration ($v)
+	{
+		$this->putInCustomData('mediaServersConfiguration', $v);
+	}
 	
 	public function getEmbedCodeTypes()
 	{
@@ -733,6 +785,10 @@ class Partner extends BasePartner
 	// logout url for partners integrating a single sign on solution
 	public function getLogoutUrl() { return $this->getFromCustomData('logoutUrl', null); }
 	public function setLogoutUrl($v) { $this->putInCustomData('logoutUrl', $v); }
+
+	// Status change reason for audit logs
+	public function getStatusChangeReason() { return $this->getFromCustomData('statusChangeReason'); }	
+	public function setStatusChangeReason( $v ) { return $this->putInCustomData('statusChangeReason', $v); }
 	
 	//kmc language
 	public function setKMCLanguage($v) { $this->putInCustomData('language', $v, 'KMC');}
@@ -893,6 +949,9 @@ class Partner extends BasePartner
     public function setAutoModerateEntryFilter($v)		{$this->putInCustomData('auto_moderate_entry_filter', $v);}
     public function setCacheFlavorVersion($v)			{$this->putInCustomData('cache_flavor_version', $v);}
     public function setBroadcastUrlManager($v)			{$this->putInCustomData('broadcast_url_manager', $v);}
+    public function setPrimaryBroadcastUrl($v)			{$this->putInCustomData('primary_broadcast_url', $v);}
+	public function setSecondaryBroadcastUrl($v)		{$this->putInCustomData('secondary_broadcast_url', $v);}
+	public function setLiveStreamPlaybackUrlConfigurations($v)		{$this->putInCustomData('live_stream_playback_url_configurations', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -933,6 +992,9 @@ class Partner extends BasePartner
 	public function getAutoModerateEntryFilter()		{return $this->getFromCustomData('auto_moderate_entry_filter');}
     public function getCacheFlavorVersion()				{return $this->getFromCustomData('cache_flavor_version');}
     public function getBroadcastUrlManager()			{return $this->getFromCustomData('broadcast_url_manager');}
+	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
+	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
+	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
 	
 	
 	/**
@@ -1224,10 +1286,76 @@ class Partner extends BasePartner
 		$this->getFromCustomData('i18n_template_partner_id');
 	}
 	
+	
+	public function setAudioThumbEntryId($v)
+	{
+		if ($v)
+		{
+			$this->putInCustomData('audioThumbEntryId', $v);
+			$entry = entryPeer::retrieveByPK($v);
+			$dataArr = explode('.',$entry->getData());
+			$this->setAudioThumbEntryVersion($dataArr[0]);
+		}
+		else
+		{
+			$this->removeFromCustomData('audioThumbEntryId');
+			$this->removeFromCustomData('audioThumbEntryVersion');
+		}
+	}
+	
+	
+	public function getAudioThumbEntryId()
+	{
+		return $this->getFromCustomData('audioThumbEntryId');
+	}
+	
+	public function setAudioThumbEntryVersion($v)
+	{
+		$this->putInCustomData('audioThumbEntryVersion', $v);
+	}
+	
+	public function getAudioThumbEntryVersion()
+	{
+		return $this->getFromCustomData('audioThumbEntryVersion');
+	}
+	
+	public function setLiveThumbEntryId($v)
+	{
+		if ($v)
+		{
+			$this->putInCustomData('liveThumbEntryId', $v);
+			$entry = entryPeer::retrieveByPK($v);
+			$dataArr = explode('.',$entry->getData());
+			$this->setLiveThumbEntryVersion($dataArr[0]);
+		}
+		else
+		{
+			$this->removeFromCustomData('liveThumbEntryId');
+			$this->removeFromCustomData('liveThumbEntryVersion');
+		}
+	}
+	
+	
+	public function getLiveThumbEntryId()
+	{
+		return $this->getFromCustomData('liveThumbEntryId');
+	}
+	
+	public function setLiveThumbEntryVersion($v)
+	{
+		$this->putInCustomData('liveThumbEntryVersion', $v);
+	}
+	
+	public function getLiveThumbEntryVersion()
+	{
+		return $this->getFromCustomData('liveThumbEntryVersion');
+	}
+	
+	
+	
 	// -------------------------------------------------
 	// -- start of account owner kuser related functions
 	// -------------------------------------------------
-		
 	
 	/**
 	 * @throws kUserException::USER_NOT_FOUND
@@ -1469,4 +1597,12 @@ class Partner extends BasePartner
 		}
 		return true;
 	}
+	
+	public function getNotificationUrl()
+	{
+		return $this->getUrl2();
+	}
+
+	public function getReferenceId() { return $this->getFromCustomData("referenceId", null); }
+	public function setReferenceId( $v ) { $this->putInCustomData("referenceId", $v); }
 }

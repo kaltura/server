@@ -1140,11 +1140,14 @@ class KalturaEntryService extends KalturaBaseService
 
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
+		
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 	
 		if( $filter->idEqual == null && $filter->redirectFromEntryId == null )
         {
         	$this->setDefaultStatus($filter);
             $this->setDefaultModerationStatus($filter);
+            $c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		}
 		
 		$this->fixFilterUserId($filter);
@@ -1154,15 +1157,11 @@ class KalturaEntryService extends KalturaBaseService
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		
 		$filter->toObject($entryFilter);
-
-		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		
 		if($pager)
 			$pager->attachToCriteria($c);
 			
 		$entryFilter->attachToCriteria($c);
-		
-		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		
 		return $c;
 	}
@@ -1625,7 +1624,6 @@ class KalturaEntryService extends KalturaBaseService
 		$dbModerationFlag->save();
 		
 		$dbEntry->setModerationStatus(KalturaEntryModerationStatus::FLAGGED_FOR_REVIEW);
-		$dbEntry->incModerationCount();
 		$dbEntry->save();
 		
 		$moderationFlag = new KalturaModerationFlag();

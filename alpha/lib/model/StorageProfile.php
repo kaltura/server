@@ -124,6 +124,16 @@ class StorageProfile extends BaseStorageProfile
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL);
 	}
+	
+	//Since the addition of configuring https base url on remote storages we need to take into consideration when to return the https base url
+	//and when to return the http. This adds this logic.
+	public function getDeliveryBaseUrlByProtocol()
+	{
+		if (infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS && $this->getDeliveryHttpsBaseUrl())
+			return $this->getDeliveryHttpsBaseUrl();
+		
+		return $this->getDeliveryHttpBaseUrl();
+	}
 
 	public function setDeliveryHttpsBaseUrl($v)
 	{
@@ -189,22 +199,15 @@ class StorageProfile extends BaseStorageProfile
 	 * @param flavorAsset $flavorAsset
 	 * @return boolean true if the given flavor asset is configured to be exported or false otherwise
 	 */
-	public function shouldExportFlavorAsset(flavorAsset $flavorAsset)
+	public function shouldExportFlavorAsset(flavorAsset $flavorAsset, $skipFlavorAssetStatusValidation = false)
 	{
 		KalturaLog::debug('Checking if flavor asset ['.$flavorAsset->getId().'] should be exported to ['.$this->getId().']');
-		if(!$flavorAsset->isLocalReadyStatus())
+		if(!$skipFlavorAssetStatusValidation && !$flavorAsset->isLocalReadyStatus())
 		{
 			KalturaLog::debug('Flavor is not ready for export');
 			return false;
 		}
-
-		$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		if($this->isExported($key))
-		{
-			KalturaLog::debug('Flavor was already exported');
-			return false;
-		}
-			
+					
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
 			KalturaLog::debug('Flavor asset is not configured for export');
@@ -219,13 +222,22 @@ class StorageProfile extends BaseStorageProfile
 			return false;
 		}
 			
+		KalturaLog::debug('Flavor should be exported');
+		return true;	    
+	}
+	
+	public function shoudlExportFileSync(FileSyncKey $key)
+	{
+		if($this->isExported($key))
+		{
+			KalturaLog::debug('Flavor was already exported');
+			return false;
+		}
 		if(!$this->isValidFileSync($key))
 		{
 			KalturaLog::debug('File sync is not valid for export');
 			return false;
 		}
-
-		KalturaLog::debug('Flavor should be exported');
 		return true;	    
 	}
 	
@@ -249,9 +261,8 @@ class StorageProfile extends BaseStorageProfile
 	}
 	
 	
-	public function isPendingExport(asset $asset)
+	public function isPendingExport(FileSyncKey $key)
 	{
-	    $key = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 	    $c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		$c->addAnd(FileSyncPeer::DC, $this->getId(), Criteria::EQUAL);
 		$fileSync = FileSyncPeer::doSelectOne($c);

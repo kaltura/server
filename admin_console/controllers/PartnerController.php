@@ -204,9 +204,10 @@ class PartnerController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$partnerId = $this->_getParam('partner_id');
 		$status = $this->_getParam('status');
+		$reason = $this->_getParam('reason');
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-		$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status);
+		$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status, $reason);
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -410,11 +411,14 @@ class PartnerController extends Zend_Controller_Action
 		$systemPartnerPlugin->systemPartner->getPlayerDeliveryTypes();
 		list($packages, $packagesVertical, $packagesClassOfService, $playerEmbedCodeTypes, $playerDeliveryTypes) = $client->doMultiRequest();
 
-		$systemDefaults = new stdClass();
+		$systemDefaults = new Kaltura_Client_Type_PlayerEmbedCodeType();
 		$systemDefaults->id = '';
 		$systemDefaults->label = 'Use System Defaults';
-		
 		$playerEmbedCodeTypes[] = $systemDefaults;
+
+		$systemDefaults = new Kaltura_Client_Type_PlayerDeliveryType();
+		$systemDefaults->id = '';
+		$systemDefaults->label = 'Use System Defaults';
 		$playerDeliveryTypes[] = $systemDefaults;
 		
 		$form = new Form_PartnerConfiguration(array('playerDeliveryTypes' => $playerDeliveryTypes));
@@ -440,7 +444,20 @@ class PartnerController extends Zend_Controller_Action
 					$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
 				}
 				catch (Exception $e){
-					$this->view->errMessage = $e->getMessage();
+					if ($e->getCode() == 'PARTNER_AUDIO_THUMB_ENTRY_ID_ERROR')
+					{
+						$this->view->formValid = false;
+						$form->populate($request->getPost());
+						$form->getElement('audio_thumb_entry_id')->addError('wrong entry id or not a \'ready\' image entry');
+					}
+					elseif ($e->getCode() == 'PARTNER_LIVE_THUMB_ENTRY_ID_ERROR')
+					{
+						$this->view->formValid = false;
+						$form->populate($request->getPost());
+						$form->getElement('live_thumb_entry_id')->addError('wrong entry id or not a \'ready\' image entry');
+					}
+					else
+						$this->view->errMessage = $e->getMessage();
 				}
 				
 				$extentFreeTrail = $this->_getParam('extended_free_trail');
@@ -449,7 +466,7 @@ class PartnerController extends Zend_Controller_Action
 					$status = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
 					$client = Infra_ClientHelper::getClient();
 					$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-					$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status);
+					$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status, "Activated due to trial extension");
 				}
 				
 			}else{
@@ -505,7 +522,12 @@ class PartnerController extends Zend_Controller_Action
 				foreach($result[0]->objects as $audit) {
 					$isExtendedFreeTrailHistory = false;
 					foreach($audit->data->changedItems as $changedItem){
-						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate' || $changedItem->descriptor == 'extendedFreeTrailExpiryReason'){ 
+						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate'
+								|| $changedItem->descriptor == 'extendedFreeTrailExpiryReason'
+								|| $changedItem->descriptor == 'partner.STATUS'
+								|| $changedItem->descriptor == 'statusChangeReason'
+							)
+						{ 
 					 		$isExtendedFreeTrailHistory = true; 
 						 	break;	
 					 	}

@@ -539,7 +539,7 @@ class KDLWrap
 		$medSet->_container->_duration=$cdlMediaInfo->getContainerDuration();
 		$medSet->_container->_bitRate=$cdlMediaInfo->getContainerBitRate();
 		$medSet->_container->_fileSize=$cdlMediaInfo->getFileSize();
-//		$medSet->_container->_isFastStart=$cdlMediaInfo->getIsFastStart();
+		$medSet->_container->_isFastStart=$cdlMediaInfo->getIsFastStart();
 		if($medSet->_container->IsDataSet()==false)
 			$medSet->_container = null;
 

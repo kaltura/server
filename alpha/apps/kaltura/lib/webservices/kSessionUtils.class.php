@@ -634,6 +634,31 @@ class ks extends kSessionBase
 			}
 		}
 	}
+
+	public function hasPrivilege($privilegeName)
+	{
+		if (!is_array($this->parsedPrivileges))
+			return false;
+
+		return isset($this->parsedPrivileges[$privilegeName]);
+	}
+
+	public function getPrivilegeValues($privilegeName, $default = array())
+	{
+		if ($this->hasPrivilege($privilegeName))
+			return $this->parsedPrivileges[$privilegeName];
+		else
+			return $default;
+	}
+
+	public function getPrivilegeValue($privilegeName, $default = null)
+	{
+		$values = $this->getPrivilegeValues($privilegeName);
+		if (isset($values[0]))
+			return $values[0];
+		else
+			return $default;
+	}
 	
 	private function expired ( )
 	{
@@ -671,6 +696,7 @@ class ks extends kSessionBase
 
 		$ksVersion = $partner->getKSVersion();
 
+		$cacheKey = self::getSecretsCacheKey($partnerId);
 		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
 		foreach ($cacheSections as $cacheSection)
 		{
@@ -678,7 +704,7 @@ class ks extends kSessionBase
 			if (!$cacheStore)
 				continue;
 			
-			$cacheStore->set(self::SECRETS_CACHE_PREFIX . $partnerId, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($partner->getAdminSecret(), $partner->getSecret(), $ksVersion));
 		}
 		
 		return array($ksVersion, $partner->getAdminSecret());

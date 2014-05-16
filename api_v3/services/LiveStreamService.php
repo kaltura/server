@@ -10,6 +10,7 @@
 class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY = 30;
+	const ISLIVE_ACTION_CONDITIONAL_CACHE_EXPIRY = 10;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -42,8 +43,13 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function addAction(KalturaLiveStreamEntry $liveStreamEntry, $sourceType = null)
 	{
-		if($sourceType)
-			$liveStreamEntry->sourceType = $sourceType;
+		if($sourceType) {
+			$liveStreamEntry->sourceType = $sourceType;	
+		}
+		else {
+			// default sourceType is AKAMAI_LIVE
+			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
+		}
 	
 		$dbEntry = $this->prepareEntryForInsert($liveStreamEntry);
 		$dbEntry->save();
@@ -99,14 +105,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$dbEntry->save();
 			
 			$broadcastUrlManager = kBroadcastUrlManager::getInstance($dbEntry->getPartnerId());
-			$otherDCs = kDataCenterMgr::getAllDcs();
-			$otherDc = reset($otherDCs);
-			
-			//In case there is only 1 DC
-			$otherDcId = $otherDc ? $otherDc['id'] : kDataCenterMgr::getCurrentDcId();
-			
-			$dbEntry->setPrimaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, kDataCenterMgr::getCurrentDcId(), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
-			$dbEntry->setSecondaryBroadcastingUrl($broadcastUrlManager->getBroadcastUrl($dbEntry, $otherDcId, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$broadcastUrlManager->setEntryBroadcastingUrls($dbEntry);
 		}
 		
 		return $dbEntry;
@@ -148,14 +147,15 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($dbEntry->getStreamPassword() != $token)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
+		// TODO count entries and not flavors
+		
 		// fetch current stream live params
 		$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());
-		$liveParamsCounts = array();
-		
-		// counting the current stream live params
+		$usedLiveParamsIds = array();
 		foreach($liveParamsIds as $liveParamsId)
-			$liveParamsCounts[$liveParamsId] = 1;
-		
+		{
+			$usedLiveParamsIds[$liveParamsId] = array($entryId);
+		}
 			
 		// fetch all live entries that currently are live
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -166,49 +166,77 @@ class LiveStreamService extends KalturaLiveEntryService
 		$filter->attachToCriteria($baseCriteria);
 		
 		$entries = entryPeer::doSelect($baseCriteria);
-		$liveParamsInputs = count($entries) + 1;
-		$maxLiveStreamInputs = $this->getPartner()->getMaxLiveStreamInputs();
-		if(is_null($maxLiveStreamInputs))
-			$maxLiveStreamInputs = kConf::get('partner_max_live_stream_inputs', 'local', 10);
+	
+		$maxInputStreams = $this->getPartner()->getMaxLiveStreamInputs();
+		if(is_null($maxInputStreams))
+			$maxInputStreams = kConf::get('partner_max_live_stream_inputs', 'local', 10);
+		KalturaLog::debug("Max live stream inputs [$maxInputStreams]");
 			
-		KalturaLog::debug("live params inputs [$liveParamsInputs], max live stream inputs [$maxLiveStreamInputs]");
-		if($liveParamsInputs > $maxLiveStreamInputs)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_INPUTS, $entryId);
-			
+		$maxTranscodedStreams = 0;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $this->getPartnerId()))
+		{
+			$maxTranscodedStreams = $this->getPartner()->getMaxLiveStreamOutputs();
+			if(is_null($maxTranscodedStreams))
+				$maxTranscodedStreams = kConf::get('partner_max_live_stream_outputs', 'local', 10);
+		}
+		KalturaLog::debug("Max live stream outputs [$maxTranscodedStreams]");
+		
+		$totalInputStreams = count($entries) + 1;
+		if($totalInputStreams > ($maxInputStreams + $maxTranscodedStreams))
+		{
+			KalturaLog::debug("Live input stream [$totalInputStreams]");
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
+		}
+		
+		$entryIds = array($entryId);
 		foreach($entries as $liveEntry)
 		{
 			/* @var $liveEntry LiveEntry */
-			$liveParamsIds = explode(',', $liveEntry->getFlavorParamsIds());
+			$entryIds[] = $liveEntry->getId();
+			$liveParamsIds = array_map('intval', explode(',', $liveEntry->getFlavorParamsIds()));
 			
 			foreach($liveParamsIds as $liveParamsId)
 			{
-				if(isset($liveParamsCounts[$liveParamsId]))
-					$liveParamsCounts[$liveParamsId]++;
+				if(isset($usedLiveParamsIds[$liveParamsId]))
+				{
+					$usedLiveParamsIds[$liveParamsId][] = $liveEntry->getId();
+				}
 				else
-					$liveParamsCounts[$liveParamsId] = 1;
+				{
+					$usedLiveParamsIds[$liveParamsId] = array($liveEntry->getId());
+				}
 			}
 		}
 			
-		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($liveParamsCounts));
-		$liveParamsOutputs = 0;
+		$liveParams = assetParamsPeer::retrieveByPKs(array_keys($usedLiveParamsIds));
+		$passthruEntries = null;
+		$transcodedEntries = null;
 		foreach($liveParams as $liveParamsItem)
 		{
 			/* @var $liveParamsItem LiveParams */
-			if(!$liveParamsItem->hasTag(liveParams::TAG_SOURCE))
+			if($liveParamsItem->hasTag(liveParams::TAG_INGEST))
 			{
-				KalturaLog::debug("Output live params [" . $liveParamsItem->getId() . "] [" . $liveParamsItem->getSystemName() . "]: " . $liveParamsCounts[$liveParamsItem->getId()]);
-				$liveParamsOutputs += $liveParamsCounts[$liveParamsItem->getId()];
+				$passthruEntries = array_intersect(is_array($passthruEntries) ? $passthruEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
+			}
+			else
+			{
+				$transcodedEntries = array_intersect(is_array($transcodedEntries) ? $transcodedEntries : $entryIds, $usedLiveParamsIds[$liveParamsItem->getId()]);
 			}
 		}
+		$passthruEntries = array_diff($passthruEntries, $transcodedEntries);
 		
-		$maxLiveStreamOutputs = $this->getPartner()->getMaxLiveStreamOutputs();
-		if(is_null($maxLiveStreamOutputs))
-			$maxLiveStreamOutputs = kConf::get('partner_max_live_stream_outputs', 'local', 30);
-			
-		KalturaLog::debug("live params outputs [$liveParamsOutputs], max live stream outputs [$maxLiveStreamOutputs]");
-		if($liveParamsOutputs > $maxLiveStreamOutputs)
-			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_OUTPUTS, $entryId);
+		$passthruEntriesCount = count($passthruEntries);
+		$transcodedEntriesCount = count($transcodedEntries);
 		
+		KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
+		if($transcodedEntriesCount > $maxTranscodedStreams)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $entryId);
+		
+		$maxInputStreams += ($maxTranscodedStreams - $transcodedEntriesCount);
+		KalturaLog::debug("Live params inputs [$passthruEntriesCount], max live stream inputs [$maxInputStreams]");
+		if($passthruEntriesCount > $maxInputStreams)
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $entryId);
+
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
 		return $entry;
@@ -315,16 +343,16 @@ class LiveStreamService extends KalturaLiveEntryService
 	public function isLiveAction ($id, $protocol)
 	{
 		KalturaResponseCacher::setExpiry(self::ISLIVE_ACTION_CACHE_EXPIRY);
-		kApiCache::disableConditionalCache();
+		KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_CONDITIONAL_CACHE_EXPIRY);
 		if (!kCurrentContext::$ks)
 		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
 		}
 		else
 		{
@@ -375,5 +403,71 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+	}
+	
+	/**
+	 * Add new pushPublish configuration to entry
+	 * 
+	 * @action addLiveStreamPushPublishConfiguration
+	 * @param string $entryId
+	 * @param KalturaPlaybackProtocol $protocol
+	 * @param string $url
+	 * @return KalturaLiveStreamEntry
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function addLiveStreamPushPublishConfigurationAction ($entryId, $protocol, $url)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+		
+		/* @var $entry LiveEntry */
+		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol($protocol);
+		$configuration->setUrl($url);
+		
+		$pushPublishConfigurations[] = $configuration;
+		$entry->setPushPublishConfigurations($pushPublishConfigurations);
+		$entry->save();
+		
+		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
+		$apiEntry->fromObject($entry);
+		return $apiEntry;
+	}
+	
+/**
+	 *Remove push publish configuration from entry
+	 * 
+	 * @action removeLiveStreamPushPublishConfiguration
+	 * @param string $entryId
+	 * @param KalturaPlaybackProtocol $protocol
+	 * @return KalturaLiveStreamEntry
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function removeLiveStreamPushPublishConfigurationAction ($entryId, $protocol)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry || $entry->getType() != entryType::LIVE_STREAM)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
+		
+		/* @var $entry LiveEntry */
+		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		foreach ($pushPublishConfigurations as $index => $config)
+		{
+			/* @var $config kLiveStreamConfiguration */
+			if ($config->getProtocol() == $protocol)
+			{
+				unset ($pushPublishConfigurations[$index]);
+			}
+		}
+
+		$entry->setPushPublishConfigurations($pushPublishConfigurations);
+		$entry->save();
+		
+		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
+		$apiEntry->fromObject($entry);
+		return $apiEntry;
 	}
 }

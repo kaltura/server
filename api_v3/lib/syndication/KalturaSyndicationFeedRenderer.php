@@ -10,7 +10,10 @@ class KalturaSyndicationFeedRenderer
 	const STATIC_PLAYLIST_ENTRY_PEER_LIMIT_QUERY = 500;
 	const CACHE_CREATION_TIME_SUFFIX = ".time";
 	const CACHE_CREATION_MARGIN = 30;
-
+	
+	const CACHE_VERSION = 1;
+	const CACHE_EXPIRY = 2592000;		// 30 days
+	
 	/**
 	 * Maximum number of items to list
 	 * @var int
@@ -129,7 +132,7 @@ class KalturaSyndicationFeedRenderer
 		
 		myPartnerUtils::resetPartnerFilter('entry');
 
-		$this->baseCriteria = entryPeer::getDefaultCriteriaFilter();
+		$this->baseCriteria = clone entryPeer::getDefaultCriteriaFilter();
 		
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
 		$startDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::START_DATE, null));
@@ -139,15 +142,12 @@ class KalturaSyndicationFeedRenderer
 		$endDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::END_DATE, null));
 		$this->baseCriteria->addAnd($endDateCriterion);
 		
-		$entryFilter = new entryFilter();
-		$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
-		$entryFilter->setStatusEquel(entryStatus::READY);
-		$entryFilter->setTypeIn(array(entryType::MEDIA_CLIP, entryType::MIX));
-		$entryFilter->setModerationStatusNotIn(array(
+		$this->baseCriteria->addAnd(entryPeer::PARTNER_ID, $this->syndicationFeed->partnerId);
+		$this->baseCriteria->addAnd(entryPeer::STATUS, entryStatus::READY);
+		$this->baseCriteria->addAnd(entryPeer::TYPE, array(entryType::MEDIA_CLIP, entryType::MIX), Criteria::IN);
+		$this->baseCriteria->addAnd(entryPeer::MODERATION_STATUS, array(
 			entry::ENTRY_MODERATION_STATUS_REJECTED, 
-			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION));
-			
-		$entryFilter->attachToCriteria($this->baseCriteria);
+			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION), Criteria::NOT_IN);
 			
 		if($this->syndicationFeed->playlistId)
 		{
@@ -388,7 +388,7 @@ class KalturaSyndicationFeedRenderer
 			reset($this->entryFilters);
 			
 		$this->executed = true;
-		
+
 		$c = clone $this->baseCriteria;
 		
 		if($this->staticPlaylist)
@@ -449,7 +449,8 @@ class KalturaSyndicationFeedRenderer
 		if($renderer->shouldEnableCache())
 			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FEED_ENTRY);
 		
-		$cachePrefix = "feed_{$this->syndicationFeed->id}/entry_";
+		$protocol = infraRequestUtils::getProtocol();
+		$cachePrefix = "feed_{$this->syndicationFeed->id}/{$protocol}/entry_";
 		$feedUpdatedAt = $this->syndicationFeedDb->getUpdatedAt(null);
 
 		$e = null;
@@ -472,7 +473,7 @@ class KalturaSyndicationFeedRenderer
 			$updatedAt = max($feedUpdatedAt,  $entry->getUpdatedAt(null));
 
 			if ($cacheStore) {	
-				$cacheKey = $cachePrefix.str_replace("_", "-", $entry->getId()); // replace _ with - so cache folders will be created with random entry id and not 0_/1_
+				$cacheKey = $cachePrefix.str_replace("_", "-", $entry->getId()).self::CACHE_VERSION; // replace _ with - so cache folders will be created with random entry id and not 0_/1_
 				$cacheTime = $cacheStore->get($cacheKey.self::CACHE_CREATION_TIME_SUFFIX);
 				if ($cacheTime !== false && $cacheTime > $updatedAt + self::CACHE_CREATION_MARGIN)
 					$xml = $cacheStore->get($cacheKey);
@@ -497,8 +498,8 @@ class KalturaSyndicationFeedRenderer
 
 			if ($cacheStore)
 			{
-				$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time());
-				$cacheStore->set($cacheKey, $xml);
+				$cacheStore->set($cacheKey.self::CACHE_CREATION_TIME_SUFFIX, time(), self::CACHE_EXPIRY);
+				$cacheStore->set($cacheKey, $xml, self::CACHE_EXPIRY);
 			}
 			
 			echo $renderer->finalize($xml, $nextEntry !== false);
@@ -550,7 +551,13 @@ class KalturaSyndicationFeedRenderer
 			$urlManager->setDomain($cdnHost);
 			
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = requestUtils::getApiCdnHost() . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
+			
+			if (!$storage->getDeliveryHttpsBaseUrl())
+				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
+			else
+				$url = requestUtils::getApiCdnHost();
+
+			$url .= $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
 		}
 		else
 		{

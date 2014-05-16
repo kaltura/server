@@ -117,49 +117,70 @@ class flavorAsset extends asset
      * @see asset::setStatusLocalReady()
      */
     public function setStatusLocalReady()
-	{
+    {
 	    KalturaLog::debug('Setting local ready status for asset id ['.$this->getId().']');
 	    $newStatus = asset::ASSET_STATUS_READY;
 	    
 	    $externalStorages = StorageProfilePeer::retrieveExternalByPartnerId($this->getPartnerId());
-		foreach($externalStorages as $externalStorage)
-		{
-		    // check if storage profile should affect the asset ready status
-		    if ($externalStorage->getReadyBehavior() != StorageProfileReadyBehavior::REQUIRED)
-		    {
-		        // current storage profile is not required for asset readiness - skipping
-		        continue;
-		    }
-		    
-		    // check if export should happen now or wait for another trigger
-		    if (!$externalStorage->triggerFitsReadyAsset($this->getEntryId())) {
-		        KalturaLog::debug('Asset id ['.$this->getId().'] is not ready to export to profile ['.$externalStorage->getId().']');
-		        continue;
-		    }
-		    
-		    // check if asset needs to be exported to the remote storage
-		    if (!$externalStorage->shouldExportFlavorAsset($this))
-		    {
-    		    // check if asset is currently being exported to the remote storage
-    		    if (!$externalStorage->isPendingExport($this))
-    		    {
-    		        KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$externalStorage->getId().']');
-		        continue;
-    		    }
-    		    else
-    		    {
-    		        KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$externalStorage->getId().']');
-    		    }
-		    }
-		    
-		    KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
-		    $newStatus = asset::ASSET_STATUS_EXPORTING;
-		    break;
-		}
+	    foreach($externalStorages as $externalStorage)
+	    {
+	    	if($this->requiredToExportFlavor($externalStorage))
+			{
+				KalturaLog::debug('Asset id ['.$this->getId().'] is required to export to profile ['.$externalStorage->getId().'] - setting status to [EXPORTING]');
+				$newStatus = asset::ASSET_STATUS_EXPORTING;
+				break;			
+			}			
+	    }
         KalturaLog::debug('Setting status to ['.$newStatus.']');
 	    $this->setStatus($newStatus);
 	}
 	
+	private function requiredToExportFlavor(StorageProfile $storage)
+	{
+		// check if storage profile should affect the asset ready status
+		if ($storage->getReadyBehavior() != StorageProfileReadyBehavior::REQUIRED)
+		{
+			// current storage profile is not required for asset readiness - skipping
+		        return false;
+		}
+		    
+		// check if export should happen now or wait for another trigger
+		if (!$storage->triggerFitsReadyAsset($this->getEntryId())) {
+			KalturaLog::debug('Asset id ['.$this->getId().'] is not ready to export to profile ['.$storage->getId().']');
+		    return false;
+		}
+		    
+		// check if asset needs to be exported to the remote storage
+		if (!$storage->shouldExportFlavorAsset($this, true))
+		{
+			KalturaLog::debug('Should not export asset id ['.$this->getId().'] to profile ['.$storage->getId().']');
+    		return false;
+    	}
+		    
+		$keys = array(
+		    		$this->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET), 
+		    		$this->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM), 
+		    		$this->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
+				
+		foreach ($keys as $key) 
+		{
+			if($storage->shoudlExportFileSync($key))
+    		{
+				return true;
+    		}
+		}
+		    
+		foreach ($keys as $key) 
+		{
+			// check if asset is currently being exported to the remote storage
+    		if ($storage->isPendingExport($key))
+    		{
+    		   	KalturaLog::debug('Asset id ['.$this->getId().'] is currently being exported to profile ['.$storage->getId().']');
+		      	return true;
+			}
+		}
+		return false;			
+	}
 
 	/**
 	 * Code to be run after inserting to database
@@ -239,5 +260,10 @@ class flavorAsset extends asset
 				$obj = new flavorAsset();
 		}
 		return $obj;
+	}
+	
+	public function getVideoBitrate()
+	{
+		return $this->getBitrate();
 	}
 }

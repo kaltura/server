@@ -144,6 +144,8 @@ class APIErrors
 	// ENTRY_ID entry_id
 	const INVALID_ENTRY_ID = "INVALID_ENTRY_ID;ENTRY_TYPE,ENTRY_ID;Unknown @ENTRY_TYPE@ [@ENTRY_ID@]" ;
 	
+	const ENTRIES_AMOUNT_EXCEEDED = "ENTRIES_AMOUNT_EXCEEDED" ;
+	
 	const INVALID_ENTRY_IDS = "INVALID_ENTRY_IDS;ENTRY_IDS;Unknown entry ids [@ENTRY_IDS@]" ;
 	
 	// ENTRY_TYPE - the type (string) of the entry dvdProject / bubbles , ...
@@ -231,6 +233,8 @@ class APIErrors
 	const SERVICE_FORBIDDEN_FULLY_BLOCKED = "SERVICE_FORBIDDEN_FULLY_BLOCKED;;The access to this service is forbidden since the specified partner is fully blocked";
 	
 	const SERVICE_FORBIDDEN_PARTNER_DELETED = "SERVICE_FORBIDDEN_PARTNER_DELETED;;The access to this service is forbidden since the specified partner is deleted";
+
+	const USER_BLOCKED = "USER_BLOCKED;;this user is blocked";
 
 	const SERVICE_ACCESS_CONTROL_RESTRICTED = "SERVICE_ACCESS_CONTROL_RESTRICTED;SERVICE;The access to service [@SERVICE@] is forbidden due to access control restriction";
 	
@@ -409,4 +413,6 @@ class APIErrors
 	const ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA;; error accored while gzuncompress job data";
 
 	const OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND;;Object not found";
+	
+	const UNKNOWN_RESPONSE_FORMAT = "UNKNOWN_RESPONSE_FORMAT;FORMAT;Response format provided [@FORMAT@] is not recognized by server";
 }

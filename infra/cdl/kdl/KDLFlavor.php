@@ -482,9 +482,18 @@ $plannedDur = 0;
 			}
 			else {
 				if($target->_container && $target->_container->_id==KDLContainerTarget::ISMV) {
-					$target->_warnings[KDLConstants::ContainerIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
-						KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
-					$target->_container->_id=KDLContainerTarget::WMA;
+					/*
+					 * EE cannot generate audio only ISMV, therefore switch to WMA
+					 */
+					foreach ($this->_transcoders as $trns){
+						$rv = strstr($trns->_id,"expressionEncoder.ExpressionEncoder");
+						if($rv!=false) {
+							$target->_warnings[KDLConstants::ContainerIndex][] = // "The target flavor bitrate {".$target->_video->_bitRate."} does not comply with the requested bitrate (".$this->_video->_bitRate.").";
+								KDLWarnings::ToString(KDLWarnings::ChangingFormt, $target->_container->_id, KDLContainerTarget::WMA);
+							$target->_container->_id=KDLContainerTarget::WMA;
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -663,12 +672,41 @@ $plannedDur = 0;
 		return $targetVid;
 	}
 	
+	/*
+	 *	switch frame sizes & inverse display aspect ratio for a certain video.
+	 */
+	
+	private static function invertVideoDimensions(KDLVideoData $video)
+	{
+		$temp = $video->_height;
+		$video->_height = $video->_width;
+		$video->_width = $temp;
+		if (isset($video->_dar) && $video->_dar != 0)
+			$video->_dar = 1/$video->_dar;
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
-	private static function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
+	private function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
 	{
 		$shrinkToSource = $target->_isShrinkFramesizeToSource;
+		$invertedVideo = false;
+		
+		
+		/*
+		 *	this is for the special case where a source has height > width.
+		 *	here it will be inverted & run through the usual flow.
+		 *	in this case the source-target frame-sizes ratio after converting should be the same as if the source had a regular height < width.
+		 *	boolean flag invertedVideo - for inverting back the source & target later on.
+		 */
+		if ((isset($source->_dar) && $source->_dar < 1) ||
+		(isset($source->_height) && isset($source->_width) && $source->_height > 0 && $source->_width > 0 && $source->_height > $source->_width))
+		{
+			KalturaLog::debug('inverting source');
+			self::invertVideoDimensions($source);
+			$invertedVideo = true;
+		}
 		
 		$widSrc = $source->_width;
 		$hgtSrc = $source->_height;
@@ -807,14 +845,116 @@ $plannedDur = 0;
 		/*
 		 * x16 - make sure both hgt/wid comply to x16
 		 * - if the frame size is an 'industry-standard', skip x16 constraint 
+		 * - for h264 targets force MOD 2 for width & height, otherwise x264 crashes.
 		 */
+		$modVal = 16;
 		if((isset($target->_forceMult16) && $target->_forceMult16 == 0)
 		|| (($target->_width == 640 || $target->_width == 480) && $target->_height == 360) || ($target->_width == 1920 && $target->_height == 1080)){
-			;
+			$h264targets = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, KDLVideoTarget::H264M, KDLVideoTarget::H264H);
+			if(in_array($target->_id, $h264targets)) {
+				$modVal = 2;
 		}
 		else {
-			$target->_height = $target->_height -($target->_height%16);
-			$target->_width  = $target->_width  -($target->_width%16);
+				return;
+			}
+		}
+
+		$this->matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, $target);
+		
+		/*
+		 *      inverting source back for conversion process.
+		 *      inverting target back so the output will be inverted as well.
+		 */
+		if ($invertedVideo)
+		{
+			KalturaLog::debug('inverting back source & target');
+			
+			self::invertVideoDimensions($source);
+			self::invertVideoDimensions($target);
+		}
+	}
+	
+	/* ---------------------------
+	 * matchBestModConstrainedVideoFramesize
+	 *  The goal is to conform with frame-size 'mod' constraint (mostly mod16) 
+	 *  while attempting to match as close as possible the required aspect ratio - 
+	 *  - Evaluating the all 4 possible setups (mod-up/mod-down for vid/hgt)
+	 *  - Compare each of them to the required AR
+	 *  - Find the setup that is closest 
+	 */
+	function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
+	{ 
+			/*
+			 * Calculate hgt & wid 'mod down' value. If not set - assign 0 
+			 */
+		$h_dw = ($target->_height>0)? $target->_height - ($target->_height%$modVal): 0;
+		$w_dw = ($target->_width>0)? $target->_width - ($target->_width%$modVal): 0;
+		
+			/*
+			 * If 'mod-down' vals equal to original trg val 
+			 * ==> leave, further calcs are redundant 
+			 * If one of 'mod-down' ==0
+			 * ==> assign and leave, further calcs are redundant
+			 */
+		if($target->_height==$h_dw && $target->_width==$w_dw){
+			return;
+		}
+		else if($h_dw==0 || $w_dw==0){
+			$target->_width  = $w_dw;
+			$target->_height = $h_dw;
+			return;
+		}
+
+			/*
+			 * Calc 'mod-up' values
+			 * Make sure not to exceed the source dims 
+			 * and original flavor dims
+			 */
+		$h_up = $target->_height -($target->_height%$modVal) + $modVal;
+		if($h_up>$hgtSrc || ($this->_video->_height>0 && $h_up>$this->_video->_height)) {
+			$h_up = $h_dw;
+		}
+		$w_up = $target->_width  -($target->_width%$modVal) + $modVal;
+		if($w_up>$widSrc || ($this->_video->_width>0 && $w_up>$this->_video->_width)) {
+			$w_up = $w_dw;
+		}
+		
+			/*
+			 * Calc difference between source AR and AR's of various mod-up/down cases.
+			 * The target is to find the option that is closest to the source AR.
+			 * Array keys notation - 'd' for 'down', 'u' for 'up'
+			 */
+		$arArr["dd"] = abs($darSrcFrame-$w_dw/$h_dw);
+		$arArr["du"] = abs($darSrcFrame-$w_dw/$h_up);
+		$arArr["ud"] = abs($darSrcFrame-$w_up/$h_dw);
+		$arArr["uu"] = abs($darSrcFrame-$w_up/$h_up);
+		
+			/*
+			 * Sort the array with AR-diffs to find the smallest (closest to source AR)
+			 */
+		asort($arArr);
+		$kAr = key($arArr);
+		
+			/*
+			 * Assign the best match to target dims.
+			 */
+		switch ($kAr){
+		case "dd":
+			$target->_width  = $w_dw;
+			$target->_height = $h_dw;
+			break;
+		case "du":
+			$target->_width  = $w_dw;
+			$target->_height = $h_up;
+			break;
+		case "ud":
+			$target->_width  = $w_up;
+			$target->_height = $h_dw;
+			break;
+		case "uu":
+			$target->_width  = $w_up;
+			$target->_height = $h_up;
+			break;
 		}
 	}
 
@@ -1017,6 +1157,17 @@ $plannedDur = 0;
 			else {
 				$targetAud->_sampleRate=max(KDLConstants::MinAudioSampleRate,min(KDLConstants::MaxAudioSampleRate,$targetAud->_sampleRate));
 			}
+		}
+		
+			/*
+			 * For following cases the audio should be resampled with ffmpeg 'aresample' filter
+			 * - Nellimoser audio source
+			 * - Low sample-rate audio (<16000hz)
+			 * - target other than OGG/Vorbis
+			 */
+		if(!$target->_container->IsFormatOf(array(KDLContainerTarget::OGG,KDLContainerTarget::OGV))
+		&& ($source->IsFormatOf(array('nellymoser'))||($source->_sampleRate && $source->_sampleRate>0 && $source->_sampleRate<16000))) {
+			$targetAud->_useResampleFilter = true;
 		}
 
 		return $targetAud;

@@ -112,7 +112,8 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
 	protected function handleEntries($context, $feed, array $entries) {
 		
-		$cachePrefix = "dist_" . ($this->profile->getId()) . "/entry_";
+		$protocol = infraRequestUtils::getProtocol();
+		$cachePrefix = "dist_" . ($this->profile->getId()) . "/{$protocol}/entry_";
 		$profileUpdatedAt = $this->profile->getUpdatedAt(null);
 		
 		$extendItems = $this->profile->getItemXpathsToExtend();

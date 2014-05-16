@@ -100,10 +100,10 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 		if (! ($scope instanceof kEventScope))
 			return array();
 		
-		if (!method_exists($scope->getEvent()->getObject(), 'getPartnerId'))
+		if (!method_exists($scope->getObject(), 'getPartnerId'))
 			return array();
 		
-		$partnerId = $scope->getEvent()->getObject()->getPartnerId();
+		$partnerId = $scope->getObject()->getPartnerId();
 		/* @var $scope kEventScope */
 		$metadataContentParameters = array();
 		foreach ($sweepFieldValues as $sweepFieldValue)
@@ -129,24 +129,24 @@ class MetadataEventNotificationsPlugin extends KalturaPlugin implements IKaltura
 				//If the objectType of the email template is a metadata object we can use its id
 				if (kMetadataManager::getObjectTypeName($profile->getObjectType()) == KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType))
 				{
-					$objectId = $scope->getEvent()->getObject()->getId();
+					$objectId = $scope->getObject()->getId();
 				}
 				elseif (kMetadataManager::getObjectTypeName($profile->getObjectType()) == 'entry'
-						&& ($scope->getEvent()->getObject() instanceof asset))
+						&& ($scope->getObject() instanceof asset))
 				{
-					$objectId = $scope->getEvent()->getObject()->getEntryId();
+					$objectId = $scope->getObject()->getEntryId();
 				}
-				elseif ($scope->getEvent()->getObject() instanceof categoryEntry)
+				elseif ($scope->getObject() instanceof categoryEntry)
 				{
 					$profileObject = kMetadataManager::getObjectTypeName($profile->getObjectType());
 					$getter = "get{$profileObject}Id";
 					KalturaLog::info ("Using $getter in order to retrieve the metadata object ID");
-					$categoryEntry = $scope->getEvent()->getObject();
+					$categoryEntry = $scope->getObject();
 					$objectId = $categoryEntry->$getter();
 				}
 				elseif (KalturaPluginManager::getObjectClass('EventNotificationEventObjectType', $objectType) == MetadataPeer::OM_CLASS)
 				{
-					$metadataObjectId = $scope->getEvent()->getObject()->getId();
+					$metadataObjectId = $scope->getObject()->getId();
 				}
 				
 				

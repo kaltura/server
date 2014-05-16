@@ -69,9 +69,10 @@ $APIV3_TESTED_ACTIONS = array(
 		);
 
 $APIV3_BLOCKED_ACTIONS = array(
-		'*.getexclusive',
-		'report.geturlforreportascsv',
-		'aspera_aspera.getfaspurl',
+		'*.getexclusive',						// not read-only
+		'report.geturlforreportascsv',			// contains random
+		'aspera_aspera.getfaspurl',				// contains random
+		'widevine_widevinedrm.getlicense',		// contains random
 		);
 
 $KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
@@ -322,6 +323,14 @@ function xmlToArray($xmlstring)
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
 	$array = json_decode($json,TRUE);
+	if (!$array) {
+		// failed to parse as XML try JSON (for feeds)
+		$xmlstring = preg_replace ( '/,\s*\]/', ']', $xmlstring );
+		$xmlstring = preg_replace ( '/,\s*\}/', '}', $xmlstring );
+		$array = json_decode ( $xmlstring, TRUE );
+		if ($array)
+			echo "\nSuccessfully parsed as json";
+	}
 	return $array;
 }
 
@@ -376,12 +385,21 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 		{
 			if (!compareValues($newValue, $oldValue))
 			{
-				$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				$newValueParsed = xmlToArray($newValue);
+				$oldValueParsed = xmlToArray($oldValue);
+				if ($newValueParsed && $oldValueParsed && is_array($newValueParsed) && is_array($oldValueParsed))
+				{
+					$errors = array_merge($errors, compareArrays($newValueParsed, $oldValueParsed, $subPath));
+				}
+				else
+				{
+					$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				}
 				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}
 		}
-		else
+		else if ($newValue !== $oldValue)
 		{
 			$errors[$subPath] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
 		}
@@ -1294,6 +1312,9 @@ class LogProcessorUriList implements LogProcessor
 			$action = $matches[1];
 
 		$fullActionName = "$service.$action";
+		if ($fullActionName == '.')
+			$fullActionName = $uri;
+		
 		testAction(null, $fullActionName, array(), $uri);
 	}
 }

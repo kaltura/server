@@ -19,8 +19,8 @@
  * 		1. The client name is defined by block brackets (ini object) [client_name]
  * 		2. under the [clientname], define the generator parameters, each in new line, as following:
  * 			a. generator - The class name of the client library generator to use
- * 			b. exclude - whether to exclude any specific API services from the client library (can only be either exclude or include defined)
- * 			c. include - whether to include any specific API services from the client library (can only be either exclude or include defined)
+ * 			b. exclude - whether to exclude any specific API services from the client library (ignored if include defined)
+ * 			c. include - whether to include any specific API services from the client library (overrides exclude)
  * 			d. plugins - whether to include any specific API services from plugins
  * 			e. additional - whether to include any additional objects not directly defined through API services
  * 			f. internal - whether to show this client in the Client Libraries UI in the testme console, or not. 
@@ -157,8 +157,8 @@ foreach($config as $name => $item)
 	$exclude = $item->get("exclude");
 	$excludePaths = $item->get("excludepaths");
 	// can only do either include or exclude
-	if ($include !== null && $exclude !== null)
-		throw new Exception("Only include or exclude should be declared");
+	if ($include !== null)
+		$exclude = null;
 
 	// get the list of Objects to include in this client generate	
 	$additional = $item->get("additional");
@@ -228,6 +228,11 @@ foreach($config as $name => $item)
 				$instance->setParam($key, $val);
 			}
 		}
+		
+		if (isset ($item->excludeSourcePaths))
+		{
+			$instance->setExcludeSourcePaths ($item->excludeSourcePaths);
+		}
 	}
 	//if it's a native php based schema generator
 	else if ($fromPhp)
@@ -270,13 +275,15 @@ foreach($config as $name => $item)
 			
 		if($clearPath || file_exists($outputPath))
 		{
-			KalturaLog::info("Delete old files [$outputPath" . ($clearPath ? ", $clearPath" : "") . "]");
 			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 			{
-				passthru("rmdir /Q /S $outputPath $clearPath");
+				$winOutputPath = realpath($outputPath);
+				KalturaLog::info("Delete old files [$winOutputPath" . ($clearPath ? ", $clearPath" : "") . "]");
+				passthru("rmdir /Q /S $winOutputPath $clearPath");
 			}
 			else
 			{
+				KalturaLog::info("Delete old files [$outputPath" . ($clearPath ? ", $clearPath" : "") . "]");
 				passthru("rm -fr $outputPath $clearPath");
 			}
 		}

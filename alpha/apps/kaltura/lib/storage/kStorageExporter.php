@@ -70,8 +70,19 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		    return;
 		}
 			
-		$key = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$exporting = false;
+		$keys = array(
+		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET), 
+		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM), 
+		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC),
+					$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL));
+		foreach ($keys as $key) 
+		{
+			if($externalStorage->shoudlExportFileSync($key))
+			{		
 		$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
+			}			
+		}
 				
 		return $exporting;
 	}
@@ -82,13 +93,15 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
 	{			
-		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
 		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
-			KalturaLog::err("no ready fileSync was found for key [$key]");
+			KalturaLog::debug("no ready fileSync was found for key [$key]");
 			return;
 		}
+		
+		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
+		
 		$parent_file_sync = kFileSyncUtils::resolve($fileSync);
 		$srcFileSyncPath = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
 		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSyncPath, $force, $fileSync->getDc());
@@ -390,7 +403,20 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			{
 				self::delete($entry, $profile, $key);
 			}
+			
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			if($profile->isExported($key))
+			{
+				self::delete($entry, $profile, $key);
+			}
+			
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
+			if($profile->isExported($key))
+			{
+				self::delete($entry, $profile, $key);
+			}			
 		}
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
+	
 }

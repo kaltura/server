@@ -86,6 +86,37 @@ function onPageLoad() {
 		} 
 	});
 
+	$("#fieldset-thumbnailConfiguration input").each(function(inx, value){
+		var $input = $(value);
+
+		if( $input.attr('type') == 'checkbox') {
+			$input.change(function(){
+						var id = $(this).attr('id').replace('checkbox_', '');
+						var $text_input = $('#' + id);
+
+						if ($(this).attr("checked")) {
+								$text_input.removeAttr('readonly');
+					}else{
+						$text_input.attr("readonly", 1);
+						$text_input.val("");
+					}
+				});
+		}
+
+		if( $input.attr('type') == 'text') {
+				var id = $(this).attr('id');
+				var $checkbox_input = $('#checkbox_' + id);
+
+				if ($input.val() == 0) {
+						$input.val("");
+                        $input.attr("readonly", 1);
+			}else{
+				$input.removeAttr('readonly');
+				$checkbox_input.attr("checked", true);
+			}
+		}
+	});
+	
 	$("#partner_group_type-element select").each(function(inx, value){
 		var $partner_parent_id = $('#partner_parent_id');
 		if ($(this).val() != <?php echo Kaltura_Client_Enum_PartnerGroupType::PUBLISHER; ?> && $(this).val() != <?php echo Kaltura_Client_Enum_PartnerGroupType::TEMPLATE; ?>){
@@ -288,7 +319,7 @@ function openViewHistory(partner_id){
 		modal: true,
 		resizable: false,
 		width: 750,
-		title: '<?php echo $this->translate('Trail Account Extension History'); ?>',
+		title: '<?php echo $this->translate('Trial Account Events History'); ?>',
 		height: 400,
 		buttons: {			
 			'<?php echo $this->translate('OK'); ?>': function() {

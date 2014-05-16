@@ -27,5 +27,7 @@ class KalturaVideoCodec extends KalturaStringEnum
 	const APCH = "apch";	// 185mbps,	profile:3
 	const DNXHD= "dnxhd";
 	const DV = "dv";
+	const VP9 = "vp9";
+	const H265 = "h265";
 	const COPY = "copy";
 }
