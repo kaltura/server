@@ -116,25 +116,25 @@ if($monitorResult->errors)
 
 if(!is_null($errorThresholdMax) && $monitorResult->value > $errorThresholdMax)
 {
-	echo "Threshold crossed - $monitorResult->description";
+	echo "CRITICAL: Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
 if(!is_null($warningThresholdMax) && $monitorResult->value > $warningThresholdMax)
 {
-	echo "Threshold crossed - $monitorResult->description";
+    echo "WARNING: Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_WARNING);
 }
 
 if(!is_null($errorThresholdMin) && $monitorResult->value < $errorThresholdMin)
 {
-	echo "Threshold crossed - $monitorResult->description";
+	echo "CRITICAL: Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_CRITICAL);
 }
 
 if(!is_null($warningThresholdMin) && $monitorResult->value < $warningThresholdMin)
 {
-	echo "Threshold crossed - $monitorResult->description";
+        echo "WARNING: Threshold crossed - $monitorResult->description";
 	exit(NAGIOS_CODE_WARNING);
 }
 
