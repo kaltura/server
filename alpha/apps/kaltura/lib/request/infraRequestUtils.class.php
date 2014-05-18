@@ -395,29 +395,49 @@ class infraRequestUtils
 		}
 		return $result;
 	}
-
-	public static function getRequestParams()
+	
+	public static function buildRequestParams(array $parameters)
 	{
-		if (!is_null(self::$requestParams))
-			return self::$requestParams;
-		
-		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
-		$pathParts = array();
-		if (isset($_SERVER['PHP_SELF']))
-			$pathParts = explode('/', $_SERVER['PHP_SELF']);
-		$pathParts = array_diff($pathParts, $scriptParts);
-		
-		$params = array();
-		reset($pathParts);
-		while(current($pathParts))
+		$pieces = array();
+		foreach($parameters as $key => $value)
 		{
-			$key = each($pathParts);
-			$value = each($pathParts);
-			$params[$key['value']] = $value['value'];
+			if($key && $value)
+			{
+				$pieces[] = "$key/$value";
+			}
 		}
+		return implode('/', $pieces);
+	}
+
+	public static function getRequestParams(array $overwrites = array())
+	{
+		if (is_null(self::$requestParams))
+		{
+			$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
+			$pathParts = array();
+			if (isset($_SERVER['PHP_SELF']))
+				$pathParts = explode('/', $_SERVER['PHP_SELF']);
+			$pathParts = array_diff($pathParts, $scriptParts);
 			
-		self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
-		return self::$requestParams;
+			$params = array();
+			reset($pathParts);
+			while(current($pathParts))
+			{
+				$key = each($pathParts);
+				$value = each($pathParts);
+				$params[$key['value']] = $value['value'];
+			}
+				
+			self::$requestParams = array_merge($params, $_GET, $_POST, $_FILES);
+		}
+		
+		$parameters = self::$requestParams;
+		foreach($overwrites as $parameterName => $parameterValue)
+		{
+			$parameters[$parameterName] = $parameterValue;
+		}
+		
+		return $parameters;
 	}
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)

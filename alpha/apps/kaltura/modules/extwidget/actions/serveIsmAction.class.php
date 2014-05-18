@@ -28,6 +28,9 @@ class serveIsmAction extends sfAction
 			$referrer = '';
 						
 		$syncKey = $this->getFileSyncKey($objectId, $type);
+		
+		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveIsm', $this->entry->getPartnerId());
+		
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);

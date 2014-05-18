@@ -69,9 +69,10 @@ $APIV3_TESTED_ACTIONS = array(
 		);
 
 $APIV3_BLOCKED_ACTIONS = array(
-		'*.getexclusive',
-		'report.geturlforreportascsv',
-		'aspera_aspera.getfaspurl',
+		'*.getexclusive',						// not read-only
+		'report.geturlforreportascsv',			// contains random
+		'aspera_aspera.getfaspurl',				// contains random
+		'widevine_widevinedrm.getlicense',		// contains random
 		);
 
 $KS_PATTERNS = array('/\/ks\/([a-zA-Z0-9+_\-]+=*)/', '/&ks=([a-zA-Z0-9+\/_\-]+=*)/', '/\?ks=([a-zA-Z0-9+\/_\-]+=*)/');
@@ -384,7 +385,16 @@ function compareArraysInternal($resultNew, $resultOld, $path)
 		{
 			if (!compareValues($newValue, $oldValue))
 			{
-				$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				$newValueParsed = xmlToArray($newValue);
+				$oldValueParsed = xmlToArray($oldValue);
+				if ($newValueParsed && $oldValueParsed && is_array($newValueParsed) && is_array($oldValueParsed))
+				{
+					$errors = array_merge($errors, compareArrays($newValueParsed, $oldValueParsed, $subPath));
+				}
+				else
+				{
+					$errors[$subPath] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
+				}
 				if (in_array($key, $ID_FIELDS))
 					break;		// id is different, all other fields will be different as well
 			}

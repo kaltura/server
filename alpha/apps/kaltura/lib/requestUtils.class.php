@@ -12,6 +12,38 @@ class requestUtils extends infraRequestUtils
 	
 	private static $s_cookies_to_be_set = array();
 	
+	public static function resolve($targetUrl, $referenceUrl)
+	{
+	    /* return if already absolute URL */
+	    if (parse_url($targetUrl, PHP_URL_SCHEME) != '') 
+	    	return $targetUrl;
+	
+	    /* queries and anchors */
+	    if ($targetUrl[0]=='#' || $targetUrl[0]=='?') 
+	    	return $referenceUrl.$targetUrl;
+	
+	    /* parse base URL and convert to local variables:
+	       $scheme, $host, $path */
+	    extract(parse_url($referenceUrl));
+	
+	    /* remove non-directory element from path */
+	    $path = preg_replace('#/[^/]*$#', '', $path);
+	
+	    /* destroy path if relative url points to root */
+	    if ($targetUrl[0] == '/') 
+	    	$path = '';
+	
+	    /* dirty absolute URL */
+	    $abs = "$host$path/$targetUrl";
+	
+	    /* replace '//' or '/./' or '/foo/../' with '/' */
+	    $re = array('#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#');
+	    for($n=1; $n>0; $abs=preg_replace($re, '/', $abs, -1, $n)) {}
+	
+	    /* absolute URL is ready! */
+	    return $scheme.'://'.$abs;
+	}
+	
 	static public function getParameter ( $param_name , $value_if_missing = NULL , $update_request_with_value = false )
 	{
 		if ( array_key_exists( $param_name , $_REQUEST ) )

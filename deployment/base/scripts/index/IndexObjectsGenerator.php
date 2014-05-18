@@ -174,7 +174,8 @@ class IndexObjectsGenerator
 			$fieldName = $idxValueAttr["field"];
 			$getter = array_key_exists("getter", $idxValueAttr) ? $idxValueAttr["getter"] :
 				"get" . ucwords(preg_replace('/_(.?)/e',"strtoupper('$1')", $fieldName));
-			$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
+			if(strpos($fieldName, ".") === FALSE)
+				$fieldName = $this->toPeerName($this->searchableObjects[$objName], $fieldName);
 			
 			$index[] = new IndexableOptimization('"' . $fieldName . '"', '"' . $getter . '"');
 		}

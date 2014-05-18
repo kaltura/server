@@ -42,7 +42,6 @@ class kSessionBase
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
-	const CACHE_VERSION = '1';
 	
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
@@ -251,7 +250,7 @@ class kSessionBase
 	
 	static protected function getSecretsCacheKey($partnerId)
 	{
-		return self::SECRETS_CACHE_PREFIX . self::CACHE_VERSION . '_' . $partnerId;
+		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', 'local', '1') . '_' . $partnerId;
 	}
 	
 	static public function getSecretsFromCache($partnerId)

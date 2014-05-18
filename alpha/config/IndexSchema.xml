@@ -114,6 +114,9 @@
 	<index format="%s">
 		<value field="id" />
 	</index>
+	<index format="isLive%s">
+		<value field="dynamic_attributes.isLive"/>
+	</index>
 </object>
 <object name="kuser">
 	<field name="login_data_id" indexName="login_data_id" type="int" orderable="yes" />

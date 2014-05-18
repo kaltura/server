@@ -74,7 +74,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$keys = array(
 		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET), 
 		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM), 
-		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
+		    		$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC),
+					$flavor->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL));
 		foreach ($keys as $key) 
 		{
 			if($externalStorage->shoudlExportFileSync($key))

@@ -55,7 +55,7 @@ class TVComDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{
-		$fieldConfigArray = array();
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(TVComDistributionField::GUID_ID);

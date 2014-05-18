@@ -81,6 +81,8 @@ class flvclipperAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
+		KalturaMonitorClient::initApiMonitor(false, 'keditorservices.flvclipper', $entry->getPartnerId());
+		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		// set the memory size to be able to serve big files in a single chunk

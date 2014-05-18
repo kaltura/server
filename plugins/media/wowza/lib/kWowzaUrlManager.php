@@ -23,4 +23,14 @@ class kWowzaUrlManager extends kUrlManager
 		
 		return $path.$postfix;
 	}
+	
+	public function getRendererClass()
+	{
+		switch ($this->protocol)
+		{
+			case PlaybackProtocol::HLS:
+			case PlaybackProtocol::APPLE_HTTP:
+				return 'kRedirectManifestRenderer';
+		}
+	}
 }

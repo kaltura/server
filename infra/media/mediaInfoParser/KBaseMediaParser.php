@@ -148,15 +148,17 @@ $video_format_synonyms = array(
 	array("mpeg4 visual","mpeg4"),
 	array("flv","sorenson spark","flash video"),
 	array("vc1","wmv3"),
-	array("mpeg video","mpeg2video","mpegps"),
+	array("mpeg video","mpeg2video","mpeg1video","mpegps"),
 	array("intermediate codec","apple intermediate codec","icod","aic"),
 	array("vp6","vp6f"),
+	array("ms video","msvideo1"),
 );
 $video_codec_id_synonyms = array(
 	array("4","[0][0][0][0]"),
-	array("2","[0][0][0][0]"),
+	array("2","[0][0][0][0]","[2][0][0][0]"),
 	array("20","mp4v"),
-	array("v_vp8","[0][0][0][0])"),
+	array("v_vp8","[0][0][0][0]"),
+	array("wmv3","[0][0][0][0]"),
 );
 $audio_format_synonyms = array(
 	array("mpeg audio","mp3", "mp2"),
@@ -173,7 +175,9 @@ $audio_codec_id_synonyms = array(
 	array("55","u[0][0][0]"),
 	array("2","[0][0][0][0]"),
 	array("a_vorbis","[0][0][0][0]"),
-	array("5","[0][0][0][0]"),
+	array("5","6","[0][0][0][0]"),
+	array("1","[1][0][0][0]"),
+	array("4","[4][0][0][0]"),
 );
 
 		if(!isset($m1) && !isset($m2)) {

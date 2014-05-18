@@ -1,5 +1,5 @@
 
-@LOG_DIR@/sphinx/kaltura_populate.log{
+@LOG_DIR@/kaltura_populate.log{
  rotate 5
  daily
  missingok
