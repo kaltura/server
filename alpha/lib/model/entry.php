@@ -3159,4 +3159,38 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
+    /**
+     * Has specified name in the custom data
+     *
+     * @param      string $name
+     * @param      string $nameSpace - default null
+     *
+     * @return     boolean True if $index has been modified.
+     */
+    public function isCustomDataModified($name = null,$nameSpace = null)
+    {
+        $oldCustomData = $this->oldCustomDataValues;
+
+        if(is_null($nameSpace))
+        {
+            $nameSpace = '';
+        }
+
+        if(!isset($oldCustomData[$nameSpace]))
+        {
+            return false;
+        }
+
+        if(is_null($name))
+        {
+            return true;
+        }
+
+        if(isset($oldCustomData[$nameSpace][$name]))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
