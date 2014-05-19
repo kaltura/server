@@ -184,10 +184,10 @@ abstract class kManifestRenderer
 	 */
 	static protected function normalizeUrlPrefix(&$flavor)
 	{
-		$urlPrefix = $flavor['urlPrefix'];
-		if (!$urlPrefix)
+		if(!isset($flavor['urlPrefix']) || !$flavor['urlPrefix'])
 			return;
-		
+			
+		$urlPrefix = $flavor['urlPrefix'];		
 		$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
 		if (!$urlPrefixPath || substr($urlPrefix, -strlen($urlPrefixPath)) != $urlPrefixPath)
 			return;
@@ -219,8 +219,13 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 			$url = $this->tokenizer->tokenizeSingleUrl($url);
 		}
 		
-		$this->flavor['url'] = self::urlJoin($this->flavor['urlPrefix'], $url);
-		unset($this->flavor['urlPrefix']);	// no longer need the prefix
+		if(isset($this->flavor['urlPrefix']))
+		{
+			$url = self::urlJoin($this->flavor['urlPrefix'], $url);
+			unset($this->flavor['urlPrefix']);	// no longer need the prefix
+		}
+		
+		$this->flavor['url'] = $url;
 	}
 }
 
@@ -267,8 +272,14 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 				{
 					$url = $this->tokenizer->tokenizeSingleUrl($url);
 				}
-				$flavor['url'] = self::urlJoin($flavor['urlPrefix'], $url);
-				unset($flavor['urlPrefix']);		// no longer need the prefix
+				
+				if(isset($flavor['urlPrefix']))
+				{
+					$url = self::urlJoin($flavor['urlPrefix'], $url);
+					unset($flavor['urlPrefix']);		// no longer need the prefix
+				}
+				
+				$flavor['url'] = $url;
 			}
 		}
 	}
