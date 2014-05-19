@@ -504,6 +504,18 @@ class kMetadataManager
 	}
 	
 	/**
+	 * @param BaseObject $object
+	 * @return boolean
+	 */
+	public static function isMetadataObject(BaseObject $object)
+	{
+		if($object instanceof IMetadataObject || $object instanceof entry || $object instanceof category || $object instanceof kuser || $object instanceof Partner)
+			return true;
+			
+		return false;
+	}
+	
+	/**
 	 * Function returns the required Metadata object type for the given object's class name
 	 * @param BaseObject $object
 	 * @return int
