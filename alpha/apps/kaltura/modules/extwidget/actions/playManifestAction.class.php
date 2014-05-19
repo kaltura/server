@@ -342,21 +342,24 @@ class playManifestAction extends kalturaAction
 		return false;
 	}
 	
-	protected function initSilverLightManifest($flavorAssets)
-	{
-		$key = null;
+	protected function getFlavorKeyByTag($flavorAssets, $tag, $syncKeyType) {
 		if($flavorAssets)
 		{
-			foreach ($flavorAssets as $flavorAsset) 
+			foreach ($flavorAssets as $flavorAsset)
 			{
-				if($flavorAsset->hasTag(assetParams::TAG_ISM_MANIFEST))
+				if($flavorAsset->hasTag($tag))
 				{
-					$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
-					break;
+					return $flavorAsset->getSyncKey($syncKeyType);
 				}
 			}
 		}
-		
+		return null;
+	}
+	
+	protected function initSilverLightManifest($flavorAssets)
+	{
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+				
 		if(!$key)
 			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 			
@@ -380,19 +383,7 @@ class playManifestAction extends kalturaAction
 
 	protected function initSmilManifest($flavorAssets)
 	{
-		$key = null;
-		if($flavorAssets)
-		{
-			foreach ($flavorAssets as $flavorAsset)
-			{
-				if($flavorAsset->hasTag(assetParams::TAG_SMIL_MANIFEST))
-				{
-					$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
-					break;
-				}
-			}
-		}
-
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, entry::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
 		if (!$key)
 			return false;
 
@@ -400,20 +391,17 @@ class playManifestAction extends kalturaAction
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
 		{
-			$this->storageId = null;
-			$this->manifestFileSync = $localFileSync;
+			$this->deliveryAttributes->setStorageId(null);
+			$this->deliveryAttributes->setManifestFileSync($localFileSync);
 		}
 		else
 		{
 			if($remoteFileSync)
-				$this->storageId = $remoteFileSync->getDc();
-			$this->manifestFileSync = $remoteFileSync;
+				$this->deliveryAttributes->setStorageId($remoteFileSync->getDc());
+			$this->deliveryAttributes->setManifestFileSync($remoteFileSync);
 		}
 
-		if ($this->manifestFileSync)
-			return true;
-		else
-			return false;
+		return (!is_null($this->deliveryAttributes->getManifestFileSync()));
 	}
 
 	private function removeNotAllowedFlavors($flavorAssets)
@@ -710,24 +698,6 @@ class playManifestAction extends kalturaAction
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve();
-		if ($this->manifestFileSync)
-		{
-			$this->setupUrlManager($this->manifestFileSync);
-			$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
-			$manifestInfo = $this->getFlavorAssetInfo($url);
-			return $this->getRenderer('kRedirectManifestRenderer', array($manifestInfo));
-		}
-
-		if ($this->manifestFileSync)
-		{
-			$this->setupUrlManager($this->manifestFileSync);
-			$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
-			$manifestInfo = $this->getFlavorAssetInfo($url);
-			$flavors = array($manifestInfo);
-		}
-		else
-		{
-		}
 	}
 	
 	private function serveHDNetwork()
@@ -968,10 +938,6 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL || $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS) 
 			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP); // Akamai HD doesn't support any other protocol
 			
-		if(in_array($this->format, self::$httpFormats) && !in_array($this->protocol, self::$httpProtocols))
-			$this->protocol = requestUtils::getProtocol();
-			
-		
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
 		{

@@ -15,8 +15,10 @@ class KalturaDeliveryProfileFactory {
 	public static function getDeliveryProfileInstanceByType($type) {
 		switch ($type) {
 			case KalturaDeliveryProfileType::GENERIC_HLS:
+			case KalturaDeliveryProfileType::GENERIC_HLS_MANIFEST:
 				return new KalturaDeliveryProfileGenericAppleHttp();
 			case KalturaDeliveryProfileType::GENERIC_HDS:
+			case KalturaDeliveryProfileType::GENERIC_HDS_MANIFEST:
 				return new KalturaDeliveryProfileGenericHds();
 			case KalturaDeliveryProfileType::GENERIC_HTTP:
 					return new KalturaDeliveryProfileGenericHttp();
