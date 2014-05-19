@@ -147,6 +147,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		
 		$this->mail = new PHPMailer();
 		$this->mail->CharSet = 'utf-8';
+		$this->mail->Encoding = 'base64';
 		$this->mail->IsHTML($isHtml);
 		$this->mail->AddAddress($recipientemail);
 			
