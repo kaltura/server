@@ -2,7 +2,10 @@
 
 class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleHttp {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+	function __construct() {
+      	parent::__construct();
+      	$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+   }
 	
 	public function serve()
 	{
@@ -12,14 +15,13 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) {
 		$url = $this->getBaseUrl($flavorAsset);
-		if($this->params->getFileExtention())
-			$url .= "/name/a." . $this->params->getFileExtention();
+		if($this->params->getFileExtension())
+			$url .= "/name/a." . $this->params->getFileExtension();
 		return $url;
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
-		$fileSync = kFileSyncUtils::resolve($fileSync);
 		$url = $fileSync->getFilePath();
 		return $url;
 	}
@@ -29,24 +31,14 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 	 */
 	protected function getSecureHdUrl()
 	{
-		$originalFormat = $this->params->getFormat();
-		$this->params->setFormat(PlaybackProtocol::HTTP);
 		$flavors = $this->buildHttpFlavorsArray();
-		$this->params->setFormat($originalFormat);
-	
 		$flavors = $this->sortFlavors($flavors);
-	
-		$this->initDeliveryDynamicAttribtues();
-	
-		$flavor = AkamaiDeliveryUtils::getManifestUrl($flavors, $this->getUrl(), '/master.m3u8', '/i');
+		$flavor = AkamaiDeliveryUtils::getHDN2ManifestUrl($flavors, $this->params->getMediaProtocol(), $this->getUrl(), '/master.m3u8', '/i');
 		if (!$flavor)
 		{
 			KalturaLog::debug(get_class() . ' failed to find flavor');
 			return null;
 		}
-	
-		if (strpos($flavor['urlPrefix'], '://') === false)
-			$flavor['urlPrefix'] = $this->params->getMediaProtocol() . '://' . $flavor['urlPrefix'];
 	
 		return $flavor;
 	}

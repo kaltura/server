@@ -367,12 +367,7 @@ class myPartnerUtils
 	// if the iis Host of the partner is false or null or an empty string - ignore it	
 	public static function getIisHost ( $partner_id, $protocol = 'http' )
 	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getIisHost() ) ) return requestUtils::getIisHost($protocol);
-		
-		$iisHost = $partner->getIisHost();
-		$iisHost = preg_replace('/^https?/', $protocol, $iisHost);
-		return $iisHost;
+		return requestUtils::getIisHost($protocol);
 	}
 	
 	

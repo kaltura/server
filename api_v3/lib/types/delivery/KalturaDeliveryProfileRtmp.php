@@ -9,7 +9,6 @@ class KalturaDeliveryProfileRtmp extends KalturaDeliveryProfile {
 	 * enforceRtmpe
 	 *
 	 * @var bool
-	 * @filter eq,in
 	 */
 	public $enforceRtmpe;
 	
@@ -18,7 +17,6 @@ class KalturaDeliveryProfileRtmp extends KalturaDeliveryProfile {
 	 * a prefix that is added to all stream urls (replaces storageProfile::rtmpPrefix)
 	 *
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $prefix;
 	

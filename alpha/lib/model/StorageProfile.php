@@ -115,17 +115,12 @@ class StorageProfile extends BaseStorageProfile
 	
 	public function setDeliveryProfileIds($params)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, serialize($params));
+		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, $params);
 	}
 	
 	public function getDeliveryProfileIds()
 	{
-		$params = $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS);
-		$params = unserialize($params);
-		if (!$params) {
-			return array();
-		}
-		return $params;
+		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS);
 	}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/

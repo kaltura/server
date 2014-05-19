@@ -7,7 +7,6 @@ class KalturaDeliveryProfileGenericAppleHttp extends KalturaDeliveryProfile {
 	
 	/**
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $pattern;
 	

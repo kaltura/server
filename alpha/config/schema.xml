@@ -1737,7 +1737,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recognizer" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tokenizer" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="streamer_type" type="varchar" size="30"/>	
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="media_protocols" type="varchar" size="256"/>	
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	

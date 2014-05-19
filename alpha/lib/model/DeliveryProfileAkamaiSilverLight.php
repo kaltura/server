@@ -6,7 +6,6 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
-		$fileSync = kFileSyncUtils::resolve($fileSync);
 		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 		if(!$storage)
 			return parent::doGetFileSyncUrl($fileSync);
@@ -27,7 +26,9 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 		$serverUrl = myPartnerUtils::getIisHost($fileSync->getPartnerId(), "http");
 		
 		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE) {
-			$path = $partnerPath . '/serveIsm/objectId/' . $fileSync->getObjectId () . '_' . $fileSync->getObjectSubType () . '_' . $fileSync->getVersion () . '.' . pathinfo ( kFileSyncUtils::resolve ( $fileSync )->getFilePath (), PATHINFO_EXTENSION ) . '/manifest';
+			$path = $partnerPath;
+			$path .= '/serveIsm/objectId/' . $fileSync->getObjectId () . '_' . $fileSync->getObjectSubType () . '_' . $fileSync->getVersion ();
+			$path .= '.' . pathinfo ( $fileSync->getFilePath (), PATHINFO_EXTENSION ) . '/manifest';
 		} else 
 		{
 			if ($storage) 

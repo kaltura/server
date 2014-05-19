@@ -258,16 +258,16 @@ class kMrssManager
 				$url = requestUtils::getApiCdnHost();
 
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$url .= kDeliveryUtils::getPlayManifestUrl($asset, $cdnHost, $mrssParams->getPlayManifestClientTag());
+			$url .= $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
 			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
-			$dynamicAttrs->setFileExtention($asset->getFileExt());
-			$urlManager->setDynamicAttribtues($dynamicAttrs);
+			$dynamicAttrs->setFileExtension($asset->getFileExt());
+			$urlManager->setDynamicAttributes($dynamicAttrs);
 			
-			$url = $urlManager->getHo . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = $urlManager->getHostName() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
 		return $url;
@@ -295,13 +295,13 @@ class kMrssManager
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
 			$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
-			$url =  requestUtils::getApiCdnHost() . kDeliveryUtils::getPlayManifestUrl($asset, $cdnHost, $mrssParams->getPlayManifestClientTag());
+			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag());
 		}
 		else
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if($asset instanceof flavorAsset)
-				$urlManager->initDeliveryDynamicAttribtues(null, $asset);
+				$urlManager->initDeliveryDynamicAttributes(null, $asset);
 			
 			$url = $urlManager->getFullAssetUrl($asset);
 		}
@@ -441,7 +441,7 @@ class kMrssManager
 		$urlPrefix = rtrim($urlPrefix,'/').'/';
 		
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
-		$urlManager->initDeliveryDynamicAttribtues($kalturaFileSync);
+		$urlManager->initDeliveryDynamicAttributes($kalturaFileSync);
 		
 		$partner = $entry->getPartner();
 		if(!$partner->getStorageServePriority() ||

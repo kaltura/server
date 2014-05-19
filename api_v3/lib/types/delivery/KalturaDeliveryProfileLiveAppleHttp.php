@@ -20,8 +20,5 @@ class KalturaDeliveryProfileLiveAppleHttp extends KalturaDeliveryProfile {
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	public function fromObject($sourceObject) {
-		parent::fromObject($sourceObject);
-	}
 }
 

@@ -14,10 +14,6 @@ class kUrlRecognizer
 	
 	protected  $uriPrefix;
 	
-	function addToken(&$value,$key) {
-		$value .= "+token";
-	}
-	
 	public function isRecognized($requestOrigin) {
 		// Check whether one of the hosts is similar to the request origin
 		$hosts = explode(",", $this->getHosts());

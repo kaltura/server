@@ -5,7 +5,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	protected $protocol;
 	protected $streamName;
 	protected $hdsPaths;
-	protected $tokenParamName;
+	protected $paramName;
 	
 	/**
 	 * @param string $url
@@ -14,7 +14,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	public function tokenizeSingleUrl($path)
 	{
 		$token = $this->getToken($path);
-		return $path."?$this->tokenParamName=$token";
+		return $path."?$this->paramName=$token";
 	}
 
 	private function getToken($path) {
@@ -63,10 +63,10 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	}
 
 	/**
-	 * @return the $tokenParamName
+	 * @return the $paramName
 	 */
-	public function getTokenParamName() {
-		return $this->tokenParamName;
+	public function getParamName() {
+		return $this->paramName;
 	}
 
 	/**
@@ -93,8 +93,8 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @param field_type $tokenParamName
 	 */
-	public function setTokenParamName($tokenParamName) {
-		$this->tokenParamName = $tokenParamName;
+	public function setParamName($paramName) {
+		$this->paramName = $paramName;
 	}
 
 		

@@ -138,11 +138,18 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if(!partner) {
+			KalturaLog::err('Failed to retrieve partnerId: '. $partnerId);
+			return null;
+		}
 		
 		$isSecured = false;
 		if($checkSecured)
 			$isSecured = self::isSecured($partner, $entry);
-		return self::getDeliveryByPartner($partner, $streamerType, $mediaProtocol, $cdnHost, $isSecured);
+		$delivery = self::getDeliveryByPartner($partner, $streamerType, $mediaProtocol, $cdnHost, $isSecured);
+		if($delivery)
+			$delivery->setEntryId($entryId);
+		return $delivery;
 	}
 		
 	/**
@@ -155,6 +162,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryByPartner(Partner $partner, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $isSecured = false) {
 		
+		$partnerId = $partner->getId();
 		$deliveryIds = $partner->getDeliveryIds();
 		
 		// if the partner has an override for the required format on the partner object - use that
@@ -162,7 +170,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveryIds = $deliveryIds[$streamerType];
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
-			$cmp = new DeliveryProfileCdnHostComparator($isSecured, $cdnHost);
+			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
 			array_walk($deliveries, array($cmp,"decorateWithUserOrder"));
 			uasort($deliveries, array($cmp, "compare"));
 		} 
@@ -175,9 +183,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
 			
 			if($isSecured)
-				$c->addDescendingOrderByColumn(DeliveryProfilePeer::TOKENIZER);
+				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null")');
 			else
-				$c->addAscendingOrderByColumn(DeliveryProfilePeer::TOKENIZER);
+				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null")');
 			
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
@@ -188,7 +196,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
 		if($delivery) {
 			KalturaLog::debug('Delivery ID for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType . ' is ' . $delivery->getId());
-			$delivery->setEntryId($entryId);
 		} else {
 			KalturaLog::err('Delivery ID can\'t be determined for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType);
 		}
@@ -215,9 +222,15 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
 	 * @return DeliveryProfile
 	 */
-	public static function getRemoteDeliveryByStorageId($storageProfileId, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
+	public static function getRemoteDeliveryByStorageId($storageProfileId, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, 
+			FileSync $fileSync = null, asset $asset = null) {
 	
 		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+		if(!$storageProfile) {
+			KalturaLog::err('Couldn\'t retrieve storageId: '. $storageProfileId);
+			return null;
+		}
+			
 		$deliveryIds = $storageProfile->getDeliveryIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
 			KalturaLog::err('Delivery ID can\'t be determined for storageId: '. $storageProfileId . ' and streamer type: ' . $streamerType);
@@ -231,6 +244,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$delivery->setEntryId($entryId);
 			$delivery->setStorageProfileId($storageProfileId);
 		}
+		
+		$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
+		
 		return $delivery;
 	}
 	
@@ -241,14 +257,17 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @return The matching DeliveryProfile if exists, or null otherwise
 	 */
 	protected static function selectByMediaProtocol($deliveries, $mediaProtocol = null) {
+		if(!$mediaProtocol)
+			return reset($deliveries);
+		
 		foreach ($deliveries as $delivery) {
 			if(is_null($delivery->getMediaProtocols()))
 				return $delivery;
 
 			$supportedProtocols = explode(",", $delivery->getMediaProtocols());
-			if((!$mediaProtocol) || (in_array($mediaProtocol, $supportedProtocols))) {
+			if(in_array($mediaProtocol, $supportedProtocols)) 
 				return $delivery;
-			}
+			
 		}
 		return null;
 	}
@@ -261,8 +280,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
 	 * @return DeliveryProfile
 	 */
-	public static function getDeliveryProfileByHostName($cdnHost, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
+	public static function getLiveDeliveryProfileByHostName($cdnHost, $entryId, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null) {
 		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry) {
+			KalturaLog::err('Failed to retrieve entryId: '. $entryId);
+			return null;
+		}
 		$partnerId = $entry->getPartnerId();
 		
 		$c = new Criteria();
@@ -275,7 +298,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c->addAnd($hostCond);
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
 		
-		$c->addDescendingOrderByColumn(DeliveryProfilePeer::HOST_NAME);
+		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null")');
 		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 		$c->addAscendingOrderByColumn($orderBy);
 			
@@ -298,36 +321,35 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function isRequestRestricted(Partner $partner) {
 		$enforceDelivery = $partner->getEnforceDelivery();
-		if($enforceDelivery) {
+		if(!$enforceDelivery)
+			return false;
 			
-			// Retrieve request origin
-			$requestOrigin = @$_SERVER['HTTP_X_FORWARDED_HOST'];
-			if(!$requestOrigin)
-				$requestOrigin = @$_SERVER['HTTP_HOST'];
-			
-			//  Otherwise, check the partner delivery profiles
-			$deliveryIds = array();
-			$deliveryIdsMap = $partner->getDeliveryIds();
-			foreach($deliveryIdsMap as $deliveriesByFormat) {
-				if(is_array($deliveriesByFormat))
-					$deliveryIds = array_merge ( $deliveryIds, $deliveriesByFormat);
-				else 
-					$deliveryIds[] = $deliveriesByFormat;
-			}
-			$deliveries = self::retrieveByPKs($deliveryIds);
-			
-			foreach($deliveries as $delivery) {
-				if(!is_null($delivery->getRecognizer())) {
-					if($delivery->getRecognizer()->isRecognized($requestOrigin)) {
-						return false;					
-					}
+		// Retrieve request origin
+		$requestOrigin = @$_SERVER['HTTP_X_FORWARDED_HOST'];
+		if(!$requestOrigin)
+			$requestOrigin = @$_SERVER['HTTP_HOST'];
+		
+		//  Otherwise, check the partner delivery profiles
+		$deliveryIds = array();
+		$deliveryIdsMap = $partner->getDeliveryIds();
+		foreach($deliveryIdsMap as $deliveriesByFormat) {
+			if(is_array($deliveriesByFormat))
+				$deliveryIds = array_merge ( $deliveryIds, $deliveriesByFormat);
+			else 
+				$deliveryIds[] = $deliveriesByFormat;
+		}
+		$deliveries = self::retrieveByPKs($deliveryIds);
+		
+		foreach($deliveries as $delivery) {
+			$recognizer = $delivery->getRecognizer();
+			if(!is_null($recognizer)) {
+				if($recognizer->isRecognized($requestOrigin)) {
+					return false;					
 				}
 			}
-			
-			return true;
-		} 
-
-		return false;
+		}
+		
+		return true;
 	}
 	
 	/**

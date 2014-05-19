@@ -10,7 +10,7 @@ class KalturaUrlTokenizerAkamaiHttp extends KalturaUrlTokenizer {
 	 *
 	 * @var string
 	 */
-	public $param;
+	public $paramName;
 	
 	/**
 	 * @var string
@@ -19,7 +19,7 @@ class KalturaUrlTokenizerAkamaiHttp extends KalturaUrlTokenizer {
 	
 	private static $map_between_objects = array
 	(
-			"param",
+			"paramName",
 			"rootDir",
 	);
 	

@@ -2,7 +2,10 @@
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
+	}
 	
 	/**
 	 * Method checks whether the URL passed to it as a parameter returns a response.

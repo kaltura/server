@@ -1,6 +1,6 @@
 <?php 
 
-class DeliveryProfileCdnHostComparator
+class DeliveryProfileComparator
 {
 	private $cdnhost;
 	private $isSecured;
@@ -10,38 +10,27 @@ class DeliveryProfileCdnHostComparator
 		$this->isSecured = $isSecured;
 	}
 	
-	function decorateWithUserOrder(DeliveryProfile &$v, $k)
+	private static function decorateWithUserOrder(DeliveryProfile $v, $k)
 	{
 		$v->userOrder = $k;
 	}
 
-	function compare(DeliveryProfile $a,DeliveryProfile $b) {
+	public function compare(DeliveryProfile $a,DeliveryProfile $b) {
 		
 		// Primary order - cdnHost
-		if($this->cdnhost) {
-			if($a->getHostName() == $this->cdnhost) {
-				if($b->getHostName() == $this->cdnhost) {
-					return $a->userOrder - $b->userOrder;
-				} else {
-					return -1;
-				}
-			}
-				
+		if (($this->cdnHost) && ($a->hostname != $b->hostname)) {
+			if($a->getHostName() == $this->cdnhost) 
+				return -1;
 			if($b->getHostName() == $this->cdnhost)
 				return 1;
 		}
-		
+			
 		// secondary order in case of secured entry - Is secured
-		if($this->isSecured) {
-			if($a->getTokenizer()) {
-				if($b->getTokenizer()) {
-					return $a->userOrder - $b->userOrder;
-				} else {
+		if ($a->getTokenizer() != $b->getTokenizer()) {
+			if(($this->isSecured && $a->getTokenizer()) || (!$this->isSecured && !$a->getTokenizer())) 
 					return -1;
-				}
-			}
-			if($b->getTokenizer())
-				return 1;
+			if(($this->isSecured && $b->getTokenizer()) || (!$this->isSecured && !$b->getTokenizer()))
+					return 1;
 		}
 		
 		return $a->userOrder - $b->userOrder;

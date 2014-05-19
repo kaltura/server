@@ -87,8 +87,6 @@ class DeliveryProfileService extends KalturaBaseService
 		$className = get_class($dbDelivery);
 		$class = new ReflectionClass($className);
 		$dbKalturaDelivery = $class->newInstanceArgs(array());
-		$dbKalturaDelivery->setParentId($deliveryId);
-		
 		$dbKalturaDelivery = $dbDelivery->cloneToNew ( $dbKalturaDelivery );
 		
 		$delivery = KalturaDeliveryProfileFactory::getDeliveryProfileInstanceByType($dbKalturaDelivery->getType());
@@ -123,9 +121,9 @@ class DeliveryProfileService extends KalturaBaseService
 		$pager->attachToCriteria($c);
 		$dbList = DeliveryProfilePeer::doSelect($c);
 		
-		$list = KalturaDeliveryProfileArray::fromDbArray($dbList);
+		$objects = KalturaDeliveryProfileArray::fromDbArray($dbList);
 		$response = new KalturaDeliveryProfileListResponse();
-		$response->objects = $list;
+		$response->objects = $objects;
 		$response->totalCount = $totalCount;
 		return $response;    
 	}

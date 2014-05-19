@@ -2,9 +2,14 @@
 
 class DeliveryProfileRtmp extends DeliveryProfileVod {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
-	protected $FLAVOR_FALLBACK = "flv";
+	protected $FLV_FILE_EXTENSION = "flv";
+	protected $NON_FLV_FILE_EXTENSION = "mp4";
 	protected $REDUNDANT_EXTENSIONS = array('.mp4','.flv');
+	
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	}
 	
 	public function setEnforceRtmpe($v)
 	{
@@ -30,21 +35,21 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
-		$url = $this->formatByExtension($url, $this->FLAVOR_FALLBACK);
+		$url = $this->formatByExtension($url);
 		return $url;
 	}
 	
-	protected function formatByExtension($url, $fallback = null) {
-		$extension = $this->params->getFileExtention();
+	protected function formatByExtension($url) {
+		$extension = $this->params->getFileExtension();
 		$containerFormat = $this->params->getContainerFormat();
 		if( $extension && strtolower($extension) != 'flv' ||
 				$containerFormat && strtolower($containerFormat) != 'flash video') {
 			$url = "mp4:".ltrim($url,'/');
-			if(!is_null($fallback))
-				$url .= "/name/a.mp4"; 
+			if($self::NON_FLV_FILE_EXTENSION)
+				$url .= "/name/a." . $self::NON_FLV_FILE_EXTENSION; 
 			
-		} else if($fallback) {
-			$url .= "/name/a." . $fallback;
+		} else if($self::FLV_FILE_EXTENSION) {
+			$url .= "/name/a." . $self::FLV_FILE_EXTENSION;
 		}
 		return $url;
 	}
@@ -108,7 +113,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 				$remoteFileSyncs = $this->params->getRemoteFileSyncs();
 				$fileSync = $remoteFileSyncs[$flavorAsset->getId()];
 
-				$this->initDeliveryDynamicAttribtues($fileSync, $flavorAsset);
+				$this->initDeliveryDynamicAttributes($fileSync, $flavorAsset);
 
 				$url = $this->getFileSyncUrl($fileSync, false);
 				$url = ltrim($url, "/");
@@ -123,7 +128,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 			{
 				/* @var $flavorAsset flavorAsset */
 
-				$this->initDeliveryDynamicAttribtues(null, $flavorAsset);
+				$this->initDeliveryDynamicAttributes(null, $flavorAsset);
 
 				$url = $this->getAssetUrl($flavorAsset, false);
 				$url = ltrim($url, "/");
@@ -132,9 +137,7 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 			}
 		}
 
-		if(strpos($this->params->getMediaProtocol(), "rtmp") === 0)
-			$baseUrl = $this->params->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-		
+		$baseUrl = $this->params->getMediaProtocol() . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 		$this->finalizeUrls($baseUrl, $flavors);
 
 		return $flavors;

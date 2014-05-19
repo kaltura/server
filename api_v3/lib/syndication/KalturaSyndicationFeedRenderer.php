@@ -554,12 +554,12 @@ class KalturaSyndicationFeedRenderer
 			else
 				$url = requestUtils::getApiCdnHost();
 		
-			$url .= kDeliveryUtils::getPlayManifestUrl($flavorAsset, $cdnHost, $clientTag);
+			$url .= $flavorAsset->getPlayManifestUrl($cdnHost, $clientTag);
 		}
 		else
 		{
-			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId());
-			$urlManager->initDeliveryDynamicAttribtues(null, $flavorAsset);
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
+					PlaybackProtocol::HTTP, null, null, $flavorAsset);
 			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
@@ -589,12 +589,12 @@ class KalturaSyndicationFeedRenderer
 		{
 			$cdnHost = requestUtils::getApiCdnHost();
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . kDeliveryUtils::getPlayManifestUrl($flavorAsset, $this->cdnHost, $clientTag);
+			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($this->cdnHost, $clientTag);
 		}
 		else
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
-			$urlManager->initDeliveryDynamicAttribtues(null, $flavorAsset);
+			$urlManager->initDeliveryDynamicAttributes(null, $flavorAsset);
 			$url = $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		

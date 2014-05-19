@@ -60,13 +60,8 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
-		if($this->getDisableExtraAttributes() == 1) {
-			$parsedUrl = parse_url($baseUrl);
-			if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
-				$baseUrl .= '&';
-			else
-				$baseUrl .= '?';
-			$baseUrl .= "attributes=off";
+		if($this->getDisableExtraAttributes()) {
+			$baseUrl = kDeliveryUtils::addQueryParameter($baseUrl, "attributes=off");
 		}
 	}
 	

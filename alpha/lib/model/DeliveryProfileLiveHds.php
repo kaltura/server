@@ -2,9 +2,13 @@
 
 class DeliveryProfileLiveHds extends DeliveryProfileLive {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	}
 	
-	protected function doCheckIsLive($url) {
+	public function isLive ($url)
+	{
 		$data = $this->urlExists($url, array('video/f4m'));
 		if (is_bool($data))
 			return $data;
@@ -16,11 +20,6 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 			return true;
 		
 		return false;
-	}
-	
-	public function isLive ($url)
-	{
-		return $this->doCheckIsLive($url);
 	}
 	
 	public function serve($baseUrl) {

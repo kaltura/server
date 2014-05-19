@@ -62,7 +62,6 @@ class KalturaDeliveryProfileFactory {
 		switch ($type) {
 			case 'kUrlRecognizerAkamaiG2O':
 				return new KalturaUrlRecognizerAkamaiG2O();
-				break;
 			case 'kUrlRecognizer':
 				return new KalturaUrlRecognizer();
 			default:

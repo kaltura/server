@@ -17,12 +17,12 @@ class KalturaUrlTokenizerVelocix extends KalturaUrlTokenizer {
 	 *
 	 * @var string
 	 */
-	public $tokenParamName;
+	public $paramName;
 	
 	private static $map_between_objects = array
 	(
 			"hdsPaths",
-			"tokenParamName"
+			"paramName"
 	);
 	
 	public function getMapBetweenObjects ( )

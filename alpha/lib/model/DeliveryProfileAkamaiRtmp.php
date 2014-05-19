@@ -2,7 +2,11 @@
 
 class DeliveryProfileAkamaiRtmp extends DeliveryProfileRtmp {
 	
-	protected $FLAVOR_FALLBACK = null;
+	function __construct() {
+		parent::__construct();
+		$this->FLV_FILE_EXTENSION = null;
+		$this->NON_FLV_FILE_EXTENSION = null;
+	}
 	
 	// doGetFlavorAssetUrl - Inherited from parent with different fallback.
 	// doGetFileSyncUrl - Inherited from parent

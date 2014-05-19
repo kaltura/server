@@ -2,7 +2,10 @@
 
 class DeliveryProfileRtsp extends DeliveryProfileVod {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kRtspManifestRenderer';
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kRtspManifestRenderer';
+	}
 	
 	/**
 	 * @return kManifestRenderer

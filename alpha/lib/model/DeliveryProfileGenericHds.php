@@ -32,8 +32,8 @@ class DeliveryProfileGenericHds extends DeliveryProfileHds {
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
-		if ($this->params->getFileExtention())
-			$url .= "/name/a." . $this->params->getFileExtention();
+		if ($this->params->getFileExtension())
+			$url .= "/name/a." . $this->params->getFileExtension();
 		
 		return kDeliveryUtils::formatGenericUrl($url, $this->getPattern(), $this->params);
 	}

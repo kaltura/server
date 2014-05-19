@@ -266,4 +266,22 @@ class flavorAsset extends asset
 	{
 		return $this->getBitrate();
 	}
+	
+	public function getPlayManifestUrl($cdnHost, $clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
+		$entryId = $this->getEntryId();
+		$partnerId = $this->getPartnerId();
+		$subpId = $this->getentry()->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$flavorAssetId = $this->getId();
+	
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url/cdnHost/$cdnHost";
+		if($storageProfileId)
+			$url .= "/storageId/" . $storageProfileId;
+	
+		if ($this->getFileExt())
+			$url .= "/a." . $this->getFileExt();
+	
+		$url .= "?clientTag=$clientTag";
+		return $url;
+	}
 }

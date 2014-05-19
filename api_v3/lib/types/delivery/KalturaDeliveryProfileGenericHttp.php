@@ -7,7 +7,6 @@ class KalturaDeliveryProfileGenericHttp extends KalturaDeliveryProfile {
 	
 	/**
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $pattern;
 	

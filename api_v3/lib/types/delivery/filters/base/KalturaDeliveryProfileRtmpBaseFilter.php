@@ -8,10 +8,6 @@ abstract class KalturaDeliveryProfileRtmpBaseFilter extends KalturaDeliveryProfi
 {
 	static private $map_between_objects = array
 	(
-		"enforceRtmpeEqual" => "_eq_enforce_rtmpe",
-		"enforceRtmpeIn" => "_in_enforce_rtmpe",
-		"prefixEqual" => "_eq_prefix",
-		"prefixIn" => "_in_prefix",
 	);
 
 	static private $order_by_map = array
@@ -27,24 +23,4 @@ abstract class KalturaDeliveryProfileRtmpBaseFilter extends KalturaDeliveryProfi
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $enforceRtmpeEqual;
-
-	/**
-	 * @var string
-	 */
-	public $enforceRtmpeIn;
-
-	/**
-	 * @var string
-	 */
-	public $prefixEqual;
-
-	/**
-	 * @var string
-	 */
-	public $prefixIn;
 }

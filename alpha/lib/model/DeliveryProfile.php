@@ -26,42 +26,33 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	public function cloneToNew ( $newObject )
 	{
-		// TODO @_!! Asd T about fillObjectFromObject Usage
-		$newObject->setCopiedFrom($this);
-	
-		$all_fields = DeliveryProfilePeer::getFieldNames ();
-		$ignore_list = array ( "Id" , "ParentId", "IsDefault");
-		
-		// clone from current
-		baseObjectUtils::fillObjectFromObject( $all_fields ,
-				$this ,
-				$newObject ,
-				baseObjectUtils::CLONE_POLICY_PREFER_NEW , $ignore_list , BasePeer::TYPE_PHPNAME );
-	
+		$this->copyInto($newObject);
+		$newObject->setParentId($this->getId());
+		$newObject->setIsDefault(false);
 		$newObject->save(null, true);
 		return $newObject;
 	}
 	
 	/**
-	 * Derives the delivery profile dynamic attribtues from the file sync and the flavor asset.
+	 * Derives the delivery profile dynamic attributes from the file sync and the flavor asset.
 	 * @param FileSync $fileSync
 	 * @param flavorAsset $flavorAsset
 	 */
-	public function initDeliveryDynamicAttribtues(FileSync $fileSync = null, flavorAsset $flavorAsset = null) {
+	public function initDeliveryDynamicAttributes(FileSync $fileSync = null, flavorAsset $flavorAsset = null) {
 		if ($flavorAsset)
 			$this->params->setContainerFormat($flavorAsset->getContainerFormat());
 	
 		if($flavorAsset && $flavorAsset->getFileExt() !== null) // if the extension is missing use the one from the actual path
-			$this->params->setFileExtention($flavorAsset->getFileExt());
+			$this->params->setFileExtension($flavorAsset->getFileExt());
 		else if ($fileSync) 
-			$this->params->setFileExtention(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
+			$this->params->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
 	}
 	
 	/**
 	 * Copies the parameters from a given DeliveryProfileDynamicAttributes object to the current object params 
 	 * @param DeliveryProfileDynamicAttributes $params 
 	 */
-	public function setDynamicAttribtues(DeliveryProfileDynamicAttributes $params) {
+	public function setDynamicAttributes(DeliveryProfileDynamicAttributes $params) {
 		$this->params->cloneAttributes($params);
 	}
 	
@@ -149,10 +140,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	public function setUrl($url) {
 		$hostName = parse_url($url, PHP_URL_HOST);
-		if(is_null($hostName)) {
-			$path = explode("/", $url);
-			$hostName = $path[0];
-		}
 		$this->setHostName($hostName);
 		parent::setUrl($url);
 	}
@@ -176,29 +163,6 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
 		return;
-	}
-	
-	/**
-	 * @param array $flavors
-	 * @return string
-	 */
-	protected function getMimeType($flavors)
-	{
-		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
-		if ($entry->getType() == entryType::MEDIA_CLIP && count($flavors))
-		{
-			$isMp3 = true;
-			foreach($flavors as $flavor)
-			{
-				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
-					$isMp3 = false;
-			}
-				
-			if ($isMp3)
-				return 'audio/mpeg';
-		}
-	
-		return 'video/x-flv';
 	}
 	
 	// -------------------------------------
@@ -230,12 +194,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		if (!$class)
 			$class = $this->getRendererClass();
 	
-		$renderer = new $class;
-		if ($renderer instanceof kMultiFlavorManifestRenderer)
-			$renderer->flavors = $flavors;
-		else
-			$renderer->flavor = reset($flavors);
-	
+		$renderer = new $class($flavors, $this->params->getEntryId());
 		return $renderer;
 	}
 	

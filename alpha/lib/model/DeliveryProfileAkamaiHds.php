@@ -2,15 +2,18 @@
 
 class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	}
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
 		$url .= '/forceproxy/true';
 
-		if($this->params->getFileExtention())
-			$url .= "/name/a." . $this->params->getFileExtention();
+		if($this->params->getFileExtension())
+			$url .= "/name/a." . $this->params->getFileExtension();
 		return $url;
 	}
 	
@@ -32,17 +35,12 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 	protected function getSecureHdUrl()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
-		$this->initDeliveryDynamicAttribtues();
-
-		$flavor = AkamaiDeliveryUtils::getManifestUrl($flavors, $this->getUrl(), '/manifest.f4m', '/z');
+		$flavor = AkamaiDeliveryUtils::getHDN2ManifestUrl($flavors, $this->params->getMediaProtocol(), $this->getUrl(), '/manifest.f4m', '/z');
 		if (!$flavor)
 		{
 			KalturaLog::debug(get_class() . ' failed to find flavor');
 			return null;
 		}
-
-		if (strpos($flavor['urlPrefix'], '://') === false)
-			$flavor['urlPrefix'] = $this->params->getMediaProtocol() . '://' . $flavor['urlPrefix'];
 
 		return $flavor;
 	}

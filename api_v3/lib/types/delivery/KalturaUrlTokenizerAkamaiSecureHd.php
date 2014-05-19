@@ -8,13 +8,8 @@ class KalturaUrlTokenizerAkamaiSecureHd extends KalturaUrlTokenizer {
 	/**
 	 * @var string
 	 */
-	public $param;
+	public $paramName;
 	
-	/**
-	 * @var string
-	 */
-	public $aclRegex;
-
 	/**
 	 * @var string
 	 */
@@ -22,8 +17,7 @@ class KalturaUrlTokenizerAkamaiSecureHd extends KalturaUrlTokenizer {
 	
 	private static $map_between_objects = array
 	(
-			"param",
-			"aclRegex",
+			"paramName",
 			"aclPostfix"
 	);
 	

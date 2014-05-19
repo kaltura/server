@@ -2,7 +2,10 @@
 
 class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kSmilManifestRenderer';
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kSmilManifestRenderer';
+	}
 	
 	/**
 	 * @return kManifestRenderer
@@ -33,34 +36,18 @@ class DeliveryProfileAkamaiHdNetworkSmil extends DeliveryProfileVod {
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
-		$deliveryUrl = $this->getUrl();
-		$host = parse_url($deliveryUrl, PHP_URL_HOST);
-		$urlpath = ltrim(parse_url($deliveryUrl, PHP_URL_PATH),"/");
-		if(is_null($host)) {
-			$deliveryUrl = "http://" . $deliveryUrl;
-			$host = parse_url($deliveryUrl, PHP_URL_HOST);
-			$urlpath = ltrim(parse_url($deliveryUrl, PHP_URL_PATH),"/");
-		}
+		$host = preg_replace("(https?://)", "", $this->getUrl() );
 		
-		$url = "http://". $host . $urlpath . $url . '/forceproxy/true';
+		$url = "http://". $host . $url . '/forceproxy/true';
 		return $url;
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
 		$path = parent::doGetFileSyncUrl($fileSync);
-	
-		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-		if(!$storage)
-			return $path;
-	
-		if($this->getHostName()) {
-			$urlSuffix = str_replace('\\', '/', $path);
-			$urlPrefix = "http://" . $this->getHostName();
-			return $urlPrefix. '/' . ltrim($urlSuffix, '/');
-		}
-		
-		return $path;
+		$host = preg_replace("(https?://)", "", $this->getUrl() );
+		$urlSuffix = str_replace('\\', '/', $path);
+		return "http://" . $host. '/' . ltrim($urlSuffix, '/');
 	}
 }
 

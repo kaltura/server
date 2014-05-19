@@ -83,7 +83,26 @@ class kUrlRecognizerAkamaiG2O extends kUrlRecognizer
 		$this->salt = $salt;
 	}
 
+	public function isRecognized($requestOrigin) {
+		$url = $_SERVER["SCRIPT_URL"];
+		$authData = @$_SERVER[$this->headerData];
+		$authSign = @$_SERVER[$this->headerSign];
 
-	
+		list($version, $ghostIp, $clientIp, $time, $uniqueId, $nonce) = explode(",", $authData);
+		if ($this->timeout) {
+			// Compare the absolute value of the difference between the current time
+			// and the "token" time.
+			if (abs(time() - $time) > $this->timeout ) {
+				return false;
+			}
+		}
+
+		$newSign = base64_encode(md5($this->timeout . $authData . $url, true));
+		if ($newSign == $authSign) {
+			return true;
+		}
+		
+		return false;		
+	}
 	
 }

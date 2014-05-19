@@ -8,8 +8,6 @@ abstract class KalturaDeliveryProfileAkamaiHttpBaseFilter extends KalturaDeliver
 {
 	static private $map_between_objects = array
 	(
-		"useIntelliseekEqual" => "_eq_use_intelliseek",
-		"useIntelliseekIn" => "_in_use_intelliseek",
 	);
 
 	static private $order_by_map = array
@@ -25,14 +23,4 @@ abstract class KalturaDeliveryProfileAkamaiHttpBaseFilter extends KalturaDeliver
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $useIntelliseekEqual;
-
-	/**
-	 * @var string
-	 */
-	public $useIntelliseekIn;
 }

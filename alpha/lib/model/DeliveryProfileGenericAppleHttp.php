@@ -14,8 +14,8 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
 	{
 		$url = $this->getBaseUrl($flavorAsset);
-		if ($this->params->getFileExtention())
-			$url .= "/name/a." . $this->params->getFileExtention();
+		if ($this->params->getFileExtension())
+			$url .= "/name/a." . $this->params->getFileExtension();
 		
 		return kDeliveryUtils::formatGenericUrl($url, $this->getPattern(), $this->params);
 	}

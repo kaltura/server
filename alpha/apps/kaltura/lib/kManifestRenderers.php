@@ -203,6 +203,12 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	 */
 	public $flavor = null;
 	
+	function __construct($flavors, $entryId = null) 
+	{
+		$this->flavor = reset($flavors);	
+		$this->entryId = $entryId;
+	}
+	
 	protected function replaceDeliveryCode()
 	{
 		$this->flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['url']);
@@ -229,11 +235,18 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	 * @var array
 	 */
 	public $flavors = array();
-
+	
 	/**
 	 * @var string
 	 */
 	public $baseUrl = '';
+	
+	function __construct($flavor, $entryId = null, $baseUrl = '')
+	{
+		$this->flavor = $flavor;
+		$this->entryId = $entryId;
+		$this->baseUrl = $baseUrl;
+	}
 	
 	protected function replaceDeliveryCode()
 	{
@@ -289,6 +302,16 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	 * @var string
 	 */
 	public $mimeType = 'video/x-flv';
+	
+	function __construct($flavor, $entryId = null, $baseUrl = '') {
+		parent::__construct($flavor, $entryId, $baseUrl);
+		
+		$entry = entryPeer::retrieveByPK($this->entryId);
+		$this->setMimeType($entry);
+		
+		if($entry instanceof LiveEntry) 
+			$this->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
+	}
 	
 	/**
 	 * @return array<string>
@@ -365,9 +388,8 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	 * @param array $flavors
 	 * @return string
 	 */
-	protected function getMimeType()
+	protected function setMimeType(entry $entry)
 	{
-		$entry = entryPeer::retrieveByPK($this->entryId);
 		if ($entry->getType() == entryType::MEDIA_CLIP && count($this->flavors))
 		{
 			$isMp3 = true;
@@ -376,14 +398,13 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
 					$isMp3 = false;
 			}
-				
+	
 			if ($isMp3)
-				return 'audio/mpeg';
+				$this->mimeType = 'audio/mpeg';
 		}
 	
-		return 'video/x-flv';
+		$this->mimeType = 'video/x-flv';
 	}
-	
 }
 	
 class kF4Mv2ManifestRenderer extends kMultiFlavorManifestRenderer

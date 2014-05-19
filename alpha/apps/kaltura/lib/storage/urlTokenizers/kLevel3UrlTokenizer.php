@@ -65,22 +65,6 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 	
 	/**
 	 * @param string $url
-	 * @param string $param
-	 * @return string
-	 */
-	protected function addQueryStringParameter($url, $param)
-	{
-		$parsedUrl = parse_url($url);
-		if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
-			$url .= '&';
-		else
-			$url .= '?';
-		$url .= $param;
-		return $url;
-	}
-	
-	/**
-	 * @param string $url
 	 * @param string $baseUrl
 	 * @param string $fileExtension
 	 * @return string
@@ -102,8 +86,8 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 		if ($this->window)
 		{
 			$expiry = "{$this->expiryName}=" . strftime("%Y%m%d%H%M%S", time() - date("Z") + $this->window);
-			$url = $this->addQueryStringParameter($url, $expiry);
-			$fullUrl = $this->addQueryStringParameter($fullUrl, $expiry);
+			$url = kDeliveryUtils::addQueryParameter($url, $expiry);
+			$fullUrl = kDeliveryUtils::addQueryParameter($fullUrl, $expiry);
 		}
 		
 		$parsedUrl = parse_url($fullUrl);
@@ -113,7 +97,7 @@ class kLevel3UrlTokenizer extends kUrlTokenizer
 		
 		$token = substr(self::hmac('sha1', $this->key, $pathString), 0, 20);
 		
-		$url = $this->addQueryStringParameter($url, "{$this->name}={$this->gen}".$token);
+		$url = $url = kDeliveryUtils::addQueryParameter($url, "{$this->name}={$this->gen}".$token); 
 		return $url;
 	}
 	

@@ -16,9 +16,12 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
 			$url .= "/clipTo/" . $this->params->getClipTo();
-		if($this->params->getFileExtention())
-			$url .= "/name/a." . $this->params->getFileExtention();
-		if($this->params->getSeekFromTime() > 0)
+		if($this->params->getFileExtension())
+			$url .= "/name/a." . $this->params->getFileExtension();
+		
+		// add offset only of intelliseek option is enabled
+		$useIntelliseek = $this->getUseIntelliseek();
+		if($useIntelliseek && ($this->params->getSeekFromTime() > 0))
 		{
 			$fromTime = floor($this->params->getSeekFromTime() / 1000);
 
@@ -30,10 +33,7 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 			if($entry && $fromTime > ($entry->getDurationInt() - 1))
 				$fromTime -= 1;
 
-			// add offset only of intelliseek option is enabled
-			$useIntelliseek = $this->getUseIntelliseek();
-			if(!is_null($useIntelliseek) && $useIntelliseek)
-				$url .= "?aktimeoffset=$fromTime";
+			$url .= "?aktimeoffset=$fromTime";
 		}
 		return $url;
 	}

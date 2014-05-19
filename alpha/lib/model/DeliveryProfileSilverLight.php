@@ -2,7 +2,10 @@
 
 class DeliveryProfileSilverLight extends DeliveryProfileVod {
 	
-	protected $DEFAULT_RENDERER_CLASS = 'kSilverLightManifestRenderer';
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kSilverLightManifestRenderer';
+	}
 	
 	public function serve()
 	{
@@ -16,12 +19,6 @@ class DeliveryProfileSilverLight extends DeliveryProfileVod {
 	protected function getSmoothStreamUrl()
 	{
 		$urlPrefix = $this->getUrl();
-		if($this->params->getManifestFileSync()->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
-		{
-			$entry = entryPeer::retrieveByPK($this->params->getEntryId());
-			$urlPrefix = myPartnerUtils::getIisHost($entry->getPartnerId(), $this->params->getMediaProtocol());
-		}
-	
 		$matches = null;
 		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))
 		{
@@ -29,7 +26,7 @@ class DeliveryProfileSilverLight extends DeliveryProfileVod {
 		}
 		$urlPrefix .= '/';
 	
-		$this->initDeliveryDynamicAttribtues($this->params->getManifestFileSync());
+		$this->initDeliveryDynamicAttributes($this->params->getManifestFileSync());
 		$url = $this->getFileSyncUrl($this->params->getManifestFileSync(), false);
 		return $this->getFlavorAssetInfo($url, $urlPrefix);
 		

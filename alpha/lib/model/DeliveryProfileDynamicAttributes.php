@@ -16,7 +16,7 @@ class DeliveryProfileDynamicAttributes {
 	/**
 	 * @var string
 	 */
-	protected $extention = null;
+	protected $extension = null;
 	
 	/**
 	 * @var string
@@ -93,10 +93,10 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @return the $extention
+	 * @return the $extension
 	 */
-	public function getFileExtention() {
-		return $this->extention;
+	public function getFileExtension() {
+		return $this->extension;
 	}
 
 	/**
@@ -177,10 +177,10 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @param string $extention
+	 * @param string $extension
 	 */
-	public function setFileExtention($extention) {
-		$this->extention = $extention;
+	public function setFileExtension($extension) {
+		$this->extension = $extension;
 	}
 
 	/**
@@ -324,7 +324,7 @@ class DeliveryProfileDynamicAttributes {
 	
 	public function cloneAttributes(DeliveryProfileDynamicAttributes $newObj) {
 		$this->format = $newObj->getFormat();
-		$this->extention = $newObj->getFileExtention();
+		$this->extension = $newObj->getFileExtension();
 		$this->containerFormat = $newObj->getContainerFormat();
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();

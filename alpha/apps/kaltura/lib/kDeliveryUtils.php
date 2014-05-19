@@ -2,24 +2,6 @@
 
 class kDeliveryUtils {
 	
-	public static function getPlayManifestUrl(flavorAsset $asset, $cdnHost, $clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
-		$entryId = $asset->getEntryId();
-		$partnerId = $asset->getPartnerId();
-		$subpId = $asset->getentry()->getSubpId();
-		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-		$flavorAssetId = $asset->getId();
-		
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url/cdnHost/$cdnHost";
-		if($storageProfileId)
-			$url .= "/storageId/" . $storageProfileId;
-		
-		if ($asset && $asset->getFileExt())
-			$url .= "/a." . $asset->getFileExt();
-		
-		$url .= "?clientTag=$clientTag";
-		return $url;
-	}
-		
 	/*
 	 * retrieves the streamer type for a delivery type array 
 	 */
@@ -98,5 +80,15 @@ class kDeliveryUtils {
 		{
 			return '/'.$url; // the trailing slash will force adding the host name to the url
 		}
+	}
+	
+	public static function addQueryParameter($url, $parameter) {
+		$parsedUrl = parse_url($url);
+		if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+			$url .= '&' . $parameter;
+		else
+			$url .= '?' . $parameter;
+		
+		return $url;
 	}
 }

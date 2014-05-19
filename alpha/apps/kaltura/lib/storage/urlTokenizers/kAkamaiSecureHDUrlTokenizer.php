@@ -225,13 +225,8 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @var string
 	 */
-	protected $param;
+	protected $paramName;
 	
-	/**
-	 * @var string
-	 */
-	protected $aclRegex;
-
 	/**
 	 * @var string
 	 */
@@ -243,9 +238,6 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url)
 	{
-		if (!preg_match($this->aclRegex, $url, $matches))
-			return $url;
-			
 		$acl = $matches[0];
 		
 		// strip manifest postfixes that should not be signed from the acl
@@ -269,21 +261,14 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 			$url .= '?';
 		else 
 			$url .= '&';
-		return $url . "{$this->param}=$token";
+		return $url . "{$this->paramName}=$token";
 	}
 	
 	/**
 	 * @return the $param
 	 */
-	public function getParam() {
-		return $this->param;
-	}
-
-	/**
-	 * @return the $aclRegex
-	 */
-	public function getAclRegex() {
-		return $this->aclRegex;
+	public function getParamName() {
+		return $this->paramName;
 	}
 
 	/**
@@ -296,15 +281,8 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @param string $param
 	 */
-	public function setParam($param) {
-		$this->param = $param;
-	}
-
-	/**
-	 * @param string $aclRegex
-	 */
-	public function setAclRegex($aclRegex) {
-		$this->aclRegex = $aclRegex;
+	public function setParamName($paramName) {
+		$this->paramName = $paramName;
 	}
 
 	/**

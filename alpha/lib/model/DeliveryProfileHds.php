@@ -1,7 +1,11 @@
 <?php
 
 class DeliveryProfileHds extends DeliveryProfileVod {
-	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
+	}
 	
 	/**
 	 * @return kManifestRenderer

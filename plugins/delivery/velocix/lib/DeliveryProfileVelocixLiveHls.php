@@ -8,18 +8,6 @@ class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 	//limit the number of urls we check as there could be a gazillion of them
 	const MAX_SEGMENTS_TO_CHECK = 3;
 	const MAX_FLAVORS_TO_CHECK = 3;
-	
-	// TODO Once we found someone who uses this tokenizer parameters, 
-	// These should be externalized.
-	public function setParamName($v)
-	{
-		$this->putInCustomData("paramName", $v);
-	}
-	
-	public function getParamName()
-	{
-		return $this->getFromCustomData("paramName");
-	}
 
 	/**
 	 * @return kUrlTokenizer
@@ -40,6 +28,13 @@ class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 		}
 		
 		return null;
+	}
+	
+	protected function getParamName() {
+		$tokenizer = $this->getTokenizer();
+		if($tokenizer && ($tokenizer instanceof kVelocixUrlTokenizer))
+			return $tokenizer->getParamName();
+		return '';
 	}
 	
 	public function isLive ($url)

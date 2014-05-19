@@ -2,8 +2,12 @@
 
 class DeliveryProfileLimeLightRtmp extends DeliveryProfileRtmp {
 	
-	protected $FLAVOR_FALLBACK = null;
-	protected $REDUNDANT_EXTENSIONS = array();
+	function __construct() {
+		parent::__construct();
+		$this->FLV_FILE_EXTENSION = null;
+		$this->NON_FLV_FILE_EXTENSION = null;
+		$this->REDUNDANT_EXTENSIONS = array();
+	}
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
@@ -13,7 +17,6 @@ class DeliveryProfileLimeLightRtmp extends DeliveryProfileRtmp {
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync) {
-		$fileSync = kFileSyncUtils::resolve($fileSync);
 		$url = $fileSync->getFilePath();
 		return $url;
 	}

@@ -31,7 +31,7 @@ class AkamaiDeliveryUtils {
 		return '/' . ltrim($baseUrl, '/') . '.csmil';
 	}
 	
-	public static function getManifestUrl(array $flavors, $urlPrefix, $urlSuffix, $protocolFolder)
+	public static function getHDN2ManifestUrl(array $flavors, $mediaProtocol, $urlPrefix, $urlSuffix, $protocolFolder)
 	{
 		$url = self::generateCsmilUrl($flavors);
 		$url .= $urlSuffix;
@@ -47,6 +47,9 @@ class AkamaiDeliveryUtils {
 			$urlPrefix = substr($urlPrefix, 0, -strlen($urlPrefixPath));
 			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
 		}
+		
+		if (strpos($urlPrefix, '://') === false)
+			$urlPrefix = $mediaProtocol . '://' . $urlPrefix;
 	
 		return array('url' => $protocolFolder . $url, 'urlPrefix' => $urlPrefix);
 	}

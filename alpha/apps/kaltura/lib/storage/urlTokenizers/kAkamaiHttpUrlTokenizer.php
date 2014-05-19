@@ -4,7 +4,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @var string
 	 */
-	protected $param;
+	protected $paramName;
 
 	/**
 	 * @var string
@@ -20,7 +20,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 		$url = '/' . ltrim($url, '/');
 		if ($this->root_dir)
 			$url = rtrim($this->root_dir, '/') . $url;
-		return self::urlauth_gen_url($url, $this->param, $this->window, $this->key, null, null);
+		return self::urlauth_gen_url($url, $this->paramName, $this->window, $this->key, null, null);
 	}
 	/**
 	 * Returns the URL path with the authorization token appended. See the
@@ -117,8 +117,8 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @return the $param
 	 */
-	public function getParam() {
-		return $this->param;
+	public function getParamName() {
+		return $this->paramName;
 	}
 
 	/**
@@ -131,8 +131,8 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 	/**
 	 * @param string $param
 	 */
-	public function setParam($param) {
-		$this->param = $param;
+	public function setParamName($paramName) {
+		$this->paramName = $paramName;
 	}
 
 	/**

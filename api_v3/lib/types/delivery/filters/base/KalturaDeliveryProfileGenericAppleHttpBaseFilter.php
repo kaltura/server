@@ -8,8 +8,6 @@ abstract class KalturaDeliveryProfileGenericAppleHttpBaseFilter extends KalturaD
 {
 	static private $map_between_objects = array
 	(
-		"patternEqual" => "_eq_pattern",
-		"patternIn" => "_in_pattern",
 	);
 
 	static private $order_by_map = array
@@ -25,14 +23,4 @@ abstract class KalturaDeliveryProfileGenericAppleHttpBaseFilter extends KalturaD
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
-
-	/**
-	 * @var string
-	 */
-	public $patternEqual;
-
-	/**
-	 * @var string
-	 */
-	public $patternIn;
 }

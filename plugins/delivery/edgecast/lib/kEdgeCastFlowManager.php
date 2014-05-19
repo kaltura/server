@@ -108,11 +108,7 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
             $deliveryProfile = $partner->getDeliveryProfileIds();
             $deliveryProfileIds = array();
             foreach($deliveryProfile as $key=>$value) {
-            	if(is_array($value)) {
-            		$deliveryProfileIds = array_merge($deliveryProfileIds, $value);
-            	} else {
-            		$deliveryProfileIds[] = $value;
-            	}
+            	$deliveryProfileIds = array_merge($deliveryProfileIds, $value);
             }
             
             

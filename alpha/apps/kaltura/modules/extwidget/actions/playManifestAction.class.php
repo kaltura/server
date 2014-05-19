@@ -243,7 +243,7 @@ class playManifestAction extends kalturaAction
 		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
-			$this->deliveryAttributes->setclipTo($this->secureEntryHelper->getPreviewLength() * 1000);
+			$this->deliveryAttributes->setClipTo($this->secureEntryHelper->getPreviewLength() * 1000);
 		}
 		else
 		{
@@ -622,7 +622,7 @@ class playManifestAction extends kalturaAction
 	{
 		$this->initFlavorIds();
 		
-		if(!$this->cdnHost || $this->entry->getPartner()->getForceCdnHost())
+		if($this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 		
 		$this->initFlavorAssetArray();
@@ -642,11 +642,9 @@ class playManifestAction extends kalturaAction
 		
 		// Fixing ALL kinds of historical bugs.
 		
-		$serveUrl = false;
 		if($this->deliveryAttributes->getFormat() == self::URL) {
 			$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
-			$serveUrl = true;
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HD) {
 			// This is a hack to return an f4m that has a URL of a smil
 			return $this->serveHDNetwork();
@@ -664,12 +662,9 @@ class playManifestAction extends kalturaAction
 		if(!$this->deliveryProfile)
 			return null;
 		
-		if($serveUrl)
-			$this->deliveryAttributes->setFormat(self::URL);
-		
 		$this->enforceAudioVideoEntry();
 		
-		$this->deliveryProfile->setDynamicAttribtues($this->deliveryAttributes);	
+		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve();
 	}
 	
@@ -678,8 +673,7 @@ class playManifestAction extends kalturaAction
 		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
 		$mediaUrl = requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"])); 
 
-		$renderer = new kF4MManifestRenderer();
-		$renderer->flavor = array();
+		$renderer = new kF4MManifestRenderer(array(), $this->entryId);
 		$renderer->mediaUrl = $mediaUrl;
 		return $renderer;
 	}
@@ -726,13 +720,13 @@ class playManifestAction extends kalturaAction
 		$baseUrl = $this->getLiveEntryBaseUrl();
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
-		$this->deliveryProfile = DeliveryProfilePeer::getDeliveryProfileByHostName($cdnHost, $this->entryId, 
+		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, 
 				$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 		
 		if(!$this->deliveryProfile)
 			return null;
 		
-		$this->deliveryProfile->setDynamicAttribtues($this->deliveryAttributes);	
+		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve($baseUrl);
 	}
 	
@@ -788,7 +782,7 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryAttributes->getSeekFromTime() <= 0)
 			$this->deliveryAttributes->setSeekFromTime(-1);
 
-		$this->deliveryAttributes->setclipTo($this->getRequestParameter ( "clipTo" , 0));
+		$this->deliveryAttributes->setClipTo($this->getRequestParameter ( "clipTo" , 0));
 		
 		$deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		$playbackContext = $this->getRequestParameter( "playbackContext", null );

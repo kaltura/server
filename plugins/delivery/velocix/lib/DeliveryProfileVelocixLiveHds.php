@@ -5,17 +5,6 @@
  */
 class DeliveryProfileVelocixLiveHds extends DeliveryProfileLiveHds
 {
-	// TODO Once we found someone who uses this tokenizer parameters, 
-	// These should be externalized.
-	public function setParamName($v)
-	{
-		$this->putInCustomData("paramName", $v);
-	}
-	
-	public function getParamName()
-	{
-		return $this->getFromCustomData("paramName");
-	}
 	
 	public function setHdsManifestContentType($v)
 	{
@@ -46,6 +35,13 @@ class DeliveryProfileVelocixLiveHds extends DeliveryProfileLiveHds
 		}
 		
 		return null;
+	}
+	
+	protected function getParamName() {
+		$tokenizer = $this->getTokenizer();
+		if($tokenizer && ($tokenizer instanceof kVelocixUrlTokenizer)) 
+			return $tokenizer->getParamName();
+		return '';
 	}
 	
 	public function isLive($url){

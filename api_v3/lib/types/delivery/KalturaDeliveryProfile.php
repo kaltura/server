@@ -130,7 +130,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 			"partnerId",
 			"streamerType",
 			"recognizer",
-			"status" => "deliveryStatus",
+			"status",
 			"systemName",
 			"tokenizer",
 			"updatedAt",

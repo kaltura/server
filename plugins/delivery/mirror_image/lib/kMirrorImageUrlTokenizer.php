@@ -2,6 +2,15 @@
 
 class kMirrorImageUrlTokenizer extends kUrlTokenizer
 {
+	// Window (default) - 900
+	// RTMP:
+	// UseDummy - true
+	// Base URL - ''
+	
+	// HTTP:
+	// UseDummy - false
+	// Base Url - rtrim($this->getUrl(), '/')
+	
     const DEFAULT_START_TIME_PAST_OFFSET = 86400; // yesterday
 
     // TODO Once we found someone who uses this tokenizer parameters,

@@ -141,6 +141,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	public function getFileSyncUrl(FileSync $fileSync, $tokenizeUrl = true)
 	{
+		$fileSync = kFileSyncUtils::resolve($fileSync);
 		$url = $this->doGetFileSyncUrl($fileSync);
 		$url = str_replace('\\', '/', $url);
 		if ($tokenizeUrl)
@@ -161,7 +162,6 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
-		$fileSync = kFileSyncUtils::resolve($fileSync);
 		$url = $fileSync->getFilePath();
 		return $url;
 	}
@@ -201,7 +201,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			return $this->getExternalStorageUrl($flavorAsset);
 		}
 			
-		$this->initDeliveryDynamicAttribtues(null, $flavorAsset);
+		$this->initDeliveryDynamicAttributes(null, $flavorAsset);
 		$url = $this->getAssetUrl($flavorAsset, false);
 		if ($this->params->getFormat() == PlaybackProtocol::RTSP)
 		{
@@ -247,7 +247,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$remoteFileSyncs = $this->params->getRemoteFileSyncs();
 		$fileSync = $remoteFileSyncs[$flavorAsset->getId()];
 	
-		$this->initDeliveryDynamicAttribtues($fileSync, $flavorAsset);
+		$this->initDeliveryDynamicAttributes($fileSync, $flavorAsset);
 		$url = $this->getFileSyncUrl($fileSync, false);
 		$url = ltrim($url, "/");
 	
@@ -270,13 +270,19 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	protected function flavorCmpFunction ($flavor1, $flavor2)
 	{
 		// move the audio flavors to the end
-		if ($flavor1['height'] == 0 && $flavor1['width'] == 0)
+		$isAudio1 = $flavor1['height'] == 0 && $flavor1['width'] == 0;
+		$isAudio2 = $flavor2['height'] == 0 && $flavor2['width'] == 0;
+		
+		if ($isAudio1 != $isAudio2)
 		{
-			return 1;
-		}
-		if ($flavor2['height'] == 0 && $flavor2['width'] == 0)
-		{
-			return -1;
+			if ($isAudio1)
+			{
+				return 1;
+			}
+			else 
+			{
+				return -1;
+			}
 		}
 	
 		// if a preferred bitrate was defined place it first

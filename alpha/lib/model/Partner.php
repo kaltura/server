@@ -552,9 +552,6 @@ class Partner extends BasePartner
 
 	public function getSupportAnimatedThumbnails()	{		return $this->getFromCustomData( "supportAnimatedThumbnails" , null, false  );	}
 	public function setSupportAnimatedThumbnails( $v )	{		return $this->putInCustomData( "supportAnimatedThumbnails", $v );	}
-		
-	public function getIisHost()	{		return $this->getFromCustomData( "iisHost" , null, false  );	}
-	public function setIisHost( $v )	{		return $this->putInCustomData( "iisHost", $v );	}	
 	
 	public function getLandingPage()	{		return $this->getFromCustomData( "landingPage" , null, null  );	}
 	public function setLandingPage( $v )	{		return $this->putInCustomData( "landingPage", $v );	}	
@@ -716,17 +713,12 @@ class Partner extends BasePartner
 	
 	public function setDeliveryProfileIds($params)
 	{
-		$this->putInCustomData('delivery_profile_ids', serialize($params));
+		$this->putInCustomData('delivery_profile_ids', $params);
 	}
 	
 	public function getDeliveryProfileIds()
 	{
-		$params = $this->getFromCustomData('delivery_profile_ids', null, array());
-		$params = unserialize($params);
-		if (!$params) {
-			return array();
-		}
-		return $params;
+		return $this->getFromCustomData('delivery_profile_ids', null, array());
 	}
 	
 	public function getEmbedCodeTypes()

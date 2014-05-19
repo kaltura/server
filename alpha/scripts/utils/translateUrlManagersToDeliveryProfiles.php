@@ -1,6 +1,6 @@
 <?php
 /**
- * This script is responsible for basic transfomation of url manaers to delivery profiles.
+ * This script is responsible for basic transfomation of url managers to delivery profiles.
  */
 
 require_once(dirname(__FILE__).'/../bootstrap.php');

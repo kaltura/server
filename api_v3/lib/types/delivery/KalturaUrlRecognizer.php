@@ -6,7 +6,7 @@
 class KalturaUrlRecognizer extends KalturaObject {
 
 	/**
-	 * The id of the Delivery
+	 * The hosts that are recognized
 	 *
 	 * @var string
 	 */
