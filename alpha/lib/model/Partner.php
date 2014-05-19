@@ -1075,6 +1075,7 @@ class Partner extends BasePartner
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
+		$c->addAnd(kuserPeer::IS_ADMIN , true);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		return kuserPeer::doCount($c);
 	}
