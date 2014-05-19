@@ -147,7 +147,33 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($dbEntry->getStreamPassword() != $token)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
-		// TODO count entries and not flavors
+		$mediaServer = $dbEntry->getMediaServer(true);
+		if($mediaServer)
+		{
+			$url = null;
+			$protocol = null;
+			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			{
+				$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
+				if ($config)
+				{
+					$url = $config->getUrl();
+					$protocol = $hlsProtocol;
+					break;
+				}
+			}
+			
+			if($url)
+			{
+				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+				$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $entryId);
+				$urlManager->setProtocol($protocol);
+				if($urlManager->isLive($url))
+				{
+					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
+				}
+			}
+		}
 		
 		// fetch current stream live params
 		$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());
