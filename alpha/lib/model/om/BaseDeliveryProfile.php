@@ -106,10 +106,10 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	protected $tokenizer;
 
 	/**
-	 * The value for the delivery_status field.
+	 * The value for the status field.
 	 * @var        int
 	 */
-	protected $delivery_status;
+	protected $status;
 
 	/**
 	 * The value for the streamer_type field.
@@ -397,13 +397,13 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [delivery_status] column value.
+	 * Get the [status] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getDeliveryStatus()
+	public function getStatus()
 	{
-		return $this->delivery_status;
+		return $this->status;
 	}
 
 	/**
@@ -811,27 +811,27 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	} // setTokenizer()
 
 	/**
-	 * Set the value of [delivery_status] column.
+	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     DeliveryProfile The current object (for fluent API support)
 	 */
-	public function setDeliveryStatus($v)
+	public function setStatus($v)
 	{
-		if(!isset($this->oldColumnsValues[DeliveryProfilePeer::DELIVERY_STATUS]))
-			$this->oldColumnsValues[DeliveryProfilePeer::DELIVERY_STATUS] = $this->delivery_status;
+		if(!isset($this->oldColumnsValues[DeliveryProfilePeer::STATUS]))
+			$this->oldColumnsValues[DeliveryProfilePeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->delivery_status !== $v) {
-			$this->delivery_status = $v;
-			$this->modifiedColumns[] = DeliveryProfilePeer::DELIVERY_STATUS;
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = DeliveryProfilePeer::STATUS;
 		}
 
 		return $this;
-	} // setDeliveryStatus()
+	} // setStatus()
 
 	/**
 	 * Set the value of [streamer_type] column.
@@ -953,7 +953,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			$this->parent_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->recognizer = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->tokenizer = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->delivery_status = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->status = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
 			$this->streamer_type = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->media_protocols = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->custom_data = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
@@ -1501,7 +1501,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 				return $this->getTokenizer();
 				break;
 			case 14:
-				return $this->getDeliveryStatus();
+				return $this->getStatus();
 				break;
 			case 15:
 				return $this->getStreamerType();
@@ -1547,7 +1547,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			$keys[11] => $this->getParentId(),
 			$keys[12] => $this->getRecognizer(),
 			$keys[13] => $this->getTokenizer(),
-			$keys[14] => $this->getDeliveryStatus(),
+			$keys[14] => $this->getStatus(),
 			$keys[15] => $this->getStreamerType(),
 			$keys[16] => $this->getMediaProtocols(),
 			$keys[17] => $this->getCustomData(),
@@ -1625,7 +1625,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 				$this->setTokenizer($value);
 				break;
 			case 14:
-				$this->setDeliveryStatus($value);
+				$this->setStatus($value);
 				break;
 			case 15:
 				$this->setStreamerType($value);
@@ -1674,7 +1674,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setParentId($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setRecognizer($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setTokenizer($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setDeliveryStatus($arr[$keys[14]]);
+		if (array_key_exists($keys[14], $arr)) $this->setStatus($arr[$keys[14]]);
 		if (array_key_exists($keys[15], $arr)) $this->setStreamerType($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setMediaProtocols($arr[$keys[16]]);
 		if (array_key_exists($keys[17], $arr)) $this->setCustomData($arr[$keys[17]]);
@@ -1703,7 +1703,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DeliveryProfilePeer::PARENT_ID)) $criteria->add(DeliveryProfilePeer::PARENT_ID, $this->parent_id);
 		if ($this->isColumnModified(DeliveryProfilePeer::RECOGNIZER)) $criteria->add(DeliveryProfilePeer::RECOGNIZER, $this->recognizer);
 		if ($this->isColumnModified(DeliveryProfilePeer::TOKENIZER)) $criteria->add(DeliveryProfilePeer::TOKENIZER, $this->tokenizer);
-		if ($this->isColumnModified(DeliveryProfilePeer::DELIVERY_STATUS)) $criteria->add(DeliveryProfilePeer::DELIVERY_STATUS, $this->delivery_status);
+		if ($this->isColumnModified(DeliveryProfilePeer::STATUS)) $criteria->add(DeliveryProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DeliveryProfilePeer::STREAMER_TYPE)) $criteria->add(DeliveryProfilePeer::STREAMER_TYPE, $this->streamer_type);
 		if ($this->isColumnModified(DeliveryProfilePeer::MEDIA_PROTOCOLS)) $criteria->add(DeliveryProfilePeer::MEDIA_PROTOCOLS, $this->media_protocols);
 		if ($this->isColumnModified(DeliveryProfilePeer::CUSTOM_DATA)) $criteria->add(DeliveryProfilePeer::CUSTOM_DATA, $this->custom_data);
@@ -1811,7 +1811,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 
 		$copyObj->setTokenizer($this->tokenizer);
 
-		$copyObj->setDeliveryStatus($this->delivery_status);
+		$copyObj->setStatus($this->status);
 
 		$copyObj->setStreamerType($this->streamer_type);
 
