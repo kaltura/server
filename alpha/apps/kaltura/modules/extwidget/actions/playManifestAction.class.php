@@ -874,6 +874,9 @@ class playManifestAction extends kalturaAction
 		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
+		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL) 
+			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
+		
 		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, 
 				$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 				if($backupUrl)
