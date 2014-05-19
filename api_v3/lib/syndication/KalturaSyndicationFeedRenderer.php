@@ -543,27 +543,24 @@ class KalturaSyndicationFeedRenderer
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $flavorAsset->getEntryId());
-		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
+			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storage->getId(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP, "https");
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$urlManager->setDomain($cdnHost);
-			
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			
-			if (!$storage->getDeliveryHttpsBaseUrl())
+		
+			if (!is_null($deliveryProfile))
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 			else
 				$url = requestUtils::getApiCdnHost();
-
-			$url .= $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
+		
+			$url .= $flavorAsset->getPlayManifestUrl($cdnHost, $clientTag);
 		}
 		else
 		{
-			$urlManager->setFileExtension($flavorAsset->getFileExt());
-			
-			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
+					PlaybackProtocol::HTTP, null, null, $flavorAsset);
+			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
 		return $url;
@@ -588,19 +585,17 @@ class KalturaSyndicationFeedRenderer
 			return null;
 		
 		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId);
-		
-		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost, $flavorAsset->getEntryId());
-		$urlManager->setDomain($this->cdnHost);
-		
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
 			$cdnHost = requestUtils::getApiCdnHost();
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . $urlManager->getPlayManifestUrl($flavorAsset, $clientTag);
+			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($this->cdnHost, $clientTag);
 		}
 		else
 		{
-			$url = $this->cdnHost . $urlManager->getAssetUrl($flavorAsset);
+			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
+			$urlManager->initDeliveryDynamicAttributes(null, $flavorAsset);
+			$url = $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		
 		return $url;

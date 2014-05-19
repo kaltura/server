@@ -62,11 +62,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $moderateContent;
 	
 	/**
-	 * @var string 
-	 */
-	public $rtmpUrl;
-	
-	/**
 	 * @var bool
 	 */
 	public $storageDeleteFromKaltura;
@@ -237,7 +232,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string 
 	 */
-	public $deliveryRestrictions;
+	public $deliveryProfileIds;
+	
+	/**
+	 * @var bool 
+	 */
+	public $enforceDelivery;
 	
 	/**
 	 * 
@@ -341,7 +341,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"partnerPackage",
 		"monitorUsage",
 		"moderateContent",
-		"rtmpUrl",
 		"storageDeleteFromKaltura",
 		"storageServePriority",
 		"kmcVersion",
@@ -359,6 +358,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"numPrevPassToKeep",
 		"passReplaceFreq",
 		"isFirstLogin",
+		"enforceDelivery",
 		"partnerGroupType",
 		"partnerParentId",
 		"streamerType",
@@ -374,7 +374,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"verticalClasiffication",
 		"partnerPackageClassOfService",
 		"enableBulkUploadNotificationsEmails",
-		"deliveryRestrictions",
 		"bulkUploadNotificationsEmail",
 		"internalUse",
 		"defaultLiveStreamEntrySourceType",
@@ -389,6 +388,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"language",
 		"audioThumbEntryId",
 		"liveThumbEntryId",		
+		"deliveryProfileIds",
 	);
 
 	public function getMapBetweenObjects()
@@ -398,6 +398,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	public function fromObject ( $source_object  )
 	{
+		KalturaLog::err("@_!! " . print_r($source_object, true) );
 		parent::fromObject($source_object);
 		
 		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
@@ -416,6 +417,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		$this->partnerName = kString::stripUtf8InvalidChars($this->partnerName);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
+		if($this->deliveryProfileIds) {
+			$this->deliveryProfileIds = json_encode($this->deliveryProfileIds);
+		}
+		KalturaLog::err("@_!! " . $this->cdnHost);
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -453,6 +458,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			KalturaLog::err('Cannot find object to fill');
 			return null;
 		}
+		
+		if($this->deliveryProfileIds)
+			$object_to_fill->setDeliveryProfileIds(json_decode($this->deliveryProfileIds));
 		
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
@@ -518,6 +526,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
+		
 		
 		return $object_to_fill;
 	}

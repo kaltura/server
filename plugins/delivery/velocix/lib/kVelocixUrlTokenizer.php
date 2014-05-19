@@ -2,29 +2,12 @@
 class kVelocixUrlTokenizer extends kUrlTokenizer
 {
 
-	protected $window;
-	protected $secret;
 	protected $protocol;
 	protected $streamName;
 	protected $hdsPaths;
-	protected $tokenParamName;
+	protected $paramName;
 	protected $authPrefix;
-	
-	/**
-	 * @param int $window
-	 * @param string $secret
-	 * @param array $protocol
-	 */
-	public function __construct($window, $secret, $protocol, $streamName,  $hdsPaths = array(), $tokenParamName, $authPrefix)
-	{
-		$this->window = $window;
-		$this->secret = $secret;
-		$this->protocol = $protocol == 'applehttp' ? 'hls' : $protocol;
-		$this->streamName = $streamName;
-		$this->hdsPaths = $hdsPaths;
-		$this->tokenParamName = $tokenParamName;
 		$this->authPrefix = $authPrefix;
-	}
 	
 	/**
 	 * @param string $url
@@ -35,7 +18,7 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		if (strstr($path, $this->authPrefix) === false)
 			return $path;
 		$token = $this->getToken($path);
-		return $path."?$this->tokenParamName=$token";
+		return $path."?$this->paramName=$token";
 	}
 
 	private function getToken($path) {
@@ -47,7 +30,8 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$message = "pathURI=" . rawurlencode($path);
 		if ($this->protocol == 'hds' && is_array($this->hdsPaths) && count($this->hdsPaths))
 		{
-			foreach ($this->hdsPaths as $path){
+			$paths = explode(",", $this->hdsPaths);
+			foreach ($paths as $path){
 				$path =  preg_replace('/@STREAM_NAME@/', $this->streamName, $path);
 				$message.= "&pathURI=" . rawurlencode($path);
 			}
@@ -55,11 +39,68 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$message .= "&expiry=" . rawurlencode($t_expiry);
 		$message .= "&random=" . uniqid();
 		// Get the HMAC in hex using the default hash function (SHA-256)
-		$hmac = hash_hmac("sha256", $message, $this->secret, false);
+		$hmac = hash_hmac("sha256", $message, $this->key, false);
 		// Concatenate the HMAC to the end of the path and Base64 encode.
 		$encoded = base64_encode("{$message},{$hmac}");
 		return $encoded;
 	}
+	
+	/**
+	 * @return the $protocol
+	 */
+	public function getProtocol() {
+		return $this->protocol;
+	}
+
+	/**
+	 * @return the $streamName
+	 */
+	public function getStreamName() {
+		return $this->streamName;
+	}
+
+	/**
+	 * @return the $hdsPaths
+	 */
+	public function getHdsPaths() {
+		return $this->hdsPaths;
+	}
+
+	/**
+	 * @return the $paramName
+	 */
+	public function getParamName() {
+		return $this->paramName;
+	}
+
+	/**
+	 * @param field_type $protocol
+	 */
+	public function setProtocol($protocol) {
+		$this->protocol = $protocol;
+	}
+
+	/**
+	 * @param field_type $streamName
+	 */
+	public function setStreamName($streamName) {
+		$this->streamName = $streamName;
+	}
+
+	/**
+	 * @param field_type $hdsPaths
+	 */
+	public function setHdsPaths($hdsPaths) {
+		$this->hdsPaths = $hdsPaths;
+	}
+
+	/**
+	 * @param field_type $tokenParamName
+	 */
+	public function setParamName($paramName) {
+		$this->paramName = $paramName;
+	}
+
 		
 	
 }

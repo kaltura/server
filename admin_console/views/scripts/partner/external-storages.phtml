@@ -33,7 +33,6 @@
 				<th><?php echo $this->translate('URL'); ?></th>
 				<th><?php echo $this->translate('Publisher ID'); ?></th>
 				<th><?php echo $this->translate('Path Manager'); ?></th>
-				<th><?php echo $this->translate('URL Manager'); ?></th>
 				<th><?php echo $this->translate('Trigger'); ?></th>
 				<th><?php echo $this->translate('Ready Behavior'); ?></th>
 				<th><?php echo $this->translate('Creation Date'); ?></th>
@@ -56,7 +55,6 @@
 				<td><?php echo $storage->storageUrl; ?></td>
 				<td><?php echo $storage->partnerId; ?></td>
 				<td><?php echo $this->translate($storage->pathManagerClass ? $storage->pathManagerClass : 'default_path_manager'); ?></td>
-				<td><?php echo $this->translate($storage->urlManagerClass ? $storage->urlManagerClass : 'default_url_manager'); ?></td>
 				<td><?php echo $triggersNames[$storage->trigger]; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_StorageProfileReadyBehavior', $storage->readyBehavior); ?></td>
 				<td><?php echo $this->dateFormat($storage->createdAt, Zend_Date::DATE_LONG); ?></td>
