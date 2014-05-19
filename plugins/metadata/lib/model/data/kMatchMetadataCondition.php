@@ -60,11 +60,17 @@ class kMatchMetadataCondition extends kMatchCondition
 		if(!$profileId)
 		{
 			if(!$this->profileSystemName)
+			{
+				KalturaLog::notice("No metadata profile id and system-name supplied");
 				return null;
+			}
 				
 			$profile = MetadataProfilePeer::retrieveBySystemName($this->profileSystemName, kCurrentContext::getCurrentPartnerId());
 			if(!$profile)
+			{
+				KalturaLog::notice("Metadata profile with system-name [$this->profileSystemName] not found");
 				return null;
+			}
 				
 			$profileId = $profile->getId();
 		}
@@ -99,6 +105,7 @@ class kMatchMetadataCondition extends kMatchCondition
 		if($metadata)
 			return kMetadataManager::parseMetadataValues($metadata, $this->xPath);
 			
+		KalturaLog::notice("Metadata object not found for scope [" . get_class($scope) . "]");
 		return null;
 	}
 	
