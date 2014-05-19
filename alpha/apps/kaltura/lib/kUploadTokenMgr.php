@@ -140,7 +140,8 @@ class kUploadTokenMgr
 		
 		// check if is a real uploaded file
 		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null; 
-		if (!is_uploaded_file($tempPath))
+		$disableValidationToken = kConf::get('disable_validation_token', 'local', 'disable_validation');
+		if (!is_uploaded_file($tempPath) && (!isset($fileData['disable_validation']) || $fileData['disable_validation'] != $disableValidationToken))
 		{
 			$msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
