@@ -46,7 +46,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		if($sourceType) {
 			$liveStreamEntry->sourceType = $sourceType;	
 		}
-		else {
+		elseif(is_null($liveStreamEntry->sourceType)) {
 			// default sourceType is AKAMAI_LIVE
 			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
 		}
