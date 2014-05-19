@@ -29,7 +29,8 @@ class DeliveryProfileSilverLight extends DeliveryProfileVod {
 		$this->initDeliveryDynamicAttributes($this->params->getManifestFileSync());
 		$url = $this->getFileSyncUrl($this->params->getManifestFileSync(), false);
 		return $this->getFlavorAssetInfo($url, $urlPrefix);
-		
+	
 	}
+	
 }
 

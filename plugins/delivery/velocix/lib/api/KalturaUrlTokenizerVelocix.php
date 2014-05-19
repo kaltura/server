@@ -19,10 +19,17 @@ class KalturaUrlTokenizerVelocix extends KalturaUrlTokenizer {
 	 */
 	public $paramName;
 	
+	/**
+	 * secure URL prefix
+	 * @var string
+	 */
+	public $authPrefix;
+	
 	private static $map_between_objects = array
 	(
 			"hdsPaths",
-			"paramName"
+			"paramName",
+			"authPrefix"
 	);
 	
 	public function getMapBetweenObjects ( )

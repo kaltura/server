@@ -7,7 +7,6 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	protected $hdsPaths;
 	protected $paramName;
 	protected $authPrefix;
-		$this->authPrefix = $authPrefix;
 	
 	/**
 	 * @param string $url
@@ -100,6 +99,21 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 	public function setParamName($paramName) {
 		$this->paramName = $paramName;
 	}
+	
+	/**
+	 * @return the $authPrefix
+	 */
+	public function getAuthPrefix() {
+		return $this->authPrefix;
+	}
+
+	/**
+	 * @param field_type $authPrefix
+	 */
+	public function setAuthPrefix($authPrefix) {
+		$this->authPrefix = $authPrefix;
+	}
+
 
 		
 	

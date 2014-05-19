@@ -51,6 +51,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::GENERIC_HTTP => 'DeliveryProfileGenericHttp',
 			DeliveryProfileType::GENERIC_HLS_MANIFEST => 'DeliveryProfileGenericAppleHttpManifest',
 			DeliveryProfileType::GENERIC_HDS_MANIFEST => 'DeliveryProfileGenericHdsManifest',
+			DeliveryProfileType::GENERIC_SS => 'DeliveryProfileGenericSilverLight',
 					
 			DeliveryProfileType::LEVEL3_HLS => 'DeliveryProfileLevel3AppleHttp',
 			DeliveryProfileType::LEVEL3_HTTP => 'DeliveryProfileLevel3Http',

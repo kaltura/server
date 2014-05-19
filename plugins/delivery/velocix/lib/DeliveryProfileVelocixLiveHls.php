@@ -22,7 +22,7 @@ class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 		if ($liveEntry && substr($liveEntry->getStreamName(), 0, 4) == 'auth'){
 			$token = parent::getTokenizer();
 			$token->setStreamName($liveEntry->getStreamName());
-			$token->setProtocol('hds');
+			$token->setProtocol('hls');
 			return $token;
 			return new kVelocixUrlTokenizer($window, $secret, $protocol, $liveEntry->getStreamName(), $hdsPaths, $tokenParamName, 'auth_');
 		}

@@ -29,6 +29,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileAkamaiHttp();
 			case KalturaDeliveryProfileType::LIVE_HLS:
 				return new KalturaDeliveryProfileLiveAppleHttp();
+			case KalturaDeliveryProfileType::GENERIC_SS:
+				return new KalturaDeliveryProfileGenericSilverLight();
 			default:
 				return new KalturaDeliveryProfile();
 		}
