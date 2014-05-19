@@ -90,9 +90,14 @@ class kMetadataFieldChangedCondition extends kCondition
 		{
 			$object = $scope->getEvent()->getObject();
 			if($object instanceof Metadata)
+			{
 				$metadata = $object;
-			elseif($object instanceof IMetadataObject)
-				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
+			}
+			elseif(kMetadataManager::isMetadataObject($object))
+			{
+				$objectType = kMetadataManager::getTypeNameFromObject($object);
+				$metadata = MetadataPeer::retrieveByObject($profileId, $objectType, $object->getId());
+			}
 		}
 			
 		if(!$metadata)

@@ -689,29 +689,35 @@ class Form_PartnerConfiguration extends Infra_Form
 				$systemPartnerConfiguration->permissions[] = $permission;
 				
 				if (($modul->basePermissionName != '') && ($modul->basePermissionType != '')){
-					$basePermission = new Kaltura_Client_Type_Permission();
-					$basePermission->name = $modul->basePermissionName;
-					$basePermission->type = $modul->basePermissionType;
-					$basePermission->status = $permission->status;
-										
-					$permissionSet = false;
-					KalturaLog::debug("try to add permission: ". $basePermission->name);
-					foreach ($systemPartnerConfiguration->permissions as $permission)
+					$basePermissionNames = explode(',', $modul->basePermissionName);
+					$basePermissionTypes = explode(',', $modul->basePermissionType);
+					foreach($basePermissionNames as $index => $basePermissionName)
 					{
-						if (($permission->name == $basePermission->name) && ($permission->type == $basePermission->type))
+						$basePermissionType = isset($basePermissionTypes[$index]) ? $basePermissionTypes[$index] : Kaltura_Client_Enum_PermissionType::SPECIAL_FEATURE;
+						$basePermission = new Kaltura_Client_Type_Permission();
+						$basePermission->name = trim($basePermissionName);
+						$basePermission->type = trim($basePermissionType);
+						$basePermission->status = $permission->status;
+											
+						$permissionSet = false;
+						KalturaLog::debug("try to add permission: ". $basePermission->name);
+						foreach ($systemPartnerConfiguration->permissions as $permission)
 						{
-							if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
-								$permission->status = $basePermission->status;
-							KalturaLog::debug("permission exists with status : " . $permission->status);
-							$permissionSet = true;
-							break;
+							if (($permission->name == $basePermission->name) && ($permission->type == $basePermission->type))
+							{
+								if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
+									$permission->status = $basePermission->status;
+								KalturaLog::debug("permission exists with status : " . $permission->status);
+								$permissionSet = true;
+								break;
+							}
 						}
-					}
-					
-					if(!$permissionSet)
-					{
-						KalturaLog::debug("permission didn't exist with status : " . $permission->status);
-						$systemPartnerConfiguration->permissions[] = $basePermission;
+						
+						if(!$permissionSet)
+						{
+							KalturaLog::debug("permission didn't exist with status : " . $permission->status);
+							$systemPartnerConfiguration->permissions[] = $basePermission;
+						}
 					}
 				}
 			}

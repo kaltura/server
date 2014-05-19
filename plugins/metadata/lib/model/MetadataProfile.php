@@ -198,4 +198,17 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	{
 		return array("metadataProfile:id=".strtolower($this->getId()), "metadataProfile:partnerId=".strtolower($this->getPartnerId()));
 	}
+
+	public function getRequiredCopyTemplatePermissions ()
+	{
+		return $this->getFromCustomData('requiredCopyTemplatePermissions', null, array());
+	}
+	
+	public function setRequiredCopyTemplatePermissions ($v)
+	{
+		if(!is_array($v))
+			$v = array_map('trim', explode(',', $v));
+			
+		$this->putInCustomData('requiredCopyTemplatePermissions', $v);
+	}
 } // MetadataProfile
