@@ -112,6 +112,10 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
  		$c = new Criteria();
  		$c->add(MetadataProfilePeer::PARTNER_ID, $fromPartnerId);
  		
+		$systemNameCriteria = new Criteria();
+		$systemNameCriteria->add(MetadataProfilePeer::PARTNER_ID, $toPartnerId);
+		$systemNameCriteria->add(MetadataProfilePeer::STATUS, MetadataProfile::STATUS_ACTIVE);
+		
  		$metadataProfiles = MetadataProfilePeer::doSelect($c);
  		foreach($metadataProfiles as $metadataProfile)
  		{
@@ -123,6 +127,14 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
  			if (!myPartnerUtils::isPartnerPermittedForCopy ($toPartner, $metadataProfile->getRequiredCopyTemplatePermissions()))
  				continue;
  				
+ 			if($metadataProfile->getSystemName())
+ 			{
+				$c = clone $systemNameCriteria;
+				$c->add(MetadataProfilePeer::SYSTEM_NAME, $metadataProfile->getSystemName());
+				if(MetadataProfilePeer::doCount($c))
+					continue;
+ 			}
+				
  			$newMetadataProfile = $metadataProfile->copy();
  			$newMetadataProfile->setPartnerId($toPartnerId);
  			$newMetadataProfile->save();

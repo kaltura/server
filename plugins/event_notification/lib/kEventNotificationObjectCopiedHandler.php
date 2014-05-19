@@ -3,7 +3,7 @@
  * @package plugins.eventNotification
  * @subpackage lib
  */
-class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsumer
+class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjectChangedEventConsumer, kObjectCreatedEventConsumer
 {
 	private static $partnerLevelPermissionTypes = array(
 		PermissionType::PLUGIN,
@@ -45,6 +45,10 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
  		$c = new Criteria();
  		$c->add(EventNotificationTemplatePeer::PARTNER_ID, $fromPartnerId);
  		
+		$systemNameCriteria = new Criteria();
+		$systemNameCriteria->add(EventNotificationTemplatePeer::PARTNER_ID, $toPartnerId);
+		$systemNameCriteria->add(EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE);
+		
  		$eventNotificationTemplates = EventNotificationTemplatePeer::doSelect($c);
  		foreach($eventNotificationTemplates as $eventNotificationTemplate)
  		{
@@ -56,6 +60,14 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
  			if (!myPartnerUtils::isPartnerPermittedForCopy ($toPartner, $eventNotificationTemplate->getRequiredCopyTemplatePermissions()))
  				continue;
  				
+ 			if($eventNotificationTemplate->getSystemName())
+ 			{
+				$c = clone $systemNameCriteria;
+				$c->add(EventNotificationTemplatePeer::SYSTEM_NAME, $eventNotificationTemplate->getSystemName());
+				if(EventNotificationTemplatePeer::doCount($c))
+					continue;
+ 			}
+				
  			$newEventNotificationTemplate = $eventNotificationTemplate->copy();
  			$newEventNotificationTemplate->setPartnerId($toPartnerId);
  			$newEventNotificationTemplate->save();
