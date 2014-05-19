@@ -60,18 +60,27 @@ class KalturaLog
 	static function alert($message)
 	{
 		self::initLog();
+		if(!$message instanceof Exception)
+			$message = new Exception($message);
+			
 		self::$_logger->log($message, self::ALERT);
 	}
 
 	static function crit($message)
 	{
 		self::initLog();
+		if(!$message instanceof Exception)
+			$message = new Exception($message);
+			
 		self::$_logger->log($message, self::CRIT);
 	}
 
 	static function err($message)
 	{
 		self::initLog();
+		if(!$message instanceof Exception)
+			$message = new Exception($message);
+			
 		self::$_logger->log($message, self::ERR);
 	}	
 
