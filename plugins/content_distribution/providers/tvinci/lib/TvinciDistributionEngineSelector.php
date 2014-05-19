@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionEngineSelector extends DistributionEngine implements
+class TvinciDistributionEngineSelector extends DistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
@@ -77,13 +77,13 @@ class YouTubeDistributionEngineSelector extends DistributionEngine implements
 
 	protected function getEngineByProfile(KalturaDistributionJobData $data)
 	{
-		if (!$data->distributionProfile instanceof KalturaYouTubeDistributionProfile)
-			throw new Exception('Distribution profile is not of type KalturaYouTubeDistributionProfile for entry distribution #'.$data->entryDistributionId);
+		if (!$data->distributionProfile instanceof KalturaTvinciDistributionProfile)
+			throw new Exception('Distribution profile is not of type KalturaTvinciDistributionProfile for entry distribution #'.$data->entryDistributionId);
 
-		if ($data->distributionProfile->feedSpecVersion == KalturaYouTubeDistributionFeedSpecVersion::VERSION_2)
-			$engine = new YouTubeDistributionRightsFeedEngine();
+		if ($data->distributionProfile->feedSpecVersion == KalturaTvinciDistributionFeedSpecVersion::VERSION_2)
+			$engine = new TvinciDistributionRightsFeedEngine();
 		else
-			$engine = new YouTubeDistributionLegacyEngine();
+			$engine = new TvinciDistributionLegacyEngine();
 
 		if (KBatchBase::$taskConfig)
 			$engine->configure();

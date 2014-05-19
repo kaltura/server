@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionLegacyFeedHelper
+class TvinciDistributionLegacyFeedHelper
 {
 
 	/**
@@ -17,7 +17,7 @@ class YouTubeDistributionLegacyFeedHelper
 	protected $xpath;
 
 	/**
-	 * @var KalturaYouTubeDistributionProfile
+	 * @var KalturaTvinciDistributionProfile
 	 */
 	protected $distributionProfile;
 
@@ -41,7 +41,7 @@ class YouTubeDistributionLegacyFeedHelper
 	/**
 	 *
 	 * Provider data object
-	 * @var KalturaYouTubeDistributionJobProviderData
+	 * @var KalturaTvinciDistributionJobProviderData
 	 */
 	protected $providerData;
 
@@ -52,7 +52,7 @@ class YouTubeDistributionLegacyFeedHelper
 	 * @param $templateName
 	 * @param $distributionProfile
 	 */
-	public function __construct($templateName, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	public function __construct($templateName, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$this->distributionProfile = $distributionProfile;
 		$this->providerData = $providerData;
@@ -76,35 +76,35 @@ class YouTubeDistributionLegacyFeedHelper
 		}
 		$this->metadataTempFileName = 'youtube_' . $this->timestampName . '.xml';
 
-		$startTime = $this->getValueForField(KalturaYouTubeDistributionField::START_TIME);
+		$startTime = $this->getValueForField(KalturaTvinciDistributionField::START_TIME);
 		if ($startTime && intval($startTime))
 			$this->setStartTime(date('c', intval($startTime)));
 
-		$endTime = $this->getValueForField(KalturaYouTubeDistributionField::END_TIME);
+		$endTime = $this->getValueForField(KalturaTvinciDistributionField::END_TIME);
 		if ($endTime && intval($endTime))
 			$this->setEndTime(date('c', $endTime));
 
-		$this->setNotificationEmail($this->getValueForField(KalturaYouTubeDistributionField::NOTIFICATION_EMAIL));
-		$this->setUsername($this->getValueForField(KalturaYouTubeDistributionField::ACCOUNT_USERNAME));
-		$this->setPassword($this->getValueForField(KalturaYouTubeDistributionField::ACCOUNT_PASSWORD));
-		$this->setOwnerName($this->getValueForField(KalturaYouTubeDistributionField::OWNER_NAME));
-		$this->setTarget($this->getValueForField(KalturaYouTubeDistributionField::TARGET));
+		$this->setNotificationEmail($this->getValueForField(KalturaTvinciDistributionField::NOTIFICATION_EMAIL));
+		$this->setUsername($this->getValueForField(KalturaTvinciDistributionField::ACCOUNT_USERNAME));
+		$this->setPassword($this->getValueForField(KalturaTvinciDistributionField::ACCOUNT_PASSWORD));
+		$this->setOwnerName($this->getValueForField(KalturaTvinciDistributionField::OWNER_NAME));
+		$this->setTarget($this->getValueForField(KalturaTvinciDistributionField::TARGET));
 
 		// community
-		$this->setAllowComments($this->getValueForField(KalturaYouTubeDistributionField::ALLOW_COMMENTS));
-		$this->setAllowEmbedding($this->getValueForField(KalturaYouTubeDistributionField::ALLOW_EMBEDDING));
-		$this->setAllowRatings($this->getValueForField(KalturaYouTubeDistributionField::ALLOW_RATINGS));
-		$this->setAllowResponses($this->getValueForField(KalturaYouTubeDistributionField::ALLOW_RESPONSES));
+		$this->setAllowComments($this->getValueForField(KalturaTvinciDistributionField::ALLOW_COMMENTS));
+		$this->setAllowEmbedding($this->getValueForField(KalturaTvinciDistributionField::ALLOW_EMBEDDING));
+		$this->setAllowRatings($this->getValueForField(KalturaTvinciDistributionField::ALLOW_RATINGS));
+		$this->setAllowResponses($this->getValueForField(KalturaTvinciDistributionField::ALLOW_RESPONSES));
 
 		// policies
-		$this->setCommercialPolicy($this->getValueForField(KalturaYouTubeDistributionField::POLICY_COMMERCIAL));
-		$this->setUGCPolicy($this->getValueForField(KalturaYouTubeDistributionField::POLICY_UGC));
+		$this->setCommercialPolicy($this->getValueForField(KalturaTvinciDistributionField::POLICY_COMMERCIAL));
+		$this->setUGCPolicy($this->getValueForField(KalturaTvinciDistributionField::POLICY_UGC));
 
 		// urgent reference file
-		$this->setUrgentReferenceFile($this->getValueForField(KalturaYouTubeDistributionField::URGENT_REFERENCE_FILE));
+		$this->setUrgentReferenceFile($this->getValueForField(KalturaTvinciDistributionField::URGENT_REFERENCE_FILE));
 
 		// keep fingerprint
-		$this->setKeepFingerprint($this->getValueForField(KalturaYouTubeDistributionField::KEEP_FINGERPRINT));
+		$this->setKeepFingerprint($this->getValueForField(KalturaTvinciDistributionField::KEEP_FINGERPRINT));
 	}
 
 	private function getValueForField($fieldName)
@@ -457,21 +457,21 @@ class YouTubeDistributionLegacyFeedHelper
 
 	public function setMetadataFromEntry()
 	{
-		$this->setTitle($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_TITLE));
-		$this->setDescription($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_DESCRIPTION));
-		$this->setRating($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_RATING));
-		$this->setKeywords($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_KEYWORDS));
-		$this->setDateRecorded($this->getValueForField(KalturaYouTubeDistributionField::DATE_RECORDED));
-		$this->setCategory($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_CATEGORY));
-		$this->setLanguage($this->getValueForField(KalturaYouTubeDistributionField::LANGUAGE));
+		$this->setTitle($this->getValueForField(KalturaTvinciDistributionField::MEDIA_TITLE));
+		$this->setDescription($this->getValueForField(KalturaTvinciDistributionField::MEDIA_DESCRIPTION));
+		$this->setRating($this->getValueForField(KalturaTvinciDistributionField::MEDIA_RATING));
+		$this->setKeywords($this->getValueForField(KalturaTvinciDistributionField::MEDIA_KEYWORDS));
+		$this->setDateRecorded($this->getValueForField(KalturaTvinciDistributionField::DATE_RECORDED));
+		$this->setCategory($this->getValueForField(KalturaTvinciDistributionField::MEDIA_CATEGORY));
+		$this->setLanguage($this->getValueForField(KalturaTvinciDistributionField::LANGUAGE));
 
 		// yt:location
-		$this->setLocationCountry($this->getValueForField(KalturaYouTubeDistributionField::LOCATION_COUNTRY));
-		$this->setLocationLocationText($this->getValueForField(KalturaYouTubeDistributionField::LOCATION_LOCATION_TEXT));
-		$this->setLocationZipCode($this->getValueForField(KalturaYouTubeDistributionField::LOCATION_ZIP_CODE));
+		$this->setLocationCountry($this->getValueForField(KalturaTvinciDistributionField::LOCATION_COUNTRY));
+		$this->setLocationLocationText($this->getValueForField(KalturaTvinciDistributionField::LOCATION_LOCATION_TEXT));
+		$this->setLocationZipCode($this->getValueForField(KalturaTvinciDistributionField::LOCATION_ZIP_CODE));
 
 		// yt:distribution_restriction
-		$this->setDistributionRestrictionRule($this->getValueForField(KalturaYouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE));
+		$this->setDistributionRestrictionRule($this->getValueForField(KalturaTvinciDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE));
 
 		// yt:*_metadata
 		$this->setWebMetadata();
@@ -481,28 +481,28 @@ class YouTubeDistributionLegacyFeedHelper
 
 	protected function setWebMetadata()
 	{
-		$this->setWebCustomId($this->getValueForField(KalturaYouTubeDistributionField::WEB_METADATA_CUSTOM_ID));
-		$this->setWebNotes($this->getValueForField(KalturaYouTubeDistributionField::WEB_METADATA_NOTES));
+		$this->setWebCustomId($this->getValueForField(KalturaTvinciDistributionField::WEB_METADATA_CUSTOM_ID));
+		$this->setWebNotes($this->getValueForField(KalturaTvinciDistributionField::WEB_METADATA_NOTES));
 	}
 
 	protected function setTvMetadata()
 	{
-		$this->setTvCustomId($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_CUSTOM_ID));
-		$this->setTvEpisode($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_EPISODE));
-		$this->setTvEpisodeTitle($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_EPISODE_TITLE));
-		$this->setTvShowTitle($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_SHOW_TITLE));
-		$this->setTvSeason($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_SEASON));
-		$this->setTvNotes($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_NOTES));
-		$this->setTvTmsId($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_TMS_ID));
+		$this->setTvCustomId($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_CUSTOM_ID));
+		$this->setTvEpisode($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_EPISODE));
+		$this->setTvEpisodeTitle($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_EPISODE_TITLE));
+		$this->setTvShowTitle($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_SHOW_TITLE));
+		$this->setTvSeason($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_SEASON));
+		$this->setTvNotes($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_NOTES));
+		$this->setTvTmsId($this->getValueForField(KalturaTvinciDistributionField::TV_METADATA_TMS_ID));
 	}
 
 	protected function setMovieMetadata()
 	{
-		$this->setMovieCustomId($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID));
-		$this->setMovieDirector($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_DIRECTOR));
-		$this->setMovieNotes($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_NOTES));
-		$this->setMovieTitle($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_TITLE));
-		$this->setMovieTmsId($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_TMS_ID));
+		$this->setMovieCustomId($this->getValueForField(KalturaTvinciDistributionField::MOVIE_METADATA_CUSTOM_ID));
+		$this->setMovieDirector($this->getValueForField(KalturaTvinciDistributionField::MOVIE_METADATA_DIRECTOR));
+		$this->setMovieNotes($this->getValueForField(KalturaTvinciDistributionField::MOVIE_METADATA_NOTES));
+		$this->setMovieTitle($this->getValueForField(KalturaTvinciDistributionField::MOVIE_METADATA_TITLE));
+		$this->setMovieTmsId($this->getValueForField(KalturaTvinciDistributionField::MOVIE_METADATA_TMS_ID));
 	}
 
 	/**
@@ -510,7 +510,7 @@ class YouTubeDistributionLegacyFeedHelper
 	 */
 	public function setPlaylists($currentPlaylists)
 	{
-		$newPlaylists = $this->getValueForField(KalturaYouTubeDistributionField::PLAYLISTS);
+		$newPlaylists = $this->getValueForField(KalturaTvinciDistributionField::PLAYLISTS);
 		KalturaLog::debug('Current playlists: ' . $currentPlaylists);
 		KalturaLog::debug('New playlists: ' . $newPlaylists);
 		$currentPlaylistsArray = explode(',', $currentPlaylists);
@@ -574,9 +574,9 @@ class YouTubeDistributionLegacyFeedHelper
 		if ($this->distributionProfile->enableAdServer)
 		{
 			$thirdPartyAdsNode = $this->doc->createElement('yt:third_party_ads');
-			$adTypeNode = $this->doc->createElement('yt:ad_type_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE));
-			$partnerIdNode = $this->doc->createElement('yt:partner_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID));
-			$videoIdNode = $this->doc->createElement('yt:video_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
+			$adTypeNode = $this->doc->createElement('yt:ad_type_id', $this->getValueForField(KalturaTvinciDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE));
+			$partnerIdNode = $this->doc->createElement('yt:partner_id', $this->getValueForField(KalturaTvinciDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID));
+			$videoIdNode = $this->doc->createElement('yt:video_id', $this->getValueForField(KalturaTvinciDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
 
 			$thirdPartyAdsNode->appendChild($adTypeNode);
 			$thirdPartyAdsNode->appendChild($partnerIdNode);
@@ -584,8 +584,8 @@ class YouTubeDistributionLegacyFeedHelper
 			$advertisingNode->appendChild($thirdPartyAdsNode);
 		}
 
-		$allowPreRolls = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
-		$allowPostRolls = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
+		$allowPreRolls = $this->getValueForField(KalturaTvinciDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
+		$allowPostRolls = $this->getValueForField(KalturaTvinciDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
 
 		$allowPreRolls = in_array($allowPreRolls, array('true', 'True', '1'));
 		$allowPostRolls = in_array($allowPostRolls, array('true', 'True', '1'));
@@ -604,7 +604,7 @@ class YouTubeDistributionLegacyFeedHelper
 		}
 
 		// yt:adsense_for_video
-		$adsenseForVideoValue = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
+		$adsenseForVideoValue = $this->getValueForField(KalturaTvinciDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
 		if ($adsenseForVideoValue)
 		{
 			$adsenseForVideoNode = $this->doc->createElement('yt:adsense_for_video', $adsenseForVideoValue);
@@ -612,7 +612,7 @@ class YouTubeDistributionLegacyFeedHelper
 		}
 
 		// yt:invideo
-		$invideoValue = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_INVIDEO);
+		$invideoValue = $this->getValueForField(KalturaTvinciDistributionField::ADVERTISING_INVIDEO);
 		if ($invideoValue)
 		{
 			$invideoNode = $this->doc->createElement('yt:invideo', $invideoValue);

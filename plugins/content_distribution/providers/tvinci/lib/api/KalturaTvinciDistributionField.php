@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.enum
  */
-class KalturaYouTubeDistributionField extends KalturaStringEnum implements YouTubeDistributionField
+class KalturaTvinciDistributionField extends KalturaStringEnum implements TvinciDistributionField
 {
-	// see YouTubeDistributionField interface
+	// see TvinciDistributionField interface
 }

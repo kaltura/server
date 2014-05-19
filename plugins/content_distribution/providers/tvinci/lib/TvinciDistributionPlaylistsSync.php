@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionPlaylistsSync
+class TvinciDistributionPlaylistsSync
 {
 	/**
-	 * @var Google_YouTubeService
+	 * @var Google_TvinciService
 	 */
 	protected $_youtubeService;
 
@@ -30,7 +30,7 @@ class YouTubeDistributionPlaylistsSync
 	 */
 	protected $_playlistLoadAttemptsLimit = 2;
 
-	public function __construct(Google_YouTubeService $youtubeService)
+	public function __construct(Google_TvinciService $youtubeService)
 	{
 		$this->_youtubeService = $youtubeService;
 		$this->_allPlaylists = array();

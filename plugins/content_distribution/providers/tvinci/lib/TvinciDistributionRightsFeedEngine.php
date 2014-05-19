@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
+class TvinciDistributionRightsFeedEngine extends DistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
@@ -25,11 +25,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYouTubeDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaYouTubeDistributionProfile");
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
 	
-		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
+		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 		
 		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
 		
@@ -48,12 +48,12 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			// try to get batch status xml to see if there is an internal error on youtube's batch
 			$batchStatus = $this->fetchBatchStatus($data, $data->distributionProfile, $data->providerData);
 			if ($batchStatus)
-				throw new Exception('Internal failure on YouTube, internal_failure-status.xml was found. Error ['.$batchStatus.']');
+				throw new Exception('Internal failure on Tvinci, internal_failure-status.xml was found. Error ['.$batchStatus.']');
 
 			return false; // return false to recheck again on next job closing iteration
 		}
 			
-		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
+		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Submit reference');
 
 		// maybe we didn't submit a reference, so let's check the file status
@@ -70,7 +70,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		$assetId = $statusParser->getAssetId();
 		$videoId = $statusParser->getVideoId();
 
-		$remoteIdHandler = new YouTubeDistributionRemoteIdHandler();
+		$remoteIdHandler = new TvinciDistributionRemoteIdHandler();
 		$remoteIdHandler->setVideoId($videoId);
 		$remoteIdHandler->setAssetId($assetId);
 		$remoteIdHandler->setReferenceId($referenceId);
@@ -88,11 +88,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	 */
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYouTubeDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaYouTubeDistributionProfile");
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
 	
-		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
+		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 		
 		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
 		
@@ -109,7 +109,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		if ($statusXml === false) // no status yet
 			return false;
 			
-		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
+		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Remove video');
 		if (is_null($status))
 			throw new Exception('Status could not be found after deletion request');
@@ -125,11 +125,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYouTubeDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaYouTubeDistributionProfile");
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
 	
-		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
+		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 
 		$this->handleUpdate($data, $data->distributionProfile, $data->providerData);
 		
@@ -146,7 +146,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		if ($statusXml === false) // no status yet
 			return false;
 			
-		$statusParser = new YouTubeDistributionRightsFeedLegacyStatusParser($statusXml);
+		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
 		$status = $statusParser->getStatusForAction('Update video');
 		if (is_null($status))
 			throw new Exception('Status could not be found after distribution update');
@@ -154,7 +154,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		if ($status != 'Success')
 			throw new Exception('Update failed with status ['.$status.']');
 
-		$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($data->remoteId);
+		$remoteIdHandler = TvinciDistributionRemoteIdHandler::initialize($data->remoteId);
 		$videoId = $remoteIdHandler->getVideoId();
 
 		$providerData = $data->providerData;
@@ -174,10 +174,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	
 	/**
 	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
-	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 */
-	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	protected function handleSubmit(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$videoFilePath = $providerData->videoAssetFilePath;
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
@@ -212,10 +212,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	
 	/**
 	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
-	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 */
-	protected function handleDelete(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	protected function handleDelete(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->deleteXml);
@@ -227,10 +227,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 	
 	/**
 	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
-	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 */
-	protected function handleUpdate(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	protected function handleUpdate(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 
@@ -275,7 +275,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		return "";
 	}
 	
-	protected function addCaptions(KalturaYouTubeDistributionJobProviderData $providerData, $sftpManager, KalturaDistributionJobData $data)
+	protected function addCaptions(KalturaTvinciDistributionJobProviderData $providerData, $sftpManager, KalturaDistributionJobData $data)
 	{
 		if ( $providerData->captionAssetIds == "" ) 
 			return;
@@ -313,11 +313,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 
 	/**
 	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
-	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 * @return Status XML or FALSE when status is not available yet
 	 */
-	protected function fetchStatusXml(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	protected function fetchStatusXml(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
 		$sftpManager = $this->getSFTPManager($distributionProfile);
@@ -341,11 +341,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 
 	/**
 	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
-	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionJobProviderData $providerData
 	 * @return string Status XML or FALSE when status is not available yet
 	 */
-	protected function fetchBatchStatus(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	protected function fetchBatchStatus(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$statusFilePath = $providerData->sftpDirectory . '/internal_failure-status.xml';
 		$sftpManager = $this->getSFTPManager($distributionProfile);
@@ -364,11 +364,11 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		}
 	}
 
-	protected function syncPlaylists($videoId, KalturaYouTubeDistributionJobProviderData $providerData)
+	protected function syncPlaylists($videoId, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$fieldValues = unserialize($providerData->fieldValues);
-		$youtubeChannel = isset($fieldValues[KalturaYouTubeDistributionField::VIDEO_CHANNEL]) ? $fieldValues[KalturaYouTubeDistributionField::VIDEO_CHANNEL] : null;
-		$newVideoPlaylists = isset($fieldValues[KalturaYouTubeDistributionField::PLAYLISTS]) ? $fieldValues[KalturaYouTubeDistributionField::PLAYLISTS] : null;
+		$youtubeChannel = isset($fieldValues[KalturaTvinciDistributionField::VIDEO_CHANNEL]) ? $fieldValues[KalturaTvinciDistributionField::VIDEO_CHANNEL] : null;
+		$newVideoPlaylists = isset($fieldValues[KalturaTvinciDistributionField::PLAYLISTS]) ? $fieldValues[KalturaTvinciDistributionField::PLAYLISTS] : null;
 		$clientId = $providerData->googleClientId;
 		$clientSecret   = $providerData->googleClientSecret;
 		$tokenData = $providerData->googleTokenData;
@@ -380,7 +380,7 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 		}
 		if (!$youtubeChannel)
 		{
-			KalturaLog::err('YouTube channel was not found');
+			KalturaLog::err('Tvinci channel was not found');
 			return $providerData->currentPlaylists;
 		}
 		if (!$videoId)
@@ -388,9 +388,9 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 			KalturaLog::err('No video id');
 			return $providerData->currentPlaylists;
 		}
-		$youtubeService = YouTubeDistributionGoogleClientHelper::getYouTubeService($clientId, $clientSecret, $tokenData);
+		$youtubeService = TvinciDistributionGoogleClientHelper::getTvinciService($clientId, $clientSecret, $tokenData);
 
-		$playlistSync = new YouTubeDistributionPlaylistsSync($youtubeService);
+		$playlistSync = new TvinciDistributionPlaylistsSync($youtubeService);
 
 		$currentPlaylists = $playlistSync->sync($youtubeChannel, $videoId, $providerData->currentPlaylists, $newVideoPlaylists);
 		return $currentPlaylists;
@@ -398,10 +398,10 @@ class YouTubeDistributionRightsFeedEngine extends DistributionEngine implements
 
 	/**
 	 * 
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @param KalturaTvinciDistributionProfile $distributionProfile
 	 * @return sftpMgr
 	 */
-	protected function getSFTPManager(KalturaYouTubeDistributionProfile $distributionProfile)
+	protected function getSFTPManager(KalturaTvinciDistributionProfile $distributionProfile)
 	{
 		if (!is_null($this->_sftpManager))
 			return $this->_sftpManager;

@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionLegacyStatusParser
+class TvinciDistributionLegacyStatusParser
 {
 	/**
 	 * @var DOMDocument

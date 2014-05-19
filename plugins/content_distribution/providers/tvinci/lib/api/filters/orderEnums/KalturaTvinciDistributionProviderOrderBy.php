@@ -1,8 +1,8 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.filters.enum
  */
-class KalturaYouTubeDistributionProviderOrderBy extends KalturaDistributionProviderOrderBy
+class KalturaTvinciDistributionProviderOrderBy extends KalturaDistributionProviderOrderBy
 {
 }

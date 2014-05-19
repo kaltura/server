@@ -1,8 +1,8 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.enum
  */
-class KalturaYouTubeDistributionFeedSpecVersion extends KalturaStringEnum implements YouTubeDistributionFeedSpecVersion
+class KalturaTvinciDistributionFeedSpecVersion extends KalturaStringEnum implements TvinciDistributionFeedSpecVersion
 {
 }

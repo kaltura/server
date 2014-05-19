@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.objects
  */
-class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionProfile
+class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionProfile
 {
 	/**
-	 * @var KalturaYouTubeDistributionFeedSpecVersion
+	 * @var KalturaTvinciDistributionFeedSpecVersion
 	 */
 	public $feedSpecVersion;
 

@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.objects
  */
-class KalturaYouTubeDistributionProvider extends KalturaDistributionProvider
+class KalturaTvinciDistributionProvider extends KalturaDistributionProvider
 {
 	
 }

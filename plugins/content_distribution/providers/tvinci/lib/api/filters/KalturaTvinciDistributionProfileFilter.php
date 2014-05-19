@@ -1,8 +1,8 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.filters
  */
-class KalturaYouTubeDistributionProfileFilter extends KalturaYouTubeDistributionProfileBaseFilter
+class KalturaTvinciDistributionProfileFilter extends KalturaTvinciDistributionProfileBaseFilter
 {
 }

@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib.enum
  */
-interface YouTubeDistributionFeedSpecVersion
+interface TvinciDistributionFeedSpecVersion
 {
 	const VERSION_1 = '1';
 	const VERSION_2 = '2';

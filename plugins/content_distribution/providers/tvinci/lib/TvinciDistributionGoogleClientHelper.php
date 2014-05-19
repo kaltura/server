@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionGoogleClientHelper
+class TvinciDistributionGoogleClientHelper
 {
 	/**
 	 * @var Google_Client
@@ -12,7 +12,7 @@ class YouTubeDistributionGoogleClientHelper
 	private static $_googleClient;
 
 	/**
-	 * @var Google_YouTubeService
+	 * @var Google_TvinciService
 	 */
 	private static $_youtubeService;
 
@@ -33,7 +33,7 @@ class YouTubeDistributionGoogleClientHelper
 		return $client;
 	}
 
-	public static function getYouTubeService($clientId, $clientSecret, $accessToken)
+	public static function getTvinciService($clientId, $clientSecret, $accessToken)
 	{
 		if (!is_null(self::$_youtubeService))
 			return self::$_youtubeService;
@@ -44,7 +44,7 @@ class YouTubeDistributionGoogleClientHelper
 			$client->refreshToken($accessTokenObject->refresh_token);
 		else
 			$client->setAccessToken($accessToken);
-		$service = new Google_YouTubeService($client);
+		$service = new Google_TvinciService($client);
 
 		self::$_youtubeService = $service;
 		return $service;

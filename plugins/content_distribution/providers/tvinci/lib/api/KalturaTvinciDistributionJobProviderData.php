@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.objects
  */
-class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistributionJobProviderData
+class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistributionJobProviderData
 {
 	/**
 	 * @var string
@@ -77,7 +77,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		if(!$distributionJobData)
 			return;
 			
-		if(!($distributionJobData->distributionProfile instanceof KalturaYouTubeDistributionProfile))
+		if(!($distributionJobData->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			return;
 		
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
@@ -110,12 +110,12 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		else
 			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');  
 
-		if ($distributionJobData->distributionProfile->feedSpecVersion != YouTubeDistributionFeedSpecVersion::VERSION_2)
+		if ($distributionJobData->distributionProfile->feedSpecVersion != TvinciDistributionFeedSpecVersion::VERSION_2)
 			return;
 			
 		if (is_null($this->fieldValues))
 			return;
-			//23.5.13 this return is a hack because of bad inheritance of kYouTubeDistributionJobProviderData causing some YouTube distribution 
+			//23.5.13 this return is a hack because of bad inheritance of kTvinciDistributionJobProviderData causing some Tvinci distribution 
 			//batch jobs to not have fieldValues. it can be removed at some point. 
 			
 		$videoFilePath = $this->videoAssetFilePath;
@@ -126,23 +126,23 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		$fieldValues = unserialize($this->fieldValues);
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
+			$feed = TvinciDistributionRightsFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
 			$this->submitXml = $feed->getXml();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 		{
-			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+			$remoteIdHandler = TvinciDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
+			$feed = TvinciDistributionRightsFeedHelper::initializeDefaultUpdateFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
 			$this->updateXml = $feed->getXml();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
 		{
-			$remoteIdHandler = YouTubeDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
-			$feed = YouTubeDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
+			$remoteIdHandler = TvinciDistributionRemoteIdHandler::initialize($distributionJobData->remoteId);
+			$feed = TvinciDistributionRightsFeedHelper::initializeDefaultDeleteFeed($distributionJobData->distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $remoteIdHandler);
 			$this->deleteXml = $feed->getXml();
 		}
 
-		$this->newPlaylists = isset($fieldValues[KalturaYouTubeDistributionField::PLAYLISTS]) ? $fieldValues[KalturaYouTubeDistributionField::PLAYLISTS] : null;
+		$this->newPlaylists = isset($fieldValues[KalturaTvinciDistributionField::PLAYLISTS]) ? $fieldValues[KalturaTvinciDistributionField::PLAYLISTS] : null;
 		if ($feed)
 		{
 			$this->sftpDirectory = $feed->getDirectoryName();

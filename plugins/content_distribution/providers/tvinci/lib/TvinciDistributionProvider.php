@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionProvider extends ConfigurableDistributionProvider
+class TvinciDistributionProvider extends ConfigurableDistributionProvider
 {
 	/**
-	 * @var YouTubeDistributionProvider
+	 * @var TvinciDistributionProvider
 	 */
 	protected static $instance;
 	
@@ -16,12 +16,12 @@ class YouTubeDistributionProvider extends ConfigurableDistributionProvider
 	}
 	
 	/**
-	 * @return YouTubeDistributionProvider
+	 * @return TvinciDistributionProvider
 	 */
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new YouTubeDistributionProvider();
+			self::$instance = new TvinciDistributionProvider();
 			
 		return self::$instance;
 	}
@@ -31,7 +31,7 @@ class YouTubeDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function getType()
 	{
-		return YouTubeDistributionPlugin::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE);
+		return TvinciDistributionPlugin::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI);
 	}
 	
 	/**
@@ -39,12 +39,12 @@ class YouTubeDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function getName()
 	{
-		return 'YouTube';
+		return 'Tvinci';
 	}
 	
 	public function getFieldEnumClass()
 	{
-	    return 'YouTubeDistributionField';
+	    return 'TvinciDistributionField';
 	}
 
 	/* (non-PHPdoc)

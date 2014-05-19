@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionRightsFeedHelper
+class TvinciDistributionRightsFeedHelper
 {
 	/**
 	 * @var DOMDocument
@@ -25,7 +25,7 @@ class YouTubeDistributionRightsFeedHelper
 	 */
 	protected $_metadataTempFileName;
 
-	public function __construct(KalturaYouTubeDistributionProfile $distributionProfile)
+	public function __construct(KalturaTvinciDistributionProfile $distributionProfile)
 	{
 		$this->_doc = new DOMDocument();
 		$this->_doc->formatOutput = true;
@@ -42,21 +42,21 @@ class YouTubeDistributionRightsFeedHelper
 		$this->_metadataTempFileName = 'youtube_xml20_' . $timestampName . '.xml';
 	}
 
-	public static function initializeDefaultSubmitFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)
+	public static function initializeDefaultSubmitFeed(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)
 	{
-		$identifier= $fieldValues[KalturaYouTubeDistributionField::ASSET_CUSTOM_ID];
+		$identifier= $fieldValues[KalturaTvinciDistributionField::ASSET_CUSTOM_ID];
 		$videoTag = $identifier.'-video';
 		$thumbnailTag = $identifier.'-thumbnail';
 		$captionTag = $identifier.'-caption';
 
-		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
+		$feed = new TvinciDistributionRightsFeedHelper($distributionProfile);
 		$feed->setNotificationEmail($fieldValues);
 		$feed->setMetadataByFieldValues($fieldValues);
 		$feed->setByXpath('video/@tag', $videoTag);
 		$feed->setByXpath('asset/@tag', $videoTag);
 
 		// video file
-		$urgentReference = $fieldValues[KalturaYouTubeDistributionField::URGENT_REFERENCE_FILE];
+		$urgentReference = $fieldValues[KalturaTvinciDistributionField::URGENT_REFERENCE_FILE];
 		$feed->appendFileElement('video', $urgentReference, pathinfo($videoFilePath, PATHINFO_BASENAME), $videoTag);
 
 		// thumbnail file
@@ -86,13 +86,13 @@ class YouTubeDistributionRightsFeedHelper
 		return $feed;
 	}
 
-	public static function initializeDefaultUpdateFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, YouTubeDistributionRemoteIdHandler $remoteIdHandler)
+	public static function initializeDefaultUpdateFeed(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, TvinciDistributionRemoteIdHandler $remoteIdHandler)
 	{
-		$identifier= $fieldValues[KalturaYouTubeDistributionField::ASSET_CUSTOM_ID];
+		$identifier= $fieldValues[KalturaTvinciDistributionField::ASSET_CUSTOM_ID];
 		$videoTag = $identifier.'-video';
 		$thumbnailTag = $identifier.'-thumbnail';
 
-		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
+		$feed = new TvinciDistributionRightsFeedHelper($distributionProfile);
 		$feed->setNotificationEmail($fieldValues);
 
 		if ($remoteIdHandler->getVideoId())
@@ -118,9 +118,9 @@ class YouTubeDistributionRightsFeedHelper
 		return $feed;
 	}
 
-	public static function initializeDefaultDeleteFeed(KalturaYouTubeDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, YouTubeDistributionRemoteIdHandler $remoteIdHandler)
+	public static function initializeDefaultDeleteFeed(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, TvinciDistributionRemoteIdHandler $remoteIdHandler)
 	{
-		$feed = new YouTubeDistributionRightsFeedHelper($distributionProfile);
+		$feed = new TvinciDistributionRightsFeedHelper($distributionProfile);
 		$feed->setNotificationEmail($fieldValues);
 		$feed->setByXpath('video/@action', 'delete');
 		$feed->setByXpath('video/@id', $remoteIdHandler->getVideoId());
@@ -177,7 +177,7 @@ class YouTubeDistributionRightsFeedHelper
 
 	public function setNotificationEmail(array $fieldValues)
 	{
-		$this->setByXpathFieldValueIfHasValue('@notification_email', $fieldValues, KalturaYouTubeDistributionField::NOTIFICATION_EMAIL);
+		$this->setByXpathFieldValueIfHasValue('@notification_email', $fieldValues, KalturaTvinciDistributionField::NOTIFICATION_EMAIL);
 	}
 
 	public function setMetadataByFieldValues(array $fieldValues)
@@ -191,38 +191,38 @@ class YouTubeDistributionRightsFeedHelper
 		if ($assetId)
 			$this->setByXpath('asset/@id', $assetId);
 
-		$this->setByXpathFieldValueIfHasValue('asset/@type', $fieldValues, KalturaYouTubeDistributionField::ASSET_TYPE);
-		$this->setByXpathFieldValueIfHasValue('asset/@override_manual_edits', $fieldValues, KalturaYouTubeDistributionField::ASSET_OVERRIDE_MANUAL_EDITS);
+		$this->setByXpathFieldValueIfHasValue('asset/@type', $fieldValues, KalturaTvinciDistributionField::ASSET_TYPE);
+		$this->setByXpathFieldValueIfHasValue('asset/@override_manual_edits', $fieldValues, KalturaTvinciDistributionField::ASSET_OVERRIDE_MANUAL_EDITS);
 
-		$this->setByXpathFieldValueIfHasValue('asset/actor', $fieldValues, KalturaYouTubeDistributionField::ASSET_ACTOR);
-		$this->setByXpathFieldValueIfHasValue('asset/broadcaster', $fieldValues, KalturaYouTubeDistributionField::ASSET_BROADCASTER);
-		$this->setByXpathFieldValueIfHasValue('asset/content_type', $fieldValues, KalturaYouTubeDistributionField::ASSET_CONTENT_TYPE);
-		$this->setByXpathFieldValueIfHasValue('asset/custom_id', $fieldValues, KalturaYouTubeDistributionField::ASSET_CUSTOM_ID);
-		$this->setByXpathFieldValueIfHasValue('asset/description', $fieldValues, KalturaYouTubeDistributionField::ASSET_DESCRIPTION);
-		$this->setByXpathFieldValueIfHasValue('asset/director', $fieldValues, KalturaYouTubeDistributionField::ASSET_DIRECTOR);
-		$this->setByXpathFieldValueIfHasValue('asset/eidr', $fieldValues, KalturaYouTubeDistributionField::ASSET_EIDR);
-		$this->setByXpathFieldValueIfHasValue('asset/end_year', $fieldValues, KalturaYouTubeDistributionField::ASSET_END_YEAR);
-		$this->setByXpathFieldValueIfHasValue('asset/episode', $fieldValues, KalturaYouTubeDistributionField::ASSET_EPISODE);
-		$this->setByXpathFieldValueIfHasValue('asset/genre', $fieldValues, KalturaYouTubeDistributionField::ASSET_GENRE);
-		$this->setByXpathFieldValueIfHasValue('asset/grid', $fieldValues, KalturaYouTubeDistributionField::ASSET_GRID);
-		$this->setByXpathFieldValueIfHasValue('asset/isan', $fieldValues, KalturaYouTubeDistributionField::ASSET_ISAN);
+		$this->setByXpathFieldValueIfHasValue('asset/actor', $fieldValues, KalturaTvinciDistributionField::ASSET_ACTOR);
+		$this->setByXpathFieldValueIfHasValue('asset/broadcaster', $fieldValues, KalturaTvinciDistributionField::ASSET_BROADCASTER);
+		$this->setByXpathFieldValueIfHasValue('asset/content_type', $fieldValues, KalturaTvinciDistributionField::ASSET_CONTENT_TYPE);
+		$this->setByXpathFieldValueIfHasValue('asset/custom_id', $fieldValues, KalturaTvinciDistributionField::ASSET_CUSTOM_ID);
+		$this->setByXpathFieldValueIfHasValue('asset/description', $fieldValues, KalturaTvinciDistributionField::ASSET_DESCRIPTION);
+		$this->setByXpathFieldValueIfHasValue('asset/director', $fieldValues, KalturaTvinciDistributionField::ASSET_DIRECTOR);
+		$this->setByXpathFieldValueIfHasValue('asset/eidr', $fieldValues, KalturaTvinciDistributionField::ASSET_EIDR);
+		$this->setByXpathFieldValueIfHasValue('asset/end_year', $fieldValues, KalturaTvinciDistributionField::ASSET_END_YEAR);
+		$this->setByXpathFieldValueIfHasValue('asset/episode', $fieldValues, KalturaTvinciDistributionField::ASSET_EPISODE);
+		$this->setByXpathFieldValueIfHasValue('asset/genre', $fieldValues, KalturaTvinciDistributionField::ASSET_GENRE);
+		$this->setByXpathFieldValueIfHasValue('asset/grid', $fieldValues, KalturaTvinciDistributionField::ASSET_GRID);
+		$this->setByXpathFieldValueIfHasValue('asset/isan', $fieldValues, KalturaTvinciDistributionField::ASSET_ISAN);
 		$this->appendAssetKeywords($fieldValues);
-		$this->setByXpathFieldValueIfHasValue('asset/original_release_date', $fieldValues, KalturaYouTubeDistributionField::ASSET_ORIGINAL_RELEASE_DATE);
-		$this->setByXpathFieldValueIfHasValue('asset/original_release_medium', $fieldValues, KalturaYouTubeDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM);
-		$this->setByXpathFieldValueIfHasValue('asset/producer', $fieldValues, KalturaYouTubeDistributionField::ASSET_PRODUCER);
-		$this->setByXpathFieldValueIfHasValue('asset/rating/@system', $fieldValues, KalturaYouTubeDistributionField::ASSET_RATING_SYSTEM);
-		$this->setByXpathFieldValueIfHasValue('asset/rating', $fieldValues, KalturaYouTubeDistributionField::ASSET_RATING_VALUE);
-		$this->setByXpathFieldValueIfHasValue('asset/season', $fieldValues, KalturaYouTubeDistributionField::ASSET_SEASON);
-		$this->setByXpathFieldValueIfHasValue('asset/shows_and_movies_programming', $fieldValues, KalturaYouTubeDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING);
-		$this->setByXpathFieldValueIfHasValue('asset/show_title', $fieldValues, KalturaYouTubeDistributionField::ASSET_SHOW_TITLE);
-		$this->setByXpathFieldValueIfHasValue('asset/spoken_language', $fieldValues, KalturaYouTubeDistributionField::ASSET_SPOKEN_LANGUAGE);
-		$this->setByXpathFieldValueIfHasValue('asset/start_year', $fieldValues, KalturaYouTubeDistributionField::ASSET_START_YEAR);
-		$this->setByXpathFieldValueIfHasValue('asset/subtitled_language', $fieldValues, KalturaYouTubeDistributionField::ASSET_SUBTITLED_LANGUAGE);
-		$this->setByXpathFieldValueIfHasValue('asset/title', $fieldValues, KalturaYouTubeDistributionField::ASSET_TITLE);
-		$this->setByXpathFieldValueIfHasValue('asset/tms_id', $fieldValues, KalturaYouTubeDistributionField::ASSET_TMS_ID);
-		$this->setByXpathFieldValueIfHasValue('asset/upc', $fieldValues, KalturaYouTubeDistributionField::ASSET_UPC);
-		$this->setByXpathFieldValueIfHasValue('asset/url', $fieldValues, KalturaYouTubeDistributionField::ASSET_URL);
-		$this->setByXpathFieldValueIfHasValue('asset/writer', $fieldValues, KalturaYouTubeDistributionField::ASSET_WRITER);
+		$this->setByXpathFieldValueIfHasValue('asset/original_release_date', $fieldValues, KalturaTvinciDistributionField::ASSET_ORIGINAL_RELEASE_DATE);
+		$this->setByXpathFieldValueIfHasValue('asset/original_release_medium', $fieldValues, KalturaTvinciDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM);
+		$this->setByXpathFieldValueIfHasValue('asset/producer', $fieldValues, KalturaTvinciDistributionField::ASSET_PRODUCER);
+		$this->setByXpathFieldValueIfHasValue('asset/rating/@system', $fieldValues, KalturaTvinciDistributionField::ASSET_RATING_SYSTEM);
+		$this->setByXpathFieldValueIfHasValue('asset/rating', $fieldValues, KalturaTvinciDistributionField::ASSET_RATING_VALUE);
+		$this->setByXpathFieldValueIfHasValue('asset/season', $fieldValues, KalturaTvinciDistributionField::ASSET_SEASON);
+		$this->setByXpathFieldValueIfHasValue('asset/shows_and_movies_programming', $fieldValues, KalturaTvinciDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING);
+		$this->setByXpathFieldValueIfHasValue('asset/show_title', $fieldValues, KalturaTvinciDistributionField::ASSET_SHOW_TITLE);
+		$this->setByXpathFieldValueIfHasValue('asset/spoken_language', $fieldValues, KalturaTvinciDistributionField::ASSET_SPOKEN_LANGUAGE);
+		$this->setByXpathFieldValueIfHasValue('asset/start_year', $fieldValues, KalturaTvinciDistributionField::ASSET_START_YEAR);
+		$this->setByXpathFieldValueIfHasValue('asset/subtitled_language', $fieldValues, KalturaTvinciDistributionField::ASSET_SUBTITLED_LANGUAGE);
+		$this->setByXpathFieldValueIfHasValue('asset/title', $fieldValues, KalturaTvinciDistributionField::ASSET_TITLE);
+		$this->setByXpathFieldValueIfHasValue('asset/tms_id', $fieldValues, KalturaTvinciDistributionField::ASSET_TMS_ID);
+		$this->setByXpathFieldValueIfHasValue('asset/upc', $fieldValues, KalturaTvinciDistributionField::ASSET_UPC);
+		$this->setByXpathFieldValueIfHasValue('asset/url', $fieldValues, KalturaTvinciDistributionField::ASSET_URL);
+		$this->setByXpathFieldValueIfHasValue('asset/writer', $fieldValues, KalturaTvinciDistributionField::ASSET_WRITER);
 		$this->appendWorldWideOwnership();
 	}
 
@@ -231,32 +231,32 @@ class YouTubeDistributionRightsFeedHelper
 		if ($videoId)
 			$this->setByXpath('video/@id', $videoId);
 
-		$this->setByXpathFieldValueIfHasValue('video/allow_comment_rating', $fieldValues, KalturaYouTubeDistributionField::VIDEO_ALLOW_COMMENT_RATINGS);
-		$this->setByXpathFieldValueIfHasValue('video/allow_comments', $fieldValues, KalturaYouTubeDistributionField::ALLOW_COMMENTS);
-		$this->setByXpathFieldValueIfHasValue('video/allow_embedding', $fieldValues, KalturaYouTubeDistributionField::ALLOW_EMBEDDING);
-		$this->setByXpathFieldValueIfHasValue('video/allow_ratings', $fieldValues, KalturaYouTubeDistributionField::ALLOW_RATINGS);
-		$this->setByXpathFieldValueIfHasValue('video/allow_responses', $fieldValues, KalturaYouTubeDistributionField::ALLOW_RESPONSES);
-		$this->setByXpathFieldValueIfHasValue('video/allow_syndication', $fieldValues, KalturaYouTubeDistributionField::VIDEO_ALLOW_SYNDICATION);
-		$this->setByXpathFieldValueIfHasValue('video/channel', $fieldValues, KalturaYouTubeDistributionField::VIDEO_CHANNEL);
-		$this->setByXpathFieldValueIfHasValue('video/description', $fieldValues, KalturaYouTubeDistributionField::MEDIA_DESCRIPTION);
-		$this->setByXpathFieldValueIfHasValue('video/domain_blacklist', $fieldValues, KalturaYouTubeDistributionField::VIDEO_DOMAIN_BLACK_LIST);
-		$this->setByXpathFieldValueIfHasValue('video/domain_whitelist', $fieldValues, KalturaYouTubeDistributionField::VIDEO_DOMAIN_WHITE_LIST);
-		$this->setByXpathFieldValueIfHasValue('video/genre', $fieldValues, KalturaYouTubeDistributionField::MEDIA_CATEGORY);
-		$this->setByXpathFieldValueIfHasValue('video/hide_view_count', $fieldValues, KalturaYouTubeDistributionField::VIDEO_HIDE_VIEW_COUNT);
+		$this->setByXpathFieldValueIfHasValue('video/allow_comment_rating', $fieldValues, KalturaTvinciDistributionField::VIDEO_ALLOW_COMMENT_RATINGS);
+		$this->setByXpathFieldValueIfHasValue('video/allow_comments', $fieldValues, KalturaTvinciDistributionField::ALLOW_COMMENTS);
+		$this->setByXpathFieldValueIfHasValue('video/allow_embedding', $fieldValues, KalturaTvinciDistributionField::ALLOW_EMBEDDING);
+		$this->setByXpathFieldValueIfHasValue('video/allow_ratings', $fieldValues, KalturaTvinciDistributionField::ALLOW_RATINGS);
+		$this->setByXpathFieldValueIfHasValue('video/allow_responses', $fieldValues, KalturaTvinciDistributionField::ALLOW_RESPONSES);
+		$this->setByXpathFieldValueIfHasValue('video/allow_syndication', $fieldValues, KalturaTvinciDistributionField::VIDEO_ALLOW_SYNDICATION);
+		$this->setByXpathFieldValueIfHasValue('video/channel', $fieldValues, KalturaTvinciDistributionField::VIDEO_CHANNEL);
+		$this->setByXpathFieldValueIfHasValue('video/description', $fieldValues, KalturaTvinciDistributionField::MEDIA_DESCRIPTION);
+		$this->setByXpathFieldValueIfHasValue('video/domain_blacklist', $fieldValues, KalturaTvinciDistributionField::VIDEO_DOMAIN_BLACK_LIST);
+		$this->setByXpathFieldValueIfHasValue('video/domain_whitelist', $fieldValues, KalturaTvinciDistributionField::VIDEO_DOMAIN_WHITE_LIST);
+		$this->setByXpathFieldValueIfHasValue('video/genre', $fieldValues, KalturaTvinciDistributionField::MEDIA_CATEGORY);
+		$this->setByXpathFieldValueIfHasValue('video/hide_view_count', $fieldValues, KalturaTvinciDistributionField::VIDEO_HIDE_VIEW_COUNT);
 		$this->appendVideoKeywords($fieldValues);
-		$this->setByXpathFieldValueIfHasValue('video/notify_subscribers', $fieldValues, KalturaYouTubeDistributionField::VIDEO_NOTIFY_SUBSCRIBERS);
-		$this->setByXpathFieldValueIfHasValue('video/public', $fieldValues, KalturaYouTubeDistributionField::VIDEO_PUBLIC);
-		$this->setByXpathFieldValueIfHasValue('video/recorded/date', $fieldValues, KalturaYouTubeDistributionField::DATE_RECORDED);
-		$this->setByXpathFieldValueIfHasValue('video/recorded/location', $fieldValues, KalturaYouTubeDistributionField::LOCATION_LOCATION_TEXT);
-		$this->setByXpathFieldValueIfHasValue('video/recorded/country', $fieldValues, KalturaYouTubeDistributionField::LOCATION_COUNTRY);
-		$this->setByXpathFieldValueIfHasValue('video/recorded/zip', $fieldValues, KalturaYouTubeDistributionField::LOCATION_ZIP_CODE);
-		$this->setByXpathFieldValueIfHasValue('video/title', $fieldValues, KalturaYouTubeDistributionField::MEDIA_TITLE);
+		$this->setByXpathFieldValueIfHasValue('video/notify_subscribers', $fieldValues, KalturaTvinciDistributionField::VIDEO_NOTIFY_SUBSCRIBERS);
+		$this->setByXpathFieldValueIfHasValue('video/public', $fieldValues, KalturaTvinciDistributionField::VIDEO_PUBLIC);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/date', $fieldValues, KalturaTvinciDistributionField::DATE_RECORDED);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/location', $fieldValues, KalturaTvinciDistributionField::LOCATION_LOCATION_TEXT);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/country', $fieldValues, KalturaTvinciDistributionField::LOCATION_COUNTRY);
+		$this->setByXpathFieldValueIfHasValue('video/recorded/zip', $fieldValues, KalturaTvinciDistributionField::LOCATION_ZIP_CODE);
+		$this->setByXpathFieldValueIfHasValue('video/title', $fieldValues, KalturaTvinciDistributionField::MEDIA_TITLE);
 
-		$startTime = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::START_TIME);
+		$startTime = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::START_TIME);
 		if ($startTime && intval($startTime))
 			$this->setByXpath('video/start_time', date('c', intval($startTime)));
 
-		$endTime = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::END_TIME);
+		$endTime = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::END_TIME);
 		if ($endTime && intval($endTime))
 			$this->setByXpath('video/end_time', date('c', intval($endTime)));
 	}
@@ -346,7 +346,7 @@ class YouTubeDistributionRightsFeedHelper
 			"/feed/file[@tag='$fileTag']",
 		);
 
-		$disableFingerprinting = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::DISABLE_FINGERPRINTING);
+		$disableFingerprinting = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::DISABLE_FINGERPRINTING);
 		$relatedItemsPaths = array();
 		// when fingerprinting is disabled on the cms account, we shouldn't add the asset to the video / file relationship
 		if (!$disableFingerprinting)
@@ -382,14 +382,14 @@ class YouTubeDistributionRightsFeedHelper
 	}
 	public function appendVideoKeywords(array $fieldValues)
 	{
-		$keywordsStr = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::MEDIA_KEYWORDS);
+		$keywordsStr = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::MEDIA_KEYWORDS);
 		$videoElement = $this->_xpath->query('/feed/video')->item(0);
 		$this->appendKeywordsToElement($videoElement, $keywordsStr);
 	}
 
 	public function appendAssetKeywords(array $fieldValues)
 	{
-		$keywordsStr = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ASSET_KEYWORDS);
+		$keywordsStr = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ASSET_KEYWORDS);
 		$videoElement = $this->_xpath->query('/feed/asset')->item(0);
 		$this->appendKeywordsToElement($videoElement, $keywordsStr);
 	}
@@ -398,14 +398,14 @@ class YouTubeDistributionRightsFeedHelper
 	{
 		if ($adServerEnabled)
 		{
-			$this->setByXpath('video_breaks/third_party_ad_server/ad_server_video_id', $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
+			$this->setByXpath('video_breaks/third_party_ad_server/ad_server_video_id', $this->getValueForField($fieldValues, KalturaTvinciDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
 			$this->setByXpath('video_breaks/@tag', $videoTag);
 			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/video_breaks[@tag='$videoTag']"));
 		}
 
-		$allowPreRolls = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
-		$allowMidRolls = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS);
-		$allowPostRolls = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
+		$allowPreRolls = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
+		$allowMidRolls = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS);
+		$allowPostRolls = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
 
 		if ($this->isAllowedValue($allowPreRolls))
 			$this->setByXpath('ad_policy/instream/prerolls', 'Allow');
@@ -422,15 +422,15 @@ class YouTubeDistributionRightsFeedHelper
 		elseif($this->isNotAllowedValue($allowPostRolls))
 			$this->setByXpath('ad_policy/instream/postrolls', 'Deny');
 
-		$adsenseForVideoValue = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
+		$adsenseForVideoValue = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
 		if ($adsenseForVideoValue)
 			$this->setByXpath('ad_policy/overlay/adsense_for_video', $adsenseForVideoValue);
 
-		$invideoValue = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_INVIDEO);
+		$invideoValue = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_INVIDEO);
 		if ($invideoValue)
 			$this->setByXpath('ad_policy/overlay/invideo', $adsenseForVideoValue);
 
-		$instreamStandardValue = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD);
+		$instreamStandardValue = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_INSTREAM_STANDARD);
 		if ($instreamStandardValue )
 			$this->setByXpath('ad_policy/instream/@standard', $instreamStandardValue );
 
@@ -453,7 +453,7 @@ class YouTubeDistributionRightsFeedHelper
 	{
 		$this->_doc->firstChild
 			->appendChild($this->_doc->createElement('claim'))
-				->setAttribute('type', $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::CLAIM_TYPE))->parentNode
+				->setAttribute('type', $this->getValueForField($fieldValues, KalturaTvinciDistributionField::CLAIM_TYPE))->parentNode
 				->setAttribute('video', "/feed/video[@tag='$videoTag']")->parentNode
 				->setAttribute('asset', "/feed/asset[@tag='$videoTag']")->parentNode
 				->setAttribute('rights_admin', "/feed/rights_admin[@type='$rightAdminType']")->parentNode
@@ -463,9 +463,9 @@ class YouTubeDistributionRightsFeedHelper
 
 	public function appendRightsAdminByFieldValues(array $fieldValues, $videoTag)
 	{
-		$commercialPolicy = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::POLICY_COMMERCIAL);
-		$ugcPolicy = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::POLICY_UGC);
-		$disableFingerprinting = $this->getValueForField($fieldValues, KalturaYouTubeDistributionField::DISABLE_FINGERPRINTING);
+		$commercialPolicy = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::POLICY_COMMERCIAL);
+		$ugcPolicy = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::POLICY_UGC);
+		$disableFingerprinting = $this->getValueForField($fieldValues, KalturaTvinciDistributionField::DISABLE_FINGERPRINTING);
 
 		$rightsAdminType = null;
 		if ($commercialPolicy)

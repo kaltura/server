@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage model
  */
-class YouTubeDistributionProfile extends ConfigurableDistributionProfile
+class TvinciDistributionProfile extends ConfigurableDistributionProfile
 {
 	const CUSTOM_DATA_FEED_SPEC_VERSION = 'apiVersion';
 	const CUSTOM_DATA_USERNAME = 'username';
@@ -70,73 +70,73 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const KEEP_FINGERPRINT_VALUES = 'yes,no';
 
 	protected $specV1OnlyFields = array(
-		YouTubeDistributionField::OWNER_NAME,
-		YouTubeDistributionField::TARGET,
-		YouTubeDistributionField::LANGUAGE,
-		YouTubeDistributionField::KEEP_FINGERPRINT,
-		YouTubeDistributionField::ACCOUNT_USERNAME,
-		YouTubeDistributionField::ACCOUNT_PASSWORD,
-		YouTubeDistributionField::WEB_METADATA_CUSTOM_ID,
-		YouTubeDistributionField::WEB_METADATA_NOTES,
-		YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID,
-		YouTubeDistributionField::MOVIE_METADATA_DIRECTOR,
-		YouTubeDistributionField::MOVIE_METADATA_TITLE,
-		YouTubeDistributionField::MOVIE_METADATA_TMS_ID,
-		YouTubeDistributionField::TV_METADATA_CUSTOM_ID,
-		YouTubeDistributionField::TV_METADATA_SHOW_TITLE,
-		YouTubeDistributionField::TV_METADATA_EPISODE,
-		YouTubeDistributionField::TV_METADATA_EPISODE_TITLE,
-		YouTubeDistributionField::TV_METADATA_NOTES,
-		YouTubeDistributionField::TV_METADATA_SEASON,
-		YouTubeDistributionField::TV_METADATA_TMS_ID,
+		TvinciDistributionField::OWNER_NAME,
+		TvinciDistributionField::TARGET,
+		TvinciDistributionField::LANGUAGE,
+		TvinciDistributionField::KEEP_FINGERPRINT,
+		TvinciDistributionField::ACCOUNT_USERNAME,
+		TvinciDistributionField::ACCOUNT_PASSWORD,
+		TvinciDistributionField::WEB_METADATA_CUSTOM_ID,
+		TvinciDistributionField::WEB_METADATA_NOTES,
+		TvinciDistributionField::MOVIE_METADATA_CUSTOM_ID,
+		TvinciDistributionField::MOVIE_METADATA_DIRECTOR,
+		TvinciDistributionField::MOVIE_METADATA_TITLE,
+		TvinciDistributionField::MOVIE_METADATA_TMS_ID,
+		TvinciDistributionField::TV_METADATA_CUSTOM_ID,
+		TvinciDistributionField::TV_METADATA_SHOW_TITLE,
+		TvinciDistributionField::TV_METADATA_EPISODE,
+		TvinciDistributionField::TV_METADATA_EPISODE_TITLE,
+		TvinciDistributionField::TV_METADATA_NOTES,
+		TvinciDistributionField::TV_METADATA_SEASON,
+		TvinciDistributionField::TV_METADATA_TMS_ID,
 	);
 
 	protected $specV2OnlyFields = array(
-		YouTubeDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS,
-		YouTubeDistributionField::ASSET_TYPE,
-		YouTubeDistributionField::ASSET_OVERRIDE_MANUAL_EDITS,
-		YouTubeDistributionField::ASSET_ACTOR,
-		YouTubeDistributionField::ASSET_BROADCASTER,
-		YouTubeDistributionField::ASSET_CONTENT_TYPE,
-		YouTubeDistributionField::ASSET_CUSTOM_ID,
-		YouTubeDistributionField::ASSET_DESCRIPTION,
-		YouTubeDistributionField::ASSET_DIRECTOR,
-		YouTubeDistributionField::ASSET_EIDR,
-		YouTubeDistributionField::ASSET_END_YEAR,
-		YouTubeDistributionField::ASSET_EPISODE,
-		YouTubeDistributionField::ASSET_GENRE,
-		YouTubeDistributionField::ASSET_GRID,
-		YouTubeDistributionField::ASSET_ISAN,
-		YouTubeDistributionField::ASSET_KEYWORDS,
-		YouTubeDistributionField::ASSET_NOTES,
-		YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_DATE,
-		YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM,
-		YouTubeDistributionField::ASSET_PRODUCER,
-		YouTubeDistributionField::ASSET_RATING_SYSTEM,
-		YouTubeDistributionField::ASSET_RATING_VALUE,
-		YouTubeDistributionField::ASSET_SEASON,
-		YouTubeDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING,
-		YouTubeDistributionField::ASSET_SHOW_TITLE,
-		YouTubeDistributionField::ASSET_SPOKEN_LANGUAGE,
-		YouTubeDistributionField::ASSET_START_YEAR,
-		YouTubeDistributionField::ASSET_SUBTITLED_LANGUAGE,
-		YouTubeDistributionField::ASSET_TITLE,
-		YouTubeDistributionField::ASSET_TMS_ID,
-		YouTubeDistributionField::ASSET_UPC,
-		YouTubeDistributionField::ASSET_URL,
-		YouTubeDistributionField::ASSET_WRITER,
-		YouTubeDistributionField::VIDEO_ALLOW_COMMENT_RATINGS,
-		YouTubeDistributionField::VIDEO_ALLOW_SYNDICATION,
-		YouTubeDistributionField::VIDEO_CHANNEL,
-		YouTubeDistributionField::VIDEO_HIDE_VIEW_COUNT,
-		YouTubeDistributionField::VIDEO_DOMAIN_BLACK_LIST,
-		YouTubeDistributionField::VIDEO_DOMAIN_WHITE_LIST,
-		YouTubeDistributionField::VIDEO_NOTIFY_SUBSCRIBERS,
-		YouTubeDistributionField::VIDEO_PUBLIC,
-		YouTubeDistributionField::CLAIM_TYPE,
-		YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP,
-		YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD,
-		YouTubeDistributionField::DISABLE_FINGERPRINTING,
+		TvinciDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS,
+		TvinciDistributionField::ASSET_TYPE,
+		TvinciDistributionField::ASSET_OVERRIDE_MANUAL_EDITS,
+		TvinciDistributionField::ASSET_ACTOR,
+		TvinciDistributionField::ASSET_BROADCASTER,
+		TvinciDistributionField::ASSET_CONTENT_TYPE,
+		TvinciDistributionField::ASSET_CUSTOM_ID,
+		TvinciDistributionField::ASSET_DESCRIPTION,
+		TvinciDistributionField::ASSET_DIRECTOR,
+		TvinciDistributionField::ASSET_EIDR,
+		TvinciDistributionField::ASSET_END_YEAR,
+		TvinciDistributionField::ASSET_EPISODE,
+		TvinciDistributionField::ASSET_GENRE,
+		TvinciDistributionField::ASSET_GRID,
+		TvinciDistributionField::ASSET_ISAN,
+		TvinciDistributionField::ASSET_KEYWORDS,
+		TvinciDistributionField::ASSET_NOTES,
+		TvinciDistributionField::ASSET_ORIGINAL_RELEASE_DATE,
+		TvinciDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM,
+		TvinciDistributionField::ASSET_PRODUCER,
+		TvinciDistributionField::ASSET_RATING_SYSTEM,
+		TvinciDistributionField::ASSET_RATING_VALUE,
+		TvinciDistributionField::ASSET_SEASON,
+		TvinciDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING,
+		TvinciDistributionField::ASSET_SHOW_TITLE,
+		TvinciDistributionField::ASSET_SPOKEN_LANGUAGE,
+		TvinciDistributionField::ASSET_START_YEAR,
+		TvinciDistributionField::ASSET_SUBTITLED_LANGUAGE,
+		TvinciDistributionField::ASSET_TITLE,
+		TvinciDistributionField::ASSET_TMS_ID,
+		TvinciDistributionField::ASSET_UPC,
+		TvinciDistributionField::ASSET_URL,
+		TvinciDistributionField::ASSET_WRITER,
+		TvinciDistributionField::VIDEO_ALLOW_COMMENT_RATINGS,
+		TvinciDistributionField::VIDEO_ALLOW_SYNDICATION,
+		TvinciDistributionField::VIDEO_CHANNEL,
+		TvinciDistributionField::VIDEO_HIDE_VIEW_COUNT,
+		TvinciDistributionField::VIDEO_DOMAIN_BLACK_LIST,
+		TvinciDistributionField::VIDEO_DOMAIN_WHITE_LIST,
+		TvinciDistributionField::VIDEO_NOTIFY_SUBSCRIBERS,
+		TvinciDistributionField::VIDEO_PUBLIC,
+		TvinciDistributionField::CLAIM_TYPE,
+		TvinciDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP,
+		TvinciDistributionField::ADVERTISING_INSTREAM_STANDARD,
+		TvinciDistributionField::DISABLE_FINGERPRINTING,
 	);
 
 	/* (non-PHPdoc)
@@ -144,7 +144,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	 */
 	public function getProvider()
 	{
-		return YouTubeDistributionPlugin::getProvider();
+		return TvinciDistributionPlugin::getProvider();
 	}
 	
 		
@@ -153,32 +153,32 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $validationErrors = parent::validateForSubmission($entryDistribution, $action);
 		
 		$maxLengthFields = array (
-		    YouTubeDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::MEDIA_TITLE => self::MEDIA_TITLE_MAXIMUM_LENGTH,
-			YouTubeDistributionField::MEDIA_KEYWORDS => self::MEDIA_KEYWORDS_MAXIMUM_TOTAL_LENGTH,
-		    YouTubeDistributionField::WEB_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::TV_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::TV_METADATA_EPISODE => self::TV_METADATA_EPISODE_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::TV_METADATA_EPISODE_TITLE => self::TV_METADATA_EPISODE_TITLE_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::TV_METADATA_SEASON => self::TV_METADATA_SEASON_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::TV_METADATA_SHOW_TITLE => self::TV_METADATA_SHOW_TITLE_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::TV_METADATA_TMS_ID => self::TV_METADATA_TMS_ID_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::MOVIE_METADATA_TITLE => self::MOVIE_METADATA_TITLE_MAXIMUM_LENGTH,
-		    YouTubeDistributionField::MOVIE_METADATA_TMS_ID => self::MOVIE_METADATA_TMS_ID_MAXIMUM_LENGTH,
+		    TvinciDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
+		    TvinciDistributionField::MEDIA_TITLE => self::MEDIA_TITLE_MAXIMUM_LENGTH,
+			TvinciDistributionField::MEDIA_KEYWORDS => self::MEDIA_KEYWORDS_MAXIMUM_TOTAL_LENGTH,
+		    TvinciDistributionField::WEB_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
+		    TvinciDistributionField::MOVIE_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
+		    TvinciDistributionField::TV_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
+		    TvinciDistributionField::TV_METADATA_EPISODE => self::TV_METADATA_EPISODE_MAXIMUM_LENGTH,
+		    TvinciDistributionField::TV_METADATA_EPISODE_TITLE => self::TV_METADATA_EPISODE_TITLE_MAXIMUM_LENGTH,
+		    TvinciDistributionField::TV_METADATA_SEASON => self::TV_METADATA_SEASON_MAXIMUM_LENGTH,
+		    TvinciDistributionField::TV_METADATA_SHOW_TITLE => self::TV_METADATA_SHOW_TITLE_MAXIMUM_LENGTH,
+		    TvinciDistributionField::TV_METADATA_TMS_ID => self::TV_METADATA_TMS_ID_MAXIMUM_LENGTH,
+		    TvinciDistributionField::MOVIE_METADATA_TITLE => self::MOVIE_METADATA_TITLE_MAXIMUM_LENGTH,
+		    TvinciDistributionField::MOVIE_METADATA_TMS_ID => self::MOVIE_METADATA_TMS_ID_MAXIMUM_LENGTH,
 		);
 		    		
 		$inListOrNullFields = array (
-		    YouTubeDistributionField::MEDIA_RATING => explode(',', self::MEDIA_RATING_VALID_VALUES),
-		    YouTubeDistributionField::ALLOW_COMMENTS => explode(',', self::ALLOW_COMMENTS_VALID_VALUES),
-		    YouTubeDistributionField::ALLOW_EMBEDDING => explode(',', self::ALLOW_EMBEDDING_VALID_VALUES),
-		    YouTubeDistributionField::ALLOW_RATINGS => explode(',', self::ALLOW_RATINGS_VALID_VALUES),
-		    YouTubeDistributionField::ALLOW_RESPONSES => explode(',', self::ALLOW_RESPONSES_VALID_VALUES),
-		    YouTubeDistributionField::ADVERTISING_INVIDEO => explode(',', self::ADVERTISING_INVIDEO_VALID_VALUES),
-		    YouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO => explode(',', self::ADVERTISING_ADSENSE_FOR_VIDEO_VALUES),
-		    YouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE => explode(',', self::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE_VALUES),
-		    YouTubeDistributionField::URGENT_REFERENCE_FILE => explode(',', self::URGENT_REFERENCE_FILE_VALUES),
-		    YouTubeDistributionField::KEEP_FINGERPRINT => explode(',', self::KEEP_FINGERPRINT_VALUES),
+		    TvinciDistributionField::MEDIA_RATING => explode(',', self::MEDIA_RATING_VALID_VALUES),
+		    TvinciDistributionField::ALLOW_COMMENTS => explode(',', self::ALLOW_COMMENTS_VALID_VALUES),
+		    TvinciDistributionField::ALLOW_EMBEDDING => explode(',', self::ALLOW_EMBEDDING_VALID_VALUES),
+		    TvinciDistributionField::ALLOW_RATINGS => explode(',', self::ALLOW_RATINGS_VALID_VALUES),
+		    TvinciDistributionField::ALLOW_RESPONSES => explode(',', self::ALLOW_RESPONSES_VALID_VALUES),
+		    TvinciDistributionField::ADVERTISING_INVIDEO => explode(',', self::ADVERTISING_INVIDEO_VALID_VALUES),
+		    TvinciDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO => explode(',', self::ADVERTISING_ADSENSE_FOR_VIDEO_VALUES),
+		    TvinciDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE => explode(',', self::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE_VALUES),
+		    TvinciDistributionField::URGENT_REFERENCE_FILE => explode(',', self::URGENT_REFERENCE_FILE_VALUES),
+		    TvinciDistributionField::KEEP_FINGERPRINT => explode(',', self::KEEP_FINGERPRINT_VALUES),
 		);
 		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
@@ -190,7 +190,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
 
-	    $fieldName = YouTubeDistributionField::NOTIFICATION_EMAIL;
+	    $fieldName = TvinciDistributionField::NOTIFICATION_EMAIL;
 		$value = $allFieldValues[$fieldName];
 		//multiple email support
 		$values = explode(' ',$value);
@@ -206,7 +206,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 			}
 		}
 
-		$fieldName = YouTubeDistributionField::MEDIA_KEYWORDS;
+		$fieldName = TvinciDistributionField::MEDIA_KEYWORDS;
 		$keywordStr = $allFieldValues[$fieldName];
 		if ($keywordStr)
 		{
@@ -234,7 +234,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 			}
 		}
 		
-		//TODO: check if MEDIA_CATEGORY is a valid YouTube category according to YouTube's XML.
+		//TODO: check if MEDIA_CATEGORY is a valid Tvinci category according to Tvinci's XML.
 								
 		return $validationErrors;
 	}
@@ -322,7 +322,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	      
 	    // media fields
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_TITLE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_TITLE);
 	    $fieldConfig->setUserFriendlyFieldName('Entry name');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
 	    $fieldConfig->setUpdateOnChange(true);
@@ -331,7 +331,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_DESCRIPTION);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_DESCRIPTION);
 	    $fieldConfig->setUserFriendlyFieldName('Entry description');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(description)" />');
 	    $fieldConfig->setUpdateOnChange(true);
@@ -340,7 +340,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	        
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_KEYWORDS);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_KEYWORDS);
 	    $fieldConfig->setUserFriendlyFieldName('Entry tags');
 	    $fieldConfig->setEntryMrssXslt(
 	    			'<xsl:for-each select="tags/tag">
@@ -355,341 +355,341 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_RATING);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_RATING);
 	    $fieldConfig->setUserFriendlyFieldName('Media rating');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_CATEGORY);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_CATEGORY);
 	    $fieldConfig->setUserFriendlyFieldName('Media category');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/default_category" />');
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::WEB_METADATA_CUSTOM_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::WEB_METADATA_CUSTOM_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Entry ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::WEB_METADATA_NOTES);
+	    $fieldConfig->setFieldName(TvinciDistributionField::WEB_METADATA_NOTES);
 	    $fieldConfig->setUserFriendlyFieldName('Web metadata notes');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MOVIE_METADATA_CUSTOM_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Movie metadata custom ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_DIRECTOR);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MOVIE_METADATA_DIRECTOR);
 	    $fieldConfig->setUserFriendlyFieldName('Movie metadata director');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_NOTES);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MOVIE_METADATA_NOTES);
 	    $fieldConfig->setUserFriendlyFieldName('Movie metadata notes');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_TITLE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MOVIE_METADATA_TITLE);
 	    $fieldConfig->setUserFriendlyFieldName('Movie metadata title');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_TMS_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::MOVIE_METADATA_TMS_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Movie metadata TMS ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::DATE_RECORDED);
+	    $fieldConfig->setFieldName(TvinciDistributionField::DATE_RECORDED);
 	    $fieldConfig->setUserFriendlyFieldName('Date recorded');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
         $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::START_TIME);
+	    $fieldConfig->setFieldName(TvinciDistributionField::START_TIME);
 	    $fieldConfig->setUserFriendlyFieldName('Distribution sunrise');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::END_TIME);
+	    $fieldConfig->setFieldName(TvinciDistributionField::END_TIME);
 	    $fieldConfig->setUserFriendlyFieldName('Distribution sunset');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunset" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::URGENT_REFERENCE_FILE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::URGENT_REFERENCE_FILE);
 	    $fieldConfig->setUserFriendlyFieldName('Urgent reference file');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::KEEP_FINGERPRINT);
+	    $fieldConfig->setFieldName(TvinciDistributionField::KEEP_FINGERPRINT);
 	    $fieldConfig->setUserFriendlyFieldName('Keep fingerprint');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    // community fields
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ALLOW_COMMENTS);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ALLOW_COMMENTS);
 	    $fieldConfig->setUserFriendlyFieldName('Allow comments');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_comments" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ALLOW_RESPONSES);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ALLOW_RESPONSES);
 	    $fieldConfig->setUserFriendlyFieldName('Allow responses');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_responses" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ALLOW_RATINGS);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ALLOW_RATINGS);
 	    $fieldConfig->setUserFriendlyFieldName('Allow ratings');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_ratings" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ALLOW_EMBEDDING);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ALLOW_EMBEDDING);
 	    $fieldConfig->setUserFriendlyFieldName('Allow embedding');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_embedding" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    // youtube extra data
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::POLICY_COMMERCIAL);
+	    $fieldConfig->setFieldName(TvinciDistributionField::POLICY_COMMERCIAL);
 	    $fieldConfig->setUserFriendlyFieldName('Commercial policy');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/commerical_policy" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::POLICY_UGC);
+	    $fieldConfig->setFieldName(TvinciDistributionField::POLICY_UGC);
 	    $fieldConfig->setUserFriendlyFieldName('UGC policy');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/ugc_policy" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::NOTIFICATION_EMAIL);
+	    $fieldConfig->setFieldName(TvinciDistributionField::NOTIFICATION_EMAIL);
 	    $fieldConfig->setUserFriendlyFieldName('Notification Email');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/notification_email" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ACCOUNT_USERNAME);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ACCOUNT_USERNAME);
 	    $fieldConfig->setUserFriendlyFieldName('Account username');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/account_username" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ACCOUNT_PASSWORD);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ACCOUNT_PASSWORD);
 	    $fieldConfig->setUserFriendlyFieldName('Account password');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>'); // the password should not be added in contributeMRSS
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::OWNER_NAME);
+	    $fieldConfig->setFieldName(TvinciDistributionField::OWNER_NAME);
 	    $fieldConfig->setUserFriendlyFieldName('Account username');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/account_username" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TARGET);
-	    $fieldConfig->setUserFriendlyFieldName('YouTube target');
+	    $fieldConfig->setFieldName(TvinciDistributionField::TARGET);
+	    $fieldConfig->setUserFriendlyFieldName('Tvinci target');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/target" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::LANGUAGE);
-	    $fieldConfig->setUserFriendlyFieldName('YouTube language');
+	    $fieldConfig->setFieldName(TvinciDistributionField::LANGUAGE);
+	    $fieldConfig->setUserFriendlyFieldName('Tvinci language');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text>en</xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_CUSTOM_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_CUSTOM_ID);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata custom id');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_EPISODE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_EPISODE);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata episode');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_EPISODE_TITLE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_EPISODE_TITLE);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata episode title');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_SHOW_TITLE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_SHOW_TITLE);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata show title');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_SEASON);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_SEASON);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata season');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_NOTES);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_NOTES);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata notes');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_TMS_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::TV_METADATA_TMS_ID);
 	    $fieldConfig->setUserFriendlyFieldName('TV metadata TMS ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::PLAYLISTS);
-	    $fieldConfig->setUserFriendlyFieldName('YouTube playlists');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/YouTubePlaylist" />');
+	    $fieldConfig->setFieldName(TvinciDistributionField::PLAYLISTS);
+	    $fieldConfig->setUserFriendlyFieldName('Tvinci playlists');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TvinciPlaylist" />');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='YouTubePlaylist']"));
+	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TvinciPlaylist']"));
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
 	    $fieldConfig->setUserFriendlyFieldName('Advertising adsense for video');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_INVIDEO);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ADVERTISING_INVIDEO);
 	    $fieldConfig->setUserFriendlyFieldName('Advertising in video');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE);
 	    $fieldConfig->setUserFriendlyFieldName('Third party ad server ad type');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text>1</xsl:text>');
 	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Third party ad server partner ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/ad_server_partner_id" />');
 	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID);
+	    $fieldConfig->setFieldName(TvinciDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Entry ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
 	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
 	    $fieldConfig->setUserFriendlyFieldName('Allow Pre Roll Ads');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_pre_roll_ads" />');
 	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		$fieldConfig = new DistributionFieldConfig();
-		$fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS);
+		$fieldConfig->setFieldName(TvinciDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS);
 		$fieldConfig->setUserFriendlyFieldName('Allow Mid Roll Ads');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_mid_roll_ads" />');
 		$fieldConfig->setUpdateOnChange(false);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
+	    $fieldConfig->setFieldName(TvinciDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
 	    $fieldConfig->setUserFriendlyFieldName('Allow Post Roll Ads');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_post_roll_ads" />');
 	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::LOCATION_COUNTRY);
+	    $fieldConfig->setFieldName(TvinciDistributionField::LOCATION_COUNTRY);
 	    $fieldConfig->setUserFriendlyFieldName('Location country');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::LOCATION_LOCATION_TEXT);
+	    $fieldConfig->setFieldName(TvinciDistributionField::LOCATION_LOCATION_TEXT);
 	    $fieldConfig->setUserFriendlyFieldName('Location text');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::LOCATION_ZIP_CODE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::LOCATION_ZIP_CODE);
 	    $fieldConfig->setUserFriendlyFieldName('Location zip code');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE);
+	    $fieldConfig->setFieldName(TvinciDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE);
 	    $fieldConfig->setUserFriendlyFieldName('Distribution restriction rule');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ACTOR, 'Asset actor', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_BROADCASTER, 'Asset broadcaster', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_CONTENT_TYPE, 'Asset content type', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_CUSTOM_ID, 'Asset custom id', '<xsl:value-of select="string(entryId)" />');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_DESCRIPTION, 'Asset description', '<xsl:value-of select="string(description)" />');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_DIRECTOR, 'Asset director', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_EIDR, 'Asset EIDR', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_END_YEAR, 'Asset end year', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_EPISODE, 'Asset episode', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_GENRE, 'Asset genre', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_GRID, 'Asset GRid', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ISAN, 'Asset ISAN', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_KEYWORDS, 'Asset keywords', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_NOTES, 'Asset notes', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_DATE, 'Asset original release date', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM, 'Asset original medium', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_PRODUCER, 'Asset producer', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_RATING_SYSTEM, 'Asset rating system', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_RATING_VALUE, 'Asset rating value', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_SEASON, 'Asset season', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING, 'Asset show and movie programming', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_SHOW_TITLE, 'Asset show title', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_SPOKEN_LANGUAGE, 'Asset spoken language', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_START_YEAR, 'Asset start year', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_SUBTITLED_LANGUAGE, 'Asset subtitles language', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_TITLE, 'Asset title', '<xsl:value-of select="string(title)" />');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_TYPE, 'Asset type', '<xsl:text>web</xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_TMS_ID, 'Asset TMS ID', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_UPC, 'Asset UPC', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_URL, 'Asset URL', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ASSET_WRITER, 'Asset Writer', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_ACTOR, 'Asset actor', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_BROADCASTER, 'Asset broadcaster', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_CONTENT_TYPE, 'Asset content type', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_CUSTOM_ID, 'Asset custom id', '<xsl:value-of select="string(entryId)" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_DESCRIPTION, 'Asset description', '<xsl:value-of select="string(description)" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_DIRECTOR, 'Asset director', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_EIDR, 'Asset EIDR', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_END_YEAR, 'Asset end year', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_EPISODE, 'Asset episode', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_GENRE, 'Asset genre', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_GRID, 'Asset GRid', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_ISAN, 'Asset ISAN', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_KEYWORDS, 'Asset keywords', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_NOTES, 'Asset notes', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_ORIGINAL_RELEASE_DATE, 'Asset original release date', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_ORIGINAL_RELEASE_MEDIUM, 'Asset original medium', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_PRODUCER, 'Asset producer', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_RATING_SYSTEM, 'Asset rating system', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_RATING_VALUE, 'Asset rating value', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_SEASON, 'Asset season', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_SHOW_AND_MOVIE_PROGRAMMING, 'Asset show and movie programming', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_SHOW_TITLE, 'Asset show title', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_SPOKEN_LANGUAGE, 'Asset spoken language', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_START_YEAR, 'Asset start year', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_SUBTITLED_LANGUAGE, 'Asset subtitles language', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_TITLE, 'Asset title', '<xsl:value-of select="string(title)" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_TYPE, 'Asset type', '<xsl:text>web</xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_TMS_ID, 'Asset TMS ID', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_UPC, 'Asset UPC', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_URL, 'Asset URL', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ASSET_WRITER, 'Asset Writer', '<xsl:text></xsl:text>');
 
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_ALLOW_COMMENT_RATINGS, 'Video allow comment ratings', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_ALLOW_SYNDICATION, 'Video allow syndication', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_CHANNEL, 'Video channel', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_HIDE_VIEW_COUNT, 'Video hide view count', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_DOMAIN_BLACK_LIST, 'Video domain black list', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_DOMAIN_WHITE_LIST, 'Video domain white list', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_NOTIFY_SUBSCRIBERS, 'Video notify subscribers', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_PUBLIC, 'Video public', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::VIDEO_CHANNEL, 'Video channel', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/account_username" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_ALLOW_COMMENT_RATINGS, 'Video allow comment ratings', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_ALLOW_SYNDICATION, 'Video allow syndication', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_CHANNEL, 'Video channel', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_HIDE_VIEW_COUNT, 'Video hide view count', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_DOMAIN_BLACK_LIST, 'Video domain black list', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_DOMAIN_WHITE_LIST, 'Video domain white list', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_NOTIFY_SUBSCRIBERS, 'Video notify subscribers', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_PUBLIC, 'Video public', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_CHANNEL, 'Video channel', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/account_username" />');
 
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_TYPE, 'Claim type', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/claim_type" />');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP, 'Video block outside ownership', '<xsl:text></xsl:text>');
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::ADVERTISING_INSTREAM_STANDARD, 'Instream standard', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/instream_standard" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CLAIM_TYPE, 'Claim type', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/claim_type" />');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CLAIM_BLOCK_OUTSIDE_OWNERSHIP, 'Video block outside ownership', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ADVERTISING_INSTREAM_STANDARD, 'Instream standard', '<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/instream_standard" />');
 
-		$this->addDistributionFieldConfig($fieldConfigArray, YouTubeDistributionField::DISABLE_FINGERPRINTING, 'Disable fingerprinting/claiming', '<xsl:text></xsl:text>');
+		$this->addDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::DISABLE_FINGERPRINTING, 'Disable fingerprinting/claiming', '<xsl:text></xsl:text>');
 
-		if ($this->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_2)
+		if ($this->getFeedSpecVersion() == TvinciDistributionFeedSpecVersion::VERSION_2)
 			$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV1OnlyFields);
 		else
 			$this->removeDistributionFieldConfigs($fieldConfigArray, $this->specV2OnlyFields);

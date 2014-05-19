@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage model.data
  */
-class kYouTubeDistributionJobProviderData extends kConfigurableDistributionJobProviderData
+class kTvinciDistributionJobProviderData extends kConfigurableDistributionJobProviderData
 {
 	/**
 	 * @var string

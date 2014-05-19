@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage model.enum
  */ 
-interface YouTubeDistributionField extends BaseEnum
+interface TvinciDistributionField extends BaseEnum
 {
 	// item
 	const NOTIFICATION_EMAIL 			= 'NOTIFICATION_EMAIL';

@@ -1,15 +1,15 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  */
-class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaConfigurator
+class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaConfigurator
 {
-	const PLUGIN_NAME = 'youTubeDistribution';
+	const PLUGIN_NAME = 'tvinciDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 	
-	const YOUTUBE_EVENT_CONSUMER = 'kYouTubeDistributionEventConsumer';
+	const TVINCI_EVENT_CONSUMER = 'kTvinciDistributionEventConsumer';
 
 	public static function getPluginName()
 	{
@@ -42,10 +42,10 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('YouTubeDistributionProviderType');
+			return array('TvinciDistributionProviderType');
 	
 		if($baseEnumName == 'DistributionProviderType')
-			return array('YouTubeDistributionProviderType');
+			return array('TvinciDistributionProviderType');
 			
 		return array();
 	}
@@ -59,62 +59,62 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		// client side apps like batch and admin console
-		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::YOUTUBE)
+		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::TVINCI)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineDelete')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineReport')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineSubmit')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 					
 			if($baseClass == 'IDistributionEngineUpdate')
-				return new YouTubeDistributionEngineSelector();
+				return new TvinciDistributionEngineSelector();
 		
 			if($baseClass == 'KalturaDistributionProfile')
-				return new KalturaYouTubeDistributionProfile();
+				return new KalturaTvinciDistributionProfile();
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
-				return new KalturaYouTubeDistributionJobProviderData();
+				return new KalturaTvinciDistributionJobProviderData();
 		}
 		
-		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::TVINCI)
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 			{
-				$reflect = new ReflectionClass('Form_YouTubeProfileConfiguration');
+				$reflect = new ReflectionClass('Form_TvinciProfileConfiguration');
 				return $reflect->newInstanceArgs($constructorArgs);
 			}
 		}
 		
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI))
 		{
-			$reflect = new ReflectionClass('KalturaYouTubeDistributionJobProviderData');
+			$reflect = new ReflectionClass('KalturaTvinciDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(TvinciDistributionProviderType::TVINCI))
 		{
-			$reflect = new ReflectionClass('kYouTubeDistributionJobProviderData');
+			$reflect = new ReflectionClass('kTvinciDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
-			return new KalturaYouTubeDistributionProfile();
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI))
+			return new KalturaTvinciDistributionProfile();
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
-			return new YouTubeDistributionProfile();
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI))
+			return new TvinciDistributionProfile();
 			
 		return null;
 	}
@@ -127,56 +127,56 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// client side apps like batch and admin console
-		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::YOUTUBE)
+		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::TVINCI)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineDelete')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineReport')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineSubmit')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 					
 			if($baseClass == 'IDistributionEngineUpdate')
-				return 'YouTubeDistributionEngineSelector';
+				return 'TvinciDistributionEngineSelector';
 		
 			if($baseClass == 'KalturaDistributionProfile')
-				return 'KalturaYouTubeDistributionProfile';
+				return 'KalturaTvinciDistributionProfile';
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
-				return 'KalturaYouTubeDistributionJobProviderData';
+				return 'KalturaTvinciDistributionJobProviderData';
 		}
 		
-		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::YOUTUBE)
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::TVINCI)
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
-				return 'Form_YouTubeProfileConfiguration';
+				return 'Form_TvinciProfileConfiguration';
 				
 			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
-				return 'Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile';
+				return 'Kaltura_Client_TvinciDistribution_Type_TvinciDistributionProfile';
 		}
 		
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
-			return 'KalturaYouTubeDistributionJobProviderData';
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI))
+			return 'KalturaTvinciDistributionJobProviderData';
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(YouTubeDistributionProviderType::YOUTUBE))
-			return 'kYouTubeDistributionJobProviderData';
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(TvinciDistributionProviderType::TVINCI))
+			return 'kTvinciDistributionJobProviderData';
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
-			return 'KalturaYouTubeDistributionProfile';
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI))
+			return 'KalturaTvinciDistributionProfile';
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
-			return 'YouTubeDistributionProfile';
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI))
+			return 'TvinciDistributionProfile';
 			
 		return null;
 	}
@@ -188,7 +188,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function getProvider()
 	{
-		return YouTubeDistributionProvider::get();
+		return TvinciDistributionProvider::get();
 	}
 	
 	/**
@@ -198,7 +198,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function getKalturaProvider()
 	{
-		$distributionProvider = new KalturaYouTubeDistributionProvider();
+		$distributionProvider = new KalturaTvinciDistributionProvider();
 		$distributionProvider->fromObject(self::getProvider());
 		return $distributionProvider;
 	}
@@ -211,7 +211,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-	    // append YouTube specific report statistics
+	    // append Tvinci specific report statistics
 	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		$mrss->addChild('allow_comments', $distributionProfile->getAllowComments());
 		$mrss->addChild('allow_responses', $distributionProfile->getAllowResponses());
@@ -236,7 +236,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getEventConsumers()
 	{
 		return array(
-			self::YOUTUBE_EVENT_CONSUMER,
+			self::TVINCI_EVENT_CONSUMER,
 		);
 	}
 	

@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
+class kTvinciDistributionEventConsumer implements kBatchJobStatusEventConsumer
 {
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
@@ -64,8 +64,8 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 
 		// only feed spec v1 (legacy) is setting the playlists on submit action
 		if ($distributionProfile &&
-			$distributionProfile instanceof YouTubeDistributionProfile &&
-			$distributionProfile->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_1)
+			$distributionProfile instanceof TvinciDistributionProfile &&
+			$distributionProfile->getFeedSpecVersion() == TvinciDistributionFeedSpecVersion::VERSION_1)
 		{
 			self::saveCurrentPlaylistsToCustomData($data, $entryDistribution);
 		}
@@ -92,8 +92,8 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 
 		// only feed spec v2 (rights feed) is setting the playlists on submit close action
 		if ($distributionProfile &&
-			$distributionProfile instanceof YouTubeDistributionProfile &&
-			$distributionProfile->getFeedSpecVersion() == YouTubeDistributionFeedSpecVersion::VERSION_2)
+			$distributionProfile instanceof TvinciDistributionProfile &&
+			$distributionProfile->getFeedSpecVersion() == TvinciDistributionFeedSpecVersion::VERSION_2)
 		{
 			self::saveCurrentPlaylistsToCustomData($data, $entryDistribution);
 		}
@@ -109,7 +109,7 @@ class kYouTubeDistributionEventConsumer implements kBatchJobStatusEventConsumer
 	{
 		$providerData = $data->getProviderData();
 		KalturaLog::debug('provider data type' . get_class($providerData));
-		if ($providerData instanceof kYouTubeDistributionJobProviderData)
+		if ($providerData instanceof kTvinciDistributionJobProviderData)
 		{
 			KalturaLog::debug('setting currentPlaylists to entryDistribution custom data');
 			$entryDistribution->putInCustomData('currentPlaylists', $providerData->getCurrentPlaylists());

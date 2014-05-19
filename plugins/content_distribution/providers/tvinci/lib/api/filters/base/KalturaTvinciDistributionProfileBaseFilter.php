@@ -1,10 +1,10 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaYouTubeDistributionProfileBaseFilter extends KalturaConfigurableDistributionProfileFilter
+abstract class KalturaTvinciDistributionProfileBaseFilter extends KalturaConfigurableDistributionProfileFilter
 {
 	static private $map_between_objects = array
 	(

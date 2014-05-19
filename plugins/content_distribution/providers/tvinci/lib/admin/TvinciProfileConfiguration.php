@@ -1,22 +1,22 @@
 <?php 
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage admin
  */
-class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfiguration
+class Form_TvinciProfileConfiguration extends Form_ConfigurableProfileConfiguration
 {
 	/**
-	 * This element id is used to separate the default profile elements and youtube profile elements, so later we could
+	 * This element id is used to separate the default profile elements and tvinci profile elements, so later we could
 	 * insert the dynamic elements at the correct position
 	 */
-	const FORM_PLACEHOLDER_ELEMENT_ID = 'youtube_placeholder';
+	const FORM_PLACEHOLDER_ELEMENT_ID = 'tvinci_placeholder';
 
 	public function init()
 	{
 		parent::init();
 		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
 		$this->addDecorator('ViewScript', array(
-			'viewScript' => 'youtube-distribution.phtml',
+			'viewScript' => 'tvinci-distribution.phtml',
 			'placement' => 'APPEND'
 		));
 	}
@@ -25,7 +25,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile)
+		if($object instanceof Kaltura_Client_TvinciDistribution_Type_TvinciDistributionProfile)
 		{
 			$upload = new Zend_File_Transfer_Adapter_Http();
 			$files = $upload->getFileInfo();
@@ -60,8 +60,8 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 
 		$order = $this->_order[self::FORM_PLACEHOLDER_ELEMENT_ID];
 		$this->resetOrderOfLastElements();
-		/** @var $object Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile */
-		if ($object->feedSpecVersion == Kaltura_Client_YouTubeDistribution_Enum_YouTubeDistributionFeedSpecVersion::VERSION_2)
+		/** @var $object Kaltura_Client_TvinciDistribution_Type_TvinciDistributionProfile */
+		if ($object->feedSpecVersion == Kaltura_Client_TvinciDistribution_Enum_TvinciDistributionFeedSpecVersion::VERSION_2)
 			$this->setV2Mode($order++);
 		else
 			$this->setV1Mode($order++);
@@ -78,7 +78,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 	    $this->setDescription(null);
 	    
 		$element = new Zend_Form_Element_Hidden('providerElements');
-		$element->setLabel('YouTube Specific Configuration');
+		$element->setLabel('Tvinci Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 		
@@ -87,7 +87,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'label'			=> 'Feed Specification Version:',
 			'multioptions' => array(
 				'1' => 'Version 1 (Legacy Feed)',
-				'2' => 'Version 2 (YouTube Rights Feeds)',
+				'2' => 'Version 2 (Tvinci Rights Feeds)',
 			),
 			'description' => 'Save to see specific spec configurations',
 		));
@@ -95,7 +95,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		$this->addElement('text', 'api_authorize_url', array(
 			'label'			=> 'Authorize API Access:',
 			'decorators' => array(array('ViewScript', array(
-				'viewScript' => 'youtube-distribution-api-authorize-field.phtml',
+				'viewScript' => 'tvinci-distribution-api-authorize-field.phtml',
 
 			)))
 		));
@@ -128,7 +128,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 
 		// General
 		$this->addElement('text', 'username', array(
-			'label'			=> 'YouTube Account:',
+			'label'			=> 'Tvinci Account:',
 			'filters'		=> array('StringTrim'),
 		));
 

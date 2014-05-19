@@ -1,16 +1,16 @@
 <?php
 /**
- * @package plugins.youTubeDistribution
+ * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class YouTubeDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
+class TvinciDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {
-	const YOUTUBE = 'YOUTUBE';
+	const TVINCI = 'TVINCI';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'YOUTUBE' => self::YOUTUBE,
+			'TVINCI' => self::TVINCI,
 		);
 	}
 	
