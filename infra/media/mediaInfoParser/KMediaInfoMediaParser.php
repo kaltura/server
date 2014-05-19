@@ -108,12 +108,12 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			return $ffMi;
 		}
 		/*
-		 * Update mediainfo generated object with fastStart and multiStream fields 
+		 * Update mediainfo generated object with fastStart and contentStreams fields 
 		 * that are available only on ffprobe
 		 */
 		else if(isset($ffMi)) {
 			$kMi->isFastStart = $ffMi->isFastStart;
-			$kMi->multiStream = $ffMi->multiStream;
+			$kMi->contentStreams = $ffMi->contentStreams;
 		}
 			
 		$compareStr = self::compareFields($kMi, $ffMi);
