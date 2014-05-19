@@ -56,7 +56,18 @@ class kBusinessPostConvertDL
 //		}
 					
 		$sourceMediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		$productMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
+		/*
+		 * For intermediate source generation, both the source and the asset have the same asset id.
+		 * In this case sourceMediaInfo should be retrieved as the first version of source asset mediaInfo 
+		 */
+		if($sourceMediaInfo->getFlavorAssetId()==$flavorAssetId) {
+			$productMediaInfo = $sourceMediaInfo;
+			$sourceMediaInfo=mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId,1);
+			KalturaLog::log("Intermediate source generation - assetId(".$flavorAssetId."),src MdInf id(".$sourceMediaInfo->getId()."),product MdInf id(".$productMediaInfo->getId()).")";
+		}
+		else {
+			$productMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
+		}
 		$targetFlavor = assetParamsOutputPeer::retrieveByAssetId($currentFlavorAsset->getId());
 		
 		//Retrieve convert job executing engien
