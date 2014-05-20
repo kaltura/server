@@ -76,7 +76,7 @@ class UploadToken extends BaseUploadToken
 		$dc = kDataCenterMgr::getCurrentDc();
 		for ($i = 0; $i < 10; $i++)
 		{
-			$id = $dc["id"].'_'.md5(microtime(true) . getmypid() . uniqueid(rand(),true));
+			$id = $dc["id"].'_'.md5(microtime(true) . getmypid() . uniqid(rand(),true));
 			$existingObject = UploadTokenPeer::retrieveByPKNoFilter($id);
 			
 			if (!$existingObject)
