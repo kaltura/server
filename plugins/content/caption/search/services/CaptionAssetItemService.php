@@ -233,6 +233,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		$inputPageSize = $captionAssetItemPager->pageSize;
 		$inputPageIndex = $captionAssetItemPager->pageIndex;
 
+		//page index & size validation - no negative values & size not too big
 		$pageSize = max(min($inputPageSize, baseObjectFilter::getMaxInValues()), 0);
 		$pageIndex = max($captionAssetItemPager::MIN_PAGE_INDEX, $inputPageIndex) - 1;
 
