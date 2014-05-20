@@ -230,8 +230,12 @@ class CaptionAssetItemService extends KalturaBaseService
 			$counter += $currCriteria->getRecordsCount();
 		}
 
-		$pageSize = $captionAssetItemPager->pageSize;
-		$pageIndex = $captionAssetItemPager->pageIndex - 1;
+		$inputPageSize = $captionAssetItemPager->pageSize;
+		$inputPageIndex = $captionAssetItemPager->pageIndex;
+
+		$pageSize = max(min($inputPageSize, baseObjectFilter::getMaxInValues()), 0);
+		$pageIndex = max($captionAssetItemPager::MIN_PAGE_INDEX, $inputPageIndex) - 1;
+
 		$firstIndex = $pageSize * $pageIndex ;
 		$entries = array_slice ($entries , $firstIndex , $pageSize);
 
