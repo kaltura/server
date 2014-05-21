@@ -2,7 +2,7 @@
 class kVelocixUrlTokenizer extends kUrlTokenizer
 {
 
-	protected $protocol;
+	protected $protocol = "http";
 	protected $streamName;
 	protected $hdsPaths;
 	protected $paramName;

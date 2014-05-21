@@ -10,7 +10,7 @@ class DeliveryProfileComparator
 		$this->isSecured = $isSecured;
 	}
 	
-	private static function decorateWithUserOrder(DeliveryProfile $v, $k)
+	public static function decorateWithUserOrder(DeliveryProfile $v, $k)
 	{
 		$v->userOrder = $k;
 	}
@@ -18,7 +18,7 @@ class DeliveryProfileComparator
 	public function compare(DeliveryProfile $a,DeliveryProfile $b) {
 		
 		// Primary order - cdnHost
-		if (($this->cdnHost) && ($a->hostname != $b->hostname)) {
+		if (($this->cdnhost) && ($a->getHostName() != $b->getHostName())) {
 			if($a->getHostName() == $this->cdnhost) 
 				return -1;
 			if($b->getHostName() == $this->cdnhost)

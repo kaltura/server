@@ -24,6 +24,7 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		
 		$renderer = $this->getRenderer($flavors);
 		$renderer->baseUrl = $baseUrl;
+		$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 		return $renderer;
 	}
 	

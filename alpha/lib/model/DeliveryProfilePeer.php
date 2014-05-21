@@ -141,7 +141,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$entry = entryPeer::retrieveByPK($entryId);
 		$partnerId = $entry->getPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!partner) {
+		if(!$partner) {
 			KalturaLog::err('Failed to retrieve partnerId: '. $partnerId);
 			return null;
 		}
@@ -166,7 +166,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	public static function getDeliveryByPartner(Partner $partner, $streamerType = PlaybackProtocol::HTTP, $mediaProtocol = null, $cdnHost = null, $isSecured = false) {
 		
 		$partnerId = $partner->getId();
-		$deliveryIds = $partner->getDeliveryIds();
+		$deliveryIds = $partner->getDeliveryProfileIds();
 		
 		// if the partner has an override for the required format on the partner object - use that
 		if(array_key_exists($streamerType, $deliveryIds)) {
@@ -174,7 +174,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
 			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-			array_walk($deliveries, array($cmp,"decorateWithUserOrder"));
+			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder");
 			uasort($deliveries, array($cmp, "compare"));
 		} 
 		// Else catch the default by the protocol
@@ -186,9 +186,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$c->add(DeliveryProfilePeer::TYPE, self::getAllLiveDeliveryProfileTypes(), Criteria::NOT_IN);
 			
 			if($isSecured)
-				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null")');
+				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is not null)');
 			else
-				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null")');
+				$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::TOKENIZER . ' is null)');
 			
 			$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 			$c->addAscendingOrderByColumn($orderBy);
@@ -301,7 +301,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c->addAnd($hostCond);
 		$c->add(DeliveryProfilePeer::STREAMER_TYPE, $streamerType);
 		
-		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null")');
+		$c->addDescendingOrderByColumn('(' . DeliveryProfilePeer::HOST_NAME . ' is not null)');
 		$orderBy = "(" . DeliveryProfilePeer::PARTNER_ID . "<>{$partnerId})";
 		$c->addAscendingOrderByColumn($orderBy);
 			
@@ -334,7 +334,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		//  Otherwise, check the partner delivery profiles
 		$deliveryIds = array();
-		$deliveryIdsMap = $partner->getDeliveryIds();
+		$deliveryIdsMap = $partner->getDeliveryProfileIds();
 		foreach($deliveryIdsMap as $deliveriesByFormat) {
 			if(is_array($deliveriesByFormat))
 				$deliveryIds = array_merge ( $deliveryIds, $deliveriesByFormat);

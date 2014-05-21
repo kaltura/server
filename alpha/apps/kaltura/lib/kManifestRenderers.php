@@ -249,7 +249,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	
 	function __construct($flavor, $entryId = null, $baseUrl = '')
 	{
-		$this->flavor = $flavor;
+		$this->flavors = $flavor;
 		$this->entryId = $entryId;
 		$this->baseUrl = $baseUrl;
 	}
@@ -330,9 +330,6 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 		
 		$entry = entryPeer::retrieveByPK($this->entryId);
 		$this->setMimeType($entry);
-		
-		if($entry instanceof LiveEntry) 
-			$this->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_LIVE;
 	}
 	
 	/**
@@ -435,8 +432,10 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 					$isMp3 = false;
 			}
 	
-			if ($isMp3)
+			if ($isMp3) {
 				$this->mimeType = 'audio/mpeg';
+				return;
+			}
 		}
 	
 		$this->mimeType = 'video/x-flv';

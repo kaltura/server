@@ -587,6 +587,9 @@ class kApiCache extends kApiCacheBase
 			// make a trace in the access log of this being a warmup call
 			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey, false);
 		}
+		
+		if(is_null($this->_cacheStoreTypes))
+			return array(null, null);
 
 		foreach ($this->_cacheStoreTypes as $cacheType)
 		{

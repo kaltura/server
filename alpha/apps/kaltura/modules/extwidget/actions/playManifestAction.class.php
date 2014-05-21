@@ -383,7 +383,7 @@ class playManifestAction extends kalturaAction
 
 	protected function initSmilManifest($flavorAssets)
 	{
-		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, entry::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
 		if (!$key)
 			return false;
 
@@ -482,7 +482,8 @@ class playManifestAction extends kalturaAction
 			$this->initSilverLightManifest($flavorAssets);
 			return;
 		}
-		if($this->format == PlaybackProtocol::HDS || $this->format == PlaybackProtocol::APPLE_HTTP)
+		
+		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HDS || $this->deliveryAttributes->getFormat() == PlaybackProtocol::APPLE_HTTP)
 		{
 			// try to look for a smil manifest, if it was found, we will use it for hds and hls
 			if ($this->initSmilManifest($flavorAssets))
@@ -721,6 +722,8 @@ class playManifestAction extends kalturaAction
 			
 		$protocol = $this->deliveryAttributes->getMediaProtocol(); 
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
+			$protocol = requestUtils::getProtocol();
+		
 		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag);
 		if ($liveStreamConfig)
 			return array($liveStreamConfig->getUrl(), $liveStreamConfig->getBackupUrl());

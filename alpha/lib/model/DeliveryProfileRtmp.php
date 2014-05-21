@@ -45,11 +45,11 @@ class DeliveryProfileRtmp extends DeliveryProfileVod {
 		if( $extension && strtolower($extension) != 'flv' ||
 				$containerFormat && strtolower($containerFormat) != 'flash video') {
 			$url = "mp4:".ltrim($url,'/');
-			if($self::NON_FLV_FILE_EXTENSION)
-				$url .= "/name/a." . $self::NON_FLV_FILE_EXTENSION; 
+			if($this->NON_FLV_FILE_EXTENSION)
+				$url .= "/name/a." . $this->NON_FLV_FILE_EXTENSION; 
 			
-		} else if($self::FLV_FILE_EXTENSION) {
-			$url .= "/name/a." . $self::FLV_FILE_EXTENSION;
+		} else if($this->FLV_FILE_EXTENSION) {
+			$url .= "/name/a." . $this->FLV_FILE_EXTENSION;
 		}
 		return $url;
 	}

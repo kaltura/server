@@ -221,6 +221,8 @@ class Akamai_EdgeAuth_Generate {
 
 class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 {
+	
+	const SECURE_HD_AUTH_ACL_REGEX = '/^[^,]*/';
 
 	/**
 	 * @var string
@@ -238,6 +240,9 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url)
 	{
+		if (!preg_match(self::SECURE_HD_AUTH_ACL_REGEX, $url, $matches))
+			return $url;
+		
 		$acl = $matches[0];
 		
 		// strip manifest postfixes that should not be signed from the acl
