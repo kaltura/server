@@ -525,7 +525,7 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	private function execSftpCommand($command)
 	{
-		$cliCommand = "{$this->sftpCmd} -oPort={$this->port} -oStrictHostKeyChecking=no";
+		$cliCommand = "{$this->sftpCmd} -oUserKnownHostsFile=/dev/null -oPort={$this->port} -oStrictHostKeyChecking=no";
 		
 		if($this->verbose)
 			$cliCommand .= " -v";
