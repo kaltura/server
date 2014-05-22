@@ -1550,6 +1550,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setIsFastStart($v)	{$this->putInCustomData('IsFastStart', $v);}
 	public function getIsFastStart()	{return $this->getFromCustomData('IsFastStart', null, 1);}
 	
+	public function setContentStreams($v)	{$this->putInCustomData('ContentStreams', $v);}
+	public function getContentStreams()	{return $this->getFromCustomData('ContentStreams', null, null);}
+	
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *

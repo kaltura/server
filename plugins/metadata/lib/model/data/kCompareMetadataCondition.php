@@ -77,10 +77,15 @@ class kCompareMetadataCondition extends kCompareCondition
 		elseif($scope instanceof kEventScope && $scope->getEvent() instanceof kApplicativeEvent)
 		{
 			$object = $scope->getEvent()->getObject();
-			if($object instanceof IMetadataObject)
-				$metadata = MetadataPeer::retrieveByObject($profileId, $object->getMetadataObjectType(), $object->getId());
+			if(kMetadataManager::isMetadataObject($object))
+			{
+				$objectType = kMetadataManager::getTypeNameFromObject($object);
+				$metadata = MetadataPeer::retrieveByObject($profileId, $objectType, $object->getId());
+			}
 			else if ($object instanceof Metadata)
-				$metadata = $object;	
+			{
+				$metadata = $object;
+			}	
 		}
 			
 		if(!$metadata)

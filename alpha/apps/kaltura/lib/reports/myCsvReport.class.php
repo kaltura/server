@@ -42,10 +42,19 @@ class myCsvReport
 			}	
 			else if($dimension)
 			{	
-				if (strlen($data) == 6) { //foramt is yyyymm
+				$added = false;
+				if (strlen($data) == 6) //foramt is yyyymm 
+				{ 
 					$date = DateTime::createFromFormat("Ym", $data);
-					$csv->addNewLine( $date->format("M Y"), $value );
-				} else {
+					if($date)
+					{
+						$csv->addNewLine( $date->format("M Y"), $value );
+						$added = true;
+					}
+				}
+				
+				if(!$added)
+				{
 					$csv->addNewLine( $csv->formatDate( myReportsMgr::formatDateFromDateId( $data ) ), $value );
 				}		
 			}

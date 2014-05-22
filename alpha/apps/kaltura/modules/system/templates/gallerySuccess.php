@@ -192,7 +192,7 @@ status:
 </form>
 <div id='widget' style='position: absolute; left: 1200px; top: 200px'>
 <!--  widget  -->
-<?
+<?php
 if ( $is_playlist )
 {
 	echo myPlaylistUtils::getEmbedCode ( $playlist_id , $widget_id , $ui_conf_id );

@@ -85,7 +85,7 @@ class kVelocixProvisionJobData extends kProvisionJobData
 	/* (non-PHPdoc)
 	 * @see kProvisionJobData::populateEntryFromData()
 	 */
-	public function populateEntryFromData (entry $entry)
+	public function populateEntryFromData (LiveStreamEntry $entry)
 	{
 		$configurations = array();
 		KalturaLog::debug('provisioningParams: '.print_r($this->provisioningParams,true));
@@ -123,7 +123,7 @@ class kVelocixProvisionJobData extends kProvisionJobData
 	/* (non-PHPdoc)
 	 * @see kProvisionJobData::populateFromEntry()
 	 */
-	public function populateFromEntry(entry $entry) 
+	public function populateFromEntry(LiveStreamEntry $entry) 
 	{
 		$this->setStreamName($entry->getStreamName());
 		$liveAssets = assetPeer::retrieveByEntryId($entry->getId(),array(assetType::LIVE));
