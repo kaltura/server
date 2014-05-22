@@ -1627,6 +1627,65 @@ class playManifestAction extends kalturaAction
 				break;
 			
 			case PlaybackProtocol::HDS:
+				if($backupUrl)
+				{
+					if($this->getRequestParameter("proxyBackup", 0))
+					{
+						$flavors = array();
+						$bootstrapInfos = array();
+						$this->buildF4mFlavors($baseUrl, $flavors, $bootstrapInfos);
+						$this->buildF4mFlavors($backupUrl, $flavors, $bootstrapInfos);
+						
+						$renderer = $this->getRenderer('kF4MManifestRenderer', $flavors);
+						if($renderer instanceof kF4MManifestRenderer)
+						{
+							$renderer->bootstrapInfos = $bootstrapInfos;
+							if($this->entry->getDvrStatus() == DVRStatus::ENABLED)
+							{
+								$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_DVR;
+								$renderer->dvrWindow = $this->entry->getDvrWindow() ? $this->entry->getDvrWindow() : '7200';
+							}
+							$renderer->mimeType = 'video/mp4';
+						}
+						break;
+					}
+					else 
+					{
+						if($this->cdnHost)
+						{
+							$baseUrl = "{$this->protocol}://{$this->cdnHost}";
+						}
+						else
+						{
+							$baseUrl = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+						}
+						
+						$parameters = array_merge(requestUtils::getRequestParams(), array(
+							'protocol' => $this->protocol,
+							'format' => 'hds',
+							'proxyBackup' => 1
+						));
+						$queryStringParameters = array();
+						foreach($parameters as $parameter => $value)
+						{
+							if(is_int(strpos($value, '/')))
+							{
+								$queryStringParameters[$parameter] = $value;
+								unset($parameters[$parameter]);
+							}
+						}
+						$requestParams = requestUtils::buildRequestParams($parameters);
+						
+						$partnerPath = myPartnerUtils::getUrlForPartner($this->entry->getPartnerId(), $this->entry->getSubpId());
+						$baseUrl .= "{$partnerPath}/playManifest/$requestParams/1/a.f4m";
+						
+						if(count($queryStringParameters))
+						{
+							$baseUrl .= '?' . http_build_query($queryStringParameters);
+						}
+					}
+				}
+				
 			case PlaybackProtocol::AKAMAI_HDS:
 			case PlaybackProtocol::MULTICAST_SL:
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
