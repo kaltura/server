@@ -213,7 +213,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		}
 		if (!$ext)
 		{
-			if($urlPrefix)
+			if($urlPrefix && $url)
 				$urlPrefix = $urlPrefix ."/";
 			$urlPath = parse_url($urlPrefix . $url, PHP_URL_PATH);
 			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
