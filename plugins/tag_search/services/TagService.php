@@ -185,7 +185,8 @@ class TagService extends KalturaBaseService
 		{
 			/* @var $catEntry categoryEntry */
 			$entry = entryPeer::retrieveByPK($catEntry->getEntryId());
-			$tagsToIncrement = array_merge($tagsToIncrement, explode(',', $entry->getTags()));
+			if($entry)
+				$tagsToIncrement = array_merge($tagsToIncrement, explode(',', $entry->getTags()));
 		}
 		
 		$tagsToIncrement = array_unique($tagsToIncrement);
