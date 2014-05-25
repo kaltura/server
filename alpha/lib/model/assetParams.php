@@ -51,7 +51,8 @@ class assetParams extends BaseassetParams
 	const TAG_THUMBSOURCE = "thumbsource";
 	const TAG_INGEST = "ingest";
 	const TAG_ISM_MANIFEST = "ism_manifest";
-	
+	const TAG_SMIL_MANIFEST = "smil_manifest";
+
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	
 	const SYSTEM_DEFAULT = 1; 

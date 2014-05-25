@@ -9,6 +9,10 @@
  */
 class CaptionAssetItemService extends KalturaBaseService
 {
+
+	const SIZE_OF_ENTRIES_CHUNK = 150;
+	const MAX_NUMBER_OF_ENTRIES = 1000;
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		$ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
@@ -183,7 +187,9 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
-		
+
+		$entryIdChunks = array(NULL);
+
 		if($entryFilter || kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$entryCoreFilter = new entryFilter();
@@ -191,32 +197,55 @@ class CaptionAssetItemService extends KalturaBaseService
 				$entryFilter->toObject($entryCoreFilter);
 			$entryCoreFilter->setPartnerSearchScope($this->getPartnerId());
 			$this->addEntryAdvancedSearchFilter($captionAssetItemFilter, $entryCoreFilter);
-				
+
 			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entryCoreFilter->attachToCriteria($entryCriteria);
+			$entryCriteria->setLimit(self::MAX_NUMBER_OF_ENTRIES);
+
 			$entryCriteria->applyFilters();
-				
+
 			$entryIds = $entryCriteria->getFetchedIds();
 			if(!$entryIds || !count($entryIds))
 				$entryIds = array('NOT_EXIST');
-				
-			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
+
+			$entryIdChunks = array_chunk($entryIds , self::SIZE_OF_ENTRIES_CHUNK);
 		}
-		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		
+		$entries = array();
+		$counter = 0;
+		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
-		$captionAssetItemPager->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemCriteria->setGroupByColumn('str_entry_id');
 		$captionAssetItemCriteria->setSelectColumn('str_entry_id');
-		$captionAssetItemCriteria->applyFilters();
-		
-		$entryIds = $captionAssetItemCriteria->getFetchedIds();
-		$dbList = entryPeer::retrieveByPKs($entryIds);
+
+		foreach ($entryIdChunks as $chunk)
+		{
+			$currCriteria = clone ($captionAssetItemCriteria);
+			if ($chunk)
+				$currCriteria->add(CaptionAssetItemPeer::ENTRY_ID , $chunk, KalturaCriteria::IN);
+			else
+				$captionAssetItemPager->attachToCriteria($currCriteria);
+			$currCriteria->applyFilters();
+			$entries = array_merge ($entries , $currCriteria->getFetchedIds());
+			$counter += $currCriteria->getRecordsCount();
+		}
+
+		$inputPageSize = $captionAssetItemPager->pageSize;
+		$inputPageIndex = $captionAssetItemPager->pageIndex;
+
+		//page index & size validation - no negative values & size not too big
+		$pageSize = max(min($inputPageSize, baseObjectFilter::getMaxInValues()), 0);
+		$pageIndex = max($captionAssetItemPager::MIN_PAGE_INDEX, $inputPageIndex) - 1;
+
+		$firstIndex = $pageSize * $pageIndex ;
+		$entries = array_slice ($entries , $firstIndex , $pageSize);
+
+		$dbList = entryPeer::retrieveByPKs($entries);
 		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $list;
-		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
-		
+		$response->totalCount = $counter;
+
 		return $response;
 	}
 }

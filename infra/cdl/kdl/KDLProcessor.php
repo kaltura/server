@@ -172,8 +172,8 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 				 		 */
 				 	//$mediaSet->_video->IsFormatOf(array("icod","intermediate codec"))||
 					($mediaSet->_container->IsFormatOf(array("qt","mov")) 
-					   && $mediaSet->_video->IsFormatOf(array("wmv","wmv3","wvc1","vc1","vc-1")) 
-					   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","windows media audio","windows media audio 10 professional"))
+					   && $mediaSet->_video->IsFormatOf(array("wmv","wmv2","wmv3","wvc1","vc1","vc-1")) 
+					   && $mediaSet->_audio->IsFormatOf(array("wma","wma2","wma3","windows media audio","windows media audio 10 professional"))
 					  ) 
 				    )
 				   )
@@ -184,9 +184,9 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 						1, "quickTimeTools.QuickTimeTools");
 			}
 			/*
-			 * For "red strip" on On2 ==> ffmpeg intermedite reconversion 
+			 * For "red/green strip" on On2 ==> ffmpeg intermedite reconversion 
 			 */
-			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("xdvd","xdva","xdvb","xdvc","xdve","xdvf","xdv4"))) {
+			else if(isset($mediaSet->_video) && $mediaSet->_video->IsFormatOf(array("xdvd","xdva","xdvb","xdvc","xdve","xdvf","xdv4","hdv2"))) {
 				foreach($profile->_flavors as $flvr){
 					foreach ($flvr->_transcoders as $trans) {
 						if($trans->_id==KDLTranscoders::ON2){

@@ -311,7 +311,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
-	 * @readonly
 	 */
 	public $referenceId;
 

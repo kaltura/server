@@ -318,7 +318,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{
-	    $fieldConfigArray = array();
+	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 	      
 	    // media fields
 	    $fieldConfig = new DistributionFieldConfig();

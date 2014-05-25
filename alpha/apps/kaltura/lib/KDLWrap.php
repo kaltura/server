@@ -527,13 +527,13 @@ class KDLWrap
 	public static function ConvertMediainfoCdl2Mediadataset(mediaInfo $cdlMediaInfo, KDLMediaDataSet &$medSet)
 	{
 		$medSet->_container = new KDLContainerData();
-/*
-		$multiStream = $cdlMediaInfo->getMultiStream();
-		if(isset($multiStream)) {
-			$fromJson = json_decode($multiStream);
-			$medSet->_multiStream = isset($fromJson)? $fromJson: null;
+/**/
+		$contentStreams = $cdlMediaInfo->getContentStreams();
+		if(isset($contentStreams)) {
+			$fromJson = json_decode($contentStreams);
+			$medSet->_contentStreams = isset($fromJson)? $fromJson: null;
 		}
-*/
+
 		$medSet->_container->_id=$cdlMediaInfo->getContainerId();
 		$medSet->_container->_format=$cdlMediaInfo->getContainerFormat();
 		$medSet->_container->_duration=$cdlMediaInfo->getContainerDuration();

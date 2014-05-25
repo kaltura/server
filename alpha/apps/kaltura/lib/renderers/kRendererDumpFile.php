@@ -18,6 +18,8 @@ class kRendererDumpFile implements kRendererBase
 	protected $mimeType;
 	protected $maxAge;
 	protected $xSendFileAllowed;
+	
+	public $partnerId;
 
 	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0)
 	{
@@ -57,6 +59,11 @@ class kRendererDumpFile implements kRendererBase
 		else
 			list($rangeFrom, $rangeTo, $rangeLength) = infraRequestUtils::handleRangeRequest($this->fileSize);
 
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorDumpFile($this->fileSize, $this->filePath);
+		}
+				
 		infraRequestUtils::sendCdnHeaders($this->fileExt, $rangeLength, $this->maxAge, $this->mimeType);
 
 		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files

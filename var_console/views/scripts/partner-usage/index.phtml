@@ -41,7 +41,7 @@
 				<th title="<?php echo $this->translate('partner-usage table partnerStatus tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerStatus'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table partnerName tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerName'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table partnerId tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerId'); ?></th>
-				<th title="<?php echo $this->translate('partner-usage table referenceId tooltip'); ?>"><?php echo $this->translate('partner-usage table referenceId'); ?></th>
+<!--				<th title="<?php echo $this->translate('partner-usage table referenceId tooltip'); ?>"><?php echo $this->translate('partner-usage table referenceId'); ?></th> -->
 				<th title="<?php echo $this->translate('partner-usage table partnerCreatedAt tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerCreatedAt'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table bandwidth tooltip'); ?>"><?php echo $this->translate('partner-usage table bandwidth'); ?></th>
 				<th title="<?php echo $this->translate('partner-usage table averageStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table averageStorage'); ?></th>
@@ -64,7 +64,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $item->partnerStatus); ?></td>
 				<td><?php echo $item->partnerName;  if ($this->partnerId == $item->partnerId) echo ' (Parent Account)';?></td>
 				<td><?php echo $item->partnerId; ?></td>
-				<td><?php echo $item->referenceId ? $item->referenceId : "N/A"; ?></td>
+<!--				<td><?php //echo $item->referenceId ? $item->referenceId : "N/A"; ?></td> -->
 				<td><?php $d = (new Zend_Date($item->partnerCreatedAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->bandwidth); ?> </td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->avgStorage); ?> </td>

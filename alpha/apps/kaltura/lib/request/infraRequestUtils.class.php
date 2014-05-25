@@ -395,6 +395,19 @@ class infraRequestUtils
 		}
 		return $result;
 	}
+	
+	public static function buildRequestParams(array $parameters)
+	{
+		$pieces = array();
+		foreach($parameters as $key => $value)
+		{
+			if($key && $value)
+			{
+				$pieces[] = "$key/$value";
+			}
+		}
+		return implode('/', $pieces);
+	}
 
 	public static function getRequestParams()
 	{

@@ -218,7 +218,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				return $this->moveFile($job, $data);
 			}
 		}
-		catch(KOperationEngineException $e)
+		catch (Exception $e)
 		{
 			$data = $this->operationEngine->getData();
 			$log = $this->operationEngine->getLogData();
@@ -236,8 +236,11 @@ class KAsyncConvert extends KJobHandlerWorker
 				}
 			}
 			$err = "engine [" . get_class($this->operationEngine) . "] converted failed: " . $e->getMessage();
-		
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED, $data);
+			
+			if ($e instanceof KOperationEngineException)
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CONVERSION_FAILED, $err, KalturaBatchJobStatus::FAILED, $data);
+			//if this is not the usual KOperationEngineException, pass the Exception
+			throw $e;
 		}
 	}
 

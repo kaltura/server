@@ -70,7 +70,10 @@ class kMetadataManager
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $version);
 		$source = kFileSyncUtils::file_get_contents($key, true, false);
 		if(!$source)
+		{
+			KalturaLog::notice("Metadata key $key not found.");
 			return null;
+		}
 		
 		$xml = new KDOMDocument();
 		$xml->loadXML($source);
@@ -88,6 +91,7 @@ class kMetadataManager
 					$xPathPattern .= "/*[local-name()='$match']";
 			}
 		}
+		KalturaLog::debug("Metadata xpath [$xPathPattern]");
 		
 		$xPath = new DOMXPath($xml);
 		$elementsList = $xPath->query($xPathPattern);
@@ -497,6 +501,18 @@ class kMetadataManager
 			return self::$objectTypeNames[$objectType];
 			
 		return KalturaPluginManager::getObjectClass('IMetadataObject', $objectType);
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return boolean
+	 */
+	public static function isMetadataObject(BaseObject $object)
+	{
+		if($object instanceof IMetadataObject || $object instanceof entry || $object instanceof category || $object instanceof kuser || $object instanceof Partner)
+			return true;
+			
+		return false;
 	}
 	
 	/**

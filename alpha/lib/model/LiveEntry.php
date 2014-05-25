@@ -272,9 +272,45 @@ abstract class LiveEntry extends entry
 				return $configurations;
 			}
 		}
+		
+		$primaryMediaServer = null;
+		$backupMediaServer = null;
+		
+		$kMediaServers = $this->getMediaServers();
+		if(count($kMediaServers))
+		{
+			foreach($kMediaServers as $key => $kMediaServer)
+			{
+				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+				{
+					KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
+					if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
+					{
+						$primaryMediaServer = $kMediaServer->getMediaServer();
+						unset($kMediaServers[$key]);
+					}
+				}
+			}
+			
+			if(!$primaryMediaServer)
+			{
+				$kMediaServer = array_shift($kMediaServers);
+				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+					$primaryMediaServer = $kMediaServer->getMediaServer();
+			}
+				
+			if(count($kMediaServers))
+			{
+				$kMediaServer = reset($kMediaServers);
+				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+					$backupMediaServer = $kMediaServer->getMediaServer();
+			}
+		}
+		
 		$configurations = array();
 		$manifestUrl = null;
-		$mediaServer = $this->getMediaServer();
+		$backupManifestUrl = null;
+		
 		if (count ($this->getPartner()->getLiveStreamPlaybackUrlConfigurations()))
 		{
 			$partnerConfigurations = $this->getPartner()->getLiveStreamPlaybackUrlConfigurations();
@@ -282,9 +318,13 @@ abstract class LiveEntry extends entry
 			if (isset($partnerConfigurations[$protocol]))
 				$manifestUrl = $partnerConfigurations[$protocol];
 		}
-		elseif($mediaServer)
+		elseif($primaryMediaServer)
 		{
-			$manifestUrl = $mediaServer->getManifestUrl($protocol);
+			$manifestUrl = $primaryMediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
+			if($backupMediaServer)
+			{
+				$backupManifestUrl = $backupMediaServer->getManifestUrl($protocol, $this->getPartner()->getMediaServersConfiguration());
+			}
 		}
 		
 		if ($manifestUrl)
@@ -304,11 +344,27 @@ abstract class LiveEntry extends entry
 			$slStreamUrl = "$manifestUrl/Manifest";
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
 			
+			$hlsBackupStreamUrl = null;
+			$hdsBackupStreamUrl = null;
+			
+			if($backupManifestUrl)
+			{
+				$backupManifestUrl .= $streamName;
+				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8";
+				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m";
+			}
+			
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
 				$hlsStreamUrl .= "?DVR";
 				$hdsStreamUrl .= "?DVR";
 				$slStreamUrl .= "?dvr";
+				
+				if($backupManifestUrl)
+				{
+					$hlsBackupStreamUrl .= "?DVR";
+					$hdsBackupStreamUrl .= "?DVR";
+				}
 			}
 			
 			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->getPartnerId()))
@@ -325,16 +381,19 @@ abstract class LiveEntry extends entry
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::HDS);
 			$configuration->setUrl($hdsStreamUrl);
+			$configuration->setBackupUrl($hdsBackupStreamUrl);
 			$configurations[] = $configuration;
 			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::HLS);
 			$configuration->setUrl($hlsStreamUrl);
+			$configuration->setBackupUrl($hlsBackupStreamUrl);
 			$configurations[] = $configuration;
 			
 			$configuration = new kLiveStreamConfiguration();
 			$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
 			$configuration->setUrl($hlsStreamUrl);
+			$configuration->setBackupUrl($hlsBackupStreamUrl);
 			$configurations[] = $configuration;
 			
 			$configuration = new kLiveStreamConfiguration();
@@ -462,10 +521,11 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
-	protected function isMediaServerRegistered($index, $serverId)
+	protected function isMediaServerRegistered($index, $hostname)
 	{
 		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
-		if($server && $server->getMediaServerId() == $serverId)
+		/* @var $server kLiveMediaServer */
+		if($server && $server->getHostname() == $hostname)
 			return true;
 		
 		return false;

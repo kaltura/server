@@ -10,6 +10,7 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	const PLUGIN_VERSION_BUILD = 0;
 	
 	const EVENT_NOTIFICATION_FLOW_MANAGER = 'kEventNotificationFlowManager';
+	const EVENT_NOTIFICATION_OBJECT_COPIED_HANDLER = 'kEventNotificationObjectCopiedHandler';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -71,7 +72,7 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 	 */
 	public static function getEventConsumers()
 	{
-		return array(self::EVENT_NOTIFICATION_FLOW_MANAGER);
+		return array(self::EVENT_NOTIFICATION_FLOW_MANAGER, self::EVENT_NOTIFICATION_OBJECT_COPIED_HANDLER);
 	}
 
 	/* (non-PHPdoc)

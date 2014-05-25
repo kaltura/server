@@ -466,7 +466,45 @@ class playManifestAction extends kalturaAction
 		if (!$this->manifestFileSync)
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 	}
-	
+
+	protected function initSmilManifest($flavorAssets)
+	{
+		$key = null;
+		if($flavorAssets)
+		{
+			foreach ($flavorAssets as $flavorAsset)
+			{
+				if($flavorAsset->hasTag(assetParams::TAG_SMIL_MANIFEST))
+				{
+					$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+					break;
+				}
+			}
+		}
+
+		if (!$key)
+			return false;
+
+		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
+		{
+			$this->storageId = null;
+			$this->manifestFileSync = $localFileSync;
+		}
+		else
+		{
+			if($remoteFileSync)
+				$this->storageId = $remoteFileSync->getDc();
+			$this->manifestFileSync = $remoteFileSync;
+		}
+
+		if ($this->manifestFileSync)
+			return true;
+		else
+			return false;
+	}
+
 	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
@@ -572,7 +610,13 @@ class playManifestAction extends kalturaAction
 			$this->initSilverLightManifest($flavorAssets);
 			return;
 		}
-					
+		if($this->format == PlaybackProtocol::HDS || $this->format == PlaybackProtocol::APPLE_HTTP)
+		{
+			// try to look for a smil manifest, if it was found, we will use it for hds and hls
+			if ($this->initSmilManifest($flavorAssets))
+				return;
+		}
+
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
 		
@@ -1250,7 +1294,7 @@ class playManifestAction extends kalturaAction
 
 		return $this->getRenderer('kSilverLightManifestRenderer', array($manifestInfo));
 	}
-	
+
 	/**
 	 * @return kManifestRenderer
 	 */
@@ -1261,7 +1305,15 @@ class playManifestAction extends kalturaAction
 		{
 			return $this->getRenderer('kRedirectManifestRenderer', array($flavor));
 		}
-		
+
+		if ($this->manifestFileSync)
+		{
+			$this->setupUrlManager($this->manifestFileSync);
+			$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
+			$manifestInfo = $this->getFlavorAssetInfo($url);
+			return $this->getRenderer('kRedirectManifestRenderer', array($manifestInfo));
+		}
+
 		$flavors = $this->buildHttpFlavorsArray();
 		
 		$flavors = $this->sortFlavors($flavors);
@@ -1274,9 +1326,18 @@ class playManifestAction extends kalturaAction
 	 */
 	private function serveHds()
 	{
-		$flavors = $this->buildHttpFlavorsArray();
-		
-		$flavors = $this->sortFlavors($flavors);
+		if ($this->manifestFileSync)
+		{
+			$this->setupUrlManager($this->manifestFileSync);
+			$url = $this->urlManager->getFileSyncUrl($this->manifestFileSync, false);
+			$manifestInfo = $this->getFlavorAssetInfo($url);
+			$flavors = array($manifestInfo);
+		}
+		else
+		{
+			$flavors = $this->buildHttpFlavorsArray();
+			$flavors = $this->sortFlavors($flavors);
+		}
 
 		return $this->getRenderer('kF4MManifestRenderer', $flavors);
 	}
@@ -1373,7 +1434,7 @@ class playManifestAction extends kalturaAction
 					
 			case PlaybackProtocol::SILVER_LIGHT:
 				return $this->serveSilverLight();
-					
+
 			case PlaybackProtocol::APPLE_HTTP:
 				return $this->serveAppleHttp();
 		
@@ -1400,19 +1461,19 @@ class playManifestAction extends kalturaAction
 		return null;
 	}
 	
-	private function getLiveEntryBaseUrl()
+	/**
+	 * @return array primary URL and backup URL
+	 */
+	private function getLiveEntryBaseUrls()
 	{
 		$tag = null;
 		if(count($this->tags) == 1)
 			$tag = reset($this->tags);
 			
-		$protocol = $this->protocol; 
-		if(in_array($this->format, self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
-			$protocol = requestUtils::getProtocol();
-			
-		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $protocol, $tag);
+		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->format, $this->protocol, $tag);
+		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
-			return $liveStreamConfig->getUrl();
+			return array($liveStreamConfig->getUrl(), $liveStreamConfig->getBackupUrl());
 		
 		switch($this->format)
 		{
@@ -1421,12 +1482,103 @@ class playManifestAction extends kalturaAction
 				$baseUrl = rtrim($baseUrl, '/');
 				if (strpos($this->protocol, "rtmp") === 0)
 					$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
-				return $baseUrl;
+				return array($baseUrl, null);
 					
 			case PlaybackProtocol::APPLE_HTTP:
-				return $this->entry->getHlsStreamUrl(); // TODO pass single tag
+				return array($this->entry->getHlsStreamUrl(), null); // TODO pass single tag
 		}
-		return null;
+		return array(null, null);
+	}
+	
+	private function buildF4mFlavors($url, array &$flavors, array &$bootstrapInfos)
+	{
+		$manifest = KCurlWrapper::getContent($url);
+		if(!$manifest)
+			return;
+	
+		$manifest = preg_replace('/xmlns="[^"]+"/', '', $manifest);
+		$xml = new SimpleXMLElement($manifest);
+		$mediaElements = $xml->xpath('/manifest/media');
+		
+		foreach($mediaElements as $mediaElement)
+		{
+			/* @var $mediaElement SimpleXMLElement */
+			$flavor = array('urlPrefix' => '');
+			$playlistUrl = null;
+			foreach($mediaElement->attributes() as $attr => $attrValue)
+			{
+				$attrValue = "$attrValue";
+				
+				if($attr === 'url')
+					$attrValue = requestUtils::resolve($attrValue, $url);
+					
+				if($attr === 'bootstrapInfoId')
+				{
+					$bootstrapInfoElements = $xml->xpath("/manifest/bootstrapInfo[@id='$attrValue']");
+					if(count($bootstrapInfoElements))
+					{
+						$bootstrapInfoElement = reset($bootstrapInfoElements);
+						/* @var $bootstrapInfoElement SimpleXMLElement */
+						$playlistUrl = requestUtils::resolve(strval($bootstrapInfoElement['url']), $url);
+					}
+				}
+					
+				$flavor["$attr"] = $attrValue;
+			}
+			
+			if($playlistUrl)
+			{
+				$playlistId = md5($playlistUrl);
+				$bootstrapInfo = array(
+					'id' => $playlistId,
+					'url' => $playlistUrl,
+				);
+				$bootstrapInfos[$playlistId] = $bootstrapInfo;
+				
+				$flavor['bootstrapInfoId'] = $playlistId;
+			}
+			
+			$flavors[] = $flavor;
+		}
+	}
+	
+	private function buildM3u8Flavors($url, array &$flavors)
+	{
+		$manifest = KCurlWrapper::getContent($url);
+		if(!$manifest)
+			return;
+	
+		$manifestLines = explode("\n", $manifest);
+		$manifestLine = reset($manifestLines);
+		while($manifestLine)
+		{
+			$lineParts = explode(':', $manifestLine, 2);
+			if($lineParts[0] === '#EXT-X-STREAM-INF')
+			{
+				$flavor = array(
+					'url' => requestUtils::resolve(next($manifestLines), $url)
+				);
+				
+				$attributes = explode(',', $lineParts[1]);
+				foreach($attributes as $attribute)
+				{
+					$attributeParts = explode('=', $attribute, 2);
+					switch($attributeParts[0])
+					{
+						case 'BANDWIDTH':
+							$flavor['bitrate'] = $attributeParts[1] / 1024;
+							break;
+							
+						case 'RESOLUTION':
+							list($flavor['width'], $flavor['height']) = explode('x', $attributeParts[1], 2);
+							break;
+					}
+				}
+				$flavors[] = $flavor;
+			}
+			
+			$manifestLine = next($manifestLines);
+		}
 	}
 	
 	private function serveLiveEntry()
@@ -1439,7 +1591,7 @@ class playManifestAction extends kalturaAction
 			kApiCache::setExpiry(120);
 		}
 		
-		$baseUrl = $this->getLiveEntryBaseUrl();
+		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
 			
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);		
 		$this->urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $this->entryId);
@@ -1466,6 +1618,20 @@ class playManifestAction extends kalturaAction
 					$this->urlManager = new kPlayServerUrlManager($this->entryId, $this->urlManager, $this->playerConfig);
 				}
 				
+				if($backupUrl)
+				{
+					$flavors = array();
+					$this->urlManager->finalizeUrls($baseUrl, $flavors);
+					$this->urlManager->finalizeUrls($backupUrl, $flavors);
+					
+					$flavors = array();
+					$this->buildM3u8Flavors($baseUrl, $flavors);
+					$this->buildM3u8Flavors($backupUrl, $flavors);
+					
+					$renderer = $this->getRenderer('kM3U8ManifestRenderer', $flavors);
+					break;
+				}
+				
 			case PlaybackProtocol::SILVER_LIGHT:
 			case PlaybackProtocol::MPEG_DASH:
 				$flavors = array();
@@ -1476,6 +1642,65 @@ class playManifestAction extends kalturaAction
 				break;
 			
 			case PlaybackProtocol::HDS:
+				if($backupUrl)
+				{
+					if($this->getRequestParameter("proxyBackup", 0))
+					{
+						$flavors = array();
+						$bootstrapInfos = array();
+						$this->buildF4mFlavors($baseUrl, $flavors, $bootstrapInfos);
+						$this->buildF4mFlavors($backupUrl, $flavors, $bootstrapInfos);
+						
+						$renderer = $this->getRenderer('kF4MManifestRenderer', $flavors);
+						if($renderer instanceof kF4MManifestRenderer)
+						{
+							$renderer->bootstrapInfos = $bootstrapInfos;
+							if($this->entry->getDvrStatus() == DVRStatus::ENABLED)
+							{
+								$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_DVR;
+								$renderer->dvrWindow = $this->entry->getDvrWindow() ? $this->entry->getDvrWindow() : '7200';
+							}
+							$renderer->mimeType = 'video/mp4';
+						}
+						break;
+					}
+					else 
+					{
+						if($this->cdnHost)
+						{
+							$baseUrl = "{$this->protocol}://{$this->cdnHost}";
+						}
+						else
+						{
+							$baseUrl = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
+						}
+						
+						$parameters = array_merge(requestUtils::getRequestParams(), array(
+							'protocol' => $this->protocol,
+							'format' => 'hds',
+							'proxyBackup' => 1
+						));
+						$queryStringParameters = array();
+						foreach($parameters as $parameter => $value)
+						{
+							if(is_int(strpos($value, '/')))
+							{
+								$queryStringParameters[$parameter] = $value;
+								unset($parameters[$parameter]);
+							}
+						}
+						$requestParams = requestUtils::buildRequestParams($parameters);
+						
+						$partnerPath = myPartnerUtils::getUrlForPartner($this->entry->getPartnerId(), $this->entry->getSubpId());
+						$baseUrl .= "{$partnerPath}/playManifest/$requestParams/1/a.f4m";
+						
+						if(count($queryStringParameters))
+						{
+							$baseUrl .= '?' . http_build_query($queryStringParameters);
+						}
+					}
+				}
+				
 			case PlaybackProtocol::AKAMAI_HDS:
 			case PlaybackProtocol::MULTICAST_SL:
 				$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
@@ -1513,7 +1738,7 @@ class playManifestAction extends kalturaAction
 			return array(
 				array(assetParams::TAG_ISM),
 			);
-			
+
 		case PlaybackProtocol::APPLE_HTTP:
 		case PlaybackProtocol::HDS:
 			return array(
@@ -1551,6 +1776,10 @@ class playManifestAction extends kalturaAction
 			
 		if ($this->format == self::HDNETWORKSMIL || $this->format == PlaybackProtocol::AKAMAI_HDS)
 			$this->protocol = PlaybackProtocol::HTTP; // Akamai HD doesn't support any other protocol
+			
+		if(in_array($this->format, self::$httpFormats) && !in_array($this->protocol, self::$httpProtocols))
+			$this->protocol = requestUtils::getProtocol();
+			
 			
 		$this->tags = $this->getRequestParameter ( "tags", null );
 		if (!$this->tags)

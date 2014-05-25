@@ -55,6 +55,8 @@ $vid = $target->_video;
 $vbrFixedVp6=null;
 		if($vid->_frameRate)
 			$cmdStr.= " -ofps ".$vid->_frameRate;
+		else
+			$cmdStr.= " -ofps ".KDLConstants::MaxFramerate;
 		
 		switch($vid->_id){
 			case KDLVideoTarget::VP6:

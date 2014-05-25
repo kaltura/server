@@ -42,7 +42,7 @@ class kSessionBase
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
-
+	
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';
 	const INVALID_SESSIONS_SYNCED_KEY = 'invalid_sessions_synched';
 
@@ -248,6 +248,11 @@ class kSessionBase
 	{
 	}
 	
+	static protected function getSecretsCacheKey($partnerId)
+	{
+		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', 'local', '1') . '_' . $partnerId;
+	}
+	
 	static public function getSecretsFromCache($partnerId)
 	{
 		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
@@ -255,6 +260,7 @@ class kSessionBase
 		if(!$cacheSections)
 			return null;
 			
+		$cacheKey = self::getSecretsCacheKey($partnerId);
 		$lowerStores = array();
 		foreach ($cacheSections as $cacheSection)
 		{
@@ -262,7 +268,7 @@ class kSessionBase
 			if (!$cacheStore)
 				continue;
 
-			$secrets = $cacheStore->get(self::SECRETS_CACHE_PREFIX . $partnerId);
+			$secrets = $cacheStore->get($cacheKey);
 			if (!$secrets)
 			{
 				$lowerStores[] = $cacheStore; 
@@ -271,7 +277,7 @@ class kSessionBase
 			
 			foreach ($lowerStores as $cacheStore)
 			{
-				$cacheStore->set(self::SECRETS_CACHE_PREFIX . $partnerId, $secrets);
+				$cacheStore->set($cacheKey, $secrets);
 			}
 			
 			return $secrets;

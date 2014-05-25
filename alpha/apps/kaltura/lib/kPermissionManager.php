@@ -475,6 +475,9 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		// throw an error if KS partner (operating partner) is blocked
 		self::errorIfPartnerBlocked();
 		
+		//throw an error if KS user is blocked
+		self::errorIfUserBlocked();
+
 		// init role ids
 		self::initRoleIds();
 
@@ -723,8 +726,16 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			
 		return $accessAllowed;
 	}
-	
-	
+
+	private static function errorIfUserBlocked()
+	{
+		if (!kCurrentContext::$ks_kuser)
+			return;
+		$status = kCurrentContext::$ks_kuser->getStatus();
+		if ($status == KuserStatus::BLOCKED)
+			throw new kCoreException("User blocked", kCoreException::USER_BLOCKED);
+	}
+
 	private static function errorIfPartnerBlocked()
 	{
 		if (!self::$operatingPartner) {

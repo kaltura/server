@@ -4,6 +4,7 @@ abstract class kManifestRenderer
 {
 	const PLAY_STREAM_TYPE_LIVE = 'live';
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
+	const PLAY_STREAM_TYPE_DVR = 'dvr';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
 	/**
@@ -183,10 +184,10 @@ abstract class kManifestRenderer
 	 */
 	static protected function normalizeUrlPrefix(&$flavor)
 	{
-		$urlPrefix = $flavor['urlPrefix'];
-		if (!$urlPrefix)
+		if(!isset($flavor['urlPrefix']) || !$flavor['urlPrefix'])
 			return;
-		
+			
+		$urlPrefix = $flavor['urlPrefix'];		
 		$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
 		if (!$urlPrefixPath || substr($urlPrefix, -strlen($urlPrefixPath)) != $urlPrefixPath)
 			return;
@@ -218,8 +219,13 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 			$url = $this->tokenizer->tokenizeSingleUrl($url);
 		}
 		
-		$this->flavor['url'] = self::urlJoin($this->flavor['urlPrefix'], $url);
-		unset($this->flavor['urlPrefix']);	// no longer need the prefix
+		if(isset($this->flavor['urlPrefix']))
+		{
+			$url = self::urlJoin($this->flavor['urlPrefix'], $url);
+			unset($this->flavor['urlPrefix']);	// no longer need the prefix
+		}
+		
+		$this->flavor['url'] = $url;
 	}
 }
 
@@ -266,8 +272,14 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 				{
 					$url = $this->tokenizer->tokenizeSingleUrl($url);
 				}
-				$flavor['url'] = self::urlJoin($flavor['urlPrefix'], $url);
-				unset($flavor['urlPrefix']);		// no longer need the prefix
+				
+				if(isset($flavor['urlPrefix']))
+				{
+					$url = self::urlJoin($flavor['urlPrefix'], $url);
+					unset($flavor['urlPrefix']);		// no longer need the prefix
+				}
+				
+				$flavor['url'] = $url;
 			}
 		}
 	}
@@ -289,6 +301,16 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	 * @var string
 	 */
 	public $mimeType = 'video/x-flv';
+
+	/**
+	 * @var array
+	 */
+	public $bootstrapInfos = array();
+
+	/**
+	 * @var int
+	 */
+	public $dvrWindow = null;
 	
 	/**
 	 * @return array<string>
@@ -317,12 +339,23 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 		foreach($this->flavors as $flavor)
 		{
 			$url = $flavor['url'];
-			$bitrate	= isset($flavor['bitrate'])	? $flavor['bitrate']	: 0;
-			$width		= isset($flavor['width'])	? $flavor['width']		: 0;
-			$height		= isset($flavor['height'])	? $flavor['height']		: 0;
+			$bitrate			= isset($flavor['bitrate'])			? $flavor['bitrate']			: 0;
+			$width				= isset($flavor['width'])			? $flavor['width']				: 0;
+			$height				= isset($flavor['height'])			? $flavor['height']				: 0;
+			$bootstrapInfoId	= isset($flavor['bootstrapInfoId'])	? $flavor['bootstrapInfoId']	: '';
 			
 			$url = htmlspecialchars($url . $deliveryCodeStr);
-			$flavorsArray[] = "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"/>";
+			
+			$mediaElement = "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"";
+			if(isset($flavor['bootstrapInfoId']) && isset($this->bootstrapInfos[$flavor['bootstrapInfoId']]))
+			{
+				$bootstrapInfo = $this->bootstrapInfos[$flavor['bootstrapInfoId']];
+				$bootstrapInfoElement = '<bootstrapInfo id="' . $bootstrapInfo['id'] . '" profile="named" url="' . $bootstrapInfo['url'] . '" />';
+				$mediaElement = $bootstrapInfoElement . $mediaElement . ' bootstrapInfoId="' . $flavor['bootstrapInfoId'] . '"';
+			}
+			$mediaElement .= ' />';
+			
+			$flavorsArray[] = $mediaElement;
 		}		
 		
 		return $flavorsArray;
@@ -332,13 +365,16 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$durationXml = ($this->duration ? "<duration>{$this->duration}</duration>" : '');
 		$baseUrlXml = ($this->baseUrl ? "<baseURL>".htmlspecialchars($this->baseUrl)."</baseURL>" : '');
+		$dvrXml = ($this->dvrWindow ? "<dvrInfo windowDuration=\"{$this->dvrWindow}\"></dvrInfo>" : '');
+		
 		return 
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 	<manifest xmlns=\"http://ns.adobe.com/f4m/1.0\">
 		<id>{$this->entryId}</id>
 		<mimeType>{$this->mimeType}</mimeType>
-		<streamType>{$this->streamType}</streamType>					
-		{$durationXml}
+		<streamType>{$this->streamType}</streamType>		
+		{$dvrXml}					
+		{$durationXml}		
 		{$baseUrlXml}";
 	}
 	

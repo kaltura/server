@@ -12,13 +12,17 @@ class mediaInfoPeer extends BasemediaInfoPeer
 {
 	/**
 	 * @param string $flavorAssetId
+	 * @param int $isAscending
 	 * @return mediaInfo
 	 */
-	public static function retrieveByFlavorAssetId($flavorAssetId)
+	public static function retrieveByFlavorAssetId($flavorAssetId, $isAscending=0)
 	{
 		$criteria = new Criteria();
 		$criteria->add(mediaInfoPeer::FLAVOR_ASSET_ID, $flavorAssetId);
-		$criteria->addDescendingOrderByColumn(mediaInfoPeer::ID);
+		if($isAscending>0)
+			$criteria->addAscendingOrderByColumn(mediaInfoPeer::ID);
+		else
+			$criteria->addDescendingOrderByColumn(mediaInfoPeer::ID);
 
 		return mediaInfoPeer::doSelectOne($criteria);
 	}

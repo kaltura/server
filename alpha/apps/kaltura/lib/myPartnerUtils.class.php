@@ -1399,7 +1399,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $checkPermissions = false)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $permissionRequiredOnly = false)
  	{
 		$copiedList = array();
 		
@@ -1412,7 +1412,7 @@ class myPartnerUtils
  		foreach($conversionProfiles as $conversionProfile)
  		{
  			/* @var $conversionProfile conversionProfile2 */
- 			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
+ 			if ($permissionRequiredOnly && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
  				continue;
  			
  			if (!self::isPartnerPermittedForCopy ($toPartner, $conversionProfile->getRequiredCopyTemplatePermissions()))

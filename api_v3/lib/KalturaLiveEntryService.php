@@ -34,7 +34,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param string $entryId Live entry id
 	 * @param KalturaMediaServerIndex $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
-	 * @param float $duration
+	 * @param float $duration in seconds
 	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
@@ -48,10 +48,19 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$currentDuration = $dbEntry->getLengthInMsecs();
 		if(!$currentDuration)
 			$currentDuration = 0;
-			
-		$currentDuration += $duration;
-		$dbEntry->setLengthInMsecs($currentDuration);
-		$dbEntry->save();
+		$currentDuration += ($duration * 1000);
+		
+		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
+		if($currentDuration > $maxRecordingDuration)
+		{
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
+		}
+		
+		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		{
+			$dbEntry->setLengthInMsecs($currentDuration);
+			$dbEntry->save();
+		}
 			
 		$kResource = $resource->toObject();
 		$target = $kResource->getLocalFilePath();

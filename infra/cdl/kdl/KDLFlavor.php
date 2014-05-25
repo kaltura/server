@@ -672,12 +672,41 @@ $plannedDur = 0;
 		return $targetVid;
 	}
 	
+	/*
+	 *	switch frame sizes & inverse display aspect ratio for a certain video.
+	 */
+	
+	private static function invertVideoDimensions(KDLVideoData $video)
+	{
+		$temp = $video->_height;
+		$video->_height = $video->_width;
+		$video->_width = $temp;
+		if (isset($video->_dar) && $video->_dar != 0)
+			$video->_dar = 1/$video->_dar;
+	}
+	
 	/* ---------------------------
 	 * evaluateTargetVideoFramesize
 	 */
 	private function evaluateTargetVideoFramesize(KDLVideoData $source, KDLVideoData $target) 
 	{
 		$shrinkToSource = $target->_isShrinkFramesizeToSource;
+		$invertedVideo = false;
+		
+		
+		/*
+		 *	this is for the special case where a source has height > width.
+		 *	here it will be inverted & run through the usual flow.
+		 *	in this case the source-target frame-sizes ratio after converting should be the same as if the source had a regular height < width.
+		 *	boolean flag invertedVideo - for inverting back the source & target later on.
+		 */
+		if ((isset($source->_dar) && $source->_dar < 1) ||
+		(isset($source->_height) && isset($source->_width) && $source->_height > 0 && $source->_width > 0 && $source->_height > $source->_width))
+		{
+			KalturaLog::debug('inverting source');
+			self::invertVideoDimensions($source);
+			$invertedVideo = true;
+		}
 		
 		$widSrc = $source->_width;
 		$hgtSrc = $source->_height;
@@ -831,6 +860,18 @@ $plannedDur = 0;
 		}
 
 		$this->matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, $target);
+		
+		/*
+		 *      inverting source back for conversion process.
+		 *      inverting target back so the output will be inverted as well.
+		 */
+		if ($invertedVideo)
+		{
+			KalturaLog::debug('inverting back source & target');
+			
+			self::invertVideoDimensions($source);
+			self::invertVideoDimensions($target);
+		}
 	}
 	
 	/* ---------------------------

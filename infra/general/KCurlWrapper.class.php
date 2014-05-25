@@ -465,5 +465,24 @@ class KCurlWrapper
 	public function __destruct()
 	{
 	}
+
+	public static function getContent($url)
+	{
+		$ch = curl_init();
+		
+		// set URL and other appropriate options
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_NOBODY, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+			
+		$content = curl_exec($ch);
+		curl_close($ch);
+		
+		return $content;
+	}
 }
 

@@ -72,7 +72,7 @@ class MsnDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{	    
-	    $fieldConfigArray = array();
+	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
 	      
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(MsnDistributionField::PROVIDER_ID);

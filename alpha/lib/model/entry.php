@@ -3159,4 +3159,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
+	
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$namespace]) && (is_null($name) || isset($this->oldCustomDataValues[$namespace][$name])))
+		{
+			return true;
+		}
+		
+		return false;
+	}
 }

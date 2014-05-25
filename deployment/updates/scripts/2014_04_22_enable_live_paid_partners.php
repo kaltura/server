@@ -21,7 +21,7 @@ function isLivePassThruConversionProfileExists($partnerId)
 	$c->add(conversionProfile2Peer::TYPE, ConversionProfileType::LIVE_STREAM);
 	$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 	
-	return conversionProfile2Peer::doCount($c) > 1;
+	return conversionProfile2Peer::doCount($c) > 0;
 }
 
 function createLivePassThruConversionProfile($partnerId)
@@ -55,7 +55,7 @@ function createLivePassThruConversionProfile($partnerId)
 
 $c = new Criteria();
 $c->add(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE);
-$c->add(PartnerPeer::PARTNER_PACKAGE, 0, Criteria::GREATER_THAN);
+$c->add(PartnerPeer::PARTNER_PACKAGE, 1, Criteria::GREATER_THAN);
 $c->add(PartnerPeer::ID, 100, Criteria::GREATER_THAN);
 $c->addAscendingOrderByColumn(PartnerPeer::ID);
 $c->setLimit(100);
