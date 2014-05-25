@@ -1,7 +1,7 @@
 <?php
 
 class kDeliveryUtils {
-		
+	
 	/*
 	 * retrieves the streamer type for a delivery type array 
 	 */
@@ -66,5 +66,29 @@ class kDeliveryUtils {
 				return $deliveryTypeConfig[$key];
 		}
 		return null;
+	}
+	
+	public static function formatGenericUrl($url, $pattern = null, DeliveryProfileDynamicAttributes $params) {
+		if ($pattern)
+		{
+			$seekFromSec = $params->getSeekFromTime() > 0 ? $params->getSeekFromTime() / 1000 : 0;
+			$pattern = str_replace('{url}', $url, $pattern);
+			$pattern = str_replace('{seekFromSec}', $seekFromSec, $pattern);
+			return $pattern;
+		}
+		else
+		{
+			return '/'.$url; // the trailing slash will force adding the host name to the url
+		}
+	}
+	
+	public static function addQueryParameter($url, $parameter) {
+		$parsedUrl = parse_url($url);
+		if (isset($parsedUrl['query']) && strlen($parsedUrl['query']) > 0)
+			$url .= '&' . $parameter;
+		else
+			$url .= '?' . $parameter;
+		
+		return $url;
 	}
 }

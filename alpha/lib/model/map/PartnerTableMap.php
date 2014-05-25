@@ -86,6 +86,7 @@ class PartnerTableMap extends TableMap {
 	public function buildRelations()
 	{
     $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('anonymous_kuser_id' => 'id', ), null, null);
+    $this->addRelation('LiveChannelSegment', 'LiveChannelSegment', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), null, null);
 	} // buildRelations()
 
 } // PartnerTableMap
