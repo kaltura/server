@@ -11,6 +11,23 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 		return $this->getFromCustomData("pattern");
 	}
 	
+	public function setRendererClassParam($v)
+	{
+		$this->putInCustomData("rendererClass", $v);
+	}
+	
+	public function getRendererClassParam()
+	{
+		return $this->getFromCustomData("rendererClass");
+	}
+	
+	protected function getRendererClass() {
+		$rendererClass = $this->getRendererClassParam();
+		if($rendererClass)
+			return $rendererClass;
+		return $this->DEFAULT_RENDERER_CLASS;
+	}
+	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset) 
 	{
 		$url = $this->getBaseUrl($flavorAsset);

@@ -10,10 +10,17 @@ class KalturaDeliveryProfileGenericAppleHttp extends KalturaDeliveryProfile {
 	 */
 	public $pattern;
 	
+	/**
+	 * rendererClass
+	 * @var string
+	 */
+	public $rendererClassParam;
+	
 	
 	private static $map_between_objects = array
 	(
-			"pattern"
+			"pattern",
+			"rendererClassParam",
 	);
 	
 	public function getMapBetweenObjects ( )

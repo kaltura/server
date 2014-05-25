@@ -270,6 +270,6 @@ $storageIds = array(101,1422,1441,1451,1471,1481,1531,1541,1561,1571,3791,161,16
 // 	setDeliveryId(null, $storageId, $deliveryIds);
 // }
 
-setDeliveryId(null, 1, array("http"=>array(3,4), "rtmp" =>5));
+setDeliveryId(103, null, array("http"=>array(3,4), "rtmp" =>array(5)));
 echo "Done.";
 

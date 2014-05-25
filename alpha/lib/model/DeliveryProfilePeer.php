@@ -234,7 +234,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			return null;
 		}
 			
-		$deliveryIds = $storageProfile->getDeliveryIds();
+		$deliveryIds = $storageProfile->getDeliveryProfileIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
 			KalturaLog::err('Delivery ID can\'t be determined for storageId: '. $storageProfileId . ' and streamer type: ' . $streamerType);
 			return null;
@@ -246,9 +246,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			KalturaLog::debug('Delivery ID for partnerId: '. $storageProfile->getPartnerId() . ' and streamer type:' . $streamerType . ' is ' . $delivery->getId());
 			$delivery->setEntryId($entryId);
 			$delivery->setStorageProfileId($storageProfileId);
+			
+			$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
 		}
-		
-		$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
 		
 		return $delivery;
 	}
