@@ -17,7 +17,7 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		return $this->getFromCustomData("enforceRtmpe");
 	}
 	
-	public function serve($baseUrl) {
+	public function serve($baseUrl, $backupUrl) {
 		$flavors = $this->buildRtmpLiveStreamFlavorsArray();
 		
 		$this->finalizeUrls($baseUrl, $flavors);

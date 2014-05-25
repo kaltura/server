@@ -726,6 +726,7 @@ class playManifestAction extends kalturaAction
 			$protocol = requestUtils::getProtocol();
 		
 		$liveStreamConfig = $this->entry->getLiveStreamConfigurationByProtocol($this->deliveryAttributes->getFormat(), $protocol, $tag);
+		/* @var $liveStreamConfig kLiveStreamConfiguration */
 		if ($liveStreamConfig)
 			return array($liveStreamConfig->getUrl(), $liveStreamConfig->getBackupUrl());
 		
@@ -744,97 +745,6 @@ class playManifestAction extends kalturaAction
 		return array(null, null);
 	}
 	
-	private function buildF4mFlavors($url, array &$flavors, array &$bootstrapInfos)
-	{
-		$manifest = KCurlWrapper::getContent($url);
-		if(!$manifest)
-			return;
-	
-		$manifest = preg_replace('/xmlns="[^"]+"/', '', $manifest);
-		$xml = new SimpleXMLElement($manifest);
-		$mediaElements = $xml->xpath('/manifest/media');
-		
-		foreach($mediaElements as $mediaElement)
-		{
-			/* @var $mediaElement SimpleXMLElement */
-			$flavor = array('urlPrefix' => '');
-			$playlistUrl = null;
-			foreach($mediaElement->attributes() as $attr => $attrValue)
-			{
-				$attrValue = "$attrValue";
-				
-				if($attr === 'url')
-					$attrValue = requestUtils::resolve($attrValue, $url);
-					
-				if($attr === 'bootstrapInfoId')
-				{
-					$bootstrapInfoElements = $xml->xpath("/manifest/bootstrapInfo[@id='$attrValue']");
-					if(count($bootstrapInfoElements))
-					{
-						$bootstrapInfoElement = reset($bootstrapInfoElements);
-						/* @var $bootstrapInfoElement SimpleXMLElement */
-						$playlistUrl = requestUtils::resolve(strval($bootstrapInfoElement['url']), $url);
-					}
-				}
-					
-				$flavor["$attr"] = $attrValue;
-			}
-			
-			if($playlistUrl)
-			{
-				$playlistId = md5($playlistUrl);
-				$bootstrapInfo = array(
-					'id' => $playlistId,
-					'url' => $playlistUrl,
-				);
-				$bootstrapInfos[$playlistId] = $bootstrapInfo;
-				
-				$flavor['bootstrapInfoId'] = $playlistId;
-			}
-			
-			$flavors[] = $flavor;
-		}
-	}
-	
-	private function buildM3u8Flavors($url, array &$flavors)
-	{
-		$manifest = KCurlWrapper::getContent($url);
-		if(!$manifest)
-			return;
-	
-		$manifestLines = explode("\n", $manifest);
-		$manifestLine = reset($manifestLines);
-		while($manifestLine)
-		{
-			$lineParts = explode(':', $manifestLine, 2);
-			if($lineParts[0] === '#EXT-X-STREAM-INF')
-			{
-				$flavor = array(
-					'url' => requestUtils::resolve(next($manifestLines), $url)
-				);
-				
-				$attributes = explode(',', $lineParts[1]);
-				foreach($attributes as $attribute)
-				{
-					$attributeParts = explode('=', $attribute, 2);
-					switch($attributeParts[0])
-					{
-						case 'BANDWIDTH':
-							$flavor['bitrate'] = $attributeParts[1] / 1024;
-							break;
-							
-						case 'RESOLUTION':
-							list($flavor['width'], $flavor['height']) = explode('x', $attributeParts[1], 2);
-							break;
-					}
-				}
-				$flavors[] = $flavor;
-			}
-			
-			$manifestLine = next($manifestLines);
-		}
-	}
-	
 	private function serveLiveEntry()
 	{		
 		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
@@ -848,28 +758,16 @@ class playManifestAction extends kalturaAction
 		list($baseUrl, $backupUrl) = $this->getLiveEntryBaseUrls();
 		$cdnHost = parse_url($baseUrl, PHP_URL_HOST);	
 		
-		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL) 
+		if($this->deliveryAttributes->getFormat() == PlaybackProtocol::MULTICAST_SL)
+		{
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HDS);
+		}
 		
-		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, 
-				$this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
-				if($backupUrl)
-				{
-					$flavors = array();
-					$this->urlManager->finalizeUrls($baseUrl, $flavors);
-					$this->urlManager->finalizeUrls($backupUrl, $flavors);
-					
-					$flavors = array();
-					$this->buildM3u8Flavors($baseUrl, $flavors);
-					$this->buildM3u8Flavors($backupUrl, $flavors);
-					
-					$renderer = $this->getRenderer('kM3U8ManifestRenderer', $flavors);
-					break;
-				}
-				
-		
+		$this->deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName($cdnHost, $this->entryId, $this->deliveryAttributes->getFormat(), $this->deliveryAttributes->getMediaProtocol());
 		if(!$this->deliveryProfile)
+		{
 			return null;
+		}
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
 		return $this->deliveryProfile->serve($baseUrl);
@@ -971,6 +869,7 @@ class playManifestAction extends kalturaAction
 		
 		// Initialize
 		$this->initEntry();
+		$this->deliveryAttributes->setEntryId($this->entryId);
 
 		$this->enforceEncryption();
 		
