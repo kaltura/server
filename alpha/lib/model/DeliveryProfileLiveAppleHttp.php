@@ -65,5 +65,72 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 	}
 	
+	/**
+	 * Fetch the manifest and build all flavors array
+	 * @param string $url
+	 */
+	private function buildM3u8Flavors($url, array &$flavors)
+	{
+		$this->finalizeUrls($url, $flavors);
+		
+		$manifest = KCurlWrapper::getContent($url);
+		if(!$manifest)
+			return;
+	
+		$manifestLines = explode("\n", $manifest);
+		$manifestLine = reset($manifestLines);
+		while($manifestLine)
+		{
+			$lineParts = explode(':', $manifestLine, 2);
+			if($lineParts[0] === '#EXT-X-STREAM-INF')
+			{
+				// passing the url as urlPrefix so that only the path will be tokenized
+				$flavor = array(
+					'url' => '',
+					'urlPrefix' => requestUtils::resolve(next($manifestLines), $url),
+					'ext' => 'm3u8',
+				);
+				
+				$attributes = explode(',', $lineParts[1]);
+				foreach($attributes as $attribute)
+				{
+					$attributeParts = explode('=', $attribute, 2);
+					switch($attributeParts[0])
+					{
+						case 'BANDWIDTH':
+							$flavor['bitrate'] = $attributeParts[1] / 1024;
+							break;
+							
+						case 'RESOLUTION':
+							list($flavor['width'], $flavor['height']) = explode('x', $attributeParts[1], 2);
+							break;
+					}
+				}
+				$flavors[] = $flavor;
+			}
+			
+			$manifestLine = next($manifestLines);
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see DeliveryProfileLive::serve()
+	 */
+	public function serve($baseUrl, $backupUrl) 
+	{
+		if(!$backupUrl)
+		{
+			return parent::serve($baseUrl, $backupUrl);
+		}
+		
+		
+		$flavors = array();
+		$this->buildM3u8Flavors($baseUrl, $flavors);
+		$this->buildM3u8Flavors($backupUrl, $flavors);
+		
+		$this->params->setResponseFormat('m3u8');
+		$renderer = $this->getRenderer($flavors);
+		return $renderer;
+	}
 }
 
