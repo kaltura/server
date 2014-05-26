@@ -84,64 +84,64 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 	 */
 	public function serve($baseUrl, $backupUrl) 
 	{
-		if($backupUrl)
-		{
-			$entryId = $this->params->getEntryId();
-			$entry = entryPeer::retrieveByPK($entryId);
-			
-			if($this->params->getResponseFormat() == 'f4m')
-			{
-				$flavors = array();
-				$bootstrapInfos = array();
-				$this->buildF4mFlavors($baseUrl, $flavors, $bootstrapInfos);
-				$this->buildF4mFlavors($backupUrl, $flavors, $bootstrapInfos);
-				
-				$renderer = $this->getRenderer($flavors);
-				if($renderer instanceof kF4MManifestRenderer)
-				{
-					$renderer->bootstrapInfos = $bootstrapInfos;
-					if($entry->getDvrStatus() == DVRStatus::ENABLED)
-					{
-						$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_DVR;
-						$renderer->dvrWindow = $entry->getDvrWindow() ? $entry->getDvrWindow() : '7200';
-					}
-					$renderer->mimeType = 'video/mp4';
-				}
-				return $renderer;
-			}
-	
-			if($entry)
-			{
-				$this->params->setResponseFormat('f4m');
-		 		
-		 		$protocol = $this->params->getMediaProtocol();
-		 		$baseUrl = myPartnerUtils::getCdnHost($entry->getPartnerId(), $protocol);
-			
-				$parameters = array_merge(requestUtils::getRequestParams(), array(
-					'protocol' => $protocol,
-					'format' => 'hds',
-					'responseFormat' => 'f4m'
-				));
-				$queryStringParameters = array();
-				foreach($parameters as $parameter => $value)
-				{
-					if(is_int(strpos($value, '/')))
-					{
-						$queryStringParameters[$parameter] = $value;
-						unset($parameters[$parameter]);
-					}
-				}
-				$requestParams = requestUtils::buildRequestParams($parameters);
-				
-		 		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
-				$baseUrl .= "{$partnerPath}/playManifest/$requestParams/1/a.f4m";
-				
-				if(count($queryStringParameters))
-				{
-					$baseUrl .= '?' . http_build_query($queryStringParameters);
-				}
-			}
-		}
+//		if($backupUrl)
+//		{
+//			$entryId = $this->params->getEntryId();
+//			$entry = entryPeer::retrieveByPK($entryId);
+//			
+//			if($this->params->getResponseFormat() == 'f4m')
+//			{
+//				$flavors = array();
+//				$bootstrapInfos = array();
+//				$this->buildF4mFlavors($baseUrl, $flavors, $bootstrapInfos);
+//				$this->buildF4mFlavors($backupUrl, $flavors, $bootstrapInfos);
+//				
+//				$renderer = $this->getRenderer($flavors);
+//				if($renderer instanceof kF4MManifestRenderer)
+//				{
+//					$renderer->bootstrapInfos = $bootstrapInfos;
+//					if($entry->getDvrStatus() == DVRStatus::ENABLED)
+//					{
+//						$renderer->streamType = kF4MManifestRenderer::PLAY_STREAM_TYPE_DVR;
+//						$renderer->dvrWindow = $entry->getDvrWindow() ? $entry->getDvrWindow() : '7200';
+//					}
+//					$renderer->mimeType = 'video/mp4';
+//				}
+//				return $renderer;
+//			}
+//	
+//			if($entry)
+//			{
+//				$this->params->setResponseFormat('f4m');
+//		 		
+//		 		$protocol = $this->params->getMediaProtocol();
+//		 		$baseUrl = myPartnerUtils::getCdnHost($entry->getPartnerId(), $protocol);
+//			
+//				$parameters = array_merge(requestUtils::getRequestParams(), array(
+//					'protocol' => $protocol,
+//					'format' => 'hds',
+//					'responseFormat' => 'f4m'
+//				));
+//				$queryStringParameters = array();
+//				foreach($parameters as $parameter => $value)
+//				{
+//					if(is_int(strpos($value, '/')))
+//					{
+//						$queryStringParameters[$parameter] = $value;
+//						unset($parameters[$parameter]);
+//					}
+//				}
+//				$requestParams = requestUtils::buildRequestParams($parameters);
+//				
+//		 		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
+//				$baseUrl .= "{$partnerPath}/playManifest/$requestParams/1/a.f4m";
+//				
+//				if(count($queryStringParameters))
+//				{
+//					$baseUrl .= '?' . http_build_query($queryStringParameters);
+//				}
+//			}
+//		}
 		
 		$flavor = $this->getFlavorAssetInfo('', $baseUrl);		// passing the url as urlPrefix so that only the path will be tokenized
 		$renderer = $this->getRenderer(array($flavor));
