@@ -62,14 +62,6 @@ class kTvinciDistributionEventConsumer implements kBatchJobStatusEventConsumer
 		$distributionProfileId = $data->getDistributionProfileId();
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 
-		// only feed spec v1 (legacy) is setting the playlists on submit action
-		if ($distributionProfile &&
-			$distributionProfile instanceof TvinciDistributionProfile &&
-			$distributionProfile->getFeedSpecVersion() == TvinciDistributionFeedSpecVersion::VERSION_1)
-		{
-			self::saveCurrentPlaylistsToCustomData($data, $entryDistribution);
-		}
-		
 		return $dbBatchJob;
 	}
 
@@ -89,14 +81,6 @@ class kTvinciDistributionEventConsumer implements kBatchJobStatusEventConsumer
 
 		$distributionProfileId = $data->getDistributionProfileId();
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-
-		// only feed spec v2 (rights feed) is setting the playlists on submit close action
-		if ($distributionProfile &&
-			$distributionProfile instanceof TvinciDistributionProfile &&
-			$distributionProfile->getFeedSpecVersion() == TvinciDistributionFeedSpecVersion::VERSION_2)
-		{
-			self::saveCurrentPlaylistsToCustomData($data, $entryDistribution);
-		}
 
 		return $dbBatchJob;
 	}

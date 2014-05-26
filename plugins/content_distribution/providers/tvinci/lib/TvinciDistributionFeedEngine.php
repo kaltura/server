@@ -3,7 +3,7 @@
  * @package plugins.tvinciDistribution
  * @subpackage lib
  */
-class TvinciDistributionRightsFeedEngine extends DistributionEngine implements
+class TvinciDistributionFeedEngine extends DistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
@@ -12,8 +12,7 @@ class TvinciDistributionRightsFeedEngine extends DistributionEngine implements
 	IDistributionEngineCloseSubmit,
 	IDistributionEngineCloseDelete
 {
-	const TEMP_DIRECTORY = 'youtube_distribution';
-	const FEED_TEMPLATE = 'feed_template.xml';
+	const TEMP_DIRECTORY = 'tvinci_distribution';
 
 	/**
 	 * @var sftpMgr
