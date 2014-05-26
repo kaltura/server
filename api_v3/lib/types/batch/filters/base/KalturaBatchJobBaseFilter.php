@@ -88,12 +88,12 @@ abstract class KalturaBatchJobBaseFilter extends KalturaFilter
 	}
 
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $idEqual;
 
 	/**
-	 * @var int
+	 * @var bigint
 	 */
 	public $idGreaterThanOrEqual;
 

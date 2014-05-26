@@ -156,7 +156,6 @@ $objectsToTrack = array(
 			"allowMultiNotification",
 			"defThumbOffset",
 			"host",
-			"cdnHost",
 			"forceCdnHost",
 			"rtmpUrl",
 			"iisHost",

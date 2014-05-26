@@ -70,23 +70,6 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'filters'		=> array('Digits'),
 		));
 		
-		$this->addElement('select', 'urlManagerClass', array(
-			'label'			=> 'Delivery URL format :',
-			'filters'		=> array('StringTrim'),
-			'multiOptions'  => array('' => 'Kaltura Delivery URL Format',
-									'kLocalPathUrlManager' => 'Local FMS Server',
-									'kLimeLightUrlManager' => 'Lime Light CDN',
-									'kAkamaiUrlManager' => 'Akamai CDN',
-									'kLevel3UrlManager' => 'Level 3 CDN',
-									'kMirrorImageUrlManager' => 'Mirror Image CDN',
-									'kFmsUrlManager' => 'FMS Server',
-									'kUplynkUrlManager' => 'Uplynk',
-									),		
-			
-		));
-		$this->getElement('urlManagerClass')->setRegisterInArrayValidator(false);
-		 
-		
 		$this->addElement('select', 'trigger', array(
 			'label'			=> 'Trigger:',
 			'filters'		=> array('StringTrim'),
@@ -99,13 +82,6 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$readyBehavior->setLabel('Ready Behavior:');
 		$this->addElements(array($readyBehavior));
 		
-		$this->addElement('textarea', 'urlManagerParams', array(
-			'label'			=> 'URL Manager Params (JSON):',
-			'cols'			=> 48,
-			'rows'			=> 2,
-			'filters'		=> array('StringTrim'),
-		));
-				
 		$this->addDisplayGroup(array('partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'desciption'), 'general_info', array(
 			'legend' => 'General',
 		));
@@ -136,19 +112,16 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		$this->addDisplayGroup(array('urlManagerClass' ), 'playback_info', array(
-			'legend' => 'Delivery Details',
-
+		$this->addElement('text', 'deliveryProfileIds', array(
+				'label'			=> 'Delivery Profile Ids (JSON):',
+				'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addDisplayGroup ( array ('deliveryProfileIds' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
 		
 		$this->addElement('hidden', 'crossLine4', array(
-			'lable'			=> 'line',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
-		));
-		
-		$this->addDisplayGroup(array('urlManagerParams'), 'advanced', array(
-			'legend' => 'Advanced',
-
+				'lable'			=> 'line',
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
 		$displayGroups = $this->getDisplayGroups();
@@ -158,13 +131,17 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 	  		$displayGroup->removeDecorator('DtDdWrapper');
 		}
 		
+		$element = new Infra_Form_Html ( 'place_holder1', array ('content' => '<span/>' ) );
+		$this->addElement ( $element );
+		$this->addDisplayGroup ( array ('place_holder1' ), 'advanced', array ('legend' => 'Advanced' ) );
+		
 		$openLeftDisplayGroup = $this->getDisplayGroup('general_info');
-    	$openLeftDisplayGroup->setDecorators(array(
-             'FormElements',
-             'Fieldset',
-             array('HtmlTag',array('tag'=>'div','openOnly'=>true,'class'=> 'storageConfigureFormPanel'))
-    	 ));
-	
+		$openLeftDisplayGroup->setDecorators(array(
+				'FormElements',
+				'Fieldset',
+				array('HtmlTag',array('tag'=>'div','openOnly'=>true,'class'=> 'storageConfigureFormPanel'))
+		));
+		
     	$closeLeftDisplayGroup = $this->getDisplayGroup('advanced');
     	$closeLeftDisplayGroup->setDecorators(array(
              'FormElements',
@@ -189,5 +166,60 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			$this->addElementToDisplayGroup('advanced', 'flavorParamsId_' . $flavorParamsItem->id);
 		}
 
+	}
+	
+	protected function insertObject(&$res, $key, $value) {
+		if(strpos($key, ".") === FALSE) {
+			$res[$key] = intval($value);
+			return;
+		}
+		
+		list($key, $newKey) = explode(".", $key, 2);
+		if(!array_key_exists($key, $res))
+			$res[$key] = array();
+		$this->insertObject($res[$key], $newKey, $value);
+	}
+	
+	public function populateFromObject($object, $add_underscore = true) {
+		
+		parent::populateFromObject($object, $add_underscore);
+		
+		$res = array();
+		foreach($object->deliveryProfileIds as $keyValue) {
+			$this->insertObject($res, $keyValue->key, $keyValue->value);
+		}		
+		$this->getElement('deliveryProfileIds')->setValue(json_encode($res));
+		
+	}
+	
+	protected function toKeyValue(array $pairs, $prefix = '')
+	{
+		$res = array();		
+		foreach($pairs as $key => $value)
+		{
+			if(is_array($value))
+			{
+				$res = array_merge($res, $this->toKeyValue($value, "$key."));
+				continue;
+			}
+				
+			$pairObject = new Kaltura_Client_Type_KeyValue();
+			$pairObject->key = $prefix . $key;
+			$pairObject->value = $value;
+			$res[] = $pairObject;
+		}
+		return $res;
+	}
+	
+	// Creates the KalturaStorageProfile
+	public function loadObject($object, array $properties, $add_underscore = true, $include_empty_fields = false) {
+		$object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
+		
+		// Input is json, output is key-value array
+		$deliveryProfileIds = $this->getElement('deliveryProfileIds')->getValue();
+		if($deliveryProfileIds != null)
+			$object->deliveryProfileIds = $this->toKeyValue(json_decode($deliveryProfileIds, true));
+		
+		return $object;
 	}
 }

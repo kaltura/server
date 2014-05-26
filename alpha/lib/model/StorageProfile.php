@@ -29,11 +29,11 @@ class StorageProfile extends BaseStorageProfile
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
 	
 	const CUSTOM_DATA_URL_MANAGER_PARAMS = 'url_manager_params';
+	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
-	const CUSTOM_DATA_HTTPS_DELIVERY_URL ='https_delivery_url';
 	
 	/**
 	 * @var kStorageProfileScope
@@ -90,16 +90,6 @@ class StorageProfile extends BaseStorageProfile
 		$this->putInCustomData("allow_auto_delete", (bool)$v); 
 	}
 	
-    public function setRTMPPrefix ($v)
-	{
-	    $this->putInCustomData("rtmp_prefix", $v);
-	}
-	
-	public function getRTMPPrefix ()
-	{
-	    return $this->getFromCustomData("rtmp_prefix");
-	}
-	
     public function setRules ($v)
 	{
 	    $this->putInCustomData(self::CUSTOM_DATA_RULES, $v);
@@ -120,44 +110,20 @@ class StorageProfile extends BaseStorageProfile
 	    $this->putInCustomData(self::CUSTOM_DATA_CREATE_FILE_LINK, $v);
 	}
 	
-	public function getDeliveryHttpsBaseUrl()
+	
+	/* Delivery Settings */
+	
+	public function setDeliveryProfileIds($params)
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL);
+		$this->putInCustomData(self::CUSTOM_DATA_DELIVERY_IDS, $params);
 	}
 	
-	//Since the addition of configuring https base url on remote storages we need to take into consideration when to return the https base url
-	//and when to return the http. This adds this logic.
-	public function getDeliveryBaseUrlByProtocol()
+	public function getDeliveryProfileIds()
 	{
-		if (infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS && $this->getDeliveryHttpsBaseUrl())
-			return $this->getDeliveryHttpsBaseUrl();
-		
-		return $this->getDeliveryHttpBaseUrl();
-	}
-
-	public function setDeliveryHttpsBaseUrl($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_HTTPS_DELIVERY_URL, $v);
+		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
 	}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
-	
-	/* URL Manager Params */
-	
-	public function setUrlManagerParams($params)
-	{
-	    $this->putInCustomData(self::CUSTOM_DATA_URL_MANAGER_PARAMS, serialize($params));
-	}
-	
-	public function getUrlManagerParams()
-	{
-	    $params = $this->getFromCustomData(self::CUSTOM_DATA_URL_MANAGER_PARAMS);
-	    $params = unserialize($params);
-	    if (!$params) {
-	        return array();
-	    }
-	    return $params;
-	}
 	
 	/* Path Manager Params */
 	

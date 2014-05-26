@@ -268,9 +268,10 @@ class kContextDataHelper
 			{
 				$storageProfileId = $fileSync->getDc();
 				
-				$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+				$storageProfile = StorageProfilePeer::retrieveByPK();
+				$deliveryProfileRtmp = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storageProfileId, $this->entry, PlaybackProtocol::RTMP);
 				
-				if ( !$storageProfile->getDeliveryRmpBaseUrl()
+				if ( !is_null($deliveryProfileRtmp)
 					&& (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO))
 				{
 					$this->streamerType = PlaybackProtocol::HTTP;

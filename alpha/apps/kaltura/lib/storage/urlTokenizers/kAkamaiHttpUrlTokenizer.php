@@ -2,38 +2,14 @@
 class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 {
 	/**
-	 * @var int
-	 */
-	protected $window;
-
-	/**
 	 * @var string
 	 */
-	protected $param;
-
-	/**
-	 * @var string
-	 */
-	protected $salt;
+	protected $paramName;
 
 	/**
 	 * @var string
 	 */
 	protected $root_dir;
-	
-	/**
-	 * @param int $window
-	 * @param string $param
-	 * @param string $salt
-	 * @param string $root_dir
-	 */
-	public function __construct($window, $param, $salt, $root_dir)
-	{
-		$this->window = $window;
-		$this->param = $param;
-		$this->salt = $salt;
-		$this->root_dir = $root_dir;
-	}
 	
 	/**
 	 * @param string $url
@@ -44,7 +20,7 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 		$url = '/' . ltrim($url, '/');
 		if ($this->root_dir)
 			$url = rtrim($this->root_dir, '/') . $url;
-		return self::urlauth_gen_url($url, $this->param, $this->window, $this->salt, null, null);
+		return self::urlauth_gen_url($url, $this->paramName, $this->window, $this->key, null, null);
 	}
 	/**
 	 * Returns the URL path with the authorization token appended. See the
@@ -137,4 +113,35 @@ class kAkamaiHttpUrlTokenizer extends kUrlTokenizer
 		}
 		return $res;
 	}
+	
+	/**
+	 * @return the $param
+	 */
+	public function getParamName() {
+		return $this->paramName;
+	}
+
+	/**
+	 * @return the $root_dir
+	 */
+	public function getRootDir() {
+		return $this->root_dir;
+	}
+
+	/**
+	 * @param string $param
+	 */
+	public function setParamName($paramName) {
+		$this->paramName = $paramName;
+	}
+
+	/**
+	 * @param string $root_dir
+	 */
+	public function setRootDir($root_dir) {
+		$this->root_dir = $root_dir;
+	}
+
+	
+	
 }

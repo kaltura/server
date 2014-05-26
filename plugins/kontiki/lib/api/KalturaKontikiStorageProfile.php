@@ -35,7 +35,6 @@ class KalturaKontikiStorageProfile extends KalturaStorageProfile
 		}
 		
 		$dbObject->setProtocol(KontikiPlugin::getStorageProfileProtocolCoreValue(KontikiStorageProfileProtocol::KONTIKI));
-		$dbObject->setUrlManagerClass("kKontikiUrlManager");
         
 		return parent::toObject($dbObject, $props_to_skip);
 	}

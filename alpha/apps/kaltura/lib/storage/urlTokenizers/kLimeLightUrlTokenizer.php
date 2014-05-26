@@ -5,22 +5,7 @@ class kLimeLightUrlTokenizer extends kUrlTokenizer
 	 * @var string
 	 */
 	public $urlPrefix;
-
-	/**
-	 * @var string
-	 */
-	public $key;
 	
-	/**
-	 * @param string $urlPrefix
-	 * @param string $key
-	 */
-	public function __construct($urlPrefix, $key)
-	{
-		$this->urlPrefix = $urlPrefix;
-		$this->key = $key;
-	}
-
 	/**
 	 * @param string $url
 	 * @return string
@@ -42,4 +27,21 @@ class kLimeLightUrlTokenizer extends kUrlTokenizer
 		$url .= $seekParam;
 		return $url;
 	}
+	
+	/**
+	 * @return the $urlPrefix
+	 */
+	public function getUrlPrefix() {
+		return $this->urlPrefix;
+	}
+
+	/**
+	 * @param string $urlPrefix
+	 */
+	public function setUrlPrefix($urlPrefix) {
+		$this->urlPrefix = $urlPrefix;
+	}
+
+	
+	
 }
