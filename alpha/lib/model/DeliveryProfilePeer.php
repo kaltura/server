@@ -43,7 +43,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::AKAMAI_HDS => 'DeliveryProfileAkamaiHds',
 			DeliveryProfileType::AKAMAI_HTTP => 'DeliveryProfileAkamaiHttp',
 			DeliveryProfileType::AKAMAI_RTMP => 'DeliveryProfileAkamaiRtmp',
-			DeliveryProfileType::AKAMAI_RTSP => 'DeliveryProfileAkamaiRtmp',
+			DeliveryProfileType::AKAMAI_RTSP => 'DeliveryProfileAkamaiRtsp',
 			DeliveryProfileType::AKAMAI_SS => 'DeliveryProfileAkamaiSilverLight',
 					
 			DeliveryProfileType::GENERIC_HLS => 'DeliveryProfileGenericAppleHttp',
