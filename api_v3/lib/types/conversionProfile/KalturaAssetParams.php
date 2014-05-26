@@ -15,7 +15,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @readonly
+	 * @requiresPermission insert,update
 	 */
 	public $partnerId;
 	
