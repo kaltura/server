@@ -71,8 +71,9 @@ class TvinciDistributionFeedHelper
 		self::setElementByXpath($domDoc, $media, "@is_active", (($isActive == 'yes' || $isActive == 'true') ? 'true' : 'false') );
 		self::setElementByXpath($domDoc, $media, "@action", 'insert' ); // 'insert' = submit
 		
-		$feedHelper->buildBasicData($domDoc, $media, $distributionProfile, $fieldValues, $extraData);
-		$feedHelper->buildStructureData($domDoc, $media, $distributionProfile, $fieldValues, $extraData);
+		$media->appendChild( $feedHelper->createBasicElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+		$media->appendChild( $feedHelper->createStructureElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+
 		// Continue according to tvinci.xsl
 		
 // 		$feed->setNotificationEmail($fieldValues);
@@ -126,77 +127,6 @@ class TvinciDistributionFeedHelper
 		return $feedHelper;
 	}
 
-	private function buildBasicData(DOMDocument $domDoc, DOMElement $media, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
-	{
-		$basic = $domDoc->createElement("basic");
-		$media->appendChild($basic);
-
-		$lang = $fieldValues[TvinciDistributionField::LANGUAGE];
-		$basic->appendChild( self::createLangAndValueElement($domDoc, 'name', $lang, $fieldValues, TvinciDistributionField::MEDIA_TITLE) );
-		$basic->appendChild( self::createLangAndValueElement($domDoc, 'description', $lang, $fieldValues, TvinciDistributionField::MEDIA_DESCRIPTION) );
-		$basic->appendChild( self::createValueElement($domDoc, 'media_type', $fieldValues, TvinciDistributionField::MEDIA_TYPE) );
-
-		$this->addDefaultThumbnail($domDoc, $basic, $distributionProfile, $fieldValues, $extraData);
-		
-		$this->buildRulesElement($domDoc, $basic, $distributionProfile, $fieldValues, $extraData);
-		$this->buildDatesElement($domDoc, $basic, $distributionProfile, $fieldValues, $extraData);
-		$this->buildPicRatiosElement($domDoc, $basic, $distributionProfile, $fieldValues, $extraData);
-	}
-	
-	private function addDefaultThumbnail(DOMDocument $domDoc, DOMElement $basic, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
-	{
-		if ( isset($extraData['defaultThumbUrl']) )
-		{
-			$thumbnail = $domDoc->createElement("thumb");
-			self::setElementByXpath($domDoc, $thumbnail, "@url", $extraData['defaultThumbUrl']);
-			$basic->appendChild( $thumbnail );
-		}
-	}
-
-	private function buildRulesElement(DOMDocument $domDoc, DOMElement $basic, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
-	{
-		$rules = $domDoc->createElement("rules");
-		$basic->appendChild($rules);
-
-		$rules->appendChild( self::createValueElement($domDoc, 'geo_block_rule', $fieldValues, TvinciDistributionField::GEO_BLOCK_RULE) );
-		$rules->appendChild( self::createValueElement($domDoc, 'watch_per_rule', $fieldValues, TvinciDistributionField::WATCH_PERMISSIONS_RULE) );
-	}
-	
-	private function buildDatesElement(DOMDocument $domDoc, DOMElement $basic, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
-	{
-		$dates = $domDoc->createElement("dates");
-		$basic->appendChild($dates);
-
- 		$dates->appendChild( self::createDateElement($domDoc, 'create', $extraData, 'createdAt') );
- 		$dates->appendChild( self::createDateElement($domDoc, 'start', $fieldValues, TvinciDistributionField::START_DATE) );
- 		$dates->appendChild( self::createDateElement($domDoc, 'catalog_start', $fieldValues, TvinciDistributionField::CATALOG_START_DATE) );
- 		$dates->appendChild( self::createDateElement($domDoc, 'catalog_end', $fieldValues, TvinciDistributionField::CATALOG_END_DATE) );
- 		$dates->appendChild( self::createDateElement($domDoc, 'final_end', $fieldValues, TvinciDistributionField::END_DATE) );
-	}
-	
-	private function createDateElement(DOMDocument $domDoc, $fieldName, array $arr, $key)
-	{
-		$timestamp = $arr[$key];
-		$formattedDate = date(self::DATE_FORMAT, $timestamp);
-		$dateNode = $domDoc->createElement($fieldName, $formattedDate);
-		return $dateNode;
-	}
-
-	private function buildPicRatiosElement(DOMDocument $domDoc, DOMElement $basic, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
-	{
-		$picRatiosNode = $domDoc->createElement("pic_ratios");
-		$basic->appendChild($picRatiosNode);
-
-		$picRatiosArray = $extraData['picRatios'];
-		foreach ( $picRatiosArray as $picRatio )
-		{
-			$ratioNode = $domDoc->createElement("ratio");
-			self::setElementByXpath($domDoc, $ratioNode, "@url", $picRatio['url']);
-			self::setElementByXpath($domDoc, $ratioNode, "@ratio", $picRatio['ratio']);
-			$picRatiosNode->appendChild( $ratioNode );
-		}
-	}
-
 	/**
 	 * Result XML:
 	 * 	<$name>$value</$name>
@@ -217,31 +147,107 @@ class TvinciDistributionFeedHelper
 	protected static function createLangAndValueElement(DOMDocument $domDoc, $name, $lang, array $fieldValues, $fieldName)
 	{
 		$value = array_key_exists($fieldName, $fieldValues) ? $fieldValues[$fieldName] : "";
-		
+	
 		$valueNode = $domDoc->createElement('value', $value);
 		self::setElementByXpath($domDoc, $valueNode, "@lang", $lang);
-		
+	
 		$namedNode = $domDoc->createElement($name);
 		$namedNode->appendChild($valueNode);
-		
+	
 		return $namedNode;
 	}
+	
+	private function createDateElement(DOMDocument $domDoc, $fieldName, array $arr, $key)
+	{
+		$timestamp = $arr[$key];
+		$formattedDate = date(self::DATE_FORMAT, $timestamp);
+		$dateNode = $domDoc->createElement($fieldName, $formattedDate);
+		return $dateNode;
+	}
+	
+	private function createBasicElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$basicNode = $domDoc->createElement("basic");
 
-	private function buildStructureData(DOMDocument $domDoc, DOMElement $media, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+		$lang = $fieldValues[TvinciDistributionField::LANGUAGE];
+		$basicNode->appendChild( self::createLangAndValueElement($domDoc, 'name', $lang, $fieldValues, TvinciDistributionField::MEDIA_TITLE) );
+		$basicNode->appendChild( self::createLangAndValueElement($domDoc, 'description', $lang, $fieldValues, TvinciDistributionField::MEDIA_DESCRIPTION) );
+		$basicNode->appendChild( self::createValueElement($domDoc, 'media_type', $fieldValues, TvinciDistributionField::MEDIA_TYPE) );
+
+		$this->addDefaultThumbnail($domDoc, $basicNode, $distributionProfile, $fieldValues, $extraData);
+		
+		$basicNode->appendChild( $this->createRulesElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+		$basicNode->appendChild( $this->createDatesElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+		$basicNode->appendChild( $this->createPicRatiosElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+		
+		return $basicNode;
+	}
+	
+	private function addDefaultThumbnail(DOMDocument $domDoc, DOMElement $basic, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		if ( isset($extraData['defaultThumbUrl']) )
+		{
+			$thumbnail = $domDoc->createElement("thumb");
+			self::setElementByXpath($domDoc, $thumbnail, "@url", $extraData['defaultThumbUrl']);
+			$basic->appendChild( $thumbnail );
+		}
+	}
+
+	private function createRulesElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$rules = $domDoc->createElement("rules");
+
+		$rules->appendChild( self::createValueElement($domDoc, 'geo_block_rule', $fieldValues, TvinciDistributionField::GEO_BLOCK_RULE) );
+		$rules->appendChild( self::createValueElement($domDoc, 'watch_per_rule', $fieldValues, TvinciDistributionField::WATCH_PERMISSIONS_RULE) );
+		
+		return $rules;
+	}
+	
+	private function createDatesElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$dates = $domDoc->createElement("dates");
+
+ 		$dates->appendChild( self::createDateElement($domDoc, 'create', $extraData, 'createdAt') );
+ 		$dates->appendChild( self::createDateElement($domDoc, 'start', $fieldValues, TvinciDistributionField::START_DATE) );
+ 		$dates->appendChild( self::createDateElement($domDoc, 'catalog_start', $fieldValues, TvinciDistributionField::CATALOG_START_DATE) );
+ 		$dates->appendChild( self::createDateElement($domDoc, 'catalog_end', $fieldValues, TvinciDistributionField::CATALOG_END_DATE) );
+ 		$dates->appendChild( self::createDateElement($domDoc, 'final_end', $fieldValues, TvinciDistributionField::END_DATE) );
+ 		
+ 		return $dates;
+	}
+
+	private function createPicRatiosElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$picRatiosNode = $domDoc->createElement("pic_ratios");
+
+		$picRatiosArray = $extraData['picRatios'];
+		foreach ( $picRatiosArray as $picRatio )
+		{
+			$ratioNode = $domDoc->createElement("ratio");
+			self::setElementByXpath($domDoc, $ratioNode, "@url", $picRatio['url']);
+			self::setElementByXpath($domDoc, $ratioNode, "@ratio", $picRatio['ratio']);
+			$picRatiosNode->appendChild( $ratioNode );
+		}
+		
+		return $picRatiosNode;
+	}
+
+	private function createStructureElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
 	{
 		$structure = $domDoc->createElement("structure");
-		$media->appendChild($structure);
 	
-// 		$lang = $fieldValues[TvinciDistributionField::LANGUAGE];
-// 		$structure->appendChild( self::createLangAndValueElement($domDoc, 'name', $lang, $fieldValues, TvinciDistributionField::MEDIA_TITLE) );
-// 		$structure->appendChild( self::createLangAndValueElement($domDoc, 'description', $lang, $fieldValues, TvinciDistributionField::MEDIA_DESCRIPTION) );
-// 		$structure->appendChild( self::createValueElement($domDoc, 'media_type', $fieldValues, TvinciDistributionField::MEDIA_TYPE) );
-	
-// 		$this->addDefaultThumbnail($domDoc, $structure, $distributionProfile, $fieldValues, $extraData);
-	
-// 		$this->buildRulesElement($domDoc, $structure, $distributionProfile, $fieldValues, $extraData);
-// 		$this->buildDatesElement($domDoc, $structure, $distributionProfile, $fieldValues, $extraData);
-// 		$this->buildPicRatiosElement($domDoc, $structure, $distributionProfile, $fieldValues, $extraData);
+ 		$structure->appendChild( $this->createStringsElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+//  		$this->createBooleansElement($domDoc, $distributionProfile, $fieldValues, $extraData);
+//  		$this->createDoublesElement($domDoc, $distributionProfile, $fieldValues, $extraData);
+
+ 		return $structure;
+	}
+
+	private function createStringsElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$strings = $domDoc->createElement("strings");
+		
+		return $strings;
 	}
 
 // 	public static function initializeDefaultSubmitFeed(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)
