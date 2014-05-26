@@ -123,7 +123,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	public function setTokenizer($newObject)
 	{
-		if ($newObject instanceof kUrlTokenizer)
+		if(is_null($newObject)) {
+			parent::setTokenizer(null);
+		}
+		else if ($newObject instanceof kUrlTokenizer)
 		{
 			$serializedObject = serialize($newObject);
 			parent::setTokenizer($serializedObject);
