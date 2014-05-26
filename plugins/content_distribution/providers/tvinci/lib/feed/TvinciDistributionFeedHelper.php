@@ -73,6 +73,7 @@ class TvinciDistributionFeedHelper
 		
 		$media->appendChild( $feedHelper->createBasicElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
 		$media->appendChild( $feedHelper->createStructureElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+		$media->appendChild( $feedHelper->createFilesElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
 
 		// Continue according to tvinci.xsl
 		
@@ -144,10 +145,8 @@ class TvinciDistributionFeedHelper
 	 * 		<value lang="$lang">$value</value>
 	 * 	</$name>
 	 */
-	protected static function createLangAndValueElement(DOMDocument $domDoc, $name, $lang, array $fieldValues, $fieldName)
+	protected static function createValueWithLangElement(DOMDocument $domDoc, $name, $value, $lang)
 	{
-		$value = array_key_exists($fieldName, $fieldValues) ? $fieldValues[$fieldName] : "";
-	
 		$valueNode = $domDoc->createElement('value', $value);
 		self::setElementByXpath($domDoc, $valueNode, "@lang", $lang);
 	
@@ -155,6 +154,19 @@ class TvinciDistributionFeedHelper
 		$namedNode->appendChild($valueNode);
 	
 		return $namedNode;
+	}
+	
+	/**
+	 * Result XML:
+	 * 	<$name>
+	 * 		<value lang="$lang">$value</value>
+	 * 	</$name>
+	 */
+	protected static function createValueWithLangElementFromAssocArray(DOMDocument $domDoc, $name, $lang, array $arr, $key)
+	{
+		$value = array_key_exists($key, $arr) ? $arr[$key] : "";
+	
+		return self::createValueWithLangElement($domDoc, $name, $value, $lang);
 	}
 	
 	private function createDateElement(DOMDocument $domDoc, $fieldName, array $arr, $key)
@@ -165,13 +177,49 @@ class TvinciDistributionFeedHelper
 		return $dateNode;
 	}
 	
+	private function createMetadataElement(DOMDocument $domDoc, $name, array $arr, $key)
+	{
+		$metaNode = self::createValueElement($domDoc, "meta", $arr, $key);
+		
+		self::setElementByXpath($domDoc, $metaNode, "@name", $name);
+		
+		return $metaNode;
+	}
+	
+	private function createMetadataWithLangElement(DOMDocument $domDoc, $name, $lang, array $arr, $key)
+	{
+		$metaNode = self::createValueWithLangElementFromAssocArray($domDoc, "meta", $lang, $arr, $key);
+		
+		self::setElementByXpath($domDoc, $metaNode, "@name", $name);
+		self::setElementByXpath($domDoc, $metaNode, "@ml_handling", "unique");
+		
+		return $metaNode;
+	}
+	
+	private function createMetadataContainerWithLangElement(DOMDocument $domDoc, $name, $lang, array $arr, $key)
+	{
+		$multivalField = $arr[$key];
+		$multivalArr = explode(',', $multivalField);
+		
+		$metaNode = $domDoc->createElement('meta');
+		self::setElementByXpath($domDoc, $metaNode, "@name", $name);
+		self::setElementByXpath($domDoc, $metaNode, "@ml_handling", "unique");
+		
+		foreach ( $multivalArr as $val )
+		{
+			$metaNode->appendChild( self::createValueWithLangElement($domDoc, 'container', $val, $lang) );
+		}
+		
+		return $metaNode;
+	}
+	
 	private function createBasicElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
 	{
 		$basicNode = $domDoc->createElement("basic");
 
 		$lang = $fieldValues[TvinciDistributionField::LANGUAGE];
-		$basicNode->appendChild( self::createLangAndValueElement($domDoc, 'name', $lang, $fieldValues, TvinciDistributionField::MEDIA_TITLE) );
-		$basicNode->appendChild( self::createLangAndValueElement($domDoc, 'description', $lang, $fieldValues, TvinciDistributionField::MEDIA_DESCRIPTION) );
+		$basicNode->appendChild( self::createValueWithLangElementFromAssocArray($domDoc, 'name', $lang, $fieldValues, TvinciDistributionField::MEDIA_TITLE) );
+		$basicNode->appendChild( self::createValueWithLangElementFromAssocArray($domDoc, 'description', $lang, $fieldValues, TvinciDistributionField::MEDIA_DESCRIPTION) );
 		$basicNode->appendChild( self::createValueElement($domDoc, 'media_type', $fieldValues, TvinciDistributionField::MEDIA_TYPE) );
 
 		$this->addDefaultThumbnail($domDoc, $basicNode, $distributionProfile, $fieldValues, $extraData);
@@ -224,7 +272,7 @@ class TvinciDistributionFeedHelper
 		foreach ( $picRatiosArray as $picRatio )
 		{
 			$ratioNode = $domDoc->createElement("ratio");
-			self::setElementByXpath($domDoc, $ratioNode, "@url", $picRatio['url']);
+			self::setElementByXpath($domDoc, $ratioNode, "@thumb", $picRatio['url']);
 			self::setElementByXpath($domDoc, $ratioNode, "@ratio", $picRatio['ratio']);
 			$picRatiosNode->appendChild( $ratioNode );
 		}
@@ -237,8 +285,9 @@ class TvinciDistributionFeedHelper
 		$structure = $domDoc->createElement("structure");
 	
  		$structure->appendChild( $this->createStringsElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
-//  		$this->createBooleansElement($domDoc, $distributionProfile, $fieldValues, $extraData);
-//  		$this->createDoublesElement($domDoc, $distributionProfile, $fieldValues, $extraData);
+ 		$structure->appendChild( $this->createBooleansElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+ 		$structure->appendChild( $this->createDoublesElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
+ 		$structure->appendChild( $this->createMetasElement($domDoc, $distributionProfile, $fieldValues, $extraData) );
 
  		return $structure;
 	}
@@ -247,7 +296,82 @@ class TvinciDistributionFeedHelper
 	{
 		$strings = $domDoc->createElement("strings");
 		
+		$lang = $fieldValues[TvinciDistributionField::LANGUAGE];
+
+		$strings->appendChild( $this->createMetadataWithLangElement($domDoc, 'Runtime', $lang, $fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
+		$strings->appendChild( $this->createMetadataWithLangElement($domDoc, 'Release date', $lang, $fieldValues, TvinciDistributionField::METADATA_RELEASE_DATE) );
+		
 		return $strings;
+	}
+
+	private function createBooleansElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$booleans = $domDoc->createElement("booleans");
+		
+		return $booleans;
+	}
+
+	private function createDoublesElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$doubles = $domDoc->createElement("doubles");
+		
+		$doubles->appendChild( $this->createMetadataElement($domDoc, 'Release year', $fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
+		
+		return $doubles;
+	}
+
+	private function createMetasElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$metas = $domDoc->createElement("metas");
+
+		$lang = $fieldValues[TvinciDistributionField::LANGUAGE];
+
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Rating', $lang, $fieldValues, TvinciDistributionField::METADATA_RATING) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Country', $lang, $fieldValues, TvinciDistributionField::METADATA_COUNTRY) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Director', $lang, $fieldValues, TvinciDistributionField::METADATA_DIRECTOR) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Audio language', $lang, $fieldValues, TvinciDistributionField::METADATA_AUDIO_LANGUAGE) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Genre', $lang, $fieldValues, TvinciDistributionField::METADATA_GENRE) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Sub genre', $lang, $fieldValues, TvinciDistributionField::METADATA_SUB_GENRE) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Studio', $lang, $fieldValues, TvinciDistributionField::METADATA_STUDIO) );
+		$metas->appendChild( $this->createMetadataContainerWithLangElement($domDoc, 'Cast', $lang, $fieldValues, TvinciDistributionField::METADATA_CAST) );
+		
+		return $metas;
+	}
+	
+	private function createFilesElement(DOMDocument $domDoc, KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	{
+		$files = $domDoc->createElement("files");
+
+		if ( isset($extraData['assetInfo']) && is_array($extraData['assetInfo']) )
+		{
+			foreach ( $extraData['assetInfo'] as $videoAssetFieldName => $assetInfo )
+			{
+				$files->appendChild( $this->createFileElement($domDoc, $videoAssetFieldName, $assetInfo) );
+			}
+		}
+
+ 		return $files;
+	}
+
+	private function createFileElement($domDoc, $videoAssetFieldName, $assetInfo)
+	{
+		$videoAssetFieldToNameMap = array(
+				TvinciDistributionField::VIDEO_ASSET_MAIN => 			'Main',
+				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN => 	'Tablet Main',
+				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN => 'Smartphone Main',
+		);
+		
+		$fileNode = $domDoc->createElement("file");
+		
+		$fieldName = $videoAssetFieldToNameMap[$videoAssetFieldName];
+		self::setElementByXpath($domDoc, $fileNode, "@type", $fieldName);
+		self::setElementByXpath($domDoc, $fileNode, "@quality", "HIGH");
+		self::setElementByXpath($domDoc, $fileNode, "@handling_type", "CLIP");
+		self::setElementByXpath($domDoc, $fileNode, "@cdn_name", "Default CDN");
+		self::setElementByXpath($domDoc, $fileNode, "@cdn_code", $assetInfo['url']);
+		self::setElementByXpath($domDoc, $fileNode, "@co_guid", $assetInfo['name']);
+
+		return $fileNode;
 	}
 
 // 	public static function initializeDefaultSubmitFeed(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $videoFilePath, $thumbnailFilePath, $captionAssetIds)

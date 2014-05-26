@@ -122,8 +122,7 @@ KalturaLog::log(">>> KalturaTvinciDistributionJobProviderData c'tor");
 // 			if(kFileSyncUtils::fileSync_exists($syncKey))
 // 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			
-			$thumbDownloadUrl = $thumbAsset->getDownloadUrlWithExpiry( self::DUR_24_HOURS_IN_SECS );
-			$thumbDownloadUrl .= '/f/' . $thumbAsset->getId() . '.' . $thumbAsset->getFileExt();
+			$thumbDownloadUrl = $this->getAssetDownloadUrl( $thumbAsset );
 			
 			$ratio = KDLVideoAspectRatio::ConvertFrameSize($thumbAsset->getWidth(), $thumbAsset->getHeight());
 			
@@ -143,6 +142,18 @@ KalturaLog::log(">>> KalturaTvinciDistributionJobProviderData c'tor");
 		{
 			// Choose the URL of the first resource in the array
 			$extraData['defaultThumbUrl'] = $picRatios[0]['url'];
+		}
+
+		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
+		$assetInfo = array();
+		foreach ( $flavorAssets as $flavorAsset )
+		{
+			$this->updateFlavorAssetInfo($assetInfo, $flavorAsset, $fieldValues);
+		}
+		
+		if ( count($assetInfo) )
+		{
+			$extraData['assetInfo'] = $assetInfo;			
 		}
 
 /*		
@@ -225,6 +236,17 @@ throw new Exception(">>> distributionJobData: " . print_r($distributionJobData,t
 // 		$partnerId = $distributionJobData->distributionProfile->partnerId;
 // 		$distributionProfileId = $distributionJobData->distributionProfile->id;
 	}
+	
+	private function updateFlavorAssetInfo(array &$assetInfo, $flavorAsset, $fieldValues)
+	{
+		$assetFlavorParams = assetParamsPeer::retrieveByPK( $flavorAsset->getFlavorParamsId() );
+		$assetFlavorParamsName = $assetFlavorParams->getName();
+
+		$videoAssetFields = array(
+				TvinciDistributionField::VIDEO_ASSET_MAIN,
+				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN,
+				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN,
+			);
 		
 	private static $map_between_objects = array
 	(
