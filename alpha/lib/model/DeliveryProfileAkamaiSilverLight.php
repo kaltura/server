@@ -23,7 +23,7 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 	
 	private function doGetServeIsmUrl(FileSync $fileSync, $partnerPath, StorageProfile $storage = null)
 	{
-		$serverUrl = myPartnerUtils::getIisHost($fileSync->getPartnerId(), "http");
+		$serverUrl = $this->getUrl();
 		
 		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE) {
 			$path = $partnerPath;

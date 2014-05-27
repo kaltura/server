@@ -94,7 +94,7 @@ class kmc4Action extends kalturaAction
 
 		$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
 		$this->cdn_host = $this->stripProtocol( $this->cdn_url );
-		$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
+		$this->rtmp_host = kConf::get("rtmp_url");
 		$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
 
 		/** set payingPartner flag **/

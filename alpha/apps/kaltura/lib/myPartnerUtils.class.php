@@ -358,19 +358,6 @@ class myPartnerUtils
 		return $thumbHost;
 	}
 	
-	// if the cdnHost of the partner is false or null or an empty string - ignore it	
-	public static function getRtmpUrl ( $partner_id )
-	{
-		return requestUtils::getRtmpUrl();
-	}
-	
-	// if the iis Host of the partner is false or null or an empty string - ignore it	
-	public static function getIisHost ( $partner_id, $protocol = 'http' )
-	{
-		return requestUtils::getIisHost($protocol);
-	}
-	
-	
 	// TODO - cleanup !!	
 	/**
 	 * Will determine the conversion string for the entry id.

@@ -115,7 +115,7 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 //				$this->params->setResponseFormat('f4m');
 //		 		
 //		 		$protocol = $this->params->getMediaProtocol();
-//		 		$baseUrl = myPartnerUtils::getCdnHost($entry->getPartnerId(), $protocol);
+		 		$baseUrl = $this->getUrl();
 //			
 //				$parameters = array_merge(requestUtils::getRequestParams(), array(
 //					'protocol' => $protocol,

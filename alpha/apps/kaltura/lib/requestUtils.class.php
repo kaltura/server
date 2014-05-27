@@ -100,16 +100,6 @@ class requestUtils extends infraRequestUtils
 		return "$protocol://" . kConf::get('cdn_api_host');
 	}
 	
-	public static function getRtmpUrl ( )
-	{
-		return kConf::get("rtmp_url");
-	}
-	
-	public static function getIisHost ($protocol = 'http')
-	{
-		return "$protocol://".kConf::get("iis_host");
-	}
-	
 	// TODO - see how can rewrite better code for the doc-root of the application !!
 	public static function  getWebRootUrl( $include_host = true )
 	{

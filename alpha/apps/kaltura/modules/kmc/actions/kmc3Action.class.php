@@ -64,7 +64,7 @@ class kmc3Action extends kalturaAction
 	$this->host = str_replace ( "http://" , "" , $this->service_url );
 	$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
 	$this->cdn_host = str_replace ( "http://" , "" , $this->cdn_url );
-	$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
+	$this->rtmp_host = kConf::get("rtmp_url");
 	$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
 		
 	/** set embed_code value **/

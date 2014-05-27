@@ -388,6 +388,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $id, $protocol);
 				if($urlManager) 
 					return $urlManager->isLive($url);
+				break;
 				
 			case KalturaPlaybackProtocol::HDS:
 			case KalturaPlaybackProtocol::AKAMAI_HDS:
