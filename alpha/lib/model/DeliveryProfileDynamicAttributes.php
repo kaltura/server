@@ -371,6 +371,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();
 		$this->storageId = $newObj->getStorageId();
+		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
 		$this->flavorAssets = $newObj->getFlavorAssets();
 		$this->remoteFileSyncs = $newObj->getRemoteFileSyncs();
@@ -378,6 +379,8 @@ class DeliveryProfileDynamicAttributes {
 		$this->preferredBitrate = $newObj->getPreferredBitrate();
 		$this->responseFormat = $newObj->getResponseFormat();
 		$this->mediaProtocol = $newObj->getMediaProtocol();
+		$this->usePlayServer = $newObj->getUsePlayServer();
+		$this->playerConfig = $newObj->getPlayerConfig();
 	}
 }
 
