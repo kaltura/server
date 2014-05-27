@@ -126,7 +126,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$partnerId = $entry->getPartnerId();
 		$playServerHost = myPartnerUtils::getPlayServerHost($partnerId, $this->params->getMediaProtocol());
 		
-		$url = "$playServerHost/manifest/master";
+		$url = "$playServerHost/manifest/master/entryId/$entryId";
 		if(count($this->params->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
