@@ -238,6 +238,7 @@ class KImageMagickCropper extends KBaseCropper
 					elseif ($h < $w)
 					{
 						$ratio = round($w / $h, 3);
+						//in case vertical image - height reduces by w/h ratio
 						if ($orientation == 6 || $orientation == 8)
 						{
 							$resizeHeight = $this->srcHeight / $ratio;
