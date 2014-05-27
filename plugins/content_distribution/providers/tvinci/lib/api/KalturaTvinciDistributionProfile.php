@@ -8,17 +8,17 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	/**
 	 * @var string
 	 */
+	public $ingestUrl;
+	
+	/**
+	 * @var string
+	 */
 	public $username;
 
 	/**
 	 * @var string
 	 */
 	public $password;
-	
-	/**
-	 * @var string
-	 */
-	public $ingestUrl;
 	
 // 	/**
 // 	 * @var string
@@ -219,9 +219,9 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	private static $map_between_objects = array 
 	(
 // 		'feedSpecVersion',
+		'ingestUrl',
 		'username',
 		'password',
-		'ingestUrl',
 // 		'broadcasterName',
 // 		'sftpHost',
 // 		'sftpPort',

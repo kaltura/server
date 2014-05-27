@@ -74,7 +74,6 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
-KalturaLog::log(">>> KalturaTvinciDistributionJobProviderData c'tor");
 		parent::__construct($distributionJobData);
 	    
 		if(!$distributionJobData)
@@ -211,7 +210,7 @@ Kaltura::log(">>> entry: " . print_r($entry,true));
 		{
 			$feed = TvinciDistributionFeedHelper::initializeDefaultSubmitFeed($distributionJobData->distributionProfile, $fieldValues, $extraData);//, $videoFilePath, $thumbnailFilePath, $captionAssetIds);
 			$this->submitXml = $feed->getXml();
-throw new Exception(">>> distributionJobData: " . print_r($distributionJobData,true) . "\nfieldValues: " . print_r($fieldValues,true) . "\nsubmitXml: {$this->submitXml}");
+KalturaLog::log(">>> distributionJobData: " . print_r($distributionJobData,true) . "\nfieldValues: " . print_r($fieldValues,true) . "\nsubmitXml: {$this->submitXml}");
 		}
 // 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 // 		{
@@ -242,12 +241,39 @@ throw new Exception(">>> distributionJobData: " . print_r($distributionJobData,t
 		$assetFlavorParams = assetParamsPeer::retrieveByPK( $flavorAsset->getFlavorParamsId() );
 		$assetFlavorParamsName = $assetFlavorParams->getName();
 
-		$videoAssetFields = array(
+		$videoAssetFieldNames = array(
 				TvinciDistributionField::VIDEO_ASSET_MAIN,
 				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN,
 				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN,
 			);
 		
+		foreach ( $videoAssetFieldNames as $videoAssetFieldName )
+		{
+			if ( isset($fieldValues[$videoAssetFieldName]) )
+			{
+				$configFlavorParamName = $fieldValues[$videoAssetFieldName];
+				
+				if ( $configFlavorParamName == $assetFlavorParamsName )
+				{
+					$assetInfo[$videoAssetFieldName] = array(
+							'url' => $this->getAssetDownloadUrl($flavorAsset),
+							'name' => $assetFlavorParamsName,
+						);
+					
+					// Note: instead of 'break'ing here, we'll continue to loop in case
+					//       the same flavor asset is required by other $videoAssetField
+				}
+			} 
+		}
+	}
+	
+	private function getAssetDownloadUrl($asset)
+	{
+		$downloadUrl = $asset->getDownloadUrlWithExpiry( self::DUR_24_HOURS_IN_SECS );
+		$downloadUrl .= '/f/' . $asset->getId() . '.' . $asset->getFileExt();
+		return $downloadUrl;
+	}
+
 	private static $map_between_objects = array
 	(
 // 		"videoAssetFilePath",

@@ -12,12 +12,12 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	IDistributionEngineCloseSubmit,
 	IDistributionEngineCloseDelete
 {
-	const TEMP_DIRECTORY = 'tvinci_distribution';
+// 	const TEMP_DIRECTORY = 'tvinci_distribution';
 
-	/**
-	 * @var sftpMgr
-	 */
-	protected $_sftpManager;
+// 	/**
+// 	 * @var sftpMgr
+// 	 */
+// 	protected $_sftpManager;
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
@@ -40,44 +40,44 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
+// 		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 
-		if ($statusXml === false) // no status yet
-		{
-			// try to get batch status xml to see if there is an internal error on youtube's batch
-			$batchStatus = $this->fetchBatchStatus($data, $data->distributionProfile, $data->providerData);
-			if ($batchStatus)
-				throw new Exception('Internal failure on Tvinci, internal_failure-status.xml was found. Error ['.$batchStatus.']');
+// 		if ($statusXml === false) // no status yet
+// 		{
+// 			// try to get batch status xml to see if there is an internal error on youtube's batch
+// 			$batchStatus = $this->fetchBatchStatus($data, $data->distributionProfile, $data->providerData);
+// 			if ($batchStatus)
+// 				throw new Exception('Internal failure on Tvinci, internal_failure-status.xml was found. Error ['.$batchStatus.']');
 
-			return false; // return false to recheck again on next job closing iteration
-		}
+// 			return false; // return false to recheck again on next job closing iteration
+// 		}
 			
-		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Submit reference');
+// 		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
+// 		$status = $statusParser->getStatusForAction('Submit reference');
 
-		// maybe we didn't submit a reference, so let's check the file status
-		if (!$status)
-			$status = $statusParser->getStatusForAction('Process file');
+// 		// maybe we didn't submit a reference, so let's check the file status
+// 		if (!$status)
+// 			$status = $statusParser->getStatusForAction('Process file');
 
-		if ($status != 'Success')
-		{
-			$errors = $statusParser->getErrorsSummary();
-			throw new Exception('Distribution failed with status ['.$status.'] and errors ['.implode(',', $errors).']');
-		}
+// 		if ($status != 'Success')
+// 		{
+// 			$errors = $statusParser->getErrorsSummary();
+// 			throw new Exception('Distribution failed with status ['.$status.'] and errors ['.implode(',', $errors).']');
+// 		}
 			
-		$referenceId = $statusParser->getReferenceId();
-		$assetId = $statusParser->getAssetId();
-		$videoId = $statusParser->getVideoId();
+// 		$referenceId = $statusParser->getReferenceId();
+// 		$assetId = $statusParser->getAssetId();
+// 		$videoId = $statusParser->getVideoId();
 
-		$remoteIdHandler = new TvinciDistributionRemoteIdHandler();
-		$remoteIdHandler->setVideoId($videoId);
-		$remoteIdHandler->setAssetId($assetId);
-		$remoteIdHandler->setReferenceId($referenceId);
-		$data->remoteId = $remoteIdHandler->getSerialized();
+// 		$remoteIdHandler = new TvinciDistributionRemoteIdHandler();
+// 		$remoteIdHandler->setVideoId($videoId);
+// 		$remoteIdHandler->setAssetId($assetId);
+// 		$remoteIdHandler->setReferenceId($referenceId);
+// 		$data->remoteId = $remoteIdHandler->getSerialized();
 
-		$providerData = $data->providerData;
-		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
-		$providerData->currentPlaylists = $newPlaylists;
+// 		$providerData = $data->providerData;
+// 		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
+// 		$providerData->currentPlaylists = $newPlaylists;
 			
 		return true;
 	}
@@ -103,18 +103,18 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
-		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
+// 		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 
-		if ($statusXml === false) // no status yet
-			return false;
+// 		if ($statusXml === false) // no status yet
+// 			return false;
 			
-		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Remove video');
-		if (is_null($status))
-			throw new Exception('Status could not be found after deletion request');
+// 		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
+// 		$status = $statusParser->getStatusForAction('Remove video');
+// 		if (is_null($status))
+// 			throw new Exception('Status could not be found after deletion request');
 		
-		if ($status != 'Success')
-			throw new Exception('Delete failed with status ['.$status.']');
+// 		if ($status != 'Success')
+// 			throw new Exception('Delete failed with status ['.$status.']');
 			
 		return true;
 	}
@@ -140,25 +140,25 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
+// 		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 
-		if ($statusXml === false) // no status yet
-			return false;
+// 		if ($statusXml === false) // no status yet
+// 			return false;
 			
-		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
-		$status = $statusParser->getStatusForAction('Update video');
-		if (is_null($status))
-			throw new Exception('Status could not be found after distribution update');
+// 		$statusParser = new TvinciDistributionRightsFeedLegacyStatusParser($statusXml);
+// 		$status = $statusParser->getStatusForAction('Update video');
+// 		if (is_null($status))
+// 			throw new Exception('Status could not be found after distribution update');
 		
-		if ($status != 'Success')
-			throw new Exception('Update failed with status ['.$status.']');
+// 		if ($status != 'Success')
+// 			throw new Exception('Update failed with status ['.$status.']');
 
-		$remoteIdHandler = TvinciDistributionRemoteIdHandler::initialize($data->remoteId);
-		$videoId = $remoteIdHandler->getVideoId();
+// 		$remoteIdHandler = TvinciDistributionRemoteIdHandler::initialize($data->remoteId);
+// 		$videoId = $remoteIdHandler->getVideoId();
 
-		$providerData = $data->providerData;
-		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
-		$providerData->currentPlaylists = implode(',',$newPlaylists);
+// 		$providerData = $data->providerData;
+// 		$newPlaylists = $this->syncPlaylists($videoId, $providerData);
+// 		$providerData->currentPlaylists = implode(',',$newPlaylists);
 
 		return true;
 	}
@@ -178,35 +178,45 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
-		$videoFilePath = $providerData->videoAssetFilePath;
-		$thumbnailFilePath = $providerData->thumbAssetFilePath;
-		$captionAssetsids = $providerData->captionAssetIds;
+// 		$videoFilePath = $providerData->videoAssetFilePath;
+// 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+// 		$captionAssetsids = $providerData->captionAssetIds;
 		
-		if (!$videoFilePath)
-			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
+// 		if (!$videoFilePath)
+// 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
-		if (!file_exists($videoFilePath))
-			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
+// 		if (!file_exists($videoFilePath))
+// 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->submitXml);
-		$data->sentData = $providerData->submitXml;
-		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
+		$url = $distributionProfile->ingestUrl;
+		$xml = $providerData->submitXml;
+		KalturaLog::info("Submitting Tvinci data to URL: $url\nXML data:\n$xml");
 
-		// upload the video
-		$videoSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($videoFilePath, PATHINFO_BASENAME);
-		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
+		$options = array( 'post_data' => $xml, 'full_response' => true );
+ 		$response = KCurlWrapper::getContent($url, $options);
+ 		KalturaLog::debug("Tvinci Response: " . print_r($response,true));
+ 		
+//  		throw new Exception( "TODO: KCurlWrapper::getContent(ingest url, xml as post data);" );
 
-		// upload the thumbnail if exists
-		if (file_exists($thumbnailFilePath))
-		{
-			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
-			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
-		}
+// 		$sftpManager = $this->getSFTPManager($distributionProfile);
+// 		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->submitXml);
+// 		$data->sentData = $providerData->submitXml;
+// 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
+
+// 		// upload the video
+// 		$videoSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($videoFilePath, PATHINFO_BASENAME);
+// 		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
+
+// 		// upload the thumbnail if exists
+// 		if (file_exists($thumbnailFilePath))
+// 		{
+// 			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
+// 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
+// 		}
 		
-		$this->addCaptions($providerData, $sftpManager, $data);
+// 		$this->addCaptions($providerData, $sftpManager, $data);
 
-		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
+// 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
 	/**
@@ -216,12 +226,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->deleteXml);
-		$data->sentData = $providerData->deleteXml;
-		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
+		throw new Exception("handleDelete - not implemented yet");
+// 		$sftpManager = $this->getSFTPManager($distributionProfile);
+// 		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->deleteXml);
+// 		$data->sentData = $providerData->deleteXml;
+// 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
-		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
+// 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
 	/**
@@ -231,220 +242,221 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
-		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+		throw new Exception("handleUpdate - not implemented yet");
+// 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->updateXml);
-		$data->sentData = $providerData->updateXml;
-		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
+// 		$sftpManager = $this->getSFTPManager($distributionProfile);
+// 		$sftpManager->filePutContents($providerData->sftpDirectory.'/'.$providerData->sftpMetadataFilename, $providerData->updateXml);
+// 		$data->sentData = $providerData->updateXml;
+// 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
-		// upload the thumbnail if exists
-		if (file_exists($thumbnailFilePath))
-		{
-			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
-			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
-		}
+// 		// upload the thumbnail if exists
+// 		if (file_exists($thumbnailFilePath))
+// 		{
+// 			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
+// 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
+// 		}
 
-		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
+// 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
-	protected function getFilePath( $asset, $entryId )
-	{
-		$filter = new KalturaFileSyncFilter();
-		$filter->orderBy = '-version';
-		$filter->fileObjectTypeEqual = KalturaFileSyncObjectType::ASSET;
-		$filter->objectIdEqual = $asset->id;
-		$filter->objectSubTypeEqual = 1;
-		$filter->statusEqual = KalturaFileSyncStatus::READY;
-		$filter->entryIdEqual = $entryId;
-		$filter->currentDc = KalturaNullableBoolean::TRUE_VALUE;
+// 	protected function getFilePath( $asset, $entryId )
+// 	{
+// 		$filter = new KalturaFileSyncFilter();
+// 		$filter->orderBy = '-version';
+// 		$filter->fileObjectTypeEqual = KalturaFileSyncObjectType::ASSET;
+// 		$filter->objectIdEqual = $asset->id;
+// 		$filter->objectSubTypeEqual = 1;
+// 		$filter->statusEqual = KalturaFileSyncStatus::READY;
+// 		$filter->entryIdEqual = $entryId;
+// 		$filter->currentDc = KalturaNullableBoolean::TRUE_VALUE;
 		
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1;
-		$pager->pageIndex = 1;
+// 		$pager = new KalturaFilterPager();
+// 		$pager->pageSize = 1;
+// 		$pager->pageIndex = 1;
 		
-		$filesyncPlugin = KalturaFilesyncClientPlugin::get( KBatchBase::$kClient );
-		$result = $filesyncPlugin->fileSync->listAction($filter, $pager);
-		if ( ! empty( $result->objects ) )
-		{
-			$fileSync = $result->objects[0];
-			return $fileSync->fileRoot . $fileSync->filePath;
-		}
+// 		$filesyncPlugin = KalturaFilesyncClientPlugin::get( KBatchBase::$kClient );
+// 		$result = $filesyncPlugin->fileSync->listAction($filter, $pager);
+// 		if ( ! empty( $result->objects ) )
+// 		{
+// 			$fileSync = $result->objects[0];
+// 			return $fileSync->fileRoot . $fileSync->filePath;
+// 		}
 
-		return "";
-	}
+// 		return "";
+// 	}
 	
-	protected function addCaptions(KalturaTvinciDistributionJobProviderData $providerData, $sftpManager, KalturaDistributionJobData $data)
-	{
-		if ( $providerData->captionAssetIds == "" ) 
-			return;
+// 	protected function addCaptions(KalturaTvinciDistributionJobProviderData $providerData, $sftpManager, KalturaDistributionJobData $data)
+// 	{
+// 		if ( $providerData->captionAssetIds == "" ) 
+// 			return;
 	
-		$entryId = $data->entryDistribution->entryId;
-		$filter = new KalturaAssetFilter();
-		$filter->idIn = $providerData->captionAssetIds;
-		$filter->entryIdEqual = $entryId;
-		KBatchBase::impersonate($data->entryDistribution->partnerId);
+// 		$entryId = $data->entryDistribution->entryId;
+// 		$filter = new KalturaAssetFilter();
+// 		$filter->idIn = $providerData->captionAssetIds;
+// 		$filter->entryIdEqual = $entryId;
+// 		KBatchBase::impersonate($data->entryDistribution->partnerId);
 		
-		try{
-			$captionPlugin = KalturaCaptionClientPlugin::get( KBatchBase::$kClient );
-			$result = $captionPlugin->captionAsset->listAction( $filter );
-		}
-		catch(Exception $e){
-			KBatchBase::unimpersonate();
-			throw $e;
-		}
+// 		try{
+// 			$captionPlugin = KalturaCaptionClientPlugin::get( KBatchBase::$kClient );
+// 			$result = $captionPlugin->captionAsset->listAction( $filter );
+// 		}
+// 		catch(Exception $e){
+// 			KBatchBase::unimpersonate();
+// 			throw $e;
+// 		}
 		
-		KBatchBase::unimpersonate();
+// 		KBatchBase::unimpersonate();
 	
-		foreach ($result->objects as $asset)
-		{
-			if ( $asset instanceof KalturaCaptionAsset )
-			{
-				$captionFilePath = $this->getFilePath($asset, $entryId);
-				if (file_exists($captionFilePath))
-				{
-					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
-					$sftpManager->putFile($captionSFTPPath, $captionFilePath);
-				}
-			}
-		}
-	}
+// 		foreach ($result->objects as $asset)
+// 		{
+// 			if ( $asset instanceof KalturaCaptionAsset )
+// 			{
+// 				$captionFilePath = $this->getFilePath($asset, $entryId);
+// 				if (file_exists($captionFilePath))
+// 				{
+// 					$captionSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($captionFilePath, PATHINFO_BASENAME);
+// 					$sftpManager->putFile($captionSFTPPath, $captionFilePath);
+// 				}
+// 			}
+// 		}
+// 	}
 
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaTvinciDistributionProfile $distributionProfile
-	 * @param KalturaTvinciDistributionJobProviderData $providerData
-	 * @return Status XML or FALSE when status is not available yet
-	 */
-	protected function fetchStatusXml(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
-	{
-		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$statusXml = null;
-		try
-		{
-			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
-			$statusXml = $sftpManager->getFile($statusFilePath);
-		}
-		catch(kFileTransferMgrException $ex) // file is still missing
-		{
-			KalturaLog::info('File doesn\'t exist yet, retry later');
-			return false;
-		}
+// 	/**
+// 	 * @param KalturaDistributionJobData $data
+// 	 * @param KalturaTvinciDistributionProfile $distributionProfile
+// 	 * @param KalturaTvinciDistributionJobProviderData $providerData
+// 	 * @return Status XML or FALSE when status is not available yet
+// 	 */
+// 	protected function fetchStatusXml(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
+// 	{
+// 		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
+// 		$sftpManager = $this->getSFTPManager($distributionProfile);
+// 		$statusXml = null;
+// 		try
+// 		{
+// 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
+// 			$statusXml = $sftpManager->getFile($statusFilePath);
+// 		}
+// 		catch(kFileTransferMgrException $ex) // file is still missing
+// 		{
+// 			KalturaLog::info('File doesn\'t exist yet, retry later');
+// 			return false;
+// 		}
 
-		KalturaLog::info('Status file was found');
+// 		KalturaLog::info('Status file was found');
 
-		$data->results = $statusXml;
-		return $statusXml;
-	}
+// 		$data->results = $statusXml;
+// 		return $statusXml;
+// 	}
 
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaTvinciDistributionProfile $distributionProfile
-	 * @param KalturaTvinciDistributionJobProviderData $providerData
-	 * @return string Status XML or FALSE when status is not available yet
-	 */
-	protected function fetchBatchStatus(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
-	{
-		$statusFilePath = $providerData->sftpDirectory . '/internal_failure-status.xml';
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$statusXml = null;
-		try
-		{
-			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
-			$statusXml = $sftpManager->getFile($statusFilePath);
-			KalturaLog::info('Status file was found');
-			return $statusXml;
-		}
-		catch(kFileTransferMgrException $ex) // file is still missing
-		{
-			KalturaLog::info('File doesn\'t exist yet, so no internal failure was found till now');
-			return false;
-		}
-	}
+// 	/**
+// 	 * @param KalturaDistributionJobData $data
+// 	 * @param KalturaTvinciDistributionProfile $distributionProfile
+// 	 * @param KalturaTvinciDistributionJobProviderData $providerData
+// 	 * @return string Status XML or FALSE when status is not available yet
+// 	 */
+// 	protected function fetchBatchStatus(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
+// 	{
+// 		$statusFilePath = $providerData->sftpDirectory . '/internal_failure-status.xml';
+// 		$sftpManager = $this->getSFTPManager($distributionProfile);
+// 		$statusXml = null;
+// 		try
+// 		{
+// 			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
+// 			$statusXml = $sftpManager->getFile($statusFilePath);
+// 			KalturaLog::info('Status file was found');
+// 			return $statusXml;
+// 		}
+// 		catch(kFileTransferMgrException $ex) // file is still missing
+// 		{
+// 			KalturaLog::info('File doesn\'t exist yet, so no internal failure was found till now');
+// 			return false;
+// 		}
+// 	}
 
-	protected function syncPlaylists($videoId, KalturaTvinciDistributionJobProviderData $providerData)
-	{
-		$fieldValues = unserialize($providerData->fieldValues);
-		$youtubeChannel = isset($fieldValues[KalturaTvinciDistributionField::VIDEO_CHANNEL]) ? $fieldValues[KalturaTvinciDistributionField::VIDEO_CHANNEL] : null;
-		$newVideoPlaylists = isset($fieldValues[KalturaTvinciDistributionField::PLAYLISTS]) ? $fieldValues[KalturaTvinciDistributionField::PLAYLISTS] : null;
-		$clientId = $providerData->googleClientId;
-		$clientSecret   = $providerData->googleClientSecret;
-		$tokenData = $providerData->googleTokenData;
+// 	protected function syncPlaylists($videoId, KalturaTvinciDistributionJobProviderData $providerData)
+// 	{
+// 		$fieldValues = unserialize($providerData->fieldValues);
+// 		$youtubeChannel = isset($fieldValues[KalturaTvinciDistributionField::VIDEO_CHANNEL]) ? $fieldValues[KalturaTvinciDistributionField::VIDEO_CHANNEL] : null;
+// 		$newVideoPlaylists = isset($fieldValues[KalturaTvinciDistributionField::PLAYLISTS]) ? $fieldValues[KalturaTvinciDistributionField::PLAYLISTS] : null;
+// 		$clientId = $providerData->googleClientId;
+// 		$clientSecret   = $providerData->googleClientSecret;
+// 		$tokenData = $providerData->googleTokenData;
 
-		if (!$newVideoPlaylists && !$tokenData)
-		{
-			// no playlists and token was not setup, do nothing
-			return $providerData->currentPlaylists;
-		}
-		if (!$youtubeChannel)
-		{
-			KalturaLog::err('Tvinci channel was not found');
-			return $providerData->currentPlaylists;
-		}
-		if (!$videoId)
-		{
-			KalturaLog::err('No video id');
-			return $providerData->currentPlaylists;
-		}
-		$youtubeService = TvinciDistributionGoogleClientHelper::getTvinciService($clientId, $clientSecret, $tokenData);
+// 		if (!$newVideoPlaylists && !$tokenData)
+// 		{
+// 			// no playlists and token was not setup, do nothing
+// 			return $providerData->currentPlaylists;
+// 		}
+// 		if (!$youtubeChannel)
+// 		{
+// 			KalturaLog::err('Tvinci channel was not found');
+// 			return $providerData->currentPlaylists;
+// 		}
+// 		if (!$videoId)
+// 		{
+// 			KalturaLog::err('No video id');
+// 			return $providerData->currentPlaylists;
+// 		}
+// 		$youtubeService = TvinciDistributionGoogleClientHelper::getTvinciService($clientId, $clientSecret, $tokenData);
 
-		$playlistSync = new TvinciDistributionPlaylistsSync($youtubeService);
+// 		$playlistSync = new TvinciDistributionPlaylistsSync($youtubeService);
 
-		$currentPlaylists = $playlistSync->sync($youtubeChannel, $videoId, $providerData->currentPlaylists, $newVideoPlaylists);
-		return $currentPlaylists;
-	}
+// 		$currentPlaylists = $playlistSync->sync($youtubeChannel, $videoId, $providerData->currentPlaylists, $newVideoPlaylists);
+// 		return $currentPlaylists;
+// 	}
 
-	/**
-	 * 
-	 * @param KalturaTvinciDistributionProfile $distributionProfile
-	 * @return sftpMgr
-	 */
-	protected function getSFTPManager(KalturaTvinciDistributionProfile $distributionProfile)
-	{
-		if (!is_null($this->_sftpManager))
-			return $this->_sftpManager;
+// 	/**
+// 	 * 
+// 	 * @param KalturaTvinciDistributionProfile $distributionProfile
+// 	 * @return sftpMgr
+// 	 */
+// 	protected function getSFTPManager(KalturaTvinciDistributionProfile $distributionProfile)
+// 	{
+// 		if (!is_null($this->_sftpManager))
+// 			return $this->_sftpManager;
 
-		$serverUrl = $distributionProfile->sftpHost;
-		$loginName = $distributionProfile->sftpLogin;
-		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
-		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
-		$port = 22;
-		if ($distributionProfile->sftpPort)
-			$port = $distributionProfile->sftpPort;
-		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
-		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile, null, $port);
-		$this->_sftpManager = $sftpManager;
-		return $this->_sftpManager;
-	}
+// 		$serverUrl = $distributionProfile->sftpHost;
+// 		$loginName = $distributionProfile->sftpLogin;
+// 		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
+// 		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
+// 		$port = 22;
+// 		if ($distributionProfile->sftpPort)
+// 			$port = $distributionProfile->sftpPort;
+// 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
+// 		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP, $engineOptions);
+// 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile, null, $port);
+// 		$this->_sftpManager = $sftpManager;
+// 		return $this->_sftpManager;
+// 	}
 	
-	/*
-	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
-	 */
-	protected function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
-	{
-		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
-		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
-		{
-			file_put_contents($fileLocation, $keyContent);
-			chmod($fileLocation, 0600);
-		}
+// 	/*
+// 	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
+// 	 */
+// 	protected function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
+// 	{
+// 		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
+// 		$fileLocation = $tempDirectory . $fileName;
+// 		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
+// 		{
+// 			file_put_contents($fileLocation, $keyContent);
+// 			chmod($fileLocation, 0600);
+// 		}
 		
-		return $fileLocation;
-	}
+// 		return $fileLocation;
+// 	}
 	
-	/*
-	 * Creates and return the temp directory used for this distribution profile 
-	 */
-	protected function getTempDirectoryForProfile($distributionProfileId)
-	{
-		$metadataTempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
-		if (!file_exists($metadataTempFilePath))
-			mkdir($metadataTempFilePath, 0777, true);
-		return $metadataTempFilePath;
-	}
+// 	/*
+// 	 * Creates and return the temp directory used for this distribution profile 
+// 	 */
+// 	protected function getTempDirectoryForProfile($distributionProfileId)
+// 	{
+// 		$metadataTempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
+// 		if (!file_exists($metadataTempFilePath))
+// 			mkdir($metadataTempFilePath, 0777, true);
+// 		return $metadataTempFilePath;
+// 	}
 
 	/**
 	 * Uploads the empty delivery.complete marker file

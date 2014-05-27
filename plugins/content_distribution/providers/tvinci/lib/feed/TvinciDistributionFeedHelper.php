@@ -17,15 +17,15 @@ class TvinciDistributionFeedHelper
 	 */
 	protected $_xpath;
 
-	/**
-	 * @var string
-	 */
-	protected $_directoryName;
+// 	/**
+// 	 * @var string
+// 	 */
+// 	protected $_directoryName;
 
-	/**
-	 * @var string
-	 */
-	protected $_metadataTempFileName;
+// 	/**
+// 	 * @var string
+// 	 */
+// 	protected $_metadataTempFileName;
 
 	public function __construct(KalturaTvinciDistributionProfile $distributionProfile)
 	{
@@ -34,8 +34,6 @@ class TvinciDistributionFeedHelper
 		$this->_doc->encoding = "UTF-8";
 		
 		$this->_xpath = new DOMXPath($this->_doc);
-
-		$_ingestUrl = $distributionProfile->ingestUrl;
 
 // 		$timestampName = date('Ymd-His') . '_' . time();
 // 		$this->_directoryName = '/' . $timestampName;
@@ -752,119 +750,119 @@ class TvinciDistributionFeedHelper
 // 		$this->appendKeywordsToElement($videoElement, $keywordsStr);
 // 	}
 
-	public function setAdParamsByFieldValues(array $fieldValues, $videoTag, $adServerEnabled = false)
-	{
-		if ($adServerEnabled)
-		{
-			$this->setByXpath('video_breaks/third_party_ad_server/ad_server_video_id', self::getValueForField($fieldValues, KalturaTvinciDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
-			$this->setByXpath('video_breaks/@tag', $videoTag);
-			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/video_breaks[@tag='$videoTag']"));
-		}
+// 	public function setAdParamsByFieldValues(array $fieldValues, $videoTag, $adServerEnabled = false)
+// 	{
+// 		if ($adServerEnabled)
+// 		{
+// 			$this->setByXpath('video_breaks/third_party_ad_server/ad_server_video_id', self::getValueForField($fieldValues, KalturaTvinciDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
+// 			$this->setByXpath('video_breaks/@tag', $videoTag);
+// 			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/video_breaks[@tag='$videoTag']"));
+// 		}
 
-		$allowPreRolls = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
-		$allowMidRolls = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS);
-		$allowPostRolls = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
+// 		$allowPreRolls = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
+// 		$allowMidRolls = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_MID_ROLL_ADS);
+// 		$allowPostRolls = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
 
-		if ($this->isAllowedValue($allowPreRolls))
-			$this->setByXpath('ad_policy/instream/prerolls', 'Allow');
-		elseif($this->isNotAllowedValue($allowPreRolls))
-			$this->setByXpath('ad_policy/instream/prerolls', 'Deny');
+// 		if ($this->isAllowedValue($allowPreRolls))
+// 			$this->setByXpath('ad_policy/instream/prerolls', 'Allow');
+// 		elseif($this->isNotAllowedValue($allowPreRolls))
+// 			$this->setByXpath('ad_policy/instream/prerolls', 'Deny');
 
-		if ($this->isAllowedValue($allowMidRolls))
-			$this->setByXpath('ad_policy/instream/midrolls', 'Allow');
-		elseif($this->isNotAllowedValue($allowMidRolls))
-			$this->setByXpath('ad_policy/instream/midrolls', 'Deny');
+// 		if ($this->isAllowedValue($allowMidRolls))
+// 			$this->setByXpath('ad_policy/instream/midrolls', 'Allow');
+// 		elseif($this->isNotAllowedValue($allowMidRolls))
+// 			$this->setByXpath('ad_policy/instream/midrolls', 'Deny');
 
-		if ($this->isAllowedValue($allowPostRolls))
-			$this->setByXpath('ad_policy/instream/postrolls', 'Allow');
-		elseif($this->isNotAllowedValue($allowPostRolls))
-			$this->setByXpath('ad_policy/instream/postrolls', 'Deny');
+// 		if ($this->isAllowedValue($allowPostRolls))
+// 			$this->setByXpath('ad_policy/instream/postrolls', 'Allow');
+// 		elseif($this->isNotAllowedValue($allowPostRolls))
+// 			$this->setByXpath('ad_policy/instream/postrolls', 'Deny');
 
-		$adsenseForVideoValue = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
-		if ($adsenseForVideoValue)
-			$this->setByXpath('ad_policy/overlay/adsense_for_video', $adsenseForVideoValue);
+// 		$adsenseForVideoValue = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
+// 		if ($adsenseForVideoValue)
+// 			$this->setByXpath('ad_policy/overlay/adsense_for_video', $adsenseForVideoValue);
 
-		$invideoValue = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_INVIDEO);
-		if ($invideoValue)
-			$this->setByXpath('ad_policy/overlay/invideo', $adsenseForVideoValue);
+// 		$invideoValue = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_INVIDEO);
+// 		if ($invideoValue)
+// 			$this->setByXpath('ad_policy/overlay/invideo', $adsenseForVideoValue);
 
-		$instreamStandardValue = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_INSTREAM_STANDARD);
-		if ($instreamStandardValue )
-			$this->setByXpath('ad_policy/instream/@standard', $instreamStandardValue );
+// 		$instreamStandardValue = self::getValueForField($fieldValues, KalturaTvinciDistributionField::ADVERTISING_INSTREAM_STANDARD);
+// 		if ($instreamStandardValue )
+// 			$this->setByXpath('ad_policy/instream/@standard', $instreamStandardValue );
 
-		// append relationship if ad policy was added
-		$adPolicyElement = $this->_xpath->query('/feed/ad_policy')->item(0);
-		if ($adPolicyElement)
-		{
-			$adPolicyElement->setAttribute('tag', $videoTag);
-			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/ad_policy[@tag='$videoTag']"));
-		}
-	}
+// 		// append relationship if ad policy was added
+// 		$adPolicyElement = $this->_xpath->query('/feed/ad_policy')->item(0);
+// 		if ($adPolicyElement)
+// 		{
+// 			$adPolicyElement->setAttribute('tag', $videoTag);
+// 			$this->appendRelationship(array("/feed/video[@tag='$videoTag']"), array("/feed/ad_policy[@tag='$videoTag']"));
+// 		}
+// 	}
 
-	public function appendWorldWideOwnership()
-	{
-		$this->setByXpath('ownership', '');
-		$this->appendRelationship(array('/feed/ownership[1]'), array('/feed/asset[1]'));
-	}
+// 	public function appendWorldWideOwnership()
+// 	{
+// 		$this->setByXpath('ownership', '');
+// 		$this->appendRelationship(array('/feed/ownership[1]'), array('/feed/asset[1]'));
+// 	}
 
-	public function appendClaimElement(array $fieldValues, $videoTag, $rightAdminType, $policyName)
-	{
-		$this->_doc->firstChild
-			->appendChild($this->_doc->createElement('claim'))
-				->setAttribute('type', self::getValueForField($fieldValues, KalturaTvinciDistributionField::CLAIM_TYPE))->parentNode
-				->setAttribute('video', "/feed/video[@tag='$videoTag']")->parentNode
-				->setAttribute('asset', "/feed/asset[@tag='$videoTag']")->parentNode
-				->setAttribute('rights_admin', "/feed/rights_admin[@type='$rightAdminType']")->parentNode
-				->setAttribute('rights_policy', "/external/rights_policy[@name='$policyName']")->parentNode
-		;
-	}
+// 	public function appendClaimElement(array $fieldValues, $videoTag, $rightAdminType, $policyName)
+// 	{
+// 		$this->_doc->firstChild
+// 			->appendChild($this->_doc->createElement('claim'))
+// 				->setAttribute('type', self::getValueForField($fieldValues, KalturaTvinciDistributionField::CLAIM_TYPE))->parentNode
+// 				->setAttribute('video', "/feed/video[@tag='$videoTag']")->parentNode
+// 				->setAttribute('asset', "/feed/asset[@tag='$videoTag']")->parentNode
+// 				->setAttribute('rights_admin', "/feed/rights_admin[@type='$rightAdminType']")->parentNode
+// 				->setAttribute('rights_policy', "/external/rights_policy[@name='$policyName']")->parentNode
+// 		;
+// 	}
 
-	public function appendRightsAdminByFieldValues(array $fieldValues, $videoTag)
-	{
-		$commercialPolicy = self::getValueForField($fieldValues, KalturaTvinciDistributionField::POLICY_COMMERCIAL);
-		$ugcPolicy = self::getValueForField($fieldValues, KalturaTvinciDistributionField::POLICY_UGC);
-		$disableFingerprinting = self::getValueForField($fieldValues, KalturaTvinciDistributionField::DISABLE_FINGERPRINTING);
+// 	public function appendRightsAdminByFieldValues(array $fieldValues, $videoTag)
+// 	{
+// 		$commercialPolicy = self::getValueForField($fieldValues, KalturaTvinciDistributionField::POLICY_COMMERCIAL);
+// 		$ugcPolicy = self::getValueForField($fieldValues, KalturaTvinciDistributionField::POLICY_UGC);
+// 		$disableFingerprinting = self::getValueForField($fieldValues, KalturaTvinciDistributionField::DISABLE_FINGERPRINTING);
 
-		$rightsAdminType = null;
-		if ($commercialPolicy)
-		{
-			$this->appendRightsAdmin('usage', 'true');
-			if (!$disableFingerprinting)
-				$this->appendClaimElement($fieldValues, $videoTag, 'usage', $commercialPolicy);
-		}
+// 		$rightsAdminType = null;
+// 		if ($commercialPolicy)
+// 		{
+// 			$this->appendRightsAdmin('usage', 'true');
+// 			if (!$disableFingerprinting)
+// 				$this->appendClaimElement($fieldValues, $videoTag, 'usage', $commercialPolicy);
+// 		}
 
-		if($ugcPolicy)
-		{
-			$this->appendRightsAdmin('match', 'true');
-			$itemsPaths = array(
-				"/feed/rights_admin[@type='match']",
-				"/external/rights_policy[@name='$ugcPolicy']",
-			);
-			$relatedItemsPaths = array(
-				"/feed/asset[@tag='$videoTag']"
-			);
-			if (!$disableFingerprinting)
-				$this->appendRelationship($itemsPaths, $relatedItemsPaths);
-		}
-	}
+// 		if($ugcPolicy)
+// 		{
+// 			$this->appendRightsAdmin('match', 'true');
+// 			$itemsPaths = array(
+// 				"/feed/rights_admin[@type='match']",
+// 				"/external/rights_policy[@name='$ugcPolicy']",
+// 			);
+// 			$relatedItemsPaths = array(
+// 				"/feed/asset[@tag='$videoTag']"
+// 			);
+// 			if (!$disableFingerprinting)
+// 				$this->appendRelationship($itemsPaths, $relatedItemsPaths);
+// 		}
+// 	}
 
-	public function appendRightsAdmin($type, $owner)
-	{
-		$this->_doc->firstChild
-			->appendChild($this->_doc->createElement('rights_admin'))
-			->setAttribute('type', $type)->parentNode
-			->setAttribute('owner', $owner)->parentNode
-		;
-	}
+// 	public function appendRightsAdmin($type, $owner)
+// 	{
+// 		$this->_doc->firstChild
+// 			->appendChild($this->_doc->createElement('rights_admin'))
+// 			->setAttribute('type', $type)->parentNode
+// 			->setAttribute('owner', $owner)->parentNode
+// 		;
+// 	}
 
-	public function appendRightsPolicy($name, $tag)
-	{
-		$this->_doc->firstChild
-			->appendChild($this->_doc->createElement('rights_policy'))
-				->setAttribute('tag', $tag)->parentNode
-				->appendChild($this->_doc->createElement('name', $name))->parentNode
-		;
-	}
+// 	public function appendRightsPolicy($name, $tag)
+// 	{
+// 		$this->_doc->firstChild
+// 			->appendChild($this->_doc->createElement('rights_policy'))
+// 				->setAttribute('tag', $tag)->parentNode
+// 				->appendChild($this->_doc->createElement('name', $name))->parentNode
+// 		;
+// 	}
 
 
 	public function getXml()
@@ -872,31 +870,31 @@ class TvinciDistributionFeedHelper
 		return $this->_doc->saveXML();
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getDirectoryName()
-	{
-		return $this->_directoryName;
-	}
+// 	/**
+// 	 * @return string
+// 	 */
+// 	public function getDirectoryName()
+// 	{
+// 		return $this->_directoryName;
+// 	}
 
-	/**
-	 * @return string
-	 */
-	public function getMetadataTempFileName()
-	{
-		return $this->_metadataTempFileName;
-	}
+// 	/**
+// 	 * @return string
+// 	 */
+// 	public function getMetadataTempFileName()
+// 	{
+// 		return $this->_metadataTempFileName;
+// 	}
 
-	private function isAllowedValue($value)
-	{
-		return in_array($value, array('true', 'True', '1'), true);
-	}
+// 	private function isAllowedValue($value)
+// 	{
+// 		return in_array($value, array('true', 'True', '1'), true);
+// 	}
 
-	private function isNotAllowedValue($value)
-	{
-		return in_array($value, array('false', 'False', '0'), true);
-	}
+// 	private function isNotAllowedValue($value)
+// 	{
+// 		return in_array($value, array('false', 'False', '0'), true);
+// 	}
 
 	private static function isAttribute($path)
 	{
