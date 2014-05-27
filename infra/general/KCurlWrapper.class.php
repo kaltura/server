@@ -498,8 +498,8 @@ class KCurlWrapper
 		if ( isset($options['full_response']) && $options['full_response'] )
 		{
 			$curlError = curl_error($ch);
-			$curlErrorCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			$response = array('response' => $response, 'error_code' => $curlErrorCode, 'error_text' => $curlError);
+			$curlHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$response = array('content' => $response, 'http_code' => $curlHttpCode, 'error_text' => $curlError);
 		}
 		
 		curl_close($ch);

@@ -193,8 +193,10 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		KalturaLog::info("Submitting Tvinci data to URL: $url\nXML data:\n$xml");
 
 		$options = array( 'post_data' => $xml, 'full_response' => true );
- 		$response = KCurlWrapper::getContent($url, $options);
- 		KalturaLog::debug("Tvinci Response: " . print_r($response,true));
+		$fullResponse = KCurlWrapper::getContent($url, $options);
+		KalturaLog::debug("Tvinci Response: " . print_r($fullResponse,true));
+
+		$result = $fullResponse['http_code'] == 200 && $this->analyzeTvinciResponse($fullResponse['content']);
  		
 //  		throw new Exception( "TODO: KCurlWrapper::getContent(ingest url, xml as post data);" );
 
@@ -219,6 +221,24 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 // 		$this->setDeliveryComplete($sftpManager, $providerData->sftpDirectory);
 	}
 	
+	protected function analyzeTvinciResponse($responseXml)
+	{
+		$success = false;
+
+		KalturaLog::info("Tvinci ingest result: $responseXml");
+
+		$xml = simplexml_load_string($responseXml);
+		if ( isset($xml->Response) )
+		{
+			if ( $xml->Response->status == "OK" )
+			{
+				$success = true;
+			}
+		}
+
+		return $success;
+	}
+
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaTvinciDistributionProfile $distributionProfile
