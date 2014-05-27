@@ -554,7 +554,7 @@ class KalturaSyndicationFeedRenderer
 			else
 				$url = requestUtils::getApiCdnHost();
 		
-			$url .= $flavorAsset->getPlayManifestUrl($cdnHost, $clientTag);
+			$url .= $flavorAsset->getPlayManifestUrl($cdnHost, $clientTag, $storage->getId());
 		}
 		else
 		{
@@ -595,7 +595,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($flavorAsset->getEntryId());
 			$urlManager->initDeliveryDynamicAttributes(null, $flavorAsset);
-			$url = $urlManager->getFullAssetUrl($flavorAsset);
+			$url = "http://" . $urlManager->getFullAssetUrl($flavorAsset);
 		}
 		
 		return $url;

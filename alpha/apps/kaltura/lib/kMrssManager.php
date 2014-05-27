@@ -258,7 +258,7 @@ class kMrssManager
 				$url = requestUtils::getApiCdnHost();
 
 			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$url .= $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag());
+			$url .= $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag(), $storage->getId());
 		}
 		else
 		{
@@ -267,7 +267,7 @@ class kMrssManager
 			$dynamicAttrs->setFileExtension($asset->getFileExt());
 			$urlManager->setDynamicAttributes($dynamicAttrs);
 			
-			$url = $urlManager->getHostName() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
 		return $url;
@@ -295,7 +295,7 @@ class kMrssManager
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
 			$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
-			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag());
+			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag(), $mrssParams->getStorageId());
 		}
 		else
 		{

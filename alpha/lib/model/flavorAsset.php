@@ -273,6 +273,11 @@ class flavorAsset extends asset
 		$subpId = $this->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $this->getId();
+		
+		// Fallback to prevent cases in which the host name contains the http prefix
+		$host = parse_url($cdnHost, PHP_URL_HOST);
+		if(!is_null($host))
+			$cdnHost = $host;
 	
 		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url/cdnHost/$cdnHost";
 		if($storageProfileId)
