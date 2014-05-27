@@ -238,10 +238,17 @@ class KImageMagickCropper extends KBaseCropper
 					elseif ($h < $w)
 					{
 						$ratio = round($w / $h, 3);
-						if ($this->srcHeight * $ratio <= $resizeWidth)
-							$resizeWidth = $this->srcHeight * $ratio;
+						if ($orientation == 6 || $orientation == 8)
+						{
+								$resizeHeight = $this->srcHeight / $ratio;
+						}
 						else
-							$resizeHeight = $this->srcWidth / $ratio;
+						{
+							if ($this->srcHeight * $ratio <= $resizeWidth)
+								$resizeWidth = $this->srcHeight * $ratio;
+							else
+								$resizeHeight = $this->srcWidth / $ratio;
+						}
 					}
 					else
 					{
