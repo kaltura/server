@@ -377,20 +377,13 @@ class myPartnerUtils
 	// if the cdnHost of the partner is false or null or an empty string - ignore it	
 	public static function getRtmpUrl ( $partner_id )
 	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getRtmpUrl() ) ) return requestUtils::getRtmpUrl();
-		return $partner->getRtmpUrl();
+		return requestUtils::getRtmpUrl();
 	}
 	
 	// if the iis Host of the partner is false or null or an empty string - ignore it	
 	public static function getIisHost ( $partner_id, $protocol = 'http' )
 	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getIisHost() ) ) return requestUtils::getIisHost($protocol);
-		
-		$iisHost = $partner->getIisHost();
-		$iisHost = preg_replace('/^https?/', $protocol, $iisHost);
-		return $iisHost;
+		return requestUtils::getIisHost($protocol);
 	}
 	
 	
@@ -1558,23 +1551,10 @@ class myPartnerUtils
 	public static function enforceDelivery($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK( $partnerId );
-		if ( !$partner || (! $partner->getDeliveryRestrictions() ) )
+		if ( !$partner )
 			return;
-
-		$deliveryRestrictions = $partner->getDeliveryRestrictions();
-		$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
 		
-		$delivery = kUrlManager::getUrlManagerIdentifyRequest();
-		
-		$restricted = true;
-		foreach($deliveryRestrictionsArr as $deliveryRestriction)
-		{
-			if ($deliveryRestriction === $delivery)
-			{
-				$restricted = false;
-				break;
-			}
-		}
+		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		
 		if ($restricted)
 		{

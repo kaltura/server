@@ -37,7 +37,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @readonly
 	 */
 	public $partnerId;
 	

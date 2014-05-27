@@ -69,21 +69,11 @@ class FileSync extends BaseFileSync
 		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($this->getDc(), $entryId);
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId);
 		$url = $urlManager->getFileSyncUrl($this);
-		
-		if ($format == PlaybackProtocol::RTMP)
-			$baseUrl = $storage->getDeliveryRmpBaseUrl();
-		else 
-			$baseUrl = $storage->getDeliveryBaseUrlByProtocol();
+		$baseUrl = $urlManager->getUrl();
 		
 		return rtrim($baseUrl, '/') . '/' . ltrim($url, '/');
-	}
-	
-	public function getSmoothStreamUrl()
-	{
-		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
-		return $storage->getDeliveryIisBaseUrl() . '/' . $this->getFilePath();
 	}
 	
 	/* (non-PHPdoc)
