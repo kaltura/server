@@ -871,6 +871,12 @@ class playManifestAction extends kalturaAction
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
+		$this->deliveryAttributes->setUsePlayServer((bool) $this->getRequestParameter("usePlayServer") && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
+		if($this->deliveryAttributes->getUsePlayServer())
+		{
+			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
+		}
+		
 		$this->enforceEncryption();
 		
 		$renderer = null;
