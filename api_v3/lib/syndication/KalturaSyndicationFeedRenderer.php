@@ -546,15 +546,14 @@ class KalturaSyndicationFeedRenderer
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
 			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storage->getId(), $flavorAsset->getEntryId(), PlaybackProtocol::HTTP, "https");
-			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
 		
-			if (!is_null($deliveryProfile))
+			if (is_null($deliveryProfile))
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 			else
 				$url = requestUtils::getApiCdnHost();
 		
-			$url .= $flavorAsset->getPlayManifestUrl($cdnHost, $clientTag, $storage->getId());
+			$url .= $flavorAsset->getPlayManifestUrl($clientTag, $storage->getId());
 		}
 		else
 		{
@@ -584,12 +583,11 @@ class KalturaSyndicationFeedRenderer
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 		
-		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId);
 		if($this->syndicationFeedDb->getServePlayManifest())
 		{
 			$cdnHost = requestUtils::getApiCdnHost();
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
-			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($this->cdnHost, $clientTag);
+			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag);
 		}
 		else
 		{

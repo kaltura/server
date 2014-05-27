@@ -267,19 +267,14 @@ class flavorAsset extends asset
 		return $this->getBitrate();
 	}
 	
-	public function getPlayManifestUrl($cdnHost, $clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
+	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP) {
 		$entryId = $this->getEntryId();
 		$partnerId = $this->getPartnerId();
 		$subpId = $this->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $this->getId();
 		
-		// Fallback to prevent cases in which the host name contains the http prefix
-		$host = parse_url($cdnHost, PHP_URL_HOST);
-		if(!is_null($host))
-			$cdnHost = $host;
-	
-		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url/cdnHost/$cdnHost";
+		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url";
 		if($storageProfileId)
 			$url .= "/storageId/" . $storageProfileId;
 	
