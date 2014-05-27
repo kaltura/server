@@ -169,7 +169,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			
 			$dropFolderFile = $dropFolderFilesMap[$physicalFileName];
 			/* @var $dropFolderFile KalturaWebexDropFolderFile */
-			if (!in_array($dropFolderFile->status, array(KalturaDropFolderFileStatus::HANDLED, KalturaDropFolderFileStatus::DELETED, KalturaDropFolderFileStatus::ERROR_DOWNLOADING)))
+			if (!in_array($dropFolderFile->status, array(KalturaDropFolderFileStatus::HANDLED, KalturaDropFolderFileStatus::DELETED)))
 			{
 				KalturaLog::info("File with name $physicalFileName not in final status. Ignoring");
 				continue;

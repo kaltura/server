@@ -770,7 +770,7 @@ class playManifestAction extends kalturaAction
 		}
 		
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);	
-		return $this->deliveryProfile->serve($baseUrl);
+		return $this->deliveryProfile->serve($baseUrl, $backupUrl);
 	}
 	
 	/* (non-PHPdoc)
