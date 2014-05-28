@@ -213,6 +213,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		$entries = array();
 		$counter = 0;
+		$shouldSortCaptionFiltering = $captionAssetItemFilter->orderBy ? false : true;
 		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemCriteria->setGroupByColumn('str_entry_id');
@@ -226,6 +227,11 @@ class CaptionAssetItemService extends KalturaBaseService
 			else
 				$captionAssetItemPager->attachToCriteria($currCriteria);
 			$currCriteria->applyFilters();
+			$currEntries = $currCriteria->getFetchedIds();
+			
+			if ($shouldSortCaptionFiltering)
+				$currEntries = array_intersect($entryIds , $currEntries);
+			$entries = array_merge ($entries , $currEntries);
 			$entries = array_merge ($entries , $currCriteria->getFetchedIds());
 			$counter += $currCriteria->getRecordsCount();
 		}
@@ -241,6 +247,17 @@ class CaptionAssetItemService extends KalturaBaseService
 		$entries = array_slice ($entries , $firstIndex , $pageSize);
 
 		$dbList = entryPeer::retrieveByPKs($entries);
+		
+		if ($shouldSortCaptionFiltering)
+		{
+			$tempEntryarr = $dbList;
+			foreach($tempEntryarr as $entryObj)
+			{
+				$id = $entryObj->getId();
+				$correctIndex = array_search($id , $entries);
+				$dbList[$correctIndex] = $entryObj;
+			}
+		}
 		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $list;
