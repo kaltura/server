@@ -79,6 +79,7 @@ class kmc4Action extends kalturaAction
 		$defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
 		$defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
 		$this->previewEmbedV2 = PermissionPeer::isValidForPartner(PermissionName::FEATURE_PREVIEW_AND_EMBED_V2, $this->partner_id);
+	
 		
 		/** set values for template **/
 		$this->service_url = requestUtils::getRequestHost();
@@ -157,6 +158,10 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		
+		$this->liveAUiConf = kmcUtils::getLiveAUiconf();
+		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
+		$this->content_uiconf_livea = (is_array($this->content_uiconfs_livea) && reset($this->content_uiconfs_livea)) ? reset($this->content_uiconfs_livea) : null;
+		
 
 		$kmcVars = array(
 			'kmc_version'				=> $this->kmc_swf_version,
@@ -204,6 +209,10 @@ class kmc4Action extends kalturaAction
                 'config'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getConfig() : '',
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
+            ),
+			'liveanalytics'					=> array(
+                'version'				=> kConf::get("liveanalytics_version"),
+                'player_id'				=> isset($this->content_uiconf_livea) ? $this->content_uiconf_livea->getId() : '',
             ),
 			'disable_analytics'			=> (bool) kConf::get("kmc_disable_analytics"),
 			'google_analytics_account'	=> kConf::get("ga_account"),
