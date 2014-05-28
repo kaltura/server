@@ -62,25 +62,25 @@ class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::TVINCI)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 					
 			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 					
 			if($baseClass == 'IDistributionEngineDelete')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 					
 			if($baseClass == 'IDistributionEngineReport')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 					
 			if($baseClass == 'IDistributionEngineSubmit')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 					
 			if($baseClass == 'IDistributionEngineUpdate')
-				return new TvinciDistributionEngineSelector();
+				return new TvinciDistributionFeedEngine();
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaTvinciDistributionProfile();
@@ -130,25 +130,25 @@ class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::TVINCI)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 					
 			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 					
 			if($baseClass == 'IDistributionEngineDelete')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 					
 			if($baseClass == 'IDistributionEngineReport')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 					
 			if($baseClass == 'IDistributionEngineSubmit')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 					
 			if($baseClass == 'IDistributionEngineUpdate')
-				return 'TvinciDistributionEngineSelector';
+				return 'TvinciDistributionFeedEngine';
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaTvinciDistributionProfile';
