@@ -232,7 +232,6 @@ class CaptionAssetItemService extends KalturaBaseService
 			if ($shouldSortCaptionFiltering)
 				$currEntries = array_intersect($entryIds , $currEntries);
 			$entries = array_merge ($entries , $currEntries);
-			$entries = array_merge ($entries , $currCriteria->getFetchedIds());
 			$counter += $currCriteria->getRecordsCount();
 		}
 
