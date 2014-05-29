@@ -68,7 +68,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_HDS => 'DeliveryProfileLiveHds',
 			DeliveryProfileType::LIVE_RTMP => 'DeliveryProfileLiveRtmp',
 					
-			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryLiveAkamaiHds',
+			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',
 	);
 	
 	/**
