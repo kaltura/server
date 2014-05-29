@@ -351,18 +351,18 @@ KalturaClientBase.prototype.doQueue = function(callback) {
 	var call = null;
 	if (this.useMultiRequest) {
 		path += 'multirequest';
-		var $i = 1;
-		for ( var v in this.callsQueue) {
+		var i = 1;
+		for ( var v = 0; v < this.callsQueue.lenght; v++) {
 			call = this.callsQueue[v];
-			var callParams = call.getParamsForMultiRequest($i);
+			var callParams = call.getParamsForMultiRequest(i);
 			for ( var sv1 in callParams) {
 				params[sv1] = callParams[sv1];
 			}
-			var callFiles = call.getFilesForMultiRequest($i);
+			var callFiles = call.getFilesForMultiRequest(i);
 			for ( var sv2 in callFiles) {
 				files[sv2] = call.files[sv2];
 			}
-			$i++;
+			i++;
 		}
 	} else {
 		call = this.callsQueue[0];
