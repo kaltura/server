@@ -12,7 +12,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return $this->getFromCustomData("disableExtraAttributes");
 	}
 	
-	public function isLive ($url)
+	public function checkIsLive ($url)
 	{
 		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
 		if(!$data)
