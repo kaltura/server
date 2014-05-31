@@ -263,7 +263,7 @@ class CaptionAssetItemService extends KalturaBaseService
 				if (isset($entriesMapping[$entryId]))
 					$dbList[] = $entriesMapping[$entryId];
 			}
-
+		}
 		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $list;
