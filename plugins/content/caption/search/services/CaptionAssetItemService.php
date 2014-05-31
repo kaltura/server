@@ -213,7 +213,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		$entries = array();
 		$counter = 0;
-		$shouldSortCaptionFiltering = $captionAssetItemFilter->orderBy ? false : true;
+		$shouldSortCaptionFiltering = $entryFilter->orderBy ? true : false;
 		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemCriteria->setGroupByColumn('str_entry_id');
@@ -229,6 +229,7 @@ class CaptionAssetItemService extends KalturaBaseService
 			$currCriteria->applyFilters();
 			$currEntries = $currCriteria->getFetchedIds();
 			
+			//sorting this chunk according to results of first sphinx query
 			if ($shouldSortCaptionFiltering)
 				$currEntries = array_intersect($entryIds , $currEntries);
 			$entries = array_merge ($entries , $currEntries);
@@ -243,20 +244,26 @@ class CaptionAssetItemService extends KalturaBaseService
 		$pageIndex = max($captionAssetItemPager::MIN_PAGE_INDEX, $inputPageIndex) - 1;
 
 		$firstIndex = $pageSize * $pageIndex ;
-		$entries = array_slice ($entries , $firstIndex , $pageSize);
+		$entries = array_slice($entries , $firstIndex , $pageSize);
 
 		$dbList = entryPeer::retrieveByPKs($entries);
-		
+
 		if ($shouldSortCaptionFiltering)
 		{
-			$tempEntryarr = $dbList;
-			foreach($tempEntryarr as $entryObj)
+			//results ids mapping
+			$entriesMapping = array();
+			foreach($dbList as $item)
 			{
-				$id = $entryObj->getId();
-				$correctIndex = array_search($id , $entries);
-				$dbList[$correctIndex] = $entryObj;
+				$entriesMapping[$item->getId()] = $item;
 			}
-		}
+
+			$dbList = array();
+			foreach($entries as $entryId)
+			{
+				if (isset($entriesMapping[$entryId]))
+					$dbList[] = $entriesMapping[$entryId];
+			}
+
 		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $list;
