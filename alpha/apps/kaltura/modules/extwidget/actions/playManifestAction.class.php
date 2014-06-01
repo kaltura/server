@@ -677,7 +677,8 @@ class playManifestAction extends kalturaAction
 		// Fixing ALL kinds of historical bugs.
 		
 		if($this->deliveryAttributes->getFormat() == self::URL) {
-			$this->deliveryAttributes->setResponseFormat('redirect');
+			if(is_null($this->deliveryAttributes->getResponseFormat()))
+				$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HD) {
 			// This is a hack to return an f4m that has a URL of a smil

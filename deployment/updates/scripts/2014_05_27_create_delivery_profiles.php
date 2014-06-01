@@ -17,3 +17,7 @@ passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/init_data/07.DeliveryProfileLiveRtmp.ini';
 passthru("php $script $config");
+
+
+$config = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/init_data/07.DeliveryProfileAkamaiHttp.ini';
+passthru("php $script $config");
