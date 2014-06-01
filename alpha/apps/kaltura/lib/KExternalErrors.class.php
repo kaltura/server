@@ -46,6 +46,7 @@ class KExternalErrors
 	const INVALID_ISM_FILE_TYPE = 37;
 	const NOT_ALLOWED_PARAMETER = 38;
 	const INVALID_SETTING_TYPE = 39;
+	const ACTION_BLOCKED = 40;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -93,6 +94,7 @@ class KExternalErrors
 			self::INVALID_ISM_FILE_TYPE => "The given ism file type is invalid",
 			self::NOT_ALLOWED_PARAMETER => "The provided parameter is not allowed",
 			self::INVALID_SETTING_TYPE => "Invalid setting type",
+			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
 	);
 	
 	public static function dieError($errorCode, $message = null)
