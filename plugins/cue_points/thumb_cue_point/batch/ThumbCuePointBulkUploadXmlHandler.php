@@ -44,7 +44,7 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			
 		//If timedThumbAssetId is present in the XML assume an existing one is beeing updated (Action = Update)
 		if(isset($scene->slide) && isset($scene->slide->timedThumbAssetId))
-			$cuePoint->timedThumbAssetId  = $scene->slide->timedThumbAssetId;
+			$cuePoint->assetId  = $scene->slide->timedThumbAssetId;
 			
 		$cuePoint->title = $scene->title;
 		$cuePoint->description = $scene->description;
@@ -63,7 +63,7 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 				if(empty($items[$index]->slide))
 					continue;
 				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, null);
-				KBatchBase::$kClient->thumbAsset->setContent($cuePoint->timedThumbAssetId, $timedThumbResource);
+				KBatchBase::$kClient->thumbAsset->setContent($cuePoint->assetId, $timedThumbResource);
 			}
 				
 		}

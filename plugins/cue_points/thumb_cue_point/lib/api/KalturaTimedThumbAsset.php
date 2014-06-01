@@ -9,12 +9,12 @@ class KalturaTimedThumbAsset extends KalturaThumbAsset
 	 * Associated thumb cue point ID
 	 * @var string
 	 */
-	public $thumbCuePointId;
+	public $cuePointId;
 
 	
 	private static $map_between_objects = array
 	(
-		"thumbCuePointId",
+		"cuePointId",
 	);
 	
 	public function getMapBetweenObjects ( )

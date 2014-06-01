@@ -9,7 +9,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 * @var string
 	 * @insertonly
 	 */
-	public $timedThumbAssetId;
+	public $assetId;
 	
 	/**
 	 * @var string
@@ -30,7 +30,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	
 	private static $map_between_objects = array
 	(
-		"timedThumbAssetId",
+		"assetId",
 		"title" => "name",
 		"description" => "text",
 	);
@@ -59,7 +59,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if($this->timedThumbAssetId !== null)	
+		if($this->assetId !== null)	
 			$this->validateTimedThumbAssetId();
 		
 		parent::validateForInsert($propertiesToSkip);
@@ -67,12 +67,12 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	
 	public function validateTimedThumbAssetId()
 	{
-		$timedThumb = assetPeer::retrieveByPK($this->timedThumbAssetId);
+		$timedThumb = assetPeer::retrieveByPK($this->assetId);
 		
 		if(!$timedThumb)
-			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $this->timedThumbAssetId);
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $this->assetId);
 		
 		if($timedThumb->getType() != kPluginableEnumsManager::apiToCore('assetType', KalturaAssetType::TIMED_THUMB_ASSET))
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE, $this->timedThumbAssetId);
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE, $this->assetId);
 	}
 }
