@@ -85,6 +85,11 @@ class flvclipperAction extends kalturaAction
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_BLOCK_FLVCLIPPER_ACTION, $entry->getPartnerId()))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
+		}
+		
 		// set the memory size to be able to serve big files in a single chunk
 		ini_set( "memory_limit","64M" );
 		// set the execution time to be able to serve big files in a single chunk
