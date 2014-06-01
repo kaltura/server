@@ -5,8 +5,6 @@
  */
 class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistributionJobProviderData
 {
-	const DUR_24_HOURS_IN_SECS = 86400; // = 24h * 60m * 60s;
-
 	/**
 	 * @var string
 	 */
@@ -128,7 +126,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	
 	private function getAssetDownloadUrl($asset)
 	{
-		$downloadUrl = $asset->getDownloadUrlWithExpiry( self::DUR_24_HOURS_IN_SECS );
+		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId()) . $asset->getFinalDownloadUrlPathWithoutKs();
 		$downloadUrl .= '/f/' . $asset->getId() . '.' . $asset->getFileExt();
 		return $downloadUrl;
 	}
