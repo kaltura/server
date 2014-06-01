@@ -20,19 +20,20 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		if(!$this->getTimedThumbAssetId())
+		if(!$this->getAssetId())
 		{
 			$timedThumbAsset = new timedThumbAsset();
-			$timedThumbAsset->setThumbCuePointID($this->getId());
+			$timedThumbAsset->setCuePointID($this->getId());
 			$timedThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 			$timedThumbAsset->setEntryId($this->getEntryId());
 			$timedThumbAsset->setPartnerId($this->getPartnerId());
 			$timedThumbAsset->save();
+			$this->setAssetId($timedThumbAsset->getId());
 		}
+		else
+			$this->setAssetId($this->getAssetId());
 		
-		$this->setTimedThumbAssetId($timedThumbAsset->getId());
 		$this->setCustomDataObj();
-		
 		return parent::preInsert($con);
 	}
 
@@ -46,8 +47,8 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		$this->setType(ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB));
 	}
 	
-	public function setTimedThumbAssetId($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID, (string)$v);}
-	public function getTimedThumbAssetId()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID);}
+	public function setAssetId($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID, (string)$v);}
+	public function getAssetId()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID);}
 	
 	/* (non-PHPdoc)
 	 * @see IMetadataObject::getMetadataObjectType()

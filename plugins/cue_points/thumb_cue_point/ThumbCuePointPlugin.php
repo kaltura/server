@@ -235,7 +235,7 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		if($cuePoint->getEndTime())
 			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 	
-		$scene->addChild('thumbAssetId', $cuePoint->getTimedThumbAssetId());
+		$scene->addChild('thumbAssetId', $cuePoint->getAssetId());
 		
 		return $scene;
 	}
@@ -254,7 +254,7 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 		if($cuePoint->getEndTime())
 			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 	
-		$scene->addChild('thumbAssetId', $cuePoint->getTimedThumbAssetId());
+		$scene->addChild('thumbAssetId', $cuePoint->getAssetId());
 			
 		return $scene;
 	}

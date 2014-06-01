@@ -18,7 +18,7 @@ class timedThumbAsset extends thumbAsset
 		$this->setType(ThumbCuePointPlugin::getAssetTypeCoreValue(timedThumbAssetType::TIMED_THUMB_ASSET));
 	}
 
-	public function getThumbCuePointID()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_THUMB_CUE_POINT_ID);}
-	public function setThumbCuePointID($v)			{$this->putInCustomData(self::CUSTOM_DATA_FIELD_THUMB_CUE_POINT_ID, (string)$v);}
+	public function getCuePointID()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_THUMB_CUE_POINT_ID);}
+	public function setCuePointID($v)			{$this->putInCustomData(self::CUSTOM_DATA_FIELD_THUMB_CUE_POINT_ID, (string)$v);}
 
 }
