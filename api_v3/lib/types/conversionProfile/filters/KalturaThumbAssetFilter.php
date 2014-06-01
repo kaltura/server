@@ -5,10 +5,16 @@
  */
 class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 {
+	/**
+	 * @var KalturaAssetType
+	 */
+	public $typeEqual = KalturaAssetType::THUMBNAIL;
+	
 	static private $map_between_objects = array
 	(
 		"thumbParamsIdEqual" => "_eq_flavor_params_id",
 		"thumbParamsIdIn" => "_in_flavor_params_id",
+		"typeEqual" => "_eq_type",
 	);
 
 	public function getMapBetweenObjects()

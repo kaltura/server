@@ -165,6 +165,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 						<scene-annotation entryId="{entry id}" systemName="MY_ANNOTATION_PARENT_SYSTEM_NAME">...</scene-annotation>
 						<scene-annotation entryId="{entry id}">...</scene-annotation>
 						<scene-code-cue-point entryId="{entry id}">...</scene-code-cue-point>
+						<scene-thumb-cue-point entryId="{entry id}">...</scene-thumb-cue-point>
 					</scenes>
 				</example>
 			</xs:appinfo>
