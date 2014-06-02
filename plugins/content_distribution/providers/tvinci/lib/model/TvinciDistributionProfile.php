@@ -350,6 +350,13 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
+	    // Set the default XSL expression for AUTOMATIC_DISTRIBUTION_CONDITIONS
+	    $fieldConfig = $fieldConfigArray[ConfigurableDistributionField::AUTOMATIC_DISTRIBUTION_CONDITIONS];
+	    if ( $fieldConfig )
+	    {
+			$fieldConfig->setEntryMrssXslt('<xsl:if test="customData/metadata/WorkflowStatus = \'Approved\'">Approved For Automatic Distribution</xsl:if>');
+	    }
+
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::IS_ACTIVE, 'Activate', 'Activate');
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::MEDIA_TYPE, 'Media Type', 'MediaType');
 
