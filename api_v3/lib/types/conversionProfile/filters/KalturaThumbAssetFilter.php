@@ -6,7 +6,7 @@
 class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 {	
 	/**
-	 * @dynamicType KalturaEntryStatus
+	 * @dynamicType KalturaAssetType
 	 * @var string
 	 */
 	public $typeIn = KalturaAssetType::THUMBNAIL;

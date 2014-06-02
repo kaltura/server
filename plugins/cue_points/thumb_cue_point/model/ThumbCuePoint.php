@@ -16,25 +16,27 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	}
 	
 	/* (non-PHPdoc)
-	 * @see CuePoint::preInsert()
+	 * @see CuePoint::preSave()
 	 */
-	public function preInsert(PropelPDO $con = null)
+	public function preSave(PropelPDO $con = null)
 	{
-		if(!$this->getAssetId())
+		if($this->isNew())
 		{
-			$timedThumbAsset = new timedThumbAsset();
-			$timedThumbAsset->setCuePointID($this->getId());
-			$timedThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
-			$timedThumbAsset->setEntryId($this->getEntryId());
-			$timedThumbAsset->setPartnerId($this->getPartnerId());
-			$timedThumbAsset->save();
-			$this->setAssetId($timedThumbAsset->getId());
+			if(!$this->getAssetId())
+			{
+				$timedThumbAsset = new timedThumbAsset();
+				$timedThumbAsset->setCuePointID($this->getId());
+				$timedThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
+				$timedThumbAsset->setEntryId($this->getEntryId());
+				$timedThumbAsset->setPartnerId($this->getPartnerId());
+				$timedThumbAsset->save();
+				$this->setAssetId($timedThumbAsset->getId());
+			}
+			else
+				$this->setAssetId($this->getAssetId());
 		}
-		else
-			$this->setAssetId($this->getAssetId());
 		
-		$this->setCustomDataObj();
-		return parent::preInsert($con);
+		return parent::preSave($con);
 	}
 
 	/**

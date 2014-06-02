@@ -67,12 +67,12 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	
 	public function validateTimedThumbAssetId()
 	{
-		$timedThumb = assetPeer::retrieveByPK($this->assetId);
+		$timedThumb = assetPeer::retrieveById($this->assetId);
 		
 		if(!$timedThumb)
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $this->assetId);
 		
-		if($timedThumb->getType() != kPluginableEnumsManager::apiToCore('assetType', KalturaAssetType::TIMED_THUMB_ASSET))
+		if($timedThumb->getType() != ThumbCuePointPlugin::getAssetTypeCoreValue(timedThumbAssetType::TIMED_THUMB_ASSET))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE, $this->assetId);
 	}
 }
