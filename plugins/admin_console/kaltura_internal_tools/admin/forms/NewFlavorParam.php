@@ -25,7 +25,7 @@ class Form_NewFlavorParam extends Infra_Form
         ));
 
         $this->addElement('text', 'partner_id', array(
-            'label' => 'Partner ID (Not Zero):',
+            'label' => 'Partner ID:',
             'required' => true,
             'filters' => array('Int'),
             'validators' => array('Int')
