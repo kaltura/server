@@ -126,8 +126,12 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	
 	private function getAssetDownloadUrl($asset)
 	{
-		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId()) . $asset->getFinalDownloadUrlPathWithoutKs();
-		$downloadUrl .= '/f/' . $asset->getId() . '.' . $asset->getFileExt();
+		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId())
+						. "/index.php/extwidget/playManifest"
+						. "/entryId/{$asset->getEntryId()}"
+						. "/format/applehttp/protocol/http"
+						. "/preferredBitrate/{$asset->getBitrate()}"
+						. "/a.m3u8";
 		return $downloadUrl;
 	}
 
