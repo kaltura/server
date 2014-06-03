@@ -6,13 +6,13 @@
 class TvinciDistributionFeedHelper
 {
 	const DATE_FORMAT = 'd/m/Y H:i:s';
-	
+
 	const ACTION_SUBMIT = 'insert';
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
 	/**
-	 * var KalturaTvinciDistributionProfile 
+	 * var KalturaTvinciDistributionProfile
 	 */
 	protected $distributionProfile;
 
@@ -35,13 +35,13 @@ class TvinciDistributionFeedHelper
 	 * @var DOMDocument
 	 */
 	protected $_doc;
-	
+
 	public function __construct(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
 	{
 		$this->distributionProfile = $distributionProfile;
 		$this->fieldValues = $fieldValues;
 		$this->extraData = $extraData;
-		$this->language = $fieldValues[TvinciDistributionField::LANGUAGE];		
+		$this->language = $fieldValues[TvinciDistributionField::LANGUAGE];
 	}
 
 	public function buildSubmitFeed()
@@ -69,13 +69,13 @@ class TvinciDistributionFeedHelper
 		// Build the feed
 		$feed = $this->_doc->createElement('feed');
 		$feed->setAttribute('broadcasterName', $this->extraData['broadcasterName']);
-		
+
 		$export = $this->_doc->createElement('export');
 		$feed->appendChild($export);
-		
+
 		$media = $this->_doc->createElement('media');
 		$export->appendChild($media);
-		
+
 		$this->setAttribute($media, "co_guid", $this->extraData['entryId']);
 		$this->setAttribute($media, "action", $action );
 
@@ -83,12 +83,12 @@ class TvinciDistributionFeedHelper
 		{
 			$isActive = $this->fieldValues[TvinciDistributionField::ACTIVATE_PUBLISHING];
 			$this->setAttribute($media, "is_active", $isActive);
-			
+
 			$media->appendChild( $this->createBasicElement() );
 			$media->appendChild( $this->createStructureElement() );
 			$media->appendChild( $this->createFilesElement() );
 		}
-		
+
 		// Wrap as a CDATA section
 		$feedAsXml = $this->_doc->saveXML($feed);
 		$data = $this->_doc->createElement('data');
@@ -104,10 +104,10 @@ class TvinciDistributionFeedHelper
 
 		// Attach the root node to the document
 		$this->_doc->appendChild($feederRootNode);
-		
+
 		return $this->getXml();
 	}
-	
+
 	/**
 	 * Result XML:
 	 * 	<$name>$value</$name>
@@ -118,7 +118,7 @@ class TvinciDistributionFeedHelper
 		$node = $this->_doc->createElement($name, $value);
 		return $node;
 	}
-	
+
 	/**
 	 * Result XML:
 	 * 	<$name>
@@ -129,13 +129,13 @@ class TvinciDistributionFeedHelper
 	{
 		$valueNode = $this->_doc->createElement('value', $value);
 		$this->setAttribute($valueNode, "lang", $lang);
-	
+
 		$namedNode = $this->_doc->createElement($name);
 		$namedNode->appendChild($valueNode);
-	
+
 		return $namedNode;
 	}
-	
+
 	/**
 	 * Result XML:
 	 * 	<$name>
@@ -145,10 +145,10 @@ class TvinciDistributionFeedHelper
 	protected function createValueWithLangElementFromAssocArray($name, $lang, array $arr, $key)
 	{
 		$value = array_key_exists($key, $arr) ? $arr[$key] : "";
-	
+
 		return $this->createValueWithLangElement($name, $value, $lang);
 	}
-	
+
 	private function createDateElement($fieldName, array $arr, $key)
 	{
 		$timestamp = $arr[$key];
@@ -156,43 +156,43 @@ class TvinciDistributionFeedHelper
 		$dateNode = $this->_doc->createElement($fieldName, $formattedDate);
 		return $dateNode;
 	}
-	
+
 	private function createMetadataElement($name, array $arr, $key)
 	{
 		$metaNode = $this->createValueElement("meta", $arr, $key);
-		
+
 		$this->setAttribute($metaNode, "name", $name);
-		
+
 		return $metaNode;
 	}
-	
+
 	private function createMetadataWithLangElement($name, $lang, array $arr, $key)
 	{
 		$metaNode = $this->createValueWithLangElementFromAssocArray("meta", $lang, $arr, $key);
-		
+
 		$this->setAttribute($metaNode, "name", $name);
 		$this->setAttribute($metaNode, "ml_handling", "unique");
-		
+
 		return $metaNode;
 	}
-	
+
 	private function createMetadataContainerWithLangElement($name, $lang, array $arr, $key)
 	{
 		$multivalField = $arr[$key];
 		$multivalArr = explode(',', $multivalField);
-		
+
 		$metaNode = $this->_doc->createElement('meta');
 		$this->setAttribute($metaNode, "name", $name);
 		$this->setAttribute($metaNode, "ml_handling", "unique");
-		
+
 		foreach ( $multivalArr as $val )
 		{
 			$metaNode->appendChild( $this->createValueWithLangElement('container', $val, $lang) );
 		}
-		
+
 		return $metaNode;
 	}
-	
+
 	private function createBasicElement()
 	{
 		$basicNode = $this->_doc->createElement("basic");
@@ -208,11 +208,11 @@ class TvinciDistributionFeedHelper
 			$this->setAttribute($thumbnail, "url", $this->extraData['defaultThumbUrl']);
 			$basicNode->appendChild( $thumbnail );
 		}
-		
+
 		$basicNode->appendChild( $this->createRulesElement() );
 		$basicNode->appendChild( $this->createDatesElement() );
 		$basicNode->appendChild( $this->createPicRatiosElement() );
-		
+
 		return $basicNode;
 	}
 
@@ -222,10 +222,10 @@ class TvinciDistributionFeedHelper
 
 		$rules->appendChild( $this->createValueElement('geo_block_rule', $this->fieldValues, TvinciDistributionField::GEO_BLOCK_RULE) );
 		$rules->appendChild( $this->createValueElement('watch_per_rule', $this->fieldValues, TvinciDistributionField::WATCH_PERMISSIONS_RULE) );
-		
+
 		return $rules;
 	}
-	
+
 	private function createDatesElement()
 	{
 		$dates = $this->_doc->createElement("dates");
@@ -235,7 +235,7 @@ class TvinciDistributionFeedHelper
  		$dates->appendChild( $this->createDateElement('catalog_start', $this->fieldValues, TvinciDistributionField::CATALOG_START_DATE) );
  		$dates->appendChild( $this->createDateElement('catalog_end', $this->fieldValues, TvinciDistributionField::CATALOG_END_DATE) );
  		$dates->appendChild( $this->createDateElement('final_end', $this->fieldValues, TvinciDistributionField::END_DATE) );
- 		
+
  		return $dates;
 	}
 
@@ -251,14 +251,14 @@ class TvinciDistributionFeedHelper
 			$this->setAttribute($ratioNode, "ratio", $picRatio['ratio']);
 			$picRatiosNode->appendChild( $ratioNode );
 		}
-		
+
 		return $picRatiosNode;
 	}
 
 	private function createStructureElement()
 	{
 		$structure = $this->_doc->createElement("structure");
-	
+
  		$structure->appendChild( $this->createStringsElement() );
  		$structure->appendChild( $this->createBooleansElement() );
  		$structure->appendChild( $this->createDoublesElement() );
@@ -270,26 +270,26 @@ class TvinciDistributionFeedHelper
 	private function createStringsElement()
 	{
 		$strings = $this->_doc->createElement("strings");
-		
+
 		$strings->appendChild( $this->createMetadataWithLangElement('Runtime', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
 		$strings->appendChild( $this->createMetadataWithLangElement('Release date', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_DATE) );
-		
+
 		return $strings;
 	}
 
 	private function createBooleansElement()
 	{
 		$booleans = $this->_doc->createElement("booleans");
-		
+
 		return $booleans;
 	}
 
 	private function createDoublesElement()
 	{
 		$doubles = $this->_doc->createElement("doubles");
-		
+
 		$doubles->appendChild( $this->createMetadataElement('Release year', $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
-		
+
 		return $doubles;
 	}
 
@@ -305,10 +305,10 @@ class TvinciDistributionFeedHelper
 		$metas->appendChild( $this->createMetadataContainerWithLangElement('Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE) );
 		$metas->appendChild( $this->createMetadataContainerWithLangElement('Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO) );
 		$metas->appendChild( $this->createMetadataContainerWithLangElement('Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST) );
-		
+
 		return $metas;
 	}
-	
+
 	private function createFilesElement()
 	{
 		$files = $this->_doc->createElement("files");
@@ -331,9 +331,9 @@ class TvinciDistributionFeedHelper
 				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN => 	'Tablet Main',
 				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN => 'Smartphone Main',
 		);
-		
+
 		$fileNode = $this->_doc->createElement("file");
-		
+
 		$fieldName = $videoAssetFieldToNameMap[$videoAssetFieldName];
 		$this->setAttribute($fileNode, "type", $fieldName);
 		$this->setAttribute($fileNode, "quality", "HIGH");

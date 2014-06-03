@@ -19,12 +19,12 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
-	
+
 		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
-		
+
 		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
-		
+
 		return true;
 	}
 
@@ -43,12 +43,12 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
-	
+
 		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 
 		$this->handleUpdate($data, $data->distributionProfile, $data->providerData);
-		
+
 		return true;
 	}
 
@@ -67,12 +67,12 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
-	
+
 		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 
 		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
-	
+
 		return true;
 	}
 
@@ -91,7 +91,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	{
 		return false;
 	}
-	
+
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaTvinciDistributionProfile $distributionProfile
@@ -102,7 +102,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		$url = $distributionProfile->ingestUrl;
 		$xml = $providerData->submitXml;
 		KalturaLog::info("Submitting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n$xml");
-		
+
 		$responseXml = $this->postXml($url, $xml);
 		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
 		if ( ! $success )
@@ -110,7 +110,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 			throw new Exception("Submit failed");
 		}
 	}
-	
+
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaTvinciDistributionProfile $distributionProfile
@@ -121,7 +121,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		$url = $distributionProfile->ingestUrl;
 		$xml = $providerData->updateXml;
 		KalturaLog::info("Updating entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n$xml");
-		
+
 		$responseXml = $this->postXml($url, $xml);
 		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
 		if ( ! $success )
@@ -140,7 +140,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		$url = $distributionProfile->ingestUrl;
 		$xml = $providerData->deleteXml;
 		KalturaLog::info("Deleting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n$xml");
-		
+
 		$responseXml = $this->postXml($url, $xml);
 		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
 		if ( ! $success )
@@ -160,13 +160,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		$options = array( 'post_data' => $xml, 'full_response' => true );
 		$fullResponse = KCurlWrapper::getContent($url, $options);
 		KalturaLog::info("Full response: " . print_r($fullResponse,true));
-		
+
 		$responseXml = null;
 		if ( $fullResponse['http_code'] == 200 )
 		{
 			$responseXml = simplexml_load_string( $fullResponse['content'] );
 		}
-		
+
 		if ( !$responseXml )
 		{
 			throw new Exception("Failed parsing response"); // Throw an Exception in order to fail the job

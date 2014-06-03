@@ -9,12 +9,12 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	 * @var TvinciDistributionProvider
 	 */
 	protected static $instance;
-	
+
 	protected function __construct()
 	{
-		
+
 	}
-	
+
 	/**
 	 * @return TvinciDistributionProvider
 	 */
@@ -22,10 +22,10 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		if(!self::$instance)
 			self::$instance = new TvinciDistributionProvider();
-			
+
 		return self::$instance;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getType()
 	 */
@@ -33,7 +33,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return TvinciDistributionPlugin::getDistributionProviderTypeCoreValue(TvinciDistributionProviderType::TVINCI);
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -41,7 +41,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return 'Tvinci';
 	}
-	
+
 	public function getFieldEnumClass()
 	{
 	    return 'TvinciDistributionField';
@@ -87,7 +87,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return true;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::isAvailabilityUpdateEnabled()
 	 */
@@ -95,7 +95,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return false;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::isLocalFileRequired()
 	 */
@@ -103,7 +103,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		if($jobType == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 			return true;
-		
+
 		return false;
 	}
 
@@ -114,7 +114,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return false;
 	}
-	
+
 	/**
 	 * returns how many seconds before sunrise the job could be created.
 	 * @return int
@@ -123,7 +123,7 @@ class TvinciDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return 0; //irrelevant
 	}
-	
+
 	/**
 	 * returns how many seconds before sunrise the job could be created.
 	 * @return int

@@ -484,24 +484,24 @@ class KCurlWrapper
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $options['post_data']);
 		}
-		
+
 		if ( isset($options['curl_options']) )
 		{
 			foreach ($options['curl_options'] as $option => $value)
 			{
 				curl_setopt($ch, $option, $value);
-			}				
+			}
 		}
-			
+
 		$response = curl_exec($ch);
-		
+
 		if ( isset($options['full_response']) && $options['full_response'] )
 		{
 			$curlError = curl_error($ch);
 			$curlHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			$response = array('content' => $response, 'http_code' => $curlHttpCode, 'error_text' => $curlError);
 		}
-		
+
 		curl_close($ch);
 		
 		return $response;

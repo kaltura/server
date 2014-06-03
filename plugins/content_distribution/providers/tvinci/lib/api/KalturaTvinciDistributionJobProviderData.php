@@ -13,35 +13,35 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);
-	    
+
 		if(!$distributionJobData)
 			return;
-			
+
 		if(!($distributionJobData->distributionProfile instanceof KalturaTvinciDistributionProfile))
 			return;
-		
+
 		$fieldValues = unserialize($this->fieldValues);
-		
+
 		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
 		$extraData = array(
 				'entryId' => $entry->getId(),
-				'createdAt' => $entry->getCreatedAtAsInt(), 
-				'broadcasterName' => 'Kaltura-' . $entry->getPartnerId(), 
+				'createdAt' => $entry->getCreatedAtAsInt(),
+				'broadcasterName' => 'Kaltura-' . $entry->getPartnerId(),
 			);
-		
+
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
 		foreach ( $thumbAssets as $thumbAsset )
 		{
 			$thumbDownloadUrl = $this->getAssetDownloadUrl( $thumbAsset );
-			
+
 			$ratio = KDLVideoAspectRatio::ConvertFrameSize($thumbAsset->getWidth(), $thumbAsset->getHeight());
-			
+
 			$picRatios[] = array(
 					'url' => $thumbDownloadUrl,
 					'ratio' => $ratio,
 				);
-			
+
 			if ( $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) )
 			{
 				$extraData['defaultThumbUrl'] = $thumbDownloadUrl;
@@ -61,14 +61,14 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		{
 			$this->updateFlavorAssetInfo($assetInfo, $flavorAsset, $fieldValues);
 		}
-		
+
 		if ( count($assetInfo) )
 		{
-			$extraData['assetInfo'] = $assetInfo;			
+			$extraData['assetInfo'] = $assetInfo;
 		}
 
 		$feed = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues, $extraData);
-		
+
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
 			$this->xml = $feed->buildSubmitFeed();
@@ -96,13 +96,13 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN,
 				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN,
 			);
-		
+
 		foreach ( $videoAssetFieldNames as $videoAssetFieldName )
 		{
 			if ( isset($fieldValues[$videoAssetFieldName]) )
 			{
 				$configFlavorParamName = $fieldValues[$videoAssetFieldName];
-				
+
 				if ( $configFlavorParamName == $assetFlavorParamsName )
 				{
 					if ( $videoAssetFieldName == TvinciDistributionField::VIDEO_ASSET_MAIN )
@@ -120,14 +120,14 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 							'url' => $url,
 							'name' => $assetFlavorParamsName,
 						);
-					
+
 					// Note: instead of 'break'ing here, we'll continue to loop in case
 					//       the same flavor asset is required by another $videoAssetField
 				}
-			} 
+			}
 		}
 	}
-	
+
 	private function getAssetDownloadUrl($asset)
 	{
 		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId()) . $asset->getFinalDownloadUrlPathWithoutKs();
