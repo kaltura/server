@@ -352,7 +352,7 @@ KalturaClientBase.prototype.doQueue = function(callback) {
 	if (this.useMultiRequest) {
 		path += 'multirequest';
 		var i = 1;
-		for ( var v = 0; v < this.callsQueue.lenght; v++) {
+		for ( var v = 0; v < this.callsQueue.length; v++) {
 			call = this.callsQueue[v];
 			var callParams = call.getParamsForMultiRequest(i);
 			for ( var sv1 in callParams) {
