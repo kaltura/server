@@ -81,8 +81,8 @@ class TvinciDistributionFeedHelper
 
  		if ( $action != self::ACTION_DELETE ) // No need for the following content in case of a delete scenario
 		{
-			$isActive = strtolower($this->fieldValues[TvinciDistributionField::IS_ACTIVE]);
-			$this->setAttribute($media, "is_active", (($isActive == 'yes' || $isActive == 'true') ? 'true' : 'false') );
+			$isActive = $this->fieldValues[TvinciDistributionField::ACTIVATE_PUBLISHING];
+			$this->setAttribute($media, "is_active", $isActive);
 			
 			$media->appendChild( $this->createBasicElement() );
 			$media->appendChild( $this->createStructureElement() );

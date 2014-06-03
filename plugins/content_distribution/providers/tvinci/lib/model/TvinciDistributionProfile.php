@@ -357,7 +357,12 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 			$fieldConfig->setEntryMrssXslt('<xsl:if test="customData/metadata/WorkflowStatus = \'Approved\'">Approved For Automatic Distribution</xsl:if>');
 	    }
 
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::IS_ACTIVE, 'Activate', 'Activate');
+	    $activatePublishingXSLT = '<xsl:choose>'
+	    							. '<xsl:when test="customData/metadata/Activate = \'Yes\'">true</xsl:when>'
+	    							. '<xsl:otherwise>false</xsl:otherwise>'
+	    						. '</xsl:choose>';
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::ACTIVATE_PUBLISHING, 'Activate Publishing', 'Activate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER, $activatePublishingXSLT);
+
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::MEDIA_TYPE, 'Media Type', 'MediaType');
 
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::GEO_BLOCK_RULE, 'Geo Block Rule', 'GeoBlockRule');
@@ -756,22 +761,25 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	    return $fieldConfigArray;
 	}
 	
-	protected function addMetadataDistributionFieldConfig(array &$array, $name, $friendlyName, $metadataName, $multiValue = false, $required = DistributionFieldRequiredStatus::NOT_REQUIRED)
+	protected function addMetadataDistributionFieldConfig(array &$array, $name, $friendlyName, $metadataName, $multiValue = false, $required = DistributionFieldRequiredStatus::NOT_REQUIRED, $xslt = null)
 	{
 		$metadataPath = "customData/metadata/$metadataName";
-		if ( ! $multiValue ) // Single value
+		if ( is_null($xslt) )
 		{
-			$xslt = '<xsl:value-of select="string('. $metadataPath . ')" />';
-		}
-		else
-		{
-			$xslt = '<xsl:for-each select="'. $metadataPath . '">'
-						. '<xsl:if test="position() &gt; 1">'
-						. '<xsl:text>,</xsl:text>'
-						. '</xsl:if>'
-						. '<xsl:value-of select="string(.)" />'
-					. '</xsl:for-each>'
-				;
+			if ( ! $multiValue ) // Single value
+			{
+				$xslt = '<xsl:value-of select="string('. $metadataPath . ')" />';
+			}
+			else
+			{
+				$xslt = '<xsl:for-each select="'. $metadataPath . '">'
+							. '<xsl:if test="position() &gt; 1">'
+							. '<xsl:text>,</xsl:text>'
+							. '</xsl:if>'
+							. '<xsl:value-of select="string(.)" />'
+						. '</xsl:for-each>'
+					;
+			}
 		}
 		
 		$updateMetadataArray = array( "/*[local-name()='metadata']/*[local-name()='$metadataName']" );

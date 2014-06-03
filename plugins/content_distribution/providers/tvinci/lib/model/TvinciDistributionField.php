@@ -29,7 +29,7 @@ interface TvinciDistributionField extends BaseEnum
 
 // 	const FEED_BROADCASTER_NAME			= 'FEED_BROADCASTER_NAME';
 //	const REFERENCE_ID					= 'REFERENCE_ID';
-	const IS_ACTIVE						= 'IS_ACTIVE';
+	const ACTIVATE_PUBLISHING			= 'ACTIVATE_PUBLISHING';
 	const MEDIA_TYPE					= 'MEDIA_TYPE';
 
 	const GEO_BLOCK_RULE 				= 'GEO_BLOCK_RULE';
