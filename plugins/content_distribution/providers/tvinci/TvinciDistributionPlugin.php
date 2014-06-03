@@ -61,15 +61,6 @@ class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 		// client side apps like batch and admin console
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::TVINCI)
 		{
-			if($baseClass == 'IDistributionEngineCloseDelete')
-				return new TvinciDistributionFeedEngine();
-					
-			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return new TvinciDistributionFeedEngine();
-					
-			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return new TvinciDistributionFeedEngine();
-					
 			if($baseClass == 'IDistributionEngineDelete')
 				return new TvinciDistributionFeedEngine();
 					
@@ -211,23 +202,6 @@ class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-	    // append Tvinci specific report statistics
-	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
-		$mrss->addChild('allow_comments', $distributionProfile->getAllowComments());
-		$mrss->addChild('allow_responses', $distributionProfile->getAllowResponses());
-		$mrss->addChild('allow_ratings', $distributionProfile->getAllowRatings());
-		$mrss->addChild('allow_embedding', $distributionProfile->getAllowEmbedding());
-		$mrss->addChild('commerical_policy', $distributionProfile->getCommercialPolicy());
-		$mrss->addChild('ugc_policy', $distributionProfile->getUgcPolicy());
-		$mrss->addChild('default_category', $distributionProfile->getDefaultCategory());
-		$mrss->addChild('target', $distributionProfile->getTarget());
-		$mrss->addChild('notification_email', $distributionProfile->getNotificationEmail());
-		$mrss->addChild('account_username', $distributionProfile->getUsername());
-		$mrss->addChild('ad_server_partner_id', $distributionProfile->getAdServerPartnerId());
-		$mrss->addChild('allow_pre_roll_ads', $distributionProfile->getAllowPreRollAds());
-		$mrss->addChild('allow_post_roll_ads', $distributionProfile->getAllowPostRollAds());		
-		$mrss->addChild('claim_type', $distributionProfile->getClaimType());
-		$mrss->addChild('instream_standard', $distributionProfile->getInstreamStandard());
 	}
 	
 	/**
