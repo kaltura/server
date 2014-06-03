@@ -2,15 +2,13 @@
 /**
  * @package plugins.tvinciDistribution
  */
-class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaConfigurator
+class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'tvinciDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 	
-	const TVINCI_EVENT_CONSUMER = 'kTvinciDistributionEventConsumer';
-
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -202,16 +200,6 @@ class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-	}
-	
-	/**
-	 * @return array
-	 */
-	public static function getEventConsumers()
-	{
-		return array(
-			self::TVINCI_EVENT_CONSUMER,
-		);
 	}
 	
 	/**
