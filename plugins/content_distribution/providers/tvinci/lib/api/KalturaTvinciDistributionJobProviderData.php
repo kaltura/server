@@ -8,17 +8,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	/**
 	 * @var string
 	 */
-	public $submitXml;
-
-	/**
-	 * @var string
-	 */
-	public $updateXml;
-
-	/**
-	 * @var string
-	 */
-	public $deleteXml;
+	public $xml;
 
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -81,15 +71,18 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
-			$this->submitXml = $feed->buildSubmitFeed();
+			$this->xml = $feed->buildSubmitFeed();
+			$this->submitXml = $this->xml;
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 		{
-			$this->updateXml = $feed->buildUpdateFeed();
+			$this->xml = $feed->buildUpdateFeed();
+			$this->updateXml = $this->xml;
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
 		{
-			$this->deleteXml = $feed->buildDeleteFeed();
+			$this->xml = $feed->buildDeleteFeed();
+			$this->deleteXml = $this->xml;
 		}
 	}
 
@@ -137,6 +130,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	private static $map_between_objects = array
 	(
+		'xml',
 	);
 
 	public function getMapBetweenObjects()
