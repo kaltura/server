@@ -105,8 +105,19 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 				
 				if ( $configFlavorParamName == $assetFlavorParamsName )
 				{
+					if ( $videoAssetFieldName == TvinciDistributionField::VIDEO_ASSET_MAIN )
+					{
+						// Main video asset if PC oriented, so we'll fetch a full path (.mp4) download file URL
+						$url = $this->getAssetDownloadUrl($flavorAsset);
+					}
+					else
+					{
+						// Other assets will be converted to a .m3u8 URL
+						$url = $this->getAssetM3U8DownloadUrl($flavorAsset);
+					}
+
 					$assetInfo[$videoAssetFieldName] = array(
-							'url' => $this->getAssetDownloadUrl($flavorAsset),
+							'url' => $url,
 							'name' => $assetFlavorParamsName,
 						);
 					
@@ -118,6 +129,13 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 	}
 	
 	private function getAssetDownloadUrl($asset)
+	{
+		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId()) . $asset->getFinalDownloadUrlPathWithoutKs();
+		$downloadUrl .= '/f/' . $asset->getId() . '.' . $asset->getFileExt();
+		return $downloadUrl;
+	}
+
+	private function getAssetM3U8DownloadUrl($asset)
 	{
 		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId())
 						. "/index.php/extwidget/playManifest"

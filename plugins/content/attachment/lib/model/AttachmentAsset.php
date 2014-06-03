@@ -25,7 +25,7 @@ class AttachmentAsset extends asset
 	public function setFilename($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FILENAME, $v);}
 	public function setTitle($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_TITLE, $v);}
 	
-	protected function getFinalDownloadUrlPathWithoutKs()
+	public function getFinalDownloadUrlPathWithoutKs()
 	{
 		$finalPath = '/api_v3/index.php/service/attachment_attachmentAsset/action/serve';
 		$finalPath .= '/attachmentAssetId/' . $this->getId();
