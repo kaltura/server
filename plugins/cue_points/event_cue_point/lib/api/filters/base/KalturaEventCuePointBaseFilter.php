@@ -8,14 +8,12 @@ abstract class KalturaEventCuePointBaseFilter extends KalturaCuePointFilter
 {
 	static private $map_between_objects = array
 	(
-		"endTimeGreaterThanOrEqual" => "_gte_end_time",
-		"endTimeLessThanOrEqual" => "_lte_end_time",
+		"eventTypeEqual" => "_eq_event_type",
+		"eventTypeIn" => "_in_event_type",
 	);
 
 	static private $order_by_map = array
 	(
-		"+endTime" => "+end_time",
-		"-endTime" => "-end_time",
 	);
 
 	public function getMapBetweenObjects()
@@ -29,12 +27,13 @@ abstract class KalturaEventCuePointBaseFilter extends KalturaCuePointFilter
 	}
 
 	/**
-	 * @var int
+	 * @var KalturaEventType
 	 */
-	public $endTimeGreaterThanOrEqual;
+	public $eventTypeEqual;
 
 	/**
-	 * @var int
+	 * @dynamicType KalturaEventType
+	 * @var string
 	 */
-	public $endTimeLessThanOrEqual;
+	public $eventTypeIn;
 }

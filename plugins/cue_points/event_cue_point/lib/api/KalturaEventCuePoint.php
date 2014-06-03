@@ -7,16 +7,10 @@ class KalturaEventCuePoint extends KalturaCuePoint
 {
 	/**
 	 * @var KalturaEventType 
+	 * @filter eq,in
 	 * @requiresPermission insert,update
 	 */
 	public $eventType;
-	
-	/**
-	 * @var int 
-	 * @filter gte,lte,order
-	 * @requiresPermission insert,update
-	 */
-	public $endTime;
 	
 	public function __construct()
 	{
@@ -25,8 +19,7 @@ class KalturaEventCuePoint extends KalturaCuePoint
 	
 	private static $map_between_objects = array
 	(
-		"eventType",
-		"endTime",
+		"eventType" => "subType",
 	);
 	
 	/* (non-PHPdoc)
@@ -48,25 +41,4 @@ class KalturaEventCuePoint extends KalturaCuePoint
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KalturaCuePoint::validateForInsert()
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		parent::validateForInsert($propertiesToSkip);
-		
-		if(!is_null($this->endTime))
-			$this->validateEndTime();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaCuePoint::validateForUpdate()
-	 */
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		if(!is_null($this->endTime))
-			$this->validateEndTime($sourceObject->getId());
-			
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
 }

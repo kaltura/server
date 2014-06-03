@@ -5,6 +5,4 @@
  */
 class KalturaEventCuePointOrderBy extends KalturaCuePointOrderBy
 {
-	const END_TIME_ASC = "+endTime";
-	const END_TIME_DESC = "-endTime";
 }

@@ -1,17 +1,14 @@
 <?php
 /**
- * @package plugins.adCuePoint
+ * @package plugins.eventCuePoint
  * @subpackage api.filters
  */
-class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
+class KalturaEventCuePointFilter extends KalturaEventCuePointBaseFilter
 {
 	static private $map_between_objects = array
 	(
-		"protocolTypeEqual" => "_eq_sub_type",
-		"protocolTypeIn" => "_in_sub_type",
-		"titleLike" => "_like_name",
-		"titleMultiLikeOr" => "_mlikeor_name",
-		"titleMultiLikeAnd" => "_mlikeand_name",
+			"eventTypeEqual" => "_eq_sub_type",
+			"eventTypeIn" => "_in_sub_type",
 	);
 
 	public function getMapBetweenObjects()

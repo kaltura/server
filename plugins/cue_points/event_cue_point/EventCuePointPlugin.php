@@ -3,13 +3,15 @@
  * Enable event cue point objects management on entry objects
  * @package plugins.EventCuePoint
  */
-class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
+class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'eventCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
 	const CUE_POINT_VERSION_MINOR = 0;
 	const CUE_POINT_VERSION_BUILD = 0;
 	const CUE_POINT_NAME = 'cuePoint';
+	
+	const EVENT_CUE_POINT_CONSUMER = 'kEventCuePointConsumer';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -93,5 +95,15 @@ class EventCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	public static function contributeToSchema($type)
 	{
 		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	*/
+	public static function getEventConsumers()
+	{
+		return array(
+				self::EVENT_CUE_POINT_CONSUMER
+		);
 	}
 }
