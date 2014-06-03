@@ -87,26 +87,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	public $storageFtpPassiveMode;
 	
 	/**
-	 * @var string
-	 */
-	public $deliveryHttpBaseUrl;
-	
-	/**
-	 * @var string
-	 */
-	public $deliveryHttpsBaseUrl;
-	
-	/**
-	 * @var string
-	 */
-	public $deliveryRmpBaseUrl;
-	
-	/**
-	 * @var string
-	 */
-	public $deliveryIisBaseUrl;
-	
-	/**
 	 * @var int
 	 */
 	public $minFileSize;
@@ -137,16 +117,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	public $pathManagerParams;
 	
 	/**
-	 * @var string
-	 */
-	public $urlManagerClass;
-	
-	/**
-	 * @var KalturaKeyValueArray
-	 */
-	public $urlManagerParams;
-	
-	/**
 	 * No need to create enum for temp field
 	 * 
 	 * @var int
@@ -165,12 +135,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 * @var KalturaStorageProfileDeliveryStatus
 	 */
 	public $deliveryStatus;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $rtmpPrefix;
 	
 	/**
 	 * 
@@ -197,6 +161,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $rules;
 	
+	/**
+	 * Delivery profile ids
+	 * @var KalturaKeyValueArray
+	 */
+	public $deliveryProfileIds;
 	
 	private static $map_between_objects = array
 	(
@@ -214,26 +183,20 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"storageUsername",
 		"storagePassword",
 		"storageFtpPassiveMode",
-		"deliveryHttpBaseUrl",
-		"deliveryHttpsBaseUrl",
-		"deliveryRmpBaseUrl",
-		"deliveryIisBaseUrl",
 		"minFileSize",
 		"maxFileSize",
 		"flavorParamsIds",
 		"maxConcurrentConnections",
 		"pathManagerClass",
-		"urlManagerClass",
 		"trigger",
 		"deliveryPriority",
 		"deliveryStatus",
-		"rtmpPrefix",
 		"readyBehavior",
 		"allowAutoDelete",
 		"createFileLink",
 		"rules",
-		"urlManagerParams",
-		"pathManagerParams",		
+		"pathManagerParams",	
+		"deliveryProfileIds",
 	);
 	
 	/* (non-PHPdoc)
@@ -292,6 +255,18 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		return parent::validateForInsert($propertiesToSkip);
 	}
 	
+	protected function insertObject(&$res, $key, $value) {
+		if(strpos($key, ".") === FALSE) {
+			$res[$key] = intval($value);
+			return;
+		}
+	
+		list($key, $newKey) = explode(".", $key, 2);
+		if(!array_key_exists($key, $res))
+			$res[$key] = array();
+		$this->insertObject($res[$key], $newKey, $value);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
@@ -302,17 +277,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		
 		
 		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
-		
-		// url manager params
-		$dbUrlManagerParams = $object_to_fill->getUrlManagerParams();
-		if (!is_null($this->urlManagerParams) && count($this->urlManagerParams) > 0)
-		{
-    		foreach ($this->urlManagerParams as $param)
-    		{
-    		    $dbUrlManagerParams[$param->key] = $param->value;
-    		}
-		}
-		$object_to_fill->setUrlManagerParams($dbUrlManagerParams);
 		
 		// path manager params
 		$dbPathManagerParams = $object_to_fill->getPathManagerParams();
@@ -325,6 +289,16 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		}
 		$object_to_fill->setPathManagerParams($dbPathManagerParams);
 		
+		// Delivery Profile Ids
+		$deliveryProfileIds = $this->deliveryProfileIds;
+		
+		$deliveryProfiles = array();
+		if($deliveryProfileIds)
+			foreach($deliveryProfileIds->toArray() as $keyValue) 
+				$this->insertObject($deliveryProfiles, $keyValue->key, $keyValue->value);
+			
+		$object_to_fill->setDeliveryProfileIds($deliveryProfiles);
+		
 		return $object_to_fill;
 	}
 	
@@ -335,8 +309,8 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	{
 	    parent::fromObject($source_object);
 	    
-	    $this->urlManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getUrlManagerParams());
 	    $this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
+	    $this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
 	}
 	
 	/* (non-PHPdoc)

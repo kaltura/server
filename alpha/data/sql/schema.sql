@@ -1917,18 +1917,44 @@ CREATE TABLE `storage_profile`
 	`storage_username` VARCHAR(31),
 	`storage_password` VARCHAR(31),
 	`storage_ftp_passive_mode` INTEGER,
-	`delivery_http_base_url` VARCHAR(127),
-	`delivery_rmp_base_url` VARCHAR(127),
-	`delivery_iis_base_url` VARCHAR(127),
 	`min_file_size` INTEGER,
 	`max_file_size` INTEGER,
 	`flavor_params_ids` VARCHAR(127),
 	`max_concurrent_connections` INTEGER,
 	`custom_data` TEXT,
 	`path_manager_class` VARCHAR(127),
-	`url_manager_class` VARCHAR(127),
 	`delivery_priority` INTEGER,
 	`delivery_status` INTEGER,
+	PRIMARY KEY (`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- delivery_profile
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_profile`;
+
+
+CREATE TABLE `delivery_profile`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`type` INTEGER default 0 NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`partner_id` INTEGER,
+	`name` VARCHAR(128),
+	`system_name` VARCHAR(128),
+	`description` VARCHAR(128),
+	`url` VARCHAR(256),
+	`host_name` VARCHAR(127),
+	`is_default` TINYINT,
+	`parent_id` INTEGER default 0,
+	`recognizer` TEXT,
+	`tokenizer` TEXT,
+	`status` INTEGER,
+	`streamer_type` VARCHAR(30),
+	`media_protocols` VARCHAR(256),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`)
 )Type=InnoDB;
 

@@ -1709,18 +1709,34 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_username" type="varchar" size="31" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_password" type="varchar" size="31" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="storage_ftp_passive_mode" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_http_base_url" type="varchar" size="127" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_rmp_base_url" type="varchar" size="127" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_iis_base_url" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="min_file_size" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="max_file_size" type="integer" />
 		<column primaryKey="false" lazyLoad="false" name="flavor_params_ids" type="varchar" required="false" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="max_concurrent_connections" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<column primaryKey="false" lazyLoad="false" name="path_manager_class" type="varchar" required="false" size="127" />
-		<column primaryKey="false" lazyLoad="false" name="url_manager_class" type="varchar" required="false" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_priority" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="integer" />
+	</table>
+	<table skipSql="false" abstract="false" name="delivery_profile">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="url" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="127" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_default" type="boolean" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recognizer" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tokenizer" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="streamer_type" type="varchar" size="30"/>	
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="media_protocols" type="varchar" size="256"/>	
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	
 	</table>
 	<table skipSql="false" abstract="false" name="email_ingestion_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />

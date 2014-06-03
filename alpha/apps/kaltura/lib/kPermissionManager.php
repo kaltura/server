@@ -500,7 +500,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if (!$ksString ||
 			(!$operatingPartner && kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID))
 		{
-			return null; // no partner or session -> no role
+			$roleId = UserRolePeer::getIdByStrId (UserRoleId::NO_SESSION_ROLE);
+			if($roleId)
+				return array($roleId);
+				
+			return null;
 		}
 
 		$ks = ks::fromSecureString($ksString);

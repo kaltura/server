@@ -213,6 +213,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		$entries = array();
 		$counter = 0;
+		$shouldSortCaptionFiltering = $entryFilter->orderBy ? true : false;
 		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemCriteria->setGroupByColumn('str_entry_id');
@@ -226,16 +227,43 @@ class CaptionAssetItemService extends KalturaBaseService
 			else
 				$captionAssetItemPager->attachToCriteria($currCriteria);
 			$currCriteria->applyFilters();
-			$entries = array_merge ($entries , $currCriteria->getFetchedIds());
+			$currEntries = $currCriteria->getFetchedIds();
+			
+			//sorting this chunk according to results of first sphinx query
+			if ($shouldSortCaptionFiltering)
+				$currEntries = array_intersect($entryIds , $currEntries);
+			$entries = array_merge ($entries , $currEntries);
 			$counter += $currCriteria->getRecordsCount();
 		}
 
-		$pageSize = $captionAssetItemPager->pageSize;
-		$pageIndex = $captionAssetItemPager->pageIndex - 1;
+		$inputPageSize = $captionAssetItemPager->pageSize;
+		$inputPageIndex = $captionAssetItemPager->pageIndex;
+
+		//page index & size validation - no negative values & size not too big
+		$pageSize = max(min($inputPageSize, baseObjectFilter::getMaxInValues()), 0);
+		$pageIndex = max($captionAssetItemPager::MIN_PAGE_INDEX, $inputPageIndex) - 1;
+
 		$firstIndex = $pageSize * $pageIndex ;
-		$entries = array_slice ($entries , $firstIndex , $pageSize);
+		$entries = array_slice($entries , $firstIndex , $pageSize);
 
 		$dbList = entryPeer::retrieveByPKs($entries);
+
+		if ($shouldSortCaptionFiltering)
+		{
+			//results ids mapping
+			$entriesMapping = array();
+			foreach($dbList as $item)
+			{
+				$entriesMapping[$item->getId()] = $item;
+			}
+
+			$dbList = array();
+			foreach($entries as $entryId)
+			{
+				if (isset($entriesMapping[$entryId]))
+					$dbList[] = $entriesMapping[$entryId];
+			}
+		}
 		$list = KalturaBaseEntryArray::fromEntryArray($dbList);
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $list;

@@ -10,6 +10,15 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
     const KONTIKI_ASSET_TAG = 'kontiki';
 	
 	const SERVICE_TOKEN_PREFIX = 'srv-';
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDeliveryProfileType($valueName)
+	{
+		$apiValue = self::getApiValue($valueName);
+		return kPluginableEnumsManager::apiToCore('DeliveryProfileType', $apiValue);
+	}
 
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectLoader::loadObject()
@@ -75,6 +84,11 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		
 		if ($baseClass == 'Kaltura_Client_Type_StorageProfile' && $enumValue == Kaltura_Client_Enum_StorageProfileProtocol::KONTIKI)
 			return 'Kaltura_Client_Kontiki_Type_KontikiStorageProfile';
+		
+		if ($baseClass == 'DeliveryProfile') {
+			if($enumValue == self::getDeliveryProfileType(KontikiDeliveryProfileType::KONTIKI_HTTP))
+				return 'DeliveryProfileKontikiHttp';
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -83,12 +97,14 @@ class KontikiPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 	public static function getEnums($baseEnumName = null) {
 		if (!$baseEnumName)
 		{
-			return array('KontikiStorageProfileProtocol');
+			return array('KontikiStorageProfileProtocol', 'KontikiDeliveryProfileType');
 		}
 		if ($baseEnumName == 'StorageProfileProtocol')
 		{
 			return array('KontikiStorageProfileProtocol');
 		}
+		if($baseEnumName == 'DeliveryProfileType')
+			return array('KontikiDeliveryProfileType');
 
 		return array();
 

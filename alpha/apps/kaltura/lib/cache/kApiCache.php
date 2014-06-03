@@ -24,7 +24,7 @@ class kApiCache extends kApiCacheBase
 	const SUFFIX_RULES = '.rules';
 	const SUFFIX_LOG = '.log';
 
-	const CACHE_VERSION = '5';
+	const CACHE_VERSION = '10';
 
 	// cache modes
 	const CACHE_MODE_ANONYMOUS = 1;				// anonymous caching should be performed - the cached response will not be associated with any conditions
@@ -587,6 +587,9 @@ class kApiCache extends kApiCacheBase
 			// make a trace in the access log of this being a warmup call
 			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey, false);
 		}
+		
+		if(is_null($this->_cacheStoreTypes))
+			return array(null, null);
 
 		foreach ($this->_cacheStoreTypes as $cacheType)
 		{

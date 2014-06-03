@@ -44,25 +44,21 @@ class StorageProfileTableMap extends TableMap {
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 128, null);
 		$this->addColumn('DESCIPTION', 'Desciption', 'VARCHAR', false, 127, null);
-		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
-		$this->addColumn('PROTOCOL', 'Protocol', 'TINYINT', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('PROTOCOL', 'Protocol', 'INTEGER', false, null, null);
 		$this->addColumn('STORAGE_URL', 'StorageUrl', 'VARCHAR', false, 127, null);
 		$this->addColumn('STORAGE_BASE_DIR', 'StorageBaseDir', 'VARCHAR', false, 127, null);
 		$this->addColumn('STORAGE_USERNAME', 'StorageUsername', 'VARCHAR', false, 31, null);
 		$this->addColumn('STORAGE_PASSWORD', 'StoragePassword', 'VARCHAR', false, 31, null);
-		$this->addColumn('STORAGE_FTP_PASSIVE_MODE', 'StorageFtpPassiveMode', 'TINYINT', false, null, null);
-		$this->addColumn('DELIVERY_HTTP_BASE_URL', 'DeliveryHttpBaseUrl', 'VARCHAR', false, 127, null);
-		$this->addColumn('DELIVERY_RMP_BASE_URL', 'DeliveryRmpBaseUrl', 'VARCHAR', false, 127, null);
-		$this->addColumn('DELIVERY_IIS_BASE_URL', 'DeliveryIisBaseUrl', 'VARCHAR', false, 127, null);
+		$this->addColumn('STORAGE_FTP_PASSIVE_MODE', 'StorageFtpPassiveMode', 'INTEGER', false, null, null);
 		$this->addColumn('MIN_FILE_SIZE', 'MinFileSize', 'INTEGER', false, null, null);
 		$this->addColumn('MAX_FILE_SIZE', 'MaxFileSize', 'INTEGER', false, null, null);
 		$this->addColumn('FLAVOR_PARAMS_IDS', 'FlavorParamsIds', 'VARCHAR', false, 127, null);
 		$this->addColumn('MAX_CONCURRENT_CONNECTIONS', 'MaxConcurrentConnections', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('PATH_MANAGER_CLASS', 'PathManagerClass', 'VARCHAR', false, 127, null);
-		$this->addColumn('URL_MANAGER_CLASS', 'UrlManagerClass', 'VARCHAR', false, 127, null);
 		$this->addColumn('DELIVERY_PRIORITY', 'DeliveryPriority', 'INTEGER', false, null, null);
-		$this->addColumn('DELIVERY_STATUS', 'DeliveryStatus', 'TINYINT', false, null, null);
+		$this->addColumn('DELIVERY_STATUS', 'DeliveryStatus', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 
