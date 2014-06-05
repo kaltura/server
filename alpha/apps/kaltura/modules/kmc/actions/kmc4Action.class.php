@@ -164,7 +164,7 @@ class kmc4Action extends kalturaAction
 			'kmc_permissions_uiconf'	=> $this->kmc_permissions->getId(),
 			'allowed_partners'			=> $allowedPartners,
 			'kmc_secured'				=> (bool) kConf::get("kmc_secured_login"),
-			'enableLanguageMenu'		=> (bool) kConf::get("enableLanguageMenu"),
+			'enableLanguageMenu'		=> true,
 			'service_url'				=> $this->service_url,
 			'host'						=> $this->host,
 			'cdn_host'					=> $this->cdn_host,
