@@ -8,6 +8,8 @@ abstract class LiveEntry extends entry
 	const IS_LIVE = 'isLive';
 	const DEFAULT_CACHE_EXPIRY = 70;
 	
+	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
+	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
 	 */
@@ -165,7 +167,7 @@ abstract class LiveEntry extends entry
 		if(is_array($streamBitrates) && count($streamBitrates))
 			return $streamBitrates;
 		
-		if($this->getSource() == EntrySourceType::LIVE_STREAM)
+		if(in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			$liveParams = assetParamsPeer::retrieveByProfile($this->getConversionProfileId());
 			$streamBitrates = array();
@@ -238,7 +240,7 @@ abstract class LiveEntry extends entry
 	
 	public function setLiveStreamConfigurations(array $v)
 	{
-		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)) )
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes) )
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
@@ -257,7 +259,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
 	{
-		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
 		{
 			$configurations = $this->getFromCustomData('live_stream_configurations');
 			if($configurations && $this->getPushPublishEnabled())

@@ -146,13 +146,11 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public function toInsertableObject ( $dbObject = null , $props_to_skip = array() )
 	{
+		//This is required for backward compatibility support of api calls in KMS
+		$propertiesToSkip[] = "id";
+		
 		/* @var $dbObject LiveStreamEntry */
 		
-		//This if-statement is required for backward compatibility support of api calls in KMS
-		if (!count ($props_to_skip))
-		{
-			$props_to_skip = array("id");
-		}	
 		// if the given password is empty, generate a random 8-character string as the new password
 		if(($this->streamPassword == null) || (strlen(trim($this->streamPassword)) <= 0))
 		{
@@ -183,11 +181,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		//This if-statement is required for backward compatibility support of api calls in KMS
-		if (!count ($propertiesToSkip))
-		{
-			$propertiesToSkip = array("id");
-		}
+		//This is required for backward compatibility support of api calls in KMS
+		$propertiesToSkip[] = "id";
 		
 		$this->validatePropertyNotNull("mediaType");
 		$this->validatePropertyNotNull("sourceType");
