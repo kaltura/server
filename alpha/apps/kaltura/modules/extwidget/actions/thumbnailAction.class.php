@@ -141,7 +141,7 @@ class thumbnailAction extends sfAction
 		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bgcolor must be six hexadecimal characters');
 
-		if(!$vid_slices)
+		if(($vid_slices != -1 && $vid_slices <= 0) || !is_numeric($vid_slices))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
 
 		if ($upload_token_id)
