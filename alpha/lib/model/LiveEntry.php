@@ -260,15 +260,12 @@ abstract class LiveEntry extends entry
 		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
 		{
 			$configurations = $this->getFromCustomData('live_stream_configurations');
-			if($configurations)
+			if($configurations && $this->getPushPublishEnabled())
 			{
-				if ($this->getPushPublishEnabled())
-				{
-					$pushPublishConfigurations = $this->getPushPublishConfigurations();
-					$configurations = array_merge($configurations, $pushPublishConfigurations);
-				}
-				return $configurations;
+				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$configurations = array_merge($configurations, $pushPublishConfigurations);
 			}
+			return $configurations;
 		}
 		
 		$primaryMediaServer = null;
