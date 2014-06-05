@@ -72,17 +72,14 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
 			$this->xml = $feed->buildSubmitFeed();
-			$this->submitXml = $this->xml;
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 		{
 			$this->xml = $feed->buildUpdateFeed();
-			$this->updateXml = $this->xml;
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
 		{
 			$this->xml = $feed->buildDeleteFeed();
-			$this->deleteXml = $this->xml;
 		}
 	}
 

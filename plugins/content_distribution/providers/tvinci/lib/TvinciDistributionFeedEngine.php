@@ -7,10 +7,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
-	IDistributionEngineDelete,
-	IDistributionEngineCloseUpdate,
-	IDistributionEngineCloseSubmit,
-	IDistributionEngineCloseDelete
+	IDistributionEngineDelete
 {
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
@@ -18,21 +15,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
 
 		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 
 		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
 
-		return true;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseSubmit::closeSubmit()
-	 */
-	public function closeSubmit(KalturaDistributionSubmitJobData $data)
-	{
 		return true;
 	}
 
@@ -42,21 +31,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
 
 		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 
 		$this->handleUpdate($data, $data->distributionProfile, $data->providerData);
 
-		return true;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseUpdate::closeUpdate()
-	 */
-	public function closeUpdate(KalturaDistributionUpdateJobData $data)
-	{
 		return true;
 	}
 
@@ -66,21 +47,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaTvinciDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaTvinciDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaTvinciDistributionProfile");
 
 		if(!$data->providerData || !($data->providerData instanceof KalturaTvinciDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaTvinciDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaTvinciDistributionJobProviderData");
 
 		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
 
-		return true;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseDelete::closeDelete()
-	*/
-	public function closeDelete(KalturaDistributionDeleteJobData $data)
-	{
 		return true;
 	}
 
@@ -100,10 +73,9 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$url = $distributionProfile->ingestUrl;
-		$xml = $providerData->submitXml;
-		KalturaLog::info("Submitting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n$xml");
+		KalturaLog::info("Submitting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
 
-		$responseXml = $this->postXml($url, $xml);
+		$responseXml = $this->postXml($url, $providerData->xml);
 		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
 		if ( ! $success )
 		{
@@ -119,10 +91,9 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	protected function handleUpdate(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$url = $distributionProfile->ingestUrl;
-		$xml = $providerData->updateXml;
-		KalturaLog::info("Updating entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n$xml");
+		KalturaLog::info("Updating entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
 
-		$responseXml = $this->postXml($url, $xml);
+		$responseXml = $this->postXml($url, $providerData->xml);
 		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
 		if ( ! $success )
 		{
@@ -138,10 +109,9 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaTvinciDistributionProfile $distributionProfile, KalturaTvinciDistributionJobProviderData $providerData)
 	{
 		$url = $distributionProfile->ingestUrl;
-		$xml = $providerData->deleteXml;
-		KalturaLog::info("Deleting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n$xml");
+		KalturaLog::info("Deleting entry {$data->entryDistribution->entryId}, url: $url\nXML data:\n{$providerData->xml}");
 
-		$responseXml = $this->postXml($url, $xml);
+		$responseXml = $this->postXml($url, $providerData->xml);
 		$success = ($responseXml->status == 'OK' || $responseXml->tvmID != '');
 		if ( ! $success )
 		{

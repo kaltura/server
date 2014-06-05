@@ -118,15 +118,6 @@ class TvinciDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 		// client side apps like batch and admin console
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::TVINCI)
 		{
-			if($baseClass == 'IDistributionEngineCloseDelete')
-				return 'TvinciDistributionFeedEngine';
-
-			if($baseClass == 'IDistributionEngineCloseSubmit')
-				return 'TvinciDistributionFeedEngine';
-
-			if($baseClass == 'IDistributionEngineCloseUpdate')
-				return 'TvinciDistributionFeedEngine';
-
 			if($baseClass == 'IDistributionEngineDelete')
 				return 'TvinciDistributionFeedEngine';
 
