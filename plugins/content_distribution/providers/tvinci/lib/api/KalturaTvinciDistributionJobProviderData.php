@@ -137,10 +137,14 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	private function getAssetM3U8DownloadUrl($asset, $entry)
 	{
+		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
+
 		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId())
-						. "/index.php/extwidget/playManifest"
+						. $partnerPath
+						. "/playManifest"
 						. "/entryId/{$asset->getEntryId()}"
-						. "/format/applehttp/protocol/http"
+						. "/format/applehttp"
+						. "/protocol/http"
 						. "/preferredBitrate/{$asset->getBitrate()}"
 						. "/a.m3u8";
 		return $downloadUrl;
