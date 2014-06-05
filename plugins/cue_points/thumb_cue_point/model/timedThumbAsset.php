@@ -8,6 +8,17 @@
 class timedThumbAsset extends thumbAsset
 {
 	const CUSTOM_DATA_FIELD_THUMB_CUE_POINT_ID = "thumbCuePointID";
+	
+	public function postInsert(PropelPDO $con = null)
+	{
+		$dbCuePoint = CuePointPeer::retrieveByPK($this->getCuePointID());
+		
+		/* @var $dbCuePoint ThumbCuePoint */
+		$dbCuePoint->setAssetId($this->getId());
+		$dbCuePoint->save();
+		
+	    return parent::postInsert();
+	}
 
 	/* (non-PHPdoc)
 	 * @see Baseasset::applyDefaultValues()

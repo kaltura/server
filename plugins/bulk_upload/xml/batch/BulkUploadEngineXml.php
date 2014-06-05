@@ -120,8 +120,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		//Validate the XML file against the schema
 		libxml_clear_errors();
-		KBatchBase::$kClient->setReturnServedResult(true);
-		$xsd = KBatchBase::$kClient->schema->serve($this->getSchemaType());
+		
+		$xsdURL = KBatchBase::$kClient->schema->serve($this->getSchemaType());
+		if(KBatchBase::$taskConfig->params->xmlSchemaVersion)
+			$xsdURL .=  "&version=" . KBatchBase::$taskConfig->params->xmlSchemaVersion;
+		$xsd = KCurlWrapper::getContent($xsdURL);
+		
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
