@@ -60,7 +60,7 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		{	
 			if($cuePoint instanceof KalturaThumbCuePoint)
 			{
-				if(empty($items[$index]->slide))
+				if(!isset($items[$index]->slide) || empty($items[$index]->slide))
 					continue;
 				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, null);
 				$thumbAsset = new KalturaTimedThumbAsset();

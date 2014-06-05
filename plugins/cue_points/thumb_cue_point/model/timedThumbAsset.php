@@ -9,7 +9,7 @@ class timedThumbAsset extends thumbAsset
 {
 	const CUSTOM_DATA_FIELD_THUMB_CUE_POINT_ID = "thumbCuePointID";
 	
-	public function preInsert(PropelPDO $con = null)
+	public function postInsert(PropelPDO $con = null)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($this->getCuePointID());
 		
@@ -17,7 +17,7 @@ class timedThumbAsset extends thumbAsset
 		$dbCuePoint->setAssetId($this->getId());
 		$dbCuePoint->save();
 		
-	    return parent::preInsert();
+	    return parent::postInsert();
 	}
 
 	/* (non-PHPdoc)

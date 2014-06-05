@@ -7,7 +7,7 @@ class KalturaCuePointErrors extends KalturaErrors implements kQuePointErrors
 {
 	const INVALID_CUE_POINT_ID = "INVALID_ID;ID;Invalid cue point id [@ID@]";
 	
-	const CUE_POINT_ID_NOT_FOUND = "CUE_POINT_ID_NOT_FOUND;ID;cue point with id provided not found [@ID@]";
+	const CUE_POINT_NOT_FOUND = "CUE_POINT_NOT_FOUND;ID;cue point with id provided not found [@ID@]";
 	
 	const CUE_POINT_PROVIDED_NOT_OF_TYPE_THUMB_CUE_POINT = "CUE_POINT_PROVIDED_NOT_OF_TYPE_THUMB_CUE_POINT;ID;cue point provided not of type thumb cue point [@ID@]";
 	

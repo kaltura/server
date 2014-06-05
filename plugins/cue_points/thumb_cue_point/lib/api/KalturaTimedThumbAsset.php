@@ -47,7 +47,7 @@ class KalturaTimedThumbAsset extends KalturaThumbAsset
 		
 		$dbCuePoint = CuePointPeer::retrieveByPK($this->cuePointId);
 		if (!$dbCuePoint)
-			throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_ID_NOT_FOUND, $this->cuePointId);
+			throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_NOT_FOUND, $this->cuePointId);
 			
 		if(!($dbCuePoint instanceof ThumbCuePoint))
 			throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_PROVIDED_NOT_OF_TYPE_THUMB_CUE_POINT, $this->cuePointId);
