@@ -22,10 +22,35 @@ class TvinciDistributionFeedHelper
 	protected $fieldValues;
 
 	/**
-	 * @var array
+	 * var string
 	 */
-	protected $extraData;
+	protected $entryId;
 
+	/**
+	 * var string
+	 */
+	protected $createdAt;
+
+	/**
+	 * var string
+	 */
+	protected $broadcasterName;
+
+	/**
+	 * var array
+	 */
+	protected $picRatiosArray;
+
+	/**
+	 * var string
+	 */
+	protected $defaultThumbUrl;
+
+	/**
+	 * var array
+	 */
+	protected $assetInfoArray;
+	
 	/**
 	 * var string
 	 */
@@ -36,13 +61,30 @@ class TvinciDistributionFeedHelper
 	 */
 	protected $_doc;
 
-	public function __construct(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues, $extraData)
+	public function __construct(KalturaTvinciDistributionProfile $distributionProfile, $fieldValues)
 	{
 		$this->distributionProfile = $distributionProfile;
 		$this->fieldValues = $fieldValues;
-		$this->extraData = $extraData;
 		$this->language = $fieldValues[TvinciDistributionField::LANGUAGE];
 	}
+
+	public function setEntryId( $entryId )						{ $this->entryId = $entryId; }
+	public function getEntryId()								{ return $this->entryId; }
+
+	public function setCreatedAt( $createdAt )					{ $this->createdAt = $createdAt; }
+	public function getCreatedAt()								{ return $this->createdAt; }
+
+	public function setBroadcasterName( $broadcasterName )		{ $this->broadcasterName = $broadcasterName; }
+	public function getBroadcasterName()						{ return $this->broadcasterName; }
+
+	public function setPicRatiosArray( $picRatiosArray )		{ $this->picRatiosArray = $picRatiosArray; }
+	public function getPicRatiosArray()							{ return $this->picRatiosArray; }
+
+	public function setDefaultThumbnailUrl( $defaultThumbUrl )	{ $this->defaultThumbUrl = $defaultThumbUrl; }
+	public function getDefaultThumbnailUrl()					{ return $this->defaultThumbUrl; }
+
+	public function setAssetInfoArray( $assetInfoArray )		{ $this->assetInfoArray = $assetInfoArray; }
+	public function getAssetInfoArray()							{ return $this->assetInfoArray; }
 
 	public function buildSubmitFeed()
 	{
@@ -68,7 +110,7 @@ class TvinciDistributionFeedHelper
 
 		// Build the feed
 		$feed = $this->_doc->createElement('feed');
-		$feed->setAttribute('broadcasterName', $this->extraData['broadcasterName']);
+		$feed->setAttribute('broadcasterName', $this->broadcasterName);
 
 		$export = $this->_doc->createElement('export');
 		$feed->appendChild($export);
@@ -76,7 +118,7 @@ class TvinciDistributionFeedHelper
 		$media = $this->_doc->createElement('media');
 		$export->appendChild($media);
 
-		$this->setAttribute($media, "co_guid", $this->extraData['entryId']);
+		$this->setAttribute($media, "co_guid", $this->entryId);
 		$this->setAttribute($media, "action", $action );
 
  		if ( $action != self::ACTION_DELETE ) // No need for the following content in case of a delete scenario
@@ -149,11 +191,17 @@ class TvinciDistributionFeedHelper
 		return $this->createValueWithLangElement($name, $value, $lang);
 	}
 
-	private function createDateElement($fieldName, array $arr, $key)
+	private function createDateElement($fieldName, $timestamp)
 	{
-		$timestamp = $arr[$key];
 		$formattedDate = date(self::DATE_FORMAT, $timestamp);
 		$dateNode = $this->_doc->createElement($fieldName, $formattedDate);
+		return $dateNode;
+	}
+
+	private function createDateElementFromAssocArray($fieldName, array $arr, $key)
+	{
+		$timestamp = $arr[$key];
+		$dateNode = $this->createDateElement($fieldName, $timestamp);
 		return $dateNode;
 	}
 
@@ -202,10 +250,10 @@ class TvinciDistributionFeedHelper
 		$basicNode->appendChild( $this->createValueElement('media_type', $this->fieldValues, TvinciDistributionField::MEDIA_TYPE) );
 
 		// Add default thumbnail
-		if ( isset($this->extraData['defaultThumbUrl']) )
+		if ( isset($this->defaultThumbUrl) )
 		{
 			$thumbnail = $this->_doc->createElement("thumb");
-			$this->setAttribute($thumbnail, "url", $this->extraData['defaultThumbUrl']);
+			$this->setAttribute($thumbnail, "url", $this->defaultThumbUrl);
 			$basicNode->appendChild( $thumbnail );
 		}
 
@@ -230,11 +278,11 @@ class TvinciDistributionFeedHelper
 	{
 		$dates = $this->_doc->createElement("dates");
 
- 		$dates->appendChild( $this->createDateElement('create', $this->extraData, 'createdAt') );
- 		$dates->appendChild( $this->createDateElement('start', $this->fieldValues, TvinciDistributionField::START_DATE) );
- 		$dates->appendChild( $this->createDateElement('catalog_start', $this->fieldValues, TvinciDistributionField::CATALOG_START_DATE) );
- 		$dates->appendChild( $this->createDateElement('catalog_end', $this->fieldValues, TvinciDistributionField::CATALOG_END_DATE) );
- 		$dates->appendChild( $this->createDateElement('final_end', $this->fieldValues, TvinciDistributionField::END_DATE) );
+		$dates->appendChild( $this->createDateElement('create', $this->createdAt) );
+		$dates->appendChild( $this->createDateElementFromAssocArray('start', $this->fieldValues, TvinciDistributionField::START_DATE) );
+		$dates->appendChild( $this->createDateElementFromAssocArray('catalog_start', $this->fieldValues, TvinciDistributionField::CATALOG_START_DATE) );
+		$dates->appendChild( $this->createDateElementFromAssocArray('catalog_end', $this->fieldValues, TvinciDistributionField::CATALOG_END_DATE) );
+		$dates->appendChild( $this->createDateElementFromAssocArray('final_end', $this->fieldValues, TvinciDistributionField::END_DATE) );
 
  		return $dates;
 	}
@@ -243,7 +291,7 @@ class TvinciDistributionFeedHelper
 	{
 		$picRatiosNode = $this->_doc->createElement("pic_ratios");
 
-		$picRatiosArray = $this->extraData['picRatios'];
+		$picRatiosArray = $this->picRatiosArray;
 		foreach ( $picRatiosArray as $picRatio )
 		{
 			$ratioNode = $this->_doc->createElement("ratio");
@@ -313,9 +361,9 @@ class TvinciDistributionFeedHelper
 	{
 		$files = $this->_doc->createElement("files");
 
-		if ( isset($this->extraData['assetInfo']) && is_array($this->extraData['assetInfo']) )
+		if ( isset($this->assetInfoArray) && is_array($this->assetInfoArray) )
 		{
-			foreach ( $this->extraData['assetInfo'] as $videoAssetFieldName => $assetInfo )
+			foreach ( $this->assetInfoArray as $videoAssetFieldName => $assetInfo )
 			{
 				$files->appendChild( $this->createFileElement($videoAssetFieldName, $assetInfo) );
 			}

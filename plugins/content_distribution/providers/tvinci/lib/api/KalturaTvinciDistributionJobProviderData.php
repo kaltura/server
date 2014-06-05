@@ -23,14 +23,17 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		$fieldValues = unserialize($this->fieldValues);
 
 		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
-		$extraData = array(
-				'entryId' => $entry->getId(),
-				'createdAt' => $entry->getCreatedAtAsInt(),
-				'broadcasterName' => 'Kaltura-' . $entry->getPartnerId(),
-			);
+
+		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues);
+		$feedHelper->setEntryId( $entry->getId() );
+		$feedHelper->setCreatedAt( $entry->getCreatedAtAsInt() );
+
+		$broadcasterName = 'Kaltura-' . $entry->getPartnerId();
+		$feedHelper->setBroadcasterName( $broadcasterName );
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
+		$defaultThumbnail = null;
 		foreach ( $thumbAssets as $thumbAsset )
 		{
 			$thumbDownloadUrl = $this->getAssetDownloadUrl( $thumbAsset );
@@ -44,46 +47,46 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 			if ( $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) )
 			{
-				$extraData['defaultThumbUrl'] = $thumbDownloadUrl;
+				$defaultThumbUrl = $thumbDownloadUrl;
 			}
 		}
 
-		$extraData['picRatios'] = $picRatios;
-		if ( ! isset($extraData['defaultThumbUrl']) && count($picRatios) )
+		$feedHelper->setPicRatiosArray( $picRatios );
+		if ( !$defaultThumbUrl && count($picRatios) )
 		{
 			// Choose the URL of the first resource in the array
-			$extraData['defaultThumbUrl'] = $picRatios[0]['url'];
+			$defaultThumbUrl = $picRatios[0]['url'];
 		}
+
+		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl ); 
 
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
 		$assetInfo = array();
 		foreach ( $flavorAssets as $flavorAsset )
 		{
-			$this->updateFlavorAssetInfo($assetInfo, $flavorAsset, $fieldValues);
+			$this->updateFlavorAssetInfo($assetInfo, $flavorAsset, $fieldValues, $entry);
 		}
 
 		if ( count($assetInfo) )
 		{
-			$extraData['assetInfo'] = $assetInfo;
+			$feedHelper->setAssetInfoArray( $assetInfo ); 
 		}
-
-		$feed = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues, $extraData);
 
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
-			$this->xml = $feed->buildSubmitFeed();
+			$this->xml = $feedHelper->buildSubmitFeed();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionUpdateJobData)
 		{
-			$this->xml = $feed->buildUpdateFeed();
+			$this->xml = $feedHelper->buildUpdateFeed();
 		}
 		elseif ($distributionJobData instanceof KalturaDistributionDeleteJobData)
 		{
-			$this->xml = $feed->buildDeleteFeed();
+			$this->xml = $feedHelper->buildDeleteFeed();
 		}
 	}
 
-	private function updateFlavorAssetInfo(array &$assetInfo, $flavorAsset, $fieldValues)
+	private function updateFlavorAssetInfo(array &$assetInfo, $flavorAsset, $fieldValues, $entry)
 	{
 		$assetFlavorParams = assetParamsPeer::retrieveByPK( $flavorAsset->getFlavorParamsId() );
 		$assetFlavorParamsName = $assetFlavorParams->getName();
@@ -110,7 +113,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 					else
 					{
 						// Other assets will be converted to a .m3u8 URL
-						$url = $this->getAssetM3U8DownloadUrl($flavorAsset);
+						$url = $this->getAssetM3U8DownloadUrl($flavorAsset, $entry);
 					}
 
 					$assetInfo[$videoAssetFieldName] = array(
@@ -132,7 +135,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		return $downloadUrl;
 	}
 
-	private function getAssetM3U8DownloadUrl($asset)
+	private function getAssetM3U8DownloadUrl($asset, $entry)
 	{
 		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId())
 						. "/index.php/extwidget/playManifest"
