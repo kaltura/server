@@ -153,7 +153,7 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 		
-		$this->studioUiConf = kmcUtils::getStudioUiconf();
+		$this->studioUiConf = kmcUtils::getStudioUiconf(kConf::get("studio_version"));
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		
