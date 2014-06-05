@@ -63,7 +63,10 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 				if(empty($items[$index]->slide))
 					continue;
 				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, null);
-				KBatchBase::$kClient->thumbAsset->setContent($cuePoint->assetId, $timedThumbResource);
+				$thumbAsset = new KalturaTimedThumbAsset();
+				$thumbAsset->cuePointId = $cuePoint->id;
+				KBatchBase::$kClient->thumbAsset->add($cuePoint->entryId, $thumbAsset);
+				KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $timedThumbResource);
 			}
 				
 		}

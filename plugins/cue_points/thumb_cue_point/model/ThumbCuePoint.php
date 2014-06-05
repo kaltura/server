@@ -14,30 +14,6 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		parent::__construct();
 		$this->applyDefaultValues();
 	}
-	
-	/* (non-PHPdoc)
-	 * @see CuePoint::preSave()
-	 */
-	public function preSave(PropelPDO $con = null)
-	{
-		if($this->isNew())
-		{
-			if(!$this->getAssetId())
-			{
-				$timedThumbAsset = new timedThumbAsset();
-				$timedThumbAsset->setCuePointID($this->getId());
-				$timedThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
-				$timedThumbAsset->setEntryId($this->getEntryId());
-				$timedThumbAsset->setPartnerId($this->getPartnerId());
-				$timedThumbAsset->save();
-				$this->setAssetId($timedThumbAsset->getId());
-			}
-			else
-				$this->setAssetId($this->getAssetId());
-		}
-		
-		return parent::preSave($con);
-	}
 
 	/**
 	 * Applies default values to this object.
