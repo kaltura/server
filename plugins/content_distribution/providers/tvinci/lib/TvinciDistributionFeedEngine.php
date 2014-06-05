@@ -127,14 +127,13 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 	 */
 	protected function postXml($url, $xml)
 	{
-		$options = array( 'post_data' => $xml, 'full_response' => true );
-		$fullResponse = KCurlWrapper::getContent($url, $options);
-		KalturaLog::info("Full response: " . print_r($fullResponse,true));
+		$response = self::curlPost($url, $xml);
+		KalturaLog::info("Full response: " . print_r($response,true));
 
 		$responseXml = null;
-		if ( $fullResponse['http_code'] == 200 )
+		if ( $response['http_code'] == 200 )
 		{
-			$responseXml = simplexml_load_string( $fullResponse['content'] );
+			$responseXml = simplexml_load_string( $response['content'] );
 		}
 
 		if ( !$responseXml )
@@ -143,5 +142,33 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		}
 
 		return $responseXml;
+	}
+	
+
+	public static function curlPost($url, $postData)
+	{
+		$ch = curl_init();
+
+		// set URL and other appropriate options
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_NOBODY, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+	
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+		$content = curl_exec($ch);
+		$curlError = curl_error($ch);
+		$curlHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		curl_close($ch);
+	
+		$response = array('content' => $content, 'http_code' => $curlHttpCode, 'error_text' => $curlError);
+
+		return $response;
 	}
 }

@@ -466,7 +466,7 @@ class KCurlWrapper
 	{
 	}
 
-	public static function getContent($url, array $options = array())
+	public static function getContent($url)
 	{
 		$ch = curl_init();
 		
@@ -478,33 +478,11 @@ class KCurlWrapper
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-		if ( isset($options['post_data']) )
-		{
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $options['post_data']);
-		}
-
-		if ( isset($options['curl_options']) )
-		{
-			foreach ($options['curl_options'] as $option => $value)
-			{
-				curl_setopt($ch, $option, $value);
-			}
-		}
-
-		$response = curl_exec($ch);
-
-		if ( isset($options['full_response']) && $options['full_response'] )
-		{
-			$curlError = curl_error($ch);
-			$curlHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			$response = array('content' => $response, 'http_code' => $curlHttpCode, 'error_text' => $curlError);
-		}
-
+			
+		$content = curl_exec($ch);
 		curl_close($ch);
 		
-		return $response;
+		return $content;
 	}
 }
 
