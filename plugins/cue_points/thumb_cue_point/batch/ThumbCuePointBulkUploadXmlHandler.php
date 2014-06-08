@@ -53,25 +53,25 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 	}
 	
 	protected function handleResults(array $results, array $items)
-	{
-		KBatchBase::$kClient->startMultiRequest();
-		
+	{	
 		foreach($results as $index => $cuePoint)
 		{	
 			if($cuePoint instanceof KalturaThumbCuePoint)
 			{
 				if(!isset($items[$index]->slide) || empty($items[$index]->slide))
 					continue;
+				
 				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, null);
 				$thumbAsset = new KalturaTimedThumbAsset();
 				$thumbAsset->cuePointId = $cuePoint->id;
+				
+				KBatchBase::$kClient->startMultiRequest();
 				KBatchBase::$kClient->thumbAsset->add($cuePoint->entryId, $thumbAsset);
 				KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $timedThumbResource);
+				KBatchBase::$kClient->doMultiRequest();
 			}
 				
 		}
-		
-		KBatchBase::$kClient->doMultiRequest();
 		
 		return parent::handleResults($results, $items);
 	}
