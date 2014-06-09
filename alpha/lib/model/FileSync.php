@@ -70,6 +70,9 @@ class FileSync extends BaseFileSync
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 			
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId);
+		if(is_null($urlManager))
+			return null;
+		
 		$url = $urlManager->getFileSyncUrl($this);
 		$baseUrl = $urlManager->getUrl();
 		
