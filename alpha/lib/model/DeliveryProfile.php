@@ -85,7 +85,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	public function setRecognizer($newObject)
 	{
-		if ($newObject instanceof kUrlRecognizer)
+		if(is_null($newObject)) {
+			parent::setRecognizer(null);
+		} 
+		else if ($newObject instanceof kUrlRecognizer)
 		{
 			$serializedObject = serialize($newObject);
 			parent::setRecognizer($serializedObject);
