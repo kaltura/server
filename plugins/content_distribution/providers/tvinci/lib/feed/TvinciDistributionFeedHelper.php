@@ -47,9 +47,19 @@ class TvinciDistributionFeedHelper
 	protected $defaultThumbUrl;
 
 	/**
-	 * var array
+	 * var string
 	 */
-	protected $assetInfoArray;
+	protected $mainPlayManifestUrl;
+	
+	/**
+	 * var string
+	 */
+	protected $iPadPlayManifestUrl;
+	
+	/**
+	 * var string
+	 */
+	protected $iPhonePlayManifestUrl;
 	
 	/**
 	 * var string
@@ -83,8 +93,14 @@ class TvinciDistributionFeedHelper
 	public function setDefaultThumbnailUrl( $defaultThumbUrl )	{ $this->defaultThumbUrl = $defaultThumbUrl; }
 	public function getDefaultThumbnailUrl()					{ return $this->defaultThumbUrl; }
 
-	public function setAssetInfoArray( $assetInfoArray )		{ $this->assetInfoArray = $assetInfoArray; }
-	public function getAssetInfoArray()							{ return $this->assetInfoArray; }
+	public function setMainPlayManifestUrl( $url )				{ $this->mainPlayManifestUrl = $url; }
+	public function getMainPlayManifestUrl()					{ return $this->mainPlayManifestUrl; }
+
+	public function setiPadPlayManifestUrl( $url )				{ $this->iPadPlayManifestUrl = $url; }
+	public function getiPadPlayManifestUrl()					{ return $this->iPadPlayManifestUrl; }
+
+	public function setiPhonePlayManifestUrl( $url )			{ $this->iPhonePlayManifestUrl = $url; }
+	public function getiPhonePlayManifestUrl()					{ return $this->iPhonePlayManifestUrl; }
 
 	public function buildSubmitFeed()
 	{
@@ -361,34 +377,23 @@ class TvinciDistributionFeedHelper
 	{
 		$files = $this->_doc->createElement("files");
 
-		if ( isset($this->assetInfoArray) && is_array($this->assetInfoArray) )
-		{
-			foreach ( $this->assetInfoArray as $videoAssetFieldName => $assetInfo )
-			{
-				$files->appendChild( $this->createFileElement($videoAssetFieldName, $assetInfo) );
-			}
-		}
+		$files->appendChild( $this->createFileElement('Main', $this->getMainPlayManifestUrl()) );
+		$files->appendChild( $this->createFileElement('Tablet Main', $this->getiPadPlayManifestUrl()) );
+		$files->appendChild( $this->createFileElement('Smartphone Main', $this->getiPhonePlayManifestUrl()) );
 
  		return $files;
 	}
 
-	private function createFileElement($videoAssetFieldName, $assetInfo)
+	private function createFileElement($fileType, $url)
 	{
-		$videoAssetFieldToNameMap = array(
-				TvinciDistributionField::VIDEO_ASSET_MAIN => 			'Main',
-				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN => 	'Tablet Main',
-				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN => 'Smartphone Main',
-		);
-
 		$fileNode = $this->_doc->createElement("file");
 
-		$fieldName = $videoAssetFieldToNameMap[$videoAssetFieldName];
-		$this->setAttribute($fileNode, "type", $fieldName);
+		$this->setAttribute($fileNode, "type", $fileType);
 		$this->setAttribute($fileNode, "quality", "HIGH");
 		$this->setAttribute($fileNode, "handling_type", "CLIP");
 		$this->setAttribute($fileNode, "cdn_name", "Default CDN");
-		$this->setAttribute($fileNode, "cdn_code", $assetInfo['url']);
-		$this->setAttribute($fileNode, "co_guid", $assetInfo['name']);
+		$this->setAttribute($fileNode, "cdn_code", $url);
+		$this->setAttribute($fileNode, "co_guid", $fileType);
 
 		return $fileNode;
 	}

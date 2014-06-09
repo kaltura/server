@@ -112,10 +112,6 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_STUDIO, 'Studio', 'Studio', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_STUDIO, 'Studio', 'Studio', true);
 
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_ASSET_MAIN, 'Main Video Asset', 'MainVideoAsset');
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN, 'Tablet Video Asset', 'TabletMainVideoAsset');
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN, 'Smartphone Video Asset', 'SmartphoneMainVideoAsset');
-
 	    return $fieldConfigArray;
 	}
 
