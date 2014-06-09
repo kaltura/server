@@ -689,6 +689,9 @@ class playManifestAction extends kalturaAction
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::RTMP) {
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0)
 				$this->deliveryAttributes->setMediaProtocol("rtmp");
+		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP) {
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
+				$this->deliveryAttributes->setMediaProtocol("http");
 		}
 
 		// <-- 

@@ -222,7 +222,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
 		}
 	
-		$bitrate = ($flavor ? $flavor->getBitrate() : 0);
+		$bitrate = ($flavor ? $flavor->getVideoBitrate() : 0);
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 	
