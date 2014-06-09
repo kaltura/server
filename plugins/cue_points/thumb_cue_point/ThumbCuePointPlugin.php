@@ -138,7 +138,6 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 				<xs:element maxOccurs="1" minOccurs="0" ref="sshUrlContentResource"></xs:element>
 				<xs:element maxOccurs="1" minOccurs="0" ref="remoteStorageContentResource"></xs:element>
 				<xs:element maxOccurs="1" minOccurs="0" ref="remoteStorageContentResources"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="0" ref="entryContentResource"></xs:element>
 				<xs:element maxOccurs="1" minOccurs="0" ref="assetContentResource"></xs:element>
 				<xs:element maxOccurs="1" minOccurs="0" ref="contentResource-extension"></xs:element>
 			</xs:choice>
