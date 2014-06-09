@@ -69,17 +69,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl ); 
 
-		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
-		$assetInfo = array();
-		foreach ( $flavorAssets as $flavorAsset )
-		{
-			$this->updateFlavorAssetInfo($assetInfo, $flavorAsset, $fieldValues, $entry);
-		}
-
-		if ( count($assetInfo) )
-		{
-			$feedHelper->setAssetInfoArray( $assetInfo ); 
-		}
+		$this->initPlayManifestUrls( $entry, $feedHelper );
 
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
@@ -95,46 +85,16 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		}
 	}
 
-	private function updateFlavorAssetInfo(array &$assetInfo, $flavorAsset, $fieldValues, $entry)
+	private function initPlayManifestUrls($entry, $feedHelper)
 	{
-		$assetFlavorParams = assetParamsPeer::retrieveByPK( $flavorAsset->getFlavorParamsId() );
-		$assetFlavorParamsName = $assetFlavorParams->getName();
+		$url = $this->getPlayManifestUrl($entry, PlaybackProtocol::AKAMAI_HDS, 'mbr', 'a4m');
+		$feedHelper->setMainPlayManifestUrl( $url );
 
-		$videoAssetFieldNames = array(
-				TvinciDistributionField::VIDEO_ASSET_MAIN,
-				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN,
-				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN,
-			);
+		$url = $this->getPlayManifestUrl($entry, PlaybackProtocol::APPLE_HTTP, 'ipad', 'm3u8');
+		$feedHelper->setiPadPlayManifestUrl( $url );
 
-		foreach ( $videoAssetFieldNames as $videoAssetFieldName )
-		{
-			if ( isset($fieldValues[$videoAssetFieldName]) )
-			{
-				$configFlavorParamName = $fieldValues[$videoAssetFieldName];
-
-				if ( $configFlavorParamName == $assetFlavorParamsName )
-				{
-					if ( $videoAssetFieldName == TvinciDistributionField::VIDEO_ASSET_MAIN )
-					{
-						// Main video asset if PC oriented, so we'll fetch a full path (.mp4) download file URL
-						$url = $this->getAssetDownloadUrl($flavorAsset);
-					}
-					else
-					{
-						// Other assets will be converted to a .m3u8 URL
-						$url = $this->getAssetM3U8DownloadUrl($flavorAsset, $entry);
-					}
-
-					$assetInfo[$videoAssetFieldName] = array(
-							'url' => $url,
-							'name' => $assetFlavorParamsName,
-						);
-
-					// Note: instead of 'break'ing here, we'll continue to loop in case
-					//       the same flavor asset is required by another $videoAssetField
-				}
-			}
-		}
+		$url = $this->getPlayManifestUrl($entry, PlaybackProtocol::APPLE_HTTP, 'iphone', 'm3u8');
+		$feedHelper->setiPhonePlayManifestUrl( $url );
 	}
 
 	private function getAssetDownloadUrl($asset)
@@ -144,18 +104,18 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		return $downloadUrl;
 	}
 
-	private function getAssetM3U8DownloadUrl($asset, $entry)
+	private function getPlayManifestUrl($entry, $format, $tag, $fileExt)
 	{
 		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
 
-		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId())
+		$downloadUrl = myPartnerUtils::getCdnHost($entry->getPartnerId())
 						. $partnerPath
 						. "/playManifest"
-						. "/entryId/{$asset->getEntryId()}"
-						. "/format/applehttp"
+						. "/entryId/{$entry->getId()}"
+						. "/format/$format"
+						. "/tags/$tag"
 						. "/protocol/http"
-						. "/preferredBitrate/{$asset->getBitrate()}"
-						. "/a.m3u8";
+						. "/f/a.$fileExt";
 		return $downloadUrl;
 	}
 
