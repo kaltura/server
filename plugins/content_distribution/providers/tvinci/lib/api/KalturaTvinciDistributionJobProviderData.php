@@ -22,7 +22,16 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$fieldValues = unserialize($this->fieldValues);
 
-		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+		$entry = null;
+		if ( $distributionJobData->entryDistribution->entryId )
+		{
+			$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+		}
+
+		if ( ! $entry ) {
+			KalturaLog::err("Can't find entry with id: {$distributionJobData->entryDistribution->entryId}");
+			return;
+		}
 
 		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues);
 		$feedHelper->setEntryId( $entry->getId() );
