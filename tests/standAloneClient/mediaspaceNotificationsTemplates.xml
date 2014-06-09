@@ -692,7 +692,7 @@
 				<systemName>User_Was_Removed_From_Category</systemName>
 				<description>Email notification template to be sent when user was removed from category.</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>8</eventType> <!-- EventNotificationEventType::OBJECT_DELETED -->
+				<eventType>7</eventType> <!-- EventNotificationEventType::OBJECT_DELETED -->
 				<eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYKUSER -->
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
