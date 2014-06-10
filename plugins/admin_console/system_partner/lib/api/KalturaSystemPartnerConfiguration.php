@@ -457,9 +457,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			return null;
 		}
 		
-		if(!empty($this->deliveryProfileIds)) {
+		if(empty($this->deliveryProfileIds)) {
+			$object_to_fill->setDeliveryProfileIds(array());
+		} else {
 			$object_to_fill->setDeliveryProfileIds(json_decode($this->deliveryProfileIds, true));
-		}
+		} 
 		
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
@@ -525,7 +527,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
-		
 		
 		return $object_to_fill;
 	}
