@@ -2,13 +2,14 @@
 /**
  * @package plugins.thumbCuePoint
  */
-class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender
+class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'thumbCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
 	const CUE_POINT_VERSION_MINOR = 0;
 	const CUE_POINT_VERSION_BUILD = 0;
 	const CUE_POINT_NAME = 'cuePoint';
+	const THUMB_CUE_POINT_MANAGER_CLASS = 'kThumbCuePointManager';
 	
 	public static function getPluginName()
 	{
@@ -39,6 +40,16 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 			return array('ThumbCuePointType');	
 			
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::THUMB_CUE_POINT_MANAGER_CLASS,
+		);
 	}
 	
 	/* (non-PHPdoc)
