@@ -1,9 +1,8 @@
 <?php
 /**
  * @package deployment
- * @subpackage live.liveStream
  *
- * Create live selivery profiles
+ * update remove_user_from_category notification template to OBJECT_DELETED event_type
  *
  * No need to re-run after server code deploy
  */
