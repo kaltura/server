@@ -457,7 +457,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			return null;
 		}
 		
-		if($this->deliveryProfileIds) {
+		if(!empty($this->deliveryProfileIds)) {
 			$object_to_fill->setDeliveryProfileIds(json_decode($this->deliveryProfileIds, true));
 		}
 		
