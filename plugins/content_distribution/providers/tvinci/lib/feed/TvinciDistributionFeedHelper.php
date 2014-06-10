@@ -240,8 +240,13 @@ class TvinciDistributionFeedHelper
 		return $metaNode;
 	}
 
-	private function createMetadataContainerWithLangElement($name, $lang, array $arr, $key)
+	private function createMetadataContainerWithLangElement($parentNode, $name, $lang, array $arr, $key)
 	{
+		if ( ! array_key_exists($key, $arr) || ! $arr[$key] )
+		{
+			return;
+		}
+
 		$multivalField = $arr[$key];
 		$multivalArr = explode(',', $multivalField);
 
@@ -254,7 +259,7 @@ class TvinciDistributionFeedHelper
 			$metaNode->appendChild( $this->createValueWithLangElement('container', $val, $lang) );
 		}
 
-		return $metaNode;
+		$parentNode->appendChild( $metaNode );
 	}
 
 	private function createBasicElement()
@@ -361,14 +366,14 @@ class TvinciDistributionFeedHelper
 	{
 		$metas = $this->_doc->createElement("metas");
 
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RATING) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Country', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_COUNTRY) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Director', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIRECTOR) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Audio language', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_AUDIO_LANGUAGE) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_GENRE) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST) );
+		$this->createMetadataContainerWithLangElement($metas, 'Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RATING);
+		$this->createMetadataContainerWithLangElement($metas, 'Country', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_COUNTRY);
+		$this->createMetadataContainerWithLangElement($metas, 'Director', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIRECTOR);
+		$this->createMetadataContainerWithLangElement($metas, 'Audio language', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_AUDIO_LANGUAGE);
+		$this->createMetadataContainerWithLangElement($metas, 'Genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_GENRE);
+		$this->createMetadataContainerWithLangElement($metas, 'Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE);
+		$this->createMetadataContainerWithLangElement($metas, 'Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO);
+		$this->createMetadataContainerWithLangElement($metas, 'Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST);
 
 		return $metas;
 	}
