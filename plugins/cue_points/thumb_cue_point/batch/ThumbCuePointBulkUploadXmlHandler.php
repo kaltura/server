@@ -54,6 +54,12 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 	
 	protected function handleResults(array $results, array $items)
 	{	
+		//Added to support cases where the resource is entry resource
+		$conversionProfileId = null;
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if($dbEntry)
+			$conversionProfileId = $dbEntry->getConversionProfileId();
+		
 		foreach($results as $index => $cuePoint)
 		{	
 			if($cuePoint instanceof KalturaThumbCuePoint)
@@ -61,7 +67,7 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 				if(!isset($items[$index]->slide) || empty($items[$index]->slide))
 					continue;
 				
-				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, null);
+				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, $conversionProfileId);
 				$thumbAsset = new KalturaTimedThumbAsset();
 				$thumbAsset->cuePointId = $cuePoint->id;
 				
