@@ -15,7 +15,7 @@
                 <!-- Entry was added to channel -->
                 <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification">
                         <filter objectType="KalturaEventNotificationTemplateFilter">
-								<partnerId>0</partnerId>
+                                <partnerId>0</partnerId>
                                 <systemNameEqual>User_Was_Removed_From_Category</systemNameEqual>
                         </filter>
                         <pager objectType="KalturaFilterPager">
@@ -25,7 +25,7 @@
                 <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
                 	<id>{1:result:objects:0:id}</id>
                    	<template objectType="KalturaEmailNotificationTemplate">
-						<eventType>7</eventType>
+                                <eventType>7</eventType>
                 	</template>
                 </request>
         </multirequest>
