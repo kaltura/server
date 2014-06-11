@@ -56,11 +56,18 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 	{	
 		//Added to support cases where the resource is entry resource
 		$conversionProfileId = null;
-		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
-		$entry = KBatchBase::$kClient->baseEntry->get($this->entryId);
-		KBatchBase::unimpersonate();
-		if($entry && $entry->conversionProfileId)
-			$conversionProfileId = $entry->conversionProfileId;
+		try {
+			KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+			$entry = KBatchBase::$kClient->baseEntry->get($this->entryId);
+			KBatchBase::unimpersonate();
+			if($entry && $entry->conversionProfileId)
+				$conversionProfileId = $entry->conversionProfileId;
+		}
+		catch (Exception $ex)
+		{
+			KBatchBase::unimpersonate();
+			KalturaLog::debug("Entry ID [" . $this->entryId . "] not found, continuing with no conversion profile");
+		}
 		
 		foreach($results as $index => $cuePoint)
 		{	
