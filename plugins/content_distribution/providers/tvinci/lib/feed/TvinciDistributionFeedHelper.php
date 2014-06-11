@@ -340,7 +340,6 @@ class TvinciDistributionFeedHelper
 	{
 		$strings = $this->_doc->createElement("strings");
 
-		$strings->appendChild( $this->createMetadataWithLangElement('Runtime', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
 		$strings->appendChild( $this->createMetadataWithLangElement('Release date', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_DATE) );
 
 		return $strings;
@@ -357,7 +356,8 @@ class TvinciDistributionFeedHelper
 	{
 		$doubles = $this->_doc->createElement("doubles");
 
-		$doubles->appendChild( $this->createMetadataElement('Release year', $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
+		$doubles->appendChild( $this->createMetadataElement('Runtime', $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
+		$doubles->appendChild( $this->createMetadataElement('Release year', $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_YEAR) );
 
 		return $doubles;
 	}

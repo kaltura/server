@@ -42,7 +42,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
-		$defaultThumbnail = null;
+		$defaultThumbUrl = null;
 		foreach ( $thumbAssets as $thumbAsset )
 		{
 			$thumbDownloadUrl = $this->getAssetDownloadUrl( $thumbAsset );
