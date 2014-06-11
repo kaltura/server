@@ -687,10 +687,8 @@ class playManifestAction extends kalturaAction
 			// Translate to playback protocol format 	
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::AKAMAI_HD);
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::RTMP) {
-			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0) {
-				$this->deliveryAttributes->setOriginalMediaProtocol($this->deliveryAttributes->getMediaProtocol());
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0) 
 				$this->deliveryAttributes->setMediaProtocol("rtmp");
-			}
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP) {
 			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
 				$this->deliveryAttributes->setMediaProtocol("http");

@@ -113,8 +113,6 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 //	
 //			if($entry)
 //			{
-//				$this->params->setResponseFormat('f4m');
-//		 		
 //		 		$protocol = $this->params->getMediaProtocol();
 //		 		$baseUrl = $this->getUrl();
 //			

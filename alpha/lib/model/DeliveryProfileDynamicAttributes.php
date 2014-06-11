@@ -86,11 +86,6 @@ class DeliveryProfileDynamicAttributes {
 	protected $mediaProtocol = PlaybackProtocol::HTTP;
 	
 	/**
-	 * @var string
-	 */
-	protected $originalMediaProtocol = null;
-	
-	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -294,20 +289,6 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @param string $mediaProtocol
-	 */
-	public function setMediaProtocol($mediaProtocol) {
-		$this->mediaProtocol = $mediaProtocol;
-	}
-	
-	/**
-	 * @return the $originalMediaProtocol
-	 */
-	public function getOriginalMediaProtocol() {
-		return $this->originalMediaProtocol;
-	}
-
-	/**
 	 * @param string $originalMediaProtocol
 	 */
 	public function setOriginalMediaProtocol($originalMediaProtocol) {
@@ -355,7 +336,6 @@ class DeliveryProfileDynamicAttributes {
 		$this->preferredBitrate = $newObj->getPreferredBitrate();
 		$this->responseFormat = $newObj->getResponseFormat();
 		$this->mediaProtocol = $newObj->getMediaProtocol();
-		$this->originalMediaProtocol = $newObj->getOriginalMediaProtocol();
 	}
 }
 
