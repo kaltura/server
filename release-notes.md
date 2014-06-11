@@ -1,3 +1,10 @@
+# IX-9.17.0 #
+
+*Permissions*
+
+- /deployment/updates/scripts/add_permissions/2014_05_11_add_permissions_to_CONTENT_MODERATE_BASE.php
+
+
 # IX-9.16.0 #
 
 ## Multicast eCDN ##
