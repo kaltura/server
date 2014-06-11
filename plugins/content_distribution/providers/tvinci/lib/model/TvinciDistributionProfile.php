@@ -105,10 +105,10 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::LANGUAGE, 'Language', 'Language', false, DistributionFieldRequiredStatus::NOT_REQUIRED, $languageXSLT);
 
 	    // Dates
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::START_DATE, 'Start Date', 'StartDate');
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::END_DATE, 'End Date', 'FinalEndDate');
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CATALOG_START_DATE, 'Catalog Start Date', 'CatalogStartDate');
-	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CATALOG_END_DATE, 'Catalog End Date', 'CatalogEndDate');
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::START_DATE, 'Start Date', 'StartDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::END_DATE, 'End Date', 'FinalEndDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CATALOG_START_DATE, 'Catalog Start Date', 'CatalogStartDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::CATALOG_END_DATE, 'Catalog End Date', 'CatalogEndDate', false, DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RUNTIME, 'Runtime', 'Runtime');
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RELEASE_YEAR, 'Release Year', 'ReleaseYear');
