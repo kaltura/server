@@ -289,10 +289,10 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @param string $originalMediaProtocol
+	 * @param string $mediaProtocol
 	 */
-	public function setOriginalMediaProtocol($originalMediaProtocol) {
-		$this->originalMediaProtocol = $originalMediaProtocol;
+	public function setMediaProtocol($mediaProtocol) {
+		$this->mediaProtocol = $mediaProtocol;
 	}
 
 	/**
