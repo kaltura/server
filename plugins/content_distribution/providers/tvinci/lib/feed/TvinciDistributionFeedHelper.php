@@ -11,6 +11,8 @@ class TvinciDistributionFeedHelper
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
+	const DEFAULT_SCHEMA_ID = 2;
+	
 	/**
 	 * var KalturaTvinciDistributionProfile
 	 */
@@ -47,19 +49,15 @@ class TvinciDistributionFeedHelper
 	protected $defaultThumbUrl;
 
 	/**
-	 * var string
+	 * var array
 	 */
-	protected $mainPlayManifestUrl;
-	
+	protected $videoAssetToUrlMap;
+
 	/**
-	 * var string
+	 * @var int
+	 * @see TvinciDistributionField::METADATA_SCHEMA_ID
 	 */
-	protected $iPadPlayManifestUrl;
-	
-	/**
-	 * var string
-	 */
-	protected $iPhonePlayManifestUrl;
+	protected $schemaId;
 	
 	/**
 	 * var string
@@ -75,7 +73,13 @@ class TvinciDistributionFeedHelper
 	{
 		$this->distributionProfile = $distributionProfile;
 		$this->fieldValues = $fieldValues;
-		$this->language = $fieldValues[TvinciDistributionField::LANGUAGE];
+		$this->language = self::getSafeFieldValue( TvinciDistributionField::LANGUAGE, 'eng');
+
+		$this->schemaId = self::getSafeFieldValue(TvinciDistributionField::METADATA_SCHEMA_ID, self::DEFAULT_SCHEMA_ID);
+		if ( $this->schemaId != 1 && $this->schemaId != 2 )
+		{
+			$this->schemaId = self::DEFAULT_SCHEMA_ID;
+		}
 	}
 
 	public function setEntryId( $entryId )						{ $this->entryId = $entryId; }
@@ -93,14 +97,24 @@ class TvinciDistributionFeedHelper
 	public function setDefaultThumbnailUrl( $defaultThumbUrl )	{ $this->defaultThumbUrl = $defaultThumbUrl; }
 	public function getDefaultThumbnailUrl()					{ return $this->defaultThumbUrl; }
 
-	public function setMainPlayManifestUrl( $url )				{ $this->mainPlayManifestUrl = $url; }
-	public function getMainPlayManifestUrl()					{ return $this->mainPlayManifestUrl; }
+	public function schemaId()									{ return $this->schemaId; }
+	
+	public function setVideoAssetUrl( $name, $url )
+	{
+		$this->videoAssetToUrlMap[$name] = $url;
+	}
 
-	public function setiPadPlayManifestUrl( $url )				{ $this->iPadPlayManifestUrl = $url; }
-	public function getiPadPlayManifestUrl()					{ return $this->iPadPlayManifestUrl; }
+	public static function getSafeArrayValue($arr, $key, $defaultValue)
+	{
+		$value = array_key_exists($key, $arr) ? $arr[$key] : $defaultValue;
+		return $value;
+	}
 
-	public function setiPhonePlayManifestUrl( $url )			{ $this->iPhonePlayManifestUrl = $url; }
-	public function getiPhonePlayManifestUrl()					{ return $this->iPhonePlayManifestUrl; }
+	public function getSafeFieldValue($fieldValue, $defaultValue)
+	{
+		$value = array_key_exists($fieldValue, $this->fieldValues) ? $this->fieldValues[$fieldValue] : $defaultValue;
+		return $value;
+	}
 
 	public function buildSubmitFeed()
 	{
@@ -240,8 +254,13 @@ class TvinciDistributionFeedHelper
 		return $metaNode;
 	}
 
-	private function createMetadataContainerWithLangElement($name, $lang, array $arr, $key)
+	private function createMetadataContainerWithLangElement($parentNode, $name, $lang, array $arr, $key)
 	{
+		if ( ! array_key_exists($key, $arr) || ! $arr[$key] )
+		{
+			return;
+		}
+
 		$multivalField = $arr[$key];
 		$multivalArr = explode(',', $multivalField);
 
@@ -254,7 +273,7 @@ class TvinciDistributionFeedHelper
 			$metaNode->appendChild( $this->createValueWithLangElement('container', $val, $lang) );
 		}
 
-		return $metaNode;
+		$parentNode->appendChild( $metaNode );
 	}
 
 	private function createBasicElement()
@@ -335,7 +354,6 @@ class TvinciDistributionFeedHelper
 	{
 		$strings = $this->_doc->createElement("strings");
 
-		$strings->appendChild( $this->createMetadataWithLangElement('Runtime', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
 		$strings->appendChild( $this->createMetadataWithLangElement('Release date', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_DATE) );
 
 		return $strings;
@@ -352,7 +370,8 @@ class TvinciDistributionFeedHelper
 	{
 		$doubles = $this->_doc->createElement("doubles");
 
-		$doubles->appendChild( $this->createMetadataElement('Release year', $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
+		$doubles->appendChild( $this->createMetadataElement('Runtime', $this->fieldValues, TvinciDistributionField::METADATA_RUNTIME) );
+		$doubles->appendChild( $this->createMetadataElement('Release year', $this->fieldValues, TvinciDistributionField::METADATA_RELEASE_YEAR) );
 
 		return $doubles;
 	}
@@ -361,15 +380,26 @@ class TvinciDistributionFeedHelper
 	{
 		$metas = $this->_doc->createElement("metas");
 
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RATING) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Country', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_COUNTRY) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Director', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIRECTOR) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Audio language', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_AUDIO_LANGUAGE) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_GENRE) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO) );
-		$metas->appendChild( $this->createMetadataContainerWithLangElement('Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST) );
+		$this->createMetadataContainerWithLangElement($metas, 'Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_RATING);
+		$this->createMetadataContainerWithLangElement($metas, 'Country', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_COUNTRY);
+		$this->createMetadataContainerWithLangElement($metas, 'Director', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIRECTOR);
+		$this->createMetadataContainerWithLangElement($metas, 'Audio language', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_AUDIO_LANGUAGE);
+		$this->createMetadataContainerWithLangElement($metas, 'Genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_GENRE);
+		$this->createMetadataContainerWithLangElement($metas, 'Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE);
+		$this->createMetadataContainerWithLangElement($metas, 'Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO);
 
+		if ( $this->schemaId() == 1 )
+		{
+			$this->createMetadataContainerWithLangElement($metas, 'Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST);
+		}
+		elseif ( $this->schemaId() == 2 )
+		{
+			$this->createMetadataContainerWithLangElement($metas, 'Parental Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_PARENTAL_RATING);
+			$this->createMetadataContainerWithLangElement($metas, 'Main Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_MAIN_CAST);
+			$this->createMetadataContainerWithLangElement($metas, 'Short title', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SHORT_TITLE);
+			$this->createMetadataContainerWithLangElement($metas, 'Dimension', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIMENSION);
+		}
+		
 		return $metas;
 	}
 
@@ -377,9 +407,10 @@ class TvinciDistributionFeedHelper
 	{
 		$files = $this->_doc->createElement("files");
 
-		$files->appendChild( $this->createFileElement('Main', $this->getMainPlayManifestUrl()) );
-		$files->appendChild( $this->createFileElement('Tablet Main', $this->getiPadPlayManifestUrl()) );
-		$files->appendChild( $this->createFileElement('Smartphone Main', $this->getiPhonePlayManifestUrl()) );
+		foreach ( $this->videoAssetToUrlMap as $name => $url )
+		{
+			$files->appendChild( $this->createFileElement($name, $url) );
+		}
 
  		return $files;
 	}
@@ -394,6 +425,18 @@ class TvinciDistributionFeedHelper
 		$this->setAttribute($fileNode, "cdn_name", "Default CDN");
 		$this->setAttribute($fileNode, "cdn_code", $url);
 		$this->setAttribute($fileNode, "co_guid", $fileType);
+
+		if ( $this->schemaId() == 2 )
+		{
+			$billingType = self::getSafeFieldValue(TvinciDistributionField::METADATA_BILLING_TYPE, null);
+			if ( $billingType )
+			{
+				$this->setAttribute($fileNode, "billing_type", $billingType);
+			}
+
+			$runtime = self::getSafeArrayValue($this->fieldValues, TvinciDistributionField::METADATA_RUNTIME, 0);
+			$this->setAttribute($fileNode, "assetDuration", $runtime * 60);
+		}
 
 		return $fileNode;
 	}

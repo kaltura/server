@@ -42,7 +42,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
-		$defaultThumbnail = null;
+		$defaultThumbUrl = null;
 		foreach ( $thumbAssets as $thumbAsset )
 		{
 			$thumbDownloadUrl = $this->getAssetDownloadUrl( $thumbAsset );
@@ -87,14 +87,48 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 	private function initPlayManifestUrls($entry, $feedHelper)
 	{
-		$url = $this->getPlayManifestUrl($entry, PlaybackProtocol::AKAMAI_HDS, 'mbr', 'a4m');
-		$feedHelper->setMainPlayManifestUrl( $url );
+		$videoAssetDataMap = array();
 
-		$url = $this->getPlayManifestUrl($entry, PlaybackProtocol::APPLE_HTTP, 'ipad', 'm3u8');
-		$feedHelper->setiPadPlayManifestUrl( $url );
+		// If the following field is defined, it will override the below hardcoded defaults
+		$videoAssetConfigLines = $feedHelper->getSafeFieldValue(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION, null);
+		if ( $videoAssetConfigLines )
+		{
+			// The format is a comma separated array of these compounds: "name:protocol:tag:ext"
+			// E.g.: "name:protocol:tag:ext,name:protocol:tag:ext,name:protocol:tag:ext"
+			$configLines = explode(',', $videoAssetConfigLines);
+			foreach ( $configLines as $configLine )
+			{
+				$vad = explode(':', $configLine);
+				$videoAssetDataMap[] = array($vad[0], $vad[1], $vad[2], $vad[3]);
+			}
+		}
+		elseif ( $feedHelper->schemaId() == 1 )
+		{
+			$videoAssetDataMap = array(
+					array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
+					array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+					array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
+				);
+		}
+		elseif ( $feedHelper->schemaId() == 2 ) {
+			$videoAssetDataMap = array(
+					array( 'Mobile Devices Trailer',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+					array( 'Mobile Devices Main SD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+					array( 'Mobile Devices Main HD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+				);
+		}
 
-		$url = $this->getPlayManifestUrl($entry, PlaybackProtocol::APPLE_HTTP, 'iphone', 'm3u8');
-		$feedHelper->setiPhonePlayManifestUrl( $url );
+		// Loop and build the file nodes
+		foreach ( $videoAssetDataMap as $videoAssetData )
+		{
+			$tvinciAssetName = $videoAssetData[0];
+			$playbackProtocol = $videoAssetData[1];
+			$tag = $videoAssetData[2];
+			$fileExt = $videoAssetData[3];
+
+			$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
+			$feedHelper->setVideoAssetUrl( $tvinciAssetName, $url );
+		}
 	}
 
 	private function getAssetDownloadUrl($asset)
@@ -104,7 +138,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		return $downloadUrl;
 	}
 
-	private function getPlayManifestUrl($entry, $format, $tag, $fileExt)
+	private function getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt)
 	{
 		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
 
@@ -112,7 +146,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 						. $partnerPath
 						. "/playManifest"
 						. "/entryId/{$entry->getId()}"
-						. "/format/$format"
+						. "/format/$playbackProtocol"
 						. "/tags/$tag"
 						. "/protocol/http"
 						. "/f/a.$fileExt";
