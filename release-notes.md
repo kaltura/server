@@ -1,3 +1,46 @@
+# IX-9.17.0 #
+
+## Add Tvinci Distribution Profile ##
+- Issue Type: New Feature
+- Issue ID: PLAT-1352
+
+#### Configuration Files ####
+
+##### Enable the plugin #####
+1. Add the following line to plugins.ini:
+
+		TvinciDistribution
+
+2. Install plugins:
+
+		php deployment/base/scripts/installPlugins.php
+
+##### Add custom metadata schema #####
+1. Add the following lines from admin.template.ini to admin.ini,
+   right after the "moduls.pushPublish.permissionName = FEATURE_PUSH_PUBLISH" block:
+
+		moduls.tvinciIngestV1.enabled = true
+		moduls.tvinciIngestV1.permissionType = 2
+		moduls.tvinciIngestV1.label = Enable Tvinci Ingest v1
+		moduls.tvinciIngestV1.permissionName = FEATURE_TVINCI_INGEST_V1
+		moduls.tvinciIngestV1.basePermissionType =
+		moduls.tvinciIngestV1.basePermissionName =
+		moduls.tvinciIngestV1.group = GROUP_ENABLE_DISABLE_FEATURES
+
+		moduls.tvinciIngestV2.enabled = true
+		moduls.tvinciIngestV2.permissionType = 2
+		moduls.tvinciIngestV2.label = Enable Tvinci Ingest v2
+		moduls.tvinciIngestV2.permissionName = FEATURE_TVINCI_INGEST_V2
+		moduls.tvinciIngestV2.basePermissionType =
+		moduls.tvinciIngestV2.basePermissionName =
+		moduls.tvinciIngestV2.group = GROUP_ENABLE_DISABLE_FEATURES
+
+2. Run the following script, which will add the custom metadata schema to partner 99:
+
+		php alpha/scripts/utils/addTvinciIngestSchemasToPartner99.php realrun
+
+   * note the 'realrun' parameter
+
 # IX-9.16.0 #
 
 ## Multicast eCDN ##
