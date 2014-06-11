@@ -56,9 +56,11 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 	{	
 		//Added to support cases where the resource is entry resource
 		$conversionProfileId = null;
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if($dbEntry)
-			$conversionProfileId = $dbEntry->getConversionProfileId();
+		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+		$entry = KBatchBase::$kClient->baseEntry->get($this->entryId);
+		KBatchBase::unimpersonate();
+		if($entry && $entry->conversionProfileId)
+			$conversionProfileId = $entry->conversionProfileId;
 		
 		foreach($results as $index => $cuePoint)
 		{	
@@ -70,11 +72,13 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, $conversionProfileId);
 				$thumbAsset = new KalturaTimedThumbAsset();
 				$thumbAsset->cuePointId = $cuePoint->id;
-				
+
+				KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 				KBatchBase::$kClient->startMultiRequest();
 				KBatchBase::$kClient->thumbAsset->add($cuePoint->entryId, $thumbAsset);
 				KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $timedThumbResource);
 				KBatchBase::$kClient->doMultiRequest();
+				KBatchBase::unimpersonate();
 			}
 				
 		}
