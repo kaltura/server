@@ -56,6 +56,13 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	    // media fields
 	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(TvinciDistributionField::METADATA_SCHEMA_ID);
+	    $fieldConfig->setUserFriendlyFieldName('Schema Id');
+	    $fieldConfig->setEntryMrssXslt('2'); // See TvinciDistributionField::METADATA_SCHEMA_ID
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(TvinciDistributionField::MEDIA_TITLE);
 	    $fieldConfig->setUserFriendlyFieldName('Entry name');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
@@ -81,6 +88,10 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::MEDIA_TYPE, 'Media Type', 'MediaType');
 
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_SHORT_TITLE, 'Short Title', 'ShortTitle', false);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_DIMENSION, 'Dimension', 'Dimension', false);
+	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_BILLING_TYPE, 'Billing Type', 'BillingType', false);
+
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::GEO_BLOCK_RULE, 'Geo Block Rule', 'GeoBlockRule');
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::WATCH_PERMISSIONS_RULE, 'Watch Permission Rule', 'WatchPermissionRule');
 
@@ -105,8 +116,10 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_GENRE, 'Genre', 'Genre', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_SUB_GENRE, 'Sub Genre', 'SubGenre', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_RATING, 'Rating', 'Rating', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_PARENTAL_RATING, 'Parental Rating', 'ParentalRating', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_COUNTRY, 'Country', 'Country', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_CAST, 'Cast', 'Cast', true);
+ 	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_MAIN_CAST, 'Main Cast', 'MainCast', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_DIRECTOR, 'Director', 'Director', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_AUDIO_LANGUAGE, 'Audio Language', 'AudioLanguage', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_STUDIO, 'Studio', 'Studio', true);

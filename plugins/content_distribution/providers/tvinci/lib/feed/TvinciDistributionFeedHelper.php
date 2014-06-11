@@ -11,6 +11,8 @@ class TvinciDistributionFeedHelper
 	const ACTION_UPDATE = 'update';
 	const ACTION_DELETE = 'delete';
 
+	const DEFAULT_SCHEMA_ID = 2;
+	
 	/**
 	 * var KalturaTvinciDistributionProfile
 	 */
@@ -62,6 +64,12 @@ class TvinciDistributionFeedHelper
 	protected $iPhonePlayManifestUrl;
 	
 	/**
+	 * @var int
+	 * @see TvinciDistributionField::METADATA_SCHEMA_ID
+	 */
+	protected $schemaId;
+	
+	/**
 	 * var string
 	 */
 	protected $language;
@@ -75,7 +83,13 @@ class TvinciDistributionFeedHelper
 	{
 		$this->distributionProfile = $distributionProfile;
 		$this->fieldValues = $fieldValues;
-		$this->language = $fieldValues[TvinciDistributionField::LANGUAGE];
+		$this->language = self::getSafeFieldValue( TvinciDistributionField::LANGUAGE, 'eng');
+
+		$this->schemaId = self::getSafeFieldValue(TvinciDistributionField::METADATA_SCHEMA_ID, self::DEFAULT_SCHEMA_ID);
+		if ( $this->schemaId != 1 && $this->schemaId != 2 )
+		{
+			$this->schemaId = self::DEFAULT_SCHEMA_ID;
+		}
 	}
 
 	public function setEntryId( $entryId )						{ $this->entryId = $entryId; }
@@ -93,6 +107,8 @@ class TvinciDistributionFeedHelper
 	public function setDefaultThumbnailUrl( $defaultThumbUrl )	{ $this->defaultThumbUrl = $defaultThumbUrl; }
 	public function getDefaultThumbnailUrl()					{ return $this->defaultThumbUrl; }
 
+	public function schemaId()									{ return $this->schemaId; }
+	
 	public function setMainPlayManifestUrl( $url )				{ $this->mainPlayManifestUrl = $url; }
 	public function getMainPlayManifestUrl()					{ return $this->mainPlayManifestUrl; }
 
@@ -101,6 +117,18 @@ class TvinciDistributionFeedHelper
 
 	public function setiPhonePlayManifestUrl( $url )			{ $this->iPhonePlayManifestUrl = $url; }
 	public function getiPhonePlayManifestUrl()					{ return $this->iPhonePlayManifestUrl; }
+
+	public static function getSafeArrayValue($arr, $key, $defaultValue)
+	{
+		$value = array_key_exists($key, $arr) ? $arr[$key] : $defaultValue;
+		return $value;
+	}
+
+	public function getSafeFieldValue($fieldValue, $defaultValue)
+	{
+		$value = array_key_exists($fieldValue, $this->fieldValues) ? $this->fieldValues[$fieldValue] : $defaultValue;
+		return $value;
+	}
 
 	public function buildSubmitFeed()
 	{
@@ -373,8 +401,19 @@ class TvinciDistributionFeedHelper
 		$this->createMetadataContainerWithLangElement($metas, 'Genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_GENRE);
 		$this->createMetadataContainerWithLangElement($metas, 'Sub genre', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SUB_GENRE);
 		$this->createMetadataContainerWithLangElement($metas, 'Studio', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_STUDIO);
-		$this->createMetadataContainerWithLangElement($metas, 'Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST);
 
+		if ( $this->schemaId() == 1 )
+		{
+			$this->createMetadataContainerWithLangElement($metas, 'Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_CAST);
+		}
+		elseif ( $this->schemaId() == 2 )
+		{
+			$this->createMetadataContainerWithLangElement($metas, 'Parental Rating', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_PARENTAL_RATING);
+			$this->createMetadataContainerWithLangElement($metas, 'Main Cast', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_MAIN_CAST);
+			$this->createMetadataContainerWithLangElement($metas, 'Short title', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_SHORT_TITLE);
+			$this->createMetadataContainerWithLangElement($metas, 'Dimension', $this->language, $this->fieldValues, TvinciDistributionField::METADATA_DIMENSION);
+		}
+		
 		return $metas;
 	}
 
@@ -399,6 +438,18 @@ class TvinciDistributionFeedHelper
 		$this->setAttribute($fileNode, "cdn_name", "Default CDN");
 		$this->setAttribute($fileNode, "cdn_code", $url);
 		$this->setAttribute($fileNode, "co_guid", $fileType);
+
+		if ( $this->schemaId() == 2 )
+		{
+			$billingType = self::getSafeFieldValue(TvinciDistributionField::METADATA_BILLING_TYPE, null);
+			if ( $billingType )
+			{
+				$this->setAttribute($fileNode, "billing_type", $billingType);
+			}
+
+			$runtime = self::getSafeArrayValue($this->fieldValues, TvinciDistributionField::METADATA_RUNTIME, 0);
+			$this->setAttribute($fileNode, "assetDuration", $runtime * 60);
+		}
 
 		return $fileNode;
 	}
