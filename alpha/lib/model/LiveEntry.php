@@ -225,6 +225,8 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
+	public function setFirstBroadcastTime ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
+	public function getFirstBroadcastTime (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{

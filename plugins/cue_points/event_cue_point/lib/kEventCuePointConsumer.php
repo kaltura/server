@@ -22,6 +22,10 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 		// If currently only one is set, and that's the one that was just changed
 		if((count($currentMediaServers) == 1) && (count(array_intersect($updatedServers, $currentMediaServers)) == 1)) {
 			$this->addEventCuePoint($object, EventType::BROADCAST_START);
+			if(is_null($object->getFirstBroadcastTime())) {
+				$object->setFirstBroadcastTime(time());
+				$object->save();
+			}
 		}
 		
 		// If currently no one is set
@@ -30,11 +34,11 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 		}
 	}
 	
-	protected function addEventCuePoint($object, $eventType) {
+	protected function addEventCuePoint(LiveEntry $liveEntry, $eventType) {
 		$cuePoint = new EventCuePoint();
-		$cuePoint->setPartnerId($object->getPartnerId());
+		$cuePoint->setPartnerId($liveEntry->getPartnerId());
 		$cuePoint->setSubType($eventType);
-		$cuePoint->setEntryId($object->getId());
+		$cuePoint->setEntryId($liveEntry->getId());
 		$cuePoint->setStartTime(time());
 		$cuePoint->setStatus(CuePointStatus::READY);
 		$cuePoint->save();
@@ -45,10 +49,10 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 	*/
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if(($object instanceof LiveEntry) && in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)) {
-			if($object->isCustomDataModified(null, 'mediaServers')) {
+		if(($object instanceof LiveEntry) && 
+				in_array(entryPeer::CUSTOM_DATA, $modifiedColumns) && 
+				($object->isCustomDataModified(null, 'mediaServers'))) {
 				return true;
-			}
 		}
 		
 		return false;
