@@ -128,7 +128,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$this->buildM3u8Flavors($baseUrl, $flavors);
 		$this->buildM3u8Flavors($backupUrl, $flavors);
 		
-		$this->params->setResponseFormat('m3u8');
+		if(is_null($this->params->getResponseFormat()))
+			$this->params->setResponseFormat('m3u8');
+		
 		$renderer = $this->getRenderer($flavors);
 		return $renderer;
 	}
