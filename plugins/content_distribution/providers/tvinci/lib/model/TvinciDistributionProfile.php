@@ -124,6 +124,14 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_AUDIO_LANGUAGE, 'Audio Language', 'AudioLanguage', true);
  	    $this->addMetadataDistributionFieldConfig($fieldConfigArray, TvinciDistributionField::METADATA_STUDIO, 'Studio', 'Studio', true);
 
+	    // Video assets configuration (see KalturaTvinciDistributionJobProviderData::initPlayManifestUrls())
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION);
+	    $fieldConfig->setUserFriendlyFieldName('Video assets configuration');
+	    $fieldConfig->setEntryMrssXslt('');
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
 	    return $fieldConfigArray;
 	}
 

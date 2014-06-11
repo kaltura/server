@@ -49,20 +49,10 @@ class TvinciDistributionFeedHelper
 	protected $defaultThumbUrl;
 
 	/**
-	 * var string
+	 * var array
 	 */
-	protected $mainPlayManifestUrl;
-	
-	/**
-	 * var string
-	 */
-	protected $iPadPlayManifestUrl;
-	
-	/**
-	 * var string
-	 */
-	protected $iPhonePlayManifestUrl;
-	
+	protected $videoAssetToUrlMap;
+
 	/**
 	 * @var int
 	 * @see TvinciDistributionField::METADATA_SCHEMA_ID
@@ -109,14 +99,10 @@ class TvinciDistributionFeedHelper
 
 	public function schemaId()									{ return $this->schemaId; }
 	
-	public function setMainPlayManifestUrl( $url )				{ $this->mainPlayManifestUrl = $url; }
-	public function getMainPlayManifestUrl()					{ return $this->mainPlayManifestUrl; }
-
-	public function setiPadPlayManifestUrl( $url )				{ $this->iPadPlayManifestUrl = $url; }
-	public function getiPadPlayManifestUrl()					{ return $this->iPadPlayManifestUrl; }
-
-	public function setiPhonePlayManifestUrl( $url )			{ $this->iPhonePlayManifestUrl = $url; }
-	public function getiPhonePlayManifestUrl()					{ return $this->iPhonePlayManifestUrl; }
+	public function setVideoAssetUrl( $name, $url )
+	{
+		$this->videoAssetToUrlMap[$name] = $url;
+	}
 
 	public static function getSafeArrayValue($arr, $key, $defaultValue)
 	{
@@ -421,9 +407,10 @@ class TvinciDistributionFeedHelper
 	{
 		$files = $this->_doc->createElement("files");
 
-		$files->appendChild( $this->createFileElement('Main', $this->getMainPlayManifestUrl()) );
-		$files->appendChild( $this->createFileElement('Tablet Main', $this->getiPadPlayManifestUrl()) );
-		$files->appendChild( $this->createFileElement('Smartphone Main', $this->getiPhonePlayManifestUrl()) );
+		foreach ( $this->videoAssetToUrlMap as $name => $url )
+		{
+			$files->appendChild( $this->createFileElement($name, $url) );
+		}
 
  		return $files;
 	}

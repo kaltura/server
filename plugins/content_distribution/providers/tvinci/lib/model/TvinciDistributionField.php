@@ -21,6 +21,8 @@ interface TvinciDistributionField extends BaseEnum
 	const CATALOG_START_DATE			= 'CATALOG_START_DATE';
 	const CATALOG_END_DATE				= 'CATALOG_END_DATE';
 
+	const VIDEO_ASSETS_CONFIGURATION	= 'VIDEO_ASSETS_CONFIGURATION'; // See KalturaTvinciDistributionJobProviderData::initPlayManifestUrls()
+
 	/**
 	 * 1 = Cast, Rating, 'Main', 'Tablet Main', etc.
 	 * 2 = Main Cast, Parental Rating, 'Mobile Devices Trailer', etc.
