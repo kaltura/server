@@ -85,6 +85,10 @@ class kFlowHelper
 			return $dbBatchJob;
 
 		$dbFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+		
+		if(!$dbFlavorAsset)
+			return $dbBatchJob;
+			
 		if($dbFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_ERROR)
 		{
 			$dbFlavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
