@@ -211,10 +211,25 @@ class flvclipperAction extends kalturaAction
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 			
-			if (is_null($fileSync) || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			if (is_null($fileSync))
 			{
 				KalturaLog::log("Error - no FileSync for flavor [".$flavorAsset->getId()."]");
 				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			}
+			
+			if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			{
+				$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
+						PlaybackProtocol::HTTP, null, null, $flavorAsset);
+				if (!$urlManager)
+				{
+					KalturaLog::log("Error - failed to find an HTTP delivery for storage profile [".$fileSync->getDc()."]");
+					KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+				}
+
+				$url = rtrim($urlManager->getUrl(), '/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync), '/');
+				header('location: ' . $url);
+				die;
 			}
 			
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
