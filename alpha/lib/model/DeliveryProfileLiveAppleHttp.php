@@ -2,6 +2,11 @@
 
 class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
+	function __construct() {
+		parent::__construct();
+		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
+	}
+	
 	public function setDisableExtraAttributes($v)
 	{
 		$this->putInCustomData("disableExtraAttributes", $v);
@@ -127,9 +132,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors);
 		$this->buildM3u8Flavors($backupUrl, $flavors);
-		
-		if(is_null($this->params->getResponseFormat()))
-			$this->params->setResponseFormat('m3u8');
 		
 		$renderer = $this->getRenderer($flavors);
 		return $renderer;
