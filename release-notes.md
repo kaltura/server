@@ -1,5 +1,13 @@
 # IX-9.17.0 #
 
+## 'Content Moderator' user-role permissions fix ##
+- Issue Type: Bug fix
+- Issue ID: SUP-2000
+
+#### Permissions ####
+
+		php /deployment/updates/scripts/add_permissions/2014_05_11_add_permissions_to_CONTENT_MODERATE_BASE.php
+
 ## Add Tvinci Distribution Profile ##
 - Issue Type: New Feature
 - Issue ID: PLAT-1352
