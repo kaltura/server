@@ -340,7 +340,9 @@ class MsnDistributionFeed
 	public function getAssetUrl(asset $asset)
 	{
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
-		$urlManager->getFullAssetUrl($asset);
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttributes(null, $asset);
+		$url = $urlManager->getFullAssetUrl($asset);
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		$url = $url.'/'.$asset->getId().'.'.$asset->getFileExt();
 		return 'http://' . $url;
