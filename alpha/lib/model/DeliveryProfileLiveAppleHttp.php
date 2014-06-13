@@ -113,6 +113,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 	}
 
+	public function compareFlavors($a, $b) 
+	{
+	    if ($a['bitrate'] == $b['bitrate']) {
+	        return 0;
+	    }
+	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
+	}
+
 	/* (non-PHPdoc)
 	 * @see DeliveryProfileLive::serve()
 	 */
@@ -123,9 +131,19 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			return parent::serve($baseUrl, $backupUrl);
 		}
 		
+		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
+		/* @var $entry LiveEntry */
+		if($entry && $entry->getSyncDCs())
+		{
+			$baseUrl = str_replace('_all.smil', '_publish.smil', $baseUrl);
+			$backupUrl = str_replace('_all.smil', '_publish.smil', $backupUrl);
+		}
+		
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors);
 		$this->buildM3u8Flavors($backupUrl, $flavors);
+		
+		usort($flavors, array($this, 'compareFlavors'));
 		
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
 		$renderer = $this->getRenderer($flavors);
