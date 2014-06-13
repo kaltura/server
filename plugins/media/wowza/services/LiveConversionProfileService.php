@@ -33,7 +33,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	public function serveAction($streamName, $hostname = null)
 	{
 		$matches = null;
-		if(!preg_match('/^(\d_.{8})_(.+)$/', $streamName, $matches))
+		if(!preg_match('/^(\d_.{8})_(\d+)$/', $streamName, $matches))
 			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
 			
 		$entryId = $matches[1];
