@@ -245,6 +245,8 @@ class KalturaErrors extends APIErrors
 	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED;URL_PATH;Failed to download thumbnail from URL \"@URL_PATH@\"";
 
 	const THUMB_ASSET_IS_DEFAULT = "THUMB_ASSET_IS_DEFAULT;ASSET;Thumbnail asset \"@ASSET@\" is default and could not be deleted";
+	
+	const THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE = "THUMB_ASSET_IS_NOT_OF_TYPE_TIMED_THUMB;ASSET;Thumbnail asset \"@ASSET@\" is not of type timed thumb";
 
 	/**
 	 * Category Service

@@ -28,7 +28,7 @@ if(top != window) { top.location = window.location; }
 // Options
 var options = {
 	secureLogin: <?php echo ($securedLogin) ? 'true' : 'false'; ?>,
-	enableLanguageMenu: "<?php echo (kConf::get('enableLanguageMenu'))? 'true': 'false'; ?>",
+	enableLanguageMenu: "<?php echo 'true'; ?>",
 	swfUrl: "<?php echo $swfUrl; ?>",
 	flashVars: {
 		host: "<?php echo $www_host; ?>",

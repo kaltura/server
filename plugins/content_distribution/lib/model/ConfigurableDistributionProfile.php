@@ -482,11 +482,13 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	    {
     	    $value = isset($allFieldValues[$fieldName]) ? $allFieldValues[$fieldName] : null;
     		if (strlen($value) <= 0) {
-    			if ( $this->fieldConfigArray[$fieldName]->getIsRequired() == DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION
-		    			&& $this->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC ) {
-    				$validationError = $this->createValidationError($action, DistributionErrorType::CONDITION_NOT_MET, $this->getUserFriendlyFieldName($fieldName));
-    				$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-    				$validationErrors[] = $validationError;
+				if ( $this->fieldConfigArray[$fieldName]->getIsRequired() == DistributionFieldRequiredStatus::REQUIRED_FOR_AUTOMATIC_DISTRIBUTION )
+				{
+					if ( $this->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC ) {
+						$validationError = $this->createValidationError($action, DistributionErrorType::CONDITION_NOT_MET, $this->getUserFriendlyFieldName($fieldName));
+						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+						$validationErrors[] = $validationError;
+					}
     			}
     			else {
 	    		    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));

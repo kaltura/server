@@ -597,7 +597,7 @@ class asset extends Baseasset implements ISyncableFile
 		return $downloadUrl;
 	}
 	
-	protected function getFinalDownloadUrlPathWithoutKs()
+	public function getFinalDownloadUrlPathWithoutKs()
 	{
 		$finalPath = myPartnerUtils::getUrlForPartner($this->getPartnerId(),$this->getPartnerId()*100).
 					"/download".
