@@ -124,6 +124,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
+		if ($streamerType == PlaybackProtocol::HTTP)
+		{
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, infraRequestUtils::getProtocol(), null, null, false);
+			if ($delivery)
+				return $delivery;
+		}
 		return self::getLocalDeliveryByPartner($entryId, $streamerType, null, null, null, false);	
 	}
 	
