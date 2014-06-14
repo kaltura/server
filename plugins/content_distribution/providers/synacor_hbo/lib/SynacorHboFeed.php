@@ -247,7 +247,7 @@ class SynacorHboFeed
 	
 	public function getAssetUrl(asset $asset)
 	{
-		$urlManager = DeliveryPeer::getDeliveryProfile($asset->getEntryId());
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 		if($asset instanceof flavorAsset)
 			$urlManager->initDeliveryDynamicAttributes(null, $asset);
 		$url = $urlManager->getFullAssetUrl($asset);
