@@ -5,13 +5,17 @@
  */
 class kTime
 {
+	const REMOVE_DATE = -1;
+
 	public static function getRelativeTime($value)
 	{
 		// empty fields should be treated as 0 and not as the current time
 		if (strlen($value) == 0)
 			return 0;
-		$maxRelativeTime = kConf::get('max_relative_time');
 		$value = (int)$value;
+		if ($value == self::REMOVE_DATE)
+			return $value;
+		$maxRelativeTime = kConf::get('max_relative_time');
 		if (-$maxRelativeTime <= $value && $value <= $maxRelativeTime && self::isRelativeTimeEnabled())
 		{
 			$time = self::getTime();
