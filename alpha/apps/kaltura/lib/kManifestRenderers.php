@@ -638,10 +638,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$bitrate += 40 * 1024;
 
 			$resolution = '';
-			$width = $flavor['width'];
-			$height = $flavor['height'];
-			if ($width && $height)
-				$resolution = ",RESOLUTION={$width}x{$height}";
+			if(isset($flavor['width']) && isset($flavor['height']))
+			{
+				$width = $flavor['width'];
+				$height = $flavor['height'];
+				if ($width && $height)
+					$resolution = ",RESOLUTION={$width}x{$height}";
+			}
 				
 			$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}\n";
 			$content .= $flavor['url'];
