@@ -16,6 +16,8 @@ class KWidevineBatchHelper
 	const LEND = 'lend';
 	const LICSTART = 'licstart';
 	const LICEND = 'licend';
+	const PTIME = 'ptime';
+	const SIGN = 'sign';
 	
 	private static $encryptionErrorCodes = array(
 						'OK', 'InvalidUsage', 'OwnerNotSpecified', 'ProviderNotSpecified', 'AssetNotSpecified', 'WVEncError',
@@ -77,7 +79,7 @@ class KWidevineBatchHelper
 	*/
 	public static function sendRegisterAssetRequest(
 							$wvRegServerHost, $assetName = null, $assetId = null, $portal = null, 
-							$policy = null, $licenseStartDate = null, $licenseEndDate = null, &$errorMessage)
+							$policy = null, $licenseStartDate = null, $licenseEndDate = null, $iv, $key, &$errorMessage)
 	{
 		$params = array();
 		
@@ -127,7 +129,16 @@ class KWidevineBatchHelper
 			$providerParams[self::LICSTART] = $licenseStartDate;
 		if($licenseEndDate)
 			$providerParams[self::LICEND] = $licenseEndDate;
-				
+
+		//sign register asset request
+		$ptime = time();
+		$signInput = $params[self::ASSET_NAME].
+					 $params[self::OWNER].
+					 $params[self::PROVIDER_NAME].
+					 $ptime;
+		$sign = WidevineLicenseProxyUtils::createRequestSignature($signInput, $key, $iv);
+		$params[self::PTIME] = $ptime;
+		$params[self::SIGN] = $sign;
 		$response = self::sendHttpRequest($wvRegServerHost.WidevinePlugin::REGISTER_ASSET_URL_PART.$portal, $params, $providerParams);
 		
 		if($response[self::STATUS] == 1)
