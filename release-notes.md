@@ -1,5 +1,13 @@
 # IX-9.17.0 #
 
+## Add ENTRY_CHANGED email notification template ##
+- Issue Type: Customer request
+- Issue ID: PLAT-1442
+
+#### Scripts ####
+
+		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
+
 ## 'Content Moderator' user-role permissions fix ##
 - Issue Type: Bug fix
 - Issue ID: SUP-2000
