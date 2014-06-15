@@ -9,7 +9,7 @@
  */
 
 chdir(__DIR__);
-require_once (__DIR__ . '/../../bootstrap.php');
+require_once (__DIR__ . '/../bootstrap.php');
 
 $realRun = isset($argv[1]) && $argv[1] == 'realrun';
 KalturaStatement::setDryRun(!$realRun);
