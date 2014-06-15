@@ -134,7 +134,7 @@ class KWidevineBatchHelper
 		$ptime = time();
 		$signInput = $params[self::ASSET_NAME].
 					 $params[self::OWNER].
-					 $params[self::PROVIDER_NAME].
+					 $providerParams[self::PROVIDER_NAME].
 					 $ptime;
 		$sign = WidevineLicenseProxyUtils::createRequestSignature($signInput, $key, $iv);
 		$params[self::PTIME] = $ptime;
