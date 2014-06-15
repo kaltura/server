@@ -1,10 +1,9 @@
 <?php
 
 class DeliveryProfileGenericRtmp extends DeliveryProfileRtmp {
-	
-	// Whenever someone wants - you can extract that as parameter.
-	private $removeDefaultPrefix = true;
-	
+
+	protected $REDUNDANT_EXTENSIONS = array();
+
 	public function setPattern($v)
 	{
 		$this->putInCustomData("pattern", $v);
@@ -44,9 +43,6 @@ class DeliveryProfileGenericRtmp extends DeliveryProfileRtmp {
 	}
 	
 	protected function formatByExtension($url) {
-		$url = parent::formatByExtension($url);
-		if($this->removeDefaultPrefix)
-			$url = str_replace("mp4:", '', $url);
 		return $url;
 	}
 }
