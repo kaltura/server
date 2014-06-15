@@ -41,25 +41,31 @@ class WidevineLicenseProxyUtils
 					 $requestParams[self::MK].
 					 $requestParams[self::MD].
 					 $ptime;
-		$sign = self::createRequestSignature($signInput);		
+					 
+		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
+		if($dbDrmProfile)
+		{
+			$key = $dbDrmProfile->getKey();
+			$iv = $dbDrmProfile->getIv();	
+			$baseUrl = $dbDrmProfile->getLicenseServerUrl();
+			$portal = $dbDrmProfile->getPortal();	
+		}
+		else 
+		{
+			$key = WidevinePlugin::getWidevineConfigParam('key');
+			$iv = WidevinePlugin::getWidevineConfigParam('iv');
+			$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
+			$portal = WidevinePlugin::getWidevineConfigParam('portal');
+		}
+		KalturaLog::debug("sign input: ".$signInput);
+		
+		$sign = self::createRequestSignature($signInput, $key, $iv);		
 		$requestParams[self::PTIME] = $ptime;
 		$requestParams[self::SIGN] = $sign;
 				
 		$overrideParams = self::getLicenseOverrideParams($overrideParamsStr, $isAdmin);
 		
 		$requestParams = array_merge($requestParams, $overrideParams);
-		
-		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
-		if($dbDrmProfile)
-		{
-			$baseUrl = $dbDrmProfile->getLicenseServerUrl();
-			$portal = $dbDrmProfile->getPortal();
-		}
-		else
-		{
-			$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
-			$portal = WidevinePlugin::getWidevineConfigParam('portal');
-		}
 		
 		if(!$baseUrl)
 			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_SERVER_URL_NOT_SET);
@@ -100,20 +106,20 @@ class WidevineLicenseProxyUtils
 			KalturaLog::debug("License response status Error with code: ".$response_status_dec);
 	}
 
-	private static function getKeyBytes()
+	//this utility function used by both batch and API
+	public static function createRequestSignature($data, $key, $iv)
 	{
-		$dbDrmProfile = DrmProfilePeer::retrieveByProvider(WidevinePlugin::getWidevineProviderCoreValue());
-		if($dbDrmProfile)
-		{
-			$key = $dbDrmProfile->getKey();
-			$iv = $dbDrmProfile->getIv();		
-		}
-		else 
-		{
-			$key = WidevinePlugin::getWidevineConfigParam('key');
-			$iv = WidevinePlugin::getWidevineConfigParam('iv');
-		}
-		
+		$digest = openssl_digest($data, "sha1", true);
+		$key_bytes = self::getKeyBytes($key, $iv);
+		if(!$key_bytes)
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_KEY_NOT_SET);
+		$iv = pack("H*", substr($key_bytes, 0, 32));
+    	$key = pack("H*", substr($key_bytes, 32));
+	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false, $iv);
+	}
+	
+	private static function getKeyBytes($key, $iv)
+	{	
 		$key = str_replace("0x", "", $key);
 		$key = str_replace(", ", "", $key);
 
@@ -121,19 +127,6 @@ class WidevineLicenseProxyUtils
 		$iv = str_replace(", ", "", $iv);
 		
 		return $key.$iv;
-	}
-	
-	protected static function createRequestSignature($data)
-	{
-		KalturaLog::debug("sign input: ".$data);
-		
-		$digest = openssl_digest($data, "sha1", true);
-		$key_bytes = self::getKeyBytes();
-		if(!$key_bytes)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_KEY_NOT_SET);
-		$iv = pack("H*", substr($key_bytes, 0, 32));
-    	$key = pack("H*", substr($key_bytes, 32));
-	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false, $iv);
 	}
 	
 	protected static function getLicenseOverrideParams($overrideParamsStr, $isAdmin)

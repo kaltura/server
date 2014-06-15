@@ -49,10 +49,10 @@ class MetadataService extends KalturaBaseService
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
 	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
-		if (!$metadataProfile)
+		if(!$metadataProfile)
 		    throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_FOUND, $metadataProfileId);
 		    
-		if ($metadataProfile->getObjectType() != $objectType)
+		if($metadataProfile->getObjectType() != kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType))
 		    throw new KalturaAPIException(MetadataErrors::INCOMPATIBLE_METADATA_PROFILE_OBJECT_TYPE, $metadataProfile->getObjectType() , $objectType);
 		
 		if($objectType == KalturaMetadataObjectType::USER)
@@ -69,7 +69,7 @@ class MetadataService extends KalturaBaseService
 			
 		// if a metadata xslt is defined on the metadata profile - transform the given metadata
 		$xmlDataTransformed = $this->transformMetadata($metadataProfileId, $xmlData);
-	    if ($xmlDataTransformed)
+	    if($xmlDataTransformed)
             $xmlData = $xmlDataTransformed;
 		
 		$errorMessage = '';

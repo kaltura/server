@@ -226,12 +226,10 @@ class TimeWarnerFeed
 	
 	public function getAssetUrl(asset $asset)
 	{
-		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
-		
-		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost, $asset->getEntryId());
-		$urlManager->setDomain($cdnHost);
-		$url = $urlManager->getAssetUrl($asset);
-		$url = $cdnHost . $url;
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttributes(null, $asset);
+		$url = $urlManager->getFullAssetUrl($asset);
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		return 'http://' . $url;
 	}

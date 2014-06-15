@@ -82,7 +82,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
-		$mediaInfo->multiStream = json_encode($mediaInfo->multiStream);
+		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
 		return $mediaInfo;
 	}
 	
@@ -146,7 +146,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				break;
 			}
 			self::removeUnsetFields($mAux);
-			$mediaInfo->multiStream[] = $mAux;
+			$mediaInfo->contentStreams[] = $mAux;
 			if($copyFlag){
 				self::copyFields($mAux, $mediaInfo);
 			}

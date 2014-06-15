@@ -484,10 +484,11 @@ class asset extends Baseasset implements ISyncableFile
 		if(!$storage)
 			return null;
 			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc(), $this->getEntryId());
-		$urlManager->setFileExtension($this->getFileExt());
-		
-		$url = rtrim($storage->getDeliveryBaseUrlByProtocol(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $this->getEntryId(), PlaybackProtocol::HTTP, null, $fileSync, $this);
+		if(is_null($urlManager)) 
+			return null;
+			
+		$url = rtrim($urlManager->getUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 		return $url;
 	}
 	
@@ -544,26 +545,14 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function isKsNeededForDownload()
 	{
+		$entry = $this->getentry();
+		if(!$entry)
+			return true;
+		
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $this->getPartnerId()))
 			return true;
-
-		$invalidModerationStatuses = array(
-			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION,
-			entry::ENTRY_MODERATION_STATUS_REJECTED
-		);
 		
-		$entry = $this->getentry();
-		if (!$entry ||
-			in_array($entry->getModerationStatus(), $invalidModerationStatuses) ||
-			($entry->getStartDate() !== null && $entry->getStartDate(null) >= time()) ||
-			($entry->getEndDate() !== null && $entry->getEndDate(null) <= time() + 86400))
-			return true;
-		
-		$accessControl = $entry->getaccessControl();
-		if (!$accessControl || $accessControl->getRulesArray())
-			return true;
-
-		return false;
+		return $entry->isSecuredEntry();
 	}
 	
 	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false)
@@ -608,7 +597,7 @@ class asset extends Baseasset implements ISyncableFile
 		return $downloadUrl;
 	}
 	
-	protected function getFinalDownloadUrlPathWithoutKs()
+	public function getFinalDownloadUrlPathWithoutKs()
 	{
 		$finalPath = myPartnerUtils::getUrlForPartner($this->getPartnerId(),$this->getPartnerId()*100).
 					"/download".

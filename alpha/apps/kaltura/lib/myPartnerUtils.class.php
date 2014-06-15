@@ -358,26 +358,6 @@ class myPartnerUtils
 		return $thumbHost;
 	}
 	
-	// if the cdnHost of the partner is false or null or an empty string - ignore it	
-	public static function getRtmpUrl ( $partner_id )
-	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getRtmpUrl() ) ) return requestUtils::getRtmpUrl();
-		return $partner->getRtmpUrl();
-	}
-	
-	// if the iis Host of the partner is false or null or an empty string - ignore it	
-	public static function getIisHost ( $partner_id, $protocol = 'http' )
-	{
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner || (! $partner->getIisHost() ) ) return requestUtils::getIisHost($protocol);
-		
-		$iisHost = $partner->getIisHost();
-		$iisHost = preg_replace('/^https?/', $protocol, $iisHost);
-		return $iisHost;
-	}
-	
-	
 	// TODO - cleanup !!	
 	/**
 	 * Will determine the conversion string for the entry id.
@@ -1383,7 +1363,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $checkPermissions = false)
+ 	public static function copyConversionProfiles(Partner $fromPartner, Partner $toPartner, $permissionRequiredOnly = false)
  	{
 		$copiedList = array();
 		
@@ -1396,7 +1376,7 @@ class myPartnerUtils
  		foreach($conversionProfiles as $conversionProfile)
  		{
  			/* @var $conversionProfile conversionProfile2 */
- 			if ($checkPermissions && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
+ 			if ($permissionRequiredOnly && !count($conversionProfile->getRequiredCopyTemplatePermissions()))
  				continue;
  			
  			if (!self::isPartnerPermittedForCopy ($toPartner, $conversionProfile->getRequiredCopyTemplatePermissions()))
@@ -1542,23 +1522,10 @@ class myPartnerUtils
 	public static function enforceDelivery($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK( $partnerId );
-		if ( !$partner || (! $partner->getDeliveryRestrictions() ) )
+		if ( !$partner )
 			return;
-
-		$deliveryRestrictions = $partner->getDeliveryRestrictions();
-		$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
 		
-		$delivery = kUrlManager::getUrlManagerIdentifyRequest();
-		
-		$restricted = true;
-		foreach($deliveryRestrictionsArr as $deliveryRestriction)
-		{
-			if ($deliveryRestriction === $delivery)
-			{
-				$restricted = false;
-				break;
-			}
-		}
+		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		
 		if ($restricted)
 		{

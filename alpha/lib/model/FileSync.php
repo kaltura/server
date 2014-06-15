@@ -68,22 +68,17 @@ class FileSync extends BaseFileSync
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() == StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
-			
-		$urlManager = kUrlManager::getUrlManagerByStorageProfile($this->getDc(), $entryId);
-		$url = $urlManager->getFileSyncUrl($this);
+
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol());
+		if(is_null($urlManager) && infraRequestUtils::getProtocol() != 'http')
+			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->getDc(), $entryId);
+		if(is_null($urlManager))
+			return null;
 		
-		if ($format == PlaybackProtocol::RTMP)
-			$baseUrl = $storage->getDeliveryRmpBaseUrl();
-		else 
-			$baseUrl = $storage->getDeliveryBaseUrlByProtocol();
+		$url = $urlManager->getFileSyncUrl($this);
+		$baseUrl = $urlManager->getUrl();
 		
 		return rtrim($baseUrl, '/') . '/' . ltrim($url, '/');
-	}
-	
-	public function getSmoothStreamUrl()
-	{
-		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
-		return $storage->getDeliveryIisBaseUrl() . '/' . $this->getFilePath();
 	}
 	
 	/* (non-PHPdoc)

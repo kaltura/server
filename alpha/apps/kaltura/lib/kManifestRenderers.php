@@ -184,10 +184,10 @@ abstract class kManifestRenderer
 	 */
 	static protected function normalizeUrlPrefix(&$flavor)
 	{
-		$urlPrefix = $flavor['urlPrefix'];
-		if (!$urlPrefix)
+		if(!isset($flavor['urlPrefix']) || !$flavor['urlPrefix'])
 			return;
-		
+			
+		$urlPrefix = $flavor['urlPrefix'];		
 		$urlPrefixPath = parse_url($urlPrefix, PHP_URL_PATH);
 		if (!$urlPrefixPath || substr($urlPrefix, -strlen($urlPrefixPath)) != $urlPrefixPath)
 			return;
@@ -204,6 +204,12 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 	 */
 	public $flavor = null;
 	
+	function __construct($flavors, $entryId = null) 
+	{
+		$this->flavor = reset($flavors);	
+		$this->entryId = $entryId;
+	}
+	
 	protected function replaceDeliveryCode()
 	{
 		$this->flavor['url'] = str_replace("{deliveryCode}", $this->deliveryCode, $this->flavor['url']);
@@ -219,8 +225,13 @@ class kSingleUrlManifestRenderer extends kManifestRenderer
 			$url = $this->tokenizer->tokenizeSingleUrl($url);
 		}
 		
-		$this->flavor['url'] = self::urlJoin($this->flavor['urlPrefix'], $url);
-		unset($this->flavor['urlPrefix']);	// no longer need the prefix
+		if(isset($this->flavor['urlPrefix']))
+		{
+			$url = self::urlJoin($this->flavor['urlPrefix'], $url);
+			unset($this->flavor['urlPrefix']);	// no longer need the prefix
+		}
+		
+		$this->flavor['url'] = $url;
 	}
 }
 
@@ -230,11 +241,18 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 	 * @var array
 	 */
 	public $flavors = array();
-
+	
 	/**
 	 * @var string
 	 */
 	public $baseUrl = '';
+	
+	function __construct($flavor, $entryId = null, $baseUrl = '')
+	{
+		$this->flavors = $flavor;
+		$this->entryId = $entryId;
+		$this->baseUrl = $baseUrl;
+	}
 	
 	protected function replaceDeliveryCode()
 	{
@@ -267,8 +285,14 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 				{
 					$url = $this->tokenizer->tokenizeSingleUrl($url);
 				}
-				$flavor['url'] = self::urlJoin($flavor['urlPrefix'], $url);
-				unset($flavor['urlPrefix']);		// no longer need the prefix
+				
+				if(isset($flavor['urlPrefix']))
+				{
+					$url = self::urlJoin($flavor['urlPrefix'], $url);
+					unset($flavor['urlPrefix']);		// no longer need the prefix
+				}
+				
+				$flavor['url'] = $url;
 			}
 		}
 	}
@@ -300,6 +324,13 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 	 * @var int
 	 */
 	public $dvrWindow = null;
+	
+	function __construct($flavor, $entryId = null, $baseUrl = '') {
+		parent::__construct($flavor, $entryId, $baseUrl);
+		
+		$entry = entryPeer::retrieveByPK($this->entryId);
+		$this->setMimeType($entry);
+	}
 	
 	/**
 	 * @return array<string>
@@ -386,7 +417,29 @@ class kF4MManifestRenderer extends kMultiFlavorManifestRenderer
 		return $this->buildFlavorsArray();
 	}
 	
+	/**
+	 * @param array $flavors
+	 * @return string
+	 */
+	protected function setMimeType(entry $entry)
+	{
+		if ($entry->getType() == entryType::MEDIA_CLIP && count($this->flavors))
+		{
+			$isMp3 = true;
+			foreach($this->flavors as $flavor)
+			{
+				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
+					$isMp3 = false;
+			}
 	
+			if ($isMp3) {
+				$this->mimeType = 'audio/mpeg';
+				return;
+			}
+		}
+	
+		$this->mimeType = 'video/x-flv';
+	}
 }
 	
 class kF4Mv2ManifestRenderer extends kMultiFlavorManifestRenderer
@@ -585,10 +638,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$bitrate += 40 * 1024;
 
 			$resolution = '';
-			$width = $flavor['width'];
-			$height = $flavor['height'];
-			if ($width && $height)
-				$resolution = ",RESOLUTION={$width}x{$height}";
+			if(isset($flavor['width']) && isset($flavor['height']))
+			{
+				$width = $flavor['width'];
+				$height = $flavor['height'];
+				if ($width && $height)
+					$resolution = ",RESOLUTION={$width}x{$height}";
+			}
 				
 			$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}\n";
 			$content .= $flavor['url'];

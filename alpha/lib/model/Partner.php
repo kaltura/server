@@ -441,12 +441,9 @@ class Partner extends BasePartner
 	
 	public function getHost()	{		return $this->getFromCustomData( "host" , null, false  );	}
 	public function setHost( $v )	{		return $this->putInCustomData( "host", $v );	}
-		
+
 	public function getCdnHost()	{		return $this->getFromCustomData( "cdnHost" , null, false  );	}
 	public function setCdnHost( $v )	{		return $this->putInCustomData( "cdnHost", $v );	}
-
-	public function getPlaybackCdnHost()    {               return $this->getFromCustomData( "playbackCdnHost" , null, false  ); }
-	public function setPlaybackCdnHost( $v )        {               return $this->putInCustomData( "playbackCdnHost", $v ); }
 
 	public function getDefaultDeliveryCode()    {               return $this->getFromCustomData( "defaultDeliveryCode" , null, false  ); }
 	public function setDefaultDeliveryCode( $v )        {               return $this->putInCustomData( "defaultDeliveryCode", $v ); }
@@ -459,6 +456,13 @@ class Partner extends BasePartner
 
 	public function getEnforceHttpsApi()	{		return $this->getFromCustomData( "enforceHttpsApi" , null, false  );	}
 	public function setEnforceHttpsApi( $v )	{		return $this->putInCustomData( "enforceHttpsApi", $v );	}
+	
+	public function getEnforceDelivery()	{
+		return $this->getFromCustomData( "enforceDelivery" , null, false  );
+	}
+	public function setEnforceDelivery( $v )	{
+		return $this->putInCustomData( "enforceDelivery", $v );
+	}
 	
 	public function getAssetsPerEntryLimitation()    		{	return $this->getFromCustomData( "assetsPerEntryAllowed" , null, false  ); 	}
 	public function setAssetsPerEntryLimitation( $v )       {	return $this->putInCustomData( "assetsPerEntryAllowed", $v ); 				}
@@ -545,12 +549,6 @@ class Partner extends BasePartner
 
 	public function getSupportAnimatedThumbnails()	{		return $this->getFromCustomData( "supportAnimatedThumbnails" , null, false  );	}
 	public function setSupportAnimatedThumbnails( $v )	{		return $this->putInCustomData( "supportAnimatedThumbnails", $v );	}
-		
-	public function getRtmpUrl()	{		return $this->getFromCustomData( "rtmpUrl" , null, false  );	}
-	public function setRtmpUrl( $v )	{		return $this->putInCustomData( "rtmpUrl", $v );	}	
-		
-	public function getIisHost()	{		return $this->getFromCustomData( "iisHost" , null, false  );	}
-	public function setIisHost( $v )	{		return $this->putInCustomData( "iisHost", $v );	}	
 	
 	public function getLandingPage()	{		return $this->getFromCustomData( "landingPage" , null, null  );	}
 	public function setLandingPage( $v )	{		return $this->putInCustomData( "landingPage", $v );	}	
@@ -625,10 +623,6 @@ class Partner extends BasePartner
 	public function getInternalUse() { return $this->getFromCustomData("internalUse", false); }
 	public function setInternalUse( $v ) { $this->putInCustomData("internalUse", $v); }	
 	
-	/** added deliveryRestrictions param for having per-partner ability to block serving of files to specific cdns and protocols **/
-	public function getDeliveryRestrictions() { return $this->getFromCustomData("deliveryRestrictions", null); }
-	public function setDeliveryRestrictions( $v ) { $this->putInCustomData("deliveryRestrictions", $v); }
-			
 	/** added disableAkamaiHDNetwork param for having per-partner ability to disable Akamai HD Network feature (GUI in KMC preview & embed) **/
 	public function getDisableAkamaiHDNetwork() { return $this->getFromCustomData("disableAkamaiHDNetwork", null); }
 	public function setDisableAkamaiHDNetwork( $v ) { $this->putInCustomData("disableAkamaiHDNetwork", $v); }
@@ -722,6 +716,16 @@ class Partner extends BasePartner
 	public function setMediaServersConfiguration ($v)
 	{
 		$this->putInCustomData('mediaServersConfiguration', $v);
+	}
+	
+	public function setDeliveryProfileIds($params)
+	{
+		$this->putInCustomData('delivery_profile_ids', $params);
+	}
+	
+	public function getDeliveryProfileIds()
+	{
+		return $this->getFromCustomData('delivery_profile_ids', null, array());
 	}
 	
 	public function getEmbedCodeTypes()
@@ -1075,6 +1079,7 @@ class Partner extends BasePartner
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
+		$c->addAnd(kuserPeer::IS_ADMIN , true);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		return kuserPeer::doCount($c);
 	}
@@ -1521,7 +1526,6 @@ class Partner extends BasePartner
 	public function setLiveStreamEnabled( $v ) {
 		$this->setEnabledService($v, PermissionName::FEATURE_LIVE_STREAM);
 	}
-	
 	
 	// ----------------------------------
 	// -- end of enabled special features

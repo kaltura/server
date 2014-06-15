@@ -221,46 +221,18 @@ class Akamai_EdgeAuth_Generate {
 
 class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 {
-	/**
-	 * @var int
-	 */
-	protected $window;
-
-	/**
-	 * @var string
-	 */
-	protected $param;
 	
+	const SECURE_HD_AUTH_ACL_REGEX = '/^[^,]*/';
+
 	/**
 	 * @var string
 	 */
-	protected $aclRegex;
-
+	protected $paramName;
+	
 	/**
 	 * @var string
 	 */
 	protected $aclPostfix;
-	
-	/**
-	 * @var string
-	 */
-	protected $salt;
-
-	/**
-	 * @param int $window
-	 * @param string $param
-	 * @param string $aclRegex
-	 * @param string $aclPostfix
-	 * @param string $salt
-	 */
-	public function __construct($window, $param, $aclRegex, $aclPostfix, $salt)
-	{
-		$this->window = $window;
-		$this->param = $param;
-		$this->aclRegex = $aclRegex;
-		$this->aclPostfix = $aclPostfix;
-		$this->salt = $salt;
-	}
 	
 	/**
 	 * @param string $url
@@ -268,9 +240,9 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url)
 	{
-		if (!preg_match($this->aclRegex, $url, $matches))
+		if (!preg_match(self::SECURE_HD_AUTH_ACL_REGEX, $url, $matches))
 			return $url;
-			
+		
 		$acl = $matches[0];
 		
 		// strip manifest postfixes that should not be signed from the acl
@@ -285,7 +257,7 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		$c->set_acl($acl);
 		$c->set_window($this->window);
 		$c->set_start_time(time());		# The time from which the token will start
-		$c->set_key($this->salt);
+		$c->set_key($this->key);
 
 		$g = new Akamai_EdgeAuth_Generate();		
 		$token = $g->generate_token($c);
@@ -294,6 +266,37 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 			$url .= '?';
 		else 
 			$url .= '&';
-		return $url . "{$this->param}=$token";
+		return $url . "{$this->paramName}=$token";
 	}
+	
+	/**
+	 * @return the $param
+	 */
+	public function getParamName() {
+		return $this->paramName;
+	}
+
+	/**
+	 * @return the $aclPostfix
+	 */
+	public function getAclPostfix() {
+		return $this->aclPostfix;
+	}
+
+	/**
+	 * @param string $param
+	 */
+	public function setParamName($paramName) {
+		$this->paramName = $paramName;
+	}
+
+	/**
+	 * @param string $aclPostfix
+	 */
+	public function setAclPostfix($aclPostfix) {
+		$this->aclPostfix = $aclPostfix;
+	}
+
+	
+	
 }

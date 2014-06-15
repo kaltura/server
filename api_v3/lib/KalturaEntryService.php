@@ -230,7 +230,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param kFileSyncResource $resource
 	 * @param entry $dbEntry
 	 * @param asset $dbAsset
-	 * @return asset
+	 * @return asset | NULL in case of IMAGE entry
 	 * @throws KalturaErrors::UPLOAD_ERROR
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
@@ -248,6 +248,10 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
 		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+		
+		//In case the target entry's media type is image no asset is created and the image is set on a entry level file sync
+		if(!$dbAsset && $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+			return null;
 		
 		// Copy the media info from the old asset to the new one
 		if($syncable instanceof asset && $resource->getObjectSubType() == asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET)

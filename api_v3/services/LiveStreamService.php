@@ -46,7 +46,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		if($sourceType) {
 			$liveStreamEntry->sourceType = $sourceType;	
 		}
-		else {
+		elseif(is_null($liveStreamEntry->sourceType)) {
 			// default sourceType is AKAMAI_LIVE
 			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
 		}
@@ -384,9 +384,11 @@ class LiveStreamService extends KalturaLiveEntryService
 					}
 				}
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-				$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
-				$urlManager->setProtocol($protocol);
-				return $urlManager->isLive($url);
+				
+				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $id, $protocol);
+				if($urlManager) 
+					return $urlManager->isLive($url);
+				break;
 				
 			case KalturaPlaybackProtocol::HDS:
 			case KalturaPlaybackProtocol::AKAMAI_HDS:
@@ -395,9 +397,9 @@ class LiveStreamService extends KalturaLiveEntryService
 				{
 					$url = $config->getUrl();
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					$urlManager = kUrlManager::getUrlManagerByCdn(parse_url($url, PHP_URL_HOST), $id);
-					$urlManager->setProtocol($protocol);
-					return $urlManager->isLive($url);
+					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $id, $protocol);
+					if($urlManager)
+						return $urlManager->isLive($url);
 				}
 				break;
 		}

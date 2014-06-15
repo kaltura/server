@@ -192,7 +192,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 		
 	}
 
-	public function populateEntryFromData (entry $entry)
+	public function populateEntryFromData (LiveStreamEntry $entry)
 	{
 		$entry->setStreamUsername($this->getEncoderUsername());
 		$entry->setStreamRemoteId($this->getStreamID());
@@ -210,7 +210,7 @@ class kAkamaiUniversalProvisionJobData extends kProvisionJobData
 	/* (non-PHPdoc)
 	 * @see kProvisionJobData::populateFromEntry()
 	 */
-	public function populateFromEntry(entry $entry) 
+	public function populateFromEntry(LiveStreamEntry $entry) 
 	{
 		$this->setEncoderIP($entry->getEncodingIP1());
  		$this->setBackupEncoderIP($entry->getEncodingIP2());

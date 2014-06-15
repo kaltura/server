@@ -31,7 +31,7 @@ class kManifestContributorConfig
 	
 	/**
 	 * URL manager
-	 * @var kUrlManager
+	 * @var DeliveryProfile
 	 */
 	public $urlManager;
 	
