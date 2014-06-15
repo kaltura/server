@@ -179,6 +179,6 @@
 			<id>{1:result:id}</id>
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
-	</multirequest>
-	</xml>
+</multirequest>
+</xml>
 	
