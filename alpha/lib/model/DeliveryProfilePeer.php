@@ -372,5 +372,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);
 		return $deliveryProfileTypes;
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("deliveryProfile:id=%s", self::ID), array("deliveryProfile:partnerId=%s", self::PARTNER_ID));		
+	}
 } // DeliveryProfilePeer
 
