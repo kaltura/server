@@ -238,6 +238,16 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("push_publish_enabled", $v);
 	}
 	
+	public function getSyncDCs()
+	{
+		return $this->getFromCustomData("sync_dcs", null, false);
+	}
+	
+	public function setSyncDCs($v)
+	{
+		$this->putInCustomData("sync_dcs", $v);
+	}
+	
 	public function setLiveStreamConfigurations(array $v)
 	{
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes) )
@@ -259,6 +269,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
 	{
+		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
 		{
 			$configurations = $this->getFromCustomData('live_stream_configurations');
@@ -304,7 +315,6 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
-		$configurations = array();
 		$manifestUrl = null;
 		$backupManifestUrl = null;
 		

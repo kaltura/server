@@ -21,6 +21,15 @@ interface TvinciDistributionField extends BaseEnum
 	const CATALOG_START_DATE			= 'CATALOG_START_DATE';
 	const CATALOG_END_DATE				= 'CATALOG_END_DATE';
 
+	const VIDEO_ASSETS_CONFIGURATION	= 'VIDEO_ASSETS_CONFIGURATION'; // See KalturaTvinciDistributionJobProviderData::initPlayManifestUrls()
+
+	/**
+	 * 1 = Cast, Rating, 'Main', 'Tablet Main', etc.
+	 * 2 = Main Cast, Parental Rating, 'Mobile Devices Trailer', etc.
+	 * @var int
+	 */
+	const METADATA_SCHEMA_ID			= 'METADATA_SCHEMA_ID';
+	
 	const METADATA_RUNTIME				= 'METADATA_RUNTIME';
 	const METADATA_RELEASE_YEAR			= 'METADATA_RELEASE_YEAR';
 	const METADATA_RELEASE_DATE			= 'METADATA_RELEASE_DATE';
@@ -32,8 +41,12 @@ interface TvinciDistributionField extends BaseEnum
 	const METADATA_DIRECTOR				= 'METADATA_DIRECTOR';
 	const METADATA_AUDIO_LANGUAGE		= 'METADATA_AUDIO_LANGUAGE';
 	const METADATA_STUDIO				= 'METADATA_STUDIO';
-	
-	const VIDEO_ASSET_MAIN				= 'VIDEO_ASSET_MAIN';
-	const VIDEO_ASSET_TABLET_MAIN		= 'VIDEO_ASSET_TABLET_MAIN';
-	const VIDEO_ASSET_SMARTPHONE_MAIN	= 'VIDEO_ASSET_SMARTPHONE_MAIN';
+
+	// Schema id 2 related fields
+	const METADATA_SHORT_TITLE			= 'METADATA_SHORT_TITLE';
+	const METADATA_PARENTAL_RATING		= 'METADATA_PARENTAL_RATING';
+	const METADATA_DIMENSION			= 'METADATA_DIMENSION';
+	const METADATA_MAIN_CAST			= 'METADATA_MAIN_CAST';
+	const METADATA_BILLING_TYPE			= 'METADATA_BILLING_TYPE';
+	const METADATA_ASSET_DURATION		= 'METADATA_ASSET_DURATION';
 }

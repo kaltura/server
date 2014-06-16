@@ -79,7 +79,9 @@ class KalturaMetroPcsDistributionJobProviderData extends KalturaConfigurableDist
 	protected static function getAssetUrl(asset $asset)
 	{
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
-		$urlManager->getFullAssetUrl($asset);
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttributes(null, $asset);
+		$url = $urlManager->getFullAssetUrl($asset);
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		$url = 'http://' . $url . '/ext/' . $asset->getId() . '.' . $asset->getFileExt(); 
 		return $url;

@@ -37,13 +37,12 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer
 	 */
 	protected function thumbCuePointDeleted(ThumbCuePoint $cuePoint) 
 	{
-		$c = new Criteria();
-		$c->add(assetPeer::id, $cuePoint->getAssetId());
-		$asset = assetPeer::doSelect($c);
+		$asset = assetPeer::retrieveById($cuePoint->getAssetId());
 		
 		if($asset)
 		{
 			$asset->setStatus(asset::ASSET_STATUS_DELETED);
+			$asset->setDeletedAt(time());
 			$asset->save();
 		}
 	}
@@ -54,8 +53,12 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer
 	protected function timedThumbAssetDeleted(timedThumbAsset $thumbAsset) 
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($thumbAsset->getCuePointID());
-		/* @var $dbCuePoint ThumbCuePoint */
-		$dbCuePoint->setAssetId(null);
-		$dbCuePoint->save();
+		
+		if($dbCuePoint)
+		{
+			/* @var $dbCuePoint ThumbCuePoint */
+			$dbCuePoint->setAssetId(null);
+			$dbCuePoint->save();
+		}
 	}
 }

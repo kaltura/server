@@ -53,8 +53,21 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 	}
 	
 	protected function handleResults(array $results, array $items)
-	{
-		KBatchBase::$kClient->startMultiRequest();
+	{	
+		//Added to support cases where the resource is entry resource
+		$conversionProfileId = null;
+		try {
+			KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+			$entry = KBatchBase::$kClient->baseEntry->get($this->entryId);
+			KBatchBase::unimpersonate();
+			if($entry && $entry->conversionProfileId)
+				$conversionProfileId = $entry->conversionProfileId;
+		}
+		catch (Exception $ex)
+		{
+			KBatchBase::unimpersonate();
+			KalturaLog::debug("Entry ID [" . $this->entryId . "] not found, continuing with no conversion profile");
+		}
 		
 		foreach($results as $index => $cuePoint)
 		{	
@@ -62,16 +75,20 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			{
 				if(!isset($items[$index]->slide) || empty($items[$index]->slide))
 					continue;
-				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, null);
+				
+				$timedThumbResource = $this->xmlBulkUploadEngine->getResource($items[$index]->slide, $conversionProfileId);
 				$thumbAsset = new KalturaTimedThumbAsset();
 				$thumbAsset->cuePointId = $cuePoint->id;
+
+				KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+				KBatchBase::$kClient->startMultiRequest();
 				KBatchBase::$kClient->thumbAsset->add($cuePoint->entryId, $thumbAsset);
 				KBatchBase::$kClient->thumbAsset->setContent(KBatchBase::$kClient->getMultiRequestResult()->id, $timedThumbResource);
+				KBatchBase::$kClient->doMultiRequest();
+				KBatchBase::unimpersonate();
 			}
 				
 		}
-		
-		KBatchBase::$kClient->doMultiRequest();
 		
 		return parent::handleResults($results, $items);
 	}

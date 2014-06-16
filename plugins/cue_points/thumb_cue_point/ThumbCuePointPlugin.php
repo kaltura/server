@@ -2,13 +2,14 @@
 /**
  * @package plugins.thumbCuePoint
  */
-class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender
+class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKalturaTypeExtender, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'thumbCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
 	const CUE_POINT_VERSION_MINOR = 0;
 	const CUE_POINT_VERSION_BUILD = 0;
 	const CUE_POINT_NAME = 'cuePoint';
+	const THUMB_CUE_POINT_MANAGER_CLASS = 'kThumbCuePointManager';
 	
 	public static function getPluginName()
 	{
@@ -39,6 +40,16 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 			return array('ThumbCuePointType');	
 			
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::THUMB_CUE_POINT_MANAGER_CLASS,
+		);
 	}
 	
 	/* (non-PHPdoc)
@@ -133,15 +144,13 @@ class ThumbCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKa
 	
 	<xs:complexType name="T_slide">
 		<xs:sequence>
-			<xs:choice maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="1" minOccurs="1" ref="serverFileContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="urlContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="sshUrlContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="remoteStorageContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="remoteStorageContentResources"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="entryContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="assetContentResource"></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" ref="contentResource-extension"></xs:element>
+			<xs:choice maxOccurs="1" minOccurs="0">
+				<xs:element maxOccurs="1" minOccurs="0" ref="urlContentResource"></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" ref="remoteStorageContentResource"></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" ref="remoteStorageContentResources"></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" ref="assetContentResource"></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" ref="entryContentResource"></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" ref="contentResource-extension"></xs:element>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="timedThumbAssetId" type="xs:string" use="optional"/>		

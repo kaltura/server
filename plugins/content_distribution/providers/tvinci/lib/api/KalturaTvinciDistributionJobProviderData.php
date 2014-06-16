@@ -22,7 +22,16 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$fieldValues = unserialize($this->fieldValues);
 
-		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+		$entry = null;
+		if ( $distributionJobData->entryDistribution->entryId )
+		{
+			$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+		}
+
+		if ( ! $entry ) {
+			KalturaLog::err("Can't find entry with id: {$distributionJobData->entryDistribution->entryId}");
+			return;
+		}
 
 		$feedHelper = new TvinciDistributionFeedHelper($distributionJobData->distributionProfile, $fieldValues);
 		$feedHelper->setEntryId( $entry->getId() );
@@ -33,7 +42,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$picRatios = array();
-		$defaultThumbnail = null;
+		$defaultThumbUrl = null;
 		foreach ( $thumbAssets as $thumbAsset )
 		{
 			$thumbDownloadUrl = $this->getAssetDownloadUrl( $thumbAsset );
@@ -60,17 +69,7 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 
 		$feedHelper->setDefaultThumbnailUrl( $defaultThumbUrl ); 
 
-		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
-		$assetInfo = array();
-		foreach ( $flavorAssets as $flavorAsset )
-		{
-			$this->updateFlavorAssetInfo($assetInfo, $flavorAsset, $fieldValues, $entry);
-		}
-
-		if ( count($assetInfo) )
-		{
-			$feedHelper->setAssetInfoArray( $assetInfo ); 
-		}
+		$this->initPlayManifestUrls( $entry, $feedHelper );
 
 		if ($distributionJobData instanceof KalturaDistributionSubmitJobData)
 		{
@@ -86,45 +85,49 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		}
 	}
 
-	private function updateFlavorAssetInfo(array &$assetInfo, $flavorAsset, $fieldValues, $entry)
+	private function initPlayManifestUrls($entry, $feedHelper)
 	{
-		$assetFlavorParams = assetParamsPeer::retrieveByPK( $flavorAsset->getFlavorParamsId() );
-		$assetFlavorParamsName = $assetFlavorParams->getName();
+		$videoAssetDataMap = array();
 
-		$videoAssetFieldNames = array(
-				TvinciDistributionField::VIDEO_ASSET_MAIN,
-				TvinciDistributionField::VIDEO_ASSET_TABLET_MAIN,
-				TvinciDistributionField::VIDEO_ASSET_SMARTPHONE_MAIN,
-			);
-
-		foreach ( $videoAssetFieldNames as $videoAssetFieldName )
+		// If the following field is defined, it will override the below hardcoded defaults
+		$videoAssetConfigLines = $feedHelper->getSafeFieldValue(TvinciDistributionField::VIDEO_ASSETS_CONFIGURATION, null);
+		if ( $videoAssetConfigLines )
 		{
-			if ( isset($fieldValues[$videoAssetFieldName]) )
+			// The format is a comma separated array of these compounds: "name:protocol:tag:ext"
+			// E.g.: "name:protocol:tag:ext,name:protocol:tag:ext,name:protocol:tag:ext"
+			$configLines = explode(',', $videoAssetConfigLines);
+			foreach ( $configLines as $configLine )
 			{
-				$configFlavorParamName = $fieldValues[$videoAssetFieldName];
-
-				if ( $configFlavorParamName == $assetFlavorParamsName )
-				{
-					if ( $videoAssetFieldName == TvinciDistributionField::VIDEO_ASSET_MAIN )
-					{
-						// Main video asset if PC oriented, so we'll fetch a full path (.mp4) download file URL
-						$url = $this->getAssetDownloadUrl($flavorAsset);
-					}
-					else
-					{
-						// Other assets will be converted to a .m3u8 URL
-						$url = $this->getAssetM3U8DownloadUrl($flavorAsset, $entry);
-					}
-
-					$assetInfo[$videoAssetFieldName] = array(
-							'url' => $url,
-							'name' => $assetFlavorParamsName,
-						);
-
-					// Note: instead of 'break'ing here, we'll continue to loop in case
-					//       the same flavor asset is required by another $videoAssetField
-				}
+				$vad = explode(':', $configLine);
+				$videoAssetDataMap[] = array($vad[0], $vad[1], $vad[2], $vad[3]);
 			}
+		}
+		elseif ( $feedHelper->schemaId() == 1 )
+		{
+			$videoAssetDataMap = array(
+					array( 'Main',						PlaybackProtocol::AKAMAI_HDS,	'mbr',		'a4m' ),
+					array( 'Tablet Main',				PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+					array( 'Smartphone Main',			PlaybackProtocol::APPLE_HTTP,	'iphone',	'm3u8' ),
+				);
+		}
+		elseif ( $feedHelper->schemaId() == 2 ) {
+			$videoAssetDataMap = array(
+					array( 'Mobile Devices Trailer',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+					array( 'Mobile Devices Main SD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+					array( 'Mobile Devices Main HD',	PlaybackProtocol::APPLE_HTTP,	'ipad',		'm3u8' ),
+				);
+		}
+
+		// Loop and build the file nodes
+		foreach ( $videoAssetDataMap as $videoAssetData )
+		{
+			$tvinciAssetName = $videoAssetData[0];
+			$playbackProtocol = $videoAssetData[1];
+			$tag = $videoAssetData[2];
+			$fileExt = $videoAssetData[3];
+
+			$url = $this->getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt);
+			$feedHelper->setVideoAssetUrl( $tvinciAssetName, $url );
 		}
 	}
 
@@ -135,18 +138,18 @@ class KalturaTvinciDistributionJobProviderData extends KalturaConfigurableDistri
 		return $downloadUrl;
 	}
 
-	private function getAssetM3U8DownloadUrl($asset, $entry)
+	private function getPlayManifestUrl($entry, $playbackProtocol, $tag, $fileExt)
 	{
 		$partnerPath = myPartnerUtils::getUrlForPartner($entry->getPartnerId(), $entry->getSubpId());
 
-		$downloadUrl = myPartnerUtils::getCdnHost($asset->getPartnerId())
+		$downloadUrl = myPartnerUtils::getCdnHost($entry->getPartnerId())
 						. $partnerPath
 						. "/playManifest"
-						. "/entryId/{$asset->getEntryId()}"
-						. "/format/applehttp"
+						. "/entryId/{$entry->getId()}"
+						. "/format/$playbackProtocol"
+						. "/tags/$tag"
 						. "/protocol/http"
-						. "/preferredBitrate/{$asset->getBitrate()}"
-						. "/a.m3u8";
+						. "/f/a.$fileExt";
 		return $downloadUrl;
 	}
 

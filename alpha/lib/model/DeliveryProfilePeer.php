@@ -52,6 +52,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::GENERIC_HLS_MANIFEST => 'DeliveryProfileGenericAppleHttpManifest',
 			DeliveryProfileType::GENERIC_HDS_MANIFEST => 'DeliveryProfileGenericHdsManifest',
 			DeliveryProfileType::GENERIC_SS => 'DeliveryProfileGenericSilverLight',
+			DeliveryProfileType::GENERIC_RTMP => 'DeliveryProfileGenericRtmp',
 					
 			DeliveryProfileType::LEVEL3_HLS => 'DeliveryProfileLevel3AppleHttp',
 			DeliveryProfileType::LEVEL3_HTTP => 'DeliveryProfileLevel3Http',
@@ -123,6 +124,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
+		if ($streamerType == PlaybackProtocol::HTTP)
+		{
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, infraRequestUtils::getProtocol(), null, null, false);
+			if ($delivery)
+				return $delivery;
+		}
 		return self::getLocalDeliveryByPartner($entryId, $streamerType, null, null, null, false);	
 	}
 	

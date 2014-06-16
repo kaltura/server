@@ -85,7 +85,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 	 */
 	public function setRecognizer($newObject)
 	{
-		if ($newObject instanceof kUrlRecognizer)
+		if(is_null($newObject)) {
+			parent::setRecognizer(null);
+		} 
+		else if ($newObject instanceof kUrlRecognizer)
 		{
 			$serializedObject = serialize($newObject);
 			parent::setRecognizer($serializedObject);
@@ -222,7 +225,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 			$ext = pathinfo($urlPath, PATHINFO_EXTENSION);
 		}
 	
-		$bitrate = ($flavor ? $flavor->getBitrate() : 0);
+		$bitrate = ($flavor ? $flavor->getVideoBitrate() : 0);
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 	

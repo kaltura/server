@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDeliveryProfileGenericAppleHttp extends KalturaDeliveryProfile {
+class KalturaDeliveryProfileGenericRtmp extends KalturaDeliveryProfile {
 	
 	/**
 	 * @var string
