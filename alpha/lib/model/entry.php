@@ -135,7 +135,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
 	const DEFAULT_ASSETCACHEVERSION = 1;
-	
+
+	const DEFAULT_IMAGE_HEIGHT = 480;
+	const DEFAULT_IMAGE_WIDTH = 640;
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -734,13 +737,31 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		{
 			return myPlaylistUtils::getExecutionUrl( $this );
 		}
+
 		//$path = $this->getThumbnailPath ( $version );
-		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/flvclipper/entry_id/" . $this->getId() ;
+		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 		$current_version = $this->getVersion();
-		if ( $version )
-			$path .= "/version/$version";
+
+		$entryId = $this->getId();
+		$media_type = $this->getMediaType();
+
+		if ($media_type == self::ENTRY_MEDIA_TYPE_VIDEO || $media_type == self::ENTRY_MEDIA_TYPE_AUDIO)
+		{
+			$httpStr = PlaybackProtocol::HTTP;
+			$path .= "/playManifest/entryId/$entryId/protocol/$httpStr/format/url";
+		}
+		else if ($media_type == self::ENTRY_MEDIA_TYPE_IMAGE  )
+		{
+			$width = self::DEFAULT_IMAGE_WIDTH;
+			$height = self::DEFAULT_IMAGE_HEIGHT;
+			if (!$version)
+				$version = $current_version;
+
+			$path .= "/thumbnail/entry_id/$entryId/def_height/$height/def_width/$width/version/$version/type/1";
+		}
 		else
-			$path .= "/version/$current_version";
+			return null;
+
 		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $path ;
 		return $url;
 	}
