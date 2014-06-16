@@ -267,6 +267,7 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
 	{
+		$configurations = array();
 		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
 		{
 			$configurations = $this->getFromCustomData('live_stream_configurations');
@@ -312,7 +313,6 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
-		$configurations = array();
 		$manifestUrl = null;
 		$backupManifestUrl = null;
 		
