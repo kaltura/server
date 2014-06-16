@@ -47,6 +47,7 @@ import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
 import com.kaltura.client.types.KalturaUploadToken;
 import com.kaltura.client.types.KalturaUploadedFileTokenResource;
+import com.kaltura.client.IKalturaLogger;
 import com.kaltura.client.KalturaLogger;
 
 public class BaseTest extends TestCase {
@@ -59,7 +60,7 @@ public class BaseTest extends TestCase {
 
 	protected boolean doCleanup = true;
 
-	private static KalturaLogger logger = KalturaLogger.getLogger(BaseTest.class);
+	private static IKalturaLogger logger = KalturaLogger.getLogger(BaseTest.class);
 
 	@Override
 	protected void setUp() throws Exception {
