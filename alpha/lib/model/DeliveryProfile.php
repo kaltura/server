@@ -238,4 +238,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 				'height' => $height);
 	}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("deliveryProfile:id=".strtolower($this->getId()), "deliveryProfile:partnerId=".strtolower($this->getPartnerId()));
+	}
 } 
