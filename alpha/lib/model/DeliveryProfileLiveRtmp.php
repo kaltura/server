@@ -45,7 +45,7 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 	protected function buildRtmpLiveStreamFlavorsArray()
 	{
 		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
-		if ($entry->getSource() == EntrySourceType::LIVE_STREAM || $entry->getSource() == EntrySourceType::LIVE_CHANNEL)
+		if (in_array($entry->getSource(), LiveEntry::$kalturaLiveSourceTypes)) 
 		{
 			$flavors = array( 0 => $this->getFlavorAssetInfo($entry->getStreamName()) );
 				

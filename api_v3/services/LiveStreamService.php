@@ -93,7 +93,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		/* @var $dbEntry LiveStreamEntry */
 				
-		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
+		if(in_array($entry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			if(!$entry->conversionProfileId)
 			{
@@ -364,7 +364,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		/* @var $liveStreamEntry LiveStreamEntry */
 	
-		if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
+		if(in_array($entry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			return $liveStreamEntry->hasMediaServer();
 		}

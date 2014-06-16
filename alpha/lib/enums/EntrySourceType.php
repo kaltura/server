@@ -20,4 +20,6 @@ interface EntrySourceType extends BaseEnum
 	const LIVE_CHANNEL = 33;
 	const RECORDED_LIVE = 34;
 	const CLIP = 35;
+	
+	const LIVE_STREAM_ONTEXTDATA_CAPTIONS = 42;
 }
