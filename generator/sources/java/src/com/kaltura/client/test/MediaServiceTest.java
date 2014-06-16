@@ -56,11 +56,12 @@ import com.kaltura.client.types.KalturaModerationFlag;
 import com.kaltura.client.types.KalturaModerationFlagListResponse;
 import com.kaltura.client.types.KalturaUploadToken;
 import com.kaltura.client.types.KalturaUploadedFileTokenResource;
+import com.kaltura.client.IKalturaLogger;
 import com.kaltura.client.KalturaLogger;
 
 public class MediaServiceTest extends BaseTest {
 
-	private KalturaLogger logger = KalturaLogger.getLogger(MediaServiceTest.class);
+	private IKalturaLogger logger = KalturaLogger.getLogger(MediaServiceTest.class);
 	
 	/**
 	 * Tests the following : 

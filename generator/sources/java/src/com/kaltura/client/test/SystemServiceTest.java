@@ -28,12 +28,13 @@
 package com.kaltura.client.test;
 
 import com.kaltura.client.KalturaLogger;
+import com.kaltura.client.IKalturaLogger;
 
 import com.kaltura.client.services.KalturaSystemService;
 
 public class SystemServiceTest extends BaseTest {
 	
-	private KalturaLogger logger = KalturaLogger.getLogger(SystemServiceTest.class);
+	private IKalturaLogger logger = KalturaLogger.getLogger(SystemServiceTest.class);
 			
 	/**
 	 * Tests that ping to the session works

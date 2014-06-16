@@ -473,6 +473,7 @@ class KalturaClientBase
 		curl_setopt($ch, CURLOPT_URL, $url);
 		if( $this->config->method == self::METHOD_POST ) {
 			curl_setopt($ch, CURLOPT_POST, 1);
+			$this->log("curl: $url&$opt");
 			if (count($files) > 0)
 			{
 				foreach($files as &$file)
@@ -481,7 +482,6 @@ class KalturaClientBase
 			}
 			else
 			{
-				$this->log("curl: $url&$opt");
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
 			}
 		}
