@@ -98,6 +98,13 @@ class KWidevineBatchHelper
 			$params[self::OWNER] = $portal;
 			$params[self::PROVIDER] = $portal;
 			
+			$ptime = time();
+			$signInput = $params[self::OWNER].
+					 	 $params[self::PROVIDER].
+					 	 $ptime;
+			$sign = WidevineLicenseProxyUtils::createRequestSignature($signInput, $key, $iv);
+			$params[self::PTIME] = $ptime;
+			$params[self::SIGN] = $sign;
 			$response = self::sendHttpRequest($wvRegServerHost.WidevinePlugin::GET_ASSET_URL_PART.$portal, $params);
 			if($response[self::STATUS] == 1)
 			{
