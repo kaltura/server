@@ -285,7 +285,7 @@ if (!isset($options['head']))
 	if (!isset($options['raw']))
 	{
 		$unserializedResult = @unserialize($result);
-		if ($unserializedResult !== false)
+		if ($unserializedResult !== false || $result === 'b:0;')
 		{
 			$result = formatResponse($unserializedResult) . "\n";
 		}
