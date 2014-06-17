@@ -111,17 +111,11 @@ class thumbnailAction extends sfAction
 		}
 		else if ($width == -1) // if only either width or height is missing reset them to zero, and convertImage will handle them
 		{
-			if ($def_width == -1)
 				$width = 0;
-			else
-				$width = $def_width;
 		}
 		else if ($height == -1)
 		{
-			if ($def_height == -1)
 				$height = 0;
-			else
-				$height = $def_height;
 		}
 		
 		$bgcolor = $this->getRequestParameter( "bgcolor", "ffffff" );

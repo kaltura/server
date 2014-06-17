@@ -747,17 +747,22 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		if ($media_type == self::ENTRY_MEDIA_TYPE_VIDEO || $media_type == self::ENTRY_MEDIA_TYPE_AUDIO)
 		{
-			$httpStr = PlaybackProtocol::HTTP;
-			$path .= "/playManifest/entryId/$entryId/protocol/$httpStr/format/url";
+			$protocolStr = infraRequestUtils::getProtocol();
+
+			$path = requestUtils::getApiCdnHost();
+			$url = $path . "/p/$partnerId/sp/$subPartnerId/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
 		}
 		else if ($media_type == self::ENTRY_MEDIA_TYPE_IMAGE  )
 		{
 			$width = self::DEFAULT_IMAGE_WIDTH;
 			$height = self::DEFAULT_IMAGE_HEIGHT;
+
+			$path = myPartnerUtils::getCdnHost($this->getPartnerId());
+			$path .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 			if (!$version)
 				$version = $current_version;
 
-			$path .= "/thumbnail/entry_id/$entryId/def_height/$height/def_width/$width/version/$version/type/1";
+			$url =  $path . "/thumbnail/entry_id/$entryId/def_height/$height/def_width/$width/version/$version/type/1";
 		}
 		else
 			return null;
