@@ -722,8 +722,10 @@ class playManifestAction extends kalturaAction
 	private function getLiveEntryBaseUrls()
 	{
 		$tag = null;
-		if(count($this->deliveryAttributes->getTags()) == 1)
-			$tag = reset($this->deliveryAttributes->getTags());
+		if(count($this->deliveryAttributes->getTags()) == 1) {
+			$tags = $this->deliveryAttributes->getTags();
+			$tag = reset($tags);
+		}
 			
 		$protocol = $this->deliveryAttributes->getMediaProtocol(); 
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
