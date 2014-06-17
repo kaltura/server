@@ -334,6 +334,14 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
+		$rtmpStreamUrl = null;
+		$hlsStreamUrl = null;
+		$hdsStreamUrl = null;
+		$slStreamUrl = null;
+		$mpdStreamUrl = null;
+		$hlsBackupStreamUrl = null;
+		$hdsBackupStreamUrl = null;
+		
 		if ($manifestUrl)
 		{
 			$streamName = $this->getId();
@@ -350,9 +358,6 @@ abstract class LiveEntry extends entry
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
 			$slStreamUrl = "$manifestUrl/Manifest";
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
-			
-			$hlsBackupStreamUrl = null;
-			$hdsBackupStreamUrl = null;
 			
 			if($backupManifestUrl)
 			{
@@ -373,45 +378,46 @@ abstract class LiveEntry extends entry
 					$hdsBackupStreamUrl .= "?DVR";
 				}
 			}
+		}
 			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::RTMP);
-			$configuration->setUrl($rtmpStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::HDS);
-			$configuration->setUrl($hdsStreamUrl);
-			$configuration->setBackupUrl($hdsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::HLS);
-			$configuration->setUrl($hlsStreamUrl);
-			$configuration->setBackupUrl($hlsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
-			$configuration->setUrl($hlsStreamUrl);
-			$configuration->setBackupUrl($hlsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
-			$configuration->setUrl($slStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
-			$configuration->setUrl($mpdStreamUrl);
-			$configurations[] = $configuration;
-			
-			if ($this->getPushPublishEnabled())
-			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
-				$configurations = array_merge($configurations, $pushPublishConfigurations);
-			}
+//		TODO - enable it and test it in non-SaaS environment
+//		$configuration = new kLiveStreamConfiguration();
+//		$configuration->setProtocol(PlaybackProtocol::RTMP);
+//		$configuration->setUrl($rtmpStreamUrl);
+//		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::HDS);
+		$configuration->setUrl($hdsStreamUrl);
+		$configuration->setBackupUrl($hdsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::HLS);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
+		$configuration->setUrl($slStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
+		$configuration->setUrl($mpdStreamUrl);
+		$configurations[] = $configuration;
+		
+		if ($this->getPushPublishEnabled())
+		{
+			$pushPublishConfigurations = $this->getPushPublishConfigurations();
+			$configurations = array_merge($configurations, $pushPublishConfigurations);
 		}
 		
 		return $configurations;
