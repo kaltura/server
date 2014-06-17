@@ -254,9 +254,9 @@ abstract class LiveEntry extends entry
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false)
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -267,7 +267,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false)
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -302,12 +302,15 @@ abstract class LiveEntry extends entry
 			
 			if(!$primaryMediaServer)
 			{
+				if($currentDcOnly)
+					return array();
+					
 				$kMediaServer = array_shift($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 					$primaryMediaServer = $kMediaServer->getMediaServer();
 			}
 				
-			if(count($kMediaServers))
+			if(!$currentDcOnly && count($kMediaServers))
 			{
 				$kMediaServer = reset($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
