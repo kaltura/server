@@ -37,11 +37,7 @@ Install the Kaltura client by running 'python setup.py install' from the same fo
 
 == TESTING THE CLIENT LIBRARY ==
   
-To run the test script that accompanies this source:
- - Edit your Partner ID, Service Secret, Admin Secret and User Name in 'TestCode/PythonTester.py'
- - Run "python PythonTester.py"
-
-Note: The library was tested under ActivePython 2.5.5
+See KalturaClient/tests/README.txt
 
 == RELEASE NOTES ==
 
