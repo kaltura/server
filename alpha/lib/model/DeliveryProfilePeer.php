@@ -181,7 +181,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
 			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder");
+			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
 			uasort($deliveries, array($cmp, "compare"));
 		} 
 		// Else catch the default by the protocol
