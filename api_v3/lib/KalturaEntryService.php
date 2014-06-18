@@ -188,7 +188,7 @@ class KalturaEntryService extends KalturaBaseService
 				break;
 	
 			case entryReplacementStatus::NONE:
-			case entryReplacementStatus::ERROR_CONVERTING:
+			case entryReplacementStatus::CONVERSION_FAILED:
 			default:
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_REPLACED, $entryId);
 				break;

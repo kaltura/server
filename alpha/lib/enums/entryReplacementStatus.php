@@ -9,5 +9,5 @@ interface entryReplacementStatus extends BaseEnum
 	const APPROVED_BUT_NOT_READY = 1;
 	const READY_BUT_NOT_APPROVED = 2;
 	const NOT_READY_AND_NOT_APPROVED = 3;
-	const ERROR_CONVERTING = 4;
+	const CONVERSION_FAILED = 4;
 }
