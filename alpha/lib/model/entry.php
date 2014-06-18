@@ -739,7 +739,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 
 		//$path = $this->getThumbnailPath ( $version );
-		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 		$current_version = $this->getVersion();
 
 		$entryId = $this->getId();
@@ -750,7 +749,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$protocolStr = infraRequestUtils::getProtocol();
 
 			$path = requestUtils::getApiCdnHost();
-			$url = $path . "/p/$partnerId/sp/$subPartnerId/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
+			$path .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
+			$url = $path . "/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
 		}
 		else if ($media_type == self::ENTRY_MEDIA_TYPE_IMAGE  )
 		{
@@ -767,7 +767,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		else
 			return null;
 
-		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $path ;
 		return $url;
 	}
 
