@@ -738,7 +738,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			return myPlaylistUtils::getExecutionUrl( $this );
 		}
 
-		//$path = $this->getThumbnailPath ( $version );
 		$current_version = $this->getVersion();
 
 		$entryId = $this->getId();
@@ -748,21 +747,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		{
 			$protocolStr = infraRequestUtils::getProtocol();
 
-			$path = requestUtils::getApiCdnHost();
-			$path .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
-			$url = $path . "/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
+			$url = requestUtils::getApiCdnHost();
+			$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
+			$url .= "/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
 		}
 		else if ($media_type == self::ENTRY_MEDIA_TYPE_IMAGE  )
 		{
 			$width = self::DEFAULT_IMAGE_WIDTH;
 			$height = self::DEFAULT_IMAGE_HEIGHT;
 
-			$path = myPartnerUtils::getCdnHost($this->getPartnerId());
-			$path .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
+			$url = myPartnerUtils::getCdnHost($this->getPartnerId());
+			$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 			if (!$version)
 				$version = $current_version;
 
-			$url =  $path . "/thumbnail/entry_id/$entryId/def_height/$height/def_width/$width/version/$version/type/1";
+			$url .= "/thumbnail/entry_id/$entryId/def_height/$height/def_width/$width/version/$version/type/1";
 		}
 		else
 			return null;
