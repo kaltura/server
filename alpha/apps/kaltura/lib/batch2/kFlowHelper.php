@@ -2332,6 +2332,16 @@ class kFlowHelper
 			return;
 		}
 
+		if ( $tempEntry->getStatus() == entryStatus::ERROR_CONVERTING )
+		{
+			$entry->setReplacementStatus(entryReplacementStatus::ERROR_CONVERTING);
+			$entry->save();
+
+			// NOTE: KalturaEntryService::cancelReplace() must be used to reset this status and delete the temp entry
+
+			return;
+		}
+
 		switch($entry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
@@ -2348,6 +2358,7 @@ class kFlowHelper
 				break;
 
 			case entryReplacementStatus::NONE:
+			case entryReplacementStatus::ERROR_CONVERTING: // Shouldn't be reached, but just in case
 			default:
 				KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] replacement canceled");
 				myEntryUtils::deleteEntry($tempEntry,null,true);
