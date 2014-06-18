@@ -6,6 +6,7 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const FIRST_BROADCAST = 'first_broadcast';
 	const DEFAULT_CACHE_EXPIRY = 70;
 	
 	/* (non-PHPdoc)
@@ -565,7 +566,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(
+				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcastTime());
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
