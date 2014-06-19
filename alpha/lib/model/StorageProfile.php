@@ -119,7 +119,10 @@ class StorageProfile extends BaseStorageProfile
 	
 	public function getDeliveryProfileIds()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
+		$deliveries = $this->getFromCustomData(self::CUSTOM_DATA_DELIVERY_IDS, null, array());
+		if(empty($deliveries))
+			return array();
+		return $deliveries;
 	}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/

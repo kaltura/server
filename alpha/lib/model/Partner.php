@@ -725,7 +725,10 @@ class Partner extends BasePartner
 	
 	public function getDeliveryProfileIds()
 	{
-		return $this->getFromCustomData('delivery_profile_ids', null, array());
+		$deliveries = $this->getFromCustomData('delivery_profile_ids', null, array());
+		if(empty($deliveries))
+			return array();
+		return $deliveries;
 	}
 	
 	public function getEmbedCodeTypes()
