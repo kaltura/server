@@ -722,8 +722,9 @@ class playManifestAction extends kalturaAction
 	private function getLiveEntryBaseUrls()
 	{
 		$tag = null;
-		if(count($this->deliveryAttributes->getTags()) == 1)
-			$tag = reset($this->deliveryAttributes->getTags());
+		$tags = $this->deliveryAttributes->getTags();
+		if(count($tags) == 1) 
+			$tag = reset($tags);
 			
 		$protocol = $this->deliveryAttributes->getMediaProtocol(); 
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
@@ -951,5 +952,4 @@ class playManifestAction extends kalturaAction
 		KExternalErrors::terminateDispatch();
 		$renderer->output($deliveryCode, $playbackContext);
 	}
-	
 }

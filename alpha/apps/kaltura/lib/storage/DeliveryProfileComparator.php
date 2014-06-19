@@ -10,9 +10,9 @@ class DeliveryProfileComparator
 		$this->isSecured = $isSecured;
 	}
 	
-	public static function decorateWithUserOrder(DeliveryProfile $v, $k)
+	public static function decorateWithUserOrder(DeliveryProfile $v, $k , $originalOrder)
 	{
-		$v->userOrder = $k;
+		$v->userOrder = array_search($v->getId(), $originalOrder);
 	}
 
 	public function compare(DeliveryProfile $a,DeliveryProfile $b) {
