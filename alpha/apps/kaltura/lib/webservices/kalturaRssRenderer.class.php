@@ -77,7 +77,7 @@ class kalturaRssRenderer
 		
 		$kaltura_elements .=
 			"<kaltura:partnerLandingPage>" . $entry->getPartnerLandingPage() . "</kaltura:partnerLandingPage>" .
-			"<kaltura:tags>" . $entry->getTags() . "</kaltura:tags>" .
+			"<kaltura:tags>" . kString::xmlEncode ($entry->getTags()) . "</kaltura:tags>" .
 			"<kaltura:adminTags>" . $entry->getAdminTags() . "</kaltura:adminTags>" .
 			"<kaltura:votes>" . ($entry->getVotes() ? $entry->getVotes() : "0") . "</kaltura:votes>" .
 			"<kaltura:rank>" . ($entry->getRank() ? $entry->getRank() : "0") . "</kaltura:rank>" .	
