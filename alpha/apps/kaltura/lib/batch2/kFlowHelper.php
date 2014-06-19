@@ -2357,8 +2357,11 @@ class kFlowHelper
 				$entry->save();
 				break;
 
+			case entryReplacementStatus::CONVERSION_FAILED:
+				// Do nothing. KalturaEntryService::cancelReplace() will be used to delete the entry.
+				break;
+
 			case entryReplacementStatus::NONE:
-			case entryReplacementStatus::CONVERSION_FAILED: // Shouldn't be reached, but just in case
 			default:
 				KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] replacement canceled");
 				myEntryUtils::deleteEntry($tempEntry,null,true);
