@@ -2334,7 +2334,7 @@ class kFlowHelper
 
 		if ( $tempEntry->getStatus() == entryStatus::ERROR_CONVERTING )
 		{
-			$entry->setReplacementStatus(entryReplacementStatus::CONVERSION_FAILED);
+			$entry->setReplacementStatus(entryReplacementStatus::FAILED);
 			$entry->save();
 
 			// NOTE: KalturaEntryService::cancelReplace() must be used to reset this status and delete the temp entry
@@ -2357,7 +2357,7 @@ class kFlowHelper
 				$entry->save();
 				break;
 
-			case entryReplacementStatus::CONVERSION_FAILED:
+			case entryReplacementStatus::FAILED:
 				// Do nothing. KalturaEntryService::cancelReplace() will be used to delete the entry.
 				break;
 
