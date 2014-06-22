@@ -6,6 +6,7 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const FIRST_BROADCAST = 'first_broadcast';
 	const DEFAULT_CACHE_EXPIRY = 70;
 	
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
@@ -227,6 +228,8 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
+	public function setFirstBroadcastTime ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
+	public function getFirstBroadcastTime (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -581,7 +584,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(
+				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcastTime());
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
