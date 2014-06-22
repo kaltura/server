@@ -55,6 +55,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $pushPublishEnabled;
 	
+	/**
+	 * The first time in which the entry was broadcast
+	 * @var int
+	 * @readonly
+	 * @filter order
+	 */
+	public $firstBroadcast;
+	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
@@ -64,6 +72,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"liveStreamConfigurations",
 		"recordedEntryId",
 		"pushPublishEnabled",
+		"firstBroadcast",
 	);
 	
 	/* (non-PHPdoc)

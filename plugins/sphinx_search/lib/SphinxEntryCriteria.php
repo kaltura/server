@@ -220,6 +220,18 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$filter->set(baseObjectFilter::ORDER, "+available_from");
 		}
 		
+		if($filter->get(baseObjectFilter::ORDER) === "-first_broadcast")
+		{
+			$this->addOrderBy(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::FIRST_BROADCAST, Criteria::DESC);
+			$filter->set(baseObjectFilter::ORDER, null);
+		}
+		
+		if($filter->get(baseObjectFilter::ORDER) === "+first_broadcast")
+		{
+			$this->addOrderBy(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::FIRST_BROADCAST, Criteria::ASC);
+			$filter->set(baseObjectFilter::ORDER, null);
+		}
+		
 		if($filter->get('_free_text'))
 		{
 			$freeTexts = $filter->get('_free_text');
