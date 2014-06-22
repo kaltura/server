@@ -272,7 +272,7 @@ abstract class LiveEntry extends entry
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
 		{
-			$configurations = $this->getFromCustomData('live_stream_configurations');
+			$configurations = $this->getFromCustomData('live_stream_configurations', null, array());
 			if($configurations && $this->getPushPublishEnabled())
 			{
 				$pushPublishConfigurations = $this->getPushPublishConfigurations();
