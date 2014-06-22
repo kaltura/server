@@ -2,6 +2,7 @@
 /**
  * @package plugins.eventCuePoint
  * @subpackage api.objects
+ * @requiresPermission insert,update
  */
 class KalturaEventCuePoint extends KalturaCuePoint
 {
