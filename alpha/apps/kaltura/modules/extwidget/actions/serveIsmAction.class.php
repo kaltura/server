@@ -80,8 +80,7 @@ class serveIsmAction extends sfAction
 		switch ($type)
 		{
 			case 'ism':
-				//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
-				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET || $subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
+				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
 					$isAsset = true;
 				else 
 					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM;
