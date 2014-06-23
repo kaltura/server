@@ -32,36 +32,23 @@ class kAkamaiRtmpUrlTokenizer extends kUrlTokenizer
 	{
 		if ($this->usePrefix)
 		{
-			$urls = array();
-			$minLen = 1024;
-
+			$strings = array();
 			foreach($flavors as $flavor)
 			{
 				$url = $flavor["url"];
 				if (substr($url, 0, 4) == "mp4:")
 					$url = substr($url, 4);
-				$urls[] = $url;
-
-				$minLen = min($minLen, strlen($url));
+				$strings[] = $url;
 			}
+			$prefix = kString::getCommonPrefix($strings);
+			$pos = strrpos($prefix , "/");
 
-			$url = array_pop($urls);
-
-			$scan = true;
-			for($i = 0; $i < $minLen && $scan; $i++)
+			if ($pos)
 			{
-				$c = substr($url, $i, 1);
-				foreach($urls as $url)
-				{
-					if ($c != substr($url, $i, 1))
-					{
-						$scan = false;
-						break;
-					}
-				}
+				//include slash sign in prefix substr
+				$pos++;
+				$prefix = substr($prefix, 0, $pos);
 			}
-
-			$prefix = substr($url, 0, $i - 1);
 		}
 		else
 		{
