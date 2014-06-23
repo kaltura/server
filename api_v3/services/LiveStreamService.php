@@ -389,7 +389,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		/* @var $liveStreamEntry LiveStreamEntry */
 	
-		if(in_array($entry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			return $liveStreamEntry->hasMediaServer();
 		}
