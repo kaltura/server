@@ -22,10 +22,6 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 		// If currently only one is set, and that's the one that was just changed
 		if((count($currentMediaServers) == 1) && (count(array_intersect($updatedServers, $currentMediaServers)) == 1)) {
 			$this->addEventCuePoint($object, EventType::BROADCAST_START);
-			if(is_null($object->getFirstBroadcastTime())) {
-				$object->setFirstBroadcastTime(time());
-				$object->save();
-			}
 		}
 		
 		// If currently no one is set

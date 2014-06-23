@@ -228,8 +228,8 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
-	public function setFirstBroadcastTime ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
-	public function getFirstBroadcastTime (  )	{	return $this->getFromCustomData( "first_broadcast");	}
+	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
+	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -586,7 +586,7 @@ abstract class LiveEntry extends entry
 	{
 		$dynamicAttributes = array(
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
-				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcastTime());
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast());
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}
