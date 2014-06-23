@@ -32,6 +32,9 @@ class kAkamaiRtmpUrlTokenizer extends kUrlTokenizer
 	{
 		if ($this->usePrefix)
 		{
+			//in case of a cached-in tokenizer - need to require bootstrap
+			require_once( dirname(__FILE__). '/../../../../../' . 'bootstrap.php');
+			
 			$strings = array();
 			foreach($flavors as $flavor)
 			{
