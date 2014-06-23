@@ -368,7 +368,9 @@ class asset extends Baseasset implements ISyncableFile
 		{
 			case self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
 				$ext = '';
-				if($this->getFileExt())
+				if($this->hasTag(assetParams::TAG_ISM_MANIFEST))
+					$ext = ".ism";
+				else if($this->getFileExt())
 					$ext = '.' . $this->getFileExt();
 				return $fileName . $ext;
 				
