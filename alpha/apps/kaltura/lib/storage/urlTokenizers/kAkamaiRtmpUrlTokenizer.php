@@ -50,6 +50,7 @@ class kAkamaiRtmpUrlTokenizer extends kUrlTokenizer
 			{
 				//include slash sign in prefix substr
 				$pos++;
+
 				$prefix = substr($prefix, 0, $pos);
 			}
 		}
