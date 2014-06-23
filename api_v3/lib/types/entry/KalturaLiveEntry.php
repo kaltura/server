@@ -61,7 +61,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 * @readonly
 	 * @filter order
 	 */
-	public $firstBroadcast;
+	public $firstBroadcastTime;
 	
 	private static $map_between_objects = array
 	(
@@ -72,7 +72,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"liveStreamConfigurations",
 		"recordedEntryId",
 		"pushPublishEnabled",
-		"firstBroadcast",
+		"firstBroadcastTime",
 	);
 	
 	/* (non-PHPdoc)
