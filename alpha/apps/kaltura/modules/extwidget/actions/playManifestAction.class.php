@@ -364,15 +364,7 @@ class playManifestAction extends kalturaAction
 		if(!$key)
 			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 			
-		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
-		
-		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
-		if(!$localFileSync)
-		{
-			$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
-			$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
-		}
-		
+		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);		
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
 		{
