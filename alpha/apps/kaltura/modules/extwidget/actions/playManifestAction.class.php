@@ -392,7 +392,7 @@ class playManifestAction extends kalturaAction
 
 	protected function initSmilManifest($flavorAssets)
 	{
-		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		if (!$key)
 			return false;
 
