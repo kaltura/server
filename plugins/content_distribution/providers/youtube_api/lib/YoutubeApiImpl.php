@@ -68,7 +68,7 @@ class YouTubeApiImpl
 		$this->yt->setMajorProtocolVersion(2);
 	}
 	
-	public function uploadVideo($fileDisk, $fileUrl, $props, $private = false)
+	public function uploadVideo($fileDisk, $props, $private = false)
 	{
 //		foreach ($props as $key => $val)
 //		{
@@ -82,7 +82,8 @@ class YouTubeApiImpl
 		$filesource->setContentType('video/quicktime'); 
 	//	print_r($filesource);
 		// set slug header 
-		$filesource->setSlug($fileUrl);  
+		$slugHeader = $props['slugHeader'] ? $props['slugHeader'] : $fileDisk;
+		$filesource->setSlug($slugHeader);
 		// add the filesource to the video entry 
 		$myVideoEntry->setMediaSource($filesource);  
 		$myVideoEntry->setVideoTitle($props['title']); 
