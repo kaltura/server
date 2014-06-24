@@ -27,7 +27,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 			$width = floor(round($height*$dar)  /2) * 2;
 		}
 		// TODO - calculate the width and height according to dar
-		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType);
+		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType, $dar);
 
 		$cmd= $cmdArr[0];
 		$rv = null;
@@ -66,11 +66,22 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		return $rv? false: true;
 	}
 	
-	protected function getCommand($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2")
+	protected function getCommand($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = 0)
 	{
 		$dimensions = (is_null($width) || is_null($height)) ? '' : ("-s ". $width ."x" . $height);
-		$position_str = $position ? " -ss $position " : '';
-		$position_str_suffix = $position ? " -ss 0.01 " : "";
+		
+		//In case the video length is less than 30 sec to the seek in the decoding phase and not in the muxing phase (related to SUP-2172)
+		if($dar > 30)
+		{
+			$position_str = $position ? " -ss $position " : '';
+			$position_str_suffix = $position ? " -ss 0.01 " : "";
+		}
+		else
+		{
+			$position_str = '';
+			$position_str_suffix = $position ? " -ss $position " : "";
+		}
+		
 		$cmdArr = array();
 		$cmdArr[] = "$this->cmdPath $position_str -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
