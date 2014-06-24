@@ -16,18 +16,18 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = null)
+	public function createThumnail($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = null, $vidDur = null)
 	{
 		if(!isset($frameCount))
 			$frameCount = 1;
 		if(!isset($targetType))
 			$targetType = "image2";
-		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar]");
+		KalturaLog::debug("position[$position], width[$width], height[$height], frameCount[$frameCount], frameCount[$frameCount], dar[$dar], vidDur[$vidDur]");
 		if(isset($dar) && $dar>0 && isset($height)){
 			$width = floor(round($height*$dar)  /2) * 2;
 		}
 		// TODO - calculate the width and height according to dar
-		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType, $dar);
+		$cmdArr = $this->getCommand($position, $width, $height, $frameCount, $targetType, $vidDur);
 
 		$cmd= $cmdArr[0];
 		$rv = null;
@@ -66,12 +66,12 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		return $rv? false: true;
 	}
 	
-	protected function getCommand($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $dar = 0)
+	protected function getCommand($position = null, $width = null, $height = null, $frameCount = 1, $targetType = "image2", $vidDur = null)
 	{
 		$dimensions = (is_null($width) || is_null($height)) ? '' : ("-s ". $width ."x" . $height);
 		
 		//In case the video length is less than 30 sec to the seek in the decoding phase and not in the muxing phase (related to SUP-2172)
-		if($dar > 30)
+		if(!isset($vidDur) || $vidDur > 30)
 		{
 			$position_str = $position ? " -ss $position " : '';
 			$position_str_suffix = $position ? " -ss 0.01 " : "";
