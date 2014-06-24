@@ -235,7 +235,8 @@ class playManifestAction extends kalturaAction
 		// by symfony calling str_parse to replace + with spaces.
 		// this happens only with params passed in the url path and not the query strings. specifically the ~ char at
 		// a columns divided by 3 causes this issue (e.g. http://www.xyzw.com/~xxx)
-		$referrer = base64_decode(str_replace(" ", "+", $base64Referrer));
+		//replace also any - with + and _ with / 
+		$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
 			
