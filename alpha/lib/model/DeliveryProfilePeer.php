@@ -379,5 +379,24 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		return array(array("deliveryProfile:id=%s", self::ID), array("deliveryProfile:partnerId=%s", self::PARTNER_ID));
 	}
+	
+	/**
+	 * Creates default criteria filter
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+	
+		$c = new myCriteria();
+		
+		// We'd like to retrieve only active delivery profiles, and the ones we consider to remove but haven't removed yet.
+		$hostCond = $c->getNewCriterion(DeliveryProfilePeer::STATUS, DeliveryStatus::ACTIVE, Criteria::EQUAL);
+		$hostCond->addOr($c->getNewCriterion(DeliveryProfilePeer::STATUS, DeliveryStatus::STAGING_OUT, Criteria::EQUAL));
+		
+		$c->addAnd($hostCond);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 } // DeliveryProfilePeer
 
