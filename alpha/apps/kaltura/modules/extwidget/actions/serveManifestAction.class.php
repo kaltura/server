@@ -99,9 +99,6 @@ class serveManifestAction extends sfAction
 				$isAsset = true;
 				break;
 			case 'smil':
-				$subType = flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL;
-				$isAsset = true;
-				break;
 			case 'mp4':
 				$subType = flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET;
 				$isAsset = true;
