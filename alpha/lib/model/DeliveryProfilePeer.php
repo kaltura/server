@@ -391,10 +391,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$c = new myCriteria();
 		
 		// We'd like to retrieve only active delivery profiles, and the ones we consider to remove but haven't removed yet.
-		$hostCond = $c->getNewCriterion(DeliveryProfilePeer::STATUS, DeliveryStatus::ACTIVE, Criteria::EQUAL);
-		$hostCond->addOr($c->getNewCriterion(DeliveryProfilePeer::STATUS, DeliveryStatus::STAGING_OUT, Criteria::EQUAL));
+		$c->addAnd(DeliveryProfilePeer::STATUS, array(DeliveryStatus::ACTIVE, DeliveryStatus::STAGING_OUT), Criteria::IN);
 		
-		$c->addAnd($hostCond);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	
