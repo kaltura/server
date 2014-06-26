@@ -245,7 +245,8 @@ class kBatchManager
 				{
 					$tagsArray = array_unique($tagsArray);
 					$key = array_search(flavorParams::TAG_MBR, $tagsArray);
-					unset($tagsArray[$key]);
+					if($key !== false)
+						unset($tagsArray[$key]);
 				}
 				
 				$finalTagsArray = $tagsArray;
