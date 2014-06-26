@@ -12,6 +12,8 @@ abstract class KalturaLiveEntryBaseFilter extends KalturaMediaEntryFilter
 
 	static private $order_by_map = array
 	(
+		"+firstBroadcast" => "+first_broadcast",
+		"-firstBroadcast" => "-first_broadcast",
 	);
 
 	public function getMapBetweenObjects()

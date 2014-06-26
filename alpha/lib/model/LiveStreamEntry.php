@@ -48,14 +48,4 @@ class LiveStreamEntry extends LiveEntry
 	{
 	    $this->putInCustomData("hls_stream_url", $v);
 	}
-	
-    public function getUrlManager ()
-	{
-	    return $this->getFromCustomData("url_manager");
-	}
-	
-	public function setUrlManager ($v)
-	{
-	    $this->putInCustomData("url_manager", $v);
-	}
 }

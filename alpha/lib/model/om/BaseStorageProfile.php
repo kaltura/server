@@ -104,24 +104,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	protected $storage_ftp_passive_mode;
 
 	/**
-	 * The value for the delivery_http_base_url field.
-	 * @var        string
-	 */
-	protected $delivery_http_base_url;
-
-	/**
-	 * The value for the delivery_rmp_base_url field.
-	 * @var        string
-	 */
-	protected $delivery_rmp_base_url;
-
-	/**
-	 * The value for the delivery_iis_base_url field.
-	 * @var        string
-	 */
-	protected $delivery_iis_base_url;
-
-	/**
 	 * The value for the min_file_size field.
 	 * @var        int
 	 */
@@ -156,12 +138,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $path_manager_class;
-
-	/**
-	 * The value for the url_manager_class field.
-	 * @var        string
-	 */
-	protected $url_manager_class;
 
 	/**
 	 * The value for the delivery_priority field.
@@ -421,36 +397,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [delivery_http_base_url] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDeliveryHttpBaseUrl()
-	{
-		return $this->delivery_http_base_url;
-	}
-
-	/**
-	 * Get the [delivery_rmp_base_url] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDeliveryRmpBaseUrl()
-	{
-		return $this->delivery_rmp_base_url;
-	}
-
-	/**
-	 * Get the [delivery_iis_base_url] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getDeliveryIisBaseUrl()
-	{
-		return $this->delivery_iis_base_url;
-	}
-
-	/**
 	 * Get the [min_file_size] column value.
 	 * 
 	 * @return     int
@@ -508,16 +454,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function getPathManagerClass()
 	{
 		return $this->path_manager_class;
-	}
-
-	/**
-	 * Get the [url_manager_class] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getUrlManagerClass()
-	{
-		return $this->url_manager_class;
 	}
 
 	/**
@@ -915,75 +851,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	} // setStorageFtpPassiveMode()
 
 	/**
-	 * Set the value of [delivery_http_base_url] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     StorageProfile The current object (for fluent API support)
-	 */
-	public function setDeliveryHttpBaseUrl($v)
-	{
-		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_HTTP_BASE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_HTTP_BASE_URL] = $this->delivery_http_base_url;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->delivery_http_base_url !== $v) {
-			$this->delivery_http_base_url = $v;
-			$this->modifiedColumns[] = StorageProfilePeer::DELIVERY_HTTP_BASE_URL;
-		}
-
-		return $this;
-	} // setDeliveryHttpBaseUrl()
-
-	/**
-	 * Set the value of [delivery_rmp_base_url] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     StorageProfile The current object (for fluent API support)
-	 */
-	public function setDeliveryRmpBaseUrl($v)
-	{
-		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_RMP_BASE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_RMP_BASE_URL] = $this->delivery_rmp_base_url;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->delivery_rmp_base_url !== $v) {
-			$this->delivery_rmp_base_url = $v;
-			$this->modifiedColumns[] = StorageProfilePeer::DELIVERY_RMP_BASE_URL;
-		}
-
-		return $this;
-	} // setDeliveryRmpBaseUrl()
-
-	/**
-	 * Set the value of [delivery_iis_base_url] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     StorageProfile The current object (for fluent API support)
-	 */
-	public function setDeliveryIisBaseUrl($v)
-	{
-		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_IIS_BASE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_IIS_BASE_URL] = $this->delivery_iis_base_url;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->delivery_iis_base_url !== $v) {
-			$this->delivery_iis_base_url = $v;
-			$this->modifiedColumns[] = StorageProfilePeer::DELIVERY_IIS_BASE_URL;
-		}
-
-		return $this;
-	} // setDeliveryIisBaseUrl()
-
-	/**
 	 * Set the value of [min_file_size] column.
 	 * 
 	 * @param      int $v new value
@@ -1119,29 +986,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	} // setPathManagerClass()
 
 	/**
-	 * Set the value of [url_manager_class] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     StorageProfile The current object (for fluent API support)
-	 */
-	public function setUrlManagerClass($v)
-	{
-		if(!isset($this->oldColumnsValues[StorageProfilePeer::URL_MANAGER_CLASS]))
-			$this->oldColumnsValues[StorageProfilePeer::URL_MANAGER_CLASS] = $this->url_manager_class;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->url_manager_class !== $v) {
-			$this->url_manager_class = $v;
-			$this->modifiedColumns[] = StorageProfilePeer::URL_MANAGER_CLASS;
-		}
-
-		return $this;
-	} // setUrlManagerClass()
-
-	/**
 	 * Set the value of [delivery_priority] column.
 	 * 
 	 * @param      int $v new value
@@ -1233,18 +1077,14 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			$this->storage_username = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->storage_password = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->storage_ftp_passive_mode = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->delivery_http_base_url = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->delivery_rmp_base_url = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->delivery_iis_base_url = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->min_file_size = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->max_file_size = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->flavor_params_ids = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->max_concurrent_connections = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->custom_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->path_manager_class = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->url_manager_class = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-			$this->delivery_priority = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-			$this->delivery_status = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->min_file_size = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->max_file_size = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->flavor_params_ids = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->max_concurrent_connections = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->custom_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->path_manager_class = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->delivery_priority = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->delivery_status = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1254,7 +1094,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 26; // 26 = StorageProfilePeer::NUM_COLUMNS - StorageProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 22; // 22 = StorageProfilePeer::NUM_COLUMNS - StorageProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating StorageProfile object", $e);
@@ -1307,7 +1147,9 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		StorageProfilePeer::setUseCriteriaFilter(false);
-		$stmt = StorageProfilePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		StorageProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -1389,18 +1231,58 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				StorageProfilePeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+			
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+			
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+               $affectedRows = $this->doSave($con);
+                if ($affectedRows || !$this->isColumnModified(StorageProfilePeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column 
+                	break;
+
+                KalturaLog::debug("was unable to save! retrying for the $retries time");
+                $criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(StorageProfilePeer::CUSTOM_DATA);
+                $stmt = BasePeer::doSelect($criteria, $con);
+                $cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $newCustomData = $cutsomDataArr[0];
+                
+                $this->custom_data_md5 = md5($newCustomData);
+
+                $valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData); 
+
+				//set custom data column values we wanted to change to
+			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+                	foreach($namespaceValues as $name => $oldValue)
+					{
+						if ($namespace)
+						{
+							$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{ 
+							$newValue = $valuesToChangeTo[$name];
+						}
+					 
+						$this->putInCustomData($name, $newValue, $namespace);
+					}
+                   }
+                   
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			StorageProfilePeer::addInstanceToPool($this);
+			
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1511,8 +1393,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1748,39 +1629,27 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 				return $this->getStorageFtpPassiveMode();
 				break;
 			case 14:
-				return $this->getDeliveryHttpBaseUrl();
-				break;
-			case 15:
-				return $this->getDeliveryRmpBaseUrl();
-				break;
-			case 16:
-				return $this->getDeliveryIisBaseUrl();
-				break;
-			case 17:
 				return $this->getMinFileSize();
 				break;
-			case 18:
+			case 15:
 				return $this->getMaxFileSize();
 				break;
-			case 19:
+			case 16:
 				return $this->getFlavorParamsIds();
 				break;
-			case 20:
+			case 17:
 				return $this->getMaxConcurrentConnections();
 				break;
-			case 21:
+			case 18:
 				return $this->getCustomData();
 				break;
-			case 22:
+			case 19:
 				return $this->getPathManagerClass();
 				break;
-			case 23:
-				return $this->getUrlManagerClass();
-				break;
-			case 24:
+			case 20:
 				return $this->getDeliveryPriority();
 				break;
-			case 25:
+			case 21:
 				return $this->getDeliveryStatus();
 				break;
 			default:
@@ -1818,18 +1687,14 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			$keys[11] => $this->getStorageUsername(),
 			$keys[12] => $this->getStoragePassword(),
 			$keys[13] => $this->getStorageFtpPassiveMode(),
-			$keys[14] => $this->getDeliveryHttpBaseUrl(),
-			$keys[15] => $this->getDeliveryRmpBaseUrl(),
-			$keys[16] => $this->getDeliveryIisBaseUrl(),
-			$keys[17] => $this->getMinFileSize(),
-			$keys[18] => $this->getMaxFileSize(),
-			$keys[19] => $this->getFlavorParamsIds(),
-			$keys[20] => $this->getMaxConcurrentConnections(),
-			$keys[21] => $this->getCustomData(),
-			$keys[22] => $this->getPathManagerClass(),
-			$keys[23] => $this->getUrlManagerClass(),
-			$keys[24] => $this->getDeliveryPriority(),
-			$keys[25] => $this->getDeliveryStatus(),
+			$keys[14] => $this->getMinFileSize(),
+			$keys[15] => $this->getMaxFileSize(),
+			$keys[16] => $this->getFlavorParamsIds(),
+			$keys[17] => $this->getMaxConcurrentConnections(),
+			$keys[18] => $this->getCustomData(),
+			$keys[19] => $this->getPathManagerClass(),
+			$keys[20] => $this->getDeliveryPriority(),
+			$keys[21] => $this->getDeliveryStatus(),
 		);
 		return $result;
 	}
@@ -1904,39 +1769,27 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 				$this->setStorageFtpPassiveMode($value);
 				break;
 			case 14:
-				$this->setDeliveryHttpBaseUrl($value);
-				break;
-			case 15:
-				$this->setDeliveryRmpBaseUrl($value);
-				break;
-			case 16:
-				$this->setDeliveryIisBaseUrl($value);
-				break;
-			case 17:
 				$this->setMinFileSize($value);
 				break;
-			case 18:
+			case 15:
 				$this->setMaxFileSize($value);
 				break;
-			case 19:
+			case 16:
 				$this->setFlavorParamsIds($value);
 				break;
-			case 20:
+			case 17:
 				$this->setMaxConcurrentConnections($value);
 				break;
-			case 21:
+			case 18:
 				$this->setCustomData($value);
 				break;
-			case 22:
+			case 19:
 				$this->setPathManagerClass($value);
 				break;
-			case 23:
-				$this->setUrlManagerClass($value);
-				break;
-			case 24:
+			case 20:
 				$this->setDeliveryPriority($value);
 				break;
-			case 25:
+			case 21:
 				$this->setDeliveryStatus($value);
 				break;
 		} // switch()
@@ -1977,18 +1830,14 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setStorageUsername($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setStoragePassword($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setStorageFtpPassiveMode($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setDeliveryHttpBaseUrl($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setDeliveryRmpBaseUrl($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setDeliveryIisBaseUrl($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setMinFileSize($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setMaxFileSize($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setFlavorParamsIds($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setMaxConcurrentConnections($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setCustomData($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setPathManagerClass($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setUrlManagerClass($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setDeliveryPriority($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setDeliveryStatus($arr[$keys[25]]);
+		if (array_key_exists($keys[14], $arr)) $this->setMinFileSize($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setMaxFileSize($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setFlavorParamsIds($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setMaxConcurrentConnections($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCustomData($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setPathManagerClass($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setDeliveryPriority($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setDeliveryStatus($arr[$keys[21]]);
 	}
 
 	/**
@@ -2014,16 +1863,12 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(StorageProfilePeer::STORAGE_USERNAME)) $criteria->add(StorageProfilePeer::STORAGE_USERNAME, $this->storage_username);
 		if ($this->isColumnModified(StorageProfilePeer::STORAGE_PASSWORD)) $criteria->add(StorageProfilePeer::STORAGE_PASSWORD, $this->storage_password);
 		if ($this->isColumnModified(StorageProfilePeer::STORAGE_FTP_PASSIVE_MODE)) $criteria->add(StorageProfilePeer::STORAGE_FTP_PASSIVE_MODE, $this->storage_ftp_passive_mode);
-		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_HTTP_BASE_URL)) $criteria->add(StorageProfilePeer::DELIVERY_HTTP_BASE_URL, $this->delivery_http_base_url);
-		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_RMP_BASE_URL)) $criteria->add(StorageProfilePeer::DELIVERY_RMP_BASE_URL, $this->delivery_rmp_base_url);
-		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_IIS_BASE_URL)) $criteria->add(StorageProfilePeer::DELIVERY_IIS_BASE_URL, $this->delivery_iis_base_url);
 		if ($this->isColumnModified(StorageProfilePeer::MIN_FILE_SIZE)) $criteria->add(StorageProfilePeer::MIN_FILE_SIZE, $this->min_file_size);
 		if ($this->isColumnModified(StorageProfilePeer::MAX_FILE_SIZE)) $criteria->add(StorageProfilePeer::MAX_FILE_SIZE, $this->max_file_size);
 		if ($this->isColumnModified(StorageProfilePeer::FLAVOR_PARAMS_IDS)) $criteria->add(StorageProfilePeer::FLAVOR_PARAMS_IDS, $this->flavor_params_ids);
 		if ($this->isColumnModified(StorageProfilePeer::MAX_CONCURRENT_CONNECTIONS)) $criteria->add(StorageProfilePeer::MAX_CONCURRENT_CONNECTIONS, $this->max_concurrent_connections);
 		if ($this->isColumnModified(StorageProfilePeer::CUSTOM_DATA)) $criteria->add(StorageProfilePeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(StorageProfilePeer::PATH_MANAGER_CLASS)) $criteria->add(StorageProfilePeer::PATH_MANAGER_CLASS, $this->path_manager_class);
-		if ($this->isColumnModified(StorageProfilePeer::URL_MANAGER_CLASS)) $criteria->add(StorageProfilePeer::URL_MANAGER_CLASS, $this->url_manager_class);
 		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_PRIORITY)) $criteria->add(StorageProfilePeer::DELIVERY_PRIORITY, $this->delivery_priority);
 		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_STATUS)) $criteria->add(StorageProfilePeer::DELIVERY_STATUS, $this->delivery_status);
 
@@ -2044,17 +1889,29 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 
 		$criteria->add(StorageProfilePeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(StorageProfilePeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != StorageProfilePeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = StorageProfilePeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if ($this->isColumnModified(StorageProfilePeer::CUSTOM_DATA))
+			{
+				if (!is_null($this->custom_data_md5))
+					$criteria->add(StorageProfilePeer::CUSTOM_DATA, "MD5(cast(" . StorageProfilePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
+					//casting to latin char set to avoid mysql and php md5 difference
+				else 
+					$criteria->add(StorageProfilePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
+			}
+			
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(StorageProfilePeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != StorageProfilePeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = StorageProfilePeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -2118,12 +1975,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 
 		$copyObj->setStorageFtpPassiveMode($this->storage_ftp_passive_mode);
 
-		$copyObj->setDeliveryHttpBaseUrl($this->delivery_http_base_url);
-
-		$copyObj->setDeliveryRmpBaseUrl($this->delivery_rmp_base_url);
-
-		$copyObj->setDeliveryIisBaseUrl($this->delivery_iis_base_url);
-
 		$copyObj->setMinFileSize($this->min_file_size);
 
 		$copyObj->setMaxFileSize($this->max_file_size);
@@ -2135,8 +1986,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		$copyObj->setCustomData($this->custom_data);
 
 		$copyObj->setPathManagerClass($this->path_manager_class);
-
-		$copyObj->setUrlManagerClass($this->url_manager_class);
 
 		$copyObj->setDeliveryPriority($this->delivery_priority);
 
@@ -2227,6 +2076,12 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	 * @var myCustomData
 	 */
 	protected $m_custom_data = null;
+	
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
 
 	/**
 	 * Store custom data old values before the changes
@@ -2284,8 +2139,17 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
-
-		$customData = $this->getCustomDataObj( );
+		$customData = $this->getCustomDataObj();
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		return $customData->remove ( $name , $namespace );
 	}
 
@@ -2332,6 +2196,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	{
 		if ( $this->m_custom_data != null )
 		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}

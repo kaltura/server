@@ -245,6 +245,8 @@ class KalturaErrors extends APIErrors
 	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED;URL_PATH;Failed to download thumbnail from URL \"@URL_PATH@\"";
 
 	const THUMB_ASSET_IS_DEFAULT = "THUMB_ASSET_IS_DEFAULT;ASSET;Thumbnail asset \"@ASSET@\" is default and could not be deleted";
+	
+	const THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE = "THUMB_ASSET_IS_NOT_OF_TYPE_TIMED_THUMB;ASSET;Thumbnail asset \"@ASSET@\" is not of type timed thumb";
 
 	/**
 	 * Category Service
@@ -499,6 +501,8 @@ class KalturaErrors extends APIErrors
 	const LIVE_STREAM_EXCEEDED_MAX_TRANSCODED = "LIVE_STREAM_EXCEEDED_MAX_TRANSCODED;ENTRY_ID;Partner exceeded max concurrent transcoded live streams in entry[@ENTRY_ID@]";
 	
 	const LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION = "LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION;ENTRY_ID;Entry exceeded max recorded live stream duration in entry[@ENTRY_ID@]";
+	
+	const LIVE_STREAM_ALREADY_BROADCASTING = "LIVE_STREAM_ALREADY_BROADCASTING;ENTRY_ID,MEDIA_SERVER;Entry [@ENTRY_ID@] already broadcasting to server [@MEDIA_SERVER@]";
 	
 	/*
 	 * BaseEntry Service

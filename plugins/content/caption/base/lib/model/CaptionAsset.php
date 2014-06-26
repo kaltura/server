@@ -28,7 +28,7 @@ class CaptionAsset extends asset
 	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
 	public function setLabel($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
 	
-	protected function getFinalDownloadUrlPathWithoutKs()
+	public function getFinalDownloadUrlPathWithoutKs()
 	{
 		$finalPath = '/api_v3/index.php/service/caption_captionAsset/action/serve';
 		$finalPath .= '/captionAssetId/' . $this->getId();

@@ -92,7 +92,7 @@ class KalturaEntryResource extends KalturaContentResource
     	{
     		/* @var $srcEntry LiveEntry */
     		
-    		if($srcEntry->getSource() != EntrySourceType::LIVE_STREAM)
+    		if(!in_array($srcEntry->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
     			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
     			
     		$mediaServer = $srcEntry->getMediaServer();

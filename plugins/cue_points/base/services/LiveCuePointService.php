@@ -49,7 +49,7 @@ class LiveCuePointService extends KalturaBaseService
 		
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
-		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::LIVE_STREAM || $dbEntry->getSource() != KalturaSourceType::LIVE_STREAM)
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($dbEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		/* @var $dbEntry LiveStreamEntry */

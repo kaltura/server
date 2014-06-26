@@ -2,10 +2,10 @@
 
 class DeliveryProfileLiveAkamaiHds extends DeliveryProfileLiveHds {
 	
-	public function isLive ($url)
+	public function checkIsLive ($url)
 	{
-		$url = kDeliveryUtils::addQueryParameter($url, kConf::get('hd_core_version'));
-		return parent::isLive($url);
+		$url = kDeliveryUtils::addQueryParameter($url, "hdcore=" . kConf::get('hd_core_version'));
+		return parent::checkIsLive($url);
 	}
 }
 

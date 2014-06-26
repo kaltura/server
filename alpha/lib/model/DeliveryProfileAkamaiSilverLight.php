@@ -11,19 +11,28 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 			return parent::doGetFileSyncUrl($fileSync);
 		
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
+		$objectSubType = $fileSync->getObjectSubType();
 		
-		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $objectSubType == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+			return $this->doGetServeIsmUrl($fileSync, $partnerPath, $storage);
+
+		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $objectSubType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
 			return $this->doGetServeIsmUrl($fileSync, $partnerPath, $storage);
 		
-		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $fileSync->getObjectSubType() == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
-			return $this->doGetServeIsmUrl($fileSync, $partnerPath, $storage);
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $objectSubType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
+		{
+			$asset = assetPeer::retrieveById($fileSync->getObjectId());
+			if($asset->hasTag(assetParams::TAG_ISM_MANIFEST))
+				return $this->doGetServeIsmUrl($fileSync, $partnerPath, $storage);	
+		}
 		
 		return parent::doGetFileSyncUrl($fileSync);
 	}
 	
 	private function doGetServeIsmUrl(FileSync $fileSync, $partnerPath, StorageProfile $storage = null)
 	{
-		$serverUrl = myPartnerUtils::getIisHost($fileSync->getPartnerId(), "http");
+		$serverUrl = $this->getUrl();
 		
 		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE) {
 			$path = $partnerPath;

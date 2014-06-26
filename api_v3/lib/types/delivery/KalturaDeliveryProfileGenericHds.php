@@ -15,13 +15,13 @@ class KalturaDeliveryProfileGenericHds extends KalturaDeliveryProfile {
 	 * rendererClass
 	 * @var string
 	 */
-	public $rendererClassParam;
+	public $rendererClass;
 	
 	
 	private static $map_between_objects = array
 	(
 			"pattern",
-			"rendererClassParam",
+			"rendererClass",
 	);
 	
 	public function getMapBetweenObjects ( )

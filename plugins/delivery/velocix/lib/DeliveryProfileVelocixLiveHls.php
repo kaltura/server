@@ -36,7 +36,7 @@ class DeliveryProfileVelocixLiveHls extends DeliveryProfileLiveAppleHttp
 		return '';
 	}
 	
-	public function isLive ($url)
+	public function checkIsLive ($url)
 	{
 		$parts = parse_url($url);
 		parse_str($parts['query'], $query);
