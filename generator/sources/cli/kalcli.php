@@ -246,6 +246,12 @@ if (isset($options['header']))
 
 $curlWrapper->useGet = isset($options['get']);
 $curlWrapper->ignoreCertErrors = isset($options['insecure']);
+$curlWrapper->followRedirects = isset($options['location']);
+
+if (isset($options['range']))
+{
+	$curlWrapper->range = $options['range'];
+}
 
 if (isset($options['log']))
 {
@@ -277,7 +283,13 @@ if (isset($options['include']) || isset($options['head']))
 if (!isset($options['head']))
 {
 	if (!isset($options['raw']))
-		$result = formatResponse(unserialize($result)) . "\n";
+	{
+		$unserializedResult = @unserialize($result);
+		if ($unserializedResult !== false || $result === 'b:0;')
+		{
+			$result = formatResponse($unserializedResult) . "\n";
+		}
+	}
 	echo $result;
 }
 

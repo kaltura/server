@@ -55,7 +55,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			$entry = entryPeer::retrieveByPK($entryId);
 		}
 			
-		if (!$entry || $entry->getType() != KalturaEntryType::LIVE_STREAM || $entry->getSource() != KalturaSourceType::LIVE_STREAM)
+		if (!$entry || $entry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($entry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		$mediaServer = null;

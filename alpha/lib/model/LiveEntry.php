@@ -6,7 +6,10 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const FIRST_BROADCAST = 'first_broadcast';
 	const DEFAULT_CACHE_EXPIRY = 70;
+	
+	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
@@ -165,7 +168,7 @@ abstract class LiveEntry extends entry
 		if(is_array($streamBitrates) && count($streamBitrates))
 			return $streamBitrates;
 		
-		if($this->getSource() == EntrySourceType::LIVE_STREAM)
+		if(in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			$liveParams = assetParamsPeer::retrieveByProfile($this->getConversionProfileId());
 			$streamBitrates = array();
@@ -225,6 +228,8 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
+	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
+	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -248,13 +253,13 @@ abstract class LiveEntry extends entry
 	
 	public function setLiveStreamConfigurations(array $v)
 	{
-		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)) )
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes) )
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false)
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -265,11 +270,12 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false)
 	{
-		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
+		$configurations = array();
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
 		{
-			$configurations = $this->getFromCustomData('live_stream_configurations');
+			$configurations = $this->getFromCustomData('live_stream_configurations', null, array());
 			if($configurations && $this->getPushPublishEnabled())
 			{
 				$pushPublishConfigurations = $this->getPushPublishConfigurations();
@@ -299,12 +305,15 @@ abstract class LiveEntry extends entry
 			
 			if(!$primaryMediaServer)
 			{
+				if($currentDcOnly)
+					return array();
+					
 				$kMediaServer = array_shift($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 					$primaryMediaServer = $kMediaServer->getMediaServer();
 			}
 				
-			if(count($kMediaServers))
+			if(!$currentDcOnly && count($kMediaServers))
 			{
 				$kMediaServer = reset($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
@@ -312,7 +321,6 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
-		$configurations = array();
 		$manifestUrl = null;
 		$backupManifestUrl = null;
 		
@@ -332,6 +340,14 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
+		$rtmpStreamUrl = null;
+		$hlsStreamUrl = null;
+		$hdsStreamUrl = null;
+		$slStreamUrl = null;
+		$mpdStreamUrl = null;
+		$hlsBackupStreamUrl = null;
+		$hdsBackupStreamUrl = null;
+		
 		if ($manifestUrl)
 		{
 			$streamName = $this->getId();
@@ -348,9 +364,6 @@ abstract class LiveEntry extends entry
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
 			$slStreamUrl = "$manifestUrl/Manifest";
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
-			
-			$hlsBackupStreamUrl = null;
-			$hdsBackupStreamUrl = null;
 			
 			if($backupManifestUrl)
 			{
@@ -371,45 +384,46 @@ abstract class LiveEntry extends entry
 					$hdsBackupStreamUrl .= "?DVR";
 				}
 			}
+		}
 			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::RTMP);
-			$configuration->setUrl($rtmpStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::HDS);
-			$configuration->setUrl($hdsStreamUrl);
-			$configuration->setBackupUrl($hdsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::HLS);
-			$configuration->setUrl($hlsStreamUrl);
-			$configuration->setBackupUrl($hlsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
-			$configuration->setUrl($hlsStreamUrl);
-			$configuration->setBackupUrl($hlsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
-			$configuration->setUrl($slStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
-			$configuration->setUrl($mpdStreamUrl);
-			$configurations[] = $configuration;
-			
-			if ($this->getPushPublishEnabled())
-			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
-				$configurations = array_merge($configurations, $pushPublishConfigurations);
-			}
+//		TODO - enable it and test it in non-SaaS environment
+//		$configuration = new kLiveStreamConfiguration();
+//		$configuration->setProtocol(PlaybackProtocol::RTMP);
+//		$configuration->setUrl($rtmpStreamUrl);
+//		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::HDS);
+		$configuration->setUrl($hdsStreamUrl);
+		$configuration->setBackupUrl($hdsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::HLS);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
+		$configuration->setUrl($slStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
+		$configuration->setUrl($mpdStreamUrl);
+		$configurations[] = $configuration;
+		
+		if ($this->getPushPublishEnabled())
+		{
+			$pushPublishConfigurations = $this->getPushPublishConfigurations();
+			$configurations = array_merge($configurations, $pushPublishConfigurations);
 		}
 		
 		return $configurations;
@@ -570,7 +584,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(
+				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast());
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}

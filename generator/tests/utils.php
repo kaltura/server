@@ -21,6 +21,7 @@ function endsWith($str, $postfix)
 
 function listDir($path)
 {
+	$result = array();
 	$dir = dir($path);
 	while (false !== ($file = $dir->read()))
 	{

@@ -36,10 +36,11 @@ import com.kaltura.client.enums.KalturaUiConfCreationMode;
 import com.kaltura.client.services.KalturaUiConfService;
 import com.kaltura.client.types.KalturaUiConf;
 import com.kaltura.client.types.KalturaUiConfListResponse;
+import com.kaltura.client.IKalturaLogger;
 import com.kaltura.client.KalturaLogger;
 
 public class UiConfServiceTest extends BaseTest {
-	private KalturaLogger logger = KalturaLogger.getLogger(UiConfServiceTest.class);
+	private IKalturaLogger logger = KalturaLogger.getLogger(UiConfServiceTest.class);
 
 	// keeps track of test vids we upload so they can be cleaned up at the end
 	protected List<Integer> testUiConfIds = new ArrayList<Integer>();

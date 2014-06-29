@@ -268,6 +268,14 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_embedding" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
+	    // The following allows defining an alternative slug header for an uploaded video, which
+	    // affects the "raw file" field of a YouTube video entry.
+	    // A typical MRSS XSLT value would be the entry's title (similar to MEDIA_TITLE)
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeApiDistributionField::ALT_RAW_FILENAME);
+	    $fieldConfig->setUserFriendlyFieldName('Alternative Raw File Name ');
+	    $fieldConfig->setEntryMrssXslt(''); // Empty by default to indicate that the feature is switched off.
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    return $fieldConfigArray;
 	}

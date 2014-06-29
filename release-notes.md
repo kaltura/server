@@ -1,3 +1,38 @@
+# IX-9.18.0 #
+
+## Event Cue point support ##
+- Issue ID: PLAT-1136
+
+#### Configuration Files ####
+
+The following rewrite rules should be added to kaltura's apache configuration file:
+
+In `^p/[-0-9]+/sp/[-0-9]+/` section:
+
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
+
+In `^s/p/[-0-9]+/sp/[-0-9]+/` section:
+
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
+
+In `^p/[-0-9]+/` section:
+
+	RewriteRule ^p/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
+
+In `^s/p/[-0-9]+/serveManifest/` section:
+
+	RewriteRule ^s/p/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
+
+##### Enable the plugin #####
+
+1. Add the following line to plugins.ini:
+
+		EventCuePoint
+
+2. Install plugins:
+
+		php deployment/base/scripts/installPlugins.php
+
 # IX-9.17.0 #
 
 ## 'Content Moderator' user-role permissions fix ##

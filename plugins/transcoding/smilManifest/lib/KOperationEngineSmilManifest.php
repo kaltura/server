@@ -42,7 +42,7 @@ class KOperationEngineSmilManifest extends KSingleOutputOperationEngine
 		$destFileSyncDescArr = array();
 		$fileSyncDesc = new KalturaDestFileSyncDescriptor();
 		$fileSyncDesc->fileSyncLocalPath = $smilFilePath;
-		$fileSyncDesc->fileSyncObjectSubType = 5; //".smil";
+		$fileSyncDesc->fileSyncObjectSubType = 1; // asset;
 		$destFileSyncDescArr[] = $fileSyncDesc;
 
 		$this->data->extraDestFileSyncs  = $destFileSyncDescArr;
