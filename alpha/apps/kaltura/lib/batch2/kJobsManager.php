@@ -1000,11 +1000,13 @@ class kJobsManager
 	
 	/**
 	 * @param BatchJob $parentJob
-	 * @param flavorAsset $asset
-	 * @param array $files
-	 * @return BatchJob
+	 * @param LiveEntry $entry
+	 * @param string $assetId
+	 * @param int $mediaServerIndex
+	 * @param string $filePath
+	 * @param float $endTime
 	 */
-	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, LiveEntry $entry, $mediaServerIndex, $filePath, $endTime)
+	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, LiveEntry $entry, $assetId, $mediaServerIndex, $filePath, $endTime)
 	{
 		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
 		if($mediaServerIndex == MediaServerIndex::SECONDARY)
@@ -1015,6 +1017,7 @@ class kJobsManager
 		
 		$jobData = new kConvertLiveSegmentJobData();
  		$jobData->setEntryId($entry->getId());
+ 		$jobData->setAssetId($assetId);
 		$jobData->setMediaServerIndex($mediaServerIndex);
 		$jobData->setEndTime($endTime);
 		$jobData->setSrcFilePath($filePath);
