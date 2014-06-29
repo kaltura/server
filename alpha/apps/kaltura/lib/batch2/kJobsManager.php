@@ -1218,7 +1218,9 @@ class kJobsManager
 					continue;
 				}
 			
-				if($flavor->getOrigin() == assetParamsOrigin::INGEST)
+				$flavorParams = assetParamsPeer::retrieveByPK($flavor->getFlavorParamsId());
+				
+				if($flavorParams instanceof liveParams || $flavor->getOrigin() == assetParamsOrigin::INGEST)
 				{
 					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
 					continue;
@@ -1234,7 +1236,6 @@ class kJobsManager
 					}
 				}
 				
-				$flavorParams = assetParamsPeer::retrieveByPK($flavor->getFlavorParamsId());
 				$sourceFileRequiredStorages[] = $flavorParams->getSourceRemoteStorageProfileId();
 				
 				$conversionRequired = true;
