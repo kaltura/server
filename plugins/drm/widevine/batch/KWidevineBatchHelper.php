@@ -16,7 +16,9 @@ class KWidevineBatchHelper
 	const LEND = 'lend';
 	const LICSTART = 'licstart';
 	const LICEND = 'licend';
-	
+	const PTIME = 'ptime';
+	const SIGN = 'sign';
+
 	private static $encryptionErrorCodes = array(
 						'OK', 'InvalidUsage', 'OwnerNotSpecified', 'ProviderNotSpecified', 'AssetNotSpecified', 'WVEncError',
   						'ConversionError', 'FinalIndexError', 'SyncFrameCountError', 'TrickPlaySyncFrameTooFarError', 'SyncFrameTooFarError',
@@ -45,13 +47,13 @@ class KWidevineBatchHelper
 	 * 
 	 */
 	public static function getEncryptPackageCmdLine(
-							$widevineExe, $wvLicenseServerUrl, $iv, $key, $assetName, $inputFiles, $destinationFile, $gop, $portal = null)
+							$widevineExe, $wvRegServerHost, $iv, $key, $assetName, $inputFiles, $destinationFile, $gop, $portal = null)
 	{
 		if(!$portal)
 			$portal = WidevinePlugin::KALTURA_PROVIDER;
-		
-		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvLicenseServerUrl.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop;
-		
+
+		$cmd = $widevineExe.' -a '.$assetName.' -u '.$wvRegServerHost.' -p '.$portal.' -o '.$portal.' -t '.$inputFiles.' -d '.$destinationFile.' -g '.$gop;
+
 		KalturaLog::debug("Encrypt package command: ".$cmd);
 		
 		$cmd = $cmd.' -v '.$iv.' -k '.$key;
@@ -72,12 +74,12 @@ class KWidevineBatchHelper
 	* Send register asset request to Widevine license server
 	* If asset name is not passed call getAsset first to get asset by id
 	* 
-	* https://register.uat.widevine.com/widevine/cypherpc/sign/cgi-bin/RegisterAsset.cgi?asset=test1155&owner=kaltura&provider=name:kaltura,policy:default&replace=1
-	* https://register.uat.widevine.com/widevine/cypherpc/cgi-bin/GetAsset.cgi?asset=test537&owner=kaltura&provider=kaltura
+	* https://register.uat.widevine.com/registerasset/kaltura?asset=test1155&owner=kaltura&provider=name:kaltura,policy:default&replace=1
+	* https://register.uat.widevine.com/getasset/kaltura?asset=test537&owner=kaltura&provider=kaltura
 	*/
 	public static function sendRegisterAssetRequest(
-							$wvLicenseServerUrl, $assetName = null, $assetId = null, $portal = null, 
-							$policy = null, $licenseStartDate = null, $licenseEndDate = null, &$errorMessage)
+							$wvRegServerHost, $assetName = null, $assetId = null, $portal = null, 
+							$policy = null, $licenseStartDate = null, $licenseEndDate = null, $iv, $key, &$errorMessage)
 	{
 		$params = array();
 		
@@ -95,8 +97,15 @@ class KWidevineBatchHelper
 			$params[self::ASSET_ID] = $assetId;
 			$params[self::OWNER] = $portal;
 			$params[self::PROVIDER] = $portal;
-			
-			$response = self::sendHttpRequest($wvLicenseServerUrl, WidevinePlugin::GET_ASSET_CGI, $params);
+
+			$ptime = time();
+			$signInput = $params[self::OWNER].
+					 	 $params[self::PROVIDER].
+					 	 $ptime;
+			$sign = WidevineLicenseProxyUtils::createRequestSignature($signInput, $key, $iv);
+			$params[self::PTIME] = $ptime;
+			$params[self::SIGN] = $sign;
+			$response = self::sendHttpRequest($wvRegServerHost.WidevinePlugin::GET_ASSET_URL_PART.$portal, $params);
 			if($response[self::STATUS] == 1)
 			{
 				$assetName = $response[self::ASSET_NAME];
@@ -127,9 +136,18 @@ class KWidevineBatchHelper
 			$providerParams[self::LICSTART] = $licenseStartDate;
 		if($licenseEndDate)
 			$providerParams[self::LICEND] = $licenseEndDate;
-				
-		$response = self::sendHttpRequest($wvLicenseServerUrl, WidevinePlugin::REGISTER_ASSET_CGI, $params, $providerParams);
-		
+
+		//sign register asset request
+		$ptime = time();
+		$signInput = $params[self::ASSET_NAME].
+					 $params[self::OWNER].
+					 $providerParams[self::PROVIDER_NAME].
+					 $ptime;
+		$sign = WidevineLicenseProxyUtils::createRequestSignature($signInput, $key, $iv);
+		$params[self::PTIME] = $ptime;
+		$params[self::SIGN] = $sign;
+		$response = self::sendHttpRequest($wvRegServerHost.WidevinePlugin::REGISTER_ASSET_URL_PART.$portal, $params, $providerParams);
+
 		if($response[self::STATUS] == 1)
 		{
 			return $response[self::ASSET_ID_ADD];
@@ -140,11 +158,11 @@ class KWidevineBatchHelper
 			return false;
 		}
 	}
-	
-	private static function sendHttpRequest($wvLicenseServerUrl, $cgiUrl, $params, $providerParams = null)
+
+	private static function sendHttpRequest($wvRegServerUrl, $params, $providerParams = null)
 	{
-		$url = $wvLicenseServerUrl.$cgiUrl.'?';
-		
+		$url = $wvRegServerUrl.'?';
+
 		if($providerParams && count($providerParams))
 			$params[self::PROVIDER] = self::providerRequestEncode($providerParams);
 		$url .= http_build_query($params, '', '&');

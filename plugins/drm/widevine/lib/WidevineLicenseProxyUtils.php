@@ -46,34 +46,42 @@ class WidevineLicenseProxyUtils
 					 $requestParams[self::MK].
 					 $requestParams[self::MD].
 					 $ptime;
-		$sign = self::createRequestSignature($signInput);		
+
+
+		$key = WidevinePlugin::getWidevineConfigParam('key');
+		$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
+		$portal = WidevinePlugin::getWidevineConfigParam('portal');
+
+		KalturaLog::debug("sign input: ".$signInput);
+
+		$sign = self::createRequestSignature($signInput, $key, $iv);		
 		$requestParams[self::PTIME] = $ptime;
 		$requestParams[self::SIGN] = $sign;
-				
+
 		$overrideParams = self::getLicenseOverrideParams($overrideParamsStr, $isAdmin);
-		
+
 		$requestParams = array_merge($requestParams, $overrideParams);
-		$url = self::buildLicenseServerUrl($requestParams);
-		
-		$ch = curl_init();		
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		
-		
-		$response = curl_exec($ch);		
-		$error = curl_error($ch);
-		curl_close($ch);
-		
-		return $response;
+
+		if(!$baseUrl)
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_SERVER_URL_NOT_SET);
+
+		if(!$portal)
+			$portal = WidevinePlugin::KALTURA_PROVIDER;
+
+		$requestParams[self::PORTAL] = $portal;
+		$baseUrl .= '/'.$portal;
+
+		return self::doCurl($baseUrl, $requestParams);
 	}
-	
+
 	public static function createErrorResponse($errorCode, $assetid)
 	{
         $badResponse = pack("NN", $errorCode, $assetid);
         $response = base64_encode($badResponse);
         return $response;
 	}
-	
+
 	public static function printLicenseResponseStatus($response)
 	{
 		KalturaLog::debug("Encoded license response: ". $response);
@@ -94,11 +102,20 @@ class WidevineLicenseProxyUtils
 			KalturaLog::debug("License response status Error with code: ".$response_status_dec);
 	}
 
-	private static function getKeyBytes()
+	//this utility function used by both batch and API
+	public static function createRequestSignature($data, $key, $iv)
 	{
-		$key = WidevinePlugin::getWidevineConfigParam('key');
-		$iv = WidevinePlugin::getWidevineConfigParam('iv');
+		$digest = openssl_digest($data, "sha1", true);
+		$key_bytes = self::getKeyBytes($key, $iv);
+		if(!$key_bytes)
+			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_KEY_NOT_SET);
+		$iv = pack("H*", substr($key_bytes, 0, 32));
+    	$key = pack("H*", substr($key_bytes, 32));
+	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false, $iv);
+	}
 
+	private static function getKeyBytes($key, $iv)
+	{	
 		$key = str_replace("0x", "", $key);
 		$key = str_replace(", ", "", $key);
 
@@ -108,19 +125,6 @@ class WidevineLicenseProxyUtils
 		return $key.$iv;
 	}
 
-	protected static function createRequestSignature($data)
-	{
-		KalturaLog::debug("sign input: ".$data);
-		
-		$digest = openssl_digest($data, "sha1", true);
-		$key_bytes = self::getKeyBytes();
-		if(!$key_bytes)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_KEY_NOT_SET);
-		$iv = pack("H*", substr($key_bytes, 0, 32));
-    	$key = pack("H*", substr($key_bytes, 32));
-	   	return openssl_encrypt($digest,'aes-256-cbc',$key, false, $iv);
-	}
-	
 	protected static function getLicenseOverrideParams($overrideParamsStr, $isAdmin)
 	{
 		$overrideParams = array();
@@ -141,23 +145,24 @@ class WidevineLicenseProxyUtils
 		}	
 		return $overrideParams;
 	}
-	
-	protected static function buildLicenseServerUrl($urlParams)
+
+	protected static function doCurl($baseUrl, $requestParams)
 	{
-		$baseUrl = WidevinePlugin::getWidevineConfigParam('license_server_url');
-		if(!$baseUrl)
-			throw new KalturaWidevineLicenseProxyException(KalturaWidevineErrorCodes::LICENSE_SERVER_URL_NOT_SET);
-			
-		$portal = WidevinePlugin::getWidevineConfigParam('portal');
-		if(!$portal)
-			$portal = WidevinePlugin::KALTURA_PROVIDER;
-			
-		$urlParams[self::PORTAL] = $portal;
-		$requestUrl = $baseUrl.'?';
-		$requestUrl .= http_build_query($urlParams, '', '&');
-		
-		KalturaLog::debug("License request URL: ".$requestUrl);
-		
-		return $requestUrl;
+		$requestParamsStr = http_build_query($requestParams, '', '&');
+
+		KalturaLog::debug("License request URL: ".$baseUrl);
+		KalturaLog::debug("License request params: ".$requestParamsStr);
+
+		$ch = curl_init();		
+		curl_setopt($ch, CURLOPT_URL, $baseUrl);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch,CURLOPT_POST, count($requestParams));
+		curl_setopt($ch,CURLOPT_POSTFIELDS, $requestParamsStr);
+
+		$response = curl_exec($ch);		
+		$error = curl_error($ch);
+		curl_close($ch);
+
+		return $response;
 	}
 }

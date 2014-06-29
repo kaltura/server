@@ -74,13 +74,15 @@ class KWidevineOperationEngine extends KOperationEngine
 		}
 
 		$wvAssetId = KWidevineBatchHelper::sendRegisterAssetRequest(
-										$this->params->wvLicenseServerUrl,
+										$this->params->regServerHost,
 										$this->packageName,
 										null,
 										$this->params->portal,
 										$policy,
 										$this->data->flavorParamsOutput->widevineDistributionStartDate,
 										$this->data->flavorParamsOutput->widevineDistributionEndDate,
+										$this->params->iv, 
+										$this->params->key, 
 										$errorMessage);
 
 		if(!$wvAssetId)
@@ -106,7 +108,7 @@ class KWidevineOperationEngine extends KOperationEngine
 
 		$cmd = KWidevineBatchHelper::getEncryptPackageCmdLine(
 										$this->params->widevineExe, 
-										$this->params->wvLicenseServerUrl, 
+										$this->params->regServerHost, 
 										$this->params->iv, 
 										$this->params->key, 
 										$this->packageName, 
