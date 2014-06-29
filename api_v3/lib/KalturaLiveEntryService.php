@@ -39,7 +39,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
@@ -71,7 +71,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($target, kConf::get('content_group'));
 			chmod($target, 0640);
 		}
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $mediaServerIndex, $target, $currentDuration);
+		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $assetId, $mediaServerIndex, $target, $currentDuration);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
