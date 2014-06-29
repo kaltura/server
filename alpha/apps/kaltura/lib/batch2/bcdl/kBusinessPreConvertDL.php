@@ -1444,6 +1444,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		foreach($flavors as $index => $flavor)
 		{
+			/* @var $flavor assetParams */
+			
 			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
 			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
 				continue;
@@ -1478,7 +1480,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT)
 				continue;
 			
-			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+			if($flavor instanceof liveParams || $conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
 			{
 				unset($flavors[$index]);
 				$ingestedNeeded = true;
