@@ -98,9 +98,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$hostName = $this->getHostName();
 		
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
-		$defaultDeliveryCode = $partner->getDefaultDeliveryCode(); 
-		if($defaultDeliveryCode !== false)
-			$hostName = str_replace("{deliveryCode}", $defaultDeliveryCode, $hostName);
+		if($partner)
+		{
+			$defaultDeliveryCode = $partner->getDefaultDeliveryCode(); 
+			if($defaultDeliveryCode !== false)
+				$hostName = str_replace("{deliveryCode}", $defaultDeliveryCode, $hostName);
+		}
 		
 		return $hostName . $assetUrl;
 	}
