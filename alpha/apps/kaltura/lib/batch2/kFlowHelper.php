@@ -2332,6 +2332,16 @@ class kFlowHelper
 			return;
 		}
 
+		if ( $tempEntry->getStatus() == entryStatus::ERROR_CONVERTING )
+		{
+			$entry->setReplacementStatus(entryReplacementStatus::FAILED);
+			$entry->save();
+
+			// NOTE: KalturaEntryService::cancelReplace() must be used to reset this status and delete the temp entry
+
+			return;
+		}
+
 		switch($entry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
@@ -2345,6 +2355,10 @@ class kFlowHelper
 			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
 				$entry->setReplacementStatus(entryReplacementStatus::READY_BUT_NOT_APPROVED);
 				$entry->save();
+				break;
+
+			case entryReplacementStatus::FAILED:
+				// Do nothing. KalturaEntryService::cancelReplace() will be used to delete the entry.
 				break;
 
 			case entryReplacementStatus::NONE:
