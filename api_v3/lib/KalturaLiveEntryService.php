@@ -32,6 +32,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * 
 	 * @action appendRecording
 	 * @param string $entryId Live entry id
+	 * @param string $assetId Live asset id
 	 * @param KalturaMediaServerIndex $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
