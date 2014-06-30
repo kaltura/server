@@ -167,7 +167,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			{
 				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
 				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $entryId, $protocol);
-				if($deliveryProfile->isLive($url))
+				if($deliveryProfile && $deliveryProfile->isLive($url))
 				{
 					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
 				}
