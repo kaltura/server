@@ -209,7 +209,8 @@ class kBatchManager
 					if(!KDLWrap::CDLIsFLV($mediaInfoDb))
 					{
 						$key = array_search(flavorParams::TAG_MBR, $tagsArray);
-						unset($tagsArray[$key]);
+						if($key !== false)
+							unset($tagsArray[$key]);
 					}
 				}
 				
