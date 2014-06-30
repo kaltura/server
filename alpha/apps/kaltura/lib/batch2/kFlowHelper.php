@@ -1666,7 +1666,10 @@ class kFlowHelper
 			$partner = $dbBatchJob->getPartner();
 			if($partner && $partner->getStorageDeleteFromKaltura())
 			{
-				self::deleteAssetLocalFileSyncs($fileSync, $asset);
+				if(self::isAssetExportFinished($fileSync, $asset))
+				{
+					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
+				}
 			}
 		}
 
@@ -1689,19 +1692,57 @@ class kFlowHelper
 			return true;
 	}
 	
-	private static function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
+	private static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
 	{
-		if(self::isAssetExportFinished($fileSync, $asset))
+		$unClosedStatuses = array (
+			asset::ASSET_STATUS_QUEUED,
+			asset::ASSET_STATUS_CONVERTING,
+			asset::ASSET_STATUS_WAIT_FOR_CONVERT,
+			asset::ASSET_STATUS_EXPORTING
+		);
+		
+		$unClosedAssets = assetPeer::retrieveReadyByEntryId($asset->getEntryId(), null, $unClosedStatuses);
+		
+		if(count($unClosedAssets))
 		{
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			$asset->setFileSyncVersionsToDelete(array($fileSync->getVersion()));
+			$asset->save();
+			return;
+		}
+		
+		if(!count($unClosedAssets))
+		{
+			$assetsToDelete = assetPeer::retrieveReadyByEntryId($asset->getEntryId());
 			
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			foreach ($assetsToDelete as $assetToDelete)
+			{
+				/* @var $assetToDelete asset */
+				$versionsToDelete =  $assetToDelete->getFileSyncVersionsToDelete();
+				KalturaLog::debug("file sync versions to delete are " . print_r($versionsToDelete, true));
+				if($versionsToDelete)
+				{
+					foreach ($versionsToDelete as $version)
+						self::deleteAssetLocalFileSyncs($version, $assetToDelete);
+						
+					$assetToDelete->resetFileSyncVersionsToDelete();
+					$assetToDelete->save();
+				}
+			}
 			
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
-		}		
+			self::deleteAssetLocalFileSyncs($fileSync->getVersion(), $asset);
+		}
+	}
+	
+	private static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
+	{
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);		
 	}
 
 	/**
