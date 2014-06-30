@@ -303,32 +303,21 @@ class kBusinessPostConvertDL
 	
 		if(!$rootBatchJob || $rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
 			return $dbBatchJob;
-			
-		$childJobs = $rootBatchJob->getChildJobs();
-		KalturaLog::debug('Child jobs found [' . count($childJobs) . ']');
-		$waitingFlavorAssets = assetPeer::retrieveByEntryIdAndStatus($currentFlavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
-		KalturaLog::debug('Waiting assets found [' . count($waitingFlavorAssets) . ']');
-		
-		if(count($childJobs) > 1 && count($waitingFlavorAssets) < 1)
-		{
-			$allDone = true;
-			foreach($childJobs as $childJob)
-			{
-				if($childJob->getId() != $rootBatchJob->getId() && $childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-				{
-					KalturaLog::debug('Child job id [' . $childJob->getId() . '] status [' . $childJob->getStatus() . ']');
-					$allDone = false;
-				}
-			}
-					
-			if($allDone)
-			{
-				KalturaLog::debug('All child jobs done, closing profile');
-				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-			}
-		}
-		
-		return $dbBatchJob;
+
+        $c = new Criteria();
+        $c->add(BatchJobPeer::ID , $rootBatchJob->getId() , Criteria::NOT_EQUAL);
+        $c->add(BatchJobPeer::STATUS , BatchJob::BATCHJOB_STATUS_FINISHED ,Criteria::NOT_EQUAL);
+        $childJobs = $rootBatchJob->getChildJobs($c);
+        KalturaLog::debug('Child jobs found [' . count($childJobs) . ']');
+        $waitingFlavorAssets = assetPeer::retrieveByEntryIdAndStatus($currentFlavorAsset->getEntryId(), flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
+        KalturaLog::debug('Waiting assets found [' . count($waitingFlavorAssets) . ']');
+
+        if(!count($childJobs) && !count($waitingFlavorAssets))
+        {
+            KalturaLog::debug('All child jobs done, closing profile');
+            kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+        }
+        return $dbBatchJob;
 	}
 	
 	/**
