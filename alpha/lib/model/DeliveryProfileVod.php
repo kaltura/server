@@ -95,7 +95,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	
 	public function getFullAssetUrl(asset $asset, $tokenizeUrl = true) {
 		$assetUrl = $this->getAssetUrl($asset, $tokenizeUrl);
-		return $this->getHostName() . $assetUrl;
+		$hostName = $this->getHostName();
+		
+		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
+		$defaultDeliveryCode = $partner->getDefaultDeliveryCode(); 
+		if($defaultDeliveryCode !== false)
+			$hostName = str_replace("{deliveryCode}", $defaultDeliveryCode, $hostName);
+		
+		return $hostName . $assetUrl;
 	}
 	
 	protected function addSeekFromBytes($flavorAsset, $url, $prefix) {
