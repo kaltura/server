@@ -1013,7 +1013,6 @@ class kJobsManager
 			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $entry->getSyncKey($keyType);
-		$files = kFileSyncUtils::dir_get_files($key, false);
 		
 		$jobData = new kConvertLiveSegmentJobData();
  		$jobData->setEntryId($entry->getId());
@@ -1021,7 +1020,6 @@ class kJobsManager
 		$jobData->setMediaServerIndex($mediaServerIndex);
 		$jobData->setEndTime($endTime);
 		$jobData->setSrcFilePath($filePath);
-		$jobData->setFileIndex(count($files));
  			
 		$batchJob = null;
 		if($parentJob)
