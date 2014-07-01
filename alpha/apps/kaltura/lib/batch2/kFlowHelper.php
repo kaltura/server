@@ -311,7 +311,7 @@ class kFlowHelper
 			$recordedAssetKey = $recordedAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			kFileSyncUtils::createSyncFileLinkForKey($recordedAssetKey, $newPartKey);
 			
-			kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset, $dbBatchJob));
+			kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset));
 			return $dbBatchJob;
 		}
 		
