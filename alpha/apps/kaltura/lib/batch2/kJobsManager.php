@@ -1012,7 +1012,11 @@ class kJobsManager
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $asset->getSyncKey($keyType);
-		$files = kFileSyncUtils::dir_get_files($key, false);
+		$files = array();
+		if(kFileSyncUtils::fileSync_exists($key))
+		{
+			$files = kFileSyncUtils::dir_get_files($key, false);
+		}
 		
 		$jobData = new kConvertLiveSegmentJobData();
  		$jobData->setEntryId($asset->getEntryId());
