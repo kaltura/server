@@ -247,6 +247,8 @@ class kFlowHelper
 	 */
 	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
+		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
+		
 		$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
 		/* @var $asset liveAsset */
 		
@@ -255,8 +257,9 @@ class kFlowHelper
 		{
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 		}
-			
-		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
+		
+		$asset->incLiveSegmentVersion($keyType);
+		$asset->save();
 		
 		$newPartKey = $asset->getSyncKey($keyType);
 		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $newPartKey);
