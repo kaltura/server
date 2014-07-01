@@ -21,6 +21,11 @@ class kConvertLiveSegmentJobData extends kJobData
 	private $mediaServerIndex;
 	
 	/**
+	 * @var int
+	 */
+	private $fileIndex;
+	
+	/**
 	 * @var string
 	 */
 	private $srcFilePath;
@@ -113,6 +118,22 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function setEndTime($endTime)
 	{
 		$this->endTime = $endTime;
+	}
+	
+	/**
+	 * @return int $fileIndex
+	 */
+	public function getFileIndex()
+	{
+		return $this->fileIndex;
+	}
+
+	/**
+	 * @param int $fileIndex
+	 */
+	public function setFileIndex($fileIndex)
+	{
+		$this->fileIndex = $fileIndex;
 	}
 	
 	/**
