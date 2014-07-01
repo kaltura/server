@@ -258,7 +258,7 @@ class kFlowHelper
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 		}
 		
-		$asset->incLiveSegmentVersion($keyType);
+		$asset->incLiveSegmentVersion($data->getMediaServerIndex());
 		$asset->save();
 		
 		$newPartKey = $asset->getSyncKey($keyType);
