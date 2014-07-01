@@ -45,16 +45,24 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		$currentDuration = $dbEntry->getLengthInMsecs();
-		if(!$currentDuration)
-			$currentDuration = 0;
-		$currentDuration += ($duration * 1000);
 		
-		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		$dbAsset = assetPeer::retrieveById($assetId);
+		if (!$dbAsset || !($dbAsset instanceof liveAsset))
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
+			
+		$currentDuration = null;
+		if($dbAsset->hasTag(assetParams::TAG_SOURCE))
 		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-			$dbEntry->save();
+			$currentDuration = $dbEntry->getLengthInMsecs();
+			if(!$currentDuration)
+				$currentDuration = 0;
+			$currentDuration += ($duration * 1000);
+			
+			if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+			{
+				$dbEntry->setLengthInMsecs($currentDuration);
+				$dbEntry->save();
+			}
 		}
 			
 		$kResource = $resource->toObject();
