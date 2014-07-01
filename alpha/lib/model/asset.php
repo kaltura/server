@@ -331,7 +331,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function getSyncKey($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType($sub_type);
+		static::validateFileSyncSubType($sub_type);
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::FLAVOR_ASSET;
 		$key->object_sub_type = $sub_type;
@@ -356,7 +356,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		
 		$entry = $this->getentry();
 		if(!$entry)
@@ -395,7 +395,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFilePathArr($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		$version = (is_null($version) ? $this->getVersionForSubType($sub_type) : $version);
 		
 		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
