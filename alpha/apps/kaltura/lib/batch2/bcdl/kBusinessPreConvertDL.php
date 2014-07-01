@@ -1476,11 +1476,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
 				continue;
 			}
+		
+			if($flavor instanceof liveParams)
+			{
+				unset($flavors[$index]);
+				$ingestedNeeded = true;
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it's ingested recorded live");
+				continue;
+			}
 			
 			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT)
 				continue;
 			
-			if($flavor instanceof liveParams || $conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
 			{
 				unset($flavors[$index]);
 				$ingestedNeeded = true;
