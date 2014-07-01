@@ -256,6 +256,8 @@ class kFlowHelper
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 		}
 			
+		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
+		
 		$newPartKey = $asset->getSyncKey($keyType);
 		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $newPartKey);
 
@@ -289,15 +291,24 @@ class kFlowHelper
 			$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 			$recordedAsset->setFlavorParamsId($assetParams->getId());
 			$recordedAsset->setFromAssetParams($assetParams);
+			
 			if($assetParams->hasTag(assetParams::TAG_SOURCE))
+			{
 				$recordedAsset->setIsOriginal(true);
+			}
+			
+			if($ext)
+			{
+				$recordedAsset->setFileExt($ext);
+			}
 				
-			$recordedAsset->incrementVersion();
 			$recordedAsset->save();
 			
 			// create file sync
 			$recordedAssetKey = $recordedAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			kFileSyncUtils::createSyncFileLinkForKey($recordedAssetKey, $newPartKey);
+			
+			kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset, $dbBatchJob));
 			return $dbBatchJob;
 		}
 		
@@ -354,8 +365,16 @@ class kFlowHelper
 		$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 		$replacingAsset->setFlavorParamsId($assetParams->getId());
 		$replacingAsset->setFromAssetParams($assetParams);
+		
 		if($assetParams->hasTag(assetParams::TAG_SOURCE))
+		{
 			$replacingAsset->setIsOriginal(true);
+		}
+	
+		if($ext)
+		{
+			$replacingAsset->setFileExt($ext);
+		}
 			
 		$replacingAsset->incrementVersion();
 		$replacingAsset->save();
