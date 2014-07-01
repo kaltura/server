@@ -247,18 +247,23 @@ class kFlowHelper
 	 */
 	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
-		/* @var $entry LiveEntry */
-
-		$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
-		/* @var $asset liveAsset */
-		
-		if(!$entry)
+		$liveEntry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $liveEntry LiveEntry */
+		if(!$liveEntry)
 		{
 			KalturaLog::err("Live entry [" . $dbBatchJob->getEntryId() . "] not found");
 			return $dbBatchJob;
 		}
 		
+		$recordedEntry = entryPeer::retrieveByPKNoFilter($liveEntry->getRecordedEntryId());
+		if(!$recordedEntry)
+		{
+			KalturaLog::err("Recorded entry [" . $liveEntry->getRecordedEntryId() . "] not found");
+			return $dbBatchJob;
+		}
+
+		$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
+		/* @var $asset liveAsset */
 		if(!$asset)
 		{
 			KalturaLog::err("Live asset [" . $data->getAssetId() . "] not found");
@@ -276,7 +281,7 @@ class kFlowHelper
 		if(count($files) > 1)
 		{
 			// find replacing entry id
-			$replacingEntryId = $entry->getReplacingEntryId();
+			$replacingEntryId = $recordedEntry->getReplacingEntryId();
 			$replacingEntry = null;
 			
 			// in replacement
@@ -297,25 +302,25 @@ class kFlowHelper
 			{
 		    	$advancedOptions = new kEntryReplacementOptions();
 		    	$advancedOptions->setKeepManualThumbnails(true);
-		    	$entry->setReplacementOptions($advancedOptions);
+		    	$recordedEntry->setReplacementOptions($advancedOptions);
 		
 				$replacingEntry = new entry();
 			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
 				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-				$replacingEntry->setConversionProfileId($entry->getConversionProfileId());
-				$replacingEntry->setName($entry->getPartnerId().'_'.time());
-				$replacingEntry->setKuserId($entry->getKuserId());
-				$replacingEntry->setAccessControlId($entry->getAccessControlId());
-				$replacingEntry->setPartnerId($entry->getPartnerId());
-				$replacingEntry->setSubpId($entry->getPartnerId() * 100);
+				$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+				$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+				$replacingEntry->setKuserId($recordedEntry->getKuserId());
+				$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+				$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+				$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
 				$replacingEntry->setDefaultModerationStatus();
 				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-				$replacingEntry->setReplacedEntryId($entry->getId());
+				$replacingEntry->setReplacedEntryId($recordedEntry->getId());
 				$replacingEntry->save();
 				
-				$entry->setReplacingEntryId($replacingEntry->getId());
-				$entry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-				$entry->save();
+				$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+				$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$recordedEntry->save();
 			}
 	
 			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
