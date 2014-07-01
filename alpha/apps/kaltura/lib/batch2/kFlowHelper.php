@@ -277,7 +277,7 @@ class kFlowHelper
 		}
 		
 		$assetParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
-		$recordedAsset = assetPeer::retrieveByEntryIdAndParams($entry, $asset->getFlavorParamsId());
+		$recordedAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $asset->getFlavorParamsId());
 		
 		// is first chunk
 		if($entry->getStatus() == entryStatus::NO_CONTENT || !$recordedAsset)
