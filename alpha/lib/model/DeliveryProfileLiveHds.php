@@ -7,7 +7,7 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	}
 	
-	public function isLive ($url)
+	public function checkIsLive ($url)
 	{
 		$data = $this->urlExists($url, array('video/f4m'));
 		if (is_bool($data))
@@ -20,6 +20,7 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 			return true;
 		
 		return false;
+		
 	}
 
 	
@@ -112,10 +113,8 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 //	
 //			if($entry)
 //			{
-//				$this->params->setResponseFormat('f4m');
-//		 		
 //		 		$protocol = $this->params->getMediaProtocol();
-//		 		$baseUrl = myPartnerUtils::getCdnHost($entry->getPartnerId(), $protocol);
+//		 		$baseUrl = $this->getUrl();
 //			
 //				$parameters = array_merge(requestUtils::getRequestParams(), array(
 //					'protocol' => $protocol,

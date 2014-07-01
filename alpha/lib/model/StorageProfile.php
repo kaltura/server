@@ -28,7 +28,6 @@ class StorageProfile extends BaseStorageProfile
 	const STORAGE_DEFAULT_KALTURA_PATH_MANAGER = 'kPathManager';
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
 	
-	const CUSTOM_DATA_URL_MANAGER_PARAMS = 'url_manager_params';
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
 	const CUSTOM_DATA_READY_BEHAVIOR = 'ready_behavior';

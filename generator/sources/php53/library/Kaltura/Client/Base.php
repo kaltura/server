@@ -614,6 +614,17 @@ class Base
 		return str_replace(array('+', '/'), array('-', '_'), base64_encode($decodedKs));
 	}
 
+	protected static function aesEncrypt($key, $message)
+	{
+		return mcrypt_encrypt(
+			MCRYPT_RIJNDAEL_128,
+			substr(sha1($key, true), 0, 16),
+			$message,
+			MCRYPT_MODE_CBC,
+			str_repeat("\0", 16)	// no need for an IV since we add a random string to the message anyway
+		);
+	}
+	
 	private function hash ( $salt , $str )
 	{
 		return sha1($salt.$str);

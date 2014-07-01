@@ -95,6 +95,8 @@ class KAsyncWidevineRepositorySync extends KJobHandlerWorker
 										null,
 										$licenseStartDate,
 										$licenseEndDate,
+										$profile->iv, 
+										$profile->key, 									
 										$errorMessage);				
 		
 		if(!$wvAssetId)

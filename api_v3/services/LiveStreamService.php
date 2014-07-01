@@ -93,7 +93,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		/* @var $dbEntry LiveStreamEntry */
 				
-		if($entry->sourceType == KalturaSourceType::LIVE_STREAM)
+		if(in_array($entry->sourceType, array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			if(!$entry->conversionProfileId)
 			{
@@ -147,7 +147,32 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($dbEntry->getStreamPassword() != $token)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
-		// TODO count entries and not flavors
+		$mediaServer = $dbEntry->getMediaServer(true);
+		if($mediaServer)
+		{
+			$url = null;
+			$protocol = null;
+			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			{
+				$config = $dbEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
+				if ($config)
+				{
+					$url = $config->getUrl();
+					$protocol = $hlsProtocol;
+					break;
+				}
+			}
+			
+			if($url)
+			{
+				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+				$deliveryProfile = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $entryId, $protocol);
+				if($deliveryProfile->isLive($url))
+				{
+					throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
+				}
+			}
+		}
 		
 		// fetch current stream live params
 		$liveParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($dbEntry->getConversionProfileId());
@@ -364,7 +389,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		/* @var $liveStreamEntry LiveStreamEntry */
 	
-		if($liveStreamEntry->getSource() == KalturaSourceType::LIVE_STREAM)
+		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			return $liveStreamEntry->hasMediaServer();
 		}
@@ -388,6 +413,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $id, $protocol);
 				if($urlManager) 
 					return $urlManager->isLive($url);
+				break;
 				
 			case KalturaPlaybackProtocol::HDS:
 			case KalturaPlaybackProtocol::AKAMAI_HDS:

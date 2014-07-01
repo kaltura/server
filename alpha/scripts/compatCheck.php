@@ -221,6 +221,10 @@ function getSignedIpHeader($ipAddress)
 
 function doCurl($url, $params = array(), $files = array(), $range = null, $requestHeaders = array())
 {
+	global $extraRequestHeaders;
+	
+	$requestHeaders	= array_merge($requestHeaders, $extraRequestHeaders);
+	
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	if ($params)
@@ -721,6 +725,13 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 		{
 			print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
 			return;
+		}
+		
+		if ($compareMode == CM_BINARY && 
+			substr($resultOld, 0, 5) ==  '<?xml' && 
+			substr($resultNew, 0, 5) ==  '<?xml')
+		{
+			$compareMode = CM_XML;
 		}
 		
 		switch ($compareMode)
@@ -1355,7 +1366,7 @@ function processGZipFile($apiLogPath, LogProcessor $logProcessor)
 
 // parse the command line
 if ($argc < 5)
-	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds/uris> [<start position> [<end position> [<max tests per action>]]]\n");
+	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2/feedIds/uris> [<start position> [<end position> [<max tests per action> [<request headers]]]]\n");
 
 $serviceUrlOld = $argv[1];
 $serviceUrlNew = $argv[2];
@@ -1383,6 +1394,7 @@ if (!beginsWith(strtolower($serviceUrlNew), 'http://'))
 $startPosition = 0;
 $endPosition = 0;
 $maxTestsPerActionType = 10;
+$extraRequestHeaders = array();
 
 if ($argc > 5)
 	$startPosition = intval($argv[5]);
@@ -1390,6 +1402,8 @@ if ($argc > 6)
 	$endPosition = intval($argv[6]);
 if ($argc > 7)
 	$maxTestsPerActionType = intval($argv[7]);
+if ($argc > 8)
+	$extraRequestHeaders = explode(',', $argv[8]);
 
 // init globals
 $testedActions = array();
@@ -1420,3 +1434,5 @@ else
 	processRegularFile($apiLogPath, $logProcessor);
 
 $partnerSecretPool = null;
+
+print "Done\n";

@@ -217,7 +217,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		
 		// Input is json, output is key-value array
 		$deliveryProfileIds = $this->getElement('deliveryProfileIds')->getValue();
-		if($deliveryProfileIds != null)
+		if(!empty($deliveryProfileIds))
 			$object->deliveryProfileIds = $this->toKeyValue(json_decode($deliveryProfileIds, true));
 		
 		return $object;

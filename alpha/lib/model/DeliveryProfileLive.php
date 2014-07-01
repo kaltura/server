@@ -72,5 +72,25 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$renderer = $this->getRenderer(array($flavor));
 		return $renderer;
 	}
+	
+	public function isLive ($url) {
+		$url = $this->getTokenizedUrl($url);
+		return $this->checkIsLive($url);
+	}
+	
+	protected function getTokenizedUrl($url){
+		$urlPath = parse_url($url, PHP_URL_PATH);
+		if (!$urlPath || substr($url, -strlen($urlPath)) != $urlPath)
+			return $url;
+		$urlPrefix = substr($url, 0, -strlen($urlPath));
+		$tokenizer = $this->getTokenizer();
+		if ($tokenizer)
+			return $urlPrefix.$tokenizer->tokenizeSingleUrl($urlPath);
+		return $url;
+	}
+	
+	protected function checkIsLive($url) {
+		throw new Exception('Status cannot be determined for live stream protocol. Delivery Profile ID: '.$this->getId());
+	}
 }
 

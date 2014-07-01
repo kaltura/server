@@ -252,13 +252,12 @@ class kMrssManager
 		{
 			$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storageId, $asset->getEntryId(), PlaybackProtocol::HTTP, "https");
 			
-			if (!is_null($deliveryProfile))
+			if (is_null($deliveryProfile))
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 			else
 				$url = requestUtils::getApiCdnHost();
 
-			$cdnHost = myPartnerUtils::getCdnHost($partner->getId());
-			$url .= $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag());
+			$url .= $asset->getPlayManifestUrl($mrssParams->getPlayManifestClientTag(), $storage->getId());
 		}
 		else
 		{
@@ -267,7 +266,7 @@ class kMrssManager
 			$dynamicAttrs->setFileExtension($asset->getFileExt());
 			$urlManager->setDynamicAttributes($dynamicAttrs);
 			
-			$url = $urlManager->getHostName() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
 		}
 		
 		return $url;
@@ -294,8 +293,7 @@ class kMrssManager
 		
 		if($asset instanceof flavorAsset && $mrssParams && $mrssParams->getServePlayManifest())
 		{
-			$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
-			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($cdnHost, $mrssParams->getPlayManifestClientTag());
+			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($mrssParams->getPlayManifestClientTag(), $mrssParams->getStorageId());
 		}
 		else
 		{
@@ -430,16 +428,6 @@ class kMrssManager
 		
 		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 	
-		$urlPrefix = myPartnerUtils::getIisHost($entry->getPartnerId(), PlaybackProtocol::HTTP);
-		$iisHost = parse_url($urlPrefix, PHP_URL_HOST);
-		
-		$matches = null;
-		if(preg_match('/(https?:\/\/[^\/]+)(.*)/', $urlPrefix, $matches))
-		{
-			$urlPrefix = $matches[1];
-		}
-		$urlPrefix = rtrim($urlPrefix,'/').'/';
-		
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
 		$urlManager->initDeliveryDynamicAttributes($kalturaFileSync);
 		
@@ -450,6 +438,7 @@ class kMrssManager
 		{
 			if($kalturaFileSync)
 			{
+				$urlPrefix = $urlManager->getUrl();
 				$url = $urlManager->getFileSyncUrl($kalturaFileSync, false);
 				$mrss->addChild('ismUrl',$urlPrefix.$url);
 				return;
@@ -467,9 +456,7 @@ class kMrssManager
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($externalFileSync->getDc(), $entry->getId(), PlaybackProtocol::SILVER_LIGHT);
 			$url = $urlManager->getFileSyncUrl($externalFileSync, false);
-			$url = ltrim($url,'/');
-        	if (strpos($url, "://") !== false)
-         		$urlPrefix = '';
+			$urlPrefix = $urlManager->getUrl();
 			$mrss->addChild('ismUrl',$urlPrefix.$url);
 			return;
 		}

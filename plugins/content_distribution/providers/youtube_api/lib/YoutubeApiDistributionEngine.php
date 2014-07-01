@@ -77,6 +77,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props['commentVote'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RATINGS);
 		$props['videoRespond'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RESPONSES);
 		$props['embed'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING);		
+
+		$props['slugHeader'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALT_RAW_FILENAME);
 		
 		KalturaLog::debug("Props [" . print_r($props, true) . "]");
 
@@ -138,7 +140,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		}
 		
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
-		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath, $videoFilePath, $props, $private);
+		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath, $props, $private);
 	
 		if ($needDel == true)
 		{

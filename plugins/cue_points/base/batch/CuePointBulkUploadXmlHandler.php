@@ -9,7 +9,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	/**
 	 * @var BulkUploadEngineXml
 	 */
-	private $xmlBulkUploadEngine = null;
+	protected $xmlBulkUploadEngine = null;
 	
 	/**
 	 * @var KalturaCuePointClientPlugin

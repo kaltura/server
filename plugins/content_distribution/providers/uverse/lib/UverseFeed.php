@@ -187,7 +187,9 @@ class UverseFeed
 	public function getAssetUrl(asset $asset)
 	{
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
-		$urlManager->getFullAssetUrl($asset);
+		if($asset instanceof flavorAsset)
+			$urlManager->initDeliveryDynamicAttributes(null, $asset);
+		$url = $urlManager->getFullAssetUrl($asset);
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		return 'http://' . $url;
 	}

@@ -27,6 +27,7 @@ interface DeliveryProfileType extends BaseEnum
 	const GENERIC_HLS_MANIFEST = 25;
 	const GENERIC_HDS_MANIFEST = 26;
 	const GENERIC_SS = 27;
+	const GENERIC_RTMP = 28;
 	
 	const LEVEL3_HLS = 31;
 	const LEVEL3_HTTP = 34;

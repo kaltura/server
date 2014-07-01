@@ -113,7 +113,7 @@ executeCommandFrom("{$rootDir}/php53/tests", $config['php']['php_bin'], 'run.php
 // Python
 echo "Python\n==================\n";
 executeCommandFrom("{$rootDir}/python", $config['python']['python_bin'], 'setup.py install');
-executeCommandFrom("{$rootDir}/python/KalturaClient/TestCode", $config['python']['python_bin'], 'PythonTester.py');
+executeCommandFrom("{$rootDir}/python/KalturaClient/tests", $config['python']['python_bin'], '-m unittest discover');
 
 // Ruby
 echo "Ruby\n==================\n";

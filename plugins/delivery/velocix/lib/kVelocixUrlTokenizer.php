@@ -27,9 +27,10 @@ class kVelocixUrlTokenizer extends kUrlTokenizer
 		$t_expiry = time() + $this->window;
 		// URL encode the parameters
 		$message = "pathURI=" . rawurlencode($path);
-		if ($this->protocol == 'hds' && is_array($this->hdsPaths) && count($this->hdsPaths))
+		$paths = explode(",", $this->hdsPaths);
+		
+		if ($this->protocol == 'hds' && count($paths))
 		{
-			$paths = explode(",", $this->hdsPaths);
 			foreach ($paths as $path){
 				$path =  preg_replace('/@STREAM_NAME@/', $this->streamName, $path);
 				$message.= "&pathURI=" . rawurlencode($path);

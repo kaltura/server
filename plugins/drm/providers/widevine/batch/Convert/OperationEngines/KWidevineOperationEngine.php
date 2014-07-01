@@ -85,6 +85,8 @@ class KWidevineOperationEngine extends KOperationEngine
 										$policy,
 										$this->data->flavorParamsOutput->widevineDistributionStartDate,
 										$this->data->flavorParamsOutput->widevineDistributionEndDate,
+										$profile->iv, 
+										$profile->key, 									
 										$errorMessage);
 
 		if(!$wvAssetId)

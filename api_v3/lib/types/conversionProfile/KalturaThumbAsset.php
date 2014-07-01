@@ -54,6 +54,9 @@ class KalturaThumbAsset extends KalturaAsset
 
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
+		if(!$object_to_fill)
+			$object_to_fill = new thumbAsset();
+		
 		if (!is_null($this->thumbParamsId))
 		{
 			$dbAssetParams = assetParamsPeer::retrieveByPK($this->thumbParamsId);
@@ -64,5 +67,21 @@ class KalturaThumbAsset extends KalturaAsset
 		}
 		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
+	}
+	
+	/**
+	 * @param int $type
+	 * @return KalturaFlavorAsset
+	 */
+	static function getInstanceByType ($type = null)
+	{
+		if($type && $type != KalturaAssetType::THUMBNAIL)
+		{
+			$pluginObj = KalturaPluginManager::loadObject('KalturaThumbAsset', $type);	
+			if($pluginObj)
+				return $pluginObj;	
+		}
+		
+		return new KalturaThumbAsset();
 	}
 }

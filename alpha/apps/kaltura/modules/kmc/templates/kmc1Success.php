@@ -639,10 +639,13 @@ if (false && kConf::get('www_host') == 'www.kaltura.com'){
 		}
 		else
 		{
+			<? $playlist_uiconf_list_exist = (bool)(isset($playlist_uiconf_list) && is_array($playlist_uiconf_list) && count($playlist_uiconf_list)) ?>
 			// override the default values from the depricated ui_conf
-			ui_conf_id = <? echo $playlist_uiconf_list[0]->getId();  ?>; //48206;
-			pl_width_str = <? echo $playlist_uiconf_list[0]->getWidth();  ?>;// 660;
-			pl_height_str = <? echo $playlist_uiconf_list[0]->getHeight();  ?>;//272;
+			if (<? echo $playlist_uiconf_list_exist ? 'true' : 'false'?>){
+				ui_conf_id = <? echo $playlist_uiconf_list[0]->getId();  ?>; //48206;
+				pl_width_str = <? echo $playlist_uiconf_list[0]->getWidth();  ?>;// 660;
+				pl_height_str = <? echo $playlist_uiconf_list[0]->getHeight();  ?>;//272;
+			}
 		}
 <?php
 }

@@ -104,7 +104,7 @@ class KalturaTypeReflector
 	    	$this->_package = $commentsParser->package;
 	    	$this->_subpackage = $commentsParser->subpackage;
 	    	if (!is_null($commentsParser->permissions)) {
-	    		$this->_permissions = explode(',',$commentsParser->permissions);
+	    		$this->_permissions = explode(',',trim($commentsParser->permissions));
 	    	}
 	    }
 	}

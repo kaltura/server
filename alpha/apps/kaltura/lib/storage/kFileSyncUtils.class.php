@@ -1097,9 +1097,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$externalStorageId = $externalStorage->getId();
 		KalturaLog::debug("key [$key], externalStorage [$externalStorageId]");
 
-		$partner = PartnerPeer::retrieveByPK($externalStorage->getPartnerId());
-		$deliveryProfile = DeliveryProfilePeer::getDeliveryByPartner($partner);
 		$fileRoot = '';
+		$deliveryProfile = DeliveryProfilePeer::getRemoteDeliveryByStorageId($externalStorageId, '');
 		if($deliveryProfile)
 			$fileRoot = $deliveryProfile->getUrl();
 			

@@ -94,7 +94,7 @@ class kmc4Action extends kalturaAction
 
 		$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
 		$this->cdn_host = $this->stripProtocol( $this->cdn_url );
-		$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
+		$this->rtmp_host = kConf::get("rtmp_url");
 		$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
 
 		/** set payingPartner flag **/
@@ -153,7 +153,7 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 		
-		$this->studioUiConf = kmcUtils::getStudioUiconf();
+		$this->studioUiConf = kmcUtils::getStudioUiconf(kConf::get("studio_version"));
 		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		
@@ -164,7 +164,7 @@ class kmc4Action extends kalturaAction
 			'kmc_permissions_uiconf'	=> $this->kmc_permissions->getId(),
 			'allowed_partners'			=> $allowedPartners,
 			'kmc_secured'				=> (bool) kConf::get("kmc_secured_login"),
-			'enableLanguageMenu'		=> (bool) kConf::get("enableLanguageMenu"),
+			'enableLanguageMenu'		=> true,
 			'service_url'				=> $this->service_url,
 			'host'						=> $this->host,
 			'cdn_host'					=> $this->cdn_host,

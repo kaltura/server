@@ -33,7 +33,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	public function serveAction($streamName, $hostname = null)
 	{
 		$matches = null;
-		if(!preg_match('/^(\d_.{8})_(.+)$/', $streamName, $matches))
+		if(!preg_match('/^(\d_.{8})_(\d+)$/', $streamName, $matches))
 			throw new KalturaAPIException(WowzaErrors::INVALID_STREAM_NAME, $streamName);
 			
 		$entryId = $matches[1];
@@ -55,7 +55,7 @@ class LiveConversionProfileService extends KalturaBaseService
 			$entry = entryPeer::retrieveByPK($entryId);
 		}
 			
-		if (!$entry || $entry->getType() != KalturaEntryType::LIVE_STREAM || $entry->getSource() != KalturaSourceType::LIVE_STREAM)
+		if (!$entry || $entry->getType() != KalturaEntryType::LIVE_STREAM || !in_array($entry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		$mediaServer = null;
