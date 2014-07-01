@@ -71,19 +71,71 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 			
 		$kResource = $resource->toObject();
-		$target = $kResource->getLocalFilePath();
+		$filename = $kResource->getLocalFilePath();
 		if (!($resource instanceof KalturaServerFileResource))
 		{
-			$target = kConf::get('uploaded_segment_destination') . basename($kResource->getLocalFilePath());
-			kFile::moveFile($kResource->getLocalFilePath(), $target);
-			chgrp($target, kConf::get('content_group'));
-			chmod($target, 0640);
+			$filename = kConf::get('uploaded_segment_destination') . basename($kResource->getLocalFilePath());
+			kFile::moveFile($kResource->getLocalFilePath(), $filename);
+			chgrp($filename, kConf::get('content_group'));
+			chmod($filename, 0640);
 		}
-		kJobsManager::addConvertLiveSegmentJob(null, $dbEntry, $assetId, $mediaServerIndex, $target, $currentDuration);
+		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
+		
+	
+		if(!$dbEntry->getRecordedEntryId())
+		{
+			$this->createRecordedEntry($dbEntry);
+		}
+		
+		$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+		if($recordedEntry)
+		{
+			$this->ingestAsset($recordedEntry, $dbAsset->getFlavorParamsId(), $filename);
+		}
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
 		return $entry;
+	}
+
+	private function ingestAsset(entry $entry, $flavorParamsId, $filename)
+	{	
+		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
+		
+		// is first chunk
+		$recordedAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavorParamsId);
+		if($recordedAsset)
+		{
+			KalturaLog::debug("Asset [" . $recordedAsset->getId() . "] of flavor params id [$flavorParamsId] already exists");
+			return;
+		}
+		
+		// create asset
+		$recordedAsset = assetPeer::getNewAsset(assetType::FLAVOR);
+		$recordedAsset->setPartnerId($entry->getPartnerId());
+		$recordedAsset->setEntryId($entry->getId());
+		$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+		$recordedAsset->setFlavorParamsId($flavorParams->getId());
+		$recordedAsset->setFromAssetParams($flavorParams);
+		
+		if($flavorParams->hasTag(assetParams::TAG_SOURCE))
+		{
+			$recordedAsset->setIsOriginal(true);
+		}
+		
+		$ext = pathinfo($filename, PATHINFO_EXTENSION);
+		if($ext)
+		{
+			$recordedAsset->setFileExt($ext);
+		}
+		
+		$recordedAsset->save();
+		
+		// create file sync
+		$recordedAssetKey = $recordedAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($filename, $recordedAssetKey, true, true);
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset));
 	}
 
 	/**
@@ -119,21 +171,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		
 		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
 		{
-			$recordedEntry = new entry();
-			$recordedEntry->setType(entryType::MEDIA_CLIP);
-			$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-			$recordedEntry->setRootEntryId($entryId);
-			$recordedEntry->setName($dbEntry->getName());
-			$recordedEntry->setDescription($dbEntry->getDescription());
-			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
-			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
-			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
-			$recordedEntry->setKuserId($dbEntry->getKuserId());
-			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
-			$recordedEntry->setDefaultModerationStatus();
-			$recordedEntry->save();
-			
-			$dbEntry->setRecordedEntryId($recordedEntry->getId());
+			$this->createRecordedEntry($dbEntry);
 		}
 		
 		$dbEntry->save();
@@ -141,6 +179,32 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
 		return $entry;
+	}
+
+	/**
+	 * @param LiveEntry $dbEntry
+	 * @return entry
+	 */
+	private function createRecordedEntry(LiveEntry $dbEntry)
+	{
+		$recordedEntry = new entry();
+		$recordedEntry->setType(entryType::MEDIA_CLIP);
+		$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$recordedEntry->setRootEntryId($dbEntry->getId());
+		$recordedEntry->setName($dbEntry->getName());
+		$recordedEntry->setDescription($dbEntry->getDescription());
+		$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+		$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
+		$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+		$recordedEntry->setKuserId($dbEntry->getKuserId());
+		$recordedEntry->setPartnerId($dbEntry->getPartnerId());
+		$recordedEntry->setDefaultModerationStatus();
+		$recordedEntry->save();
+		
+		$dbEntry->setRecordedEntryId($recordedEntry->getId());
+		$dbEntry->save();
+		
+		return $recordedEntry;
 	}
 
 	/**

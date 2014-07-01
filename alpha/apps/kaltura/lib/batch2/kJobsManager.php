@@ -1000,26 +1000,27 @@ class kJobsManager
 	
 	/**
 	 * @param BatchJob $parentJob
-	 * @param LiveEntry $entry
-	 * @param string $assetId
+	 * @param liveAsset $asset
 	 * @param int $mediaServerIndex
 	 * @param string $filePath
 	 * @param float $endTime
 	 */
-	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, LiveEntry $entry, $assetId, $mediaServerIndex, $filePath, $endTime)
+	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, liveAsset $asset, $mediaServerIndex, $filePath, $endTime)
 	{
-		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
+		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
 		if($mediaServerIndex == MediaServerIndex::SECONDARY)
-			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
+			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
-		$key = $entry->getSyncKey($keyType);
+		$key = $asset->getSyncKey($keyType);
+		$files = kFileSyncUtils::dir_get_files($key, false);
 		
 		$jobData = new kConvertLiveSegmentJobData();
- 		$jobData->setEntryId($entry->getId());
- 		$jobData->setAssetId($assetId);
+ 		$jobData->setEntryId($asset->getEntryId());
+ 		$jobData->setAssetId($asset->getId());
 		$jobData->setMediaServerIndex($mediaServerIndex);
 		$jobData->setEndTime($endTime);
 		$jobData->setSrcFilePath($filePath);
+		$jobData->setFileIndex(count($files));
  			
 		$batchJob = null;
 		if($parentJob)
@@ -1029,11 +1030,11 @@ class kJobsManager
 		else
 		{
 			$batchJob = new BatchJob();
-			$batchJob->setEntryId($entry->getId());
-			$batchJob->setPartnerId($entry->getPartnerId());
+			$batchJob->setEntryId($asset->getEntryId());
+			$batchJob->setPartnerId($asset->getPartnerId());
 		}
 		
-		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectId($asset->getEntryId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_LIVE_SEGMENT);
 	}
