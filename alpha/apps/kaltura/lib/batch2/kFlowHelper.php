@@ -247,147 +247,96 @@ class kFlowHelper
 	 */
 	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		$ext = pathinfo($data->getDestFilePath(), PATHINFO_EXTENSION);
-		
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $entry LiveEntry */
+
 		$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
 		/* @var $asset liveAsset */
 		
-		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
-		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
-		{
-			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
-		}
-		
-		$asset->incLiveSegmentVersion($data->getMediaServerIndex());
-		$asset->save();
-		
-		$newPartKey = $asset->getSyncKey($keyType);
-		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $newPartKey);
-
-		if($data->getMediaServerIndex() != MediaServerIndex::PRIMARY)
-		{
-			return $dbBatchJob;
-		}
-		
-		// find live entry
-		$liveEntry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
-		/* @var $liveEntry LiveEntry */
-		
-		// find recorded entry
-		$entry = entryPeer::retrieveByPKNoFilter($liveEntry->getRecordedEntryId());
 		if(!$entry)
 		{
-			KalturaLog::err('Recorded entry [' . $liveEntry->getRecordedEntryId() . '] not found for live entry [' . $dbBatchJob->getEntryId() . ']');
+			KalturaLog::err("Live entry [" . $dbBatchJob->getEntryId() . "] not found");
 			return $dbBatchJob;
 		}
 		
-		$assetParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
-		$recordedAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $asset->getFlavorParamsId());
-		
-		// is first chunk
-		if($entry->getStatus() == entryStatus::NO_CONTENT || !$recordedAsset)
+		if(!$asset)
 		{
-			// create asset
-			$recordedAsset = assetPeer::getNewAsset(assetType::FLAVOR);
-			$recordedAsset->setPartnerId($entry->getPartnerId());
-			$recordedAsset->setEntryId($entry->getId());
-			$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
-			$recordedAsset->setFlavorParamsId($assetParams->getId());
-			$recordedAsset->setFromAssetParams($assetParams);
+			KalturaLog::err("Live asset [" . $data->getAssetId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
-			if($assetParams->hasTag(assetParams::TAG_SOURCE))
-			{
-				$recordedAsset->setIsOriginal(true);
-			}
+		$key = $asset->getSyncKey($keyType);
+		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
+		$files = kFileSyncUtils::dir_get_files($key);
+		
+		if(count($files) > 1)
+		{
+			// find replacing entry id
+			$replacingEntryId = $entry->getReplacingEntryId();
+			$replacingEntry = null;
 			
-			if($ext)
+			// in replacement
+			if($replacingEntryId)
 			{
-				$recordedAsset->setFileExt($ext);
-			}
+				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
 				
-			$recordedAsset->save();
-			
-			// create file sync
-			$recordedAssetKey = $recordedAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			kFileSyncUtils::createSyncFileLinkForKey($recordedAssetKey, $newPartKey);
-			
-			kEventsManager::raiseEvent(new kObjectAddedEvent($recordedAsset));
-			return $dbBatchJob;
-		}
-		
-		// find the existing key
-		$oldPartKey = $recordedAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-	
-		// find replacing entry id
-		$replacingEntryId = $entry->getReplacingEntryId();
-		$replacingEntry = null;
-		
-		// in replacement
-		if($replacingEntryId)
-		{
-			$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
-			
-			// check if asset already ingested
-			$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
-			if($replacingAsset)
-			{
-				KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-				return $dbBatchJob;
+				// check if asset already ingested
+				$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+				if($replacingAsset)
+				{
+					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
+					return;
+				}
 			}
-		}
-		// not in replacement
-		else
-		{
-	    	$advancedOptions = new kEntryReplacementOptions();
-	    	$advancedOptions->setKeepManualThumbnails(true);
-	    	$entry->setReplacementOptions($advancedOptions);
-	
-			$replacingEntry = new entry();
-		 	$replacingEntry->setType(entryType::MEDIA_CLIP);
-			$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-			$replacingEntry->setConversionProfileId($entry->getConversionProfileId());
-			$replacingEntry->setName($entry->getPartnerId().'_'.time());
-			$replacingEntry->setKuserId($entry->getKuserId());
-			$replacingEntry->setAccessControlId($entry->getAccessControlId());
-			$replacingEntry->setPartnerId($entry->getPartnerId());
-			$replacingEntry->setSubpId($entry->getPartnerId() * 100);
-			$replacingEntry->setDefaultModerationStatus();
-			$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
-			$replacingEntry->setReplacedEntryId($entry->getId());
-			$replacingEntry->save();
-			
-			$entry->setReplacingEntryId($replacingEntry->getId());
-			$entry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-			$entry->save();
-		}
-
-		// create asset
-		$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
-		$replacingAsset->setPartnerId($replacingEntry->getPartnerId());
-		$replacingAsset->setEntryId($replacingEntry->getId());
-		$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
-		$replacingAsset->setFlavorParamsId($assetParams->getId());
-		$replacingAsset->setFromAssetParams($assetParams);
+			// not in replacement
+			else
+			{
+		    	$advancedOptions = new kEntryReplacementOptions();
+		    	$advancedOptions->setKeepManualThumbnails(true);
+		    	$entry->setReplacementOptions($advancedOptions);
 		
-		if($assetParams->hasTag(assetParams::TAG_SOURCE))
-		{
-			$replacingAsset->setIsOriginal(true);
-		}
+				$replacingEntry = new entry();
+			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
+				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+				$replacingEntry->setConversionProfileId($entry->getConversionProfileId());
+				$replacingEntry->setName($entry->getPartnerId().'_'.time());
+				$replacingEntry->setKuserId($entry->getKuserId());
+				$replacingEntry->setAccessControlId($entry->getAccessControlId());
+				$replacingEntry->setPartnerId($entry->getPartnerId());
+				$replacingEntry->setSubpId($entry->getPartnerId() * 100);
+				$replacingEntry->setDefaultModerationStatus();
+				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+				$replacingEntry->setReplacedEntryId($entry->getId());
+				$replacingEntry->save();
+				
+				$entry->setReplacingEntryId($replacingEntry->getId());
+				$entry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$entry->save();
+			}
 	
-		if($ext)
-		{
-			$replacingAsset->setFileExt($ext);
-		}
+			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+		
+			// create asset
+			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
+			$replacingAsset->setPartnerId($replacingEntry->getPartnerId());
+			$replacingAsset->setEntryId($replacingEntry->getId());
+			$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+			$replacingAsset->setFlavorParamsId($flavorParams->getId());
+			$replacingAsset->setFromAssetParams($flavorParams);
 			
-		$replacingAsset->incrementVersion();
-		$replacingAsset->save();
+			if($flavorParams->hasTag(assetParams::TAG_SOURCE))
+			{
+				$replacingAsset->setIsOriginal(true);
+			}
+		
+			$replacingAsset->save();
 
-		$files = array(
-			kFileSyncUtils::getLocalFilePathForKey($oldPartKey),
-			kFileSyncUtils::getLocalFilePathForKey($newPartKey),
-		);
-		KalturaLog::debug("Ingesting entry [" . $replacingAsset->getId() . "]");
-		$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
+			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
+		}
 		
 		return $dbBatchJob;
 	}
