@@ -99,9 +99,26 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		$dbEntry->setMediaServer($mediaServerIndex, $hostname);
+		$dbEntry->setRedirectEntryId(null);
+		
 		if(is_null($dbEntry->getFirstBroadcast())) 
 				$dbEntry->setFirstBroadcast(time());
+		
 		$dbEntry->save();
+		
+		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
+		{
+			$recordedEntry = new entry();
+			$recordedEntry->setType(entryType::MEDIA_CLIP);
+			$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+			$recordedEntry->setRootEntryId($entryId);
+			$recordedEntry->setName($dbEntry->getName());
+			$recordedEntry->setDescription($dbEntry->getDescription());
+			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
+			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
+			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+			$recordedEntry->save();
+		}
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
@@ -134,6 +151,12 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		$dbEntry->unsetMediaServer($mediaServerIndex, $hostname);
+		
+		if(!$dbEntry->hasMediaServer() && $dbEntry->getRecordedEntryId())
+		{
+			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
+		}
+		
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
