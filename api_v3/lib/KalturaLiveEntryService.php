@@ -104,8 +104,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if(is_null($dbEntry->getFirstBroadcast())) 
 				$dbEntry->setFirstBroadcast(time());
 		
-		$dbEntry->save();
-		
 		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
 		{
 			$recordedEntry = new entry();
@@ -117,8 +115,15 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
 			$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
 			$recordedEntry->setConversionProfileId($dbEntry->getConversionProfileId());
+			$recordedEntry->setKuserId($dbEntry->getKuserId());
+			$recordedEntry->setPartnerId($dbEntry->getPartnerId());
+			$recordedEntry->setDefaultModerationStatus();
 			$recordedEntry->save();
+			
+			$dbEntry->setRecordedEntryId($recordedEntry->getId());
 		}
+		
+		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry);
