@@ -17,7 +17,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($this->getPartnerId() == Partner::BATCH_PARTNER_ID && $actionName == 'list')
 			myPartnerUtils::resetPartnerFilter('entry');
 			
-		if ($this->getPartner()->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK || $this->getPartner()->getStatus() == Partner::PARTNER_STATUS_FULL_BLOCK)
+		if (in_array($this->getPartner()->getStatus(), array (Partner::PARTNER_STATUS_CONTENT_BLOCK, Partner::PARTNER_STATUS_FULL_BLOCK)))
 		{
 			throw new kCoreException("Partner blocked", kCoreException::PARTNER_BLOCKED);
 		}
