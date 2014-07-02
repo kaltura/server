@@ -146,7 +146,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				break;
 			}
 			self::removeUnsetFields($mAux);
-			$mediaInfo->contentStreams[] = $mAux;
+			$mediaInfo->contentStreams[$stream->codec_type][] = $mAux;
 			if($copyFlag){
 				self::copyFields($mAux, $mediaInfo);
 			}
@@ -237,11 +237,29 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$mediaInfo->audioBitRate = isset($stream->bit_rate)? round($stream->bit_rate/1000,2): null;
 		$mediaInfo->audioBitRateMode; // FIXME
 		$mediaInfo->audioChannels = isset($stream->channels)? trim($stream->channels): null;
+			// mono,stereo,downmix,FR,FL,BR,BL,LFE
+		$mediaInfo->audioChannelLayout = isset($stream->channel_layout)? self::parseAudioLayout($stream->channel_layout): null;
 		$mediaInfo->audioSamplingRate = isset($stream->sample_rate)? trim($stream->sample_rate): null;
 		if ($mediaInfo->audioSamplingRate < 1000)
 			$mediaInfo->audioSamplingRate *= 1000;
 		$mediaInfo->audioResolution = isset($stream->bits_per_sample)? trim($stream->bits_per_sample): null;
+		if(isset($stream->tags) && isset($stream->tags->language)){
+			$mediaInfo->audioLanguage = trim($stream->tags->language);
+		}
 		return $mediaInfo;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $layout
+	 * @return string
+	 */
+	protected static function parseAudioLayout($layout)
+	{
+		$lout = KDLAudioLayouts::Detect($layout);
+		if(!isset($lout))
+			$lout = $layout;
+		return $lout;
 	}
 	
 	/**
@@ -262,7 +280,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param unknown_type $ffmpegBin
 	 * @param unknown_type $srcFileName
 	 * @param KalturaMediaInfo $mediaInfo
-	 * @return NULL|multitype:Ambigous <NULL, string>
+	 * @return multitype:Ambigous <NULL, string> string |NULL|multitype:Ambigous <NULL, string>
 	 */
 	public static function checkForSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, KalturaMediaInfo $mediaInfo)
 	{
@@ -285,16 +303,68 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else
 			$audDetectDur = 0;
 	
+		list($silenceDur,$blackDur) = self::checkSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, $vidDetectDur, $audDetectDur);
+		
+		switch ($blackDur){
+		case null:
+			$blackDetectMsg = null;
+			break;
+		case -1:
+			$blackDetectMsg = "black frame content for at least $vidDetectDur sec";
+			break;
+		default:
+			$blackDetectMsg = "black frame content for at least $blackDur sec";
+			break;
+		}
+		
+		switch ($silenceDur){
+		case null:
+			$silenceDetectMsg = null;
+			break;
+		case -1:
+			$silenceDetectMsg = "silent content for at least $audDetectDur sec";
+			break;
+		default:
+			$silenceDetectMsg = "silent content for at least $silenceDur sec";
+			break;
+		}
+		
+		$detectMsg = $silenceDetectMsg;
+		if(isset($blackDetectMsg))
+			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetectMsg":$blackDetectMsg;
+		
+		if(empty($detectMsg))
+			KalturaLog::log("No black frame or silent content in $srcFileName");
+		else
+			KalturaLog::log("Detected - $detectMsg, in $srcFileName");
+		
+		return array($silenceDetectMsg, $blackDetectMsg);		
+	}
+
+	/**
+	 * 
+	 * @param unknown_type $ffmpegBin
+	 * @param unknown_type $srcFileName
+	 * @param unknown_type $blackInterval
+	 * @param unknown_type $silenceInterval
+	 * @param unknown_type $detectDur
+	 * @param unknown_type $audNoiseLevel
+	 * @return NULL|multitype:Ambigous <NULL, number, unknown>
+	 */
+	public static function checkSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, $blackInterval, $silenceInterval, $detectDur=null, $audNoiseLevel=0.0001)
+	{
+		//		KalturaLog::log("checkSilentAudioAndBlackVideo(contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration)");
+	
 		/*
 		 * Set appropriate detection filters
-		 */
+		*/
 		$detectFiltersStr=null;
 		// ~/ffmpeg-2.1.3 -i /web//content/r71v1/entry/data/321/479/1_u076unw9_1_wprx637h_21.copy -vf blackdetect=d=2500 -af silencedetect=noise=0.0001:d=2500 -f null dummyfilename 2>&1
-		if($vidDetectDur>0) {
-			$detectFiltersStr = "-vf blackdetect=d=$vidDetectDur";
+		if(isset($blackInterval) && $blackInterval>0) {
+			$detectFiltersStr = "-vf blackdetect=d=$blackInterval";
 		}
-		if($audDetectDur>0) {
-			$detectFiltersStr.= " -af silencedetect=noise=0.0001:d=$audDetectDur";
+		if(isset($silenceInterval) && $silenceInterval>0) {
+			$detectFiltersStr.= " -af silencedetect=noise=$audNoiseLevel:d=$silenceInterval";
 		}
 	
 		if(empty($detectFiltersStr)){
@@ -302,11 +372,16 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			return null;
 		}
 	
+		$cmdLine = "$ffmpegBin ";
+		if(isset($detectDur) && $detectDur>0){
+			$cmdLine.= "-t $detectDur";
+		}
+		$cmdLine.= " -i $srcFileName $detectFiltersStr -nostats -f null dummyfilename 2>&1";
+		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
+	
 		/*
 		 * Execute the black/silence detection
-		 */
-		$cmdLine = "$ffmpegBin -i $srcFileName $detectFiltersStr -nostats -f null dummyfilename 2>&1";
-		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
+		*/
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
@@ -317,30 +392,33 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	
 		/*
 		 * Searce the ffmpeg printout for
-		 * - blackdetect or black_start
-		 * - silencedetect or silence_start
-		 */
-		$blackDetectMsg = null;
-		if(strstr($outputStr,"blackdetect")!=false || strstr($outputStr,"black_start")!=false) {
-			$blackDetectMsg = "black frame content for at least $vidDetectDur sec";
-			KalturaLog::log("Detected $blackDetectMsg");
-		}
-	
-		$silenceDetectMsg = null;
-		if(strstr($outputStr,"silencedetect")!=false || strstr($outputStr,"silence_start")!=false) {
-			$silenceDetectMsg = "silent content for at least $audDetectDur sec";
-			KalturaLog::log("Detected $silenceDetectMsg");
-		}
-	
-		$detectMsg = $silenceDetectMsg;
-		if(isset($blackDetectMsg))
-			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetectMsg":$blackDetectMsg;
+		* - blackdetect or black_duration
+		* - silencedetect or silence_duration
+		*/
+		$silenceDur= self::parseDetectionOutput($outputStr,"silencedetect", "silence_duration");
+		$blackDur  = self::parseDetectionOutput($outputStr,"blackdetect", "black_duration");
+		return array($silenceDur, $blackDur);
 		
-		if(empty($detectMsg))
-			KalturaLog::log("No black frame or silent content in $srcFileName");
-		else
-			KalturaLog::log("Detected - $detectMsg, in $srcFileName");
-		return array($silenceDetectMsg, $blackDetectMsg);
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $outputStr
+	 * @param unknown_type $detectString
+	 * @param unknown_type $durationString
+	 * @return NULL|number|unknown
+	 */
+	private static function parseDetectionOutput($outputStr, $detectString, $durationString)
+	{
+		if(strstr($outputStr, $detectString)==false) {
+			return null;
+		}
+		$str = strstr($outputStr, $durationString);
+		if($str==null)
+			return -1;
+		
+		sscanf($str,"$durationString:%f", $dur);
+		return $dur;
 	}
 	
 	/**

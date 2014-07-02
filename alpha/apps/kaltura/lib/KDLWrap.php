@@ -269,13 +269,13 @@ class KDLWrap
 			$flavor->setClipOffset($target->_clipStart);
 		if($target->_clipDur)
 			$flavor->setClipDuration($target->_clipDur);
-/*
+/**/
 		if(isset($target->_multiStream))
 		{
 			$toJson = json_encode($target->_multiStream);
 			$flavor->setMultiStream($toJson);
 		}
-*/
+
 		$flavor->_errors   = $flavor->_errors + $target->_errors;
 		$flavor->_warnings = $flavor->_warnings + $target->_warnings;
 		
@@ -294,6 +294,11 @@ class KDLWrap
 				$flavor->setAspectRatioProcessingMode($target->_video->_arProcessingMode);
 			if($target->_video->_forceMult16)
 				$flavor->setForceFrameToMultiplication16($target->_video->_forceMult16);
+			if(isset($target->_video->_watermarkData))
+			{
+				$toJson = json_encode($target->_video->_watermarkData);
+				$flavor->setWatermarkData($toJson);
+			}
 		}
 
 		if($target->_audio) {
@@ -376,13 +381,15 @@ class KDLWrap
 		{ 
 			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
 			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
-/*
-			$multiStream = $cdlFlavor->getMultiStream();
-			if(isset($multiStream)) {
-				$fromJson = json_decode($multiStream);
-				$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
+/**/
+			if($cdlFlavor instanceof flavorParams) {
+				$multiStream = $cdlFlavor->getMultiStream();
+				if(isset($multiStream)) {
+							//Sample json string: {"detect":"auto","audio":{"mapping":[1,2]}}
+					$fromJson = json_decode($multiStream);
+					$kdlFlavor->_multiStream = isset($fromJson)? $fromJson: null;
+				}
 			}
-*/
 		}
 		
 		$kdlFlavor->_cdlObject = $cdlFlavor;
@@ -424,6 +431,11 @@ class KDLWrap
 				$kdlFlavor->_video->_anamorphic = $cdlFlavor->getAnamorphicPixels();
 				$kdlFlavor->_video->_maxFrameRate = $cdlFlavor->getMaxFrameRate();
 				$kdlFlavor->_video->_isForcedKeyFrames = !$cdlFlavor->getIsAvoidForcedKeyFrames();
+				$watermarkData = $cdlFlavor->getWatermarkData();
+				if(isset($watermarkData)) {
+					$fromJson = json_decode($watermarkData);
+					$kdlFlavor->_video->_watermarkData = isset($fromJson)? $fromJson: null;
+				}
 			}
 			//		$flavor->_video->_dar = $api->getVideoDar();
 			if($kdlFlavor->_video->IsDataSet()==false)
@@ -530,8 +542,13 @@ class KDLWrap
 /**/
 		$contentStreams = $cdlMediaInfo->getContentStreams();
 		if(isset($contentStreams)) {
-			$fromJson = json_decode($contentStreams);
-			$medSet->_contentStreams = isset($fromJson)? $fromJson: null;
+			if(is_string($contentStreams)) {
+				$fromJson = json_decode($contentStreams);
+				$medSet->_contentStreams = isset($fromJson)? $fromJson: null;
+			}
+			else {
+				$medSet->_contentStreams = $contentStreams;
+			}
 		}
 
 		$medSet->_container->_id=$cdlMediaInfo->getContainerId();

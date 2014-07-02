@@ -44,9 +44,10 @@ class flavorParamsAction extends kalturaSystemAction
 				$newFalvorParams->setIsAvoidVideoShrinkBitrateToSource($this->editFlavorParam->getIsAvoidVideoShrinkBitrateToSource());
 				$newFalvorParams->setIsVideoFrameRateForLowBrAppleHls($this->editFlavorParam->getIsVideoFrameRateForLowBrAppleHls());
 				$newFalvorParams->setIsAvoidForcedKeyFrames($this->editFlavorParam->getIsAvoidForcedKeyFrames());
-//				$newFalvorParams->setMultiStream($this->editFlavorParam->getMultiStream());
+				$newFalvorParams->setMultiStream($this->editFlavorParam->getMultiStream());
 				$newFalvorParams->setAnamorphicPixels($this->editFlavorParam->getAnamorphicPixels());
 				$newFalvorParams->setMaxFrameRate($this->editFlavorParam->getMaxFrameRate());
+				$newFalvorParams->setWatermarkData($this->editFlavorParam->getWatermarkData());
 				$newFalvorParams->setIsDefault(false);
 				$newFalvorParams->setPartnerId(-1);
 				$newFalvorParams->save();
@@ -97,12 +98,13 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setIsAvoidVideoShrinkBitrateToSource($this->getRequestParameter("isAvoidVideoShrinkBitrateToSource",0));
 						$this->editFlavorParam->setIsVideoFrameRateForLowBrAppleHls($this->getRequestParameter("isVideoFrameRateForLowBrAppleHls",0));
 						$this->editFlavorParam->setIsAvoidForcedKeyFrames($this->getRequestParameter("isAvoidForcedKeyFrames",0));
-//						$this->editFlavorParam->setMultiStream($this->getRequestParameter("multiStream",0));
+						$this->editFlavorParam->setMultiStream($this->getRequestParameter("multiStream",0));
 						$this->editFlavorParam->setAnamorphicPixels($this->getRequestParameter("anamorphicPixels",0));
 						$this->editFlavorParam->setWidth($this->getRequestParameter("width"));
 						$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
 						$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
 						$this->editFlavorParam->setVideoBitrate($this->getRequestParameter("video-bitrate"));
+						$this->editFlavorParam->setWatermarkData($this->getRequestParameter("watermarkData",0));
 						$this->editFlavorParam->setFrameRate($this->getRequestParameter("frame-rate"));
 						$this->editFlavorParam->setMaxFrameRate($this->getRequestParameter("max-frame-rate"));
 						$this->editFlavorParam->setGopSize($this->getRequestParameter("gop-size"));
@@ -115,6 +117,7 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setConversionEnginesExtraParams($this->getRequestParameter("conversion-engines-extra-params"));
 						$this->editFlavorParam->setOperators($this->getRequestParameter("operators"));
 						$this->editFlavorParam->setEngineVersion($this->getRequestParameter("engine-version"));
+						$this->editFlavorParam->setType($this->getRequestParameter("type"));
 					}
 					
 					$this->editFlavorParam->save();

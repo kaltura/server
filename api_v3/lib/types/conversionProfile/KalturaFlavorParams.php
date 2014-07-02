@@ -155,7 +155,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 	/**
 	 * @var string;
 	 */
-//	public $multiStream;
+	public $multiStream;
 	
 	/**
 	 * @var float
@@ -189,6 +189,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	 */
 	public $videoBitrateTolerance;
 
+	/**
+	 * @var string;
+	 */
+	public $watermarkData;
+	
 	/**
 	 * @var int
 	 */
@@ -225,12 +230,13 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"isAvoidVideoShrinkFramesizeToSource",
 		"isAvoidVideoShrinkBitrateToSource",
 		"isVideoFrameRateForLowBrAppleHls",
-//		"multiStream",
+		"multiStream",
 		"anamorphicPixels",
 		"isAvoidForcedKeyFrames",
 		"maxFrameRate",
 		"videoConstantBitrate",
 		"videoBitrateTolerance",
+		"watermarkData",
 		"clipOffset",
 		"clipDuration",
 	);
