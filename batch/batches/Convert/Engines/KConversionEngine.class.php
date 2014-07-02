@@ -10,7 +10,7 @@ abstract class KConversionEngine
 	const COMMAND_SEPARATOR = "|||";
 	const COMMAND_KEY_SEPARATOR = "@@@";
 	
-	const MILTI_COMMAND_LINE_SEPERATOR = ';';
+	const MILTI_COMMAND_LINE_SEPERATOR = ';;;';
 	const FAST_START_SIGN = 'FS';
 	
 	
