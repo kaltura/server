@@ -473,15 +473,21 @@ class KalturaClientBase
 		curl_setopt($ch, CURLOPT_URL, $url);
 		if( $this->config->method == self::METHOD_POST ) {
 			curl_setopt($ch, CURLOPT_POST, 1);
+			$this->log("curl: $url&$opt");
 			if (count($files) > 0)
 			{
-				foreach($files as &$file)
-					$file = "@".$file; // let curl know its a file
+				if (version_compare(phpversion(), '5.4.0', '<')) {
+					foreach($files as &$file)
+						$file = "@".$file; // let curl know its a file
+								
+				}else{
+					$files = array('fileData' => new CurlFile($files['fileData'], null,basename($files['fileData'] )));
+				
+				}
 				curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 			}
 			else
 			{
-				$this->log("curl: $url&$opt");
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $opt);
 			}
 		}
@@ -1164,7 +1170,7 @@ class KalturaConfiguration
 	public $serviceUrl    				= "http://www.kaltura.com/";
 	public $partnerId    				= null;
 	public $format        				= 3;
-	public $clientTag 	  				= "php5:@DATE@";
+	public $clientTag 	  				= "php5:14-07-01";
 	public $curlTimeout   				= 120;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;
