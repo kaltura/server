@@ -210,7 +210,7 @@ params.fastStartCmd									= @BIN_DIR@/qt-faststart
 params.avidemuxCmd									= @BIN_DIR@/avidemux2_cli
 params.segmenterCmd									= @BIN_DIR@/segmenter
 params.pdf2SwfCmd									= @BIN_DIR@/pdf2swf
-params.ImageMagickCmd								= @BIN_DIR@/convert
+params.ImageMagickCmd								= convert
 params.ismIndexCmd									= @BIN_DIR@/ismIndex
 
 params.EncodingComUserId							= should-fail
