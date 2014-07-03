@@ -13,6 +13,9 @@ class WidevinePlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	const REGISTER_ASSET_CGI = '/widevine/cypherpc/sign/cgi-bin/RegisterAsset.cgi';
 	const GET_ASSET_CGI = '/widevine/cypherpc/cgi-bin/GetAsset.cgi';
 	
+	const REGISTER_ASSET_URL_PART = '/registerasset/';
+	const GET_ASSET_URL_PART = '/getasset/';
+	
 	//Default values
 	const KALTURA_PROVIDER = 'kaltura';
 	const DEFAULT_POLICY = 'default';
