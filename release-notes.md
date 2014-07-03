@@ -1,3 +1,13 @@
+# IX-9.19.0 #
+
+## Add ENTRY_CHANGED email notification template ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1442
+
+#### Scripts ####
+
+		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
+
 # IX-9.18.0 #
 
 ## Event Cue point support ##
@@ -34,14 +44,6 @@ In `^s/p/[-0-9]+/serveManifest/` section:
 		php deployment/base/scripts/installPlugins.php
 
 # IX-9.17.0 #
-
-## Add ENTRY_CHANGED email notification template ##
-- Issue Type: Customer request
-- Issue ID: PLAT-1442
-
-#### Scripts ####
-
-		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
 
 ## 'Content Moderator' user-role permissions fix ##
 - Issue Type: Bug fix
