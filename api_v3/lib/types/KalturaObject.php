@@ -455,7 +455,8 @@ abstract class KalturaObject
 	        $separateWords = explode(" ", $this->$propertyName);
 	        foreach ($separateWords as $word)
 	        {
-	            if (strlen($word) < $minLength)
+
+                if (mb_strlen($word,'utf-8') < $minLength)
 	            {
 	                throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
 	            }
@@ -518,10 +519,13 @@ abstract class KalturaObject
                 
 		if ($this->$propertyName instanceof KalturaNullField)
 			return;
-		                                          
-		if (strlen($this->$propertyName) > $maxLength)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
-	}
+
+
+        if (mb_strlen($this->$propertyName,'utf-8') > $maxLength)
+        {
+            throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
+        }
+    }
 	
 	public function validatePropertyMinMaxLength($propertyName, $minLength, $maxLength, $allowNull = false)
 	{
