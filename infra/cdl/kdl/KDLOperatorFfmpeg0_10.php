@@ -62,34 +62,12 @@ $fltStr = null;
 			 */
 		if(strstr($cmdStr, " -deinterlace")!=false) {
 			$cmdStr = str_replace(" -deinterlace", "", $cmdStr);
-			$fltStr = "yadif";
 		}
 		
-		if(isset($vid->_rotation)) {
-			if($vid->_rotation==180)
-				$rotStr = "vflip,hflip";
-			else if($vid->_rotation==90)
-				$rotStr = "transpose=1";
-			else if($vid->_rotation==270 || $vid->_rotation==-90)
-				$rotStr ="transpose=2";
-			if(isset($rotStr)) {
-				if(isset($fltStr))
-					$fltStr.= ",$rotStr";
-				else
-					$fltStr = " $rotStr";
-			}
-		}
-			// Letterboxing 
-		if(isset($vid->_arProcessingMode) && $vid->_arProcessingMode==2){
-			if(isset($fltStr)) 
-				$fltStr.=",";
-			$fltStr.='"scale=iw*sar*min('.$vid->_width.'/(iw*sar)\,';
-			$fltStr.=$vid->_height.'/ih):ih*min('.$vid->_width.'/(iw*sar)\,';
-			$fltStr.=$vid->_height.'/ih),pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2"';
-		}
-		
-		if(isset($fltStr)) {
-			$cmdStr.= " -vf $fltStr";
+		$filters = self::generateVideoFilters($vid);
+		if(count($filters)>0){
+			$fltStr = implode(',', $filters);
+			$cmdStr.= " -vf '$fltStr'";
 		}
 		return $cmdStr;
 	}
@@ -111,6 +89,49 @@ $fltStr = null;
 		}
 		
 		return $cmdStr;
+	}
+
+	/**
+	 * 
+	 * @param unknown_type $vid
+	 * @return multitype:string
+	 */
+	protected static function generateVideoFilters($vid)
+	{
+		/*
+		 *  The 'old' deinterlace failed to handle several HD sources.
+		 * Switched to newer 'yadif'
+		 */
+		$filters = array();
+		if($vid->_scanType!==null && $vid->_scanType>0){ // ScanType 0:progressive, 1:interlaced
+			$filters[] = "yadif";
+		}
+	
+		if(isset($vid->_rotation)) {
+			switch($vid->_rotation) {
+				case 180:
+					$filters[] = "vflip";
+					$filters[] = "hflip";
+					break;
+				case 90:
+					$filters[] = "transpose=1";
+					break;
+				case 270:
+				case -90:
+					$filters[] = "transpose=2";
+					break;
+			}
+		}
+		// Letterboxing
+		if(isset($vid->_arProcessingMode) && $vid->_arProcessingMode==2){
+			$str ='scale=iw*sar*min('.$vid->_width.'/(iw*sar)\,';
+			$str.=$vid->_height.'/ih):ih*min('.$vid->_width.'/(iw*sar)\,';
+			$str.=$vid->_height.'/ih)';
+			$filters[] = $str;
+			$filters[] = 'pad='.$vid->_width.':'.$vid->_height.':(ow-iw)/2:(oh-ih)/2';
+		}
+	
+		return $filters;
 	}
 	
 	/* ---------------------------
@@ -134,12 +155,17 @@ $fltStr = null;
     		return null;
     	
 		if(isset($target->_explicitClipDur) && $target->_explicitClipDur)
-			$dur=$target->_explicitClipDur/1000;
+			$duration=$target->_explicitClipDur/1000;
 		else if(isset($target->_clipDur) && $target->_clipDur)
-			$dur=$target->_clipDur/1000;
+			$duration=$target->_clipDur/1000;
 		else
-			$dur = $target->_container->_duration/1000;
-		$forcedKF=KDLCmdlinePlaceholders::ForceKeyframes.$dur."_$gopInSecs";
+			$duration = $target->_container->_duration/1000;
+		if($duration>7200) {
+			$forcedKF = "expr:'gte(t,n_forced*".round($gopInSecs).")'";
+		}
+		else {
+			$forcedKF = KDLCmdlinePlaceholders::ForceKeyframes.$duration."_$gopInSecs";
+		}
 		return " -force_key_frames $forcedKF";
     }
     

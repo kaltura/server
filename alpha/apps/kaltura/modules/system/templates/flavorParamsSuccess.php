@@ -72,13 +72,11 @@ if ($editFlavorParam)
 			<label for="text">AnamorphicPixels </label>
 			<input type="text" id="anamorphicPixels" name="anamorphicPixels" value="<?php echo $editFlavorParam->getAnamorphicPixels(); ?>" size="5" <?php echo $disabled; ?>/>
 			<br />
-<!--
-To activate the 'multiStream' remove the remarks from that portion
-and "" that are placed arround editFlavorParam->getMultiStream
-			<label for="multiStream">MultiStream:</label><br />
-			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?/*php echo "$editFlavorParam->getMultiStream()"*/; ?></textarea><br/>
+			<label for="watermarkData">Watermark:</label><br />
+			<textarea id="watermarkData" name="watermarkData" cols="40" rows="1" <?php echo $disabled; ?>><?php echo $editFlavorParam->getWatermarkData(); ?></textarea><br/>
 			<br />
--->
+
+
 			<label for="audio-codec"><b>Audio codec </b></label>
 			<select id="audio-codec" name="audio-codec" <?php echo $disabled; ?>>
 				<?php foreach($audioCodecs as $name => $audioCodec): ?>
@@ -98,14 +96,25 @@ and "" that are placed arround editFlavorParam->getMultiStream
 			<label for="conversion-engines"><b>Conversion engines:</b></label> <label>(Delimited with ",")</label>
 			<span style="color: white; background:white;><label for="name">.......................</label></span>
 			<label for="conversion-engines-extra-params"><b>Extra params:(Delimited with "|") </b></label>
-			
 			<br />
 			 
 			<input type="text" id="conversion-engines" name="conversion-engines" value="<?php echo $editFlavorParam->getConversionEngines(); ?>" size="60" <?php echo $disabled; ?>/>
-			<input type="text" id="conversion-engines-extra-params" name="conversion-engines-extra-params" value="<?php echo $editFlavorParam->getConversionEnginesExtraParams(); ?>" size="60" <?php echo $disabled; ?>/>
+
+			<textarea id="conversion-engines-extra-params" name="conversion-engines-extra-params" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getConversionEnginesExtraParams(); ?></textarea><br/>
+
+			<label for="operators"><b>Operators:</b></label>
+			<span style="color: white; background:white;><label for="name">......................................................................</label></span>
+			<label for="operators"><b>MultiStream:</b></label>
 			<br />
-			<label for="operators"><b>Operators:</b></label><br />
-			<textarea id="operators" name="operators" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getOperators(); ?></textarea><br/>
+			<textarea id="operators" name="operators" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getOperators(); ?></textarea>
+<!--
+To activate the 'multiStream' remove the remarks from that portion
+and "" that are placed arround editFlavorParam->getMultiStream
+			<label for="multiStream">MultiStream:</label><br />
+-->
+			<textarea id="multiStream" name="multiStream" cols="47" rows="2" <?php echo $disabled; ?>><?php echo $editFlavorParam->getMultiStream(); ?></textarea><br/>
+
+
 			<label for="sourceAssetParamsIds"><b>SourceAssetParamsIds: </b></label>
 			<input type="text" id="sourceAssetParamsIds" name="sourceAssetParamsIds" value="<?php echo $editFlavorParam->getSourceAssetParamsIds(); ?>" size="40" <?php echo $disabled; ?>/>	
 			<br />
@@ -119,6 +128,9 @@ and "" that are placed arround editFlavorParam->getMultiStream
 
 			<label for="version">Engine version </label>
 			<input type="text" id="engine-version" name="engine-version" value="<?php echo $editFlavorParam->getEngineVersion(); ?>" size="1" <?php echo $disabled; ?>/>
+
+			<label for="type">Type </label>
+			<input type="text" id="type" name="type" value="<?php echo $editFlavorParam->getType(); ?>" size="5" <?php echo $disabled; ?>/>
 
 			<br />
 			<?php if (!$disabledSave): ?>

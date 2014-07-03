@@ -111,7 +111,7 @@ class kBusinessPreConvertDL
 			
 		$errDescription = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
-		$destThumbParamsOutput = self::validateThumbAndMediaInfo($destThumbParams, $mediaInfo, $errDescription);
+		$destThumbParamsOutput = self::validateThumbAndMediaInfo($destThumbParams, $mediaInfo, $errDescription, $srcAsset);
 		
 		if($srcAsset->getType() == assetType::FLAVOR && is_null($destThumbParamsOutput->getVideoOffset()))
 		{
@@ -803,7 +803,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 * @param string $errDescription
 	 * @return thumbParamsOutput or null for fail
 	 */
-	protected static function validateThumbAndMediaInfo(thumbParams $thumbParams, mediaInfo $mediaInfo = null, &$errDescription)
+	protected static function validateThumbAndMediaInfo(thumbParams $thumbParams, mediaInfo $mediaInfo = null, &$errDescription, $srcAsset = null)
 	{
 		$thumbParamsOutput = new thumbParamsOutput();
 	
@@ -820,7 +820,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setConversionEnginesExtraParams($thumbParams->getConversionEnginesExtraParams());
 		$thumbParamsOutput->setOperators($thumbParams->getOperators());
 		$thumbParamsOutput->setEngineVersion($thumbParams->getEngineVersion());
-		$thumbParamsOutput->setFileExt('jpg');
+		$fileExt = ($srcAsset != null) ? $srcAsset->getFileExt() : null;
+		if (is_null($fileExt) || $fileExt == "") {
+			$fileExt = 'jpg';
+		}
+		$thumbParamsOutput->setFileExt($fileExt);
 		$thumbParamsOutput->setRotate($mediaInfo? $mediaInfo->getVideoRotation() : null);
 		
 		$thumbParamsOutput->setCropType($thumbParams->getCropType());

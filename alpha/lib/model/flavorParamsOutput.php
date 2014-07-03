@@ -71,4 +71,11 @@ class flavorParamsOutput extends assetParamsOutput
 	
 	public function setForceFrameToMultiplication16($v)	{$this->putInCustomData('ForceFrameToMultiplication16', $v);}
 	public function getForceFrameToMultiplication16()	{return $this->getFromCustomData('ForceFrameToMultiplication16', null, 1);}
+	
+	public function setMultiStream($v){ $this->putInCustomData('MultiStream', $v);}
+	public function getMultiStream(){return $this->getFromCustomData('MultiStream', null, null);}
+	
+	public function setWatermarkData($v){ $this->putInCustomData('WatermarkData', $v);}
+	public function getWatermarkData(){return $this->getFromCustomData('WatermarkData', null, null);}
+
 }
