@@ -54,7 +54,7 @@ class entryIndex extends BaseIndexObject
 				'name' => 'name',
 				'tags' => 'tags',
 				'categories' => 'categoriesEntryIds',
-				'flavor_params' => 'flavorParamsIds',
+				'flavor_params' => 'formatFlavorParamsIds',
 				'kshow_id' => 'kshowId',
 				'group_id' => 'groupId',
 				'description' => 'description',

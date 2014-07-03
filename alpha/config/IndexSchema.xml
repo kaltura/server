@@ -62,7 +62,7 @@
 	<field name="name" indexName="name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
 	<field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes" />
 	<field name="categories_ids" indexName="categories" getter="categoriesEntryIds" type="string" nullable="yes" matchable="yes" />
-	<field name="flavor_params_ids" indexName="flavor_params" getter="flavorParamsIds" type="string" nullable="yes" matchable="yes" />
+	<field name="flavor_params_ids" indexName="flavor_params" getter="formatFlavorParamsIds" type="string" nullable="yes" matchable="yes" />
 	<field name="kshow_id" indexName="kshow_id" type="string" nullable="yes" />
 	<field name="group_id" indexName="group_id" type="string" nullable="yes" />
 	<field name="description" indexName="description" type="string" nullable="yes" matchable="yes" />

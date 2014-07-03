@@ -3159,4 +3159,22 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			}
 		}
 	}
+	
+	public function getformatFlavorParamsIds() {
+		$flavorParamsId = $this->getFlavorParamsIds();
+		if(empty($flavorParamsId))
+			$flavorParamsId = array();
+		else 
+			$flavorParamsId = explode(",", $flavorParamsId);
+		
+		$partnerId = $this->getPartnerId();
+		return implode(",", self::formatFlavorParamsIds($flavorParamsId, $partnerId));
+	}
+	
+	public static function formatFlavorParamsIds($fps, $partnerId) {
+		$formatFPs = array();
+		foreach($fps as $fp)
+			$formatFPs[] = $partnerId . "_" . $fp;
+		return $formatFPs;
+	}
 }

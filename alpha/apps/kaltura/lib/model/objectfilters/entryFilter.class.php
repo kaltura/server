@@ -503,28 +503,6 @@ class entryFilter extends baseObjectFilter
 	}
 
 	/**
-	 * Convert the flavor params ids to indexed flavor params string
-	 * 
-	 * @param string $flavorParamsIds
-	 * @return string
-	 */
-	public function flavorParamsIdsToIndexedStrings($flavorParamsIds)
-	{ 
-		if (is_null($flavorParamsIds) || $flavorParamsIds === "") // string "0" is valid here
-			$flavorParamsIds = array();
-		else
-			$flavorParamsIds = explode(",", $flavorParamsIds);
-		kArray::trim($flavorParamsIds);
-			
-		$flavorParamsStrings = array();
-		foreach($flavorParamsIds as $flavorParamsId)
-		{
-			$flavorParamsStrings[mySearchUtils::ENTRY_FLAVOR_PARAMS_PREFIX.$flavorParamsId] = null;
-		}
-		return implode(",", array_keys($flavorParamsStrings));
-	}
-	
-	/**
 	 * Convert the duration types to indexed duration type strings
 	 * 
 	 * @param string $durationTypeIds
