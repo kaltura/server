@@ -461,7 +461,7 @@ scriptPath											= batches/CaptureThumb/KAsyncCaptureThumbExe.php
 params.localTempPath 								= @TMP_DIR@/thumb 
 params.sharedTempPath 								= @WEB_DIR@/tmp/thumb
 params.FFMpegCmd	 								= @BIN_DIR@/ffmpeg
-params.ImageMagickCmd								= @BIN_DIR@/convert
+params.ImageMagickCmd								= convert
 
 
 [KAsyncDistribute : JobHandlerWorker]
