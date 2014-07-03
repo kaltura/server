@@ -1969,6 +1969,12 @@ class kFlowHelper
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 
+		$entry = $dbBatchJob->getEntry();
+		if($entry)
+		{
+			kBusinessConvertDL::checkForPendingLiveClips($entry);
+		}
+		
 		return $dbBatchJob;
 	}
 

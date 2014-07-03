@@ -142,6 +142,15 @@ class kBusinessPostConvertDL
 		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
 		
+		if($currentFlavorAsset->getIsOriginal())
+		{
+			$entry = $currentFlavorAsset->getentry();
+			if($entry)
+			{
+				kBusinessConvertDL::checkForPendingLiveClips($entry);
+			}
+		}
+		
 		return $currentFlavorAsset;
 	}
 	
