@@ -199,15 +199,17 @@ class kBusinessConvertDL
 		{
 			/* @var $pendingMediaEntry kPendingMediaEntry */
 			
- 			if($pendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
- 			{
- 				KalturaLog::info("Pending entry [" . $pendingMediaEntry->getEntryId() . "] is pending on different dc [" . $pendingMediaEntry->getDc() . "]");
- 				continue;
- 			}
- 
 			if($pendingMediaEntry->getRequiredDuration() && $pendingMediaEntry->getRequiredDuration() > $entry->getLengthInMsecs())
 			{
 				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] required duration [" . $pendingMediaEntry->getRequiredDuration() . "] while entry duration [" . $entry->getLengthInMsecs() . "] is too short");
+				continue;
+			}
+			$liveEntry->dettachPendingMediaEntry($pendingMediaEntry->getEntryId());
+			
+			$pendingEntry = entryPeer::retrieveByPK($pendingMediaEntry->getEntryId());
+			if(!$pendingEntry)
+			{
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] not found");
 				continue;
 			}
 			
@@ -217,6 +219,11 @@ class kBusinessConvertDL
  				$sourceAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
  				$sourceAsset = array_pop($sourceAssets);
  			}
+			if(!$sourceAsset)
+			{
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] source asset not found");
+				continue;
+			}
  			/* @var $sourceAsset flavorAsset */
  			
  			$operationAttributes = new kClipAttributes();
@@ -239,9 +246,9 @@ class kBusinessConvertDL
 			
 			$errDescription = '';
  			kBusinessPreConvertDL::decideAddEntryFlavor(null, $entry->getId(), $operationAttributes->getAssetParamsId(), $errDescription, $targetAsset->getId(), array($operationAttributes));
- 			
-			$liveEntry->dettachPendingMediaEntry($pendingMediaEntry->getEntryId());
 		}
+		
+		$liveEntry->save();
 	}
 
 	private static function createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, $fileSyncSubType)
