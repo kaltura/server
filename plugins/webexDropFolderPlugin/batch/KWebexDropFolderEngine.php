@@ -56,7 +56,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		}
 		
-		if ($this->dropFolder->fileDeletePolicy == KalturaDropFolderFileDeletePolicy::AUTO_DELETE)
+		if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
 		{
 			$this->purgeFiles ($dropFolderFilesMap);
 		}
