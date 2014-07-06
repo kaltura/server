@@ -297,13 +297,15 @@ class KalturaEntryService extends KalturaBaseService
 		$offset = null;
 		$duration = null;
 		$requiredDuration = null;
-		
+		$clipAttributes = null;
 		if(is_array($operationAttributes))
 		{
 			foreach($operationAttributes as $operationAttributesItem)
 			{
 				if($operationAttributesItem instanceof kClipAttributes)
 				{
+					$clipAttributes = $operationAttributesItem;
+					
 					// convert milliseconds to seconds
 					$offset = $operationAttributesItem->getOffset() / 1000;
 					$duration = $operationAttributesItem->getDuration() / 1000;
@@ -315,7 +317,7 @@ class KalturaEntryService extends KalturaBaseService
 		$dbLiveEntry = $resource->getEntry();
 		$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
 		
-		if($requiredDuration || !$dbRecordedEntry)
+		if(!$dbRecordedEntry || ($requiredDuration && $requiredDuration > $dbRecordedEntry->getDuration()))
 		{
 			$mediaServer = $dbLiveEntry->getMediaServer(true);
 			if(!$mediaServer)
@@ -380,8 +382,19 @@ class KalturaEntryService extends KalturaBaseService
 			throw $e;
 		}
 		
-		if($isNewAsset)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+
+		if($requiredDuration)
+		{
+		$offset = null;
+		$duration = null;
+			$errDescription = '';
+ 			kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $clipAttributes->getAssetParamsId(), $errDescription, $dbAsset->getId(), array($clipAttributes));
+		}
+		else
+		{
+			if($isNewAsset)
+				kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		}
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		return $dbAsset;
