@@ -268,7 +268,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	private function onEntryStatusChanged( $entry )
 	{
-		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryId($entry->getId());
+		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryAndPartnerIds($entry->getId(), $entry->getPartnerId());
 		$dropFolderIdToDropFolderCache = array();
 
 		$entryStatus = $entry->getStatus();
