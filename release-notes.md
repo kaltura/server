@@ -1,3 +1,13 @@
+# IX-9.19.0 #
+
+## Add ENTRY_CHANGED email notification template ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1442
+
+#### Scripts ####
+
+		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
+
 # IX-9.18.0 #
 
 ## Event Cue point support ##

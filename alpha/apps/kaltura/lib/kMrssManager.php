@@ -171,6 +171,8 @@ class kMrssManager
 		$media->addChild('mediaType', $entry->getMediaType());
 		$media->addChild('duration', $entry->getLengthInMsecs());
 		$media->addChild('flavorParamsIds', $entry->getFlavorParamsIds());
+		$media->addChild('plays', $entry->getPlays());
+		$media->addChild('views', $entry->getViews());
 	}
 	
 	

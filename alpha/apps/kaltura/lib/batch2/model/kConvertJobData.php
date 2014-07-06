@@ -5,7 +5,7 @@
  */
 class kConvertJobData extends kConvartableJobData
 {
-	const CONVERSION_MILTI_COMMAND_LINE_SEPERATOR = ';';
+	const CONVERSION_MILTI_COMMAND_LINE_SEPERATOR = ';;;';
 	const CONVERSION_FAST_START_SIGN = 'FS';
 	const MIGRATION_FLAVOR_PRIORITY = 10;
 
