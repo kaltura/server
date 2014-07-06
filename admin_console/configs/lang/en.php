@@ -1058,8 +1058,9 @@ return array(
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
 
-	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic',
-	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::MANUAL_DELETE' => 'Manual',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY' => 'Automatic deletion when entry is ready',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic deletion after import',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::MANUAL_DELETE' => 'Manual deletion',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW' => 'Add as new',
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_ADD_AS_NEW' => 'Match existing or add as new',
