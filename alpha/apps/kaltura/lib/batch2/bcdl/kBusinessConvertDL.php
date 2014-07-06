@@ -240,7 +240,7 @@ class kBusinessConvertDL
 			kFileSyncUtils::createSyncFileLinkForKey($targetSyncKey, $sourceSyncKey);
 			
 			$errDescription = '';
- 			kBusinessPreConvertDL::decideAddEntryFlavor(null, $entry->getId(), $operationAttributes->getAssetParamsId(), $errDescription, $targetAsset->getId(), $operationAttributes);
+ 			kBusinessPreConvertDL::decideAddEntryFlavor(null, $entry->getId(), $operationAttributes->getAssetParamsId(), $errDescription, $targetAsset->getId(), array($operationAttributes));
 		}
 	}
 
