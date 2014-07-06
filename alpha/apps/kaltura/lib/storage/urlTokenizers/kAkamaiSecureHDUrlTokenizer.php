@@ -250,9 +250,8 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		
 		$acl = $matches[0];
 
-		$customPostfixesArray = $this->customPostfixes ? explode(',', $this->customPostfixes) : array();
 		// strip manifest postfixes that should not be signed from the acl
-		$postfixes = array_merge($customPostfixesArray , array('/master.m3u8', '/manifest.f4m'));
+		$postfixes =  $this->customPostfixes ? explode(',', $this->customPostfixes) : array('/master.m3u8', '/manifest.f4m');
 		foreach ($postfixes as $postfix)
 			if (substr($acl, -strlen($postfix)) == $postfix)
 				$acl = substr($acl, 0, -strlen($postfix));		
