@@ -113,6 +113,27 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 	}
 
+	protected function getPlayServerUrl($manifestUrl)
+	{
+		$entryId = $this->params->getEntryId();
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			KalturaLog::err("Entry [$entryId] not found");
+			return $manifestUrl;
+		}
+		
+		$partnerId = $entry->getPartnerId();
+		$playServerHost = myPartnerUtils::getPlayServerHost($partnerId, $this->params->getMediaProtocol());
+		
+		$url = "$playServerHost/manifest/master/entryId/$entryId";
+		if(count($this->params->getPlayerConfig()))
+			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
+			
+		// TODO encrypt the manifest URL
+		return "$url?url=$manifestUrl";
+	}
+	
 	public function compareFlavors($a, $b) 
 	{
 	    if ($a['bitrate'] == $b['bitrate']) {
@@ -124,7 +145,18 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	/* (non-PHPdoc)
 	 * @see DeliveryProfileLive::serve()
 	 */
-	public function serve($baseUrl, $backupUrl) 
+	public final function serve($baseUrl, $backupUrl) 
+	{
+		if($this->params->getUsePlayServer())
+		{
+			$baseUrl = $this->getPlayServerUrl($baseUrl);
+			$backupUrl = null;
+		}
+		
+		return $this->doServe($baseUrl, $backupUrl);
+	}
+
+	protected function doServe($baseUrl, $backupUrl) 
 	{
 		if(!$backupUrl)
 		{

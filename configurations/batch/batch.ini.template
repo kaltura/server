@@ -140,7 +140,7 @@ params.minutesOld 									= 2880
 id													= 16
 friendlyName										= Recorded Media Cleanup
 params.path											= @WOWZA_DIR@/content/
-params.pattern										= *
+params.pattern										= *.*
 params.minutesOld 									= 2880
 
 [KAsyncDbCleanup : PeriodicWorker]

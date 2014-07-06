@@ -86,6 +86,16 @@ class DeliveryProfileDynamicAttributes {
 	protected $mediaProtocol = PlaybackProtocol::HTTP;
 	
 	/**
+	 * @var boolean
+	 */
+	protected $usePlayServer = false;
+	
+	/**
+	 * @var string
+	 */
+	protected $playerConfig = null;
+	
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -296,6 +306,38 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
+	 * @return the $usePlayServer
+	 */
+	public function getUsePlayServer()
+	{
+		return $this->usePlayServer;
+	}
+
+	/**
+	 * @return the $playerConfig
+	 */
+	public function getPlayerConfig()
+	{
+		return $this->playerConfig;
+	}
+
+	/**
+	 * @param boolean $usePlayServer
+	 */
+	public function setUsePlayServer($usePlayServer)
+	{
+		$this->usePlayServer = $usePlayServer;
+	}
+
+	/**
+	 * @param string $playerConfig
+	 */
+	public function setPlayerConfig($playerConfig)
+	{
+		$this->playerConfig = $playerConfig;
+	}
+
+	/**
 	 * @param array<asset|assetParams> $flavors
 	 * @return array
 	 */
@@ -329,6 +371,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->seekFromTime = $newObj->getSeekFromTime();
 		$this->clipTo = $newObj->getClipTo();
 		$this->storageId = $newObj->getStorageId();
+		$this->entryId = $newObj->getEntryId();
 		$this->tags = $newObj->getTags();
 		$this->flavorAssets = $newObj->getFlavorAssets();
 		$this->remoteFileSyncs = $newObj->getRemoteFileSyncs();
@@ -336,6 +379,8 @@ class DeliveryProfileDynamicAttributes {
 		$this->preferredBitrate = $newObj->getPreferredBitrate();
 		$this->responseFormat = $newObj->getResponseFormat();
 		$this->mediaProtocol = $newObj->getMediaProtocol();
+		$this->usePlayServer = $newObj->getUsePlayServer();
+		$this->playerConfig = $newObj->getPlayerConfig();
 	}
 }
 
