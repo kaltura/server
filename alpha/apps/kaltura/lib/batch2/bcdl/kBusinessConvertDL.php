@@ -211,12 +211,10 @@ class kBusinessConvertDL
 				continue;
 			}
 			
-			$liveEntry->dettachPendingMediaEntry($pendingMediaEntry->getEntryId());
-			
-			$sourceAsset = assetPeer::retrieveOriginalByEntryId($pendingMediaEntry->getEntryId());
+			$sourceAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
  			if(!$sourceAsset)
  			{
- 				$sourceAssets = assetPeer::retrieveReadyFlavorsByEntryId($pendingMediaEntry->getEntryId());
+ 				$sourceAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
  				$sourceAsset = array_pop($sourceAssets);
  			}
  			/* @var $sourceAsset flavorAsset */
@@ -241,6 +239,8 @@ class kBusinessConvertDL
 			
 			$errDescription = '';
  			kBusinessPreConvertDL::decideAddEntryFlavor(null, $entry->getId(), $operationAttributes->getAssetParamsId(), $errDescription, $targetAsset->getId(), array($operationAttributes));
+ 			
+			$liveEntry->dettachPendingMediaEntry($pendingMediaEntry->getEntryId());
 		}
 	}
 
