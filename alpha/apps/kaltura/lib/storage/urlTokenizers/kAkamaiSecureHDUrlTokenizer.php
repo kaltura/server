@@ -233,6 +233,11 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 * @var string
 	 */
 	protected $aclPostfix;
+
+	/**
+	 * @var string
+	 */
+	protected $customPostfixes;
 	
 	/**
 	 * @param string $url
@@ -244,9 +249,10 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 			return $url;
 		
 		$acl = $matches[0];
-		
+
+		$customPostfixesArray = $this->customPostfixes ? explode(',', $this->customPostfixes) : array();
 		// strip manifest postfixes that should not be signed from the acl
-		$postfixes = array('/master.m3u8', '/manifest.f4m');
+		$postfixes = array_merge($customPostfixesArray , array('/master.m3u8', '/manifest.f4m'));
 		foreach ($postfixes as $postfix)
 			if (substr($acl, -strlen($postfix)) == $postfix)
 				$acl = substr($acl, 0, -strlen($postfix));		
@@ -284,6 +290,13 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	}
 
 	/**
+	 * @return the $customPostfixes
+	 */
+	public function getCustomPostfixes() {
+		return $this->customPostfixes;
+	}
+
+	/**
 	 * @param string $param
 	 */
 	public function setParamName($paramName) {
@@ -297,6 +310,11 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		$this->aclPostfix = $aclPostfix;
 	}
 
-	
-	
+	/**
+	 * @return the $customPostfixes
+	 */
+	public function setCustomPostfixes($customPostfixes) {
+		return $this->customPostfixes = $customPostfixes;
+	}
+
 }
