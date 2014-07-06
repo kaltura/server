@@ -227,8 +227,8 @@ class kBusinessConvertDL
  			/* @var $sourceAsset flavorAsset */
  			
  			$operationAttributes = new kClipAttributes();
- 			$operationAttributes->setOffset($pendingMediaEntry->getOffset());
- 			$operationAttributes->setDuration($pendingMediaEntry->getDuration());
+ 			$operationAttributes->setOffset($pendingMediaEntry->getOffset() * 1000);
+ 			$operationAttributes->setDuration($pendingMediaEntry->getDuration() * 1000);
  			
 			$targetAsset = assetPeer::retrieveOriginalByEntryId($pendingMediaEntry->getEntryId());
 			if(!$targetAsset)
