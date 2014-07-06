@@ -210,7 +210,7 @@ params.fastStartCmd									= @BIN_DIR@/qt-faststart
 params.avidemuxCmd									= @BIN_DIR@/avidemux2_cli
 params.segmenterCmd									= @BIN_DIR@/segmenter
 params.pdf2SwfCmd									= @BIN_DIR@/pdf2swf
-params.ImageMagickCmd								= @BIN_DIR@/convert
+params.ImageMagickCmd								= convert
 params.ismIndexCmd									= @BIN_DIR@/ismIndex
 
 params.EncodingComUserId							= should-fail
@@ -372,9 +372,6 @@ params.emailId										= @PROVISION_PROVIDE_EMAIL_ID@
 params.primaryContact								= @PROVISION_PROVIDE_PRIMARY_CONTACT@
 params.secondaryContact								= @PROVISION_PROVIDE_SECONDARY_CONTACT@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
-params.restapi.velocixApiBaseServiceUrl				= "http://cmin.live.cdn.antel.net.uy:82"
-params.restapi.velocixPlaybackHost					= "live.cdn.antel.net.uy"
-params.restapi.velocixPublishHost					= "cmin.live.cdn.antel.net.uy"
 params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
@@ -392,7 +389,6 @@ minCreatedAtMinutes									= 10080
 params.wsdlUsername									= @PROVISION_PROVIDE_USER@
 params.wsdlPassword									= @PROVISION_PROVIDE_PASS@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
-params.restapi.velocixApiBaseServiceUrl				= "http://cmin.live.cdn.antel.net.uy:82"
 params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
@@ -465,7 +461,7 @@ scriptPath											= batches/CaptureThumb/KAsyncCaptureThumbExe.php
 params.localTempPath 								= @TMP_DIR@/thumb 
 params.sharedTempPath 								= @WEB_DIR@/tmp/thumb
 params.FFMpegCmd	 								= @BIN_DIR@/ffmpeg
-params.ImageMagickCmd								= @BIN_DIR@/convert
+params.ImageMagickCmd								= convert
 
 
 [KAsyncDistribute : JobHandlerWorker]

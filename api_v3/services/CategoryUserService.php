@@ -294,7 +294,10 @@ class CategoryUserService extends KalturaBaseService
 			
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get categoryUser of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
-				
+
+			// in case of more than one deleted kusers - get the last one
+			$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
+
 			$kuser = kuserPeer::doSelectOne($c);
 			kuserPeer::setUseCriteriaFilter(true);
 			
