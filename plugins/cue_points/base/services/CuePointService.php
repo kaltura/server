@@ -217,14 +217,11 @@ class CuePointService extends KalturaBaseService
 			$filter->entryIdEqual = null;
 			$filter->entryIdIn = implode ( ',', $entryIds );
 		}
-			
-		
-		
+
 		$cuePointFilter = $filter->toObject();
-		
 		$cuePointFilter->attachToCriteria($c);
-		if ($pager)
-			$pager->attachToCriteria($c);
+
+		$pager->attachToCriteria($c);
 			
 		$list = CuePointPeer::doSelect($c);
 		
