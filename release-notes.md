@@ -10,6 +10,7 @@
 
 ## Watermark support ##
 - Issue Type: PLAT-1510
+
 #### Objective:
 To provide static watermark support. The watermark definitions will be defined on a specific flavor params, and will be applied to all assets generated with this flavor.
 
