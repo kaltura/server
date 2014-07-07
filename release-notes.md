@@ -43,15 +43,15 @@ Currently supported - ‘audio surround layout’. If detected, the FR and FL st
 #### Configuration structure
 - detect - (optional),
 
-* * ‘auto’ - use internal logic to detect the source stream layout. All other fields are ignored.
-* * TBD - hinting the detection logic of the source stream layout (for example - ‘languages’,’surround’)
+- - ‘auto’ - use internal logic to detect the source stream layout. All other fields are ignored.
+- - TBD - hinting the detection logic of the source stream layout (for example - ‘languages’,’surround’)
 - audio (optional) - description of either a single target audio stream or an array of target audio streams -
 
--- mapping - array of input streams to be mapped in. ffmpeg style multi file source mapping notation might be used (aka. lecture-captured files, not-implemented)
+- - mapping - array of input streams to be mapped in. ffmpeg style multi file source mapping notation might be used (aka. lecture-captured files, not-implemented)
 
--- action - (optional) required processing action
---- ‘merge’ (default)
---- ‘concat’ (optional,not-implemented)
+- - action - (optional) required processing action
+- -- ‘merge’ (default)
+- -- ‘concat’ (optional,not-implemented)
 - output (optional,not-implemented) - output stream mapping
 - video (optional, not-implemented)
 
