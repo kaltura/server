@@ -10,7 +10,6 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 		$updatedServers = array();
 		if(array_key_exists('mediaServers', $customData)) {
 			$updatedServers =  array_keys($customData['mediaServers']);
-			KalturaLog::err("@_!! " . print_r($customData['mediaServers'], true));
 		}
 
 		$mediaServersInfo = $object->getMediaServers();
