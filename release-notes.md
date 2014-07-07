@@ -27,7 +27,34 @@ Added 'watermarkData' field to flavor params object (stored in a customData). Th
 The combination of transparent waternark with opacity does not work properly.
 
 #### Sample watermark setup:
-{"imageEntry":"0_yn0vivhl","margins":"-100x10","opacity":"0.5","scale":"x250"}
+{"imageEntry":"0_yn0vivhl","margins":"-100x10","opacity":"0.5","scale":"0x250"}
+
+## Mutli-audio stream support ##
+- Issue Type: PLAT-1510
+
+#### Objective:
+To support input multi-stream detection and mapping.
+
+#### Description:
+Using an existing (but unused) flavorParams::multiStream field to store an optional configuration structure as a JSON string.
+If omitted ‘layout detection logic’ is used to detect whether it has a ‘known layout’.
+Currently supported - ‘audio surround layout’. If detected, the FR and FL streams are merged into a stereo source stream.
+
+#### Configuration structure
+- detect - (optional),
+-- ‘auto’ - use internal logic to detect the source stream layout. All other fields are ignored.
+-- TBD - hinting the detection logic of the source stream layout (for example - ‘languages’,’surround’)
+- audio (optional) - description of either a single target audio stream or an array of target audio streams -
+-- mapping - array of input streams to be mapped in. ffmpeg style multi file source mapping notation might be used (aka. lecture-captured files, not-implemented)
+-- action - (optional) required processing action
+--- ‘merge’ (default)
+--- ‘concat’ (optional,not-implemented)
+- output (optional,not-implemented) - output stream mapping
+- video (optional, not-implemented)
+
+#### Sample multi-stream configuration stream:
+{"audio":{"mapping":[1,2]}}
+
 
 # IX-9.18.0 #
 
