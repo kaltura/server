@@ -8,6 +8,17 @@
 
 		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
 
+## Watermark support ##
+Objective:
+	To provide static watermark support. The watermark definitions will be defined on a specific flavor params, and will be applied to all assets generated with this flavor.
+- Issue Type: Customer Request
+- Issue ID: PLAT-1442
+
+#### Scripts ####
+
+		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
+
+
 # IX-9.18.0 #
 
 ## Event Cue point support ##
