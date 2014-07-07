@@ -12,6 +12,20 @@
 Objective:
 
 To provide static watermark support. The watermark definitions will be defined on a specific flavor params, and will be applied to all assets generated with this flavor.
+
+Description:
+​​Added 'watermarkData' field to flavor params object (stored in a customData). This field will store following structure as a JSON string:
+imageEntry - (optional),an image entry that will be used as a watermark image. Supported - PNG and JPG. Transparent alpha layer (PNG only) is supported.
+url - (optional), external url for the watermark image file. Formats same as above. Either 'imageEntry' or 'url' must be provided
+margins - (optional), 'WxH', distance from the video frame borders. Positive numbers refer to LeftUp corner, negative to RightDown corner of the video frame. If omitted - LeftUp is assumed. (Example - '-100x10'- 100pix from right side, 10 pixs from the upper side)
+opacity -  (optional) - 0-1.0 range. Defines the blending level between the watermark image and the video frame. if omitted teh watermark is presented un-blended.
+scale - (optional), 'WxH' - scale the water mark image to the given size. If one of the dimensions is omitted, it is calculated to preserve the watermark image aspect ratio.
+​Limitations:
+​The combination of transparent waternark with opacity does not work properly.
+
+​Sample watermark setup:
+​
+{"imageEntry":"0_yn0vivhl","margins":"-100x10","opacity":"0.5","scale":"x250"}
 - Issue Type: Customer Request
 - Issue ID: PLAT-1442
 
