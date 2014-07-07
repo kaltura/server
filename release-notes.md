@@ -52,7 +52,7 @@ Currently supported - ‘audio surround layout’. If detected, the FR and FL st
 -   -- action - (optional) required processing action
 -   --- ‘merge’ (default)
 -   --- ‘concat’ (optional,not-implemented)
--   --output (optional,not-implemented) - output stream mapping
+-   -- output (optional,not-implemented) - output stream mapping
 - video (optional, not-implemented)
 
 #### Sample multi-stream configuration stream:
