@@ -8,6 +8,24 @@
 
 		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
 
+## Live Cue-Point support ##
+Support cue-point on absolute server time stamp.
+
+
+## Live recording optimization ##
+Record all live assets and manage the recording on the API server side.
+
+- Issue ID: PLAT-1367
+- Issue ID: PLAT-1274
+- Issue ID: PLAT-1476
+- Issue ID: SUP-2202
+
+#### Configuration Files ####
+- `base.ini` already changed to support `max_live_recording_duration_hours` of 24 hours.
+
+#### Media-Server version ####
+- New media-server version [3.0.9](https://github.com/kaltura/media-server/releases/download/rel-3.0.9/KalturaWowzaServer-3.0.9.jar "3.0.9") required. 
+
 # IX-9.18.0 #
 
 ## Event Cue point support ##
