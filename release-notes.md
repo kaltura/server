@@ -9,6 +9,7 @@
 		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
 
 ## Watermark support ##
+- Issue Type: PLAT-1510
 #### Objective:
 To provide static watermark support. The watermark definitions will be defined on a specific flavor params, and will be applied to all assets generated with this flavor.
 
@@ -26,7 +27,6 @@ The combination of transparent waternark with opacity does not work properly.
 
 #### Sample watermark setup:
 {"imageEntry":"0_yn0vivhl","margins":"-100x10","opacity":"0.5","scale":"x250"}
-- Issue Type: Customer Request
 
 # IX-9.18.0 #
 
