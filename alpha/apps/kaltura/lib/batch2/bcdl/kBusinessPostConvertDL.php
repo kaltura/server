@@ -310,9 +310,12 @@ class kBusinessPostConvertDL
 			}
 			else
 			{
-			    // mark the context root job as finished only if all conversion jobs are completed
-    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-    			
+				if($currentFlavorAsset->getIsOriginal() || !$currentFlavorAsset->getentry()->getReplacedEntryId())
+				{
+				    // mark the context root job as finished only if all conversion jobs are completed
+	    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
+				}
+				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}
