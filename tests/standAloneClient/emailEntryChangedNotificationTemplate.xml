@@ -106,21 +106,21 @@
 						<key>owner_name</key>
 						<description>Account owner name</description>
 						<value objectType="KalturaEvalStringField">
-						<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>owner_email</key>
 						<description>Account owner email</description>
 						<value objectType="KalturaEvalStringField">
-						<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getAdminEmail() : ''</code>
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getAdminEmail() : ''</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>creator_name</key>
 						<description>Entry creator name</description>
 						<value objectType="KalturaEvalStringField">
-						<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+							<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
