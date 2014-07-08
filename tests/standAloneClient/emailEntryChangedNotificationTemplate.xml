@@ -25,12 +25,42 @@
 						<description>Entry metadata changed, columns defined in modified_columns parameter</description>
 						<modifiedColumns>{modified_columns}</modifiedColumns>
 					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>only non-temporary entries</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getEvent()->getObject()->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM </code>
+						</field>
+					</item>	
 				</eventConditions>
 				<format>1</format>
 				<subject>[Kaltura] - Entry metadata changed</subject>
 				<body>Entry with ID {entry_id} NAME {entry_name} metadata changed.</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationStaticRecipientProvider">
+					<emailRecipients objectType="array">			
+						<item objectType = "KalturaEmailNotificationRecipient">
+							<email objectType="KalturaStringValue">
+								<value>{creator_email}</value>
+							</email>
+							<name objectType="KalturaStringValue">
+								<value>{creator_name}</value>
+							</name>
+						</item>
+					</emailRecipients>
+				</to>
+				<cc objectType="KalturaEmailNotificationStaticRecipientProvider">
+					<emailRecipients objectType="array">
+						<item objectType = "KalturaEmailNotificationRecipient">
+							<email objectType="KalturaStringValue">
+								<value>{owner_email}</value>
+							</email>
+							<name objectType="KalturaStringValue">
+								<value>{owner_name}</value>
+							</name>
+						</item>
+					</emailRecipients>
+				</cc>
 				<bcc objectType="KalturaEmailNotificationStaticRecipientProvider">
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
@@ -70,6 +100,34 @@
 						<description>Entry name</description>
 						<value objectType="KalturaEvalStringField">
 							<code>$scope->getEvent()->getObject()->getName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_name</key>
+						<description>Account owner name</description>
+						<value objectType="KalturaEvalStringField">
+						<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>owner_email</key>
+						<description>Account owner email</description>
+						<value objectType="KalturaEvalStringField">
+						<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getAdminEmail() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_name</key>
+						<description>Entry creator name</description>
+						<value objectType="KalturaEvalStringField">
+						<code>$scope->getEvent()->getObject()->getkuser()->getFirstName() . ' ' . $scope->getEvent()->getObject()->getkuser()->getLastName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>creator_email</key>
+						<description>Entry creator email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getkuser()->getEmail()</code>
 						</value>
 					</item>
 				</contentParameters>
@@ -181,4 +239,3 @@
 		</request>
 </multirequest>
 </xml>
-	
