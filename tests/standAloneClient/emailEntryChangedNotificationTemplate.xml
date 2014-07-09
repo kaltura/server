@@ -65,10 +65,10 @@
 					<emailRecipients objectType="array">
 						<item objectType = "KalturaEmailNotificationRecipient">
 							<email objectType="KalturaEvalStringField">
-								<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getAdminEmail() : ''</code>
+								<code>!is_null($entry = entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? $entry->getPartner()->getAdminEmail() : ''</code>
 							</email>
 							<name objectType="KalturaEvalStringField">
-								<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getPartner()->getPartnerName() : ''</code>
+								<code>!is_null($entry = entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? $entry->getPartner()->getPartnerName() : ''</code>
 							</name>
 						</item>
 					</emailRecipients>
