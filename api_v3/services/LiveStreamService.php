@@ -132,12 +132,13 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @action authenticate
 	 * @param string $entryId Live stream entry id
 	 * @param string $token Live stream broadcasting token
+	 * @param KalturaMediaServerIndex $mediaServerIndex the index of the media server sending the authentication request (primary/backup)
 	 * @return KalturaLiveStreamEntry The authenticated live stream entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::LIVE_STREAM_INVALID_TOKEN
 	 */
-	function authenticateAction($entryId, $token)
+	function authenticateAction($entryId, $token, $mediaServerIndex)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
@@ -147,7 +148,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($dbEntry->getStreamPassword() != $token)
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
-		$mediaServer = $dbEntry->getMediaServer(true);
+		$mediaServer = $dbEntry->getMediaServer(true, $mediaServerIndex);
 		if($mediaServer)
 		{
 			$url = null;

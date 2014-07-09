@@ -432,7 +432,7 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return MediaServer
 	 */
-	public function getMediaServer($currentDcOnly = false)
+	public function getMediaServer($currentDcOnly = false, $mediaServerIndex = null)
 	{
 		$kMediaServers = $this->getMediaServers();
 		if(! count($kMediaServers))
@@ -445,6 +445,10 @@ abstract class LiveEntry extends entry
 				KalturaLog::debug("mediaServer->getDc [" . $kMediaServer->getDc() . "] == kDataCenterMgr::getCurrentDcId [" . kDataCenterMgr::getCurrentDcId() . "]");
 				if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
 					return $kMediaServer->getMediaServer();
+					
+				if (!is_null($mediaServerIndex) && $kMediaServer->getIndex() == $mediaServerIndex)
+					return $kMediaServer->getMediaServer();
+				
 			}
 		}
 		if($currentDcOnly)
