@@ -7,6 +7,13 @@
 #### Scripts ####
 
 		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
+#### Configurations ####
+
+Local.ini:
+
+api_cache_warmup_host = 127.0.0.1
+html5lib_host = 127.0.0.1
+
 
 ## Watermark support ##
 - Issue Type: PLAT-1510
