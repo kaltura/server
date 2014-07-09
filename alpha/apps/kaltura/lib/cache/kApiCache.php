@@ -922,7 +922,7 @@ class kApiCache extends kApiCacheBase
 		
 		$uri = $_SERVER["REQUEST_URI"];
 
-		$fp = fsockopen('127.0.0.1', 80, $errno, $errstr, 1);
+		$fp = fsockopen(kConf::get('api_cache_warmup_host'), 80, $errno, $errstr, 1);
 
 		if ($fp === false)
 		{
