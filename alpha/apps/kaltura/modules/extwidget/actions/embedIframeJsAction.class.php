@@ -49,7 +49,7 @@ class embedIframeJsAction extends sfAction
 		if ($autoEmbed)
 		{
 			$port = $_SERVER['SERVER_PORT'];
-			$host = "$protocol://127.0.0.1:$port/";
+			$host = "$protocol://" . kConf::get('html5lib_host') . ":$port/";
 		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
