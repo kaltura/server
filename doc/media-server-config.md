@@ -5,6 +5,10 @@
 ## Plugins: ##
 - Add Wowza to plugins.ini.
 
+## Configuration ##
+- Add the IP range containing the Wowza machine IP to the local.ini:  
+	internal_ip_range = {required range}  
+  Note that this is not necessary for a Hybrid eCDN installation.
 
 
 ## Admin Console: ##
