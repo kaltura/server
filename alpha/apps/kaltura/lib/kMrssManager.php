@@ -266,7 +266,7 @@ class kMrssManager
 			$dynamicAttrs->setFileExtension($asset->getFileExt());
 			$urlManager->setDynamicAttributes($dynamicAttrs);
 			
-			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 		}
 		
 		return $url;
