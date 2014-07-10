@@ -41,13 +41,19 @@
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->id; ?>') "<?php echo $disabled; ?>>
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if ($user->email != $this->myEmail): ?>
-							<?php if ($user->status === Kaltura_Client_Enum_UserStatus::ACTIVE): ?>
-							<option value="block" ><?php echo $this->translate('Block'); ?></option>
-							<?php elseif ($user->status === Kaltura_Client_Enum_UserStatus::BLOCKED): ?>
-							<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
-							<?php endif; ?>
-							<option value="remove"><?php echo $this->translate('Remove user'); ?></option>
-							<option value="change role"><?php echo $this->translate('Change role'); ?></option>
+							<?php if (Infra_AclHelper::isAllowed('user','block') || Infra_AclHelper::isAllowed('user','unblock')) { ?>
+								<?php if ($user->status === Kaltura_Client_Enum_UserStatus::ACTIVE): ?>
+								<option value="block" ><?php echo $this->translate('Block'); ?></option>
+								<?php elseif ($user->status === Kaltura_Client_Enum_UserStatus::BLOCKED): ?>
+								<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
+								<?php endif; ?>
+							<?php } ?>
+							<?php if (Infra_AclHelper::isAllowed('user','remove')) { ?>
+								<option value="remove"><?php echo $this->translate('Remove user'); ?></option>
+							<?php } ?>
+							<?php if (Infra_AclHelper::isAllowed('user','change-role')) { ?>
+								<option value="change role"><?php echo $this->translate('Change role'); ?></option>
+							<?php } ?>
 							<?php if (Infra_AclHelper::isAllowed('user','assign')): ?>
 							<option value="assign partners"><?php echo $this->translate('Assign partners'); ?></option>
 							<?php endif; ?>
