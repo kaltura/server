@@ -185,7 +185,12 @@ class CuePointService extends KalturaBaseService
 	 */
 	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+			$pager->pageSize = baseObjectFilter::getMaxInValues();			// default to the max for compatibility reasons
+		}
+
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
 		
@@ -212,14 +217,11 @@ class CuePointService extends KalturaBaseService
 			$filter->entryIdEqual = null;
 			$filter->entryIdIn = implode ( ',', $entryIds );
 		}
-			
-		
-		
+
 		$cuePointFilter = $filter->toObject();
-		
 		$cuePointFilter->attachToCriteria($c);
-		if ($pager)
-			$pager->attachToCriteria($c);
+
+		$pager->attachToCriteria($c);
 			
 		$list = CuePointPeer::doSelect($c);
 		
