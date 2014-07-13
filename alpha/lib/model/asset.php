@@ -555,16 +555,23 @@ class asset extends Baseasset implements ISyncableFile
 		
 		if ($this->isKsNeededForDownload())
 		{
-			$partner = PartnerPeer::retrieveByPK($partnerId);
-			$secret = $partner->getSecret();
-			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
-			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
-			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();
-			
-			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
-	
-			if ($result < 0)
-				throw new Exception("Failed to generate session for asset [".$this->getId()."] of type ". $this->getType());
+			if (kCurrentContext::$is_admin_session && kCurrentContext::$ks)
+			{
+				$ksStr = kCurrentContext::$ks;
+			}
+			else
+			{
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$secret = $partner->getSecret();
+				$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
+				$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
+				$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();
+
+				$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
+
+				if ($result < 0)
+					throw new Exception("Failed to generate session for asset [".$this->getId()."] of type ". $this->getType());
+			}
 		}
 		
 		$finalPath = $this->getFinalDownloadUrlPathWithoutKs();
