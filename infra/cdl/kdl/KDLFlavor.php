@@ -461,7 +461,44 @@ $plannedDur = 0;
 		else {
 			$target->_fastSeekTo = true;
 		}
-		
+			/*
+			 * Analyse the source to determine whether it contains multi-stream audio.
+			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
+			 * try to define a multiStream processing setup
+			 */
+		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
+		if(!isset($target->_multiStream) 
+		|| (isset($target->_multiStream->detect) && $target->_multiStream->detect=='auto')){
+			if(isset($sourceAnalize->streamsAsChannels)) {
+/*
+ * Sample json string: {"detect":"auto","audio":{"mapping":[1,2]}}
+ * Struct:
+ * 	detect - 'auto', when set all other fields are omitted, (optional)
+ * 	audio - either as a single field or as array
+ * 		mapping - array of stream ids, optionally in ffmpeg syntax (with source file id)
+ * 		action	- 'merge' (default),'languages', (optional)
+ * 		output	- output stream (optional)
+ * 	video 
+ * 		...
+ * 
+ */
+				$multiStream = new stdClass();
+				$multiStream->audio = new stdClass();
+				$multiStream->audio->mapping = array();
+					/*
+					 * Use 'downnmix' stream, if there is such,
+					 * Otherwise try to map-in FL and FR streams
+					 */
+				$mappedStreams = KDLAudioLayouts::matchLayouts($source->_contentStreams->audio, KDLAudioLayouts::DOWNMIX);
+				if(count($mappedStreams)==0) 
+					$mappedStreams = KDLAudioLayouts::matchLayouts($sourceAnalize->streamsAsChannels, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR,));
+				foreach ($mappedStreams as $stream){
+					$multiStream->audio->mapping[] = $stream->id;
+				}
+				$target->_multiStream = $multiStream;
+			}
+		}
+
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
@@ -882,7 +919,7 @@ $plannedDur = 0;
 	 *  - Compare each of them to the required AR
 	 *  - Find the setup that is closest 
 	 */
-	function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
+	protected function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
 	{ 
 			/*
 			 * Calculate hgt & wid 'mod down' value. If not set - assign 0 
@@ -1173,6 +1210,113 @@ $plannedDur = 0;
 		return $targetAud;
 	}
 
+	/**
+	 * 
+	 * @param unknown_type $contentStreams
+	 */
+	private static function analizeSourceContentStreams($contentStreams)
+	{
+		$rvAnalize = new stdClass();
+		
+			/*
+			 * Evaluate stream duration differences
+			 * - calc average duration of each stream type (vid, aud,...)
+			 * - calc delta between the avg and every stream dur (per type - aud, vid,...)
+			 * - evaluate which streams have dur identical to the avg, which one is diff, and which one is zeroed
+			 * - store in array for final part of anaylize logic
+			 */
+		$dursAccm = array();
+		foreach($contentStreams as $t=>$streams) {
+			foreach($streams as $stream){
+				if(!array_key_exists($t, $dursAccm))
+					$dursAccm[$t] = 0;
+				$fld = $t."Duration";
+				$dursAccm[$t] += isset($stream->$fld)?$stream->$fld:0;
+			}
+		}
+		foreach($dursAccm as $t=>$accm){
+			$dursAvg[$t] = $accm>0?$accm/count($contentStreams->$t):0;
+		}
+
+		$identicalDur = array();
+		$zeroedDur = array();
+		$differentDur = array();
+		foreach($contentStreams as $t=>$streams) {
+			foreach($streams as $stream){
+				$fld = $t."Duration";
+				$dur = $stream->$fld; //audoDuration or videoDuration or dataDuration
+				if($dur==0) {
+					$zeroedDur[$t][] = $stream;
+					continue;
+				}
+				
+				$dlt = abs($dursAvg[$t]-$dur);
+					// Identical concidered to be less than 1sec delta and the delts is less than 0.1% 
+				if($dlt<1000 && $dlt/$dur<0.001)
+					$identicalDur[$t][] = $stream;
+				else
+					$differentDur[$t][] = $stream;
+				
+			}
+		}
+		
+			/*
+			 * For audio streams - 
+			 * Check for 'streamAsChannel' case and for 'multilangual' case
+			 * 'streamAsChannel' considerd to be if there are more than 1 mono streams.
+			 */
+		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1){
+				// Get all streams that have 'surround' like audio layout - FR, FL, ...
+			$channelStreams = KDLAudioLayouts::matchLayouts($identicalDur['audio']);
+				// Sort the audio streams for chunnel number. We are looking for mono streams
+			$chnNumStreams = array();
+			foreach ($channelStreams as $stream){
+				if(isset($stream->audioChannels))
+					$chnNumStreams[$stream->audioChannels][] = $stream;
+			}
+				
+				/*
+				 * The streams that might be used for merging are only mono streams
+				 * otherwise - no streamAsChannel
+				 */ 
+			if(array_key_exists(1, $chnNumStreams) && count($chnNumStreams[1])>1){
+				$channelStreams = $chnNumStreams[1];
+			}
+			else {
+				$channelStreams = array();
+			}
+			
+				/* 
+				 * Check for multi-langual case
+				 * Sort the streams according to stream language
+				 */
+			$langStreams = array();
+			foreach ($identicalDur['audio'] as $stream){
+				if(isset($stream->audioLanguage))
+					$langStreams[$stream->audioLanguage][] = $stream;
+			}
+			
+				// Set 'streamsAsChannels' only if there are more than 2 audio streams in the file
+			if(count($channelStreams)>1){
+				$rvAnalize->streamsAsChannels = $channelStreams;
+			}
+				// Set 'languages' only if there are more than 1 language in the file
+			if(count($langStreams)>1){
+				$rvAnalize->languages = $langStreams;
+			}	// not overlayed streams, probably should be concated
+			if(count($contentStreams->audio)-count($identicalDur['audio'])>2){
+				$rvAnalize = null;
+			}
+			 
+		}
+		
+		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;
+		if(count($differentDur)>0) $rvAnalize->differentDur = $differentDur;		
+		if(count($zeroedDur)>0) $rvAnalize->zeroedDur = $zeroedDur;
+		
+		return $rvAnalize;
+	}
+	
 	/* ---------------------------
 	 * evaluateMultiStream
 	 * 

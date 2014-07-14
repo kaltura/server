@@ -22,8 +22,14 @@ class CuePointService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 
-		// Play server lists entries of all partners
-		if($this->getPartnerId() == Partner::PLAY_SERVER_PARTNER_ID && $actionName == 'list')
+		// Play-Server and Media-Server list entries of all partners
+		// This is not too expensive as the requests are cached conditionally and performed on sphinx
+		$allowedSystemPartners = array(
+			Partner::MEDIA_SERVER_PARTNER_ID,
+			Partner::PLAY_SERVER_PARTNER_ID,
+		);
+		
+		if(in_array($this->getPartnerId(), $allowedSystemPartners) && $actionName == 'list')
 		{
 			myPartnerUtils::resetPartnerFilter('entry');
 		}
@@ -179,7 +185,12 @@ class CuePointService extends KalturaBaseService
 	 */
 	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+			$pager->pageSize = baseObjectFilter::getMaxInValues();			// default to the max for compatibility reasons
+		}
+
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
 		
@@ -206,14 +217,11 @@ class CuePointService extends KalturaBaseService
 			$filter->entryIdEqual = null;
 			$filter->entryIdIn = implode ( ',', $entryIds );
 		}
-			
-		
-		
+
 		$cuePointFilter = $filter->toObject();
-		
 		$cuePointFilter->attachToCriteria($c);
-		if ($pager)
-			$pager->attachToCriteria($c);
+
+		$pager->attachToCriteria($c);
 			
 		$list = CuePointPeer::doSelect($c);
 		

@@ -40,6 +40,10 @@ function checkCache()
 		unset($params['ks']);
 		unset($params['kalsig']);
 		$params['uri'] = $_SERVER['PATH_INFO'];
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+			$params['__protocol'] = 'https';
+		else 	
+			$params['__protocol'] = 'http';
 		ksort($params);
 
 		$keys = array_keys($params);

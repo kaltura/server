@@ -126,7 +126,7 @@ class WidevineLicenseProxyUtils
 		$iv = str_replace("0x", "", $iv);
 		$iv = str_replace(", ", "", $iv);
 		
-		return $key.$iv;
+		return $iv.$key;
 	}
 	
 	protected static function getLicenseOverrideParams($overrideParamsStr, $isAdmin)

@@ -43,7 +43,6 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 * Duration in milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
-	 * @readonly
 	 */
 	public $duration;
 
@@ -88,8 +87,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	{
 		parent::validateForInsert($propertiesToSkip);
 		
-		if(!is_null($this->endTime))
-			$this->validateEndTime();
+		$this->validateEndTime();
 	}
 	
 	/* (non-PHPdoc)
@@ -97,8 +95,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if(!is_null($this->endTime))
-			$this->validateEndTime($sourceObject->getId());
+		$this->validateEndTime($sourceObject);
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
