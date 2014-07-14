@@ -16,12 +16,11 @@
 		<h1>An error occurred</h1>
 		<?php echo (isset($this->code) ? "(error code: $this->code)" : (isset($this->exception) ? '(error code: ' . $this->exception->getCode() . ')' : '')); ?>
 
-		<p>
-			<b>Message:</b> <?php echo $this->exception->getMessage() ?>
-		</p>
-
-
 		<?php if ('development' == APPLICATION_ENV): ?>
+			<p>
+				<b>Message:</b> <?php echo $this->exception->getMessage() ?>
+			</p>
+
 			<h3>Stack trace:</h3>
 			<pre><?php echo $this->exception->getTraceAsString() ?></pre>
 
