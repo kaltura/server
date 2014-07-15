@@ -216,6 +216,17 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	 */
 	public function validateEndTime(CuePoint $cuePoint = null)
 	{
+		if($cuePoint)
+		{
+			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
+		}
+		else //add
+		{
+			$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		}
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+
 		if(is_null($this->startTime) && $cuePoint && $cuePoint->getStartTime())
 			$this->startTime = $cuePoint->getStartTime();
 			
@@ -224,8 +235,19 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 			
 		if($this->startTime)
 		{
-			if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
-				$this->endTime = $this->startTime;
+			if ($dbEntry instanceof LiveEntry)
+			{
+				if (!$this->duration && !$this->endTime)
+					throw new KalturaAPIException(KalturaCuePointErrors::LIVE_ENTRY_WITHOUT_END_TIME_OR_DURATION, $this->parentId);
+			}
+
+			if ($this->isNull('endTime'))
+			{
+				if (!$cuePoint)
+					$this->endTime = $this->startTime;
+				else if (!is_null($cuePoint->getEndTime()))
+					$this->endTime = $cuePoint->getEndTime();
+			}
 				
 			if($this->endTime < $this->startTime)
 				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
@@ -243,18 +265,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 			if(!$this->isNull('duration') || !$this->isNull('endTime'))
 				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
 		}
-		
-		if($cuePoint)
-		{
-			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
-		}
-		else //add
-		{ 
-			$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		}
-		if (!$dbEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		
+
 		if($dbEntry->getLengthInMsecs())
 		{
 			if($this->endTime && $dbEntry->getLengthInMsecs() < $this->endTime)
