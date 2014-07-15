@@ -559,7 +559,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $flavorAsset->getEntryId(),
 					PlaybackProtocol::HTTP, null, null, $flavorAsset);
-			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 		}
 		
 		return $url;

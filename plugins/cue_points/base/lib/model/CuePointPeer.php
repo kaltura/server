@@ -57,7 +57,12 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		    if (! $kuser) {
 				$kuser = kuserPeer::createKuserForPartner($partnerId, $puserId);
 			}
-			$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
+			// Temporarily change user filter to (user==kuser OR cuepoint of type THUMB). Long term fix will be accomplished 
+			// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
+			//$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
+			$criterionUserOrPublic = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
+			$criterionUserOrPublic->addOr($c->getNewCriterion(CuePointPeer::TYPE,ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB)));
+			$c->addAnd($criterionUserOrPublic);
 		}
 		self::$s_criteria_filter->setFilter($c);
 	}

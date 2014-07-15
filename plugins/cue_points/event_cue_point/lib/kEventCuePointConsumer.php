@@ -20,8 +20,14 @@ class kEventCuePointConsumer implements kObjectChangedEventConsumer
 		}
 		
 		// If currently only one is set, and that's the one that was just changed
-		if((count($currentMediaServers) == 1) && (count(array_intersect($updatedServers, $currentMediaServers)) == 1)) {
-			$this->addEventCuePoint($object, EventType::BROADCAST_START);
+		$updatedMediaServers = array_intersect($updatedServers, $currentMediaServers);
+		if((count($currentMediaServers) == 1) && (count($updatedMediaServers) == 1)) {
+			
+			// This hack was made to avoid cases in which someone updates the media server.
+			$updatedMediaServer = $updatedMediaServers[0];
+			$oldHost = $customData['mediaServers'][$updatedMediaServer];
+			if(is_null($oldHost))
+				$this->addEventCuePoint($object, EventType::BROADCAST_START);
 		}
 		
 		// If currently no one is set

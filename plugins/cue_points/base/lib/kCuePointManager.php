@@ -304,7 +304,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$update->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
 		
 		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
-		BasePeer::doUpdate($select, $update);
+		BasePeer::doUpdate($select, $update, $con);
 		
 		$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);
 		foreach($cuePoints as $cuePoint)
