@@ -5,6 +5,7 @@
  */
 interface kQuePointErrors
 {
+	const LIVE_ENTRY_WITHOUT_END_TIME_OR_DURATION = "LIVE_ENTRY_WITHOUT_END_TIME_OR_DURATION,live entry without end time or duration";
 	const END_TIME_CANNOT_BE_LESS_THAN_START_TIME = "END_TIME_CANNOT_BE_LESS_THAN_START_TIME,end time cannot be less than start time";
 	const START_TIME_CANNOT_BE_EMPTY = "START_TIME_CANNOT_BE_EMPTY,start time cannot be null";
 	const END_TIME_WITHOUT_START_TIME = "END_TIME_WITHOUT_START_TIME,cannot provide end time without start time";
