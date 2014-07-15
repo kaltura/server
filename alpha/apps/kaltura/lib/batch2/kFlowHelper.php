@@ -247,50 +247,101 @@ class kFlowHelper
 	 */
 	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
-		/* @var $entry LiveEntry */
+		$liveEntry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $liveEntry LiveEntry */
+		if(!$liveEntry)
+		{
+			KalturaLog::err("Live entry [" . $dbBatchJob->getEntryId() . "] not found");
+			return $dbBatchJob;
+		}
 		
-		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
+		$recordedEntry = entryPeer::retrieveByPKNoFilter($liveEntry->getRecordedEntryId());
+		if(!$recordedEntry)
+		{
+			KalturaLog::err("Recorded entry [" . $liveEntry->getRecordedEntryId() . "] not found");
+			return $dbBatchJob;
+		}
+
+		$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
+		/* @var $asset liveAsset */
+		if(!$asset)
+		{
+			KalturaLog::err("Live asset [" . $data->getAssetId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
 		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
-			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
+			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
-		$key = $entry->getSyncKey($keyType);
+		$key = $asset->getSyncKey($keyType);
 		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
 		$files = kFileSyncUtils::dir_get_files($key);
 		
-		if(!$entry->isConvertingSegments())
+		if(count($files) > 1)
 		{
-			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
-			foreach($attachedPendingMediaEntries as $attachedPendingMediaEntry)
+			// find replacing entry id
+			$replacingEntryId = $recordedEntry->getReplacingEntryId();
+			$replacingEntry = null;
+			
+			// in replacement
+			if($replacingEntryId)
 			{
-				/* @var $attachedPendingMediaEntry kPendingMediaEntry */
-				if($attachedPendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
-				{
-					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] is pending on different dc [" . $attachedPendingMediaEntry->getDc() . "]");
-					continue;
-				}
+				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
 				
-				if($attachedPendingMediaEntry->getRequiredDuration() && $attachedPendingMediaEntry->getRequiredDuration() > $data->getEndTime())
+				// check if asset already ingested
+				$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+				if($replacingAsset)
 				{
-					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] requires longer duration [" . $attachedPendingMediaEntry->getRequiredDuration() . "]");
-					continue;
+					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
+					return;
 				}
-					
-				$dbAsset = assetPeer::retrieveOriginalByEntryId($attachedPendingMediaEntry->getEntryId());
-				if(!$dbAsset)
-				{
-					KalturaLog::info("Source of entry id [" . $attachedPendingMediaEntry->getEntryId() . "] not found (probably deleted)");
-					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
-					continue;
-				}
-				
-				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
-				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files, $attachedPendingMediaEntry->getOffset(), $attachedPendingMediaEntry->getDuration());
-				if($job)
-					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
 			}
+			// not in replacement
+			else
+			{
+		    	$advancedOptions = new kEntryReplacementOptions();
+		    	$advancedOptions->setKeepManualThumbnails(true);
+		    	$recordedEntry->setReplacementOptions($advancedOptions);
+		
+				$replacingEntry = new entry();
+			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
+				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+				$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+				$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+				$replacingEntry->setKuserId($recordedEntry->getKuserId());
+				$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+				$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+				$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
+				$replacingEntry->setDefaultModerationStatus();
+				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+				$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+				$replacingEntry->save();
+				
+				$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+				$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$recordedEntry->save();
+			}
+	
+			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+		
+			// create asset
+			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
+			$replacingAsset->setPartnerId($replacingEntry->getPartnerId());
+			$replacingAsset->setEntryId($replacingEntry->getId());
+			$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+			$replacingAsset->setFlavorParamsId($flavorParams->getId());
+			$replacingAsset->setFromAssetParams($flavorParams);
+			
+			if($flavorParams->hasTag(assetParams::TAG_SOURCE))
+			{
+				$replacingAsset->setIsOriginal(true);
+			}
+		
+			$replacingAsset->save();
+
+			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
 		}
-		$entry->save();
 		
 		return $dbBatchJob;
 	}
@@ -1825,6 +1876,12 @@ class kFlowHelper
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 
+		$entry = $dbBatchJob->getEntry();
+		if($entry)
+		{
+			kBusinessConvertDL::checkForPendingLiveClips($entry);
+		}
+		
 		return $dbBatchJob;
 	}
 

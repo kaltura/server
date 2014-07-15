@@ -266,7 +266,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 
 		myPartnerUtils::setPartnerIdForObj($this);
-		mySearchUtils::setDisplayInSearch($this);
+		
+		if($this->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
+		{
+			mySearchUtils::setDisplayInSearch($this);
+		}
+			
 		ktagword::updateAdminTags($this);
 		
 		// same for puserId ...

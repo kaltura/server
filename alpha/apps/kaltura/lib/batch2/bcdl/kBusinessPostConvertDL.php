@@ -132,6 +132,15 @@ class kBusinessPostConvertDL
 		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
 		
+		if($currentFlavorAsset->getIsOriginal())
+		{
+			$entry = $currentFlavorAsset->getentry();
+			if($entry)
+			{
+				kBusinessConvertDL::checkForPendingLiveClips($entry);
+			}
+		}
+		
 		return $currentFlavorAsset;
 	}
 	
@@ -301,9 +310,12 @@ class kBusinessPostConvertDL
 			}
 			else
 			{
-			    // mark the context root job as finished only if all conversion jobs are completed
-    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-    			
+				if($currentFlavorAsset->getIsOriginal() || !$currentFlavorAsset->getentry()->getReplacedEntryId())
+				{
+				    // mark the context root job as finished only if all conversion jobs are completed
+	    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
+				}
+				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}

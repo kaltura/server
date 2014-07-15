@@ -66,6 +66,31 @@ Currently supported - ‘audio surround layout’. If detected, the FR and FL st
 {"audio":{"mapping":[1,2]}}
 
 
+## Live Cue-Point support ##
+Support cue-point on absolute server time stamp.
+
+
+## Live recording optimization ##
+Record all live assets and manage the recording on the API server side.
+
+- Issue Type: Change Request 
+- Issue ID: PLAT-1367
+- Issue ID: PLAT-1274
+- Issue ID: PLAT-1476
+- Issue ID: SUP-2202
+
+#### Configuration ####
+- `base.ini` already changed to support `max_live_recording_duration_hours` of 24 hours.
+
+#### Media-Server version ####
+- New media-server version [3.0.9](https://github.com/kaltura/media-server/releases/download/rel-3.0.9/KalturaWowzaServer-3.0.9.jar "3.0.9") required. 
+
+#### Deployment Scripts ####
+None
+
+#### Known Issues & Limitations ####
+- The recording duration is limited to 24 hours.
+
 # IX-9.18.0 #
 
 ## Event Cue point support ##
