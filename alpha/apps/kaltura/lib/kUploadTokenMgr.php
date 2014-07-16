@@ -196,7 +196,17 @@ class kUploadTokenMgr
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 			
 		if ($resumeAt > kFile::fileSize($uploadFilePath))
-			throw new kUploadTokenException("Temp file [$uploadFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
+		{
+			$desc = fopen($uploadFilePath , 'r');
+			fseek($desc ,0, SEEK_END);
+			if ($resumeAt > ftell($desc))
+			{
+				fclose($desc);
+				throw new kUploadTokenException("Temp file [$uploadFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
+			}
+			fclose($desc);
+		}
+		
 			
 		$this->resumeFile($fileData['tmp_name'], $uploadFilePath, $resumeAt);
 		KalturaLog::info("The file resumed successfully");
