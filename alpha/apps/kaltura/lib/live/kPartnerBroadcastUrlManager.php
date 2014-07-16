@@ -10,8 +10,24 @@ class kPartnerBroadcastUrlManager extends kBroadcastUrlManager
 			return;
 		}
 		
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $partner->getPrimaryBroadcastUrl(), self::PRIMARY_MEDIA_SERVER_INDEX));
-		$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $partner->getSecondaryBroadcastUrl(), self::SECONDARY_MEDIA_SERVER_INDEX));
+		$hostname = $partner->getPrimaryBroadcastUrl();
+		$port = kBroadcastUrlManager::DEFAULT_PORT;
+		if(strpos($hostname, ':') > 0)
+		{
+			list($hostname, $port) = explode(':', $hostname, 2);
+		}
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, self::PRIMARY_MEDIA_SERVER_INDEX, $port));
+		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, self::PRIMARY_MEDIA_SERVER_INDEX, $port, true));
+		
+	
+		$hostname = $partner->getSecondaryBroadcastUrl();
+		$port = kBroadcastUrlManager::DEFAULT_PORT;
+		if(strpos($hostname, ':') > 0)
+		{
+			list($hostname, $port) = explode(':', $hostname, 2);
+		}
+		$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, self::SECONDARY_MEDIA_SERVER_INDEX, $port));
+		$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, self::SECONDARY_MEDIA_SERVER_INDEX, $port, true));
 	}
 	
 }
