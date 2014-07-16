@@ -76,6 +76,15 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 		return $dropFolderFiles;		
 	}
 	
+	public static function retrieveByEntryAndPartnerIds($entryId, $partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderFilePeer::ENTRY_ID, $entryId, Criteria::EQUAL);
+		$c->addAnd(DropFolderFilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
+		return $dropFolderFiles;
+	}
+
 	/* (non-PHPdoc)
 	 * @see BaseCuePointPeer::getOMClass()
 	 */
