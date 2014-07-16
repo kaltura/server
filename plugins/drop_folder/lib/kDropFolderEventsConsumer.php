@@ -268,58 +268,55 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	private function onEntryStatusChanged( $entry )
 	{
-		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryAndPartnerIds($entry->getId(), $entry->getPartnerId());
+		// Handle only files that are still in the PROCESSING state, which were left
+		// in this state due to AUTO_DELETE_WHEN_ENTRY_IS_READY delete policy.
+		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryIdPartnerIdAndStatuses($entry->getId(), $entry->getPartnerId(), array(DropFolderFileStatus::PROCESSING));
 		$dropFolderIdToDropFolderCache = array();
 
 		$entryStatus = $entry->getStatus();
 
 		foreach ( $dropFolderFiles as $dropFolderFile )
 		{
-			// Handle only files that are still in the PROCESSING state, which were left
-			// in this state due to AUTO_DELETE_WHEN_ENTRY_IS_READY delete policy.
-			if ( $dropFolderFile->getStatus() == DropFolderFileStatus::PROCESSING )
+			$newDropFolderFileStatus = null;
+
+			if ( $entryStatus == entryStatus::ERROR_CONVERTING )
 			{
-				$newDropFolderFileStatus = null;
-				
-				if ( $entryStatus == entryStatus::ERROR_CONVERTING )
+				$newDropFolderFileStatus = DropFolderFileStatus::ERROR_HANDLING;
+			}
+			elseif ( $entryStatus == entryStatus::READY )
+			{
+				// Get the associated drop folder
+				$dropFolderId = $dropFolderFile->getDropFolderId();
+				if ( key_exists( $dropFolderId, $dropFolderIdToDropFolderCache ) )
 				{
-					$newDropFolderFileStatus = DropFolderFileStatus::ERROR_HANDLING;
+					$dropFolder = $dropFolderIdToDropFolderCache[ $dropFolderId ];
 				}
-				elseif ( $entryStatus == entryStatus::READY )
+				else
 				{
-					// Get the associated drop folder
-					$dropFolderId = $dropFolderFile->getDropFolderId();
-					if ( key_exists( $dropFolderId, $dropFolderIdToDropFolderCache ) )
+					$dropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
+					$dropFolderIdToDropFolderCache[ $dropFolderId ] = $dropFolder;
+				}
+
+				if ( $dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY )
+				{
+					if ( $dropFolder->getAutoFileDeleteDays() == 0 )
 					{
-						$dropFolder = $dropFolderIdToDropFolderCache[ $dropFolderId ];
+						$newDropFolderFileStatus = DropFolderFileStatus::DELETED; // Mark for immediate deletion
 					}
 					else
 					{
-						$dropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
-						$dropFolderIdToDropFolderCache[ $dropFolderId ] = $dropFolder;
-					}
-					
-					if ( $dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY )
-					{
-						if ( $dropFolder->getAutoFileDeleteDays() == 0 )
-						{
-							$newDropFolderFileStatus = DropFolderFileStatus::DELETED; // Mark for immediate deletion
-						}
-						else
-						{
-							$newDropFolderFileStatus = DropFolderFileStatus::HANDLED;
-						}
+						$newDropFolderFileStatus = DropFolderFileStatus::HANDLED;
 					}
 				}
+			}
 
-				KalturaLog::info("Entry id [{$entry->getId()}] status [{$entryStatus}], drop folder file id [{$dropFolderFile->getId()}] status [{$dropFolderFile->getStatus()}] => ["
-									. ($newDropFolderFileStatus ? $newDropFolderFileStatus : "{$dropFolderFile->getStatus()} (unchanged)") . "]");
-				
-				if ( $newDropFolderFileStatus )
-				{
-					$dropFolderFile->setStatus( $newDropFolderFileStatus );
-					$dropFolderFile->save();
-				}				
+			KalturaLog::info("Entry id [{$entry->getId()}] status [{$entryStatus}], drop folder file id [{$dropFolderFile->getId()}] status [{$dropFolderFile->getStatus()}] => ["
+								. ($newDropFolderFileStatus ? $newDropFolderFileStatus : "{$dropFolderFile->getStatus()} (unchanged)") . "]");
+
+			if ( $newDropFolderFileStatus )
+			{
+				$dropFolderFile->setStatus( $newDropFolderFileStatus );
+				$dropFolderFile->save();
 			}
 		}
 	}
