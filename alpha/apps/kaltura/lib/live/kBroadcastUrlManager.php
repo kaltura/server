@@ -3,7 +3,12 @@ class kBroadcastUrlManager
 {
 	const PRIMARY_MEDIA_SERVER_INDEX = 0;
 	const SECONDARY_MEDIA_SERVER_INDEX = 1;
+	
 	const DEFAULT_SUFFIX = 'default';
+	const DEFAULT_PORT = 1935;
+	
+	const PROTOCOL_RTMP = 'rtmp';
+	const PROTOCOL_RTSP = 'rtsp';
 	
 	protected $partnerId;
 	
@@ -34,14 +39,23 @@ class kBroadcastUrlManager
 	
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry,  $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource()), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+		$hostname = $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource());
+		$port = $this->getProt(kDataCenterMgr::getCurrentDcId());
+		
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, $port));		
+		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, $port, true));
 			
 		$otherDCs = kDataCenterMgr::getAllDcs();
 		if(count($otherDCs))
 		{
 			$otherDc = reset($otherDCs);
 			$otherDcId = $otherDc['id'];
-			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $this->getHostname($otherDcId, $dbEntry->getSource()), kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			
+			$hostname = $this->getHostname($otherDcId, $dbEntry->getSource());
+			$port = $this->getProt($otherDcId);
+			
+			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $port));
+			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $port, true));
 		}
 	}
 	
@@ -75,14 +89,32 @@ class kBroadcastUrlManager
 		return "$url/$app";
 	}
 	
-	protected function getBroadcastUrl(LiveStreamEntry $entry, $hostname, $mediaServerIndex)
+	protected function getProt ($dc)
+	{
+		$port = kBroadcastUrlManager::DEFAULT_PORT;
+	
+		$broadcastConfig = kConf::getMap('broadcast');	
+		if(isset($broadcastConfig['port']))
+		{
+			$port = $broadcastConfig['port'];
+		}
+		
+		if (isset($broadcastConfig[$dc]) && isset($broadcastConfig[$dc]['port']))
+		{
+			$port = $broadcastConfig[$dc]['port'];
+		}
+		
+		return $port;
+	}
+	
+	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $port, $concatStreamName = false)
 	{
 		if (!$hostname)
 		{
 			return '';
 		}
 		
-		$url = 'rtmp://' . $hostname;
+		$url = "$protocol://$hostname:$port";
 		
 		$params = array(
 			'p' => $this->partnerId,
@@ -92,7 +124,13 @@ class kBroadcastUrlManager
 		);
 		$paramsStr = http_build_query($params);
 		
-		return "$url/?$paramsStr"; 
+		$streamName = '';
+		if($concatStreamName)
+		{
+			$streamName = $entry->getId() . '_%i';
+		}
+		
+		return "$url/$streamName?$paramsStr"; 
 	}
 	
 }
