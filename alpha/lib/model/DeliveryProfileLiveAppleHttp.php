@@ -79,14 +79,8 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	{
 		$lines = $this->getM3U8Urls( $urlContent );
 
-		$attempt = 0;
 		foreach ($lines as $urlLine)
 		{
-			if ( $attempt++ == self::MAX_IS_LIVE_ATTEMPTS )
-			{
-				return false;
-			}
-
 			$mediaUrl = $this->checkIfValidUrl($urlLine, $url);
 	
 			$urlContent = $this->urlExists($mediaUrl, kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE));
@@ -116,17 +110,15 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	{
 		$lines = $this->getM3U8Urls( $urlContent );
 
-		$attempt = 0;
+		$lines = array_slice($lines, -self::MAX_IS_LIVE_ATTEMPTS, self::MAX_IS_LIVE_ATTEMPTS, true);
 		foreach ($lines as $urlLine)
 		{
-			if ( $attempt++ == self::MAX_IS_LIVE_ATTEMPTS )
-			{
-				return false;
-			}
-
 			$tsUrl = $this->checkIfValidUrl($urlLine, $url);
 			if ($this->urlExists($tsUrl ,kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE),'0-1') !== false)
+			{
+				KalturaLog::log("Live ts url: $tsUrl");
 				return true;
+			}
 		}
 	
 		return false;
