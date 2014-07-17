@@ -247,22 +247,22 @@ class kUploadTokenMgr
 	 */
 	protected function resumeFile($sourceFilePath, $targetFilePath, $resumeAt = -1)
 	{
-		$sourceFileResource = fopen($sourceFilePath, 'rb');
 		$targetFileResource = fopen($targetFilePath, 'r+b');
 
-        if ($resumeAt != -1)
-			fseek($targetFileResource, $resumeAt, SEEK_SET);
-        else
-			fseek($targetFileResource, 0, SEEK_END);
-
-		if ($resumeAt > kFile::fileSize($targetFilePath) && $resumeAt > ftell($targetFileResource))
+		fseek($targetFileResource, 0, SEEK_END);
+		if ($resumeAt != -1)
 		{
-			KalturaLog::debug(' kfile size - ' . kFile::fileSize($targetFilePath) . 'actual size - ' . ftell($targetFileResource));
-			fclose($sourceFileResource);
-			fclose($targetFileResource);
-			throw new kUploadTokenException("Temp file [$targetFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
-        }
-        
+			if ($resumeAt > ftell($targetFileResource))
+			{
+				KalturaLog::debug('actual size - ' . ftell($targetFileResource));
+				fclose($targetFileResource);
+				throw new kUploadTokenException("Temp file [$targetFilePath] attempted to resume at invalid position $resumeAt", kUploadTokenException::UPLOAD_TOKEN_RESUMING_INVALID_POSITION);
+			}
+			fseek($targetFileResource, $resumeAt, SEEK_SET);
+		}
+
+		$sourceFileResource = fopen($sourceFilePath, 'rb');
+
 		while(!feof($sourceFileResource))
 		{
 			$data = fread($sourceFileResource, 1024*100);
