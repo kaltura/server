@@ -56,7 +56,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		}
 		
-		if ($this->dropFolder->fileDeletePolicy == KalturaDropFolderFileDeletePolicy::AUTO_DELETE)
+		if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
 		{
 			$this->purgeFiles ($dropFolderFilesMap);
 		}
@@ -149,11 +149,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	{
 		KalturaLog::info('Deleting older files from Webex account');
 		
-		if (!$this->dropFolder->autoFileDeleteDays)
-		{
-			KalturaLog::err("Illegal value for property [autoFileDeleteDays] on drop folder with ID [" . $this->dropFolder->id . "]. Exiting.");
-			return;
-		}
 		$createTimeEnd = strtotime ("now") - ($this->dropFolder->autoFileDeleteDays*86400);
 		$fileList = $this->listRecordings(self::ZERO_DATE, date('m/j/Y H:i:s',$createTimeEnd));
 		KalturaLog::debug("Files to delete: " . count($fileList));
