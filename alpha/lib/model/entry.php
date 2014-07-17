@@ -325,6 +325,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	}
 
 	/**
+	 * Get the number of plays.
+	 * In case of an image - get the number of views instead
+	 *
+	 * @return     int
+	 */
+	public function getPlays()
+	{
+		if ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE )
+		{
+			// Plays are irrelevant in case of an image, so we'll return the number of views instead.
+			return $this->getViews();
+		}
+
+		return parent::getPlays();
+	}
+
+	/**
 	 * will handle the flow in case of need to moderate.
 	 */
 	public function setStatusReady ( $force = false )
