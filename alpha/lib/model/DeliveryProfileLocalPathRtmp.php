@@ -16,5 +16,20 @@ class DeliveryProfileLocalPathRtmp extends DeliveryProfileRtmp {
 		$url = preg_replace('/\.[\w]+$/', '', $url);
 		return $url;
 	}
+	
+	protected function formatByExtension($url) {
+		$extension = $this->params->getFileExtension();
+		$containerFormat = $this->params->getContainerFormat();
+		if( $extension && strtolower($extension) != 'flv' ||
+				$containerFormat && strtolower($containerFormat) != 'flash video') {
+			$url = "mp4:".ltrim($url,'/');
+			if($this->NON_FLV_FILE_EXTENSION)
+				$url .= "." .  $this->NON_FLV_FILE_EXTENSION; 
+			
+		} else if($this->FLV_FILE_EXTENSION) {
+			$url .= "." . $this->FLV_FILE_EXTENSION;
+		}
+		return $url;
+	}
 }
 
