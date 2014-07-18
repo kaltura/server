@@ -756,7 +756,10 @@ class Partner extends BasePartner
 	public function setExtendedFreeTrail( $v )
 	{
 		$this->putInCustomData("extendedFreeTrail", $v);
-		$this->setUsageLimitWarning(null);
+		if ( $v )
+		{
+			$this->setUsageLimitWarning(null);
+		}
 	}
 	
 	public function getExtendedFreeTrailExpiryReason() { return $this->getFromCustomData("extendedFreeTrailExpiryReason", null); }
