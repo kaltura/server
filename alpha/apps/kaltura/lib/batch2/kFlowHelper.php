@@ -294,7 +294,7 @@ class kFlowHelper
 				if($replacingAsset)
 				{
 					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-					return;
+					return $dbBatchJob;
 				}
 			}
 			// not in replacement
