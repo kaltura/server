@@ -83,11 +83,10 @@ class kBusinessPostConvertDL
 		if($postConvertData instanceof kPostConvertJobData)
 			$postConvertAssetType = $postConvertData->getPostConvertAssetType();
 		
-		$tags = $targetFlavor->getTags();
 		// don't validate in case of bypass, in case target flavor or media info are null 
 		// or ISM/ISMC manifest assets
 		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo
-		&& !(isset($tags) && strstr($tags,assetParams::TAG_ISM_MANIFEST)!=false))
+		&& !$targetFlavor->hasTag(assetParams::TAG_ISM_MANIFEST))
 		{
 			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo, $convertEngineType);
