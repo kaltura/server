@@ -49,7 +49,7 @@ class embedIframeJsAction extends sfAction
 		if ($autoEmbed)
 		{
 			$port = $_SERVER['SERVER_PORT'];
-			$host = "$protocol://". kConf::get('kaltura_installation_type') .":$port/";
+			$host = "$protocol://". kConf::get('html5lib_host') .":$port/";
 		}
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
