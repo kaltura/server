@@ -41,6 +41,18 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	public $secondaryBroadcastingUrl;
 	
 	/**
+	 * @requiresPermission all
+	 * @var string
+	 */
+	public $primaryRtspBroadcastingUrl;
+	
+	/**
+	 * @requiresPermission all
+	 * @var string
+	 */
+	public $secondaryRtspBroadcastingUrl;
+	
+	/**
 	 * @var string
 	 */
 	public $streamName;
@@ -104,6 +116,8 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 	"streamRemoteBackupId",
 		"primaryBroadcastingUrl",
 		"secondaryBroadcastingUrl",
+		"primaryRtspBroadcastingUrl",
+		"secondaryRtspBroadcastingUrl",
 		"streamName",
 		"streamUrl",
 	    "hlsStreamUrl",
