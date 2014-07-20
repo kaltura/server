@@ -276,6 +276,10 @@ class kFlowHelper
 			
 		$key = $asset->getSyncKey($keyType);
 		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
+		
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			return $dbBatchJob;
+			
 		$files = kFileSyncUtils::dir_get_files($key);
 		
 		if(count($files) > 1)
