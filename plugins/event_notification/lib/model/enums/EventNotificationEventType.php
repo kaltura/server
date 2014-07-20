@@ -19,4 +19,5 @@ interface EventNotificationEventType extends BaseEnum
 	const OBJECT_SAVED = 10;
 	const OBJECT_UPDATED = 11;
 	const OBJECT_REPLACED = 12;
+	const OBJECT_READY_FOR_INDEX = 13;
 }
