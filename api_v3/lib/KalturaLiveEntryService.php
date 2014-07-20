@@ -84,16 +84,18 @@ class KalturaLiveEntryService extends KalturaEntryService
 		}
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
 		
-	
-		if(!$dbEntry->getRecordedEntryId())
+		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
-			$this->createRecordedEntry($dbEntry);
-		}
-		
-		$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
-		if($recordedEntry)
-		{
-			$this->ingestAsset($recordedEntry, $dbAsset->getFlavorParamsId(), $filename);
+			if(!$dbEntry->getRecordedEntryId())
+			{
+				$this->createRecordedEntry($dbEntry);
+			}
+			
+			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
+			if($recordedEntry)
+			{
+				$this->ingestAsset($recordedEntry, $dbAsset->getFlavorParamsId(), $filename);
+			}
 		}
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
