@@ -33,7 +33,7 @@ $PS2_TESTED_XML_ACTIONS = array(
 		);
 
 $PS2_TESTED_BIN_ACTIONS = array(
-		'extwidget.serveFlavor',
+		'extwidget.serveflavor',
 		'extwidget.kwidget',
 		'extwidget.thumbnail',
 		'extwidget.download',
