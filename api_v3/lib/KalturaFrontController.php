@@ -114,7 +114,7 @@ class KalturaFrontController
 			{
 				$success = false;
 				$errorCode = $ex->getCode();
-				$result = $this->getExceptionObject($ex);
+				$result = $this->getExceptionObject($ex, $this->service, $this->action);
 			}
 			
 	        $this->onRequestEnd($success, $errorCode);
@@ -233,7 +233,7 @@ class KalturaFrontController
 				{
 					$success = false;
 					$errorCode = $ex->getCode();
-					$currentResult = $this->getExceptionObject($ex);
+					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
 				}
 				$cache->storeCache($currentResult, "", true);
 			}
@@ -306,7 +306,7 @@ class KalturaFrontController
 		}
 	}
 	
-	public function getExceptionObject($ex)
+	public function getExceptionObject($ex, $service, $action)
 	{
 		KalturaResponseCacher::adjustApiCacheForException($ex);
 		
@@ -414,7 +414,7 @@ class KalturaFrontController
 			$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
 		
-		return $object;
+		return $this->handleErrorMapping($object, $service, $action);
 	}
 	
 	
@@ -507,5 +507,52 @@ class KalturaFrontController
 		$serializedObject .= $this->serializer->getMulitRequestFooter();
 		
 		return $serializedObject;
+	}
+
+	protected function handleErrorMapping(KalturaAPIException $apiException, $service, $action)
+	{
+		if (!kConf::hasParam('api_strict_error_map'))
+		{
+			KalturaLog::err('api_strict_error_map was not found in kConf and is mandatory!');
+			return new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+		}
+
+		$map = kConf::get('api_strict_error_map');
+		if (!is_array($map))
+			return $apiException;
+
+		foreach($map as $key => $serviceParams)
+		{
+			$configService = isset($serviceParams['service']) ? $serviceParams['service'] : null;
+			$configAction = isset($serviceParams['action']) ? $serviceParams['action'] : null;
+			if (strcasecmp($configService, $service) !== 0 || strcasecmp($configAction, $action) !== 0)
+				continue;
+
+			$defaultError = isset($serviceParams['default']) ? $serviceParams['default'] : null;
+			$whiteListedErrors = isset($serviceParams['whitelisted']) ? $serviceParams['whitelisted'] : array();
+			if (!is_array($whiteListedErrors))
+				$whiteListedErrors = array();
+
+			foreach($whiteListedErrors as $whiteListedError)
+			{
+				$whiteListedErrorCode = APIErrors::getErrorData(constant($whiteListedError));
+				$whiteListedErrorCode = $whiteListedErrorCode['code'];
+				if ($whiteListedErrorCode == $apiException->getCode())
+				{
+					KalturaLog::debug('Returning white-listed error: '.$whiteListedErrorCode);
+					return $apiException;
+				}
+			}
+
+			$reflectionException = new ReflectionClass("KalturaAPIException");
+			$errorStr = constant($defaultError);
+			$args = array_merge(array($errorStr), $apiException->getArgs());
+			/** @var KalturaAPIException $replacedException */
+			$replacedException = $reflectionException->newInstanceArgs($args);
+			KalturaLog::debug('Replacing error code "'.$apiException->getCode().'" with error code "'.$replacedException->getCode().'"');
+			return $replacedException;
+		}
+
+		return $apiException;
 	}
 }
