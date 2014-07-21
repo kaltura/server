@@ -71,7 +71,7 @@ class serveFlavorAction extends kalturaAction
 		if ($pathOnly && kIpAddressUtils::isInternalIp())
 		{
 			$path = null;
-			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false );
+			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
 			if ( $file_sync )
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
