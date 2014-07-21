@@ -40,10 +40,9 @@ class kBroadcastUrlManager
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
 		$hostname = $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource());
-		$port = $this->getPort(kDataCenterMgr::getCurrentDcId());
 		
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, $port));		
-		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, $port, true));
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));		
+		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, true));
 			
 		$otherDCs = kDataCenterMgr::getAllDcs();
 		if(count($otherDCs))
@@ -52,10 +51,9 @@ class kBroadcastUrlManager
 			$otherDcId = $otherDc['id'];
 			
 			$hostname = $this->getHostname($otherDcId, $dbEntry->getSource());
-			$port = $this->getPort($otherDcId);
 			
-			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $port));
-			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $port, true));
+			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, true));
 		}
 	}
 	
@@ -77,6 +75,7 @@ class kBroadcastUrlManager
 		$applicationSuffix = $this->getPostfixValue($sourceType);
 		$mediaServerConfig = kConf::get($dc, 'broadcast');
 		$url = $mediaServerConfig['domain'];
+		$port = $this->getPort($dc);
 		
 		if (isset ($mediaServerConfig['application'][$applicationSuffix]))
 			$app = $mediaServerConfig['application'][$applicationSuffix];
@@ -86,7 +85,7 @@ class kBroadcastUrlManager
 			throw new kCoreException("The value for $applicationSuffix does not exist in the broadcast map.");
 		}
 		
-		return "$url/$app";
+		return "$url:$port/$app";
 	}
 	
 	protected function getPort ($dc)
@@ -107,14 +106,14 @@ class kBroadcastUrlManager
 		return $port;
 	}
 	
-	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $port, $concatStreamName = false)
+	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
 	{
 		if (!$hostname)
 		{
 			return '';
 		}
 		
-		$url = "$protocol://$hostname:$port";
+		$url = "$protocol://$hostname";
 		
 		$params = array(
 			'p' => $this->partnerId,
