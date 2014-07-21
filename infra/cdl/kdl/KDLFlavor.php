@@ -498,7 +498,7 @@ $plannedDur = 0;
 				$target->_multiStream = $multiStream;
 			}
 		}
-
+		
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
@@ -538,7 +538,7 @@ $plannedDur = 0;
 		$target->_audio = null;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
-				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target);
+				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
 			}
 		}
 		
@@ -1072,8 +1072,29 @@ $plannedDur = 0;
 	/* ---------------------------
 	 * evaluateTargetAudio
 	 */
-	public function evaluateTargetAudio(KDLAudioData $source, KDLMediaDataSet $target)
+	public function evaluateTargetAudio(KDLAudioData $source, KDLMediaDataSet $target, $contentStreams=null)
 	{
+		/*
+		 * Adjust source channnels count to match the mapping settings
+		 */
+		$multiStream = $target->_multiStream;
+		$multiStreamChannels = null;
+		if(isset($multiStream) && isset($multiStream->audio)
+		&& isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
+			if(count($multiStream->audio->mapping)>1){
+				$multiStreamChannels = 2;
+			}
+			else if(isset($contentStreams) && isset($contentStreams->audio)){
+				$streams = $contentStreams->audio;
+				foreach ($streams as $stream){
+					if($stream->id==$multiStream->audio->mapping[0]){
+						$multiStreamChannels = $stream->audioChannels;
+						break;
+					}
+				}
+			}
+		}
+		
 		$targetAud = clone $this->_audio;
 		if($targetAud->_id=="" || $targetAud->_id==null) {
 			if($target->_container!=null) {
@@ -1148,6 +1169,9 @@ $plannedDur = 0;
 		else if($targetAud->_channels==0 
 		&& !($targetAud->_id==KDLAudioTarget::AAC || $targetAud->_id==KDLAudioTarget::PCM || $targetAud->_id==KDLAudioTarget::MPEG2)){
 			$targetAud->_channels=KDLConstants::DefaultAudioChannels;
+		}
+		else if(isset($multiStreamChannels)){
+			$targetAud->_channels=min($targetAud->_channels, $multiStreamChannels);
 		}
 		else {
 			$targetAud->_channels=min($targetAud->_channels, $source->_channels);
