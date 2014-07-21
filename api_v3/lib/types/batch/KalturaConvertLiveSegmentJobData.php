@@ -12,6 +12,11 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 	public $entryId;
 	
 	/**
+	 * @var string
+	 */
+	public $assetId;
+	
+	/**
 	 * Primary or secondary media server
 	 * @var KalturaMediaServerIndex
 	 */
@@ -44,6 +49,7 @@ class KalturaConvertLiveSegmentJobData extends KalturaJobData
 	private static $map_between_objects = array
 	(
 		'entryId',
+		'assetId',
 		'mediaServerIndex',
 		'fileIndex',
 		'srcFilePath',
