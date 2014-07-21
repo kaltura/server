@@ -307,8 +307,8 @@ class KalturaEntryService extends KalturaBaseService
 					$clipAttributes = $operationAttributesItem;
 					
 					// convert milliseconds to seconds
-					$offset = $operationAttributesItem->getOffset() / 1000;
-					$duration = $operationAttributesItem->getDuration() / 1000;
+					$offset = $operationAttributesItem->getOffset();
+					$duration = $operationAttributesItem->getDuration();
 					$requiredDuration = $offset + $duration;
 				}
 			}
@@ -317,7 +317,7 @@ class KalturaEntryService extends KalturaBaseService
 		$dbLiveEntry = $resource->getEntry();
 		$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
 		
-		if(!$dbRecordedEntry || ($requiredDuration && $requiredDuration > $dbRecordedEntry->getDuration()))
+		if(!$dbRecordedEntry || ($requiredDuration && $requiredDuration > $dbRecordedEntry->getLengthInMsecs()))
 		{
 			$mediaServer = $dbLiveEntry->getMediaServer(true);
 			if(!$mediaServer)
@@ -385,8 +385,6 @@ class KalturaEntryService extends KalturaBaseService
 
 		if($requiredDuration)
 		{
-		$offset = null;
-		$duration = null;
 			$errDescription = '';
  			kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $clipAttributes->getAssetParamsId(), $errDescription, $dbAsset->getId(), array($clipAttributes));
 		}
