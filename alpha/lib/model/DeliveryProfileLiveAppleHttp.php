@@ -4,6 +4,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
 	const HLS_LIVE_STREAM_CONTENT_TYPE = "hls_live_stream_content_type";
 	const M3U8_MASTER_PLAYLIST_IDENTIFIER = "EXT-X-STREAM-INF";
+	const MAX_IS_LIVE_ATTEMPTS = 3;
 
 	public function setDisableExtraAttributes($v)
 	{
@@ -40,7 +41,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 * @param $content array|string Full file content as a single string or as a lines-array
 	 * @return array Valid lines
 	 */
-	protected function getM3U8ValidLinesArray( $content )
+	protected function getM3U8Urls( $content )
 	{
 		$outLines = array();
 
@@ -76,10 +77,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 */
 	protected function checkIsLiveMasterPlaylist( $url, $urlContent )
 	{
-		$lines = $this->getM3U8ValidLinesArray( $urlContent );
+		$lines = $this->getM3U8Urls( $urlContent );
 
+		$attempt = 0;
 		foreach ($lines as $urlLine)
 		{
+			if ( $attempt++ == self::MAX_IS_LIVE_ATTEMPTS )
+			{
+				return false;
+			}
+
 			$mediaUrl = $this->checkIfValidUrl($urlLine, $url);
 	
 			$urlContent = $this->urlExists($mediaUrl, kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE));
@@ -107,10 +114,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	 */
 	protected function checkIsLiveMediaPlaylist( $url, $urlContent )
 	{
-		$lines = $this->getM3U8ValidLinesArray( $urlContent );
+		$lines = $this->getM3U8Urls( $urlContent );
 
+		$attempt = 0;
 		foreach ($lines as $urlLine)
 		{
+			if ( $attempt++ == self::MAX_IS_LIVE_ATTEMPTS )
+			{
+				return false;
+			}
+
 			$tsUrl = $this->checkIfValidUrl($urlLine, $url);
 			if ($this->urlExists($tsUrl ,kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE),'0-1') !== false)
 				return true;
