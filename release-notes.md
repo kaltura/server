@@ -11,12 +11,17 @@ Record all live assets and manage the recording on the API server side.
 
 #### Configuration ####
 - `base.ini` already changed to support `max_live_recording_duration_hours` of 24 hours.
+- `[api_strict_error_map]` section was added to `base.ini` to define strict error results for login services 
 
 #### Media-Server version ####
 - New media-server version [3.0.9](https://github.com/kaltura/media-server/releases/download/rel-3.0.9/KalturaWowzaServer-3.0.9.jar "3.0.9") required. 
 
 #### Deployment Scripts ####
 None
+
+#### DB Changes ####
+
+		deployment/updates/sql/2014_14_07_permission_getcurrentpermissions_remove_widget_permission.sql
 
 #### Known Issues & Limitations ####
 - The recording duration is limited to 24 hours.
