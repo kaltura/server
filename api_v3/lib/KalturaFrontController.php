@@ -521,38 +521,38 @@ class KalturaFrontController
 		if (!is_array($map))
 			return $apiException;
 
-		foreach($map as $key => $serviceParams)
+		$mapKey = strtolower($service).'_'.strtolower($action);
+		if (!isset($map[$mapKey]))
+			return $apiException;
+
+		$mapParams = $map[$mapKey];
+		$defaultError = isset($mapParams['defaultError']) ? $mapParams['defaultError'] : null;
+		$defaultNull = isset($mapParams['defaultNull']) ? $mapParams['defaultNull'] : null;
+		$whiteListedErrors = isset($mapParams['whitelisted']) ? $mapParams['whitelisted'] : array();
+		if (!is_array($whiteListedErrors))
+			$whiteListedErrors = array();
+
+		if (array_search($apiException->getCode(), $whiteListedErrors, true) !== false)
 		{
-			$configService = isset($serviceParams['service']) ? $serviceParams['service'] : null;
-			$configAction = isset($serviceParams['action']) ? $serviceParams['action'] : null;
-			if (strcasecmp($configService, $service) !== 0 || strcasecmp($configAction, $action) !== 0)
-				continue;
+			KalturaLog::debug('Returning white-listed error: '.$apiException->getCode());
+			return $apiException;
+		}
 
-			$defaultError = isset($serviceParams['default']) ? $serviceParams['default'] : null;
-			$whiteListedErrors = isset($serviceParams['whitelisted']) ? $serviceParams['whitelisted'] : array();
-			if (!is_array($whiteListedErrors))
-				$whiteListedErrors = array();
-
-			foreach($whiteListedErrors as $whiteListedError)
-			{
-				$whiteListedErrorCode = APIErrors::getErrorData(constant($whiteListedError));
-				$whiteListedErrorCode = $whiteListedErrorCode['code'];
-				if ($whiteListedErrorCode == $apiException->getCode())
-				{
-					KalturaLog::debug('Returning white-listed error: '.$whiteListedErrorCode);
-					return $apiException;
-				}
-			}
-
+		// finally, replace the error or return null as default
+		if ($defaultNull)
+		{
+			KalturaLog::debug('Replacing error code "' . $apiException->getCode() . '" with null result');
+			return null;
+		}
+		else
+		{
 			$reflectionException = new ReflectionClass("KalturaAPIException");
 			$errorStr = constant($defaultError);
 			$args = array_merge(array($errorStr), $apiException->getArgs());
 			/** @var KalturaAPIException $replacedException */
 			$replacedException = $reflectionException->newInstanceArgs($args);
-			KalturaLog::debug('Replacing error code "'.$apiException->getCode().'" with error code "'.$replacedException->getCode().'"');
+			KalturaLog::debug('Replacing error code "' . $apiException->getCode() . '" with error code "' . $replacedException->getCode() . '"');
 			return $replacedException;
 		}
-
-		return $apiException;
 	}
 }
