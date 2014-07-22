@@ -406,7 +406,7 @@ class kString
 	{
 		if (count($strings) < 2)
 			return reset($strings);
-	
+
 		$postfix = self::getCommonPostfixBase(reset($strings), next($strings));
 		for (;;)
 		{
