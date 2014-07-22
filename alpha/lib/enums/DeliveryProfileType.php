@@ -37,9 +37,9 @@ interface DeliveryProfileType extends BaseEnum
 	const LIMELIGHT_RTMP = 45;
 	
 	const LOCAL_PATH_APPLE_HTTP = 51;
+	const LOCAL_PATH_HDS = 53;
 	const LOCAL_PATH_HTTP = 54;
 	const LOCAL_PATH_RTMP = 55;
-	const LOCAL_PATH_HDS = 56;
 	
 	const LIVE_HLS = 1001;
 	const LIVE_HDS = 1002;

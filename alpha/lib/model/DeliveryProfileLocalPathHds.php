@@ -1,7 +1,6 @@
 <?php
 class DeliveryProfileLocalPathHds extends DeliveryProfileHds {
 	
-// doGetFlavorAssetUrl - Fully inherit from parent
 	
 	function __construct() {
 		parent::__construct();
