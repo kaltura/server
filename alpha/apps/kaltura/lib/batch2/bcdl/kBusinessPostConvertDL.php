@@ -243,7 +243,7 @@ class kBusinessPostConvertDL
 				continue;
 			}
 			
-			if($entry->getReplacedEntryId())
+			if($entry->getReplacedEntryId() && $siblingFlavorAsset->getStatus() != flavorAsset::ASSET_STATUS_NOT_APPLICABLE)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete and in replacement");
 				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
