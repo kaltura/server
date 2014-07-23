@@ -5,8 +5,7 @@
  */
 class kmcAction extends kalturaAction
 {
-	const KMC_ACTION_HOST = "kmc.kaltura.com";
-	
+		
 	public function execute ( ) 
 	{
 		// Prevent the page fron being embeded in an iframe
@@ -17,9 +16,9 @@ class kmcAction extends kalturaAction
 			$this->redirect('kmc/kmc2');
 		}
 
-		if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') && kConf::get('kmc_secured_login'))
+		if ((infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS) && kConf::get('kmc_secured_login'))
 		{
-			$url = 'https://' . self::KMC_ACTION_HOST . $_SERVER['REQUEST_URI'];
+			$url = kConf::get("kmc_action_secured_url");
 			header('Location:' . $url);
 			die;
 		}
