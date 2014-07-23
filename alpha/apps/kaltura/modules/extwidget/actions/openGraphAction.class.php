@@ -65,6 +65,9 @@ class openGraphAction extends sfAction
 		$this->swfUrl = 'http://' . $embed_host . $swfPath;
 		$this->swfSecureUrl = 'https://' . $embed_host_https . $swfPath;		
 
+		// set player url
+		$this->playerUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/embedIframeJs/uiconf_id/' . $this->uiconf_id . '/partner_id/' . $this->partner_id . '?iframeembed=true&entry_id=' . $this->entry_id . '&flashvars[streamerType]=auto';
+
 		$host = ($https_enabled) ? $embed_host_https : $embed_host;
 		$this->html5Url = $protocol . "://" . $host . $port . "/p/".$partnerId."/sp/".$partnerId."00/embedIframeJs/uiconf_id/".$uiConfId."/partner_id/". $partnerId;
 		$this->pageURL = $protocol . '://' . $_SERVER["SERVER_NAME"] . $port . $_SERVER["REQUEST_URI"];

@@ -13,6 +13,19 @@
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
 	<meta property="og:video:type" content="application/x-shockwave-flash" />
+
+	<meta name="twitter:card" content="player"/>
+    <meta name="twitter:site" content="@kaltura"/>
+    <meta name="twitter:creator" content="@kaltura"/>
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($entry_name); ?>" />
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
+    <meta name="twitter:image" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+    <meta name="twitter:player" content="<?php echo $playerUrl; ?>" />
+    <meta name="twitter:player:stream" content="<?php echo $flavorUrl; ?>" />
+    <meta name="twitter:player:stream:content_type" content="video/mp4"/>
+    <meta name="twitter:player:height" content="<?php echo $uiConf->getHeight();?>" />
+    <meta name="twitter:player:width" content="<?php echo $uiConf->getWidth();?>" />
+
 	<?php if( isset($flavorUrl) ) { ?>
 	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
 	<meta property="og:video:type" content="video/mp4" />	
