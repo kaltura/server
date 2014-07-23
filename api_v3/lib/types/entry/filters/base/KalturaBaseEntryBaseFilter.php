@@ -18,6 +18,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
 		"userIdEqual" => "_eq_user_id",
+		"userIdIn" => "_in_user_id",
 		"creatorIdEqual" => "_eq_creator_id",
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
@@ -184,6 +185,11 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $userIdEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $userIdIn;
 
 	/**
 	 * @var string
