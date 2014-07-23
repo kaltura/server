@@ -1,5 +1,20 @@
 # IX-9.20.0 #
 
+## Live params tags ##
+Added web and mobile tags to live params
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1624
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
 ## Live recording optimization ##
 Record all live assets and manage the recording on the API server side.
 
