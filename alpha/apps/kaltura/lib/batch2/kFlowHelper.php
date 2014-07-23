@@ -275,7 +275,8 @@ class kFlowHelper
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $asset->getSyncKey($keyType);
-		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
+		$baseName = $asset->getEntryId() . '_' . $asset->getId() . '.ts';
+		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath(), $baseName);
 		
 		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
 			return $dbBatchJob;

@@ -358,7 +358,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
-	public static function moveFromFileToDirectory(FileSyncKey $directory_key, $temp_file_path)
+	public static function moveFromFileToDirectory(FileSyncKey $directory_key, $temp_file_path, $base_file_name = null)
 	{
 		KalturaLog::debug("move file to directory: [$temp_file_path] to key [$directory_key]");
 
@@ -402,9 +402,25 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(count($existing_files) >= self::MAX_FILES_IN_CATEGORY)
 			throw new kFileSyncException("Exceeded max number of files [" . self::MAX_FILES_IN_CATEGORY . "] in category [$dirFullPath]");
 			
-		$destination_file_path = $dirFullPath . DIRECTORY_SEPARATOR . basename($temp_file_path);
+		if($base_file_name)
+		{
+			$filesCount = 0;
+			$files = glob($dirFullPath . DIRECTORY_SEPARATOR . '*');
+			if ($files)
+			{
+				$filesCount = count($files);
+			}
+			$base_file_name = str_pad($filesCount, 4, 0, STR_PAD_LEFT) . '.' . $base_file_name;
+		}
+		else
+		{
+			$base_file_name = basename($temp_file_path);
+		}
+		
+		$destination_file_path = $dirFullPath . DIRECTORY_SEPARATOR . $base_file_name;
 		$success = kFile::moveFile($temp_file_path, $destination_file_path);
 		self::setPermissions($dirFullPath);
+		KalturaLog::debug("temp_file_path [$temp_file_path](" . filesize($temp_file_path) . ") destination_file_path [$destination_file_path](" . filesize($destination_file_path) . ")");
 
 		if(!$success)
 			throw new kFileSyncException("Could not move file from [$temp_file_path] to [{$destination_file_path}]");

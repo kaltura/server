@@ -71,7 +71,7 @@ class KAsyncConvertLiveSegment extends KJobHandlerWorker
 		$jobData = $job->data;
 		
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
-		$fileName = "{$job->entryId}_{$jobData->assetId}_{$data->mediaServerIndex}.{$data->fileIndex}.ts";
+		$fileName = "{$job->entryId}_{$jobData->assetId}_{$data->mediaServerIndex}.{$job->id}.ts";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 		
