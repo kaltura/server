@@ -159,9 +159,6 @@ class previewAction extends kalturaAction
 			$this->flavorUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/playManifest/entryId/' . $this->entry_id . '/flavorId/' . $this->flavor_asset_id . '/format/url/protocol/' . $protocol . '/a.mp4';
 		}
 
-		// set player url
-		$this->playerUrl = 'https://' . $embed_host_https . '/p/'. $this->partner_id .'/sp/' . $this->partner_id . '00/embedIframeJs/uiconf_id/' . $this->uiconf_id . '/partner_id/' . $this->partner_id . '?iframeembed=true&entry_id=' . $this->entry_id . '&flashvars[streamerType]=auto';
-
 		// Set Page name
 		if(!$this->entry_id) {
 			$this->entry_name = ($playlist_name) ? $playlist_name : 'Kaltura Player';
