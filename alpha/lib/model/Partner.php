@@ -753,7 +753,14 @@ class Partner extends BasePartner
 	
 	/** monitor Usage Expiry **/
 	public function getExtendedFreeTrail() { return $this->getFromCustomData("extendedFreeTrail", null); }
-	public function setExtendedFreeTrail( $v ) { $this->putInCustomData("extendedFreeTrail", $v); }
+	public function setExtendedFreeTrail( $v )
+	{
+		$this->putInCustomData("extendedFreeTrail", $v);
+		if ( $v )
+		{
+			$this->setUsageLimitWarning(null);
+		}
+	}
 	
 	public function getExtendedFreeTrailExpiryReason() { return $this->getFromCustomData("extendedFreeTrailExpiryReason", null); }
 	public function setExtendedFreeTrailExpiryReason( $v ) { $this->putInCustomData("extendedFreeTrailExpiryReason", $v); }
