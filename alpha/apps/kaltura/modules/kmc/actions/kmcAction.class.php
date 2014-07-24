@@ -18,7 +18,7 @@ class kmcAction extends kalturaAction
 
 		if ((infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS) && kConf::get('kmc_secured_login'))
 		{
-			$url = kConf::get("kmc_action_secured_url");
+			$url = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 			header('Location:' . $url);
 			die;
 		}
