@@ -21,7 +21,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return true;
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if($object instanceof flavorAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
 			
 		return false;		
@@ -44,7 +44,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if($object instanceof flavorAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 		{
 			$entry = $object->getentry();
 			
@@ -163,39 +163,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 			return true;
 		
-		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
-			return true;
-		
 		return false;
 	}
 	
 	public static function exportSourceAssetFromJob(BatchJob $dbBatchJob)
 	{
-		// convert profile finished - export source flavor
-		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
-		{
-			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());
-			$sourceFlavor = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-			if (!$sourceFlavor) 
-			{
-			    KalturaLog::debug('Cannot find source flavor for entry id ['.$dbBatchJob->getEntryId().']');
-			}
-			else if (!$sourceFlavor->isLocalReadyStatus()) 
-			{
-			    KalturaLog::debug('Source flavor id ['.$sourceFlavor->getId().'] has status ['.$sourceFlavor->getStatus().'] - not ready for export');
-			}
-			else
-			{
-    			foreach($externalStorages as $externalStorage)
-    			{
-    				if ($externalStorage->triggerFitsReadyAsset($dbBatchJob->getEntryId()))
-    				{
-    				    self::exportFlavorAsset($sourceFlavor, $externalStorage);
-    				}
-    			}
-			}
-		}
-    			
 		// convert collection finished - export ism and ismc files
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 		{
