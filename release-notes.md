@@ -1,3 +1,23 @@
+# IX-9.21.0 #
+
+## login page redirection to https ##
+Making the login page load in https only
+
+- Issue Type: Improvement
+- Issue ID: PLAT-1540
+
+#### Configuration ####
+
+**Local.ini**
+
+kmc_action_secured_url = https://kmc.kaltura.com/index.php/kmc/kmc
+
+#### Deployment Scripts ####
+None
+
+#### Known Issues & Limitations ####
+None
+
 # IX-9.20.0 #
 
 ## Live params tags ##
