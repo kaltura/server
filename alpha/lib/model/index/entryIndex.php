@@ -7,6 +7,8 @@ class entryIndex extends BaseIndexObject
 {
 	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
 
+	const FIRST_BROADCAST = "first_broadcast";
+
 	const PLUGINS_DATA = "plugins_data";
 
 	const SEARCH_TEXT = "search_text";
@@ -247,6 +249,7 @@ class entryIndex extends BaseIndexObject
 				'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
 				'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
 				'entry.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
+				'entry.FIRST_BROADCAST' => 'dynamic_attributes.first_broadcast',
 				'entry.PLUGINS_DATA' => 'plugins_data',
 				'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
 			);
@@ -335,6 +338,7 @@ class entryIndex extends BaseIndexObject
 				'entry.END_DATE' => 'end_date',
 				'entry.AVAILABLE_FROM' => 'available_from',
 				'entry.LAST_PLAYED_AT' => 'last_played_at',
+				'entry.FIRST_BROADCAST' => 'dynamic_attributes.first_broadcast',
 			);
 		}
 		return self::$orderFields;

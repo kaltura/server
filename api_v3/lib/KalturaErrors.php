@@ -531,4 +531,9 @@ class KalturaErrors extends APIErrors
     * Delivery Service
     */
 	const DELIVERY_ID_NOT_FOUND = 'DELIVERY_ID_NOT_FOUND;DELIVERY_ID;delivery id [@DELIVERY_ID@] not found';
+	
+	/*
+	 * Live reports Service
+	 */
+	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
 }
