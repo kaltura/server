@@ -281,7 +281,7 @@ class kFlowHelper
 		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
 			return $dbBatchJob;
 			
-		$files = kFileSyncUtils::dir_get_files($key);
+		$files = kFileSyncUtils::dir_get_files($key, false);
 		
 		if(count($files) > 1)
 		{
