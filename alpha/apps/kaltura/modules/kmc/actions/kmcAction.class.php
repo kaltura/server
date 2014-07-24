@@ -5,6 +5,7 @@
  */
 class kmcAction extends kalturaAction
 {
+		
 	public function execute ( ) 
 	{
 		// Prevent the page fron being embeded in an iframe
@@ -13,6 +14,13 @@ class kmcAction extends kalturaAction
 		// Check if user already logged in and redirect to kmc2
 		if( $this->getRequest()->getCookie('kmcks') ) {
 			$this->redirect('kmc/kmc2');
+		}
+
+		if ((infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS) && kConf::get('kmc_secured_login'))
+		{
+			$url = kConf::get("kmc_action_secured_url");
+			header('Location:' . $url);
+			die;
 		}
 
 		$this->www_host = kConf::get('www_host');
