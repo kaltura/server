@@ -820,7 +820,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$thumbParamsOutput->setConversionEnginesExtraParams($thumbParams->getConversionEnginesExtraParams());
 		$thumbParamsOutput->setOperators($thumbParams->getOperators());
 		$thumbParamsOutput->setEngineVersion($thumbParams->getEngineVersion());
-		$fileExt = ($srcAsset != null) ? $srcAsset->getFileExt() : null;
+		$fileExt = ($srcAsset != null && $srcAsset instanceof thumbAsset) ? $srcAsset->getFileExt() : null;
 		if (is_null($fileExt) || $fileExt == "") {
 			$fileExt = 'jpg';
 		}
