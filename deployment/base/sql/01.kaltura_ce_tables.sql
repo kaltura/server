@@ -598,7 +598,7 @@ CREATE TABLE delivery_profile
 		status INTEGER,
 		media_protocols VARCHAR(255),
 		streamer_type VARCHAR(30),
-		is_default tinyint(4),
+		is_default tinyint(4) DEFAULT 0,
 		parent_id bigint(20),
 		custom_data text,
         PRIMARY KEY (id),
