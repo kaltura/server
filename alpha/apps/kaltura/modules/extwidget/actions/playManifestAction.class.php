@@ -639,8 +639,8 @@ class playManifestAction extends kalturaAction
 		if(!$storageProfile)
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 				
-		// storage doesn't belong to the partner
-		if($storageProfile->getPartnerId() != $this->entry->getPartnerId())
+		// storage doesn't belong to the partner OR is not global
+		if($storageProfile->getPartnerId() != 0 && $storageProfile->getPartnerId() != $this->entry->getPartnerId())
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
