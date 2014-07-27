@@ -182,8 +182,8 @@ class ReportService extends KalturaBaseService
 	    
 		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
 			$report = str_replace("http://","https://",$report);
-		
-	    return $report;
+
+		return $report;
 	}
 	
 	/**
