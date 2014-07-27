@@ -54,6 +54,12 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 	}
 	
 	
+	/**
+	 * 
+	 * @param unknown_type $srcFileSyncs
+	 * @param unknown_type $targetIsmcPath
+	 * @return NULL
+	 */
 	private function mergeIsmManifests($srcFileSyncs, $targetIsmcPath)
 	{
 		$root = null;
@@ -102,48 +108,79 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 			return null;
 	}
 	
-	private function mergeIsmcManifests(array $srcFileSyncs)
+	/**
+	 * 
+	 * @param array $srcFileSyncs
+	 * @return NULL
+	 */
+	static private function mergeIsmcManifests(array $srcFileSyncs)
 	{
 		$root = null;
-		foreach ($srcFileSyncs as $srcFileSync) 
-		{
-			if($srcFileSync->fileSyncObjectSubType == 4)
-			{
-				$xml = new SimpleXMLElement(file_get_contents($srcFileSync->fileSyncLocalPath));
-				if(!$root)
-  				{
+		foreach ($srcFileSyncs as $srcFileSync) {
+			if($srcFileSync->fileSyncObjectSubType == 4) {
+				$str = file_get_contents($srcFileSync->fileSyncLocalPath);
+				$xml = new SimpleXMLElement($str);
+
+				/*
+				 * Use the first ISMC as a root. 
+				 * The other IMSMC files will be merged with the root ISMC
+				 */
+				if(!$root) {
   					$root = $xml;
+  					continue;
   				}
-				else
-				{
-			  		for($strIdx=0; $strIdx<count($xml->StreamIndex); $strIdx++) 
-	  				{
-	   					$this->addQualityLevel($root->StreamIndex[$strIdx], $xml->StreamIndex[$strIdx]->QualityLevel);
-	  				}
-				} 				
+  				
+  				/*
+  				 *  To merge new ISMC with 'root' ISMC,
+  				 *  if new StreamIndex::Type can be matched with ne of root's stream, then add the QualityLevels
+  				 *  otherwise - add it to root as a new stream 
+  				 */
+		  		foreach($xml->StreamIndex as $xmlStream) {
+		  			$found = false;
+  					foreach($root->StreamIndex as $rootStream) {
+  						if((string)$rootStream['Type']==(string)$xmlStream['Type']){
+   							self::addQualityLevel($rootStream, $xmlStream->QualityLevel);
+   							$found = true;
+   							break;
+  						}
+  					}
+  					if(!$found) {
+  						self::addXMLElement($root, $xmlStream);	
+  					}
+				}
 			}
-		} 
+		}
 		if($root)		
  			return $root->asXML(); 		
  		else
  			return null;
 	}
 
-	private function addQualityLevel(SimpleXMLElement $dest, SimpleXMLElement $source)
+	/**
+	 * 
+	 * @param SimpleXMLElement $dest
+	 * @param SimpleXMLElement $source
+	 */
+	static private function addQualityLevel(SimpleXMLElement $dest, SimpleXMLElement $source)
 	{
  		$tmp = new SimpleXMLElement($dest->saveXML());
  		unset($dest->c);
- 		$this->addXMLElement($dest, $source);
+ 		self::addXMLElement($dest, $source);
  		$index  = count($tmp->QualityLevel);
  		$dest->QualityLevel[$index]['Index'] = $index;
  		foreach ($tmp->c as $obj)
  		{
-  			$this->addXMLElement($dest, $obj);
+  			self::addXMLElement($dest, $obj);
  		}
  		$dest['QualityLevels'] = $index+1;
 	}
 	
-	public function addXMLElement(SimpleXMLElement $dest, SimpleXMLElement $source)
+	/**
+	 * 
+	 * @param SimpleXMLElement $dest
+	 * @param SimpleXMLElement $source
+	 */
+	static public function addXMLElement(SimpleXMLElement $dest, SimpleXMLElement $source)
     {
         $new_dest = $dest->addChild($source->getName(), $source[0]);
 
@@ -151,7 +188,7 @@ class KOperationEngineIsmManifest extends KSingleOutputOperationEngine
 			$new_dest->addAttribute($name, $val);
 		} 
         foreach ($source->children() as $child) {
-            $this->addXMLElement($new_dest, $child);
+            self::addXMLElement($new_dest, $child);
         }
     }
 }

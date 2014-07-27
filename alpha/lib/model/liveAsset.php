@@ -90,6 +90,6 @@ class liveAsset extends flavorAsset
 			return parent::generateFileName($sub_type, $version);
 		}
 		
-		return $this->getEntryId() . "_" . $this->getId() . "_{$version}";
+		return $this->getEntryId() . "_" . $this->getId() . "_{$sub_type}_{$version}";
 	}
 }

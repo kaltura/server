@@ -19,10 +19,14 @@ while($s = trim(fgets($f))){
                 KalturaLog::err ('Couldn\'t find entry [' . $entryId . ']' );
                 continue;
         }
+
+        if ( $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ) {
+			$plays = $views;
+        }
+
         if ($entry->getViews() != $views || $entry->getPlays() != $plays){
                 $entry->setViews ( $views );
                 $entry->setPlays ( $plays );
-                KalturaLog::debug ( 'Successfully saved entry [' . $entryId . ']' );
 
 
 		try {
@@ -35,6 +39,8 @@ while($s = trim(fgets($f))){
 			$updateSql = "UPDATE entry set views='$views',plays='$plays',last_played_at='$mysqlNow' WHERE id='$entryId'";
 			$stmt = $connection->prepare($updateSql);
 			$stmt->execute();
+			KalturaLog::debug ( 'Successfully saved entry [' . $entryId . ']' );
+
 			$affectedRows = $stmt->rowCount();
 			KalturaLog::log("AffectedRows: ". $affectedRows);
 			// update sphinx log directly

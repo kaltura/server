@@ -58,7 +58,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$urlToCheck = trim($urlToCheck);
 		if (strpos($urlToCheck, '://') === false)
 		{
-			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
+			$urlToCheck = dirname($parentURL) . '/' . $urlToCheck;
 		}
 	
 		return $urlToCheck;

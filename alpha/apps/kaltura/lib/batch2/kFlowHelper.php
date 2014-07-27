@@ -275,8 +275,13 @@ class kFlowHelper
 			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
 		$key = $asset->getSyncKey($keyType);
-		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
-		$files = kFileSyncUtils::dir_get_files($key);
+		$baseName = $asset->getEntryId() . '_' . $asset->getId() . '.ts';
+		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath(), $baseName);
+		
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			return $dbBatchJob;
+			
+		$files = kFileSyncUtils::dir_get_files($key, false);
 		
 		if(count($files) > 1)
 		{
@@ -294,7 +299,7 @@ class kFlowHelper
 				if($replacingAsset)
 				{
 					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
-					return;
+					return $dbBatchJob;
 				}
 			}
 			// not in replacement
@@ -1717,11 +1722,54 @@ class kFlowHelper
 			$partner = $dbBatchJob->getPartner();
 			if($partner && $partner->getStorageDeleteFromKaltura())
 			{
-				self::deleteAssetLocalFileSyncs($fileSync, $asset);
+				if(self::isAssetExportFinished($fileSync, $asset))
+				{
+					if(!is_null($asset->getentry()->getReplacedEntryId()))
+						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
+					
+					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
+				}
 			}
 		}
 
 		return $dbBatchJob;
+	}
+	
+	/**
+	 * 
+	 * Handle deleteion of original entries file sync when in the process of entry replacement.
+	 * @param FileSync $fileSync
+	 * @param array $fileSyncSubTypesToHandle
+	 */
+	private static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
+	{	
+		$c = new Criteria();
+		$c->add(FileSyncPeer::FILE_TYPE, array (FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_FILE), Criteria::IN);
+		$c->add(FileSyncPeer::OBJECT_TYPE, $fileSync->getObjectType());
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $fileSync->getObjectSubType());
+		$c->add(FileSyncPeer::PARTNER_ID, $fileSync->getPartnerId());
+		$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
+		
+		$originalEntryFileSync = FileSyncPeer::doSelectOne($c);
+		if(!$originalEntryFileSync)
+		{
+			KalturaLog::debug("Origianl entry file sync not found with the following details: [object_type, object_sub_type, Partner_id, Linked_id] [" . $fileSync->getObjectType() 
+							. ", " . $fileSync->getObjectSubType() . ", " . $fileSync->getPartnerId() . ", " . $fileSync->getId() . "]");
+			return;
+		}
+		
+		$originalAssetToDeleteFileSyncFor = assetPeer::retrieveById($originalEntryFileSync->getObjectId());
+		if(!$originalAssetToDeleteFileSyncFor)
+		{
+			KalturaLog::debug("Could not find asset matching file sync object id " . $originalEntryFileSync->getObjectId());
+			return;
+		}
+		
+		foreach ($fileSyncSubTypesToHandle as $fileSyncSubType)
+		{		
+			$syncKeyToDelete = $originalAssetToDeleteFileSyncFor->getSyncKey($fileSyncSubType);
+			kFileSyncUtils::deleteSyncFileForKey($syncKeyToDelete, false, true);
+		}
 	}
 	
 	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
@@ -1740,19 +1788,59 @@ class kFlowHelper
 			return true;
 	}
 	
-	private static function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
+	private static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
 	{
-		if(self::isAssetExportFinished($fileSync, $asset))
+		$unClosedStatuses = array (
+			asset::ASSET_STATUS_QUEUED,
+			asset::ASSET_STATUS_CONVERTING,
+			asset::ASSET_STATUS_WAIT_FOR_CONVERT,
+			asset::ASSET_STATUS_EXPORTING
+		);
+		
+		$unClosedAssets = assetPeer::retrieveReadyByEntryId($asset->getEntryId(), null, $unClosedStatuses);
+		
+		if(count($unClosedAssets))
 		{
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			$asset->setFileSyncVersionsToDelete(array($fileSync->getVersion()));
+			$asset->save();
+			return;
+		}
+		
+		$assetsToDelete = assetPeer::retrieveReadyByEntryId($asset->getEntryId());
+		
+		self::deleteAssetLocalFileSyncsByAssetArray($assetsToDelete);
 			
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+		self::deleteAssetLocalFileSyncs($fileSync->getVersion(), $asset);
+	}
+	
+	private static function deleteAssetLocalFileSyncsByAssetArray($assetsToDeleteArray = array())
+	{
+		foreach ($assetsToDeleteArray as $assetToDelete)
+		{
+			/* @var $assetToDelete asset */
+			$versionsToDelete =  $assetToDelete->getFileSyncVersionsToDelete();
+			KalturaLog::debug("file sync versions to delete are " . print_r($versionsToDelete, true));
+			if($versionsToDelete)
+			{
+				foreach ($versionsToDelete as $version)
+					self::deleteAssetLocalFileSyncs($version, $assetToDelete);
+						
+				$assetToDelete->resetFileSyncVersionsToDelete();
+				$assetToDelete->save();
+			}
+		}
+	}
+	
+	private static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
+	{
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
 			
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
-		}		
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);		
 	}
 
 	/**
@@ -1864,6 +1952,8 @@ class kFlowHelper
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 
 		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
+		
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
 
 		return $dbBatchJob;
 	}
@@ -1873,6 +1963,8 @@ class kFlowHelper
 		KalturaLog::debug("Convert Profile finished");
 
 		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
+		
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 
@@ -2498,6 +2590,18 @@ class kFlowHelper
 				$tempFlavorAsset->setDeletedAt(time());
 				$tempFlavorAsset->save();
 			}
+		}
+	}
+	
+	private static function handleLocalFileSyncDeletion($entryId, Partner $partner)
+	{
+		if($partner && $partner->getStorageDeleteFromKaltura())
+		{
+			KalturaLog::debug("searching for exported assets of entry [$entryId] to delete local file syncs for");
+			
+			$readyAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryId);
+			
+			self::deleteAssetLocalFileSyncsByAssetArray($readyAssets);
 		}
 	}
 	
