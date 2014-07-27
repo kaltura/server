@@ -10,8 +10,8 @@ reverting the current encoder to the old one
 
 **Local.ini**
 
-bin_path_ffmpeg = ffmpeg
-;bin_path_ffmpeg = /opt/kaltura/bin/x64/run/run-ffmpeg-0.10.sh
+- bin_path_ffmpeg = ffmpeg
+- ;bin_path_ffmpeg = /opt/kaltura/bin/x64/run/run-ffmpeg-0.10.sh
 
 
 #### Deployment Scripts ####
