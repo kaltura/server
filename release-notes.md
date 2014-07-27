@@ -50,6 +50,19 @@ Update script already exists in `alpha/scripts/utils/setAlwaysAllowedPermissions
 #### DB Changes ####
 		deployment/updates/sql/2014_14_07_permission_getcurrentpermissions_remove_widget_permission.sql
 
+
+## Delivery profile ##
+set is default to be false in default.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- /deployment/updates/sql/2014\_07\_27\_delivery\_profile\_default\_false.sql
+
+#### Known Issues & Limitations ####
+None
+
 # IX-9.19.0 #
 
 ## Add ENTRY_CHANGED email notification template ##

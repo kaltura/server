@@ -47,7 +47,7 @@ class DeliveryProfileTableMap extends TableMap {
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 128, null);
 		$this->addColumn('URL', 'Url', 'VARCHAR', false, 256, null);
 		$this->addColumn('HOST_NAME', 'HostName', 'VARCHAR', false, 127, null);
-		$this->addColumn('IS_DEFAULT', 'IsDefault', 'BOOLEAN', false, null, null);
+		$this->addColumn('IS_DEFAULT', 'IsDefault', 'BOOLEAN', false, null, false);
 		$this->addColumn('PARENT_ID', 'ParentId', 'INTEGER', false, null, 0);
 		$this->addColumn('RECOGNIZER', 'Recognizer', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('TOKENIZER', 'Tokenizer', 'LONGVARCHAR', false, null, null);
