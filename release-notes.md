@@ -53,8 +53,15 @@ Update script already exists in `alpha/scripts/utils/setAlwaysAllowedPermissions
 
 ## Delivery profile ##
 set is default to be false in default.
-#### scripts ####
-- Requires executing : /deployment/updates/sql/2014\_07\_27\_delivery\_profile\_default\_false.sql
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- /deployment/updates/sql/2014\_07\_27\_delivery\_profile\_default\_false.sql
+
+#### Known Issues & Limitations ####
+None
 
 # IX-9.19.0 #
 
