@@ -180,7 +180,10 @@ class ReportService extends KalturaBaseService
 			$objectIds ,
 			$pager->pageSize , $pager->pageIndex , $order ); 
 	    
-	    return $report;
+		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
+			$report = str_replace("http://","https://",$report);
+
+		return $report;
 	}
 	
 	/**
