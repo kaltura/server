@@ -21,6 +21,11 @@ None
 #### Known Issues & Limitations ####
 - The recording duration is limited to 24 hours.
 
+## Delivery profile ##
+set is default to be false in default.
+#### scripts ####
+- Requires executing : /deployment/updates/sql/2014\_07\_27\_delivery\_profile\_default\_false.sql
+
 
 # IX-9.19.0 #
 
