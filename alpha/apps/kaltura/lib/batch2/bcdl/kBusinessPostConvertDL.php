@@ -60,7 +60,7 @@ class kBusinessPostConvertDL
 		 * For intermediate source generation, both the source and the asset have the same asset id.
 		 * In this case sourceMediaInfo should be retrieved as the first version of source asset mediaInfo 
 		 */
-		if($sourceMediaInfo->getFlavorAssetId()==$flavorAssetId) {
+		if(isset($sourceMediaInfo) && $sourceMediaInfo->getFlavorAssetId()==$flavorAssetId) {
 			$productMediaInfo = $sourceMediaInfo;
 			$sourceMediaInfo=mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId,1);
 			KalturaLog::log("Intermediate source generation - assetId(".$flavorAssetId."),src MdInf id(".$sourceMediaInfo->getId()."),product MdInf id(".$productMediaInfo->getId()).")";
@@ -131,6 +131,15 @@ class kBusinessPostConvertDL
 		}
 		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
+		
+		if($currentFlavorAsset->getIsOriginal())
+		{
+			$entry = $currentFlavorAsset->getentry();
+			if($entry)
+			{
+				kBusinessConvertDL::checkForPendingLiveClips($entry);
+			}
+		}
 		
 		return $currentFlavorAsset;
 	}
@@ -301,9 +310,12 @@ class kBusinessPostConvertDL
 			}
 			else
 			{
-			    // mark the context root job as finished only if all conversion jobs are completed
-    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-    			
+				if($currentFlavorAsset->getIsOriginal() || !$currentFlavorAsset->getentry()->getReplacedEntryId())
+				{
+				    // mark the context root job as finished only if all conversion jobs are completed
+	    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
+				}
+				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}

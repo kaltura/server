@@ -13,7 +13,7 @@ class DeliveryProfileVelocixLiveHds extends DeliveryProfileLiveHds
 	
 	public function getHdsManifestContentType()
 	{
-		return $this->getFromCustomData("hdsManifestContentType");
+		return $this->getFromCustomData("hdsManifestContentType", null, 'text/plain');
 	}
 	
 	/**
@@ -44,7 +44,8 @@ class DeliveryProfileVelocixLiveHds extends DeliveryProfileLiveHds
 		return '';
 	}
 	
-	public function isLive($url){
+	public function checkIsLive($url){
+		
 		KalturaLog::info('url to check:'.$url);
 		$parts = parse_url($url);
 		parse_str($parts['query'], $query);

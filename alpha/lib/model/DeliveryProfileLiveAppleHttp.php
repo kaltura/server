@@ -12,7 +12,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return $this->getFromCustomData("disableExtraAttributes");
 	}
 	
-	public function isLive ($url)
+	public function checkIsLive ($url)
 	{
 		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
 		if(!$data)
@@ -113,22 +113,71 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		}
 	}
 
+	protected function getPlayServerUrl($manifestUrl)
+	{
+		$entryId = $this->params->getEntryId();
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			KalturaLog::err("Entry [$entryId] not found");
+			return $manifestUrl;
+		}
+		
+		$partnerId = $entry->getPartnerId();
+		$playServerHost = myPartnerUtils::getPlayServerHost($partnerId, $this->params->getMediaProtocol());
+		
+		$url = "$playServerHost/manifest/master/entryId/$entryId";
+		if(count($this->params->getPlayerConfig()))
+			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
+			
+		// TODO encrypt the manifest URL
+		return "$url?url=$manifestUrl";
+	}
+	
+	public function compareFlavors($a, $b) 
+	{
+	    if ($a['bitrate'] == $b['bitrate']) {
+	        return 0;
+	    }
+	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
+	}
+
 	/* (non-PHPdoc)
 	 * @see DeliveryProfileLive::serve()
 	 */
-	public function serve($baseUrl, $backupUrl) 
+	public final function serve($baseUrl, $backupUrl) 
+	{
+		if($this->params->getUsePlayServer())
+		{
+			$baseUrl = $this->getPlayServerUrl($baseUrl);
+			$backupUrl = null;
+		}
+		
+		return $this->doServe($baseUrl, $backupUrl);
+	}
+
+	protected function doServe($baseUrl, $backupUrl) 
 	{
 		if(!$backupUrl)
 		{
 			return parent::serve($baseUrl, $backupUrl);
 		}
 		
+		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
+		/* @var $entry LiveEntry */
+		if($entry && $entry->getSyncDCs())
+		{
+			$baseUrl = str_replace('_all.smil', '_publish.smil', $baseUrl);
+			$backupUrl = str_replace('_all.smil', '_publish.smil', $backupUrl);
+		}
 		
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors);
 		$this->buildM3u8Flavors($backupUrl, $flavors);
 		
-		$this->params->setResponseFormat('m3u8');
+		usort($flavors, array($this, 'compareFlavors'));
+		
+		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
 		$renderer = $this->getRenderer($flavors);
 		return $renderer;
 	}

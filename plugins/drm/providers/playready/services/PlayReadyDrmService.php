@@ -66,7 +66,7 @@ class PlayReadyDrmService extends KalturaBaseService
 	 * 
 	 * @action getEntryContentKey
 	 * @param string $entryId 
-	 * @param int $createIfMissing
+	 * @param bool $createIfMissing
 	 * @return KalturaPlayReadyContentKey $response
 	 * 
 	 */

@@ -22,7 +22,7 @@ class thumbAsset extends asset
 		$this->setType(assetType::THUMBNAIL);
 	}
 	
-	protected function getFinalDownloadUrlPathWithoutKs()
+	public function getFinalDownloadUrlPathWithoutKs()
 	{
 		$finalPath = '/api_v3/index.php/service/thumbAsset/action/serve';
 		$finalPath .= '/thumbAssetId/' . $this->getId();

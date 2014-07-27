@@ -1000,21 +1000,27 @@ class kJobsManager
 	
 	/**
 	 * @param BatchJob $parentJob
-	 * @param flavorAsset $asset
-	 * @param array $files
-	 * @return BatchJob
+	 * @param liveAsset $asset
+	 * @param int $mediaServerIndex
+	 * @param string $filePath
+	 * @param float $endTime
 	 */
-	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, LiveEntry $entry, $mediaServerIndex, $filePath, $endTime)
+	public static function addConvertLiveSegmentJob(BatchJob $parentJob = null, liveAsset $asset, $mediaServerIndex, $filePath, $endTime)
 	{
-		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
+		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
 		if($mediaServerIndex == MediaServerIndex::SECONDARY)
-			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
+			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
 			
-		$key = $entry->getSyncKey($keyType);
-		$files = kFileSyncUtils::dir_get_files($key, false);
+		$key = $asset->getSyncKey($keyType);
+		$files = array();
+		if(kFileSyncUtils::fileSync_exists($key))
+		{
+			$files = kFileSyncUtils::dir_get_files($key, false);
+		}
 		
 		$jobData = new kConvertLiveSegmentJobData();
- 		$jobData->setEntryId($entry->getId());
+ 		$jobData->setEntryId($asset->getEntryId());
+ 		$jobData->setAssetId($asset->getId());
 		$jobData->setMediaServerIndex($mediaServerIndex);
 		$jobData->setEndTime($endTime);
 		$jobData->setSrcFilePath($filePath);
@@ -1028,11 +1034,11 @@ class kJobsManager
 		else
 		{
 			$batchJob = new BatchJob();
-			$batchJob->setEntryId($entry->getId());
-			$batchJob->setPartnerId($entry->getPartnerId());
+			$batchJob->setEntryId($asset->getEntryId());
+			$batchJob->setPartnerId($asset->getPartnerId());
 		}
 		
-		$batchJob->setObjectId($entry->getId());
+		$batchJob->setObjectId($asset->getEntryId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::CONVERT_LIVE_SEGMENT);
 	}
@@ -1215,7 +1221,9 @@ class kJobsManager
 					continue;
 				}
 			
-				if($flavor->getOrigin() == assetParamsOrigin::INGEST)
+				$flavorParams = assetParamsPeer::retrieveByPK($flavor->getFlavorParamsId());
+				
+				if($flavorParams instanceof liveParams || $flavor->getOrigin() == assetParamsOrigin::INGEST)
 				{
 					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
 					continue;
@@ -1231,7 +1239,6 @@ class kJobsManager
 					}
 				}
 				
-				$flavorParams = assetParamsPeer::retrieveByPK($flavor->getFlavorParamsId());
 				$sourceFileRequiredStorages[] = $flavorParams->getSourceRemoteStorageProfileId();
 				
 				$conversionRequired = true;

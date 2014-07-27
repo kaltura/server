@@ -171,6 +171,8 @@ class kMrssManager
 		$media->addChild('mediaType', $entry->getMediaType());
 		$media->addChild('duration', $entry->getLengthInMsecs());
 		$media->addChild('flavorParamsIds', $entry->getFlavorParamsIds());
+		$media->addChild('plays', $entry->getPlays());
+		$media->addChild('views', $entry->getViews());
 	}
 	
 	
@@ -266,7 +268,7 @@ class kMrssManager
 			$dynamicAttrs->setFileExtension($asset->getFileExt());
 			$urlManager->setDynamicAttributes($dynamicAttrs);
 			
-			$url = $urlManager->getUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 		}
 		
 		return $url;

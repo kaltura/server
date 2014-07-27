@@ -84,21 +84,25 @@ Alias /sf "/usr/share/pear/data/symfony/web/sf/"
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveIsm/(.*)$ /index.php/extwidget/serveIsm/$1 [L]
+	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^p/[-0-9]+/sp/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/sp/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
 	RewriteRule ^p/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
 	RewriteRule ^p/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^p/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^p/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^p/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	
 	RewriteRule ^s/p/[-0-9]+/playManifest/(.*)$ /index.php/extwidget/playManifest/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/serveFlavor/(.*)$ /index.php/extwidget/serveFlavor/$1 [L]
+	RewriteRule ^s/p/[-0-9]+/serveManifest/(.*)$ /index.php/extwidget/serveManifest/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/embedIframe/(.*)$ /index.php/extwidget/embedIframe/$1 [L]
 	RewriteRule ^s/p/[-0-9]+/embedIframeJs/(.*)$ /index.php/extwidget/embedIframeJs/$1 [L]
 	

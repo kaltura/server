@@ -268,10 +268,10 @@ class kContextDataHelper
 			{
 				$storageProfileId = $fileSync->getDc();
 				
-				$storageProfile = StorageProfilePeer::retrieveByPK();
+				$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 				$deliveryProfileRtmp = DeliveryProfilePeer::getRemoteDeliveryByStorageId($storageProfileId, $this->entry, PlaybackProtocol::RTMP);
 				
-				if ( !is_null($deliveryProfileRtmp)
+				if ( is_null($deliveryProfileRtmp)
 					&& (!$this->streamerType || $this->streamerType == PlaybackProtocol::AUTO))
 				{
 					$this->streamerType = PlaybackProtocol::HTTP;
@@ -299,7 +299,7 @@ class kContextDataHelper
 		{
 			$protocols = array();
 			
-			if($this->entry->getSource() != EntrySourceType::LIVE_STREAM && $this->entry->getSource() != EntrySourceType::LIVE_CHANNEL)
+			if(!in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 				$protocols[] = PlaybackProtocol::AKAMAI_HDS;
 				
 			$protocols[] = PlaybackProtocol::HDS;
@@ -317,7 +317,7 @@ class kContextDataHelper
 				}
 			}	
 			
-			if($this->entry->getSource() == EntrySourceType::LIVE_STREAM)
+			if(in_array($this->entry->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 				$this->streamerType = PlaybackProtocol::HDS;
 			if($this->entry->getSource() == EntrySourceType::AKAMAI_LIVE)
 				$this->streamerType = PlaybackProtocol::RTMP;

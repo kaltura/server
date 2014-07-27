@@ -34,6 +34,8 @@ class KalturaCurlWrapper
 	public $requestHeaders = array();
 	public $useGet = false;
 	public $ignoreCertErrors = false;
+	public $followRedirects = false;
+	public $range = '';
 	
 	public function readHeader($ch, $string)
 	{
@@ -44,7 +46,7 @@ class KalturaCurlWrapper
 	function getUrl($url, $params) 
 	{
 		$ch = curl_init();
-		if (!$this->useGet)
+		if (!$this->useGet && !$this->range)
 		{
 			curl_setopt($ch, CURLOPT_POST, 1);
 			$hasFiles = false;
@@ -66,11 +68,23 @@ class KalturaCurlWrapper
 		}
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+		if (!$this->range)
+		{
+			curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+		}
 		if ($this->ignoreCertErrors)
 		{
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}
+		if ($this->followRedirects)
+		{
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		}
+		if ($this->range)
+		{
+			curl_setopt($ch, CURLOPT_RANGE, $this->range);
+		}
+		
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader'));
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->requestHeaders);
 		$data = curl_exec($ch);

@@ -6,7 +6,12 @@
 abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
+	const FIRST_BROADCAST = 'first_broadcast';
 	const DEFAULT_CACHE_EXPIRY = 70;
+	
+	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
+	
+	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
@@ -122,7 +127,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['mediaServers']))
+		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS]))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
@@ -165,7 +170,7 @@ abstract class LiveEntry extends entry
 		if(is_array($streamBitrates) && count($streamBitrates))
 			return $streamBitrates;
 		
-		if($this->getSource() == EntrySourceType::LIVE_STREAM)
+		if(in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			$liveParams = assetParamsPeer::retrieveByProfile($this->getConversionProfileId());
 			$streamBitrates = array();
@@ -225,6 +230,11 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
+	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
+	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
+	
+	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
+	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -236,15 +246,25 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("push_publish_enabled", $v);
 	}
 	
+	public function getSyncDCs()
+	{
+		return $this->getFromCustomData("sync_dcs", null, false);
+	}
+	
+	public function setSyncDCs($v)
+	{
+		$this->putInCustomData("sync_dcs", $v);
+	}
+	
 	public function setLiveStreamConfigurations(array $v)
 	{
-		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)) )
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes) )
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false)
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -255,20 +275,18 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false)
 	{
-		if (!in_array($this->getSource(), array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
+		$configurations = array();
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
 		{
-			$configurations = $this->getFromCustomData('live_stream_configurations');
-			if($configurations)
+			$configurations = $this->getFromCustomData('live_stream_configurations', null, array());
+			if($configurations && $this->getPushPublishEnabled())
 			{
-				if ($this->getPushPublishEnabled())
-				{
-					$pushPublishConfigurations = $this->getPushPublishConfigurations();
-					$configurations = array_merge($configurations, $pushPublishConfigurations);
-				}
-				return $configurations;
+				$pushPublishConfigurations = $this->getPushPublishConfigurations();
+				$configurations = array_merge($configurations, $pushPublishConfigurations);
 			}
+			return $configurations;
 		}
 		
 		$primaryMediaServer = null;
@@ -292,12 +310,15 @@ abstract class LiveEntry extends entry
 			
 			if(!$primaryMediaServer)
 			{
+				if($currentDcOnly)
+					return array();
+					
 				$kMediaServer = array_shift($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
 					$primaryMediaServer = $kMediaServer->getMediaServer();
 			}
 				
-			if(count($kMediaServers))
+			if(!$currentDcOnly && count($kMediaServers))
 			{
 				$kMediaServer = reset($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
@@ -305,7 +326,6 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
-		$configurations = array();
 		$manifestUrl = null;
 		$backupManifestUrl = null;
 		
@@ -325,6 +345,14 @@ abstract class LiveEntry extends entry
 			}
 		}
 		
+		$rtmpStreamUrl = null;
+		$hlsStreamUrl = null;
+		$hdsStreamUrl = null;
+		$slStreamUrl = null;
+		$mpdStreamUrl = null;
+		$hlsBackupStreamUrl = null;
+		$hdsBackupStreamUrl = null;
+		
 		if ($manifestUrl)
 		{
 			$streamName = $this->getId();
@@ -341,9 +369,6 @@ abstract class LiveEntry extends entry
 			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
 			$slStreamUrl = "$manifestUrl/Manifest";
 			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
-			
-			$hlsBackupStreamUrl = null;
-			$hdsBackupStreamUrl = null;
 			
 			if($backupManifestUrl)
 			{
@@ -364,45 +389,46 @@ abstract class LiveEntry extends entry
 					$hdsBackupStreamUrl .= "?DVR";
 				}
 			}
+		}
 			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::RTMP);
-			$configuration->setUrl($rtmpStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::HDS);
-			$configuration->setUrl($hdsStreamUrl);
-			$configuration->setBackupUrl($hdsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::HLS);
-			$configuration->setUrl($hlsStreamUrl);
-			$configuration->setBackupUrl($hlsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
-			$configuration->setUrl($hlsStreamUrl);
-			$configuration->setBackupUrl($hlsBackupStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
-			$configuration->setUrl($slStreamUrl);
-			$configurations[] = $configuration;
-			
-			$configuration = new kLiveStreamConfiguration();
-			$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
-			$configuration->setUrl($mpdStreamUrl);
-			$configurations[] = $configuration;
-			
-			if ($this->getPushPublishEnabled())
-			{
-				$pushPublishConfigurations = $this->getPushPublishConfigurations();
-				$configurations = array_merge($configurations, $pushPublishConfigurations);
-			}
+//		TODO - enable it and test it in non-SaaS environment
+//		$configuration = new kLiveStreamConfiguration();
+//		$configuration->setProtocol(PlaybackProtocol::RTMP);
+//		$configuration->setUrl($rtmpStreamUrl);
+//		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::HDS);
+		$configuration->setUrl($hdsStreamUrl);
+		$configuration->setBackupUrl($hdsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::HLS);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::APPLE_HTTP);
+		$configuration->setUrl($hlsStreamUrl);
+		$configuration->setBackupUrl($hlsBackupStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::SILVER_LIGHT);
+		$configuration->setUrl($slStreamUrl);
+		$configurations[] = $configuration;
+		
+		$configuration = new kLiveStreamConfiguration();
+		$configuration->setProtocol(PlaybackProtocol::MPEG_DASH);
+		$configuration->setUrl($mpdStreamUrl);
+		$configurations[] = $configuration;
+		
+		if ($this->getPushPublishEnabled())
+		{
+			$pushPublishConfigurations = $this->getPushPublishConfigurations();
+			$configurations = array_merge($configurations, $pushPublishConfigurations);
 		}
 		
 		return $configurations;
@@ -509,13 +535,14 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
+		$this->setLastBroadcast(time());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
-		$this->putInCustomData("server-$index", $server, 'mediaServers');
+		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
 	protected function isMediaServerRegistered($index, $hostname)
 	{
-		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		/* @var $server kLiveMediaServer */
 		if($server && $server->getHostname() == $hostname)
 			return true;
@@ -525,9 +552,9 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $hostname)
 	{
-		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getHostname() == $hostname)
-			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
+			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
 	/**
@@ -536,14 +563,14 @@ abstract class LiveEntry extends entry
 	public function validateMediaServers()
 	{
 		$listChanged = false;
-		$kMediaServers = $this->getFromCustomData(null, 'mediaServers', array());
+		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
 		{
 			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
 				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
-				$this->removeFromCustomData($key, 'mediaServers');
+				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			}
 		}
 		
@@ -555,7 +582,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServers()
 	{
-		return $this->getFromCustomData(null, 'mediaServers', array());
+		return $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 	}
 	
 	/* (non-PHPdoc)
@@ -563,7 +590,9 @@ abstract class LiveEntry extends entry
 	 */
 	public function getDynamicAttributes()
 	{
-		$dynamicAttributes = array(LiveEntry::IS_LIVE => intval($this->hasMediaServer()));
+		$dynamicAttributes = array(
+				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast());
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}

@@ -25,7 +25,7 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{	
 		// replacing the ismc file name in the ism file
-		$ismPrevVersionFileSyncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+		$ismPrevVersionFileSyncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$ismContents = kFileSyncUtils::file_get_contents($ismPrevVersionFileSyncKey);
 		
 		$ismcPrevVersionFileSyncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
@@ -47,7 +47,7 @@ class kIsmIndexEventsConsumer implements kObjectChangedEventConsumer
 		$tmpPath = kFileSyncUtils::getLocalFilePathForKey($ismPrevVersionFileSyncKey).'.tmp';
 		file_put_contents($tmpPath, $ismXml->asXML());
 		
-		kFileSyncUtils::moveFromFile($tmpPath, $object->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM));
+		kFileSyncUtils::moveFromFile($tmpPath, $object->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 					
 		return true;
 	}

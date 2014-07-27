@@ -87,7 +87,9 @@ class asset extends Baseasset implements ISyncableFile
 	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 	const FILE_SYNC_ASSET_SUB_TYPE_ISM = 3;
 	const FILE_SYNC_ASSET_SUB_TYPE_ISMC = 4;
-	const FILE_SYNC_ASSET_SUB_TYPE_SMIL = 5;
+	
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY = 5; 
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY = 6;
 
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
@@ -129,13 +131,11 @@ class asset extends Baseasset implements ISyncableFile
 		$convertLogSyncKey = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 		$ismSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISM);
 		$ismcSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
-		$smilSyncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
 
 		$newAssetSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$newConvertLogSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 		$newIsmSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISM);
 		$newIsmcSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
-		$newSmilSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
 
 		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
 			kFileSyncUtils::softCopy($assetSyncKey, $newAssetSyncKey);
@@ -149,9 +149,6 @@ class asset extends Baseasset implements ISyncableFile
 		if(kFileSyncUtils::fileSync_exists($ismcSyncKey))
 			kFileSyncUtils::softCopy($ismcSyncKey, $newIsmcSyncKey);
 
-		if(kFileSyncUtils::fileSync_exists($smilSyncKey))
-			kFileSyncUtils::softCopy($smilSyncKey, $newSmilSyncKey);
-			
 		kEventsManager::raiseEvent(new kObjectAddedEvent($newFlavorAsset));
 		
 		return $newFlavorAsset;
@@ -301,17 +298,31 @@ class asset extends Baseasset implements ISyncableFile
 	}
 	
 	
-	private static function validateFileSyncSubType ( $sub_type )
+	protected static function validateFileSyncSubType ( $sub_type )
 	{
 		$valid_sub_types = array(
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET,
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG,
 			self::FILE_SYNC_ASSET_SUB_TYPE_ISM,
 			self::FILE_SYNC_ASSET_SUB_TYPE_ISMC,
-			self::FILE_SYNC_ASSET_SUB_TYPE_SMIL,
 		);
 		if (!in_array($sub_type, $valid_sub_types))
 			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
+	}
+	
+	protected function getVersionForSubType($sub_type, $version = null)
+	{
+		switch ($sub_type)
+		{
+			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+				return $this->getVersion();
+				
+			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
+				return $this->getLogFileVersion();
+		}
+		return null;
 	}
 	
 	/**
@@ -320,7 +331,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function getSyncKey($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType($sub_type);
+		static::validateFileSyncSubType($sub_type);
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::FLAVOR_ASSET;
 		$key->object_sub_type = $sub_type;
@@ -331,18 +342,7 @@ class asset extends Baseasset implements ISyncableFile
 		}
 		else
 		{
-			switch ($sub_type)
-			{
-				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL:
-					$key->version = $this->getVersion();
-					break;
-				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
-					$key->version = $this->getLogFileVersion();
-					break;
-			}
+			$key->version = $this->getVersionForSubType($sub_type);
 		}
 		$key->partner_id = $this->getPartnerId();
 		
@@ -356,7 +356,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		
 		$entry = $this->getentry();
 		if(!$entry)
@@ -368,7 +368,11 @@ class asset extends Baseasset implements ISyncableFile
 		{
 			case self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
 				$ext = '';
-				if($this->getFileExt())
+				if($this->hasTag(assetParams::TAG_ISM_MANIFEST))
+					$ext = ".ism";
+				elseif($this->hasTag(assetParams::TAG_SMIL_MANIFEST))
+					$ext = ".smil";
+				else if($this->getFileExt())
 					$ext = '.' . $this->getFileExt();
 				return $fileName . $ext;
 				
@@ -380,9 +384,6 @@ class asset extends Baseasset implements ISyncableFile
 				
 			case self::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
 				return "$fileName.ismc";
-
-			case self::FILE_SYNC_ASSET_SUB_TYPE_SMIL:
-				return "$fileName.smil";
 		}
 		
 		return null;
@@ -394,8 +395,8 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFilePathArr($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
-		$version = (is_null($version) ? $this->getVersion() : $version);
+		static::validateFileSyncSubType ( $sub_type );
+		$version = (is_null($version) ? $this->getVersionForSubType($sub_type) : $version);
 		
 		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
 		if(!$entry)
@@ -485,7 +486,9 @@ class asset extends Baseasset implements ISyncableFile
 			return null;
 			
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $this->getEntryId(), PlaybackProtocol::HTTP, null, $fileSync, $this);
-		
+		if(is_null($urlManager)) 
+			return null;
+			
 		$url = rtrim($urlManager->getUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 		return $url;
 	}
@@ -595,7 +598,7 @@ class asset extends Baseasset implements ISyncableFile
 		return $downloadUrl;
 	}
 	
-	protected function getFinalDownloadUrlPathWithoutKs()
+	public function getFinalDownloadUrlPathWithoutKs()
 	{
 		$finalPath = myPartnerUtils::getUrlForPartner($this->getPartnerId(),$this->getPartnerId()*100).
 					"/download".

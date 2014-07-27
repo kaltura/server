@@ -2,7 +2,7 @@
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kObjectDeletedEventConsumer
+class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -280,5 +280,57 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		
 		return $xmlContent;
-	}	
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		/* @var $object LiveEntry */
+		$select = new Criteria();
+		$select->add(CuePointPeer::ENTRY_ID, $object->getId());
+		$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
+		
+		$cuePoints = CuePointPeer::doSelect($select);
+		$cuePointsIds = array();
+		foreach($cuePoints as $cuePoint)
+		{
+			/* @var $cuePoint CuePoint */
+			$cuePointsIds[] = $cuePoint->getId();
+		}
+		
+		$update = new Criteria();
+		$update->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
+		
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
+		BasePeer::doUpdate($select, $update, $con);
+		
+		$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);
+		foreach($cuePoints as $cuePoint)
+		{
+			/* @var $cuePoint CuePoint */
+			$cuePoint->indexToSearchIndex();
+		}
+	}
+
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof LiveEntry && !count($object->getMediaServers()))
+		{
+			// checking if the live-entry media-server was just unregistered
+			$customDataOldValues = $object->getCustomDataOldValues();
+			if(isset($customDataOldValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS]))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 }

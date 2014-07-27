@@ -460,6 +460,22 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		// copy kCurrentContext parameters (kCurrentContext::init should have been executed before)
 		self::$requestedPartnerId = !self::isEmpty(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
 		self::$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
+		if (self::$ksPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID && 
+			kConf::hasParam('admin_console_partner_allowed_ips'))
+		{
+			$ipAllowed = false;
+			$ipRanges = explode(',', kConf::get('admin_console_partner_allowed_ips'));
+			foreach ($ipRanges as $curRange)
+			{
+				if (kIpAddressUtils::isIpInRange($_SERVER['REMOTE_ADDR'], $curRange))
+				{
+					$ipAllowed = true;
+					break;
+				}
+			} 
+			if (!$ipAllowed)
+				throw new kCoreException("Admin console partner used from an unallowed address", kCoreException::PARTNER_BLOCKED);
+		}
 		self::$ksUserId = !self::isEmpty(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
 		if (self::$ksPartnerId != Partner::BATCH_PARTNER_ID)
 			self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser() : null;

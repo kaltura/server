@@ -3,6 +3,7 @@ class kBroadcastUrlManager
 {
 	const PRIMARY_MEDIA_SERVER_INDEX = 0;
 	const SECONDARY_MEDIA_SERVER_INDEX = 1;
+	const DEFAULT_SUFFIX = 'default';
 	
 	protected $partnerId;
 	
@@ -33,22 +34,43 @@ class kBroadcastUrlManager
 	
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry,  $this->getHostname(kDataCenterMgr::getCurrentDcId()), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry,  $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource()), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
 			
 		$otherDCs = kDataCenterMgr::getAllDcs();
 		if(count($otherDCs))
 		{
 			$otherDc = reset($otherDCs);
 			$otherDcId = $otherDc['id'];
-			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $this->getHostname($otherDcId), kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
+			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $this->getHostname($otherDcId, $dbEntry->getSource()), kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 		}
 	}
 	
-	protected function getHostname ($dc)
+	protected function getPostfixValue ($sourceType)
 	{
+		//We want the behavior to be as before.
+		if (in_array($sourceType, array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL)))
+			return self::DEFAULT_SUFFIX;
+			
+		$reflector = new ReflectionClass("EntrySourceType");
+		KalturaLog::debug(print_r($reflector, true));
+		$constantNames = array_flip($reflector->getConstants());
+		
+		return $constantNames[$sourceType];
+	}
+	
+	protected function getHostname ($dc, $sourceType)
+	{
+		$applicationSuffix = $this->getPostfixValue($sourceType);
 		$mediaServerConfig = kConf::get($dc, 'broadcast');
 		$url = $mediaServerConfig['domain'];
-		$app = $mediaServerConfig['application'];
+		
+		if (isset ($mediaServerConfig['application'][$applicationSuffix]))
+			$app = $mediaServerConfig['application'][$applicationSuffix];
+		else
+		{
+			KalturaLog::err("The value for $applicationSuffix does not exist in the broadcast map.");
+			throw new kCoreException("The value for $applicationSuffix does not exist in the broadcast map.");
+		}
 		
 		return "$url/$app";
 	}

@@ -235,7 +235,8 @@ class playManifestAction extends kalturaAction
 		// by symfony calling str_parse to replace + with spaces.
 		// this happens only with params passed in the url path and not the query strings. specifically the ~ char at
 		// a columns divided by 3 causes this issue (e.g. http://www.xyzw.com/~xxx)
-		$referrer = base64_decode(str_replace(" ", "+", $base64Referrer));
+		//replace also any - with + and _ with / 
+		$referrer = base64_decode(str_replace(array('-', '_', ' '), array('+', '/', '+'), $base64Referrer));
 		if (!is_string($referrer))
 			$referrer = ""; // base64_decode can return binary data
 			
@@ -358,13 +359,22 @@ class playManifestAction extends kalturaAction
 	
 	protected function initSilverLightManifest($flavorAssets)
 	{
-		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				
 		if(!$key)
 			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 			
 		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		
+		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
+		if(!$localFileSync && !$remoteFileSync)
+		{
+			$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
+			$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+			$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		}
+		
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
 		{
 			$this->deliveryAttributes->setStorageId(null);
@@ -383,7 +393,7 @@ class playManifestAction extends kalturaAction
 
 	protected function initSmilManifest($flavorAssets)
 	{
-		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_SMIL);
+		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_SMIL_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		if (!$key)
 			return false;
 
@@ -677,7 +687,8 @@ class playManifestAction extends kalturaAction
 		// Fixing ALL kinds of historical bugs.
 		
 		if($this->deliveryAttributes->getFormat() == self::URL) {
-			$this->deliveryAttributes->setResponseFormat('redirect');
+			if(is_null($this->deliveryAttributes->getResponseFormat()))
+				$this->deliveryAttributes->setResponseFormat('redirect');
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HD) {
 			// This is a hack to return an f4m that has a URL of a smil
@@ -686,8 +697,11 @@ class playManifestAction extends kalturaAction
 			// Translate to playback protocol format 	
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::AKAMAI_HD);
 		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::RTMP) {
-			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0)
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "rtmp") !== 0) 
 				$this->deliveryAttributes->setMediaProtocol("rtmp");
+		} else if($this->deliveryAttributes->getFormat() == PlaybackProtocol::HTTP) {
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
+				$this->deliveryAttributes->setMediaProtocol("http");
 		}
 
 		// <-- 
@@ -718,8 +732,9 @@ class playManifestAction extends kalturaAction
 	private function getLiveEntryBaseUrls()
 	{
 		$tag = null;
-		if(count($this->deliveryAttributes->getTags()) == 1)
-			$tag = reset($this->deliveryAttributes->getTags());
+		$tags = $this->deliveryAttributes->getTags();
+		if(count($tags) == 1) 
+			$tag = reset($tags);
 			
 		$protocol = $this->deliveryAttributes->getMediaProtocol(); 
 		if(in_array($this->deliveryAttributes->getFormat(), self::$httpFormats) && !in_array($protocol, self::$httpProtocols))
@@ -747,7 +762,7 @@ class playManifestAction extends kalturaAction
 	
 	private function serveLiveEntry()
 	{		
-		if ($this->entry->getSource() == EntrySourceType::LIVE_STREAM || $this->entry->getSource() == EntrySourceType::LIVE_CHANNEL)
+		if (in_array($this->entry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
  		{
  			if (!$this->entry->hasMediaServer())
  				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$this->entryId] is not broadcasting");
@@ -871,6 +886,12 @@ class playManifestAction extends kalturaAction
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
+		$this->deliveryAttributes->setUsePlayServer((bool) $this->getRequestParameter("usePlayServer") && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
+		if($this->deliveryAttributes->getUsePlayServer())
+		{
+			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
+		}
+		
 		$this->enforceEncryption();
 		
 		$renderer = null;
@@ -947,5 +968,4 @@ class playManifestAction extends kalturaAction
 		KExternalErrors::terminateDispatch();
 		$renderer->output($deliveryCode, $playbackContext);
 	}
-	
 }

@@ -52,6 +52,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::GENERIC_HLS_MANIFEST => 'DeliveryProfileGenericAppleHttpManifest',
 			DeliveryProfileType::GENERIC_HDS_MANIFEST => 'DeliveryProfileGenericHdsManifest',
 			DeliveryProfileType::GENERIC_SS => 'DeliveryProfileGenericSilverLight',
+			DeliveryProfileType::GENERIC_RTMP => 'DeliveryProfileGenericRtmp',
 					
 			DeliveryProfileType::LEVEL3_HLS => 'DeliveryProfileLevel3AppleHttp',
 			DeliveryProfileType::LEVEL3_HTTP => 'DeliveryProfileLevel3Http',
@@ -68,7 +69,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIVE_HDS => 'DeliveryProfileLiveHds',
 			DeliveryProfileType::LIVE_RTMP => 'DeliveryProfileLiveRtmp',
 					
-			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryLiveAkamaiHds',
+			DeliveryProfileType::LIVE_AKAMAI_HDS => 'DeliveryProfileLiveAkamaiHds',
 	);
 	
 	/**
@@ -123,6 +124,12 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 */
 	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
 	{
+		if ($streamerType == PlaybackProtocol::HTTP)
+		{
+			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, infraRequestUtils::getProtocol(), null, null, false);
+			if ($delivery)
+				return $delivery;
+		}
 		return self::getLocalDeliveryByPartner($entryId, $streamerType, null, null, null, false);	
 	}
 	
@@ -174,7 +181,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
 			
 			$cmp = new DeliveryProfileComparator($isSecured, $cdnHost);
-			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder");
+			array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $deliveryIds);
 			uasort($deliveries, array($cmp, "compare"));
 		} 
 		// Else catch the default by the protocol
@@ -198,9 +205,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
 		if($delivery) {
-			KalturaLog::debug('Delivery ID for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType . ' is ' . $delivery->getId());
+			KalturaLog::debug("Delivery ID for partnerId [$partnerId] and streamer type [$streamerType] is " . $delivery->getId());
 		} else {
-			KalturaLog::err('Delivery ID can\'t be determined for partnerId: '. $partnerId . ' and streamer type: ' . $streamerType);
+			KalturaLog::err("Delivery ID can't be determined for partnerId [$partnerId] streamer type [$streamerType] and media protocol [$mediaProtocol]");
 		}
 		return $delivery;
 	}
@@ -236,18 +243,20 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			
 		$deliveryIds = $storageProfile->getDeliveryProfileIds();
 		if(!array_key_exists($streamerType, $deliveryIds)) {
-			KalturaLog::err('Delivery ID can\'t be determined for storageId: '. $storageProfileId . ' and streamer type: ' . $streamerType);
+			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) and streamer type [ $streamerType ]");
 			return null;
 		}
 		
 		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds[$streamerType]);
 		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
 		if($delivery) {
-			KalturaLog::debug('Delivery ID for partnerId: '. $storageProfile->getPartnerId() . ' and streamer type:' . $streamerType . ' is ' . $delivery->getId());
+			KalturaLog::debug("Delivery ID for storageId [$storageProfileId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
 			$delivery->setEntryId($entryId);
 			$delivery->setStorageProfileId($storageProfileId);
 			
 			$delivery->initDeliveryDynamicAttributes($fileSync, $asset);
+		} else {
+			KalturaLog::err("Delivery ID can't be determined for storageId [$storageProfileId] ( PartnerId [" .  $storageProfile->getPartnerId() . "] ) streamer type [$streamerType] and media protocol [$mediaProtocol]");
 		}
 		
 		return $delivery;
@@ -308,10 +317,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveries = self::doSelect($c);
 		$delivery = self::selectByMediaProtocol($deliveries, $mediaProtocol);
 		if($delivery) {
-			KalturaLog::debug('Delivery ID for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType . ' is ' . $delivery->getId());
+			KalturaLog::debug("Delivery ID for Host Name: [$cdnHost] and streamer type: [$streamerType] is [" . $delivery->getId());
 			$delivery->setEntryId($entryId);
 		} else {
-			KalturaLog::err('Delivery ID can\'t be determined for Host Name: '. $cdnHost . ' and streamer type: ' . $streamerType);
+			KalturaLog::err("Delivery ID can't be determined for Host Name [$cdnHost] and streamer type [$streamerType]");
 		}
 		return $delivery;
 		
@@ -365,5 +374,27 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);
 		return $deliveryProfileTypes;
 	}
+	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("deliveryProfile:id=%s", self::ID), array("deliveryProfile:partnerId=%s", self::PARTNER_ID));
+	}
+	
+	/**
+	 * Creates default criteria filter
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+	
+		$c = new myCriteria();
+		
+		// We'd like to retrieve only active delivery profiles, and the ones we consider to remove but haven't removed yet.
+		$c->addAnd(DeliveryProfilePeer::STATUS, array(DeliveryStatus::ACTIVE, DeliveryStatus::STAGING_OUT), Criteria::IN);
+		
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 } // DeliveryProfilePeer
 

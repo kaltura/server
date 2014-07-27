@@ -135,7 +135,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	const CATEGORIES_INDEXED_FIELD_PREFIX = 'pid';
 	
 	const DEFAULT_ASSETCACHEVERSION = 1;
-	
+
+	const DEFAULT_IMAGE_HEIGHT = 480;
+	const DEFAULT_IMAGE_WIDTH = 640;
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -263,7 +266,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 
 		myPartnerUtils::setPartnerIdForObj($this);
-		mySearchUtils::setDisplayInSearch($this);
+		
+		if($this->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
+		{
+			mySearchUtils::setDisplayInSearch($this);
+		}
+			
 		ktagword::updateAdminTags($this);
 		
 		// same for puserId ...
@@ -734,14 +742,35 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		{
 			return myPlaylistUtils::getExecutionUrl( $this );
 		}
-		//$path = $this->getThumbnailPath ( $version );
-		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/flvclipper/entry_id/" . $this->getId() ;
+
 		$current_version = $this->getVersion();
-		if ( $version )
-			$path .= "/version/$version";
+
+		$entryId = $this->getId();
+		$media_type = $this->getMediaType();
+
+		if ($media_type == self::ENTRY_MEDIA_TYPE_VIDEO || $media_type == self::ENTRY_MEDIA_TYPE_AUDIO)
+		{
+			$protocolStr = infraRequestUtils::getProtocol();
+
+			$url = requestUtils::getApiCdnHost();
+			$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
+			$url .= "/playManifest/entryId/$entryId/format/url/protocol/$protocolStr";
+		}
+		else if ($media_type == self::ENTRY_MEDIA_TYPE_IMAGE  )
+		{
+			$width = self::DEFAULT_IMAGE_WIDTH;
+			$height = self::DEFAULT_IMAGE_HEIGHT;
+
+			$url = myPartnerUtils::getCdnHost($this->getPartnerId());
+			$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
+			if (!$version)
+				$version = $current_version;
+
+			$url .= "/thumbnail/entry_id/$entryId/def_height/$height/def_width/$width/version/$version/type/1";
+		}
 		else
-			$path .= "/version/$current_version";
-		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $path ;
+			return null;
+
 		return $url;
 	}
 

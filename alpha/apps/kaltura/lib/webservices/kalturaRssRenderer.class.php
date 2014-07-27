@@ -61,7 +61,7 @@ class kalturaRssRenderer
 			$kaltura_elements .=
 				"<kaltura:views>" . ($entry->getViews() ? $entry->getViews() : "0"). "</kaltura:views>" .  
 				"<kaltura:plays>" . ($entry->getPlays() ? $entry->getPlays() : "0"). "</kaltura:plays>" .
-				"<kaltura:userScreenName>" . $entry->getUserScreenName() . "</kaltura:userScreenName>" . 
+				"<kaltura:userScreenName>" . kString::xmlEncode ($entry->getUserScreenName()) . "</kaltura:userScreenName>" . 
 				"<kaltura:puserId>" . $entry->getPuserId() . "</kaltura:puserId>" .
 				"<kaltura:userLandingPage>" . $entry->getUserLandingPage() . "</kaltura:userLandingPage>";
 		}
@@ -77,8 +77,8 @@ class kalturaRssRenderer
 		
 		$kaltura_elements .=
 			"<kaltura:partnerLandingPage>" . $entry->getPartnerLandingPage() . "</kaltura:partnerLandingPage>" .
-			"<kaltura:tags>" . $entry->getTags() . "</kaltura:tags>" .
-			"<kaltura:adminTags>" . $entry->getAdminTags() . "</kaltura:adminTags>" .
+			"<kaltura:tags>" . kString::xmlEncode ($entry->getTags()) . "</kaltura:tags>" .
+			"<kaltura:adminTags>" . kString::xmlEncode ($entry->getAdminTags()) . "</kaltura:adminTags>" .
 			"<kaltura:votes>" . ($entry->getVotes() ? $entry->getVotes() : "0") . "</kaltura:votes>" .
 			"<kaltura:rank>" . ($entry->getRank() ? $entry->getRank() : "0") . "</kaltura:rank>" .	
 			"<kaltura:createdAt>" . $entry->getCreatedAt() . "</kaltura:createdAt>" .

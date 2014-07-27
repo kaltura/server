@@ -80,6 +80,8 @@ class kwidgetAction extends sfAction
 		{
 			KExternalErrors::dieGracefully();
 		}
+		
+		myPartnerUtils::blockInactivePartner($widget->getPartnerId());
 
 		// because of the routing rule - the entry_id & kmedia_type WILL exist. be sure to ignore them if smaller than 0
 		$kshow_id= $widget->getKshowId();

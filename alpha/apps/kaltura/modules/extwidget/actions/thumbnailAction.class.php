@@ -93,18 +93,31 @@ class thumbnailAction extends sfAction
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
 		$rel_width = $this->getFloatRequestParameter("rel_width", -1, -1, 10000);
 		$rel_height = $this->getFloatRequestParameter("rel_height", -1, -1, 10000);
-				
+
+		$def_width = $this->getFloatRequestParameter("def_width", -1, -1, 10000);
+		$def_height = $this->getFloatRequestParameter("def_height", -1, -1, 10000);
+		
 		if ($width == -1 && $height == -1) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
 		{
-			$width = 120;
-			$height = 90;
+			if ( $def_width == -1 )
+				$width = 120;
+			else
+				$width = $def_width;
+
+			if ( $def_height == -1 )
+				$height = 90;
+			else
+				$height = $def_height;
 		}
 		else if ($width == -1) // if only either width or height is missing reset them to zero, and convertImage will handle them
-			$width = 0;
+		{
+				$width = 0;
+		}
 		else if ($height == -1)
-			$height = 0;
-			
-				
+		{
+				$height = 0;
+		}
+		
 		$bgcolor = $this->getRequestParameter( "bgcolor", "ffffff" );
 		$partner = null;
 		
@@ -141,7 +154,7 @@ class thumbnailAction extends sfAction
 		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bgcolor must be six hexadecimal characters');
 
-		if(!$vid_slices)
+		if(($vid_slices != -1 && $vid_slices <= 0) || !is_numeric($vid_slices))
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
 
 		if ($upload_token_id)

@@ -55,6 +55,10 @@ class kuserPeer extends BasekuserPeer
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partnerId);
 		$c->add(self::PUSER_ID, $puserId);
+		
+		// in case of more than one deleted kusers - get the last one
+		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
+		
 		return self::doSelectOne($c);
 	}
 	

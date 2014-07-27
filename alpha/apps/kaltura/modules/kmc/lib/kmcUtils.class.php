@@ -129,10 +129,10 @@ class kmcUtils
 	
 	
 	
-	public static function getStudioUiconf()
+	public static function getStudioUiconf($version)
 	{
 		$c = new Criteria();
-		$tag = 'HTML5Studio';
+		$tag = 'HTML5Studio_' . $version;
 		$c->addAnd(uiConfPeer::PARTNER_ID, 0);
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
 		$c->addAnd ( uiConfPeer::TAGS, '%'.$tag.'%', Criteria::LIKE );
