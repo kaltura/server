@@ -39,6 +39,11 @@
 				<fullName>Template Partner</fullName>
 			</user>
 		</request>
+		<request service="partner" action="update">
+			<partner objectType="KalturaPartner">
+				<adminUserId>template@kaltura.com</adminUserId>
+			</partner>
+		</request>
 	</multirequest>
 	<request service="userRole" action="add">
 		<userRole objectType="KalturaUserRole">
