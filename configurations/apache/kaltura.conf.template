@@ -1,3 +1,4 @@
+Listen @KALTURA_VIRTUAL_HOST_PORT@
 <VirtualHost *:@KALTURA_VIRTUAL_HOST_PORT@>
 	ErrorLog "@LOG_DIR@/kaltura_apache_errors.log"
 	CustomLog @LOG_DIR@/kaltura_apache_access.log vhost_kalt
