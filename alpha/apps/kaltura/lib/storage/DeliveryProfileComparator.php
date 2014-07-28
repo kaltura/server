@@ -26,10 +26,12 @@ class DeliveryProfileComparator
 		}
 			
 		// secondary order in case of secured entry - Is secured
-		if ($a->getTokenizer() != $b->getTokenizer()) {
-			if(($this->isSecured && $a->getTokenizer()) || (!$this->isSecured && !$a->getTokenizer())) 
+		$tokenA = ($a->getTokenizer != NULL);
+		$tokenB = ($b->getTokenizer != NULL);
+		if ($tokenA != $tokenB) {
+			if(($this->isSecured && $tokenA) || (!$this->isSecured && !$tokenA)) 
 					return -1;
-			if(($this->isSecured && $b->getTokenizer()) || (!$this->isSecured && !$b->getTokenizer()))
+			if(($this->isSecured && $tokenB) || (!$this->isSecured && !$tokenB))
 					return 1;
 		}
 		
