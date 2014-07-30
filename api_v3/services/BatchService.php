@@ -98,18 +98,31 @@ class BatchService extends KalturaBatchService
 
 
 	/**
-	 * Returns total created entries count
+	 * Returns total created entries count and total error entries count
 	 *
 	 * @action countBulkUploadEntries
 	 * @param int $bulkUploadJobId The id of the bulk upload job
 	 * @param KalturaBulkUploadObjectType $bulkUploadObjectType
-	 * @return int the number of created entries
+	 * @return KalturaKeyValueArray the number of created entries and error entries
 	 */
 	function countBulkUploadEntriesAction($bulkUploadJobId, $bulkUploadObjectType = KalturaBulkUploadObjectType::ENTRY)
 	{
-		return BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
+		$createdRecordsCount = BulkUploadResultPeer::countWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
+		$errorRecordsCount = BulkUploadResultPeer::countErrorWithObjectTypeByBulkUploadId($bulkUploadJobId, $bulkUploadObjectType);
+		
+		$res = array();
+		$created = new KalturaKeyValue();
+		$created->key = 'created';
+		$created->value = $createdRecordsCount;
+		$res[] = $created;		
+		$error = new KalturaKeyValue();
+		$error->key = 'error';
+		$error->value = $errorRecordsCount;
+		$res[] = $error;
+		
+		return $res;
 	}
-
+	
 	/**
 	 * batch updateBulkUploadResults action adds KalturaBulkUploadResult to the DB
 	 *
