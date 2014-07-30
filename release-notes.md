@@ -1,3 +1,17 @@
+# IX-9.19.1 #
+
+## Delivery profile ##
+set is default to be false in default.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+	/deployment/updates/sql/2014_07_27_delivery_profile_default_false.sql
+
+#### Known Issues & Limitations ####
+None
+
 # IX-9.19.0 #
 
 ## Add ENTRY_CHANGED email notification template ##
