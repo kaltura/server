@@ -17,6 +17,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $partnerId;
 	
