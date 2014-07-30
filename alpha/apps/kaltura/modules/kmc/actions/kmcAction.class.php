@@ -34,7 +34,11 @@ class kmcAction extends kalturaAction
 		}
 		
 		$this->beta = $this->getRequestParameter( "beta" );
-		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
+
+		//prevent script injections in this field since it's being echoed
+		$passHashparam = $this->getRequestParameter( "setpasshashkey" );
+		$this->setPassHashKey = strip_tags($passHashparam);
+		
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;
 		if ($this->setPassHashKey) {
