@@ -227,7 +227,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 			if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
 				$this->endTime = $this->startTime;
 				
-			if($this->endTime < $this->startTime)
+			if(!is_null($this->endTime) && $this->endTime < $this->startTime)
 				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
 		}
 		elseif($this->triggeredAt)
