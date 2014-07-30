@@ -753,9 +753,13 @@ class entryPeer extends BaseentryPeer
 		
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $entryIds, Criteria::IN);
-		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
-		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
-		$c->addAnd($criterionPartnerOrKn);
+		
+		if($partnerId >= 0)
+		{
+			$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $partnerId);
+			$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+			$c->addAnd($criterionPartnerOrKn);
+		}
 
 		$dbEntries = self::doSelect($c);
 
