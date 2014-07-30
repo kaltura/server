@@ -479,6 +479,12 @@ class kFlowHelper
 				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
 					return $dbBatchJob;
 				 
+				if ($ex->getCode() == KDLErrors::SanityInvalidFrameDim)
+				{
+					kBusinessPostConvertDL::handleConvertFailed($dbBatchJob , null , $data->getFlavorAssetId() , null , null);
+					return $dbBatchJob;
+				}
+				
 				//This was added so the all the assets prior to reaching the limit would still be created
 				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
 					throw $ex;

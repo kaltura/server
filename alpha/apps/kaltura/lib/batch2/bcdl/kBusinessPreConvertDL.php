@@ -551,7 +551,18 @@ class kBusinessPreConvertDL
 		{
 			$errDesc = '';
 			foreach($cdl->_errors as $section => $errors)
+			{
 				$errDesc .= "$section errors: " . join(";", $errors) . "\n";
+				foreach($errors as $error)
+				{
+					if (strpos($error,'Invalid frame dimensions') != 0)
+					{
+						$errDescription .= "\nMedia err: $errDesc";
+						KalturaLog::err($error);
+						throw new kCoreException($error , KDLErrors::SanityInvalidFrameDim);
+					}
+				}
+			}
 				
 			KalturaLog::log("Decision layer input errors: $errDesc");
 			$errDescription .= "\nMedia err: $errDesc";
@@ -1025,7 +1036,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 		}
 
-		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		try{
+			return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		}
+		catch(Exception $e){
+			if (strpos($e->getMessage(),'Invalid frame dimensions') != 0)
+				throw $e;
+		}
+
 	}
 		
 	public static function continueProfileConvert(BatchJob $parentJob)
@@ -1093,7 +1111,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
 		
-		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		try{
+			return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		}
+		catch(Exception $e){
+			KalturaLog::err('decideProfileFlavorsConvert - ' . $e->getMessage());
+		}
 	}
 		
 	public static function decideProfileFlavorsConvert(BatchJob $parentJob, BatchJob $convertProfileJob, array $flavors, array $conversionProfileFlavorParams, $conversionProfileId, mediaInfo $mediaInfo = null)
@@ -1109,8 +1132,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 		
 		$errDescription = null;
-		$finalFlavors = self::validateConversionProfile($convertProfileJob->getPartnerId(), $entryId, $mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
-			
+	                
+		try{
+			$finalFlavors = self::validateConversionProfile($convertProfileJob->getPartnerId(), $entryId, $mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
+		}
+		catch(Exception $e){
+			if (strpos($e->getMessage(),'Invalid frame dimensions') != 0)
+			{
+				$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription);
+				KalturaLog::err($e->getMessage());
+				throw $e;
+			}
+		}
+	
 		KalturaLog::log(count($finalFlavors) . " flavors returned from the decision layer");
 		if(is_null($finalFlavors))
 		{
