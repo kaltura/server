@@ -91,6 +91,7 @@ class asset extends Baseasset implements ISyncableFile
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
+	const CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE = "fileSyncVersionsToDelete";
 	
 	const MAX_ASSETS_PER_ENTRY = 500;
 	
@@ -686,5 +687,16 @@ class asset extends Baseasset implements ISyncableFile
 	public function getActualSourceAssetParamsIds()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS);}
 	public function setActualSourceAssetParamsIds($v)	{$this->putInCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS, $v);}
 	
+	public function resetFileSyncVersionsToDelete() 	{$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, null);}
+	public function getFileSyncVersionsToDelete()		{return $this->getFromCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE);}
+	public function setFileSyncVersionsToDelete($v)	
+	{
+		$versionsToDelete = $this->getFileSyncVersionsToDelete();
+		
+		if($versionsToDelete)
+			$v = array_merge($versionsToDelete, $v);
+		
+		$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, $v);
+	}
 	
 }

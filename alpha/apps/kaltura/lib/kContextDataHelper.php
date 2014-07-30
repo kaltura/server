@@ -161,7 +161,8 @@ class kContextDataHelper
 				if (array_key_exists($partnerId, $optimizedPlayback))
 				{
 					$params = $optimizedPlayback[$partnerId];
-					if (array_key_exists('cache_kdp_access_control', $params) && $params['cache_kdp_access_control'])
+					if (array_key_exists('cache_kdp_access_control', $params) && $params['cache_kdp_access_control'] &&
+					 	(strpos(strtolower(kCurrentContext::$client_lang), "kdp") !== false || strpos(strtolower(kCurrentContext::$client_lang), "html") !== false ))
 						return;
 				}
 			}		
