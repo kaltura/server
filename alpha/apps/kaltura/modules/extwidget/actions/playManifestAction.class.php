@@ -852,8 +852,12 @@ class playManifestAction extends kalturaAction
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 			
-		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL || $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS) 
+		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) 
 			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP); // Akamai HD doesn't support any other protocol
+		
+		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
+			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
 			
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
