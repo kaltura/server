@@ -96,9 +96,11 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 		$job = $engine->getJob();
 		$data = $engine->getData();
 
-		$countHandledObjects = $this->countCreatedObjects($job->id, $job->data->bulkUploadObjectType);
-				
-		if(!$countHandledObjects && !$engine->shouldRetry())
+		$countObjects = $this->countCreatedObjects($job->id, $job->data->bulkUploadObjectType);
+		$countHandledObjects = $countObjects[0];
+		$countErrorObjects = $countObjects[1];
+						
+		if(!$countHandledObjects && !$engine->shouldRetry() && $countErrorObjects)
 			throw new KalturaBatchException("None of the uploaded items were processed succsessfuly", KalturaBatchJobAppErrors::BULK_NO_ENTRIES_HANDLED, $engine->getData());
 		
 		if($engine->shouldRetry())
@@ -118,7 +120,20 @@ class KAsyncBulkUpload extends KJobHandlerWorker
 	 */
 	protected function countCreatedObjects($jobId, $bulkuploadObjectType) 
 	{
-		return self::$kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
+		$createdCount = 0;
+		$errorCount = 0;
+		
+		$counters = self::$kClient->batch->countBulkUploadEntries($jobId, $bulkuploadObjectType);
+		foreach($counters as $counter)
+		{
+			/** @var KalturaKeyValue $counter */
+			if ($counter->key == 'created')
+				$createdCount = $counter->value;
+			if ($counter->key == 'error')
+				$errorCount = $counter->value;
+		}
+		
+		return array($createdCount, $errorCount);
 	}
 	
 }
