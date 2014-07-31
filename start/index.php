@@ -77,7 +77,7 @@ include_once(__DIR__ . '/../alpha/config/kConf.php');
 <div style="width:260px;height:130px;display:block;position:relative;float:left;margin-right:20px;">
 			<h4 class="thumbdsec">Publisher Tools (Content Admins)</h4>
 			<div class="strongs">How do I manage my rich-media content?</div>
-Use the <a target="_blank" href="/kmc">Kaltura Management Console (KMC)</a>!<br />The KMC supports content ingestion, media and playlist management, wyswyg application studio for creating media players, rich-media syndication, advertising and more.<br />Learn more in the <a target="_blank" href="/content/docs/pdf/KMC_Quick_Start_Guide.pdf">KMC quick start guide.</a>
+Use the <a target="_blank" href="/kmc">Kaltura Management Console (KMC)</a>!<br />The KMC supports content ingestion, media and playlist management, wyswyg application studio for creating media players, rich-media syndication, advertising and more.<br />Learn more in the <a target="_blank" href="/content/docs/pdf/KMC_User_Manual.pdf">KMC quick start guide.</a>
 </div>
 <div style="width:260px;height:130px;display:block;position: relative;float:left;">
 <h4 class="thumbdsec">Server Admin Tools (IT technicians)</h4>
