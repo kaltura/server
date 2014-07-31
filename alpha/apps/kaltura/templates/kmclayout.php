@@ -12,8 +12,8 @@
 
 <?php if (@$extraHead) echo $extraHead; ?>
 
-<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/jquery-1.8.3.min.js"></script>
-<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/swfobject_v2.2.js"></script>
+<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ) .':' . requestUtils::getRequestPort() ; ?>/lib/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ) .':' . requestUtils::getRequestPort() ;; ?>/lib/js/swfobject_v2.2.js"></script>
 
 </head>
 <body id="ng-app" ng-app="kmcApp">
