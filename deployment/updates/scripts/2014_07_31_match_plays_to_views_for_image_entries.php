@@ -12,10 +12,10 @@ require_once (__DIR__ . '/../../bootstrap.php');
 $realRun = isset($argv[1]) && $argv[1] == 'realrun';
 KalturaStatement::setDryRun(!$realRun);
 
-$c = new Criteria();
+$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 $c->add( entryPeer::MEDIA_TYPE, entry::ENTRY_MEDIA_TYPE_IMAGE );
-$c->add( $c->getNewCriterion(entryPeer::PLAYS, entryPeer::PLAYS . '<>' . entryPeer::VIEWS, Criteria::CUSTOM) );
-$c->setLimit( 100 ); // Select in bulks of 100 
+$c->add( $c->getNewCriterion(entryPeer::PLAYS, entryPeer::PLAYS . '<>' . entryPeer::VIEWS, KalturaCriteria::CUSTOM) );
+$c->setLimit( 100 ); // Select in bulks of 100
 
 $entries = entryPeer::doSelect($c);
 while(count($entries))
