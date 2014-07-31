@@ -438,6 +438,7 @@ return array(
 	'entry-investigate info entry play xml label' => 'Play (XML Configuration)',
 	'entry-investigate info entry config xml label' => 'Config XML',
 	'entry-investigate info entry manifest label' => 'Manifest',
+	'entry-investigate info entry big-red-button label' => 'Big-Red-Button',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
 	'entry-investigate entry boostJobs' => 'Boost Jobs',
