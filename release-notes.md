@@ -1,5 +1,24 @@
 # IX-9.19.1 #
 
+## Image entry plays/views ##
+- Issue Type: Change Request
+- Issue ID: KMS-3488
+
+Match the number of plays to the number of views in image entries.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+deployment/updates/scripts/2014_07_31_match_plays_to_views_for_image_entries.php realrun
+
+* Note the **realrun** argument after the script name
+
+#### Known Issues & Limitations ####
+None
+
+
 ## Delivery profile ##
 set is default to be false in default.
 
