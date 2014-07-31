@@ -206,12 +206,6 @@ class PartnerController extends Zend_Controller_Action
 		$storageId = $this->_getParam('storageId');
 		$currentDps = $this->_getParam('currentDeliveryProfiles');
 		
-		if(is_null($currentDps)) {
-			echo "Error: Please select delivery format";
-			$this->view->selectedValues = array(array("name" => "Error", "id" => "Error"));
-			return;
-		} 
-		
 		$client = Infra_ClientHelper::getClient();
 		$options = $this->getDeliveryProfiles($client, $partnerId);
 		$selected = $this->getDeliveryProfiles($client, $partnerId, $currentDps);

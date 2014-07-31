@@ -120,40 +120,23 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		// @_!! ---------------->
-		
+		// TODO @_!! Set to hidden
 		$this->addElement('text', 'deliveryProfileIds', array(
-				'label'			=> 'Delivery Profile Ids (JSON):',
 				'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('select', 'delivery_format', array(
-				'label'			=> 'Delivery Format:',
+		$this->addElement('select', 'deliveryFormat', array(
 				'filters'		=> array('StringTrim'),
-				'multiOptions'  => array(	"http"	=> "http", 
-											"rtmp"	=>	"rtmp", 
-											"hls"	=> 	"hls",
-											"AVI"	=> "AVI"),
 		));
-		
-		$this->addElement('text', 'deliveryIdsPerFormat', array(
-				'label'			=> 'Delivery Profile Ids:',
-				'filters'		=> array('StringTrim'),
-				'placeHolder'			=> 'Select format', 
-		));
-		
-		$this->getElement('deliveryIdsPerFormat')->setAttrib('readonly', 'readonly');
 		
 		$this->addElement('button', 'editStorage', array(
-				'label'		=> 'Edit...',
+				'label'		=> 'Add',
 				'decorators'	=> array('ViewHelper'),
 		));
 		
-		$this->getElement('editStorage')->setAttrib('onClick', 'editDeliveryProfile()');
+		$this->getElement('editStorage')->setAttrib('onClick', 'addDeliveryProfile()');
 		
-		$this->addDisplayGroup ( array ('deliveryProfileIds', 'delivery_format', 'deliveryIdsPerFormat', 'editStorage' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
-		
-		// @_!! <----------------
+		$this->addDisplayGroup ( array ('deliveryProfileIds', 'deliveryFormat', 'editStorage' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
 		
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',
