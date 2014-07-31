@@ -240,38 +240,129 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	protected $customPostfixes;
 	
 	/**
-	 * @param string $url
+	 * @var string
+	 */
+	protected $useCookieHosts;
+	
+	/**
+	 * @var string
+	 */
+	protected $rootDir;
+	
+	/**
+	 * @param array $urls
 	 * @return string
 	 */
-	public function tokenizeSingleUrl($url)
+	protected function getAcl(array $urls)
 	{
-		if (!preg_match(self::SECURE_HD_AUTH_ACL_REGEX, $url, $matches))
-			return $url;
+		require_once( dirname(__FILE__). '/../../../../../../infra/general/kString.class.php');
 		
-		$acl = $matches[0];
-
-		// strip manifest postfixes that should not be signed from the acl
+		$acl = kString::getCommonPrefix($urls);
+		
+		// the first comma in csmil denotes the beginning of the non-common URL part
+		$commaPos = strpos($acl, ',');
+		if ($commaPos !== false)
+		{
+			$acl = substr($acl, 0, $commaPos);
+		}
+		
+		// don't sign the manifest file name when playing HLS/HDS via AkamaiHD
 		$postfixes =  $this->customPostfixes ? explode(',', $this->customPostfixes) : array('/master.m3u8', '/manifest.f4m');
 		foreach ($postfixes as $postfix)
 			if (substr($acl, -strlen($postfix)) == $postfix)
-				$acl = substr($acl, 0, -strlen($postfix));		
+				$acl = substr($acl, 0, -strlen($postfix));
 		
-		$acl .= $this->aclPostfix;		
+		if (!$acl)
+		{
+			return false;
+		}
 		
+		$acl .= $this->aclPostfix;
+
+		return $acl;
+	}
+	
+	/**
+	 * @param string $acl
+	 * @return string
+	 */
+	protected function generateToken($acl)
+	{
 		$c = new Akamai_EdgeAuth_Config();
 		$c->set_acl($acl);
 		$c->set_window($this->window);
 		$c->set_start_time(time());		# The time from which the token will start
 		$c->set_key($this->key);
-
-		$g = new Akamai_EdgeAuth_Generate();		
-		$token = $g->generate_token($c);
+		
+		$g = new Akamai_EdgeAuth_Generate();
+		return $g->generate_token($c);
+	}
+	
+	/**
+	 * @param string $url
+	 * @return string
+	 */
+	public function tokenizeSingleUrl($url)
+	{
+		if ($this->rootDir)
+			$url = rtrim($this->rootDir, '/') . '/' . ltrim($url, '/');
+		
+		$acl = $this->getAcl(array($url));
+		if (!$acl)
+			return $url;
+		
+		$token = $this->generateToken($acl);
+		
+		if ($this->useCookieHosts)
+		{
+			if (in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
+			{
+				setcookie($this->paramName, $token);
+			}
+			return $url;
+		}
 		
 		if (strpos($url, '?') === false)
 			$url .= '?';
 		else 
 			$url .= '&';
 		return $url . "{$this->paramName}=$token";
+	}
+	
+	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
+	{
+		$urls = array();
+		foreach($flavors as &$flavor)
+		{
+			if ($this->rootDir)
+				$flavor["url"] = rtrim($this->rootDir, '/') . '/' . ltrim($flavor["url"], '/');
+			$urls[] = $flavor["url"];
+		}
+		
+		$acl = $this->getAcl($urls);
+		if (!$acl)
+			return;
+		
+		$token = $this->generateToken($acl);
+		
+		if ($this->useCookieHosts)
+		{
+			if (in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
+			{
+				setcookie($this->paramName, $token);
+			}
+			return;
+		}
+		
+		foreach($flavors as &$flavor)
+		{
+			$url = $flavor["url"];
+			if (strpos($url, '?') === false)
+				$url .= '?';
+			else 
+				$url .= '&';
+			$flavor["url"] = $url . "{$this->paramName}=$token";
+		}		
 	}
 	
 	/**
@@ -296,6 +387,20 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	}
 
 	/**
+	 * @return the $useCookieHosts
+	 */
+	public function getUseCookieHosts() {
+		return $this->useCookieHosts;
+	}
+	
+	/**
+	 * @return the $rootDir
+	 */
+	public function getRootDir() {
+		return $this->rootDir;
+	}
+	
+	/**
 	 * @param string $param
 	 */
 	public function setParamName($paramName) {
@@ -310,10 +415,23 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	}
 
 	/**
-	 * @return the $customPostfixes
+	 * @param string $customPostfixes
 	 */
 	public function setCustomPostfixes($customPostfixes) {
 		return $this->customPostfixes = $customPostfixes;
 	}
 
+	/**
+	 * @param string $useCookieHosts
+	 */
+	public function setUseCookieHosts($useCookieHosts) {
+		return $this->useCookieHosts = $useCookieHosts;
+	}
+	
+	/**
+	 * @param string $rootDir
+	 */
+	public function setRootDir($rootDir) {
+		$this->rootDir = $rootDir;
+	}
 }
