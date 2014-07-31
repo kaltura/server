@@ -114,6 +114,7 @@ class DeliveryProfileService extends KalturaBaseService
 		$filter->toObject($delivery);
 
 		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, array(0, kCurrentContext::getCurrentPartnerId()), Criteria::IN);
 		$delivery->attachToCriteria($c);
 		
 		$totalCount = DeliveryProfilePeer::doCount($c);

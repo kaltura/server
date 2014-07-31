@@ -45,6 +45,80 @@ jQuery(document).ready(function() {
 	<?php endif; ?>
 });
 
+jQuery('#delivery_format').change(function() {
+	var dpIdsStr = $("#deliveryProfileIds")[0].value;
+	var dpIds = jQuery.parseJSON(dpIdsStr);
+
+	if(this.value in dpIds)
+		$("#deliveryIdsPerFormat")[0].value = dpIds[this.value];
+	else 
+		$("#deliveryIdsPerFormat")[0].value = "Null";
+});
+
+function editDeliveryProfile()
+{
+	var storageProfileId = $("#storageId")[0].value;
+	var partnerId = $("#partnerId")[0].value;
+	var currentDps = $("#deliveryIdsPerFormat")[0].value;
+	var format = $("#delivery_format")[0].value;
+
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'edit-delivery-profile')); ?>';
+	url += '/currentDeliveryProfiles/' + currentDps + "/";
+	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 750,
+		title: '<?php echo $this->translate('Edit delivery profiles : Storage id '); ?>' + storageProfileId +
+			'<?php echo $this->translate(' , Format '); ?>' + format,
+		height: 400,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				okPressed();
+				jQuery(this).dialog('close').remove();
+			},
+			'<?php echo $this->translate('EMPTY'); ?>': function() {
+				var dpIdsStr = $("#deliveryProfileIds")[0].value;
+				var dpIdsObj = jQuery.parseJSON(dpIdsStr);
+				var format = $("#delivery_format")[0].value;
+
+				delete dpIdsObj[format];
+
+				$("#deliveryProfileIds")[0].value = JSON.stringify(dpIdsObj);
+				$("#deliveryIdsPerFormat")[0].value = "Null";
+				
+				jQuery(this).dialog('close').remove();
+			}
+		},
+		close: function() {
+			$(this).dialog('close').remove();
+		}
+	});
+	dialogDiv.load(
+			url
+		);
+}
+
+function okPressed() {
+	if(	($("#selectedValues option").length == 1) 
+			&&	($("#selectedValues option")[0].value == "Error")) 
+		return;
+
+	var selectedValues = [];
+	$("#selectedValues option").each(function() {selectedValues.push(parseInt(this.value))})
+	
+	var dpIdsStr = $("#deliveryProfileIds")[0].value;
+	var dpIdsObj = jQuery.parseJSON(dpIdsStr);
+
+	var format = $("#delivery_format")[0].value;
+
+	dpIdsObj[format] = selectedValues;
+	$("#deliveryProfileIds")[0].value = JSON.stringify(dpIdsObj);
+	$("#deliveryIdsPerFormat")[0].value = selectedValues.join(",");
+}
+
 </script>
 </form>
 

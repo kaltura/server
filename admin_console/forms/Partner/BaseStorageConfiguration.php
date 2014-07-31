@@ -10,6 +10,14 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmStorageConfig');
+		
+		$this->addElement('text', 'storageId', array(
+				'label' 		=> 'Storage ID:',
+				'required'		=> true,
+				'filters' 		=> array('StringTrim'),
+				'validators' 	=> array(),
+				'readonly'		=> true,
+		));
 
 		$this->addElement('text', 'partnerId', array(
 			'label' 		=> 'Related Publisher ID*:',
@@ -82,7 +90,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$readyBehavior->setLabel('Ready Behavior:');
 		$this->addElements(array($readyBehavior));
 		
-		$this->addDisplayGroup(array('partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'desciption'), 'general_info', array(
+		$this->addDisplayGroup(array('storageId', 'partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'desciption'), 'general_info', array(
 			'legend' => 'General',
 		));
 		
@@ -112,12 +120,40 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
+		// @_!! ---------------->
+		
 		$this->addElement('text', 'deliveryProfileIds', array(
 				'label'			=> 'Delivery Profile Ids (JSON):',
 				'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addDisplayGroup ( array ('deliveryProfileIds' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+		$this->addElement('select', 'delivery_format', array(
+				'label'			=> 'Delivery Format:',
+				'filters'		=> array('StringTrim'),
+				'multiOptions'  => array(	"http"	=> "http", 
+											"rtmp"	=>	"rtmp", 
+											"hls"	=> 	"hls",
+											"AVI"	=> "AVI"),
+		));
+		
+		$this->addElement('text', 'deliveryIdsPerFormat', array(
+				'label'			=> 'Delivery Profile Ids:',
+				'filters'		=> array('StringTrim'),
+				'placeHolder'			=> 'Select format', 
+		));
+		
+		$this->getElement('deliveryIdsPerFormat')->setAttrib('readonly', 'readonly');
+		
+		$this->addElement('button', 'editStorage', array(
+				'label'		=> 'Edit...',
+				'decorators'	=> array('ViewHelper'),
+		));
+		
+		$this->getElement('editStorage')->setAttrib('onClick', 'editDeliveryProfile()');
+		
+		$this->addDisplayGroup ( array ('deliveryProfileIds', 'delivery_format', 'deliveryIdsPerFormat', 'editStorage' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+		
+		// @_!! <----------------
 		
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',

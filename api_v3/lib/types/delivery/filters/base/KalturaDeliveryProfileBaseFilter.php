@@ -10,6 +10,8 @@ abstract class KalturaDeliveryProfileBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"partnerIdEqual" => "_eq_partner_id",
+		"partnerIdIn" => "_in_partner_id",
 		"systemNameEqual" => "_eq_system_name",
 		"systemNameIn" => "_in_system_name",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -45,6 +47,16 @@ abstract class KalturaDeliveryProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * @var int
+	 */
+	public $partnerIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $partnerIdIn;
 
 	/**
 	 * @var string

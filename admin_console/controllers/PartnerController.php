@@ -199,6 +199,54 @@ class PartnerController extends Zend_Controller_Action
 		echo $this->_helper->json('ok', false);
 	}
 	
+	public function editDeliveryProfileAction() 
+	{
+		$this->_helper->layout->disableLayout();
+		$partnerId = $this->_getParam('partnerId');
+		$storageId = $this->_getParam('storageId');
+		$currentDps = $this->_getParam('currentDeliveryProfiles');
+		
+		if(is_null($currentDps)) {
+			echo "Error: Please select delivery format";
+			$this->view->selectedValues = array(array("name" => "Error", "id" => "Error"));
+			return;
+		} 
+		
+		$client = Infra_ClientHelper::getClient();
+		$options = $this->getDeliveryProfiles($client, $partnerId);
+		$selected = $this->getDeliveryProfiles($client, $partnerId, $currentDps);
+		
+		$this->view->possibleValues = array_diff_key($options, $selected);
+		$this->view->selectedValues = $selected;
+		
+	}
+	
+	protected function getDeliveryProfiles($client, $partnerId, $dpIds = null) {
+		
+		$options = array();
+		$deliveryProfileService = new Kaltura_Client_DeliveryProfileService($client);
+		
+		Infra_ClientHelper::impersonate($partnerId);
+		$filter = new Kaltura_Client_Type_DeliveryProfileFilter();
+		if($dpIds) {
+			if(empty($dpIds))
+				return $options;
+			$filter->idIn = $dpIds;
+		}
+		$dpsResponse = $deliveryProfileService->listAction($filter, null);
+		Infra_ClientHelper::unimpersonate();
+		
+		
+		if(!$dpsResponse->totalCount)
+			return $options;
+		
+		foreach($dpsResponse->objects as $deliveryProfile) {
+			$name = $deliveryProfile->id . " : " . $deliveryProfile->name;
+			$options[$deliveryProfile->id] = array("name" => $name, "id" => $deliveryProfile->id);
+		}
+		return $options;
+	}
+	
 	public function updateStatusAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
