@@ -1605,7 +1605,11 @@ class KalturaEntryService extends KalturaBaseService
 		$moderationFlag->validatePropertyNotNull("flaggedEntryId");
 
 		$entryId = $moderationFlag->flaggedEntryId;
-		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		$dbEntry = kCurrentContext::initPartnerByEntryId($entryId);
+
+		// before returning any error, let's validate partner's access control
+		if ($dbEntry)
+			$this->validateApiAccessControl($dbEntry->getPartnerId());
 
 		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
