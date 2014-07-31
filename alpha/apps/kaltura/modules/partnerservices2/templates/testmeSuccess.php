@@ -42,7 +42,7 @@ function createSelect ( $id , $name , $default_value , $list_name , $pid_str = n
 		$media_source_list = array ( "25" => "KalturaQa") + $media_source_list ;									
 
 	$protocol = requestUtils::getRequestProtocol();
-	$current_server = str_replace("$protocol://", "", requestUtils::getRequestHost());
+	$current_server = str_replace("$protocol://", "", requestUtils::getRequestHost()).':'.requestUtils::getRequestPort();
 	$service_url_list[$current_server] = $current_server;
 		
 	if( $limited )
