@@ -17,6 +17,15 @@ class DeliveryProfileLocalPathHds extends DeliveryProfileHds {
 		return $this->getFromCustomData("rendererClass", null, $this->DEFAULT_RENDERER_CLASS);
 	}
 	
+	public function setPattern($v)
+	{
+		$this->putInCustomData("pattern", $v);
+	}
+	public function getPattern()
+	{
+		return $this->getFromCustomData("pattern");
+	}
+	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
