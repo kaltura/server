@@ -121,7 +121,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		));
 		
 		// TODO @_!! Set to hidden
-		$this->addElement('text', 'deliveryProfileIds', array(
+		$this->addElement('text', 'delivery_profile_ids', array(
 				'filters'		=> array('StringTrim'),
 		));
 		
@@ -129,14 +129,14 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 				'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('button', 'editStorage', array(
+		$this->addElement('button', 'editDeliveryProfiles', array(
 				'label'		=> 'Add',
 				'decorators'	=> array('ViewHelper'),
 		));
 		
-		$this->getElement('editStorage')->setAttrib('onClick', 'addDeliveryProfile()');
+		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
 		
-		$this->addDisplayGroup ( array ('deliveryProfileIds', 'deliveryFormat', 'editStorage' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+		$this->addDisplayGroup ( array ('delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
 		
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',
@@ -207,7 +207,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		foreach($object->deliveryProfileIds as $keyValue) {
 			$this->insertObject($res, $keyValue->key, $keyValue->value);
 		}		
-		$this->getElement('deliveryProfileIds')->setValue(json_encode($res));
+		$this->getElement('delivery_profile_ids')->setValue(json_encode($res));
 		
 	}
 	
@@ -235,7 +235,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
 		
 		// Input is json, output is key-value array
-		$deliveryProfileIds = $this->getElement('deliveryProfileIds')->getValue();
+		$deliveryProfileIds = $this->getElement('delivery_profile_ids')->getValue();
 		if(!empty($deliveryProfileIds))
 			$object->deliveryProfileIds = $this->toKeyValue(json_decode($deliveryProfileIds, true));
 		

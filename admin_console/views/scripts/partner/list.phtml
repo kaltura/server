@@ -1,3 +1,5 @@
+<?php $this->headScript()->appendFile($this->baseUrl('js/assignDeliveryProfile.js'));?>
+
 <p><?php echo $this->translate('partner-list intro text'); ?></p>
 <?php echo $this->form; ?>
 <div id="results" class="clear">
@@ -422,6 +424,37 @@ jQuery(function() {
 		}
 	});
 });
+
+function editDeliveryProfile(format, currentDps)
+{
+	var partnerId = $("#id")[0].value;
+
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'edit-delivery-profile')); ?>';
+	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/";
+	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 750,
+		title: '<?php echo $this->translate('Edit delivery profiles : Partner id '); ?>' + partnerId +
+			'<?php echo $this->translate(' , Format '); ?>' + format,
+		height: 400,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				okPressed(format);
+				jQuery(this).dialog('close').remove();
+			},
+		},
+		close: function() {
+			$(this).dialog('close').remove();
+		}
+	});
+	dialogDiv.load(
+			url
+		);
+}
 
 <?php
 
