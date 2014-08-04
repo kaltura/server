@@ -14,9 +14,9 @@ $realRun = isset($argv[1]) && $argv[1] == 'realrun';
 KalturaStatement::setDryRun(!$realRun);
 
 $userRole = new UserRole();
-$userRole->setStrId('playback base role');
-$userRole->setName('PLAYBACK BASE');
-$userRole->setSystemName('PLAYBACK_BASE');
+$userRole->setStrId('PLAYBACK_BASE_ROLE');
+$userRole->setName('PLAYBACK BASE ROLE');
+$userRole->setSystemName('PLAYBACK_BASE_ROLE');
 $userRole->setDescription('Only playback');
 $userRole->setPartnerId(0);
 $userRole->setStatus(UserRoleStatus::ACTIVE);
