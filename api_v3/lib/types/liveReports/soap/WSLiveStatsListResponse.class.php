@@ -11,7 +11,7 @@ class WSLiveStatsListResponse extends WSBaseObject
 	{
 		switch($attributeName)
 		{	
-			case 'events':
+			case 'objects':
 				return 'WSLiveStatsArray';
 			default:
 				return parent::getAttributeType($attributeName);
@@ -21,7 +21,7 @@ class WSLiveStatsListResponse extends WSBaseObject
 	/**
 	 * @var array
 	 **/
-	public $events;
+	public $objects;
 	
 	/**
 	 * @var int

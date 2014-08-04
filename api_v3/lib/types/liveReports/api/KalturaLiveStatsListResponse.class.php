@@ -10,7 +10,7 @@ class KalturaLiveStatsListResponse extends KalturaObject
 	 *
 	 * @var KalturaLiveStats
 	 **/
-	public $events;
+	public $objects;
 	
 	/**
 	 *
