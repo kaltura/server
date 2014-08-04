@@ -10,6 +10,10 @@ class WSLiveStatsArray extends SoapArray {
 	protected function getClass($object = null) {
 		if(is_null($object))
 			return null;
+		
+		if(!array_key_exists('__object_type__', $object))
+			return 'WSLiveStats';
+		
 		switch($object['__object_type__']) {
 			case "geoTimeLiveStats":
 				return 'WSGeoTimeLiveStats';
