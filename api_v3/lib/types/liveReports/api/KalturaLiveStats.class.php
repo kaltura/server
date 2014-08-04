@@ -10,31 +10,31 @@ class KalturaLiveStats extends KalturaObject
 	 *
 	 * @var int
 	 **/
-	public $audience;
+	public $audience = 0;
 	
 	/**
 	 *
 	 * @var float
 	 **/
-	public $avgBitrate;
+	public $avgBitrate = 0;
 	
 	/**
 	 *
 	 * @var int
 	 **/
-	public $bufferTime;
+	public $bufferTime = 0;
 	
 	/**
 	 *
 	 * @var int
 	 **/
-	public $plays;
+	public $plays = 0;
 	
 	/**
 	 *
 	 * @var int
 	 **/
-	public $secondsViewed;
+	public $secondsViewed = 0;
 	
 	/**
 	 *

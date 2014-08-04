@@ -17,9 +17,14 @@ class LiveReportsService extends KalturaBaseService
 	 * @return KalturaLiveStatsListResponse
 	 */
 	public function getReportAction($reportType, 
-			KalturaLiveReportInputFilter $filter,
-			KalturaFilterPager $pager)
+			KalturaLiveReportInputFilter $filter = null,
+			KalturaFilterPager $pager = null)
 	{
+		if(is_null($filter))
+			$filter = new KalturaLiveReportInputFilter();
+		if(is_null($pager))
+			$pager = new KalturaFilterPager;
+		
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
 		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();
@@ -33,8 +38,13 @@ class LiveReportsService extends KalturaBaseService
 			case KalturaLiveReportType::PARTNER_TOTAL:
 				if($filter->live && empty($wsFilter->entryIds)) {
 					$entryIds = $this->getAllLiveEntriesLiveNow();
-					if(empty($entryIds))
-						return new KalturaLiveStatsListResponse();
+					if(empty($entryIds)) {
+						$response = new KalturaLiveStatsListResponse();
+						$response->totalCount = 1;
+						$response->objects = array();
+						$response->objects[] = new KalturaLiveStats();
+						return $response;
+					}
 					
 					$wsFilter->entryIds = $entryIds;
 				}
