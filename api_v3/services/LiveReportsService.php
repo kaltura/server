@@ -22,6 +22,7 @@ class LiveReportsService extends KalturaBaseService
 	{
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
+		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();
 		
 		switch($reportType) {
 			case KalturaLiveReportType::ENTRY_GEO_TIME_LINE:
@@ -61,10 +62,13 @@ class LiveReportsService extends KalturaBaseService
 		$filter = new entryFilter();
 		$filter->setTypeEquel(KalturaEntryType::LIVE_STREAM);
 		$filter->setIsLive(true);
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($baseCriteria);
-		$baseCriteria->setSelectColumn(entryPeer::ID);
 		
-		$entryIds = entryPeer::doSelect($baseCriteria);
+		$entries = entryPeer::doSelect($baseCriteria);
+		$entryIds = array();
+		foreach($entries as $entry)
+			$entryIds[] = $entry->getId();
 		
 		return implode(",", $entryIds);
 	}
@@ -92,12 +96,15 @@ class LiveReportsService extends KalturaBaseService
 		$filter = new entryFilter();
 		$filter->setTypeEquel(KalturaEntryType::LIVE_STREAM);
 		$filter->setIdIn($entryIds);
+		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($baseCriteria);
 		$baseCriteria->addDescendingOrderByColumn("entry.FIRST_BROADCAST");
 		$pager->attachToCriteria($baseCriteria);
-		$baseCriteria->setSelectColumn(entryPeer::ID);
 		
-		$entryIds = entryPeer::doSelect($baseCriteria);
+		$entries = entryPeer::doSelect($baseCriteria);
+		$entryIds = array();
+		foreach($entries as $entry)
+			$entryIds[] = $entry->getId();
 		
 		return implode(",", $entryIds);
 	}
