@@ -1,0 +1,1 @@
+ALTER TABLE delivery_profile MODIFY COLUMN is_default tinyint(4) DEFAULT 0;

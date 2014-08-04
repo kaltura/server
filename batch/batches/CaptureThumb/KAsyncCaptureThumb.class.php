@@ -98,6 +98,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 				$mediaInfoWidth = null;
 				$mediaInfoHeight = null;
 				$mediaInfoDar = null;
+				$mediaInfoVidDur = null;
 				$mediaInfoFilter = new KalturaMediaInfoFilter();
 				$mediaInfoFilter->flavorAssetIdEqual = $data->srcAssetId;
 				$this->impersonate($job->partnerId);
@@ -110,11 +111,18 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 					$mediaInfoWidth = $mediaInfo->videoWidth;
 					$mediaInfoHeight = $mediaInfo->videoHeight;
 					$mediaInfoDar = $mediaInfo->videoDar;
+					
+					if($mediaInfo->videoDuration)
+						$mediaInfoVidDur = $mediaInfo->videoDuration/1000;
+					else if ($mediaInfo->containerDuration)
+						$mediaInfoVidDur = $mediaInfo->containerDuration/1000;
+					else if($mediaInfo->audioDuration)
+						$mediaInfoVidDur = $mediaInfo->audioDuration/1000;
 				}
 				
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, self::$taskConfig->params->FFMpegCmd);
-				$created = $thumbMaker->createThumnail($thumbParamsOutput->videoOffset, $mediaInfoWidth, $mediaInfoHeight, null ,null, $mediaInfoDar);
+				$created = $thumbMaker->createThumnail($thumbParamsOutput->videoOffset, $mediaInfoWidth, $mediaInfoHeight, null ,null, $mediaInfoDar, $mediaInfoVidDur);
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
 				

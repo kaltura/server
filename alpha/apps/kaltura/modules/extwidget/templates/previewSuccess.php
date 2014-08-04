@@ -18,9 +18,11 @@
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
 	<meta property="og:video:type" content="application/x-shockwave-flash" />
+
 	<?php if( isset($flavor_asset_id) ) { ?>
 	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
-	<meta property="og:video:type" content="video/mp4" />	
+	<meta property="og:video:type" content="video/mp4" />
+
 	<?php } ?>
 	<meta property="og:site_name" content="Kaltura" />
 	<?php } ?>

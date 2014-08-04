@@ -1,5 +1,20 @@
 # IX-9.20.0 #
 
+## Live params tags ##
+Added web and mobile tags to live params
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1624
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
 ## Live recording optimization ##
 Record all live assets and manage the recording on the API server side.
 
@@ -21,6 +36,32 @@ None
 #### Known Issues & Limitations ####
 - The recording duration is limited to 24 hours.
 
+## Strict api errors/results ##
+Added support for a configurable API errors/results for login api and reset password api to hide errors like invalid email address and general errors related to access control restrictions
+
+#### Configuration ####
+- `[api_strict_error_map]` section was added to `base.ini` to define strict error results for login services
+
+## Blocking of permission.getCurrentPermission for WIDGET session ##
+Widget session was removed from permission.getCurrentPermission api. It will still be accessed by default with ALWAYS_ALLOWED_ACTIONS permission.
+In order to fully block this api, ALWAYS_ALLOWED_ACTIONS can be removed from a partner by setting the custom data field 'always_allowed_permission_names' to NO_ALWAYS_ALLOWED_ACTIONS, which will then disable the default ALWAYS_ALLOWED_ACTIONS permission.
+Update script already exists in `alpha/scripts/utils/setAlwaysAllowedPermissions.php`
+  
+#### DB Changes ####
+		deployment/updates/sql/2014_14_07_permission_getcurrentpermissions_remove_widget_permission.sql
+
+
+## Delivery profile ##
+set is default to be false in default.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- /deployment/updates/sql/2014\_07\_27\_delivery\_profile\_default\_false.sql
+
+#### Known Issues & Limitations ####
+None
 
 # IX-9.19.0 #
 

@@ -2,6 +2,10 @@
 
 class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
+	const HLS_LIVE_STREAM_CONTENT_TYPE = "hls_live_stream_content_type";
+	const M3U8_MASTER_PLAYLIST_IDENTIFIER = "EXT-X-STREAM-INF";
+	const MAX_IS_LIVE_ATTEMPTS = 3;
+
 	public function setDisableExtraAttributes($v)
 	{
 		$this->putInCustomData("disableExtraAttributes", $v);
@@ -12,47 +16,109 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return $this->getFromCustomData("disableExtraAttributes");
 	}
 	
-	public function checkIsLive ($url)
+	public function checkIsLive( $url )
 	{
-		$data = $this->urlExists($url, kConf::get("hls_live_stream_content_type"));
-		if(!$data)
+		$urlContent = $this->urlExists($url, kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE));
+		if( ! $urlContent )
 		{
-			KalturaLog::Info("URL [$url] returned no valid data. Exiting.");
-			return $data;
+			return false;
 		}
-	
-		$lines = explode("#EXT-X-STREAM-INF:", trim($data));
-	
-		foreach ($lines as $line)
+
+		if ( strpos( $urlContent, self::M3U8_MASTER_PLAYLIST_IDENTIFIER ) !== false )
 		{
-			$explodedLine = explode("\n", $line);
-			// find a line that does not start with #
-			array_shift($explodedLine);	// drop the line of the EXT-X-STREAM-INF
-			$streamUrl = null;
-			foreach ($explodedLine as $curLine)
+			$isLive = $this->checkIsLiveMasterPlaylist( $url, $urlContent );
+		}
+		else
+		{
+			$isLive = $this->checkIsLiveMediaPlaylist( $url, $urlContent );
+		}
+
+		return $isLive;
+	}
+	
+	/**
+	 * Extract all non-empty / non-comment lines from a .m3u/.m3u8 content
+	 * @param $content array|string Full file content as a single string or as a lines-array
+	 * @return array Valid lines
+	 */
+	protected function getM3U8Urls( $content )
+	{
+		$outLines = array();
+
+		if ( !$content )
+		{
+			return $outLines;
+		}
+
+		if ( !is_array($content) )
+		{
+			$lines = explode("\n", trim($content));
+		}
+
+		foreach ( $lines as $line )
+		{
+			$line = trim($line);
+			if (!$line || $line[0] == '#')
 			{
-				$curLine = trim($curLine);
-				if (!$curLine || $curLine[0] == '#')
-					continue;
-				$streamUrl = $curLine;
-				break;
+				continue;
 			}
-			if (!$streamUrl || strpos($streamUrl, '.m3u8') === false)
-				continue;
-			$streamUrl = $this->checkIfValidUrl($streamUrl, $url);
+
+			$outLines[] = $line;
+		}
+
+		return $outLines;
+	}
 	
-			$data = $this->urlExists($streamUrl, kConf::get("hls_live_stream_content_type"));
-			if (!$data)
-				continue;
+	/**
+	 * Check if the given URL contains live entries (typically live .m3u8 URLs)
+	 * @param string $url
+	 * @param string|array $urlContent The URL's parsed content
+	 * @return boolean
+	 */
+	protected function checkIsLiveMasterPlaylist( $url, $urlContent )
+	{
+		$lines = $this->getM3U8Urls( $urlContent );
+
+		foreach ($lines as $urlLine)
+		{
+			$mediaUrl = $this->checkIfValidUrl($urlLine, $url);
 	
-			$segments = explode("#EXTINF:", $data);
-			if(!preg_match('/.+\.ts.*/', array_pop($segments), $matches))
+			$urlContent = $this->urlExists($mediaUrl, kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE));
+
+			if (!$urlContent)
+			{
 				continue;
-	
-			$tsUrl = $matches[0];
-			$tsUrl = $this->checkIfValidUrl($tsUrl, $url);
-			if ($this->urlExists($tsUrl ,kConf::get("hls_live_stream_content_type"),'0-1') !== false)
+			}
+
+			$isLive = $this->checkIsLiveMediaPlaylist($mediaUrl, $urlContent);
+			if ( $isLive )
+			{
 				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	/**
+	 * Check if the given URL contains live entries (typically containing .ts URLs)
+	 * @param string $url
+	 * @param string|array $urlContent The URL's parsed content
+	 * @return boolean
+	 */
+	protected function checkIsLiveMediaPlaylist( $url, $urlContent )
+	{
+		$lines = $this->getM3U8Urls( $urlContent );
+
+		$lines = array_slice($lines, -self::MAX_IS_LIVE_ATTEMPTS, self::MAX_IS_LIVE_ATTEMPTS, true);
+		foreach ($lines as $urlLine)
+		{
+			$tsUrl = $this->checkIfValidUrl($urlLine, $url);
+			if ($this->urlExists($tsUrl ,kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE),'0-1') !== false)
+			{
+				KalturaLog::log("Live ts url: $tsUrl");
+				return true;
+			}
 		}
 	
 		return false;

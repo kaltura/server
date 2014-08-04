@@ -84,7 +84,9 @@ class kBusinessPostConvertDL
 			$postConvertAssetType = $postConvertData->getPostConvertAssetType();
 		
 		// don't validate in case of bypass, in case target flavor or media info are null 
-		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo)
+		// or ISM/ISMC manifest assets
+		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo
+		&& !$targetFlavor->hasTag(assetParams::TAG_ISM_MANIFEST))
 		{
 			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo, $convertEngineType);
@@ -215,6 +217,7 @@ class kBusinessPostConvertDL
 		KalturaLog::debug("required flavor params ids [" . print_r($requiredFlavorParamsIds, true) . "]");
 		
 		// go over all the flavor assets of the entry
+		$entry = $currentFlavorAsset->getentry();
 		$inCompleteFlavorIds = array();
 		$origianlAssetFlavorId = null;
 		$siblingFlavorAssets = assetPeer::retrieveFlavorsByEntryId($currentFlavorAsset->getEntryId());
@@ -231,6 +234,12 @@ class kBusinessPostConvertDL
 					
 				continue;
 			}
+			
+			if($entry->getReplacedEntryId() && $siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_QUEUED)
+			{
+				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete and in replacement");
+				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
+			}
 				
 			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset, $profile);
 			
@@ -245,8 +254,8 @@ class kBusinessPostConvertDL
 			        KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
 				    $inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
 			    }
-			}			
-			
+			}		
+
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is ignored");
@@ -310,11 +319,8 @@ class kBusinessPostConvertDL
 			}
 			else
 			{
-				if($currentFlavorAsset->getIsOriginal() || !$currentFlavorAsset->getentry()->getReplacedEntryId())
-				{
-				    // mark the context root job as finished only if all conversion jobs are completed
-	    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-				}
+			    // mark the context root job as finished only if all conversion jobs are completed
+    			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);

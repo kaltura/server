@@ -13,6 +13,7 @@
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
 	<meta property="og:video:type" content="application/x-shockwave-flash" />
+
 	<?php if( isset($flavorUrl) ) { ?>
 	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
 	<meta property="og:video:type" content="video/mp4" />	

@@ -753,7 +753,14 @@ class Partner extends BasePartner
 	
 	/** monitor Usage Expiry **/
 	public function getExtendedFreeTrail() { return $this->getFromCustomData("extendedFreeTrail", null); }
-	public function setExtendedFreeTrail( $v ) { $this->putInCustomData("extendedFreeTrail", $v); }
+	public function setExtendedFreeTrail( $v )
+	{
+		$this->putInCustomData("extendedFreeTrail", $v);
+		if ( $v )
+		{
+			$this->setUsageLimitWarning(null);
+		}
+	}
 	
 	public function getExtendedFreeTrailExpiryReason() { return $this->getFromCustomData("extendedFreeTrailExpiryReason", null); }
 	public function setExtendedFreeTrailExpiryReason( $v ) { $this->putInCustomData("extendedFreeTrailExpiryReason", $v); }
@@ -1158,8 +1165,9 @@ class Partner extends BasePartner
 	public function getAlwaysAllowedPermissionNames()
 	{
 		$names = $this->getFromCustomData('always_allowed_permission_names');
-		$namesArray = explode(',', $names);
-		if (!count($namesArray) || !in_array(PermissionName::ALWAYS_ALLOWED_ACTIONS, $namesArray)) {
+		// add ALWAYS_ALLOWED_ACTIONS only when always_allowed_permission_names was not specified explicitly
+		// it's required to support the scenario where ALWAYS_ALLOWED_ACTIONS should be disabled (by specifying a "dummy" permission in always_allowed_permission_names)
+		if (!trim($names)) {
 			$names = PermissionName::ALWAYS_ALLOWED_ACTIONS.','.$names;
 		}
 		$names = trim($names, ',');

@@ -7,6 +7,20 @@ class serveFlavorAction extends kalturaAction
 {
 	const CHUNK_SIZE = 1048576; // 1024 X 1024
 	
+	protected function storeCache($renderer, $partnerId)
+	{
+		if (!function_exists('apc_store') || $_SERVER["REQUEST_METHOD"] != "GET")
+		{
+			return;
+		}
+
+		$renderer->partnerId = $partnerId;
+		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp().'-'.$host.$_SERVER["REQUEST_URI"];
+		apc_store($cacheKey, $renderer, 86400);
+		header("X-Kaltura:cache-key");
+	}
+	
 	public function execute()
 	{
 		//entitlement should be disabled to serveFlavor action as we do not get ks on this action.
@@ -19,10 +33,11 @@ class serveFlavorAction extends kalturaAction
 		$ks = $this->getRequestParameter( "ks" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
+		$pathOnly = $this->getRequestParameter( "pathOnly", false );
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
-	
+
 		$flavorAsset = assetPeer::retrieveById($flavorId);	
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
@@ -52,6 +67,28 @@ class serveFlavorAction extends kalturaAction
 			$version = $flavorAsset->getVersion();
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
+
+		if ($pathOnly && kIpAddressUtils::isInternalIp())
+		{
+			$path = null;
+			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
+			if ( $file_sync )
+			{
+				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
+				$path = $parent_file_sync->getFullPath();
+			}
+		
+			$renderer = new kRendererString(
+				'<?xml version="1.0" encoding="utf-8"?><xml><result>' . $path . '</result></xml>', 
+				'text/xml');
+			if ($path)
+			{
+				$this->storeCache($renderer, $flavorAsset->getPartnerId());
+			}
+			$renderer->output();
+			KExternalErrors::dieGracefully();
+		}
+
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
@@ -68,7 +105,6 @@ class serveFlavorAction extends kalturaAction
 		}
 		
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
-	
 		$isFlv = false;
 		if (!$shouldProxy) // if the forceproxy is set dump file and dont treat it as flv (for progressive download)
 		{
@@ -135,14 +171,7 @@ class serveFlavorAction extends kalturaAction
 			}
 			
 			$renderer = kFileUtils::getDumpFileRenderer($path, null, null, $limit_file_size);
-			$renderer->partnerId = $flavorAsset->getPartnerId();
-			if (function_exists('apc_store') && $_SERVER["REQUEST_METHOD"] == "GET")
-			{
-				$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
-				apc_store('dumpFile-'.$host.$_SERVER["REQUEST_URI"], $renderer, 86400);
-				header("X-Kaltura:cache-key");
-			}
-
+			$this->storeCache($renderer, $flavorAsset->getPartnerId());
 			$renderer->output();
 			
 			KExternalErrors::dieGracefully();

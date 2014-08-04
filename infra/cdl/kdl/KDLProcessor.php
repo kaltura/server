@@ -243,8 +243,13 @@ KalturaLog::log("Automatic Intermediate Source will be generated");
 			}
 			//Add silent track to video
 			if($forceAudioStream){
+				//When duration is set on the source we will use it instead of the -shortest to avoid large difference between video and audio difference
+				if($this->_srcDataSet->_video->_duration)
+					$useToAddSilence = "-t " . $this->_srcDataSet->_video->_duration/1000;
+				else 
+					$useToAddSilence = "-shortest";
 				$cmd = $targetList[0]->_transcoders[0]->_cmd;
-				$cmd = str_replace("__inFileName__", "__inFileName__ -ar 44100 -ac 2 -f s16le -i /dev/zero -shortest", $cmd);
+				$cmd = str_replace("__inFileName__", "__inFileName__ -ar 44100 -ac 2 -f s16le -i /dev/zero " . $useToAddSilence, $cmd);
 				$cmd = str_replace("-an", "-b:a 64k", $cmd);
 				$targetList[0]->_transcoders[0]->_cmd = $cmd;
 			}

@@ -142,7 +142,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		 	else
 		 	{
 		 		$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays*86400;
-		 		if(($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $this->dropFolder->fileDeletePolicy == KalturaDropFolderFileDeletePolicy::AUTO_DELETE && time() > $deleteTime) ||
+		 		if(($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE && time() > $deleteTime) ||
 		 			$dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
 		 		{
 		 			$this->purgeFile($dropFolderFile);

@@ -71,7 +71,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$jobData = $job->data;
 		
 		$ffmpegBin = KBatchBase::$taskConfig->params->ffmpegCmd;
-		$fileName = $job->entryId . ".mp4";
+		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 		

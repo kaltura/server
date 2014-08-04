@@ -386,6 +386,9 @@ class kString
 	
 	public static function getCommonPrefix(array $strings)
 	{
+		if (count($strings) < 2)
+			return reset($strings);
+
 		$prefix = self::getCommonPrefixBase(reset($strings), next($strings));
 		for (;;)
 		{
@@ -401,6 +404,9 @@ class kString
 	
 	public static function getCommonPostfix(array $strings)
 	{
+		if (count($strings) < 2)
+			return reset($strings);
+
 		$postfix = self::getCommonPostfixBase(reset($strings), next($strings));
 		for (;;)
 		{
