@@ -47,6 +47,7 @@
 								<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
 									<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
 								<?php endif; ?>
+								<option value="deliveryProfile" ><?php echo $this->translate('Delivery Profile'); ?></option>
 								<?php if ($partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId == 0): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')):?>
 										<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
@@ -425,11 +426,11 @@ jQuery(function() {
 	});
 });
 
-function editDeliveryProfile(format, currentDps)
+function assignDeliveryProfile(format, currentDps)
 {
 	var partnerId = $("#id")[0].value;
 
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'edit-delivery-profile')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'assign-delivery-profile')); ?>';
 	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/";
 	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
 	

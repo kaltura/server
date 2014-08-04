@@ -67,7 +67,7 @@ function addFormatRow(tbl, format, deliveryProfileIds)
 	var tdDPIds = document.createElement('td');
 	tdDPIds.innerHTML = deliveryProfileIds;
 	var tdEdit = document.createElement('td');
-	tdEdit.innerHTML = '<button onclick="editDeliveryProfile(\'' +format+'\',[' + deliveryProfileIds+ ']);">Edit</button>';
+	tdEdit.innerHTML = '<button onclick="assignDeliveryProfile(\'' +format+'\',[' + deliveryProfileIds+ ']);">Edit</button>';
 	var tdRemove = document.createElement('td');
 	tdRemove.innerHTML = '<button onclick="removeFormat(\'' +format+'\');">Remove</button>';
 
@@ -77,7 +77,7 @@ function addFormatRow(tbl, format, deliveryProfileIds)
 
 function addDeliveryProfile() {
 	var deliveryFormat = jQuery('#deliveryFormat').val();
-	editDeliveryProfile(deliveryFormat, null);
+	assignDeliveryProfile(deliveryFormat, null);
 }
 
 function removeFormat(format) {

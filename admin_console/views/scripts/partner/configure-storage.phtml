@@ -45,11 +45,11 @@ jQuery(document).ready(function() {
 	updatedUI();
 });
 
-function editDeliveryProfile(format, currentDps)
+function assignDeliveryProfile(format, currentDps)
 {
 	var storageProfileId = $("#storageId")[0].value;
 
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'edit-delivery-profile')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'assign-delivery-profile')); ?>';
 	url += '/currentDeliveryProfiles/' + currentDps + "/";
 	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
 	

@@ -199,7 +199,7 @@ class PartnerController extends Zend_Controller_Action
 		echo $this->_helper->json('ok', false);
 	}
 	
-	public function editDeliveryProfileAction() 
+	public function assignDeliveryProfileAction() 
 	{
 		$this->_helper->layout->disableLayout();
 		$partnerId = $this->_getParam('partnerId');
