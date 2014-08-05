@@ -96,6 +96,11 @@ class DeliveryProfileDynamicAttributes {
 	protected $playerConfig = null;
 	
 	/**
+	 * @var int
+	 */
+	protected $uiConfId = null;
+	
+	/**
 	 * @return the $format
 	 */
 	public function getFormat() {
@@ -336,6 +341,22 @@ class DeliveryProfileDynamicAttributes {
 	{
 		$this->playerConfig = $playerConfig;
 	}
+	
+	/**
+	 * @return the uiConfId
+	 */
+	public function getUiConfId()
+	{
+		return $this->uiConfId;
+	}
+	
+	/**
+	 * @param string $uiConfId
+	 */
+	public function setUiConfId($uiConfId)
+	{
+		$this->uiConfId = $uiConfId;
+	}
 
 	/**
 	 * @param array<asset|assetParams> $flavors
@@ -381,6 +402,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->mediaProtocol = $newObj->getMediaProtocol();
 		$this->usePlayServer = $newObj->getUsePlayServer();
 		$this->playerConfig = $newObj->getPlayerConfig();
+		$this->uiConfId = $newObj->getUiConfId();
 	}
 }
 
