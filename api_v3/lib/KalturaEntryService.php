@@ -1778,13 +1778,13 @@ class KalturaEntryService extends KalturaBaseService
 
         if(!empty($filter->userIdIn))
         {
-            $userArr = array();
             $userIdsArr = array();
             $userIds = explode(',',$filter->userIdIn);
             $userArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $userIds);
+
             foreach($userArr as $user)
             {
-                $userIdsArr[] =$user->getId;
+                $userIdsArr[] =$user->getId();
             }
             if(!empty($userIdsArr))
             {
