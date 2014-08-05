@@ -1,5 +1,21 @@
 # IX-9.19.1 #
 
+## add base-playback user role ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1565
+
+Adding a user-role with playback capabilities only
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_03_add_base_playback_role_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
 ## Image entry plays/views ##
 - Issue Type: Change Request
 - Issue ID: KMS-3488
