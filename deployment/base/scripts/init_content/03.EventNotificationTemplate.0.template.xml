@@ -219,6 +219,86 @@
 		</request>
 	</multirequest>
 	
+	
+	
+	<multirequest>
+		<!-- New Item Pending Moderation -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>New Item Pending Moderation</name>
+				<systemName>New_Item_Pending_Moderation_2</systemName>
+				<description>Email notification template to be sent when a new item is pending moderation in a specific category (channel).</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>37</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORYENTRY -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getEvent()->getObject() instanceof categoryEntry &amp;&amp; in_array(categoryEntryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getEvent()->getObject()->getStatus() == CategoryEntryStatus::PENDING</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>[AppTitle] - New Item Pending Moderation</subject>
+				<body>A new item is pending your approval: [ChannelSettingsPendingURLPrefix]{category_name_encoded}/{category_id}[ChannelSettingsPendingURLSuffix]</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<to objectType="KalturaEmailNotificationCategoryRecipientProvider">
+					<categoryId objectType="KalturaEvalStringField">
+						<code>$scope->getEvent()->getObject()->getCategoryId()</code>
+					</categoryId>
+					<categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
+						<permissionNamesMatchOr>CATEGORY_MODERATE</permissionNamesMatchOr>
+					</categoryUserFilter>
+				</to>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entry_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getEvent()->getObject()->getEntryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_id</key>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getCategoryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_name</key>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : ''</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>category_name_encoded</key>
+						<value objectType="KalturaEvalStringField">
+							<code>urlencode(!is_null(categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName() : '')</code>
+						</value>
+					</item>
+				</contentParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+	
+	
+	
 	<multirequest>
 		<!-- Entry Approved In Category -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
