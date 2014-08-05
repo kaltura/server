@@ -34,6 +34,7 @@ $html5Version = 'v2.13.rc1';
 
 		function loadPlayer(){
 			var entryId = $('#txtEntryId').val();
+			var uiConfId = $('#txtUiConfId').val();
 
 			var hlsUrl = location.protocol + '//';
 			hlsUrl += location.host;
@@ -43,6 +44,7 @@ $html5Version = 'v2.13.rc1';
 			var stitchedUrl = hlsUrl;
 
 			hlsUrl += '/a/playlist.m3u8';
+			stitchedUrl += '/uiConfId/' + uiConfId;
 			stitchedUrl += '/usePlayServer/1/a/playlist.m3u8';
 
 			var hdsUrl = location.protocol + '//';
@@ -258,6 +260,10 @@ $html5Version = 'v2.13.rc1';
 		<tr>
 			<td>Entry Id:</td>
 			<td><input type="text" id="txtEntryId" value="<?php echo isset($_GET['entryId']) ? $_GET['entryId'] : ''; ?>" />
+		</td>
+		<tr>
+        	<td>uiConf Id:</td>
+            <td><input type="text" id="txtUiConfId" value="<?php echo isset($_GET['uiConfId']) ? $_GET['uiConfId'] : ''; ?>" />
 		</td>
 		<tr>
 			<td colspan="2">
