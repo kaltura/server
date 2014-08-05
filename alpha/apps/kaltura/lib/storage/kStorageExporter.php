@@ -47,13 +47,17 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($object instanceof flavorAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 		{
 			$entry = $object->getentry();
-			
-			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-			foreach($externalStorages as $externalStorage)
+
+			//no temp entries should be exported
+			if ($entry && $entry->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
 			{
-				if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
+				$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+				foreach($externalStorages as $externalStorage)
 				{
-					self::exportFlavorAsset($object, $externalStorage);
+					if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
+					{
+						self::exportFlavorAsset($object, $externalStorage);
+					}
 				}
 			}
 		}
