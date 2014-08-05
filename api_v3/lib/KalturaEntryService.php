@@ -1792,7 +1792,7 @@ class KalturaEntryService extends KalturaBaseService
             }
             else
             {
-                $filter->userIdIn = null;
+                $filter->userIdIn = -1;
             }
         }
 	}
