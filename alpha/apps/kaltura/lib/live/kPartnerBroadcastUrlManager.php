@@ -10,14 +10,8 @@ class kPartnerBroadcastUrlManager extends kBroadcastUrlManager
 			return;
 		}
 		
-		$hostname = $partner->getPrimaryBroadcastUrl();
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, self::PRIMARY_MEDIA_SERVER_INDEX));
-		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, self::PRIMARY_MEDIA_SERVER_INDEX, true));
-		
-	
-		$hostname = $partner->getSecondaryBroadcastUrl();
-		$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, self::SECONDARY_MEDIA_SERVER_INDEX));
-		$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, self::SECONDARY_MEDIA_SERVER_INDEX, true));
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $partner->getPrimaryBroadcastUrl(), self::PRIMARY_MEDIA_SERVER_INDEX));
+		$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $partner->getSecondaryBroadcastUrl(), self::SECONDARY_MEDIA_SERVER_INDEX));
 	}
 	
 }

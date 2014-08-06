@@ -34,21 +34,14 @@ class kBroadcastUrlManager
 	
 	public function setEntryBroadcastingUrls (LiveStreamEntry $dbEntry)
 	{
-		$hostname = $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource());
-		
-		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));		
-		$dbEntry->setPrimaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, true));
+		$dbEntry->setPrimaryBroadcastingUrl($this->getBroadcastUrl($dbEntry,  $this->getHostname(kDataCenterMgr::getCurrentDcId(), $dbEntry->getSource()), kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX));
 			
 		$otherDCs = kDataCenterMgr::getAllDcs();
 		if(count($otherDCs))
 		{
 			$otherDc = reset($otherDCs);
 			$otherDcId = $otherDc['id'];
-			
-			$hostname = $this->getHostname($otherDcId, $dbEntry->getSource());
-			
-			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
-			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, true));
+			$dbEntry->setSecondaryBroadcastingUrl($this->getBroadcastUrl($dbEntry, $this->getHostname($otherDcId, $dbEntry->getSource()), kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX));
 		}
 	}
 	
@@ -70,7 +63,6 @@ class kBroadcastUrlManager
 		$applicationSuffix = $this->getPostfixValue($sourceType);
 		$mediaServerConfig = kConf::get($dc, 'broadcast');
 		$url = $mediaServerConfig['domain'];
-		$port = $this->getPort($dc);
 		
 		if (isset ($mediaServerConfig['application'][$applicationSuffix]))
 			$app = $mediaServerConfig['application'][$applicationSuffix];
@@ -80,35 +72,17 @@ class kBroadcastUrlManager
 			throw new kCoreException("The value for $applicationSuffix does not exist in the broadcast map.");
 		}
 		
-		return "$url:$port/$app";
+		return "$url/$app";
 	}
 	
-	protected function getPort ($dc)
-	{
-		$port = kBroadcastUrlManager::DEFAULT_PORT;
-	
-		$broadcastConfig = kConf::getMap('broadcast');	
-		if(isset($broadcastConfig['port']))
-		{
-			$port = $broadcastConfig['port'];
-		}
-		
-		if (isset($broadcastConfig[$dc]) && isset($broadcastConfig[$dc]['port']))
-		{
-			$port = $broadcastConfig[$dc]['port'];
-		}
-		
-		return $port;
-	}
-	
-	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
+	protected function getBroadcastUrl(LiveStreamEntry $entry, $hostname, $mediaServerIndex)
 	{
 		if (!$hostname)
 		{
 			return '';
 		}
 		
-		$url = "$protocol://$hostname";
+		$url = 'rtmp://' . $hostname;
 		
 		$params = array(
 			'p' => $this->partnerId,
