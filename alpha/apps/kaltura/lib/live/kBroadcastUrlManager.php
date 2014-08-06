@@ -4,6 +4,10 @@ class kBroadcastUrlManager
 	const PRIMARY_MEDIA_SERVER_INDEX = 0;
 	const SECONDARY_MEDIA_SERVER_INDEX = 1;
 	const DEFAULT_SUFFIX = 'default';
+	const DEFAULT_PORT = 1935;
+
+	const PROTOCOL_RTMP = 'rtmp';
+	const PROTOCOL_RTSP = 'rtsp';
 	
 	protected $partnerId;
 	
