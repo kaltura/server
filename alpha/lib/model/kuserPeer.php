@@ -52,18 +52,14 @@ class kuserPeer extends BasekuserPeer
 				return $puserKuser->getKuser();
 		}
 		
-		self::setUseCriteriaFilter(false);
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partnerId);
 		$c->add(self::PUSER_ID, $puserId);
-		$c->addAnd ( kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
 		
 		// in case of more than one deleted kusers - get the last one
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
 		
-		$result = self::doSelectOne($c);
-		self::setUseCriteriaFilter(true);
-		return $result;
+		return self::doSelectOne($c);
 	}
 	
 	/**
@@ -93,7 +89,7 @@ class kuserPeer extends BasekuserPeer
 	
 	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
-		$kuser = self::getKuserByPartnerAndUid($partner_id, $puser_id);
+		$kuser = kuserPeer::getKuserForPartner($partner_id, $puser_id);
 		
 		if (!$kuser)
 		{
@@ -107,6 +103,23 @@ class kuserPeer extends BasekuserPeer
 			$kuser->save();
 		}
 		
+		return $kuser;
+	}
+
+	/**
+	 * Replaces 'getKuserByPartnerAndUid' and doesn't use its default conditions.
+	 * @param string $partnerId
+	 * @param string $puserId
+	 */
+	protected static function getKuserForPartner($partnerId, $puserId) {
+		self::setUseCriteriaFilter(false);
+		$c = new Criteria();
+		$c->add(self::PARTNER_ID, $partnerId);
+		$c->add(self::PUSER_ID, $puserId);
+		$c->addAnd ( kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
+		
+		$kuser = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
 		return $kuser;
 	}
 	
