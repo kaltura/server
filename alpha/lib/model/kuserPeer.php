@@ -52,14 +52,18 @@ class kuserPeer extends BasekuserPeer
 				return $puserKuser->getKuser();
 		}
 		
+		self::setUseCriteriaFilter(false);
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partnerId);
 		$c->add(self::PUSER_ID, $puserId);
+		$c->addAnd ( kuserPeer::STATUS, KuserStatus::DELETED, KalturaCriteria::NOT_EQUAL);
 		
 		// in case of more than one deleted kusers - get the last one
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
 		
-		return self::doSelectOne($c);
+		$result = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		return $result;
 	}
 	
 	/**
