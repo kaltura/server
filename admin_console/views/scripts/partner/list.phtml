@@ -222,6 +222,11 @@ function remoteStorage(partnerId) {
 	document.location = url;
 }
 
+function deliveryProfile(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'delivery-profiles-configuration'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
+	document.location = url; 
+}
+
 function configurePartnerSuccess(html) {
 	jQuery('.ui-widget-overlay').css('z-index', 1000 );
 	jQuery('#loader').hide();

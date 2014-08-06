@@ -215,6 +215,43 @@ class PartnerController extends Zend_Controller_Action
 		
 	}
 	
+	public function deliveryProfilesConfigurationAction()
+	{
+		$request = $this->getRequest();
+		$page = $this->_getParam('page', 1);
+		$pageSize = $this->_getParam('pageSize', 10);
+	
+		$client = Infra_ClientHelper::getClient();
+		$form = new Form_PartnerIdFilter();
+		$form->populate($request->getParams());
+		$newForm = new Form_NewDeliveryProfile();
+		$newForm->populate($request->getParams());
+	
+		$action = $this->view->url(array('controller' => 'partner', 'action' => 'delivery-profiles-configuration'), null, true);
+		$form->setAction($action);
+	
+		$partnerId = null;
+		if ($request->getParam('filter_input') != '') {
+			$partnerId = $request->getParam('filter_input');
+			$newForm->getElement('newPartnerId')->setValue($partnerId);
+		}
+		$filter = new Kaltura_Client_Type_DeliveryProfileFilter();
+	
+		// get results and paginate
+		$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $partnerId, $filter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		$paginator->setCurrentPageNumber($page);
+		$paginator->setItemCountPerPage($pageSize);
+	
+		// popule the form
+		$form->populate($request->getParams());
+	
+		// set view
+		$this->view->form = $form;
+		$this->view->newForm = $newForm;
+		$this->view->paginator = $paginator;
+	}
+	
 	protected function getDeliveryProfiles($client, $partnerId, $dpIds = null) {
 		
 		$options = array();
@@ -239,6 +276,95 @@ class PartnerController extends Zend_Controller_Action
 			$options[$deliveryProfile->id] = array("name" => $name, "id" => $deliveryProfile->id);
 		}
 		return $options;
+	}
+	
+	public function configureDeliveryProfileAction()
+	{
+		$this->_helper->layout->disableLayout();
+		$partnerId = $this->_getParam('partnerId');
+		$deliveryProfileId = $this->_getParam('deliveryProfileId');
+		$type = $this->_getParam('type');
+	
+		$editMode = false;
+		
+		// Retrieve delivery profile if DP id is given
+		$client = Infra_ClientHelper::getClient();
+		$deliveryProfile = null;
+		if ($deliveryProfileId)
+		{
+			Infra_ClientHelper::impersonate($partnerId);
+			try
+			{
+				$deliveryProfile = $client->deliveryProfile->get($deliveryProfileId);
+			}
+			catch (Exception $e)
+			{
+				Infra_ClientHelper::unimpersonate();
+				throw $e;
+			}
+			Infra_ClientHelper::unimpersonate();
+			$type = $deliveryProfile->type;
+		}
+	
+		// @_!! Problem here
+		$form = KalturaPluginManager::loadObject('Form_Partner_DeliveryProfileConfiguration', $type, array($partnerId, $type));
+	
+		KalturaLog::debug("form class: ". get_class($form));
+	
+		$request = $this->getRequest();
+		$form->populate($request->getParams());
+	
+		$request = $this->getRequest();
+	
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageSize = 500;
+		if (!$deliveryProfileId) //new
+		{
+			$partnerId = $request->getParam('new_partner_id');
+			$form->getElement('partnerId')->setValue($partnerId);
+		}
+		else
+		{
+			if (!$request->isPost())
+				$form->populateFromObject($deliveryProfile, false);
+		}
+		
+		$form->getElement('partnerId')->setAttrib('readonly',true);
+	
+		if ($request->isPost())
+		{
+			$request = $this->getRequest();
+			$formData = $request->getPost();
+				
+			if ($form->isValid($formData))
+			{
+				$this->view->formValid = true;
+				$form->populate($formData);
+				
+				// @_!! Problem there
+				$deliveryProfileClass = KalturaPluginManager::getObjectClass('Kaltura_Client_Type_DeliveryProfile', $type);
+				$deliveryFromForm = $form->getObject($deliveryProfileClass, $formData, false, true);
+	
+				Infra_ClientHelper::impersonate($deliveryFromForm->partnerId);
+				$deliveryFromForm->partnerId = null;
+				if (!$deliveryProfileId)
+				{
+					$client->deliveryProfile->add($deliveryFromForm);
+				}
+				else
+				{
+					$client->deliveryProfile->update($deliveryProfileId, $deliveryFromForm);
+				}
+			}
+			else
+			{
+				$this->view->formValid = false;
+				$form->populate($formData);
+			}
+		}
+	
+		$this->view->form = $form;
+		$this->view->protocol = $type;
 	}
 	
 	public function updateStatusAction()
