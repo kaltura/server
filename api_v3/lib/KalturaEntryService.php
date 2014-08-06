@@ -1776,7 +1776,7 @@ class KalturaEntryService extends KalturaBaseService
 				$filter->userIdEqual = -1; // no result will be returned when the user is missing
 		}
 
-        if(!empty($filter->userIdIn))
+        if($filter->userIdIn!==null)
         {
             $userIdsArr = array();
             $userIds = explode(',',$filter->userIdIn);
