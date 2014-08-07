@@ -37,6 +37,9 @@ class SessionService extends KalturaBaseService
 	 */
 	function startAction($secret, $userId = "", $type = 0, $partnerId = null, $expiry = 86400 , $privileges = null )
 	{
+		if(!$secret)
+			throw new KalturaAPIException ( KalturaErrors::MISSING_MANDATORY_PARAMETER, $secret );
+		
 		KalturaResponseCacher::disableCache();
 		// make sure the secret fits the one in the partner's table
 		$ks = "";
