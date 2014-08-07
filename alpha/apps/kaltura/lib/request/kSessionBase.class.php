@@ -121,6 +121,10 @@ class kSessionBase
 	 */
 	public function parseKS($encoded_str)
 	{
+		if ( is_array($encoded_str) ) {
+			$encoded_str = array_shift($encoded_str);
+		}
+
 		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $encoded_str), true);
 		if (!$decodedKs)
 		{
