@@ -502,7 +502,7 @@ class BaseEntryService extends KalturaEntryService
 		if (!$refId)
 		{
 			//if refId wasn't provided return an error of missing parameter
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $refId);
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'refId');
 		}
 				
 		if (!$pager){
