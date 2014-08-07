@@ -10,6 +10,39 @@ class LiveReportsService extends KalturaBaseService
 {
 	
 	/**
+	 * @action getEvents
+	 * @param KalturaLiveReportType $reportType
+	 * @param KalturaLiveReportInputFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaLiveStatsListResponse
+	 */
+	public function getEventsAction($reportType,
+			KalturaLiveReportInputFilter $filter = null,
+			KalturaFilterPager $pager = null)
+	{
+		if(is_null($filter))
+			$filter = new KalturaLiveReportInputFilter();
+		if(is_null($pager))
+			$pager = new KalturaFilterPager;
+		
+		$client = new WSLiveReportsClient();
+		$wsFilter = $filter->getWSObject();
+		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();
+		$wsPager = new WSLiveReportInputPager($pager->pageSize, $pager->pageIndex);
+		
+		$wsResult = $client->getEvents($reportType, $wsFilter, $wsPager);
+		$objects = $wsResult->objects;
+		$resultsArray = array();
+		foreach($objects as $result) {
+			$resultsArray[$result->timestamp] = $result->value;
+		}
+		
+		$kResult = KalturaReportGraphArray::fromReportDataArray(array("audience" => $resultsArray));
+		
+		return $kResult;
+	}
+	
+	/**
 	 * @action getReport
 	 * @param KalturaLiveReportType $reportType
 	 * @param KalturaLiveReportInputFilter $filter
@@ -23,17 +56,18 @@ class LiveReportsService extends KalturaBaseService
 		if(is_null($filter))
 			$filter = new KalturaLiveReportInputFilter();
 		if(is_null($pager))
-			$pager = new KalturaFilterPager;
+			$pager = new KalturaFilterPager();
 		
 		$client = new WSLiveReportsClient();
 		$wsFilter = $filter->getWSObject();
 		$wsFilter->partnerId = kCurrentContext::getCurrentPartnerId();
 		
+		$wsPager = new WSLiveReportInputPager($pager->pageSize, $pager->pageIndex);
+		
 		switch($reportType) {
 			case KalturaLiveReportType::ENTRY_GEO_TIME_LINE:
 			case KalturaLiveReportType::ENTRY_SYNDICATION_TOTAL:
-			case KalturaLiveReportType::ENTRY_TIME_LINE:
-				return $this->requestClient($client, $reportType, $wsFilter);
+				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 				
 			case KalturaLiveReportType::PARTNER_TOTAL:
 				if($filter->live && empty($wsFilter->entryIds)) {
@@ -48,7 +82,7 @@ class LiveReportsService extends KalturaBaseService
 					
 					$wsFilter->entryIds = $entryIds;
 				}
-				return $this->requestClient($client, $reportType, $wsFilter);
+				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 				
 			case KalturaLiveReportType::ENTRY_TOTAL:
 				if(!$filter->live) {
@@ -58,7 +92,7 @@ class LiveReportsService extends KalturaBaseService
 					
 					$wsFilter->entryIds = $entryIds;
 				}
-				return $this->requestClient($client, $reportType, $wsFilter);
+				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 		}
 		
 	}
@@ -119,9 +153,9 @@ class LiveReportsService extends KalturaBaseService
 		return implode(",", $entryIds);
 	}
 	
-	protected function requestClient(WSLiveReportsClient $client, $reportType, $wsFilter) {
+	protected function requestClient(WSLiveReportsClient $client, $reportType, $wsFilter, $wsPager) {
 		/** @var WSLiveStatsListResponse */
-		$result = $client->getReport($reportType, $wsFilter);
+		$result = $client->getReport($reportType, $wsFilter, $wsPager);
 		$kResult = $result->toKalturaObject();
 		return $kResult;
 	}
