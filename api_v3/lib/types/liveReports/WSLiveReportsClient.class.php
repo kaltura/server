@@ -16,14 +16,32 @@ class WSLiveReportsClient extends nusoap_client
 	 * @param KalturaliveReportInputFilter $filter
 	 * @return KalturaLiveStatsListResponse 
 	 **/
-	public function getReport($reportType, WSLiveReportInputFilter $filter)
+	public function getReport($reportType, WSLiveReportInputFilter $filter, WSLiveReportInputPager $pager)
 	{
 		$params = array();
 		
-		$params["arg0"] = $this->parseParam($reportType, 'tns:liveReportType');
-		$params["arg1"] = $this->parseParam($filter, 'tns:liveReportInputFilter');
+		$params["reportType"] = $this->parseParam($reportType, 'tns:liveReportType');
+		$params["filter"] = $this->parseParam($filter, 'tns:liveReportInputFilter');
+		$params["pager"] = $this->parseParam($pager, 'tns:liveReportInputPager');
+		
 
 		return $this->doCall("getReport", $params, 'WSLiveStatsListResponse');
+	}
+	
+	/**
+	 * @param KalturaliveReportType $reportType
+	 * @param KalturaliveReportInputFilter $filter
+	 * @return KalturaLiveStatsListResponse
+	 **/
+	public function getEvents($reportType, WSLiveReportInputFilter $filter, WSLiveReportInputPager $pager)
+	{
+		$params = array();
+	
+		$params["reportType"] = $this->parseParam($reportType, 'tns:liveReportType');
+		$params["filter"] = $this->parseParam($filter, 'tns:liveReportInputFilter');
+		$params["pager"] = $this->parseParam($pager, 'tns:liveReportInputPager');
+	
+		return $this->doCall("getEvents", $params, 'WSLiveEventsListResponse');
 	}
 	
 	/**
@@ -35,7 +53,7 @@ class WSLiveReportsClient extends nusoap_client
 	{
 		$params = array();
 		
-		$params["arg0"] = $this->parseParam($partnerId, 'xsd:int');
+		$params["partnerId"] = $this->parseParam($partnerId, 'xsd:int');
 
 		return $this->doCall("getLiveEntries", $params, 'WSLiveEntriesListResponse');
 	}
