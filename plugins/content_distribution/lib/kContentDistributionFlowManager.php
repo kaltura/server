@@ -1607,7 +1607,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
-			
+		
+		//no temp entries should be handled
+		if ($entry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
+			return true;
+
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 		{
@@ -1618,8 +1622,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				self::onEntryDistributionUpdateRequired($entryDistribution);
 				continue;
 			}
-			//distribute only non-temp entries
-			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC && $entry->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM) 
+
+			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC) 
 			{
 				self::addEntryDistribution($entry, $distributionProfile, true);
 			}
