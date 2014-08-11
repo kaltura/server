@@ -12,7 +12,7 @@ class DeliveryProfileLocalPathRtmp extends DeliveryProfileRtmp {
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync) {
-		$url = $fileSync->getFilePath();
+		$url = kFileSyncUtils::getRelativeFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync));
 		$url = preg_replace('/\.[\w]+$/', '', $url);
 		return $url;
 	}

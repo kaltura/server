@@ -26,7 +26,7 @@ class DeliveryProfileLocalPathAppleHttp extends DeliveryProfileAppleHttp {
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync) {
-		$url = parent::doGetFileSyncUrl($fileSync);
+		$url = kFileSyncUtils::getRelativeFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync));
 		return $url . "/playlist.m3u8";
 	}
 }
