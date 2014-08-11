@@ -25,7 +25,7 @@ class DeliveryProfileLocalPathHds extends DeliveryProfileHds {
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync) {
-		$url = parent::doGetFileSyncUrl($fileSync);
+		$url = kFileSyncUtils::getRelativeFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync));
 		return $url . "/manifest.f4m";
 	}
 	
