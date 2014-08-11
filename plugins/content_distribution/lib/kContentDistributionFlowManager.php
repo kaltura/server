@@ -1618,8 +1618,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				self::onEntryDistributionUpdateRequired($entryDistribution);
 				continue;
 			}
-
-			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC) 
+			//distribute only non-temp entries
+			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC && $entry->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM) 
 			{
 				self::addEntryDistribution($entry, $distributionProfile, true);
 			}
