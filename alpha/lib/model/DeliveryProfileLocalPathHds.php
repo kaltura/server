@@ -21,11 +21,11 @@ class DeliveryProfileLocalPathHds extends DeliveryProfileHds {
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-		return $this->doGetFileSyncUrl($fileSync);
+		return $this->getFileSyncUrl($fileSync);
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync) {
-		$url = kFileSyncUtils::getRelativeFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync));
+		$url = $fileSync->getFilePath();
 		return $url . "/manifest.f4m";
 	}
 	
