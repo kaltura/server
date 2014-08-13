@@ -37,7 +37,7 @@
 		  div#thx button { margin-right:214px;}
 	</style>
 	<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8">
-	<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ) . ':' . requestUtils::getRequestPort(); ?>/lib/js/jquery_v1.4.2.min.js"></script>
+	<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/jquery_v1.4.2.min.js"></script>
 	<script>
 	// Prevent the page to be framed
 	if(top != window && top.location.hostname != window.location.hostname ) { 

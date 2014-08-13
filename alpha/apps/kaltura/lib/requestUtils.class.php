@@ -233,10 +233,6 @@ class requestUtils extends infraRequestUtils
 		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		return $protocol;
 	}
-	public static function getRequestPort()
-	{
-		return $_SERVER['SERVER_PORT'];
-	}
 	
 	public static function getRequestHost()
 	{
