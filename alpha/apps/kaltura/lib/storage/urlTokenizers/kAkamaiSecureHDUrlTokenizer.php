@@ -304,6 +304,11 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url)
 	{
+		if ($this->useCookieHosts && !in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
+		{
+			return $url;
+		}
+		
 		if ($this->rootDir)
 			$url = rtrim($this->rootDir, '/') . '/' . ltrim($url, '/');
 		
@@ -315,10 +320,9 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		
 		if ($this->useCookieHosts)
 		{
-			if (in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
-			{
-				setcookie($this->paramName, $token);
-			}
+			$slashPos = strrpos($acl, '/');
+			$path = $slashPos !== false ? substr($acl, 0, $slashPos + 1) : '/';
+			setrawcookie($this->paramName, $token, time() + $this->window, $path);
 			return $url;
 		}
 		
@@ -331,6 +335,11 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	
 	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
 	{
+		if ($this->useCookieHosts && !in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
+		{
+			return;
+		}
+		
 		$urls = array();
 		foreach($flavors as &$flavor)
 		{
@@ -347,10 +356,9 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		
 		if ($this->useCookieHosts)
 		{
-			if (in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
-			{
-				setcookie($this->paramName, $token);
-			}
+			$slashPos = strrpos($acl, '/');
+			$path = $slashPos !== false ? substr($acl, 0, $slashPos + 1) : '/';
+			setrawcookie($this->paramName, $token, time() + $this->window, $path);
 			return;
 		}
 		
