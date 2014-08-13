@@ -49,6 +49,10 @@ abstract class kUrlTokenizer
 	 */
 	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
 	{
+		foreach($flavors as &$flavor)
+		{
+			$flavor['url'] = $this->tokenizeSingleUrl($flavor['url']);
+		}
 	}
 	
 	/**

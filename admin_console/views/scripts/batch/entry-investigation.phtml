@@ -193,12 +193,18 @@
 							'entryId' => $entry->id,
 						));
 						
+						$getBigRedButton = http_build_query(array(
+							'partnerId' => $entry->partnerId,
+							'entryId' => $entry->id,
+						));
+						
 						?>
 							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/AkamaiBroadcaster.php?' . $getBroadcast); ?>"><?php echo $this->translate('entry-investigate info entry broadcast label'); ?></a></li>
 							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/SimpleJWPlayer.php?' . $getSimplePlay); ?>"><?php echo $this->translate('entry-investigate info entry play simple label'); ?></a></li>
 							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/XmlJWPlayer.php?' . $getXml); ?>"><?php echo $this->translate('entry-investigate info entry play xml label'); ?></a>
 							<li><a target="_blank" href="/index.php/extwidget/streamclipper?<?php echo $getXml; ?>"><?php echo $this->translate('entry-investigate info entry config xml label'); ?></a>
 							<li><a target="_blank" href="/p/<?php echo $entry->partnerId; ?>/sp/<?php echo $entry->partnerId; ?>00/playManifest/entryId/<?php echo $entry->id; ?>/format/rtmp/a/a.f4m"><?php echo $this->translate('entry-investigate info entry manifest label'); ?></a>
+							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/bigRedButton.php?' . $getBigRedButton); ?>"><?php echo $this->translate('entry-investigate info entry big-red-button label'); ?></a>						
 						<?php 
 					}
 					elseif($entry instanceof Kaltura_Client_Type_MediaEntry)

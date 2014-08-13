@@ -1605,7 +1605,11 @@ class KalturaEntryService extends KalturaBaseService
 		$moderationFlag->validatePropertyNotNull("flaggedEntryId");
 
 		$entryId = $moderationFlag->flaggedEntryId;
-		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+		$dbEntry = kCurrentContext::initPartnerByEntryId($entryId);
+
+		// before returning any error, let's validate partner's access control
+		if ($dbEntry)
+			$this->validateApiAccessControl($dbEntry->getPartnerId());
 
 		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -1771,8 +1775,28 @@ class KalturaEntryService extends KalturaBaseService
 			else 
 				$filter->userIdEqual = -1; // no result will be returned when the user is missing
 		}
+
+        if(!empty($filter->userIdIn))
+        {
+            $userIdsArr = array();
+            $userIds = explode(',',$filter->userIdIn);
+            $userArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $userIds);
+
+            foreach($userArr as $user)
+            {
+                $userIdsArr[] =$user->getId();
+            }
+            if(!empty($userIdsArr))
+            {
+                $filter->userIdIn = implode(',',$userIdsArr);
+            }
+            else
+            {
+                $filter->userIdIn = -1;
+            }
+        }
 	}
-	
+
 	/**
 	 * Convert duration in seconds to msecs (because the duration field is mapped to length_in_msec)
 	 * 

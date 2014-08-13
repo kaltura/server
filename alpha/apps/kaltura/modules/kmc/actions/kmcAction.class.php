@@ -15,6 +15,13 @@ class kmcAction extends kalturaAction
 			$this->redirect('kmc/kmc2');
 		}
 
+		if ((infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS) && kConf::get('kmc_secured_login'))
+		{
+			$url = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+			header('Location:' . $url);
+			die;
+		}
+
 		$this->www_host = kConf::get('www_host');
 		$https_enabled = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? true : false;
 		$this->securedLogin = (kConf::get('kmc_secured_login') || $https_enabled) ? true : false;
@@ -34,7 +41,11 @@ class kmcAction extends kalturaAction
 		}
 		
 		$this->beta = $this->getRequestParameter( "beta" );
-		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
+
+		//prevent script injections in this field since it's being echoed
+		$passHashparam = $this->getRequestParameter( "setpasshashkey" );
+		$this->setPassHashKey = strip_tags($passHashparam);
+		
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;
 		if ($this->setPassHashKey) {

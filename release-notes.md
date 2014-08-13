@@ -1,3 +1,52 @@
+# IX-9.19.1 #
+
+## add base-playback user role ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1565
+
+Adding a user-role with playback capabilities only
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_03_add_base_playback_role_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
+## Image entry plays/views ##
+- Issue Type: Change Request
+- Issue ID: KMS-3488
+
+Match the number of plays to the number of views in image entries.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+deployment/updates/scripts/2014_07_31_match_plays_to_views_for_image_entries.php realrun
+
+* Note the **realrun** argument after the script name
+
+#### Known Issues & Limitations ####
+None
+
+
+## Delivery profile ##
+set is default to be false in default.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+	/deployment/updates/sql/2014_07_27_delivery_profile_default_false.sql
+
+#### Known Issues & Limitations ####
+None
+
 # IX-9.19.0 #
 
 ## Add ENTRY_CHANGED email notification template ##

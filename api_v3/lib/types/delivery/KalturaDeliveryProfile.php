@@ -102,6 +102,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 * True if this is the systemwide default for the protocol
 	 *
 	 * @var KalturaNullableBoolean
+	 * @readonly
 	 */
 	public $isDefault;
 	

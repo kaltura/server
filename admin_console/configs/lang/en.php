@@ -438,6 +438,7 @@ return array(
 	'entry-investigate info entry play xml label' => 'Play (XML Configuration)',
 	'entry-investigate info entry config xml label' => 'Config XML',
 	'entry-investigate info entry manifest label' => 'Manifest',
+	'entry-investigate info entry big-red-button label' => 'Big-Red-Button',
 
 	'entry-investigate entry reconvert' => 'Reconvert',
 	'entry-investigate entry boostJobs' => 'Boost Jobs',
@@ -1058,8 +1059,9 @@ return array(
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
 
-	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic',
-	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::MANUAL_DELETE' => 'Manual',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY' => 'Automatic deletion when entry is ready',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic deletion after import',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::MANUAL_DELETE' => 'Manual deletion',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW' => 'Add as new',
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_ADD_AS_NEW' => 'Match existing or add as new',
