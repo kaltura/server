@@ -1,3 +1,25 @@
+# IX-9.19.2 #
+
+## Thumbnail encoder ##
+reverting the current encoder to the old one
+
+- Issue Type: Bug fix
+- Issue ID: SUP-2581
+
+#### Configuration ####
+
+**Local.ini**
+
+- bin_path_ffmpeg = ffmpeg
+- ;bin_path_ffmpeg = /opt/kaltura/bin/x64/run/run-ffmpeg-0.10.sh
+
+
+#### Deployment Scripts ####
+None
+
+#### Known Issues & Limitations ####
+None
+
 # IX-9.19.1 #
 
 ## add base-playback user role ##
