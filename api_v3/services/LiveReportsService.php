@@ -85,7 +85,7 @@ class LiveReportsService extends KalturaBaseService
 				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 				
 			case KalturaLiveReportType::ENTRY_TOTAL:
-				if(!$filter->live) {
+				if(!$filter->live && empty($wsFilter->entryIds)) {
 					$entryIds = $this->getLiveEntries($client, kCurrentContext::getCurrentPartnerId(), $pager);
 					if(empty($entryIds))
 						return new KalturaLiveStatsListResponse();
