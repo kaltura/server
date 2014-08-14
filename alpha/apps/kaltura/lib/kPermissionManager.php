@@ -537,7 +537,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$c = new Criteria();
 			$c->addAnd(is_numeric($ksSetRoleId) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME
 				, $ksSetRoleId, Criteria::EQUAL);
-			$c->addAnd(UserRolePeer::PARTNER_ID, array($ksPartnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$partnerIds = array_map('strval', array($ksPartnerId, PartnerPeer::GLOBAL_PARTNER));
+			$c->addAnd(UserRolePeer::PARTNER_ID, $partnerIds, Criteria::IN);
 			$roleId = UserRolePeer::doSelectOne($c);
 
 			if ($roleId){
