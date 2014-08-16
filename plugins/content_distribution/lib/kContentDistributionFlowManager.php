@@ -1607,7 +1607,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
-			
+		
+		//no temp entries should be handled
+		if ($entry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM && $entry->getReplacedEntryId())
+			return true;
+
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 		{
