@@ -187,7 +187,8 @@ if (isset($options['url']) && is_string($options['url']))
 }
 else
 {
-	$serviceUrl = 'www.kaltura.com';
+	$config = parse_ini_file(dirname(__file__) . '/config/config.ini');
+	$serviceUrl = isset( $config['apiHost'] ) ? $config['apiHost'] : 'www.kaltura.com';
 }
 
 if (strpos($serviceUrl, '://') === false)
