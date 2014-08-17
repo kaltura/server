@@ -45,11 +45,12 @@ class kmcAction extends kalturaAction
 		$this->beta = $this->getRequestParameter( "beta" );
 
 		//prevent script injections - allow only base64_encode chars , which is used when creating A new hash key
-		if (!preg_match(self::BASE64_ENCODE_CHARS_REGEX , $this->getRequestParameter( "setpasshashkey" )))
+		$passHashparam = $this->getRequestParameter( "setpasshashkey" );
+		if (!preg_match(self::BASE64_ENCODE_CHARS_REGEX , $passHashparam))
 			KExternalErrors::dieError(KExternalErrors::INVALID_HASH);
-		
-		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
-		
+
+		$this->setPassHashKey = $passHashparam;
+
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;
 		if ($this->setPassHashKey) {
