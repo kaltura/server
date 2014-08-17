@@ -44,7 +44,7 @@ class kmcAction extends kalturaAction
 
 		//prevent script injections in this field since it's being echoed
 		$passHashparam = $this->getRequestParameter( "setpasshashkey" );
-		$this->setPassHashKey = strip_tags($passHashparam);
+		$this->setPassHashKey = preg_replace("/[^\da-zA-Z]+/" , "" , strip_tags($passHashparam));
 		
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;
