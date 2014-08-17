@@ -5,7 +5,7 @@
  */
 class kmcAction extends kalturaAction
 {
-	const BASE64_ENCODE_CHARS_REGEX = "/[^a-zA-Z0-9\/\+\=]+/";
+	const NON_BASE64_ENCODE_CHARS_REGEX = "/[^a-zA-Z0-9\/\+\=]+/";
 	
 	public function execute ( ) 
 	{
@@ -47,7 +47,7 @@ class kmcAction extends kalturaAction
 		$passHashparam = $this->getRequestParameter( "setpasshashkey" );
 
 		//prevent script injections - allow only base64_encode chars , which is used when creating A new hash key
-		$this->setPassHashKey = preg_replace(self::BASE64_ENCODE_CHARS_REGEX , "" , strip_tags($passHashparam));
+		$this->setPassHashKey = preg_replace(self::NON_BASE64_ENCODE_CHARS_REGEX , "" , strip_tags($passHashparam));
 		
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;
