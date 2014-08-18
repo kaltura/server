@@ -14,9 +14,12 @@ KalturaStatement::setDryRun(!$realRun);
 
 $c = KalturaCriteria::create(entryPeer::OM_CLASS);
 $c->add( entryPeer::MEDIA_TYPE, entry::ENTRY_MEDIA_TYPE_IMAGE );
-$c->add( $c->getNewCriterion(entryPeer::PLAYS, entryPeer::PLAYS . '<>' . entryPeer::VIEWS, KalturaCriteria::CUSTOM) );
+$c->add( entryPeer::TYPE, entryType::MEDIA_CLIP);
+$c->addAscendingOrderByColumn(entryPeer::INT_ID);
+$c->addCondition("plays <> views");
 $c->setLimit( 100 ); // Select in bulks of 100
 
+$lastIntId = 0;
 $entries = entryPeer::doSelect($c);
 while(count($entries))
 {
@@ -24,9 +27,11 @@ while(count($entries))
 	{
 		$entry->setPlays( $entry->getViews() );
 		$entry->save();
+		$lastIntId = $entry->getIntId();
 	}
 
 	usleep( 50 * 1000 ); // Rest for 50 msec
 	
+	$c->add(entryPeer::INT_ID, $lastIntId, Criteria::GREATER_THAN);
 	$entries = entryPeer::doSelect( $c );
 }
