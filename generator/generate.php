@@ -278,6 +278,7 @@ foreach($config as $name => $item)
 			if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 			{
 				$winOutputPath = realpath($outputPath);
+				$clearPath = str_replace("/", "\\", $clearPath);
 				KalturaLog::info("Delete old files [$winOutputPath" . ($clearPath ? ", $clearPath" : "") . "]");
 				passthru("rmdir /Q /S $winOutputPath $clearPath");
 			}
