@@ -24,10 +24,9 @@ $lastCreatedAt = 0;
 $processedEntries = array();
 while( $processing )
 {
-	$criteriaForSelect = $c;
+	$criteriaForSelect = clone($c);
 	if ( count($processedEntries) )
 	{
-		$criteriaForSelect = clone($c);
 		$criteriaForSelect->add(entryPeer::ID, $processedEntries, Criteria::NOT_IN);
 	}
 
@@ -38,22 +37,21 @@ while( $processing )
 	{
 		$entryId = $entry->getId();
 
-		if ( ! in_array($entryId, $processedEntries) )
+		$entry->setPlays( $entry->getViews() );
+		$entry->save();
+		$processing = true;
+
+		$createdAt = $entry->getCreatedAt( null );
+		if ( $createdAt > $lastCreatedAt )
 		{
-			$entry->setPlays( $entry->getViews() );
-			$entry->save();
-			$processing = true;
-
-			$createdAt = $entry->getCreatedAt( null );
-			if ( $createdAt > $lastCreatedAt )
-			{
-				$lastCreatedAt = $createdAt;
-				$processedEntries = array();
-			}
-
-			$processedEntries[] = $entryId;
+			$lastCreatedAt = $createdAt;
+			$processedEntries = array();
 		}
+
+		$processedEntries[] = $entryId;
 	}
+
+	kEventsManager::flushEvents();
 
 	usleep( 50 * 1000 ); // Rest for 50 msec
 	
