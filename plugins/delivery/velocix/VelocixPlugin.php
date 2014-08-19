@@ -79,6 +79,9 @@ class VelocixPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltu
 		if(($baseClass == 'KalturaTokenizer') && ($enumValue == 'kVelocixUrlTokenizer'))
 			return new KalturaUrlTokenizerVelocix();
 		
+		if(($baseClass == 'Form_Delivery_DeliveryProfileTokenizer') && ($enumValue == 'Kaltura_Client_Type_UrlTokenizerVelocix'))
+			return new Form_Delivery_UrlTokenizerVelocix();
+		
 		return null;
 	}
 	

@@ -1578,6 +1578,41 @@ body#batch-learn-more ol li {
 	overflow: auto;
 }
 
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset {
+	border: none;
+	background: none;
+	margin: 0px 0px 10px 21px;
+	width: 850px;
+	line-height: 2;
+}
+
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset legend {
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset dt {
+	display: block;
+	width: 333px;
+	float: left;
+	line-height: 1.8;
+	clear: both;
+}
+
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset dd {
+	line-height: 2;
+	display: block;
+}
+
+#delivery-delivery-profiles-configuration #addNewDeliveryProfile {
+	margin-left: 20px;
+}
+
+#delivery-delivery-profiles-configuration #addNewDeliveryProfile dd,#delivery-delivery-profiles-configuration #addNewDeliveryProfile dt
+	{
+	float: left;
+}
+
 form#addNewDistributionProfile {
 	margin-left: 20px;
 }

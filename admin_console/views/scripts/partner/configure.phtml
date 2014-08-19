@@ -2,7 +2,6 @@
 <?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'configure'))); ?>
 <?php echo $this->form; ?>
 
-
 <script type="text/javascript">
 $(function(){
 	jQuery('.ui-widget-overlay').css('z-index', 1000 );
@@ -363,6 +362,7 @@ jQuery(document).ready(function() {
 
 	jQuery('#use_default_streamers').change(useDefaultStreamersChanged);
 	useDefaultStreamersChanged();
+	updatedUI();
 });
 
 </script>
