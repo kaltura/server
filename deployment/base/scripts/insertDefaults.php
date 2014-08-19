@@ -138,11 +138,23 @@ function handleFile($filePath)
 		$object = new $newObjectType();
 		/* @var $object BaseObject */
 		$pk = null;
+		$pkField = null;
+		// New logic allowing to use other parameters as uique identifers for updates
+		$identifierParam = null;
+		$identifierColumn = null;
+		
 		$setters = array();
 		foreach($objectConfiguration as $attributeName => $value)
 		{
 			if($attributeName == 'id')
+			{
 				$pk = $value;
+			}
+			elseif ($attributeName == 'identifierParam' || $attributeName == 'identifierColumn')
+			{
+				$$identifierColumn = $value;
+				continue;
+			} 
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
@@ -161,13 +173,26 @@ function handleFile($filePath)
 		}
 
 		$pkCriteria = null;
+		$existingObject = null;
 		if(!is_null($pk))
 		{
 			$pkCriteria = new Criteria();
 			$pkCriteria->add(constant(get_class($peer) . '::ID'), $pk);
 			$existingObject = $peer->doSelectOne($pkCriteria, $con);
-			if($existingObject)
-				$object = $existingObject;
+			
+		}
+		elseif (!is_null($identifierParam) && !is_null($identifierColumn))
+		{
+			// If we have some other form of identifier on the object
+			$c = new Criteria();
+			$c->add (constant(get_class($peer) . "::$identifierColumn"), $objectConfiguration[$identifierParam]);
+			$existingObject = $peer->doSelectOne($c, $con);
+		}
+		
+		if($existingObject)
+		{
+			KalturaLog::info ('existing objects will not be re-written');
+			continue;
 		}
 
 		foreach($setters as $setter => $value)
