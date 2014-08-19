@@ -24,7 +24,14 @@ $lastCreatedAt = 0;
 $processedEntries = array();
 while( $processing )
 {
-	$entries = entryPeer::doSelect($c);
+	$criteriaForSelect = $c;
+	if ( count($processedEntries) )
+	{
+		$criteriaForSelect = clone($c);
+		$criteriaForSelect->add(entryPeer::ID, $processedEntries, Criteria::NOT_IN);
+	}
+
+	$entries = entryPeer::doSelect( $criteriaForSelect );
 	$processing = false;
 
 	foreach($entries as $entry)
@@ -37,16 +44,14 @@ while( $processing )
 			$entry->save();
 			$processing = true;
 
-			$createdAt = $entry->getCreatedAt('%s');
+			$createdAt = $entry->getCreatedAt( null );
 			if ( $createdAt > $lastCreatedAt )
 			{
 				$lastCreatedAt = $createdAt;
 				$processedEntries = array();
 			}
-			else
-			{
-				$processedEntries[] = $entryId;
-			}
+
+			$processedEntries[] = $entryId;
 		}
 	}
 
