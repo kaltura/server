@@ -86,6 +86,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaDeliveryStatus
+	 * @filter eq,in
 	 */
 	public $status;
 	

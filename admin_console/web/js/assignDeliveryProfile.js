@@ -97,6 +97,8 @@ function okPressed(format) {
 	
 	var dpIdsStr = $("#delivery_profile_ids")[0].value;
 	var dpIdsObj = jQuery.parseJSON(dpIdsStr);
+	if(dpIdsObj == null)
+		dpIdsObj = jQuery.parseJSON("{}");
 
 	dpIdsObj[format] = selectedValues;
 	$("#delivery_profile_ids")[0].value = JSON.stringify(dpIdsObj);

@@ -223,7 +223,7 @@ function remoteStorage(partnerId) {
 }
 
 function deliveryProfile(partnerId) {
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'delivery-profiles-configuration'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'delivery-profiles-configuration'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
 	document.location = url; 
 }
 
@@ -435,7 +435,7 @@ function assignDeliveryProfile(format, currentDps)
 {
 	var partnerId = $("#id")[0].value;
 
-	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'assign-delivery-profile')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';
 	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/";
 	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
 	

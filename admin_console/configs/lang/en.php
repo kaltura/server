@@ -1243,6 +1243,19 @@ return array(
 		"Kaltura_Client_Enum_PlaybackProtocol::RTMP" => "RTMP",
 		"Kaltura_Client_Enum_PlaybackProtocol::RTSP" => "RTSP",
 		"Kaltura_Client_Enum_PlaybackProtocol::SILVER_LIGHT" => "SILVER_LIGHT",
+		
+		"Kaltura_Client_Type_UrlTokenizerAkamaiSecureHd" => "Akamai Secure Hd",
+		'Kaltura_Client_Type_UrlTokenizer'	=> 'Default tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerAkamaiHttp'	=> 'Akamai Http Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerAkamaiRtmp'	=>	'Akamai Rtmp Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerAkamaiRtsp'	=> 	'Akamai Rtsp Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerBitGravity'	=>	'Bit Gravity Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerLevel3'		=> 	'Level 3 Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerLimeLight'		=> 	'Lime Light Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerUplynk'	=> 'Uplynk Tokenizer',
+		'Kaltura_Client_Type_UrlTokenizerVelocix'	=> 'Velocix Tokenizer',
+		
+		'Kaltura_Client_Type_UrlRecognizer' => "default recognizer",
 );
 
 

@@ -1578,6 +1578,41 @@ body#batch-learn-more ol li {
 	overflow: auto;
 }
 
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset {
+	border: none;
+	background: none;
+	margin: 0px 0px 10px 21px;
+	width: 850px;
+	line-height: 2;
+}
+
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset legend {
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset dt {
+	display: block;
+	width: 333px;
+	float: left;
+	line-height: 1.8;
+	clear: both;
+}
+
+#delivery-delivery-profiles-configuration .deliveryProfileConfigureFormPanel fieldset dd {
+	line-height: 2;
+	display: block;
+}
+
+#delivery-delivery-profiles-configuration #addNewDeliveryProfile {
+	margin-left: 20px;
+}
+
+#delivery-delivery-profiles-configuration #addNewDeliveryProfile dd,#delivery-delivery-profiles-configuration #addNewDeliveryProfile dt
+	{
+	float: left;
+}
+
 form#addNewDistributionProfile {
 	margin-left: 20px;
 }
@@ -2333,47 +2368,6 @@ form#addNewForm #newPartnerId {
 }
 
 #storage-configure-dialog .storageConfigureFormPanel fieldset#fieldset-advanced dd {
-	line-height: 1.7;
-	display: block;
-	width: 800px;
-}
-
-#delivery-profile-configure-dialog .deliveryProfileConfigureFormPanel fieldset {
-	border: none;
-	background: none;
-	margin: 0px 0px 10px 21px;
-	width: 850px;
-	line-height: 2;
-}
-
-#delivery-profile-configure-dialog .deliveryProfileConfigureFormPanel fieldset legend
-	{
-	font-weight: bold;
-	margin-bottom: 10px;
-}
-
-#delivery-profile-configure-dialog .deliveryProfileConfigureFormPanel fieldset dt {
-	display: block;
-	width: 333px;
-	float: left;
-	line-height: 1.8;
-	clear: both;
-}
-
-#delivery-profile-configure-dialog .deliveryProfileConfigureFormPanel fieldset dd {
-	line-height: 2;
-	display: block;
-}
-
-#delivery-profile-configure-dialog .deliveryProfileConfigureFormPanel fieldset#fieldset-advanced dt {
-	display: block;
-	width: 800px;
-	float: left;
-	line-height: 1.5;
-	clear: both;
-}
-
-#delivery-profile-configure-dialog .deliveryProfileConfigureFormPanel fieldset#fieldset-advanced dd {
 	line-height: 1.7;
 	display: block;
 	width: 800px;

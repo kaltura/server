@@ -13,7 +13,6 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		
 		$this->addElement('text', 'storageId', array(
 				'label' 		=> 'Storage ID:',
-				'required'		=> true,
 				'filters' 		=> array('StringTrim'),
 				'validators' 	=> array(),
 				'readonly'		=> true,
@@ -120,13 +119,15 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		// TODO @_!! Set to hidden
 		$this->addElement('text', 'delivery_profile_ids', array(
+				'label'			=> "Delivery profile ids (JSON)",
 				'filters'		=> array('StringTrim'),
+				'readonly'		=> true,
 		));
 		
-		$this->addElement('select', 'deliveryFormat', array(
+		$element = $this->addElement('select', 'deliveryFormat', array(
 				'filters'		=> array('StringTrim'),
+				'registerInArrayValidator' => false,
 		));
 		
 		$this->addElement('button', 'editDeliveryProfiles', array(
@@ -167,6 +168,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
              'Fieldset',
               array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
      	));
+    	
 	}
 
 	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())

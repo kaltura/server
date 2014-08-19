@@ -143,15 +143,15 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		// TODO @_!! Set to hidden
 		$this->addElement('text', 'delivery_profile_ids', array(
-				'label'			=> "label",
+				'label'			=> "Delivery profile ids (JSON)",
 				'filters'		=> array('StringTrim'),
+				'readonly'		=> true,
 		));
 		
 		$this->addElement('select', 'deliveryFormat', array(
 				'label'			=> 'Add format',
-				'filters'		=> array('StringTrim'),
+				'registerInArrayValidator' => false,
 		));
 		
 		$this->addElement('button', 'editDeliveryProfiles', array(
