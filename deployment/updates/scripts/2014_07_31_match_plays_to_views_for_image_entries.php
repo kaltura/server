@@ -55,6 +55,8 @@ while( $processing )
 		}
 	}
 
+	kEventsManager::flushEvents();
+
 	usleep( 50 * 1000 ); // Rest for 50 msec
 	
 	$c->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::GREATER_EQUAL);
