@@ -15,23 +15,47 @@ KalturaStatement::setDryRun(!$realRun);
 $c = KalturaCriteria::create(entryPeer::OM_CLASS);
 $c->add( entryPeer::MEDIA_TYPE, entry::ENTRY_MEDIA_TYPE_IMAGE );
 $c->add( entryPeer::TYPE, entryType::MEDIA_CLIP);
-$c->addAscendingOrderByColumn(entryPeer::INT_ID);
+$c->addAscendingOrderByColumn(entryPeer::CREATED_AT);
 $c->addCondition("plays <> views");
 $c->setLimit( 100 ); // Select in bulks of 100
 
-$lastIntId = 0;
-$entries = entryPeer::doSelect($c);
-while(count($entries))
+$processing = true;
+$lastCreatedAt = 0;
+$processedEntries = array();
+while( $processing )
 {
+	$criteriaForSelect = $c;
+	if ( count($processedEntries) )
+	{
+		$criteriaForSelect = clone($c);
+		$criteriaForSelect->add(entryPeer::ID, $processedEntries, Criteria::NOT_IN);
+	}
+
+	$entries = entryPeer::doSelect( $criteriaForSelect );
+	$processing = false;
+
 	foreach($entries as $entry)
 	{
-		$entry->setPlays( $entry->getViews() );
-		$entry->save();
-		$lastIntId = $entry->getIntId();
+		$entryId = $entry->getId();
+
+		if ( ! in_array($entryId, $processedEntries) )
+		{
+			$entry->setPlays( $entry->getViews() );
+			$entry->save();
+			$processing = true;
+
+			$createdAt = $entry->getCreatedAt( null );
+			if ( $createdAt > $lastCreatedAt )
+			{
+				$lastCreatedAt = $createdAt;
+				$processedEntries = array();
+			}
+
+			$processedEntries[] = $entryId;
+		}
 	}
 
 	usleep( 50 * 1000 ); // Rest for 50 msec
 	
-	$c->add(entryPeer::INT_ID, $lastIntId, Criteria::GREATER_THAN);
-	$entries = entryPeer::doSelect( $c );
+	$c->add(entryPeer::CREATED_AT, $lastCreatedAt, Criteria::GREATER_EQUAL);
 }
