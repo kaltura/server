@@ -202,11 +202,7 @@ class kApiCache extends kApiCacheBase
 		$this->_params['___cache___host'] = @$_SERVER['HTTP_HOST'];
 		$this->_params['___cache___version'] = self::CACHE_VERSION;
 		$this->_params['___internal'] = intval(kIpAddressUtils::isInternalIp());
-	}
-
-	protected function isCacheDisabled()
-	{
-		// check the clientTag parameter for a cache start time (cache_st:<time>) directive
+		
 		if ($this->clientTag)
 		{
 			$matches = null;
@@ -214,11 +210,14 @@ class kApiCache extends kApiCacheBase
 			{
 				if ($matches[1] > time())
 				{
-					return true;
+					$this->_params['___cache___start'] = $matches[1];
 				}
 			}
 		}
+	}
 
+	protected function isCacheDisabled()
+	{
 		if (isset($this->_params['nocache']))
 		{
 			return true;
