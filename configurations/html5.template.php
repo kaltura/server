@@ -77,7 +77,7 @@ if( $kConf->hasMap('playReady') ) {
 function wgGetUrl( $hostKey = null ) {
         global $wgHTTPProtocol, $wgServerPort, $kConf;
         if( $hostKey && $kConf->hasParam($hostKey) ) {
-                return $wgHTTPProtocol . '://' . $kConf->get($hostKey) . $wgServerPort;
+                return $wgHTTPProtocol . '://' . $kConf->get($hostKey);
         }
         return null;
 }
