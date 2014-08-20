@@ -6,6 +6,24 @@ reverting the current encoder to the old one
 - Issue Type: Bug fix
 - Issue ID: SUP-2581
 
+## Delivery profiles UI ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1482
+
+Adding a UI for delivery profiles
+
+#### Configuration ####
+In admin.ini add:
+	access.delivery.all = SYSTEM_ADMIN_PUBLISHER_USAGE
+
+#### Deployment Scripts ####
+
+None
+
+#### Known Issues & Limitations ####
+None
+
+
 #### Configuration ####
 
 **Local.ini**
