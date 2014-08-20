@@ -1,11 +1,5 @@
 # IX-9.19.2 #
 
-## Thumbnail encoder ##
-reverting the current encoder to the old one
-
-- Issue Type: Bug fix
-- Issue ID: SUP-2581
-
 ## Delivery profiles UI ##
 - Issue Type: Customer Request
 - Issue ID: PLAT-1482
@@ -13,7 +7,9 @@ reverting the current encoder to the old one
 Adding a UI for delivery profiles
 
 #### Configuration ####
-In admin.ini add:
+
+**admin.ini**
+
 	access.delivery.all = SYSTEM_ADMIN_PUBLISHER_USAGE
 
 #### Deployment Scripts ####
@@ -21,8 +17,15 @@ In admin.ini add:
 None
 
 #### Known Issues & Limitations ####
+
 None
 
+
+## Thumbnail encoder ##
+reverting the current encoder to the old one
+
+- Issue Type: Bug fix
+- Issue ID: SUP-2581
 
 #### Configuration ####
 
