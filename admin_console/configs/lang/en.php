@@ -280,7 +280,7 @@ return array(
 	// login
 	'login error' => 'Invalid credentials provided',
 	'login forget password' => 'Forgot Your Password?',
-	'login forget password text' => 'Instructions to reset your password will be sent to your email. If you have forgotten which email you used, please <a href="http://corp.kaltura.com/about/contact" target"_bkank">contact us</a>.',
+	'login forget password text' => 'Instructions to reset your password will be sent to your email. If you have forgotten which email you used, please <a href="http://corp.kaltura.com/about/contact" target"_blank">contact us</a>.',
 
 	// reset password
 	'email not found' => 'Email address was not found',
