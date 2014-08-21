@@ -152,7 +152,7 @@ function handleFile($filePath)
 			}
 			elseif ($attributeName == 'identifierParam' || $attributeName == 'identifierColumn')
 			{
-				$$identifierColumn = $value;
+				$$attributeName = $value;
 				continue;
 			} 
 
