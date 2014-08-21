@@ -43,6 +43,20 @@ None
 
 # IX-9.19.1 #
 
+## add widevine permission to base-playback ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1741
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_21_base_playback_role_add_widevine_permission.php
+
+#### Known Issues & Limitations ####
+None
+
 ## add base-playback user role ##
 - Issue Type: Customer Request
 - Issue ID: PLAT-1565
