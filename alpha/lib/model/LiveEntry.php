@@ -233,6 +233,9 @@ abstract class LiveEntry extends entry
 	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
+	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
+	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
+	
 	public function getPushPublishEnabled()
 	{
 		return $this->getFromCustomData("push_publish_enabled", null, false);
@@ -532,6 +535,7 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
+		$this->setLastBroadcast(time());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}

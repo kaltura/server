@@ -147,21 +147,26 @@ class SoapArray extends SoapObject implements ArrayAccess, Iterator
 		return $this->array;
 	}
 	
+	protected function getClass($value = null) {
+		return $this->class;
+	}
+	
 	public function fromArray(array $result)
 	{
-		$class = $this->class;
 		foreach($result as $field => $value)
 		{
 			if(is_int($field))
 			{
 				if(is_array($value))
 				{
+					$class = $this->getClass($value);
 					$obj = new $class();
 					$obj->fromArray($value);
 					$this[] = $obj;
 				}
 				else
 				{
+					
 					$this[] = $value;
 				}
 			}

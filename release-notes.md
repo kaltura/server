@@ -20,6 +20,29 @@ None
 
 None
 
+## Live analytics integration ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-870
+
+Added php support for live analytics
+
+#### Configuration ####
+
+**local.ini**
+
+Should fill with the WS path.
+ 
+	live_analytics_web_service_url = @LIVE_ANALYTICS_WS@
+
+
+#### Deployment Scripts ####
+
+Permission script execution:
+	php deployment\updates\scripts\add_permissions\2014_07_17_live_reports_service.php
+
+#### Known Issues & Limitations ####
+
+Integration in process.
 
 ## Thumbnail encoder ##
 reverting the current encoder to the old one
@@ -359,7 +382,8 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 *Permissions*
 
-- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestreamservice.php
+- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestream
+- php
 
 
 ## YouTube Captions Upload via SFTP ##
