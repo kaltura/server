@@ -49,6 +49,8 @@ class nusoap_parser extends nusoap_base {
 	var $multirefs = array();
 	// toggle for auto-decoding element content
 	var $decode_utf8 = true;
+	// Whether we should keep the object type
+	var $keep_type = false;
 
 	/**
 	* constructor that actually does the parsing
@@ -59,12 +61,14 @@ class nusoap_parser extends nusoap_base {
 	* @param    string $decode_utf8 whether to decode UTF-8 to ISO-8859-1
 	* @access   public
 	*/
-	function nusoap_parser($xml,$encoding='UTF-8',$method='',$decode_utf8=true){
+	function nusoap_parser($xml,$encoding='UTF-8',$method='',$decode_utf8=true,$keep_type = false){
+		
 		parent::nusoap_base();
 		$this->xml = $xml;
 		$this->xml_encoding = $encoding;
 		$this->method = $method;
 		$this->decode_utf8 = $decode_utf8;
+		$this->keep_type = $keep_type;
 
 		// Check whether content has been read.
 		if(!empty($xml)){
@@ -572,6 +576,8 @@ class nusoap_parser extends nusoap_base {
 					$notstruct = 1;
 				} else {
 					$notstruct = 0;
+					if($this->keep_type && !empty($this->message[$pos]['type']) && ($this->message[$pos]['type'] != 'struct'))
+						$params['__object_type__'] = $this->message[$pos]['type'];
 	            }
             	//
             	foreach($children as $child_pos){

@@ -114,6 +114,20 @@ class kmcUtils
 		return $confs;
 	}
 
+	public static function getLiveAUiconf()
+	{
+		$c = new Criteria();
+		$tag = 'livea_player';
+		$c->addAnd(uiConfPeer::PARTNER_ID, 0);
+		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
+		$c->addAnd ( uiConfPeer::TAGS, '%'.$tag.'%', Criteria::LIKE );
+		$c->addAnd ( uiConfPeer::TAGS, '%deprecated%', Criteria::NOT_LIKE );
+		$c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);	
+		$confs = uiConfPeer::doSelect($c);
+		return $confs;
+	}
+	
+	
 	
 	public static function getStudioUiconf($version)
 	{
