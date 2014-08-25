@@ -28,7 +28,7 @@ Added php support for live analytics
 
 #### Prerequisites ####
 
-- Player version: v2.17.rc8 or higher. (http://kgit.html5video.org/tags/v2.17.rc8/mwEmbedLoader.php)
+- Player version: v2.17.rc7 or higher. (http://kgit.html5video.org/tags/v2.17.rc7/mwEmbedLoader.php)
 - KMC version: V5.38
 
 #### Configuration ####
