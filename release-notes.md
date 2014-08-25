@@ -26,19 +26,49 @@ None
 
 Added php support for live analytics
 
+#### Prerequisites ####
+
+- Player version: v2.17.rc8 or higher. (http://kgit.html5video.org/tags/v2.17.rc8/mwEmbedLoader.php)
+- KMC version: V5.38
+
 #### Configuration ####
+
+**base.ini**
+
+Should verify the following:
+
+- live analytics version v0.1
+- kmc version v5.38 
 
 **local.ini**
 
-Should fill with the WS path.
+Should fill with the WS path:
  
 	live_analytics_web_service_url = @LIVE_ANALYTICS_WS@
+
+Should set the live stats host:
+
+	live_stats_host =  <LIVE_STATS_HOST_NAME>
+	live_stats_host_https = <LIVE_STATS_HOST_NAME_HTTPS>
 
 
 #### Deployment Scripts ####
 
 Permission script execution:
 	php deployment\updates\scripts\add_permissions\2014_07_17_live_reports_service.php
+
+#### Apps installation ####
+Install live analytics app by check-outing 
+
+	https://github.com/kaltura/LiveAnalytics/releases
+into 
+
+	/opt/Kaltura/apps/liveanalytics/
+
+Deploy uiconf: 
+
+	liveanalytics_version/deploy/config.ini
+
 
 #### Known Issues & Limitations ####
 
