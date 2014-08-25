@@ -58,16 +58,17 @@ Permission script execution:
 	php deployment\updates\scripts\add_permissions\2014_07_17_live_reports_service.php
 
 #### Apps installation ####
-Install live analytics app by check-outing 
+Install live analytics app by downloading _dist.zip from
 
-	https://github.com/kaltura/LiveAnalytics/releases
-into 
+	https://github.com/kaltura/LiveAnalytics/releases/tag/0.1
+and unzipping it into 
 
-	/opt/Kaltura/apps/liveanalytics/
+	/opt/Kaltura/apps/liveanalytics/v0.1/
 
+(discard "_dist" folder)
 Deploy uiconf: 
 
-	liveanalytics_version/deploy/config.ini
+	<liveanalytics_version>/deploy/config.ini
 
 
 #### Known Issues & Limitations ####
