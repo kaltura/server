@@ -1,3 +1,123 @@
+<<<<<<< HEAD
+=======
+# IX-9.19.1 #
+
+## add base-playback user role ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1565
+
+Adding a user-role with playback capabilities only
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_03_add_base_playback_role_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
+## Image entry plays/views ##
+- Issue Type: Change Request
+- Issue ID: KMS-3488
+
+Match the number of plays to the number of views in image entries.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+deployment/updates/scripts/2014_07_31_match_plays_to_views_for_image_entries.php realrun
+
+* Note the **realrun** argument after the script name
+
+#### Known Issues & Limitations ####
+None
+
+
+## Delivery profile ##
+set is default to be false in default.
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+	/deployment/updates/sql/2014_07_27_delivery_profile_default_false.sql
+
+#### Known Issues & Limitations ####
+None
+
+# IX-9.19.0 #
+
+## Add ENTRY_CHANGED email notification template ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1442
+
+#### Scripts ####
+
+		php /deployment/updates/scripts/2014_06_15_add_entry_changed_email_notification.php
+#### Configurations ####
+
+**Local.ini**
+
+api_cache_warmup_host = 127.0.0.1  
+html5lib_host = 127.0.0.1
+
+
+## Watermark support ##
+- Issue Type: PLAT-1510
+
+#### Objective:
+To provide static watermark support. The watermark definitions will be defined on a specific flavor params, and will be applied to all assets generated with this flavor.
+
+#### Description:
+Added 'watermarkData' field to flavor params object (stored in a customData). This field will store following structure as a JSON string:
+- imageEntry - (optional),an image entry that will be used as a watermark image. Supported - PNG and JPG. Transparent alpha layer (PNG only) is supported.
+- url - (optional), external url for the watermark image file. Formats same as above. Either 'imageEntry' or 'url' must be provided
+- margins - (optional), 'WxH', distance from the video frame borders. Positive numbers refer to LeftUp corner, negative to RightDown corner of the video frame. If omitted - LeftUp is assumed. (Example - '-100x10'- 100pix from right side, 10 pixs from the upper side)
+- opacity -  (optional) - 0-1.0 range. Defines the blending level between the watermark image and the video frame. if omitted teh watermark is presented un-blended.
+- scale - (optional), 'WxH' - scale the water mark image to the given size. If one of the dimensions is omitted, it is calculated to preserve the watermark image aspect ratio.
+​
+
+#### Limitations:
+The combination of transparent waternark with opacity does not work properly.
+
+#### Sample watermark setup:
+{"imageEntry":"0_yn0vivhl","margins":"-100x10","opacity":"0.5","scale":"0x250"}
+
+## Mutli-audio stream support ##
+- Issue Type: PLAT-1510
+
+#### Objective:
+To support input multi-stream detection and mapping.
+
+#### Description:
+Using an existing (but unused) flavorParams::multiStream field to store an optional configuration structure as a JSON string.
+If omitted ‘layout detection logic’ is used to detect whether it has a ‘known layout’.
+Currently supported - ‘audio surround layout’. If detected, the FR and FL streams are merged into a stereo source stream.
+
+#### Configuration structure
+- detect - (optional),
+
+-   -- ‘auto’ - use internal logic to detect the source stream layout. All other fields are ignored.
+-   --  TBD - hinting the detection logic of the source stream layout (for example - ‘languages’,’surround’)
+- audio (optional) - description of either a single target audio stream or an array of target audio streams -
+
+-   -- mapping - array of input streams to be mapped in. ffmpeg style multi file source mapping notation might be used (aka. lecture-captured files, not-implemented)
+
+-   -- action - (optional) required processing action
+-   --- ‘merge’ (default)
+-   --- ‘concat’ (optional,not-implemented)
+-   -- output (optional,not-implemented) - output stream mapping
+- video (optional, not-implemented)
+
+#### Sample multi-stream configuration stream:
+{"audio":{"mapping":[1,2]}}
+
+
+>>>>>>> 8f1752f... release notes
 # IX-9.18.0 #
 
 ## Event Cue point support ##
