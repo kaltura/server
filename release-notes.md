@@ -1,5 +1,22 @@
 # IX-9.18.0 #
 
++## Add base-playback user role ##
++- Issue Type: Customer Request
++- Issue ID: PLAT-1565
++
++Adding a user-role with playback capabilities only
++
++#### Configuration ####
++None
++
++#### Deployment Scripts ####
++
++		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_03_add_base_playback_role_permissions.php
++
++#### Known Issues & Limitations ####
++None
++
+
 ## Event Cue point support ##
 - Issue ID: PLAT-1136
 
