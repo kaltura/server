@@ -13,7 +13,7 @@ class kSessionUtils
 	 */
 	public static function startKSessionFromLks ( $partner_id , $lks , $puser_id , $version , &$ks_str  , &$ks,	$desired_expiry_in_seconds=86400 )
 	{
-		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
+		$ks_max_expiry_in_seconds = myPartnerUtils::getExpiry ( $partner_id );
 		
 		$result = myPartnerUtils::isValidLks ( $partner_id , $lks , $puser_id , $version , $ks_max_expiry_in_seconds );
 		if ( $result >= 0 )
@@ -51,7 +51,7 @@ class kSessionUtils
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
 		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null)
 	{
-		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
+		$ks_max_expiry_in_seconds = myPartnerUtils::getExpiry ( $partner_id );
 		ks::validatePrivileges($privileges,  $partner_id);
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
@@ -90,14 +90,11 @@ class kSessionUtils
 	public static function createKSessionNoValidations ( $partner_id , $puser_id , &$ks_str  ,
 		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "")
 	{
-	// 2009-10-20 - don't limit the expiry of the ks !
-/*
-		// TODO - verify the partner allows such sessions (basically allows external widgets)
+		
 		$ks_max_expiry_in_seconds =  myPartnerUtils::getExpiry ( $partner_id );
-
 		if ( $ks_max_expiry_in_seconds < $desired_expiry_in_seconds )
 			$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
-*/
+		
 		$ks = new ks();
 		$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
 //			$ks->type = $admin ? ks::TYPE_KAS : ks::TYPE_KS;
