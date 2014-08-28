@@ -275,7 +275,7 @@ $html5Version = 'v2.13.rc1';
 		</tr>
 		<tr>
 			<td>Ad URL:</td>
-			<td><input type="text" id="txtAdUrl" value="http://search.spotxchange.com/vast/2.00/79391?VPAID=1&content_page_url=[please_put_dynamic_page_url]&cb=[random_number]" />
+			<td><input type="text" id="txtAdUrl" value="http://search.spotxchange.com/vast/2.00/79391?content_page_url=[please_put_dynamic_page_url]&cb=[random_number]&VPI=MP4" />
 		</td>
 		<tr>
 			<td>Ad Duration (milliseconds):</td>
