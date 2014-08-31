@@ -58,8 +58,13 @@ class downloadAction extends sfAction
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 			
+		$preview = null;
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::DOWNLOAD);
-		$securyEntryHelper->validateForDownload();
+		if ($securyEntryHelper->shouldPreview()) { 
+			$preview = $securyEntryHelper->getPreviewLength();
+		} else { 
+			$securyEntryHelper->validateForDownload();
+		}
 		
 		$flavorAsset = null;
 
@@ -128,7 +133,7 @@ class downloadAction extends sfAction
 		//enable downloading file_name which inside the flavor asset directory 
 		if(is_dir($filePath))
 			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
-		$this->dumpFile($filePath, $fileName);
+		$this->dumpFile($filePath, $fileName, $preview);
 		
 		KExternalErrors::dieGracefully(); // no view
 	}
@@ -187,7 +192,7 @@ class downloadAction extends sfAction
 		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
 	}
 	
-	private function dumpFile($file_path, $file_name)
+	private function dumpFile($file_path, $file_name, $limit_file_size = 0)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
@@ -218,7 +223,7 @@ class downloadAction extends sfAction
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 				
 			$mime_type = kFile::mimeType($file_path);
-			kFileUtils::dumpFile($file_path, $mime_type);
+			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size);
 		}
 	}
 	
