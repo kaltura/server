@@ -1,6 +1,9 @@
 index kaltura_base
 {
 	type	 = rt
+	dict	 = keywords
+	min_prefix_len  = 3
+	enable_star	 = 1
 	charset_type	 = utf-8
 	rt_mem_limit	 = 1024M
 	blend_chars	 = `, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, ', \, |, /, ?, <, >
