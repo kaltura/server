@@ -108,7 +108,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 
 		foreach($fieldConfigArray as $fieldConfig)
 		{
-			if (!isset($fieldConfig->updateParams[0]) && isset($fieldConfig->updateParams[0]->value))
+			if (!isset($fieldConfig->updateParams[0]) || !isset($fieldConfig->updateParams[0]->value))
 				continue;
 				
 			$field = $fieldConfig->updateParams[0]->value;
