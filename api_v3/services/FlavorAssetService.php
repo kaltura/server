@@ -741,7 +741,16 @@ class FlavorAssetService extends KalturaAssetService
 			
 		if ($flavorAssetDb->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
-
+		
+		// Validate for download
+		$entryDb = entryPeer::retrieveByPK($flavorAssetDb->getEntryId());
+		if(is_null($entryDb))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $flavorAssetDb->getEntryId());
+		
+		$ksObj = $this->getKs();
+		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
+		$securyEntryHelper->validateForDownload();
 		
 		return $flavorAssetDb->getDownloadUrl($useCdn);
 	}
