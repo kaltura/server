@@ -40,7 +40,7 @@ class myReportsMgr
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	
-	
+	const REPORTS_TABLE_RESULTS_CHUNK_SIZE = 10000 ;
 	const REPORTS_COUNT_CACHE = 60;
 	
 	const COUNT_PLAYS_HEADER = "count_plays";
@@ -371,13 +371,13 @@ class myReportsMgr
 		if ( ! $page_index || $page_index < 0 ) $page_index = 0;
 		
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids );
-
 		if ( count($result) > 0 )
 		{
 			$row = $result[0];
 			$header = array();
 			$data = array();
 			$first = true;
+			$counter = 0;
 			foreach ( $result as $row )
 			{
 				$rowData = array();
@@ -398,6 +398,7 @@ class myReportsMgr
 			$res = array ( $header , $data , $total_count );
 			
 		}
+
 		else
 		{
 			$res =  array ( array() , array() , 0 );
@@ -456,7 +457,7 @@ class myReportsMgr
 			$dimension = null , 
 			$object_ids = null ,
 			$page_size =10, $page_index =0, $order_by )
-	{
+		{
 		// create file_name
 		// TODO - check if file already exists - if so - serve it if not expired
 		
@@ -477,29 +478,89 @@ class myReportsMgr
 		list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
 			$report_type , 
 			$input_filter , $object_ids );			
-		
-			
-		list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id , 
-			$report_type , 
-			$input_filter ,
-			$page_size , $page_index ,
-			$order_by ,  $object_ids );		
 
-		if ($input_filter instanceof endUserReportsInputFilter)
+		if ($page_size > self::REPORTS_TABLE_RESULTS_CHUNK_SIZE)
 		{
-			$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
-		}
-			
-		$data = myCsvReport::createReport( $report_title , $report_text , $headers ,
-			$report_type , $input_filter , $dimension , 
-			$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count);
+			$initial_page_size = $page_size < 1 ? 30 : floor($page_size);
+			$initial_page_index = $page_index < 1 ? 0 : floor($page_index - 1);
+	
+			$start = $initial_page_size  * $initial_page_index;
+			$start_diff = $start % (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE);
+			$first_index = (($start - $start_diff) / (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE)) + 1;
+	
+			$end = $start + $initial_page_size;
+			$end_diff = $end % (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE);
+	
+			$last_index = (($end - $end_diff) / (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE)) + 1;
+			if ($end_diff == 0)
+				$last_index = $last_index - 1;
+	
+			$page_size = self::REPORTS_TABLE_RESULTS_CHUNK_SIZE;
+	
+			$tempCsv = new myCsvWrapper ();
+			$should_iterate = true;
+		}	
+		else
+		{
+			$first_index = $page_index;
+				$last_index = $page_index;
+			$should_iterate = false;
 		
-		// return URL
-		if ( ! file_exists (dirname ( $file_name ) ))
-			kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
-		//adding BOM for fixing problem in open .csv file with special chars using excel.
-		$BOM = "\xEF\xBB\xBF";
-		file_put_contents ( $file_name, $BOM . $data );
+		}
+		
+		$csv = new myCsvWrapper ();
+		
+		for ($page_index = $first_index ; $page_index <= $last_index ; $page_index++)
+		{
+			list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+				$report_type ,
+					$input_filter ,
+							$page_size , $page_index ,
+								$order_by ,  $object_ids );
+			
+			if ($page_index == $first_index)
+			{
+				if ($input_filter instanceof endUserReportsInputFilter &&  !$should_iterate)
+				{
+							$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+				}
+				elseif ($should_iterate)
+				{
+						$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $initial_page_size, $initial_page_index, $order_by, $object_ids);
+				}
+				if ($should_iterate && $start_diff)
+					$table_data = array_slice($table_data , $start_diff);
+			
+				$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
+					$report_type , $input_filter , $dimension ,
+					$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count , $csv);
+			
+				$data = $csv->getData();
+				if ( ! file_exists (dirname ( $file_name ) ))
+					kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
+				//adding BOM for fixing problem in open .csv file with special chars using excel.
+				$BOM = "\xEF\xBB\xBF";
+				file_put_contents ( $file_name, $BOM . $data );
+			}
+			else
+			{
+				list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+						$report_type ,
+							$input_filter ,
+								$page_size , $page_index ,
+									$order_by ,  $object_ids );
+				
+				if ($should_iterate && $page_index == $last_index  && $end_diff)
+					$table_data = array_slice($table_data , 0 , $end_diff);
+
+				$tempCsv->clearData();
+				
+				$tempCsv = myCsvReport::appendLines($tempCsv , $table_data);
+				$data = $tempCsv->getData();
+				
+				file_put_contents ( $file_name, $data  , FILE_APPEND);
+			}
+		}
 		
 		return $url;
 	}
