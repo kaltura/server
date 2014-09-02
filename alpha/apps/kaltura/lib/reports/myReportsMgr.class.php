@@ -519,7 +519,6 @@ class myReportsMgr
 	
 			for ($current_offset = $start_offest ; $current_offset < $end_offset  ; $current_offset = $current_offset + $iteration_page_size )
 			{
-				KalturaLog::debug('XXXX - current_offset - ' . $current_offset . ' - start_offest - ' . $start_offest . ' - end_offset - ' . $end_offset . ' - iteration_page_size - ' . $iteration_page_size);
 				$offset_difference = $end_offset - $current_offset;
 				if ($offset_difference < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
 					$iteration_page_size = $offset_difference;
