@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2014-07-27
+/*! KMC - v6.0.11 - 2014-09-02
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -3358,6 +3358,7 @@ if ( window.XDomainRequest ) {
 	Preview.generateIframe = function(embedCode) {
 
 		var ltIE10 = $('html').hasClass('lt-ie10');
+		var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 		var style = '<style>html, body {margin: 0; padding: 0; width: 100%; height: 100%; } #framePlayerContainer {margin: 0 auto; padding-top: 20px; text-align: center; } object, div { margin: 0 auto; }</style>';
 		var container = this.emptyDiv(this.iframeContainer);
 		var iframe = document.createElement('iframe');
@@ -3373,7 +3374,7 @@ if ( window.XDomainRequest ) {
 
 		container.appendChild(iframe);
 
-		if(ltIE10) {
+		if(ltIE10 || is_firefox) {
 			iframe.src = this.getPreviewUrl(this.Service, true);
 		} else {
 			var newDoc = iframe.contentDocument;
