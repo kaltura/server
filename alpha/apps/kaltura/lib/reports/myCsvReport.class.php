@@ -3,7 +3,7 @@ class myCsvReport
 {
 	public static function createReport ( $report_title , $report_text , $headers , 
 		$report_type , reportsInputFilter $input_filter , $dimension ,
-		$graphs , $total_header , $total_data , $table_header , $table_data , $table_total_count )
+		$graphs , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv)
 	{
 		
 		list ( $total_dictionary , $table_dictionary ) = self::buildDictionaries ( $headers );
@@ -78,11 +78,20 @@ class myCsvReport
 			$csv->addNewLine( $row );
 		}
 		
-		$data = $csv->getData();
-
-		return $data;
+		return $csv;
 	}
 	
+	public static function appendLines (myCsvWrapper $csv , $table_data)
+	{
+	        foreach ( $table_data as $row )
+		{
+			$csv->addNewLine( $row );
+		}
+
+		return $csv;
+	}
+
+
 	private static function buildDictionaries ( $headers ) 
 	{
 		list ( $total_dictionary_str ,$table_dictionary_str ) = explode ( ";" , $headers );
