@@ -7,6 +7,9 @@
  */
 class ReportService extends KalturaBaseService
 {
+	
+	const REPORTS_MAX_PAGE_SIZE = 80000;
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -171,6 +174,9 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+		if ($pager->pageSize > self::REPORTS_MAX_PAGE_SIZE)
+			throw new KalturaAPIException(KalturaErrors::MAX_PAGE_SIZE_EXCEEDED, self::REPORTS_MAX_PAGE_SIZE);
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
