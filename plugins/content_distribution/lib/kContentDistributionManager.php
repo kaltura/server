@@ -34,7 +34,7 @@ class kContentDistributionManager
 		KalturaLog::debug("Importing asset [" . $asset->getId() . "] from dc [$dc] with URL [$entryUrl]");
 		
 		$entryUrl = str_replace('//', '/', $entryUrl);
-		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
+		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\/', '$1://', $entryUrl);
 	
 		$jobData = new kImportJobData();
 		$jobData->setCacheOnly(true);
