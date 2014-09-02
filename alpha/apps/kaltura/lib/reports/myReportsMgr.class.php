@@ -39,8 +39,9 @@ class myReportsMgr
 	const REPORT_TYPE_OPERATION_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
-	
-	
+
+	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 30000;
+	const REPORTS_TABLE_RESULTS_CHUNK_SIZE = 5000 ;
 	const REPORTS_COUNT_CACHE = 60;
 	
 	const COUNT_PLAYS_HEADER = "count_plays";
@@ -371,7 +372,6 @@ class myReportsMgr
 		if ( ! $page_index || $page_index < 0 ) $page_index = 0;
 		
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids );
-
 		if ( count($result) > 0 )
 		{
 			$row = $result[0];
@@ -398,6 +398,7 @@ class myReportsMgr
 			$res = array ( $header , $data , $total_count );
 			
 		}
+
 		else
 		{
 			$res =  array ( array() , array() , 0 );
@@ -477,30 +478,101 @@ class myReportsMgr
 		list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
 			$report_type , 
 			$input_filter , $object_ids );			
-		
-			
-		list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id , 
-			$report_type , 
-			$input_filter ,
-			$page_size , $page_index ,
-			$order_by ,  $object_ids );		
 
-		if ($input_filter instanceof endUserReportsInputFilter)
+		//in case big query - divide to smaller queries
+		if ($page_size > self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
 		{
-			$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+			$initial_page_size = $page_size < 1 ? 30 : floor($page_size);
+			$initial_page_index = $page_index < 1 ? 0 : floor($page_index - 1);
+	
+			//calculating first page index of loop
+			$first_element = $initial_page_size * $initial_page_index;
+			$first_element_difference_from_chunk = $first_element % (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE);
+			$first_page_index = (($first_element - $first_element_difference_from_chunk) / (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE));
+	
+			//calculating last page index of loop
+			$last_element = $first_element + $initial_page_size;
+			$last_element_difference_from_chunk = $last_element % (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE);
+			$last_page_index = (($last_element - $last_element_difference_from_chunk) / (self::REPORTS_TABLE_RESULTS_CHUNK_SIZE));
+	
+			//in case no elements in last index iteration , prevent it
+			if ($last_element_difference_from_chunk == 0)
+				$last_page_index = $last_page_index - 1;
+	
+			//keeping backward compatibility
+			if ($first_page_index == 0)
+			{
+				$first_page_index++;
+				$last_page_index++;
+			}
+	
+			//use smaller query chunks
+			$iteration_page_size = self::REPORTS_TABLE_RESULTS_CHUNK_SIZE;
+	
+			$tempCsv = new myCsvWrapper();
+			$should_iterate = true;
+		}	
+		else
+		{
+			//set parameters for a single iteration
+			$first_page_index = $page_index;
+			$last_page_index = $page_index;
+			$iteration_page_size = $page_size;
+			$should_iterate = false;
 		}
+	
+		$csv = new myCsvWrapper ();
+	
+		for ($iteration_page_index = $first_page_index ; $iteration_page_index <= $last_page_index ; $iteration_page_index++)
+		{	
+			list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+				$report_type ,
+				$input_filter ,
+				$iteration_page_size , $iteration_page_index ,
+				$order_by ,  $object_ids );
+	
+			if ($iteration_page_index == $first_page_index)
+			{
+				if ($input_filter instanceof endUserReportsInputFilter ||  $should_iterate)
+				{
+							$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+				}
+		
+				if ($should_iterate && $first_element_difference_from_chunk)
+						$table_data = array_slice($table_data , $first_element_difference_from_chunk);
 			
-		$data = myCsvReport::createReport( $report_title , $report_text , $headers ,
-			$report_type , $input_filter , $dimension , 
-			$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count);
+				$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
+						$report_type , $input_filter , $dimension ,
+						$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count , $csv);
+			
+				$data = $csv->getData();
+				if ( ! file_exists (dirname ( $file_name ) ))
+					kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
+				//adding BOM for fixing problem in open .csv file with special chars using excel.
+				$BOM = "\xEF\xBB\xBF";
+				file_put_contents ( $file_name, $BOM . $data );
+			}
+			else
+			{
+				list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+					$report_type ,
+					$input_filter ,
+					$iteration_page_size , $iteration_page_index ,
+					$order_by ,  $object_ids );
 		
-		// return URL
-		if ( ! file_exists (dirname ( $file_name ) ))
-			kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
-		//adding BOM for fixing problem in open .csv file with special chars using excel.
-		$BOM = "\xEF\xBB\xBF";
-		file_put_contents ( $file_name, $BOM . $data );
-		
+				if ($should_iterate && $iteration_page_index == $last_page_index  && $last_element_difference_from_chunk)
+						$table_data = array_slice($table_data , 0 , $last_element_difference_from_chunk);
+			
+				//append data from query to file
+				$tempCsv->clearData();
+				$tempCsv = myCsvReport::appendLines($tempCsv , $table_data);
+				$data = $tempCsv->getData();
+			
+				file_put_contents ( $file_name, $data  , FILE_APPEND);
+			}
+
+		}
+
 		return $url;
 	}
 
@@ -1072,10 +1144,10 @@ class myReportsMgr
 		// TODO - format the search_text according to the the $input_filter
 		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
 		
-		
+	
 		$pagination_first = ( $page_index - 1 ) * $page_size;
 		if ( $pagination_first < 0 ) $pagination_first = 0;
-		
+
 		if ( $order_by )
 		{
 			$order_by_str = $order_by;
