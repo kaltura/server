@@ -76,7 +76,12 @@ class WSLiveReportsClient extends nusoap_client
 	
 	protected function doCall($operation, array $params = array(), $type = null)
 	{
-		$result = $this->call($operation, $params);
+		$namespace = 'http://tempuri.org';
+		$soapAction = '';
+		$headers = array();
+		$headers["KALTURA_SESSION_ID"] = (string)(new UniqueId());
+		
+		$result = $this->call($operation, $params, $namespace, $soapAction, $headers);
 		$this->throwError($result);
 	
 		if($type)
