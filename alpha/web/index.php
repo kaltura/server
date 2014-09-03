@@ -224,7 +224,7 @@ function checkCache()
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/request/kIpAddressUtils.php');
 		
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
-		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp().'-'.$host.$uri;
+		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$uri;
 		
 		$renderer = apc_fetch($cacheKey);
 		if ($renderer)
