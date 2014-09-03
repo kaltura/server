@@ -16,7 +16,7 @@ class serveFlavorAction extends kalturaAction
 
 		$renderer->partnerId = $partnerId;
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
-		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp().'-'.$host.$_SERVER["REQUEST_URI"];
+		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$_SERVER["REQUEST_URI"];
 		apc_store($cacheKey, $renderer, 86400);
 		header("X-Kaltura:cache-key");
 	}
@@ -68,7 +68,7 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($pathOnly && kIpAddressUtils::isInternalIp())
+		if ($pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
 			$path = null;
 			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
