@@ -39,8 +39,9 @@ class myReportsMgr
 	const REPORT_TYPE_OPERATION_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
-
-	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 30000;
+	
+	const REPORTS_CSV_MAX_QUERY_SIZE = 100000;
+	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 20000;
 	const REPORTS_COUNT_CACHE = 60;
 	
 	const COUNT_PLAYS_HEADER = "count_plays";
@@ -513,6 +514,12 @@ class myReportsMgr
 			if ( ! $page_size || $page_size < 0 ) $page_size = 10;
 			if ( ! $page_index || $page_index < 1 ) $page_index = 1;
 	
+			//checking if query is too big
+			$table_amount =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+			
+			if ($table_amount > self::REPORTS_CSV_MAX_QUERY_SIZE && $page_size > self::REPORTS_CSV_MAX_QUERY_SIZE)
+				throw new kCoreException("Exceeded max query size: " . self::REPORTS_CSV_MAX_QUERY_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
+			
 			$start_offest = ($page_index - 1) * $page_size;
 			$end_offset = $start_offest + $page_size;
 			$iteration_page_size = self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE;
@@ -533,11 +540,10 @@ class myReportsMgr
 				//first iteration - create the beginning of the report
 				if ($current_offset == $start_offest)
 				{
-					$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
 	
 					$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
 						$report_type , $input_filter , $dimension ,
-						$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count , $csv);
+						$arr , $total_header , $total_data , $table_header , $table_data , $table_amount , $csv);
 	
 					$data = $csv->getData();
 	
