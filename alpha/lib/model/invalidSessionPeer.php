@@ -40,11 +40,9 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	 */
 	public static function invalidateKs(ks $ks, PropelPDO $con = null)
 	{
-		KalturaLog::debug("@_!! HERE " . print_r($ks, true));
 		$result = self::invalidateByKey($ks->getHash(), invalidSession::INVALID_SESSION_TYPE_KS, $ks->valid_until, $con);
 		$sessionId = $ks->getPrivilegeValue(self::SESSION_ID_PRIVILEGE);
 		if($sessionId) {
-			KalturaLog::debug("@_!! THERE");
 			self::invalidateByKey($sessionId, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $ks->valid_until, $con);
 		}
 		
