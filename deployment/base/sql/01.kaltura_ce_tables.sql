@@ -1137,6 +1137,7 @@ CREATE TABLE IF NOT EXISTS `invalid_session` (
   `ks_valid_until` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `actions_limit` int(11) DEFAULT NULL,
+  `type` int(6) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `ks_index` (`ks`(255)),
   KEY `ks_valid_until_index` (`ks_valid_until`)

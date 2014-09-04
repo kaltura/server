@@ -303,13 +303,13 @@ class ks extends kSessionBase
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
-		
 		if ( ! $this->valid_string ) return self::INVALID_STR;
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
 		if ( ! $this->matchUser ( $puser_id ) ) return self::INVALID_USER;
 		if ($type !== false) { // do not check ks type
 			if ( ! $this->type == $type  ) return self::INVALID_TYPE;
 		}
+		
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 
 		if (!$this->isUserIPAllowed()) return self::EXCEEDED_RESTRICTED_IP;
@@ -321,6 +321,7 @@ class ks extends kSessionBase
 		{
 			$criteria = new Criteria();
 			$criteria->add(invalidSessionPeer::KS, $this->getHash());
+			$criteria->add(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_KS);
 			$dbKs = invalidSessionPeer::doSelectOne($criteria);
 			if ($dbKs)
 			{
@@ -339,6 +340,17 @@ class ks extends kSessionBase
 				if ($limit)
 					invalidSessionPeer::actionsLimitKs($this, $limit - 1);
 			}
+		}
+		
+		// Validate session
+		$sessionId = $this->getPrivilegeValue("sessionId");
+		if($sessionId) {
+			$criteria = new Criteria();
+			$criteria->add(invalidSessionPeer::KS, $sessionId);
+			$criteria->add(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_SESSION_ID);
+			$dbKs = invalidSessionPeer::doSelectOne($criteria);
+			if($dbKs)
+				return self::LOGOUT;
 		}
 		
 		// creates the kuser
