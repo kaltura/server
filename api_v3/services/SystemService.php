@@ -59,4 +59,14 @@ class SystemService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		return time();
 	}
+	
+	/**
+	 * @action getVersion
+	 * @return string the current server version
+	 */
+	function getVersionAction()
+	{	
+		$version = file_get_contents(realpath(dirname(__FILE__)) . '/../../VERSION.txt');
+		return trim($version);
+	}
 }
