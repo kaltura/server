@@ -56,7 +56,7 @@ class DeliveryProfileGenericAppleHttp extends DeliveryProfileAppleHttp {
 			kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
 			$parsedUrl = parse_url($this->getUrl());
 			$flavor = array(
-				'urlPrefix' => $parsedUrl['scheme'] . '://' . $parsedUrl['host'], 
+				'urlPrefix' => $this->params->getMediaProtocol() . '://' . $parsedUrl['host'], 
 				'url' => $_SERVER["REQUEST_URI"]);
 			return new kRedirectManifestRenderer(array($flavor), $this->params->getEntryId());
 		}
