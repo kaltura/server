@@ -9,8 +9,6 @@ class KalturaErrors extends APIErrors
 	 * General Errors
 	 *
 	 */
-
-	const MAX_PAGE_SIZE_EXCEEDED = "MAX_PAGE_SIZE_EXCEEDED;;max_page_size_exceeded";
 	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
