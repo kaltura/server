@@ -346,7 +346,7 @@ class ks extends kSessionBase
 		$sessionId = $this->getPrivilegeValue("sessionId");
 		if($sessionId) {
 			$criteria = new Criteria();
-			$criteria->add(invalidSessionPeer::KS, $sessionId);
+			$criteria->add(invalidSessionPeer::KS, sha1($sessionId));
 			$criteria->add(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_SESSION_ID);
 			$dbKs = invalidSessionPeer::doSelectOne($criteria);
 			if($dbKs)

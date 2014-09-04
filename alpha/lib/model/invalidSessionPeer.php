@@ -43,7 +43,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		$result = self::invalidateByKey($ks->getHash(), invalidSession::INVALID_SESSION_TYPE_KS, $ks->valid_until, $con);
 		$sessionId = $ks->getPrivilegeValue(self::SESSION_ID_PRIVILEGE);
 		if($sessionId) {
-			self::invalidateByKey($sessionId, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $ks->valid_until, $con);
+			self::invalidateByKey(sha1($sessionId), invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $ks->valid_until, $con);
 		}
 		
 		return $result;
