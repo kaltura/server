@@ -37,5 +37,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 				kApiCache::setExpiry( self::LIVE_ENTRY_CUE_POINT_CACHE_EXPIRY_SECONDS );
 			}
 		}
+
+		return parent::applyFilterFields($filter);
 	}
 }
