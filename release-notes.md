@@ -90,7 +90,10 @@ reverting the current encoder to the old one
 
 
 #### Deployment Scripts ####
-None
+Execute: 
+
+	php deployment/updates/scripts/add_permissions/2014_09_07_delivery_profile_ui.php
+
 
 #### Known Issues & Limitations ####
 None
