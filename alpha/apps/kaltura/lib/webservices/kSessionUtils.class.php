@@ -13,7 +13,7 @@ class kSessionUtils
 	 */
 	public static function startKSessionFromLks ( $partner_id , $lks , $puser_id , $version , &$ks_str  , &$ks,	$desired_expiry_in_seconds=86400 )
 	{
-		$ks_max_expiry_in_seconds = myPartnerUtils::getExpiry ( $partner_id );
+		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		
 		$result = myPartnerUtils::isValidLks ( $partner_id , $lks , $puser_id , $version , $ks_max_expiry_in_seconds );
 		if ( $result >= 0 )
@@ -51,7 +51,7 @@ class kSessionUtils
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
 		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null)
 	{
-		$ks_max_expiry_in_seconds = myPartnerUtils::getExpiry ( $partner_id );
+		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		ks::validatePrivileges($privileges,  $partner_id);
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
