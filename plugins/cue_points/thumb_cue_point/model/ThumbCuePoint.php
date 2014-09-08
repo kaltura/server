@@ -26,7 +26,7 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	}
 	
 	public function setAssetId($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID, (string)$v);}
-	public function getAssetId()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID);}
+	public function getAssetId()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_THUMB_ASSET_ID);}
 	
 	/* (non-PHPdoc)
 	 * @see IMetadataObject::getMetadataObjectType()
