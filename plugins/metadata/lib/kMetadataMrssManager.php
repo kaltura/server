@@ -50,7 +50,12 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 			KalturaLog::alert("ready file sync was not found for key[$key]");
 			return;
 		}
+
+		libxml_use_internal_errors(true);
+		libxml_clear_errors();
 		$metadataXml = new SimpleXMLElement($xml);
+		libxml_clear_errors();
+		libxml_use_internal_errors(false);
 		
 		$customData = $mrss->addChild('customData');
 		$customData->addAttribute('metadataId', $metadata->getId());
