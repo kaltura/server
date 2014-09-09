@@ -550,8 +550,9 @@ class myReportsMgr
 					// return URL
 					if ( ! file_exists (dirname ( $file_path ) ))
 						kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
-								//adding BOM for fixing problem in open .csv file with special chars using excel.
-								$BOM = "\xEF\xBB\xBF";
+					
+					//adding BOM for fixing problem in open .csv file with special chars using excel.
+					$BOM = "\xEF\xBB\xBF";
 					file_put_contents ( $file_path, $BOM . $data );
 				}
 				//not first iteration - append data to the created file
