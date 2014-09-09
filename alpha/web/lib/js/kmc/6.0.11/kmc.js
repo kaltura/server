@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2014-09-02
+/*! KMC - v6.0.11 - 2014-09-08
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -3966,10 +3966,7 @@ kmc.functions = {
 	openLiveAnalyticsDrilldown: function(entryId, entryName){
 		// Set title
 		var title = entryName ? entryName : '';
-		// setup url
-		var http_protocol = (kmc.vars.kmc_secured || location.protocol == 'https:') ? 'https' : 'http';
-		var from_domain = http_protocol + '://' + window.location.hostname;
-		var url = from_domain + kmc.vars.port + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html#/entry/' + entryId + '/nonav';
+		var url = kmc.vars.base_url + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html#/entry/' + entryId + '/nonav';
 		
 		var modal_content = '<iframe id="liveIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
 
