@@ -196,6 +196,32 @@ class ReportService extends KalturaBaseService
 	}
 	
 	/**
+	 *
+	 * Will serve a requested report
+	 * @action serve
+	 * 
+	 * @param string $fileName - the requested file name
+	 * @return string 
+	 */
+	public function serveAction($fileName) {
+		
+		// KS verification - we accept either admin session or download privilege of the file 
+		if(!kCurrentContext::isApiV3Context()) {
+			$ks = kCurrentContext::$ks_object;
+			if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $fileName))
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
+		
+		$partner_id = $this->getPartnerId();
+		$folderPath = "/content/reports/$partner_id";
+		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
+		$file_path = "$fullPath/$fileName";
+		
+		$mime_type = kFile::mimeType($file_path);
+		return $this->dumpFile($file_path, $mime_type);
+	}
+	
+	/**
 	 * @action execute
 	 * @param int $id
 	 * @param KalturaKeyValueArray $params
