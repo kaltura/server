@@ -412,6 +412,17 @@ class uiConfDeployment
 		
 		if ($widget->config)
 			$uiconf->setConfig(@$widget->config);
+		else if ($widget->config_file) {
+			$configFileContents = uiConfDeployment::readConfFileFromPath($widget->config_file);
+		
+			if(!$configFileContents)
+			{
+				KalturaLog::debug("Unable to read json file from: {$widget->config_file}");
+			}
+		
+			$uiconf->setConfig($configFileContents);
+		}
+		
 		
 		if($uiconf->getConfFile() === FALSE && $uiconf->getConfig() === FALSE)
 		{
