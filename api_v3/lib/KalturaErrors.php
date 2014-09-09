@@ -9,7 +9,7 @@ class KalturaErrors extends APIErrors
 	 * General Errors
 	 *
 	 */
-
+	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
 
@@ -532,4 +532,9 @@ class KalturaErrors extends APIErrors
     */
 	const DELIVERY_ID_NOT_FOUND = 'DELIVERY_ID_NOT_FOUND;DELIVERY_ID;delivery id [@DELIVERY_ID@] not found';
 	const DELIVERY_UPDATE_ISNT_ALLOWED = 'DELIVERY_UPDATE_ISNT_ALLOWED;DELIVERY_ID;delivery id [@DELIVERY_ID@] is default and can\'t be set';
+	
+	/*
+	 * Live reports Service
+	 */
+	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
 }

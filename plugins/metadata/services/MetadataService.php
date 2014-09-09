@@ -606,6 +606,6 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(MetadataErrors::XSLT_VALIDATION_ERROR, implode(',', $xsltErrors));
 		}
 
-		return $this->updateAction($id, $transformMetadataObjectData);
+		return $this->updateImpl($id, $transformMetadataObjectData);
 	}
 }

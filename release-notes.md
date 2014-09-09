@@ -20,6 +20,60 @@ None
 
 None
 
+## Live analytics integration ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-870
+
+Added php support for live analytics
+
+#### Prerequisites ####
+
+- Player version: v2.17.rc7 or higher. (http://kgit.html5video.org/tags/v2.17.rc7/mwEmbedLoader.php)
+- KMC version: V5.38
+
+#### Configuration ####
+
+**base.ini**
+
+Should verify the following:
+
+- live analytics version v0.1
+- kmc version v5.38 
+
+**local.ini**
+
+Should fill with the WS path:
+ 
+	live_analytics_web_service_url = @LIVE_ANALYTICS_WS@
+
+Should set the live stats host:
+
+	live_stats_host =  <LIVE_STATS_HOST_NAME>
+	live_stats_host_https = <LIVE_STATS_HOST_NAME_HTTPS>
+
+
+#### Deployment Scripts ####
+
+Permission script execution:
+	php deployment\updates\scripts\add_permissions\2014_07_17_live_reports_service.php
+
+#### Apps installation ####
+Install live analytics app by downloading _dist.zip from
+
+	https://github.com/kaltura/LiveAnalytics/releases/tag/0.1
+and unzipping it into 
+
+	/opt/Kaltura/apps/liveanalytics/v0.1/
+
+(discard "_dist" folder)
+Deploy uiconf: 
+
+	<liveanalytics_version>/deploy/config.ini
+
+
+#### Known Issues & Limitations ####
+
+Integration in process.
 
 ## Thumbnail encoder ##
 reverting the current encoder to the old one
@@ -36,12 +90,29 @@ reverting the current encoder to the old one
 
 
 #### Deployment Scripts ####
-None
+Execute: 
+
+	php deployment/updates/scripts/add_permissions/2014_09_07_delivery_profile_ui.php
+
 
 #### Known Issues & Limitations ####
 None
 
 # IX-9.19.1 #
+
+## add widevine permission to base-playback ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1741
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_21_base_playback_role_add_widevine_permission.php
+
+#### Known Issues & Limitations ####
+None
 
 ## add base-playback user role ##
 - Issue Type: Customer Request
@@ -359,7 +430,8 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 *Permissions*
 
-- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestreamservice.php
+- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestream
+- php
 
 
 ## YouTube Captions Upload via SFTP ##
