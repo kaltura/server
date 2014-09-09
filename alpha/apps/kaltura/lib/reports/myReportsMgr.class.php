@@ -460,10 +460,10 @@ class myReportsMgr
 		// create file_name
 		// TODO - check if file already exists - if so - serve it if not expired
 		
-		list ( $file_name , $url ) = self::createFileName ( $partner_id , $report_type , $input_filter , $dimension , $object_ids ,$page_size , $page_index , $order_by );
+		list ( $file_path , $file_name ) = self::createFileName ( $partner_id , $report_type , $input_filter , $dimension , $object_ids ,$page_size , $page_index , $order_by );
 		// TODO - remove comment and read from disk
 /*		
-		if ( file_exists ( $file_name ) )
+		if ( file_exists ( $file_path ) )
 		{
 			return $url;
 		}
@@ -495,17 +495,36 @@ class myReportsMgr
 			$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count);
 		
 		// return URL
-		if ( ! file_exists (dirname ( $file_name ) ))
-			kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
+		if ( ! file_exists (dirname ( $file_path ) ))
+			kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
 		//adding BOM for fixing problem in open .csv file with special chars using excel.
 		$BOM = "\xEF\xBB\xBF";
-		file_put_contents ( $file_name, $BOM . $data );
+		file_put_contents ( $file_path, $BOM . $data );
 		
+		$url = self::createUrl($partner_id, $file_name);
 		return $url;
 	}
 
 // -------------------------------------------- private -----------------------------------------------// 	
 
+	private static function createUrl ($partner_id, $file_name)
+	{
+		$ksStr = "";
+		$partner = PartnerPeer::retrieveByPK ( $partner_id );
+		$expiry = min(86400, $partner->getKsMaxExpiryInSeconds());
+		$secret = $partner->getSecret ();
+		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+		
+		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
+		
+		if ($result < 0)
+			throw new Exception ( "Failed to generate session for asset [" . $this->getId () . "] of type " . $this->getType () );
+			
+		//url is built with DC url in order to be directed to the same DC of the saved file
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/fileName/$file_name/report.txt";
+		return $url;
+	}
+	
 	private static function createFileName ( $partner_id )
 	{
 	$args = func_get_args();
@@ -518,14 +537,12 @@ class myReportsMgr
 			kFile::fullMkfileDir($fullPath, 0777, true);
 			
 		$fileName = "{$file_name}_{$time_suffix}";
-		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl(). "$folderPath/$fileName";
 		$file_path = "$fullPath/$fileName";
 		
 //		$path = "/content/reports/$partner_id/{$file_name}_{$time_suffix}";
 //		$file_path = myContentStorage::getFSContentRootPath() .  $path;
 //		$url = requestUtils::getHost() . $path;
-		return array ( $file_path , $url );
+		return array ( $file_path , $fileName );
 	}
 	/**
 	 * @var myCache
