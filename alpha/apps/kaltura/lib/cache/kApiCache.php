@@ -203,6 +203,24 @@ class kApiCache extends kApiCacheBase
 		$this->_params['___cache___version'] = self::CACHE_VERSION;
 		$this->_params['___internal'] = intval(kIpAddressUtils::isInternalIp());
 		
+		if (kConf::hasMap("optimized_playback"))
+		{
+			$optimizedPlayback = kConf::getMap("optimized_playback");
+			if (array_key_exists($this->_ksPartnerId, $optimizedPlayback))
+			{
+				$params = $optimizedPlayback[$this->_ksPartnerId];
+				if (array_key_exists('cache_kdp_access_control', $params) && $params['cache_kdp_access_control'])
+				{
+					$clientTag = 'none';
+					if (strpos(strtolower($this->clientTag), "kdp") !== false || strpos(strtolower($this->clientTag), "html") !== false )
+					{
+						$clientTag = 'player';
+					}
+					$this->_params['___cache___clientTag'] = $clientTag;
+				}
+			}
+		}
+		
 		if ($this->clientTag)
 		{
 			$matches = null;
