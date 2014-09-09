@@ -501,11 +501,11 @@ class myReportsMgr
 			$data = $csv->getData();
 	
 			// return URLwq
-			if ( ! file_exists (dirname ( $file_name ) ))
-					kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
+			if ( ! file_exists (dirname ( $file_path ) ))
+					kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
 				//adding BOM for fixing problem in open .csv file with special chars using excel.
 				$BOM = "\xEF\xBB\xBF";
-				file_put_contents ( $file_name, $BOM . $data );
+				file_put_contents ( $file_path, $BOM . $data );
 		}
 		else
 		{
@@ -548,11 +548,11 @@ class myReportsMgr
 					$data = $csv->getData();
 	
 					// return URL
-		if ( ! file_exists (dirname ( $file_path ) ))
-			kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
-					//adding BOM for fixing problem in open .csv file with special chars using excel.
-					$BOM = "\xEF\xBB\xBF";
-		file_put_contents ( $file_path, $BOM . $data );
+					if ( ! file_exists (dirname ( $file_path ) ))
+						kFile::fullMkfileDir( dirname ( $file_path ) , 0777 );
+								//adding BOM for fixing problem in open .csv file with special chars using excel.
+								$BOM = "\xEF\xBB\xBF";
+					file_put_contents ( $file_path, $BOM . $data );
 				}
 				//not first iteration - append data to the created file
 				else
@@ -562,7 +562,7 @@ class myReportsMgr
 					$tempCsv = myCsvReport::appendLines($tempCsv , $table_data);
 					$data = $tempCsv->getData();
 	
-					file_put_contents ( $file_name, $data  , FILE_APPEND);
+					file_put_contents ( $file_path, $data  , FILE_APPEND);
 				}
 	
 			}
