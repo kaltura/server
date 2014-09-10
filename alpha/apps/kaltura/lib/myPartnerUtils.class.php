@@ -1201,7 +1201,8 @@ class myPartnerUtils
 	
 	protected static function dailyActivityGraph($data, $startDate)
 	{
-		$daysInMonth = date('t', (int)strtotime($startDate));
+		//$startDate must be passed as Unix time stamp value
+		$daysInMonth = date('t', $startDate);
 		$points = array_fill(1, $daysInMonth, 0);
 		
 		if(!isset($data['bandwidth'])) 
