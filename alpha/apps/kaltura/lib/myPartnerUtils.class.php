@@ -1201,6 +1201,7 @@ class myPartnerUtils
 	
 	protected static function dailyActivityGraph($data, $startDate)
 	{
+		//$startDate must be passed as Unix time stamp value
 		$daysInMonth = date('t', $startDate);
 		$points = array_fill(1, $daysInMonth, 0);
 		
