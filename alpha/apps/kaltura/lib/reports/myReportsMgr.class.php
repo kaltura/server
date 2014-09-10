@@ -538,7 +538,7 @@ class myReportsMgr
 					$order_by ,  $object_ids , $current_offset);
 	
 				$dataCount = count($table_data);
-				KalturaLog::log('count table data - ' . $dataCount);
+				KalturaLog::debug('count table data - ' . $dataCount);
 				
 				//no more data - break loop
 				if  ($dataCount == 0)
