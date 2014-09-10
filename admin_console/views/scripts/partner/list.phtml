@@ -436,7 +436,7 @@ function assignDeliveryProfile(format, currentDps)
 	var partnerId = $("#id")[0].value;
 
 	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';
-	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/";
+	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/streamerType/" + format;
 	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
 	
 	dialogDiv.dialog({
