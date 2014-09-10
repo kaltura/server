@@ -536,11 +536,14 @@ class myReportsMgr
 					$input_filter ,
 					$iteration_page_size , $page_index ,
 					$order_by ,  $object_ids , $current_offset);
-	
+
+				//if no more data - stop loop 
+				if  (count($table_data) == 0)
+					break;
+
 				//first iteration - create the beginning of the report
 				if ($current_offset == $start_offest)
-				{
-	
+				{	
 					$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
 						$report_type , $input_filter , $dimension ,
 						$arr , $total_header , $total_data , $table_header , $table_data , $table_amount , $csv);
