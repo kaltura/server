@@ -92,7 +92,7 @@ class kSessionUtils
 	{
 		
 		$ks_max_expiry_in_seconds =  myPartnerUtils::getExpiry ( $partner_id );
-		if ( $ks_max_expiry_in_seconds < $desired_expiry_in_seconds )
+		if ($ks_max_expiry_in_seconds && ($ks_max_expiry_in_seconds < $desired_expiry_in_seconds))
 			$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
 		
 		$ks = new ks();
