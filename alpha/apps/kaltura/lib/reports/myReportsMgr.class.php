@@ -536,11 +536,14 @@ class myReportsMgr
 					$input_filter ,
 					$iteration_page_size , $page_index ,
 					$order_by ,  $object_ids , $current_offset);
-
-				//if no more data - stop loop 
-				if  (count($table_data) == 0)
+	
+				$dataCount = count($table_data);
+				KalturaLog::log('count table data - ' . $dataCount);
+				
+				//no more data - break loop
+				if  ($dataCount == 0)
 					break;
-
+				
 				//first iteration - create the beginning of the report
 				if ($current_offset == $start_offest)
 				{	
@@ -568,7 +571,10 @@ class myReportsMgr
 	
 					file_put_contents ( $file_path, $data  , FILE_APPEND);
 				}
-	
+				
+				//last chunk of data - break loop
+				if ($dataCount < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
+					break;
 			}
 	
 		}
