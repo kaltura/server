@@ -12,6 +12,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const GROUP_NOTIFICATION_CONFIG = 'GROUP_NOTIFICATION_CONFIG';
     const GROUP_ACCESS_CONTROL = 'GROUP_ACCESS_CONTROL';
     const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
+    const SECURITY_OPTIONS = 'GROUP_SECURITY_OPTIONS';
    	
     protected $limitSubForms = array();
     
@@ -40,6 +41,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_NOTIFICATION_CONFIG] = array();
 		$permissionNames[self::GROUP_ACCESS_CONTROL] = array();
 		$permissionNames[self::THUMBNAIL_CONFIGURATION] = array();
+		$permissionNames[self::SECURITY_OPTIONS] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -449,6 +451,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
 			ksort($permissionNames[self::GROUP_NOTIFICATION_CONFIG]);
+			ksort($permissionNames[self::SECURITY_OPTIONS]);
 			$this->addAllDisplayGroups($permissionNames);
 		}
 		
@@ -822,11 +825,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
 		$this->addDisplayGroup(array_merge(array('api_access_control_id', 'restrict_entry_by_metadata'), $permissionNames[self::GROUP_ACCESS_CONTROL], array('crossLine')), 'apiAccessControlIdGroup', array('legend' => 'Access Control'));
-		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
+		$this->addDisplayGroup(array_merge(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
-									 'pass_replace_freq'),
+									 'pass_replace_freq'), 
+									 $permissionNames[self::SECURITY_OPTIONS]),
 									 'passwordSecurity', array('legend' => 'Password Security'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
