@@ -40,7 +40,8 @@ class myReportsMgr
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	
-	
+	const REPORTS_CSV_MAX_QUERY_SIZE = 100000;
+	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 10000;
 	const REPORTS_COUNT_CACHE = 60;
 	
 	const COUNT_PLAYS_HEADER = "count_plays";
@@ -351,7 +352,8 @@ class myReportsMgr
 	
 	
 	public static function getTable ( $partner_id , $report_type , reportsInputFilter $input_filter  ,
-		$page_size , $page_index , $order_by , $object_ids = null )
+		$page_size , $page_index , $order_by , $object_ids = null , $offset = null)
+
 	{
 		$start = microtime ( true );
 		$total_count = 0;
@@ -369,9 +371,8 @@ class myReportsMgr
 		}
 		if ( ! $page_size || $page_size < 0 ) $page_size = 10;
 		if ( ! $page_index || $page_index < 0 ) $page_index = 0;
-		
-		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids );
 
+		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids, $offset );
 		if ( count($result) > 0 )
 		{
 			$row = $result[0];
@@ -398,6 +399,7 @@ class myReportsMgr
 			$res = array ( $header , $data , $total_count );
 			
 		}
+
 		else
 		{
 			$res =  array ( array() , array() , 0 );
@@ -477,31 +479,97 @@ class myReportsMgr
 		list ( $total_header , $total_data ) = self::getTotal( $partner_id , 
 			$report_type , 
 			$input_filter , $object_ids );			
-		
-			
-		list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id , 
-			$report_type , 
-			$input_filter ,
-			$page_size , $page_index ,
-			$order_by ,  $object_ids );		
-
-		if ($input_filter instanceof endUserReportsInputFilter)
+		$csv = new myCsvWrapper ();
+	
+		if ($page_size < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
 		{
-			$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+			list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+				$report_type ,
+				$input_filter ,
+				$page_size , $page_index ,
+				$order_by ,  $object_ids );
+	
+			if ($input_filter instanceof endUserReportsInputFilter)
+			{
+					$table_total_count =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
+			}
+	
+			$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
+				$report_type , $input_filter , $dimension ,
+				$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count, $csv);
+	
+			$data = $csv->getData();
+	
+			// return URLwq
+			if ( ! file_exists (dirname ( $file_name ) ))
+					kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
+				//adding BOM for fixing problem in open .csv file with special chars using excel.
+				$BOM = "\xEF\xBB\xBF";
+				file_put_contents ( $file_name, $BOM . $data );
 		}
+		else
+		{
+			$tempCsv = new myCsvWrapper();
+	
+			if ( ! $page_size || $page_size < 0 ) $page_size = 10;
+			if ( ! $page_index || $page_index < 1 ) $page_index = 1;
+	
+			//checking if query is too big
+			$table_amount =  self::getTotalTableCount($partner_id, $report_type, $input_filter, $page_size, $page_index, $order_by, $object_ids);
 			
-		$data = myCsvReport::createReport( $report_title , $report_text , $headers ,
-			$report_type , $input_filter , $dimension , 
-			$arr , $total_header , $total_data , $table_header , $table_data , $table_total_count);
-		
-		// return URL
-		if ( ! file_exists (dirname ( $file_name ) ))
-			kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
-		//adding BOM for fixing problem in open .csv file with special chars using excel.
-		$BOM = "\xEF\xBB\xBF";
-		file_put_contents ( $file_name, $BOM . $data );
-		
-		return $url;
+			if ($table_amount > self::REPORTS_CSV_MAX_QUERY_SIZE && $page_size > self::REPORTS_CSV_MAX_QUERY_SIZE)
+				throw new kCoreException("Exceeded max query size: " . self::REPORTS_CSV_MAX_QUERY_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
+			
+			$start_offest = ($page_index - 1) * $page_size;
+			$end_offset = $start_offest + $page_size;
+			$iteration_page_size = self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE;
+	
+			for ($current_offset = $start_offest ; $current_offset < $end_offset  ; $current_offset = $current_offset + $iteration_page_size )
+			{
+				$offset_difference = $end_offset - $current_offset;
+				if ($offset_difference < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
+					$iteration_page_size = $offset_difference;
+	
+				//here page_index is redundant
+				list ( $table_header , $table_data , $table_total_count ) = self::getTable( $partner_id ,
+					$report_type ,
+					$input_filter ,
+					$iteration_page_size , $page_index ,
+					$order_by ,  $object_ids , $current_offset);
+	
+				//first iteration - create the beginning of the report
+				if ($current_offset == $start_offest)
+				{
+	
+					$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
+						$report_type , $input_filter , $dimension ,
+						$arr , $total_header , $total_data , $table_header , $table_data , $table_amount , $csv);
+	
+					$data = $csv->getData();
+	
+					// return URL
+					if ( ! file_exists (dirname ( $file_name ) ))
+						kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
+					//adding BOM for fixing problem in open .csv file with special chars using excel.
+					$BOM = "\xEF\xBB\xBF";
+					file_put_contents ( $file_name, $BOM . $data );
+				}
+				//not first iteration - append data to the created file
+				else
+				{
+					//append data from query to file
+					$tempCsv->clearData();
+					$tempCsv = myCsvReport::appendLines($tempCsv , $table_data);
+					$data = $tempCsv->getData();
+	
+					file_put_contents ( $file_name, $data  , FILE_APPEND);
+				}
+	
+			}
+	
+		}
+
+	return $url;
 	}
 
 // -------------------------------------------- private -----------------------------------------------// 	
@@ -591,7 +659,7 @@ class myReportsMgr
 	}
 	
 	private static function executeQueryByType ( $partner_id , $report_type , $report_flavor , reportsInputFilter $input_filter  ,
-		$page_size , $page_index , $order_by , $object_ids = null )
+		$page_size , $page_index , $order_by , $object_ids = null , $offset = null)
 	{
 		$start = microtime(true);
 		try
@@ -753,7 +821,7 @@ class myReportsMgr
 			if ( is_numeric( $report_type ))
 				$order_by = self::getOrderBy( self::$type_map[$report_type] , $order_by );
 			
-			$query = self::getReplacedSql( $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause );
+			$query = self::getReplacedSql( $sql_raw_content , $partner_id , $input_filter , $page_size , $page_index , $order_by , $obj_ids_clause, $category_ids_clause , $offset);
 			if ( is_numeric( $report_type ))
 				$query_header = "/* -- " . self::$type_map[$report_type] . " " . self::$flavor_map[$report_flavor] . " -- */\n";
 			else 
@@ -1067,15 +1135,19 @@ class myReportsMgr
 	}
 	
 	private static function getReplacedSql ( $sql_content , $partner_id , reportsInputFilter $input_filter , 
-		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null)
+		$page_size , $page_index  , $order_by , $obj_ids_clause = null, $cat_ids_clause = null , $offset = null)
 	{
 		// TODO - format the search_text according to the the $input_filter
 		$search_text_match_clause = "1=1"; //self::setSearchFieldsAndText ( $input_filter );
-		
-		
+
+		if ($offset)
+			$pagination_first = $offset;
+		else
+		{
 		$pagination_first = ( $page_index - 1 ) * $page_size;
 		if ( $pagination_first < 0 ) $pagination_first = 0;
-		
+		}
+
 		if ( $order_by )
 		{
 			$order_by_str = $order_by;

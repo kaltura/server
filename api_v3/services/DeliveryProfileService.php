@@ -39,9 +39,15 @@ class DeliveryProfileService extends KalturaBaseService
 	 */
 	function updateAction( $id , KalturaDeliveryProfile $delivery )
 	{
+		DeliveryProfilePeer::setUseCriteriaFilter(false);
 		$dbDelivery = DeliveryProfilePeer::retrieveByPK($id);
+		DeliveryProfilePeer::setUseCriteriaFilter(true);
 		if (!$dbDelivery)
 			throw new KalturaAPIException(KalturaErrors::DELIVERY_ID_NOT_FOUND, $id);
+		
+		// Don't allow to update default delivery profiles from the outside
+		if($dbDelivery->getIsDefault())
+			throw new KalturaAPIException(KalturaErrors::DELIVERY_UPDATE_ISNT_ALLOWED, $id);
 		
 		$delivery->toUpdatableObject($dbDelivery);
 		$dbDelivery->save();
@@ -60,7 +66,10 @@ class DeliveryProfileService extends KalturaBaseService
 	*/
 	function getAction( $id )
 	{
+		DeliveryProfilePeer::setUseCriteriaFilter(false);
 		$dbDelivery = DeliveryProfilePeer::retrieveByPK($id);
+		DeliveryProfilePeer::setUseCriteriaFilter(true);
+		
 		if (!$dbDelivery)
 			throw new KalturaAPIException(KalturaErrors::DELIVERY_ID_NOT_FOUND, $id);
 			
@@ -113,13 +122,18 @@ class DeliveryProfileService extends KalturaBaseService
 		$delivery = new DeliveryProfileFilter();
 		$filter->toObject($delivery);
 
+		DeliveryProfilePeer::setUseCriteriaFilter(false);
+		
 		$c = new Criteria();
+		$c->add(DeliveryProfilePeer::PARTNER_ID, array(0, kCurrentContext::getCurrentPartnerId()), Criteria::IN);
 		$delivery->attachToCriteria($c);
 		
 		$totalCount = DeliveryProfilePeer::doCount($c);
 		
 		$pager->attachToCriteria($c);
 		$dbList = DeliveryProfilePeer::doSelect($c);
+		
+		DeliveryProfilePeer::setUseCriteriaFilter(true);
 		
 		$objects = KalturaDeliveryProfileArray::fromDbArray($dbList);
 		$response = new KalturaDeliveryProfileListResponse();

@@ -749,4 +749,6 @@ class PartnerController extends Zend_Controller_Action
 		$this->getResponse()->setRedirect($url);
 	}
 
+	
+	
 }

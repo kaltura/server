@@ -121,6 +121,11 @@ class kSessionBase
 	 */
 	public function parseKS($encoded_str)
 	{
+		// Convert to a string in order to ensure str_replace below won't break.
+		// If the input is an array for example (entered by mistake), the string conversion will yield "Array"
+		// which will be parsed as a bad KS (this is the expected behavior in this case).
+		$encoded_str = (string)$encoded_str;
+
 		$decodedKs = base64_decode(str_replace(array('-', '_'), array('+', '/'), $encoded_str), true);
 		if (!$decodedKs)
 		{

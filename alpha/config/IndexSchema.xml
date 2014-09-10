@@ -105,6 +105,7 @@
 	<field name="creator_kuser_id" indexName="creator_kuser_id" type="string" />
 	<field name="creator_puser_id" indexName="creator_puser_id" type="string" />
 	<field name="dynamic_attributes" indexName="dynamic_attributes" type="json" matchable="yes" />
+	<field name="first_broadcast" indexName="dynamic_attributes.first_broadcast" type="null" searchableonly="yes" orderable="yes" />
 	<field name="plugins_data" indexName="plugins_data" type="string" searchableonly="yes" matchable="yes" />
 	<field name="search_text" indexName="(name,tags,description,entry_id,reference_id,roots,puser_id)" type="null" searchableonly="yes" matchable="yes" />
 	<index format="P%sST%s">

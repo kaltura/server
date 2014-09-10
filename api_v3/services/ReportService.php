@@ -7,6 +7,7 @@
  */
 class ReportService extends KalturaBaseService
 {
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -171,15 +172,23 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
-		$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType , 
+		try {
+			$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType ,
 			$reportInputFilter->toReportsInputFilter() ,
-			$dimension , 
+			$dimension ,
 			$objectIds ,
-			$pager->pageSize , $pager->pageIndex , $order ); 
-	    
+			$pager->pageSize , $pager->pageIndex , $order );
+		}
+		catch(Exception $e){
+			$code = $e->getCode();
+			if ($code == kCoreException::SEARCH_TOO_GENERAL)
+					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
+			}
+
 		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
 			$report = str_replace("http://","https://",$report);
 
