@@ -18,6 +18,7 @@ abstract class KalturaDeliveryProfileBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"streamerTypeEqual" => "_eq_streamer_type",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 	);
@@ -89,6 +90,11 @@ abstract class KalturaDeliveryProfileBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * @var KalturaPlaybackProtocol
+	 */
+	public $streamerTypeEqual;
 
 	/**
 	 * @var KalturaDeliveryStatus
