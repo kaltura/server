@@ -537,10 +537,16 @@ class myReportsMgr
 					$iteration_page_size , $page_index ,
 					$order_by ,  $object_ids , $current_offset);
 	
+				$dataCount = count($table_data);
+				KalturaLog::debug('count table data - ' . $dataCount);
+				
+				//no more data - break loop
+				if  ($dataCount == 0)
+					break;
+				
 				//first iteration - create the beginning of the report
 				if ($current_offset == $start_offest)
-				{
-	
+				{	
 					$csv = myCsvReport::createReport( $report_title , $report_text , $headers ,
 						$report_type , $input_filter , $dimension ,
 						$arr , $total_header , $total_data , $table_header , $table_data , $table_amount , $csv);
@@ -564,7 +570,10 @@ class myReportsMgr
 	
 					file_put_contents ( $file_name, $data  , FILE_APPEND);
 				}
-	
+				
+				//last chunk of data - break loop
+				if ($dataCount < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
+					break;
 			}
 	
 		}
