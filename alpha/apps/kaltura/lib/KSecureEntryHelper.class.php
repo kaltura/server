@@ -226,6 +226,9 @@ class KSecureEntryHelper
 	
 	public function isAssetAllowed(asset $asset)
 	{
+		if ($this->ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD_ASSET, $asset->getId()))
+			return true;
+
 		return $this->isFlavorParamsAllowed($asset->getFlavorParamsId());		
 	}
 	
