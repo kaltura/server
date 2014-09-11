@@ -218,7 +218,7 @@ class ReportService extends KalturaBaseService
 		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
 		$file_path = "$fullPath/$id";
 		
-		return $this->dumpFile($file_path, text/csv);
+		return $this->dumpFile($file_path, 'text/csv');
 	}
 	
 	/**

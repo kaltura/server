@@ -585,7 +585,7 @@ class myReportsMgr
 		
 		$maxExpiry = 86400;
 		$expiry = $partner->getKsMaxExpiryInSeconds();
-		if(!$expiry || ($expiry < $maxExpiry))
+		if(!$expiry || ($expiry > $maxExpiry))
 			$expiry = $maxExpiry;
 		
 		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
