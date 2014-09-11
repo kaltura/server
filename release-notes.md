@@ -1,3 +1,97 @@
+# IX-9.19.3 #
+
+## BOA - PLAT-1554 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1554
+
+#### Configuration ####
+
+None.
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+Requires validating all the partners with ks_max_expiry_in_seconds different than 86400 and either nullify them or set them to 86400.
+
+	mysql> select id, partner_name, status, ks_max_expiry_in_seconds from partner where ks_max_expiry_in_seconds != 86400 and status = 1;
+	mysql> select id, partner_name, status, ks_max_expiry_in_seconds from partner where ks_max_expiry_in_seconds is null and status = 1;
+
+## BOA - PLAT-1649 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1649
+
+#### Configuration ####
+
+**admin.ini**
+
+- requires merge of the section - disableResetPassword
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+None
+
+## BOA - PLAT-1558 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1558
+
+#### Configuration ####
+
+**admin.ini**
+
+- requires merge of the section - disableRememberMe
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+None
+
+## BOA - PLAT-1555 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1555
+
+#### Configuration ####
+None
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+See limitations within the JIRA ticket.
+
+
+## BOA - PLAT-1548 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1548
+
+#### Configuration ####
+None
+
+
+#### Deployment Scripts ####
+
+	php deployment/updates/scripts/add_permissions/2014_09_09_serve_report.php
+
+
+#### Known Issues & Limitations ####
+None.
+
 # IX-9.19.2 #
 
 ## Delivery profiles UI ##
@@ -14,7 +108,9 @@ Adding a UI for delivery profiles
 
 #### Deployment Scripts ####
 
-None
+Execute: 
+
+	php deployment/updates/scripts/add_permissions/2014_09_07_delivery_profile_ui.php
 
 #### Known Issues & Limitations ####
 
@@ -90,9 +186,7 @@ reverting the current encoder to the old one
 
 
 #### Deployment Scripts ####
-Execute: 
-
-	php deployment/updates/scripts/add_permissions/2014_09_07_delivery_profile_ui.php
+None.
 
 
 #### Known Issues & Limitations ####
