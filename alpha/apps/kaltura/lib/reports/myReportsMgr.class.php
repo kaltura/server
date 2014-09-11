@@ -580,9 +580,13 @@ class myReportsMgr
 	{
 		$ksStr = "";
 		$partner = PartnerPeer::retrieveByPK ( $partner_id );
-		$expiry = min(86400, $partner->getKsMaxExpiryInSeconds());
 		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+		
+		$maxExpiry = 86400;
+		$expiry = $partner->getKsMaxExpiryInSeconds();
+		if(!$expiry || ($expiry < $maxExpiry))
+			$expiry = $maxExpiry;
 		
 		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
 		
@@ -590,7 +594,7 @@ class myReportsMgr
 			throw new Exception ( "Failed to generate session for asset [" . $this->getId () . "] of type " . $this->getType () );
 			
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/fileName/$file_name/report.txt";
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/report.csv";
 		return $url;
 	}
 	
