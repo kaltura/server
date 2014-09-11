@@ -155,6 +155,15 @@ function handleFile($filePath)
 				$$attributeName = $value;
 				continue;
 			} 
+			if (preg_match('/eval\((?P<evalString>.+)\)/', $value, $matches))
+			{
+				$evalString = $matches["evalString"];
+				$evaluator = new kEvalStringField();
+				$evaluator->setScope(new kScope());
+				$evaluator->setCode($evalString);
+				$value = $evaluator->getValue();
+				KalturaLog::info("Evaluated property value: $value");
+			}
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
