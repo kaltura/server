@@ -40,7 +40,7 @@ class myReportsMgr
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 	
-	const REPORTS_CSV_MAX_QUERY_SIZE = 100000;
+	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
 	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 10000;
 	const REPORTS_COUNT_CACHE = 60;
 	
@@ -537,11 +537,7 @@ class myReportsMgr
 					$iteration_page_size , $page_index ,
 					$order_by ,  $object_ids , $current_offset);
 	
-				$dataCount = count($table_data);
-				KalturaLog::debug('count table data - ' . $dataCount);
-				
-				//no more data - break loop
-				if  ($dataCount == 0)
+				if (!$table_data)
 					break;
 				
 				//first iteration - create the beginning of the report
@@ -572,9 +568,6 @@ class myReportsMgr
 					file_put_contents ( $file_path, $data  , FILE_APPEND);
 				}
 				
-				//last chunk of data - break loop
-				if ($dataCount < self::REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE)
-					break;
 			}
 	
 		}
