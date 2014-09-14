@@ -140,11 +140,13 @@ class updateLoginDataAction extends kalturaAction
 
 		$firstName = $_POST['fname'] ;
 		$lastName = $_POST['lname'] ;
-		$charsToRemove = array("\"" , "=" , "(" , ")" , "'");
-		
-		$firstName = str_replace ($charsToRemove , '' , $firstName);
-		$lastName = str_replace ($charsToRemove , '' , $lastName);
-		
+
+		$firstName = strip_tags($firstName);
+		$firstName = htmlentities($firstName);
+
+		$lastName = strip_tags($lastName);
+		$lastName = htmlentities($lastName);
+
 		try {
 			$this->updateLoginData($this->email, $_POST['password'], null, null, $firstName, $lastName);
 			$this->setSuccess();
