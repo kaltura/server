@@ -58,7 +58,7 @@ class downloadAction extends sfAction
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 			
-		$preview = null;
+		$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW);
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) { 
 			$preview = $securyEntryHelper->getPreviewLength();
