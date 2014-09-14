@@ -1,3 +1,32 @@
+# IX-9.19.3 #
+
+## Get version action on system services ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1663
+
+Add server get version action on system service
+
+#### Configuration ####
+
+**service.system.ini**
+
+	permissionItem1.service = system
+	permissionItem1.action = getVersion
+	permissionItem1.partnerId = 0
+	permissionItem1.param3 = 
+	permissionItem1.param4 = 
+	permissionItem1.param5 = 
+	permissionItem1.tags = 
+	permissionItem1.permissions = ALWAYS_ALLOWED_ACTIONS
+
+#### Deployment Scripts ####
+
+- deployment/updates/scripts/add_permissions/2014_09_04_add_system_get_version_permission.php	
+
+#### Known Issues & Limitations ####
+
+- For each deployment we need to make sure that the 'VERSION.txt' file is updated with the current server version.
+
 # IX-9.19.2 #
 
 ## Delivery profiles UI ##
