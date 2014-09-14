@@ -8,20 +8,11 @@ Add server get version action on system service
 
 #### Configuration ####
 
-**service.system.ini**
-
-	permissionItem1.service = system
-	permissionItem1.action = getVersion
-	permissionItem1.partnerId = 0
-	permissionItem1.param3 = 
-	permissionItem1.param4 = 
-	permissionItem1.param5 = 
-	permissionItem1.tags = 
-	permissionItem1.permissions = ALWAYS_ALLOWED_ACTIONS
+None.
 
 #### Deployment Scripts ####
 
-- deployment/updates/scripts/add_permissions/2014_09_04_add_system_get_version_permission.php	
+	php deployment/updates/scripts/add_permissions/2014_09_04_add_system_get_version_permission.php	
 
 #### Known Issues & Limitations ####
 
