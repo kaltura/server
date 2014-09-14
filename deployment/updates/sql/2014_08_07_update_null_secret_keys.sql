@@ -1,0 +1,1 @@
+update partner set secret = MD5(CONV(SUBSTRING(RAND(), 3), 10, 36)) where secret IS NULL;
