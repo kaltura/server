@@ -1,5 +1,24 @@
 # IX-9.19.3 #
 
+## Live Analytics - PLAT-1862 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1862
+
+#### Configuration ####
+
+**admin.ini**
+
+- requires merge of the section - realTimeReports
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+None
+
 ## BOA - PLAT-1554 ##
 
 - Issue Type: Bug fix
