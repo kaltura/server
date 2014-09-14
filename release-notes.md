@@ -1,5 +1,23 @@
 # IX-9.19.3 #
 
+## Get version action on system services - PLAT-1663 ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1663
+
+Add server get version action on system service
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php deployment/updates/scripts/add_permissions/2014_09_04_add_system_get_version_permission.php	
+
+#### Known Issues & Limitations ####
+
+- For each deployment we need to make sure that the 'VERSION.txt' file is updated with the current server version.
+
 ## Live Analytics - PLAT-1862 ##
 
 - Issue Type: Bug fix
