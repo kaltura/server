@@ -159,7 +159,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function validateRegisteredMediaServersAction($entryId)
+	function validateRegisteredMediaServersAction($entryId, $force=false)
 	{
 		$entryDc = substr($entryId, 0, 1);
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
@@ -173,7 +173,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		/* @var $dbEntry LiveEntry */
-		if($dbEntry->validateMediaServers())
+		if($dbEntry->validateMediaServers($force))
 			$dbEntry->save();	
 	}
 }

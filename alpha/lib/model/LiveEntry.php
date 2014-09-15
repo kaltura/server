@@ -552,6 +552,12 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $hostname)
 	{
+		if (!$this->validateRecording())
+		{
+			KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
+			return;	
+		}
+		
 		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getHostname() == $hostname)
 			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
@@ -560,8 +566,14 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return bool true is list changed
 	 */
-	public function validateMediaServers()
+	public function validateMediaServers($force=false)
 	{
+		if (!$force && !$this->validateRecording())
+		{
+			KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
+			return;	
+		}
+		
 		$listChanged = false;
 		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
@@ -575,6 +587,24 @@ abstract class LiveEntry extends entry
 		}
 		
 		return $listChanged;
+	}
+	
+	protected function validateRecording ()
+	{
+		if ($this->getDvrStatus() == DVRStatus::ENABLED && $this->getRecordedEntryId())
+		{
+			$recording = entryPeer::retrieveByPK($this->getRecordedEntryId());
+			if ($recording)
+			{
+				if ($recording->getReplacingEntryId())
+				{
+					KalturaLog::info("Recorded entry is not ready yet.");
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	/**
