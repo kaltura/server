@@ -552,7 +552,7 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $hostname)
 	{
-		if (!$this->validateRecording())
+		if (!$this->validateLiveRecordingStatus())
 		{
 			KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
 			$this->setFirstUnregisterAttemptTimestamp(time());
@@ -569,7 +569,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function validateMediaServers()
 	{
-		if (!$this->validateRecording())
+		if (!$this->validateLiveRecordingStatus())
 		{
 			if (now() - $this->getFirstUnregisterAttemptTimestamp() < intval(kConf::get('default_live_recording_timeout')))
 			{
