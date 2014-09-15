@@ -555,6 +555,7 @@ abstract class LiveEntry extends entry
 		if (!$this->validateRecording())
 		{
 			KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
+			$this->setFirstUnregisterAttemptTimestamp(time());
 			return;	
 		}
 		
@@ -566,14 +567,18 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return bool true is list changed
 	 */
-	public function validateMediaServers($force=false)
+	public function validateMediaServers()
 	{
-		if (!$force && !$this->validateRecording())
+		if (!$this->validateRecording())
 		{
-			KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
-			return;	
+			if (now() - $this->getFirstUnregisterAttemptTimestamp() < intval(kConf::get('default_live_recording_timeout')))
+			{
+				KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
+				return;	
+			}
 		}
 		
+		$this->setFirstUnregisterAttemptTimestamp(null);
 		$listChanged = false;
 		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
@@ -589,14 +594,14 @@ abstract class LiveEntry extends entry
 		return $listChanged;
 	}
 	
-	protected function validateRecording ()
+	protected function validateLiveRecordingStatus ()
 	{
 		if ($this->getDvrStatus() == DVRStatus::ENABLED && $this->getRecordedEntryId())
 		{
 			$recording = entryPeer::retrieveByPK($this->getRecordedEntryId());
 			if ($recording)
 			{
-				if ($recording->getReplacingEntryId())
+				if ($recording->getStatus() != entryStatus::READY || $recording->getReplacementStatus() != entryReplacementStatus::NONE )
 				{
 					KalturaLog::info("Recorded entry is not ready yet.");
 					return false;
@@ -676,6 +681,16 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
 	
+	public function getFirstUnregisterAttemptTimestamp ()
+	{
+		return $this->getFromCustomData('first_unregister_attempt_timestamp',null);
+	}
+	
+	public function setFirstUnregisterAttemptTimestamp ($v)
+	{
+		$this->putInCustomData('first_unregister_attempt_timestamp', $v);
+	}
+	
 	/**
 	 * @return boolean
 	 */
@@ -711,4 +726,6 @@ abstract class LiveEntry extends entry
 			return $value->getHostname();
 		}
 	}
+	
+	
 }

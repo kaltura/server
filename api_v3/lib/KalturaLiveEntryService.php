@@ -159,7 +159,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function validateRegisteredMediaServersAction($entryId, $force=false)
+	function validateRegisteredMediaServersAction($entryId)
 	{
 		$entryDc = substr($entryId, 0, 1);
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
