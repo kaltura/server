@@ -486,7 +486,7 @@ class asset extends Baseasset implements ISyncableFile
 		return $url;
 	}
 	
-	public function getDownloadUrl($useCdn = false, $forceProxy = false)
+	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
@@ -534,7 +534,7 @@ class asset extends Baseasset implements ISyncableFile
 		if($serveRemote && $fileSync)
 			return $fileSync->getExternalUrl($this->getEntryId());
 		
-		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy);
+		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
 	}
 	
 	public function isKsNeededForDownload()
@@ -549,18 +549,21 @@ class asset extends Baseasset implements ISyncableFile
 		return $entry->isSecuredEntry();
 	}
 	
-	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false)
+	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false, $preview = null)
 	{
 		$ksStr = "";
 		$partnerId = $this->getPartnerId();
 		
-		if ($this->isKsNeededForDownload())
+		if ($this->isKsNeededForDownload() || $preview)
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$secret = $partner->getSecret();
 			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
 			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
 			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();
+			
+			if($preview)
+				$privilege .= "," . kSessionBase::PRIVILEGE_PREVIEW . ":" . $preview;
 			
 			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
 	

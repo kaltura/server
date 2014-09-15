@@ -675,17 +675,23 @@ class FlavorAssetService extends KalturaAssetService
 		if(is_null($entryDb))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $assetDb->getEntryId());
 		
+		$preview = null;
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
-		$securyEntryHelper->validateForDownload();
+		if ($securyEntryHelper->shouldPreview()) { 
+			$preview = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
+		} else { 
+			$securyEntryHelper->validateForDownload();
+		}
 
 		//files grater then 1.8GB can't be downloaded from cdn.
 		$flavorSizeKB = $assetDb->getSize();
 		$useCdn = true;
 		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
 			$useCdn = false;
-		return $assetDb->getDownloadUrl($useCdn, $forceProxy);
+		
+		return $assetDb->getDownloadUrl($useCdn, $forceProxy,$preview);
 	}
 	
 	/**
@@ -741,9 +747,23 @@ class FlavorAssetService extends KalturaAssetService
 			
 		if ($flavorAssetDb->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
-
 		
-		return $flavorAssetDb->getDownloadUrl($useCdn);
+		// Validate for download
+		$entryDb = entryPeer::retrieveByPK($flavorAssetDb->getEntryId());
+		if(is_null($entryDb))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $flavorAssetDb->getEntryId());
+		
+		$preview = null;
+		$ksObj = $this->getKs();
+		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
+		if ($securyEntryHelper->shouldPreview()) {
+			$preview = $flavorAssetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
+		} else {
+			$securyEntryHelper->validateForDownload();
+		}
+		
+		return $flavorAssetDb->getDownloadUrl($useCdn, false, $preview);
 	}
 	
 	/**

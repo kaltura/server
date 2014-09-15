@@ -39,6 +39,7 @@ class kSessionBase
 	const PRIVILEGE_ENABLE_CATEGORY_MODERATION = "enablecategorymoderation";
 	const PRIVILEGE_REFERENCE_TIME = "reftime";
 	const PRIVILEGE_SESSION_KEY = "sessionkey";
+	const PRIVILEGE_PREVIEW = "preview";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
