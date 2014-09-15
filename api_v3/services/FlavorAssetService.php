@@ -9,8 +9,6 @@
  */
 class FlavorAssetService extends KalturaAssetService
 {
-	const LENGTH_TO_SIZE_FACTOR = 1000;
-	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -682,7 +680,7 @@ class FlavorAssetService extends KalturaAssetService
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) { 
-			$preview = $securyEntryHelper->getPreviewLength() * self::LENGTH_TO_SIZE_FACTOR;
+			$preview = $assetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
 		} else { 
 			$securyEntryHelper->validateForDownload();
 		}
@@ -760,7 +758,7 @@ class FlavorAssetService extends KalturaAssetService
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) {
-			$preview = $securyEntryHelper->getPreviewLength() * self::LENGTH_TO_SIZE_FACTOR;
+			$preview = $flavorAssetDb->estimateFileSize($entryDb, $securyEntryHelper->getPreviewLength());
 		} else {
 			$securyEntryHelper->validateForDownload();
 		}

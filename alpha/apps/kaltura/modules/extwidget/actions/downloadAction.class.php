@@ -6,8 +6,6 @@
 class downloadAction extends sfAction
 {
 	
-	const LENGTH_TO_SIZE_FACTOR = 1000;
-	
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
 	 */
@@ -61,13 +59,10 @@ class downloadAction extends sfAction
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
-		$preview = 0;
-		if(kCurrentContext::$ks_object) 
-			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW);
-		
+		$shouldPreview = false;
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) { 
-			$preview = $securyEntryHelper->getPreviewLength() * self::LENGTH_TO_SIZE_FACTOR;
+			$shouldPreview = true;
 		} else { 
 			$securyEntryHelper->validateForDownload();
 		}
@@ -100,7 +95,14 @@ class downloadAction extends sfAction
 				}
 			}
 		}
-
+		
+		$preview = 0;
+		if($shouldPreview) {
+			$preview = $flavorAsset->estimateFileSize($entry, $securyEntryHelper->getPreviewLength());
+		} else if(kCurrentContext::$ks_object) {
+			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
+		}
+		
 		// Gonen 26-04-2010: in case entry has no flavor with 'mbr' tag - we return the source
 		if(!$flavorAsset && ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO))
 		{
