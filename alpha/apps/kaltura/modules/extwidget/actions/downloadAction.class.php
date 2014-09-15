@@ -5,6 +5,9 @@
  */
 class downloadAction extends sfAction
 {
+	
+	const LENGTH_TO_SIZE_FACTOR = 1000;
+	
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
 	 */
@@ -57,11 +60,14 @@ class downloadAction extends sfAction
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.download', $entry->getPartnerId());
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
-			
-		$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW);
+		
+		$preview = 0;
+		if(kCurrentContext::$ks_object) 
+			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW);
+		
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) { 
-			$preview = $securyEntryHelper->getPreviewLength();
+			$preview = $securyEntryHelper->getPreviewLength() * self::LENGTH_TO_SIZE_FACTOR;
 		} else { 
 			$securyEntryHelper->validateForDownload();
 		}

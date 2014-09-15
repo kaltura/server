@@ -554,7 +554,7 @@ class asset extends Baseasset implements ISyncableFile
 		$ksStr = "";
 		$partnerId = $this->getPartnerId();
 		
-		if ($this->isKsNeededForDownload())
+		if ($this->isKsNeededForDownload() || $preview)
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$secret = $partner->getSecret();

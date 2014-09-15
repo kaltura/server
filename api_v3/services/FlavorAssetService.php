@@ -9,6 +9,8 @@
  */
 class FlavorAssetService extends KalturaAssetService
 {
+	const LENGTH_TO_SIZE_FACTOR = 1000;
+	
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -680,7 +682,7 @@ class FlavorAssetService extends KalturaAssetService
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
 		if ($securyEntryHelper->shouldPreview()) { 
-			$preview = $securyEntryHelper->getPreviewLength();
+			$preview = $securyEntryHelper->getPreviewLength() * self::LENGTH_TO_SIZE_FACTOR;
 		} else { 
 			$securyEntryHelper->validateForDownload();
 		}
@@ -690,6 +692,7 @@ class FlavorAssetService extends KalturaAssetService
 		$useCdn = true;
 		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
 			$useCdn = false;
+		
 		return $assetDb->getDownloadUrl($useCdn, $forceProxy,$preview);
 	}
 	
@@ -752,12 +755,17 @@ class FlavorAssetService extends KalturaAssetService
 		if(is_null($entryDb))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $flavorAssetDb->getEntryId());
 		
+		$preview = null;
 		$ksObj = $this->getKs();
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
-		$securyEntryHelper->validateForDownload();
+		if ($securyEntryHelper->shouldPreview()) {
+			$preview = $securyEntryHelper->getPreviewLength() * self::LENGTH_TO_SIZE_FACTOR;
+		} else {
+			$securyEntryHelper->validateForDownload();
+		}
 		
-		return $flavorAssetDb->getDownloadUrl($useCdn);
+		return $flavorAssetDb->getDownloadUrl($useCdn, false, $preview);
 	}
 	
 	/**
