@@ -64,6 +64,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
+			$dbEntry->setLastElapsedRecordingTimeMsec( $currentDuration );
 			$dbEntry->save();
 		}
 			

@@ -138,8 +138,17 @@ class updateLoginDataAction extends kalturaAction
 			return ;
 		}
 
+		$firstName = $_POST['fname'] ;
+		$lastName = $_POST['lname'] ;
+
+		$firstName = strip_tags($firstName);
+		$firstName = htmlentities($firstName);
+
+		$lastName = strip_tags($lastName);
+		$lastName = htmlentities($lastName);
+
 		try {
-			$this->updateLoginData($this->email, $_POST['password'], null, null, $_POST['fname'], $_POST['lname']);
+			$this->updateLoginData($this->email, $_POST['password'], null, null, $firstName, $lastName);
 			$this->setSuccess();
 
 		} catch( KalturaLoginDataException $e ){

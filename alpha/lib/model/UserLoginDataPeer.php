@@ -184,6 +184,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
+		$partnerId = $loginData->getConfigPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		// If on the partner it's set not to reset the password - skip the email sending
+		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
+			KalturaLog::debug("Skipping reset-password email sending according to partner configuration.");
+			return true;
+		}
+		
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 				

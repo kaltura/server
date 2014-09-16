@@ -90,14 +90,11 @@ class kSessionUtils
 	public static function createKSessionNoValidations ( $partner_id , $puser_id , &$ks_str  ,
 		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "")
 	{
-	// 2009-10-20 - don't limit the expiry of the ks !
-/*
-		// TODO - verify the partner allows such sessions (basically allows external widgets)
+		
 		$ks_max_expiry_in_seconds =  myPartnerUtils::getExpiry ( $partner_id );
-
-		if ( $ks_max_expiry_in_seconds < $desired_expiry_in_seconds )
+		if ($ks_max_expiry_in_seconds && ($ks_max_expiry_in_seconds < $desired_expiry_in_seconds))
 			$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
-*/
+		
 		$ks = new ks();
 		$ks->valid_until = kApiCache::getTime() + $desired_expiry_in_seconds ; // store in milliseconds to make comparison easier at validation time
 //			$ks->type = $admin ? ks::TYPE_KAS : ks::TYPE_KS;

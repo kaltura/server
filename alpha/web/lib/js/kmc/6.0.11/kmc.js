@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2014-09-02
+/*! KMC - v6.0.11 - 2014-09-15
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -3966,10 +3966,7 @@ kmc.functions = {
 	openLiveAnalyticsDrilldown: function(entryId, entryName){
 		// Set title
 		var title = entryName ? entryName : '';
-		// setup url
-		var http_protocol = (kmc.vars.kmc_secured || location.protocol == 'https:') ? 'https' : 'http';
-		var from_domain = http_protocol + '://' + window.location.hostname;
-		var url = from_domain + kmc.vars.port + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html#/entry/' + entryId + '/nonav';
+		var url = kmc.vars.base_url + '/apps/liveanalytics/' + kmc.vars.liveanalytics.version + '/index.html#/entry/' + entryId + '/nonav';
 		
 		var modal_content = '<iframe id="liveIF" src="' + url + '" width="100%" height="100%" frameborder="0"></iframe>';
 
@@ -4103,15 +4100,10 @@ kmc.utils = {
 	},
 
 	resize : function() {
-		var min_height = ($.browser.ie) ? 640 : 590;
-		var doc_height = $(document).height(),
-		offset = $.browser.mozilla ? 37 : 74;
-		doc_height = (doc_height-offset);
-		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
 		if ($("#flash_wrap").css("visibility") == "visible" || $("#flash_wrap").css("visibility") == "inherit"){
-			$("#flash_wrap").height(doc_height + "px");
+			$("#flash_wrap").height($(window).height()-44);
 		}
-		$("#server_wrap iframe").height(doc_height + "px");
+		$("#server_wrap iframe").height($(window).height()-46);
 	},
 	isModuleLoaded : function() {
 		if($("#flash_wrap object").length || $("#flash_wrap embed").length) {

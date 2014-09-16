@@ -60,9 +60,17 @@ class kBusinessPostConvertDL
 		 * For intermediate source generation, both the source and the asset have the same asset id.
 		 * In this case sourceMediaInfo should be retrieved as the first version of source asset mediaInfo 
 		 */
-		if(isset($sourceMediaInfo) && $sourceMediaInfo->getFlavorAssetId()==$flavorAssetId) {
+		if(isset($sourceMediaInfo) && $sourceMediaInfo->getFlavorAssetId()== $flavorAssetId) {
 			$productMediaInfo = $sourceMediaInfo;
-			$sourceMediaInfo=mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId,1);
+			
+			$entry = $dbBatchJob->getEntry();
+			$operationAttributes = $entry->getOperationAttributes();
+
+			// if in clipping operation - take the latest created mediainfo object
+			$ascending = empty($operationAttributes)? 1 : 0 ;
+
+			$sourceMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId, $ascending);
+
 			KalturaLog::log("Intermediate source generation - assetId(".$flavorAssetId."),src MdInf id(".$sourceMediaInfo->getId()."),product MdInf id(".$productMediaInfo->getId()).")";
 		}
 		else {
