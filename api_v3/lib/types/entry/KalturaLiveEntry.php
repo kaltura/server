@@ -37,7 +37,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 * Elapsed recording time (in msec) up to the point where the live stream was last stopped (unpublished).
 	 * @var int
 	 */
-	public $lastElapsedRecordingTimeMsec;
+	public $lastElapsedRecordingTime;
 
 	/**
 	 * Array of key value protocol->live stream url objects
@@ -84,7 +84,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	    "recordStatus",
 	    "dvrStatus",
 	    "dvrWindow",
-		"lastElapsedRecordingTimeMsec",
+		"lastElapsedRecordingTime",
 		"liveStreamConfigurations",
 		"recordedEntryId",
 		"pushPublishEnabled",
