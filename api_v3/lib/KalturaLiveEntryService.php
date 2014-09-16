@@ -174,7 +174,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		/* @var $dbEntry LiveEntry */
-		if($dbEntry->validateMediaServers($force))
+		if($dbEntry->validateMediaServers())
 			$dbEntry->save();	
 	}
 }
