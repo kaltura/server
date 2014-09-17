@@ -162,6 +162,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function validateRegisteredMediaServersAction($entryId)
 	{
+		KalturaResponseCacher::disableCache();
 		$entryDc = substr($entryId, 0, 1);
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
 		{
