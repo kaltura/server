@@ -604,7 +604,7 @@ abstract class LiveEntry extends entry
 			$recording = entryPeer::retrieveByPK($this->getRecordedEntryId());
 			if ($recording)
 			{
-				if ($recording->getStatus() != entryStatus::READY || $recording->getReplacementStatus() != entryReplacementStatus::NONE )
+				if ($recording->getStatus() != entryStatus::READY || !is_null($recording->getReplacingEntryId()))
 				{
 					KalturaLog::info("Recorded entry is not ready yet.");
 					return false;
