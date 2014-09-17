@@ -561,7 +561,9 @@ class asset extends Baseasset implements ISyncableFile
 			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
 			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
 			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();
-			
+			if (kCurrentContext::$is_admin_session)
+				$privilege .= "," . kSessionBase::PRIVILEGE_DOWNLOAD_ASSET . ":" . $this->getId();
+
 			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
 	
 			if ($result < 0)
