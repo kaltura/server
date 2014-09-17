@@ -574,7 +574,7 @@ abstract class LiveEntry extends entry
 	{
 		if (!$this->validateLiveRecordingStatus())
 		{
-			if (now() - $this->getFirstUnregisterAttemptTimestamp() < intval(kConf::get('default_live_recording_timeout')))
+			if (time() - $this->getFirstUnregisterAttemptTimestamp() < intval(kConf::get('default_live_recording_timeout')))
 			{
 				KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
 				return;	
