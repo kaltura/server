@@ -284,7 +284,7 @@ class DeliveryController extends Zend_Controller_Action
 				$form->populate($formData);
 	
 				$deliveryProfileClass = $this->getDeliveryProfileClass($type);
-				$deliveryFromForm = $form->getObject($deliveryProfileClass, $formData, false, true);
+				$deliveryFromForm = $form->getObject($deliveryProfileClass, $formData, false, false);
 	
 				Infra_ClientHelper::impersonate($deliveryFromForm->partnerId);
 				$deliveryFromForm->partnerId = null;
