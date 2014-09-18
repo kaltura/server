@@ -175,7 +175,7 @@ function newDeliveryProfileSuccess(html) {
 	});
 }
 
-function configure(partnerId, deliveryProfileId, type, tokenizerClass, recognizerClass) {
+function configure(partnerId, deliveryProfileId, status, type, tokenizerClass, recognizerClass) {
 
 	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'configure-delivery-profile', 'partnerId' => 'PARTNER_ID', 
 			'type'=>'TYPE', 'tokenizerClz' => 'TOKENIZER', 'recognizerClz' => 'RECOGNIZER', 'deliveryProfileId' => '')); ?>' + deliveryProfileId;
