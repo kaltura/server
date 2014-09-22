@@ -29,6 +29,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile {
 		$this->copyInto($newObject);
 		$newObject->setParentId($this->getId());
 		$newObject->setIsDefault(false);
+		$newObject->setRecognizer($this->getRecognizer());
+		$newObject->setTokenizer($this->getTokenizer());
 		$newObject->save(null, true);
 		return $newObject;
 	}
