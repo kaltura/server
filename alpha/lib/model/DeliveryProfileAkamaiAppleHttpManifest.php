@@ -44,10 +44,14 @@ class DeliveryProfileAkamaiAppleHttpManifest extends DeliveryProfileAkamaiAppleH
 	{
 		$params = array();
 		if($this->getUseTimingParameters()) {
-			if($this->params->getSeekFromTime())
+			if($this->params->getSeekFromTime()) {
 				$params['start'] = $this->params->getSeekFromTime();
-			if($this->params->getClipTo())
+				$this->params->setSeekFromTime(null);
+			}
+			if($this->params->getClipTo()) {
 				$params['end'] = $this->params->getClipTo();
+				$this->params->setClipTo(null);
+			}
 		}
 		
 		$flavors = $this->buildHttpFlavorsArray();
