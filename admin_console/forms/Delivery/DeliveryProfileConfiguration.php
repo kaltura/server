@@ -73,14 +73,7 @@ class Form_Delivery_DeliveryProfileConfiguration extends Infra_Form
 				'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'isDefault', array(
-				'label' 		=> 'Is Default Delivery Profile:',
-				'filters'		=> array('StringTrim'),
-				'readonly'		=> true,
-		));
-		
-		
-		$this->addDisplayGroup(array('type', 'streamerType', 'mediaProtocols', 'url', 'isDefault'), 'delivery_info', array(
+		$this->addDisplayGroup(array('type', 'streamerType', 'mediaProtocols', 'url'), 'delivery_info', array(
 				'legend' => 'Delivery Info',
 		));
 		

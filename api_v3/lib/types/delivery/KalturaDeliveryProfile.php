@@ -69,6 +69,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaPlaybackProtocol
+	 * @filter eq
 	 */
 	public $streamerType;
 	

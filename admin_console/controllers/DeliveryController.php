@@ -12,11 +12,12 @@ class DeliveryController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$partnerId = $this->_getParam('partnerId');
 		$storageId = $this->_getParam('storageId');
+		$streamerType = $this->_getParam('streamerType');
 		$currentDps = $this->_getParam('currentDeliveryProfiles');
 	
 		$client = Infra_ClientHelper::getClient();
-		$options = $this->getDeliveryProfiles($client, $partnerId);
-		$selected = $this->getDeliveryProfiles($client, $partnerId, $currentDps);
+		$options = $this->getDeliveryProfiles($client, $partnerId, $streamerType);
+		$selected = $this->getDeliveryProfiles($client, $partnerId, $streamerType, $currentDps);
 	
 		$this->view->possibleValues = array_diff_key($options, $selected);
 		$this->view->selectedValues = $selected;
@@ -65,7 +66,7 @@ class DeliveryController extends Zend_Controller_Action
 	
 	}
 	
-	protected function getDeliveryProfiles($client, $partnerId, $dpIds = null) {
+	protected function getDeliveryProfiles($client, $partnerId, $streamerType, $dpIds = null) {
 	
 		$options = array();
 		$deliveryProfileService = new Kaltura_Client_DeliveryProfileService($client);
@@ -77,8 +78,14 @@ class DeliveryController extends Zend_Controller_Action
 				return $options;
 			$filter->idIn = $dpIds;
 		}
+		
+		$filter->streamerTypeEqual = $streamerType;
 		$filter->statusIn = Kaltura_Client_Enum_DeliveryStatus::ACTIVE . "," . Kaltura_Client_Enum_DeliveryStatus::STAGING_OUT;
-		$dpsResponse = $deliveryProfileService->listAction($filter, null);
+		
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageSize = 500;
+		
+		$dpsResponse = $deliveryProfileService->listAction($filter, $pager);
 		Infra_ClientHelper::unimpersonate();
 	
 	

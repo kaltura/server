@@ -64,6 +64,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
+			$dbEntry->setLastElapsedRecordingTime( $currentDuration );
 			$dbEntry->save();
 		}
 			
@@ -161,6 +162,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	function validateRegisteredMediaServersAction($entryId)
 	{
+		KalturaResponseCacher::disableCache();
 		$entryDc = substr($entryId, 0, 1);
 		if($entryDc != kDataCenterMgr::getCurrentDcId())
 		{

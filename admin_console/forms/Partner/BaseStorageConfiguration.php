@@ -205,11 +205,15 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		
 		parent::populateFromObject($object, $add_underscore);
 		
-		$res = array();
-		foreach($object->deliveryProfileIds as $keyValue) {
-			$this->insertObject($res, $keyValue->key, $keyValue->value);
-		}		
-		$this->getElement('delivery_profile_ids')->setValue(json_encode($res));
+		if(empty($object->deliveryProfileIds)) {
+			$this->getElement('delivery_profile_ids')->setValue("{}");
+		} else {
+			$res = array();
+			foreach($object->deliveryProfileIds as $keyValue) {
+				$this->insertObject($res, $keyValue->key, $keyValue->value);
+			}
+			$this->getElement('delivery_profile_ids')->setValue(json_encode($res));
+		}
 		
 	}
 	
