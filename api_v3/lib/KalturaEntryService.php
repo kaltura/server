@@ -374,7 +374,7 @@ class KalturaEntryService extends KalturaBaseService
 				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 				$dbEntry->save();
 			}
-			
+
 			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$dbAsset->save();												
 			throw $e;
