@@ -1,8 +1,28 @@
 # IX-9.19.3 #
 
+
 ## Get version action on system services - PLAT-1663 ##
 - Issue Type: Back-End Request
 - Issue ID: PLAT-1663
+
+
+## Live params tags ##
+Added web and mobile tags to live params
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1624
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
+## Live recording optimization ##
+Record all live assets and manage the recording on the API server side.
 
 Add server get version action on system service
 
