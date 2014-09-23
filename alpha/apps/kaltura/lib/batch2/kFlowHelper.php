@@ -336,8 +336,7 @@ class kFlowHelper
 			if($flavorParams->hasTag(assetParams::TAG_SOURCE))
 			{
 				$replacingAsset->setIsOriginal(true);
-			}
-		
+			}		
 			$replacingAsset->save();
 
 			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
