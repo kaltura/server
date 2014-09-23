@@ -196,6 +196,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$url = "$playServerHost/p/$partnerId/manifest/master/entryId/$entryId";
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
+
 		if(count($this->params->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
