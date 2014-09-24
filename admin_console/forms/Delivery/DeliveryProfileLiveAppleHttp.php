@@ -12,11 +12,11 @@ class Form_Delivery_DeliveryProfileLiveAppleHttp extends Form_Delivery_DeliveryP
 				'label'			=> 'Disable Extra attributes:',
 		));
 		
-		$this->addElement('checkbox', 'enforceProxy', array(
-				'label'			=> 'Enforce proxy:',
+		$this->addElement('checkbox', 'forceProxy', array(
+				'label'			=> 'Force proxy:',
 		));
 		
-		return array('disableExtraAttributes', 'enforceProxy');
+		return array('disableExtraAttributes', 'forceProxy');
 	}
 	
 }

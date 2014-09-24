@@ -13,12 +13,12 @@ class KalturaDeliveryProfileLiveAppleHttp extends KalturaDeliveryProfile {
 	/**
 	 * @var bool
 	 */
-	public $enforceProxy;
+	public $forceProxy;
 	
 	private static $map_between_objects = array
 	(
 			"disableExtraAttributes",
-			"enforceProxy"
+			"forceProxy"
 	);
 	
 	public function getMapBetweenObjects ( )
