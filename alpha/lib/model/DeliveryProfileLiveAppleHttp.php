@@ -16,14 +16,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return $this->getFromCustomData("disableExtraAttributes");
 	}
 	
-	public function setEnforceProxy($v)
+	public function setForceProxy($v)
 	{
 		$this->putInCustomData("enforceProxy", $v);
 	}
 	
-	public function getEnforceProxy()
+	public function getForceProxy()
 	{
-		return $this->getFromCustomData("enforceProxy", null, false);
+		return $this->getFromCustomData("forceProxy", null, false);
 	}
 	
 	public function checkIsLive( $url )
@@ -237,7 +237,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 	protected function doServe($baseUrl, $backupUrl) 
 	{
-		if(!$backupUrl && !$this->getEnforceProxy())
+		if(!$backupUrl && !$this->getForceProxy())
 		{
 			return parent::serve($baseUrl, $backupUrl);
 		}
