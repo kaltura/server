@@ -18,7 +18,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	
 	public function setForceProxy($v)
 	{
-		$this->putInCustomData("enforceProxy", $v);
+		$this->putInCustomData("forceProxy", $v);
 	}
 	
 	public function getForceProxy()
