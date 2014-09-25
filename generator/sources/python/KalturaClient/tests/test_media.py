@@ -7,6 +7,7 @@ from utils import getTestFile
 from KalturaClient.Plugins.Core import KalturaMediaListResponse
 from KalturaClient.Plugins.Core import KalturaMediaEntry, KalturaMediaType
 from KalturaClient.Plugins.Core import KalturaMediaEntryFilter
+from KalturaClient.Plugins.Core import KalturaUploadToken, KalturaUploadedFileTokenResource
 
 
 class MediaTests(KalturaBaseTest):
@@ -20,9 +21,9 @@ class MediaTests(KalturaBaseTest):
         
         [self.assertIsInstance(o, KalturaMediaEntry) for o in objs]
         
-    def test_createRemote(self):
+    def test_addFromUploadedFile(self):
         mediaEntry = KalturaMediaEntry()
-        mediaEntry.setName('pytest.MediaTests.test_createRemote')
+        mediaEntry.setName('pytest.MediaTests.test_addFromUploadedFile')
         mediaEntry.setMediaType(KalturaMediaType(KalturaMediaType.VIDEO))
             
         ulFile = getTestFile('DemoVideo.flv')
@@ -35,7 +36,42 @@ class MediaTests(KalturaBaseTest):
         #cleanup
         self.client.media.delete(mediaEntry.id)
 
-
+    def test_updateContent(self):
+        mediaEntry = KalturaMediaEntry()
+        mediaEntry.setName('pytest.MediaTests.test_updateContent')
+        mediaEntry.setMediaType(KalturaMediaType(KalturaMediaType.VIDEO))
+        ulFile = getTestFile('DemoVideo.flv')
+        uploadTokenId = self.client.media.upload(ulFile)
+        mediaEntry = self.client.media.addFromUploadedFile(mediaEntry, uploadTokenId)
+        self.addCleanup(self.client.media.delete, mediaEntry.getId())
+        self.readyWait(mediaEntry.getId())
+        
+        #now, change the content on the mediaEntry to another video file
+        token = KalturaUploadToken()
+        token = self.client.uploadToken.add(token)
+        self.addCleanup(self.client.uploadToken.delete, token.getId())
+        ulFile = getTestFile('countdown.mp4')
+        token = self.client.uploadToken.upload(token.getId(), ulFile)
+        
+        #create a resource
+        resource = KalturaUploadedFileTokenResource()
+        resource.setToken(token.getId())
+        
+        #DO THE TEST
+        newMediaEntry = self.client.media.updateContent(mediaEntry.getId(), resource)
+        
+        #must approve it...
+        newMediaEntry = self.client.media.approveReplace(newMediaEntry.getId())
+        self.readyWait(newMediaEntry.getId())
+        
+        #make sure everything but content is the same
+        self.assertEqual(mediaEntry.getId(), newMediaEntry.getId())
+        self.assertEqual(mediaEntry.getName(), newMediaEntry.getName())
+        
+        self.assertNotEqual(mediaEntry.getDuration(), newMediaEntry.getDuration())
+        
+        
+        
 class Utf8_tests(KalturaBaseTest):
     
     test_unicode = u'\u03dd\xf5\xf6'  #an odd representation of the word 'FOO'
