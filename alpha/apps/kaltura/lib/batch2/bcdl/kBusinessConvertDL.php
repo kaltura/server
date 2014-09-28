@@ -165,6 +165,7 @@ class kBusinessConvertDL
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
 
+		kBusinessConvertDL::checkForPendingLiveClips($entry);
 		kEventsManager::raiseEvent(new kObjectReplacedEvent($entry, $tempEntry));
 
 		myEntryUtils::deleteEntry($tempEntry,null,true);
@@ -175,6 +176,79 @@ class kBusinessConvertDL
 		$te->setParam1Str($tempEntry->getId());
 		$te->setDescription(__METHOD__ . "[" . __LINE__ . "]");
 		TrackEntry::addTrackEntry($te);
+	}
+
+	public static function checkForPendingLiveClips(entry $entry)
+	{
+		if($entry->getSource() != EntrySourceType::RECORDED_LIVE)
+		{
+			KalturaLog::debug("Entry [" . $entry->getId() . "] is not a recorded live");
+			return;
+		}
+	
+		$liveEntry = entryPeer::retrieveByPKNoFilter($entry->getRootEntryId());
+		if(!$liveEntry || $liveEntry->getStatus() == entryStatus::DELETED || !($liveEntry instanceof LiveEntry))
+		{
+			KalturaLog::debug("Entry root [" . $entry->getRootEntryId() . "] is not a valid live entry");
+			return;
+		}
+		/* @var $liveEntry LiveEntry */
+		
+		$pendingMediaEntries = $liveEntry->getAttachedPendingMediaEntries();
+		foreach($pendingMediaEntries as $pendingMediaEntry)
+		{
+			/* @var $pendingMediaEntry kPendingMediaEntry */
+			
+			if($pendingMediaEntry->getRequiredDuration() && $pendingMediaEntry->getRequiredDuration() > $entry->getLengthInMsecs())
+			{
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] required duration [" . $pendingMediaEntry->getRequiredDuration() . "] while entry duration [" . $entry->getLengthInMsecs() . "] is too short");
+				continue;
+			}
+			$liveEntry->dettachPendingMediaEntry($pendingMediaEntry->getEntryId());
+			
+			$pendingEntry = entryPeer::retrieveByPK($pendingMediaEntry->getEntryId());
+			if(!$pendingEntry)
+			{
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] not found");
+				continue;
+			}
+			
+			$sourceAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
+ 			if(!$sourceAsset)
+ 			{
+ 				$sourceAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
+ 				$sourceAsset = array_pop($sourceAssets);
+ 			}
+			if(!$sourceAsset)
+			{
+				KalturaLog::debug("Pending entry [" . $pendingMediaEntry->getEntryId() . "] source asset not found");
+				continue;
+			}
+ 			/* @var $sourceAsset flavorAsset */
+ 			
+ 			$operationAttributes = new kClipAttributes();
+ 			$operationAttributes->setOffset($pendingMediaEntry->getOffset());
+ 			$operationAttributes->setDuration($pendingMediaEntry->getDuration());
+ 			
+			$targetAsset = assetPeer::retrieveOriginalByEntryId($pendingMediaEntry->getEntryId());
+			if(!$targetAsset)
+			{
+	 			KalturaLog::debug("Creating original flavor asset");
+				$targetAsset = kFlowHelper::createOriginalFlavorAsset($entry->getPartnerId(), $pendingMediaEntry->getEntryId());
+			}
+			$targetAsset->setFileExt($sourceAsset->getFileExt());
+			$targetAsset->save();
+			
+			$sourceSyncKey = $sourceAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$targetSyncKey = $targetAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			
+			kFileSyncUtils::createSyncFileLinkForKey($targetSyncKey, $sourceSyncKey);
+			
+			$errDescription = '';
+ 			kBusinessPreConvertDL::decideAddEntryFlavor(null, $pendingMediaEntry->getEntryId(), $operationAttributes->getAssetParamsId(), $errDescription, $targetAsset->getId(), array($operationAttributes));
+		}
+		
+		$liveEntry->save();
 	}
 
 	private static function createFileSyncLinkFromReplacingAsset($oldAsset, $newAsset, $fileSyncSubType)
