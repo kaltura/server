@@ -12,4 +12,6 @@ interface ObjectTaskType extends BaseEnum
 	const DELETE_ENTRY_FLAVORS = 3;
 
 	const CONVERT_ENTRY_FLAVORS = 4;
+
+	const DELETE_LOCAL_CONTENT = 5;
 }
