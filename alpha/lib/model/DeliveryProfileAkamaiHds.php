@@ -46,7 +46,7 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 	{
 		$params = array();
 		if($this->getSupportClipping()) {
-			if($this->params->getSeekFromTime()) {
+			if($this->params->getSeekFromTime() != -1) {
 				$params['start'] = $this->params->getSeekFromTime();
 				$this->params->setSeekFromTime(-1);
 			}
