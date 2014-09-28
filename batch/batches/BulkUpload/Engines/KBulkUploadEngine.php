@@ -180,6 +180,10 @@ abstract class KBulkUploadEngine
 	{
 		$str = KCurlWrapper::encodeUrl($str);
 		
+		$redundant_chars = kConf::get("redundant_url_chars");
+		
+		$str = str_replace($redundant_chars,"",$str);
+		
 		return filter_var($str, FILTER_VALIDATE_URL);
 	}
 		
