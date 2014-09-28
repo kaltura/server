@@ -10,11 +10,11 @@ class KalturaDeliveryProfileAkamaiAppleHttpManifest extends KalturaDeliveryProfi
 	 * 
 	 * @var bool
 	 */
-	public $useTimingParameters;
+	public $supportClipping;
 	
 	private static $map_between_objects = array
 	(
-			"useTimingParameters",
+			"supportClipping",
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -7,14 +7,14 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	}
 	
-	public function setUseTimingParameters($v)
+	public function setSupportClipping($v)
 	{
-		$this->putInCustomData("useTimingParameters", $v);
+		$this->putInCustomData("supportClipping", $v);
 	}
 	 
-	public function getUseTimingParameters()
+	public function getSupportClipping()
 	{
-		return $this->getFromCustomData("useTimingParameters", null, true);
+		return $this->getFromCustomData("supportClipping", null, true);
 	}
 	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
@@ -45,10 +45,10 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 	protected function getSecureHdUrl()
 	{
 		$params = array();
-		if($this->getUseTimingParameters()) {
+		if($this->getSupportClipping()) {
 			if($this->params->getSeekFromTime()) {
 				$params['start'] = $this->params->getSeekFromTime();
-				$this->params->setSeekFromTime(null);
+				$this->params->setSeekFromTime(-1);
 			}
 			if($this->params->getClipTo()) {
 				$params['end'] = $this->params->getClipTo();

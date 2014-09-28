@@ -8,12 +8,12 @@ class Form_Delivery_DeliveryProfileAkamaiAppleHttpManifest extends Form_Delivery
 	
 	public function getAdvancedSettings()
 	{
-		$element = $this->addElement('checkbox', 'useTimingParameters', array(
-				'label'			=> 'Use timing parameters:',
+		$element = $this->addElement('checkbox', 'supportClipping', array(
+				'label'			=> 'Support clipping parameters:',
 				'filters'		=> array('StringTrim'),
 		));
 		
-		return array('useTimingParameters');
+		return array('supportClipping');
 	}
 	
 }

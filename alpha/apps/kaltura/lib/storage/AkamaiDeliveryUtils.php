@@ -48,11 +48,9 @@ class AkamaiDeliveryUtils {
 			$url = rtrim($urlPrefixPath, '/') . '/' . ltrim($url, '/');
 		}
 		
-		$paramsStr = array();
-		foreach ($params as $key => $value) {
-			$paramsStr[] = $key . "=" . $value;
-		}
-		$url .= "?" . implode("&", $paramsStr);
+		$paramsStr = http_build_query($params,'','&');
+		if(!empty($paramsStr))
+			$url .= "?" . $paramsStr;
 		
 		if (strpos($urlPrefix, '://') === false)
 			$urlPrefix = $mediaProtocol . '://' . $urlPrefix;

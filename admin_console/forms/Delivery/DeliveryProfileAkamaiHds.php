@@ -8,12 +8,12 @@ class Form_Delivery_DeliveryProfileAkamaiHds extends Form_Delivery_DeliveryProfi
 	
 	public function getAdvancedSettings()
 	{
-		$element = $this->addElement('checkbox', 'useTimingParameters', array(
-				'label'			=> 'Use timing parameters:',
+		$element = $this->addElement('checkbox', 'supportClipping', array(
+				'label'			=> 'Support clipping parameters:',
 				'filters'		=> array('StringTrim'),
 		));
 		
-		return array('useTimingParameters');
+		return array('supportClipping');
 	}
 	
 }
