@@ -541,7 +541,7 @@ class asset extends Baseasset implements ISyncableFile
 		
 		if($serveRemote && $fileSync)
 			return $fileSync->getExternalUrl($this->getEntryId());
-		
+
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy);
 	}
 	
@@ -568,7 +568,8 @@ class asset extends Baseasset implements ISyncableFile
 			$secret = $partner->getSecret();
 			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
 			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
-			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();
+			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();       
+			$privilege .= "," . kSessionBase::PRIVILEGE_DOWNLOAD_ASSET . ":" . $this->getId();
 
 			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
 	

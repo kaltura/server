@@ -679,13 +679,17 @@ class FlavorAssetService extends KalturaAssetService
 		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
 		$securyEntryHelper = new KSecureEntryHelper($entryDb, $ks, null, ContextType::DOWNLOAD);
 		$securyEntryHelper->validateForDownload();
+		if (!$securyEntryHelper->isAssetAllowed($assetDb))
+			throw new KalturaAPIException(KalturaErrors::ASSET_NOT_ALLOWED, $id);
 
 		//files grater then 1.8GB can't be downloaded from cdn.
 		$flavorSizeKB = $assetDb->getSize();
 		$useCdn = true;
 		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
 			$useCdn = false;
+
 		return $assetDb->getDownloadUrl($useCdn, $forceProxy);
+
 	}
 	
 	/**
