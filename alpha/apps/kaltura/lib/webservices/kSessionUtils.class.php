@@ -320,8 +320,18 @@ class ks extends kSessionBase
 			$this->isKSInvalidated() !== false)				// Could not check for invalidation using the memcache
 		{
 			$criteria = new Criteria();
-			$criteria->add(invalidSessionPeer::KS, $this->getHash());
-			$criteria->add(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_KS);
+			
+			$ksCriterion = $criteria->getNewCriterion(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_KS);
+			$ksCriterion->addAnd($criteria->getNewCriterion(invalidSessionPeer::KS, $this->getHash()));
+			
+			$sessionId = $this->getSessionIdHash();
+			if($sessionId) {
+				$invalidSession = $criteria->getNewCriterion(invalidSessionPeer::KS, $sessionId);
+				$invalidSession->addAnd($criteria->getNewCriterion(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_SESSION_ID));
+				$ksCriterion->addOr($invalidSession);
+			}
+			
+			$criteria->add($ksCriterion);
 			$dbKs = invalidSessionPeer::doSelectOne($criteria);
 			if ($dbKs)
 			{
@@ -340,17 +350,6 @@ class ks extends kSessionBase
 				if ($limit)
 					invalidSessionPeer::actionsLimitKs($this, $limit - 1);
 			}
-		}
-		
-		// Validate session
-		$sessionId = $this->getPrivilegeValue("sessionId");
-		if($sessionId) {
-			$criteria = new Criteria();
-			$criteria->add(invalidSessionPeer::KS, sha1($sessionId));
-			$criteria->add(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_SESSION_ID);
-			$dbKs = invalidSessionPeer::doSelectOne($criteria);
-			if($dbKs)
-				return self::LOGOUT;
 		}
 		
 		// creates the kuser

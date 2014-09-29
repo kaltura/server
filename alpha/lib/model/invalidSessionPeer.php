@@ -15,8 +15,6 @@
  */
 class invalidSessionPeer extends BaseinvalidSessionPeer {
 	
-	const SESSION_ID_PRIVILEGE = "sessionId";
-	
 	/**
 	 * @param      ks $ks
 	 * @param	   int $limit
@@ -41,9 +39,9 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	public static function invalidateKs(ks $ks, PropelPDO $con = null)
 	{
 		$result = self::invalidateByKey($ks->getHash(), invalidSession::INVALID_SESSION_TYPE_KS, $ks->valid_until, $con);
-		$sessionId = $ks->getPrivilegeValue(self::SESSION_ID_PRIVILEGE);
+		$sessionId = $ks->getSessionIdHash();
 		if($sessionId) {
-			self::invalidateByKey(sha1($sessionId), invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $ks->valid_until, $con);
+			self::invalidateByKey($sessionId, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $ks->valid_until, $con);
 		}
 		
 		return $result;

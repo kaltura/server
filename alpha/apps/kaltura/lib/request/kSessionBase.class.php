@@ -39,6 +39,7 @@ class kSessionBase
 	const PRIVILEGE_ENABLE_CATEGORY_MODERATION = "enablecategorymoderation";
 	const PRIVILEGE_REFERENCE_TIME = "reftime";
 	const PRIVILEGE_SESSION_KEY = "sessionkey";
+	const PRIVILEGE_SESSION_ID = "sessionId";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
@@ -540,4 +541,13 @@ class kSessionBase
 		return true;
 	}
 
+	public function getSessionIdHash()
+	{
+		if (isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID])) {
+			if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
+				return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
+			}
+		}
+		return null;
+	}
 }
