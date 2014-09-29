@@ -30,8 +30,6 @@ class kCoreException extends Exception
 		return $this->data;
 	}
 	
-	const ASSET_NOT_ALLOWED = "ASSET_NOT_ALLOWED";
-	
 	const INVALID_QUERY = "INVALID_QUERY";
 	
 	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED";
