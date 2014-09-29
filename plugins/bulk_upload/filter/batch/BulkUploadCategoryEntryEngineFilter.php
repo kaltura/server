@@ -107,4 +107,20 @@ class BulkUploadCategoryEntryEngineFilter extends BulkUploadEngineFilter
 	{
 		return KalturaBulkUploadResultObjectType::CATEGORY_ENTRY;
 	}
+	
+	protected function isErrorResult($requestResult){
+		if(is_array($requestResult) && isset($requestResult['code'])){
+			if($requestResult['code'] == 'CATEGORY_ENTRY_ALREADY_EXISTS')
+				return false;
+			else 
+				return true;
+		}
+		if($requestResult instanceof Exception){
+			if($requestResult->getCode() == 'CATEGORY_ENTRY_ALREADY_EXISTS')
+				return false;
+			else
+				return true;
+		}
+		return false;
+	}
 }
