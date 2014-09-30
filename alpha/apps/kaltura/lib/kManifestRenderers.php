@@ -33,6 +33,11 @@ abstract class kManifestRenderer
 	public $forceCachingHeaders = false;
 	
 	/**
+	 * @var int
+	 */
+	public $lastModified = null;
+	
+	/**
 	 * @var string
 	 */
 	public $deliveryCode = '';
@@ -121,7 +126,7 @@ abstract class kManifestRenderer
 		if (kApiCache::hasExtraFields() && !$this->forceCachingHeaders)
 			$this->cachingHeadersAge = 0;
 		
-		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge, true);
+		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge, true, $this->lastModified);
 
 		$header = $this->getManifestHeader();
 		$footer = $this->getManifestFooter();
@@ -137,9 +142,13 @@ abstract class kManifestRenderer
 		$separator = $this->getSeparator();
 		
 		$flavorsString = implode($separator, $flavors);
-		$content .= $separator.$flavorsString;
+		if ($content)
+			$content .= $separator;		
+		$content .= $flavorsString;
 		
-		$content.=$separator.$footer;
+		if ($content)
+			$content .= $separator;		
+		$content .= $footer;
 		echo $content;
 		
 		die;
