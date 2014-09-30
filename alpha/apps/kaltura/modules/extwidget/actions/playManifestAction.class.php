@@ -306,7 +306,9 @@ class playManifestAction extends kalturaAction
 		{
 			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted manifest request - forbidden');
-			if (strtolower($this->deliveryAttributes->getMediaProtocol()) != 'https' && strtolower($this->deliveryAttributes->getMediaProtocol()) != 'rtmpe')
+
+			$allowedProtocols = array('https','rtmpe','rtmpte');
+			if (!in_array(strtolower($this->deliveryAttributes->getMediaProtocol()) , $allowedProtocols))
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
 		}
 	}
