@@ -940,6 +940,7 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryProfile)
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
+		$renderer->lastModified = time();
 		
 		// Handle caching
 		$canCacheAccessControl = false;

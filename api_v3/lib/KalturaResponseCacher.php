@@ -104,7 +104,7 @@ class KalturaResponseCacher extends kApiCache
 		return $ks;
 	}
 
-	protected function sendCachingHeaders($usingCache)
+	protected function sendCachingHeaders($usingCache, $lastModified = null)
 	{
 		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 
@@ -122,7 +122,7 @@ class KalturaResponseCacher extends kApiCache
 			$max_age = $this->_cacheHeadersExpiry;
 			header("Cache-Control: private, max-age=$max_age, max-stale=0");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
-			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . 'GMT');
 		}
 		else
 		{
@@ -167,7 +167,7 @@ class KalturaResponseCacher extends kApiCache
 		foreach ($responseMetadata['headers'] as $curHeader)
 			header($curHeader, true);
 		
-		$this->sendCachingHeaders(true);
+		$this->sendCachingHeaders(true, isset($responseMetadata['lastModified']) ? $responseMetadata['lastModified'] : time());
 
 		// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);
 		if (@$_REQUEST["format"] == 9)
@@ -214,7 +214,11 @@ class KalturaResponseCacher extends kApiCache
 			
 			$contentHeaders = $this->getContentHeaders();
 			
-			$responseMetadata = array('headers' => $contentHeaders, 'class' => $responseClass);
+			$responseMetadata = array(
+				'lastModified' => time(),
+				'headers' => $contentHeaders, 
+				'class' => $responseClass
+			);
 						
 			$this->storeCache($response, serialize($responseMetadata), $serializeResponse);
 		}
