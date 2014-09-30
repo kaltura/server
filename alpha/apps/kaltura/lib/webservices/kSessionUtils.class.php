@@ -300,13 +300,13 @@ class ks extends kSessionBase
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
-		
 		if ( ! $this->valid_string ) return self::INVALID_STR;
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
 		if ( ! $this->matchUser ( $puser_id ) ) return self::INVALID_USER;
 		if ($type !== false) { // do not check ks type
 			if ( ! $this->type == $type  ) return self::INVALID_TYPE;
 		}
+		
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 
 		if (!$this->isUserIPAllowed()) return self::EXCEEDED_RESTRICTED_IP;
@@ -317,7 +317,18 @@ class ks extends kSessionBase
 			$this->isKSInvalidated() !== false)				// Could not check for invalidation using the memcache
 		{
 			$criteria = new Criteria();
-			$criteria->add(invalidSessionPeer::KS, $this->getHash());
+			
+			$ksCriterion = $criteria->getNewCriterion(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_KS);
+			$ksCriterion->addAnd($criteria->getNewCriterion(invalidSessionPeer::KS, $this->getHash()));
+			
+			$sessionId = $this->getSessionIdHash();
+			if($sessionId) {
+				$invalidSession = $criteria->getNewCriterion(invalidSessionPeer::KS, $sessionId);
+				$invalidSession->addAnd($criteria->getNewCriterion(invalidSessionPeer::TYPE, invalidSession::INVALID_SESSION_TYPE_SESSION_ID));
+				$ksCriterion->addOr($invalidSession);
+			}
+			
+			$criteria->add($ksCriterion);
 			$dbKs = invalidSessionPeer::doSelectOne($criteria);
 			if ($dbKs)
 			{

@@ -2033,6 +2033,7 @@ CREATE TABLE `invalid_session`
 	`ks_valid_until` DATETIME,
 	`created_at` DATETIME,
 	`actions_limit` INTEGER,
+	`type` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `ks_index`(`ks`)
 )Type=InnoDB;
