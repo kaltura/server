@@ -323,6 +323,14 @@ class kSessionBase
 
 		$ksKey = self::INVALID_SESSION_KEY_PREFIX . $this->hash;
 		$keysToGet = array(self::INVALID_SESSIONS_SYNCED_KEY, $ksKey);
+		
+		$sessionIdKey = $this->getSessionIdHash();
+		if ($sessionIdKey)
+		{
+			$sessionIdKey = self::INVALID_SESSION_KEY_PREFIX . $sessionIdKey;
+			$keysToGet[] = $sessionIdKey;
+		}
+		
 		$cacheResult = $memcache->multiGet($keysToGet);
 		if ($cacheResult === false)
 			return null;			// failed to get the keys
@@ -331,7 +339,8 @@ class kSessionBase
 			!$cacheResult[self::INVALID_SESSIONS_SYNCED_KEY])
 			return null;			// invalid sessions not synched to memcache
 		
-		if (array_key_exists($ksKey, $cacheResult))
+		unset($cacheResult[self::INVALID_SESSIONS_SYNCED_KEY]);
+		if ($cacheResult)
 			return true;			// the session is invalid
 		
 		return false;
