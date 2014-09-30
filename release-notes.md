@@ -1,3 +1,22 @@
+# IX-9.19.4 #
+
+## KS invalidation : PLAT-1556 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1556
+
+#### Configuration ####
+
+None.
+
+
+#### Deployment Scripts ####
+	deployment/updates/sql/2014_09_02_add_session_type_invalid_session.sql
+
+
+#### Known Issues & Limitations ####
+None
+
 # IX-9.19.3 #
 
 
