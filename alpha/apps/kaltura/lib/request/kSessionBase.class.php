@@ -543,10 +543,8 @@ class kSessionBase
 
 	public function getSessionIdHash()
 	{
-		if (isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID])) {
-			if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
-				return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
-			}
+		if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
+			return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
 		}
 		return null;
 	}

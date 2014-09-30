@@ -41,7 +41,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		$result = self::invalidateByKey($ks->getHash(), invalidSession::INVALID_SESSION_TYPE_KS, $ks->valid_until, $con);
 		$sessionId = $ks->getSessionIdHash();
 		if($sessionId) {
-			self::invalidateByKey($sessionId, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, $ks->valid_until, $con);
+			self::invalidateByKey($sessionId, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, time() + (24 * 60 * 60), $con);
 		}
 		
 		return $result;
