@@ -237,7 +237,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 	protected function doServe($baseUrl, $backupUrl) 
 	{
-		if(!$backupUrl && !$this->getForceProxy())
+		if((!$backupUrl && !$this->getForceProxy()) || $this->params->getUsePlayServer())
 		{
 			return parent::serve($baseUrl, $backupUrl);
 		}
