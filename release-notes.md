@@ -1,3 +1,21 @@
+# IX-9.19.5 #
+
+##'remove user from channel' notification template fix##
+- Issue Type: Bug fix
+- Issue ID: SUP-2132
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/updates/scripts/2014_06_10_update_remove_user_from_category_notification_template.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.4 #
 
 ## KS invalidation : PLAT-1556 ##
