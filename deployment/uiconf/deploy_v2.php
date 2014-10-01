@@ -202,7 +202,7 @@ class uiConfDeployment
 									$dependUiConfValue = $uiConfIds[$dependencyValue];
 									
 									uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
-								
+									uiConfDeployment::updateFeaturesFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@");
 								}
 								else
 								{
