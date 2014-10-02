@@ -43,6 +43,7 @@ class Form_Delivery_DeliveryProfileConfiguration extends Infra_Form
 		
 		$deliveryStatus = new Kaltura_Form_Element_EnumSelect('status', array('enum' => 'Kaltura_Client_Enum_DeliveryStatus'));
 		$deliveryStatus->setLabel('Delivery Status:');
+		$deliveryStatus->setAttrib('disabled', true);
 		$this->addElements(array($deliveryStatus));
 		
 		$this->addDisplayGroup(array('deliveryProfileId', 'partnerId', 'name', 'systemName', 'description', 'status'), 'general_info', array(
