@@ -213,6 +213,13 @@ class category extends Basecategory implements IIndexable
 		$filter = new categoryKuserFilter();
 		$filter->setCategoryIdEqual($this->getId());
 		$filter->set('_notcontains_permission_names', PermissionName::CATEGORY_CONTRIBUTE.",".PermissionName::CATEGORY_EDIT.",".PermissionName::CATEGORY_MODERATE.",".PermissionName::CATEGORY_VIEW);
+		
+		$c = new Criteria();
+		$c->add(categoryKuserPeer::CATEGORY_ID, $this->getId());
+		if(!categoryKuserPeer::doSelectOne($c)) {
+			return;
+		}
+		
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
@@ -566,6 +573,12 @@ class category extends Basecategory implements IIndexable
 		$filter->setCategoryIdEqual($categoryId);
 		$filter->set('_category_direct_members', $deleteCategoryDirectMembersOnly);
 		
+		$c = new Criteria();
+		$c->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
+		if(!categoryKuserPeer::doSelectOne($c)) {
+			return;
+		}
+		
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
@@ -584,6 +597,12 @@ class category extends Basecategory implements IIndexable
 	{
 		$filter = new categoryEntryFilter();
 		$filter->setCategoryIdEqual($categoryId);
+		
+		$c = new Criteria();
+		$filter->attachToCriteria($c);
+		if(!categoryEntryPeer::doSelectOne($c)) {
+			return;
+		}
 
 		kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}

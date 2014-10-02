@@ -130,7 +130,13 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());
-
+		
+		$c = new Criteria();
+		$filter->attachToCriteria($c);
+		if(!categoryEntryPeer::doSelectOne($c)) {
+			return;
+		}
+		
 		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::CATEGORY_ENTRY, $filter);
 	}
 	
@@ -138,7 +144,13 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	{
 		$filter = new categoryKuserFilter();
 		$filter->setUserIdEqual($kuser->getPuserId());
-
+		
+		$c = new Criteria();
+		$filter->attachToCriteria($c);
+		if(!categoryKuserPeer::doSelectOne($c)) {
+			return;
+		}
+		
 		kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 	}
 	
