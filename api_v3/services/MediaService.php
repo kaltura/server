@@ -450,7 +450,7 @@ class MediaService extends KalturaEntryService
 			*/
 		}
 
-		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
+		$dbEntry = parent::add($mediaEntry, $mediaEntry->conversionProfileId);
 
         $kshowId = $dbEntry->getKshowId();
 
