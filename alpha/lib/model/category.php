@@ -599,7 +599,7 @@ class category extends Basecategory implements IIndexable
 		$filter->setCategoryIdEqual($categoryId);
 		
 		$c = new Criteria();
-		$filter->attachToCriteria($c);
+		$c->add(categoryEntryPeer::CATEGORY_ID, $categoryId);
 		if(!categoryEntryPeer::doSelectOne($c)) {
 			return;
 		}
