@@ -599,7 +599,7 @@ abstract class LiveEntry extends entry
 	
 	protected function validateLiveRecordingStatus ()
 	{
-		$partnerIdsToValidate = kConf::get('live_recording_status_validation_partner_ids', null, array());
+		$partnerIdsToValidate = kConf::get('live_recording_status_validation_partner_ids', 'local', array());
 		if (in_array($this->getPartnerId(), $partnerIdsToValidate) && $this->getDvrStatus() == DVRStatus::ENABLED && $this->getRecordedEntryId())
 		{
 			$recording = entryPeer::retrieveByPK($this->getRecordedEntryId());
