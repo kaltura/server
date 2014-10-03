@@ -924,12 +924,10 @@ class FlavorAssetService extends KalturaAssetService
 		if(is_null($asset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 
-		//TODO check if there are any distribution or export jobs for the entry
-
 		// get the local file syncs for this asset
 		$syncable = kFileSyncObjectManager::retrieveObject(FileSyncObjectType::ASSET ,$assetId);
 		$srcSyncKey = $syncable->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$fileSyncs = kFileSyncUtils::getReadyInternalFileSyncForKey($srcSyncKey);
+		$fileSyncs = kFileSyncUtils::getReadyInternalFileSyncsForKey($srcSyncKey);
 		foreach ($fileSyncs as $fileSync){
 			/* @var $fileSync FileSync*/
 			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);

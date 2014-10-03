@@ -28,8 +28,8 @@
 							<type>1</type>
 							<items objectType="array">
 								<item objectType="KalturaSearchCondition">
-									<field>/*[local-name()='metadata']/*[local-name()='DeleteLocalStatus']</field>
-									<value>Not Deleted</value>
+									<field>/*[local-name()='metadata']/*[local-name()='DeleteStatus']</field>
+									<value>Local Content Not Deleted</value>
 								</item>
 							</items>
 						</item>
@@ -49,11 +49,11 @@
 			<xsl:apply-templates select="@*|node()"/>
 		</xsl:copy>
 	</xsl:template>
-	<xsl:template match="ArchiveStatus" />
+	<xsl:template match="DeleteStatus" />
 	<xsl:template match="metadata">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()" />
-			<ArchiveStatus>deleted</ArchiveStatus>
+			<DeleteStatus>Local Content Deleted</DeleteStatus>
 		</xsl:copy>
 	</xsl:template>
 </xsl:stylesheet>
