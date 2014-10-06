@@ -244,14 +244,18 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
 		}
 
-		// Reset currentBroadcastStartTime
-		// Note that this value is set in the media-server, at KalturaLiveManager::onPublish()
 		if ( count( $dbEntry->getMediaServers() ) == 0 )
 		{
+			// Reset currentBroadcastStartTime
+			// Note that this value is set in the media-server, at KalturaLiveManager::onPublish()
 			if ( $dbEntry->getCurrentBroadcastStartTime() )
 			{
 				$dbEntry->setCurrentBroadcastStartTime( 0 );
 			}
+
+			// Save last elapsed recording time
+			$dbEntry->setLastElapsedRecordingTime( $dbEntry->getLengthInMsecs() );
+
 		}
 
 		$dbEntry->save();
