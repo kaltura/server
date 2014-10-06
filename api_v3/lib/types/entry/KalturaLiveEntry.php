@@ -77,6 +77,26 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $lastBroadcast;
 	
+	/**
+	 * The event's start time (UTC timestamp)
+	 * @var int
+	 * @filter order,gte,lte,eq
+	 */
+	public $eventStartTime;
+
+	/**
+	 * The event's end time (UTC timestamp)
+	 * @var int
+	 * @filter order,gte,lte,eq
+	 */
+	public $eventEndTime;
+
+	/**
+	 * The event's timezone (PHP timezone name)
+	 * @var string
+	 */
+	public $eventTimezone;
+
 	
 	private static $map_between_objects = array
 	(
@@ -90,6 +110,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"pushPublishEnabled",
 		"firstBroadcast",
 		"lastBroadcast",
+		"eventStartTime",
+		"eventEndTime",
+		"eventTimezone",
 	);
 	
 	/* (non-PHPdoc)
