@@ -927,6 +927,10 @@ class FlavorAssetService extends KalturaAssetService
 		// get the local file syncs for this asset
 		$syncable = kFileSyncObjectManager::retrieveObject(FileSyncObjectType::ASSET ,$assetId);
 		$srcSyncKey = $syncable->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$externalFileSyncs = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey);
+		if (!$externalFileSyncs)
+			throw new KalturaAPIException(KalturaErrors::NO_EXTERNAL_CONTENT_EXISTS);
+
 		$fileSyncs = kFileSyncUtils::getReadyInternalFileSyncsForKey($srcSyncKey);
 		foreach ($fileSyncs as $fileSync){
 			/* @var $fileSync FileSync*/
