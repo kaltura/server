@@ -243,7 +243,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			$dbEntry->setRedirectEntryId($dbEntry->getRecordedEntryId());
 		}
-		
+
+		if ( count( $dbEntry->getMediaServers() ) == 0 )
+		{
+			// Save last elapsed recording time
+			$dbEntry->setLastElapsedRecordingTime( $dbEntry->getLengthInMsecs() );
+		}
+
 		$dbEntry->save();
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
