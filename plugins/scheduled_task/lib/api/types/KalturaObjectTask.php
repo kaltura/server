@@ -46,6 +46,8 @@ abstract class KalturaObjectTask extends KalturaObject
 				return new KalturaDeleteEntryFlavorsObjectTask();
 			case ObjectTaskType::CONVERT_ENTRY_FLAVORS:
 				return new KalturaConvertEntryFlavorsObjectTask();
+			case ObjectTaskType::DELETE_LOCAL_CONTENT:
+				return new KalturaDeleteLocalContentObjectTask();
 			default:
 				return KalturaPluginManager::loadObject('KalturaObjectTask', $dbObject->getType());
 		}
