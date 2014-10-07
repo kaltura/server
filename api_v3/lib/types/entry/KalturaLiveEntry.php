@@ -79,14 +79,14 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	/**
 	 * The event's start time (UTC timestamp)
-	 * @var int
+	 * @var time
 	 * @filter order,gte,lte,eq
 	 */
 	public $eventStartTime;
 
 	/**
 	 * The event's end time (UTC timestamp)
-	 * @var int
+	 * @var time
 	 * @filter order,gte,lte,eq
 	 */
 	public $eventEndTime;
