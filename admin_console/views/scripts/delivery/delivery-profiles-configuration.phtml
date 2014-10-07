@@ -54,19 +54,26 @@
 				<td><?php echo $this->dateFormat($delivery->updatedAt, Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $delivery->partnerId; ?>, <?php echo $delivery->id; ?>, 
+					<?php echo $delivery->status;?>,
 					<?php if(is_int($delivery->type)) echo $delivery->type; else echo "'" . $delivery->type . "'"; ?>, 
 					<?php if(is_null($delivery->tokenizer)) echo "'Null'"; else echo "'" . get_class($delivery->tokenizer) . "'"; ?>, 
 					<?php if(is_null($delivery->recognizer)) echo "'Null'"; else echo "'" . get_class($delivery->recognizer) . "'"; ?>)">
+					
+						<!-- Actions -->
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
-						<?php if ($delivery->status == Kaltura_Client_Enum_DeliveryStatus::ACTIVE): ?>
-							<option value="disable"><?php echo $this->translate('Disable'); ?></option>
-						<?php else: ?>
+						<?php if ($delivery->status == Kaltura_Client_Enum_DeliveryStatus::DELETED): ?>
 							<option value="enable"><?php echo $this->translate('Enable'); ?></option>
-						<?php endif; ?>
-						<?php if ($delivery->status != Kaltura_Client_Enum_DeliveryStatus::DELETED): ?>
+						<?php else:?>
 							<option value="deleteDP"><?php echo $this->translate('Delete'); ?></option>
+							<?php if ($delivery->status == Kaltura_Client_Enum_DeliveryStatus::ACTIVE): ?>
+								<option value="disable"><?php echo $this->translate('Disable'); ?></option>
+							<?php elseif ($delivery->status == Kaltura_Client_Enum_DeliveryStatus::STAGING_IN):?>
+								<option value="enable"><?php echo $this->translate('Enable'); ?></option>
+							<?php endif;?>
 						<?php endif; ?>
+						<!-- Actions -->
+						
 					</select>
 				</td>
 			</tr>
@@ -99,7 +106,7 @@ jQuery('#filter_type').change(function() {
 
 jQuery('#filter_type').change();
 
-function doAction(action, partnerId, deliveryProfieId) {
+function doAction(action, partnerId, deliveryProfieId, deliveryStatus) {
 	if (action && eval('typeof ' + action) == 'function')
 	{
 		f = eval(action);
@@ -168,7 +175,7 @@ function newDeliveryProfileSuccess(html) {
 	});
 }
 
-function configure(partnerId, deliveryProfileId, type, tokenizerClass, recognizerClass) {
+function configure(partnerId, deliveryProfileId, status, type, tokenizerClass, recognizerClass) {
 
 	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'configure-delivery-profile', 'partnerId' => 'PARTNER_ID', 
 			'type'=>'TYPE', 'tokenizerClz' => 'TOKENIZER', 'recognizerClz' => 'RECOGNIZER', 'deliveryProfileId' => '')); ?>' + deliveryProfileId;
@@ -212,7 +219,7 @@ function configure(partnerId, deliveryProfileId, type, tokenizerClass, recognize
 	);
 }
 
-function disable(partnerId, deliveryProfileId)
+function disable(partnerId, deliveryProfileId, status)
 {
 	var ok = confirm('<?php echo $this->translate('Disable delivery profile?'); ?>');
 	if (ok)
@@ -228,15 +235,19 @@ function disable(partnerId, deliveryProfileId)
 	}
 }
 
-function deleteDP(partnerId, deliveryProfileId)
+function deleteDP(partnerId, deliveryProfileId, curStatus)
 {
 	var ok = confirm('<?php echo $this->translate('Delete delivery profile?'); ?>');
 	if (ok)
 	{
+		var status = <?php echo Kaltura_Client_Enum_DeliveryStatus::DELETED; ?>;
+		if(curStatus == <?php echo Kaltura_Client_Enum_DeliveryStatus::ACTIVE; ?>)
+			status = <?php echo Kaltura_Client_Enum_DeliveryStatus::STAGING_OUT; ?>;
+			
 		changeStatus(
 				partnerId, 
 				deliveryProfileId, 
-			<?php echo Kaltura_Client_Enum_DeliveryStatus::DELETED; ?>, 
+				status, 
 			function() {
 				alert('<?php echo $this->translate('Delivery profile was deleted');?>');
 			}
@@ -244,15 +255,19 @@ function deleteDP(partnerId, deliveryProfileId)
 	}
 }
 
-function enable(partnerId, deliveryProfileId)
+function enable(partnerId, deliveryProfileId, curStatus)
 {
 	var ok = confirm('<?php echo $this->translate('Enable delivery profile?'); ?>');
 	if (ok)
 	{
+		var status = <?php echo Kaltura_Client_Enum_DeliveryStatus::ACTIVE; ?>;
+		if(curStatus == <?php echo Kaltura_Client_Enum_DeliveryStatus::DELETED; ?>)
+			status = <?php echo Kaltura_Client_Enum_DeliveryStatus::STAGING_IN; ?>;
+			
 		changeStatus(
 				partnerId, 
 				deliveryProfileId, 
-			<?php echo Kaltura_Client_Enum_DeliveryStatus::STAGING_IN; ?>, 
+				status, 
 			function() {
 				alert('<?php echo $this->translate('Delivery profile was enabled');?>');
 			}

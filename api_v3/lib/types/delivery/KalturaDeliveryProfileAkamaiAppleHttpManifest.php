@@ -3,22 +3,18 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDeliveryProfileLiveAppleHttp extends KalturaDeliveryProfile {
+class KalturaDeliveryProfileAkamaiAppleHttpManifest extends KalturaDeliveryProfile {
 	
 	/**
+	 * Should we use timing parameters - clipTo / seekFrom
+	 * 
 	 * @var bool
 	 */
-	public $disableExtraAttributes;
-	
-	/**
-	 * @var bool
-	 */
-	public $forceProxy;
+	public $supportClipping;
 	
 	private static $map_between_objects = array
 	(
-			"disableExtraAttributes",
-			"forceProxy"
+			"supportClipping",
 	);
 	
 	public function getMapBetweenObjects ( )

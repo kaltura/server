@@ -10,6 +10,12 @@ jQuery('[class=commentForm]').toggle();
 
 jQuery(document).ready(function() {
 
+	var dpId = jQuery('#deliveryProfileId').val();
+	if(dpId == "") {
+		jQuery('#status').empty();
+		jQuery('#status').append(new Option('Staging-in', 2));
+	}
+	
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPartnerFilter').submit();

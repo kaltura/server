@@ -1799,6 +1799,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="ks_valid_until" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="actions_limit" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" />
 		<index name="ks_index">
 			<index-column name="ks" />
 		</index>
