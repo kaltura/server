@@ -7,7 +7,7 @@ abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
 	const FIRST_BROADCAST = 'first_broadcast';
-	const DEFAULT_CACHE_EXPIRY = 70;
+	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	
