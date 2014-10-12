@@ -543,9 +543,10 @@ class kBusinessConvertDL
 					
 					if ($entry->getRecordStatus() && !$definedRecordingAnchor) 
 					{
-						$definedRecordingAnchor = Math.rand(0, 1);
-						if ($definedRecordingAnchor)
-							$liveAsset->addTags(liveAsset::RECORDING_ANCHOR_TAG);
+						// We specifically add a flag that does NOT exist on the live asset, since we can't predict which
+						// live params the conversion profile is going to contain.
+						$liveAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
+						$definedRecordingAnchor = true;
 					}
 				}
 				

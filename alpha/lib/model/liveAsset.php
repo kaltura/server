@@ -10,8 +10,6 @@
  */
 class liveAsset extends flavorAsset
 {
-	const RECORDING_ANCHOR_TAG = 'recordingAnchor';
-	
 	public function getMulticastIP ()
 	{
 		return $this->getFromCustomData('multicast_ip');
