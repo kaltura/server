@@ -60,7 +60,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$currentDuration = 0;
 		$currentDuration += ($duration * 1000);
 		
-		if($dbAsset->hasTag(assetParams::TAG_SOURCE) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		if($dbAsset->hasTag(liveAsset::RECORDING_ANCHOR_TAG) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
 			$dbEntry->save();
