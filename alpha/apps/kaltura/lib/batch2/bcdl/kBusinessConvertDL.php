@@ -509,6 +509,7 @@ class kBusinessConvertDL
 			return;
 		
 		$streamBitrates = array();
+		$definedRecordingAnchor = false;
 		foreach ($flavorParamsConversionProfileArray as $flavorParamsConversionProfile)
 		{
 			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */
@@ -539,6 +540,13 @@ class kBusinessConvertDL
 					$liveAsset->setFlavorParamsId($liveParams->getId());
 					$liveAsset->setFromAssetParams($liveParams);
 					$liveAsset->setEntryId($entry->getId());
+					
+					if ($entry->getRecordStatus() && !$definedRecordingAnchor) 
+					{
+						$definedRecordingAnchor = Math.rand(0, 1);
+						if ($definedRecordingAnchor)
+							$liveAsset->addTags(liveAsset::RECORDING_ANCHOR_TAG);
+					}
 				}
 				
 				// set the status according to the entry status
