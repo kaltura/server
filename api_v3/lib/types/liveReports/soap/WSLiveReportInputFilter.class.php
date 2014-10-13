@@ -15,17 +15,12 @@ class WSLiveReportInputFilter extends WSBaseObject
 	/**
 	 * @var long
 	 **/
-	public $eventTime;
+	public $fromTime;
 	
 	/**
 	 * @var long
 	 **/
-	public $fromTime;
-	
-	/**
-	 * @var int
-	 **/
-	public $hoursBefore;
+	public $toTime;
 	
 	/**
 	 * @var boolean
@@ -36,11 +31,6 @@ class WSLiveReportInputFilter extends WSBaseObject
 	 * @var long
 	 **/
 	public $partnerId;
-	
-	/**
-	 * @var long
-	 **/
-	public $toTime;
 	
 	/**
 	 * @var int

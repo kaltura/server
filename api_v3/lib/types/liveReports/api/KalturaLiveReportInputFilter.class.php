@@ -14,17 +14,12 @@ class KalturaLiveReportInputFilter extends KalturaObject
 	/**
 	 * @var time
 	 **/
-	public $eventTime;
+	public $fromTime;
 	
 	/**
 	 * @var time
 	 **/
-	public $fromTime;
-	
-	/**
-	 * @var int
-	 **/
-	public $hoursBefore;
+	public $toTime;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -35,11 +30,6 @@ class KalturaLiveReportInputFilter extends KalturaObject
 	 * @var int
 	 **/
 	public $partnerId;
-	
-	/**
-	 * @var time
-	 **/
-	public $toTime;
 	
 	/**
 	 * @var int
