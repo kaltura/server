@@ -913,7 +913,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * delete all local file syncs for this asset
 	 *
 	 * @action deleteLocalContent
-	 * @param $assetId
+	 * @param string $assetId
 	 * @validateUser asset::entry id edit
 	 * @throws KalturaAPIException
 	 */
