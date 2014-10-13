@@ -1,5 +1,19 @@
 # IX-9.19.5 #
 
+##add attachment service permissions to base-playback##
+- Issue Type: Customer request
+- Issue ID: PLAT-1830
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_10_19_base_playback_role_add_widevine_Attachment_permissions.php
+
+#### Known Issues & Limitations ####
+
 ##'remove user from channel' notification template fix##
 - Issue Type: Bug fix
 - Issue ID: SUP-2132
