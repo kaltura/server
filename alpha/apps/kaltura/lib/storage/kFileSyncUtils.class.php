@@ -771,6 +771,21 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return FileSyncPeer::doSelectOne( $c );
 	}
 
+	/**
+	 * Get the internal from kaltura data centers only FileSync object by its key
+	 *
+	 * @param FileSyncKey $key
+	 * @return FileSync
+	 */
+	public static function getReadyInternalFileSyncsForKey(FileSyncKey $key)
+	{
+		$c = new Criteria();
+		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+
+		return FileSyncPeer::doSelect( $c );
+	}
 
 	/**
 	 * Create a path on disk for the LOCAL FileSync that is coupled with the key.

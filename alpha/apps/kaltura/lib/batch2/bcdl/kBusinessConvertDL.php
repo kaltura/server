@@ -509,6 +509,7 @@ class kBusinessConvertDL
 			return;
 		
 		$streamBitrates = array();
+		$definedRecordingAnchor = false;
 		foreach ($flavorParamsConversionProfileArray as $flavorParamsConversionProfile)
 		{
 			/* @var $flavorParamsConversionProfile flavorParamsConversionProfile */
@@ -539,6 +540,14 @@ class kBusinessConvertDL
 					$liveAsset->setFlavorParamsId($liveParams->getId());
 					$liveAsset->setFromAssetParams($liveParams);
 					$liveAsset->setEntryId($entry->getId());
+					
+					if ($entry->getRecordStatus() && !$definedRecordingAnchor) 
+					{
+						// We specifically add a flag that does NOT exist on the live asset, since we can't predict which
+						// live params the conversion profile is going to contain.
+						$liveAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
+						$definedRecordingAnchor = true;
+					}
 				}
 				
 				// set the status according to the entry status

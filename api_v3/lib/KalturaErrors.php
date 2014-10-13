@@ -233,6 +233,8 @@ class KalturaErrors extends APIErrors
 
 	const NO_FLAVORS_FOUND = "NO_FLAVORS_FOUND;;No flavors found";
 
+	const NO_EXTERNAL_CONTENT_EXISTS = "NO_EXTERNAL_CONTENT_EXISTS;;Can't delete local content because no external content exists";
+
 	/**
 	 * ThumbAsset Service
 	 */
