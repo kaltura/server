@@ -26,6 +26,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		$invalidSession->setKs($ks->getHash());
 		$invalidSession->setActionsLimit($limit);
 		$invalidSession->setKsValidUntil($ks->valid_until);
+		$invalidSession->setType(invalidSession::INVALID_SESSION_TYPE_KS);
 		$invalidSession->save();
 		
 		return $invalidSession;
@@ -37,14 +38,26 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	 */
 	public static function invalidateKs(ks $ks, PropelPDO $con = null)
 	{
+		$result = self::invalidateByKey($ks->getHash(), invalidSession::INVALID_SESSION_TYPE_KS, $ks->valid_until, $con);
+		$sessionId = $ks->getSessionIdHash();
+		if($sessionId) {
+			self::invalidateByKey($sessionId, invalidSession::INVALID_SESSION_TYPE_SESSION_ID, time() + (24 * 60 * 60), $con);
+		}
+		
+		return $result;
+	}
+	
+	protected static function invalidateByKey($key, $type, $validUntil, PropelPDO $con = null) {
 		$criteria = new Criteria();
-		$criteria->add(invalidSessionPeer::KS, $ks->getHash());
+		$criteria->add(invalidSessionPeer::KS, $key);
+		$criteria->add(invalidSessionPeer::TYPE, $type);
 		$invalidSession = invalidSessionPeer::doSelectOne($criteria, $con);
 		
 		if(!$invalidSession){
 			$invalidSession = new invalidSession();
-			$invalidSession->setKs($ks->getHash());
-			$invalidSession->setKsValidUntil($ks->valid_until);
+			$invalidSession->setKs($key);
+			$invalidSession->setType($type);
+			$invalidSession->setKsValidUntil($validUntil);
 		}
 		
 		$invalidSession->setActionsLimit(null);
@@ -57,4 +70,5 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	{
 		return array(array("invalidSession:ks=%s", self::KS));		
 	}
+	
 } // invalidSessionPeer

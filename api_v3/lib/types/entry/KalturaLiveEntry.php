@@ -34,6 +34,12 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public $dvrWindow;
 	
 	/**
+	 * Elapsed recording time (in msec) up to the point where the live stream was last stopped (unpublished).
+	 * @var int
+	 */
+	public $lastElapsedRecordingTime;
+
+	/**
 	 * Array of key value protocol->live stream url objects
 	 * @var KalturaLiveStreamConfigurationArray
 	 */
@@ -63,16 +69,27 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $firstBroadcast;
 	
+	/**
+	 * The Last time in which the entry was broadcast
+	 * @var int
+	 * @readonly
+	 * @filter order
+	 */
+	public $lastBroadcast;
+	
+	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
 	    "recordStatus",
 	    "dvrStatus",
 	    "dvrWindow",
+		"lastElapsedRecordingTime",
 		"liveStreamConfigurations",
 		"recordedEntryId",
 		"pushPublishEnabled",
 		"firstBroadcast",
+		"lastBroadcast",
 	);
 	
 	/* (non-PHPdoc)

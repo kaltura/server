@@ -57,8 +57,8 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
-$limit = 2000; 	// The number of sphinxLog records we want to query
-$gap = 1000;	// The gap from 'getLastLogId' we want to query
+$limit = 1000; 	// The number of sphinxLog records we want to query
+$gap = 500;	// The gap from 'getLastLogId' we want to query
 
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer);
 $lastLogs = array();

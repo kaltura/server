@@ -151,7 +151,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			foreach($data->contentParameters as $contentParameter)
 			{
 				/* @var $contentParameter KalturaKeyValue */
-				$contentParameters['{' .$contentParameter->key. '}'] = $contentParameter->value;
+				$contentParameters['{' .$contentParameter->key. '}'] = strip_tags($contentParameter->value);
 			}		
 		}
 			

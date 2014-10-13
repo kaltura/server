@@ -141,8 +141,8 @@ var kmc = {
 	</div>
 </div>
 <script src="/lib/js/angular-1.0.4.min.js"></script>
-<script src="/lib/js/kmc/6.0.10/langMenu.min.js"></script>
-<script src="/lib/js/kmc/6.0.10/kmc.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
+<script src="/lib/js/kmc/6.0.11/langMenu.min.js"></script>
+<script src="/lib/js/kmc/6.0.11/kmc.min.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } else { ?>
 <script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
 <?php } ?>

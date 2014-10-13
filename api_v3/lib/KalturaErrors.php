@@ -9,7 +9,7 @@ class KalturaErrors extends APIErrors
 	 * General Errors
 	 *
 	 */
-
+	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
 
@@ -219,6 +219,8 @@ class KalturaErrors extends APIErrors
 	/**
 	 * FlavorAsset Service
 	 */
+	const ASSET_NOT_ALLOWED = "ASSET_NOT_ALLOWED;ID;Flavor asset id \"@ID@\" not allowed";
+
 	const FLAVOR_ASSET_ID_NOT_FOUND = "FLAVOR_ASSET_ID_NOT_FOUND;ID;Flavor asset id \"@ID@\" not found";
 
 	const FLAVOR_ASSET_ALREADY_EXISTS = "FLAVOR_ASSET_ALREADY_EXISTS;ASSET_ID,PARAMS_ID;Flavor asset id \"@ASSET_ID@\" already use flavor params id \"@PARAMS_ID@\"";
@@ -532,4 +534,9 @@ class KalturaErrors extends APIErrors
     */
 	const DELIVERY_ID_NOT_FOUND = 'DELIVERY_ID_NOT_FOUND;DELIVERY_ID;delivery id [@DELIVERY_ID@] not found';
 	const DELIVERY_UPDATE_ISNT_ALLOWED = 'DELIVERY_UPDATE_ISNT_ALLOWED;DELIVERY_ID;delivery id [@DELIVERY_ID@] is default and can\'t be set';
+	
+	/*
+	 * Live reports Service
+	 */
+	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
 }

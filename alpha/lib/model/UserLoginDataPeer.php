@@ -184,6 +184,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
+		$partnerId = $loginData->getConfigPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		// If on the partner it's set not to reset the password - skip the email sending
+		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
+			KalturaLog::debug("Skipping reset-password email sending according to partner configuration.");
+			return true;
+		}
+		
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 				
@@ -306,7 +314,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$resetLinksArray = kConf::get('password_reset_links');
 		$resetLinkPrefix = $resetLinksArray['default'];		
 		
-		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
+		$partnerId = $loginData->getConfigPartnerId();
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner) {
 			// partner may define a custom reset password url (admin console for example)
 			$urlPrefixName = $partner->getPassResetUrlPrefixName();
@@ -314,8 +324,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			{
 				$resetLinkPrefix = $resetLinksArray[$urlPrefixName];
 			}
-		}	
-		
+		}
+
+		$httpsEnforcePermission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
+		if($httpsEnforcePermission)
+			$resetLinkPrefix = str_replace(infraRequestUtils::PROTOCOL_HTTP , infraRequestUtils::PROTOCOL_HTTPS , $resetLinkPrefix);
+
 		return $resetLinkPrefix.$hashKey;
 	}
 	

@@ -27,6 +27,7 @@ class kSessionBase
 	const PRIVILEGE_VIEW = "sview";
 	const PRIVILEGE_LIST = "list"; // used to bypass the user filter in entry list
 	const PRIVILEGE_DOWNLOAD = "download";
+	const PRIVILEGE_DOWNLOAD_ASSET = 'downloadasset';
 	const PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST = "editplaylist";
 	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
 	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
@@ -40,6 +41,7 @@ class kSessionBase
 	const PRIVILEGE_REFERENCE_TIME = "reftime";
 	const PRIVILEGE_SESSION_KEY = "sessionkey";
 	const PRIVILEGE_PREVIEW = "preview";
+	const PRIVILEGE_SESSION_ID = "sessionId";
 	const PRIVILEGES_DELIMITER = "/";
 
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
@@ -322,6 +324,14 @@ class kSessionBase
 
 		$ksKey = self::INVALID_SESSION_KEY_PREFIX . $this->hash;
 		$keysToGet = array(self::INVALID_SESSIONS_SYNCED_KEY, $ksKey);
+		
+		$sessionIdKey = $this->getSessionIdHash();
+		if ($sessionIdKey)
+		{
+			$sessionIdKey = self::INVALID_SESSION_KEY_PREFIX . $sessionIdKey;
+			$keysToGet[] = $sessionIdKey;
+		}
+		
 		$cacheResult = $memcache->multiGet($keysToGet);
 		if ($cacheResult === false)
 			return null;			// failed to get the keys
@@ -330,7 +340,8 @@ class kSessionBase
 			!$cacheResult[self::INVALID_SESSIONS_SYNCED_KEY])
 			return null;			// invalid sessions not synched to memcache
 		
-		if (array_key_exists($ksKey, $cacheResult))
+		unset($cacheResult[self::INVALID_SESSIONS_SYNCED_KEY]);
+		if ($cacheResult)
 			return true;			// the session is invalid
 		
 		return false;
@@ -541,4 +552,11 @@ class kSessionBase
 		return true;
 	}
 
+	public function getSessionIdHash()
+	{
+		if(isset($this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0])) {
+			return sha1( $this->partner_id . '_' . $this->parsedPrivileges[self::PRIVILEGE_SESSION_ID][0]);
+		}
+		return null;
+	}
 }

@@ -1,3 +1,191 @@
+# IX-9.19.5 #
+
+##'remove user from channel' notification template fix##
+- Issue Type: Bug fix
+- Issue ID: SUP-2132
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php /opt/kaltura/app/deployment/updates/scripts/2014_06_10_update_remove_user_from_category_notification_template.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# IX-9.19.4 #
+
+## KS invalidation : PLAT-1556 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1556
+
+#### Configuration ####
+
+None.
+
+
+#### Deployment Scripts ####
+	deployment/updates/sql/2014_09_02_add_session_type_invalid_session.sql
+
+
+#### Known Issues & Limitations ####
+None
+
+# IX-9.19.3 #
+
+
+## Get version action on system services - PLAT-1663 ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1663
+
+
+## Live params tags ##
+Added web and mobile tags to live params
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1624
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+- deployment/updates/scripts/2014_01_12_update_live_params_permissions.php
+
+#### Known Issues & Limitations ####
+None
+
+## Live recording optimization ##
+Record all live assets and manage the recording on the API server side.
+
+Add server get version action on system service
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+	php deployment/updates/scripts/add_permissions/2014_09_04_add_system_get_version_permission.php	
+
+#### Known Issues & Limitations ####
+
+- For each deployment we need to make sure that the 'VERSION.txt' file is updated with the current server version.
+
+## Live Analytics - PLAT-1862 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1862
+
+#### Configuration ####
+
+**admin.ini**
+
+- requires merge of the section - realTimeReports
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+None
+
+## BOA - PLAT-1554 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1554
+
+#### Configuration ####
+
+None.
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+Requires validating all the partners with ks_max_expiry_in_seconds different than 86400 and either nullify them or set them to 86400.
+
+	mysql> select id, partner_name, status, ks_max_expiry_in_seconds from partner where ks_max_expiry_in_seconds != 86400 and status = 1;
+	mysql> select id, partner_name, status, ks_max_expiry_in_seconds from partner where ks_max_expiry_in_seconds is null and status = 1;
+
+## BOA - PLAT-1649 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1649
+
+#### Configuration ####
+
+**admin.ini**
+
+- requires merge of the section - disableResetPassword
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+None
+
+## BOA - PLAT-1558 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1558
+
+#### Configuration ####
+
+**admin.ini**
+
+- requires merge of the section - disableRememberMe
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+None
+
+## BOA - PLAT-1555 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1555
+
+#### Configuration ####
+None
+
+
+#### Deployment Scripts ####
+None.
+
+
+#### Known Issues & Limitations ####
+See limitations within the JIRA ticket.
+
+
+## BOA - PLAT-1548 ##
+
+- Issue Type: Bug fix
+- Issue ID: PLAT-1548
+
+#### Configuration ####
+None
+
+
+#### Deployment Scripts ####
+
+	php deployment/updates/scripts/add_permissions/2014_09_09_serve_report.php
+
+
+#### Known Issues & Limitations ####
+None.
+
 # IX-9.19.2 #
 
 ## Delivery profiles UI ##
@@ -14,12 +202,68 @@ Adding a UI for delivery profiles
 
 #### Deployment Scripts ####
 
-None
+Execute: 
+
+	php deployment/updates/scripts/add_permissions/2014_09_07_delivery_profile_ui.php
 
 #### Known Issues & Limitations ####
 
 None
 
+## Live analytics integration ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-870
+
+Added php support for live analytics
+
+#### Prerequisites ####
+
+- Player version: v2.17.rc7 or higher. (http://kgit.html5video.org/tags/v2.17.rc7/mwEmbedLoader.php)
+- KMC version: V5.38
+
+#### Configuration ####
+
+**base.ini**
+
+Should verify the following:
+
+- live analytics version v0.1
+- kmc version v5.38 
+
+**local.ini**
+
+Should fill with the WS path:
+ 
+	live_analytics_web_service_url = @LIVE_ANALYTICS_WS@
+
+Should set the live stats host:
+
+	live_stats_host =  <LIVE_STATS_HOST_NAME>
+	live_stats_host_https = <LIVE_STATS_HOST_NAME_HTTPS>
+
+
+#### Deployment Scripts ####
+
+Permission script execution:
+	php deployment\updates\scripts\add_permissions\2014_07_17_live_reports_service.php
+
+#### Apps installation ####
+Install live analytics app by downloading _dist.zip from
+
+	https://github.com/kaltura/LiveAnalytics/releases/tag/0.1
+and unzipping it into 
+
+	/opt/Kaltura/apps/liveanalytics/v0.1/
+
+(discard "_dist" folder)
+Deploy uiconf: 
+
+	<liveanalytics_version>/deploy/config.ini
+
+
+#### Known Issues & Limitations ####
+
+Integration in process.
 
 ## Thumbnail encoder ##
 reverting the current encoder to the old one
@@ -36,12 +280,27 @@ reverting the current encoder to the old one
 
 
 #### Deployment Scripts ####
-None
+None.
+
 
 #### Known Issues & Limitations ####
 None
 
 # IX-9.19.1 #
+
+## add widevine permission to base-playback ##
+- Issue Type: Customer Request
+- Issue ID: PLAT-1741
+
+#### Configuration ####
+None
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_08_21_base_playback_role_add_widevine_permission.php
+
+#### Known Issues & Limitations ####
+None
 
 ## add base-playback user role ##
 - Issue Type: Customer Request
@@ -157,6 +416,31 @@ Currently supported - ‘audio surround layout’. If detected, the FR and FL st
 #### Sample multi-stream configuration stream:
 {"audio":{"mapping":[1,2]}}
 
+
+## Live Cue-Point support ##
+Support cue-point on absolute server time stamp.
+
+
+## Live recording optimization ##
+Record all live assets and manage the recording on the API server side.
+
+- Issue Type: Change Request 
+- Issue ID: PLAT-1367
+- Issue ID: PLAT-1274
+- Issue ID: PLAT-1476
+- Issue ID: SUP-2202
+
+#### Configuration ####
+- `base.ini` already changed to support `max_live_recording_duration_hours` of 24 hours.
+
+#### Media-Server version ####
+- New media-server version [3.0.9](https://github.com/kaltura/media-server/releases/download/rel-3.0.9/KalturaWowzaServer-3.0.9.jar "3.0.9") required. 
+
+#### Deployment Scripts ####
+None
+
+#### Known Issues & Limitations ####
+- The recording duration is limited to 24 hours.
 
 # IX-9.18.0 #
 
@@ -359,7 +643,8 @@ Enable sending periodic live sync points on Kaltura live stream.
 
 *Permissions*
 
-- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestreamservice.php
+- deployment/updates/scripts/2014_03_10_addpushpublishconfigurationaction_added_to_livestream
+- php
 
 
 ## YouTube Captions Upload via SFTP ##

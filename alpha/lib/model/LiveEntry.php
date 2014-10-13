@@ -227,11 +227,17 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("dvr_window", $v);
 	}
 	
+	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
+	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
+
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
 	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
+	
+	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
+	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -532,6 +538,7 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
+		$this->setLastBroadcast(time());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
@@ -548,6 +555,13 @@ abstract class LiveEntry extends entry
 	
 	public function unsetMediaServer($index, $hostname)
 	{
+		if (!$this->validateLiveRecordingStatus())
+		{
+			KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
+			$this->setFirstUnregisterAttemptTimestamp(time());
+			return;	
+		}
+		
 		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getHostname() == $hostname)
 			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
@@ -558,6 +572,16 @@ abstract class LiveEntry extends entry
 	 */
 	public function validateMediaServers()
 	{
+		if (!$this->validateLiveRecordingStatus())
+		{
+			if (time() - $this->getFirstUnregisterAttemptTimestamp() < intval(kConf::get('default_live_recording_timeout')))
+			{
+				KalturaLog::info("Postpone unregister - recorded entry is not ready yet.");
+				return;	
+			}
+		}
+		
+		$this->setFirstUnregisterAttemptTimestamp(null);
 		$listChanged = false;
 		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
@@ -571,6 +595,24 @@ abstract class LiveEntry extends entry
 		}
 		
 		return $listChanged;
+	}
+	
+	protected function validateLiveRecordingStatus ()
+	{
+		if ($this->getDvrStatus() == DVRStatus::ENABLED && $this->getRecordedEntryId())
+		{
+			$recording = entryPeer::retrieveByPK($this->getRecordedEntryId());
+			if ($recording)
+			{
+				if ($recording->getStatus() != entryStatus::READY || !is_null($recording->getReplacingEntryId()))
+				{
+					KalturaLog::info("Recorded entry is not ready yet.");
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -642,6 +684,16 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
 	
+	public function getFirstUnregisterAttemptTimestamp ()
+	{
+		return $this->getFromCustomData('first_unregister_attempt_timestamp',null);
+	}
+	
+	public function setFirstUnregisterAttemptTimestamp ($v)
+	{
+		$this->putInCustomData('first_unregister_attempt_timestamp', $v);
+	}
+	
 	/**
 	 * @return boolean
 	 */
@@ -677,4 +729,6 @@ abstract class LiveEntry extends entry
 			return $value->getHostname();
 		}
 	}
+	
+	
 }

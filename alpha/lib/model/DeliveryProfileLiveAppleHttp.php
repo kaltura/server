@@ -16,6 +16,16 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		return $this->getFromCustomData("disableExtraAttributes");
 	}
 	
+	public function setForceProxy($v)
+	{
+		$this->putInCustomData("forceProxy", $v);
+	}
+	
+	public function getForceProxy()
+	{
+		return $this->getFromCustomData("forceProxy", null, false);
+	}
+	
 	public function checkIsLive( $url )
 	{
 		$urlContent = $this->urlExists($url, kConf::get(self::HLS_LIVE_STREAM_CONTENT_TYPE));
@@ -196,6 +206,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$url = "$playServerHost/p/$partnerId/manifest/master/entryId/$entryId";
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
+
 		if(count($this->params->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
@@ -227,7 +238,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 	protected function doServe($baseUrl, $backupUrl) 
 	{
-		if(!$backupUrl)
+		if((!$backupUrl && !$this->getForceProxy()) || $this->params->getUsePlayServer())
 		{
 			return parent::serve($baseUrl, $backupUrl);
 		}
@@ -237,12 +248,14 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($entry && $entry->getSyncDCs())
 		{
 			$baseUrl = str_replace('_all.smil', '_publish.smil', $baseUrl);
-			$backupUrl = str_replace('_all.smil', '_publish.smil', $backupUrl);
+			if($backupUrl)
+				$backupUrl = str_replace('_all.smil', '_publish.smil', $backupUrl);
 		}
 		
 		$flavors = array();
 		$this->buildM3u8Flavors($baseUrl, $flavors);
-		$this->buildM3u8Flavors($backupUrl, $flavors);
+		if($backupUrl)
+			$this->buildM3u8Flavors($backupUrl, $flavors);
 		
 		usort($flavors, array($this, 'compareFlavors'));
 		

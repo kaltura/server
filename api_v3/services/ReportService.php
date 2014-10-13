@@ -7,6 +7,7 @@
  */
 class ReportService extends KalturaBaseService
 {
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -171,19 +172,53 @@ class ReportService extends KalturaBaseService
 		KalturaFilterPager $pager = null , 
 		$order = null , $objectIds = null )
 	{
+
 		if($reportType == KalturaReportType::PARTNER_USAGE || $reportType == KalturaReportType::VAR_USAGE)
 			$objectIds = $this->validateObjectsAreAllowedPartners($objectIds);
 		
-		$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType , 
+		try {
+			$report = myReportsMgr::getUrlForReportAsCsv( $this->getPartnerId() ,  $reportTitle , $reportText , $headers , $reportType ,
 			$reportInputFilter->toReportsInputFilter() ,
-			$dimension , 
+			$dimension ,
 			$objectIds ,
-			$pager->pageSize , $pager->pageIndex , $order ); 
-	    
+			$pager->pageSize , $pager->pageIndex , $order );
+		}
+		catch(Exception $e){
+			$code = $e->getCode();
+			if ($code == kCoreException::SEARCH_TOO_GENERAL)
+					throw new KalturaAPIException(KalturaErrors::SEARCH_TOO_GENERAL);
+			}
+
 		if ((infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS))
 			$report = str_replace("http://","https://",$report);
 
 		return $report;
+	}
+	
+	/**
+	 *
+	 * Will serve a requested report
+	 * @action serve
+	 * 
+	 * @param string $id - the requested id
+	 * @return string 
+	 */
+	public function serveAction($id) {
+		
+		// KS verification - we accept either admin session or download privilege of the file 
+		$ks = $this->getKs();
+		if(!($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		
+		if(!preg_match('/^[\w-_]*$/', $id))
+			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+		
+		$partner_id = $this->getPartnerId();
+		$folderPath = "/content/reports/$partner_id";
+		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
+		$file_path = "$fullPath/$id";
+		
+		return $this->dumpFile($file_path, 'text/csv');
 	}
 	
 	/**

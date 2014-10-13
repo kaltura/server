@@ -42,6 +42,7 @@ class invalidSessionTableMap extends TableMap {
 		$this->addColumn('KS_VALID_UNTIL', 'KsValidUntil', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('ACTIONS_LIMIT', 'ActionsLimit', 'INTEGER', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

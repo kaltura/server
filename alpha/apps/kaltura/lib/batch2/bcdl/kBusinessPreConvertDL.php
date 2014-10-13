@@ -1478,6 +1478,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		foreach($flavors as $index => $flavor)
 		{
+			/* @var $flavor assetParams */
+			
 			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
 			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
 				continue;
@@ -1506,6 +1508,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$sourceFlavor = $flavor;
 				unset($flavors[$index]);
 				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
+				continue;
+			}
+		
+			if($flavor instanceof liveParams)
+			{
+				unset($flavors[$index]);
+				$ingestedNeeded = true;
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it's ingested recorded live");
 				continue;
 			}
 			

@@ -57,8 +57,8 @@ class Form_Delivery_DeliveryProfileRecognizer extends Zend_Form_SubForm
 	
 	public function getObject($properties) {
 		$objectClass = $properties["objectType"];
-		if($objectClass == "Null")
-			return new Kaltura_Client_Type_UrlRecognizer();
+		if($objectClass == "Null") 
+			return KalturaNull::getInstance();
 		
 		$object = new $objectClass();
 	

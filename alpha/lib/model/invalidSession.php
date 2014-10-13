@@ -14,6 +14,9 @@
  * @subpackage model
  */
 class invalidSession extends BaseinvalidSession {
+	
+	const INVALID_SESSION_TYPE_KS = 0;
+	const INVALID_SESSION_TYPE_SESSION_ID = 1;
 
 	public function getCacheInvalidationKeys()
 	{

@@ -39,6 +39,12 @@ class LiveStreamEntry extends LiveEntry
 	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
 	public function getSecondaryBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryBroadcastingUrl", null, '' );	}
 	
+	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtspBroadcastingUrl" , $v );	}
+	public function getPrimaryRtspBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryRtspBroadcastingUrl" );	}
+	
+	public function setSecondaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtspBroadcastingUrl" , $v );	}
+	public function getSecondaryRtspBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryRtspBroadcastingUrl", null, '' );	}
+	
 	public function getHlsStreamUrl ()
 	{
 	    return $this->getFromCustomData("hls_stream_url");
