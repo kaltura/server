@@ -24,7 +24,7 @@ class KalturaLiveStreamRTMPConfiguration extends KalturaLiveStreamConfiguration
 	
 	private static $mapBetweenObjects = array
 	(
-		"akamaiUser", "akamaiPassword", "akamaiStreamId"
+		"userId", "password", "streamName"
 	);
 	
 	/* (non-PHPdoc)
