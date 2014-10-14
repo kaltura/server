@@ -5,22 +5,22 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStreamAkamaiConfiguration extends KalturaLiveStreamConfiguration
+class KalturaLiveStreamRTMPConfiguration extends KalturaLiveStreamConfiguration
 {
 	/**
 	 * @var string
 	 */
-	public $akamaiUser;
+	public $userId;
 	
 	/**
 	 * @var string
 	 */
-	public $akamaiPassword;
+	public $password;
 	
 	/**
 	 * @var string
 	 */
-	public $akamaiStreamId;
+	public $streamName;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -42,7 +42,7 @@ class KalturaLiveStreamAkamaiConfiguration extends KalturaLiveStreamConfiguratio
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLiveStreamAkamaiConfiguration();
+			$dbObject = new kLiveStreamRTMPConfiguration();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);

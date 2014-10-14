@@ -47,13 +47,13 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 		$entry = entryPeer::retrieveByPK($this->params->getEntryId());
 		if (in_array($entry->getSource(), LiveEntry::$kalturaLiveSourceTypes)) 
 		{
+			/* @var $entry LiveEntry */
 			$flavors = array( 0 => $this->getFlavorAssetInfo($entry->getStreamName()) );
 				
 			$conversionProfileId = $entry->getConversionProfileId();
 			if($conversionProfileId)
 			{
 				$liveParams = assetParamsPeer::retrieveByProfile($conversionProfileId);
-				$liveParams = $this->params->filterFlavorsByTags($liveParams);
 	
 				if(count($liveParams))
 				{
@@ -61,6 +61,12 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 					foreach($liveParams as $index => $liveParamsItem)
 					{
 						/* @var $liveParamsItem liveParams */
+						if($entry->getLiveStreamConfigurationByProtocol(PlaybackProtocol::RTMP, 'http'))
+						{
+							$configuration = $entry->getLiveStreamConfigurationByProtocol(PlaybackProtocol::RTMP, 'http');
+							$flavors[$index] = $this->getFlavorAssetInfo(str_replace("%i", $liveParamsItem->getId(), $configuration->getStreamName()), '', $liveParamsItem);		
+							continue;
+						}
 						$flavors[$index] = $this->getFlavorAssetInfo($entry->getStreamName() . '_' . $liveParamsItem->getId(), '', $liveParamsItem);
   					}
 				}
