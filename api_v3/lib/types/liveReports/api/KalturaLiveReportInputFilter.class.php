@@ -14,27 +14,7 @@ class KalturaLiveReportInputFilter extends KalturaObject
 	/**
 	 * @var time
 	 **/
-	public $eventTime;
-	
-	/**
-	 * @var time
-	 **/
 	public $fromTime;
-	
-	/**
-	 * @var int
-	 **/
-	public $hoursBefore;
-	
-	/**
-	 * @var KalturaNullableBoolean
-	 **/
-	public $live;
-	
-	/**
-	 * @var int
-	 **/
-	public $partnerId;
 	
 	/**
 	 * @var time
@@ -42,9 +22,9 @@ class KalturaLiveReportInputFilter extends KalturaObject
 	public $toTime;
 	
 	/**
-	 * @var int
-	 */
-	public $resultsLimit;
+	 * @var KalturaNullableBoolean
+	 **/
+	public $live;
 	
 	public function getWSObject() {
 		$obj = new WSLiveReportInputFilter();
