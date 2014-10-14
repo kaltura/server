@@ -26,16 +26,6 @@ class KalturaLiveReportInputFilter extends KalturaObject
 	 **/
 	public $live;
 	
-	/**
-	 * @var int
-	 **/
-	public $partnerId;
-	
-	/**
-	 * @var int
-	 */
-	public $resultsLimit;
-	
 	public function getWSObject() {
 		$obj = new WSLiveReportInputFilter();
 		$obj->fromKalturaObject($this);
