@@ -1,6 +1,6 @@
 <?php
 /**
- * A representation of an Akamai live stream configuration
+ * A representation of an RTMP live stream configuration
  * 
  * @package api
  * @subpackage objects
@@ -22,9 +22,14 @@ class KalturaLiveStreamRTMPConfiguration extends KalturaLiveStreamConfiguration
 	 */
 	public $streamName;
 	
+	/**
+	 * @var string
+	 */
+	public $applicationName;
+	
 	private static $mapBetweenObjects = array
 	(
-		"userId", "password", "streamName"
+		"userId", "password", "streamName", "applicationName"
 	);
 	
 	/* (non-PHPdoc)

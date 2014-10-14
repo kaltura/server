@@ -1,6 +1,6 @@
 <?php
 /**
- * Akamai-specific live stream configuration object, containing information regarding the protocol and url of the live stream. 
+ * RTMP-specific live stream configuration object, containing information regarding the protocol and url of the live stream. 
  * 
  * @package Core
  * @subpackage model
@@ -22,6 +22,26 @@ class kLiveStreamRTMPConfiguration extends kLiveStreamConfiguration
 	 * @var string
 	 */
 	protected $streamName;
+	
+	/**
+	 * @var string
+	 */
+	protected $applicationName;
+	
+	/**
+	 * @return the $applicationName
+	 */
+	public function getApplicationName() {
+		return $this->applicationName;
+	}
+
+	/**
+	 * @param string $applicationName
+	 */
+	public function setApplicationName($applicationName) {
+		$this->applicationName = $applicationName;
+	}
+
 	/**
 	 * @return the $userId
 	 */
