@@ -63,7 +63,7 @@ class DeliveryProfileLiveRtmp extends DeliveryProfileLive {
 						/* @var $liveParamsItem liveParams */
 						if($entry->getLiveStreamConfigurationByProtocol(PlaybackProtocol::RTMP, 'rtmp'))
 						{
-							$configuration = $entry->getLiveStreamConfigurationByProtocol(PlaybackProtocol::RTMP, 'http');
+							$configuration = $entry->getLiveStreamConfigurationByProtocol(PlaybackProtocol::RTMP, 'rtmp');
 							$flavors[$index] = $this->getFlavorAssetInfo(str_replace("%i", $liveParamsItem->getId(), $configuration->getStreamName()), '', $liveParamsItem);		
 							continue;
 						}
