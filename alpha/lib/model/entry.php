@@ -3222,5 +3222,20 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		
 		return false;
 	}
+
+	/**
+	 * @return array comma separated ID
+	 */
+	public function getReadyFlavorAssetIds(){
+		$flavorAssetIds = array();
+		$entryFlavors = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->getId(), null, array(flavorAsset::ASSET_STATUS_READY));
+		if ($entryFlavors && is_array($entryFlavors))
+		{
+			foreach($entryFlavors as $entryFlavor){
+				$flavorAssetIds[] = $entryFlavor->getId();
+			}
+		}
+		return $flavorAssetIds;
+	}
 	
 }

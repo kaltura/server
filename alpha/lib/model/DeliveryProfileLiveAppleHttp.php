@@ -55,7 +55,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	{
 		$outLines = array();
 
-		if ( !$content )
+		if ( strpos($content, "#EXTM3U") !== 0 )
 		{
 			return $outLines;
 		}
