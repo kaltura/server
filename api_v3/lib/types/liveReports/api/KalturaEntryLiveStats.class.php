@@ -12,7 +12,7 @@ class KalturaEntryLiveStats extends KalturaLiveStats
 	public $entryId;
 	
 	/**
-	 * @var long
+	 * @var int
 	 */
 	public $peakAudience;
 	
