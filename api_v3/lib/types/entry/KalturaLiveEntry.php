@@ -77,6 +77,11 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	 */
 	public $lastBroadcast;
 	
+	/**
+	 * The time in which the entry broadcast started or 0 when the entry is off the air
+	 * @var int
+	 */
+	public $currentBroadcastStartTime;
 	
 	private static $map_between_objects = array
 	(
@@ -90,6 +95,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		"pushPublishEnabled",
 		"firstBroadcast",
 		"lastBroadcast",
+		"currentBroadcastStartTime",
 	);
 	
 	/* (non-PHPdoc)
