@@ -244,6 +244,15 @@ abstract class LiveEntry extends entry
 		return $this->getFromCustomData("push_publish_enabled", null, false);
 	}
 	
+	public function getEventStartTime()		{ return $this->getFromCustomData( "eventStartTime", null, 0 ); }
+	public function setEventStartTime( $v )	{ $this->putInCustomData( "eventStartTime" , $v ); }
+
+	public function getEventEndTime()		{ return $this->getFromCustomData( "eventEndTime", null, 0 ); }
+	public function setEventEndTime( $v )	{ $this->putInCustomData( "eventEndTime" , $v ); }
+
+	public function getEventTimezone()		{ return $this->getFromCustomData( "eventTimezone", null, 0 ); }
+	public function setEventTimezone( $v )	{ $this->putInCustomData( "eventTimezone" , $v ); }
+
 	public function setPushPublishEnabled($v)
 	{
 		$this->putInCustomData("push_publish_enabled", $v);
