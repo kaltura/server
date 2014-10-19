@@ -4,12 +4,12 @@
  * @subpackage objects
  *
  */
-class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
+class KalturaLiveStreamPushPublishConfigurationArray extends KalturaTypedArray
 {
 	/**
 	 * Returns API array object from regular array of database objects.
 	 * @param array $dbArray
-	 * @return KalturaLiveStreamConfiguration
+	 * @return KalturaLiveStreamPushPublishConfiguration
 	 */
 	public static function fromDbArray(array $dbArray = null)
 	{
@@ -18,8 +18,8 @@ class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 		{
 			foreach($dbArray as $object)
 			{
-				/* @var $object kLiveStreamConfiguration */
-				$configObject = new KalturaLiveStreamConfiguration();
+				/* @var $object kLiveStreamPushPublishConfiguration */
+				$configObject = KalturaLiveStreamPushPublishConfiguration::getInstance($object->getProtocol());
 				$configObject->fromObject($object);
 				$array[] = $configObject;
 			}
@@ -29,7 +29,7 @@ class KalturaLiveStreamConfigurationArray extends KalturaTypedArray
 	
 	public function __construct()
 	{
-		return parent::__construct("KalturaLiveStreamConfiguration");
+		return parent::__construct("KalturaLiveStreamPushPublishConfiguration");
 	}
 	
 	/* (non-PHPdoc)

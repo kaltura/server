@@ -430,7 +430,7 @@ abstract class LiveEntry extends entry
 		
 		if ($this->getPushPublishEnabled())
 		{
-			$pushPublishConfigurations = $this->getPushPublishConfigurations();
+			$pushPublishConfigurations = $this->getPushPublishPlaybackConfigurations();
 			$configurations = array_merge($configurations, $pushPublishConfigurations);
 		}
 		
@@ -639,12 +639,22 @@ abstract class LiveEntry extends entry
 		return $this->getFromCustomData('attached_pending_media_entries', null, array());
 	}
 	
-	public function getPushPublishConfigurations ()
+	public function getPushPublishPlaybackConfigurations ()
 	{
-		return $this->getFromCustomData('push_publish_configurations',null, array());
+		return $this->getFromCustomData('push_publish_playback_configurations',null, array());
 	}
 	
-	public function setPushPublishConfigurations ($v)
+	public function setPushPublishPlaybackConfigurations ($v)
+	{
+		$this->putInCustomData('push_publish_playback_configurations', $v);
+	}
+	
+	public function getPublishConfigurations ()
+	{
+		return $this->getFromCustomData('push_publish_configurations', null, array());
+	}
+	
+	public function setPublishConfigurations ($v)
 	{
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
