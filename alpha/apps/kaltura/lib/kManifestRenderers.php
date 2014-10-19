@@ -142,13 +142,9 @@ abstract class kManifestRenderer
 		$separator = $this->getSeparator();
 		
 		$flavorsString = implode($separator, $flavors);
-		if ($content)
-			$content .= $separator;		
-		$content .= $flavorsString;
+		$content .= $separator.$flavorsString;
 		
-		if ($content)
-			$content .= $separator;		
-		$content .= $footer;
+		$content.=$separator.$footer;
 		echo $content;
 		
 		die;
