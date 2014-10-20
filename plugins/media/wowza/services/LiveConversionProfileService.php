@@ -20,7 +20,7 @@ class LiveConversionProfileService extends KalturaBaseService
 	}
 	
 	/**
-	 * Allows you to add a new KalturaDropFolderFile object
+	 * Serve XML rendition of the Kaltura Live Transcoding Profile usable by the Wowza transcoding add-on
 	 * 
 	 * @action serve
 	 * @param string $streamName the id of the live entry with it's stream suffix

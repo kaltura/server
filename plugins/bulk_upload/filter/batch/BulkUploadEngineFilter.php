@@ -220,9 +220,9 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 				    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
 					$bulkUploadResult->objectStatus = $requestResult['code'];
 					$bulkUploadResult->errorDescription = $requestResult['message'];
-					$this->addBulkUploadResult($bulkUploadResult);
-					continue;					
-				}
+					$this->addBulkUploadResult($bulkUploadResult);	
+					continue;				
+				}				
 			}
 			
 			if($requestResult instanceof Exception)
@@ -233,7 +233,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 					$bulkUploadResult->errorDescription = $requestResult->getMessage();
 					$this->addBulkUploadResult($bulkUploadResult);
 					continue;
-				}
+				}				
 			}
 			
 			// update the results with the new object Id

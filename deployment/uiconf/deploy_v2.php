@@ -202,7 +202,7 @@ class uiConfDeployment
 									$dependUiConfValue = $uiConfIds[$dependencyValue];
 									
 									uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
-								
+									uiConfDeployment::updateFeaturesFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@");
 								}
 								else
 								{
@@ -508,9 +508,11 @@ class uiConfDeployment
 		$conf_file = $uiconf->getConfFile(true);
 		$featuresFile = $uiconf->getConfFileFeatures(true);
 		$newFeatures = str_replace($replacementToken, $replacementString, $featuresFile);
-		$uiconf->setConfFile($conf_file);
-		$uiconf->setConfFileFeatures($newFeatures);
-		$uiconf->save();
+		if ($newFeatures != $featuresFile) {
+			$uiconf->setConfFile($conf_file);
+			$uiconf->setConfFileFeatures($newFeatures);
+			$uiconf->save();
+		}
 	}
 	
 	/**

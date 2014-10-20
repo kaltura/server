@@ -1,42 +1,35 @@
 <?php
 /**
- * A representation of a live stream configuration
+ * A representation of an RTMP live stream configuration
  * 
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStreamConfiguration extends KalturaObject
+class KalturaLiveStreamPushPublishRTMPConfiguration extends KalturaLiveStreamPushPublishConfiguration
 {
 	/**
-	 * @var KalturaPlaybackProtocol
+	 * @var string
 	 */
-	public $protocol;
+	public $userId;
 	
 	/**
 	 * @var string
 	 */
-	public $url;
-	
-	/**
-	 * @var string
-	 * @deprecated
-	 */
-	public $publishUrl;
-	
-	/**
-	 * @var string
-	 * @deprecated
-	 */
-	public $backupUrl;
+	public $password;
 	
 	/**
 	 * @var string
 	 */
 	public $streamName;
 	
+	/**
+	 * @var string
+	 */
+	public $applicationName;
+	
 	private static $mapBetweenObjects = array
 	(
-		"protocol", "url", "publishUrl", "backupUrl", "streamName",
+		"userId", "password", "streamName", "applicationName"
 	);
 	
 	/* (non-PHPdoc)
@@ -54,11 +47,9 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLiveStreamConfiguration();
+			$dbObject = new kLiveStreamPushPublishRTMPConfiguration();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
-
-	
 }

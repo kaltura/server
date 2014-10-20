@@ -142,6 +142,15 @@ class kBusinessPostConvertDL
 		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
 		
+		if($currentFlavorAsset->getIsOriginal())
+		{
+			$entry = $currentFlavorAsset->getentry();
+			if($entry)
+			{
+				kBusinessConvertDL::checkForPendingLiveClips($entry);
+			}
+		}
+		
 		return $currentFlavorAsset;
 	}
 	
@@ -216,6 +225,7 @@ class kBusinessPostConvertDL
 		KalturaLog::debug("required flavor params ids [" . print_r($requiredFlavorParamsIds, true) . "]");
 		
 		// go over all the flavor assets of the entry
+		$entry = $currentFlavorAsset->getentry();
 		$inCompleteFlavorIds = array();
 		$origianlAssetFlavorId = null;
 		$siblingFlavorAssets = assetPeer::retrieveFlavorsByEntryId($currentFlavorAsset->getEntryId());
@@ -232,6 +242,12 @@ class kBusinessPostConvertDL
 					
 				continue;
 			}
+			
+			if($entry->getReplacedEntryId() && $siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_QUEUED)
+			{
+				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete and in replacement");
+				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
+			}
 				
 			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset, $profile);
 			
@@ -246,8 +262,8 @@ class kBusinessPostConvertDL
 			        KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
 				    $inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
 			    }
-			}			
-			
+			}		
+
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is ignored");
@@ -313,7 +329,7 @@ class kBusinessPostConvertDL
 			{
 			    // mark the context root job as finished only if all conversion jobs are completed
     			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-    			
+				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}
