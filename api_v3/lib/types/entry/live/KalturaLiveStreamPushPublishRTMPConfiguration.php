@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStreamRTMPConfiguration extends KalturaLiveStreamConfiguration
+class KalturaLiveStreamPushPublishRTMPConfiguration extends KalturaLiveStreamPushPublishConfiguration
 {
 	/**
 	 * @var string
@@ -47,7 +47,7 @@ class KalturaLiveStreamRTMPConfiguration extends KalturaLiveStreamConfiguration
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLiveStreamRTMPConfiguration();
+			$dbObject = new kLiveStreamPushPublishRTMPConfiguration();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);

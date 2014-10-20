@@ -454,7 +454,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
 			
 		/* @var $entry LiveEntry */
-		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		$pushPublishConfigurations = $entry->getPushPublishPlaybackConfigurations();
 
 		$configuration = null;
 		if ($url)
@@ -472,7 +472,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($configuration)
 		{
 			$pushPublishConfigurations[] = $configuration;
-			$entry->setPushPublishConfigurations($pushPublishConfigurations);
+			$entry->setPushPublishPlaybackConfigurations($pushPublishConfigurations);
 			$entry->save();
 		}
 		
@@ -497,7 +497,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID);
 		
 		/* @var $entry LiveEntry */
-		$pushPublishConfigurations = $entry->getPushPublishConfigurations();
+		$pushPublishConfigurations = $entry->getPushPublishPlaybackConfigurations();
 		foreach ($pushPublishConfigurations as $index => $config)
 		{
 			/* @var $config kLiveStreamConfiguration */
@@ -507,7 +507,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 		}
 
-		$entry->setPushPublishConfigurations($pushPublishConfigurations);
+		$entry->setPushPublishPlaybackConfigurations($pushPublishConfigurations);
 		$entry->save();
 		
 		$apiEntry = KalturaEntryFactory::getInstanceByType($entry->getType());
