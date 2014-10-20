@@ -297,13 +297,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
-			
 			if($this->currentItem < $startIndex)
 			{
 				$this->currentItem++;
 				continue;
 			}
-				
 			
 			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 				return;
