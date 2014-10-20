@@ -19,7 +19,7 @@ class KalturaLiveStreamPushPublishConfigurationArray extends KalturaTypedArray
 			foreach($dbArray as $object)
 			{
 				/* @var $object kLiveStreamPushPublishConfiguration */
-				$configObject = KalturaLiveStreamPushPublishConfiguration::getInstance($object->getProtocol());
+				$configObject = KalturaLiveStreamPushPublishConfiguration::getInstance(get_class($object));
 				$configObject->fromObject($object);
 				$array[] = $configObject;
 			}

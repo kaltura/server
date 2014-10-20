@@ -14,11 +14,6 @@ class kLiveStreamPushPublishConfiguration
 	/**
 	 * @var string
 	 */
-	protected $protocol;
-	
-	/**
-	 * @var string
-	 */
 	protected $port;
 	/**
 	 * @return the $publishUrl

@@ -18,18 +18,13 @@ class KalturaLiveStreamPushPublishConfiguration extends KalturaObject
 	public $backupPublishUrl;
 	
 	/**
-	 * @var KalturaPlaybackProtocol
-	 */
-	public $protocol;
-	
-	/**
 	 * @var string
 	 */
 	public $port;
 	
 	private static $mapBetweenObjects = array
 	(
-		"publishUrl", "backupPublishUrl" , "protocol" , "port",
+		"publishUrl", "backupPublishUrl" , "port",
 	);
 	
 	/* (non-PHPdoc)
@@ -53,11 +48,11 @@ class KalturaLiveStreamPushPublishConfiguration extends KalturaObject
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
-	public static function getInstance ($protocol)
+	public static function getInstance ($className)
 	{
-		switch ($protocol)
+		switch ($className)
 		{
-			case PlaybackProtocol::RTMP:
+			case 'kLiveStreamPushPublishRTMPConfiguration':
 				return new KalturaLiveStreamPushPublishRTMPConfiguration();
 			default:
 				return new KalturaLiveStreamPushPublishConfiguration();
