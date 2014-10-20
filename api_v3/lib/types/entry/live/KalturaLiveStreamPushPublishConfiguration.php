@@ -1,42 +1,30 @@
 <?php
 /**
- * A representation of a live stream configuration
- * 
+ * Basic push-publish configuration for Kaltura live stream entry
  * @package api
  * @subpackage objects
+ *
  */
-class KalturaLiveStreamConfiguration extends KalturaObject
+class KalturaLiveStreamPushPublishConfiguration extends KalturaObject
 {
 	/**
-	 * @var KalturaPlaybackProtocol
-	 */
-	public $protocol;
-	
-	/**
 	 * @var string
-	 */
-	public $url;
-	
-	/**
-	 * @var string
-	 * @deprecated
 	 */
 	public $publishUrl;
 	
 	/**
 	 * @var string
-	 * @deprecated
 	 */
-	public $backupUrl;
+	public $backupPublishUrl;
 	
 	/**
 	 * @var string
 	 */
-	public $streamName;
+	public $port;
 	
 	private static $mapBetweenObjects = array
 	(
-		"protocol", "url", "publishUrl", "backupUrl", "streamName",
+		"publishUrl", "backupPublishUrl" , "port",
 	);
 	
 	/* (non-PHPdoc)
@@ -54,11 +42,20 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLiveStreamConfiguration();
+			$dbObject = new kLiveStreamPushPublishConfiguration();
 		}
 		
 		return parent::toObject($dbObject, $propsToSkip);
 	}
-
 	
+	public static function getInstance ($className)
+	{
+		switch ($className)
+		{
+			case 'kLiveStreamPushPublishRTMPConfiguration':
+				return new KalturaLiveStreamPushPublishRTMPConfiguration();
+			default:
+				return new KalturaLiveStreamPushPublishConfiguration();
+		}
+	}
 }

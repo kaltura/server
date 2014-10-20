@@ -11,6 +11,11 @@ class KalturaEntryLiveStats extends KalturaLiveStats
 	 **/
 	public $entryId;
 	
+	/**
+	 * @var int
+	 */
+	public $peakAudience;
+	
 	public function getWSObject() {
 		$obj = new WSEntryLiveStats();
 		$obj->fromKalturaObject($this);

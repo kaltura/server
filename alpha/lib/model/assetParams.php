@@ -52,6 +52,7 @@ class assetParams extends BaseassetParams
 	const TAG_INGEST = "ingest";
 	const TAG_ISM_MANIFEST = "ism_manifest";
 	const TAG_SMIL_MANIFEST = "smil_manifest";
+	const TAG_RECORDING_ANCHOR = 'recording_anchor';
 
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	

@@ -11,6 +11,11 @@ class kConvertLiveSegmentJobData extends kJobData
 	private $entryId;
 	
 	/**
+	 * @var string
+	 */
+	private $assetId;
+	
+	/**
 	 * @var int
 	 */
 	private $mediaServerIndex;
@@ -129,5 +134,21 @@ class kConvertLiveSegmentJobData extends kJobData
 	public function setFileIndex($fileIndex)
 	{
 		$this->fileIndex = $fileIndex;
+	}
+	
+	/**
+	 * @return the $assetId
+	 */
+	public function getAssetId()
+	{
+		return $this->assetId;
+	}
+
+	/**
+	 * @param string $assetId
+	 */
+	public function setAssetId($assetId)
+	{
+		$this->assetId = $assetId;
 	}
 }

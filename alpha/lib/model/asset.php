@@ -87,6 +87,9 @@ class asset extends Baseasset implements ISyncableFile
 	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 	const FILE_SYNC_ASSET_SUB_TYPE_ISM = 3;
 	const FILE_SYNC_ASSET_SUB_TYPE_ISMC = 4;
+	
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY = 5; 
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY = 6;
 
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
@@ -296,7 +299,7 @@ class asset extends Baseasset implements ISyncableFile
 	}
 	
 	
-	private static function validateFileSyncSubType ( $sub_type )
+	protected static function validateFileSyncSubType ( $sub_type )
 	{
 		$valid_sub_types = array(
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET,
@@ -308,13 +311,28 @@ class asset extends Baseasset implements ISyncableFile
 			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
 	}
 	
+	protected function getVersionForSubType($sub_type, $version = null)
+	{
+		switch ($sub_type)
+		{
+			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+				return $this->getVersion();
+				
+			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
+				return $this->getLogFileVersion();
+		}
+		return null;
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#getSyncKey()
 	 */
 	public function getSyncKey($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType($sub_type);
+		static::validateFileSyncSubType($sub_type);
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::FLAVOR_ASSET;
 		$key->object_sub_type = $sub_type;
@@ -325,17 +343,7 @@ class asset extends Baseasset implements ISyncableFile
 		}
 		else
 		{
-			switch ($sub_type)
-			{
-				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
-					$key->version = $this->getVersion();
-					break;
-				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
-					$key->version = $this->getLogFileVersion();
-					break;
-			}
+			$key->version = $this->getVersionForSubType($sub_type);
 		}
 		$key->partner_id = $this->getPartnerId();
 		
@@ -349,7 +357,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		
 		$entry = $this->getentry();
 		if(!$entry)
@@ -388,8 +396,8 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFilePathArr($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
-		$version = (is_null($version) ? $this->getVersion() : $version);
+		static::validateFileSyncSubType ( $sub_type );
+		$version = (is_null($version) ? $this->getVersionForSubType($sub_type) : $version);
 		
 		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
 		if(!$entry)

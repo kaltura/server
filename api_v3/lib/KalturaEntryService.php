@@ -297,24 +297,27 @@ class KalturaEntryService extends KalturaBaseService
 		$offset = null;
 		$duration = null;
 		$requiredDuration = null;
-		
+		$clipAttributes = null;
 		if(is_array($operationAttributes))
 		{
 			foreach($operationAttributes as $operationAttributesItem)
 			{
 				if($operationAttributesItem instanceof kClipAttributes)
 				{
+					$clipAttributes = $operationAttributesItem;
+					
 					// convert milliseconds to seconds
-					$offset = $operationAttributesItem->getOffset() / 1000;
-					$duration = $operationAttributesItem->getDuration() / 1000;
+					$offset = $operationAttributesItem->getOffset();
+					$duration = $operationAttributesItem->getDuration();
 					$requiredDuration = $offset + $duration;
 				}
 			}
 		}
 		
 		$dbLiveEntry = $resource->getEntry();
+		$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
 		
-		if($requiredDuration)
+		if(!$dbRecordedEntry || ($requiredDuration && $requiredDuration > $dbRecordedEntry->getLengthInMsecs()))
 		{
 			$mediaServer = $dbLiveEntry->getMediaServer(true);
 			if(!$mediaServer)
@@ -331,24 +334,67 @@ class KalturaEntryService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaErrors::MEDIA_SERVER_SERVICE_NOT_FOUND, $mediaServer->getId(), MediaServer::WEB_SERVICE_LIVE);
 			}
+			return $dbAsset;
 		}
-		elseif($dbLiveEntry->isConvertingSegments())
+		
+		$dbRecordedAsset = assetPeer::retrieveOriginalReadyByEntryId($dbRecordedEntry->getId());
+		if(!$dbRecordedAsset)
 		{
-			$dbLiveEntry->attachPendingMediaEntry($dbEntry, $requiredDuration, $offset, $duration);
-			$dbLiveEntry->save();
+			$dbRecordedAssets = assetPeer::retrieveReadyFlavorsByEntryId($dbRecordedEntry->getId());
+			$dbRecordedAsset = array_pop($dbRecordedAssets);
+		}
+		/* @var $dbRecordedAsset flavorAsset */
+		
+		$isNewAsset = false;
+		if(!$dbAsset)
+		{
+			$isNewAsset = true;
+ 			KalturaLog::debug("Creating original flavor asset for recorded live");
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+		}
+		
+		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
+		{
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+			$dbEntry->save();
+		}
+		
+		$sourceSyncKey = $dbRecordedAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		
+		$dbAsset->setFileExt($dbRecordedAsset->getFileExt());
+		$dbAsset->save();
+		
+		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		
+		try {
+			kFileSyncUtils::createSyncFileLinkForKey($syncKey, $sourceSyncKey);
+		}
+		catch (Exception $e) {
+			
+			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
+
+			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$dbAsset->save();												
+			throw $e;
+		}
+		
+
+		if($requiredDuration)
+		{
+			$errDescription = '';
+ 			kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $clipAttributes->getAssetParamsId(), $errDescription, $dbAsset->getId(), array($clipAttributes));
 		}
 		else
 		{
-			$key = $dbLiveEntry->getSyncKey(LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY);
-			if(!kFileSyncUtils::file_exists($key))
-				$key = $dbLiveEntry->getSyncKey(LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY);
-			if(!kFileSyncUtils::file_exists($key))
-				throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-			
-			$files = kFileSyncUtils::dir_get_files($key);
-			kJobsManager::addConcatJob(null, $dbAsset, $files, $offset, $duration);
+			if($isNewAsset)
+				kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		}
-		
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
+			
 		return $dbAsset;
 	}
 	

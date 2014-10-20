@@ -55,7 +55,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	{
 		$outLines = array();
 
-		if ( !$content )
+		if ( strpos($content, "#EXTM3U") !== 0 )
 		{
 			return $outLines;
 		}
@@ -206,6 +206,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$url = "$playServerHost/p/$partnerId/manifest/master/entryId/$entryId";
 		if($uiConfId)
 			$url .= '/uiConfId/' . $uiConfId;
+
 		if(count($this->params->getPlayerConfig()))
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
