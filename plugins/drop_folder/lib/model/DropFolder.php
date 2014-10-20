@@ -24,6 +24,7 @@ class DropFolder extends BaseDropFolder
 	const METADATA_PROFILE_ID = 'metadata_profile_id';
 	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
 	const ENFORCE_ENTITLEMENT = 'enforce_entitlement';
+	const SHOULD_VALIDATE_KS = 'should_validate_ks';
 	
 	// -------------------------------------
 	// -- Default values -------------------
@@ -182,6 +183,22 @@ class DropFolder extends BaseDropFolder
 	public function setIncremental($v)
 	{
 		$this->putInCustomData(self::INCREMENTAL, $v);
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getShouldValidateKS()
+	{
+		return $this->getFromCustomData(self::SHOULD_VALIDATE_KS);
+	}
+	
+	/**
+	 * @param bool $v
+	 */
+	public function setShouldValidateKS($v)
+	{
+		$this->putInCustomData(self::SHOULD_VALIDATE_KS, $v);
 	}
 	
 	/**
