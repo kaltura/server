@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS delivery_profile;
 CREATE TABLE delivery_profile
 (
         id BIGINT  NOT NULL AUTO_INCREMENT,
