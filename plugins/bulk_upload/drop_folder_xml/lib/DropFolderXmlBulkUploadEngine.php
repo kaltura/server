@@ -21,11 +21,15 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	private $fileTransferMgr = null;
 	
 	/**
-	 *
 	 * @var array
 	 */
 	private $contentResourceNameToIdMap = null;
 	
+	/**
+	 * XML provided KS info
+	 * @var KalturaSessionInfo
+	 */
+	private $ksInfo = null;
 	
 	public function __construct(KalturaBatchJob $job)
 	{
@@ -234,5 +238,52 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 			KalturaLog::debug("Changing owner of file [$filepath] to [$chown_name]");
 			@chown($filepath, $chown_name);
 		}
+	}
+	
+	protected function validate()
+	{
+		$isValid = parent::validate();
+		
+		if($this->dropFolder->shouldValidateKS){
+			$this->validateKs();		
+		}
+		
+		return $isValid;
+	}
+	
+	protected function validateKs()
+	{
+		//Retrieve the KS from within the XML
+		$xdoc = new SimpleXMLElement($this->xslTransform($this->data->filePath));
+		$xmlKs = $xdoc->ks;
+		
+		//Get session info
+		KBatchBase::impersonate($this->currentPartnerId);
+		try{
+			$this->ksInfo = KBatchBase::$kClient->session->get($xmlKs);	
+		}
+		catch (Exception $e){
+			KBatchBase::unimpersonate();
+			throw new KalturaBatchException("KS [$xmlKs] validation failed for [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
+		KBatchBase::unimpersonate();
+		
+		//validate ks is still valid
+		$currentTime = time();
+		if($currentTime > $this->ksInfo->expiry){
+			throw new KalturaBatchException("KS validation failed for [{$this->job->id}], ks provided in XML Expired", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
+	}
+	
+	/**
+	 * Validates the given item's user id is identical to the user id on the KS
+	 * @param SimpleXMLElement $item
+	 */
+	protected function validateItem(SimpleXMLElement $item)
+	{
+		if($item->userId != $this->ksInfo->userId)
+			throw new KalturaBulkUploadXmlException("KS user ID [" . $this->ksInfo->userId . "] does not match item user ID [" . $item->userId . "]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			
+		parent::validateItem($item);
 	}
 }
