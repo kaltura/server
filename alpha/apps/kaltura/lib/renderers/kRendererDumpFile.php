@@ -41,7 +41,7 @@ class kRendererDumpFile implements kRendererBase
 		
 		if ($this->fileSize && $this->fileSize < self::CACHE_FILE_CONTENTS_MAX_SIZE)
 		{
-			$this->fileData = file_get_contents($this->filePath);
+			 $this->fileData = file_get_contents($this->filePath, false , null , -1, $limitFileSize);
 		}
 	}
 	
