@@ -3,7 +3,6 @@
 	<variables>
 		<variable name="partnerId">{prompt:Partner ID:}</variable>
 		<variable name="metadataProfileId">{prompt:Metadata profile:}</variable>
-		<variable name="archiveCategoryId">{prompt:Archive Category ID:}</variable>
 	</variables>
 	<config>
 		<serviceUrl>http://{prompt:Host name:}/</serviceUrl>
