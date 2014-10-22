@@ -1,3 +1,25 @@
+# IX-9.19.6 #
+
+##add partner to 'exclude' list##
+- Issue Type: Customer request
+- Issue ID: SUP-2935
+
+#### Configuration ####
+
+**local.ini**
+
+under 'global_whitelisted_domains_exclude'
+
+		12 = 520641
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.5 #
 
 ##add attachment service permissions to base-playback##
