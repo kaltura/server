@@ -255,7 +255,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	protected function validateKs()
 	{
 		//Retrieve the KS from within the XML
-		$xdoc = new SimpleXMLElement($this->xslTransform($this->data->filePath));
+		$xdoc = new SimpleXMLElement($this->xslTransformedContent);
 		$xmlKs = $xdoc->ks;
 		
 		//Get session info
@@ -283,10 +283,22 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	protected function validateItem(SimpleXMLElement $item)
 	{
 		if($this->dropFolder->shouldValidateKS){
-			if($item->userId != $this->ksInfo->userId)
-				throw new KalturaBulkUploadXmlException("KS user ID [" . $this->ksInfo->userId . "] does not match item user ID [" . $item->userId . "]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			if(!isset($item->userId) && $this->ksInfo->sessionType == KalturaSessionType::USER)
+				throw new KalturaBulkUploadXmlException("Drop Folder is set with KS validation but no user id was provided", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			if($item->userId != $this->ksInfo->userId && $this->ksInfo->sessionType == KalturaSessionType::USER)
+				throw new KalturaBulkUploadXmlException("Drop Folder is set with KS validation, KS user ID [" . $this->ksInfo->userId . "] does not match item user ID [" . $item->userId . "]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 			
 		parent::validateItem($item);
+	}
+	
+	protected function createEntryFromItem(SimpleXMLElement $item, $type = null)
+	{
+		$entry = parent::createEntryFromItem($item, $type);
+		
+		if($this->dropFolder->shouldValidateKS && !isset($entry->userId))
+			$entry->userId = $this->ksInfo->userId;
+			
+		return $entry;
 	}
 }
