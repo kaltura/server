@@ -26,6 +26,11 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	 */
 	private $contentResourceNameToIdMap = null;
 	
+	/**
+	 * XML provided KS info
+	 * @var KalturaSessionInfo
+	 */
+	private $ksInfo = null;
 	
 	public function __construct(KalturaBatchJob $job)
 	{
@@ -234,5 +239,66 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 			KalturaLog::debug("Changing owner of file [$filepath] to [$chown_name]");
 			@chown($filepath, $chown_name);
 		}
+	}
+	
+	protected function validate()
+	{
+		$isValid = parent::validate();
+		
+		if($this->dropFolder->shouldValidateKS){
+			$this->validateKs();		
+		}
+		
+		return $isValid;
+	}
+	
+	protected function validateKs()
+	{
+		//Retrieve the KS from within the XML
+		$xdoc = new SimpleXMLElement($this->xslTransformedContent);
+		$xmlKs = $xdoc->ks;
+		
+		//Get session info
+		KBatchBase::impersonate($this->currentPartnerId);
+		try{
+			$this->ksInfo = KBatchBase::$kClient->session->get($xmlKs);	
+		}
+		catch (Exception $e){
+			KBatchBase::unimpersonate();
+			throw new KalturaBatchException("KS [$xmlKs] validation failed for [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
+		KBatchBase::unimpersonate();
+		
+		//validate ks is still valid
+		$currentTime = time();
+		if($currentTime > $this->ksInfo->expiry){
+			throw new KalturaBatchException("KS validation failed for [{$this->job->id}], ks provided in XML Expired", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
+	}
+	
+	/**
+	 * Validates the given item's user id is identical to the user id on the KS
+	 * @param SimpleXMLElement $item
+	 */
+	protected function validateItem(SimpleXMLElement $item)
+	{
+		if($this->dropFolder->shouldValidateKS){
+			if(!isset($item->userId) && $this->ksInfo->sessionType == KalturaSessionType::USER)
+				throw new KalturaBulkUploadXmlException("Drop Folder is set with KS validation but no user id was provided", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			if($item->userId != $this->ksInfo->userId && $this->ksInfo->sessionType == KalturaSessionType::USER)
+				throw new KalturaBulkUploadXmlException("Drop Folder is set with KS validation, KS user ID [" . $this->ksInfo->userId . "] does not match item user ID [" . $item->userId . "]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+			
+		parent::validateItem($item);
+	}
+	
+	protected function createEntryFromItem(SimpleXMLElement $item, $type = null)
+	{
+		$entry = parent::createEntryFromItem($item, $type);
+		
+		if($this->dropFolder->shouldValidateKS && !isset($entry->userId))
+			$entry->userId = $this->ksInfo->userId;
+			
+		return $entry;
 	}
 }
