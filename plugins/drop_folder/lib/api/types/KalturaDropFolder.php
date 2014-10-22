@@ -160,9 +160,9 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	*/
 	public $enforceEntitlement;
 	
-	/*
-	 * @var bool
-	 */
+	/**
+	* @var bool
+	*/
 	public $shouldValidateKS;
 	
 	/*
