@@ -7,7 +7,9 @@
 #### Configuration ####
 
 **local.ini**
+
 under 'global_whitelisted_domains_exclude'
+
 		12 = 520641
 
 #### Deployment Scripts ####
