@@ -236,6 +236,9 @@ abstract class LiveEntry extends entry
 	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
+	public function setCurrentBroadcastStartTime( $v )	{ $this->putInCustomData ( "currentBroadcastStartTime" , $v ); }
+	public function getCurrentBroadcastStartTime()		{ return $this->getFromCustomData( "currentBroadcastStartTime", null, 0 ); }
+
 	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
 	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
