@@ -46,9 +46,9 @@ None.
 
 #### Configuration ####
 
-**configurations\sphinx\kaltura.conf**
+Make sure configurations\sphinx\kaltura.conf is updated and the line - 
 rt_field = user_names
-under kaltura_entry
+is added under kaltura_entry part
 
 #### Deployment Scripts ####
 
