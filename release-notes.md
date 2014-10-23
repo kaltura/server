@@ -20,6 +20,26 @@ None.
 
 None.
 
+##add new XML drop folder configuration - KS validation##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1978
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 2
+
+#### Deployment Scripts ####
+
+php deployment/updates/scripts/add_permissions/2014_10_20_update_session_service_permissions.php to update batch permissions.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.5 #
 
 ##add attachment service permissions to base-playback##
