@@ -799,3 +799,12 @@ define command{
 	command_line		@PHP_BIN@ @APP_DIR@/plugins/monitor/nagios/exec.php --warning-threshold 55 --script "@APP_DIR@/tests/monitoring/api_v3/play.php --service-url $HOSTADDRESS$ --entry-reference-id MEDIA_WEB_QUALITY --protocol @ENVIRONMENT_PROTOCOL@ --format http"
 }
 
+define command{
+        command_name check_api_v3_log
+        command_line $USER1$/check_log -F /opt/kaltura/log/kaltura_api_v3.log -O /opt/kaltura/tmp/kaltura_api_v3.log -q "ERR:|PHP|trace|CRIT|\[error\]"
+}
+
+define command{
+        command_name check_kaltura_apache_log
+        command_line $USER1$/check_log -F /opt/kaltura/log/kaltura_apache_errors.log -O /opt/kaltura/tmp/kaltura_apache_errors.log -q "PHP|\[error\]"
+}

@@ -1410,3 +1410,21 @@ define	service{
 		check_command					kaltura-play-http
 		notifications_enabled			1
 }
+
+
+define service{
+		use                             local-service         
+		hostgroup_name                  front-servers
+		service_description             API v3 log check
+		check_command                   check_api_v3_log
+		notifications_enabled           1
+        }
+
+define service{
+		use                             local-service         
+		hostgroup_name                  front-servers
+		service_description             kaltura Apache Vhost log check
+		check_command                   check_kaltura_apache_log
+		notifications_enabled           1
+        }
+
