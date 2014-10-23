@@ -99,6 +99,7 @@ class entryIndex extends BaseIndexObject
 				'creator_kuser_id' => 'creatorKuserId',
 				'creator_puser_id' => 'creatorPuserId',
 				'dynamic_attributes' => 'dynamicAttributes',
+				'user_names' => 'userNames',
 			);
 		}
 		return self::$fieldsMap;
@@ -160,6 +161,7 @@ class entryIndex extends BaseIndexObject
 				'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 				'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
+				'user_names' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
@@ -250,6 +252,7 @@ class entryIndex extends BaseIndexObject
 				'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
 				'entry.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
 				'entry.FIRST_BROADCAST' => 'dynamic_attributes.first_broadcast',
+				'entry.USER_NAMES' => 'user_names',
 				'entry.PLUGINS_DATA' => 'plugins_data',
 				'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
 			);
