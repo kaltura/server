@@ -40,6 +40,25 @@ under 'KAsyncBulkUpload'
 
 None.
 
+##Added user names column to Kaltura_entry table on sphinx##
+- Issue Type: Customer request
+- Issue ID: PLAT-1973
+
+#### Configuration ####
+
+Make sure configurations\sphinx\kaltura.conf is updated and the line - 
+rt_field = user_names
+is added under kaltura_entry part
+
+#### Deployment Scripts ####
+
+None.
+As it requires adding a sphinx column, kaltura_entry must be re-populated.
+
+#### Known Issues & Limitations ####
+
+won't be updated when a user changes his first name / last name or screen name.
+
 # IX-9.19.5 #
 
 ##add attachment service permissions to base-playback##
