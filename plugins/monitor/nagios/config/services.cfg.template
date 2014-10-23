@@ -1418,7 +1418,7 @@ define service{
 		service_description			        API v3 log check
 		check_command					check_api_v3_log
 		notifications_enabled			1
-        }
+}
 
 define service{
 		use						local-service
@@ -1426,5 +1426,20 @@ define service{
 		service_description				kaltura Apache Vhost log check
 		check_command					check_kaltura_apache_log
 		notifications_enabled			1
-        }
+}
 
+define service{
+		use						local-service
+		host_name					@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Check MySQL Connectivity to Kaltura DB
+		check_command					check_kaltura_mysql
+		notifications_enabled			1
+}
+
+define service{
+		use						local-service
+		host_name					@KALTURA_VIRTUAL_HOST_NAME@
+		service_description				Check MySQL Connectivity to Kaltura DWH DB
+		check_command					check_kaltura_dwh_mysql
+		notifications_enabled			1
+}
