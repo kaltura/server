@@ -34,7 +34,7 @@ under 'KAsyncBulkUpload'
 
 #### Deployment Scripts ####
 
-php deployment/updates/scripts/add_permissions/2014_10_20_update_session_service_permissions.php to update batch permissions.
+	php deployment/updates/scripts/add_permissions/2014_10_20_update_session_service_permissions.php to update batch permissions.
 
 #### Known Issues & Limitations ####
 
