@@ -47,7 +47,7 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		sort($imagesList);
 		$imagesListXML = new SimpleXMLElement('<'.self::LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
-			if($image == "xmlFile.xml")
+			if($image == self::METADATA_XML_NAME)
 				continue;
     		$imageNode = $imagesListXML->addChild(self::LIST_XML_LABEL_ITEM);
     		$imageNode->addChild(self::LIST_XML_LABEL_NAME, $image);

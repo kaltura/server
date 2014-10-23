@@ -19,7 +19,7 @@ class KDLTranscoderPpt2Img extends KDLOperatorBase{
 		
 		$cmdStr .= ' -inputFile=' . KDLCmdlinePlaceholders::InFileName;
 		$cmdStr .= ' -imagesfolder=' . KDLCmdlinePlaceholders::OutFileName;
-		$cmdStr .= ' -xmlFile=' .  KDLCmdlinePlaceholders::OutFileName . DIRECTORY_SEPARATOR . "xmlFile.xml";
+		$cmdStr .= ' -xmlFile=' .  KDLCmdlinePlaceholders::OutFileName . DIRECTORY_SEPARATOR . "metadata.xml";
 		$cmdStr .= ' -slideWidth=' . $target->_image->_sizeWidth;
 		return $cmdStr;
 	}
