@@ -802,9 +802,9 @@ define command{
 
 
 # the following commands use the standard nagios plugins available from the EPEL repo:
-# nagios-plugins-log-1.4.16-10.el6.x86_64
-# nagios-plugins-ntp-1.4.16-10.el6.x86_64
-# nagios-plugins-mysql-1.4.16-10.el6.x86_64
+# nagios-plugins-log
+# nagios-plugins-ntp
+# nagios-plugins-mysql
 
 
 define command{
