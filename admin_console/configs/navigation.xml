@@ -114,7 +114,12 @@
 				<label>APC</label>
 				<controller>index</controller>
 				<action>apc</action>
-			</apc>
+			</apc>			
+            <memcache>
+				<label>Memcache</label>
+				<controller>index</controller>
+				<action>memcache</action>
+			</memcache>
 			<client-libs>
 				<label>API Client Libraries</label>
 				<controller>index</controller>
