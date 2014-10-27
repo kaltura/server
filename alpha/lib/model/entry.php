@@ -3248,6 +3248,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$userNames[] = $kuser->getLastName();
 		$userNames[] = $kuser->getScreenName();
 		
-		return implode(" ", $pieces);
+		return implode(" ", $userNames);
 	}
 }
