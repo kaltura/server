@@ -31,6 +31,7 @@ $html5Version = 'v2.20.rc5';
 		var ks = null;
 		var lastSyncPointTime = null;
 		var lastSyncPointOffset = null;
+		var lastSyncPointTimestamp = null;
 
 		function loadPlayer(){
 			var entryId = $('#txtEntryId').val();
@@ -139,9 +140,10 @@ $html5Version = 'v2.20.rc5';
 			var date = new Date();
 			lastSyncPointTime = date.getTime();
 			lastSyncPointOffset = metadata.offset;
+			lastSyncPointTimestamp = metadata.timestamp;
 
 			$('#btnSendAd').removeAttr('disabled');
-			log('Ads Enabled last offset:' + lastSyncPointOffset);
+			log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
 		}
 		
 		function enableAds(){
