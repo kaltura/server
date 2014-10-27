@@ -8,6 +8,16 @@ class Form_Delivery_DeliveryProfileGenericRtmp extends Form_Delivery_DeliveryPro
 	
 	public function getAdvancedSettings()
 	{
+		$this->addElement('text', 'prefix', array(
+				'label'			=> 'Prefix:',
+				'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('checkbox', 'enforceRtmpe', array(
+				'label'			=> 'Enforce RtmpE:',
+				'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'pattern', array(
 				'label'			=> 'Pattern:',
 				'filters'		=> array('StringTrim'),
@@ -18,7 +28,7 @@ class Form_Delivery_DeliveryProfileGenericRtmp extends Form_Delivery_DeliveryPro
 				'filters'		=> array('StringTrim'),
 		));
 		
-		return array('pattern', 'rendererClass');
+		return array('prefix', 'enforceRtmpe', 'pattern', 'rendererClass');
 	}
 	
 }
