@@ -39,6 +39,65 @@ Requires adding a new windows worker. Sample configuration -
 #### Known Issues & Limitations ####
 None.
 
+##add partner to 'exclude' list##
+- Issue Type: Customer request
+- Issue ID: SUP-2935
+
+#### Configuration ####
+
+**local.ini**
+
+under 'global_whitelisted_domains_exclude'
+
+		12 = 520641
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+##add new XML drop folder configuration - KS validation##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1978
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 2
+
+#### Deployment Scripts ####
+
+	php deployment/updates/scripts/add_permissions/2014_10_20_update_session_service_permissions.php to update batch permissions.
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Added user names column to Kaltura_entry table on sphinx##
+- Issue Type: Customer request
+- Issue ID: PLAT-1973
+
+#### Configuration ####
+
+Make sure configurations\sphinx\kaltura.conf is updated and the line - 
+rt_field = user_names
+is added under kaltura_entry part
+
+#### Deployment Scripts ####
+
+None.
+As it requires adding a sphinx column, kaltura_entry must be re-populated.
+
+#### Known Issues & Limitations ####
+
+won't be updated when a user changes his first name / last name or screen name.
+
 # IX-9.19.5 #
 
 ##add attachment service permissions to base-playback##

@@ -59,7 +59,8 @@
 						]]>
 					</xslt>
 				</item>
-				<item objectType="KalturaDeleteLocalContentObjectTask" />
+                <item objectType="KalturaDeleteLocalContentObjectTask">
+                </item>
 			</objectTasks>
 		</scheduledTaskProfile>
 	</request>
