@@ -617,7 +617,7 @@ class nusoap_parser extends nusoap_base {
 			}
 			$ret = is_array($params) ? $params : array();
 			$this->debug('in buildVal, return:');
-			$this->appendDebug($this->varDump($ret));
+			//$this->appendDebug($this->varDump($ret));
 			return $ret;
 		} else {
         	$this->debug('in buildVal, no children, building scalar');
