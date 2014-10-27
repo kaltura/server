@@ -211,7 +211,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$url .= '/playerConfig/' . $this->params->getPlayerConfig();
 			
 		// TODO encrypt the manifest URL
-		return "$url?url=$manifestUrl";
+		return "$url/a.m3u8?url=$manifestUrl";
 	}
 	
 	public function compareFlavors($a, $b) 
