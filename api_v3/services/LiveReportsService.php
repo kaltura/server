@@ -31,10 +31,14 @@ class LiveReportsService extends KalturaBaseService
 		$wsPager = new WSLiveReportInputPager($pager->pageSize, $pager->pageIndex);
 		
 		$wsResult = $client->getEvents($reportType, $wsFilter, $wsPager);
-		$objects = $wsResult->objects;
 		$resultsArray = array();
-		foreach($objects as $result) {
-			$resultsArray[$result->timestamp] = $result->value;
+		$objects = explode(";", $wsResult->objects);
+		foreach($objects as $object) {
+			if(empty($object))
+				continue;
+			
+			$parts = explode(",", $object);
+			$resultsArray[$parts[0]] = $parts[1];
 		}
 		
 		$kResult = KalturaReportGraphArray::fromReportDataArray(array("audience" => $resultsArray));
