@@ -205,10 +205,50 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedEntry->setPartnerId($dbEntry->getPartnerId());
 		$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 		$recordedEntry->save();
+
+		$recordedEntryId = $recordedEntry->getId();
 		
-		$dbEntry->setRecordedEntryId($recordedEntry->getId());
+		$dbEntry->setRecordedEntryId($recordedEntryId);
 		$dbEntry->save();
-		
+
+		$liveEntryId = $dbEntry->getId();
+		$partnerId = $dbEntry->getPartnerId();
+
+		$metadataProfiles = MetadataProfilePeer::retrieveAllActiveByPartnerId($partnerId);
+		foreach ($metadataProfiles as $metadataProfile)
+		{
+			$originMetadataObj = MetadataPeer::retrieveByObject($metadataProfile->getId() , MetadataObjectType::ENTRY , $liveEntryId);
+			if ($originMetadataObj)
+			{
+				$metadataProfileId = $metadataProfile->getId();
+				$metadataProfileVersion = $metadataProfile->getVersion();
+
+				$destMetadataObj = new Metadata();
+
+				$destMetadataObj->setPartnerId($partnerId);
+				$destMetadataObj->setMetadataProfileId($metadataProfileId);
+				$destMetadataObj->setMetadataProfileVersion($metadataProfileVersion);
+				$destMetadataObj->setObjectType(MetadataObjectType::ENTRY);
+				$destMetadataObj->setObjectId($recordedEntryId);
+				$destMetadataObj->setStatus(KalturaMetadataStatus::VALID);
+
+				$originMetadataKey = $originMetadataObj->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+				$originXml = kFileSyncUtils::file_get_contents($originMetadataKey, true, false);
+
+				// validate object exists
+				$object = kMetadataManager::getObjectFromPeer($destMetadataObj);
+				if($object)
+					$destMetadataObj->save();
+				else
+				{
+					KalturaLog::err('invalid object type');
+					continue;
+				}
+
+				$destMetadataKey = $destMetadataObj->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+				kFileSyncUtils::file_put_contents($destMetadataKey, $originXml);
+			}
+		}
 		return $recordedEntry;
 	}
 

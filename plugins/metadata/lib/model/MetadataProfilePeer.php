@@ -57,8 +57,20 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 		
 		return $ret;
 	}
+	
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("metadataProfile:id=%s", self::ID), array("metadataProfile:partnerId=%s", self::PARTNER_ID));		
 	}
+	
+	public static function retrieveAllActiveByPartnerId($partnerId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(MetadataProfilePeer::PARTNER_ID, $partnerId);
+
+		$profiles = MetadataProfilePeer::doSelect($criteria, $con);
+
+		return $profiles;
+	}
+	
 } // MetadataProfilePeer
