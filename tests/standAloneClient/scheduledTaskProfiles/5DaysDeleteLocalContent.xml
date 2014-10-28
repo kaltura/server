@@ -12,13 +12,13 @@
 		<userAgent>Stand alone php 1.0.0</userAgent>
 	</config>
 	<session />
-	<!-- 24 Months Archive -->
+	<!-- 5 Days Delte Local Content -->
 	<request service="scheduledTaskProfile" action="add" plugin="scheduledTask" partnerId="{variable:partnerId}">
 		<scheduledTaskProfile objectType="KalturaScheduledTaskProfile">
-			<name>24 Months Archive</name>
+			<name>5 Days Delete Local Content</name>
 			<objectFilterEngineType>1</objectFilterEngineType>
 			<objectFilter objectType="KalturaMediaEntryFilter">
-				<createdAtLessThanOrEqual>{php:return -3*24*60*60;}</createdAtLessThanOrEqual>
+				<createdAtLessThanOrEqual>{php:return -5*24*60*60;}</createdAtLessThanOrEqual>
 				<advancedSearch objectType="KalturaSearchOperator">
 					<type>1</type>
 					<items objectType="array">
