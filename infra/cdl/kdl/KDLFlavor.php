@@ -270,6 +270,21 @@ $plannedDur = 0;
 			}
 		}
 
+		/*
+		 * Allow conversion and fixing of invalidly muxed WEB-CAM recordecd files - 
+		 * - FLV/Sorenson/Nellimossr
+		 * - very HUGE duration
+		 * - very LOW bitrate - about several bits-per-sec.
+		 * In such cases the 'duration validation' is un-applicable
+		 *
+		if(isset($srcVid) && $srcVid->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) 
+		&& isset($srcAud) && $srcAud->IsFormatOf(array('nellymoser')) && $cDur>0 && isset($srcCont->_fileSize)){
+			if($srcCont->_fileSize*8000/$cDur<KDLSanityLimits::MinBitrate) {
+				KalturaLog::log("Invalid WEB-CAM source file. Duration validation is un-applicable");
+				return true;
+			}
+		}
+		*/
 		if($this->_video!==null) {
 			if($product->_video===null){
 				$product->_errors[KDLConstants::VideoIndex][] = KDLErrors::ToString(KDLErrors::MissingMediaStream);
@@ -608,6 +623,7 @@ $plannedDur = 0;
 					$targetVid->_id = KDLVideoTarget::H264;
 					break;
 				case KDLContainerTarget::MP4:
+				case KDLContainerTarget::M4V:
 					$targetVid->_id = KDLVideoTarget::H264;
 					break;
 				case KDLContainerTarget::MOV:
@@ -1083,6 +1099,7 @@ $plannedDur = 0;
 			if($target->_container!=null) {
 				switch($target->_container->_id){
 					case KDLContainerTarget::MP4:
+					case KDLContainerTarget::M4V:
 					case KDLContainerTarget::_3GP:
 						$targetAud->_id=KDLAudioTarget::AAC;
 						break;
@@ -1208,8 +1225,10 @@ $plannedDur = 0;
 			 * - Nellimoser audio source
 			 * - Low sample-rate audio (<16000hz)
 			 * - target other than OGG/Vorbis
+			 * DO-NOT try to resample on 'copy' cases - it can not be done
 			 */
 		if(!$target->_container->IsFormatOf(array(KDLContainerTarget::OGG,KDLContainerTarget::OGV))
+		&& !$targetAud->IsFormatOf(array(KDLAudioTarget::COPY))
 		&& ($source->IsFormatOf(array('nellymoser'))||($source->_sampleRate && $source->_sampleRate>0 && $source->_sampleRate<16000))) {
 			$targetAud->_useResampleFilter = true;
 		}
