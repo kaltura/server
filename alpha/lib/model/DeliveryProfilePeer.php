@@ -372,6 +372,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		$deliveryProfileTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, self::LIVE_DELIVERY_PROFILE);
 		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);
+		
+		$key = array_search(self::LIVE_DELIVERY_PROFILE, $deliveryProfileTypes);
+		unset($deliveryProfileTypes[$key]);
+		
 		return $deliveryProfileTypes;
 	}
 	
