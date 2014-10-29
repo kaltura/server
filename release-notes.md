@@ -1,3 +1,22 @@
+# IX-9.19.7 #
+
+##added read permissions to delivery profiles##
+- Issue Type: Customer request
+- Issue ID: PLAT-2021
+
+#### Configuration ####
+
+requires adding the permission to the required user roles.
+
+#### Deployment Scripts ####
+
+execute:
+	php deployment/updates/scripts/add_permissions/2014_10_29_read_permissions_delivery_profiles.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.6 #
 
 ##add partner to 'exclude' list##
