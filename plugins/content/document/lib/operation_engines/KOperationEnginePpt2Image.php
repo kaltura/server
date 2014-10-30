@@ -43,7 +43,7 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 	
 	// The returned xml will be stored in the images directory. it than can be downloaded by he user with serveFlavorAction and provide him
 	// information about the created images.
-	private function createImagesListXML($imagesList, $ignoreList){
+	private function createImagesListXML($imagesList){
 		sort($imagesList);
 		$imagesListXML = new SimpleXMLElement('<'.self::LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
