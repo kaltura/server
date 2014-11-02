@@ -3238,4 +3238,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $flavorAssetIds;
 	}
 	
+	public function getUserNames() {
+		$kuser = $this->getkuser();
+		if(!$kuser)
+			return "";
+		
+		$userNames = array();
+		$userNames[] = $kuser->getFirstName();
+		$userNames[] = $kuser->getLastName();
+		$userNames[] = $kuser->getScreenName();
+		
+		return implode(" ", $userNames);
+	}
 }

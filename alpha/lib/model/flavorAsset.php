@@ -284,4 +284,11 @@ class flavorAsset extends asset
 		$url .= "?clientTag=$clientTag";
 		return $url;
 	}
+	
+	public function estimateFileSize(entry $entry, $seconds) {
+		$orginalSizeKB = $this->getSize();
+		$size = $orginalSizeKB * ($seconds / ($entry->getLengthInMsecs() / 1000)) * 1.2;
+		$size = min($orginalSizeKB, floor($size)) * 1024;
+		return $size;
+	}
 }

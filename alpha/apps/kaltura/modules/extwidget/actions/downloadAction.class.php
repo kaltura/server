@@ -5,6 +5,7 @@
  */
 class downloadAction extends sfAction
 {
+	
 	/**
 	 * Will forward to the regular swf player according to the widget_id 
 	 */
@@ -57,9 +58,14 @@ class downloadAction extends sfAction
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.download', $entry->getPartnerId());
 		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
-			
+		
+		$shouldPreview = false;
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer, ContextType::DOWNLOAD);
-		$securyEntryHelper->validateForDownload();
+		if ($securyEntryHelper->shouldPreview()) { 
+			$shouldPreview = true;
+		} else { 
+			$securyEntryHelper->validateForDownload();
+		}
 		
 		$flavorAsset = null;
 
@@ -89,7 +95,14 @@ class downloadAction extends sfAction
 				}
 			}
 		}
-
+		
+		$preview = 0;
+		if($shouldPreview) {
+			$preview = $flavorAsset->estimateFileSize($entry, $securyEntryHelper->getPreviewLength());
+		} else if(kCurrentContext::$ks_object) {
+			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
+		}
+		
 		// Gonen 26-04-2010: in case entry has no flavor with 'mbr' tag - we return the source
 		if(!$flavorAsset && ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO))
 		{
@@ -128,7 +141,7 @@ class downloadAction extends sfAction
 		//enable downloading file_name which inside the flavor asset directory 
 		if(is_dir($filePath))
 			$filePath = $filePath.DIRECTORY_SEPARATOR.$fileName;
-		$this->dumpFile($filePath, $fileName);
+		$this->dumpFile($filePath, $fileName, $preview);
 		
 		KExternalErrors::dieGracefully(); // no view
 	}
@@ -187,7 +200,7 @@ class downloadAction extends sfAction
 		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
 	}
 	
-	private function dumpFile($file_path, $file_name)
+	private function dumpFile($file_path, $file_name, $limit_file_size = 0)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
@@ -218,7 +231,7 @@ class downloadAction extends sfAction
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 				
 			$mime_type = kFile::mimeType($file_path);
-			kFileUtils::dumpFile($file_path, $mime_type);
+			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size);
 		}
 	}
 	

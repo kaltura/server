@@ -4,7 +4,7 @@ if(!isset($_GET['partnerId']))
 
 $partnerId = $_GET['partnerId'];
 
-$html5Version = 'v2.13.rc1';
+$html5Version = 'v2.20.rc5';
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -31,6 +31,7 @@ $html5Version = 'v2.13.rc1';
 		var ks = null;
 		var lastSyncPointTime = null;
 		var lastSyncPointOffset = null;
+		var lastSyncPointTimestamp = null;
 
 		function loadPlayer(){
 			var entryId = $('#txtEntryId').val();
@@ -59,7 +60,7 @@ $html5Version = 'v2.13.rc1';
 			$('#lblUrl').html(html);
 
 			loadAdminPlayer(hdsUrl);
-			loadUserPlayer(entryId, stitchedUrl);
+			loadUserPlayer(entryId, uiConfId);
 			startSession();
 		}
 
@@ -88,28 +89,20 @@ $html5Version = 'v2.13.rc1';
 			});
 		}
 
-		function loadUserPlayer(entryId, url){
-			mw.setConfig('Kaltura.LeadWithHTML5', true);
-			mw.setConfig('EmbedPlayer.ForceKPlayer', true);
-			mw.setConfig('LeadWithHLSOnFlash', true);
-
-			mw.setConfig('EmbedPlayer.ReplaceSources', [{
-				type : 'application/vnd.apple.mpegurl',
-				src : url
-			}]);
-			
-			kWidget.embed({
-				sourceType: 'url', // TODO remove
-				targetId: 'userPlayerContainer',
-				wid: '_' + partnerId,
-				uiconf_id: 11601127,
-				entry_id: entryId,
-				flashvars: {
-					confFilePath: '{libPath}/modules/KalturaSupport/tests/confFiles/jsonConfig.json',
-					autoPlay: true
-				},
-				cache_st: 1387835968
-			});
+		function loadUserPlayer(entryId, uiConfId){
+            mw.setConfig('LeadWithHLSOnFlash', true);
+            mw.setConfig('Kaltura.LeadWithHTML5', true);
+            kWidget.embed({
+                    targetId: 'userPlayerContainer',
+                    wid: '_' + partnerId,
+                    "uiconf_id": uiConfId,
+                    "flashvars": {
+                            "streamerType": "auto",
+                            autoPlay: true
+                    },
+                    "cache_st": 1410340114,
+                    "entry_id": entryId
+            });
 		}
 
 		function loadAdminPlayer(url){
@@ -147,9 +140,10 @@ $html5Version = 'v2.13.rc1';
 			var date = new Date();
 			lastSyncPointTime = date.getTime();
 			lastSyncPointOffset = metadata.offset;
+			lastSyncPointTimestamp = metadata.timestamp;
 
 			$('#btnSendAd').removeAttr('disabled');
-			log('Ads Enabled last offset:' + lastSyncPointOffset);
+			log('Ads Enabled last offset:' + lastSyncPointOffset + ' last timestamp: ' + lastSyncPointTimestamp);
 		}
 		
 		function enableAds(){
@@ -185,38 +179,81 @@ $html5Version = 'v2.13.rc1';
 		function sendAd(){
 			var date = new Date();
 			var timeSinceLastSyncPoint = date.getTime() - lastSyncPointTime;
-			var startTime = lastSyncPointOffset + timeSinceLastSyncPoint;
 
 			var entryId = $('#txtEntryId').val();
 			var adUrl = $('#txtAdUrl').val();
 			var duration = $('#txtAdDuration').val();
+			var cuePointType = $('#cuePointType').val();
 
-			$.ajax(
-				'/api_v3/index.php/service/cuePoint_cuePoint/action/add', {
-				data: {
-					format: 1,
-					ks: ks,
-					'cuePoint:objectType': 'KalturaAdCuePoint',
-					'cuePoint:entryId': entryId,
-					'cuePoint:startTime': startTime,
-					'cuePoint:protocolType': 'VPAID',
-					'cuePoint:sourceUrl': adUrl,
-					'cuePoint:adType': 1, // VIDEO
-					'cuePoint:title': 'Test Cue-Point',
-					'cuePoint:duration': duration
-				},
-				error: function(jqXHR, textStatus, errorThrown){
-					alert(errorThrown);
-				},
-				success: function(data, textStatus, jqXHR){
-					if(data.code && data.message){
-						alert(data.message);
-						return;
+			if(cuePointType == 'offset'){
+				var startTime = lastSyncPointOffset + timeSinceLastSyncPoint;
+				$.ajax(
+						'/api_v3/index.php/service/cuePoint_cuePoint/action/add', {
+						data: {
+							format: 1,
+							ks: ks,
+							'cuePoint:objectType': 'KalturaAdCuePoint',
+							'cuePoint:entryId': entryId,
+							'cuePoint:startTime': startTime,
+							'cuePoint:protocolType': 'VPAID',
+							'cuePoint:sourceUrl': adUrl,
+							'cuePoint:adType': 1, // VIDEO
+							'cuePoint:title': 'Test Cue-Point',
+							'cuePoint:duration': duration
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							alert(errorThrown);
+						},
+						success: function(data, textStatus, jqXHR){
+							if(data.code && data.message){
+								alert(data.message);
+								return;
+							}
+
+							log('Cue-Point created [' + data.id + '] startTime [' + startTime + '] timeSinceLastSyncPoint [' + timeSinceLastSyncPoint +']');
+						}
+					});
+			}
+			else{
+				var delay = $('#txtAdDelay').val();
+				var triggeredAt = (lastSyncPointTimestamp + timeSinceLastSyncPoint + parseInt(delay)) / 1000;
+
+				$.ajax(
+					'/api_v3/index.php/service/cuePoint_cuePoint/action/add', {
+					data: {
+						format: 1,
+						ks: ks,
+						'cuePoint:objectType': 'KalturaAdCuePoint',
+						'cuePoint:entryId': entryId,
+						'cuePoint:triggeredAt': triggeredAt,
+						'cuePoint:protocolType': 'VPAID',
+						'cuePoint:sourceUrl': adUrl,
+						'cuePoint:adType': 1, // VIDEO
+						'cuePoint:title': 'Test Cue-Point',
+						'cuePoint:duration': duration
+					},
+					error: function(jqXHR, textStatus, errorThrown){
+						alert(errorThrown);
+					},
+					success: function(data, textStatus, jqXHR){
+						if(data.code && data.message){
+							alert(data.message);
+							return;
+						}
+
+						log('Cue-Point created [' + data.id + '] triggeredAt [' + triggeredAt + '] timeSinceLastSyncPoint [' + timeSinceLastSyncPoint +']');
 					}
+				});
+			}
+		}
 
-					log('Cue-Point created [' + data.id + '] startTime [' + startTime + '] timeSinceLastSyncPoint [' + timeSinceLastSyncPoint +']');
-				}
-			});
+		function selectCuePointType(type){
+			if(type == 'offset'){
+				$('#txtAdDelay').attr("disabled", "disabled");
+			}
+			else{
+				$('#txtAdDelay').removeAttr("disabled");
+			}
 		}
 
 		function log(log){
@@ -281,6 +318,18 @@ $html5Version = 'v2.13.rc1';
 			<td>Ad Duration (milliseconds):</td>
 			<td><input type="text" id="txtAdDuration" value="15000" />
 		</td>
+		<tr>
+			<td>Cue point type:</td>
+			<td>
+				<select id="cuePointType" onchange="selectCuePointType(this.options[this.selectedIndex].value)">
+  					<option value="offset" selected>Offset</option>
+  					<option value="time">Timestamp</option>
+				</select>
+		</td>
+		<tr>			
+			<td>Add cue point in (milliseconds):</td>
+			<td><input type="text" id="txtAdDelay" value="300000" disabled="disabled"/>			
+		</td>	
 		<tr>
 			<td colspan="2">
 				<input id="btnSendAd" type="button" onclick="sendAd()" disabled="disabled" value="Big Red Button" style="background-color: red; height: 50px; font-size: 15pt;" />

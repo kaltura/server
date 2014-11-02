@@ -69,7 +69,7 @@ class KObjectTaskDeleteLocalContentEngine extends KObjectTaskEntryEngineBase
 		catch(Exception $ex)
 		{
 			$this->unimpersonate();
-			KalturaLog::err($ex);
+			KalturaLog::err($ex->getMessage());
 			KalturaLog::err("Failed to delete local content of flavor id [$id]");
 		}
 	}

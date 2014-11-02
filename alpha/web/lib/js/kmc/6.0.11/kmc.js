@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2014-10-01
+/*! KMC - v6.0.11 - 2014-10-20
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4181,8 +4181,9 @@ kmc.utils = {
 					moduleName : tab,
 					subtab : subtab
 				};
-                $("#kcms")[0].gotoPage(go_to);
-                kmc.utils.verifyUploadVisible(go_to.moduleName);
+                if (!kmc.utils.verifyUploadVisible(go_to.moduleName)) {
+					$("#kcms")[0].gotoPage(go_to);
+				}
                 return false;
 			});
 		} else {
@@ -4197,7 +4198,9 @@ kmc.utils = {
                 $("#kcms")[0].gotoPage({"moduleName":"content", "subtab":"manage"});
                 $("#kcms")[0].gotoPage({"moduleName":"add"});
             }
+			return true;
         }
+		return false;
     },
 	setTab : function(module, resetAll){
 		if( resetAll ) {$("#kmcHeader ul li a").removeClass("active");}
