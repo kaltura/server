@@ -11,12 +11,19 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		try 
+		try
 		{
-			$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
-			if($object->getStatus() == DropFolderFileStatus::PENDING)
+			if ( $object instanceof DropFolderFile )
 			{
-				$this->onContentDropFolderFileStatusChangedToPending($folder, $object);
+				$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+				if($object->getStatus() == DropFolderFileStatus::PENDING)
+				{
+					$this->onContentDropFolderFileStatusChangedToPending($folder, $object);
+				}
+			}
+			elseif ( $object instanceof entry )
+			{
+				$this->onEntryStatusChanged($object);
 			}
 		}
 		catch(Exception $e)
@@ -43,6 +50,12 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 						return true;
 				}
 			}			
+			elseif(	$object instanceof entry
+					&& in_array(entryPeer::STATUS, $modifiedColumns)
+					&& ($object->getStatus() == entryStatus::READY || $object->getStatus() == entryStatus::ERROR_CONVERTING) )
+			{
+				return true;
+			}
 		}
 		catch(Exception $e)
 		{
@@ -122,7 +135,18 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+				$newStatus = DropFolderFileStatus::HANDLED;
+
+				$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+				if ( $dropFolder
+						&& $dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY )
+				{
+					// Shift the state to PROCESSING until the associated entry will reach the READY (or ERROR_CONVERTING) state
+					KalturaLog::info("Shifting drop folder file id [{$dropFolderFile->getId()}] from status [{$dropFolderFile->getStatus()}] to PROCESSING due to AUTO_DELETE_WHEN_ENTRY_IS_READY policy"); 
+					$newStatus = DropFolderFileStatus::PROCESSING;
+				}
+
+				$dropFolderFile->setStatus($newStatus);
 				$dropFolderFile->save();
 				break;
 			case BatchJob::BATCHJOB_STATUS_FAILED:
@@ -233,7 +257,70 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 		
 		return false;
 	}
-	
+
+	/**
+	 * Convert all drop folder files' status from PROCESSING to HANDLED/DELETED in case of DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY
+	 * 
+	 * Note that if the entry reached entryStatus::ERROR_CONVERTING, then the drop folder files' 
+	 * conversions already failed, so there's no need to change their status (thus they won't be handled here).  
+	 *  
+	 * @param entry $entry
+	 */
+	private function onEntryStatusChanged( $entry )
+	{
+		// Handle only files that are still in the PROCESSING state, which were left
+		// in this state due to AUTO_DELETE_WHEN_ENTRY_IS_READY delete policy.
+		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryIdPartnerIdAndStatuses($entry->getId(), $entry->getPartnerId(), array(DropFolderFileStatus::PROCESSING));
+		$dropFolderIdToDropFolderCache = array();
+
+		$entryStatus = $entry->getStatus();
+
+		foreach ( $dropFolderFiles as $dropFolderFile )
+		{
+			$newDropFolderFileStatus = null;
+
+			if ( $entryStatus == entryStatus::ERROR_CONVERTING )
+			{
+				$newDropFolderFileStatus = DropFolderFileStatus::ERROR_HANDLING;
+			}
+			elseif ( $entryStatus == entryStatus::READY )
+			{
+				// Get the associated drop folder
+				$dropFolderId = $dropFolderFile->getDropFolderId();
+				if ( key_exists( $dropFolderId, $dropFolderIdToDropFolderCache ) )
+				{
+					$dropFolder = $dropFolderIdToDropFolderCache[ $dropFolderId ];
+				}
+				else
+				{
+					$dropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
+					$dropFolderIdToDropFolderCache[ $dropFolderId ] = $dropFolder;
+				}
+
+				if ( $dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE_WHEN_ENTRY_IS_READY )
+				{
+					if ( $dropFolder->getAutoFileDeleteDays() == 0 )
+					{
+						$newDropFolderFileStatus = DropFolderFileStatus::DELETED; // Mark for immediate deletion
+					}
+					else
+					{
+						$newDropFolderFileStatus = DropFolderFileStatus::HANDLED;
+					}
+				}
+			}
+
+			KalturaLog::info("Entry id [{$entry->getId()}] status [{$entryStatus}], drop folder file id [{$dropFolderFile->getId()}] status [{$dropFolderFile->getStatus()}] => ["
+								. ($newDropFolderFileStatus ? $newDropFolderFileStatus : "{$dropFolderFile->getStatus()} (unchanged)") . "]");
+
+			if ( $newDropFolderFileStatus )
+			{
+				$dropFolderFile->setStatus( $newDropFolderFileStatus );
+				$dropFolderFile->save();
+			}
+		}
+	}
+
 	/**
 	 * Check if all required files for the given ingestion profile are in the drop folder.
 	 */

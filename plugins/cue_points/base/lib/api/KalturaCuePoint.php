@@ -53,6 +53,12 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $updatedAt;
+
+	/**
+	 * @var time
+	 * @filter gte,lte,order
+	 */
+	public $triggeredAt;
 	
 	/**
 	 * @var string
@@ -118,6 +124,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 		"forceStop",
 		"thumbOffset",
 		"systemName",
+		"triggeredAt",
 	);
 	
 	public function getMapBetweenObjects()
@@ -175,7 +182,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	 */
 	public function validateParentId($cuePointId = null)
 	{
-		if ($this->parentId === null || $this->parentId === "" || $this->parentId === "0")
+		if ($this->isNull('parentId'))
 			$this->parentId = 0;
 			
 		if ($this->parentId !== 0)
@@ -204,39 +211,59 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 	}
 	
 	/*
-	 * @param string $cuePointId
+	 * @param CuePoint $cuePoint
 	 * @throw KalturaAPIException
 	 */
-	public function validateEndTime($cuePointId = null)
+	public function validateEndTime(CuePoint $cuePoint = null)
 	{
-		if(($this->startTime === null) && ($this->endTime !== null))
-				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
-		
-		if ($this->endTime === null)
-			$this->endTime = $this->startTime;
+		if(is_null($this->startTime) && $cuePoint && $cuePoint->getStartTime())
+			$this->startTime = $cuePoint->getStartTime();
 			
-		if($this->endTime < $this->startTime)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
-		
-		if($cuePointId !== null)
+		if(is_null($this->triggeredAt) && $cuePoint && $cuePoint->getTriggeredAt())
+			$this->triggeredAt = $cuePoint->getTriggeredAt();
+			
+		if($this->startTime)
 		{
-			$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
-			if(!$dbCuePoint)
-				throw new KalturaAPIException(KalturaCuePointErrors::INVALID_OBJECT_ID, $cuePointId);
+			if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
+				$this->endTime = $this->startTime;
 				
-			$dbEntry = entryPeer::retrieveByPK($dbCuePoint->getEntryId());
+			if(!is_null($this->endTime) && $this->endTime < $this->startTime)
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		}
+		elseif($this->triggeredAt)
+		{
+			if ($this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
+				$this->duration = 0;
+				
+			if($this->duration && $this->duration < 0)
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		}
+		else
+		{
+			if(!$this->isNull('duration') || !$this->isNull('endTime'))
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
+		}
+		
+		if($cuePoint)
+		{
+			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
 		}
 		else //add
 		{ 
 			$dbEntry = entryPeer::retrieveByPK($this->entryId);
-			if (!$dbEntry)
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		
-		if($dbEntry->getLengthInMsecs() && $dbEntry->getLengthInMsecs() < $this->endTime)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->endTime, $dbEntry->getLengthInMsecs());	
+		if($dbEntry->getType() != entryType::LIVE_STREAM
+			&& $dbEntry->getLengthInMsecs())
+		{
+			if($this->endTime && $dbEntry->getLengthInMsecs() < $this->endTime)
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->endTime, $dbEntry->getLengthInMsecs());
+				
+			if($this->duration && $dbEntry->getLengthInMsecs() < $this->duration)
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->duration, $dbEntry->getLengthInMsecs());
+		}	
 	}
 	
 	/*
@@ -265,7 +292,8 @@ abstract class KalturaCuePoint extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
 		
-		if($dbEntry->getLengthInMsecs() && $dbEntry->getLengthInMsecs() < $this->startTime)
+		if($dbEntry->getType() != entryType::LIVE_STREAM
+			&& $dbEntry->getLengthInMsecs() && $dbEntry->getLengthInMsecs() < $this->startTime)
 			throw new KalturaAPIException(KalturaCuePointErrors::START_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->startTime, $dbEntry->getLengthInMsecs());
 	}
 	

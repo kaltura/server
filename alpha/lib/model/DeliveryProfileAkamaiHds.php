@@ -7,6 +7,16 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 		$this->DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
 	}
 	
+	public function setSupportClipping($v)
+	{
+		$this->putInCustomData("supportClipping", $v);
+	}
+	 
+	public function getSupportClipping()
+	{
+		return $this->getFromCustomData("supportClipping", null, true);
+	}
+	
 	protected function doGetFlavorAssetUrl(flavorAsset $flavorAsset)
 	{
 		$url = parent::doGetFlavorAssetUrl($flavorAsset);
@@ -34,14 +44,32 @@ class DeliveryProfileAkamaiHds extends DeliveryProfileHds {
 	 */
 	protected function getSecureHdUrl()
 	{
+		$params = array();
+		if($this->getSupportClipping()) {
+			$seekStart = $this->params->getSeekFromTime();
+			$seekEnd = $this->params->getClipTo();
+			
+			if($seekStart != -1) {
+				$params['start'] = floor($this->params->getSeekFromTime() / 1000);
+				$this->params->setSeekFromTime(-1);
+			} else if($seekEnd) {
+					$params['start'] = 0;
+			}
+				
+			if($seekEnd) {
+				$params['end'] = ceil($this->params->getClipTo() / 1000);
+				$this->params->setClipTo(null);
+			}
+		}
+			
 		$flavors = $this->buildHttpFlavorsArray();
-		$flavor = AkamaiDeliveryUtils::getHDN2ManifestUrl($flavors, $this->params->getMediaProtocol(), $this->getUrl(), '/manifest.f4m', '/z');
+		$flavor = AkamaiDeliveryUtils::getHDN2ManifestUrl($flavors, $this->params->getMediaProtocol(), $this->getUrl(), '/manifest.f4m', '/z', $params);
 		if (!$flavor)
 		{
 			KalturaLog::debug(get_class() . ' failed to find flavor');
 			return null;
 		}
-
+		
 		return $flavor;
 	}
 	

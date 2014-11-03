@@ -3,6 +3,6 @@
  * @package Scheduler
  * @subpackage Conversion
  */
-class KOperationEngineFfmpegVp8  extends KSingleOutputOperationEngine
+class KOperationEngineFfmpegVp8  extends KOperationEngineFfmpeg
 {
 }

@@ -5,6 +5,8 @@
  */
 class kmcAction extends kalturaAction
 {
+	const BASE64_ENCODE_CHARS_REGEX = "/^[a-zA-Z0-9\/\+\=]+$/";
+	
 	public function execute ( ) 
 	{
 		// Prevent the page fron being embeded in an iframe
@@ -13,6 +15,13 @@ class kmcAction extends kalturaAction
 		// Check if user already logged in and redirect to kmc2
 		if( $this->getRequest()->getCookie('kmcks') ) {
 			$this->redirect('kmc/kmc2');
+		}
+
+		if ((infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS) && kConf::get('kmc_secured_login'))
+		{
+			$url = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+			header('Location:' . $url);
+			die;
 		}
 
 		$this->www_host = kConf::get('www_host');
@@ -34,7 +43,14 @@ class kmcAction extends kalturaAction
 		}
 		
 		$this->beta = $this->getRequestParameter( "beta" );
-		$this->setPassHashKey = $this->getRequestParameter( "setpasshashkey" );
+
+		//prevent script injections - allow only base64_encode chars , which is used when creating A new hash key
+		$passHashparam = $this->getRequestParameter( "setpasshashkey" );
+		if ($passHashparam && !preg_match(self::BASE64_ENCODE_CHARS_REGEX , $passHashparam))
+			KExternalErrors::dieError(KExternalErrors::INVALID_HASH);
+
+		$this->setPassHashKey = $passHashparam;
+
 		$this->hashKeyErrorCode = null;
 		$this->displayErrorFromServer = false;
 		if ($this->setPassHashKey) {

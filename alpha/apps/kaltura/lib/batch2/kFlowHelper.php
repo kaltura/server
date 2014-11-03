@@ -247,50 +247,105 @@ class kFlowHelper
 	 */
 	public static function handleConvertLiveSegmentFinished(BatchJob $dbBatchJob, kConvertLiveSegmentJobData $data)
 	{
-		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
-		/* @var $entry LiveEntry */
-		
-		$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY;
-		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
-			$keyType = LiveEntry::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY;
-			
-		$key = $entry->getSyncKey($keyType);
-		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath());
-		$files = kFileSyncUtils::dir_get_files($key);
-		
-		if(!$entry->isConvertingSegments())
+		$liveEntry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
+		/* @var $liveEntry LiveEntry */
+		if(!$liveEntry)
 		{
-			$attachedPendingMediaEntries = $entry->getAttachedPendingMediaEntries();
-			foreach($attachedPendingMediaEntries as $attachedPendingMediaEntry)
-			{
-				/* @var $attachedPendingMediaEntry kPendingMediaEntry */
-				if($attachedPendingMediaEntry->getDc() != kDataCenterMgr::getCurrentDcId())
-				{
-					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] is pending on different dc [" . $attachedPendingMediaEntry->getDc() . "]");
-					continue;
-				}
-				
-				if($attachedPendingMediaEntry->getRequiredDuration() && $attachedPendingMediaEntry->getRequiredDuration() > $data->getEndTime())
-				{
-					KalturaLog::info("Pending entry [" . $attachedPendingMediaEntry->getEntryId() . "] requires longer duration [" . $attachedPendingMediaEntry->getRequiredDuration() . "]");
-					continue;
-				}
-					
-				$dbAsset = assetPeer::retrieveOriginalByEntryId($attachedPendingMediaEntry->getEntryId());
-				if(!$dbAsset)
-				{
-					KalturaLog::info("Source of entry id [" . $attachedPendingMediaEntry->getEntryId() . "] not found (probably deleted)");
-					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
-					continue;
-				}
-				
-				KalturaLog::debug("Ingesting entry [" . $attachedPendingMediaEntry->getEntryId() . "]");
-				$job = kJobsManager::addConcatJob($dbBatchJob, $dbAsset, $files, $attachedPendingMediaEntry->getOffset(), $attachedPendingMediaEntry->getDuration());
-				if($job)
-					$entry->dettachPendingMediaEntry($attachedPendingMediaEntry->getEntryId());
-			}
+			KalturaLog::err("Live entry [" . $dbBatchJob->getEntryId() . "] not found");
+			return $dbBatchJob;
 		}
-		$entry->save();
+		
+		$recordedEntry = entryPeer::retrieveByPKNoFilter($liveEntry->getRecordedEntryId());
+		if(!$recordedEntry)
+		{
+			KalturaLog::err("Recorded entry [" . $liveEntry->getRecordedEntryId() . "] not found");
+			return $dbBatchJob;
+		}
+
+		$asset = assetPeer::retrieveByIdNoFilter($data->getAssetId());
+		/* @var $asset liveAsset */
+		if(!$asset)
+		{
+			KalturaLog::err("Live asset [" . $data->getAssetId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY;
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			$keyType = liveAsset::FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY;
+			
+		$key = $asset->getSyncKey($keyType);
+		$baseName = $asset->getEntryId() . '_' . $asset->getId() . '.ts';
+		kFileSyncUtils::moveFromFileToDirectory($key, $data->getDestFilePath(), $baseName);
+		
+		if($data->getMediaServerIndex() == MediaServerIndex::SECONDARY)
+			return $dbBatchJob;
+			
+		$files = kFileSyncUtils::dir_get_files($key, false);
+		
+		if(count($files) > 1)
+		{
+			// find replacing entry id
+			$replacingEntryId = $recordedEntry->getReplacingEntryId();
+			$replacingEntry = null;
+			
+			// in replacement
+			if($replacingEntryId)
+			{
+				$replacingEntry = entryPeer::retrieveByPKNoFilter($replacingEntryId);
+				
+				// check if asset already ingested
+				$replacingAsset = assetPeer::retrieveByEntryIdAndParams($replacingEntryId, $asset->getFlavorParamsId());
+				if($replacingAsset)
+				{
+					KalturaLog::err('Asset with params [' . $asset->getFlavorParamsId() . '] already replaced');
+					return $dbBatchJob;
+				}
+			}
+			// not in replacement
+			else
+			{
+		    	$advancedOptions = new kEntryReplacementOptions();
+		    	$advancedOptions->setKeepManualThumbnails(true);
+		    	$recordedEntry->setReplacementOptions($advancedOptions);
+		
+				$replacingEntry = new entry();
+			 	$replacingEntry->setType(entryType::MEDIA_CLIP);
+				$replacingEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+				$replacingEntry->setConversionProfileId($recordedEntry->getConversionProfileId());
+				$replacingEntry->setName($recordedEntry->getPartnerId().'_'.time());
+				$replacingEntry->setKuserId($recordedEntry->getKuserId());
+				$replacingEntry->setAccessControlId($recordedEntry->getAccessControlId());
+				$replacingEntry->setPartnerId($recordedEntry->getPartnerId());
+				$replacingEntry->setSubpId($recordedEntry->getPartnerId() * 100);
+				$replacingEntry->setDefaultModerationStatus();
+				$replacingEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+				$replacingEntry->setReplacedEntryId($recordedEntry->getId());
+				$replacingEntry->save();
+				
+				$recordedEntry->setReplacingEntryId($replacingEntry->getId());
+				$recordedEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$recordedEntry->save();
+			}
+	
+			$flavorParams = assetParamsPeer::retrieveByPKNoFilter($asset->getFlavorParamsId());
+		
+			// create asset
+			$replacingAsset = assetPeer::getNewAsset(assetType::FLAVOR);
+			$replacingAsset->setPartnerId($replacingEntry->getPartnerId());
+			$replacingAsset->setEntryId($replacingEntry->getId());
+			$replacingAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+			$replacingAsset->setFlavorParamsId($flavorParams->getId());
+			$replacingAsset->setFromAssetParams($flavorParams);
+			
+			if($flavorParams->hasTag(assetParams::TAG_SOURCE))
+			{
+				$replacingAsset->setIsOriginal(true);
+			}		
+			$replacingAsset->save();
+
+			$job = kJobsManager::addConcatJob($dbBatchJob, $replacingAsset, $files);
+		}
 		
 		return $dbBatchJob;
 	}
@@ -406,6 +461,13 @@ class kFlowHelper
 		if(!$rootBatchJob)
 			return $dbBatchJob;
 
+			/*
+			 * Fix web-cam sources with bad timestamps
+			 */
+		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
+		if($dbBatchJobAux!=null)
+			return $dbBatchJobAux;
+
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
@@ -423,6 +485,12 @@ class kFlowHelper
 				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
 					return $dbBatchJob;
 				 
+				if ($ex->getCode() == KDLErrors::SanityInvalidFrameDim)
+				{
+					kBusinessPostConvertDL::handleConvertFailed($dbBatchJob , null , $data->getFlavorAssetId() , null , null);
+					return $dbBatchJob;
+				}
+				
 				//This was added so the all the assets prior to reaching the limit would still be created
 				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
 					throw $ex;
@@ -439,6 +507,78 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kExtractMediaJobData $data
+	 * @return BatchJob/null
+	 */
+	protected static function fixWebCamSources(BatchJob &$rootBatchJob, BatchJob &$dbBatchJob, kExtractMediaJobData $data)
+	{
+		$mediaInfo = mediaInfoPeer::retrieveById($data->getMediaInfoId());
+		
+			/*
+			 * Check validity of web-cam sources, for:
+			 * - h263/sorenson video
+			 * - nellymoser audio
+			 * - and for following params:
+			 * -- Duration>100hrs (KDLSanityLimits::MaxDuration) or 
+			 * -- Bitrate<10Kbps (KDLSanityLimits::MinBitrate)
+			 * then run the webcam-flv-fix procedure
+			 */
+		$webCamVideoCodecs = array("h.263","h263","sorenson spark","vp6");
+		if(isset($mediaInfo)
+		&& (in_array($mediaInfo->getVideoFormat(),$webCamVideoCodecs)
+		 || in_array($mediaInfo->getVideoCodecId(),$webCamVideoCodecs))
+		&& (in_array($mediaInfo->getAudioFormat(),array("nellymoser"))
+		 || in_array($mediaInfo->getAudioCodecId(),array("nellymoser"))) ){
+			KalturaLog::log("webcam type of source");
+			if($mediaInfo->getVideoDuration()>0)
+				$durToTest = $mediaInfo->getVideoDuration();
+			else if($mediaInfo->getAudioDuration()>0)
+				$durToTest = $mediaInfo->getAudioDuration();
+			else if($mediaInfo->getContainerDuration()>0)
+				$durToTest = $mediaInfo->getContainerDuration();
+			else 
+				$durToTest = 0;
+
+			if($durToTest>0)
+				$calcBrToTest = $mediaInfo->getFileSize()*8000/$durToTest;
+			else
+				$calcBrToTest = 0;
+				
+			if($mediaInfo->getVideoBitRate()>0)
+				$brToTest = $mediaInfo->getVideoBitRate();
+			else if($mediaInfo->getContainerBitRate()>0)
+				$brToTest = $mediaInfo->getContainerBitRate();
+			else
+				$brToTest = $calcBrToTest;
+			
+			KalturaLog::log("durToTest($durToTest),brToTest($brToTest),calcBrToTest($calcBrToTest)");
+			if(($durToTest>KDLSanityLimits::MaxDuration	// 360000000
+			 ||($calcBrToTest>0 && $calcBrToTest<KDLSanityLimits::MinBitrate) )
+			 ||($brToTest>0 && $brToTest<KDLSanityLimits::MinBitrate)) {
+				KalturaLog::log("invalid source, should be fixed");
+				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+				if($flavorAsset && $flavorAsset->getVersion()<40){
+					$flavorAsset->incrementVersion();
+					$flavorAsset->save();
+					$fixedFileName = $data->getSrcFileSyncLocalPath().".fixed";
+					myFlvHandler::fixFlvTimestamps($data->getSrcFileSyncLocalPath(),$fixedFileName);
+					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					kFileSyncUtils::moveFromFile($fixedFileName, $syncKey);
+					$syncPath=kFileSyncUtils::getLocalFilePathForKey($syncKey);
+						/*
+						 * Finish the current extract medi job and start a new one
+						 */
+					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+					kJobsManager::addExtractMediaJob($rootBatchJob, $syncPath, $data->getFlavorAssetId());
+					return $dbBatchJob;
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
@@ -1666,11 +1806,54 @@ class kFlowHelper
 			$partner = $dbBatchJob->getPartner();
 			if($partner && $partner->getStorageDeleteFromKaltura())
 			{
-				self::deleteAssetLocalFileSyncs($fileSync, $asset);
+				if(self::isAssetExportFinished($fileSync, $asset))
+				{
+					if(!is_null($asset->getentry()->getReplacedEntryId()))
+						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
+					
+					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
+				}
 			}
 		}
 
 		return $dbBatchJob;
+	}
+	
+	/**
+	 * 
+	 * Handle deleteion of original entries file sync when in the process of entry replacement.
+	 * @param FileSync $fileSync
+	 * @param array $fileSyncSubTypesToHandle
+	 */
+	private static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
+	{	
+		$c = new Criteria();
+		$c->add(FileSyncPeer::FILE_TYPE, array (FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_FILE), Criteria::IN);
+		$c->add(FileSyncPeer::OBJECT_TYPE, $fileSync->getObjectType());
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $fileSync->getObjectSubType());
+		$c->add(FileSyncPeer::PARTNER_ID, $fileSync->getPartnerId());
+		$c->add(FileSyncPeer::LINKED_ID, $fileSync->getId());
+		
+		$originalEntryFileSync = FileSyncPeer::doSelectOne($c);
+		if(!$originalEntryFileSync)
+		{
+			KalturaLog::debug("Origianl entry file sync not found with the following details: [object_type, object_sub_type, Partner_id, Linked_id] [" . $fileSync->getObjectType() 
+							. ", " . $fileSync->getObjectSubType() . ", " . $fileSync->getPartnerId() . ", " . $fileSync->getId() . "]");
+			return;
+		}
+		
+		$originalAssetToDeleteFileSyncFor = assetPeer::retrieveById($originalEntryFileSync->getObjectId());
+		if(!$originalAssetToDeleteFileSyncFor)
+		{
+			KalturaLog::debug("Could not find asset matching file sync object id " . $originalEntryFileSync->getObjectId());
+			return;
+		}
+		
+		foreach ($fileSyncSubTypesToHandle as $fileSyncSubType)
+		{		
+			$syncKeyToDelete = $originalAssetToDeleteFileSyncFor->getSyncKey($fileSyncSubType);
+			kFileSyncUtils::deleteSyncFileForKey($syncKeyToDelete, false, true);
+		}
 	}
 	
 	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
@@ -1689,19 +1872,59 @@ class kFlowHelper
 			return true;
 	}
 	
-	private static function deleteAssetLocalFileSyncs(FileSync $fileSync, asset $asset)
+	private static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
 	{
-		if(self::isAssetExportFinished($fileSync, $asset))
+		$unClosedStatuses = array (
+			asset::ASSET_STATUS_QUEUED,
+			asset::ASSET_STATUS_CONVERTING,
+			asset::ASSET_STATUS_WAIT_FOR_CONVERT,
+			asset::ASSET_STATUS_EXPORTING
+		);
+		
+		$unClosedAssets = assetPeer::retrieveReadyByEntryId($asset->getEntryId(), null, $unClosedStatuses);
+		
+		if(count($unClosedAssets))
 		{
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			$asset->setFileSyncVersionsToDelete(array($fileSync->getVersion()));
+			$asset->save();
+			return;
+		}
+		
+		$assetsToDelete = assetPeer::retrieveReadyByEntryId($asset->getEntryId());
+		
+		self::deleteAssetLocalFileSyncsByAssetArray($assetsToDelete);
 			
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+		self::deleteAssetLocalFileSyncs($fileSync->getVersion(), $asset);
+	}
+	
+	private static function deleteAssetLocalFileSyncsByAssetArray($assetsToDeleteArray = array())
+	{
+		foreach ($assetsToDeleteArray as $assetToDelete)
+		{
+			/* @var $assetToDelete asset */
+			$versionsToDelete =  $assetToDelete->getFileSyncVersionsToDelete();
+			KalturaLog::debug("file sync versions to delete are " . print_r($versionsToDelete, true));
+			if($versionsToDelete)
+			{
+				foreach ($versionsToDelete as $version)
+					self::deleteAssetLocalFileSyncs($version, $assetToDelete);
+						
+				$assetToDelete->resetFileSyncVersionsToDelete();
+				$assetToDelete->save();
+			}
+		}
+	}
+	
+	private static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
+	{
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
 			
-			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSync->getVersion());
-			kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
-		}		
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+			
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC, $fileSyncVersion);
+		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);		
 	}
 
 	/**
@@ -1813,6 +2036,8 @@ class kFlowHelper
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 
 		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
+		
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
 
 		return $dbBatchJob;
 	}
@@ -1822,9 +2047,17 @@ class kFlowHelper
 		KalturaLog::debug("Convert Profile finished");
 
 		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
+		
+		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
 
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 
+		$entry = $dbBatchJob->getEntry();
+		if($entry)
+		{
+			kBusinessConvertDL::checkForPendingLiveClips($entry);
+		}
+		
 		return $dbBatchJob;
 	}
 
@@ -1904,8 +2137,9 @@ class kFlowHelper
 				}
 				else
 				{
-					$jobIsFinished = false;
-					$entry->createDownloadAsset($dbBatchJob, $flavorParamsId, $data->getPuserId());
+					$conversionJob = $entry->createDownloadAsset($dbBatchJob, $flavorParamsId, $data->getPuserId());
+					if (!is_null($conversionJob))
+						$jobIsFinished = false;
 				}
 			}
 		}
@@ -2332,6 +2566,16 @@ class kFlowHelper
 			return;
 		}
 
+		if ( $tempEntry->getStatus() == entryStatus::ERROR_CONVERTING )
+		{
+			$entry->setReplacementStatus(entryReplacementStatus::FAILED);
+			$entry->save();
+
+			// NOTE: KalturaEntryService::cancelReplace() must be used to reset this status and delete the temp entry
+
+			return;
+		}
+
 		switch($entry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
@@ -2345,6 +2589,10 @@ class kFlowHelper
 			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
 				$entry->setReplacementStatus(entryReplacementStatus::READY_BUT_NOT_APPROVED);
 				$entry->save();
+				break;
+
+			case entryReplacementStatus::FAILED:
+				// Do nothing. KalturaEntryService::cancelReplace() will be used to delete the entry.
 				break;
 
 			case entryReplacementStatus::NONE:
@@ -2427,6 +2675,18 @@ class kFlowHelper
 				$tempFlavorAsset->setDeletedAt(time());
 				$tempFlavorAsset->save();
 			}
+		}
+	}
+	
+	private static function handleLocalFileSyncDeletion($entryId, Partner $partner)
+	{
+		if($partner && $partner->getStorageDeleteFromKaltura())
+		{
+			KalturaLog::debug("searching for exported assets of entry [$entryId] to delete local file syncs for");
+			
+			$readyAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryId);
+			
+			self::deleteAssetLocalFileSyncsByAssetArray($readyAssets);
 		}
 	}
 	

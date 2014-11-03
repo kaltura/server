@@ -42,7 +42,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		
 		$entryFields = array_keys($this->getEntryFields());
 		$metadataXpaths = array_keys($this->getMetadataFields());
-		$fieldConfigArray = array();
+		$fieldConfigArray = $object->fieldConfigArray;
 		foreach($properties as $property => $value)
 		{
 			if(!$value)
@@ -90,7 +90,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	public function populateFromObject($object, $add_underscore = true)
 	{
         /* @var Kaltura_Client_FtpDistribution_Type_FtpDistributionProfile $object */
-		Infra_Form::populateFromObject($object, $add_underscore);
+		parent::populateFromObject($object, $add_underscore);
 		$this->addItemXpathsToExtend($object->itemXpathsToExtend);
 		
 		$entryFields = array_keys($this->getEntryFields());
@@ -108,7 +108,7 @@ class Form_FtpProfileConfiguration extends Form_ConfigurableProfileConfiguration
 
 		foreach($fieldConfigArray as $fieldConfig)
 		{
-			if (!isset($fieldConfig->updateParams[0]) && isset($fieldConfig->updateParams[0]->value))
+			if (!isset($fieldConfig->updateParams[0]) || !isset($fieldConfig->updateParams[0]->value))
 				continue;
 				
 			$field = $fieldConfig->updateParams[0]->value;

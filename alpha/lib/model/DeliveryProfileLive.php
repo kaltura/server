@@ -41,7 +41,16 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$contentTypeToCheck = $contentType;
 		if($data && $httpcode>=200 && $httpcode<300)
 		{
-			return in_array(trim($contentTypeToCheck), $contentTypeToReturn) ? $data : true;
+			$contentTypeToCheck = strtolower( trim( $contentTypeToCheck ) );
+			foreach ( $contentTypeToReturn as $cttr )
+			{
+				if ( $contentTypeToCheck === strtolower( trim( $cttr ) ) )
+				{
+					return $data;
+				}
+			}
+
+			return true;
 		}
 		else
 			return false;
@@ -58,7 +67,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$urlToCheck = trim($urlToCheck);
 		if (strpos($urlToCheck, '://') === false)
 		{
-			$urlToCheck = dirname($parentURL) . DIRECTORY_SEPARATOR . $urlToCheck;
+			$urlToCheck = dirname($parentURL) . '/' . $urlToCheck;
 		}
 	
 		return $urlToCheck;

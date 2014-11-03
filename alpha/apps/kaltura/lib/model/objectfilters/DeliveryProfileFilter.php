@@ -13,6 +13,8 @@ class DeliveryProfileFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
+			"_in_partner_id",
+			"_eq_partner_id",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",
@@ -23,6 +25,7 @@ class DeliveryProfileFilter extends baseObjectFilter
 			"_in_protocol",
 			"_eq_status",
 			"_in_status",
+			"_eq_streamer_type",
 			) , NULL );
 
 		$this->allowed_order_fields = array ("created_at", "updated_at");

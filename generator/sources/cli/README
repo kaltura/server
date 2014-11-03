@@ -52,6 +52,9 @@ Linux
 	b. IP address salt - required for the genIpHeader utility.
 		The salt has to match the parameter 'remote_addr_header_salt' that is configured in
 		configuration/local.ini on the Kaltura server.
+	c. API Host - The default is www.kaltura.com if not defined
+		May be uncommented and modified in order to globally point to a different api host
+		The -u parameter may be used to override the api host via command line
 
 Windows
 --------

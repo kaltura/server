@@ -7,6 +7,8 @@ class entryIndex extends BaseIndexObject
 {
 	const DYNAMIC_ATTRIBUTES = "dynamic_attributes";
 
+	const FIRST_BROADCAST = "first_broadcast";
+
 	const PLUGINS_DATA = "plugins_data";
 
 	const SEARCH_TEXT = "search_text";
@@ -97,6 +99,7 @@ class entryIndex extends BaseIndexObject
 				'creator_kuser_id' => 'creatorKuserId',
 				'creator_puser_id' => 'creatorPuserId',
 				'dynamic_attributes' => 'dynamicAttributes',
+				'user_names' => 'userNames',
 			);
 		}
 		return self::$fieldsMap;
@@ -158,6 +161,7 @@ class entryIndex extends BaseIndexObject
 				'creator_kuser_id' => IIndexable::FIELD_TYPE_STRING,
 				'creator_puser_id' => IIndexable::FIELD_TYPE_STRING,
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
+				'user_names' => IIndexable::FIELD_TYPE_STRING,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
@@ -247,6 +251,8 @@ class entryIndex extends BaseIndexObject
 				'entry.CREATOR_KUSER_ID' => 'creator_kuser_id',
 				'entry.CREATOR_PUSER_ID' => 'creator_puser_id',
 				'entry.DYNAMIC_ATTRIBUTES' => 'dynamic_attributes',
+				'entry.FIRST_BROADCAST' => 'dynamic_attributes.first_broadcast',
+				'entry.USER_NAMES' => 'user_names',
 				'entry.PLUGINS_DATA' => 'plugins_data',
 				'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id,roots,puser_id)',
 			);
@@ -335,6 +341,7 @@ class entryIndex extends BaseIndexObject
 				'entry.END_DATE' => 'end_date',
 				'entry.AVAILABLE_FROM' => 'available_from',
 				'entry.LAST_PLAYED_AT' => 'last_played_at',
+				'entry.FIRST_BROADCAST' => 'dynamic_attributes.first_broadcast',
 			);
 		}
 		return self::$orderFields;

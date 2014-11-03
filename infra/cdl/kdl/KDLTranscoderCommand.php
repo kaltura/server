@@ -123,6 +123,7 @@ class KDLTranscoderCommand {
 				$cmd=$this->CLI_Encode($transParams->_extra);;
 				break;
 			case KDLTranscoders::FFMPEG:
+			case KDLTranscoders::FFMPEG_VP8:
 				$cmd=$this->FFMpeg($transParams->_extra);
 				break;
 			case KDLTranscoders::MENCODER:
@@ -132,7 +133,6 @@ class KDLTranscoderCommand {
 				$cmd=$transParams->_id;
 				break;
 			case KDLTranscoders::FFMPEG_AUX:
-			case KDLTranscoders::FFMPEG_VP8:
 				$cmd=$this->FFMpeg_aux($transParams->_extra);
 				break;
 			case KDLTranscoders::EE3:

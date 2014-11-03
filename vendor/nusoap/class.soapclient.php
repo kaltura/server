@@ -54,6 +54,7 @@ class nusoap_client extends nusoap_base  {
 	var $responseData = '';			// SOAP payload of response
 	var $cookies = array();			// Cookies from response or for request
     var $decode_utf8 = true;		// toggles whether the parser decodes element content w/ utf8_decode()
+    var $keep_type = false;			// toggels whether we keep the object type
 	var $operations = array();		// WSDL operations, empty for WSDL initialization error
 	var $curl_options = array();	// User-specified cURL options
 	var $bindingType = '';			// WSDL operation binding type
@@ -516,7 +517,7 @@ class nusoap_client extends nusoap_base  {
 			$this->xml_encoding = 'ISO-8859-1';
 		}
 		$this->debug('Use encoding: ' . $this->xml_encoding . ' when creating nusoap_parser');
-		$parser = new nusoap_parser($data,$this->xml_encoding,$this->operation,$this->decode_utf8);
+		$parser = new nusoap_parser($data,$this->xml_encoding,$this->operation,$this->decode_utf8, $this->keep_type);
 		// add parser debug data to our debug
 		$this->appendDebug($parser->getDebug());
 		// if parse errors
@@ -857,6 +858,15 @@ class nusoap_client extends nusoap_base  {
     function decodeUTF8($bool){
 		$this->decode_utf8 = $bool;
 		return true;
+    }
+    
+    /*
+     * Whether or not parser should keep the element type 
+     * @return always returns true
+     */
+    function keepType($bool) {
+    	$this->keep_type = $bool;
+    	return true;
     }
 
 	/**

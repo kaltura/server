@@ -27,6 +27,10 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaDeliveryProfileRtmp();
 			case KalturaDeliveryProfileType::AKAMAI_HTTP:
 				return new KalturaDeliveryProfileAkamaiHttp();
+			case KalturaDeliveryProfileType::AKAMAI_HLS_MANIFEST:
+				return new KalturaDeliveryProfileAkamaiAppleHttpManifest();
+			case KalturaDeliveryProfileType::AKAMAI_HDS:
+				return new KalturaDeliveryProfileAkamaiHds();
 			case KalturaDeliveryProfileType::LIVE_HLS:
 				return new KalturaDeliveryProfileLiveAppleHttp();
 			case KalturaDeliveryProfileType::GENERIC_SS:

@@ -82,6 +82,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the is_default field.
+	 * Note: this column has a database default value of: false
 	 * @var        boolean
 	 */
 	protected $is_default;
@@ -183,6 +184,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->type = 0;
+		$this->is_default = false;
 		$this->parent_id = 0;
 	}
 
@@ -733,7 +735,7 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 			$v = (boolean) $v;
 		}
 
-		if ($this->is_default !== $v) {
+		if ($this->is_default !== $v || $this->isNew()) {
 			$this->is_default = $v;
 			$this->modifiedColumns[] = DeliveryProfilePeer::IS_DEFAULT;
 		}
@@ -910,6 +912,10 @@ abstract class BaseDeliveryProfile extends BaseObject  implements Persistent {
 	public function hasOnlyDefaultValues()
 	{
 			if ($this->type !== 0) {
+				return false;
+			}
+
+			if ($this->is_default !== false) {
 				return false;
 			}
 

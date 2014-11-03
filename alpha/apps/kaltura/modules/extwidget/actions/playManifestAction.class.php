@@ -306,7 +306,9 @@ class playManifestAction extends kalturaAction
 		{
 			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted manifest request - forbidden');
-			if (strtolower($this->deliveryAttributes->getMediaProtocol()) != 'https')
+
+			$allowedProtocols = array('https','rtmpe','rtmpte');
+			if (!in_array(strtolower($this->deliveryAttributes->getMediaProtocol()) , $allowedProtocols))
 				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED, 'unencrypted playback protocol - forbidden');
 		}
 	}
@@ -852,8 +854,12 @@ class playManifestAction extends kalturaAction
 		if(!$this->deliveryAttributes->getFormat())
 			$this->deliveryAttributes->setFormat(PlaybackProtocol::HTTP);
 			
-		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL || $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS) 
+		if ($this->deliveryAttributes->getFormat() == self::HDNETWORKSMIL) 
 			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP); // Akamai HD doesn't support any other protocol
+		
+		if ($this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
+			if(strpos($this->deliveryAttributes->getMediaProtocol(), "http") !== 0)
+			$this->deliveryAttributes->setMediaProtocol(PlaybackProtocol::HTTP);
 			
 		$tags = $this->getRequestParameter ( "tags", null );
 		if (!$tags)
@@ -886,6 +892,14 @@ class playManifestAction extends kalturaAction
 		$this->initEntry();
 		$this->deliveryAttributes->setEntryId($this->entryId);
 
+		$this->deliveryAttributes->setUsePlayServer((bool) $this->getRequestParameter("usePlayServer") && PermissionPeer::isValidForPartner(PermissionName::FEATURE_PLAY_SERVER, $this->entry->getPartnerId()));
+		if($this->deliveryAttributes->getUsePlayServer())
+		{
+			$this->deliveryAttributes->setPlayerConfig($this->getRequestParameter("playerConfig"));
+			//In case request needs to be redirected to play-server we need to add the ui conf id to the manifest url as well
+			$this->deliveryAttributes->setUiConfId($this->getRequestParameter("uiConfId"));
+		}
+		
 		$this->enforceEncryption();
 		
 		$renderer = null;
@@ -928,6 +942,7 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryProfile)
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
 		$renderer->defaultDeliveryCode = $this->entry->getPartner()->getDefaultDeliveryCode();
+		$renderer->lastModified = time();
 		
 		// Handle caching
 		$canCacheAccessControl = false;

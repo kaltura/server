@@ -56,7 +56,7 @@ class KWidevineBatchHelper
 		
 		KalturaLog::debug("Encrypt package command: ".$cmd);
 		
-		$cmd = $cmd.' -v '.$iv.' -k '.$key;
+		//$cmd = $cmd.' -v '.$iv.' -k '.$key;
 		return $cmd;
 		
 	}

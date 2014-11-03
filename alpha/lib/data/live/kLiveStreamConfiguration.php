@@ -30,6 +30,26 @@ class kLiveStreamConfiguration
 	protected $publishUrl;
 	
 	/**
+	 * @var string
+	 */
+	protected $streamName;
+	
+	
+	/**
+	 * @return the $streamName
+	 */
+	public function getStreamName() {
+		return $this->streamName;
+	}
+
+	/**
+	 * @param string $streamName
+	 */
+	public function setStreamName($streamName) {
+		$this->streamName = $streamName;
+	}
+
+	/**
 	 * @return the $backupUrl
 	 */
 	public function getBackupUrl()

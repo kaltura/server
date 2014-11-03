@@ -40,6 +40,10 @@ function checkCache()
 		unset($params['ks']);
 		unset($params['kalsig']);
 		$params['uri'] = $_SERVER['PATH_INFO'];
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+			$params['__protocol'] = 'https';
+		else 	
+			$params['__protocol'] = 'http';
 		ksort($params);
 
 		$keys = array_keys($params);
@@ -215,11 +219,14 @@ function checkCache()
 	else if (strpos($uri, "/serveFlavor/") !== false && function_exists('apc_fetch') && $_SERVER["REQUEST_METHOD"] == "GET")
 	{
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererDumpFile.php');
+		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererString.php');
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/monitor/KalturaMonitorClient.php');
+		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/request/kIpAddressUtils.php');
 		
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
+		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$uri;
 		
-		$renderer = apc_fetch("dumpFile-{$host}{$uri}");
+		$renderer = apc_fetch($cacheKey);
 		if ($renderer)
 		{
 			KalturaMonitorClient::initApiMonitor(true, 'extwidget.serveFlavor', $renderer->partnerId);

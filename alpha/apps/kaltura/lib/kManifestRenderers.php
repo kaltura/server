@@ -33,6 +33,11 @@ abstract class kManifestRenderer
 	public $forceCachingHeaders = false;
 	
 	/**
+	 * @var int
+	 */
+	public $lastModified = null;
+	
+	/**
 	 * @var string
 	 */
 	public $deliveryCode = '';
@@ -121,7 +126,7 @@ abstract class kManifestRenderer
 		if (kApiCache::hasExtraFields() && !$this->forceCachingHeaders)
 			$this->cachingHeadersAge = 0;
 		
-		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge, true);
+		infraRequestUtils::sendCachingHeaders($this->cachingHeadersAge, true, $this->lastModified);
 
 		$header = $this->getManifestHeader();
 		$footer = $this->getManifestFooter();
@@ -274,26 +279,52 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 			{
 				$this->tokenizer->tokenizeMultiUrls($this->baseUrl, $this->flavors);
 			}
+			return;
 		}
-		else
+
+		$prefixes = array();
+		foreach ($this->flavors as &$flavor)
 		{
+			self::normalizeUrlPrefix($flavor);
+			if(!isset($flavor['urlPrefix']))
+			{
+				$prefixes = array();
+				break;
+			}
+			$prefixes[$flavor['urlPrefix']] = true;
+		}
+		
+		if (count($prefixes) == 1)
+		{
+			reset($prefixes);
+			$baseUrl = key($prefixes);
+			if ($this->tokenizer)
+			{
+				$this->tokenizer->tokenizeMultiUrls($baseUrl, $this->flavors);
+			}
 			foreach ($this->flavors as &$flavor)
 			{
-				self::normalizeUrlPrefix($flavor);
-				$url = $flavor['url'];
-				if ($this->tokenizer)
-				{
-					$url = $this->tokenizer->tokenizeSingleUrl($url);
-				}
-				
-				if(isset($flavor['urlPrefix']))
-				{
-					$url = self::urlJoin($flavor['urlPrefix'], $url);
-					unset($flavor['urlPrefix']);		// no longer need the prefix
-				}
-				
-				$flavor['url'] = $url;
+				$flavor['url'] = self::urlJoin($baseUrl, $flavor['url']);
+				unset($flavor['urlPrefix']);		// no longer need the prefix
 			}
+			return;
+		}
+		
+		foreach ($this->flavors as &$flavor)
+		{
+			$url = $flavor['url'];
+			if ($this->tokenizer)
+			{
+				$url = $this->tokenizer->tokenizeSingleUrl($url);
+			}
+			
+			if(isset($flavor['urlPrefix']))
+			{
+				$url = self::urlJoin($flavor['urlPrefix'], $url);
+				unset($flavor['urlPrefix']);		// no longer need the prefix
+			}
+			
+			$flavor['url'] = $url;
 		}
 	}
 }

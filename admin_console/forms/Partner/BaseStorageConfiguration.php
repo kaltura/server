@@ -10,6 +10,13 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmStorageConfig');
+		
+		$this->addElement('text', 'storageId', array(
+				'label' 		=> 'Storage ID:',
+				'filters' 		=> array('StringTrim'),
+				'validators' 	=> array(),
+				'readonly'		=> true,
+		));
 
 		$this->addElement('text', 'partnerId', array(
 			'label' 		=> 'Related Publisher ID*:',
@@ -82,7 +89,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$readyBehavior->setLabel('Ready Behavior:');
 		$this->addElements(array($readyBehavior));
 		
-		$this->addDisplayGroup(array('partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'desciption'), 'general_info', array(
+		$this->addDisplayGroup(array('storageId', 'partnerId', 'name', 'systemName', 'deliveryStatus', 'deliveryPriority', 'desciption'), 'general_info', array(
 			'legend' => 'General',
 		));
 		
@@ -112,12 +119,25 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		$this->addElement('text', 'deliveryProfileIds', array(
-				'label'			=> 'Delivery Profile Ids (JSON):',
+		$this->addElement('text', 'delivery_profile_ids', array(
+				'label'			=> "Delivery profile ids (JSON)",
 				'filters'		=> array('StringTrim'),
+				'readonly'		=> true,
 		));
 		
-		$this->addDisplayGroup ( array ('deliveryProfileIds' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+		$element = $this->addElement('select', 'deliveryFormat', array(
+				'filters'		=> array('StringTrim'),
+				'registerInArrayValidator' => false,
+		));
+		
+		$this->addElement('button', 'editDeliveryProfiles', array(
+				'label'		=> 'Add',
+				'decorators'	=> array('ViewHelper'),
+		));
+		
+		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
+		
+		$this->addDisplayGroup ( array ('delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
 		
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',
@@ -148,6 +168,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
              'Fieldset',
               array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
      	));
+    	
 	}
 
 	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())
@@ -184,11 +205,15 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		
 		parent::populateFromObject($object, $add_underscore);
 		
-		$res = array();
-		foreach($object->deliveryProfileIds as $keyValue) {
-			$this->insertObject($res, $keyValue->key, $keyValue->value);
-		}		
-		$this->getElement('deliveryProfileIds')->setValue(json_encode($res));
+		if(empty($object->deliveryProfileIds)) {
+			$this->getElement('delivery_profile_ids')->setValue("{}");
+		} else {
+			$res = array();
+			foreach($object->deliveryProfileIds as $keyValue) {
+				$this->insertObject($res, $keyValue->key, $keyValue->value);
+			}
+			$this->getElement('delivery_profile_ids')->setValue(json_encode($res));
+		}
 		
 	}
 	
@@ -216,7 +241,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		$object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
 		
 		// Input is json, output is key-value array
-		$deliveryProfileIds = $this->getElement('deliveryProfileIds')->getValue();
+		$deliveryProfileIds = $this->getElement('delivery_profile_ids')->getValue();
 		if(!empty($deliveryProfileIds))
 			$object->deliveryProfileIds = $this->toKeyValue(json_decode($deliveryProfileIds, true));
 		

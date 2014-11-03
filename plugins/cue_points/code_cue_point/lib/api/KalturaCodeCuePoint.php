@@ -73,8 +73,7 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 		
 		$this->validatePropertyNotNull("code");
 			
-		if(!is_null($this->endTime))
-			$this->validateEndTime();
+		$this->validateEndTime();
 	}
 	
 	/* (non-PHPdoc)
@@ -82,8 +81,7 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if(!is_null($this->endTime))
-			$this->validateEndTime($sourceObject->getId());
+		$this->validateEndTime($sourceObject);
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

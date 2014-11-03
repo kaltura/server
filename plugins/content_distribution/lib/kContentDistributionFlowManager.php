@@ -1607,7 +1607,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
-			
+		
+		//no temp entries should be handled
+		if ($entry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM && $entry->getReplacedEntryId())
+			return true;
+
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 		{
@@ -1635,14 +1639,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($asset->getPartnerId()))
 		{
-			KalturaLog::log("Partner [ . $asset->getPartnerId() . ] is not allowed");
+			KalturaLog::log("Partner [" . $asset->getPartnerId() . "] is not allowed");
 			return true;
 		}
 			
 		$entry = $asset->getentry();
 		if(!$entry)
 		{
-			KalturaLog::log("Entry [ . $asset->getEntryId() . ] not found");
+			KalturaLog::log("Entry [" . $asset->getEntryId() . "] not found");
 			return true;
 		}
 			

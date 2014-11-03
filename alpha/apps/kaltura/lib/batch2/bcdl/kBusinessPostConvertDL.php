@@ -60,9 +60,17 @@ class kBusinessPostConvertDL
 		 * For intermediate source generation, both the source and the asset have the same asset id.
 		 * In this case sourceMediaInfo should be retrieved as the first version of source asset mediaInfo 
 		 */
-		if(isset($sourceMediaInfo) && $sourceMediaInfo->getFlavorAssetId()==$flavorAssetId) {
+		if(isset($sourceMediaInfo) && $sourceMediaInfo->getFlavorAssetId()== $flavorAssetId) {
 			$productMediaInfo = $sourceMediaInfo;
-			$sourceMediaInfo=mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId,1);
+			
+			$entry = $dbBatchJob->getEntry();
+			$operationAttributes = $entry->getOperationAttributes();
+
+			// if in clipping operation - take the latest created mediainfo object
+			$ascending = empty($operationAttributes)? 1 : 0 ;
+
+			$sourceMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId, $ascending);
+
 			KalturaLog::log("Intermediate source generation - assetId(".$flavorAssetId."),src MdInf id(".$sourceMediaInfo->getId()."),product MdInf id(".$productMediaInfo->getId()).")";
 		}
 		else {
@@ -83,8 +91,10 @@ class kBusinessPostConvertDL
 		if($postConvertData instanceof kPostConvertJobData)
 			$postConvertAssetType = $postConvertData->getPostConvertAssetType();
 		
-		// don't validate in case of bypass, in case target flavor or media info are null 
-		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo)
+		// don't validate in case of bypass, in case target flavor or media info are null
+		// or ISM/ISMC manifest assets
+		if($postConvertAssetType != BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS && $targetFlavor && $productMediaInfo
+		&& !$targetFlavor->hasTag(assetParams::TAG_ISM_MANIFEST))
 		{
 			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo, $convertEngineType);
@@ -131,6 +141,15 @@ class kBusinessPostConvertDL
 		}
 		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
+		
+		if($currentFlavorAsset->getIsOriginal())
+		{
+			$entry = $currentFlavorAsset->getentry();
+			if($entry)
+			{
+				kBusinessConvertDL::checkForPendingLiveClips($entry);
+			}
+		}
 		
 		return $currentFlavorAsset;
 	}
@@ -206,6 +225,7 @@ class kBusinessPostConvertDL
 		KalturaLog::debug("required flavor params ids [" . print_r($requiredFlavorParamsIds, true) . "]");
 		
 		// go over all the flavor assets of the entry
+		$entry = $currentFlavorAsset->getentry();
 		$inCompleteFlavorIds = array();
 		$origianlAssetFlavorId = null;
 		$siblingFlavorAssets = assetPeer::retrieveFlavorsByEntryId($currentFlavorAsset->getEntryId());
@@ -222,6 +242,12 @@ class kBusinessPostConvertDL
 					
 				continue;
 			}
+			
+			if($entry->getReplacedEntryId() && $siblingFlavorAsset->getStatus() == flavorAsset::ASSET_STATUS_QUEUED)
+			{
+				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete and in replacement");
+				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
+			}
 				
 			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset, $profile);
 			
@@ -236,8 +262,8 @@ class kBusinessPostConvertDL
 			        KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is incomplete");
 				    $inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
 			    }
-			}			
-			
+			}		
+
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 			{
 				KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] is ignored");
@@ -303,7 +329,7 @@ class kBusinessPostConvertDL
 			{
 			    // mark the context root job as finished only if all conversion jobs are completed
     			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-    			
+				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}

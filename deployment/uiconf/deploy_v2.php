@@ -202,7 +202,7 @@ class uiConfDeployment
 									$dependUiConfValue = $uiConfIds[$dependencyValue];
 									
 									uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
-								
+									uiConfDeployment::updateFeaturesFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@");
 								}
 								else
 								{
@@ -412,6 +412,17 @@ class uiConfDeployment
 		
 		if ($widget->config)
 			$uiconf->setConfig(@$widget->config);
+		else if ($widget->config_file) {
+			$configFileContents = uiConfDeployment::readConfFileFromPath($widget->config_file);
+		
+			if(!$configFileContents)
+			{
+				KalturaLog::debug("Unable to read json file from: {$widget->config_file}");
+			}
+		
+			$uiconf->setConfig($configFileContents);
+		}
+		
 		
 		if($uiconf->getConfFile() === FALSE && $uiconf->getConfig() === FALSE)
 		{
@@ -497,9 +508,11 @@ class uiConfDeployment
 		$conf_file = $uiconf->getConfFile(true);
 		$featuresFile = $uiconf->getConfFileFeatures(true);
 		$newFeatures = str_replace($replacementToken, $replacementString, $featuresFile);
-		$uiconf->setConfFile($conf_file);
-		$uiconf->setConfFileFeatures($newFeatures);
-		$uiconf->save();
+		if ($newFeatures != $featuresFile) {
+			$uiconf->setConfFile($conf_file);
+			$uiconf->setConfFileFeatures($newFeatures);
+			$uiconf->save();
+		}
 	}
 	
 	/**

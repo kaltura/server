@@ -17,6 +17,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $partnerId;
 	
@@ -68,6 +69,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaPlaybackProtocol
+	 * @filter eq
 	 */
 	public $streamerType;
 	
@@ -85,6 +87,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaDeliveryStatus
+	 * @filter eq,in
 	 */
 	public $status;
 	
@@ -102,6 +105,7 @@ class KalturaDeliveryProfile extends KalturaObject implements IFilterable
 	 * True if this is the systemwide default for the protocol
 	 *
 	 * @var KalturaNullableBoolean
+	 * @readonly
 	 */
 	public $isDefault;
 	

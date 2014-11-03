@@ -205,6 +205,23 @@ class BulkService extends KalturaBaseService
 	 */
 	public function addCategoryEntriesAction (KalturaBulkServiceData $bulkUploadData, KalturaBulkUploadCategoryEntryData $bulkUploadCategoryEntryData = null)
 	{
+		if($bulkUploadData instanceof  KalturaBulkServiceFilterData){
+			if($bulkUploadData->filter instanceof KalturaBaseEntryFilter){
+				if(	$bulkUploadData->filter->idEqual == null &&
+					$bulkUploadData->filter->idIn == null &&
+					$bulkUploadData->filter->categoriesIdsMatchOr == null &&
+					$bulkUploadData->filter->categoriesMatchAnd == null &&
+					$bulkUploadData->filter->categoriesMatchOr == null &&
+					$bulkUploadData->filter->categoriesIdsMatchAnd == null)
+						throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);					
+			}
+			else if($bulkUploadData->filter instanceof KalturaCategoryEntryFilter){
+				if(	$bulkUploadData->filter->entryIdEqual == null &&
+					$bulkUploadData->filter->categoryIdIn == null &&
+					$bulkUploadData->filter->categoryIdEqual == null )
+						throw new KalturaAPIException(KalturaErrors::MUST_FILTER_ON_ENTRY_OR_CATEGORY);				
+			}
+		}
 	   	$bulkUploadJobData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadData->getType());
 	   	$bulkUploadData->toBulkUploadJobData($bulkUploadJobData);
 	    

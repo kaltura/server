@@ -1947,7 +1947,7 @@ CREATE TABLE `delivery_profile`
 	`description` VARCHAR(128),
 	`url` VARCHAR(256),
 	`host_name` VARCHAR(127),
-	`is_default` TINYINT,
+	`is_default` TINYINT default 0,
 	`parent_id` INTEGER default 0,
 	`recognizer` TEXT,
 	`tokenizer` TEXT,
@@ -2033,6 +2033,7 @@ CREATE TABLE `invalid_session`
 	`ks_valid_until` DATETIME,
 	`created_at` DATETIME,
 	`actions_limit` INTEGER,
+	`type` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `ks_index`(`ks`)
 )Type=InnoDB;

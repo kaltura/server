@@ -233,6 +233,70 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 * @var string
 	 */
 	protected $aclPostfix;
+
+	/**
+	 * @var string
+	 */
+	protected $customPostfixes;
+	
+	/**
+	 * @var string
+	 */
+	protected $useCookieHosts;
+	
+	/**
+	 * @var string
+	 */
+	protected $rootDir;
+	
+	/**
+	 * @param array $urls
+	 * @return string
+	 */
+	protected function getAcl(array $urls)
+	{
+		require_once( dirname(__FILE__). '/../../../../../../infra/general/kString.class.php');
+		
+		$acl = kString::getCommonPrefix($urls);
+		
+		// the first comma in csmil denotes the beginning of the non-common URL part
+		$commaPos = strpos($acl, ',');
+		if ($commaPos !== false)
+		{
+			$acl = substr($acl, 0, $commaPos);
+		}
+		
+		// don't sign the manifest file name when playing HLS/HDS via AkamaiHD
+		$postfixes =  $this->customPostfixes ? explode(',', $this->customPostfixes) : array('/master.m3u8', '/manifest.f4m');
+		foreach ($postfixes as $postfix)
+			if (substr($acl, -strlen($postfix)) == $postfix)
+				$acl = substr($acl, 0, -strlen($postfix));
+		
+		if (!$acl)
+		{
+			return false;
+		}
+		
+		$acl .= $this->aclPostfix;
+
+		return $acl;
+	}
+	
+	/**
+	 * @param string $acl
+	 * @return string
+	 */
+	protected function generateToken($acl)
+	{
+		$c = new Akamai_EdgeAuth_Config();
+		$c->set_acl($acl);
+		$c->set_window($this->window);
+		$c->set_start_time(time());		# The time from which the token will start
+		$c->set_key($this->key);
+		
+		$g = new Akamai_EdgeAuth_Generate();
+		return $g->generate_token($c);
+	}
 	
 	/**
 	 * @param string $url
@@ -240,33 +304,73 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	 */
 	public function tokenizeSingleUrl($url)
 	{
-		if (!preg_match(self::SECURE_HD_AUTH_ACL_REGEX, $url, $matches))
+		if ($this->useCookieHosts && !in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
+		{
+			return $url;
+		}
+		
+		if ($this->rootDir)
+			$url = rtrim($this->rootDir, '/') . '/' . ltrim($url, '/');
+		
+		$acl = $this->getAcl(array($url));
+		if (!$acl)
 			return $url;
 		
-		$acl = $matches[0];
+		$token = $this->generateToken($acl);
 		
-		// strip manifest postfixes that should not be signed from the acl
-		$postfixes = array('/master.m3u8', '/manifest.f4m');
-		foreach ($postfixes as $postfix)
-			if (substr($acl, -strlen($postfix)) == $postfix)
-				$acl = substr($acl, 0, -strlen($postfix));		
-		
-		$acl .= $this->aclPostfix;		
-		
-		$c = new Akamai_EdgeAuth_Config();
-		$c->set_acl($acl);
-		$c->set_window($this->window);
-		$c->set_start_time(time());		# The time from which the token will start
-		$c->set_key($this->key);
-
-		$g = new Akamai_EdgeAuth_Generate();		
-		$token = $g->generate_token($c);
+		if ($this->useCookieHosts)
+		{
+			$slashPos = strrpos($acl, '/');
+			$path = $slashPos !== false ? substr($acl, 0, $slashPos + 1) : '/';
+			setrawcookie($this->paramName, $token, time() + $this->window, $path);
+			return $url;
+		}
 		
 		if (strpos($url, '?') === false)
 			$url .= '?';
 		else 
 			$url .= '&';
 		return $url . "{$this->paramName}=$token";
+	}
+	
+	public function tokenizeMultiUrls(&$baseUrl, &$flavors)
+	{
+		if ($this->useCookieHosts && !in_array($_SERVER['HTTP_HOST'], explode(',', $this->useCookieHosts)))
+		{
+			return;
+		}
+		
+		$urls = array();
+		foreach($flavors as &$flavor)
+		{
+			if ($this->rootDir)
+				$flavor["url"] = rtrim($this->rootDir, '/') . '/' . ltrim($flavor["url"], '/');
+			$urls[] = $flavor["url"];
+		}
+		
+		$acl = $this->getAcl($urls);
+		if (!$acl)
+			return;
+		
+		$token = $this->generateToken($acl);
+		
+		if ($this->useCookieHosts)
+		{
+			$slashPos = strrpos($acl, '/');
+			$path = $slashPos !== false ? substr($acl, 0, $slashPos + 1) : '/';
+			setrawcookie($this->paramName, $token, time() + $this->window, $path);
+			return;
+		}
+		
+		foreach($flavors as &$flavor)
+		{
+			$url = $flavor["url"];
+			if (strpos($url, '?') === false)
+				$url .= '?';
+			else 
+				$url .= '&';
+			$flavor["url"] = $url . "{$this->paramName}=$token";
+		}		
 	}
 	
 	/**
@@ -284,6 +388,27 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 	}
 
 	/**
+	 * @return the $customPostfixes
+	 */
+	public function getCustomPostfixes() {
+		return $this->customPostfixes;
+	}
+
+	/**
+	 * @return the $useCookieHosts
+	 */
+	public function getUseCookieHosts() {
+		return $this->useCookieHosts;
+	}
+	
+	/**
+	 * @return the $rootDir
+	 */
+	public function getRootDir() {
+		return $this->rootDir;
+	}
+	
+	/**
 	 * @param string $param
 	 */
 	public function setParamName($paramName) {
@@ -297,6 +422,24 @@ class kAkamaiSecureHDUrlTokenizer extends kUrlTokenizer
 		$this->aclPostfix = $aclPostfix;
 	}
 
+	/**
+	 * @param string $customPostfixes
+	 */
+	public function setCustomPostfixes($customPostfixes) {
+		return $this->customPostfixes = $customPostfixes;
+	}
+
+	/**
+	 * @param string $useCookieHosts
+	 */
+	public function setUseCookieHosts($useCookieHosts) {
+		return $this->useCookieHosts = $useCookieHosts;
+	}
 	
-	
+	/**
+	 * @param string $rootDir
+	 */
+	public function setRootDir($rootDir) {
+		$this->rootDir = $rootDir;
+	}
 }

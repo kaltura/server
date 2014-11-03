@@ -1,9 +1,9 @@
 <?php
 	class KDLSanityLimits {
 		const MinDuration = 100;
-		const MaxDuration = 360000000;	// 10h
-		const MinBitrate = 1;
-		const MaxBitrate = 400000;		// 40MBps
+		const MaxDuration = 360000000;	// 100h
+		const MinBitrate = 10;			// 10Kbps
+		const MaxBitrate = 400000;		// 400MBps
 		const MinFileSize = 1;
 		const MaxFileSize = 40000000000;		// 40GB
 		const MinDimension = 10;
@@ -239,6 +239,9 @@
 		const ConfigFileName= "__configFileName__";
 		const BinaryName	= "__binaryName__";
 		const ForceKeyframes= "__forceKeyframes__";
+		const WaterMarkFileName = "__waterMarkFileName__";
+		const WaterMarkWidth = "__waterMarkWidth__";
+		const WaterMarkHeight = "__waterMarkHeight__";	
 	};
 	
 	class KDLContainerTarget {
@@ -304,6 +307,86 @@
 		const PCM= "pcm";
 		const COPY = "copy";
 	};
+	
+	/**
+	 * KDLAudioLayouts
+	 * 
+	 *
+	 */
+	class KDLAudioLayouts {
+		const FL = "fl";
+		const FR = "fr";
+		const FC = "fc";
+		const LFE = "lfe";
+		const BL = "bl";
+		const BR = "br";
+		const DOWNMIX = "downmix";
+		const MONO = "mono";
+		const STEREO = "stereo";
+		
+		static $layouts = array(
+			self::FL => array("(fl)"),
+			self::FR => array("(fr)"),
+			self::FC => array(),
+			self::LFE => array("(lfe)"),
+			self::BL => array("(bl)"),
+			self::BR => array("(br)"),			
+			self::DOWNMIX => array("downmix"),
+			self::MONO =>array("mono"),	
+			self::STEREO =>array("stereo"),	
+		);
+		
+		static $surroundlayoutTypes = array(
+			self::FL,	self::FR, self::FC,
+			self::LFE,	self::BL, self::BR,			
+			self::MONO);
+		
+		/**
+		 * 
+		 * @param unknown_type $layout
+		 * @return NULL|Ambigous <multitype:, multitype:string >
+		 */
+		public static function Detect($layout) {
+			if(!isset($layout))
+				return null;
+			foreach(self::$layouts as $l=>$names){
+				if(count($names)==0){
+					continue;
+				}
+				foreach($names as $name){
+					if(!isset($name) || strlen($name)==0){
+						continue;
+					}
+					if(stristr($layout,$name)!=false){
+						return $l;
+					}
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * 
+		 * @param unknown_type $audioStreams
+		 * @param unknown_type $layoutTypes
+		 * @return multitype:unknown
+		 */
+		public static function matchLayouts($audioStreams, $layoutTypes = null)
+		{
+			if(!isset($layoutTypes)){
+				$layoutTypes = self::$surroundlayoutTypes;
+			}
+			else if(!is_array($layoutTypes))
+				$layoutTypes = array($layoutTypes);
+			$rv = array();
+			foreach ($audioStreams as $stream){
+				if(isset($stream->audioChannelLayout) && in_array($stream->audioChannelLayout, $layoutTypes)){
+					$rv[] = $stream;
+				}
+			}
+			return $rv;
+		}
+	}
 	
 	class KDLErrors {
 		const SanityInvalidFileSize = 1000;

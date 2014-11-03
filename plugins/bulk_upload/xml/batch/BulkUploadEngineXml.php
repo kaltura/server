@@ -68,6 +68,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var string
 	 */
 	protected $conversionProfileXsl = null;
+	
+	/**
+	 * The original xml content after going through xsl transformation
+	 * @var string
+	 */
+	protected $xslTransformedContent = null;
 
 	/**
 	 * @param KalturaBatchJob $job
@@ -111,10 +117,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		$xdoc = new KDOMDocument();
 		
-		$xmlContent = $this->xslTransform($this->data->filePath);
+		$this->xslTransformedContent = $this->xslTransform($this->data->filePath);
 		libxml_clear_errors();
-		if(!$xdoc->loadXML($xmlContent)){
-			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
+		if(!$xdoc->loadXML($this->xslTransformedContent)){
+			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
 			KalturaLog::debug("Could not load xml");
 			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
@@ -128,7 +134,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!$xdoc->schemaValidateSource($xsd))
 		{
-			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
+			$errorMessage = kXml::getLibXmlErrorDescription($this->xslTransformedContent);
 			KalturaLog::debug("XML is invalid:\n$errorMessage");
 			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
@@ -202,7 +208,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->currentItem = 0;
 		
-		$xdoc = new SimpleXMLElement($this->xslTransform($this->data->filePath));
+		$xdoc = new SimpleXMLElement($this->xslTransformedContent);
 		
 		foreach( $xdoc->channel as $channel)
 		{
@@ -297,13 +303,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
-			
 			if($this->currentItem < $startIndex)
 			{
 				$this->currentItem++;
 				continue;
 			}
-				
 			
 			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 				return;

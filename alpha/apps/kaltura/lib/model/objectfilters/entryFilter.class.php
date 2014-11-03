@@ -5,7 +5,7 @@
  */ 
 class entryFilter extends baseObjectFilter
 {
-	const FREE_TEXT_FIELDS = 'name,tags,description,entry_id,reference_id,roots,puser_id';
+	const FREE_TEXT_FIELDS = 'name,tags,description,entry_id,reference_id,roots,puser_id,user_names';
 	
 	// allow only 256 charaters when creation a MATCH-AGAINST caluse
 	const MAX_SAERCH_TEXT_SIZE = 256;
@@ -27,7 +27,8 @@ class entryFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_in_id" , 
 			"_notin_id" , 
-			"_eq_id" , 
+			"_eq_id" ,
+			"_in_user_id", 
 			"_eq_user_id" ,  // is in fact the kuser_id - see aliases
 			"_eq_kshow_id" ,
 			"_eq_status" ,
@@ -604,6 +605,10 @@ class entryFilter extends baseObjectFilter
 		$this->set('_notin_status', $arr);
 	}
 	
+	public function setUserIdIn($v)
+	{
+		$this->set('_in_user_id', $v);
+	}
 	public function setUserIdEquel($v)
 	{
 		$this->set('_eq_user_id', $v);

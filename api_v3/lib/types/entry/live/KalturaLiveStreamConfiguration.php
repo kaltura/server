@@ -19,12 +19,24 @@ class KalturaLiveStreamConfiguration extends KalturaObject
 	
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $publishUrl;
 	
+	/**
+	 * @var string
+	 * @deprecated
+	 */
+	public $backupUrl;
+	
+	/**
+	 * @var string
+	 */
+	public $streamName;
+	
 	private static $mapBetweenObjects = array
 	(
-		"protocol", "url", "publishUrl"
+		"protocol", "url", "publishUrl", "backupUrl", "streamName",
 	);
 	
 	/* (non-PHPdoc)

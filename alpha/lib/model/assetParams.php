@@ -28,6 +28,7 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	const CONTAINER_FORMAT_WAV = "wav";
 	const CONTAINER_FORMAT_HLS = "hls";
+	const CONTAINER_FORMAT_M4V = "m4v";
 	const CONTAINER_FORMAT_COPY = "copy";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
@@ -52,6 +53,7 @@ class assetParams extends BaseassetParams
 	const TAG_INGEST = "ingest";
 	const TAG_ISM_MANIFEST = "ism_manifest";
 	const TAG_SMIL_MANIFEST = "smil_manifest";
+	const TAG_RECORDING_ANCHOR = 'recording_anchor';
 
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	

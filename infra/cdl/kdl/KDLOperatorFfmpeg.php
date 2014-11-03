@@ -247,6 +247,7 @@ $con = $target->_container;
 			case KDLContainerTarget::MOV:
 			case KDLContainerTarget::MP3:
 			case KDLContainerTarget::OGG:
+			case KDLContainerTarget::M4V:
 				$format = $con->_id;
 				break;
 			case KDLContainerTarget::OGV:

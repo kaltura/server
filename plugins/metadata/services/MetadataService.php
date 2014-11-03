@@ -234,7 +234,12 @@ class MetadataService extends KalturaBaseService
 	 * @throws MetadataErrors::INVALID_METADATA_VERSION
 	 * @throws MetadataErrors::XSLT_VALIDATION_ERROR
 	 */	
-	function updateAction($id, $xmlData = null, $version = null)
+	function updateAction ($id, $xmlData = null, $version = null)
+	{
+		return kLock::runLocked("metadata_update_xsl_{$id}", array($this, 'updateImpl'), array($id, $xmlData, $version));
+	}
+
+	function updateImpl($id, $xmlData = null, $version = null)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		if(!$dbMetadata)
@@ -281,10 +286,11 @@ class MetadataService extends KalturaBaseService
 			}
 			
 			$dbMetadata->incrementVersion();
-			$dbMetadata->save();
 		
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 			kFileSyncUtils::file_put_contents($key, $xmlData);
+			
+			$dbMetadata->save();
 			
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 		}
@@ -600,6 +606,6 @@ class MetadataService extends KalturaBaseService
 			throw new KalturaAPIException(MetadataErrors::XSLT_VALIDATION_ERROR, implode(',', $xsltErrors));
 		}
 
-		return $this->updateAction($id, $transformMetadataObjectData);
+		return $this->updateImpl($id, $transformMetadataObjectData);
 	}
 }

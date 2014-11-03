@@ -4,8 +4,6 @@
 	id="frmStorageConfig" class="<?php echo ($this->formValid) ? 'valid' : 'invalid'; ?>">
 
 <?php echo $this->form; ?>
-			
-
 
 <script type="text/javascript">
 jQuery('[class=commentForm]').toggle();
@@ -43,8 +41,40 @@ jQuery(document).ready(function() {
 		dialogDiv.dialog('close');
 		jQuery('#frmPartnerFilter').submit();
 	<?php endif; ?>
+
+	updatedUI();
 });
 
+function assignDeliveryProfile(format, currentDps)
+{
+	var storageProfileId = $("#storageId")[0].value;
+
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';
+	url += '/currentDeliveryProfiles/' + currentDps + "/streamerType/" + format;
+	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 750,
+		title: '<?php echo $this->translate('Edit delivery profiles : Storage id '); ?>' + storageProfileId +
+			'<?php echo $this->translate(' , Format '); ?>' + format,
+		height: 400,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				okPressed(format);
+				jQuery(this).dialog('close').remove();
+			},
+		},
+		close: function() {
+			$(this).dialog('close').remove();
+		}
+	});
+	dialogDiv.load(
+			url
+		);
+}
 </script>
 </form>
 

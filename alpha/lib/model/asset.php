@@ -87,10 +87,14 @@ class asset extends Baseasset implements ISyncableFile
 	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 	const FILE_SYNC_ASSET_SUB_TYPE_ISM = 3;
 	const FILE_SYNC_ASSET_SUB_TYPE_ISMC = 4;
+	
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_PRIMARY = 5; 
+	const FILE_SYNC_ASSET_SUB_TYPE_LIVE_SECONDARY = 6;
 
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
+	const CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE = "fileSyncVersionsToDelete";
 	
 	const MAX_ASSETS_PER_ENTRY = 500;
 	
@@ -295,7 +299,7 @@ class asset extends Baseasset implements ISyncableFile
 	}
 	
 	
-	private static function validateFileSyncSubType ( $sub_type )
+	protected static function validateFileSyncSubType ( $sub_type )
 	{
 		$valid_sub_types = array(
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET,
@@ -307,13 +311,28 @@ class asset extends Baseasset implements ISyncableFile
 			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
 	}
 	
+	protected function getVersionForSubType($sub_type, $version = null)
+	{
+		switch ($sub_type)
+		{
+			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
+			case asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
+				return $this->getVersion();
+				
+			case asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
+				return $this->getLogFileVersion();
+		}
+		return null;
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#getSyncKey()
 	 */
 	public function getSyncKey($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType($sub_type);
+		static::validateFileSyncSubType($sub_type);
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::FLAVOR_ASSET;
 		$key->object_sub_type = $sub_type;
@@ -324,17 +343,7 @@ class asset extends Baseasset implements ISyncableFile
 		}
 		else
 		{
-			switch ($sub_type)
-			{
-				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM:
-				case flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC:
-					$key->version = $this->getVersion();
-					break;
-				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
-					$key->version = $this->getLogFileVersion();
-					break;
-			}
+			$key->version = $this->getVersionForSubType($sub_type);
 		}
 		$key->partner_id = $this->getPartnerId();
 		
@@ -348,7 +357,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType ( $sub_type );
 		
 		$entry = $this->getentry();
 		if(!$entry)
@@ -387,8 +396,8 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function generateFilePathArr($sub_type, $version = null)
 	{
-		self::validateFileSyncSubType ( $sub_type );
-		$version = (is_null($version) ? $this->getVersion() : $version);
+		static::validateFileSyncSubType ( $sub_type );
+		$version = (is_null($version) ? $this->getVersionForSubType($sub_type) : $version);
 		
 		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
 		if(!$entry)
@@ -485,7 +494,7 @@ class asset extends Baseasset implements ISyncableFile
 		return $url;
 	}
 	
-	public function getDownloadUrl($useCdn = false, $forceProxy = false)
+	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
@@ -532,8 +541,8 @@ class asset extends Baseasset implements ISyncableFile
 		
 		if($serveRemote && $fileSync)
 			return $fileSync->getExternalUrl($this->getEntryId());
-		
-		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy);
+
+		return $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview);
 	}
 	
 	public function isKsNeededForDownload()
@@ -548,19 +557,23 @@ class asset extends Baseasset implements ISyncableFile
 		return $entry->isSecuredEntry();
 	}
 	
-	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false)
+	public function getDownloadUrlWithExpiry($expiry, $useCdn = false, $forceProxy = false, $preview = null)
 	{
 		$ksStr = "";
 		$partnerId = $this->getPartnerId();
 		
-		if ($this->isKsNeededForDownload())
+		if ($this->isKsNeededForDownload() || $preview)
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$secret = $partner->getSecret();
 			$privilege = ks::PRIVILEGE_DOWNLOAD.":".$this->getEntryId();
 			$privilege .= ",".kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY .":". $this->getEntryId();
-			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();
+			$privilege .= "," . kSessionBase::PRIVILEGE_VIEW . ":" . $this->getEntryId();       
+			$privilege .= "," . kSessionBase::PRIVILEGE_DOWNLOAD_ASSET . ":" . $this->getId();
 			
+			if($preview)
+				$privilege .= "," . kSessionBase::PRIVILEGE_PREVIEW . ":" . $preview;
+
 			$result = kSessionUtils::startKSession($partnerId, $secret, null, $ksStr, $expiry, false, "", $privilege);
 	
 			if ($result < 0)
@@ -686,5 +699,16 @@ class asset extends Baseasset implements ISyncableFile
 	public function getActualSourceAssetParamsIds()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS);}
 	public function setActualSourceAssetParamsIds($v)	{$this->putInCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS, $v);}
 	
+	public function resetFileSyncVersionsToDelete() 	{$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, null);}
+	public function getFileSyncVersionsToDelete()		{return $this->getFromCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE);}
+	public function setFileSyncVersionsToDelete($v)	
+	{
+		$versionsToDelete = $this->getFileSyncVersionsToDelete();
+		
+		if($versionsToDelete)
+			$v = array_merge($versionsToDelete, $v);
+		
+		$this->putInCustomData(self::CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE, $v);
+	}
 	
 }

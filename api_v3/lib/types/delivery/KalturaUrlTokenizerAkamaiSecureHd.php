@@ -14,11 +14,29 @@ class KalturaUrlTokenizerAkamaiSecureHd extends KalturaUrlTokenizer {
 	 * @var string
 	 */
 	public $aclPostfix;
+
+	/**
+	 * @var string
+	 */
+	public $customPostfixes;
+
+	/**
+	 * @var string
+	 */
+	public $useCookieHosts;
+	
+	/**
+	 * @var string
+	 */
+	public $rootDir;
 	
 	private static $map_between_objects = array
 	(
 			"paramName",
-			"aclPostfix"
+			"aclPostfix",
+			"customPostfixes",
+			"useCookieHosts",
+			"rootDir",
 	);
 	
 	public function getMapBetweenObjects ( )

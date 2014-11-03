@@ -60,6 +60,8 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 					
 			DeliveryProfileType::LIMELIGHT_HTTP => 'DeliveryProfileLimeLightHttp',
 			DeliveryProfileType::LIMELIGHT_RTMP => 'DeliveryProfileLimeLightRtmp',
+			
+			DeliveryProfileType::VOD_PACKAGER_DASH => 'DeliveryProfileVodPackagerDash',
 					
 			DeliveryProfileType::LOCAL_PATH_APPLE_HTTP => 'DeliveryProfileLocalPathAppleHttp',
 			DeliveryProfileType::LOCAL_PATH_HTTP => 'DeliveryProfileLocalPathHttp',
@@ -373,6 +375,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	{
 		$deliveryProfileTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, self::LIVE_DELIVERY_PROFILE);
 		$deliveryProfileTypes = array_merge($deliveryProfileTypes, self::$LIVE_DELIVERY_PROFILES);
+		
+		$key = array_search(self::LIVE_DELIVERY_PROFILE, $deliveryProfileTypes);
+		unset($deliveryProfileTypes[$key]);
+		
 		return $deliveryProfileTypes;
 	}
 	

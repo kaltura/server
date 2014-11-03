@@ -1729,7 +1729,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="url" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="host_name" type="varchar" size="127" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_default" type="boolean" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_default" type="boolean" default="false"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parent_id" default="0" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="recognizer" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tokenizer" type="longvarchar" />
@@ -1799,6 +1799,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="ks_valid_until" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="actions_limit" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="integer" />
 		<index name="ks_index">
 			<index-column name="ks" />
 		</index>

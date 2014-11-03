@@ -111,7 +111,7 @@ class kBusinessPreConvertDL
 			
 		$errDescription = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
-		$destThumbParamsOutput = self::validateThumbAndMediaInfo($destThumbParams, $mediaInfo, $errDescription);
+		$destThumbParamsOutput = self::validateThumbAndMediaInfo($destThumbParams, $mediaInfo, $errDescription, $srcAsset);
 		
 		if($srcAsset->getType() == assetType::FLAVOR && is_null($destThumbParamsOutput->getVideoOffset()))
 		{
@@ -551,7 +551,18 @@ class kBusinessPreConvertDL
 		{
 			$errDesc = '';
 			foreach($cdl->_errors as $section => $errors)
+			{
 				$errDesc .= "$section errors: " . join(";", $errors) . "\n";
+				foreach($errors as $error)
+				{
+					if (strpos($error,'Invalid frame dimensions') != 0)
+					{
+						$errDescription .= "\nMedia err: $errDesc";
+						KalturaLog::err($error);
+						throw new kCoreException($error , KDLErrors::SanityInvalidFrameDim);
+					}
+				}
+			}
 				
 			KalturaLog::log("Decision layer input errors: $errDesc");
 			$errDescription .= "\nMedia err: $errDesc";
@@ -803,7 +814,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 * @param string $errDescription
 	 * @return thumbParamsOutput or null for fail
 	 */
-	protected static function validateThumbAndMediaInfo(thumbParams $thumbParams, mediaInfo $mediaInfo = null, &$errDescription)
+	protected static function validateThumbAndMediaInfo(thumbParams $thumbParams, mediaInfo $mediaInfo = null, &$errDescription, $srcAsset = null)
 	{
 		$thumbParamsOutput = new thumbParamsOutput();
 	
@@ -1025,7 +1036,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			}
 		}
 
-		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		try{
+			return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		}
+		catch(Exception $e){
+			if (strpos($e->getMessage(),'Invalid frame dimensions') != 0)
+				throw $e;
+		}
+
 	}
 		
 	public static function continueProfileConvert(BatchJob $parentJob)
@@ -1093,7 +1111,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
 		
-		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		try{
+			return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
+		}
+		catch(Exception $e){
+			KalturaLog::err('decideProfileFlavorsConvert - ' . $e->getMessage());
+		}
 	}
 		
 	public static function decideProfileFlavorsConvert(BatchJob $parentJob, BatchJob $convertProfileJob, array $flavors, array $conversionProfileFlavorParams, $conversionProfileId, mediaInfo $mediaInfo = null)
@@ -1109,8 +1132,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 		
 		$errDescription = null;
-		$finalFlavors = self::validateConversionProfile($convertProfileJob->getPartnerId(), $entryId, $mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
-			
+	                
+		try{
+			$finalFlavors = self::validateConversionProfile($convertProfileJob->getPartnerId(), $entryId, $mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
+		}
+		catch(Exception $e){
+			if (strpos($e->getMessage(),'Invalid frame dimensions') != 0)
+			{
+				$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription);
+				KalturaLog::err($e->getMessage());
+				throw $e;
+			}
+		}
+	
 		KalturaLog::log(count($finalFlavors) . " flavors returned from the decision layer");
 		if(is_null($finalFlavors))
 		{
@@ -1444,6 +1478,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		foreach($flavors as $index => $flavor)
 		{
+			/* @var $flavor assetParams */
+			
 			KalturaLog::debug("Check flavor [" . $flavor->getId() . "]");
 			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
 				continue;
@@ -1472,6 +1508,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$sourceFlavor = $flavor;
 				unset($flavors[$index]);
 				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it has source tag");
+				continue;
+			}
+		
+			if($flavor instanceof liveParams)
+			{
+				unset($flavors[$index]);
+				$ingestedNeeded = true;
+				KalturaLog::debug("Flavor [" . $flavor->getId() . "] won't be converted because it's ingested recorded live");
 				continue;
 			}
 			

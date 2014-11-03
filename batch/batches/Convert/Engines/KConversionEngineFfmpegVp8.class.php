@@ -3,7 +3,7 @@
  * @package Scheduler
  * @subpackage Conversion.engines
  */
-class KConversionEngineFfmpegVp8  extends KJobConversionEngine
+class KConversionEngineFfmpegVp8  extends KConversionEngineFfmpeg
 {
 	const FFMPEG_VP8 = "ffmpeg_vp8";
 	

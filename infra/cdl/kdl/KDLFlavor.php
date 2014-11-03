@@ -270,6 +270,21 @@ $plannedDur = 0;
 			}
 		}
 
+		/*
+		 * Allow conversion and fixing of invalidly muxed WEB-CAM recordecd files - 
+		 * - FLV/Sorenson/Nellimossr
+		 * - very HUGE duration
+		 * - very LOW bitrate - about several bits-per-sec.
+		 * In such cases the 'duration validation' is un-applicable
+		 *
+		if(isset($srcVid) && $srcVid->IsFormatOf(array("h.263","h263","sorenson spark","vp6")) 
+		&& isset($srcAud) && $srcAud->IsFormatOf(array('nellymoser')) && $cDur>0 && isset($srcCont->_fileSize)){
+			if($srcCont->_fileSize*8000/$cDur<KDLSanityLimits::MinBitrate) {
+				KalturaLog::log("Invalid WEB-CAM source file. Duration validation is un-applicable");
+				return true;
+			}
+		}
+		*/
 		if($this->_video!==null) {
 			if($product->_video===null){
 				$product->_errors[KDLConstants::VideoIndex][] = KDLErrors::ToString(KDLErrors::MissingMediaStream);
@@ -461,11 +476,31 @@ $plannedDur = 0;
 		else {
 			$target->_fastSeekTo = true;
 		}
+			/*
+			 * Analyse the source to determine whether it contains multi-stream audio.
+			 * In case it does and the flavor has 'multiStream' set to 'auto-detect' (default action) -
+			 * try to define a multiStream processing setup
+			 */
+		$sourceAnalize = self::analizeSourceContentStreams($source->_contentStreams);
+			/*
+			 * If 'streamsAsChannels' were detected do 'multiStream' processing
+			 * otherwise remove 'multiStream' settings from the target
+			 */
+		if(isset($sourceAnalize->streamsAsChannels)){
+			if(!isset($target->_multiStream)
+			|| (isset($target->_multiStream->detect) && $target->_multiStream->detect=='auto')){
+				$target->_multiStream = self::sourceMultiStreamToTarget($source, $sourceAnalize);
+			}
+		}
+		else {
+			$target->_multiStream = null;
+		}
+				
 		
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
 		}
-		
+
 		$target->_container->_duration = $sourceDur;
 		$target->_video = null;
 		if($this->_video!="") {
@@ -501,7 +536,7 @@ $plannedDur = 0;
 		$target->_audio = null;
 		if($this->_audio!=""){
 			if($source->_audio!=""){
-				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target);
+				$target->_audio = $this->evaluateTargetAudio($source->_audio, $target, $source->_contentStreams);
 			}
 		}
 		
@@ -588,6 +623,7 @@ $plannedDur = 0;
 					$targetVid->_id = KDLVideoTarget::H264;
 					break;
 				case KDLContainerTarget::MP4:
+				case KDLContainerTarget::M4V:
 					$targetVid->_id = KDLVideoTarget::H264;
 					break;
 				case KDLContainerTarget::MOV:
@@ -882,7 +918,7 @@ $plannedDur = 0;
 	 *  - Compare each of them to the required AR
 	 *  - Find the setup that is closest 
 	 */
-	function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
+	protected function matchBestModConstrainedVideoFramesize($darSrcFrame, $hgtSrc, $widSrc, $modVal, KDLVideoData $target) 
 	{ 
 			/*
 			 * Calculate hgt & wid 'mod down' value. If not set - assign 0 
@@ -1035,13 +1071,35 @@ $plannedDur = 0;
 	/* ---------------------------
 	 * evaluateTargetAudio
 	 */
-	public function evaluateTargetAudio(KDLAudioData $source, KDLMediaDataSet $target)
+	public function evaluateTargetAudio(KDLAudioData $source, KDLMediaDataSet $target, $contentStreams=null)
 	{
+		/*
+		 * Adjust source channnels count to match the mapping settings
+		 */
+		$multiStream = $target->_multiStream;
+		$multiStreamChannels = null;
+		if(isset($multiStream) && isset($multiStream->audio)
+		&& isset($multiStream->audio->mapping) && count($multiStream->audio->mapping)>0) {
+			if(count($multiStream->audio->mapping)>1){
+				$multiStreamChannels = 2;
+			}
+			else if(isset($contentStreams) && isset($contentStreams->audio)){
+				$streams = $contentStreams->audio;
+				foreach ($streams as $stream){
+					if($stream->id==$multiStream->audio->mapping[0]){
+						$multiStreamChannels = $stream->audioChannels;
+						break;
+					}
+				}
+			}
+		}
+		
 		$targetAud = clone $this->_audio;
 		if($targetAud->_id=="" || $targetAud->_id==null) {
 			if($target->_container!=null) {
 				switch($target->_container->_id){
 					case KDLContainerTarget::MP4:
+					case KDLContainerTarget::M4V:
 					case KDLContainerTarget::_3GP:
 						$targetAud->_id=KDLAudioTarget::AAC;
 						break;
@@ -1112,6 +1170,9 @@ $plannedDur = 0;
 		&& !($targetAud->_id==KDLAudioTarget::AAC || $targetAud->_id==KDLAudioTarget::PCM || $targetAud->_id==KDLAudioTarget::MPEG2)){
 			$targetAud->_channels=KDLConstants::DefaultAudioChannels;
 		}
+		else if(isset($multiStreamChannels)){
+			$targetAud->_channels=$multiStreamChannels;
+		}
 		else {
 			$targetAud->_channels=min($targetAud->_channels, $source->_channels);
 		}
@@ -1164,8 +1225,10 @@ $plannedDur = 0;
 			 * - Nellimoser audio source
 			 * - Low sample-rate audio (<16000hz)
 			 * - target other than OGG/Vorbis
+			 * DO-NOT try to resample on 'copy' cases - it can not be done
 			 */
 		if(!$target->_container->IsFormatOf(array(KDLContainerTarget::OGG,KDLContainerTarget::OGV))
+		&& !$targetAud->IsFormatOf(array(KDLAudioTarget::COPY))
 		&& ($source->IsFormatOf(array('nellymoser'))||($source->_sampleRate && $source->_sampleRate>0 && $source->_sampleRate<16000))) {
 			$targetAud->_useResampleFilter = true;
 		}
@@ -1173,6 +1236,156 @@ $plannedDur = 0;
 		return $targetAud;
 	}
 
+	/**
+	 * 
+	 * @param unknown_type $contentStreams
+	 */
+	private static function analizeSourceContentStreams($contentStreams)
+	{
+		$rvAnalize = new stdClass();
+		
+			/*
+			 * Evaluate stream duration differences
+			 * - calc average duration of each stream type (vid, aud,...)
+			 * - calc delta between the avg and every stream dur (per type - aud, vid,...)
+			 * - evaluate which streams have dur identical to the avg, which one is diff, and which one is zeroed
+			 * - store in array for final part of anaylize logic
+			 */
+		$dursAccm = array();
+		foreach($contentStreams as $t=>$streams) {
+			foreach($streams as $stream){
+				if(!array_key_exists($t, $dursAccm))
+					$dursAccm[$t] = 0;
+				$fld = $t."Duration";
+				$dursAccm[$t] += isset($stream->$fld)?$stream->$fld:0;
+			}
+		}
+		foreach($dursAccm as $t=>$accm){
+			$dursAvg[$t] = $accm>0?$accm/count($contentStreams->$t):0;
+		}
+
+		$identicalDur = array();
+		$zeroedDur = array();
+		$differentDur = array();
+		foreach($contentStreams as $t=>$streams) {
+			foreach($streams as $stream){
+				$fld = $t."Duration";
+				$dur = $stream->$fld; //audoDuration or videoDuration or dataDuration
+				if($dur==0) {
+					$zeroedDur[$t][] = $stream;
+					continue;
+				}
+				
+				$dlt = abs($dursAvg[$t]-$dur);
+					// Identical concidered to be less than 1sec delta and the delts is less than 0.1% 
+				if($dlt<1000 && $dlt/$dur<0.001)
+					$identicalDur[$t][] = $stream;
+				else
+					$differentDur[$t][] = $stream;
+				
+			}
+		}
+		
+			/*
+			 * For audio streams - 
+			 * Check for 'streamAsChannel' case and for 'multilangual' case
+			 * 'streamAsChannel' considerd to be if there are more than 1 mono streams.
+			 */
+		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1){
+				// Get all streams that have 'surround' like audio layout - FR, FL, ...
+			$channelStreams = KDLAudioLayouts::matchLayouts($identicalDur['audio']);
+				// Sort the audio streams for chunnel number. We are looking for mono streams
+			$chnNumStreams = array();
+			foreach ($channelStreams as $stream){
+				if(isset($stream->audioChannels))
+					$chnNumStreams[$stream->audioChannels][] = $stream;
+			}
+				
+				/*
+				 * The streams that might be used for merging are only mono streams
+				 * otherwise - no streamAsChannel
+				 */ 
+			if(array_key_exists(1, $chnNumStreams) && count($chnNumStreams[1])>1){
+				$channelStreams = $chnNumStreams[1];
+			}
+			else {
+				$channelStreams = array();
+			}
+			
+				/* 
+				 * Check for multi-langual case
+				 * Sort the streams according to stream language
+				 */
+			$langStreams = array();
+			foreach ($identicalDur['audio'] as $stream){
+				if(isset($stream->audioLanguage))
+					$langStreams[$stream->audioLanguage][] = $stream;
+			}
+			
+				// Set 'streamsAsChannels' only if there are more than 2 audio streams in the file
+			if(count($channelStreams)>1){
+				$rvAnalize->streamsAsChannels = $channelStreams;
+			}
+				// Set 'languages' only if there are more than 1 language in the file
+			if(count($langStreams)>1){
+				$rvAnalize->languages = $langStreams;
+			}	// not overlayed streams, probably should be concated
+			if(count($contentStreams->audio)-count($identicalDur['audio'])>2){
+				$rvAnalize = null;
+			}
+			 
+		}
+		
+		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;
+		if(count($differentDur)>0) $rvAnalize->differentDur = $differentDur;		
+		if(count($zeroedDur)>0) $rvAnalize->zeroedDur = $zeroedDur;
+		
+		return $rvAnalize;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $source
+	 * @param unknown_type $sourceAnalize
+	 * @return NULL|stdClass
+	 */
+	private static function sourceMultiStreamToTarget($source, $sourceAnalize)
+	{
+		if(!isset($sourceAnalize->streamsAsChannels)){
+			return null;
+		}
+
+		/*
+		 * Sample json string: 
+		 * 		- {"detect":"auto"}
+		 * 		- {"audio":{"mapping":[1,2]}}
+		 * Struct:
+		 * 	detect - 'auto', when set all other fields are omitted, (optional)
+		 * 	audio - either as a single field or as array
+		 * 		mapping - array of stream ids, optionally in ffmpeg syntax (with source file id)
+		 * 		action	- 'merge' (default),'languages', (optional)
+		 * 		output	- output stream (optional)
+		 * 	video
+		 * 		...
+		 *
+		 */
+		$multiStream = new stdClass();
+		$multiStream->audio = new stdClass();
+		$multiStream->audio->mapping = array();
+		/*
+		 * Use 'downnmix' stream, if there is such,
+		 * Otherwise try to map-in FL and FR streams
+		 */
+		$mappedStreams = KDLAudioLayouts::matchLayouts($source->_contentStreams->audio, KDLAudioLayouts::DOWNMIX);
+		if(count($mappedStreams)==0) {
+			$mappedStreams = KDLAudioLayouts::matchLayouts($sourceAnalize->streamsAsChannels, array(KDLAudioLayouts::FL, KDLAudioLayouts::FR, KDLAudioLayouts::MONO,));
+		}
+		foreach ($mappedStreams as $stream){
+			$multiStream->audio->mapping[] = $stream->id;
+		}
+		return $multiStream;
+	}
+	
 	/* ---------------------------
 	 * evaluateMultiStream
 	 * 

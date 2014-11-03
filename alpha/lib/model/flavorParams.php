@@ -130,8 +130,8 @@ class flavorParams extends assetParams
 	public function setIsVideoFrameRateForLowBrAppleHls($v) 	{$this->putInCustomData('IsVideoFrameRateForLowBrAppleHls', $v);}
 	public function getIsVideoFrameRateForLowBrAppleHls()		{return $this->getFromCustomData('IsVideoFrameRateForLowBrAppleHls', null, 0);}
 
-//	public function setMultiStream($v){ $this->putInCustomData('MultiStream', $v);}
-//	public function getMultiStream(){return $this->getFromCustomData('MultiStream', null, 0);}
+	public function setMultiStream($v){ $this->putInCustomData('MultiStream', $v);}
+	public function getMultiStream(){return $this->getFromCustomData('MultiStream', null, null);}
 	
 	public function setAnamorphicPixels($v){ $this->putInCustomData('AnamorphicPixels', $v);}
 	public function getAnamorphicPixels(){return $this->getFromCustomData('AnamorphicPixels', null, 0);}
@@ -142,4 +142,6 @@ class flavorParams extends assetParams
 	public function setMaxFrameRate($v){ $this->putInCustomData('MaxFrameRate', $v);}
 	public function getMaxFrameRate(){return $this->getFromCustomData('MaxFrameRate', null, 0);}
 	
+	public function setWatermarkData($v){ $this->putInCustomData('WatermarkData', $v);}
+	public function getWatermarkData(){return $this->getFromCustomData('WatermarkData', null, null);}
 }

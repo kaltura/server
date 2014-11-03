@@ -58,6 +58,16 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 	
 	abstract protected function getBulkUploadResultObjectType ();
 	
+	protected function isErrorResult($requestResult){
+		if(is_array($requestResult) && isset($requestResult['code'])){
+			return true;
+		}
+		if($requestResult instanceof Exception){
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 *
 	 * Creates a new upload result object from the given parameters
@@ -155,7 +165,7 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 		    switch ($bulkUploadResult->action)
 		    {
 		        case KalturaBulkUploadAction::ADD:
-    		        $categoryEntry = $this->createObjectFromResultAndJobData($bulkUploadResult);       					
+    		        $this->createObjectFromResultAndJobData($bulkUploadResult);       					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
 		            break;
 		        		            
@@ -205,21 +215,25 @@ abstract class BulkUploadEngineFilter extends KBulkUploadEngine
 			
 			if(is_array($requestResult) && isset($requestResult['code']))
 			{
-			    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-			    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
-				$bulkUploadResult->objectStatus = $requestResult['code'];
-				$bulkUploadResult->errorDescription = $requestResult['message'];
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
+				if($this->isErrorResult($requestResult)){
+				    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+				    $bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+					$bulkUploadResult->objectStatus = $requestResult['code'];
+					$bulkUploadResult->errorDescription = $requestResult['message'];
+					$this->addBulkUploadResult($bulkUploadResult);	
+					continue;				
+				}				
 			}
 			
 			if($requestResult instanceof Exception)
 			{
-				$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
-				$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
-				$bulkUploadResult->errorDescription = $requestResult->getMessage();
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
+				if($this->isErrorResult($requestResult)){
+					$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+					$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::KALTURA_API;
+					$bulkUploadResult->errorDescription = $requestResult->getMessage();
+					$this->addBulkUploadResult($bulkUploadResult);
+					continue;
+				}				
 			}
 			
 			// update the results with the new object Id

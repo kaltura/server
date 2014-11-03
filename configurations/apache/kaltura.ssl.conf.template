@@ -1,3 +1,9 @@
+<IfModule !ssl_module>
+	LoadModule ssl_module modules/mod_ssl.so
+</IfModule>
+
+Listen @KALTURA_VIRTUAL_HOST_PORT@
+
 SSLPassPhraseDialog  builtin
 SSLSessionCache         shmcb:/var/cache/mod_ssl/scache(512000)
 SSLSessionCacheTimeout  300

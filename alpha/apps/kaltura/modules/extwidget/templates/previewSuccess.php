@@ -13,14 +13,31 @@
 	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
 	<meta property="og:type" content="video.other" />
 	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
-	<meta property="og:image:seucre_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+	<meta property="og:image:secure_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video" content="<?php echo $swfSecureUrl; ?>" />
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
 	<meta property="og:video:type" content="application/x-shockwave-flash" />
+
+	<meta name="twitter:card" content="player"/>
+    <meta name="twitter:site" content="@kaltura"/>
+    <meta name="twitter:creator" content="@kaltura"/>
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($entry_name); ?>" />
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
+    <meta name="twitter:image" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+    <meta name="twitter:player" content="<?php echo $playerUrl; ?>" />
+    <?php if( isset($flavorUrl) ) { ?>
+    <meta name="twitter:player:stream" content="<?php echo $flavorUrl; ?>" />
+    <?php } ?>
+	<meta name="twitter:player:stream:content_type" content="video/mp4"/>
+    <meta name="twitter:player:height" content="<?php echo $uiConf->getHeight();?>" />
+    <meta name="twitter:player:width" content="<?php echo $uiConf->getWidth();?>" />
+
+
 	<?php if( isset($flavor_asset_id) ) { ?>
 	<meta property="og:video" content="<?php echo $flavorUrl; ?>" />
-	<meta property="og:video:type" content="video/mp4" />	
+	<meta property="og:video:type" content="video/mp4" />
+
 	<?php } ?>
 	<meta property="og:site_name" content="Kaltura" />
 	<?php } ?>

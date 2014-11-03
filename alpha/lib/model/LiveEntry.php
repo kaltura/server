@@ -7,7 +7,9 @@ abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
 	const FIRST_BROADCAST = 'first_broadcast';
-	const DEFAULT_CACHE_EXPIRY = 70;
+	const DEFAULT_CACHE_EXPIRY = 120;
+	
+	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -125,7 +127,7 @@ abstract class LiveEntry extends entry
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 			
-		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues['mediaServers']))
+		if(!$this->decidingLiveProfile && $this->conversion_profile_id && isset($this->oldCustomDataValues[LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS]))
 		{
 			$this->decidingLiveProfile = true;
 			kBusinessConvertDL::decideLiveProfile($this);
@@ -225,11 +227,17 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("dvr_window", $v);
 	}
 	
+	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
+	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
+
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
 	
 	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
+	
+	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
+	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
 	public function getPushPublishEnabled()
 	{
@@ -422,7 +430,7 @@ abstract class LiveEntry extends entry
 		
 		if ($this->getPushPublishEnabled())
 		{
-			$pushPublishConfigurations = $this->getPushPublishConfigurations();
+			$pushPublishConfigurations = $this->getPushPublishPlaybackConfigurations();
 			$configurations = array_merge($configurations, $pushPublishConfigurations);
 		}
 		
@@ -530,13 +538,14 @@ abstract class LiveEntry extends entry
 		if($this->storeInCache($key) && $this->isMediaServerRegistered($index, $hostname))
 			return;
 		
+		$this->setLastBroadcast(time());
 		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
-		$this->putInCustomData("server-$index", $server, 'mediaServers');
+		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
 	protected function isMediaServerRegistered($index, $hostname)
 	{
-		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		/* @var $server kLiveMediaServer */
 		if($server && $server->getHostname() == $hostname)
 			return true;
@@ -545,10 +554,10 @@ abstract class LiveEntry extends entry
 	}
 	
 	public function unsetMediaServer($index, $hostname)
-	{
-		$server = $this->getFromCustomData("server-$index", 'mediaServers');
+	{	
+		$server = $this->getFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 		if($server && $server->getHostname() == $hostname)
-			$server = $this->removeFromCustomData("server-$index", 'mediaServers');
+			$server = $this->removeFromCustomData("server-$index", LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
 	/**
@@ -557,14 +566,14 @@ abstract class LiveEntry extends entry
 	public function validateMediaServers()
 	{
 		$listChanged = false;
-		$kMediaServers = $this->getFromCustomData(null, 'mediaServers', array());
+		$kMediaServers = $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 		foreach($kMediaServers as $key => $kMediaServer)
 		{
 			if(!$kMediaServer || ! $this->isCacheValid($kMediaServer))
 			{
 				$listChanged = true;
 				KalturaLog::debug("Removing media server [" . ($kMediaServer ? $kMediaServer->getHostname() : $key) . "]");
-				$this->removeFromCustomData($key, 'mediaServers');
+				$this->removeFromCustomData($key, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 			}
 		}
 		
@@ -576,7 +585,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getMediaServers()
 	{
-		return $this->getFromCustomData(null, 'mediaServers', array());
+		return $this->getFromCustomData(null, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS, array());
 	}
 	
 	/* (non-PHPdoc)
@@ -630,12 +639,22 @@ abstract class LiveEntry extends entry
 		return $this->getFromCustomData('attached_pending_media_entries', null, array());
 	}
 	
-	public function getPushPublishConfigurations ()
+	public function getPushPublishPlaybackConfigurations ()
 	{
-		return $this->getFromCustomData('push_publish_configurations',null, array());
+		return $this->getFromCustomData('push_publish_playback_configurations',null, array());
 	}
 	
-	public function setPushPublishConfigurations ($v)
+	public function setPushPublishPlaybackConfigurations ($v)
+	{
+		$this->putInCustomData('push_publish_playback_configurations', $v);
+	}
+	
+	public function getPublishConfigurations ()
+	{
+		return $this->getFromCustomData('push_publish_configurations', null, array());
+	}
+	
+	public function setPublishConfigurations ($v)
 	{
 		$this->putInCustomData('push_publish_configurations', $v);
 	}
@@ -675,4 +694,6 @@ abstract class LiveEntry extends entry
 			return $value->getHostname();
 		}
 	}
+	
+	
 }

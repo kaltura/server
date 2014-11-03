@@ -1,3 +1,5 @@
+<?php $this->headScript()->appendFile($this->baseUrl('js/assignDeliveryProfile.js'));?>
+
 <p><?php echo $this->translate('partner-list intro text'); ?></p>
 <?php echo $this->form; ?>
 <div id="results" class="clear">
@@ -45,6 +47,7 @@
 								<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
 									<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
 								<?php endif; ?>
+								<option value="deliveryProfile" ><?php echo $this->translate('Delivery Profile'); ?></option>
 								<?php if ($partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId == 0): ?>
 									<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')):?>
 										<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
@@ -217,6 +220,11 @@ function mpLogin(partnerId) {
 function remoteStorage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'external-storages'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
 	document.location = url;
+}
+
+function deliveryProfile(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'delivery-profiles-configuration'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
+	document.location = url; 
 }
 
 function configurePartnerSuccess(html) {
@@ -422,6 +430,37 @@ jQuery(function() {
 		}
 	});
 });
+
+function assignDeliveryProfile(format, currentDps)
+{
+	var partnerId = $("#id")[0].value;
+
+	var url = '<?php echo $this->url(array('controller' => 'delivery', 'action' => 'assign-delivery-profile')); ?>';
+	url += '/partnerId/' + partnerId + '/currentDeliveryProfiles/' + currentDps + "/streamerType/" + format;
+	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 750,
+		title: '<?php echo $this->translate('Edit delivery profiles : Partner id '); ?>' + partnerId +
+			'<?php echo $this->translate(' , Format '); ?>' + format,
+		height: 400,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				okPressed(format);
+				jQuery(this).dialog('close').remove();
+			},
+		},
+		close: function() {
+			$(this).dialog('close').remove();
+		}
+	});
+	dialogDiv.load(
+			url
+		);
+}
 
 <?php
 

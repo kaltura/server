@@ -598,7 +598,7 @@ CREATE TABLE delivery_profile
 		status INTEGER,
 		media_protocols VARCHAR(255),
 		streamer_type VARCHAR(30),
-		is_default tinyint(4),
+		is_default tinyint(4) DEFAULT 0,
 		parent_id bigint(20),
 		custom_data text,
         PRIMARY KEY (id),
@@ -1137,6 +1137,7 @@ CREATE TABLE IF NOT EXISTS `invalid_session` (
   `ks_valid_until` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `actions_limit` int(11) DEFAULT NULL,
+  `type` int(6) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `ks_index` (`ks`(255)),
   KEY `ks_valid_until_index` (`ks_valid_until`)
