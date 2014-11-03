@@ -48,4 +48,17 @@ class mediaInfoPeer extends BasemediaInfoPeer
 	{
 		return array(array("mediaInfo:flavorAssetId=%s", self::FLAVOR_ASSET_ID));		
 	}
+
+	/**
+	 * @param string $id
+	 * @return mediaInfo
+	 */
+	public static function retrieveById($id)
+	{
+		$criteria = new Criteria();
+		$criteria->add(mediaInfoPeer::ID, $id);
+		return mediaInfoPeer::doSelectOne($criteria);
+	}
+	
+
 }

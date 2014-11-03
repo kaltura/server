@@ -883,6 +883,73 @@ class myFlvHandler
 
 		fclose ( $fh );
 	}
+	
+	public static function fixFlvTimestamps($srcName, $outName)
+	{
+		$flv_wrapper = new myFlvHandler ( $srcName );
+		$header = $flv_wrapper->getHeader();
+			
+		$fh = fopen ( $outName , "wb" );
+		fwrite ($fh , $header) ;
+		$aTS = 0; $aInsaneTS = null;
+		$vTS = 0; $vInsaneTS = null;
+		while (true)
+		{
+			list($type, $size, $timestamp, $keyframe, $start_pos, $data) =
+			$flv_wrapper->getNextTag(myFlvHandler::GET_NEXT_TAG_ALL);
+			if(!isset($type))
+				break;
+	
+	
+			$fixedTS = null;
+			switch($type){
+				case myFlvHandler::TAG_TYPE_AUDIO:
+					if(!isset($aInsaneTS) && $timestamp-$aTS>200){
+						$aInsaneTS = $timestamp - $aTS;
+					}
+					if(isset($aInsaneTS)) {
+						$fixedTS = $timestamp - $aInsaneTS;
+					}
+					$aTS = $timestamp;
+					break;
+				case myFlvHandler::TAG_TYPE_VIDEO:
+					if(!isset($vInsaneTS) && $timestamp-$vTS>200){
+						$vInsaneTS = $timestamp - $vTS;
+					}
+					if(isset($vInsaneTS)) {
+						$fixedTS = $timestamp - $vInsaneTS;
+					}
+					$vTS = $timestamp;
+					break;
+				case myFlvHandler::TAG_TYPE_METADATA:
+					break;
+				default:
+					continue;
+			}
+			if ($size == self::TAG_WRAPPER_SIZE){ // dont write tag with no actual data
+				continue;
+			}
+	
+			if(isset($fixedTS)){
+				$data = self::updateFlvTagTimestamp($data,$fixedTS);
+			}
+			fwrite ( $fh , $data );
+				
+		}
+		fclose ( $fh );
+	}
+	
+	public static function updateFlvTagTimestamp($data, $ts)
+	{
+		$res = unpack("C12", $data);
+		$res[7] = (int)($ts % (256));
+		$res[8] = (int)(($ts / (256*256*256))%256);
+		$res[6] = (int)(($ts / (256))%256);
+		$res[5] = (int)(($ts / (256*256))%256);
+		$tag_header = pack("C12", $res[1], $res[2], $res[3], $res[4], $res[5], $res[6], $res[7], $res[8], $res[9], $res[10], $res[11], $res[12]);
+		$data = $tag_header.substr($data, 12);
+		return $data;
+	}
 }
 
 /**

@@ -461,6 +461,13 @@ class kFlowHelper
 		if(!$rootBatchJob)
 			return $dbBatchJob;
 
+			/*
+			 * Fix web-cam sources with bad timestamps
+			 */
+		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
+		if($dbBatchJobAux!=null)
+			return $dbBatchJobAux;
+
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
@@ -500,6 +507,78 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kExtractMediaJobData $data
+	 * @return BatchJob/null
+	 */
+	protected static function fixWebCamSources(BatchJob &$rootBatchJob, BatchJob &$dbBatchJob, kExtractMediaJobData $data)
+	{
+		$mediaInfo = mediaInfoPeer::retrieveById($data->getMediaInfoId());
+		
+			/*
+			 * Check validity of web-cam sources, for:
+			 * - h263/sorenson video
+			 * - nellymoser audio
+			 * - and for following params:
+			 * -- Duration>100hrs (KDLSanityLimits::MaxDuration) or 
+			 * -- Bitrate<10Kbps (KDLSanityLimits::MinBitrate)
+			 * then run the webcam-flv-fix procedure
+			 */
+		$webCamVideoCodecs = array("h.263","h263","sorenson spark","vp6");
+		if(isset($mediaInfo)
+		&& (in_array($mediaInfo->getVideoFormat(),$webCamVideoCodecs)
+		 || in_array($mediaInfo->getVideoCodecId(),$webCamVideoCodecs))
+		&& (in_array($mediaInfo->getAudioFormat(),array("nellymoser"))
+		 || in_array($mediaInfo->getAudioCodecId(),array("nellymoser"))) ){
+			KalturaLog::log("webcam type of source");
+			if($mediaInfo->getVideoDuration()>0)
+				$durToTest = $mediaInfo->getVideoDuration();
+			else if($mediaInfo->getAudioDuration()>0)
+				$durToTest = $mediaInfo->getAudioDuration();
+			else if($mediaInfo->getContainerDuration()>0)
+				$durToTest = $mediaInfo->getContainerDuration();
+			else 
+				$durToTest = 0;
+
+			if($durToTest>0)
+				$calcBrToTest = $mediaInfo->getFileSize()*8000/$durToTest;
+			else
+				$calcBrToTest = 0;
+				
+			if($mediaInfo->getVideoBitRate()>0)
+				$brToTest = $mediaInfo->getVideoBitRate();
+			else if($mediaInfo->getContainerBitRate()>0)
+				$brToTest = $mediaInfo->getContainerBitRate();
+			else
+				$brToTest = $calcBrToTest;
+			
+			KalturaLog::log("durToTest($durToTest),brToTest($brToTest),calcBrToTest($calcBrToTest)");
+			if(($durToTest>KDLSanityLimits::MaxDuration	// 360000000
+			 ||($calcBrToTest>0 && $calcBrToTest<KDLSanityLimits::MinBitrate) )
+			 ||($brToTest>0 && $brToTest<KDLSanityLimits::MinBitrate)) {
+				KalturaLog::log("invalid source, should be fixed");
+				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+				if($flavorAsset && $flavorAsset->getVersion()<40){
+					$flavorAsset->incrementVersion();
+					$flavorAsset->save();
+					$fixedFileName = $data->getSrcFileSyncLocalPath().".fixed";
+					myFlvHandler::fixFlvTimestamps($data->getSrcFileSyncLocalPath(),$fixedFileName);
+					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					kFileSyncUtils::moveFromFile($fixedFileName, $syncKey);
+					$syncPath=kFileSyncUtils::getLocalFilePathForKey($syncKey);
+						/*
+						 * Finish the current extract medi job and start a new one
+						 */
+					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+					kJobsManager::addExtractMediaJob($rootBatchJob, $syncPath, $data->getFlavorAssetId());
+					return $dbBatchJob;
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
