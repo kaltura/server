@@ -137,7 +137,11 @@ class entryFilter extends baseObjectFilter
 			"_gte_last_played_at",
 			"_lte_last_played_at",
 			"_is_live",
-			) , NULL );
+			"_eq_source",
+			"_not_source",
+			"_in_source",
+			"_notin_source",
+		) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
 			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , 
