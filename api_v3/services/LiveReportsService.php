@@ -95,8 +95,8 @@ class LiveReportsService extends KalturaBaseService
 					if(empty($entryIds))
 						return new KalturaLiveStatsListResponse();
 					
-					$wsFilter->entryIds = $entryIds;
 					$totalCount = count($entryIds);
+					$wsFilter->entryIds = implode(",", $entryIds);
 				}
 				
 				/** @var KalturaLiveStatsListResponse */
@@ -162,7 +162,7 @@ class LiveReportsService extends KalturaBaseService
 		foreach($entries as $entry)
 			$entryIds[] = $entry->getId();
 		
-		return implode(",", $entryIds);
+		return $entryIds;
 	}
 	
 	protected function requestClient(WSLiveReportsClient $client, $reportType, $wsFilter, $wsPager) {
