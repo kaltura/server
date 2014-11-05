@@ -247,6 +247,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$abstract = ' abstract';
 		
 		$needsSuperConstructor = false;
+		$this->appendLine ( '@SuppressWarnings("serial")' );
 		if ($classNode->hasAttribute ( "base" )) 
 		{
 			$this->appendLine ( "public{$abstract} class $type extends " . $classNode->getAttribute ( "base" ) . " {" );
@@ -462,6 +463,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		if($desc)
 			$this->appendLine ( $desc );
 		
+		$this->appendLine ( '@SuppressWarnings("serial")' );
 		$this->appendLine ( "public class $javaServiceType extends KalturaServiceBase {" );
 		$this->appendLine ( "    public $javaServiceType(KalturaClient client) {" );
 		$this->appendLine ( "        this.kalturaClient = client;" );
@@ -724,6 +726,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		$this->startNewTextBlock ();
 		$this->appendLine ( $this->getBanner () );
+		$this->appendLine ( '@SuppressWarnings("serial")' );
 		$this->appendLine ( "public class KalturaClient extends KalturaClientBase {" );
 		$this->appendLine ( "	" );
 		$this->appendLine ( "	protected String apiVersion = \"$apiVersion\";" );

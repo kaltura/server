@@ -27,6 +27,7 @@
 // ===================================================================================================
 package com.kaltura.client;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,8 @@ import java.util.Map;
  * @author jpotts
  *
  */
-public class KalturaConfiguration {
+@SuppressWarnings("serial")
+public class KalturaConfiguration implements Serializable {
 	protected int partnerId;
 	protected String secret;
 	protected String adminSecret;	
