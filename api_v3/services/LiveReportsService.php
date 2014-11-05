@@ -89,14 +89,22 @@ class LiveReportsService extends KalturaBaseService
 				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 				
 			case KalturaLiveReportType::ENTRY_TOTAL:
+				$totalCount = null;
 				if(!$filter->live && empty($wsFilter->entryIds)) {
 					$entryIds = $this->getLiveEntries($client, kCurrentContext::getCurrentPartnerId(), $pager);
 					if(empty($entryIds))
 						return new KalturaLiveStatsListResponse();
 					
 					$wsFilter->entryIds = $entryIds;
+					$totalCount = count($entryIds);
 				}
-				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
+				
+				/** @var KalturaLiveStatsListResponse */
+				$result = $this->requestClient($client, $reportType, $wsFilter, $wsPager);
+				if($totalCount)
+					$result->totalCount = $totalCount;
+				
+				return $result;
 		}
 		
 	}
