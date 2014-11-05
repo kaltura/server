@@ -36,7 +36,7 @@ require_once(dirname(__file__) . '/kalcliSwitches.php');
 $DATE_FIELD_SUFFIXES = array('At', 'Date', 'On');
 define('MIN_TIME_STAMP', 946677600);		// 2000
 define('MAX_TIME_STAMP', 2147483647);		// 2038
-define('API_LOG_FILENAME', '/var/log/kaltura_api_v3.log');
+define('API_LOG_FILENAME', '@LOG_DIR@/kaltura_api_v3.log');
 
 function formatResponse($resp, $indent = '', $varName = null)
 {
