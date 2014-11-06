@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.metadata
- * @subpackage api.filters.enum
+ * @package api
+ * @subpackage filters.enum
  */
 class KalturaFileAssetOrderBy extends KalturaStringEnum
 {

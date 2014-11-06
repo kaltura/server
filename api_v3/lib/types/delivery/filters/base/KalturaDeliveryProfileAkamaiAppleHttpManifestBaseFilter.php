@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-abstract class KalturaDeliveryProfileGenericRtmpBaseFilter extends KalturaDeliveryProfileRtmpFilter
+abstract class KalturaDeliveryProfileAkamaiAppleHttpManifestBaseFilter extends KalturaDeliveryProfileFilter
 {
 	static private $map_between_objects = array
 	(

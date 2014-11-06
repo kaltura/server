@@ -1,10 +1,10 @@
 <?php
 /**
- * @package api
- * @subpackage filters.base
+ * @package plugins.kontiki
+ * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaDeliveryProfileGenericRtmpBaseFilter extends KalturaDeliveryProfileRtmpFilter
+abstract class KalturaKontikiStorageProfileBaseFilter extends KalturaStorageProfileFilter
 {
 	static private $map_between_objects = array
 	(
