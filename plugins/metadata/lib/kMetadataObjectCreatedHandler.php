@@ -10,7 +10,6 @@ class kMetadataObjectCreatedHandler implements kObjectCreatedEventConsumer
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $fromObject)
 	{
-		KalturaLog::debug('XXXXXXXXXXXXXX');
 		if($fromObject instanceof entry)
 		{
 			if ($fromObject->getIsRecordedEntry() == true)
@@ -25,7 +24,6 @@ class kMetadataObjectCreatedHandler implements kObjectCreatedEventConsumer
 	 */
 	public function objectCreated(BaseObject $fromObject)
 	{
-		KalturaLog::debug('YYYYYYYYYYYYYYYYYYY');
 		if($fromObject instanceof entry)
 		{
 				$liveEntryId = $fromObject->getRootEntryId();
@@ -41,8 +39,6 @@ class kMetadataObjectCreatedHandler implements kObjectCreatedEventConsumer
 		$partnerId = $object->getPartnerId();
 	
 		$metadataProfiles = MetadataProfilePeer::retrieveAllActiveByPartnerId($partnerId , MetadataObjectType::ENTRY);
-	
-		KalturaLog::debug('1111111111111');
 	
 		foreach ($metadataProfiles as $metadataProfile)
 		{
