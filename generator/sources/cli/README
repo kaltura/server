@@ -55,8 +55,7 @@ Linux
 	c. API Host - The default is www.kaltura.com if not defined
 		May be uncommented and modified in order to globally point to a different api host
 		The -u parameter may be used to override the api host via command line
-8. Optional (if needed): replace the @LOG_DIR@ with token with the path to kaltura's log directory in kalcli.php
-   Common values are '/var/log' or '/opt/kaltura/log'
+	d. Log Dir - The log directory that contains kaltura_api_v3.log (typically /var/log or /opt/kaltura/log)
 
 Windows
 --------
