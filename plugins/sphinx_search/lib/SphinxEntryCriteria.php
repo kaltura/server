@@ -173,7 +173,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 		if($filter->is_set('_is_live'))
 		{
-			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . $filter->get('_is_live'));
+			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . ($filter->get('_is_live') == '1' ? '1' : '0') );
 			$filter->unsetByName('_is_live');
 		}
 		
