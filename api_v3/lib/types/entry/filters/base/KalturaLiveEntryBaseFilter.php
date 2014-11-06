@@ -14,6 +14,8 @@ abstract class KalturaLiveEntryBaseFilter extends KalturaMediaEntryFilter
 	(
 		"+firstBroadcast" => "+first_broadcast",
 		"-firstBroadcast" => "-first_broadcast",
+		"+lastBroadcast" => "+last_broadcast",
+		"-lastBroadcast" => "-last_broadcast",
 	);
 
 	public function getMapBetweenObjects()
