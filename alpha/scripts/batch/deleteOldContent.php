@@ -684,8 +684,8 @@ class kOldContentCleaner
 				switch($objectSubType)
 				{
 					case MetadataProfile::FILE_SYNC_METADATA_DEFINITION:
-				        $join->addCondition(FileSyncPeer::VERSION, MetadataProfilePeer::VERSION, Criteria::NOT_EQUAL);
-						$criteria->add(MetadataProfilePeer::VERSION, null, Criteria::ISNOTNULL);
+				        $join->addCondition(FileSyncPeer::VERSION, MetadataProfilePeer::FILE_SYNC_VERSION, Criteria::NOT_EQUAL);
+						$criteria->add(MetadataProfilePeer::FILE_SYNC_VERSION, null, Criteria::ISNOTNULL);
 				        break;
 					
 					case MetadataProfile::FILE_SYNC_METADATA_VIEWS:

@@ -178,12 +178,10 @@ class MetadataProfileService extends KalturaBaseService
 		if(!$oldXsd)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
 		
-		$oldVersion = $dbMetadataProfile->getVersion();
-		
 		if($xsdData)
 		{
 			$xsdData = html_entity_decode($xsdData);
-			$dbMetadataProfile->incrementVersion();
+			$dbMetadataProfile->incrementFileSyncVersion();
 		}
 			
 		if(!is_null($viewsData) && $viewsData != '')
@@ -196,7 +194,7 @@ class MetadataProfileService extends KalturaBaseService
 		{		    
 			try
 			{
-				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $xsdData);
+				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldXsd, $xsdData);
 			}
 			catch(kXsdException $e)
 			{
@@ -363,7 +361,7 @@ class MetadataProfileService extends KalturaBaseService
 				continue;
 				
 			$metadata->incrementVersion();
-			$oldKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $metadata->getVersion() - $versionGap);
+			$oldKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $toVersion);
 			if(!kFileSyncUtils::fileSync_exists($oldKey))
 				continue;
 			
@@ -425,13 +423,11 @@ class MetadataProfileService extends KalturaBaseService
 		if(!$oldXsd)
 			throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_FILE_NOT_FOUND, $id);
 		
-		$oldVersion = $dbMetadataProfile->getVersion();
-		
-		$dbMetadataProfile->incrementVersion();
+		$dbMetadataProfile->incrementFileSyncVersion();
 		
 		try
 		{
-			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $newXsd);
+			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldXsd, $newXsd);
 		}
 		catch(kXsdException $e)
 		{

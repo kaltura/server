@@ -41,6 +41,7 @@ class MetadataProfileTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
+		$this->addColumn('FILE_SYNC_VERSION', 'FileSyncVersion', 'INTEGER', false, null, null);
 		$this->addColumn('VIEWS_VERSION', 'ViewsVersion', 'INTEGER', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
