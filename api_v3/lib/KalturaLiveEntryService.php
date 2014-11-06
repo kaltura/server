@@ -206,6 +206,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedEntry->setModerationStatus($dbEntry->getModerationStatus());
 		$recordedEntry->save();
 		
+		$recordedEntry->setIsRecordedEntry(true);
 		$dbEntry->setRecordedEntryId($recordedEntry->getId());
 		$dbEntry->save();
 		
