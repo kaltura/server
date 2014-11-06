@@ -33,10 +33,12 @@ require_once(dirname(__file__) . '/lib/KalturaCommandLineParser.php');
 require_once(dirname(__file__) . '/lib/KalturaCurlWrapper.php');
 require_once(dirname(__file__) . '/kalcliSwitches.php');
 
+$config = parse_ini_file(dirname(__file__) . '/config/config.ini');
+
 $DATE_FIELD_SUFFIXES = array('At', 'Date', 'On');
 define('MIN_TIME_STAMP', 946677600);		// 2000
 define('MAX_TIME_STAMP', 2147483647);		// 2038
-define('API_LOG_FILENAME', '/var/log/kaltura_api_v3.log');
+define('API_LOG_FILENAME', $config['logDir'] . '/kaltura_api_v3.log');
 
 function formatResponse($resp, $indent = '', $varName = null)
 {
@@ -187,7 +189,6 @@ if (isset($options['url']) && is_string($options['url']))
 }
 else
 {
-	$config = parse_ini_file(dirname(__file__) . '/config/config.ini');
 	$serviceUrl = isset( $config['apiHost'] ) ? $config['apiHost'] : 'www.kaltura.com';
 }
 
