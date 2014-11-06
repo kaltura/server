@@ -61,7 +61,7 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 	{
 		return array(array("metadataProfile:id=%s", self::ID), array("metadataProfile:partnerId=%s", self::PARTNER_ID));		
 	}
-	public static function retrieveAllActiveByPartnerId($partnerId, $object_type = null ,PropelPDO $con = null)
+	public static function retrieveAllActiveByPartnerId($partnerId, $object_type ,PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(MetadataProfilePeer::PARTNER_ID, $partnerId);
