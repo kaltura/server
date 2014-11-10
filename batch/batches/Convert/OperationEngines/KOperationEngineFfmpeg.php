@@ -33,8 +33,12 @@ class KOperationEngineFfmpeg  extends KSingleOutputOperationEngine
 		// impersonite
 		KBatchBase::impersonate($this->data->flavorParamsOutput->partnerId); // !!!!!!!!!!!$this->job->partnerId);
 
+		// Apply theads configuration parameter, or default to 4
+		$threads = isset( KBatchBase::$taskConfig->params->threads ) ? KBatchBase::$taskConfig->params->threads : 4;
+		$ffmpegCmd = KBatchBase::$taskConfig->params->ffmpegCmd . ' -threads '. $threads;
+
 		$wmCmdLine = KConversionEngineFfmpeg::buildWatermarkedCommandLine($wmData, $this->data->destFileSyncLocalPath, $cmdLine,
-						KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
+			$ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
 		// un-impersonite
 		KBatchBase::unimpersonate();
 

@@ -19,7 +19,8 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 	
 	public function getCmd ()
 	{
-		return KBatchBase::$taskConfig->params->ffmpegCmd;
+		$threads = isset( KBatchBase::$taskConfig->params->threads ) ? KBatchBase::$taskConfig->params->threads : 4;
+		return KBatchBase::$taskConfig->params->ffmpegCmd . ' -threads '. $threads;
 	}
 	
 	/**
@@ -56,7 +57,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 				KBatchBase::impersonate($data->flavorParamsOutput->partnerId); 
 				
 				$wmCmdLine = self::buildWatermarkedCommandLine($wmData, $data->destFileSyncLocalPath, $exec_cmd, 
-									KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
+									$this->getCmd(), KBatchBase::$taskConfig->params->mediaInfoCmd);
 				// un-impersonite
 				KBatchBase::unimpersonate();
 			}
