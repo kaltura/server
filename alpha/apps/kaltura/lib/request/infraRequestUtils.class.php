@@ -88,8 +88,8 @@ class infraRequestUtils
 				// (?) Echo some info to the client?
 				exit;
 			}
-			$start  = $c_start;
-			$end	= $c_end;
+			$start  = (int)$c_start;
+			$end	= (int)$c_end;
 			$length = $end - $start + 1; // Calculate new content length
 			header('HTTP/1.1 206 Partial Content');
 			header("Content-Range: bytes $start-$end/$size");
