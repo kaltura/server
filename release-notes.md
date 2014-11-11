@@ -1,3 +1,26 @@
+# IX-9.19.7 #
+##add sub type to thumb cue point##
+- Issue Type: Application's request
+- Issue ID: PLAT-2069
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 3
+
+#### Deployment Scripts ####
+
+Need to run an update SQL statment:
+
+		deployment/updates/sql/2014_11_11_set_thumb_cue_point_default_sub_type.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.6 #
 
 ##add partner to 'exclude' list##

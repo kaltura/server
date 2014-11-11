@@ -76,6 +76,11 @@ class ThumbCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKaltura
 				<xs:sequence>
 					<xs:element name="title" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
 					<xs:element name="description" minOccurs="1" maxOccurs="1" type="xs:string"> </xs:element>
+					<xs:element name="subType" minOccurs="0" maxOccurs="1" type="KalturaThumbCuePointSubType">
+						<xs:annotation>
+							<xs:documentation>Indicates the thumb cue point sub type 1 = Slide 2 = Chapter, defaults to Slide</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element maxOccurs="1" minOccurs="1" ref="slide" />
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
