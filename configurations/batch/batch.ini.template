@@ -220,6 +220,8 @@ params.EncodingComUrl								= http://manage.encoding.com/index.php
 params.isRemoteInput								= 0
 params.isRemoteOutput								= 0
 
+params.threads                      = 4
+
 ;The path for local temporary generated product
 params.localTempPath 								= @TMP_DIR@/convert
 
