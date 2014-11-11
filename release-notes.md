@@ -1,4 +1,25 @@
 # IX-9.19.7 #
+
+##remove partner from 'exclude' list##
+- Issue Type: Customer request
+- Issue ID: SUP-2935
+
+#### Configuration ####
+
+**local.ini**
+
+under 'global_whitelisted_domains_exclude'
+
+-		12 = 520641
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ##add sub type to thumb cue point##
 - Issue Type: Application's request
 - Issue ID: PLAT-2069
