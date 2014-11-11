@@ -1,6 +1,7 @@
 # IX-9.19.7 #
 ##add sub type to thumb cue point##
-- Issue Type: Product request
+- Issue Type: Application's request
+- Issue ID: PLAT-2069
 
 #### Configuration ####
 
