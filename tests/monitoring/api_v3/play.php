@@ -583,12 +583,16 @@ catch(Exception $ex)
 	$monitorResult->description = $ex->getMessage();
 }
 
-unlink($manifestLocalPath);
-unlink($mediaLocalPath);
+
+if (file_exists($manifestLocalPath)){
+      unlink($manifestLocalPath);
+}
+if (file_exists($mediaLocalPath)){
+      unlink($mediaLocalPath);
+}
 echo "$monitorResult";
-
-
 if (isset($error)){
-    exit(1);
+            exit(1);
 }
 exit(0);
+
