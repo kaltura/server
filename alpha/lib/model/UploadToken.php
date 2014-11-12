@@ -88,10 +88,8 @@ class UploadToken extends BaseUploadToken
 	
 	public function getPuserId()
 	{
-		kuserPeer::setUseCriteriaFilter(false);
 		$kuser = $this->getkuser();
-		kuserPeer::setUseCriteriaFilter(true);
-		return $kuser->getPuserId();
+		return $kuser ? $kuser->getPuserId() : null;
 	}
 
 	public function getCacheInvalidationKeys()
