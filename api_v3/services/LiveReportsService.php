@@ -31,10 +31,14 @@ class LiveReportsService extends KalturaBaseService
 		$wsPager = new WSLiveReportInputPager($pager->pageSize, $pager->pageIndex);
 		
 		$wsResult = $client->getEvents($reportType, $wsFilter, $wsPager);
-		$objects = $wsResult->objects;
 		$resultsArray = array();
-		foreach($objects as $result) {
-			$resultsArray[$result->timestamp] = $result->value;
+		$objects = explode(";", $wsResult->objects);
+		foreach($objects as $object) {
+			if(empty($object))
+				continue;
+			
+			$parts = explode(",", $object);
+			$resultsArray[$parts[0]] = $parts[1];
 		}
 		
 		$kResult = KalturaReportGraphArray::fromReportDataArray(array("audience" => $resultsArray));
@@ -85,14 +89,21 @@ class LiveReportsService extends KalturaBaseService
 				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
 				
 			case KalturaLiveReportType::ENTRY_TOTAL:
+				$totalCount = null;
 				if(!$filter->live && empty($wsFilter->entryIds)) {
-					$entryIds = $this->getLiveEntries($client, kCurrentContext::getCurrentPartnerId(), $pager);
+					list($entryIds, $totalCount) = $this->getLiveEntries($client, kCurrentContext::getCurrentPartnerId(), $pager);
 					if(empty($entryIds))
 						return new KalturaLiveStatsListResponse();
 					
-					$wsFilter->entryIds = $entryIds;
+					$wsFilter->entryIds = implode(",", $entryIds);
 				}
-				return $this->requestClient($client, $reportType, $wsFilter, $wsPager);
+				
+				/** @var KalturaLiveStatsListResponse */
+				$result = $this->requestClient($client, $reportType, $wsFilter, $wsPager);
+				if($totalCount)
+					$result->totalCount = $totalCount;
+				
+				return $result;
 		}
 		
 	}
@@ -150,7 +161,8 @@ class LiveReportsService extends KalturaBaseService
 		foreach($entries as $entry)
 			$entryIds[] = $entry->getId();
 		
-		return implode(",", $entryIds);
+		$totalCount = $baseCriteria->getRecordsCount();
+		return array($entryIds, $totalCount);
 	}
 	
 	protected function requestClient(WSLiveReportsClient $client, $reportType, $wsFilter, $wsPager) {

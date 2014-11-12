@@ -19,6 +19,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const PLUGIN_VERSION_BUILD = 0;
 	
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
+	const METADATA_CREATE_HANDLER_CLASS = 'kMetadataObjectCreatedHandler';
 	const METADATA_COPY_HANDLER_CLASS = 'kMetadataObjectCopiedHandler';
 	const METADATA_DELETE_HANDLER_CLASS = 'kMetadataObjectDeletedHandler';
 	
@@ -150,6 +151,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	{
 		return array(
 			self::METADATA_FLOW_MANAGER_CLASS,
+			self::METADATA_CREATE_HANDLER_CLASS,
 			self::METADATA_COPY_HANDLER_CLASS,
 			self::METADATA_DELETE_HANDLER_CLASS,
 		);

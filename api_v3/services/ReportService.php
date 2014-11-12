@@ -207,7 +207,7 @@ class ReportService extends KalturaBaseService
 		
 		// KS verification - we accept either admin session or download privilege of the file 
 		$ks = $this->getKs();
-		if(!($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		
 		if(!preg_match('/^[\w-_]*$/', $id))

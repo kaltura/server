@@ -30,6 +30,7 @@ class myReportsMgr
 	const REPORT_TYPE_PARTNER_BANDWIDTH_USAGE = 200;
 	const REPORT_TYPE_PARTNER_USAGE = 201;
 	const REPORT_TYPE_PARTNER_USAGE_DASHBOARD = 202;
+	const REPORT_TYPE_PEAK_STORAGE = 300;
 	const REPORT_TYPE_APPLICATIONS = 16;
 	const REPORT_TYPE_USER_USAGE = 17;
 	const REPORT_TYPE_SPECIFIC_USER_USAGE = 18;
@@ -804,7 +805,7 @@ class myReportsMgr
 				{
 					$obj_ids_clause = "dim_partner.partner_id in ( $object_ids_str)";
 				}			
-				else if ( $report_type == self::REPORT_TYPE_PARTNER_USAGE || $report_type == self::REPORT_TYPE_VAR_USAGE)
+				else if ( $report_type == self::REPORT_TYPE_PARTNER_USAGE || $report_type == self::REPORT_TYPE_VAR_USAGE || $report_type == self::REPORT_TYPE_PEAK_STORAGE)
 				{
 					$obj_ids_clause = "partner_id in ($object_ids_str)";
 				}		
@@ -902,6 +903,7 @@ class myReportsMgr
 		self::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => "partner_bandwidth_usage" ,
 		self::REPORT_TYPE_PARTNER_USAGE => "partner_usage" ,
 		self::REPORT_TYPE_PARTNER_USAGE_DASHBOARD => "partner_usage_dashboard",
+		self::REPORT_TYPE_PEAK_STORAGE => "peak_storage" ,
 		self::REPORT_TYPE_APPLICATIONS => 'applications',
 		self::REPORT_TYPE_USER_USAGE => 'user_usage',
 		self::REPORT_TYPE_SPECIFIC_USER_USAGE => 'specific_user_usage',

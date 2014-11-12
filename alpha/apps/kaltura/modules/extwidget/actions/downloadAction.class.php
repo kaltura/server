@@ -96,13 +96,6 @@ class downloadAction extends sfAction
 			}
 		}
 		
-		$preview = 0;
-		if($shouldPreview) {
-			$preview = $flavorAsset->estimateFileSize($entry, $securyEntryHelper->getPreviewLength());
-		} else if(kCurrentContext::$ks_object) {
-			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
-		}
-		
 		// Gonen 26-04-2010: in case entry has no flavor with 'mbr' tag - we return the source
 		if(!$flavorAsset && ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO))
 		{
@@ -136,7 +129,13 @@ class downloadAction extends sfAction
 		
 		if ($fileExt && !is_dir($filePath))
 			$fileName = $fileName . '.' . $fileExt;
-			
+		
+		$preview = 0;
+		if($shouldPreview && $flavorAsset) {
+			$preview = $flavorAsset->estimateFileSize($entry, $securyEntryHelper->getPreviewLength());
+		} else if(kCurrentContext::$ks_object) {
+			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
+		}
 		
 		//enable downloading file_name which inside the flavor asset directory 
 		if(is_dir($filePath))

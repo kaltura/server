@@ -204,6 +204,7 @@ index kaltura_entry:kaltura_base
 	rt_field = creator_kuser_id
 	rt_field = creator_puser_id
 	rt_attr_json = dynamic_attributes
+	rt_field = user_names
 	rt_field = plugins_data
 }
 

@@ -74,7 +74,7 @@ class ClamAVScanEngine extends VirusScanEngine
 		
 		$scanStatus = trim(end(explode(' ', $statusLine)));
 		
-		if ($scanStatus == 'OK')
+		if ($scanStatus == 'OK' || strpos($statusLine , 'Empty file') != 0)
 		{
 			return KalturaVirusScanJobResult::FILE_IS_CLEAN;
 		}

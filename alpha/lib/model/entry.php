@@ -1743,7 +1743,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 	public function setReplacementOptions ($v)  {	$this->putInCustomData ( "replacementOptions" , $v );	}
 	public function getReplacementOptions (  )	{	return $this->getFromCustomData( "replacementOptions", null, new kEntryReplacementOptions() );	}
-	
+
+	public function setIsRecordedEntry( $v )                { $this->putInCustomData( "isRecordedEntry" , $v ); }
+	public function getIsRecordedEntry()                    { return $this->getFromCustomData( "isRecordedEntry", null, false ); }
+
 	public function setRedirectEntryId ( $v )	{	$this->putInCustomData ( "redirectEntryId" , $v );	}
 	public function getRedirectEntryId (  )		{	return $this->getFromCustomData( "redirectEntryId" );	}
 	
@@ -3238,4 +3241,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $flavorAssetIds;
 	}
 	
+	public function getUserNames() {
+		$kuser = $this->getkuser();
+		if(!$kuser)
+			return "";
+		
+		$userNames = array();
+		$userNames[] = $kuser->getFirstName();
+		$userNames[] = $kuser->getLastName();
+		$userNames[] = $kuser->getScreenName();
+		
+		return implode(" ", $userNames);
+	}
 }

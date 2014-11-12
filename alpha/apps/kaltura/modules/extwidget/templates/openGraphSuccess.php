@@ -8,7 +8,7 @@
 	<meta property="og:description" content="<?php echo htmlspecialchars($entry_description); ?>" />
 	<meta property="og:type" content="video.other" />
 	<meta property="og:image" content="<?php echo $entry_thumbnail_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
-	<meta property="og:image:seucre_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
+	<meta property="og:image:secure_url" content="<?php echo $entry_thumbnail_secure_url; ?>/width/<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video" content="<?php echo $swfSecureUrl; ?>" />
 	<meta property="og:video:width" content="<?php echo $uiConf->getWidth();?>" />
 	<meta property="og:video:height" content="<?php echo $uiConf->getHeight();?>" />	
