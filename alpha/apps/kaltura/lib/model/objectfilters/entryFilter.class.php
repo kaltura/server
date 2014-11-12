@@ -141,6 +141,7 @@ class entryFilter extends baseObjectFilter
 			"_not_source",
 			"_in_source",
 			"_notin_source",
+			"_is_recorded_entry_id_empty",
 		) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
