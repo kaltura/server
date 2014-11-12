@@ -177,6 +177,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$filter->unsetByName('_is_live');
 		}
 		
+		if($filter->is_set('_is_recorded_entry_id_empty'))
+		{
+			$fieldName = entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::RECORDED_ENTRY_ID;
+			$this->addWhere( "$fieldName " . ($filter->get('_is_recorded_entry_id_empty') ? "IS" : "IS NOT") . " NULL" );
+
+			$filter->unsetByName('_is_recorded_entry_id_empty');
+		}
+
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))
 		{
