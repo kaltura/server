@@ -297,6 +297,9 @@ class PlaylistService extends KalturaEntryService
 		$extraFilters = array();
 		if ($filter)
 		{
+			$limit = $filter->limit;
+			$filter->limit = null;
+
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
 			$extraFilters[1] = $coreFilter;
@@ -324,6 +327,9 @@ class PlaylistService extends KalturaEntryService
 					    		
     		throw $ex;
 		}
+
+		if ($limit)
+			$entryList = array_slice($entryList , 0 , $limit);
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
 			
