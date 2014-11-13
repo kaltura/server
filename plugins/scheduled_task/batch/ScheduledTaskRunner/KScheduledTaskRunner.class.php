@@ -98,11 +98,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 			if ($result->totalCount > $maxTotalCountAllowed)
 			{
-				KalturaLog::crit(
-					sprintf('List query for profile %s returned too many results (%s when the allowed total count is %s), suspending the profile',
-						$profile->id,
-						$result->totalCount,
-						$maxTotalCountAllowed));
+				KalturaLog::crit("List query for profile $profile->id returned too many results ($result->totalCount when the allowed total count is $maxTotalCountAllowed), suspending the profile");
 				$this->suspendProfile($profile);
 				break;
 			}
