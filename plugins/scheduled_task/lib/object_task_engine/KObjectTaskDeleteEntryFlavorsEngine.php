@@ -40,7 +40,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		if (!count($flavors))
 			return;
 
-		KalturaLog::debug('Delete type is '.count($deleteType));
+		KalturaLog::debug('Delete type is '.$deleteType);
 		switch($deleteType)
 		{
 			case KalturaDeleteFlavorsLogicType::DELETE_LIST:

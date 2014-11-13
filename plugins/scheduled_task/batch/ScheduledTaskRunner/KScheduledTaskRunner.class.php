@@ -32,7 +32,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	public function run($jobs = null)
 	{
 		KalturaLog::info("Scheduled Task Runner");
-		$maxProfiles = $this->getParams('maxProfile');
+		$maxProfiles = $this->getParams('maxProfiles');
 
 		$profiles = $this->getScheduledTaskProfiles($maxProfiles);
 		foreach($profiles as $profile)
@@ -49,10 +49,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	}
 
 	/**
-	 * @param int $maxProfile
+	 * @param int $maxProfiles
 	 * @return array
 	 */
-	protected function getScheduledTaskProfiles($maxProfile = 500)
+	protected function getScheduledTaskProfiles($maxProfiles = 500)
 	{
 		$scheduledTaskClient = $this->getScheduledTaskClient();
 
@@ -61,7 +61,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$filter->statusEqual = KalturaScheduledTaskProfileStatus::ACTIVE;
 
 		$pager = new KalturaFilterPager();
-		$pager->pageSize = $maxProfile;
+		$pager->pageSize = $maxProfiles;
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
 
@@ -74,6 +74,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	protected function processProfile(KalturaScheduledTaskProfile $profile)
 	{
 		$this->updateProfileBeforeExecution($profile);
+		if ($profile->maxTotalCountAllowed)
+			$maxTotalCountAllowed = $profile->maxTotalCountAllowed;
+		else
+			$maxTotalCountAllowed = $this->getParams('maxTotalCountAllowed');
 
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
@@ -90,6 +94,13 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			{
 				$this->unimpersonate();
 				throw $ex;
+			}
+
+			if ($result->totalCount > $maxTotalCountAllowed)
+			{
+				KalturaLog::crit("List query for profile $profile->id returned too many results ($result->totalCount when the allowed total count is $maxTotalCountAllowed), suspending the profile");
+				$this->suspendProfile($profile);
+				break;
 			}
 			if (!count($result->objects))
 				break;
@@ -164,6 +175,21 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$scheduledTaskClient = $this->getScheduledTaskClient();
 		$profileForUpdate = new KalturaScheduledTaskProfile();
 		$profileForUpdate->lastExecutionStartedAt = time();
+		$this->impersonate($profile->partnerId);
+		$scheduledTaskClient->scheduledTaskProfile->update($profile->id, $profileForUpdate);
+		$this->unimpersonate();
+	}
+
+	/**
+	 * Moves the profile to suspended status
+	 *
+	 * @param KalturaScheduledTaskProfile $profile
+	 */
+	protected function suspendProfile(KalturaScheduledTaskProfile $profile)
+	{
+		$scheduledTaskClient = $this->getScheduledTaskClient();
+		$profileForUpdate = new KalturaScheduledTaskProfile();
+		$profileForUpdate->status = KalturaScheduledTaskProfileStatus::SUSPENDED;
 		$this->impersonate($profile->partnerId);
 		$scheduledTaskClient->scheduledTaskProfile->update($profile->id, $profileForUpdate);
 		$this->unimpersonate();
