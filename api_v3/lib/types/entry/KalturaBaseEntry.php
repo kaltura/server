@@ -305,7 +305,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * IF not empty, points to an entry ID the should replace this current entry's id. 
 	 *
 	 * @var string
-	 * @filter eq
 	 */
 	public $redirectEntryId;
 

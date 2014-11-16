@@ -48,7 +48,12 @@ class ThumbCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			
 		$cuePoint->title = $scene->title;
 		$cuePoint->description = $scene->description;
-			
+		
+		if(isset($scene->subType))
+			$cuePoint->subType = $scene->subType;
+		else 
+			$cuePoint->subType = KalturaThumbCuePointSubType::SLIDE;
+		
 		return $cuePoint;
 	}
 	
