@@ -72,7 +72,6 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"replacementStatusIn" => "_in_replacement_status",
 		"partnerSortValueGreaterThanOrEqual" => "_gte_partner_sort_value",
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
-		"redirectEntryIdEqual" => "_eq_redirect_entry_id",
 		"rootEntryIdEqual" => "_eq_root_entry_id",
 		"rootEntryIdIn" => "_in_root_entry_id",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
@@ -495,11 +494,6 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $partnerSortValueLessThanOrEqual;
-
-	/**
-	 * @var string
-	 */
-	public $redirectEntryIdEqual;
 
 	/**
 	 * @var string

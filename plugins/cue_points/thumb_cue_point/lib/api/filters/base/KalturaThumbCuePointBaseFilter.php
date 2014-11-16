@@ -14,6 +14,8 @@ abstract class KalturaThumbCuePointBaseFilter extends KalturaCuePointFilter
 		"titleLike" => "_like_title",
 		"titleMultiLikeOr" => "_mlikeor_title",
 		"titleMultiLikeAnd" => "_mlikeand_title",
+		"subTypeEqual" => "_eq_sub_type",
+		"subTypeIn" => "_in_sub_type",
 	);
 
 	static private $order_by_map = array
@@ -59,4 +61,14 @@ abstract class KalturaThumbCuePointBaseFilter extends KalturaCuePointFilter
 	 * @var string
 	 */
 	public $titleMultiLikeAnd;
+
+	/**
+	 * @var KalturaThumbCuePointSubType
+	 */
+	public $subTypeEqual;
+
+	/**
+	 * @var string
+	 */
+	public $subTypeIn;
 }

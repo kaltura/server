@@ -200,7 +200,7 @@ class serveIsmAction extends sfAction
 		$replacingFileName = null;
 		$fileName = null;
 		$syncKey = $asset->getSyncKey($fileSyncObjectSubType);
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey , true);
 		if($fileSync)			
 		{
 			$replacingFileName = basename($fileSync->getFilePath());
