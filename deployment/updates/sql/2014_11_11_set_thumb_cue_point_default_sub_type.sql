@@ -1,0 +1,1 @@
+ UPDATE cue_point SET sub_type = 1 WHERE type = (select id from dynamic_enum where enum_name = 'CuePointType' and value_name = 'Thumb' and plugin_name = 'thumbCuePoint');

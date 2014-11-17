@@ -1,3 +1,65 @@
+# IX-9.19.7 #
+
+##remove partner from 'exclude' list##
+- Issue Type: Customer request
+- Issue ID: SUP-2935
+
+#### Configuration ####
+
+**local.ini**
+
+under 'global_whitelisted_domains_exclude'
+
+-		12 = 520641
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+##added read permissions to delivery profiles##
+- Issue Type: Customer request
+- Issue ID: PLAT-2021
+
+#### Configuration ####
+
+requires adding the permission to the required user roles.
+
+#### Deployment Scripts ####
+
+execute:
+	php deployment/updates/scripts/add_permissions/2014_10_29_read_permissions_delivery_profiles.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+##add sub type to thumb cue point##
+- Issue Type: Application's request
+- Issue ID: PLAT-2069
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 3
+
+#### Deployment Scripts ####
+
+Need to run an update SQL statment:
+
+		deployment/updates/sql/2014_11_11_set_thumb_cue_point_default_sub_type.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.6 #
 
 ##add partner to 'exclude' list##

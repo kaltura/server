@@ -3,6 +3,6 @@
  * @package api
  * @subpackage filters.enum
  */
-class KalturaDeliveryProfileGenericRtmpOrderBy extends KalturaDeliveryProfileOrderBy
+class KalturaDeliveryProfileGenericRtmpOrderBy extends KalturaDeliveryProfileRtmpOrderBy
 {
 }

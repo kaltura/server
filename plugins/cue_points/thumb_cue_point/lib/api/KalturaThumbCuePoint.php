@@ -21,6 +21,14 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 * @filter like,mlikeor,mlikeand
 	 */
 	public $title;
+	
+	/**
+	 * The sub type of the ThumbCuePoint
+	 * 
+	 * @var KalturaThumbCuePointSubType
+	 * @filter eq,in
+	 */
+	public $subType;
 
 	public function __construct()
 	{
