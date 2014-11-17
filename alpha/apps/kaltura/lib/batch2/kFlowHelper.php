@@ -481,20 +481,18 @@ class kFlowHelper
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
 			catch (Exception $ex) {
-				//If exception code is NoValidMediaStream return the job to avoid continuing with the code below
-				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
-					return $dbBatchJob;
-				 
-				if ($ex->getCode() == KDLErrors::SanityInvalidFrameDim)
-				{
-					kBusinessPostConvertDL::handleConvertFailed($dbBatchJob , null , $data->getFlavorAssetId() , null , null);
-					return $dbBatchJob;
-				}
-				
-				//This was added so the all the assets prior to reaching the limit would still be created
-				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
-					throw $ex;
-				
+			$code = $ex->getCode();
+
+			if ($code == KDLErrors::SanityInvalidFrameDim || $code == KDLErrors::NoValidMediaStream)
+			{
+				kBusinessPostConvertDL::handleConvertFailed($dbBatchJob , null , $data->getFlavorAssetId() , null , null);
+				return $dbBatchJob;
+			}	
+	
+			//This was added so the all the assets prior to reaching the limit would still be created
+			if ($code != kCoreException::MAX_ASSETS_PER_ENTRY)
+				throw $ex;
+
 				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
 			}			
 
