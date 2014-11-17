@@ -516,6 +516,10 @@ class KalturaErrors extends APIErrors
 	
 	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED;;Unable to generate list. max matches value was reached";
 	
+	const ASSIGINING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDEN = "ASSIGINING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDEN;ID;assigning categories|scheduling|access control to entry with parent entry \"@ID@\" is not allowed";
+	
+	const PARENT_ENTRY_ID_NOT_FOUND = "PARENT_ENTRY_ID_NOT_FOUND;ID;parent entry id \"@ID@\" not found";
+	
 	/*
 	 * FileAsset Service
 	 */

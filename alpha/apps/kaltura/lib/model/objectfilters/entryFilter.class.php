@@ -126,6 +126,7 @@ class entryFilter extends baseObjectFilter
 			"_eq_redirect_from_entry_id",
 			"_eq_root_entry_id",
 			"_in_root_entry_id",
+			"_eq_parent_entry_id",
 			"_is_root",
 			"_matchand_roots",
 			"_notin_roots",
@@ -213,6 +214,7 @@ class entryFilter extends baseObjectFilter
 			"replacing_entry_id", 
 			"replaced_entry_id", 
 			"root_entry_id",
+			"parent_entry_id",
 		));
 	}
 	
@@ -729,5 +731,10 @@ class entryFilter extends baseObjectFilter
 		return true;
 	}
 	
+	public function setParentEntryIdEqual($v)
+	{
+		$this->set('_eq_parent_entry_id', ($v));
+	}
+
 }
 
