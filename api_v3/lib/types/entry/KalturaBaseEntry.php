@@ -522,13 +522,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	
 	public function validateParentEntryId() 
 	{
+		//An entry with a parent entry id cannot be assigned to categories nor have access control/scheduling
 		if ($this->parentEntryId && ($this->categories || $this->categoriesIds || $this->accessControlId || $this->startDate || $this->endDate))
 			throw new KalturaAPIException(KalturaErrors::ASSIGINING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDEN, $this->parentEntryId);
 			
+		//Parent entry id must exists before assigning it to a child entry
 		if ($this->parentEntryId)
 		{
 			$entry = entryPeer::retrieveByPK($this->parentEntryId);
-			if($entry)
+			if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::PARENT_ENTRY_ID_NOT_FOUND, $this->parentEntryId);
 		}
 	}
