@@ -298,6 +298,9 @@ class PlaylistService extends KalturaEntryService
 		if (!$playlist)
 			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
 
+		if ($playlist->getType() != entryType::PLAYLIST)
+			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
+
 		$extraFilters = array();
 		if ($filter)
 		{
@@ -322,16 +325,16 @@ class PlaylistService extends KalturaEntryService
 	        $corePlaylistContext = $playlistContext->toObject();
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
+
+	    if ( is_null ( $detailed ) ) $detailed = true ;
+
 		try
 		{
-			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
+			$entryList= myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
 		}
 		catch (kCoreException $ex)
 		{
-			if ($ex->getCode() == APIErrors::INVALID_ENTRY_TYPE)
-				throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
-
-    		throw $ex;
+			throw $ex;
 		}
 
 		if ($limit)

@@ -102,9 +102,15 @@ class myPlaylistUtils
 	 * if after the entryFilter retrieved a list, still not enough entries (less than list's total number of results) - go to next list
 	 * 
 	 */
-	public static function executePlaylistById ( $partner_id , $playlist ,  $extra_filters = null , $detailed = true)
+	public static function executePlaylistById ( $partner_id , $playlist_id ,  $extra_filters = null , $detailed = true)
 	{
+		$playlist = entryPeer::retrieveByPK( $playlist_id );
 
+		if ( ! $playlist )
+		{
+			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID); 
+		}
+		
 		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
 			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_TYPE);
