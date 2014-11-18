@@ -83,6 +83,13 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 	 */
 	public $lastExecutionStartedAt;
 
+	/**
+	 * The maximum number of result count allowed to be processed by this profile per execution
+	 *
+	 * @var int
+	 */
+	public $maxTotalCountAllowed;
+
 	/*
 	 */
 	private static $map_between_objects = array(
@@ -98,6 +105,7 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'lastExecutionStartedAt',
+		'maxTotalCountAllowed',
 	);
 		 
 	/* (non-PHPdoc)
@@ -126,6 +134,7 @@ class KalturaScheduledTaskProfile extends KalturaObject implements IFilterable
 		$this->validatePropertyNotNull('objectFilterEngineType');
 		$this->validatePropertyNotNull('objectFilter');
 		$this->validatePropertyNotNull('objectTasks');
+		$this->validatePropertyNotNull('maxTotalCountAllowed');
 
 		parent::validateForInsert($propertiesToSkip);
 	}

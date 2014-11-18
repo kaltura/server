@@ -98,6 +98,12 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 	protected $last_execution_started_at;
 
 	/**
+	 * The value for the max_total_count_allowed field.
+	 * @var        int
+	 */
+	protected $max_total_count_allowed;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -360,6 +366,16 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [max_total_count_allowed] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getMaxTotalCountAllowed()
+	{
+		return $this->max_total_count_allowed;
 	}
 
 	/**
@@ -743,6 +759,29 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 	} // setLastExecutionStartedAt()
 
 	/**
+	 * Set the value of [max_total_count_allowed] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     ScheduledTaskProfile The current object (for fluent API support)
+	 */
+	public function setMaxTotalCountAllowed($v)
+	{
+		if(!isset($this->oldColumnsValues[ScheduledTaskProfilePeer::MAX_TOTAL_COUNT_ALLOWED]))
+			$this->oldColumnsValues[ScheduledTaskProfilePeer::MAX_TOTAL_COUNT_ALLOWED] = $this->max_total_count_allowed;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->max_total_count_allowed !== $v) {
+			$this->max_total_count_allowed = $v;
+			$this->modifiedColumns[] = ScheduledTaskProfilePeer::MAX_TOTAL_COUNT_ALLOWED;
+		}
+
+		return $this;
+	} // setMaxTotalCountAllowed()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -787,6 +826,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->last_execution_started_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->max_total_count_allowed = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -796,7 +836,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 13; // 13 = ScheduledTaskProfilePeer::NUM_COLUMNS - ScheduledTaskProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = ScheduledTaskProfilePeer::NUM_COLUMNS - ScheduledTaskProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ScheduledTaskProfile object", $e);
@@ -849,7 +889,9 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		// already in the pool.
 
 		ScheduledTaskProfilePeer::setUseCriteriaFilter(false);
-		$stmt = ScheduledTaskProfilePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		entryPeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		ScheduledTaskProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -1049,8 +1091,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -1097,7 +1138,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-		
+	
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -1282,6 +1323,9 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			case 12:
 				return $this->getLastExecutionStartedAt();
 				break;
+			case 13:
+				return $this->getMaxTotalCountAllowed();
+				break;
 			default:
 				return null;
 				break;
@@ -1316,6 +1360,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			$keys[10] => $this->getCreatedAt(),
 			$keys[11] => $this->getUpdatedAt(),
 			$keys[12] => $this->getLastExecutionStartedAt(),
+			$keys[13] => $this->getMaxTotalCountAllowed(),
 		);
 		return $result;
 	}
@@ -1386,6 +1431,9 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 			case 12:
 				$this->setLastExecutionStartedAt($value);
 				break;
+			case 13:
+				$this->setMaxTotalCountAllowed($value);
+				break;
 		} // switch()
 	}
 
@@ -1423,6 +1471,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setLastExecutionStartedAt($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setMaxTotalCountAllowed($arr[$keys[13]]);
 	}
 
 	/**
@@ -1447,6 +1496,7 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		if ($this->isColumnModified(ScheduledTaskProfilePeer::CREATED_AT)) $criteria->add(ScheduledTaskProfilePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(ScheduledTaskProfilePeer::UPDATED_AT)) $criteria->add(ScheduledTaskProfilePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT)) $criteria->add(ScheduledTaskProfilePeer::LAST_EXECUTION_STARTED_AT, $this->last_execution_started_at);
+		if ($this->isColumnModified(ScheduledTaskProfilePeer::MAX_TOTAL_COUNT_ALLOWED)) $criteria->add(ScheduledTaskProfilePeer::MAX_TOTAL_COUNT_ALLOWED, $this->max_total_count_allowed);
 
 		return $criteria;
 	}
@@ -1539,6 +1589,8 @@ abstract class BaseScheduledTaskProfile extends BaseObject  implements Persisten
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setLastExecutionStartedAt($this->last_execution_started_at);
+
+		$copyObj->setMaxTotalCountAllowed($this->max_total_count_allowed);
 
 
 		$copyObj->setNew(true);

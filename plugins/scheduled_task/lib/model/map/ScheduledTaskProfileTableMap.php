@@ -50,6 +50,7 @@ class ScheduledTaskProfileTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('LAST_EXECUTION_STARTED_AT', 'LastExecutionStartedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('MAX_TOTAL_COUNT_ALLOWED', 'MaxTotalCountAllowed', 'INTEGER', true, null, null);
 		// validators
 	} // initialize()
 

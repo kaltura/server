@@ -163,8 +163,8 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		if (!$dbScheduledTaskProfile)
 			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_FOUND, $scheduledTaskProfileId);
 
-		if ($dbScheduledTaskProfile->getStatus() != KalturaScheduledTaskProfileStatus::ACTIVE)
-			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_PROFILE_NOT_ACTIVE, $scheduledTaskProfileId);
+		if (!in_array($dbScheduledTaskProfile->getStatus(), array(KalturaScheduledTaskProfileStatus::ACTIVE, KalturaScheduledTaskProfileStatus::DRY_RUN_ONLY)))
+			throw new KalturaAPIException(KalturaScheduledTaskErrors::SCHEDULED_TASK_DRY_RUN_NOT_ALLOWED, $scheduledTaskProfileId);
 
 		$jobData = new kScheduledTaskJobData();
 		$jobData->setMaxResults($maxResults);
