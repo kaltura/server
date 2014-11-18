@@ -293,12 +293,20 @@ class PlaylistService extends KalturaEntryService
 	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null, $filter = null )
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
-		
+
+		$playlist = entryPeer::retrieveByPK($id);
+		if (!$playlist)
+			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
+
 		$extraFilters = array();
 		if ($filter)
 		{
-			$limit = $filter->limit;
-			$filter->limit = null;
+
+			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+			{
+				$limit = $filter->limit;
+				$filter->limit = null;
+			}
 
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
@@ -316,15 +324,13 @@ class PlaylistService extends KalturaEntryService
 	    }
 		try
 		{
-			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed);
+			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
 		}
 		catch (kCoreException $ex)
 		{
-			if ($ex->getCode() ==  APIErrors::INVALID_ENTRY_ID)
-	    		throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
-			else if ($ex->getCode() == APIErrors::INVALID_ENTRY_TYPE)
+			if ($ex->getCode() == APIErrors::INVALID_ENTRY_TYPE)
 				throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
-					    		
+
     		throw $ex;
 		}
 

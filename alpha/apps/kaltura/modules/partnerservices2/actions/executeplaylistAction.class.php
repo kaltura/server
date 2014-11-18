@@ -128,13 +128,13 @@ class executeplaylistAction extends defPartnerservices2Action
 			return $cahce_key;
 		}
 		
+		$playlist = entryPeer::retrieveByPK($playlist_id);
+		if (!$playlist)
+			throw new APIException(APIErrors::INVALID_ENTRY_ID, "Playlist", $playlist_id) ;
+		
 		// this service is executed twice! (first time for the cache key, second time for the execution)
 		if (is_null($this->playlist))
 		{
-			$playlist = entryPeer::retrieveByPK($playlist_id);
-			if (!$playlist)
-				throw new APIException(APIErrors::INVALID_ENTRY_ID, "Playlist", $playlist_id) ;
-				 
 			myPartnerUtils::addPartnerToCriteria('accessControl', $playlist->getPartnerId() , $this->getPrivatePartnerData(), $this->partnerGroup2(), null);
 			
 			$this->playlist = $playlist;
@@ -143,7 +143,7 @@ class executeplaylistAction extends defPartnerservices2Action
 		if ($this->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
 
-		$entry_list = myPlaylistUtils::executePlaylistById( $partner_id , $playlist_id , $extra_filters , $detailed );
+		$entry_list = myPlaylistUtils::executePlaylistById( $partner_id , $playlist , $extra_filters , $detailed );
 
 		myEntryUtils::updatePuserIdsForEntries ( $entry_list );
 		
