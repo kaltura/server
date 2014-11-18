@@ -1778,6 +1778,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setRootEntryId($v)	{	$this->putInCustomData("rootEntryId", $v); }
 	
+	public function setParentEntryId($v)	{ $this->setRootEntryId($v);	$this->putInCustomData("parentEntryId", $v); }
+	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
+	
 	public function getSphinxMatchOptimizations() {
 		$objectName = $this->getIndexObjectName();
 		return $objectName::getSphinxMatchOptimizations($this);

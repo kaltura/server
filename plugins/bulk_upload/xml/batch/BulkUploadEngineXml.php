@@ -1904,6 +1904,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$entry->conversionProfileId = $this->getConversionProfileId($item);
 		if(($entry instanceof KalturaPlayableEntry) && isset($item->msDuration))
 			$entry->msDuration = (int)$item->msDuration;
+		if(isset($item->parentReferenceId))
+		{
+			$parentEntryId = $this->getEntryIdFromReference("{$item->parentReferenceId}");
+			if($parentEntryId)
+				$entry->parentEntryId = $parentEntryId; 
+		}
 		
 		return $entry;
 	}

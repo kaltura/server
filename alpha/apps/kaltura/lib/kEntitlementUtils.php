@@ -51,6 +51,9 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		if($entry->getParentEntryId())
+			$entry = entryPeer::retrieveByPK($entry->getParentEntryId());
+		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		
 		if(self::$entitlementForced === false)
