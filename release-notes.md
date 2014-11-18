@@ -1,3 +1,25 @@
+# IX-9.19.8 #
+
+##add new XML drop folder configuration - KS validation##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1112
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 3
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.7 #
 
 ##remove partner from 'exclude' list##
