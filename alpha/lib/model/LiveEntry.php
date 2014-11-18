@@ -294,6 +294,8 @@ abstract class LiveEntry extends entry
 		
 		$primaryMediaServer = null;
 		$backupMediaServer = null;
+		$primaryApplicationName = null;
+		$backupApplicationName = null;
 		
 		$kMediaServers = $this->getMediaServers();
 		if(count($kMediaServers))
@@ -306,6 +308,7 @@ abstract class LiveEntry extends entry
 					if($kMediaServer->getDc() == kDataCenterMgr::getCurrentDcId())
 					{
 						$primaryMediaServer = $kMediaServer->getMediaServer();
+						$primaryApplicationName = $kMediaServer->getApplicationName();
 						unset($kMediaServers[$key]);
 					}
 				}
@@ -318,14 +321,22 @@ abstract class LiveEntry extends entry
 					
 				$kMediaServer = array_shift($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+				{
 					$primaryMediaServer = $kMediaServer->getMediaServer();
+					$primaryApplicationName = $kMediaServer->getApplicationName();
+				}
 			}
+			
+			
 				
 			if(!$currentDcOnly && count($kMediaServers))
 			{
 				$kMediaServer = reset($kMediaServers);
 				if($kMediaServer && $kMediaServer instanceof kLiveMediaServer)
+				{
 					$backupMediaServer = $kMediaServer->getMediaServer();
+					$backupApplicationName = $kMediaServer->getApplicationName();
+				}
 			}
 		}
 		
@@ -358,6 +369,7 @@ abstract class LiveEntry extends entry
 		
 		if ($manifestUrl)
 		{
+			$manifestUrl .= "$primaryApplicationName/";
 			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
@@ -375,6 +387,7 @@ abstract class LiveEntry extends entry
 			
 			if($backupManifestUrl)
 			{
+				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
 				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8";
 				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m";
@@ -526,7 +539,7 @@ abstract class LiveEntry extends entry
 		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 	}
 	
-	public function setMediaServer($index, $hostname)
+	public function setMediaServer($index, $hostname, $applicationName = null)
 	{
 		$mediaServer = MediaServerPeer::retrieveByHostname($hostname);
 		if (!$mediaServer)
@@ -539,7 +552,8 @@ abstract class LiveEntry extends entry
 			return;
 		
 		$this->setLastBroadcast(time());
-		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null);
+		$server = new kLiveMediaServer($index, $hostname, $mediaServer ? $mediaServer->getDc() : null, $mediaServer ? $mediaServer->getId() : null, 
+			$applicationName ? $applicationName : MediaServer::DEFAULT_APPLICATION);
 		$this->putInCustomData("server-$index", $server, LiveEntry::CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS);
 	}
 	
