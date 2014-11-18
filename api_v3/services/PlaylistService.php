@@ -304,7 +304,6 @@ class PlaylistService extends KalturaEntryService
 		$extraFilters = array();
 		if ($filter)
 		{
-
 			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
 			{
 				$limit = $filter->limit;
@@ -326,11 +325,11 @@ class PlaylistService extends KalturaEntryService
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
 
-	    if ( is_null ( $detailed ) ) $detailed = true ;
+		if ( is_null ( $detailed ) ) $detailed = true ;
 
 		try
 		{
-			$entryList= myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
+			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
 		}
 		catch (kCoreException $ex)
 		{
