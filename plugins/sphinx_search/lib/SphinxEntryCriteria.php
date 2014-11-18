@@ -196,7 +196,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		//When setting parent entry ID we also set the root entry id so the entry should be indexed with the root entry prefix
 		if($filter->is_set('_eq_parent_entry_id'))
 		{
-			$matchOrRoots[] = entry::ROOTS_FIELD_ENTRY_PREFIX . ' ' . $filter->get('_eq_parent_entry_id');
+			$matchOrRoots[] = entry::ROOTS_FIELD_PARENT_ENTRY_PREFIX . ' ' . $filter->get('_eq_parent_entry_id');
 			$filter->unsetByName('_eq_parent_entry_id');
 		}
 		
