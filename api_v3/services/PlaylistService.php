@@ -324,15 +324,16 @@ class PlaylistService extends KalturaEntryService
 	        $corePlaylistContext = $playlistContext->toObject();
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
-
-		if ( is_null ( $detailed ) ) $detailed = true ;
+	    
+		if (is_null($detailed))
+			 $detailed = true ;
 
 		try
 		{
 			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
 		}
 		catch (kCoreException $ex)
-		{
+		{   		
 			throw $ex;
 		}
 
