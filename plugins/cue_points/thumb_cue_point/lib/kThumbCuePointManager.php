@@ -119,7 +119,6 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 		// Clone the cue point to the VOD entry
 		$vodThumbCuePoint = $thumbCuePoint->copy();
 		$vodThumbCuePoint->setEntryId( $vodEntryId );
-		$vodThumbCuePoint->setAssetId( $timedThumbAsset->getId() );
 		$vodThumbCuePoint->save();
 
 		$timedThumbAssetCuePointID = $timedThumbAsset->getCuePointID();	// Remember the current thumb asset's cue point id
@@ -129,6 +128,8 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 		// Make a copy of the current thumb asset
 		// copyToEntry will create a filesync softlink to the original filesync
 		$vodTimedThumbAsset = $timedThumbAsset->copyToEntry( $vodEntryId, $vodEntry->getPartnerId() );
+ 		$vodThumbCuePoint->setAssetId( $vodTimedThumbAsset->getId() );
+ 		$vodThumbCuePoint->save();
 
 		// Restore the thumb asset's prev. cue point id (for good measures)
 		$timedThumbAsset->setCuePointID( $timedThumbAssetCuePointID );
