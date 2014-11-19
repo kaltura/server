@@ -1531,8 +1531,6 @@ class KalturaEntryService extends KalturaBaseService
 
 		if (!$entryToDelete || ($entryType !== null && $entryToDelete->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		
 		
 		myEntryUtils::deleteEntry($entryToDelete);
 		

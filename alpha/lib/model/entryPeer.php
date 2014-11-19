@@ -327,6 +327,19 @@ class entryPeer extends BaseentryPeer
 		self::setUseCriteriaFilter ( true );
 		return $res;
 	}
+	
+	public static function retrieveChildEntriesByEntryIdAndPartnerId ($parentId, $partnerId)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		
+		$filter = new entryFilter();
+		$filter->setParentEntryIdEqual($parentId);
+		$filter->setPartnerSearchScope($partnerId);
+		$filter->setDisplayInSearchEquel(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$filter->attachToCriteria($c);
+		
+		return self::doSelect($c);
+	}
 
 	public static function setFilterdCategoriesIds($filteredCategoriesIds)
 	{

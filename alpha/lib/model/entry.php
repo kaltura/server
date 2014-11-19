@@ -2673,6 +2673,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$trackEntry->setChangedProperties(implode("\n", $changedProperties));
 			$trackEntry->setDescription(__METHOD__ . "[" . __LINE__ . "]");
 			TrackEntry::addTrackEntry($trackEntry);
+			
+			//In case this entry has sub streams assigned to it we should delete them as well
+			$subStreamEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->id, $this->partner_id);
+			foreach ($subStreamEntries as $subStreamEntry)
+			{
+				myEntryUtils::deleteEntry($subStreamEntry);
+			}
 		}
 			
 		if($objectUpdated)
