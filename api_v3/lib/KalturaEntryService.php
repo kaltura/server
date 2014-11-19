@@ -1198,7 +1198,7 @@ class KalturaEntryService extends KalturaBaseService
         {
         	$this->setDefaultStatus($filter);
             $this->setDefaultModerationStatus($filter);
-            if($filter->parentEntryIdEqual !== null)
+            if($filter->parentEntryIdEqual == null)
             	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		}
 		
