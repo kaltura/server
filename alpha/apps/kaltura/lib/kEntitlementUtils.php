@@ -52,7 +52,14 @@ class kEntitlementUtils
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
 		if($entry->getParentEntryId())
-			$entry = entryPeer::retrieveByPK($entry->getParentEntryId());
+		{
+			$entry = $entry->getParentEntry();
+			if(!$entry)
+			{
+				KalturaLog::debug('Parent entry not found, cannot validate entitlement');
+				return false;
+			}
+		}
 		
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		

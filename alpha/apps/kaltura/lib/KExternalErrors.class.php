@@ -48,6 +48,7 @@ class KExternalErrors
 	const INVALID_SETTING_TYPE = 39;
 	const ACTION_BLOCKED = 40;
 	const INVALID_HASH = 41;
+	const PARENT_ENTRY_ID_NOT_FOUND = 42;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	

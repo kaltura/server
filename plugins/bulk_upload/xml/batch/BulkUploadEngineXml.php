@@ -1908,7 +1908,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$parentEntryId = $this->getEntryIdFromReference("{$item->parentReferenceId}");
 			if($parentEntryId)
-				$entry->parentEntryId = $parentEntryId; 
+				$entry->parentEntryId = $parentEntryId;
+			else 
+				throw new KalturaBulkUploadXmlException("Parent entry id with reference id [$item->parentReferenceId] not found ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		return $entry;

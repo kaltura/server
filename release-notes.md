@@ -1,6 +1,6 @@
 # IX-9.19.8 #
 
-##add new XML drop folder configuration - KS validation##
+##Add support for multiple video/audio substreams##
 - Issue Type: Back-End Request
 - Issue ID: PLAT-1112
 

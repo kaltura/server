@@ -524,7 +524,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	{
 		//An entry with a parent entry id cannot be assigned to categories nor have access control/scheduling
 		if ($this->parentEntryId && ($this->categories || $this->categoriesIds || $this->accessControlId || $this->startDate || $this->endDate))
-			throw new KalturaAPIException(KalturaErrors::ASSIGINING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDEN, $this->parentEntryId);
+			throw new KalturaAPIException(KalturaErrors::ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN, $this->parentEntryId);
 			
 		//Parent entry id must exists before assigning it to a child entry
 		if ($this->parentEntryId)
