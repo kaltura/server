@@ -1680,4 +1680,24 @@ class kJobsManager
 		
 		return self::addJob( $batchJob, $jobData, BatchJobType::COPY_PARTNER );
 	}
+	
+	public static function addExportLiveReportJob($reportType, $entryIds, $outputPath, $recpientEmail = null)
+	{
+		KalturaLog::debug("adding Export Live Report job");
+		
+		$jobData = new kLiveReportExportJobData();
+		$jobData->entryIds = $entryIds;
+		$jobData->outputPath = $outputPath;
+		$jobData->recipientEmail = $recpientEmail;
+		$jobData->timeReference = time();
+		
+		
+		$job = new BatchJob();
+		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$job->setJobType(BatchJobType::LIVE_REPORT_EXPORT);
+		$job->setJobSubType($reportType);
+		$job->setData($jobData);
+		
+		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT );
+	}
 }

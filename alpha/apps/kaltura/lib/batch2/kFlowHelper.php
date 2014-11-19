@@ -14,6 +14,8 @@ class kFlowHelper
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
+	
+	const KALTURA_LIVE_REPORT_EXPORT_IS_READY = 130;
 
 	/**
 	 * @param int $partnerId
@@ -2643,6 +2645,24 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+	
+	public static function handleLiveReportExportFinished(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
+		
+		$jobData = new kMailJobData();
+		$jobData->setIsHtml(true);
+		$jobData->setMailPriority(kMailJobData::MAIL_PRIORITY_NORMAL);
+		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
+		$jobData->setMailType(self::KALTURA_LIVE_REPORT_EXPORT_IS_READY);
+		
+		$jobData->setFromEmail(kConf::get("live_report_sender_email"));
+		$jobData->setFromName(kConf::get("live_report_sender_email"));
+		
+		$jobData->setBodyParamsArray(array($data->outputFilePath));
+		$jobData->setRecipientEmail($data->recipientEmail);
+		$jobData->setSubjectParamsArray(array());
+		
+		kJobsManager::addJob($dbBatchJob->createChild(BatchJobType::MAIL, $jobData->getMailType()), $jobData, BatchJobType::MAIL, $jobData->getMailType());
 	}
 	
 	private static function deleteTemporaryFlavors($entryId)

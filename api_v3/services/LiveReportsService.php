@@ -14,7 +14,7 @@ class LiveReportsService extends KalturaBaseService
 	 * @param KalturaLiveReportType $reportType
 	 * @param KalturaLiveReportInputFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaLiveStatsListResponse
+	 * @return KalturaReportGraphArray
 	 */
 	public function getEventsAction($reportType,
 			KalturaLiveReportInputFilter $filter = null,
@@ -106,6 +106,20 @@ class LiveReportsService extends KalturaBaseService
 				return $result;
 		}
 		
+	}
+	
+	/**
+	 * @action exportToCsv
+	 * @param KalturaLiveReportExportType $reportType 
+	 * @param string $entryIds
+	 * @param string $recpientEmail
+	 * @return KalturaLiveStatsListResponse
+	 */
+	public function exportToCsvAction($reportType, $entryIds, $recpientEmail = null)
+	{
+		// @_!! DO SOMETHING
+		$outputPath = "/opt/kaltura/tmp/convert";
+		kJobsManager::addExportLiveReportJob($reportType, $entryIds, $outputPath, $recpientEmail);
 	}
 	
 	/**
