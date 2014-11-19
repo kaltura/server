@@ -325,6 +325,7 @@ class PlaylistService extends KalturaEntryService
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
 	    
+		// the default of detrailed should be true - most of the time the kuse is needed
 		if (is_null($detailed))
 			 $detailed = true ;
 
@@ -337,7 +338,7 @@ class PlaylistService extends KalturaEntryService
 			throw $ex;
 		}
 
-		if ($limit)
+		if (isset($limit) && $limit)
 			$entryList = array_slice($entryList , 0 , $limit);
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
