@@ -165,7 +165,10 @@ class previewAction extends kalturaAction
 		// Set Page name
 		if(!$this->entry_id) {
 			$this->entry_name = ($playlist_name) ? $playlist_name : 'Kaltura Player';
-			$this->entry_description = '';
+			if (isset($playlist) && $playlist)
+				$this->entry_description = $playlist->getDescription();
+			else
+				$this->entry_description = '';
 		}
 
 	}
