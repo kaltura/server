@@ -74,6 +74,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 		"rootEntryIdEqual" => "_eq_root_entry_id",
 		"rootEntryIdIn" => "_in_root_entry_id",
+		"parentEntryIdEqual" => "_eq_parent_entry_id",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -504,6 +505,11 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $rootEntryIdIn;
+	
+	/**
+	 * @var string
+	 */
+	public $parentEntryIdEqual;
 
 	/**
 	 * @var string

@@ -65,9 +65,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 * @see KalturaCuePoint::validateForInsert()
 	 */
 	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull(array("assetId", "startTime", "thumbOffset"));
-		
+	{	
 		if($this->assetId !== null)	
 			$this->validateTimedThumbAssetId();
 		

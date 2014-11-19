@@ -1,3 +1,48 @@
+# IX-9.19.8 #
+
+##add new XML drop folder configuration - KS validation##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1112
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KAsyncBulkUpload'
+
+		params.xmlSchemaVersion		= 3
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Scheduled Tasks Enhancements##
+- Issue Type: Customer request
+- Issue ID: P-282702
+
+#### Configuration ####
+
+**workers.ini**
+
+under 'KScheduledTaskRunner' add
+
+		maxProfiles = 50
+		maxTotalCountAllowed = 10
+
+#### Deployment Scripts ####
+
+*DB*
+
+- Run deployment/updates/sql/2014_11_02_add_max_total_count_allowed_column_to_scheduled_task_table.sql
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.7 #
 
 ##remove partner from 'exclude' list##

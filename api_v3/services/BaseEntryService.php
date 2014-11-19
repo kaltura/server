@@ -722,6 +722,15 @@ class BaseEntryService extends KalturaEntryService
 		$result->mediaProtocol = $contextDataHelper->getMediaProtocol();
 		$result->storageProfilesXML = $contextDataHelper->getStorageProfilesXML();
 		$result->isAdmin = $contextDataHelper->getIsAdmin();
+		
+		$parentEntryId = $dbEntry->getParentEntryId();
+		if ($parentEntryId)
+		{
+			$dbEntry = entryPeer::retrieveByPK($parentEntryId);
+			if(!$dbEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
+		}
+		
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
 		
 		return $result;
