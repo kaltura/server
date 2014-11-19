@@ -20,7 +20,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	const ROOTS_FIELD_PREFIX = 'K_Pref';
 	const ROOTS_FIELD_ENTRY_PREFIX = 'KP_Entry';
-	const ROOTS_FIELD_PARENT_ENTRY_PREFIX = 'KPE_Entry';
+	const ROOTS_FIELD_PARENT_ENTRY_PREFIX = 'KP_Parent';
 	const ROOTS_FIELD_BULK_UPLOAD_PREFIX = 'KP_Bulk';
 
 	// NOTE - CHANGES MUST BE MADE TO LAYOUT.PHP JS PART AS WELL
@@ -1924,7 +1924,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$ret[] = entry::ROOTS_FIELD_ENTRY_PREFIX . ' ' . $this->getRootEntryId();
 			
 		if($this->getParentEntryId())
-			$ret[] = entry::ROOTS_FIELD_PARENT_ENTRY_PREFIX . ' ' . $this->getParentEntryId();
+			$ret[] = entry::ROOTS_FIELD_PARENT_ENTRY_PREFIX . '_' . $this->getParentEntryId();
 		
 		return implode(',', $ret);
 	}
