@@ -1660,7 +1660,7 @@ class kFlowHelper
 					{ 
 						//check if the inter flow count is larger than 2.  
 						//In this cases probably something went wrong so we will continue with the original flow and will not check if any additioanl inter flow nneds to be done.
-						if($currFlavorAsset->getInterFlowCount() < self::MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE)
+						if($currentFlavorAsset && $currFlavorAsset->getInterFlowCount() < self::MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE)
 						{
 							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 							kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $convertProfileJob, $mediaInfo->getId());
