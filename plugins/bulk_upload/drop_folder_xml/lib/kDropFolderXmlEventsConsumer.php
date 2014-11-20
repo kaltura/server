@@ -45,6 +45,13 @@ class kDropFolderXmlEventsConsumer implements kBatchJobStatusEventConsumer, kObj
 				in_array(DropFolderFilePeer::STATUS, $modifiedColumns))
 			{
 				$folder = DropFolderPeer::retrieveByPK($object->getDropFolderId());
+				
+				if(!$folder)
+				{
+					KalturaLog::err('Failed to process shouldConsumeChangedEvent - Failed to retrieve drop folder with ID ' . $object->getDropFolderId());
+					return false;
+				}
+				
 				if($folder->getFileHandlerType() == DropFolderXmlBulkUploadPlugin::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
 					return true;
 			}
