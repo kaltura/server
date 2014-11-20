@@ -62,7 +62,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LIMELIGHT_RTMP => 'DeliveryProfileLimeLightRtmp',
 			
 			DeliveryProfileType::VOD_PACKAGER_DASH => 'DeliveryProfileVodPackagerDash',
-					
+			DeliveryProfileType::VOD_PACKAGER_HDS => 'DeliveryProfileVodPackagerHds',
+			DeliveryProfileType::VOD_PACKAGER_MSS => 'DeliveryProfileVodPackagerMss',
+				
 			DeliveryProfileType::LOCAL_PATH_APPLE_HTTP => 'DeliveryProfileLocalPathAppleHttp',
 			DeliveryProfileType::LOCAL_PATH_HTTP => 'DeliveryProfileLocalPathHttp',
 			DeliveryProfileType::LOCAL_PATH_RTMP => 'DeliveryProfileLocalPathRtmp',

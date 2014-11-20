@@ -1,7 +1,7 @@
 <?php
 
-class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
-		
+class DeliveryProfileVodPackagerMss extends DeliveryProfileSilverLight {
+	
 	function __construct() {
 		parent::__construct();
 		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
@@ -20,11 +20,11 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 	public function serve()
 	{
 		$flavors = $this->buildHttpFlavorsArray();
-		
+		$flavors = $this->sortFlavors($flavors);
 		$flavor = VodPackagerDeliveryUtils::getVodPackagerUrl(
 				$flavors, 
 				$this->getUrl(), 
-				'/manifest.mpd', 
+				'/manifest', 
 				$this->params);
 		
 		return $this->getRenderer(array($flavor));
