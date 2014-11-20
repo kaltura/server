@@ -115,7 +115,7 @@ class LiveReportsService extends KalturaBaseService
 	 * @param string $recpientEmail
 	 * @return KalturaLiveStatsListResponse
 	 */
-	public function exportToCsvAction($reportType, $entryIds, $recpientEmail = null)
+	public function exportToCsvAction($reportType, $entryIds = null, $recpientEmail = null)
 	{
 		// @_!! DO SOMETHING
 		$outputPath = "/opt/kaltura/tmp/convert";

@@ -2,20 +2,30 @@
 
 abstract class LiveReportExporter {
 	
+	protected $fileDir;
 	protected $fileName = "fileName.csv";
 	protected $params = array();
+	
+	public function __construct(KalturaLiveReportExportJobData $data) {
+		$this->params[LiveReportConstants::TIME_REFERENCE_PARAM] = $jobData->timeReference;
+		if($jobData->entryIds)
+			$this->params[LiveReportConstants::ENTRY_IDS] = $jobData->entryIds;
+		
+		$this->fileDir = $data->outputPath;
+	}
 	
 	/**
 	 * Returns list of LiveReportEngine needed to create the export
 	 */
 	abstract protected function getEngines();
 	
-	abstract public function init(KalturaLiveReportExportJobData $jobData) {
-		$this->params[LiveReportConstants::TIME_REFERENCE_PARAM] = $jobData->timeReference;
-		if($jobData->entryIds)
-			$this->params[LiveReportConstants::ENTRY_IDS] = $jobData->entryIds;
-		
-		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . $this->fileName;
+	/**
+	 * Init function - Empty implementation. 
+	 * Here should be anything that might throw an exception.
+	 * @param KalturaLiveReportExportJobData $jobData
+	 */
+	public function init(KalturaLiveReportExportJobData $jobData) {
+		// Do nothing
 	}
 	
 	public function run() {

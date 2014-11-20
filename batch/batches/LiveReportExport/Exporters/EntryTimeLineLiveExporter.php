@@ -2,9 +2,13 @@
 
 class EntryTimeLineLiveExporter extends LiveReportEntryExporter {
 
-	public function __construct($timeReference) {
-		$fromTime = date(LiveReportConstants::DATE_FORMAT, $timeReference - LiveReportConstants::SECONDS_36_HOURS);
-		$toTime = date(LiveReportConstants::DATE_FORMAT, $timeReference);
+	public function __construct(KalturaLiveReportExportJobData $data) {
+		parent::__construct($data);
+		
+		$this->params[LiveReportConstants::IS_LIVE] = true;
+		
+		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
+		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
 		$this->fileName = "audience-%s-%s.csv";
 	}
 	
@@ -20,8 +24,4 @@ class EntryTimeLineLiveExporter extends LiveReportEntryExporter {
 		return $audienceLiveReport;
 	}
 
-	public function init(KalturaLiveReportExportJobData $jobData) {
-		parent::init($jobData);
-		$this->params[LiveReportConstants::IS_LIVE] = true;
-	}
 }

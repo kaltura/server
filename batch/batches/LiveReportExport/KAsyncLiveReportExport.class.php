@@ -18,7 +18,7 @@ class KAsyncLiveReportExport  extends KJobHandlerWorker
 
 	protected function createCsv(KalturaBatchJob $job, KalturaLiveReportExportJobData $data) {
 		$type = $job->jobSubType;
-		$exporter = LiveReportFactory::getExporter($type);
+		$exporter = LiveReportFactory::getExporter($type, $data);
 		$exporter->run();
 	}
 }

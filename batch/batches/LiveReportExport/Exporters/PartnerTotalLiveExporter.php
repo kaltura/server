@@ -2,9 +2,12 @@
 
 class PartnerTotalLiveExporter extends LiveReportExporter {
 
-	public function __construct($timeReference) {
-		$fromTime = date(LiveReportConstants::DATE_FORMAT, $timeReference - LiveReportConstants::SECONDS_36_HOURS);
-		$toTime = date(LiveReportConstants::DATE_FORMAT, $timeReference);
+	public function __construct(KalturaLiveReportExportJobData $data) {
+		parent::__construct($data);
+		$this->params[LiveReportConstants::IS_LIVE] = true;
+		
+		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
+		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
 		$this->fileName = "live-noe-entries-%s-%s.csv";
 	}
 	
@@ -31,10 +34,5 @@ class PartnerTotalLiveExporter extends LiveReportExporter {
 				new LiveReportEntryBasedChunkerEngine($subEngines));
 		
 		return $liveEntriesReport;
-	}
-	
-	public function init(KalturaLiveReportExportJobData $jobData) {
-		parent::init($jobData);
-		$this->params[LiveReportConstants::IS_LIVE] = true;
 	}
 }

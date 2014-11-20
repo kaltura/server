@@ -1698,6 +1698,6 @@ class kJobsManager
 		$job->setJobSubType($reportType);
 		$job->setData($jobData);
 		
-		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT );
+		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
 	}
 }
