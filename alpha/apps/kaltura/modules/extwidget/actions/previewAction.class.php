@@ -45,6 +45,7 @@ class previewAction extends kalturaAction
 		}
 
 		$playlist_name = null;
+		$playlist_description = null;
 		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
 		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
 
@@ -103,6 +104,7 @@ class previewAction extends kalturaAction
 				$playlist = entryPeer::retrieveByPK($playlistId);
 				if( $playlist ) {
 					$playlist_name = $playlist->getName();
+					$playlist_description = $playlist->getDescription();
 				}
 			}
 		} else {
@@ -165,10 +167,7 @@ class previewAction extends kalturaAction
 		// Set Page name
 		if(!$this->entry_id) {
 			$this->entry_name = ($playlist_name) ? $playlist_name : 'Kaltura Player';
-			if (isset($playlist) && $playlist)
-				$this->entry_description = $playlist->getDescription();
-			else
-				$this->entry_description = '';
+			$this->entry_description = ($playlist_description) ? $playlist_description : '';
 		}
 
 	}
