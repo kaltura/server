@@ -2647,8 +2647,10 @@ class kFlowHelper
 	
 	public static function handleLiveReportExportFinished(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 		
+		$time = date("m-d-y H:i", $data->timeReference); 
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
-		$params = array($dbBatchJob->getPartner()->name, $data->timeReference, $job->id, $data->outputPath);
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $data->outputPath);
+		$titleParams = array($time);
 		
 		kJobsManager::addMailJob(
 				null,
@@ -2659,7 +2661,8 @@ class kFlowHelper
 				kConf::get( "live_report_sender_email" ),
 				kConf::get( "live_report_sender_name" ),
 				$data->recipientEmail,
-				$params
+				$params,
+				$titleParams
 		);
 		
 		return $dbBatchJob;
@@ -2667,9 +2670,11 @@ class kFlowHelper
 	
 	public static function handleLiveReportExportFailed(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 	
+		$time = date("m-d-y H:i", $data->timeReference);
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
-		$params = array($dbBatchJob->getPartner()->name, $data->timeReference, $job->id, 
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), 
 				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage());
+		$titleParams = array($time);
 	
 		kJobsManager::addMailJob(
 				null,
@@ -2680,15 +2685,18 @@ class kFlowHelper
 				kConf::get( "live_report_sender_email" ),
 				kConf::get( "live_report_sender_name" ),
 				$data->recipientEmail,
-				$params
+				$params,
+				$titleParams
 		);
 		return $dbBatchJob;
 	}
 	
 	public static function handleLiveReportExportAborted(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 	
+		$time = date("m-d-y H:i", $data->timeReference);
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
-		$params = array($dbBatchJob->getPartner()->name, $data->timeReference, $job->id);
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
+		$titleParams = array($time);
 	
 		kJobsManager::addMailJob(
 				null,
@@ -2699,7 +2707,8 @@ class kFlowHelper
 				kConf::get( "live_report_sender_email" ),
 				kConf::get( "live_report_sender_name" ),
 				$data->recipientEmail,
-				$params
+				$params,
+				$titleParams
 		);
 		return $dbBatchJob;
 	}

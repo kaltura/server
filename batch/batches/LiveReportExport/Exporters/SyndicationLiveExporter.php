@@ -2,13 +2,14 @@
 
 class SyndicationLiveExporter extends LiveReportEntryExporter {
 
-	public function __construct(KalturaLiveReportExportJobData $data) {
-		parent::__construct($data);
+	public function __construct($partnerId, KalturaLiveReportExportJobData $data) {
+		parent::__construct($partnerId, $data);
 		$this->params[LiveReportConstants::IS_LIVE] = true;
 		
 		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
 		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
-		$this->fileName = "referrers-live-now-%s-%s.csv";
+		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . "referrers-live-now-%s-%s.csv";
+		$data->outputPath =  $this->fileName;
 	}
 
 	protected function getEngines() {

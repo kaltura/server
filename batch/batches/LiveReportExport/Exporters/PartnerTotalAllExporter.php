@@ -6,7 +6,8 @@ class PartnerTotalAllExporter extends LiveReportExporter {
 		parent::__construct($partnerId, $data);
 		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
 		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
-		$this->fileName = "all-entries-%s-%s.csv";
+		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . "all-entries-%s-%s.csv";
+		$data->outputPath =  $this->fileName;
 	}
 	
 	public function init(KalturaLiveReportExportJobData $jobData) {

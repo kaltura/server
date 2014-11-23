@@ -3,7 +3,6 @@
 abstract class LiveReportExporter {
 	
 	protected $partnerId;
-	protected $fileDir;
 	protected $fileName = "fileName.csv";
 	protected $params = array();
 	
@@ -13,8 +12,6 @@ abstract class LiveReportExporter {
 		$this->params[LiveReportConstants::TIME_REFERENCE_PARAM] = $data->timeReference;
 		if($data->entryIds)
 			$this->params[LiveReportConstants::ENTRY_IDS] = $data->entryIds;
-		
-		$this->fileDir = $data->outputPath;
 	}
 	
 	/**
@@ -33,8 +30,7 @@ abstract class LiveReportExporter {
 	
 	public function run() {
 		
-		$fileName = $this->fileDir . DIRECTORY_SEPARATOR . $this->fileName;
-		
+		$fileName = $this->fileName;
 		$fp = fopen($fileName, 'w');
 		if(!$fp)
 			throw new KOperationEngineException("Failed to open report file : " . $fileName);
