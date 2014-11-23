@@ -2,14 +2,16 @@
 
 abstract class LiveReportExporter {
 	
+	protected $partnerId;
 	protected $fileDir;
 	protected $fileName = "fileName.csv";
 	protected $params = array();
 	
 	public function __construct(KalturaLiveReportExportJobData $data) {
-		$this->params[LiveReportConstants::TIME_REFERENCE_PARAM] = $jobData->timeReference;
-		if($jobData->entryIds)
-			$this->params[LiveReportConstants::ENTRY_IDS] = $jobData->entryIds;
+		$this->params[LiveReportConstants::IS_LIVE] = false;
+		$this->params[LiveReportConstants::TIME_REFERENCE_PARAM] = $data->timeReference;
+		if($data->entryIds)
+			$this->params[LiveReportConstants::ENTRY_IDS] = $data->entryIds;
 		
 		$this->fileDir = $data->outputPath;
 	}
@@ -30,9 +32,13 @@ abstract class LiveReportExporter {
 	
 	public function run() {
 		
-		$fileName = $this->getDirectory . DIRECTORY_SEPARATOR . $this->fileName;
-		$fp = fopen($fileName, 'w');
+		$fileName = $this->fileDir . DIRECTORY_SEPARATOR . $this->fileName;
 		
+		$fp = fopen($fileName, 'w');
+		if(!$fp)
+			throw new KOperationEngineException("Failed to open report file : " . $fileName);
+		
+		KalturaLog::debug("Exporting report to $fileName");
 		$engines = $this->getEngines();
 		foreach ($engines as $engine) {
 			$engine->run($fp, $this->params);

@@ -16,4 +16,7 @@ interface LiveReportConstants {
 	const SECONDS_36_HOURS = 12960;
 	const SECONDS_10 = 10;
 	const SECONDS_60 = 60;
+	
+	// Other constants
+	const MAX_ENTRIES = 500;
 }

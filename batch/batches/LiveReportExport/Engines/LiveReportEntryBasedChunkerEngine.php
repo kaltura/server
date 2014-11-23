@@ -17,15 +17,17 @@ class LiveReportEntryBasedChunkerEngine extends LiveReportEngine {
 	public function run($fp, array $args = array()) {
 		$this->checkParams($args, array( LiveReportConstants::ENTRY_IDS, LiveReportConstants::TIME_REFERENCE_PARAM));
 		$entryIds = explode(",", $args[LiveReportConstants::ENTRY_IDS]);
-		$entryChunks = array_chunk($entryIds, LiveReportConstants::ENTRY_CHUNK_SIZE);
+		$entryChunks = array_chunk($entryIds, self::ENTRY_CHUNK_SIZE);
 
 		$values = array();
 		// Execute all engines
 		foreach ($entryChunks as $entryChunk) {
 			foreach($this->subEngines as  $engine) {
 				$columnName = $engine->getTitle();
-				$engineArgs[LiveReportConstants::ENTRY_IDS] = $entryChunk;
+				$engineArgs = $args;
+				$engineArgs[LiveReportConstants::ENTRY_IDS] = implode(",", $entryChunk);
 				$engineArgs["TIME_REFERENCE_PARAM"] = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
+				
 				$values[$columnName] = $engine->run($fp, $engineArgs);
 			}
 		}

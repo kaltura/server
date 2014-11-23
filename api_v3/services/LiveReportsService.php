@@ -119,6 +119,7 @@ class LiveReportsService extends KalturaBaseService
 	{
 		// @_!! DO SOMETHING
 		$outputPath = "/opt/kaltura/tmp/convert";
+		$recpientEmail = "sharon.adar@kaltura.com";
 		kJobsManager::addExportLiveReportJob($reportType, $entryIds, $outputPath, $recpientEmail);
 	}
 	

@@ -9,6 +9,25 @@ class PartnerTotalAllExporter extends LiveReportExporter {
 		$this->fileName = "all-entries-%s-%s.csv";
 	}
 	
+	public function init(KalturaLiveReportExportJobData $jobData) {
+		$filter = new KalturaLiveStreamEntryFilter();
+		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_DESC;
+		$filter->isLive = true;
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = LiveReportConstants::MAX_ENTRIES;
+		
+		/** @var KalturaLiveStreamListResponse */
+		$response = KBatchBase::$kClient->liveStream->listAction($filter, $pager);
+		$entryIds = array();
+		foreach($response->objects as $object) {
+			$entryIds[] = $object->id;
+		}
+		
+		$this->params[LiveReportConstants::ENTRY_IDS] = implode(",", $entryIds);
+	}
+	
 	protected function getEngines() {
 		$subEngines = array(
 				new LiveReportEntryQueryEngine("plays", LiveReportConstants::SECONDS_36_HOURS, "Plays", false), 

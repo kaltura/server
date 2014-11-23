@@ -302,6 +302,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return kFlowHelper::handleLiveReportExportFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_ABORTED:
+				return kFlowHelper::handleLiveReportExportAborted($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}

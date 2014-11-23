@@ -55,5 +55,21 @@ class kLiveReportExportJobData extends kJobData
 	public function setEntryIds($entryIds) {
 		$this->entryIds = $entryIds;
 	}
+	
+	/**
+	 * @return the $outputPath
+	 */
+	public function getOutputPath() {
+		return $this->outputPath;
+	}
 
+	/**
+	 * @param field_type $outputPath
+	 */
+	public function setOutputPath($outputPath) {
+		$this->outputPath = $outputPath;
+	}
+
+
+	
 }

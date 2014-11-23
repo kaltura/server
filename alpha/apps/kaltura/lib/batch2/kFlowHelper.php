@@ -15,8 +15,6 @@ class kFlowHelper
 	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
 	
-	const KALTURA_LIVE_REPORT_EXPORT_IS_READY = 130;
-
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -2649,20 +2647,61 @@ class kFlowHelper
 	
 	public static function handleLiveReportExportFinished(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 		
-		$jobData = new kMailJobData();
-		$jobData->setIsHtml(true);
-		$jobData->setMailPriority(kMailJobData::MAIL_PRIORITY_NORMAL);
-		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
-		$jobData->setMailType(self::KALTURA_LIVE_REPORT_EXPORT_IS_READY);
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
+		$params = array($dbBatchJob->getPartner()->name, $data->timeReference, $job->id, $data->outputPath);
 		
-		$jobData->setFromEmail(kConf::get("live_report_sender_email"));
-		$jobData->setFromName(kConf::get("live_report_sender_email"));
+		kJobsManager::addMailJob(
+				null,
+				0,
+				$dbBatchJob->getPartnerId(),
+				$email_id,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "live_report_sender_email" ),
+				kConf::get( "live_report_sender_name" ),
+				$data->recipientEmail,
+				$params
+		);
 		
-		$jobData->setBodyParamsArray(array($data->outputFilePath));
-		$jobData->setRecipientEmail($data->recipientEmail);
-		$jobData->setSubjectParamsArray(array());
-		
-		kJobsManager::addJob($dbBatchJob->createChild(BatchJobType::MAIL, $jobData->getMailType()), $jobData, BatchJobType::MAIL, $jobData->getMailType());
+		return $dbBatchJob;
+	}
+	
+	public static function handleLiveReportExportFailed(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
+	
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
+		$params = array($dbBatchJob->getPartner()->name, $data->timeReference, $job->id, 
+				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage());
+	
+		kJobsManager::addMailJob(
+				null,
+				0,
+				$dbBatchJob->getPartnerId(),
+				$email_id,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "live_report_sender_email" ),
+				kConf::get( "live_report_sender_name" ),
+				$data->recipientEmail,
+				$params
+		);
+		return $dbBatchJob;
+	}
+	
+	public static function handleLiveReportExportAborted(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
+	
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
+		$params = array($dbBatchJob->getPartner()->name, $data->timeReference, $job->id);
+	
+		kJobsManager::addMailJob(
+				null,
+				0,
+				$dbBatchJob->getPartnerId(),
+				$email_id,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "live_report_sender_email" ),
+				kConf::get( "live_report_sender_name" ),
+				$data->recipientEmail,
+				$params
+		);
+		return $dbBatchJob;
 	}
 	
 	private static function deleteTemporaryFlavors($entryId)
