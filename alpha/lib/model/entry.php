@@ -1787,7 +1787,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		if(!$this->getParentEntryId())
 		{
 			KalturaLog::debug("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
-			return $this;
+			return null;
 		}
 		
 		$parentEntry = entryPeer::retrieveByPK($this->getParentEntryId());
