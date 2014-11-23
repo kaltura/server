@@ -1,4 +1,4 @@
-/*! KMC - v6.0.11 - 2014-10-20
+/*! KMC - v6.0.11 - 2014-11-23
 * https://github.com/kaltura/KMC_V2
 * Copyright (c) 2014 Amir Chervinsky; Licensed GNU */
 /**
@@ -4107,6 +4107,7 @@ kmc.utils = {
 		}
 		if ($("#flash_wrap").css("visibility") == "visible" || $("#flash_wrap").css("visibility") == "inherit"){
 			$("#flash_wrap").height(new_height);
+			$("#kcms").height(new_height);
 		}
 		kmc.utils.kmcHeight = new_height;
 		$("#server_wrap iframe").height(new_height - 2);
