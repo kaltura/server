@@ -149,7 +149,15 @@ KalturaLog::log("ARF (Webex) sources don't have proper mediaInfo, therefore turn
 						KDLVideoTarget::WVC1A, 4000, 1080,
 						KDLAudioTarget::WMA, 128, 0,
 						1, "webexNbrplayer.WebexNbrplayer");
+					/*
+					 * Following creates 3 retries for Webex conversions.
+					 * Required for the sake of 'garbled audio' issue.
+					 */
+				$interSrcFlavor = $interSrcProfile->_flavors[0];
+				$interSrcFlavor->_transcoders[] = $interSrcFlavor->_transcoders[0];
+				$interSrcFlavor->_transcoders[] = $interSrcFlavor->_transcoders[0];
 			}
+			
 			/*
 			 * For GotoMeeting ==> EE plugin 
 			 */
