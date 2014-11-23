@@ -1786,7 +1786,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	{
 		if(!$this->getParentEntryId())
 		{
-			KalturaLog::debug("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
+			KalturaLog::debug("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist");
 			return null;
 		}
 		
@@ -1798,8 +1798,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	//If entry has parent we need to retrieve access control from the parent
 	public function getaccessControl(PropelPDO $con = null)
 	{
-		if($this->getParentEntryId())
-			return $this->getParentEntry()->getaccessControl($con);
+		$parentEntry = $this->getParentEntry();
+		
+		if($parentEntry)
+			return $parentEntry->getaccessControl($con);
 		else
 			return parent::getaccessControl($con);
 	}
