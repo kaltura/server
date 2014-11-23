@@ -284,7 +284,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 */
 	public static function checkForSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, KalturaMediaInfo $mediaInfo)
 	{
-		KalturaLog::log("checkForSilentAudioAndBlackVideo(contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration)");
+		KalturaLog::log("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
 	
 		/*
 		 * Evaluate vid/aud detection durations
@@ -303,32 +303,26 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else
 			$audDetectDur = 0;
 	
-		list($silenceDur,$blackDur) = self::checkSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, $vidDetectDur, $audDetectDur);
+		list($silenceDetected,$blackDetected) = self::detectSilentAudioAndBlackVideoIntervals($ffmpegBin, $srcFileName, $vidDetectDur, $audDetectDur);
 		
-		switch ($blackDur){
-		case null:
-			$blackDetectMsg = null;
-			break;
-		case -1:
-			$blackDetectMsg = "black frame content for at least $vidDetectDur sec";
-			break;
-		default:
+		if(isset($blackDetected)){
+			list($blackStart,$blackDur) = $blackDetected[0];
+			if($blackDur==-1) $blackDur = $vidDetectDur;
 			$blackDetectMsg = "black frame content for at least $blackDur sec";
-			break;
 		}
-		
-		switch ($silenceDur){
-		case null:
-			$silenceDetectMsg = null;
-			break;
-		case -1:
-			$silenceDetectMsg = "silent content for at least $audDetectDur sec";
-			break;
-		default:
+		else{
+			$blackDetectMsg = null;
+		}
+
+		if(isset($silenceDetected)){
+			list($silenceStart,$silenceDur) = $silenceDetected[0];
+			if($silenceDur==-1) $silenceDur = $audDetectDur;
 			$silenceDetectMsg = "silent content for at least $silenceDur sec";
-			break;
 		}
-		
+		else{
+			$silenceDetectMsg = null;
+		}
+
 		$detectMsg = $silenceDetectMsg;
 		if(isset($blackDetectMsg))
 			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetectMsg":$blackDetectMsg;
@@ -345,13 +339,69 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * 
 	 * @param unknown_type $ffmpegBin
 	 * @param unknown_type $srcFileName
+	 * @param KalturaMediaInfo $mediaInfo
+	 * @return boolean
+	 */
+	public static function checkForGarbledAudio($ffmpegBin, $srcFileName, KalturaMediaInfo $mediaInfo)
+	{
+		KalturaLog::log("contDur:$mediaInfo->containerDuration,audDur:$mediaInfo->audioDuration");
+		if(isset($mediaInfo->audioDuration)){ 
+			$audDetectDur = ($mediaInfo->audioDuration>600000)? 600: round($mediaInfo->audioDuration/1000,2);
+		}
+		else if(isset($mediaInfo->containerDuration)){ 
+			$audDetectDur = ($mediaInfo->containerDuration>600000)? 600: round($mediaInfo->containerDuration/1000,2);
+		}		
+		else if(isset($mediaInfo->videoDuration)){ 
+			$audDetectDur = ($mediaInfo->videoDuration>600000)? 600: round($mediaInfo->videoDuration/1000,2);
+		}
+		else	
+			$audDetectDur = 0;
+		
+		if($audDetectDur>0 && $audDetectDur<10){
+			KalturaLog::log("Audio OK - short audio, audDetectDur($audDetectDur)");
+			return false;
+		}
+		
+		list($silenceDetected,$blackDetected) = KFFMpegMediaParser::detectSilentAudioAndBlackVideoIntervals($ffmpegBin, $srcFileName, null, 0.05, $audDetectDur,"-90dB");
+		
+		$ticks = isset($silenceDetected)? count($silenceDetected): 0;
+		if($ticks<=10){
+			KalturaLog::log("Audio OK - low numbers of ticks($ticks)");
+			return false;
+		}
+		
+		KalturaLog::log("audDetectDur($audDetectDur),ticks($ticks)");
+		if($audDetectDur>0) {
+			$ticksPerMin = $ticks/($audDetectDur/60);
+			KalturaLog::log("ticksPerMin($ticksPerMin)");
+			
+			if($ticksPerMin<10 
+			||($audDetectDur<60 && $ticksPerMin<30) 
+			||($audDetectDur<120 && $ticksPerMin<10) ){
+				KalturaLog::log("Audio OK");
+				return false;
+			}
+		}
+		else if($ticks<100) {
+			KalturaLog::log("Audio OK - no duration, number of ticks smaller than threshold(100)");
+			return false;
+		}
+		
+		KalturaLog::log("Detected garbled audio.");
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param unknown_type $ffmpegBin
+	 * @param unknown_type $srcFileName
 	 * @param unknown_type $blackInterval
 	 * @param unknown_type $silenceInterval
 	 * @param unknown_type $detectDur
 	 * @param unknown_type $audNoiseLevel
 	 * @return NULL|multitype:Ambigous <NULL, number, unknown>
 	 */
-	public static function checkSilentAudioAndBlackVideo($ffmpegBin, $srcFileName, $blackInterval, $silenceInterval, $detectDur=null, $audNoiseLevel=0.0001)
+	public static function detectSilentAudioAndBlackVideoIntervals($ffmpegBin, $srcFileName, $blackInterval, $silenceInterval, $detectDur=null, $audNoiseLevel=0.0001)
 	{
 		//		KalturaLog::log("checkSilentAudioAndBlackVideo(contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration)");
 	
@@ -388,16 +438,15 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			return null;
 		}
 	
-		$outputStr = implode($outputArr);
 	
 		/*
 		 * Searce the ffmpeg printout for
-		* - blackdetect or black_duration
-		* - silencedetect or silence_duration
-		*/
-		$silenceDur= self::parseDetectionOutput($outputStr,"silencedetect", "silence_duration");
-		$blackDur  = self::parseDetectionOutput($outputStr,"blackdetect", "black_duration");
-		return array($silenceDur, $blackDur);
+		 * - blackdetect or black_duration
+		 * - silencedetect or silence_duration
+		 */
+		$silenceDetected= self::parseDetectionOutput($outputArr,"silencedetect", "silence_duration", "silence_start");
+		$blackDetected  = self::parseDetectionOutput($outputArr,"blackdetect", "black_duration", "black_start");
+		return array($silenceDetected, $blackDetected);
 		
 	}
 	
@@ -408,17 +457,37 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 * @param unknown_type $durationString
 	 * @return NULL|number|unknown
 	 */
-	private static function parseDetectionOutput($outputStr, $detectString, $durationString)
+	private static function parseDetectionOutput(array $outputArr, $detectString, $durationString, $startString=null)
 	{
-		if(strstr($outputStr, $detectString)==false) {
-			return null;
+		$detectedArr = array();
+		$start = null;
+		$dur = null;
+		$isDetected = false;
+		foreach ($outputArr as $line){
+			if(strstr($line, $detectString)==false){
+				continue;
+			}
+			$isDetected = true;
+			if(isset($startString) && ($str=strstr($line, $startString))!=false){
+				sscanf($str,"$startString:%f", $start);
+			}
+			if(($str=strstr($line, $durationString))!=false){
+				sscanf($str,"$durationString:%f", $dur);
+				if(!isset($start)) {
+					$start = 0; 
+				}
+				$detectedArr[] = array($start,$dur);
+				$start = $dur = null;
+			}
 		}
-		$str = strstr($outputStr, $durationString);
-		if($str==null)
-			return -1;
-		
-		sscanf($str,"$durationString:%f", $dur);
-		return $dur;
+		if($isDetected==true) {
+			if(count($detectedArr)==0){
+				$detectedArr[] = array(0,-1);	
+			}
+			return $detectedArr;
+		}
+		else
+			return null;
 	}
 	
 	/**
@@ -429,7 +498,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 */
 	public static function retrieveSceneCuts($ffprobeBin, $srcFileName)
 	{
-		KalturaLog::log("retrieveScenCuts");
+		KalturaLog::log("srcFileName($srcFileName)");
 	
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time";
 		KalturaLog::log("$cmdLine");
@@ -456,7 +525,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	 */
 	public static function retrieveKeyFrames($ffprobeBin, $srcFileName)
 	{
-		KalturaLog::log("retrieveKeyFrames");
+		KalturaLog::log("srcFileName($srcFileName)");
 	
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)\" -show_entries frame=pkt_pts_time";
 		KalturaLog::log("$cmdLine");
