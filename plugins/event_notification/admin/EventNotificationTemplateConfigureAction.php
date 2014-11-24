@@ -115,7 +115,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 						$form->populate($request->getPost());
 						$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 					}
-					$form->finit();
+					$form->finit($eventNotificationTemplate);
 				}
 				else
 				{
@@ -138,7 +138,7 @@ class EventNotificationTemplateConfigureAction extends KalturaApplicationPlugin
 					$form->populate($request->getPost());
 					$eventNotificationTemplate = $form->getObject($templateClass, $request->getPost());
 				}
-				$form->finit();
+				$form->finit($eventNotificationTemplate);
 			}
 		}
 		catch(Exception $e)

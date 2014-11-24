@@ -28,7 +28,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		parent::__construct();
 	}
 	
-	abstract protected function addTypeElements();
+	abstract protected function addTypeElements(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate);
 
 	protected function getDescriptionHtml($description)
 	{
@@ -111,7 +111,7 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		foreach($object->userParameters as $parameter)
 			$this->addUserParameter($parameter);
 			
-		$this->finit();
+		$this->finit($object);
 		
 		parent::populateFromObject($object, $add_underscore);
 	}
@@ -210,14 +210,14 @@ abstract class Form_EventNotificationTemplateConfiguration extends Infra_Form
 		$eventNotificationTemplate->status = null;
 	}
 	
-	public function finit()
+	public function finit(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate)
 	{
 		$this->addElement('hidden', 'crossLine01', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		$this->addTypeElements();
+		$this->addTypeElements($eventNotificationTemplate);
 	}
 	
 	public function init()
