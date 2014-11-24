@@ -1117,6 +1117,8 @@ return array(
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::EMAIL' => 'Email',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::HTTP' => 'HTTP',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_START' => 'Start Business-Process',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_SIGNAL' => 'Signal Business-Process',
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::BATCH_JOB_STATUS' => 'Batch job status (Very dangerous)',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_ADDED' => 'Object added',
