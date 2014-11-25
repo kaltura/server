@@ -164,15 +164,20 @@ class thumbnailAction extends sfAction
 			{
 				$partnerId = $upload_token->getPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
-				
+
 				if ($partner)
+				{
 					KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $partner->getId());
+					if ($quality == 0)
+						$quality = $partner->getDefThumbQuality();
+
+					if($density == 0)
+						$density = $partner->getDefThumbDensity();
+
+					if(is_null($stripProfiles))
+						$stripProfiles = $partner->getStripThumbProfile();
+				}
 				
-				if($density == 0)
-					$density = $partner->getDefThumbDensity();
-				
-				if(is_null($stripProfiles))
-					$stripProfiles = $partner->getStripThumbProfile();
 				
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
 				kFile::fullMkdir($thumb_full_path);
@@ -287,8 +292,16 @@ class thumbnailAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
 		}
-		if($density == 0)
-			$density = $partner->getDefThumbDensity();
+
+		if ($partner)
+		{
+			if ($quality == 0)
+				$quality = $partner->getDefThumbQuality();
+
+			if($density == 0)
+				$density = $partner->getDefThumbDensity();
+		}
+
 		$thumbParams = new kThumbnailParameters();
 		$thumbParams->setSupportAnimatedThumbnail($partner->getSupportAnimatedThumbnails());
 		
