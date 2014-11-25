@@ -166,7 +166,11 @@ class thumbnailAction extends sfAction
 				$partner = PartnerPeer::retrieveByPK($partnerId);
 				
 				if ($partner)
+				{
 					KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $partner->getId());
+					if ($quality == 0)
+						$quality = $partner->getThumbnailQuality();
+				}
 				
 				if($density == 0)
 					$density = $partner->getDefThumbDensity();
@@ -287,6 +291,10 @@ class thumbnailAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
 		}
+
+		if ($quality == 0)
+			$quality = $partner->getThumbnailQuality();
+
 		if($density == 0)
 			$density = $partner->getDefThumbDensity();
 		$thumbParams = new kThumbnailParameters();
