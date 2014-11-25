@@ -41,7 +41,7 @@
 			continue;
 		}
 	
-		$partner->setThumbnailQuality($quality);
+		$partner->setDefThumbQuality($quality);
 		KalturaLog::debug("saving partner id $partnerId");
 		$partner->save();
 	}

@@ -426,16 +426,16 @@ class Partner extends BasePartner
 		return $this->putInCustomData( "partnerSpecificServices", $v );
 	}
 
-	public function getThumbnailQuality()
+	public function getDefThumbQuality()
 	{
-		return $this->getFromCustomData( "thumbnailQuality" , null , 0);
+		return $this->getFromCustomData( "defThumbQuality" , null , 0);
 	}
 
-	public function setThumbnailQuality( $v )
+	public function setDefThumbQuality( $v )
 	{
-		return $this->putInCustomData( "thumbnailQuality", $v );
+		return $this->putInCustomData( "defThumbQuality", $v );
 	}
-	
+
 	public function getAllowAnonymousRanking()	{		return $this->getFromCustomData( "allowAnonymousRanking" , null, false  );	}
 	public function setAllowAnonymousRanking( $v )	{		return $this->putInCustomData( "allowAnonymousRanking", $v );	}
 	
