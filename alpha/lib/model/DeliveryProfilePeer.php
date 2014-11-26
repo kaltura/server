@@ -68,6 +68,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 			DeliveryProfileType::LOCAL_PATH_APPLE_HTTP => 'DeliveryProfileLocalPathAppleHttp',
 			DeliveryProfileType::LOCAL_PATH_HTTP => 'DeliveryProfileLocalPathHttp',
 			DeliveryProfileType::LOCAL_PATH_RTMP => 'DeliveryProfileLocalPathRtmp',
+			DeliveryProfileType::LOCAL_PATH_HDS => 'DeliveryProfileLocalPathHds',
 					
 			DeliveryProfileType::LIVE_HLS => 'DeliveryProfileLiveAppleHttp',
 			DeliveryProfileType::LIVE_HDS => 'DeliveryProfileLiveHds',

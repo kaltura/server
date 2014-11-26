@@ -35,9 +35,14 @@
 				<password>@TEMPLATE_PARTNER_ADMIN_PASSWORD@</password>
 				<status>1</status>
 				<isAdmin>1</isAdmin>
-				<roleIds>{1:result:id}</roleIds>
+				<roleIds>2</roleIds>
 				<fullName>Template Partner</fullName>
 			</user>
+		</request>
+		<request service="partner" action="update">
+			<partner objectType="KalturaPartner">
+				<adminUserId>template@kaltura.com</adminUserId>
+			</partner>
 		</request>
 	</multirequest>
 	<request service="userRole" action="add">
