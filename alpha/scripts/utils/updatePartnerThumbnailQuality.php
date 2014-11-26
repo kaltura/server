@@ -27,7 +27,7 @@
 	$dryRun= $argv[3] !== 'realRun';
 	KalturaStatement::setDryRun($dryRun);
 	if ($dryRun)
-        	KalturaLog::debug('dry run --- in order to save, give realRun as a second parameter');
+        	KalturaLog::debug('dry run --- in order to save, give realRun as a third parameter');
 	
 	$partnerIds = file($fileName);
 	$partnerIds = array_map('trim' , $partnerIds);
