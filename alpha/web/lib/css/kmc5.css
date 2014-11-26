@@ -264,7 +264,7 @@ div.description ul button { padding: 0 5px;} /* vertical-align:1px; */
 .modal .title .icon { display: block; width:16px; height:16px; margin:-1px 0 0 5px; float:right; background: url(../images/kmc/kmc_sprite.png) no-repeat; cursor: pointer; }
 .modal .title .close { background-position: -155px -152px; }
 .modal .title .help { background-position: -177px -152px;}
-.modal .content { padding: 6px; }
+.modal .content { /*padding: 6px;*/ }
 .modal.iframe .content { padding: 0; }
 .modal .flash_only { background: #e1e1e1; padding: 10px;  -moz-border-radius:6px; -webkit-border-radius:6px; border-radius: 6px; }
 .modal .flash_only object { }
