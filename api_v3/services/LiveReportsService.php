@@ -119,11 +119,15 @@ class LiveReportsService extends KalturaBaseService
 	{
 		if(!$recpientEmail) {
 			$kuser = kCurrentContext::getCurrentKsKuser();
-			if($kuser)
+			if($kuser) {
 				$recpientEmail = $kuser->getEmail();
-			
-			$recpientEmail = "sharon.adar@kaltura.com";
+			} else {
+				$partnerId = kCurrentContext::getCurrentPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$recpientEmail = $partner->getAdminEmail();
+			}
 		}
+		
 		
 		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $entryIds, $recpientEmail);
 		
