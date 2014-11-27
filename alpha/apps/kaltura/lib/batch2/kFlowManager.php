@@ -175,7 +175,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		switch ($dbBatchJob->getStatus())
 		{
-			case BatchJob::BATCHJOB_STATUS_PROCESSING:
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return kFlowHelper::handleDeleteFileFinished($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
