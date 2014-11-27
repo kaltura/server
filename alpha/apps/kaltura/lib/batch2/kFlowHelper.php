@@ -1245,11 +1245,6 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	public static function handleDeleteFileProcessing (kDeleteFileJobData $data)
-	{
-		KalturaLog::info("Delete started for file path " . $data->getLocalFileSyncPath());
-	}
-
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
