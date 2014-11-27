@@ -3,17 +3,8 @@
 class PartnerTotalLiveExporter extends LiveReportExporter {
 
 	public function __construct(KalturaLiveReportExportJobData $data) {
-		parent::__construct($data);
+		parent::__construct($data, "live-now-entries-%s-%s.csv", LiveReportConstants::SECONDS_36_HOURS);
 		$this->params[LiveReportConstants::IS_LIVE] = true;
-		
-		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
-		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
-		
-		$this->params[self::TIME_RANGE] = $fromTime . " - " . $toTime;
-		
-		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . "live-now-entries-%s-%s.csv";
-		$this->fileName = vsprintf($this->fileName, array($fromTime, $toTime));
-		$data->outputPath =  $this->fileName;
 	}
 	
 	public function init(KalturaLiveReportExportJobData $jobData) {
