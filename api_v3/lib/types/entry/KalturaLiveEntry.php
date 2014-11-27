@@ -112,7 +112,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	public function toInsertableObject($sourceObject = null, $propsToSkip = array())
 	{
 		if(is_null($this->recordStatus))
-			$this->recordStatus = (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ? KalturaRecordStatus::ENABLED : KalturaRecordStatus::DISABLED);
+			$this->recordStatus = (PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM_RECORD, kCurrentContext::getCurrentPartnerId()) ? KalturaRecordStatus::APPENDED : KalturaRecordStatus::DISABLED);
 			
 		return parent::toInsertableObject($sourceObject, $propsToSkip);
 	}

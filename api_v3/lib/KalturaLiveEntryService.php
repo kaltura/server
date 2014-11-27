@@ -172,12 +172,20 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
 		$dbEntry->setRedirectEntryId(null);
 		
-		if(is_null($dbEntry->getFirstBroadcast())) 
-				$dbEntry->setFirstBroadcast(time());
-		
-		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
+		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus())
 		{
-			$this->createRecordedEntry($dbEntry);
+			$createRecordedEntry = false;
+			if(!$dbEntry->getRecordedEntryId())
+			{
+				$createRecordedEntry = true;
+			}
+			elseif($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION && ($dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 300) > time()))
+			{
+				$createRecordedEntry = true;
+			}
+			
+			if($createRecordedEntry)
+				$this->createRecordedEntry($dbEntry);
 		}
 		
 		$dbEntry->save();
