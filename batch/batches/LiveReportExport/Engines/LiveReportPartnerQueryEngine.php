@@ -25,7 +25,7 @@ class LiveReportPartnerEngine extends LiveReportEngine {
 		$filter->toTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
 		$filter->fromTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM] - $this->timeFrame;
 		if(isset($args[LiveReportConstants::ENTRY_IDS])) 
-			$filter->entryIds = LiveReportConstants::ENTRY_IDS;
+			$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 		
 		$res = EngineUtils::retrieveFromReport($reportType, $filter, null, null, $this->fieldName);
 		fwrite($fp, $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res));
@@ -40,7 +40,7 @@ class LiveReportLivePartnerEngine extends LiveReportPartnerEngine {
 	
 	public function run($fp, array $args = array()) {
 		$this->checkParams($args, array(LiveReportConstants::ENTRY_IDS));
-		parent::queryPartnerTotal($fp, $args);
+		parent::run($fp, $args);
 	}
 }
 

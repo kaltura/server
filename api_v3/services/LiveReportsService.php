@@ -113,14 +113,66 @@ class LiveReportsService extends KalturaBaseService
 	 * @param KalturaLiveReportExportType $reportType 
 	 * @param string $entryIds
 	 * @param string $recpientEmail
-	 * @return KalturaLiveStatsListResponse
+	 * @return KalturaLiveReportExportResponse
 	 */
 	public function exportToCsvAction($reportType, $entryIds = null, $recpientEmail = null)
 	{
-		// @_!! DO SOMETHING
-		$outputPath = "/opt/kaltura/tmp/convert";
-		$recpientEmail = "sharon.adar@kaltura.com";
-		kJobsManager::addExportLiveReportJob($reportType, $entryIds, $outputPath, $recpientEmail);
+		if(!$recpientEmail) {
+			$kuser = kCurrentContext::getCurrentKsKuser();
+			if($kuser)
+				$recpientEmail = $kuser->getEmail();
+			
+			$recpientEmail = "sharon.adar@kaltura.com";
+		}
+		
+		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $entryIds, $recpientEmail);
+		
+		$res = new KalturaLiveReportExportResponse();
+		$res->referenceJobId = $dbBatchJob->getId();
+		$res->reportEmail = $recpientEmail;
+		
+		return $res;
+	}
+	
+	/**
+	 *
+	 * Will serve a requested report
+	 * @action serveReport
+	 *
+	 *
+	 * @param string $id - the requested id
+	 * @return string
+	 */
+	public function serveReportAction($id) {
+		
+		$fileNameRegex = "/^(?<dc>[01]+)_(?<fileName>\\d+_Export_[a-zA-Z0-9]+_[\\w\\-]+.csv)$/";
+	
+		// KS verification - we accept either admin session or download privilege of the file
+		$ks = $this->getKs();
+		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+	
+		if(!preg_match($fileNameRegex, $id, $matches)) {
+			KalturaLog::err("Report Id Format doesn't match the file name format");
+			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+		}
+		
+		// Check if the request should be handled by the other DC
+		$curerntDc = kDataCenterMgr::getCurrentDcId();
+		if($matches['dc'] == 1 - $curerntDc)
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - $curerntDc ) );
+		
+		// Serve report
+		$filePath = $this->getReportDirectory( $this->getPartnerId()) . DIRECTORY_SEPARATOR . $matches['fileName'];
+		return $this->dumpFile($filePath, 'text/csv');
+	}
+	
+	protected function getReportDirectory($partnerId) {
+		$folderPath = "/content/reports/live/$partnerId";
+		$directory =  myContentStorage::getFSContentRootPath() . $folderPath;
+		if(!file_exists($directory))
+			mkdir($directory);
+		return $directory;
 	}
 	
 	/**

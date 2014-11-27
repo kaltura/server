@@ -10,24 +10,30 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 	
 	public function run($fp, array $args = array()) {
 		$this->checkParams($args, array(LiveReportConstants::TIME_REFERENCE_PARAM, LiveReportConstants::ENTRY_IDS));
-		$endTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
-		$timeRange = LiveReportConstants::SECONDS_36_HOURS;
+		$toTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
+		$fromTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM] - LiveReportConstants::SECONDS_36_HOURS;
 		
 		$this->printHeaders($fp);
 		
 		$objs = array();
 		$lastTimeGroup = null;
-		for($curTime = $endTime; $curTime >= $endTime - $timeRange; $curTime = $curTime - self::TIME_CHUNK) {
-			$results = $this->getRecords($curTime - self::TIME_CHUNK, $curTime, $args[LiveReportConstants::ENTRY_IDS]);
+		
+		
+		for($curTime = $fromTime; $curTime < $toTime; $curTime = $curTime + self::TIME_CHUNK) {
+			$curTo = min($toTime, $curTime + self::TIME_CHUNK);
+			$results = $this->getRecords($curTime, $curTo, $args[LiveReportConstants::ENTRY_IDS]);
+			if($results->totalCount == 0)
+				continue;
 			
 			foreach($results->objects as $result) {
+				
 				$groupTime = $this->roundTime($result->timestamp);
 				
 				if(is_null($lastTimeGroup))
 					$lastTimeGroup = $groupTime;
-					
-				if($lastTimeGroup > $groupTime + self::AGGREGATION_CHUNK) {
-					$this->printRows($objs, $lastTimeGroup);
+				
+				if($lastTimeGroup < $groupTime) {
+					$this->printRows($fp, $objs, $lastTimeGroup);
 					$lastTimeGroup = $groupTime;
 				}
 				
@@ -43,11 +49,11 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			}
 		}
 		
-		$this->printRows($objs, $lastTimeGroup);
+		$this->printRows($fp, $objs, $lastTimeGroup);
 	}
 	
 	// ASUMPTION - we have a single entry ID (that's a constraint of the cassandra)
-	// and the results are ordered from the newest to the oldest
+	// and the results are ordered from the oldest to the newest
 	protected function getRecords($fromTime, $toTime, $entryId) {
 		
 		$reportType = KalturaLiveReportType::ENTRY_GEO_TIME_LINE;
@@ -56,7 +62,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$filter->fromTime = $fromTime;
 		$filter->entryIds = $entryId;
 		
-		return EngineUtils::getReport($reportType, $filter, null);
+		return KBatchBase::$kClient->liveReports->getReport($reportType, $filter, null);
 	}
 	
 	protected function printHeaders($fp) {
@@ -71,16 +77,17 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$values[] = "Buffer time";
 		$values[] = "Seconds viewed";
 		
-		fwrite($fp, implode(LiveReportConstants::CELLS_SEPARATOR, $values));
+		fwrite($fp, implode(LiveReportConstants::CELLS_SEPARATOR, $values) . "\n");
 	}
 	
 	protected function printRows($fp, &$objects, $lastTimeGroup) {
+		
 		foreach ($objects as $records) {
 
 			$firstRecord = $records[0];
 			
 			$values = array();
-			$values[] = date(LiveReportConstants::DATE_FORMAT, $lastTimeGroup);
+			$values[] = $lastTimeGroup;
 			$values[] = $firstRecord->country->name;
 			$values[] = $firstRecord->city->name;
 			$values[] = $firstRecord->city->latitude;
@@ -96,12 +103,12 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			}
 			
 			$nObj = count($records);
-			$values[] = $plays / $nObj;
-			$values[] = $avgBitrate / $nObj;
-			$values[] = $bufferTime / $nObj;
-			$values[] = $secondsViewed / $nObj;
+			$values[] = round($plays / $nObj, 2);
+			$values[] = round($avgBitrate / $nObj, 2);
+			$values[] = round($bufferTime / $nObj, 2);
+			$values[] = round($secondsViewed / $nObj, 2);
 			
-			fwrite($fp, implode(LiveReportConstants::CELLS_SEPARATOR, $values));
+			fwrite($fp, implode(LiveReportConstants::CELLS_SEPARATOR, $values) . "\n");
 		}
 		
 		$objects = array();

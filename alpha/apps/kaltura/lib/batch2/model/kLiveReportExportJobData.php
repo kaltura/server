@@ -13,7 +13,6 @@ class kLiveReportExportJobData extends kJobData
 	
 	public $recipientEmail;
 	
-
 	/**
 	 * @return the $recipientEmail
 	 */
@@ -69,7 +68,5 @@ class kLiveReportExportJobData extends kJobData
 	public function setOutputPath($outputPath) {
 		$this->outputPath = $outputPath;
 	}
-
-
 	
 }

@@ -2645,13 +2645,70 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
+	protected static function createLiveReportExportDownloadUrl ($partner_id, $file_name)
+	{
+		// Extract simple download name
+		$regex = "/^{$partner_id}_Export_[a-zA-Z0-9]+_(?<fileName>[\w\-]+.csv)$/";
+		if(!preg_match($regex, $file_name, $matches)) {
+			KalturaLog::err("File name doesn't match expected format");
+			return null;
+		}
+		$downloadName = $matches['fileName'];
+		
+		// Add dc to enable redirection
+		$dc = kDataCenterMgr::getCurrentDc();
+		$file_name = $dc['id'] . "_" . $file_name;
+		
+		$ksStr = "";
+		$partner = PartnerPeer::retrieveByPK ( $partner_id );
+		$secret = $partner->getSecret ();
+		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+	
+		$maxExpiry = 3 * 24 * 60 * 60;
+		$expiry = $partner->getKsMaxExpiryInSeconds();
+		if(!$expiry || ($expiry > $maxExpiry))
+			$expiry = $maxExpiry;
+	
+		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
+	
+		if ($result < 0) {
+			KalturaLog::err("Failed to create KS for Live report export download url");
+			return null;
+		}
+			
+		//url is built with DC url in order to be directed to the same DC of the saved file
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+		return $url;
+	}
+	
 	public static function handleLiveReportExportFinished(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 		
+		// Move file from shared temp to it's final location
+		$fileName =  basename($data->outputPath);
+		$directory =  myContentStorage::getFSContentRootPath() . "/content/reports/live/" . $dbBatchJob->getPartnerId() ;
+		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+		
+		$moveFile = kFile::moveFile($data->outputPath, $filePath);
+		if(!$moveFile) {
+			KalturaLog::err("Failed to move report file from: " . $data->outputPath . " to: " . $filePath);
+			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
+		}
+		
+		// Create download URL
+		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		if(!$url) {
+			KalturaLog::err("Failed to create download URL");
+			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
+		}
+		
+		// Create email params
 		$time = date("m-d-y H:i", $data->timeReference); 
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $data->outputPath);
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url);
 		$titleParams = array($time);
 		
+		
+		// Email it all
 		kJobsManager::addMailJob(
 				null,
 				0,
@@ -2673,7 +2730,7 @@ class kFlowHelper
 		$time = date("m-d-y H:i", $data->timeReference);
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), 
-				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage());
+				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
 		$titleParams = array($time);
 	
 		kJobsManager::addMailJob(

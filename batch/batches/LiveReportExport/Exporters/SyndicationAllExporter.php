@@ -2,24 +2,19 @@
 
 class SyndicationAllExporter extends LiveReportEntryExporter {
 
-	public function __construct($partnerId, KalturaLiveReportExportJobData $data) {
-		parent::__construct($partnerId, $data);
-		
-		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
-		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
-		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . "referrers-%s-%s.csv";
-		$data->outputPath =  $this->fileName;
+	public function __construct(KalturaLiveReportExportJobData $data) {
+		parent::__construct($data, "referrers-%s-%s.csv", LiveReportConstants::SECONDS_36_HOURS);
 	}
 
 	protected function getEngines() {
 		return array_merge(
 			array(
-					new LiveReportConstantStringEngine("Report Type: Referrers of pure live (%s)"),
+					new LiveReportConstantStringEngine("Report Type:". LiveReportConstants::CELLS_SEPARATOR ."Referrers of pure live (%s)",
+							 array(LiveReportConstants::ENTRY_IDS)),
 					new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
-					new LiveReportConstantStringEngine("Time Range: %s - %s")),
+					new LiveReportConstantStringEngine("Time Range:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(self::TIME_RANGE))),
 			$this->allEntriesEngines,
 			array(new LiveReportReferrerEngine())
 		);
 	}
 }
-

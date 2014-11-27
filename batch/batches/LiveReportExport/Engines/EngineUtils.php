@@ -17,10 +17,11 @@ abstract class EngineUtils {
 			$valueField) {
 		
 		$result = KBatchBase::$kClient->liveReports->getReport($reportType, $filter, $pager);
-		$objects = $result->objects;
-	
+		if($result->totalCount == 0)
+			return array();
+		
 		$res = array();
-		foreach($objects as $object) {
+		foreach($result->objects as $object) {
 			if($keyField)
 				$res[$object->$keyField] = $object->$valueField;
 			else
@@ -44,7 +45,7 @@ abstract class EngineUtils {
 		$results = KBatchBase::$kClient->liveReports->getEvents($reportType, $filter, $pager);
 		foreach($results as $result) {
 			if($result->id == $keyField) {
-				return $result;
+				return $result->data;
 			}
 		}
 		return null;

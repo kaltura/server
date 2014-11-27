@@ -2,18 +2,43 @@
 
 class PartnerTotalLiveExporter extends LiveReportExporter {
 
-	public function __construct($partnerId, KalturaLiveReportExportJobData $data) {
-		parent::__construct($partnerId, $data);
+	public function __construct(KalturaLiveReportExportJobData $data) {
+		parent::__construct($data);
 		$this->params[LiveReportConstants::IS_LIVE] = true;
 		
 		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
 		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
+		
+		$this->params[self::TIME_RANGE] = $fromTime . " - " . $toTime;
+		
 		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . "live-now-entries-%s-%s.csv";
+		$this->fileName = vsprintf($this->fileName, array($fromTime, $toTime));
 		$data->outputPath =  $this->fileName;
+	}
+	
+	public function init(KalturaLiveReportExportJobData $jobData) {
+		$filter = new KalturaLiveStreamEntryFilter();
+		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_DESC;
+		$filter->isLive = true;
+	
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = LiveReportConstants::MAX_ENTRIES;
+	
+		/** @var KalturaLiveStreamListResponse */
+		$response = KBatchBase::$kClient->liveStream->listAction($filter, $pager);
+		$entryIds = array();
+		foreach($response->objects as $object) {
+			$entryIds[] = $object->id;
+		}
+	
+		$this->params[LiveReportConstants::ENTRY_IDS] = implode(",", $entryIds);
 	}
 	
 	protected function getEngines() {
 		$subEngines = array(
+				new LiveReportEntryEngine("name", "Entry name"),
+				new LiveReportEntryEngine("firstBroadcast", "First broadcast"),
 				new LiveReportEntryQueryEngine("audience", LiveReportConstants::SECONDS_10, "Total Plays:", false),
 				new LiveReportEntryQueryEngine("peakAudience", LiveReportConstants::SECONDS_36_HOURS, "Peak Audience", false),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed", false),
@@ -22,9 +47,9 @@ class PartnerTotalLiveExporter extends LiveReportExporter {
 		);
 		
 		$liveEntriesReport = array(
-				new LiveReportConstantStringEngine("Report Type: Live Now Only"),
+				new LiveReportConstantStringEngine("Report Type:". LiveReportConstants::CELLS_SEPARATOR ."Live Now Only"),
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
-				new LiveReportConstantStringEngine("Time Range: %s - %s"),
+				new LiveReportConstantStringEngine("Time Range:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(self::TIME_RANGE)),
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
 				
 				new LiveReportLivePartnerEngine("audience", LiveReportConstants::SECONDS_10, "Total Audience:"),

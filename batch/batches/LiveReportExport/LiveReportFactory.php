@@ -2,33 +2,33 @@
 
 class LiveReportFactory {
 	
-	public function getExporter($partnerId, $type, KalturaLiveReportExportJobData $jobData) {
+	public function getExporter($type, KalturaLiveReportExportJobData $jobData) {
 		
 		$exporter = null;
 		switch ($type) {
 			case KalturaLiveReportExportType::PARTNER_TOTAL_ALL :
-				$exporter = new PartnerTotalAllExporter($partnerId, $jobData);
+				$exporter = new PartnerTotalAllExporter($jobData);
 				break;
 			case KalturaLiveReportExportType::PARTNER_TOTAL_LIVE :
-				$exporter = new PartnerTotalLiveExporter($partnerId, $jobData);
+				$exporter = new PartnerTotalLiveExporter($jobData);
 				break;
 			case KalturaLiveReportExportType::ENTRY_TIME_LINE_ALL :
-				$exporter = new EntryTimeLineAllExporter($partnerId, $jobData);
+				$exporter = new EntryTimeLineAllExporter($jobData);
 				break;
 			case KalturaLiveReportExportType::ENTRY_TIME_LINE_LIVE :
-				$exporter = new EntryTimeLineLiveExporter ($partnerId, $jobData);
+				$exporter = new EntryTimeLineLiveExporter ($jobData);
 				break;
 			case KalturaLiveReportExportType::LOCATION_ALL :
-				$exporter = new LocationAllExporter($partnerId, $jobData);
+				$exporter = new LocationAllExporter($jobData);
 				break;
 			case KalturaLiveReportExportType::LOCATION_LIVE :
-				$exporter = new LocationLiveExporter($partnerId, $jobData);
+				$exporter = new LocationLiveExporter($jobData);
 				break;
 			case KalturaLiveReportExportType::SYNDICATION_ALL :
-				$exporter = new SyndicationAllExporter($partnerId, $jobData);
+				$exporter = new SyndicationAllExporter($jobData);
 				break;
 			case KalturaLiveReportExportType::SYNDICATION_LIVE :
-				$exporter = new SyndicationLiveExporter($partnerId, $jobData);
+				$exporter = new SyndicationLiveExporter($jobData);
 				break;
 			default:
 				throw new KOperationEngineException("Unknown Exporter type : " . $type);

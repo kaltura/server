@@ -16,8 +16,8 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		$endTime =  $args[LiveReportConstants::TIME_REFERENCE_PARAM];
 		$timeRange = LiveReportConstants::SECONDS_36_HOURS;
 		
-		for($curTime = $endTime; $curTime >= $endTime - $timeRange; $curTime = $curTime - self::TIME_CHUNK) {
-			$this->executeAudienceQuery($curTime - self::TIME_CHUNK, $curTime);
+		for($curTime = $endTime - $timeRange; $curTime < $endTime ; $curTime = $curTime + self::TIME_CHUNK) {
+			$this->executeAudienceQuery($fp, $curTime, $curTime + self::TIME_CHUNK, $args);
 		}
 		
 	}
@@ -32,11 +32,14 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
 		$resultsStr = EngineUtils::getEvents($reportType, $filter, null, "audience");
-		$couples = explode($resultsStr, ";");
+		$couples = explode(";", $resultsStr);
 		
 		foreach($couples as $couple) {
-			$msg = implode(LiveReportConstants::CELLS_SEPARATOR, explode(",", $couple)) . "\n";
-			fwrite($fp, $msg);
+			$parts = explode(",", $couple);
+			if(count($parts) == 2) {
+				$msg = implode(LiveReportConstants::CELLS_SEPARATOR, $parts) . "\n";
+				fwrite($fp, $msg);
+			}
 		}
 	}
 

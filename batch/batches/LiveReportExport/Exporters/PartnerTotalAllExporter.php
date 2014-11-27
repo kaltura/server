@@ -2,35 +2,29 @@
 
 class PartnerTotalAllExporter extends LiveReportExporter {
 
-	public function __construct($partnerId, KalturaLiveReportExportJobData $data) {
-		parent::__construct($partnerId, $data);
-		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - LiveReportConstants::SECONDS_36_HOURS);
-		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
-		$this->fileName = $data->outputPath . DIRECTORY_SEPARATOR . "all-entries-%s-%s.csv";
-		$data->outputPath =  $this->fileName;
+	public function __construct(KalturaLiveReportExportJobData $data) {
+		parent::__construct($data, "all-entries-%s-%s.csv", LiveReportConstants::SECONDS_36_HOURS);
 	}
 	
 	public function init(KalturaLiveReportExportJobData $jobData) {
-		$filter = new KalturaLiveStreamEntryFilter();
-		$filter->orderBy = KalturaLiveStreamEntryOrderBy::CREATED_AT_DESC;
-		$filter->isLive = true;
+		
+		$filter = new KalturaLiveReportInputFilter();
+		$filter->live =  false;
+		$filter->toTime = $jobData->timeReference;
+		$filter->fromTime = $jobData->timeReference - LiveReportConstants::SECONDS_36_HOURS;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 0;
 		$pager->pageSize = LiveReportConstants::MAX_ENTRIES;
 		
-		/** @var KalturaLiveStreamListResponse */
-		$response = KBatchBase::$kClient->liveStream->listAction($filter, $pager);
-		$entryIds = array();
-		foreach($response->objects as $object) {
-			$entryIds[] = $object->id;
-		}
-		
+		$entryIds = EngineUtils::retrieveFromReport(KalturaLiveReportType::ENTRY_TOTAL, $filter, $pager, null, "entryId");
 		$this->params[LiveReportConstants::ENTRY_IDS] = implode(",", $entryIds);
 	}
 	
 	protected function getEngines() {
 		$subEngines = array(
+				new LiveReportEntryEngine("name", "Entry name"),
+				new LiveReportEntryEngine("firstBroadcast", "First broadcast"),
 				new LiveReportEntryQueryEngine("plays", LiveReportConstants::SECONDS_36_HOURS, "Plays", false), 
 				new LiveReportEntryQueryEngine("peakAudience", LiveReportConstants::SECONDS_36_HOURS, "Peak Audience", false),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed", false),
@@ -39,9 +33,9 @@ class PartnerTotalAllExporter extends LiveReportExporter {
 		);
 
 		$allEntriesReport = array(
-				new LiveReportConstantStringEngine("Report Type: All entries"), 
+				new LiveReportConstantStringEngine("Report Type:". LiveReportConstants::CELLS_SEPARATOR ."All entries", array(LiveReportConstants::ENTRY_IDS)), 
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
-				new LiveReportConstantStringEngine("Time Range: %s - %s"),
+				new LiveReportConstantStringEngine("Time Range:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(self::TIME_RANGE)),
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
 				
 				new LiveReportPartnerEngine("plays", LiveReportConstants::SECONDS_36_HOURS, "Total Plays:"),
