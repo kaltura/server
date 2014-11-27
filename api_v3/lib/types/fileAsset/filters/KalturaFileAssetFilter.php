@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.metadata
+ * @package api
  * @subpackage api.filters
  */
 class KalturaFileAssetFilter extends KalturaFileAssetBaseFilter
