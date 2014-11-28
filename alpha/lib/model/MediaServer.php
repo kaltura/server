@@ -76,6 +76,7 @@ class MediaServer extends BaseMediaServer {
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
 		$portField = 'port';
+		$params = '';
 		if($protocol != 'http')
 			$portField .= "-$protocol";
 		
@@ -92,7 +93,10 @@ class MediaServer extends BaseMediaServer {
 				$domain = $mediaServers['domain'];
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
-				
+
+			if (isset ($mediaServers['params']))
+				$params = $mediaServers['params'];
+			
 			if (isset ($mediaServers['dc-'.$this->getDc()]))
 		    {
 		    	$mediaServer = $mediaServers['dc-'.$this->getDc()];
@@ -102,6 +106,9 @@ class MediaServer extends BaseMediaServer {
 		    
 		    	if(isset($mediaServer['domain']))
 		     		$domain = $mediaServer['domain'];
+		     	
+		     	if (isset ($mediaServer['params']))
+					$params = $mediaServer['params'];
 		    }
 				
 			if(isset($mediaServers[$this->getHostname()]))
@@ -113,11 +120,14 @@ class MediaServer extends BaseMediaServer {
 				
 				if(isset($mediaServer['domain']))
 					$domain = $mediaServer['domain'];
+				
+				if (isset ($mediaServer['params']))
+					$params = $mediaServer['params'];
 			}
 		}
 		
 		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
-		$url = "$protocol://$domain:$port/";
+		$url = "$protocol://$domain:$port/$params/";
 		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
 		
