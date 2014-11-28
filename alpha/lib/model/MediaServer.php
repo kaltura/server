@@ -76,7 +76,7 @@ class MediaServer extends BaseMediaServer {
 		$domain = $this->getHostname();
 		$port = MediaServer::DEFAULT_MANIFEST_PORT;
 		$portField = 'port';
-		$domainPostfix = '';
+		$appPrefix = '';
 		if($protocol != 'http')
 			$portField .= "-$protocol";
 		
@@ -94,8 +94,8 @@ class MediaServer extends BaseMediaServer {
 			elseif(isset($mediaServers['search_regex_pattern']) && isset($mediaServers['replacement']))
 				$domain = preg_replace($mediaServers['search_regex_pattern'], $mediaServers['replacement'], $domain);
 
-			if (isset ($mediaServers['domainPostfix']))
-				$domainPostfix = $mediaServers['domainPostfix'];
+			if (isset ($mediaServers['appPrefix']))
+				$appPrefix = $mediaServers['appPrefix'];
 			
 			if (isset ($mediaServers['dc-'.$this->getDc()]))
 		    {
@@ -107,8 +107,8 @@ class MediaServer extends BaseMediaServer {
 		    	if(isset($mediaServer['domain']))
 		     		$domain = $mediaServer['domain'];
 		     	
-		     	if (isset ($mediaServer['domainPostfix']))
-					$domainPostfix = $mediaServer['domainPostfix'];
+		     	if (isset ($mediaServer['appPrefix']))
+					$appPrefix = $mediaServer['appPrefix'];
 		    }
 				
 			if(isset($mediaServers[$this->getHostname()]))
@@ -121,13 +121,13 @@ class MediaServer extends BaseMediaServer {
 				if(isset($mediaServer['domain']))
 					$domain = $mediaServer['domain'];
 				
-				if (isset ($mediaServer['domainPostfix']))
-					$domainPostfix = $mediaServer['domainPostfix'];
+				if (isset ($mediaServer['appPrefix']))
+					$appPrefix = $mediaServer['appPrefix'];
 			}
 		}
 		
 		$hostname = preg_replace('/\..*$/', '', $this->getHostname());
-		$url = "$protocol://$domain:$port/$domainPostfix";
+		$url = "$protocol://$domain:$port/$appPrefix";
 		$url = str_replace("{hostName}", $hostname, $url);
 		return $url;
 		
