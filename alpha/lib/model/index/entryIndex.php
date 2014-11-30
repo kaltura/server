@@ -100,7 +100,7 @@ class entryIndex extends BaseIndexObject
 				'creator_puser_id' => 'creatorPuserId',
 				'dynamic_attributes' => 'dynamicAttributes',
 				'user_names' => 'userNames',
-				'source' => 'sourceType',
+				'source' => 'source',
 			);
 		}
 		return self::$fieldsMap;
