@@ -17,7 +17,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="city" type="varchar" size="30" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="zip" type="varchar" size="10" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="url_list" type="varchar" size="256" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="picture" type="varchar" size="48" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="picture" type="varchar" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="icon" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="about_me" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />

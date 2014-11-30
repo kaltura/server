@@ -1266,7 +1266,7 @@ CREATE TABLE IF NOT EXISTS `kuser` (
   `city` varchar(30) DEFAULT NULL,
   `zip` varchar(10) DEFAULT NULL,
   `url_list` varchar(256) DEFAULT NULL,
-  `picture` varchar(48) DEFAULT NULL,
+  `picture` varchar(1024) DEFAULT NULL,
   `icon` tinyint(4) DEFAULT NULL,
   `about_me` varchar(4096) DEFAULT NULL,
   `tags` text,
