@@ -48,6 +48,7 @@ class KExternalErrors
 	const INVALID_SETTING_TYPE = 39;
 	const ACTION_BLOCKED = 40;
 	const INVALID_HASH = 41;
+	const PARENT_ENTRY_ID_NOT_FOUND = 42;
 	
 	const HTTP_STATUS_NOT_FOUND = 404;
 	
@@ -96,7 +97,8 @@ class KExternalErrors
 			self::NOT_ALLOWED_PARAMETER => "The provided parameter is not allowed",
 			self::INVALID_SETTING_TYPE => "Invalid setting type",
 			self::ACTION_BLOCKED => "The requested action is blocked for this partner",
-			self::INVALID_HASH => "Hash key contains invalid characters"
+			self::INVALID_HASH => "Hash key contains invalid characters",
+			self::PARENT_ENTRY_ID_NOT_FOUND => "Parent entry id provided not found in system"
 	);
 	
 	public static function dieError($errorCode, $message = null)

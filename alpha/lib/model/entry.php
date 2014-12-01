@@ -20,6 +20,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	const ROOTS_FIELD_PREFIX = 'K_Pref';
 	const ROOTS_FIELD_ENTRY_PREFIX = 'KP_Entry';
+	const ROOTS_FIELD_PARENT_ENTRY_PREFIX = 'KP_Parent';
 	const ROOTS_FIELD_BULK_UPLOAD_PREFIX = 'KP_Bulk';
 
 	// NOTE - CHANGES MUST BE MADE TO LAYOUT.PHP JS PART AS WELL
@@ -1778,6 +1779,35 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function setRootEntryId($v)	{	$this->putInCustomData("rootEntryId", $v); }
 	
+	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
+	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
+	
+	public function getParentEntry()
+	{
+		if(!$this->getParentEntryId())
+		{
+			KalturaLog::debug("Attempting to get parent entry of entry " . $this->getId() . " but parent does not exist, returning original entry");
+			return $this;
+		}
+		
+		$parentEntry = entryPeer::retrieveByPK($this->getParentEntryId());
+		
+		return $parentEntry;
+	}
+	
+	//If entry has parent we need to retrieve access control from the parent
+	public function getaccessControl(PropelPDO $con = null)
+	{
+		if(!$this->getParentEntryId())
+			return parent::getaccessControl($con);
+			
+		$parentEntry = $this->getParentEntry();
+		if($parentEntry)
+			return $parentEntry->getaccessControl($con);
+			
+		return null;
+	}
+	
 	public function getSphinxMatchOptimizations() {
 		$objectName = $this->getIndexObjectName();
 		return $objectName::getSphinxMatchOptimizations($this);
@@ -1911,6 +1941,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			
 		if($this->getRootEntryId() != $this->getId())
 			$ret[] = entry::ROOTS_FIELD_ENTRY_PREFIX . ' ' . $this->getRootEntryId();
+			
+		if($this->getParentEntryId())
+			$ret[] = entry::ROOTS_FIELD_PARENT_ENTRY_PREFIX . '_' . $this->getParentEntryId();
 		
 		return implode(',', $ret);
 	}
@@ -2659,6 +2692,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$trackEntry->setChangedProperties(implode("\n", $changedProperties));
 			$trackEntry->setDescription(__METHOD__ . "[" . __LINE__ . "]");
 			TrackEntry::addTrackEntry($trackEntry);
+			
+			//In case this entry has sub streams assigned to it we should delete them as well
+			$subStreamEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->id, $this->partner_id);
+			foreach ($subStreamEntries as $subStreamEntry)
+			{
+				myEntryUtils::deleteEntry($subStreamEntry);
+			}
 		}
 			
 		if($objectUpdated)

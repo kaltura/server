@@ -77,11 +77,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 	}	
 	
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
-	{
-		// support filters array only if atleast one filters was specified
-		if ($this->playlistType == KalturaPlaylistType::DYNAMIC && $this->filters !== null)
-			$this->filtersToPlaylistContentXml();
-			
+	{		
 		if (!$object_to_fill)
 			$object_to_fill = new entry();
 		$object_to_fill->setType ( entryType::PLAYLIST );

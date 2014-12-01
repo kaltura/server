@@ -327,7 +327,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 
 		$httpsEnforcePermission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
-		if($httpsEnforcePermission)
+		if(strpos($resetLinkPrefix, infraRequestUtils::PROTOCOL_HTTPS) === false && $httpsEnforcePermission)
 			$resetLinkPrefix = str_replace(infraRequestUtils::PROTOCOL_HTTP , infraRequestUtils::PROTOCOL_HTTPS , $resetLinkPrefix);
 
 		return $resetLinkPrefix.$hashKey;

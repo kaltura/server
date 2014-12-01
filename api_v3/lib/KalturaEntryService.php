@@ -1198,7 +1198,8 @@ class KalturaEntryService extends KalturaBaseService
         {
         	$this->setDefaultStatus($filter);
             $this->setDefaultModerationStatus($filter);
-            $c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+            if($filter->parentEntryIdEqual == null)
+            	$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		}
 		
 		$this->fixFilterUserId($filter);
@@ -1227,7 +1228,8 @@ class KalturaEntryService extends KalturaBaseService
 			$filter->idIn != null ||
 			$filter->referenceIdEqual != null ||
 			$filter->redirectFromEntryId != null ||
-			$filter->referenceIdIn != null))
+			$filter->referenceIdIn != null || 
+			$filter->parentEntryIdEqual != null))
 			$disableWidgetSessionFilters = true;
 			
 		if (!$pager)
@@ -1529,8 +1531,6 @@ class KalturaEntryService extends KalturaBaseService
 
 		if (!$entryToDelete || ($entryType !== null && $entryToDelete->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-
-		
 		
 		myEntryUtils::deleteEntry($entryToDelete);
 		

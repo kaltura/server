@@ -481,20 +481,18 @@ class kFlowHelper
 				kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 			}
 			catch (Exception $ex) {
-				//If exception code is NoValidMediaStream return the job to avoid continuing with the code below
-				if ($ex->getCode() == KDLErrors::NoValidMediaStream)
-					return $dbBatchJob;
-				 
-				if ($ex->getCode() == KDLErrors::SanityInvalidFrameDim)
-				{
-					kBusinessPostConvertDL::handleConvertFailed($dbBatchJob , null , $data->getFlavorAssetId() , null , null);
-					return $dbBatchJob;
-				}
-				
-				//This was added so the all the assets prior to reaching the limit would still be created
-				if ($ex->getCode() != kCoreException::MAX_ASSETS_PER_ENTRY)
-					throw $ex;
-				
+			$code = $ex->getCode();
+
+			if ($code == KDLErrors::SanityInvalidFrameDim || $code == KDLErrors::NoValidMediaStream)
+			{
+				kBusinessPostConvertDL::handleConvertFailed($dbBatchJob , null , $data->getFlavorAssetId() , null , null);
+				return $dbBatchJob;
+			}	
+	
+			//This was added so the all the assets prior to reaching the limit would still be created
+			if ($code != kCoreException::MAX_ASSETS_PER_ENTRY)
+				throw $ex;
+
 				KalturaLog::err("Max assets per entry was reached continuing with normal flow");
 			}			
 
@@ -1238,7 +1236,9 @@ class kFlowHelper
 		KalturaLog::debug("File delete finished for file path: ". $data->getLocalFileSyncPath().", data center: ".$dbBatchJob->getDc());
 
 		//Change status of the filesync to "purged"
-		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
+		FileSyncPeer::setUseCriteriaFilter(false);
+		$fileSyncFroDeletedFile = FileSyncPeer::retrieveByFileSyncKey($data->getSyncKey(), true);
+		FileSyncPeer::setUseCriteriaFilter(true);
 		$fileSyncFroDeletedFile->setStatus(FileSync::FILE_SYNC_STATUS_PURGED);
 		$fileSyncFroDeletedFile->save();
 
@@ -1248,9 +1248,6 @@ class kFlowHelper
 	public static function handleDeleteFileProcessing (kDeleteFileJobData $data)
 	{
 		KalturaLog::info("Delete started for file path " . $data->getLocalFileSyncPath());
-		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
-		$fileSyncFroDeletedFile->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
-		$fileSyncFroDeletedFile->save();
 	}
 
 	/**
@@ -1663,7 +1660,7 @@ class kFlowHelper
 					{ 
 						//check if the inter flow count is larger than 2.  
 						//In this cases probably something went wrong so we will continue with the original flow and will not check if any additioanl inter flow nneds to be done.
-						if($currFlavorAsset->getInterFlowCount() < self::MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE)
+						if($currentFlavorAsset && $currFlavorAsset->getInterFlowCount() < self::MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE)
 						{
 							$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 							kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $convertProfileJob, $mediaInfo->getId());

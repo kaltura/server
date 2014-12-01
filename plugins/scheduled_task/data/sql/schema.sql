@@ -25,6 +25,7 @@ CREATE TABLE `scheduled_task_profile`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`last_execution_started_at` DATETIME,
+	`max_total_count_allowed` INTEGER  NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `system_name_partner_id`(`system_name`, `partner_id`),

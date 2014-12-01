@@ -40,6 +40,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 		"assetId",
 		"title" => "name",
 		"description" => "text",
+		"subType",
 	);
 	
 	/* (non-PHPdoc)
@@ -65,9 +66,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 * @see KalturaCuePoint::validateForInsert()
 	 */
 	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull(array("assetId", "startTime", "thumbOffset"));
-		
+	{	
 		if($this->assetId !== null)	
 			$this->validateTimedThumbAssetId();
 		

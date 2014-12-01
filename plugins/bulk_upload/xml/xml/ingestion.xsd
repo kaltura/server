@@ -110,6 +110,16 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="parentReferenceId">
+					<xs:annotation>
+						<xs:documentation>Partner external identifier of the parent entry's reference id'</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="100"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
 			</xs:choice>
 			<xs:element maxOccurs="1" minOccurs="0" name="userId">
 				<xs:annotation>
