@@ -7,6 +7,8 @@ abstract class LiveEntry extends entry
 {
 	const IS_LIVE = 'isLive';
 	const FIRST_BROADCAST = 'first_broadcast';
+	const RECORDED_ENTRY_ID = 'recorded_entry_id';
+
 	const DEFAULT_CACHE_EXPIRY = 120;
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
@@ -236,6 +238,9 @@ abstract class LiveEntry extends entry
 	public function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
 	
+	public function setCurrentBroadcastStartTime( $v )	{ $this->putInCustomData ( "currentBroadcastStartTime" , $v ); }
+	public function getCurrentBroadcastStartTime()		{ return $this->getFromCustomData( "currentBroadcastStartTime", null, 0 ); }
+
 	public function setLastBroadcast ( $v )	{	$this->putInCustomData ( "last_broadcast" , $v );	}
 	public function getLastBroadcast (  )	{	return $this->getFromCustomData( "last_broadcast");	}
 	
@@ -609,7 +614,9 @@ abstract class LiveEntry extends entry
 	{
 		$dynamicAttributes = array(
 				LiveEntry::IS_LIVE => intval($this->hasMediaServer()),
-				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast());
+				LiveEntry::FIRST_BROADCAST => $this->getFirstBroadcast(),
+				LiveEntry::RECORDED_ENTRY_ID => $this->getRecordedEntryId(),
+		);
 		
 		return array_merge( $dynamicAttributes, parent::getDynamicAttributes() ); 
 	}

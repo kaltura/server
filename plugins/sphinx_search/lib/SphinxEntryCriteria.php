@@ -173,10 +173,18 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 		if($filter->is_set('_is_live'))
 		{
-			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . $filter->get('_is_live'));
+			$this->addCondition(entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::IS_LIVE . ' = ' . ($filter->get('_is_live') == '1' ? '1' : '0') );
 			$filter->unsetByName('_is_live');
 		}
 		
+		if($filter->is_set('_is_recorded_entry_id_empty'))
+		{
+			$fieldName = entryIndex::DYNAMIC_ATTRIBUTES . '.' . LiveEntry::RECORDED_ENTRY_ID;
+			$this->addWhere( "$fieldName " . ($filter->get('_is_recorded_entry_id_empty') ? "IS" : "IS NOT") . " NULL" );
+
+			$filter->unsetByName('_is_recorded_entry_id_empty');
+		}
+
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))
 		{
