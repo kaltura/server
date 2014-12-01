@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
@@ -84,7 +85,8 @@ import com.kaltura.client.utils.XmlUtils;
  * @author jpotts
  *
  */
-abstract public class KalturaClientBase {
+@SuppressWarnings("serial")
+abstract public class KalturaClientBase implements Serializable {
 	
 	private static final String UTF8_CHARSET = "UTF-8";
 
