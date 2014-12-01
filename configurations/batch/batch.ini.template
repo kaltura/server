@@ -693,3 +693,12 @@ friendlyName										= Re-index tags
 type												= KAsyncTagIndex
 maximumExecutionTime								= 12000
 scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
+
+[KAsyncLiveReportExport : JobHandlerWorker]
+id													= 600
+friendlyName										= Live reports export
+type												= KAsyncLiveReportExport
+maximumExecutionTime								= 12000
+scriptPath											= batches/LiveReportExport/KAsyncLiveReportExportExe.php
+params.localTempPath								= @TMP_DIR@/reports
+params.sharedPath									= @WEB_DIR@/tmp/reports

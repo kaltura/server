@@ -6,7 +6,7 @@
  */
  class LiveReportReferrerEngine extends LiveReportEngine {
 	
-	const CHUNK_SIZE = 10;
+	const CHUNK_SIZE = 100;
 	
 	public function run($fp, array $args = array()) {
 		
