@@ -41,4 +41,5 @@ interface BatchJobType extends BaseEnum
 	const COPY_PARTNER = 37;
 	const VALIDATE_LIVE_MEDIA_SERVERS = 38;
 	const SYNC_CATEGORY_PRIVACY_CONTEXT = 39;
+	const LIVE_REPORT_EXPORT = 40;
 }

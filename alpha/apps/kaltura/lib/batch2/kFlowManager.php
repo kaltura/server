@@ -145,7 +145,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return $dbBatchJob;
 		}
 	}
-	
+
 	protected function updatedStorageDelete(BatchJob $dbBatchJob, kStorageDeleteJobData $data)
 	{
 		switch($dbBatchJob->getStatus())
@@ -295,6 +295,22 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return $dbBatchJob;
 		}
 	}
+	
+	protected function updatedLiveReportExport(BatchJob $dbBatchJob, kLiveReportExportJobData $data)
+	{
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleLiveReportExportFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_ABORTED:
+				return kFlowHelper::handleLiveReportExportAborted($dbBatchJob, $data);
+			default:
+				return $dbBatchJob;
+		}
+	}
 
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -400,6 +416,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					$dbBatchJob=$this->updatedConvertLiveSegment($dbBatchJob, $dbBatchJob->getData());
 					break;
 
+				case BatchJobType::LIVE_REPORT_EXPORT:
+					$dbBatchJob=$this->updatedLiveReportExport($dbBatchJob, $dbBatchJob->getData());
+					break;
+					
 				default:
 					break;
 			}
