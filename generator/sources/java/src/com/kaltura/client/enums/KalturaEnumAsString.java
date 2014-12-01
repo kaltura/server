@@ -27,10 +27,12 @@
 // ===================================================================================================
 package com.kaltura.client.enums;
 
+import java.io.Serializable;
+
 /**
  * This class is an interface for all kaltura enums that their value is represented as String
  */
-public interface KalturaEnumAsString {
+public interface KalturaEnumAsString extends Serializable {
 	
 	 public String getHashCode();
 }
