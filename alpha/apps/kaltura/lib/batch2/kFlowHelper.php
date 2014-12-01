@@ -2751,7 +2751,7 @@ class kFlowHelper
 	public static function handleLiveReportExportAborted(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 	
 		$time = date("m-d-y H:i", $data->timeReference);
-		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_ABORT;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
 		$titleParams = array($time);
 	
