@@ -1,3 +1,27 @@
+# Jupiter-10.0.0 #
+
+## sourceType filter ##
+- Issue Type: Change Request
+- Issue ID: PLAT-2148
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Add the following line to the kaltura_entry class in configurations/sphinx/kaltura.conf (or merged from configurations/sphinx/kaltura.conf.template)
+
+	rt_attr_uint = source
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 # IX-9.19.8 #
 
 ##Add support for multiple video/audio substreams##
