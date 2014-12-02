@@ -446,6 +446,7 @@ class kBusinessPostConvertDL
 				if(isset($syncKey)){
 					kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
 					$flavorAsset->setVersion($prevVer);
+					$flavorAsset->setPreviousVersion(null);
 					KalturaLog::log("Webex conversion - Rolled back");
 				}
 			}
