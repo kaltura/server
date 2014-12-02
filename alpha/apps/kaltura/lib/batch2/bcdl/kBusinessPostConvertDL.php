@@ -433,6 +433,24 @@ class kBusinessPostConvertDL
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
 		
+			/*
+			 * On Webex error, roll back the inter-src asset version in order to allow the retry to get ARF as a source, 
+			 * rather than the invlaid WMV file (product of bad nbrplayer session)
+			 */
+		if($dbBatchJob->getErrNumber()==BatchJobAppErrors::BLACK_OR_SILENT_CONTENT) {
+			$prevVer = $flavorAsset->getPreviousVersion();
+			$currVer = $flavorAsset->getVersion();
+			KalturaLog::log("Webex conversion - Garbled Audio or Black frame or Silence. Rolling back asset/file-sync version - curr($currVer), prev($prevVer)");
+			if(isset($prevVer)) {
+				$syncKey = $flavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $currVer);
+				if(isset($syncKey)){
+					kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
+					$flavorAsset->setVersion($prevVer);
+					KalturaLog::log("Webex conversion - Rolled back");
+				}
+			}
+		}
+
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 		$flavorAsset->save();
 		
