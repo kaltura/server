@@ -191,7 +191,7 @@ class UserService extends KalturaBaseUserService
 	    }
 
 		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $userId)
-			throw new KalturaAPIException(KalturaErrors::DIFFERENT_USER_QUERY_USING_NON_ADMIN_SESSSION);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ADMIN_USER_USING_NON_ADMIN_SESSION, $userId);
 
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 	

@@ -9,7 +9,7 @@ class KalturaErrors extends APIErrors
 	 * General Errors
 	 *
 	 */
-	const DIFFERENT_USER_QUERY_USING_NON_ADMIN_SESSSION = "DIFFERENT_USER_QUERY_USING_NON_ADMIN_SESSSION;;Different user query using non admin sesssion";
+	const CANNOT_RETRIEVE_ADMIN_USER_USING_NON_ADMIN_SESSION = "CANNOT_RETRIEVE_ADMIN_USER_USING_NON_ADMIN_SESSION;USER_ID;cannot retrieve admin user \"@USER_ID@\" using non-admin session";
 	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
