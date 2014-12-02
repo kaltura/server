@@ -555,7 +555,14 @@ class kBusinessPreConvertDL
 				$errDesc .= "$section errors: " . join(";", $errors) . "\n";
 				foreach($errors as $error)
 				{
-					if (strpos($error,'Invalid frame dimensions') != 0)
+					if (strpos($error, 'Invalid File - No media content' !== false))
+					{
+						$errDescription .= "\nMedia err: $errDesc";
+						KalturaLog::err($error);
+						throw new kCoreException($error , KDLErrors::NoValidMediaStream);
+					}
+
+					if (strpos($error,'Invalid frame dimensions') !== false)
 					{
 						$errDescription .= "\nMedia err: $errDesc";
 						KalturaLog::err($error);
@@ -1040,10 +1047,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams,  $profile->getId(), $mediaInfo);
 		}
 		catch(Exception $e){
-			if (strpos($e->getMessage(),'Invalid frame dimensions') != 0)
+			$code = $e->getCode();
+			if ($code == KDLErrors::SanityInvalidFrameDim || $code == KDLErrors::NoValidMediaStream)
 				throw $e;
 		}
-
 	}
 		
 	public static function continueProfileConvert(BatchJob $parentJob)
@@ -1137,7 +1144,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$finalFlavors = self::validateConversionProfile($convertProfileJob->getPartnerId(), $entryId, $mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
 		}
 		catch(Exception $e){
-			if (strpos($e->getMessage(),'Invalid frame dimensions') != 0)
+			$code = $e->getCode();
+			if ($code == KDLErrors::SanityInvalidFrameDim || $code == KDLErrors::NoValidMediaStream)
 			{
 				$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription);
 				KalturaLog::err($e->getMessage());
