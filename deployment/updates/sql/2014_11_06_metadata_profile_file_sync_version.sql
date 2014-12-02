@@ -1,0 +1,1 @@
+ALTER TABLE `metadata_profile` ADD `file_sync_version` int(11) AFTER `version`;

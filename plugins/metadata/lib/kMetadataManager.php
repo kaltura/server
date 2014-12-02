@@ -377,7 +377,7 @@ class kMetadataManager
 	 * @param int $prevVersion
 	 * @param string $prevXsd
 	 */
-	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsd, $newVersion, $newXsd)
+	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevXsd, $newXsd)
 	{
 		$xsl = true;
 		if(!PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
@@ -386,8 +386,12 @@ class kMetadataManager
 		}
 			
 		if($xsl === true)
-			return self::upgradeMetadataObjects($metadataProfile->getId(), $prevVersion, $newVersion);
+			return;
 
+		$prevVersion = $metadataProfile->getFileSyncVersion();
+		$metadataProfile->incrementVersion();
+		$newVersion = $metadataProfile->getVersion();
+		
 		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_TRANSFORMATION, $metadataProfile->getPartnerId()))
 			throw new kXsdException(kXsdException::TRANSFORMATION_REQUIRED);
 			
@@ -395,50 +399,16 @@ class kMetadataManager
 	}
 
 	/**
-	 * batch getTransformMetadataObjects action retrieve all metadata objects that requires upgrade and the total count
-	 *
-	 * @param int $metadataProfileId The id of the metadata profile
-	 * @param int $srcVersion The old metadata profile version
-	 * @param int $destVersion The new metadata profile version
-	 */
-	private static function upgradeMetadataObjects($metadataProfileId, $srcVersion, $destVersion)
-	{
-		$affectedRows = null;
-		do
-		{
-			$table = MetadataPeer::TABLE_NAME;
-			$colId = MetadataPeer::ID;
-			$colMetadataProfileId = MetadataPeer::METADATA_PROFILE_ID;
-			$colMetadataProfileVersion = MetadataPeer::METADATA_PROFILE_VERSION;
-			$colStatus = MetadataPeer::STATUS;
-			$validStatus = Metadata::STATUS_VALID;
-			
-			$sql = "UPDATE $table ";
-			$sql .= "SET $colMetadataProfileVersion = $destVersion ";
-			$sql .= "WHERE $colMetadataProfileId = $metadataProfileId ";
-			$sql .= "AND $colMetadataProfileVersion = $srcVersion ";
-			$sql .= "AND $colStatus = $validStatus ";
-			$sql .= "ORDER BY $colId ";
-			$sql .= "LIMIT 10000";
-			
-			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-			$affectedRows = $con->exec($sql);
-			KalturaLog::debug("Affected rows [$affectedRows]");
-		}
-		while($affectedRows);
-	}
-	
-	/**
 	 * Validate the XML against the profile XSD and set the metadata status
 	 *
 	 * @param int $metadataProfileId
 	 * @param string $metadata
 	 * @param string $errorMessage
-	 * @param int $metadataProfileVersion leave it null to use the latest
+	 * @param int $compareAgainstPreviousVersion leave it false to use the latest metadata profile version
 	 *
 	 * returns bool
 	 */
-	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $metadataProfileVersion = null)
+	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $compareAgainstPreviousVersion = false)
 	{
 		KalturaLog::debug("Validating metadata [$metadata]");
 		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
@@ -449,7 +419,12 @@ class kMetadataManager
 			return false;
 		}
 		
-		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $metadataProfileVersion);
+		$metadataProfileFSVersion = null;
+		if($compareAgainstPreviousVersion) {
+			$metadataProfileFSVersion = $metadataProfile->getPreviousFileSyncVersion();
+		}
+		
+		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $metadataProfileFSVersion);
 		$xsdData = kFileSyncUtils::file_get_contents($metadataProfileKey, true, false);
 		if(!$xsdData)
 		{
