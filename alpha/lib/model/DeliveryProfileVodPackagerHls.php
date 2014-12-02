@@ -18,15 +18,13 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		$seekEnd = $this->params->getClipTo();
 		
 		if($seekStart != -1) {
-			$url .= '/start/'. floor($this->params->getSeekFromTime() / 1000);
-			$this->params->setSeekFromTime(-1);
+			$url .= '/clipFrom/'. $this->params->getSeekFromTime();
 		} else if($seekEnd) {
-			$url .= '/start/0';
+			$url .= '/clipFrom/0';
 		}
 			
 		if($seekEnd) {
-			$url .= '/end/'. ceil($this->params->getClipTo() / 1000);
-			$this->params->setClipTo(null);
+			$url .= '/clipTo/'. $this->params->getClipTo();
 		}
 		
 		return $url;
