@@ -31,7 +31,7 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		$filter->fromTime = $fromTime;
 		$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
-		$resultsStr = EngineUtils::getEvents($reportType, $filter, null, "audience");
+		$resultsStr = LiveReportQueryHelper::getEvents($reportType, $filter, null, "audience");
 		$couples = explode(";", $resultsStr);
 		
 		foreach($couples as $couple) {

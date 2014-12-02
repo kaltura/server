@@ -2689,7 +2689,11 @@ class kFlowHelper
 		if(!$moveFile) {
 			KalturaLog::err("Failed to move report file from: " . $data->outputPath . " to: " . $filePath);
 			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
-		}
+		} 
+		
+		$data->outputPath = $filePath;
+		$dbBatchJob->setData($data);
+		$dbBatchJob->save();
 		
 		// Create download URL
 		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName);

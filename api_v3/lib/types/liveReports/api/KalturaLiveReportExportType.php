@@ -17,11 +17,4 @@ class KalturaLiveReportExportType extends KalturaEnum implements BaseEnum
 
 	const SYNDICATION_ALL = 31;
 	const SYNDICATION_LIVE = 32;
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaDynamicEnum::getEnumClass()
-	*/
-	public static function getEnumClass() {
-		return 'LiveReportExportType';
-	}
 }

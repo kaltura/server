@@ -1,6 +1,6 @@
 <?php 
 
-abstract class EngineUtils {
+abstract class LiveReportQueryHelper {
 	
 	/**
 	 * Executes a simple report query and returns the result as array of <key, value> according to the specified fields. 
