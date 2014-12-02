@@ -17,7 +17,7 @@ class PartnerTotalAllExporter extends LiveReportExporter {
 		$pager->pageIndex = 0;
 		$pager->pageSize = LiveReportConstants::MAX_ENTRIES;
 		
-		$entryIds = EngineUtils::retrieveFromReport(KalturaLiveReportType::ENTRY_TOTAL, $filter, $pager, null, "entryId");
+		$entryIds = LiveReportQueryHelper::retrieveFromReport(KalturaLiveReportType::ENTRY_TOTAL, $filter, $pager, null, "entryId");
 		$this->params[LiveReportConstants::ENTRY_IDS] = implode(",", $entryIds);
 	}
 	

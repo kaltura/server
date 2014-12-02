@@ -18,5 +18,6 @@ abstract class LiveReportEngine
 	 * @param array $args The args to run with
 	 */
 	abstract public function run($fp, array $args = array());
+	
 }
 

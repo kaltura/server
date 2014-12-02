@@ -34,6 +34,6 @@
 		$pager->pageIndex = $pageIdx;
 		$pager->pageSize = self::CHUNK_SIZE;
 		
-		return EngineUtils::retrieveFromReport($reportType, $filter, null, "referrer", "plays");
+		return LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, "referrer", "plays");
 	}
 }
