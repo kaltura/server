@@ -44,27 +44,7 @@ None.
 
 # IX-9.19.8 #
 
-<<<<<<< HEAD
 ##Add support for multiple video/audio substreams##
-=======
-##add user->get permission to basic user role##
-- Issue Type: Customer request
-- Issue ID: SUP-2899
-
-#### Configuration ####
-
-None.
-
-#### Deployment Scripts ####
-
-		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
-
-#### Known Issues & Limitations ####
-
-None.
-
-##add new XML drop folder configuration - KS validation##
->>>>>>> 3d5b778... adding ralease notes
 - Issue Type: Back-End Request
 - Issue ID: PLAT-1112
 
