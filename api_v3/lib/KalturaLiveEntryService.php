@@ -172,12 +172,20 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbEntry->setMediaServer($mediaServerIndex, $hostname, $applicationName);
 		$dbEntry->setRedirectEntryId(null);
 		
-		if(is_null($dbEntry->getFirstBroadcast())) 
-				$dbEntry->setFirstBroadcast(time());
-		
-		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus() == RecordStatus::ENABLED && !$dbEntry->getRecordedEntryId())
+		if($mediaServerIndex == MediaServerIndex::PRIMARY && $dbEntry->getRecordStatus())
 		{
-			$this->createRecordedEntry($dbEntry);
+			$createRecordedEntry = false;
+			if(!$dbEntry->getRecordedEntryId())
+			{
+				$createRecordedEntry = true;
+			}
+			elseif($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION && ($dbEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 300) > time()))
+			{
+				$createRecordedEntry = true;
+			}
+			
+			if($createRecordedEntry)
+				$this->createRecordedEntry($dbEntry);
 		}
 		
 		$dbEntry->save();
@@ -193,11 +201,15 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	private function createRecordedEntry(LiveEntry $dbEntry)
 	{
+		$recordedEntryName = $dbEntry->getName();
+		if($dbEntry->getRecordStatus() == RecordStatus::PER_SESSION)
+			$recordedEntryName .= ' ' . ($dbEntry->getRecordedEntryIndex() + 1);
+			
 		$recordedEntry = new entry();
 		$recordedEntry->setType(entryType::MEDIA_CLIP);
 		$recordedEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
 		$recordedEntry->setRootEntryId($dbEntry->getId());
-		$recordedEntry->setName($dbEntry->getName());
+		$recordedEntry->setName($recordedEntryName);
 		$recordedEntry->setDescription($dbEntry->getDescription());
 		$recordedEntry->setSourceType(EntrySourceType::RECORDED_LIVE);
 		$recordedEntry->setAccessControlId($dbEntry->getAccessControlId());
