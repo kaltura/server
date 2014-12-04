@@ -41,7 +41,7 @@ class myReportsMgr
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
 
-	const REPORTS_TABLE_MAX_QUERY_SIZE = 22000;
+	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
 	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 10000;
 	const REPORTS_COUNT_CACHE = 60;
@@ -371,11 +371,9 @@ class myReportsMgr
 				return array ( array() , array() , 0 );
 			}
 		}
-
-		if ($total_count > self::REPORTS_TABLE_MAX_QUERY_SIZE && $page_size > self::REPORTS_TABLE_MAX_QUERY_SIZE )
-			throw new kCoreException("Exceeded max query size: " . self::REPORTS_TABLE_MAX_QUERY_SIZE ,kCoreException::SEARCH_TOO_GENERAL);
-
 		if ( ! $page_size || $page_size < 0 ) $page_size = 10;
+		$page_size = min($page_size , self::REPORTS_TABLE_MAX_QUERY_SIZE);
+		
 		if ( ! $page_index || $page_index < 0 ) $page_index = 0;
 
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids, $offset );
