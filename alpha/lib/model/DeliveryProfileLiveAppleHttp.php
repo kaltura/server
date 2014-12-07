@@ -217,7 +217,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 	public function compareFlavors($a, $b) 
 	{
 	    if ($a['bitrate'] == $b['bitrate']) {
-	        return 0;
+	        return ($a['index'] < $b['index']) ? -1 : 1;
 	    }
 	    return ($a['bitrate'] < $b['bitrate']) ? -1 : 1;
 	}
@@ -257,6 +257,11 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($backupUrl)
 			$this->buildM3u8Flavors($backupUrl, $flavors);
 		
+		foreach ($flavors as $index => $flavor)
+		{
+			$flavors[$index]['index'] = $index;
+		}
+			
 		usort($flavors, array($this, 'compareFlavors'));
 		
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
