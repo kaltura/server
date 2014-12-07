@@ -4,8 +4,6 @@ class EntryTimeLineAllExporter extends LiveReportEntryExporter {
 
 	public function __construct(KalturaLiveReportExportJobData $data) {
 		parent::__construct($data, "audience-@ENTRY_ID@-%s-%s.csv", LiveReportConstants::SECONDS_36_HOURS);
-		$this->fileName = str_replace("@ENTRY_ID@", $data->entryIds, $this->fileName);
-		$data->outputPath = $this->fileName;
 	}
 	
 	protected function getEngines() {

@@ -67,7 +67,14 @@ abstract class LiveReportEntryExporter extends LiveReportExporter {
 	protected $liveEntriesEngines = array();
 	
 	public function __construct(KalturaLiveReportExportJobData $data, $reportNameFormat, $timeRange) {
+		if(!$data->entryIds)
+			throw new KOperationEngineException("Missing mandatory argument entryIds");
+		if(count(explode(",", $data->entryIds)) != 1)
+			throw new KOperationEngineException("Too many entry ids :" . $data->entryIds);
+		
+		$reportNameFormat = str_replace("@ENTRY_ID@", $data->entryIds, $reportNameFormat);
 		parent::__construct($data, $reportNameFormat, $timeRange);
+		
 		$this->allEntriesEngines = array(
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
 				new LiveReportEntryQueryEngine("plays", LiveReportConstants::SECONDS_36_HOURS, "Total Plays:"),
