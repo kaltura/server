@@ -106,11 +106,11 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		/*
 		 * Look for silent/black conversions. Curently checked only for Webex/ARF products
 		 */
+		$detectMsg = null;
 		if(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
 		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false) {
-			$detectMsg = $this->checkForValidityOfWebexProduct($job, $data, realpath($mediaFile), $mediaInfo);
-			if(isset($detectMsg)){
-				$job->data->engineMessage = $detectMsg;
+			$rv = $this->checkForValidityOfWebexProduct($data, realpath($mediaFile), $mediaInfo, &$detectMsg);
+			if($rv==false){
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::BLACK_OR_SILENT_CONTENT, $detectMsg, KalturaBatchJobStatus::FAILED);
 			}
 		}
@@ -123,7 +123,10 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			/* @var $createdMediaInfo KalturaMediaInfo */
 			
 			// must save the mediaInfoId before reporting that the task is finished
-			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, $data);
+			$msg = "Saving media info id $createdMediaInfo->id";
+			if(isset($detectMsg))
+				$msg.= "($detectMsg)";
+			$this->updateJob($job, $msg, KalturaBatchJobStatus::PROCESSED, $data);
 			
 			$data->thumbPath = null;
 			if(!$data->createThumb)
@@ -224,9 +227,9 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 * @param KalturaPostConvertJobData $data
 	 * $param $mediaFile
 	 * #param KalturaMediaInfo $mediaInfo
-	 * @return string
+	 * @return boolean
 	 */
-	private function checkForValidityOfWebexProduct(KalturaBatchJob $job, KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo)
+	private function checkForValidityOfWebexProduct(KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo, &$detectMsg)
 	{
 		KalturaLog::debug("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
 
@@ -235,12 +238,16 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		 */
 		list($silenceDetect, $blackDetect) = KFFMpegMediaParser::checkForSilentAudioAndBlackVideo(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
 		
+		$rv = true;
 		$detectMsg = $silenceDetect;
 		if(isset($blackDetect))
 			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetect":$blackDetect;
 		
+		/*
+		 * Silent/Black does not cause validation failure, just a job message 
+		 */
 		if(isset($detectMsg)){
-			return $detectMsg;
+//			return false;
 		}
 		
 		/*
@@ -252,12 +259,12 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		 */
 		$operators = json_decode($data->flavorParamsOutput->operators);
 		if($data->currentOperationSet<count($operators)-1) {
-			$rv = KFFMpegMediaParser::checkForGarbledAudio(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
-			if($rv==true) {
-				$detectMsg = "Garbled Audio!";
+			if(KFFMpegMediaParser::checkForGarbledAudio(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo)==true) {
+				$detectMsg.= " Garbled Audio!";
+				$rv = false;
 			}
 		}
 		
-		return $detectMsg;
+		return $rv;
 	}
 }
