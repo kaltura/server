@@ -398,23 +398,27 @@ abstract class LiveEntry extends entry
 			
 			if(count($queryString))
 			{
-				$streamName .= '?' . implode('&', $queryString);
+				$queryString = '?' . implode('&', $queryString);
+			}
+			else
+			{
+				$queryString = '';
 			}
 			
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
-			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$slStreamUrl = "$manifestUrl/Manifest";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
+			$hlsStreamUrl = "$manifestUrl/playlist.m3u8" . $queryString;
+			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
+			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
 			
 			if($backupManifestUrl)
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8";
-				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m";
+				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
+				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
 		}
 			
