@@ -2703,7 +2703,7 @@ class kFlowHelper
 		}
 		
 		// Create email params
-		$time = date("m-d-y H:i", $data->timeReference); 
+		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset); 
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url);
 		$titleParams = array($time);
@@ -2728,7 +2728,7 @@ class kFlowHelper
 	
 	public static function handleLiveReportExportFailed(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 	
-		$time = date("m-d-y H:i", $data->timeReference);
+		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset);
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), 
 				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
@@ -2751,7 +2751,7 @@ class kFlowHelper
 	
 	public static function handleLiveReportExportAborted(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
 	
-		$time = date("m-d-y H:i", $data->timeReference);
+		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset);
 		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_ABORT;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
 		$titleParams = array($time);

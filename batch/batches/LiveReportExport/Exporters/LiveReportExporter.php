@@ -6,6 +6,7 @@ abstract class LiveReportExporter {
 	
 	protected $fileName = "fileName.csv";
 	protected $params = array();
+	protected $dateFormatter;
 	
 	public function __construct(KalturaLiveReportExportJobData $data, $reportNameFormat, $timeRange) {
 		$this->params[LiveReportConstants::IS_LIVE] = false;
@@ -13,9 +14,10 @@ abstract class LiveReportExporter {
 		if($data->entryIds)
 			$this->params[LiveReportConstants::ENTRY_IDS] = $data->entryIds;
 		
+		$this->dateFormatter = new LiveReportDateFormatter($data->timeZoneOffset);
 		
-		$fromTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference - $timeRange);
-		$toTime = date(LiveReportConstants::DATE_FORMAT, $data->timeReference);
+		$fromTime = $this->dateFormatter->format($data->timeReference - $timeRange);
+		$toTime = $this->dateFormatter->format($data->timeReference);
 		
 		$this->params[self::TIME_RANGE] = $fromTime . " - " . $toTime;
 		
@@ -66,7 +68,7 @@ abstract class LiveReportEntryExporter extends LiveReportExporter {
 	
 	public function __construct(KalturaLiveReportExportJobData $data, $reportNameFormat, $timeRange) {
 		parent::__construct($data, $reportNameFormat, $timeRange);
-			$this->allEntriesEngines = array(
+		$this->allEntriesEngines = array(
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
 				new LiveReportEntryQueryEngine("plays", LiveReportConstants::SECONDS_36_HOURS, "Total Plays:"),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed:"),

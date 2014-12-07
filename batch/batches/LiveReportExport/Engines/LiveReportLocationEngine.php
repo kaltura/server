@@ -8,6 +8,12 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 	const TIME_CHUNK = 3600;
 	const AGGREGATION_CHUNK = LiveReportConstants::SECONDS_60;
 	
+	protected $formatter;
+	
+	public function LiveReportLocation1MinEngine(LiveReportDateFormatter $formatter) {
+		$this->formatter = $formatter;
+	}
+	
 	public function run($fp, array $args = array()) {
 		$this->checkParams($args, array(LiveReportConstants::TIME_REFERENCE_PARAM, LiveReportConstants::ENTRY_IDS));
 		$toTime = $args[LiveReportConstants::TIME_REFERENCE_PARAM];
@@ -87,7 +93,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$firstRecord = $records[0];
 			
 			$values = array();
-			$values[] = $lastTimeGroup;
+			$values[] = $this->formatter->format($lastTimeGroup);
 			$values[] = $firstRecord->country->name;
 			$values[] = $firstRecord->city->name;
 			$values[] = $firstRecord->city->latitude;

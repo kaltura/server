@@ -5,10 +5,12 @@ class LiveReportEntryEngine extends LiveReportEngine {
 	
 	protected $title;
 	protected $fieldName;
+	protected $formatter;
 	
-	public function LiveReportEntryEngine($field, $title = null) {
+	public function LiveReportEntryEngine($field, $title = null, LiveReportFormatter $formatter = null) {
 		$this->fieldName = $field;
 		$this->title = $title;
+		$this->formatter = $formatter;
 	}
 	
 	public function run($fp, array $args = array()) {
@@ -23,7 +25,10 @@ class LiveReportEntryEngine extends LiveReportEngine {
 		$valueField = $this->fieldName;
 		$res = array();
 		foreach($response->objects as $object) {
-			$res[$object->id] = $object->$valueField;
+			if($this->formatter)
+				$res[$object->id] = $this->formatter->format($object->$valueField);
+			else 
+				$res[$object->id] = $object->$valueField;
 		}
 	
 		return $res;

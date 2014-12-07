@@ -9,6 +9,8 @@ class kLiveReportExportJobData extends kJobData
 	
 	public $timeReference;
 	
+	public $timeZoneOffset;
+	
 	public $outputPath;
 	
 	public $recipientEmail;
@@ -68,5 +70,21 @@ class kLiveReportExportJobData extends kJobData
 	public function setOutputPath($outputPath) {
 		$this->outputPath = $outputPath;
 	}
+	
+	/**
+	 * @return the $timeZoneOffset
+	 */
+	public function getTimeZoneOffset() {
+		return $this->timeZoneOffset;
+	}
+
+	/**
+	 * @param field_type $timeZoneOffset
+	 */
+	public function setTimeZoneOffset($timeZoneOffset) {
+		$this->timeZoneOffset = $timeZoneOffset;
+	}
+
+	
 	
 }

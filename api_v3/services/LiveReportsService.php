@@ -111,29 +111,28 @@ class LiveReportsService extends KalturaBaseService
 	/**
 	 * @action exportToCsv
 	 * @param KalturaLiveReportExportType $reportType 
-	 * @param string $entryIds
-	 * @param string $recpientEmail
+	 * @param KalturaLiveReportExportParams $params
 	 * @return KalturaLiveReportExportResponse
 	 */
-	public function exportToCsvAction($reportType, $entryIds = null, $recpientEmail = null)
+	public function exportToCsvAction($reportType, KalturaLiveReportExportParams $params)
 	{
-		if(!$recpientEmail) {
+		if(!$params->recpientEmail) {
 			$kuser = kCurrentContext::getCurrentKsKuser();
 			if($kuser) {
-				$recpientEmail = $kuser->getEmail();
+				$params->recpientEmail = $kuser->getEmail();
 			} else {
 				$partnerId = kCurrentContext::getCurrentPartnerId();
 				$partner = PartnerPeer::retrieveByPK($partnerId);
-				$recpientEmail = $partner->getAdminEmail();
+				$params->recpientEmail = $partner->getAdminEmail();
 			}
 		}
 		
 		
-		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $entryIds, $recpientEmail);
+		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $params);
 		
 		$res = new KalturaLiveReportExportResponse();
 		$res->referenceJobId = $dbBatchJob->getId();
-		$res->reportEmail = $recpientEmail;
+		$res->reportEmail = $params->recpientEmail;
 		
 		return $res;
 	}
