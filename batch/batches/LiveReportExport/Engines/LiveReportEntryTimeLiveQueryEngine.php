@@ -7,6 +7,12 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 	
 	const TIME_CHUNK = 3600;
 	
+	protected $formatter;
+	
+	public function LiveReportAudienceEngine(LiveReportDateFormatter $formatter) {
+		$this->formatter = $formatter;
+	}
+	
 	public function run($fp, array $args = array()) {
 		
 		$this->checkParams($args, array(LiveReportConstants::TIME_REFERENCE_PARAM));
@@ -37,6 +43,7 @@ class LiveReportAudienceEngine extends LiveReportEngine {
 		foreach($couples as $couple) {
 			$parts = explode(",", $couple);
 			if(count($parts) == 2) {
+				$parts[0] = $this->formatter->format($parts[0]);
 				$msg = implode(LiveReportConstants::CELLS_SEPARATOR, $parts) . "\n";
 				fwrite($fp, $msg);
 			}

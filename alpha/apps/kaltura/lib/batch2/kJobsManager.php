@@ -1681,13 +1681,21 @@ class kJobsManager
 		return self::addJob( $batchJob, $jobData, BatchJobType::COPY_PARTNER );
 	}
 	
-	public static function addExportLiveReportJob($reportType, $entryIds, $recpientEmail = null)
+	public static function addExportLiveReportJob($reportType, KalturaLiveReportExportParams $params)
 	{
 		KalturaLog::debug("adding Export Live Report job");
 		
+		// Calculate time offset from server time to UTC
+		$dateTimeZoneServer = new DateTimeZone(kConf::get('date_default_timezone'));
+		$dateTimeZoneUTC = new DateTimeZone("UTC");
+		$dateTimeUTC = new DateTime("now", $dateTimeZoneUTC);
+		$timeOffsetSeconds = -1 * $dateTimeZoneServer->getOffset($dateTimeUTC);
+		
+		// Create job data
 		$jobData = new kLiveReportExportJobData();
-		$jobData->entryIds = $entryIds;
-		$jobData->recipientEmail = $recpientEmail;
+		$jobData->entryIds = $params->entryIds;
+		$jobData->recipientEmail = $params->recpientEmail;
+		$jobData->timeZoneOffset = ($params->timeZoneOffset * 60) + $timeOffsetSeconds; // Convert minutes to seconds
 		$jobData->timeReference = time();
 		
 		

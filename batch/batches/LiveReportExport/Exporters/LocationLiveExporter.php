@@ -15,7 +15,7 @@ class LocationLiveExporter extends LiveReportEntryExporter {
 					new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
 					new LiveReportConstantStringEngine("Time Range:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(self::TIME_RANGE))),
 			$this->liveEntriesEngines,
-			array(new LiveReportLocation1MinEngine())
+			array(new LiveReportLocation1MinEngine($this->dateFormatter))
 		);
 	}
 }
