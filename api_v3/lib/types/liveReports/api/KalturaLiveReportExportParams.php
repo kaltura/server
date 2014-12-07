@@ -17,7 +17,7 @@ class KalturaLiveReportExportParams extends KalturaObject
 	public $recpientEmail;
 	
 	/**
-	 * Time zone offset in minutes
+	 * Time zone offset in minutes (between client to UTC)
 	 *
 	 * @var int
 	 */
