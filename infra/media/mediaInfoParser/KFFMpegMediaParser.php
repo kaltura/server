@@ -375,9 +375,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$ticksPerMin = $ticks/($audDetectDur/60);
 			KalturaLog::log("ticksPerMin($ticksPerMin)");
 			
-			if($ticksPerMin<10 
+			if($ticksPerMin<15 
 			||($audDetectDur<60 && $ticksPerMin<30) 
-			||($audDetectDur<120 && $ticksPerMin<10) ){
+			||($audDetectDur<120 && $ticksPerMin<20) ){
 				KalturaLog::log("Audio OK");
 				return false;
 			}
