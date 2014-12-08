@@ -70,7 +70,7 @@ abstract class LiveReportEntryExporter extends LiveReportExporter {
 		if(!$data->entryIds)
 			throw new KOperationEngineException("Missing mandatory argument entryIds");
 		if(count(explode(",", $data->entryIds)) != 1)
-			throw new KOperationEngineException("Too many entry ids :" . $data->entryIds);
+			throw new KOperationEngineException("This exporter supports only a single entry id :" . $data->entryIds);
 		
 		$reportNameFormat = str_replace("@ENTRY_ID@", $data->entryIds, $reportNameFormat);
 		parent::__construct($data, $reportNameFormat, $timeRange);
