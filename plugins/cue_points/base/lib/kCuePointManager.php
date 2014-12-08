@@ -4,6 +4,8 @@
  */
 class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
 {
+	const MAX_COPIED_VOD_CUE_POINT_START_TIME = "maxCopiedVodCuePointStartTime";
+
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
 	 */
@@ -387,39 +389,47 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntryId}]");
 
-		// Select the VOD cuepoint with top startTime
-		$c = new KalturaCriteria();
-		$c->add(CuePointPeer::ENTRY_ID, $vodEntryId);
-		$c->addAnd(CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL );
-		$c->addDescendingOrderByColumn(CuePointPeer::START_TIME);
-		$vodCuePointWithTopStartTime = CuePointPeer::doSelectOne($c);
-
-		if ( $vodCuePointWithTopStartTime && $vodCuePointWithTopStartTime->getStartTime() )
+		$maxCopiedVodCuePointStartTime = $liveEntry->getFromCustomData( self::MAX_COPIED_VOD_CUE_POINT_START_TIME );
+		if ( is_null( $maxCopiedVodCuePointStartTime ) )
 		{
-			$vodTopStartTime = $vodCuePointWithTopStartTime->getStartTime();
-		}
+			// Select the VOD cuepoint with top startTime
+			$c = new KalturaCriteria();
+			$c->add(CuePointPeer::ENTRY_ID, $vodEntryId);
+			$c->add(CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL );
+			$c->addDescendingOrderByColumn(CuePointPeer::START_TIME);
+			$vodCuePointWithTopStartTime = CuePointPeer::doSelectOne($c);
 
-		$currentStartTimeOffset = $liveEntry->getLastElapsedRecordingTime();
-		if ( $liveEntry->getCurrentBroadcastStartTime() )
-		{
-			$currentStartTimeOffset += time() - $liveEntry->getCurrentBroadcastStartTime();
+			if ( $vodCuePointWithTopStartTime && $vodCuePointWithTopStartTime->getStartTime() )
+			{
+				$maxCopiedVodCuePointStartTime = $vodCuePointWithTopStartTime->getStartTime();
+			}
 		}
 
 		$c = new KalturaCriteria();
 		$c->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
 		$c->addAnd(CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL );
-		$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $currentStartTimeOffset, KalturaCriteria::LESS_EQUAL) ); // Don't copy future cuepoints
-		if ( isset($vodTopStartTime) ) // Prev. cuepoints exist?
+		$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL) ); // Don't copy future cuepoints
+		if ( !is_null($maxCopiedVodCuePointStartTime) ) // Prev. cuepoints exist?
 		{
-			$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $vodTopStartTime, KalturaCriteria::GREATER_THAN) );
+			$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $maxCopiedVodCuePointStartTime, KalturaCriteria::GREATER_THAN) );
 		}
 
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
 
-		foreach ( $liveCuePointsToCopy as $liveCuePoint )
+		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
+		if ( $numLiveCuePointsToCopy > 0 )
 		{
-			$liveCuePoint->copyToEntry( $vodEntry );
+			KalturaLog::debug("Copying $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
+
+			foreach ( $liveCuePointsToCopy as $liveCuePoint )
+			{
+				$liveCuePoint->copyToEntry( $vodEntry );
+			}
+
+			$maxStartTime = $liveCuePointsToCopy[$numLiveCuePointsToCopy - 1]->getStartTime();
+			$liveEntry->putInCustomData( self::MAX_COPIED_VOD_CUE_POINT_START_TIME, $maxStartTime );
+			$liveEntry->save();
 		}
 	}
 }
