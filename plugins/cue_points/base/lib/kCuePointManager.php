@@ -401,6 +401,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		$c->setLimit(100);
 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
 
 		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
