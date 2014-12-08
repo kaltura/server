@@ -2,7 +2,7 @@
 /**
  * @package plugins.cuePoint
  */
-class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
+class kThumbCuePointManager implements kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -60,85 +60,5 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 			$dbCuePoint->setAssetId(null);
 			$dbCuePoint->save();
 		}
-	}
-
-	/* (non-PHPdoc)
-	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
-	*/
-	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
-	{
-		if ( $object instanceof timedThumbAsset
-				&& $object->getStatus() == thumbAsset::ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) )
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	/* (non-PHPdoc)
-	 * @see kObjectChangedEventConsumer::objectChanged()
-	 */
-	public function objectChanged(BaseObject $object, array $modifiedColumns)
-	{
-		$this->copyCuePointToVodIfLiveEntry( $object );
-	}
-
-	protected function copyCuePointToVodIfLiveEntry( $timedThumbAsset )
-	{
-		$thumbCuePoint = CuePointPeer::retrieveByPK( $timedThumbAsset->getCuePointID() );
-
-		if ( ! $thumbCuePoint )
-		{
-			return;
-		}
-
-		$entry = entryPeer::retrieveByPK( $thumbCuePoint->getEntryId() );
-
-		if ( $entry->getType() != entryType::LIVE_STREAM )
-		{
-			return;
-		}
-
-		$vodEntryId = $entry->getRecordedEntryId();
-
-		if ( ! $vodEntryId )
-		{
-			return;
-		}
-
-		$vodEntry = entryPeer::retrieveByPK( $vodEntryId );
-
-		if ( ! $vodEntry )
-		{
-			return;
-		}
-
-		KalturaLog::log("Saving the live entry [{$entry->getId()}] cue point [{$thumbCuePoint->getId()}] and timed thumb asset [{$timedThumbAsset->getId()}] to the associated VOD entry [{$vodEntryId}]");
-
-		// Clone the cue point to the VOD entry
-		$vodThumbCuePoint = $thumbCuePoint->copy();
-		$vodThumbCuePoint->setEntryId( $vodEntryId );
-		$vodThumbCuePoint->save();
-
-		$timedThumbAssetCuePointID = $timedThumbAsset->getCuePointID();	// Remember the current thumb asset's cue point id
-		$timedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );	// Set the VOD cue point's id
-		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
-
-		// Make a copy of the current thumb asset
-		// copyToEntry will create a filesync softlink to the original filesync
-		$vodTimedThumbAsset = $timedThumbAsset->copyToEntry( $vodEntryId, $vodEntry->getPartnerId() );
- 		$vodThumbCuePoint->setAssetId( $vodTimedThumbAsset->getId() );
- 		$vodThumbCuePoint->save();
-
-		// Restore the thumb asset's prev. cue point id (for good measures)
-		$timedThumbAsset->setCuePointID( $timedThumbAssetCuePointID );
-		$timedThumbAsset->setCustomDataObj();
-
-		// Save the VOD entry's thumb asset
-		$vodTimedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );
-		$vodTimedThumbAsset->save();
-
-		KalturaLog::log("Saved recorded entry cue point [{$vodThumbCuePoint->getId()}] and timed thumb asset [{$vodTimedThumbAsset->getId()}]");
 	}
 }
