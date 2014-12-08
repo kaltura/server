@@ -1695,7 +1695,7 @@ class kJobsManager
 		$jobData = new kLiveReportExportJobData();
 		$jobData->entryIds = $params->entryIds;
 		$jobData->recipientEmail = $params->recpientEmail;
-		$jobData->timeZoneOffset = ($params->timeZoneOffset * 60) + $timeOffsetSeconds; // Convert minutes to seconds
+		$jobData->timeZoneOffset = $timeOffsetSeconds - ($params->timeZoneOffset * 60); // Convert minutes to seconds
 		$jobData->timeReference = time();
 		
 		

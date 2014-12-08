@@ -127,6 +127,14 @@ class LiveReportsService extends KalturaBaseService
 			}
 		}
 		
+		// Validate input
+		if($params->entryIds) {
+			$entryIds = explode(",", $params->entryIds);
+			$entries = entryPeer::retrieveByPKs($entryIds);
+			if(count($entryIds) != count($entries))
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $params->entryIds);
+		}
+		
 		
 		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $params);
 		
