@@ -86,7 +86,6 @@ public final class ParseUtils {
 		 return txt.equals("0") ? false : true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T> ArrayList<T> parseArray(Class<T> clz, Node aNode) throws KalturaApiException{
 		ArrayList<T> tmpList = new ArrayList<T>();
 		NodeList subNodeList = aNode.getChildNodes();
@@ -97,7 +96,6 @@ public final class ParseUtils {
 		return tmpList;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T parseObject(Class<T> clz, Node aNode) throws KalturaApiException{
 		 return (T) KalturaObjectFactory.create((Element)aNode, clz);
 	}

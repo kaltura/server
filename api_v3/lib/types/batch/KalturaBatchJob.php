@@ -399,6 +399,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kSyncCategoryPrivacyContextJobData':
 				$this->data = new KalturaSyncCategoryPrivacyContextJobData();
 				break;
+			
+			case 'kLiveReportExportJobData':
+				$this->data = new KalturaLiveReportExportJobData();
+				break;
 				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)

@@ -19,13 +19,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 
 /**
  * This is an abstraction of a file which allows this construct to hold a File OR a Stream
  * 
  * @author Aaron Zeckoski (azeckoski @ vt.edu)
  */
-public class KalturaFile {
+@SuppressWarnings("serial")
+public class KalturaFile implements Serializable {
 
     private String name;
     private long size;

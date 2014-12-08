@@ -75,6 +75,7 @@ public class ErrorTest extends BaseTest {
 		}
 	}
 	
+	@SuppressWarnings("serial")
 	private class KalturaClientMock extends KalturaClient {
 		
 		String resultToReturn;

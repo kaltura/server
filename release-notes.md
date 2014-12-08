@@ -22,6 +22,48 @@ None.
 None.
 
 
+##add user->get permission to basic user role##
+- Issue Type: Customer request
+- Issue ID: SUP-2899
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Live reports - Export to CSV ##
+- Issue Type: Customer request
+- Issue ID: PLAT-2020
+
+#### Configuration ####
+
+Create the following directory for the generated reports - 
+@WEB_DIR@/content/reports/live/
+
+**local.ini**
+requires the configuration of 'live_report_sender_email' and 'live_report_sender_name'.
+
+**workers.ini**
+Requires the addition of 'KAsyncLiveReportExport' worker definition and enabling.
+a template can be found at batch.ini.template
+
+#### Deployment Scripts ####
+
+*Permissions*
+
+- execute: php deployment/updates/scripts/add_permissions/2014_11_20_export_live_reports_to_csv.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.8 #
 
 ##Add support for multiple video/audio substreams##

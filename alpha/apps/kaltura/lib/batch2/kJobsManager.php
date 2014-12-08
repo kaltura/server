@@ -1680,4 +1680,31 @@ class kJobsManager
 		
 		return self::addJob( $batchJob, $jobData, BatchJobType::COPY_PARTNER );
 	}
+	
+	public static function addExportLiveReportJob($reportType, KalturaLiveReportExportParams $params)
+	{
+		KalturaLog::debug("adding Export Live Report job");
+		
+		// Calculate time offset from server time to UTC
+		$dateTimeZoneServer = new DateTimeZone(kConf::get('date_default_timezone'));
+		$dateTimeZoneUTC = new DateTimeZone("UTC");
+		$dateTimeUTC = new DateTime("now", $dateTimeZoneUTC);
+		$timeOffsetSeconds = -1 * $dateTimeZoneServer->getOffset($dateTimeUTC);
+		
+		// Create job data
+		$jobData = new kLiveReportExportJobData();
+		$jobData->entryIds = $params->entryIds;
+		$jobData->recipientEmail = $params->recpientEmail;
+		$jobData->timeZoneOffset = $timeOffsetSeconds - ($params->timeZoneOffset * 60); // Convert minutes to seconds
+		$jobData->timeReference = time();
+		
+		
+		$job = new BatchJob();
+		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$job->setJobType(BatchJobType::LIVE_REPORT_EXPORT);
+		$job->setJobSubType($reportType);
+		$job->setData($jobData);
+		
+		return self::addJob( $job, $jobData, BatchJobType::LIVE_REPORT_EXPORT, $reportType);
+	}
 }
