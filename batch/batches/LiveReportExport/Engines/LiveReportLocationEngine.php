@@ -97,7 +97,6 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$values[] = $firstRecord->country->name;
 			$values[] = $firstRecord->city->name;
 			$values[] = $firstRecord->city->latitude;
-			$values[] = $firstRecord->city->latitude;
 			$values[] = $firstRecord->city->longitude;
 			
 			$plays = $avgBitrate = $bufferTime = $secondsViewed = 0;
