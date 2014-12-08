@@ -1,5 +1,27 @@
 # Jupiter-10.0.0 #
 
+## sourceType filter ##
+- Issue Type: Change Request
+- Issue ID: PLAT-2148
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Add the following line to the kaltura_entry class in configurations/sphinx/kaltura.conf (or merged from configurations/sphinx/kaltura.conf.template)
+
+	rt_attr_uint = source
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ##add user->get permission to basic user role##
 - Issue Type: Customer request
 - Issue ID: SUP-2899
@@ -150,6 +172,45 @@ Need to run an update SQL statment:
 None.
 
 # IX-9.19.6 #
+
+##Added PPT to image conversion##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1750
+
+#### Configuration ####
+In order to use, requires adding a new flavor_params such as: [Assuming 10025 == document / assetType / Image]
+
+	INSERT INTO flavor_params VALUES (581230,0,0,'PPT 2 Image','',NULL,'PPT 2 Image',0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,0,'jpg','',1,'',0,0,0,0,0,0,0,0,0,NULL,NULL,'a:3:{s:18:\"FlavorVideoBitrate\";i:1;s:19:\"requiredPermissions\";a:0:{}s:9:"sizeWidth";i:940;}',0,NULL,1,0,0,'[[{\"id\":\"document.ppt2Img\",\"extra\":null,\"command\":null}]]',NULL,10025);
+
+Place PowerPointConvertor.exe and PowerPointConvertor.exe.config in the same directory on your windows machine.
+f.i. /opt/kaltura/exe
+
+Requires adding a new windows worker. Sample configuration - 
+
+	[KAsyncConvertPpt : KAsyncConvert]
+	id = XXXXX
+	friendlyName = Convert ppt
+	params.isRemoteInput = 1
+	params.isRemoteOutput = 0
+	maximumExecutionTime = 36000
+	maxJobsEachRun = 1
+	filter.jobSubTypeIn = document.ppt2Img
+	params.ppt2ImgCmd = C:\opt\kaltura\exe\PowerPointConvertor.exe
+	baseLocalPath = C:\web\
+	baseTempSharedPath = /opt/kaltura/web/tmp/convert/
+	baseTempLocalPath = W:\tmp\convert\
+	params.localFileRoot = C:/output
+	params.remoteUrlDirectory = /output
+	params.fileCacheExpire = 36000
+	params.localTempPath = C:\opt\kaltura\tmp\convert
+	params.sharedTempPath = W:\tmp\convert\ 
+
+#### Deployment Scripts ####
+
+	php deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+None.
 
 ##add partner to 'exclude' list##
 - Issue Type: Customer request

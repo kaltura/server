@@ -35,4 +35,36 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	{
 		return ThumbCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(ThumbCuePointMetadataObjectType::THUMB_CUE_POINT);
 	}
+
+	public function copyToEntry( $dstEntry, PropelPDO $con = null)
+	{
+		// Clone the cue point to the destination entry
+		$dstThumbCuePoint = parent::copyToEntry( $dstEntry, $con );
+
+		$timedThumbAsset = assetPeer::retrieveByPK($this->getAssetId());
+		if ( ! $timedThumbAsset )
+		{
+			KalturaLog::debug("Can't retrieve timedThumbAsset with id: {$this->getAssetId()}");
+			return;
+		}
+
+		$timedThumbAsset->setCuePointID( $dstThumbCuePoint->getId() );	// Set the destination cue point's id
+		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
+
+		// Make a copy of the current thumb asset
+		// copyToEntry will create a filesync softlink to the original filesync
+		$dstTimedThumbAsset = $timedThumbAsset->copyToEntry( $dstEntry->getId(), $dstEntry->getPartnerId() );
+		$dstThumbCuePoint->setAssetId( $dstTimedThumbAsset->getId() );
+		$dstThumbCuePoint->save( $con );
+
+		// Restore the thumb asset's prev. cue point id (for good measures)
+		$timedThumbAsset->setCuePointID( $this->getId() );
+		$timedThumbAsset->setCustomDataObj();
+
+		// Save the destination entry's thumb asset
+		$dstTimedThumbAsset->setCuePointID( $dstThumbCuePoint->getId() );
+		$dstTimedThumbAsset->save( $con );
+
+		KalturaLog::log("Saved cue point [{$dstThumbCuePoint->getId()}] and timed thumb asset [{$dstTimedThumbAsset->getId()}]");
+	}
 }
