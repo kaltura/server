@@ -320,6 +320,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$cuePoint->indexToSearchIndex();
 			}
 		}
+
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -342,7 +344,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 	public static function isAllMediaServersStopped(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof LiveEntry && !count($object->getMediaServers()))
+		if($object instanceof LiveEntry && !$object->hasMediaServer())
 		{
 			// checking if the live-entry media-server was just unregistered
 			$customDataOldValues = $object->getCustomDataOldValues();
@@ -388,6 +390,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		// Select the VOD cuepoint with top startTime
 		$c = new KalturaCriteria();
 		$c->add(CuePointPeer::ENTRY_ID, $vodEntryId);
+		$c->addAnd(CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL );
 		$c->addDescendingOrderByColumn(CuePointPeer::START_TIME);
 		$vodCuePointWithTopStartTime = CuePointPeer::doSelectOne($c);
 
@@ -404,6 +407,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		$c = new KalturaCriteria();
 		$c->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+		$c->addAnd(CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL );
 		$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $currentStartTimeOffset, KalturaCriteria::LESS_EQUAL) ); // Don't copy future cuepoints
 		if ( isset($vodTopStartTime) ) // Prev. cuepoints exist?
 		{
