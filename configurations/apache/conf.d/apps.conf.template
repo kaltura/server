@@ -6,6 +6,7 @@ Alias /kmc "@APP_DIR@/kmc/web"
     AllowOverride All
     Order allow,deny
     Allow from all
+    Require all granted
 </Directory>
 
 Alias /hosted_pages "@BASE_DIR@/apps/hosted_pages/web"
@@ -15,6 +16,7 @@ Alias /hosted_pages "@BASE_DIR@/apps/hosted_pages/web"
 	AllowOverride All
 	Order allow,deny
 	Allow from all
+	Require all granted
 </Directory>
 
 Alias /html5 "@WEB_DIR@/html5"
@@ -25,6 +27,7 @@ Alias /html5 "@WEB_DIR@/html5"
     AllowOverride None
     Order allow,deny
     Allow from all
+    Require all granted
 </Directory>
 
 Alias /apps "@BASE_DIR@/apps"
@@ -34,5 +37,6 @@ Alias /apps "@BASE_DIR@/apps"
     AllowOverride None
     Order allow,deny
     Allow from all
+    Require all granted
 </Directory>
 

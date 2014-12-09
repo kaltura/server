@@ -162,6 +162,7 @@ Alias /start "@APP_DIR@/start"
 	AllowOverride All
 	Order allow,deny
 	Allow from all
+	Require all granted
 </Directory>
 
 Alias /content/uiconf "@WEB_DIR@/content/uiconf"
@@ -175,6 +176,7 @@ Alias /content/uiconf "@WEB_DIR@/content/uiconf"
         Header unset ETag
         AllowOverride None
         Allow from all
+	Require all granted
 </Directory>
 
 Alias /content "@WEB_DIR@/content"
@@ -191,6 +193,7 @@ Alias /content "@WEB_DIR@/content"
 	RewriteRule ^(.*)entry/widget/(.*) /images/blank_one_pixel.gif [L]
         AllowOverride None
         Allow from all
+	Require all granted
 </Directory>
 
 Alias /flash "@WEB_DIR@/flash"
@@ -205,6 +208,7 @@ Alias /flash "@WEB_DIR@/flash"
 	FileETag None
         AllowOverride None
         Allow from all
+	Require all granted
 </Directory>
 
 # ------------------------------------------------------------------------------
