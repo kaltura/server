@@ -58,7 +58,8 @@ class myReportsMgr
 										
 	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
 										self::REPORT_TYPE_OPERATION_SYSTEM, 
-										self::REPORT_TYPE_BROWSERS);
+										self::REPORT_TYPE_BROWSERS,
+										self::REPORT_TYPE_TOP_CONTENT);
 										
 
 	public static function runQuery ( $query_file , $map , $debug = false )
