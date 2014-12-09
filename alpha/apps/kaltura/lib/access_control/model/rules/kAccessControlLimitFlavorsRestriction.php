@@ -67,5 +67,12 @@ class kAccessControlLimitFlavorsRestriction extends kAccessControlRestriction
 	{
 		$this->getAction()->setIsBlockedList($type == kAccessControlRestriction::RESTRICTION_TYPE_RESTRICT_LIST);
 	}
-}
 
+	/* (non-PHPdoc)
+	 * @see kRule::shouldDisableCache()
+	 */
+	public function shouldDisableCache($scope)
+	{
+		return false;
+	}
+}
