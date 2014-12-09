@@ -6,11 +6,13 @@ class LiveReportEntryEngine extends LiveReportEngine {
 	protected $title;
 	protected $fieldName;
 	protected $formatter;
+	protected $printResult;
 	
-	public function LiveReportEntryEngine($field, $title = null, LiveReportFormatter $formatter = null) {
+	public function LiveReportEntryEngine($field, $title = null, LiveReportFormatter $formatter = null, $printResult = false) {
 		$this->fieldName = $field;
 		$this->title = $title;
 		$this->formatter = $formatter;
+		$this->printResult = $printResult;
 	}
 	
 	public function run($fp, array $args = array()) {
@@ -31,6 +33,11 @@ class LiveReportEntryEngine extends LiveReportEngine {
 				$res[$object->id] = $object->$valueField;
 		}
 	
+		if($this->printResult) {
+			$msg = $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res);
+			fwrite($fp, $msg);
+		}
+		
 		return $res;
 	}
 	
