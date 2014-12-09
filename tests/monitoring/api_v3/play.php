@@ -581,5 +581,6 @@ catch(Exception $ex)
 	$monitorResult->errors[] = $error;
 	$monitorResult->description = $ex->getMessage();
 }
+
 echo "$monitorResult";
 exit(0);
