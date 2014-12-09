@@ -756,7 +756,7 @@ $plannedDur = 0;
 			$darSrc = $source->_dar;
 			$diff = abs(1-$darSrc/$darSrcFrame);
 				// Less strict diff (original was diff>0.1) test to allow hadling of 5:4 to 4:3 adjustments
-			if($diff>0.05) { 
+			if($diff>0.05) {  
 				$widSrc = $darSrc*$hgtSrc;
 				$darSrcFrame = $darSrc;
 			}
