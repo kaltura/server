@@ -379,4 +379,9 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		$cuePointCopy->save($con);
 		return $cuePointCopy;
 	}
+	
+	public function contributeData()
+	{
+		return null;
+	}
 } // CuePoint

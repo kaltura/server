@@ -375,7 +375,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		// attach all default criteria from peer
 		$objectClass::getDefaultCriteriaFilter()->applyFilter($this);
 		
-		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx())
+		if(!$this->hasAdvancedSearchFilter && !count($this->matchClause) && $this->shouldSkipSphinx() && !isset($this->groupByColumn) && !isset($this->selectColumn))
 		{
 			KalturaLog::debug('Skip Sphinx');
 			$this->sphinxSkipped = true;

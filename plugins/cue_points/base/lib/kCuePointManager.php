@@ -2,10 +2,19 @@
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
+class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
 	const MAX_COPIED_VOD_CUE_POINT_START_TIME = "maxCopiedVodCuePointStartTime";
 
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof CuePoint)
+			return true;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
 	 */
@@ -21,6 +30,18 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
+	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if($object instanceof CuePoint)
+			$this->cuePointAdded($object);
+			
+		return true;
+	}
+	
+	
+	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
@@ -32,6 +53,14 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$this->cuePointDeleted($object);
 			
 		return true;
+	}
+	
+	/**
+	 * @param CuePoint $cuePoint
+	 */
+	protected function cuePointAdded(CuePoint $cuePoint)
+	{
+		$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -53,6 +82,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
+			
+		//re-index cue point entry
+		$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -417,6 +449,19 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			$maxStartTime = $liveCuePointsToCopy[$numLiveCuePointsToCopy - 1]->getStartTime();
 			$liveEntry->putInCustomData( self::MAX_COPIED_VOD_CUE_POINT_START_TIME, $maxStartTime );
 			$liveEntry->save();
+		}
+	}
+	
+	protected function reIndexCuePointEntry(CuePoint $cuePoint)
+	{
+		//index the entry after the cue point was added
+		$entryId = $cuePoint->getEntryId();
+		$entry = entryPeer::retrieveByPK($entryId);
+
+		if($entry){
+			$entry->setUpdatedAt(time());
+			$entry->save();
+			$entry->indexToSearchIndex();
 		}
 	}
 }

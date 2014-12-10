@@ -5,10 +5,16 @@
  */
 class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 {
+	/**
+	 * @var string
+	 */
+	public $freeText;
+	
 	static private $map_between_objects = array
 	(
 		"cuePointTypeEqual" => "_eq_type",
 		"cuePointTypeIn" => "_in_type",
+		"freeText" => "_free_text",
 	);
 
 	public function getMapBetweenObjects()
@@ -18,7 +24,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	protected function validateEntryIdFiltered()
 	{
-		if(!$this->idEqual && !$this->idIn && !$this->entryIdEqual && !$this->entryIdIn)
+		if(!$this->idEqual && !$this->idIn && !$this->entryIdEqual && !$this->entryIdIn && !$this->freeText)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
 					$this->getFormattedPropertyNameWithClassName('idEqual') . '/' . $this->getFormattedPropertyNameWithClassName('idIn') . '/' .
 					$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));

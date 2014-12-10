@@ -5,6 +5,11 @@
  */
 class CuePointFilter extends baseObjectFilter
 {
+	const FREE_TEXT_FIELDS = 'name,tags,text';
+	
+	// allow only 256 charaters when creation a MATCH-AGAINST caluse
+	const MAX_SAERCH_TEXT_SIZE = 256;
+	
 	public function init ()
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
@@ -52,7 +57,8 @@ class CuePointFilter extends baseObjectFilter
 				"_eq_parent_id",
 				"_in_parent_id",
 				"_eq_cue_point_type", 
-				"_in_cue_point_type"
+				"_in_cue_point_type",
+				"_free_text",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
@@ -92,6 +98,20 @@ class CuePointFilter extends baseObjectFilter
 	public function getIdFromPeer (  )
 	{
 		return CuePointPeer::ID;
+	}
+	
+	public function setEntryIdIn(array $arr)
+	{
+		$ids = $this->get('_in_entry_id');
+		if($ids)
+		{
+			if(!is_array($ids))
+				$ids = explode(',', $ids);
+	
+			$arr = array_merge($ids, $arr);
+		}
+		
+		$this->set('_in_entry_id', $arr);
 	}
 }
 

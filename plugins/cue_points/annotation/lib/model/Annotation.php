@@ -28,4 +28,24 @@ class Annotation extends CuePoint implements IMetadataObject
 	{
 		return AnnotationMetadataPlugin::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
 	}
+	
+	public function contributeData()
+	{
+		$data = null;
+		
+		$cuePointCoreType = AnnotationPlugin::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION);
+		
+		if($this->getText())
+			$data = $data . $this->getText() . ' ';
+		
+		if($this->getTags())
+			$data = $data . $this->getTags() . ' ';
+			
+		if($data)
+		{
+			$data = " cp_" . $cuePointCoreType . " " . $data . "cp_" . $cuePointCoreType;
+		}
+			
+		return $data;
+	}
 }
