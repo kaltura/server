@@ -7,11 +7,24 @@ DirectoryIndex index.html
 DeflateFilterNote Ratio ratio
 DeflateCompressionLevel 9
 FilterDeclare COMPRESS
+
+<IfVersion >= 2.4>
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'text/html'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/x-javascript'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'application/.*xml.*'"
+FilterProvider COMPRESS DEFLATE "%{CONTENT_TYPE} = 'image/svg+xml'"
+</IfVersion>
+
+<IfVersion < 2.4>
 FilterProvider COMPRESS DEFLATE resp=Content-Type $text
 FilterProvider COMPRESS DEFLATE resp=Content-Type $application/x-javascript
 FilterProvider COMPRESS DEFLATE resp=Content-Type $application/.*xml.*
 FilterProvider COMPRESS DEFLATE resp=Content-Type $image/svg+xml
+</IfVersion>
+
 FilterChain COMPRESS
+
+
 
 <IfModule !filter_module>
     LoadModule filter_module modules/mod_filter.so
