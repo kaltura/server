@@ -6,6 +6,7 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_api_v3_analytics.log {
@@ -15,6 +16,7 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_api_v3_tests.log {
@@ -24,6 +26,7 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_prod.log {
@@ -33,4 +36,5 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
