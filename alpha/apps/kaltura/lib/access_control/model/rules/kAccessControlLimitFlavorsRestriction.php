@@ -71,7 +71,7 @@ class kAccessControlLimitFlavorsRestriction extends kAccessControlRestriction
 	/* (non-PHPdoc)
 	 * @see kRule::shouldDisableCache()
 	 */
-	public function shouldDisableCache($scope)
+	public function shouldDisableCache()
 	{
 		return false;
 	}
