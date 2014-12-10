@@ -6,4 +6,5 @@ Alias /admin_console "@APP_DIR@/admin_console/web"
 	AllowOverride All
 	Order allow,deny
 	Allow from all
+	Require all granted
 </Directory>
