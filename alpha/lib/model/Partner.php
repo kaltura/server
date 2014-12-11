@@ -1020,25 +1020,22 @@ class Partner extends BasePartner
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
 
 
-    public function setBroadcastConfig($key, $value)
+    public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
-    	$this->putInCustomData($key, $value, 'broadcast_config');
+    	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
     }
     
-	public function getBroadcastConfig($dc = null)
+	public function getLiveStreamBroadcastUrlConfigurations($dc = null)
 	{
-		$config = $this->getFromCustomData($dc, 'broadcast_config', null);
-		if($config)
+		$config = ($dc ? kConf::get($dc, 'broadcast') : kConf::getMap('broadcast'));
+		
+		$partnerConfig = $this->getFromCustomData($dc, 'live_stream_broadcast_url_configurations');
+		if($partnerConfig)
 		{
-			return $config;
+			$config = kConf::mergeConfigItem($config, $partnerConfig, true);
 		}
 		
-		if($dc)
-		{
-			return kConf::get($dc, 'broadcast');
-		}
-		
-		return kConf::getMap('broadcast');
+		return $config;
 	}
 	
 	/**

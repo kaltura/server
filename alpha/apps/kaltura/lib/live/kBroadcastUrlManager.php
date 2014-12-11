@@ -74,7 +74,7 @@ class kBroadcastUrlManager
 	protected function getConfiguration ($dc = null)
 	{
 		$partner = PartnerPeer::retrieveByPK($this->partnerId);
-		return $partner->getBroadcastConfig($dc);
+		return $partner->getLiveStreamBroadcastUrlConfigurations($dc);
 	}
 	
 	protected function getHostname ($dc, $sourceType)
