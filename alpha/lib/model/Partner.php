@@ -1018,7 +1018,28 @@ class Partner extends BasePartner
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
-	
+
+
+    public function setBroadcastConfig($key, $value)
+    {
+    	$this->putInCustomData($key, $value, 'broadcast_config');
+    }
+    
+	public function getBroadcastConfig($dc = null)
+	{
+		$config = $this->getFromCustomData($dc, 'broadcast_config', null);
+		if($config)
+		{
+			return $config;
+		}
+		
+		if($dc)
+		{
+			return kConf::get($dc, 'broadcast');
+		}
+		
+		return kConf::getMap('broadcast');
+	}
 	
 	/**
 	 * @return kAkamaiLiveParams
