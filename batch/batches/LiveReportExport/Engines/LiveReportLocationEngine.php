@@ -5,7 +5,7 @@
  */
 class LiveReportLocation1MinEngine extends LiveReportEngine {
 	
-	const TIME_CHUNK = 3600;
+	const TIME_CHUNK = 600;
 	const AGGREGATION_CHUNK = LiveReportConstants::SECONDS_60;
 	
 	protected $formatter;
