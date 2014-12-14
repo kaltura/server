@@ -287,29 +287,29 @@ if ($argc > 5 && $argv[5] === 'realrun')
 	$dryRun = false;
 
 // Connect to database
-$link = mysql_connect($HOST_NAME, $USER_NAME, $PASSWORD)
-    or die('Error: Could not connect: ' . mysql_error() . "\n");
+$link = mysqli_connect($HOST_NAME, $USER_NAME, $PASSWORD)
+    or die('Error: Could not connect: ' . mysqli_connect_error() . "\n");
 
 // Make sure 'Memcached Functions for MySQL' is installed
-mysql_select_db('mysql') or die("Error: Could not select 'mysql' database\n");
+mysqli_select_db($link,'mysql') or die("Error: Could not select 'mysql' database\n");
 $query = "SELECT * FROM func WHERE name='memc_server_count'";
-$result = mysql_query($query) or die('Error: Select from func table query failed: ' . mysql_error() . "\n");
+$result = mysqli_query($link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($link) . "\n");
 
-if (!mysql_fetch_array($result, MYSQL_ASSOC))
+if (!mysqli_fetch_array($result, MYSQLI_ASSOC))
 {
 	die("Error: 'Memcached Functions for MySQL' not installed\nNote: this script should only be run on multi-datacenter environments.\n");
 }
 
-mysql_free_result($result);
+mysqli_free_result($result);
 
 // Change database to kaltura
-mysql_select_db('kaltura') or die("Error: Could not select 'kaltura' database\n");
+mysqli_select_db($link,'kaltura') or die("Error: Could not select 'kaltura' database\n");
 
 // Make sure the memcache server is configured
 $query = "SELECT memc_server_count()";
-$result = mysql_query($query) or die('Error: Select memc_server_count query failed: ' . mysql_error() . "\n");
+$result = mysqli_query($link,$query) or die('Error: Select memc_server_count query failed: ' . mysqli_error($link) . "\n");
 
-$line = mysql_fetch_array($result, MYSQL_NUM);
+$line = mysqli_fetch_array($result, MYSQLI_NUM);
 if (!$line)
 {
 	die("Unexpected: memc_server_count returned nothing\n");
@@ -320,13 +320,13 @@ if ($line[0] <= 0)
 	die("Error: Memcached server not configured\n");
 }
 
-mysql_free_result($result);
+mysqli_free_result($result);
 
 // Get the slave status
 $query = "SHOW SLAVE STATUS";
-$result = mysql_query($query) or die('Error: show slave status query failed: ' . mysql_error() . "\n");
+$result = mysqli_query($link,$query) or die('Error: show slave status query failed: ' . mysqli_error($link) . "\n");
 
-$status = mysql_fetch_array($result, MYSQL_ASSOC);
+$status = mysqli_fetch_array($result, MYSQLI_ASSOC);
 $slaveRunning = isset($status['Slave_SQL_Running']) ? $status['Slave_SQL_Running'] : null;
 if (!in_array($slaveRunning, array('Yes', 'No')))
 {
@@ -336,15 +336,15 @@ if (!in_array($slaveRunning, array('Yes', 'No')))
 $slaveRunning = ($slaveRunning == 'Yes');
 $initialSlaveRunning = $slaveRunning;
 
-mysql_free_result($result);
+mysqli_free_result($result);
 
 // Get list of installed triggers
 $triggers = array();
 $query = "SHOW TRIGGERS";
-$result = mysql_query($query) or die('Error: Show triggers failed: ' . mysql_error() . "\n");
+$result = mysqli_query($link,$query) or die('Error: Show triggers failed: ' . mysqli_error($link) . "\n");
 for(;;)
 {
-        $curRes = mysql_fetch_array($result, MYSQL_ASSOC);
+        $curRes = mysqli_fetch_array($result, MYSQLI_ASSOC);
         if (!$curRes)
                 break;
 		$triggerName = $curRes["Trigger"];
@@ -352,7 +352,7 @@ for(;;)
 		
 		$triggers[$triggerName] = $triggerStatement;
 }
-mysql_free_result($result);
+mysqli_free_result($result);
 
 // Install / remove triggers
 foreach ($INVALIDATION_KEYS as $invalidationKey)
@@ -404,7 +404,7 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 			if ($slaveRunning)
 			{
 				print "Stopping slave...\n";
-				$result = mysql_query('STOP SLAVE') or die('Error: Stop slave query failed: ' . mysql_error() . "\n");
+				$result = mysqli_query($link,'STOP SLAVE') or die('Error: Stop slave query failed: ' . mysqli_error($link) . "\n");
 				if ($result !== true)
 				{
 					die("Error: Unexpected result returned while stopping slave\n");
@@ -412,10 +412,10 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 				$slaveRunning = false;
 			}
 			
-			$result = mysql_query($sqlCommand) or die('Error: Trigger query failed: ' . mysql_error() . "\n");
+			$result = mysqli_query($link,$sqlCommand) or die('Error: Trigger query failed: ' . mysqli_error($link) . "\n");
 			if ($result !== true)
 			{
-				die("Error: Unexpected result returned from mysql_query\n");
+				die("Error: Unexpected result returned from mysqli_query()\n");
 			}
 		}
 	}
@@ -424,7 +424,7 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 if (!$slaveRunning && $initialSlaveRunning)
 {
 	print "Starting slave...\n";
-	$result = mysql_query('START SLAVE') or die('Error: Start slave query failed: ' . mysql_error() . "\n");
+	$result = mysqli_query($link,'START SLAVE') or die('Error: Start slave query failed: ' . mysqli_error($link) . "\n");
 	if ($result !== true)
 	{
 		die("Error: Unexpected result returned while starting slave\n");
@@ -432,6 +432,6 @@ if (!$slaveRunning && $initialSlaveRunning)
 }
 
 // Close database connection
-mysql_close($link);
+mysqli_close($link);
 
 print "Done !\n";
