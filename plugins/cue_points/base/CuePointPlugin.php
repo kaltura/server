@@ -12,6 +12,10 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	const CUE_POINT_MANAGER = 'kCuePointManager';
 	const SEARCH_FIELD_DATA = 'data';
 	const SEARCH_TEXT_SUFFIX = 'cpend';
+	const ENTRY_CUE_POINT_INDEX_PREFIX = 'cps_';
+	const ENTRY_CUE_POINT_INDEX_SUFFIX = 'cpe_';
+	const ENTRY_CUE_POINT_INDEX_SUB_TYPE = 'cpst';
+	
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -295,14 +299,19 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			if(!$contributedData)
 				continue;
 				
-			$dataByType[$cuePoint->getType()][] = $cuePoint->getId() . $contributedData;
+			$cuePointType = $cuePoint->getType();
+			if(!isset($dataByType[$cuePointType]))
+				$dataByType[$cuePointType] = array();
+			
+			$contributedData = self::buildDataToIndexOnEntry($contributedData, $cuePointType, $cuePoint->getPartnerId(), $cuePoint->getId(), $cuePoint->getSubType());
+			
+			$dataByType[$cuePointType][] = $contributedData;
 		}
 		
 		$data = array();
-		foreach ($indexOnEntryTypes as $type)
+		foreach ($dataByType as $type => $typeData)
 		{
-			if(isset($dataByType[$type]))
-				$data = array_merge($data, $dataByType[$type]);
+			$data = array_merge($data, $typeData);
 		}
 		
 		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
@@ -311,6 +320,18 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		);
 		
 		return $searchValues;
+	}
+	
+	public static function buildDataToIndexOnEntry($contributedData, $type, $partnerId, $cuePointId, $subType = null)
+	{	
+		$prefix = self::ENTRY_CUE_POINT_INDEX_PREFIX . $partnerId . "_" . $type;
+		
+		if($subType)
+			$prefix .= " " . self::ENTRY_CUE_POINT_INDEX_SUB_TYPE . $subType;
+		
+		$suffix = self::ENTRY_CUE_POINT_INDEX_SUFFIX . $partnerId . "_" . $type;
+			
+		return $cuePointId . " " . $prefix . " " . $contributedData . $suffix;
 	}
 	
 	public static function getIndexOnEntryTypes()

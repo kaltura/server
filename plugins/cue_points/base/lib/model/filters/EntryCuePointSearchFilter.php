@@ -8,7 +8,7 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	/**
 	 * @var string
 	 */
-	protected  $freeText;
+	protected  $cuePointsFreeText;
 	
 	/**
 	 * @dynamicType KalturaCuePointType
@@ -24,15 +24,15 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	/**
 	 * @return the $freeText
 	 */
-	public function getFreeText() {
-		return $this->freeText;
+	public function getCuePointsFreeText() {
+		return $this->$cuePointsFreeText;
 	}
 
 	/**
 	 * @param string $freeText
 	 */
-	public function setFreeText($freeText) {
-		$this->freeText = $this->formatCondition($freeText, null, ' ');
+	public function setCuePointsFreeText($freeText) {
+		$this->$cuePointsFreeText = $this->formatMatchPhrase($freeText);
 	}
 	
 	/**
@@ -63,59 +63,47 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 		$this->cuePointSubTypeEqual = $cuePointSubTypeEqual;
 	}
 
-	private function formatCondition($conditionString, $explodeDelimiter, $implodeDelimiter)
+	private function formatMatchPhrase($conditionString)
 	{
 		if(!strlen($conditionString))
-		{
 			return null;
-		}
 		
-		$res = null;
-		if($explodeDelimiter)
-		{		
-			$vals = explode($explodeDelimiter, $conditionString);
-			foreach($vals as $valIndex => $valValue)
-			{
-				if(!$valValue)
-					unset($vals[$valIndex]);
-				elseif(preg_match('/[\s\t]/', $valValue))
-					$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
-				else
-					$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-			}
-						
-			if(count($vals))
-			{
-				$res = implode($implodeDelimiter, $vals);
-			}	
-		}	
+		if(preg_match('/[\s\t]/', $conditionString)) 
+			$res = '"' . SphinxUtils::escapeString($conditionString) . '"';
 		else
-		{
-			if(preg_match('/[\s\t]/', $conditionString)) 
-				$res = '"' . SphinxUtils::escapeString($conditionString) . '"';
-			else
-				$res = SphinxUtils::escapeString($conditionString);
+			$res = SphinxUtils::escapeString($conditionString);
 									
-		}
 		return $res;
 	}
 	
-	private function addCondition($conditionStr, IKalturaIndexQuery $query)
-	{	
-		$conditions = array();
+	private function applyMatchCondition($conditionStr, IKalturaIndexQuery $query)
+	{			
+		$matchCondition = $this->createSphinxMatchPhrase($conditionStr); 
 		
+		$query->addMatch("($matchCondition)");			
+	}
+	
+	private function createSphinxMatchPhrase($conditionStr) 
+	{	
 		if(isset($this->cuePointTypeIn))
 		{
+			$conditions = array();
+			
 			$types = explode(',', $this->cuePointTypeIn);
 		
 			foreach($types as $type)
-			{
-				$cuePointSubType = $this->getCuePointSubTypeEqual();
+			{				
+				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 				
-				$prefix = $cuePointSubType ?  "cp_" . $type . "_" . $cuePointSubType . " << " : "cp_" . $type . " << ";
-				$postfix = $cuePointSubType ? " << cp_" . $type . "_" . $this->getCuePointSubTypeEqual() : " << cp_" . $type;
+				$prefix = CuePointPlugin::ENTRY_CUE_POINT_INDEX_PREFIX . $partnerId . "_" . $type;
+				
+				$cuePointSubType = $this->getCuePointSubTypeEqual();
+				if($cuePointSubType)
+					$prefix .= " " . CuePointPlugin::ENTRY_CUE_POINT_INDEX_SUB_TYPE . $cuePointSubType;
+				
+				$postfix = CuePointPlugin::ENTRY_CUE_POINT_INDEX_SUFFIX . $partnerId . "_" . $type;
 
-				$conditions[] = "(" . $prefix . $conditionStr . $postfix .")";
+				$conditions[] = "(" . $prefix . " << " . $conditionStr . " << " . $postfix .")";
 			}
 			
 			$condition = implode(' | ', $conditions);
@@ -126,8 +114,7 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 		
 		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
 		
-		$key = '@' . CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
-		$query->addMatch("($key $condition)");			
+		return '@' . CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA) . " " . $condition;
 	}
 	
 	/* (non-PHPdoc)
@@ -136,7 +123,56 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	public function applyCondition(IKalturaDbQuery $query)
 	{
 		if ($query instanceof IKalturaIndexQuery){
-			$this->addCondition($this->getFreeText(), $query);
+			$this->applyMatchCondition($this->getCuePointsFreeText(), $query);
 		}
+	}
+	
+	public function getFreeTextConditions($partnerScope, $freeTexts) 
+	{
+		KalturaLog::debug("freeText [$freeTexts]");
+		$additionalConditions = array();
+		
+		if($this->getCuePointsFreeText())
+			return;
+		
+		if(preg_match('/^"[^"]+"$/', $freeTexts))
+		{
+			$freeText = str_replace('"', '', $freeTexts);
+			$freeText = SphinxUtils::escapeString($freeText);
+			$freeText = "^$freeText$";
+			
+			$additionalConditions[] = $this->createSphinxMatchPhrase($freeTexts);
+			
+			return $additionalConditions;
+		}
+		
+		if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
+		{
+			str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
+		
+			$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
+			foreach($freeTextsArr as $valIndex => $valValue)
+				if(!is_numeric($valValue) && strlen($valValue) <= 0)
+					unset($freeTextsArr[$valIndex]);
+					
+			foreach($freeTextsArr as $freeText)
+			{
+				$freeText = SphinxUtils::escapeString($freeText);
+				$additionalConditions[] = $this->createSphinxMatchPhrase($freeText);
+			}
+			
+			return $additionalConditions;
+		}
+		
+		$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
+		foreach($freeTextsArr as $valIndex => $valValue)
+			if(!is_numeric($valValue) && strlen($valValue) <= 0)
+				unset($freeTextsArr[$valIndex]);
+				
+		$freeTextsArr = array_unique($freeTextsArr);
+		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
+		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
+		$additionalConditions[] =  $this->createSphinxMatchPhrase($freeTextExpr);
+		return $additionalConditions;
 	}
 }

@@ -80,7 +80,6 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 	public function contributeData()
 	{
 		$data = null;
-		$cuePointTypeCoreValue = ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB);
 		
 		if($this->getText())
 			$data = $data . $this->getText() . ' ';
@@ -90,18 +89,6 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		
 		if($this->getTags())
 			$data = $data . $this->getTags() . ' ';
-		
-		if ($data)
-		{
-			if ($this->getSubType() == ThumbCuePointSubType::SLIDE)
-			{
-				$data = " cp_" . $cuePointTypeCoreValue . " cp_" . $cuePointTypeCoreValue . "_" . ThumbCuePointSubType::SLIDE . " " . $data . "cp_" . $cuePointTypeCoreValue . "_" . ThumbCuePointSubType::SLIDE . " " . "cp_" . $cuePointTypeCoreValue; 
-			}
-			elseif ($this->getSubType() == ThumbCuePointSubType::CHAPTER)
-			{
-				$data = " cp_" . $cuePointTypeCoreValue . " cp_" . $cuePointTypeCoreValue . "_" . ThumbCuePointSubType::CHAPTER . " " . $data . "cp_" . $cuePointTypeCoreValue . "_" . ThumbCuePointSubType::CHAPTER . " " . "cp_" . $cuePointTypeCoreValue;
-			}
-		}
 		
 		return $data;
 	}

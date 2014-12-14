@@ -8,7 +8,7 @@ class KalturaEntryCuePointSearchFilter extends KalturaSearchItem
 	/**
 	 * @var string
 	 */
-	public $freeText;
+	public $cuePointsFreeText;
 	
 	/**
 	 * @dynamicType KalturaCuePointType
@@ -23,7 +23,7 @@ class KalturaEntryCuePointSearchFilter extends KalturaSearchItem
 	
 	private static $map_between_objects = array
 	(
-		"freeText",
+		"cuePointsFreeText",
 		"cuePointTypeIn",
 		"cuePointSubTypeEqual",
 	);
@@ -47,12 +47,8 @@ class KalturaEntryCuePointSearchFilter extends KalturaSearchItem
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
-
-		$freeTextIsNull = is_null($this->freeText);
 		
-		if ( $freeTextIsNull )
-		{
-			throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, "freeText" );
-		}
+		if(isset($this->cuePointSubTypeEqual) && !isset($this->cuePointTypeIn))
+			throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('cuePointSubTypeEqual') );
 	}
 }
