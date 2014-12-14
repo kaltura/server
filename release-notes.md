@@ -1,5 +1,25 @@
 # Jupiter-10.0.0 #
 
+## Change emails_en to templace ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-2244
+
+#### Configuration ####
+
+** emails_en **
+
+Requires cloning batch/batches/Mailer/emails_en.template.ini to batch/batches/Mailer/emails_en.ini and replace all place holders in it.
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## sourceType filter ##
 - Issue Type: Change Request
 - Issue ID: PLAT-2148
