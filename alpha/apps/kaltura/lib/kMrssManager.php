@@ -272,7 +272,7 @@ class kMrssManager
 				$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
 			} else {
 				KalturaLog::debug("Couldn't determine delivery profile for storage id");
-				$url = "http://nonExistingUrl.com/";
+				$url = null;
 			}
 		}
 		
