@@ -264,11 +264,16 @@ class kMrssManager
 		else
 		{
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($fileSync->getDc(), $asset->getEntryId());
-			$dynamicAttrs = new DeliveryProfileDynamicAttributes();
-			$dynamicAttrs->setFileExtension($asset->getFileExt());
-			$urlManager->setDynamicAttributes($dynamicAttrs);
-			
-			$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+			if($urlManager) {
+				$dynamicAttrs = new DeliveryProfileDynamicAttributes();
+				$dynamicAttrs->setFileExtension($asset->getFileExt());
+				$urlManager->setDynamicAttributes($dynamicAttrs);
+				
+				$url = rtrim($urlManager->getUrl(),'/') . '/' . ltrim($urlManager->getFileSyncUrl($fileSync),'/');
+			} else {
+				KalturaLog::debug("Couldn't determine delivery profile for storage id");
+				$url = "http://nonExistingUrl.com/";
+			}
 		}
 		
 		return $url;
