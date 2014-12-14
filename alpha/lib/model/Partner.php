@@ -1027,7 +1027,7 @@ class Partner extends BasePartner
     
 	public function getLiveStreamBroadcastUrlConfigurations($dc = null)
 	{
-		$config = ($dc ? kConf::get($dc, 'broadcast') : kConf::getMap('broadcast'));
+		$config = (!is_null($dc) ? kConf::get($dc, 'broadcast') : kConf::getMap('broadcast'));
 		
 		$partnerConfig = $this->getFromCustomData($dc, 'live_stream_broadcast_url_configurations');
 		if($partnerConfig)
