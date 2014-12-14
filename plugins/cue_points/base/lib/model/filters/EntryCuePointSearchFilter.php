@@ -85,6 +85,8 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	
 	private function createSphinxMatchPhrase($conditionStr) 
 	{	
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		
 		if(isset($this->cuePointTypeIn))
 		{
 			$conditions = array();
@@ -93,8 +95,6 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 		
 			foreach($types as $type)
 			{				
-				$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-				
 				$prefix = CuePointPlugin::ENTRY_CUE_POINT_INDEX_PREFIX . $partnerId . "_" . $type;
 				
 				$cuePointSubType = $this->getCuePointSubTypeEqual();
@@ -103,13 +103,13 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 				
 				$postfix = CuePointPlugin::ENTRY_CUE_POINT_INDEX_SUFFIX . $partnerId . "_" . $type;
 
-				$conditions[] = "(" . $prefix . " << " . $conditionStr . " << " . $postfix .")";
+				$conditions[] = $prefix . " << " . $conditionStr . " << " . $postfix;
 			}
 			
 			$condition = implode(' | ', $conditions);
 		}
 		else {
-			$condition = "(cuePoint << $conditionStr << cpend)";
+			$condition = "cuePoint_" . $partnerId . " << $conditionStr << cpend";
 		}
 		
 		KalturaLog::debug("condition [" . print_r($condition, true) . "]");

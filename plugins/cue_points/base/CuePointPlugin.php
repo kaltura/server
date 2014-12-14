@@ -316,7 +316,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		
 		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
 		$searchValues = array(
-			$dataField => CuePointPlugin::PLUGIN_NAME . ' ' . implode(' ', $data) . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
+			$dataField => CuePointPlugin::PLUGIN_NAME . "_" . $cuePoint->getPartnerId() . ' ' . implode(' ', $data) . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
 		);
 		
 		return $searchValues;
