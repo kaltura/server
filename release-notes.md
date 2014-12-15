@@ -1,5 +1,26 @@
 # Jupiter-10.0.0 #
 
+## New UI Conf Type ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2245
+
+#### Configuration ####
+
+*admin.ini*
+
+Add the following line to the end of the settings.uiConfTypes[] list
+
+		settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::WEBCASTING
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
 ## Change emails_en to templace ##
 - Issue Type: Back-End Request
 - Issue ID: PLAT-2244
