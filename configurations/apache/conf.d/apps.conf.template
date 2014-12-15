@@ -6,17 +6,21 @@ Alias /kmc "@APP_DIR@/kmc/web"
     AllowOverride All
     Order allow,deny
     Allow from all
-    Require all granted
+    <IfVersion >= 2.4>
+	Require all granted
+    </IfVersion>
 </Directory>
 
 Alias /hosted_pages "@BASE_DIR@/apps/hosted_pages/web"
 <Directory "@BASE_DIR@/apps/hosted_pages/web">
-	DirectoryIndex index.php
-	Options Indexes FollowSymLinks Includes
-	AllowOverride All
-	Order allow,deny
-	Allow from all
+    DirectoryIndex index.php
+    Options Indexes FollowSymLinks Includes
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+    <IfVersion >= 2.4>
 	Require all granted
+    </IfVersion>
 </Directory>
 
 Alias /html5 "@WEB_DIR@/html5"
@@ -27,7 +31,9 @@ Alias /html5 "@WEB_DIR@/html5"
     AllowOverride None
     Order allow,deny
     Allow from all
-    Require all granted
+    <IfVersion >= 2.4>
+	Require all granted
+    </IfVersion>
 </Directory>
 
 Alias /apps "@BASE_DIR@/apps"
@@ -37,6 +43,8 @@ Alias /apps "@BASE_DIR@/apps"
     AllowOverride None
     Order allow,deny
     Allow from all
-    Require all granted
+    <IfVersion >= 2.4>
+	Require all granted
+    </IfVersion>
 </Directory>
 
