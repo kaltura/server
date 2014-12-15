@@ -758,10 +758,14 @@ class MediaService extends KalturaEntryService
        		$this->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
 		}
 		catch(Exception $e){
-       		$lock->unlock();
+			if($lock){
+				$lock->unlock();
+			}
        		throw $e;
 		}
-		$lock->unlock();
+		if($lock){
+			$lock->unlock();
+		}
 
 		return $this->getEntry($entryId);
 	}
