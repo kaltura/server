@@ -24,7 +24,7 @@ class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 	
 	protected function validateEntryIdFiltered()
 	{
-		if(!$this->idEqual && !$this->idIn && !$this->entryIdEqual && !$this->entryIdIn && !$this->freeText)
+		if(!$this->idEqual && !$this->idIn && !$this->entryIdEqual && !$this->entryIdIn)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
 					$this->getFormattedPropertyNameWithClassName('idEqual') . '/' . $this->getFormattedPropertyNameWithClassName('idIn') . '/' .
 					$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));

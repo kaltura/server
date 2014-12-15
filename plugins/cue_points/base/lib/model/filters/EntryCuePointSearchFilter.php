@@ -109,7 +109,7 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 			$condition = implode(' | ', $conditions);
 		}
 		else {
-			$condition = "cuePoint_" . $partnerId . " << $conditionStr << cpend";
+			$condition = CuePointPlugin::PLUGIN_NAME . "_" . $partnerId . " << $conditionStr << " . CuePointPlugin::SEARCH_TEXT_SUFFIX;
 		}
 		
 		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
@@ -141,7 +141,7 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 			$freeText = SphinxUtils::escapeString($freeText);
 			$freeText = "^$freeText$";
 			
-			$additionalConditions[] = $this->createSphinxMatchPhrase($freeTexts);
+			$additionalConditions[] = $this->createSphinxMatchPhrase($freeText);
 			
 			return $additionalConditions;
 		}
