@@ -1269,7 +1269,7 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 	
-		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
+		$mysql_function = 'mysqli';
 		
 		$db_config = kConf::get( "reports_db_config" );
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
