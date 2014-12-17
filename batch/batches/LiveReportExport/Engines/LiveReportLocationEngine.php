@@ -78,7 +78,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$values[] = "City";
 		$values[] = "latitude";
 		$values[] = "longitude";
-		$values[] = "Plays";
+		$values[] = "Audience";
 		$values[] = "Average bitrate";
 		$values[] = "Buffer time";
 		$values[] = "Seconds viewed";
@@ -99,16 +99,16 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$values[] = $firstRecord->city->latitude;
 			$values[] = $firstRecord->city->longitude;
 			
-			$plays = $avgBitrate = $bufferTime = $secondsViewed = 0;
+			$audience = $avgBitrate = $bufferTime = $secondsViewed = 0;
 			foreach ($records as $record) {
-				$plays += $record->plays;
+				$audience += $record->audience;
 				$avgBitrate += $record->avgBitrate;
 				$bufferTime += $record->bufferTime;
 				$secondsViewed += $record->secondsViewed;
 			}
 			
 			$nObj = count($records);
-			$values[] = round($plays / $nObj, 2);
+			$values[] = round($audience / $nObj, 2);
 			$values[] = round($avgBitrate / $nObj, 2);
 			$values[] = round($bufferTime / $nObj, 2);
 			$values[] = round($secondsViewed / $nObj, 2);
