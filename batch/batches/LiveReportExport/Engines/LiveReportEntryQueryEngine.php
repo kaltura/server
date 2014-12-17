@@ -10,7 +10,8 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 	protected $printResult;
 	protected $timeFrame;
 	protected $fieldName;
-	
+	protected $defaultVal = array(0); // If didn't retrieve any value - use this as default.
+
 	public function LiveReportEntryQueryEngine($field, $timeFrame, $title = null, $printResult = true) {
 		$this->fieldName = $field;
 		$this->timeFrame = $timeFrame;
@@ -30,6 +31,8 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 		$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
 		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, "entryId", $this->fieldName);
+		if(empty($res))
+			$res = $this->defaultVal;
 		
 		if($this->printResult) {
 			$msg = $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res);
@@ -41,5 +44,9 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 	
 	public function getTitle() {
 		return $this->title;
+	}
+
+	public function setDefaultValue($defaultValue) {
+		$this->defaultVal = $defaultValue;
 	}
 }
