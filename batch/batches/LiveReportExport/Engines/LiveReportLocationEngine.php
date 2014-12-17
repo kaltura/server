@@ -6,6 +6,7 @@
 class LiveReportLocation1MinEngine extends LiveReportEngine {
 	
 	const TIME_CHUNK = 600;
+	const MAX_RECORDS_PER_REQUEST = 1000;
 	const AGGREGATION_CHUNK = LiveReportConstants::SECONDS_60;
 	
 	protected $formatter;
@@ -27,31 +28,39 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		
 		for($curTime = $fromTime; $curTime < $toTime; $curTime = $curTime + self::TIME_CHUNK) {
 			$curTo = min($toTime, $curTime + self::TIME_CHUNK);
-			$results = $this->getRecords($curTime, $curTo, $args[LiveReportConstants::ENTRY_IDS]);
-			if($results->totalCount == 0)
-				continue;
 			
-			foreach($results->objects as $result) {
+			$pageIndex = 0;
+			$moreResults = true;
+			
+			while($moreResults) {
+				$pageIndex++;
+				$results = $this->getRecords($curTime, $curTo, $args[LiveReportConstants::ENTRY_IDS], $pageIndex);
+				$moreResults = self::MAX_RECORDS_PER_REQUEST * $pageIndex < $results->totalCount;
+				if($results->totalCount == 0)  
+					continue;
 				
-				$groupTime = $this->roundTime($result->timestamp);
-				
-				if(is_null($lastTimeGroup))
-					$lastTimeGroup = $groupTime;
-				
-				if($lastTimeGroup < $groupTime) {
-					$this->printRows($fp, $objs, $lastTimeGroup);
-					$lastTimeGroup = $groupTime;
+				foreach($results->objects as $result) {
+					
+					$groupTime = $this->roundTime($result->timestamp);
+					
+					if(is_null($lastTimeGroup))
+						$lastTimeGroup = $groupTime;
+					
+					if($lastTimeGroup < $groupTime) {
+						$this->printRows($fp, $objs, $lastTimeGroup);
+						$lastTimeGroup = $groupTime;
+					}
+					
+					$country = $result->country->name;
+					$city = $result->city->name;
+					$key = ($result->entryId . "#" . $country . "#" . $city);
+			
+					if(!array_key_exists($key, $objs)) {
+						$objs[$key] = array();
+					}
+					$objs[$key][] = $result;
+					
 				}
-				
-				$country = $result->country->name;
-				$city = $result->city->name;
-				$key = ($result->entryId . "#" . $country . "#" . $city);
-		
-				if(!array_key_exists($key, $objs)) {
-					$objs[$key] = array();
-				}
-				$objs[$key][] = $result;
-				
 			}
 		}
 		
@@ -60,7 +69,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 	
 	// ASUMPTION - we have a single entry ID (that's a constraint of the cassandra)
 	// and the results are ordered from the oldest to the newest
-	protected function getRecords($fromTime, $toTime, $entryId) {
+	protected function getRecords($fromTime, $toTime, $entryId, $pageIdx) {
 		
 		$reportType = KalturaLiveReportType::ENTRY_GEO_TIME_LINE;
 		$filter = new KalturaLiveReportInputFilter();
@@ -68,7 +77,11 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$filter->fromTime = $fromTime;
 		$filter->entryIds = $entryId;
 		
-		return KBatchBase::$kClient->liveReports->getReport($reportType, $filter, null);
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = $pageIdx;
+		$pager->pageSize = self::MAX_RECORDS_PER_REQUEST;
+		
+		return KBatchBase::$kClient->liveReports->getReport($reportType, $filter, $pager);
 	}
 	
 	protected function printHeaders($fp) {
