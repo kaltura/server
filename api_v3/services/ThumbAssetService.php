@@ -652,7 +652,13 @@ class ThumbAssetService extends KalturaAssetService
 		
 		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 		{
-			throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_REMOTE);
+			$dcId = $fileSync->getDc();
+			$storageProfile = StorageProfilePeer::retrieveByPK($dcId);
+			//We are using a remote storage, but it is LOCAL
+			if(!is_null($storageProfile) && $storageProfile->getProtocol() == StorageProfile::STORAGE_PROTOCOL_LOCAL)
+				$local = true;
+			else
+				throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_REMOTE);
 		}
 		
 		if(!$local)
