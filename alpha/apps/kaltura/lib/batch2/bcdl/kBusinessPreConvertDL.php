@@ -279,11 +279,18 @@ class kBusinessPreConvertDL
 		
 		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 		{
-			$errDescription = 'Source asset could has no valid file sync';
-			return false;
+			$dcId = $fileSync->getDc();
+			$storageProfile = StorageProfilePeer::retrieveByPK($dcId);
+			if(!is_null($storageProfile) && $storageProfile->getProtocol() == StorageProfile::STORAGE_PROTOCOL_LOCAL)
+				$srcPath = $storageProfile->getStorageBaseDir() . "/" . $fileSync->getFilePath();
+			else{
+				$errDescription = 'Source asset could has no valid file sync';
+				return false;
+                        }
 		}
+		else
+			$srcPath = $fileSync->getFullPath();
 		
-		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!file_exists($tempDir))
