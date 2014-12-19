@@ -47,7 +47,7 @@ class MultiRequestSubResult implements ArrayAccess
 	{
         return new MultiRequestSubResult($this->value . ':' . $name);
 	}
-	
+
 	public function offsetExists($offset)
 	{
 		return true;
@@ -61,7 +61,7 @@ class MultiRequestSubResult implements ArrayAccess
 	public function offsetSet($offset, $value)
 	{
 	}
-	
+
 	public function offsetUnset($offset)
 	{
 	}
@@ -157,13 +157,13 @@ class KalturaClientBase
 	* @var Array of response headers
 	*/
 	private $responseHeaders = array();
-	
+
 	/**
 	 * path to save served results
 	 * @var string
 	 */
 	protected $destinationPath = null;
-	
+
 	/**
 	 * return served results without unserializing them
 	 * @var boolean
@@ -297,7 +297,7 @@ class KalturaClientBase
 			$this->resetRequest();
 			throw new KalturaClientException("Downloading files is not supported as part of multi-request.", KalturaClientException::ERROR_DOWNLOAD_IN_MULTIREQUEST);
 		}
-		
+
 		if (count($this->callsQueue) == 0)
 		{
 			$this->resetRequest();
@@ -371,7 +371,7 @@ class KalturaClientBase
 			}
 			if (!is_null($serverName) || !is_null($serverSession))
 				$this->log("server: [{$serverName}], session: [{$serverSession}]");
-			
+
 			$this->log("result (serialized): " . $postResult);
 
 			if($this->returnServedResult)
@@ -441,10 +441,10 @@ class KalturaClientBase
 	{
 		if (function_exists('curl_init'))
 			return $this->doCurl($url, $params, $files);
-			
+
 		if($this->destinationPath || $this->returnServedResult)
 			throw new KalturaClientException("Downloading files is not supported with stream context http request, please use curl.", KalturaClientException::ERROR_DOWNLOAD_NOT_SUPPORTED);
-				
+
 		return $this->doPostRequest($url, $params, $files);
 	}
 
@@ -476,9 +476,16 @@ class KalturaClientBase
 			$this->log("curl: $url&$opt");
 			if (count($files) > 0)
 			{
-				foreach($files as &$file)
-					$file = "@".$file; // let curl know its a file
-				curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
+                foreach ($files as &$file) {
+                    // The usage of the @filename API for file uploading is
+                    // deprecated since PHP 5.5. CURLFile must be used instead.
+                    if (PHP_VERSION_ID >= 50500) {
+                        $file = new \CURLFile($file);
+                    } else {
+                        $file = "@" . $file; // let curl know its a file
+                    }
+                }
+                curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge($params, $files));
 			}
 			else
 			{
@@ -546,12 +553,12 @@ class KalturaClientBase
 		{
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		}
-		
+
 		$result = curl_exec($ch);
-		
+
 		if($destinationResource)
 			fclose($destinationResource);
-			
+
 		$curlError = curl_error($ch);
 		curl_close($ch);
 		return array($result, $curlError);
