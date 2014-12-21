@@ -1234,6 +1234,15 @@ $plannedDur = 0;
 			$targetAud->_useResampleFilter = true;
 		}
 
+			/*
+			 * Check for 'down' mix audio, it requires special ffmpeg processing 
+			 */
+		if(isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
+		&& isset($contentStreams->audio[0]->audioChannelLayout)
+		&& $contentStreams->audio[0]->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
+			$targetAud->_downmix = true;
+		}
+
 		return $targetAud;
 	}
 
