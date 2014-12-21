@@ -2661,11 +2661,7 @@ class kFlowHelper
 		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 	
-		$maxExpiry = 3 * 24 * 60 * 60;
-		$expiry = $partner->getKsMaxExpiryInSeconds();
-		if(!$expiry || ($expiry > $maxExpiry))
-			$expiry = $maxExpiry;
-	
+		$expiry = kConf::get("live_report_export_expiry", 'local', 3 * 24 * 60 * 60);
 		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
 	
 		if ($result < 0) {
