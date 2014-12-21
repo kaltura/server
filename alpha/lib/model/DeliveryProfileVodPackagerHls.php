@@ -29,19 +29,4 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		
 		return $url;
 	}
-	
-	public function serve()
-	{
-		if ($this->getHostName() != $_SERVER['HTTP_HOST'])
-		{
-			kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
-			$parsedUrl = parse_url($this->getUrl());
-			$flavor = array(
-				'urlPrefix' => $this->params->getMediaProtocol() . '://' . $parsedUrl['host'], 
-				'url' => $_SERVER["REQUEST_URI"]);
-			return new kRedirectManifestRenderer(array($flavor), $this->params->getEntryId());
-		}
-		
-		return parent::serve();
-	}
 }
