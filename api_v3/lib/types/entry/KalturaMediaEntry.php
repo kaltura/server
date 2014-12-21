@@ -27,6 +27,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 *
 	 * @var KalturaSourceType
 	 * @insertonly
+	 * @filter eq,not,in,notin
 	 */
 	public $sourceType;
 	

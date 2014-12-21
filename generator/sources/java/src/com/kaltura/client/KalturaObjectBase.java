@@ -27,13 +27,16 @@
 // ===================================================================================================
 package com.kaltura.client;
 
+import java.io.Serializable;
+
 /**
  * Ancestor class for all of the generated classes in the com.kaltura.client.types package.
  * 
  * @author jpotts
  *
  */
-public class KalturaObjectBase {
+@SuppressWarnings("serial")
+public class KalturaObjectBase implements Serializable {
 
 	public KalturaParams toParams() {
 		return new KalturaParams();

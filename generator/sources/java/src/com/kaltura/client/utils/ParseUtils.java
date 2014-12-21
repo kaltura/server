@@ -70,13 +70,13 @@ public final class ParseUtils {
 		return 0;
 	}
 	
-	public static float parseFloat(String txt) {
+	public static double parseDouble(String txt) {
 		if (txt.length() != 0) {
 			try {
-				return Float.parseFloat(txt);
+				return Double.parseDouble(txt);
 			} catch (NumberFormatException nfe) {
 				if (logger.isEnabled())
-					logger.warn("Failed to parse [" + txt + "] as float", nfe);
+					logger.warn("Failed to parse [" + txt + "] as double", nfe);
 			}
 		}
 		return 0;
@@ -86,7 +86,6 @@ public final class ParseUtils {
 		 return txt.equals("0") ? false : true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T> ArrayList<T> parseArray(Class<T> clz, Node aNode) throws KalturaApiException{
 		ArrayList<T> tmpList = new ArrayList<T>();
 		NodeList subNodeList = aNode.getChildNodes();
@@ -97,7 +96,6 @@ public final class ParseUtils {
 		return tmpList;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T parseObject(Class<T> clz, Node aNode) throws KalturaApiException{
 		 return (T) KalturaObjectFactory.create((Element)aNode, clz);
 	}

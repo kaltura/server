@@ -240,7 +240,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		if(is_dir($filePath))
 		{
-			chmod($filePath, 0750);
+			chmod($filePath, 0770);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -260,7 +260,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$filePath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $filePath);
 	
 		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
-			return kFile::fullMkdir($filePath, 0750);
+			return kFile::fullMkdir($filePath, 0770);
 			
 		$contentGroup = kConf::get('content_group');
 		if(is_numeric($contentGroup))
@@ -274,7 +274,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	        if (is_dir($path))
 	        	continue;
 	        	
-	        if(!kFile::fullMkfileDir($path, 0750))
+	        if(!kFile::fullMkfileDir($path, 0770))
 	        	return false;
 	        	
 	        chgrp($path, $contentGroup);

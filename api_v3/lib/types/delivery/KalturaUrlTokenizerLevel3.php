@@ -28,7 +28,7 @@ class KalturaUrlTokenizerLevel3 extends KalturaUrlTokenizer {
 	
 	private static $map_between_objects = array
 	(
-			"paramName",
+			"paramName" => "name",
 			"expiryName",
 			"gen"
 	);

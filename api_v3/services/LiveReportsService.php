@@ -14,7 +14,7 @@ class LiveReportsService extends KalturaBaseService
 	 * @param KalturaLiveReportType $reportType
 	 * @param KalturaLiveReportInputFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaLiveStatsListResponse
+	 * @return KalturaReportGraphArray
 	 */
 	public function getEventsAction($reportType,
 			KalturaLiveReportInputFilter $filter = null,
@@ -106,6 +106,84 @@ class LiveReportsService extends KalturaBaseService
 				return $result;
 		}
 		
+	}
+	
+	/**
+	 * @action exportToCsv
+	 * @param KalturaLiveReportExportType $reportType 
+	 * @param KalturaLiveReportExportParams $params
+	 * @return KalturaLiveReportExportResponse
+	 */
+	public function exportToCsvAction($reportType, KalturaLiveReportExportParams $params)
+	{
+		if(!$params->recpientEmail) {
+			$kuser = kCurrentContext::getCurrentKsKuser();
+			if($kuser) {
+				$params->recpientEmail = $kuser->getEmail();
+			} else {
+				$partnerId = kCurrentContext::getCurrentPartnerId();
+				$partner = PartnerPeer::retrieveByPK($partnerId);
+				$params->recpientEmail = $partner->getAdminEmail();
+			}
+		}
+		
+		// Validate input
+		if($params->entryIds) {
+			$entryIds = explode(",", $params->entryIds);
+			$entries = entryPeer::retrieveByPKs($entryIds);
+			if(count($entryIds) != count($entries))
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $params->entryIds);
+		}
+		
+		
+		$dbBatchJob = kJobsManager::addExportLiveReportJob($reportType, $params);
+		
+		$res = new KalturaLiveReportExportResponse();
+		$res->referenceJobId = $dbBatchJob->getId();
+		$res->reportEmail = $params->recpientEmail;
+		
+		return $res;
+	}
+	
+	/**
+	 *
+	 * Will serve a requested report
+	 * @action serveReport
+	 *
+	 *
+	 * @param string $id - the requested id
+	 * @return string
+	 */
+	public function serveReportAction($id) {
+		
+		$fileNameRegex = "/^(?<dc>[01]+)_(?<fileName>\\d+_Export_[a-zA-Z0-9]+_[\\w\\-]+.csv)$/";
+	
+		// KS verification - we accept either admin session or download privilege of the file
+		$ks = $this->getKs();
+		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+	
+		if(!preg_match($fileNameRegex, $id, $matches)) {
+			KalturaLog::err("Report Id Format doesn't match the file name format");
+			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+		}
+		
+		// Check if the request should be handled by the other DC
+		$curerntDc = kDataCenterMgr::getCurrentDcId();
+		if($matches['dc'] == 1 - $curerntDc)
+			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - $curerntDc ) );
+		
+		// Serve report
+		$filePath = $this->getReportDirectory( $this->getPartnerId()) . DIRECTORY_SEPARATOR . $matches['fileName'];
+		return $this->dumpFile($filePath, 'text/csv');
+	}
+	
+	protected function getReportDirectory($partnerId) {
+		$folderPath = "/content/reports/live/$partnerId";
+		$directory =  myContentStorage::getFSContentRootPath() . $folderPath;
+		if(!file_exists($directory))
+			mkdir($directory);
+		return $directory;
 	}
 	
 	/**

@@ -372,7 +372,7 @@ params.emailId										= @PROVISION_PROVIDE_EMAIL_ID@
 params.primaryContact								= @PROVISION_PROVIDE_PRIMARY_CONTACT@
 params.secondaryContact								= @PROVISION_PROVIDE_SECONDARY_CONTACT@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
-params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
+params.restapi.systemUserName							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
 params.restapi.primaryContact						= @AKAMAI_UNIVERSAL_STREAM_PRIMARY_CONTACT@
@@ -389,7 +389,7 @@ minCreatedAtMinutes									= 10080
 params.wsdlUsername									= @PROVISION_PROVIDE_USER@
 params.wsdlPassword									= @PROVISION_PROVIDE_PASS@
 params.restapi.akamaiRestApiBaseServiceUrl			= "https://control.akamai.com/hdnetwork/api/live"
-params.restapi.systemUser							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
+params.restapi.systemUserName							= @AKAMAI_UNIVERSAL_STREAM_USER_NAME@
 params.restapi.systemPassword						= @AKAMAI_UNIVERSAL_STREAM_USER_PASSWORD@
 params.restapi.domainName							= @AKAMAI_UNIVERSAL_STREAM_DOMAIN_NAME@
 
@@ -694,3 +694,12 @@ friendlyName										= Re-index tags
 type												= KAsyncTagIndex
 maximumExecutionTime								= 12000
 scriptPath											= ../plugins/tag_search/lib/batch/tag_index/KAsyncTagIndexExe.php
+
+[KAsyncLiveReportExport : JobHandlerWorker]
+id													= 600
+friendlyName										= Live reports export
+type												= KAsyncLiveReportExport
+maximumExecutionTime								= 12000
+scriptPath											= batches/LiveReportExport/KAsyncLiveReportExportExe.php
+params.localTempPath								= @TMP_DIR@/reports
+params.sharedPath									= @WEB_DIR@/tmp/reports
