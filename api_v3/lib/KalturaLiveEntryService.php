@@ -68,7 +68,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			if ( $isLastChunk )
 			{
 				// Save last elapsed recording time
-				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
+				$dbEntry->setLastElapsedRecordingTime( $currentDuration / 1000.0 );
 			}
 
 			$dbEntry->save();

@@ -35,7 +35,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	/**
 	 * Elapsed recording time (in msec) up to the point where the live stream was last stopped (unpublished).
-	 * @var int
+	 * @var float
 	 */
 	public $lastElapsedRecordingTime;
 
