@@ -1233,6 +1233,15 @@ $plannedDur = 0;
 		&& ($source->IsFormatOf(array('nellymoser'))||($source->_sampleRate && $source->_sampleRate>0 && $source->_sampleRate<16000))) {
 			$targetAud->_useResampleFilter = true;
 		}
+			/*
+			 * Check for 'down' mix audio, it requires special ffmpeg processing 
+			 */
+		if(isset($contentStreams) && isset($contentStreams->audio) && count($contentStreams->audio)==1 
+		&& isset($contentStreams->audio[0]->audioChannelLayout)
+		&& $contentStreams->audio[0]->audioChannelLayout==KDLAudioLayouts::DOWNMIX){
+			$targetAud->_downmix = true;
+		}
+
 
 			/*
 			 * Check for 'down' mix audio, it requires special ffmpeg processing 
