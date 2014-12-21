@@ -629,8 +629,9 @@ class kBusinessPreConvertDL
 			if($flavor->_isNonComply)
 			{
 				KalturaLog::log("Flavor [" . $flavor->getFlavorParamsId() . "] is none complied");
-				
-				if($flavor->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+				// If the flavor is set to 'force' (generate the asset regardless of any Kaltura optimization), 
+				// don't fail it even if it is 'NonComply'
+				if($flavor->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED && !$flavor->_force)
 				{
 					$errDescription = "Business decision layer, required flavor none complied: id[" . $flavor->getId() . "] flavor params id [" . $flavor->getFlavorParamsId() . "]";
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
