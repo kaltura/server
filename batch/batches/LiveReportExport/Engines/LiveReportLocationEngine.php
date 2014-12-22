@@ -91,7 +91,10 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$values[] = "City";
 		$values[] = "latitude";
 		$values[] = "longitude";
-		$values[] = "Audience";
+		$values[] = "plays";
+		$values[] = "Average Audience";
+		$values[] = "Min Audience";
+		$values[] = "Max Audience";
 		$values[] = "Average bitrate";
 		$values[] = "Buffer time";
 		$values[] = "Seconds viewed";
@@ -112,19 +115,27 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$values[] = $firstRecord->city->latitude;
 			$values[] = $firstRecord->city->longitude;
 			
-			$audience = $avgBitrate = $bufferTime = $secondsViewed = 0;
+			$plays = $audience = $avgBitrate = $bufferTime = $secondsViewed = $maxAudience = 0;
+			$minAudience = PHP_INT_MAX;
+			
 			foreach ($records as $record) {
+				$plays += $record->plays;
 				$audience += $record->audience;
+				$maxAudience = max($maxAudience, $record->audience);
+				$minAudience = min($minAudience, $record->audience);
 				$avgBitrate += $record->avgBitrate;
 				$bufferTime += $record->bufferTime;
 				$secondsViewed += $record->secondsViewed;
 			}
 			
 			$nObj = count($records);
+			$values[] = $plays;
 			$values[] = round($audience / $nObj, 2);
+			$values[] = $minAudience;
+			$values[] = $maxAudience;
 			$values[] = round($avgBitrate / $nObj, 2);
 			$values[] = round($bufferTime / $nObj, 2);
-			$values[] = round($secondsViewed / $nObj, 2);
+			$values[] = $secondsViewed;
 			
 			fwrite($fp, implode(LiveReportConstants::CELLS_SEPARATOR, $values) . "\n");
 		}
