@@ -31,10 +31,10 @@ class LiveReportEntryQueryEngine extends LiveReportEngine {
 		$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 
 		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, "entryId", $this->fieldName);
-		if(empty($res))
-			$res = $this->defaultVal;
 		
 		if($this->printResult) {
+			if(empty($res))
+				$res = $this->defaultVal;
 			$msg = $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res);
 			fwrite($fp, $msg);
 		}
