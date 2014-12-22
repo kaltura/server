@@ -11,7 +11,7 @@
 	public function run($fp, array $args = array()) {
 		
 		fwrite($fp, "Referrer" . LiveReportConstants::CELLS_SEPARATOR . "Visits\n");
-		for($i = 0 ; ; $i += 1) {
+		for($i = 1 ; ; $i += 1) {
 			$res = $this->querySyndicationReport(LiveReportConstants::SECONDS_36_HOURS, $i, $args);
 			foreach ($res as $referer => $plays) {
 				fwrite($fp, $referer . LiveReportConstants::CELLS_SEPARATOR . $plays . "\n");
