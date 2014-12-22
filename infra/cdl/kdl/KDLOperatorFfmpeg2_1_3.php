@@ -98,14 +98,14 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 			/*
 			 * Handle audio multi stream 
 			 */
-		$filterStr  = null;
+		$filterStr = null;
 		if(isset($target->_multiStream)){
 			$filterStr = self::getMultiStream($target->_multiStream);
 		}
 		else if(isset($target->_audio->_downmix)){
 			$filterStr = "pan=stereo:c0=c0:c1=c1";
- 		}
- 		
+		}
+		
 		$cmdValsArr = null;
 			/*
 			 * Switch the 'ar' setting to 'aresample' filter, for cases that require it.
