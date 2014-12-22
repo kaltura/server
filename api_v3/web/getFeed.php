@@ -79,33 +79,30 @@ catch(Exception $ex)
 	KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST, $msg);
 }
 
-// small feeds will have a short
-if ($limit)
+if (kConf::hasParam("v3cache_getfeed_default_cache_time_frame"))
+	$cache_time_to_set = kConf::get("v3cache_getfeed_default_cache_time_frame");
+else
+	$cache_time_to_set = 86400;
+
+if(kConf::hasParam("v3cache_getfeed_short_limits_array"))
+	$short_limits = kConf::get("v3cache_getfeed_short_limits_array");
+else
+	$short_limits = array(50 => 900 , 100 => 1800 , 200 => 3600 , 400 => 7200);
+
+//in KalturaSyndicationFeedRenderer - if the limit does restrict the amount of entries - the entries counter passes the limit's value by one , so it must be decreased back
+$entries_count = $syndicationFeedRenderer->getReturnedEntriesCount();
+$entries_count--;
+
+foreach ($short_limits as $num_of_nutries => $cache_time_frame)
 {
-	if(kConf::hasParam("v3cache_getfeed_short_limits_array"))
-		$short_limits = kConf::get("v3cache_getfeed_short_limits_array");
-	else
-		$short_limits = array(50 => 900 , 100 => 1800 , 200 => 3600 , 400 => 7200);
-
-	//in KalturaSyndicationFeedRenderer - if the limit does restrict the amount of entries - the entries counter passes the limit's value by one , so it must be decreased back
-	$entries_count = $syndicationFeedRenderer->getReturnedEntriesCount();
-	$entries_count--;
-
-	$cache_time_to_set = null;
-
-	foreach ($short_limits as $num_of_nutries => $cache_time_frame)
+	if ($entries_count <= $num_of_nutries)
 	{
-		if ($entries_count <= $num_of_nutries)
-		{
-			$cache_time_to_set = $cache_time_frame;
-			break;
-		}
+		$cache_time_to_set = min($cache_time_to_set , $cache_time_frame);
+		break;
 	}
-
-	if ($cache_time_to_set)
-		KalturaResponseCacher::setExpiry($cache_time_to_set);
 }
 
+KalturaResponseCacher::setExpiry($cache_time_to_set);
 
 $expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();
 foreach($expiryArr as $item)
