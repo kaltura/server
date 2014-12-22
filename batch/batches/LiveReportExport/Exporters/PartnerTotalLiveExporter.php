@@ -30,6 +30,7 @@ class PartnerTotalLiveExporter extends LiveReportExporter {
 		$subEngines = array(
 				new LiveReportEntryEngine("name", "Entry name", new LiveReportStringFormatter()),
 				new LiveReportEntryEngine("firstBroadcast", "First broadcast", $this->dateFormatter),
+				new LiveReportEntryEngine("lastBroadcast", "Last broadcast", $this->dateFormatter),
 				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience", false), 
 				new LiveReportEntryQueryEngine("peakAudience", LiveReportConstants::SECONDS_36_HOURS, "Peak Audience", false),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed", false),
