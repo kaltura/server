@@ -4,7 +4,7 @@ if(!isset($_GET['partnerId']))
 
 $partnerId = $_GET['partnerId'];
 
-$html5Version = 'v2.20.rc5';
+$html5Version = $_GET['playerVersion'];
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
