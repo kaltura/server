@@ -89,9 +89,9 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$values[] = "Date";
 		$values[] = "Country";
 		$values[] = "City";
-		$values[] = "latitude";
-		$values[] = "longitude";
-		$values[] = "plays";
+		$values[] = "Latitude";
+		$values[] = "Longitude";
+		$values[] = "Plays";
 		$values[] = "Average Audience";
 		$values[] = "Min Audience";
 		$values[] = "Max Audience";
@@ -119,7 +119,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$minAudience = PHP_INT_MAX;
 			
 			foreach ($records as $record) {
-				$audience += $record->audience;
+				$plays += $record->plays;
 				$audience += $record->audience;
 				$maxAudience = max($maxAudience, $record->audience);
 				$minAudience = min($minAudience, $record->audience);
