@@ -1,4 +1,4 @@
-# Jupiter-10.0.0 #
+# Jupiter-10.1.0 #
 
 ## New UI Conf Type ##
 - Issue Type: New Feature
@@ -20,6 +20,8 @@ None.
 
 None.
 
+
+# Jupiter-10.0.0 #
 
 ## Change emails_en to templace ##
 - Issue Type: Back-End Request
