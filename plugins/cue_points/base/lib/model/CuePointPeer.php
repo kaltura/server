@@ -144,15 +144,16 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	 * @param      PropelPDO $con the connection to use
 	 * @return     CuePoint
 	 */
-	public static function retrieveByEntryId($entryId, $type = null, PropelPDO $con = null)
+	public static function retrieveByEntryId($entryId, $types = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
-		if(!is_null($type))
-			$criteria->add(CuePointPeer::TYPE, $type);
+		if(!is_null($types))
+			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 
 		return CuePointPeer::doSelect($criteria, $con);
 	}
+	
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("cuePoint:id=%s", self::ID), array("cuePoint:entryId=%s", self::ENTRY_ID));		

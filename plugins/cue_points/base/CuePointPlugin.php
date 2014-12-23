@@ -3,13 +3,19 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
 	const CUE_POINT_MANAGER = 'kCuePointManager';
+	const SEARCH_FIELD_DATA = 'data';
+	const SEARCH_TEXT_SUFFIX = 'cpend';
+	const ENTRY_CUE_POINT_INDEX_PREFIX = 'cps_';
+	const ENTRY_CUE_POINT_INDEX_SUFFIX = 'cpe_';
+	const ENTRY_CUE_POINT_INDEX_SUB_TYPE = 'cpst';
+	
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -263,5 +269,94 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	public function getObjectFeatureType ()
 	{
 		return self::getObjectFeatureTypeCoreValue(CuePointObjectFeatureType::CUE_POINT);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof entry && self::isAllowedPartner($object->getPartnerId()))
+			return self::getCuePointSearchData($object);
+			
+		return null;
+	}
+	
+	public static function getCuePointSearchData(entry $entry)
+	{
+		$indexOnEntryTypes = self::getIndexOnEntryTypes();
+		if(!count($indexOnEntryTypes))
+			return;
+		
+		$dataByType = array();
+		$cuePointObjects = CuePointPeer::retrieveByEntryId($entry->getId(), $indexOnEntryTypes);
+		
+		foreach($cuePointObjects as $cuePoint)
+		{
+			/* @var $cuePoint CuePoint */	
+			$contributedData = $cuePoint->contributeData();
+			
+			if(!$contributedData)
+				continue;
+				
+			$cuePointType = $cuePoint->getType();
+			if(!isset($dataByType[$cuePointType]))
+				$dataByType[$cuePointType] = array();
+			
+			$contributedData = self::buildDataToIndexOnEntry($contributedData, $cuePointType, $cuePoint->getPartnerId(), $cuePoint->getId(), $cuePoint->getSubType());
+			
+			$dataByType[$cuePointType][] = $contributedData;
+		}
+		
+		$data = array();
+		foreach ($dataByType as $type => $typeData)
+		{
+			$data = array_merge($data, $typeData);
+		}
+		
+		$dataField  = CuePointPlugin::getSearchFieldName(CuePointPlugin::SEARCH_FIELD_DATA);
+		$searchValues = array(
+			$dataField => CuePointPlugin::PLUGIN_NAME . "_" . $cuePoint->getPartnerId() . ' ' . implode(' ', $data) . ' ' . CuePointPlugin::SEARCH_TEXT_SUFFIX
+		);
+		
+		return $searchValues;
+	}
+	
+	public static function buildDataToIndexOnEntry($contributedData, $type, $partnerId, $cuePointId, $subType = null)
+	{	
+		$prefix = self::ENTRY_CUE_POINT_INDEX_PREFIX . $partnerId . "_" . $type;
+		
+		if($subType)
+			$prefix .= " " . self::ENTRY_CUE_POINT_INDEX_SUB_TYPE . $subType;
+		
+		$suffix = self::ENTRY_CUE_POINT_INDEX_SUFFIX . $partnerId . "_" . $type;
+			
+		return $cuePointId . " " . $prefix . " " . $contributedData . $suffix;
+	}
+	
+	public static function getIndexOnEntryTypes()
+	{
+		$indexOnEntryTypes = array();
+		
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePoint');
+		foreach ($pluginInstances as $pluginInstance)
+		{
+			$currIndexOnEntryTypes = $pluginInstance::getTypesToIndexOnEntry();
+			
+			$indexOnEntryTypes = array_merge($indexOnEntryTypes, $currIndexOnEntryTypes);
+		}
+		
+		return $indexOnEntryTypes;
+	}
+	
+	/**
+	 * return field name as appears in index schema
+	 * @param string $fieldName
+	 */
+	public static function getSearchFieldName($fieldName){
+		if ($fieldName == self::SEARCH_FIELD_DATA)
+			return  'plugins_data';
+			
+		return CuePointPlugin::getPluginName() . '_' . $fieldName;
 	}
 }

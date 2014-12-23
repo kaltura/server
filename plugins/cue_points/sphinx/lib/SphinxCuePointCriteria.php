@@ -37,6 +37,16 @@ class SphinxCuePointCriteria extends SphinxCriteria
 				kApiCache::setExpiry( self::LIVE_ENTRY_CUE_POINT_CACHE_EXPIRY_SECONDS );
 			}
 		}
+		
+		if($filter->get('_free_text'))
+		{
+			$this->sphinxSkipped = false;
+			$freeTexts = $filter->get('_free_text');
+			KalturaLog::debug("Attach free text [$freeTexts]");
+			
+			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, CuePointFilter::FREE_TEXT_FIELDS);
+		}
+		$filter->unsetByName('_free_text');
 
 		return parent::applyFilterFields($filter);
 	}
