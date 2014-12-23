@@ -1,6 +1,9 @@
 <?php 
 if(!isset($_GET['partnerId']))
 	die('partnerId must be supplied in query string');
+	
+if(!isset($_GET['playerVersion']))
+	die('html5 lib version must be supplied in query string');
 
 $partnerId = $_GET['partnerId'];
 
