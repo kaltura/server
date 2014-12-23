@@ -39,7 +39,18 @@ class KFileTransferExportEngine extends KExportEngine
 		
 		try
 		{
-			$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
+			$keyPairLogin = false;
+			if($this->protocol == KalturaStorageProfileProtocol::SFTP) {
+				$keyPairLogin = ($this->data->serverPrivateKey || $this->data->serverPublicKey);
+			}
+			
+			if($keyPairLogin) {
+				$privateKeyFile = self::getTempFileWithContent($this->data->serverPrivateKey, 'privateKey');
+				$publicKeyFile = self::getTempFileWithContent($this->data->serverPublicKey, 'publicKey');
+				$engine->loginPubKey($this->data->serverUrl, $this->data->serverUsername, $publicKeyFile, $privateKeyFile, $this->data->serverPassPhrase);
+			} else {	
+				$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
+			}
 		}
 		catch(Exception $e)
 		{
