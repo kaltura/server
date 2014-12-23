@@ -8,9 +8,9 @@ require_once __DIR__ . '/lib/init.php';
 
 $partner = new KalturaPartner();
 $partner->name = 'sanity-test';
-$partner->website = 'sanity.test.com';
+$partner->website = 'sanity.example.com';
 $partner->adminName = 'sanity-test';
-$partner->adminEmail = uniqid('sanity.') . '@test.com';
+$partner->adminEmail = uniqid('sanity.') . '@example.com';
 $partner->description = 'sanity-test';
 $cmsPassword = uniqid('pW@4');
 $registeredPartner = $client->partner->register($partner, $cmsPassword);

@@ -105,7 +105,12 @@ class ScriptsRunner
 		
 		foreach($this->dbParams as $key => $value)
 		{
-			echo $key . "=>" . $value . "\n";
+			echo $key .' => '; 
+			if (is_array($value)){
+				var_dump($value);
+			}else{
+				echo "$value\n";
+			}
 		}
 		$this->version = $this->getMaxVersion() + 1;
 		$this->alreadyRun = $this->getDeployedScripts();
@@ -182,39 +187,38 @@ class ScriptsRunner
 	
 	private function getMaxVersion()
 	{
-		$link = mysql_connect($this->dbParams['host'] . ':' . $this->dbParams['port'], $this->dbParams['user'], $this->dbParams['password'], null);
-		
-		$db_selected = mysql_select_db($this->dbParams['dbname'], $link);
-		$result = mysql_query('select max(version) from version_management');
+		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], null, $this->dbParams['port']);
+		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
+		$result = mysqli_query($link,'select max(version) from version_management');
 		if($result)
 		{
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			$version = $row ? $row[0] : null;
 		}
 		
-		mysql_free_result($result);
-		mysql_close($link);
+		mysqli_free_result($result);
+		mysqli_close($link);
 		return $version;
 	}
 	
 	private function getDeployedScripts()
 	{
-		$link = mysql_connect($this->dbParams['host'] . ':' . $this->dbParams['port'], $this->dbParams['user'], $this->dbParams['password'], null);
+		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], null, $this->dbParams['port']);
 		
-		$db_selected = mysql_select_db($this->dbParams['dbname'], $link);
-		$result = mysql_query('select filename from version_management');
+		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
+		$result = mysqli_query($link,'select filename from version_management');
 		if($result)
 		{
 			$res = array();
 			
-			while($row = mysql_fetch_assoc($result))
+			while($row = mysqli_fetch_assoc($result))
 			{
 				$res[$row['filename']] = true;
 			}
 		}
 		
-		mysql_free_result($result);
-		mysql_close($link);
+		mysqli_free_result($result);
+		mysqli_close($link);
 		return $res;
 	}
 	
@@ -227,11 +231,11 @@ class ScriptsRunner
 	
 	private function updateVersion($fileName)
 	{
-		$link = mysql_connect($this->dbParams['host'] . ':' . $this->dbParams['port'], $this->dbParams['user'], $this->dbParams['password'], null);
+		$link = mysqli_connect($this->dbParams['host'] . ':' . $this->dbParams['port'], $this->dbParams['user'], $this->dbParams['password'], null);
 		
-		$db_selected = mysql_select_db($this->dbParams['dbname'], $link);
-		$filePathToInsert = mysql_real_escape_string($fileName);
-		$result = mysql_query("insert into version_management(filename, version) values ('" . $filePathToInsert . "'," . $this->version . ")");
+		$db_selected = mysqli_select_db($this->dbParams['dbname'], $link);
+		$filePathToInsert = mysqli_real_escape_string($fileName);
+		$result = mysqli_query("insert into version_management(filename, version) values ('" . $filePathToInsert . "'," . $this->version . ")");
 		
 		return $result;
 	}

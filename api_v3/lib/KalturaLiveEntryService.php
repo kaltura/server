@@ -41,16 +41,17 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 * @param KalturaMediaServerIndex $mediaServerIndex
 	 * @param KalturaDataCenterContentResource $resource
 	 * @param float $duration in seconds
+	 * @param bool $isLastChunk Is this the last recorded chunk in the current session (i.e. following a stream stop event)
 	 * @return KalturaLiveEntry The updated live entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration)
+	function appendRecordingAction($entryId, $assetId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $isLastChunk = false)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !($dbEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
+
 		$dbAsset = assetPeer::retrieveById($assetId);
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
@@ -58,11 +59,18 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$currentDuration = $dbEntry->getLengthInMsecs();
 		if(!$currentDuration)
 			$currentDuration = 0;
-		$currentDuration += ($duration * 1000);
+		$currentDuration += (int)($duration * 1000);
 		
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
 			$dbEntry->setLengthInMsecs($currentDuration);
+
+			if ( $isLastChunk )
+			{
+				// Save last elapsed recording time
+				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
+			}
+
 			$dbEntry->save();
 		}
 	
@@ -254,10 +262,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			{
 				$dbEntry->setCurrentBroadcastStartTime( 0 );
 			}
-
-			// Save last elapsed recording time
-			$dbEntry->setLastElapsedRecordingTime( $dbEntry->getLengthInMsecs() );
-
 		}
 
 		$dbEntry->save();

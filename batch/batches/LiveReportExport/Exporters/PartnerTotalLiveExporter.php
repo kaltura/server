@@ -30,6 +30,7 @@ class PartnerTotalLiveExporter extends LiveReportExporter {
 		$subEngines = array(
 				new LiveReportEntryEngine("name", "Entry name", new LiveReportStringFormatter()),
 				new LiveReportEntryEngine("firstBroadcast", "First broadcast", $this->dateFormatter),
+				new LiveReportEntryEngine("lastBroadcast", "Last broadcast", $this->dateFormatter),
 				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience", false), 
 				new LiveReportEntryQueryEngine("peakAudience", LiveReportConstants::SECONDS_36_HOURS, "Peak Audience", false),
 				new LiveReportEntryQueryEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed", false),
@@ -43,7 +44,7 @@ class PartnerTotalLiveExporter extends LiveReportExporter {
 				new LiveReportConstantStringEngine("Time Range:". LiveReportConstants::CELLS_SEPARATOR ."%s", array(self::TIME_RANGE)),
 				new LiveReportConstantStringEngine(LiveReportConstants::ROWS_SEPARATOR),
 				
-				new LiveReportEntryExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience:"), 
+				new LiveReportLivePartnerExactTimeEngine("audience", LiveReportConstants::SECONDS_60, "Total Audience:"), 
 				new LiveReportLivePartnerEngine("secondsViewed", LiveReportConstants::SECONDS_36_HOURS, "Seconds Viewed:"),
 				new LiveReportLivePartnerEngine("bufferTime", LiveReportConstants::SECONDS_60, "Average Buffering Time per Minute (seconds):"),
 				new LiveReportLivePartnerEngine("avgBitrate", LiveReportConstants::SECONDS_60, "Average Bitrate (kbps):"),

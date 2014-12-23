@@ -1,6 +1,26 @@
 # Jupiter-10.1.0 #
 
-## sourceType filter ##
+## New UI Conf Type ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2245
+
+#### Configuration ####
+
+*admin.ini*
+
+Add the following line to the end of the settings.uiConfTypes[] list
+
+		settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::WEBCASTING
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow cue point search combined with entry filter ##
 - Issue Type: New Feature
 - Issue ID: PLAT-2208
 
@@ -17,6 +37,26 @@ Need to re-index the entry in order for the cue points to get indexed on it.
 None.
 
 # Jupiter-10.0.0 #
+
+## Change emails_en to templace ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-2244
+
+#### Configuration ####
+
+** emails_en **
+
+Requires cloning batch/batches/Mailer/emails_en.template.ini to batch/batches/Mailer/emails_en.ini and replace all place holders in it.
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 
 ## sourceType filter ##
 - Issue Type: Change Request

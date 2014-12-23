@@ -58,7 +58,8 @@ class myReportsMgr
 										
 	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
 										self::REPORT_TYPE_OPERATION_SYSTEM, 
-										self::REPORT_TYPE_BROWSERS);
+										self::REPORT_TYPE_BROWSERS,
+										self::REPORT_TYPE_TOP_CONTENT);
 										
 
 	public static function runQuery ( $query_file , $map , $debug = false )
@@ -1268,7 +1269,7 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 	
-		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
+		$mysql_function = 'mysqli';
 		
 		$db_config = kConf::get( "reports_db_config" );
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
