@@ -264,6 +264,11 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			
 		usort($flavors, array($this, 'compareFlavors'));
 		
+		foreach ($flavors as $index => $flavor)
+		{
+			unset($flavors[$index]['index']);
+		}
+		
 		$this->DEFAULT_RENDERER_CLASS = 'kM3U8ManifestRenderer';
 		$renderer = $this->getRenderer($flavors);
 		return $renderer;
