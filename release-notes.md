@@ -1,3 +1,21 @@
+# Jupiter-10.1.0 #
+
+## sourceType filter ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2208
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+Need to re-index the entry in order for the cue points to get indexed on it.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.0.0 #
 
 ## Change emails_en to templace ##
