@@ -3139,16 +3139,19 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			 	foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
                 	foreach($namespaceValues as $name => $oldValue)
 					{
+						$newValue = null;
 						if ($namespace)
 						{
-							$newValue = $valuesToChangeTo[$namespace][$name];
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
 						}
 						else
 						{ 
 							$newValue = $valuesToChangeTo[$name];
 						}
 					 
-						$this->putInCustomData($name, $newValue, $namespace);
+						if ($newValue)
+							$this->putInCustomData($name, $newValue, $namespace);
 					}
                    }
                    
@@ -3370,7 +3373,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
