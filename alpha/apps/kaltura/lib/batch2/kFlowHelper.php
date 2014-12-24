@@ -2662,12 +2662,7 @@ class kFlowHelper
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
 	
 		$expiry = kConf::get("live_report_export_expiry", 'local', 3 * 24 * 60 * 60);
-		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
-	
-		if ($result < 0) {
-			KalturaLog::err("Failed to create KS for Live report export download url");
-			return null;
-		}
+		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 			
 		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
