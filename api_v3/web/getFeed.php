@@ -2,42 +2,32 @@
 
 function setCacheExpiry($entriesCount , $feedId)
 {
-$expiry = null;
-
 $expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();
 foreach($expiryArr as $item)
 {
 	if ($item["key"] == "partnerId" && $item["value"] == kCurrentContext::$partner_id ||
 		$item["key"] == "feedId" && $item["value"] == $feedId)
 	{
-		$expiry = $item["expiry"];
-		break;
+		KalturaResponseCacher::setExpiry($item["expiry"]);
+		return;
 	}
 }
 
-if (!$expiry)
+$expiry = kConf::get("v3cache_getfeed_default_cache_time_frame" , 'local' , 86400);
+
+if(kConf::hasParam("v3cache_getfeed_short_limits_array"))
+	$shortLimits = kConf::get("v3cache_getfeed_short_limits_array");
+else
+	$shortLimits = array(50 => 900 , 100 => 1800 , 200 => 3600 , 400 => 7200);
+
+foreach ($shortLimits as $numOfEntries => $cacheTimeFrame)
 {
-	if (kConf::hasParam("v3cache_getfeed_default_cache_time_frame"))
-		$expiry = kConf::get("v3cache_getfeed_default_cache_time_frame");
-	else
-		$expiry = 86400;
-
-	if(kConf::hasParam("v3cache_getfeed_short_limits_array"))
-		$shortLimits = kConf::get("v3cache_getfeed_short_limits_array");
-	else
-		$shortLimits = array(50 => 900 , 100 => 1800 , 200 => 3600 , 400 => 7200);
-
-	foreach ($shortLimits as $numOfEntries => $cacheTimeFrame)
-	{
-		if ($entriesCount <= $numOfEntries)
-		{
-			$expiry = min($expiry , $cacheTimeFrame);
-			break;
-		}
-	}
+	if ($entriesCount <= $numOfEntries)
+		$expiry = min($expiry , $cacheTimeFrame);
 }
 
 KalturaResponseCacher::setExpiry($expiry);
+
 }
 
 function getRequestParameter($paramName)
