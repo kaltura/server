@@ -146,12 +146,9 @@ class PlaylistService extends KalturaEntryService
 		
 		// Added the following 2 lines in order to make the permission verifications in toUpdatableObject work on the actual db object
 		// TODO: the following use of autoFillObjectFromObject should be replaced by a normal toUpdatableObject
-		$tmpDbPlaylist = clone $dbPlaylist;
-		$tmpDbPlaylist = $playlist->toUpdatableObject($tmpDbPlaylist);
-		
-		$playlistUpdate = null;
-		$playlistUpdate = $playlist->toObject($playlistUpdate);
-		
+		$playlistUpdate = clone $dbPlaylist;
+		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
+
 		$this->checkAndSetValidUserUpdate($playlist, $dbPlaylist);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
@@ -293,10 +290,23 @@ class PlaylistService extends KalturaEntryService
 	function executeAction( $id , $detailed = false, KalturaContext $playlistContext = null, $filter = null )
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
-		
+
+		$playlist = entryPeer::retrieveByPK($id);
+		if (!$playlist)
+			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
+
+		if ($playlist->getType() != entryType::PLAYLIST)
+			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
+
 		$extraFilters = array();
 		if ($filter)
 		{
+			if ($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+			{
+				$limit = $filter->limit;
+				$filter->limit = null;
+			}
+
 			$coreFilter = new entryFilter();
 			$filter->toObject($coreFilter);
 			$extraFilters[1] = $coreFilter;
@@ -311,19 +321,22 @@ class PlaylistService extends KalturaEntryService
 	        $corePlaylistContext = $playlistContext->toObject();
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
+	    
+		// the default of detrailed should be true - most of the time the kuse is needed
+		if (is_null($detailed))
+			 $detailed = true ;
+
 		try
 		{
-			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed);
+			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $extraFilters , $detailed);
 		}
 		catch (kCoreException $ex)
-		{
-			if ($ex->getCode() ==  APIErrors::INVALID_ENTRY_ID)
-	    		throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
-			else if ($ex->getCode() == APIErrors::INVALID_ENTRY_TYPE)
-				throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
-					    		
-    		throw $ex;
+		{   		
+			throw $ex;
 		}
+
+		if (isset($limit) && $limit)
+			$entryList = array_slice($entryList , 0 , $limit);
 
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
 			

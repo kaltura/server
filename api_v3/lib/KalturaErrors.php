@@ -9,6 +9,7 @@ class KalturaErrors extends APIErrors
 	 * General Errors
 	 *
 	 */
+	const CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION = "CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION;USER_ID;cannot retrieve another user \"@USER_ID@\" using non-admin session";
 	
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR;;Internal server error occurred";
@@ -515,6 +516,10 @@ class KalturaErrors extends APIErrors
 	const DELIVERY_TYPE_NOT_SPECIFIED = "DELIVERY_TYPE_NOT_SPECIFIED;;At least one non auto delivery type must be specified";
 	
 	const SPHINX_CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = "QUERY_EXCEEDED_MAX_MATCHES_ALLOWED;;Unable to generate list. max matches value was reached";
+	
+	const ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN = "ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN;ID;assigning categories|scheduling|access control to entry with parent entry \"@ID@\" is not allowed";
+	
+	const PARENT_ENTRY_ID_NOT_FOUND = "PARENT_ENTRY_ID_NOT_FOUND;ID;parent entry id \"@ID@\" not found";
 	
 	/*
 	 * FileAsset Service

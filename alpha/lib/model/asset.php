@@ -95,6 +95,7 @@ class asset extends Baseasset implements ISyncableFile
 	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	const CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS = "actualSourceParamsIds";
 	const CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE = "fileSyncVersionsToDelete";
+	const CUSTOM_DATA_PREVIOUS_VERSION = "previousVersion";
 	
 	const MAX_ASSETS_PER_ENTRY = 500;
 	
@@ -272,6 +273,8 @@ class asset extends Baseasset implements ISyncableFile
 		
 	public function incrementVersion()
 	{
+		if(isset($this->version))
+			$this->setPreviousVersion($this->version);
 		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
 		$this->setVersion($newVersion);
@@ -666,6 +669,9 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function getPartnerData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DATA);}
 	public function setPartnerData($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DATA, $v);}
+
+	public function getPreviousVersion()	{return $this->getFromCustomData(self::CUSTOM_DATA_PREVIOUS_VERSION);}
+	public function setPreviousVersion($v)	{$this->putInCustomData(self::CUSTOM_DATA_PREVIOUS_VERSION, $v);}
 
 	public function setFromAssetParams($dbAssetParams)
 	{

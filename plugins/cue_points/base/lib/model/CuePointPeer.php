@@ -57,11 +57,22 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 		    if (! $kuser) {
 				$kuser = kuserPeer::createKuserForPartner($partnerId, $puserId);
 			}
-			// Temporarily change user filter to (user==kuser OR cuepoint of type THUMB). Long term fix will be accomplished 
+
+			// Temporarily change user filter to (user==kuser OR cuepoint of type THUMB/CODE). Long term fix will be accomplished 
 			// by adding a public property on the cuepoint object and checking (user==kuser OR is public)
 			//$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 			$criterionUserOrPublic = $c->getNewCriterion(CuePointPeer::KUSER_ID, $kuser->getId());
-			$criterionUserOrPublic->addOr($c->getNewCriterion(CuePointPeer::TYPE,ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB)));
+			$criterionUserOrPublic->addOr(
+										$c->getNewCriterion(
+											CuePointPeer::TYPE,
+											array(
+												ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB),
+												CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE),
+											),
+											Criteria::IN
+										)
+									);
+
 			$c->addAnd($criterionUserOrPublic);
 		}
 		self::$s_criteria_filter->setFilter($c);
@@ -133,15 +144,16 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer
 	 * @param      PropelPDO $con the connection to use
 	 * @return     CuePoint
 	 */
-	public static function retrieveByEntryId($entryId, $type = null, PropelPDO $con = null)
+	public static function retrieveByEntryId($entryId, $types = null, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
-		if(!is_null($type))
-			$criteria->add(CuePointPeer::TYPE, $type);
+		if(!is_null($types))
+			$criteria->add(CuePointPeer::TYPE, $types, Criteria::IN);
 
 		return CuePointPeer::doSelect($criteria, $con);
 	}
+	
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("cuePoint:id=%s", self::ID), array("cuePoint:entryId=%s", self::ENTRY_ID));		

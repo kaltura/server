@@ -89,6 +89,13 @@ class KSecureEntryHelper
 		if(!is_array($contexts))
 			$contexts = array($contexts);
 			
+		if($entry->getParentEntryId())
+		{
+			$entry = $entry->getParentEntry();
+			if(!$entry)
+				KExternalErrors::dieError(KExternalErrors::PARENT_ENTRY_ID_NOT_FOUND, "Entry is configured with parent entry, but parent entry was not found");
+		}
+			
 		$this->entry = $entry;
 		$this->ksStr = $ksStr;
 		$this->referrer = $referrer;

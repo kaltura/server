@@ -41,6 +41,9 @@ interface DeliveryProfileType extends BaseEnum
 	const LOCAL_PATH_HTTP = 54;
 	const LOCAL_PATH_RTMP = 55;
 	
+	const VOD_PACKAGER_HLS = 61;
+	const VOD_PACKAGER_HDS = 63;
+	const VOD_PACKAGER_MSS = 67;
 	const VOD_PACKAGER_DASH = 68;
 	
 	const LIVE_HLS = 1001;

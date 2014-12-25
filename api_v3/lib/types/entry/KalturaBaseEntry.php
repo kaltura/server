@@ -305,7 +305,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * IF not empty, points to an entry ID the should replace this current entry's id. 
 	 *
 	 * @var string
-	 * @filter eq
 	 */
 	public $redirectEntryId;
 
@@ -317,6 +316,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $rootEntryId;
+	
+	/**
+ 	 * ID of source root entry, used for defining entires association
+ 	 * @var string
+ 	 * @filter eq
+ 	 */
+	public $parentEntryId;
 	
 	/**
 	 * clipping, skipping and cropping attributes that used to create this entry  
@@ -381,6 +387,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"conversionProfileId" => "conversionQuality",
 	 	"redirectEntryId",
 	 	"rootEntryId",
+	 	"parentEntryId",
 	 	"entitledUsersEdit" => "entitledPusersEdit",
 	 	"entitledUsersPublish" => "entitledPusersPublish"
 	 );
@@ -495,6 +502,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->validateCategories();
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
+		$this->validateParentEntryId();
 	
 //		if($this->referenceId)
 //		{
@@ -506,6 +514,25 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 //		}
 		
 		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	/**
+	 * Validate that no forbiden attributes are added to an entry that has a parent entry assigned to it.
+	 */
+	
+	public function validateParentEntryId() 
+	{
+		//An entry with a parent entry id cannot be assigned to categories nor have access control/scheduling
+		if ($this->parentEntryId && ($this->categories || $this->categoriesIds || $this->accessControlId || $this->startDate || $this->endDate))
+			throw new KalturaAPIException(KalturaErrors::ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN, $this->parentEntryId);
+			
+		//Parent entry id must exists before assigning it to a child entry
+		if ($this->parentEntryId)
+		{
+			$entry = entryPeer::retrieveByPK($this->parentEntryId);
+			if(!$entry)
+				throw new KalturaAPIException(KalturaErrors::PARENT_ENTRY_ID_NOT_FOUND, $this->parentEntryId);
+		}
 	}
 		
 	/**

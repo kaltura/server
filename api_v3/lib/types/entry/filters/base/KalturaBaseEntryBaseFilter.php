@@ -17,8 +17,8 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"nameEqual" => "_eq_name",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
-		"userIdIn" => "_in_user_id",
 		"userIdEqual" => "_eq_user_id",
+		"userIdIn" => "_in_user_id",
 		"creatorIdEqual" => "_eq_creator_id",
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
@@ -74,6 +74,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 		"rootEntryIdEqual" => "_eq_root_entry_id",
 		"rootEntryIdIn" => "_in_root_entry_id",
+		"parentEntryIdEqual" => "_eq_parent_entry_id",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -187,8 +188,8 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $userIdEqual;
 
 	/**
-         * @var string
-         */
+	 * @var string
+	 */
 	public $userIdIn;
 
 	/**
@@ -504,6 +505,11 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $rootEntryIdIn;
+	
+	/**
+	 * @var string
+	 */
+	public $parentEntryIdEqual;
 
 	/**
 	 * @var string

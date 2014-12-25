@@ -10,5 +10,6 @@
  postrotate
  service kaltura_populate restart
  endscript
+ su root kaltura
 }
 

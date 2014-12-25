@@ -618,4 +618,10 @@ class KalturaSyndicationFeedRenderer
 	public function getSyndicationFeedDb() {
 		return $this->syndicationFeedDb;
 	}
+
+	public function getReturnedEntriesCount()
+	{
+		return $this->returnedEntriesCount;
+	}
+
 }

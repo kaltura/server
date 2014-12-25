@@ -21,6 +21,14 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 * @filter like,mlikeor,mlikeand
 	 */
 	public $title;
+	
+	/**
+	 * The sub type of the ThumbCuePoint
+	 * 
+	 * @var KalturaThumbCuePointSubType
+	 * @filter eq,in
+	 */
+	public $subType;
 
 	public function __construct()
 	{
@@ -32,6 +40,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 		"assetId",
 		"title" => "name",
 		"description" => "text",
+		"subType",
 	);
 	
 	/* (non-PHPdoc)
@@ -57,9 +66,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 	 * @see KalturaCuePoint::validateForInsert()
 	 */
 	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyNotNull(array("assetId", "startTime", "thumbOffset"));
-		
+	{	
 		if($this->assetId !== null)	
 			$this->validateTimedThumbAssetId();
 		

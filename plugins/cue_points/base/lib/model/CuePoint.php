@@ -366,4 +366,22 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		
 		return parent::preInsert($con);
 	}
+
+	/**
+	 * @param entry $entry
+	 * @param PropelPDO $con
+	 * @return mixed The copied cuepoint
+	 */
+	public function copyToEntry( $entry, PropelPDO $con = null)
+	{
+		$cuePointCopy = $this->copy();
+		$cuePointCopy->setEntryId($entry->getId());
+		$cuePointCopy->save($con);
+		return $cuePointCopy;
+	}
+	
+	public function contributeData()
+	{
+		return null;
+	}
 } // CuePoint

@@ -27,13 +27,16 @@
 // ===================================================================================================
 package com.kaltura.client;
 
+import java.io.Serializable;
+
 /**
  * Common ancestor for all generated classes in the com.kaltura.client.services package.
  * 
  * @author jpotts
  *
  */
-public class KalturaServiceBase {
+@SuppressWarnings("serial")
+public class KalturaServiceBase implements Serializable {
 
 	protected KalturaClient kalturaClient;
 	

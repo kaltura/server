@@ -126,6 +126,7 @@ class entryFilter extends baseObjectFilter
 			"_eq_redirect_from_entry_id",
 			"_eq_root_entry_id",
 			"_in_root_entry_id",
+			"_eq_parent_entry_id",
 			"_is_root",
 			"_matchand_roots",
 			"_notin_roots",
@@ -137,7 +138,12 @@ class entryFilter extends baseObjectFilter
 			"_gte_last_played_at",
 			"_lte_last_played_at",
 			"_is_live",
-			) , NULL );
+			"_eq_source",
+			"_not_source",
+			"_in_source",
+			"_notin_source",
+			"_is_recorded_entry_id_empty",
+		) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
 			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , 
@@ -213,6 +219,7 @@ class entryFilter extends baseObjectFilter
 			"replacing_entry_id", 
 			"replaced_entry_id", 
 			"root_entry_id",
+			"parent_entry_id",
 		));
 	}
 	
@@ -729,5 +736,10 @@ class entryFilter extends baseObjectFilter
 		return true;
 	}
 	
+	public function setParentEntryIdEqual($v)
+	{
+		$this->set('_eq_parent_entry_id', ($v));
+	}
+
 }
 

@@ -103,13 +103,19 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		if(is_null($mediaInfo))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
 
-		/* Look for silent/black conversions. Cuurently checked only for Webex/ARF products */
-		$detectMsg = $this->checkForSilentAudioAndBlackVideo($job, $data, realpath($mediaFile), $mediaInfo);
-		if(isset($detectMsg)){
-			$job->data->engineMessage = $detectMsg;
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::BLACK_OR_SILENT_CONTENT, $detectMsg, KalturaBatchJobStatus::FAILED);
+		/*
+		 * Look for silent/black conversions. Curently checked only for Webex/ARF products
+		 */
+		$detectMsg = null;
+		if(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
+		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false) {
+			$rv = $this->checkForValidityOfWebexProduct($data, realpath($mediaFile), $mediaInfo, &$detectMsg);
+			if($rv==false){
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::BLACK_OR_SILENT_CONTENT, $detectMsg, KalturaBatchJobStatus::FAILED);
+			}
 		}
-				
+
+
 		try
 		{
 			$mediaInfo->flavorAssetId = $data->flavorAssetId;
@@ -117,7 +123,10 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			/* @var $createdMediaInfo KalturaMediaInfo */
 			
 			// must save the mediaInfoId before reporting that the task is finished
-			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, $data);
+			$msg = "Saving media info id $createdMediaInfo->id";
+			if(isset($detectMsg))
+				$msg.= "($detectMsg)";
+			$this->updateJob($job, $msg, KalturaBatchJobStatus::PROCESSED, $data);
 			
 			$data->thumbPath = null;
 			if(!$data->createThumb)
@@ -218,25 +227,45 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 * @param KalturaPostConvertJobData $data
 	 * $param $mediaFile
 	 * #param KalturaMediaInfo $mediaInfo
-	 * @return string
+	 * @return boolean
 	 */
-	private function checkForSilentAudioAndBlackVideo(KalturaBatchJob $job, KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo)
+	private function checkForValidityOfWebexProduct(KalturaPostConvertJobData $data, $srcFileName, KalturaMediaInfo $mediaInfo, &$detectMsg)
 	{
-		KalturaLog::debug("checkForSilentAudioAndBlackVideo(contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration)");
+		KalturaLog::debug("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
 
+		$rv = true;
+		$detectMsg = null;
 		/*
-		 * Check for Webex, other sources should not be checked
-		 */
-		if(!(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
-		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false)) {
-			return null;
-		}
-		
+		 * Get silent and black portions
+		 *
 		list($silenceDetect, $blackDetect) = KFFMpegMediaParser::checkForSilentAudioAndBlackVideo(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
 		
 		$detectMsg = $silenceDetect;
 		if(isset($blackDetect))
 			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetect":$blackDetect;
-		return $detectMsg;
+		*/
+		/*
+		 * Silent/Black does not cause validation failure, just a job message 
+		 */
+		if(isset($detectMsg)){
+//			return false;
+		}
+		
+		/*
+		 * Get number of Webex operators that represent the number of conversion retries.
+		 * Return success after the last retry, independently of whether the result is garbled or not.
+		 * The assumption is that 3 retries will bring the number of garbled audios to acceptable rate.
+		 * Therefore if the audio is still garbled, it is probably due to false detection,
+		 * therefore DO NOT fail the asset.
+		 */
+		$operators = json_decode($data->flavorParamsOutput->operators);
+		if($data->currentOperationSet<count($operators)-1) {
+			if(KFFMpegMediaParser::checkForGarbledAudio(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo)==true) {
+				$detectMsg.= " Garbled Audio!";
+				$rv = false;
+			}
+		}
+		
+		return $rv;
 	}
 }
