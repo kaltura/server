@@ -123,6 +123,9 @@ class EntryCuePointSearchFilter extends AdvancedSearchFilterItem
 	public function applyCondition(IKalturaDbQuery $query)
 	{
 		if ($query instanceof IKalturaIndexQuery){
+			if(!$this->getCuePointsFreeText())
+				return;
+			
 			$this->applyMatchCondition($this->getCuePointsFreeText(), $query);
 		}
 	}
