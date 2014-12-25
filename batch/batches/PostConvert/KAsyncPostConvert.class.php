@@ -233,16 +233,17 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	{
 		KalturaLog::debug("contDur:$mediaInfo->containerDuration,vidDur:$mediaInfo->videoDuration,audDur:$mediaInfo->audioDuration");
 
+		$rv = true;
+		$detectMsg = null;
 		/*
 		 * Get silent and black portions
-		 */
+		 *
 		list($silenceDetect, $blackDetect) = KFFMpegMediaParser::checkForSilentAudioAndBlackVideo(KBatchBase::$taskConfig->params->FFMpegCmd, $srcFileName, $mediaInfo);
 		
-		$rv = true;
 		$detectMsg = $silenceDetect;
 		if(isset($blackDetect))
 			$detectMsg = isset($detectMsg)?"$detectMsg,$blackDetect":$blackDetect;
-		
+		*/
 		/*
 		 * Silent/Black does not cause validation failure, just a job message 
 		 */
