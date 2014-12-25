@@ -98,6 +98,22 @@ class KFileTransferExportEngine extends KExportEngine
 		
 		return true;
 	}
+	
+	/**
+	 * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
+	 * @param string $fileContent
+	 * @param string $prefix
+	 * @return string path to temporary file location
+	 */
+	private static function getTempFileWithContent($fileContent, $prefix = '')
+	{
+		if(!$fileContent)
+			return null;
+		$tempDirectory = sys_get_temp_dir();
+		$fileLocation = tempnam($tempDirectory, $prefix);
+		file_put_contents($fileLocation, $fileContent);
+		return $fileLocation;
+	}
 
 	/* (non-PHPdoc)
 	 * @see KExportEngine::verifyExportedResource()

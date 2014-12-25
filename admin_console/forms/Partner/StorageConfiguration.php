@@ -35,8 +35,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		$this->addElementToDisplayGroup('storage_info', 'storageUsername');
 		 
 		$this->addElement('text', 'storagePassword', array(
-			'label'			=> 'Storage Password*:',
-			'required'		=> true,
+			'label'			=> 'Storage Password:',
 			'filters'		=> array('StringTrim'),
 		));
 		$this->addElementToDisplayGroup('storage_info', 'storagePassword');
