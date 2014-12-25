@@ -173,8 +173,6 @@ class myKshowUtils
 		$domain = requestUtils::getRequestHost();
 
 		$kshowName = $kshow->getName();
-		$producer = kuser::getKuserById( $kshow->getProducerId() );
-		$producerName = $producer->getScreenName();
 
 		if ($entry_id >= 0)
 			$headerImage = $domain.'/index.php/browse/getWidgetImage/entry_id/'.$entry_id;
