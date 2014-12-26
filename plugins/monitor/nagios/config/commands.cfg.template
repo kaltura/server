@@ -832,6 +832,6 @@ define command{
 
 define command{
         command_name check_ntp_time
-        $USER1$/check_ntp_time -H $HOSTADDRESS$ -w 2 -c 5
+	command_line $USER1$/check_ntp_time -H $HOSTADDRESS$ -w 2 -c 5
 }
 
