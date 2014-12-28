@@ -112,6 +112,7 @@ class KFileTransferExportEngine extends KExportEngine
 		$tempDirectory = sys_get_temp_dir();
 		$fileLocation = tempnam($tempDirectory, $prefix);
 		file_put_contents($fileLocation, $fileContent);
+		chmod($fileLocation, 0600);
 		return $fileLocation;
 	}
 
