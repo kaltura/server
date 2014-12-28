@@ -41,7 +41,7 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		// Clone the cue point to the destination entry
 		$dstThumbCuePoint = parent::copyToEntry( $dstEntry, $con );
 
-		$timedThumbAsset = assetPeer::retrieveByPK($this->getAssetId());
+		$timedThumbAsset = assetPeer::retrieveById($this->getAssetId());
 		if ( ! $timedThumbAsset )
 		{
 			KalturaLog::debug("Can't retrieve timedThumbAsset with id: {$this->getAssetId()}");
