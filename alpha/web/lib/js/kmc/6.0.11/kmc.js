@@ -3400,7 +3400,7 @@ if ( window.XDomainRequest ) {
             if (previewService.get('live') == true){
                 flashVars.disableEntryRedirect = true;
             }
-			flashVars['liveAnalytics.plugin'] = 'false';
+			// flashVars['liveAnalytics.plugin'] = 'false';
 		}
 
 		var playlistId = previewService.get('playlistId');
