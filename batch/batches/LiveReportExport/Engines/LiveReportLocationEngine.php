@@ -9,10 +9,12 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 	const MAX_RECORDS_PER_REQUEST = 1000;
 	const AGGREGATION_CHUNK = LiveReportConstants::SECONDS_60;
 	
-	protected $formatter;
+	protected $dateFormatter;
+	protected $nameFormatter;
 	
-	public function LiveReportLocation1MinEngine(LiveReportDateFormatter $formatter) {
-		$this->formatter = $formatter;
+	public function LiveReportLocation1MinEngine(LiveReportDateFormatter $dateFormatter) {
+		$this->dateFormatter = $dateFormatter;
+		$this->nameFormatter = new LiveReportStringFormatter();
 	}
 	
 	public function run($fp, array $args = array()) {
@@ -110,9 +112,9 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			$firstRecord = $records[0];
 			
 			$values = array();
-			$values[] = $this->formatter->format($lastTimeGroup);
-			$values[] = $firstRecord->country->name;
-			$values[] = $firstRecord->city->name;
+			$values[] = $this->dateFormatter->format($lastTimeGroup);
+			$values[] = $this->nameFormatter->format($firstRecord->country->name);
+			$values[] = $this->nameFormatter->format($firstRecord->city->name);
 			$values[] = $firstRecord->city->latitude;
 			$values[] = $firstRecord->city->longitude;
 			
