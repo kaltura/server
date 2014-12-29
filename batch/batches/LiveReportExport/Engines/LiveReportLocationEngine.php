@@ -25,6 +25,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$objs = array();
 		$lastTimeGroup = null;
 		
+		
 		for($curTime = $fromTime; $curTime < $toTime; $curTime = $curTime + self::TIME_CHUNK) {
 			$curTo = min($toTime, $curTime + self::TIME_CHUNK);
 			
@@ -35,7 +36,6 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			while($moreResults) {
 				$pageIndex++;
 				$results = $this->getRecords($curTime + $fix, $curTo, $args[LiveReportConstants::ENTRY_IDS], $pageIndex);
-				$fix = LiveReportConstants::SECONDS_10;
 				$moreResults = self::MAX_RECORDS_PER_REQUEST * $pageIndex < $results->totalCount;
 				if($results->totalCount == 0)  
 					continue;
@@ -63,6 +63,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 					
 				}
 			}
+			$fix = LiveReportConstants::SECONDS_10;
 		}
 		
 		$this->printRows($fp, $objs, $lastTimeGroup);
