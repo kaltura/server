@@ -716,5 +716,18 @@ abstract class LiveEntry extends entry
 		}
 	}
 	
+	public function setRecordingOptions($v)
+	{
+		$this->putInCustomData("recording_options", serialize($v));
+	}
 	
+	public function getRecordingOptions()
+	{
+		$res = $this->getFromCustomData("recording_options");
+		
+		if($res)
+			$res = unserialize($res);
+		
+		return $res; 
+	}
 }
