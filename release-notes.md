@@ -1,3 +1,25 @@
+# Jupiter-10.2.0 #
+
+## Copy entitlement info from live entry to vod entry ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2313
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectCreatedHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.1.0 #
 
 ## New UI Conf Type ##
