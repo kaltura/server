@@ -12,7 +12,7 @@ class kLiveEntryRecordingOptions
 	/**
 	 * @var boolean
 	 */
-	public $shouldCopyEntitlement;
+	protected $shouldCopyEntitlement;
 	
 	/**
 	 * @param boolean $shouldCopyEntitlement

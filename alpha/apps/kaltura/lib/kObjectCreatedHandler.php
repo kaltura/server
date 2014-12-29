@@ -36,9 +36,9 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 		/* @var $liveEntry LiveEntry */
 		$recordingOptions = $liveEntry->getRecordingOptions();
 		/* @var $recordingOptions kLiveEntryRecordingOptions */
-		if($recordingOptions->shouldCopyEntitlement)
+		if($recordingOptions->getShouldCopyEntitlement())
 		{
-			$this->syncEntryEnttlmentInfo($object, $liveEntry);
+			$this->syncEntryEntitlementInfo($object, $liveEntry);
 			$this->syncCategoryEntries($object, $liveEntry);
 		}
 		
@@ -61,7 +61,7 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 		}
 	}
 	
-	public function syncEntryEnttlmentInfo(entry $vodEntry, LiveEntry $liveEntry)
+	public function syncEntryEntitlementInfo(entry $vodEntry, LiveEntry $liveEntry)
 	{
 		$entitledPusersEdit = $liveEntry->getEntitledPusersEdit();
 		$entitledPusersPublish = $liveEntry->getEntitledPusersPublish();
