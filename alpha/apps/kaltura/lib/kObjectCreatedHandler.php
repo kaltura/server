@@ -49,7 +49,7 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 	{
 		$liveCategoryEntryArray = categoryEntryPeer::selectByEntryId($liveEntry->getId());
 		
-		if(!count($$liveCategoryEntryArray))
+		if(!count($liveCategoryEntryArray))
 			return;
 
 		foreach($liveCategoryEntryArray as $categoryEntry)
