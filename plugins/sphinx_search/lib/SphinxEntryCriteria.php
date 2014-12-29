@@ -259,58 +259,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
 			}
 			
-			if(preg_match('/^"[^"]+"$/', $freeTexts))
-			{
-				$freeText = str_replace('"', '', $freeTexts);
-				$freeText = SphinxUtils::escapeString($freeText);
-				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-			}
-			else
-			{
-				if(strpos($freeTexts, baseObjectFilter::IN_SEPARATOR) > 0)
-				{
-					str_replace(baseObjectFilter::AND_SEPARATOR, baseObjectFilter::IN_SEPARATOR, $freeTexts);
-				
-					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
-						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					foreach($freeTextsArr as $freeText)
-					{
-						$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-					}
-				}
-				else
-				{
-					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
-					foreach($freeTextsArr as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 0)
-							unset($freeTextsArr[$valIndex]);
-						else
-							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					$freeTextsArr = array_unique($freeTextsArr);
-					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
-				}
-			}
-			if(count($additionalConditions))
-			{	
-				$additionalConditions = array_unique($additionalConditions);
-				$matches = reset($additionalConditions);
-				if(count($additionalConditions) > 1)
-					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
-					
-				$this->matchClause[] = $matches;
-			}
+			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, entryFilter::FREE_TEXT_FIELDS, $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');
 		

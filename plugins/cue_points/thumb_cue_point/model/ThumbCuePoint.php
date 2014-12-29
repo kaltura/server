@@ -67,4 +67,29 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 
 		KalturaLog::log("Saved cue point [{$dstThumbCuePoint->getId()}] and timed thumb asset [{$dstTimedThumbAsset->getId()}]");
 	}
+	
+	public function save(PropelPDO $con = null)
+	{
+		$subType = $this->getSubType();
+		if(!isset($subType))
+			$this->setSubType(ThumbCuePointSubType::SLIDE);
+			
+		return parent::save($con);
+	}
+	
+	public function contributeData()
+	{
+		$data = null;
+		
+		if($this->getText())
+			$data = $data . $this->getText() . ' ';
+		
+		if($this->getName())
+			$data = $data . $this->getName() . ' ';
+		
+		if($this->getTags())
+			$data = $data . $this->getTags() . ' ';
+		
+		return $data;
+	}
 }

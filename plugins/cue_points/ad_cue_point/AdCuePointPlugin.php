@@ -250,4 +250,9 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint, IKaltu
 			
 		return $scene;
 	}
+	
+	public static function getTypesToIndexOnEntry()
+	{
+		return array();
+	}
 }

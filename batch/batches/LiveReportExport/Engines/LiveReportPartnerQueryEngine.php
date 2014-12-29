@@ -28,6 +28,9 @@ class LiveReportPartnerEngine extends LiveReportEngine {
 			$filter->entryIds = $args[LiveReportConstants::ENTRY_IDS];
 		
 		$res = LiveReportQueryHelper::retrieveFromReport($reportType, $filter, null, null, $this->fieldName);
+		if(empty($res))
+			$res = array(0);
+		
 		fwrite($fp, $this->title . LiveReportConstants::CELLS_SEPARATOR . implode(LiveReportConstants::CELLS_SEPARATOR, $res));
 	}
 
