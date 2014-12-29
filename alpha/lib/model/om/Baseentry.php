@@ -3150,7 +3150,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 							$newValue = $valuesToChangeTo[$name];
 						}
 					 
-						if ($newValue)
+						if (!is_null($newValue))
 							$this->putInCustomData($name, $newValue, $namespace);
 					}
                    }
