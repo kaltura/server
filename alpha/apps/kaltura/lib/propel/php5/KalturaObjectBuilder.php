@@ -298,7 +298,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 							\$newValue = \$valuesToChangeTo[\$name];
 						}
 					 
-						if (\$newValue)
+						if (!is_null(\$newValue))
 							\$this->putInCustomData(\$name, \$newValue, \$namespace);
 					}
                    }
