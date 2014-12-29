@@ -166,7 +166,7 @@ class LiveConversionProfileService extends KalturaBaseService
 		$video = $encode->addChild('Video');
 		$audio = $encode->addChild('Audio');
 		
-		if($liveParams->hasTag(liveParams::TAG_SOURCE) || $liveParams->hasTag(liveParams::TAG_INGEST))
+		if($liveParams->hasTag(liveParams::TAG_INGEST))
 		{
 			$video->addChild('Codec', 'PassThru');
 			$audio->addChild('Codec', 'AAC');
