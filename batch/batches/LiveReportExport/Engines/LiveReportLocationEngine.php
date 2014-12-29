@@ -25,12 +25,12 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$objs = array();
 		$lastTimeGroup = null;
 		
-		$fix = 0; // The report is inclussive, therefore starting from the the second request we shouldn't query twice
 		for($curTime = $fromTime; $curTime < $toTime; $curTime = $curTime + self::TIME_CHUNK) {
 			$curTo = min($toTime, $curTime + self::TIME_CHUNK);
 			
 			$pageIndex = 0;
 			$moreResults = true;
+			$fix = 0; // The report is inclussive, therefore starting from the the second request we shouldn't query twice
 			
 			while($moreResults) {
 				$pageIndex++;
