@@ -25,7 +25,7 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 		$objs = array();
 		$lastTimeGroup = null;
 		
-		
+		$fix = 0; // The report is inclussive, therefore starting from the the second request we shouldn't query twice
 		for($curTime = $fromTime; $curTime < $toTime; $curTime = $curTime + self::TIME_CHUNK) {
 			$curTo = min($toTime, $curTime + self::TIME_CHUNK);
 			
@@ -34,7 +34,8 @@ class LiveReportLocation1MinEngine extends LiveReportEngine {
 			
 			while($moreResults) {
 				$pageIndex++;
-				$results = $this->getRecords($curTime, $curTo, $args[LiveReportConstants::ENTRY_IDS], $pageIndex);
+				$results = $this->getRecords($curTime + $fix, $curTo, $args[LiveReportConstants::ENTRY_IDS], $pageIndex);
+				$fix = LiveReportConstants::SECONDS_10;
 				$moreResults = self::MAX_RECORDS_PER_REQUEST * $pageIndex < $results->totalCount;
 				if($results->totalCount == 0)  
 					continue;
