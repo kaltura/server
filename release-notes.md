@@ -20,6 +20,26 @@ None.
 
 None.
 
+## Scheduled Tasks Enhancements 2 ##
+- Issue Type: New Feature
+- Issue ID: PLAT-1631
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following plugin to the list of plugins
+
+		ScheduledTaskContentDistribution
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_25_scheduled_task_update.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.1.0 #
 
 ## New UI Conf Type ##
