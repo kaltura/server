@@ -257,7 +257,9 @@ class KAsyncNotifier extends KJobHandlerWorker
 		}
 		
 		$updateData = new KalturaNotificationJobData();
-		$updateData->notificationResult = $not->data->notificationResult;
+		//Instead of writing the notification result to th DB, write it to the log only
+		KalturaLog::info("Notification result: [" . $not->data->notificationResult ."]");
+		//$updateData->notificationResult = $not->data->notificationResult;
 		
 		$updateNot = new KalturaBatchJob();
 		$updateNot->status = $not->status;
