@@ -505,7 +505,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $rootEntryIdIn;
-	
+
 	/**
 	 * @var string
 	 */
