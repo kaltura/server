@@ -1,4 +1,5 @@
 <?php
+$jw_license = null;
 $jw_license = ($jw_license) ? "licensed" : "non-commercial";
 $service_url = myPartnerUtils::getHost($partner_id);		/*** move to action ***/
 $host = str_replace ( "http://" , "" , $service_url );
