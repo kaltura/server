@@ -94,7 +94,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		$entryDistribution = $data->entryDistribution;
 		/* @var $entryDistribution KalturaEntryDistribution */
 		
-		$flavorAssetIds = implode(',', $entryDistribution->flavorAssetIds);
+		$flavorAssetIds = explode(',', $entryDistribution->flavorAssetIds);
 		$flavorAssetId = reset($flavorAssetIds);
 		$downloadURL = $this->getFlavorAssetUrl($flavorAssetId);
 		
