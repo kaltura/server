@@ -145,6 +145,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
 	{
 		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		KalturaLog::debug("XML [$xml]");
 		
 		$curl = new KCurlWrapper();
 		$curl->setOpt(CURLOPT_POST, true);
