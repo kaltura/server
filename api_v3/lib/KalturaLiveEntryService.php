@@ -56,10 +56,23 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$dbAsset || !($dbAsset instanceof liveAsset))
 			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $assetId);
 			
+		$kResource = $resource->toObject();
+		$filename = $kResource->getLocalFilePath();
+
+		$fileIsServerFileResource = ($resource instanceof KalturaServerFileResource);
+		if ( ! $fileIsServerFileResource )
+		{
+			$filename = kConf::get('uploaded_segment_destination') . basename($kResource->getLocalFilePath());
+		}
+		
+		// Extract the exact video segment duration from the recorded file
+		$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
+		$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
+		
 		$currentDuration = $dbEntry->getLengthInMsecs();
 		if(!$currentDuration)
 			$currentDuration = 0;
-		$currentDuration += (int)($duration * 1000);
+		$currentDuration += $recordedSegmentDurationInMsec;
 		
 		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
 		{
@@ -81,11 +94,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION, $entryId);
 		}
 			
-		$kResource = $resource->toObject();
-		$filename = $kResource->getLocalFilePath();
-		if (!($resource instanceof KalturaServerFileResource))
+		if ( ! $fileIsServerFileResource )
 		{
-			$filename = kConf::get('uploaded_segment_destination') . basename($kResource->getLocalFilePath());
 			kFile::moveFile($kResource->getLocalFilePath(), $filename);
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
