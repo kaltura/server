@@ -86,6 +86,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		//re-index cue point entry
 		$this->reIndexCuePointEntry($cuePoint);
+		CuePointPeer::setUseCriteriaFilter(true);
 	}
 	
 	/**
@@ -108,6 +109,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
+			
+		CuePointPeer::setUseCriteriaFilter(true);
 	}
 	
 	/**
