@@ -1,5 +1,24 @@
 # Jupiter-10.2.0 #
 
+## Unicorn Connector ##
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		UnicornDistribution
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/add_permissions/2014_12_30_unicorn_callback_service.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Copy entitlement info from live entry to vod entry ##
 - Issue Type: New Feature
 - Issue ID: PLAT-2313
