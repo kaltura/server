@@ -113,7 +113,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		
 		$avItemXml->addChild('Title', $providerData->title);
 		
-		if(count($entryDistribution->assetIds))
+		if($entryDistribution->assetIds)
 		{
 			$captionsXml = $avItemXml->addChild('Captions');
 			
