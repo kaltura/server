@@ -28,15 +28,33 @@ class UnicornService extends KalturaBaseService
 			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE),
 			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE),
 		);
-		$validJobStatuses = BatchJobPeer::getUnClosedStatusList();
 		
 		$batchJob = BatchJobPeer::retrieveByPK($id);
-		if(		!$batchJob 
-			||	!in_array($batchJob->getJobType(), $validJobTypes)
-			||	!in_array($batchJob->getStatus(), $validJobStatuses)
-			||	$batchJob->getJobSubType() != UnicornDistributionProvider::get()->getType()
-		)
+		$invalid = false;
+		if(!$batchJob)
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] not found");
+		}
+		elseif(!in_array($batchJob->getJobType(), $validJobTypes))
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] wrong type [" . $batchJob->getJobType() . "] expected [" . implode(', ', $validJobTypes) . "]");
+		}
+		elseif($batchJob->getJobSubType() != UnicornDistributionProvider::get()->getType())
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] wrong sub-type [" . $batchJob->getJobSubType() . "] expected [" . UnicornDistributionProvider::get()->getType() . "]");
+		}
+		elseif($batchJob->getStatus() != KalturaBatchJobStatus::ALMOST_DONE)
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] wrong status [" . $batchJob->getStatus() . "] expected [" . KalturaBatchJobStatus::ALMOST_DONE . "]");
+		}
+		if($invalid)
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $id);
+		}
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
 	}
