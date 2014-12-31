@@ -79,7 +79,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
-
+		CuePointPeer::setUseCriteriaFilter(true);
+		
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
 			
@@ -103,7 +104,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
-
+		CuePointPeer::setUseCriteriaFilter(true);
+		
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
 	}
