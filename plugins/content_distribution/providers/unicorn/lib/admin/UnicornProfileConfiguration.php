@@ -17,22 +17,22 @@ class Form_UnicornProfileConfiguration extends Form_ConfigurableProfileConfigura
 		$this->addElements(array($element));
 		
 		$this->addElement('text', 'username', array(
-			'label' => 'Channel Title:', 
+			'label' => 'Username:', 
 			'filters' => array('StringTrim')
 		));
 		
 		$this->addElement('text', 'password', array(
-			'label' => 'FTP Host:', 
+			'label' => 'Password:', 
 			'filters' => array('StringTrim')
 		));
 		
 		$this->addElement('text', 'domain_name', array(
-			'label' => 'FTP user name:', 
+			'label' => 'Domain name:', 
 			'filters' => array('StringTrim')
 		));
 		
 		$this->addElement('text', 'api_host_url', array(
-			'label' => 'FTP password:', 
+			'label' => 'API host URL:', 
 			'filters' => array('StringTrim')
 		));
 	}
