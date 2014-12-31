@@ -22,7 +22,8 @@ class UnicornService extends KalturaBaseService
 	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
 	 * @param int $id distribution job id
 	 */
-	public function notifyAction($id) {
+	public function notifyAction($id) 
+	{
 		$validJobTypes = array(
 			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT),
 			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE),
@@ -57,5 +58,43 @@ class UnicornService extends KalturaBaseService
 		}
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
+		
+		if($batchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+		{
+			$this->attachRemoteAssetResource($batchJob->getEntry(), $batchJob->getData());
+		}
+	}
+	
+	protected function attachRemoteAssetResource(entry $entry, kDistributionSubmitJobData $data)
+	{
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($data->getDistributionProfileId());
+		/* @var $distributionProfile UnicornDistributionProfile */
+		
+		$domainGuid = $distributionProfile->getDomainGuid();
+		$applicationGuid = $distributionProfile->getAdFreeApplicationGuid();
+		$mediaItemGuid = $data->getRemoteId();
+		
+		$url = "$domainGuid/$applicationGuid/$mediaItemGuid/content.m3u8";
+		
+		$entry->setSource(KalturaSourceType::URL);
+		$entry->save();
+		
+		$asset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $distributionProfile->getRemoteAssetParamsId());
+		if(!$asset)
+		{
+			KalturaLog::err("Flavor asset not created for entry [" . $entry->getId() . "]");
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $distributionProfile->getRemoteAssetParamsId());
+		}
+				
+		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$storageProfile = StorageProfilePeer::retrieveByPK($distributionProfile->getStorageProfileId());
+		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $url, $storageProfile);
+
+		$asset->setFileExt('m3u8');
+		$asset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+		$asset->save();
+		
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($asset));
+		kBusinessPostConvertDL::handleConvertFinished(null, $asset);
 	}
 }
