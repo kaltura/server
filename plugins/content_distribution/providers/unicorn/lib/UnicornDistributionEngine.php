@@ -48,9 +48,9 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseUpdate::closeSubmit()
+	 * @see IDistributionEngineCloseUpdate::closeUpdate()
 	 */
-	public function closeUpdate(KalturaDistributionSubmitJobData $data)
+	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
 		// will be closed by the callback notification
 		return false;
