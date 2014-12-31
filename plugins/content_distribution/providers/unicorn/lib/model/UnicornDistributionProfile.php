@@ -18,7 +18,6 @@ class UnicornDistributionProfile extends ConfigurableDistributionProfile
 	{
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 		$maxLengthFields = array(UnicornDistributionField::TITLE => self::ITEM_TITLE_MAXIMUM_LENGTH);
-		$notEmptyFields = array(UnicornDistributionField::CATALOG_GUID);
 		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if(!$allFieldValues || !is_array($allFieldValues))
@@ -28,7 +27,6 @@ class UnicornDistributionProfile extends ConfigurableDistributionProfile
 		}
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
-		$validationErrors = array_merge($validationErrors, $this->validateNotEmpty($notEmptyFields, $allFieldValues, $action));
 		
 		return $validationErrors;
 	}
