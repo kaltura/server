@@ -71,7 +71,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$c = new Criteria();
 		$c->add(CuePointPeer::PARENT_ID, $cuePoint->getId());
 			
-		$this->deleteCuePoints($c);
+		self::deleteCuePoints($c, true);
 			
 		//re-index cue point on entry
 		$this->reIndexCuePointEntry($cuePoint);
@@ -85,12 +85,16 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $entryId);
 			
-		$this->deleteCuePoints($c);
+		self::deleteCuePoints($c, true);
 	}
 	
-	protected function deleteCuePoints(Criteria $c)
+	public static function deleteCuePoints(Criteria $c, $ignoreCriteriaFilter = false)
 	{
-		CuePointPeer::setUseCriteriaFilter(false);
+		if ( $ignoreCriteriaFilter )
+		{
+			CuePointPeer::setUseCriteriaFilter(false);
+		}
+
 		$cuePoints = CuePointPeer::doSelect($c);
 
 		$update = new Criteria();
@@ -98,7 +102,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
-		CuePointPeer::setUseCriteriaFilter(true);
+
+		if ( $ignoreCriteriaFilter )
+		{
+			CuePointPeer::setUseCriteriaFilter(true);
+		}
 
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
