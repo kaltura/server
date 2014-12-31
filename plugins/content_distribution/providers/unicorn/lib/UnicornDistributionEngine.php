@@ -59,8 +59,8 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function getNotificationUrl()
 	{
 		$job = KJobHandlerWorker::getCurrentJob();
-		$urlParams = array('service' => 'unicornDistribution_unicorn', 'action' => 'notify', 'partnerId' => $job->partnerId, 'id' => $job->id);
-		return requestUtils::getRequestHost() . '/api_v3/index.php/' . requestUtils::buildRequestParams($urlParams);
+		$serviceUrl = trim(KBatchBase::$kClientConfig->serviceUrl, '/');
+		return "$serviceUrl/api_v3/index.php/service/unicornDistribution_unicorn/action/notify/partnerId/{$job->partnerId}/id/{$job->id}";
 	}
 	
 	/**
