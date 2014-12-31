@@ -99,4 +99,23 @@ class UnicornDistributionProfile extends ConfigurableDistributionProfile
 		
 		return $fieldConfigArray;
 	}
+	
+	public function getOptionalAssetDistributionRules()
+	{
+		$ret = parent::getOptionalAssetDistributionRules();
+		if(!class_exists('CaptionPlugin') || !CaptionPlugin::isAllowedPartner($this->getPartnerId()))
+		{
+			return $ret;
+		}
+		
+		$isCaptionCondition = new kAssetDistributionPropertyCondition();
+		$isCaptionCondition->setPropertyName(assetPeer::translateFieldName(assetPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME));
+		$isCaptionCondition->setPropertyValue(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		
+		$captionDistributionRule = new kAssetDistributionRule();
+		$captionDistributionRule->setAssetDistributionConditions(array($isCaptionCondition));
+		$ret[] = $captionDistributionRule;
+		
+		return $ret;
+	}
 }
