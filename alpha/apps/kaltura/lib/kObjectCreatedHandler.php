@@ -35,6 +35,9 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 		
 		/* @var $liveEntry LiveEntry */
 		$recordingOptions = $liveEntry->getRecordingOptions();
+		if(!$recordingOptions)
+			return true;
+		
 		/* @var $recordingOptions kLiveEntryRecordingOptions */
 		if($recordingOptions->getShouldCopyEntitlement())
 		{
