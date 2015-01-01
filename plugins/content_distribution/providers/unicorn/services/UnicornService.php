@@ -98,13 +98,14 @@ class UnicornService extends KalturaBaseService
 				$asset->setIsOriginal(true);
 		}
 				
-		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$storageProfile = StorageProfilePeer::retrieveByPK($distributionProfile->getStorageProfileId());
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $url, $storageProfile);
-
+		$asset->incrementVersion();
 		$asset->setFileExt('m3u8');
 		$asset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 		$asset->save();
+		
+		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$storageProfile = StorageProfilePeer::retrieveByPK($distributionProfile->getStorageProfileId());
+		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $url, $storageProfile);
 		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($asset));
