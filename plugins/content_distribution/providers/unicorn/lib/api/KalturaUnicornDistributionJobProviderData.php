@@ -10,7 +10,7 @@ class KalturaUnicornDistributionJobProviderData extends KalturaConfigurableDistr
 	 * 
 	 * @var string
 	 */
-	public $catalogGUID;
+	public $catalogGuid;
 	
 	/**
 	 * The Title assigned to the video. The Foreign Key will be used if no title is provided.
@@ -34,12 +34,12 @@ class KalturaUnicornDistributionJobProviderData extends KalturaConfigurableDistr
 		/* @var $distributionProfileDb UnicornDistributionProfile */
 		
 		$values = $distributionProfileDb->getAllFieldValues($entryDistributionDb);
-		$this->catalogGUID = $values[UnicornDistributionField::CATALOG_GUID];
+		$this->catalogGuid = $values[UnicornDistributionField::CATALOG_GUID];
 		$this->title = $values[UnicornDistributionField::TITLE];
 	}
 	
 	private static $map_between_objects = array(
-		'catalogGUID',
+		'catalogGuid',
 		'title'
 	);
 	

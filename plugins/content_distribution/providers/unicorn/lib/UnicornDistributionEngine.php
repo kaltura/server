@@ -129,7 +129,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		$xml->addChild('DomainName', $distributionProfile->domainName);
 		
 		$avItemXml = $xml->addChild('AVItem');
-		$avItemXml->addChild('CatalogGUID', $providerData->catalogGUID);
+		$avItemXml->addChild('CatalogGuid', $providerData->catalogGuid);
 		$avItemXml->addChild('ForeignKey', $entryDistribution->entryId);
 		$avItemXml->addChild('IngestItemType', 'Video');
 		
@@ -162,7 +162,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
 	
 			$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
-			$publicationRuleXml->addChild('ChannelGUID', date($format, $distributionProfile->channelGUID));
+			$publicationRuleXml->addChild('ChannelGuid', date($format, $distributionProfile->channelGuid));
 			$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
 			
 			if($data instanceof KalturaDistributionDeleteJobData)

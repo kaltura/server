@@ -31,7 +31,7 @@ class KalturaUnicornDistributionProfile extends KalturaConfigurableDistributionP
 	 * 
 	 * @var string
 	 */
-	public $channelGUID;
+	public $channelGuid;
 	
 	/**
 	 * The API host URL that the Upload User should have access to, Used for HTTP content submission.
@@ -75,7 +75,7 @@ class KalturaUnicornDistributionProfile extends KalturaConfigurableDistributionP
 		'username', 
 		'password', 
 		'domainName', 
-		'channelGUID', 
+		'channelGuid', 
 		'apiHostUrl',
 		'domainGuid',
 		'adFreeApplicationGuid',
