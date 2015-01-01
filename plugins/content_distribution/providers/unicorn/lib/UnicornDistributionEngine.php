@@ -3,7 +3,7 @@
  * @package plugins.unicornDistribution
  * @subpackage lib
  */
-class UnicornDistributionEngine extends DistributionEngine implements IDistributionEngineUpdate, IDistributionEngineSubmit, IDistributionEngineCloseSubmit, IDistributionEngineCloseUpdate
+class UnicornDistributionEngine extends DistributionEngine implements IDistributionEngineUpdate, IDistributionEngineSubmit, IDistributionEngineDelete, IDistributionEngineCloseSubmit, IDistributionEngineCloseUpdate, IDistributionEngineCloseDelete
 {
 	
 	/* (non-PHPdoc)
@@ -37,6 +37,22 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		
 		return false;
 	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineDelete::delete()
+	 */
+	public function delete(KalturaDistributionDeleteJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaUnicornDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaUnicornDistributionProfile");
+		
+		if(!$data->providerData || !($data->providerData instanceof KalturaUnicornDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaUnicornDistributionJobProviderData");
+		
+		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseSubmit::closeSubmit()
@@ -51,6 +67,15 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	 * @see IDistributionEngineCloseUpdate::closeUpdate()
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
+	{
+		// will be closed by the callback notification
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseDelete::closeDelete()
+	 */
+	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
 		// will be closed by the callback notification
 		return false;
@@ -131,6 +156,21 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			}
 		}
 		
+		$publicationRulesXml = $xml->addChild('PublicationRules');
+		$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
+
+		$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
+		$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
+		
+		if($data instanceof KalturaDistributionDeleteJobData)
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, time()));
+		}
+		else 
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
+		}
+		
 		$xml->addChild('NotificationURL', $this->getNotificationUrl());
 		$xml->addChild('NotificationRequestMethod', 'GET');
 		
@@ -145,8 +185,33 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
 	{
 		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		$remoteId = $this->send($distributionProfile, $xml);
+		if($remoteId)
+		{
+			KalturaLog::debug("Remote ID [$remoteId]");
+			$data->remoteId = $remoteId;
+		}
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaUnicornDistributionProfile $distributionProfile
+	 * @param KalturaUnicornDistributionJobProviderData $providerData
+	 */
+	protected function handleDelete(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
+	{
+		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		$this->send($distributionProfile, $xml);
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaUnicornDistributionProfile $distributionProfile
+	 * @param KalturaUnicornDistributionJobProviderData $providerData
+	 */
+	protected function send(KalturaUnicornDistributionProfile $distributionProfile, $xml)
+	{
 		KalturaLog::debug("XML [$xml]");
-		
 		
 		$ch = curl_init($distributionProfile->apiHostUrl);
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -188,16 +253,13 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 				
 				if(preg_match('/^MediaItemGuid: (.+)$/', $message, $matches))
 				{
-					$data->remoteId = $matches[1];
-					KalturaLog::debug("Remote ID [$data->remoteId]");
+					return $matches[1];
 				}
 				
-				return;
+				return null;
 			}
 		}
-		else
-		{
-			throw new KalturaDistributionException("Unexpected HTTP response");
-		}
+
+		throw new KalturaDistributionException("Unexpected HTTP response");
 	}
 }

@@ -42,7 +42,7 @@ class UnicornDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return false;
+		return true;
 	}
 	
 	/* (non-PHPdoc)
@@ -74,7 +74,7 @@ class UnicornDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		return false;
+		return true;
 	}
 	
 	/* (non-PHPdoc)
