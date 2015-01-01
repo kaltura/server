@@ -254,7 +254,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 				
 				if($code != KCurlHeaderResponse::HTTP_STATUS_OK)
 				{
-					throw new KalturaDistributionException("HTTP response code [$code] error: $message", $code);
+					throw new Exception("HTTP response code [$code] error: $message", $code);
 				}
 				
 				if(preg_match('/^MediaItemGuid: (.+)$/', $message, $matches))
