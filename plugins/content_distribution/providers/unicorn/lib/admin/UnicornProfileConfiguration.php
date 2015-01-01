@@ -39,6 +39,11 @@ class Form_UnicornProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'filters' => array('StringTrim')
 		));
 		
+		$this->addElement('text', 'channel_guid', array(
+			'label' => 'Channel GUID:', 
+			'filters' => array('StringTrim')
+		));
+		
 		$this->addElement('text', 'ad_free_application_guid', array(
 			'label' => 'Ad free application GUID:', 
 			'filters' => array('StringTrim')

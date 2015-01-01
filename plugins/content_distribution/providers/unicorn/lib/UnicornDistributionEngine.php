@@ -156,19 +156,23 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			}
 		}
 		
-		$publicationRulesXml = $xml->addChild('PublicationRules');
-		$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
-
-		$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
-		$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
-		
-		if($data instanceof KalturaDistributionDeleteJobData)
+		if($data instanceof KalturaDistributionDeleteJobData || $data->entryDistribution->sunset)
 		{
-			$publicationRuleXml->addChild('EndDate', date($format, time()));
-		}
-		elseif($data->entryDistribution->sunset)
-		{
-			$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
+			$publicationRulesXml = $xml->addChild('PublicationRules');
+			$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
+	
+			$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
+			$publicationRuleXml->addChild('ChannelGUID', date($format, $distributionProfile->channelGUID));
+			$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
+			
+			if($data instanceof KalturaDistributionDeleteJobData)
+			{
+				$publicationRuleXml->addChild('EndDate', date($format, time()));
+			}
+			else
+			{
+				$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
+			}
 		}
 		
 		$xml->addChild('NotificationURL', $this->getNotificationUrl());

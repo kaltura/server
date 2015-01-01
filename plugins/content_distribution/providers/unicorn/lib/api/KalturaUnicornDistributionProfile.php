@@ -27,6 +27,13 @@ class KalturaUnicornDistributionProfile extends KalturaConfigurableDistributionP
 	public $domainName;
 	
 	/**
+	 * The Channel GUID assigned to this Publication Rule. Must be a valid Channel in the Domain that was used in authentication.
+	 * 
+	 * @var string
+	 */
+	public $channelGUID;
+	
+	/**
 	 * The API host URL that the Upload User should have access to, Used for HTTP content submission.
 	 * 
 	 * @var string
@@ -68,6 +75,7 @@ class KalturaUnicornDistributionProfile extends KalturaConfigurableDistributionP
 		'username', 
 		'password', 
 		'domainName', 
+		'channelGUID', 
 		'apiHostUrl',
 		'domainGuid',
 		'adFreeApplicationGuid',

@@ -8,6 +8,7 @@ class UnicornDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_USERNAME = 'username';
 	const CUSTOM_DATA_PASSWORD = 'password';
 	const CUSTOM_DATA_DOMAIN_NAME = 'domainName';
+	const CUSTOM_DATA_CHANNEL_GUID = 'channelGUID';
 	const CUSTOM_DATA_API_HOST_URL = 'apiHostUrl';
 	const CUSTOM_DATA_DOMAIN_GUID = 'domainGuid';
 	const CUSTOM_DATA_AD_FREE_APPLICATION_GUID = 'adFreeApplicationGuid';
@@ -69,6 +70,11 @@ class UnicornDistributionProfile extends ConfigurableDistributionProfile
 		return $this->getFromCustomData(self::CUSTOM_DATA_DOMAIN_NAME);
 	}
 	
+	public function getChannelGUID()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CHANNEL_GUID);
+	}
+	
 	public function getUsername()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);
@@ -107,6 +113,11 @@ class UnicornDistributionProfile extends ConfigurableDistributionProfile
 	public function setDomainName($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_DOMAIN_NAME, $v);
+	}
+	
+	public function setChannelGUID($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CHANNEL_GUID, $v);
 	}
 	
 	public function setUsername($v)
