@@ -72,6 +72,7 @@ class UnicornService extends KalturaBaseService
 		
 		$domainGuid = $distributionProfile->getDomainGuid();
 		$applicationGuid = $distributionProfile->getAdFreeApplicationGuid();
+		$assetParamsId = $distributionProfile->getRemoteAssetParamsId();
 		$mediaItemGuid = $data->getRemoteId();
 		
 		$url = "$domainGuid/$applicationGuid/$mediaItemGuid/content.m3u8";
@@ -79,11 +80,22 @@ class UnicornService extends KalturaBaseService
 		$entry->setSource(KalturaSourceType::URL);
 		$entry->save();
 		
-		$asset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $distributionProfile->getRemoteAssetParamsId());
+		$isNewAsset = false;
+		$asset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $assetParamsId);
 		if(!$asset)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $entry->getId() . "]");
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $distributionProfile->getRemoteAssetParamsId());
+			$isNewAsset = true;
+			$assetParams = assetParamsPeer::retrieveByPK($assetParamsId);
+			
+			$asset = assetPeer::getNewAsset($assetParams->getType());
+			$asset->setPartnerId($entry->getPartnerId());
+			$asset->setEntryId($entry->getId());
+			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+			
+			$asset->setFlavorParamsId($assetParamsId);
+			$asset->setFromAssetParams($assetParams);
+			if($assetParams->hasTag(assetParams::TAG_SOURCE))
+				$asset->setIsOriginal(true);
 		}
 				
 		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -93,6 +105,9 @@ class UnicornService extends KalturaBaseService
 		$asset->setFileExt('m3u8');
 		$asset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 		$asset->save();
+		
+		if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($asset));
 		
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($asset));
 		kBusinessPostConvertDL::handleConvertFinished(null, $asset);
