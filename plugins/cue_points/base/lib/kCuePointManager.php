@@ -350,6 +350,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$cuePoint->indexToSearchIndex();
 			}
 		}
+		
+		if(self::shouldReIndexEntry($object, $modifiedColumns))
+		{
+			$this->reIndexCuePointEntry($object);
+		}
 
 		return true;
 	}
@@ -365,6 +370,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 
 		if ( self::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
+		{
+			return true;
+		}
+		
+		if( self::shouldReIndexEntry($object, $modifiedColumns) )
 		{
 			return true;
 		}
@@ -397,6 +407,26 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		{
 			return true;
 		}
+
+		return false;
+	}
+	
+	public static function shouldReIndexEntry(BaseObject $object, array $modifiedColumns)
+	{
+		if(!($object instanceof CuePoint))
+			return false;
+		
+		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
+		if(!count($indexOnEntryTypes))
+			return false;
+			
+		if(!in_array($object->getType(), $indexOnEntryTypes))
+			return false;
+		
+		$filedsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
+		
+		if(count(array_intersect($filedsToMonitor, $modifiedColumns)) > 0)
+			return true;
 
 		return false;
 	}
