@@ -166,7 +166,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		{
 			$publicationRuleXml->addChild('EndDate', date($format, time()));
 		}
-		else 
+		elseif($data->entryDistribution->sunset)
 		{
 			$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
 		}
@@ -185,6 +185,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
 	{
 		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		$data->sentData = $xml;
 		$remoteId = $this->send($distributionProfile, $xml);
 		if($remoteId)
 		{
@@ -201,6 +202,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
 	{
 		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		$data->sentData = $xml;
 		$this->send($distributionProfile, $xml);
 	}
 	
