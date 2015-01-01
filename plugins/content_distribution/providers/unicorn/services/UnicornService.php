@@ -24,10 +24,14 @@ class UnicornService extends KalturaBaseService
 	 */
 	public function notifyAction($id) 
 	{
+		$submitCoreType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$updateCoreType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$deleteCoreType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		
 		$validJobTypes = array(
-			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT),
-			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE),
-			ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE),
+			$submitCoreType,
+			$updateCoreType,
+			$deleteCoreType,
 		);
 		
 		$batchJob = BatchJobPeer::retrieveByPK($id);
@@ -59,10 +63,26 @@ class UnicornService extends KalturaBaseService
 			
 		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
 		
-		if($batchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+		if($batchJob->getJobType() == $submitCoreType)
 		{
 			$this->attachRemoteAssetResource($batchJob->getEntry(), $batchJob->getData());
 		}
+		
+		if($batchJob->getJobType() == $deleteCoreType)
+		{
+			$this->detachRemoteAssetResource($batchJob->getEntry(), $batchJob->getData());
+		}
+	}
+	
+	protected function detachRemoteAssetResource(entry $entry, kDistributionSubmitJobData $data)
+	{
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($data->getDistributionProfileId());
+		/* @var $distributionProfile UnicornDistributionProfile */
+		
+		$asset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $distributionProfile->getRemoteAssetParamsId());
+		$asset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$asset->setDeletedAt(time());
+		$asset->save();		
 	}
 	
 	protected function attachRemoteAssetResource(entry $entry, kDistributionSubmitJobData $data)
