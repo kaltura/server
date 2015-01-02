@@ -158,7 +158,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		
 		if($data instanceof KalturaDistributionDeleteJobData || $data->entryDistribution->sunset)
 		{
-			$publicationRulesXml = $xml->addChild('PublicationRules');
+			$publicationRulesXml = $avItemXml->addChild('PublicationRules');
 			$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
 	
 			$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
