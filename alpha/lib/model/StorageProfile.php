@@ -396,4 +396,28 @@ class StorageProfile extends BaseStorageProfile
 	{
 		$this->scope = $scope;
 	}
+	
+	public function setPrivateKey($v) {
+		$this->putInCustomData("privateKey", $v);
+	}
+	
+	public function setPublicKey($v) {
+		$this->putInCustomData("publicKey", $v);
+	}
+	
+	public function setPassPhrase($v) {
+		$this->putInCustomData("passPhrase", $v);
+	}
+	
+	public function getPrivateKey() {
+		return $this->getFromCustomData("privateKey");
+	}
+	
+	public function getPublicKey() {
+		return $this->getFromCustomData("publicKey");
+	}
+	
+	public function getPassPhrase() {
+		return $this->getFromCustomData("passPhrase");
+	}
 }
