@@ -423,9 +423,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		if(!in_array($object->getType(), $indexOnEntryTypes))
 			return false;
 		
-		$filedsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
+		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
 		
-		if(count(array_intersect($filedsToMonitor, $modifiedColumns)) > 0)
+		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
 			return true;
 
 		return false;
