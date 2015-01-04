@@ -1805,7 +1805,7 @@ class kFlowHelper
 			{
 				if(self::isAssetExportFinished($fileSync, $asset))
 				{
-					if(!is_null($asset->getentry()->getReplacedEntryId()))
+					if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
 						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
 					
 					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
