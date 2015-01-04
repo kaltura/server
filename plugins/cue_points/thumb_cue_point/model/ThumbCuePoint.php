@@ -36,10 +36,10 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		return ThumbCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(ThumbCuePointMetadataObjectType::THUMB_CUE_POINT);
 	}
 
-	public function copyToEntry( $dstEntry, PropelPDO $con = null)
+	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $liveDurationOffsetFromVodInMsec )
 	{
 		// Clone the cue point to the destination entry
-		$dstThumbCuePoint = parent::copyToEntry( $dstEntry, $con );
+		$dstThumbCuePoint = parent::copyToEntry( $vodEntry );
 
 		$timedThumbAsset = assetPeer::retrieveById($this->getAssetId());
 		if ( ! $timedThumbAsset )
@@ -48,14 +48,18 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 			return;
 		}
 
+		// Offset the startTime according to the duration gap between the live and VOD entries
+		$startTime = $dstThumbCuePoint->getStartTime();
+		$dstThumbCuePoint->setStartTime( $startTime - $liveDurationOffsetFromVodInMsec );
+
 		$timedThumbAsset->setCuePointID( $dstThumbCuePoint->getId() );	// Set the destination cue point's id
 		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
 
 		// Make a copy of the current thumb asset
 		// copyToEntry will create a filesync softlink to the original filesync
-		$dstTimedThumbAsset = $timedThumbAsset->copyToEntry( $dstEntry->getId(), $dstEntry->getPartnerId() );
+		$dstTimedThumbAsset = $timedThumbAsset->copyToEntry( $vodEntry->getId(), $vodEntry->getPartnerId() );
 		$dstThumbCuePoint->setAssetId( $dstTimedThumbAsset->getId() );
-		$dstThumbCuePoint->save( $con );
+		$dstThumbCuePoint->save();
 
 		// Restore the thumb asset's prev. cue point id (for good measures)
 		$timedThumbAsset->setCuePointID( $this->getId() );
@@ -63,7 +67,7 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 
 		// Save the destination entry's thumb asset
 		$dstTimedThumbAsset->setCuePointID( $dstThumbCuePoint->getId() );
-		$dstTimedThumbAsset->save( $con );
+		$dstTimedThumbAsset->save();
 
 		KalturaLog::log("Saved cue point [{$dstThumbCuePoint->getId()}] and timed thumb asset [{$dstTimedThumbAsset->getId()}]");
 	}
