@@ -1,5 +1,21 @@
 # Jupiter-10.2.0 #
 
+##add flavorasset->getwebplayablebyentryid permission to basic playback role##
+- Issue Type: Back-End Request
+- Issue ID: KMS-5334
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_base_playback_role_flavorasset_getwebplayablebyentryid_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Copy entitlement info from live entry to vod entry ##
 - Issue Type: New Feature
 - Issue ID: PLAT-2313
