@@ -1,5 +1,21 @@
 # Jupiter-10.2.0 #
 
+##link externalmedia->add permission to basic permission objects##
+- Issue Type: Back-End Request
+- Issue ID: SUP-2708
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_externalmedia_add_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 ##add flavorasset->getwebplayablebyentryid permission to basic playback role##
 - Issue Type: Back-End Request
 - Issue ID: KMS-5334
