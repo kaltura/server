@@ -2,7 +2,7 @@
 /**
  * @package plugins.cuePoint
  */
-class kThumbCuePointManager implements kObjectDeletedEventConsumer
+class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -19,6 +19,54 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	*/
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if(self::isTimedThumbAssetChangedToReady($object, $modifiedColumns))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		KalturaLog::debug(">>> inside objectChanged 1");
+		if(self::isTimedThumbAssetChangedToReady($object, $modifiedColumns))
+		{
+			KalturaLog::debug(">>> inside objectChanged 2");
+			/* @var $object timedThumbAsset */
+			$cuePointId = $object->getCuePointID();
+			if(!$cuePointId)
+			{
+				KalturaLog::debug("CuePoint Id not found on object");
+				return true;
+			}
+			
+			$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
+			if(!$cuePoint)
+			{
+				KalturaLog::debug("CuePoint with ID [$cuePointId] not found");
+				return true;
+			}
+			
+			if($cuePoint->getStatus() == CuePointStatus::PENDING)
+			{
+				$cuePoint->setStatus(CuePointStatus::READY);
+				$cuePoint->save();	
+				return true;
+			}
+		}
+		
+		return true;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
@@ -30,6 +78,14 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer
 			$this->timedThumbAssetDeleted($object);
 			
 		return true;
+	}
+	
+	public static function isTimedThumbAssetChangedToReady(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof timedThumbAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+				return true;
+		}
 	}
 	
 	/**
