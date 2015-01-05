@@ -3,8 +3,9 @@
  * @package plugins.unicornDistribution
  * @subpackage lib
  */
-class UnicornDistributionEngine extends DistributionEngine implements IDistributionEngineUpdate, IDistributionEngineSubmit, IDistributionEngineCloseSubmit, IDistributionEngineCloseUpdate
+class UnicornDistributionEngine extends DistributionEngine implements IDistributionEngineUpdate, IDistributionEngineSubmit, IDistributionEngineDelete, IDistributionEngineCloseSubmit, IDistributionEngineCloseUpdate, IDistributionEngineCloseDelete
 {
+	const FAR_FUTURE = 933120000; // 60s * 60m * 24h * 30d * 12m * 30y
 	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
@@ -37,6 +38,22 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		
 		return false;
 	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineDelete::delete()
+	 */
+	public function delete(KalturaDistributionDeleteJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaUnicornDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaUnicornDistributionProfile");
+		
+		if(!$data->providerData || !($data->providerData instanceof KalturaUnicornDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaUnicornDistributionJobProviderData");
+		
+		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseSubmit::closeSubmit()
@@ -48,9 +65,18 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseUpdate::closeSubmit()
+	 * @see IDistributionEngineCloseUpdate::closeUpdate()
 	 */
-	public function closeUpdate(KalturaDistributionSubmitJobData $data)
+	public function closeUpdate(KalturaDistributionUpdateJobData $data)
+	{
+		// will be closed by the callback notification
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseDelete::closeDelete()
+	 */
+	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
 		// will be closed by the callback notification
 		return false;
@@ -59,8 +85,8 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function getNotificationUrl()
 	{
 		$job = KJobHandlerWorker::getCurrentJob();
-		$urlParams = array('service' => 'unicornDistribution_unicorn', 'action' => 'notify', 'partnerId' => $job->partnerId, 'id' => $job->id);
-		return requestUtils::getRequestHost() . '/api_v3/index.php/' . requestUtils::buildRequestParams($urlParams);
+		$serviceUrl = trim(KBatchBase::$kClientConfig->serviceUrl, '/');
+		return "$serviceUrl/api_v3/index.php/service/unicornDistribution_unicorn/action/notify/partnerId/{$job->partnerId}/id/{$job->id}";
 	}
 	
 	/**
@@ -94,7 +120,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		$entryDistribution = $data->entryDistribution;
 		/* @var $entryDistribution KalturaEntryDistribution */
 		
-		$flavorAssetIds = implode(',', $entryDistribution->flavorAssetIds);
+		$flavorAssetIds = explode(',', $entryDistribution->flavorAssetIds);
 		$flavorAssetId = reset($flavorAssetIds);
 		$downloadURL = $this->getFlavorAssetUrl($flavorAssetId);
 		
@@ -104,7 +130,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		$xml->addChild('DomainName', $distributionProfile->domainName);
 		
 		$avItemXml = $xml->addChild('AVItem');
-		$avItemXml->addChild('CatalogGUID', $providerData->catalogGUID);
+		$avItemXml->addChild('CatalogGUID', $providerData->catalogGuid);
 		$avItemXml->addChild('ForeignKey', $entryDistribution->entryId);
 		$avItemXml->addChild('IngestItemType', 'Video');
 		
@@ -113,7 +139,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		
 		$avItemXml->addChild('Title', $providerData->title);
 		
-		if(count($entryDistribution->assetIds))
+		if($entryDistribution->assetIds)
 		{
 			$captionsXml = $avItemXml->addChild('Captions');
 			
@@ -131,6 +157,26 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			}
 		}
 		
+		$publicationRulesXml = $avItemXml->addChild('PublicationRules');
+		$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
+		
+		$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
+		$publicationRuleXml->addChild('ChannelGUID', $distributionProfile->channelGuid);
+		$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
+		
+		if($data instanceof KalturaDistributionDeleteJobData)
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, time()));
+		}
+		elseif($data->entryDistribution->sunset)
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
+		}
+		else
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, time() + self::FAR_FUTURE));
+		}
+		
 		$xml->addChild('NotificationURL', $this->getNotificationUrl());
 		$xml->addChild('NotificationRequestMethod', 'GET');
 		
@@ -145,25 +191,83 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 	protected function handleSubmit(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
 	{
 		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		$data->sentData = $xml;
+		$remoteId = $this->send($distributionProfile, $xml);
+		if($remoteId)
+		{
+			KalturaLog::debug("Remote ID [$remoteId]");
+			$data->remoteId = $remoteId;
+		}
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaUnicornDistributionProfile $distributionProfile
+	 * @param KalturaUnicornDistributionJobProviderData $providerData
+	 */
+	protected function handleDelete(KalturaDistributionJobData $data, KalturaUnicornDistributionProfile $distributionProfile, KalturaUnicornDistributionJobProviderData $providerData)
+	{
+		$xml = $this->buildXml($data, $distributionProfile, $providerData);
+		$data->sentData = $xml;
+		$this->send($distributionProfile, $xml);
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaUnicornDistributionProfile $distributionProfile
+	 * @param KalturaUnicornDistributionJobProviderData $providerData
+	 */
+	protected function send(KalturaUnicornDistributionProfile $distributionProfile, $xml)
+	{
+		KalturaLog::debug("XML [$xml]");
 		
-		$curl = new KCurlWrapper();
-		$curl->setOpt(CURLOPT_POST, true);
-		$curl->setOpt(CURLOPT_POSTFIELDS, $xml);
-		$curl->setOpt(CURLOPT_HTTPHEADER, array('Content-type: text/xml'));
-		$response = $curl->getHeader($distributionProfile->apiHostUrl);
+		$ch = curl_init($distributionProfile->apiHostUrl);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/xml'));
+		$response = curl_exec($ch);
+		
 		
 		if(!$response)
 		{
-			$curlError = $curl->getError();
-			$curlErrorNumber = $curl->getErrorNumber();
-			$curl->close();
+			$curlError = curl_error($ch);
+			$curlErrorNumber = curl_errno($ch);
+			curl_close($ch);
 			throw new KalturaDispatcherException("HTTP request failed: $curlError", $curlErrorNumber);
 		}
-		$curl->close();
-		
-		if($response->code != KCurlHeaderResponse::HTTP_STATUS_OK)
+		curl_close($ch);
+		KalturaLog::debug("Response [$response]");
+	
+		$matches = null;
+		if(preg_match_all('/HTTP\/?[\d.]{0,3} ([\d]{3}) ([^\n\r]+)/', $response, $matches))
 		{
-			throw new KalturaDispatcherException("HTTP response code error: $response->codeName", $response->code);
+			KalturaLog::debug("Matches [" . print_r($matches, true) . "]");
+			foreach($matches[0] as $index => $match)
+			{
+				$code = intval($matches[1][$index]);
+				$message = $matches[2][$index];
+			
+				if($code == KCurlHeaderResponse::HTTP_STATUS_CONTINUE)
+				{
+					continue;
+				}
+				
+				if($code != KCurlHeaderResponse::HTTP_STATUS_OK)
+				{
+					throw new Exception("HTTP response code [$code] error: $message", $code);
+				}
+				
+				if(preg_match('/^MediaItemGuid: (.+)$/', $message, $matches))
+				{
+					return $matches[1];
+				}
+				
+				return null;
+			}
 		}
+
+		throw new KalturaDistributionException("Unexpected HTTP response");
 	}
 }

@@ -90,6 +90,18 @@ class UnicornDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 					
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'UnicornDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineDelete')
+				return 'UnicornDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineCloseSubmit')
+				return 'UnicornDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineCloseUpdate')
+				return 'UnicornDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineCloseDelete')
+				return 'UnicornDistributionEngine';
 		}
 		
 		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::UNICORN)

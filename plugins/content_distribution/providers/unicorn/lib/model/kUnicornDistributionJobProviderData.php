@@ -10,7 +10,7 @@ class kUnicornDistributionJobProviderData extends kDistributionJobProviderData
 	 * 
 	 * @var string
 	 */
-	protected $catalogGUID;
+	protected $catalogGuid;
 	
 	/**
 	 * The Title assigned to the video. The Foreign Key will be used if no title is provided.
@@ -22,9 +22,9 @@ class kUnicornDistributionJobProviderData extends kDistributionJobProviderData
 	/**
 	 * @return string
 	 */
-	public function getCatalogGUID()
+	public function getCatalogGuid()
 	{
-		return $this->catalogGUID;
+		return $this->catalogGuid;
 	}
 	
 	/**
@@ -36,11 +36,11 @@ class kUnicornDistributionJobProviderData extends kDistributionJobProviderData
 	}
 	
 	/**
-	 * @param string $catalogGUID
+	 * @param string $catalogGuid
 	 */
-	public function setCatalogGUID($catalogGUID)
+	public function setCatalogGuid($catalogGuid)
 	{
-		$this->catalogGUID = $catalogGUID;
+		$this->catalogGuid = $catalogGuid;
 	}
 	
 	/**
