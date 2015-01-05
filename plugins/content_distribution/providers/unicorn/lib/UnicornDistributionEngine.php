@@ -5,6 +5,7 @@
  */
 class UnicornDistributionEngine extends DistributionEngine implements IDistributionEngineUpdate, IDistributionEngineSubmit, IDistributionEngineDelete, IDistributionEngineCloseSubmit, IDistributionEngineCloseUpdate, IDistributionEngineCloseDelete
 {
+	const FAR_FUTURE = 933120000; // 60s * 60m * 24h * 30d * 12m * 30y
 	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
@@ -156,23 +157,24 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			}
 		}
 		
-		if($data instanceof KalturaDistributionDeleteJobData || $data->entryDistribution->sunset)
+		$publicationRulesXml = $avItemXml->addChild('PublicationRules');
+		$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
+		
+		$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
+		$publicationRuleXml->addChild('ChannelGUID', $distributionProfile->channelGuid);
+		$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
+		
+		if($data instanceof KalturaDistributionDeleteJobData)
 		{
-			$publicationRulesXml = $avItemXml->addChild('PublicationRules');
-			$publicationRuleXml = $publicationRulesXml->addChild('PublicationRule');
-	
-			$format = 'Y-m-d\TH:i:s\Z'; // e.g. 2007-03-01T13:00:00Z
-			$publicationRuleXml->addChild('ChannelGUID', $distributionProfile->channelGuid);
-			$publicationRuleXml->addChild('StartDate', date($format, $data->entryDistribution->sunrise));
-			
-			if($data instanceof KalturaDistributionDeleteJobData)
-			{
-				$publicationRuleXml->addChild('EndDate', date($format, time()));
-			}
-			else
-			{
-				$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
-			}
+			$publicationRuleXml->addChild('EndDate', date($format, time()));
+		}
+		elseif($data->entryDistribution->sunset)
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, $data->entryDistribution->sunset));
+		}
+		else
+		{
+			$publicationRuleXml->addChild('EndDate', date($format, time() + self::FAR_FUTURE));
 		}
 		
 		$xml->addChild('NotificationURL', $this->getNotificationUrl());
