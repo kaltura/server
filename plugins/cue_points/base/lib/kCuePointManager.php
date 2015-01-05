@@ -71,19 +71,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$c = new Criteria();
 		$c->add(CuePointPeer::PARENT_ID, $cuePoint->getId());
 			
-		CuePointPeer::setUseCriteriaFilter(false);
-		$cuePoints = CuePointPeer::doSelect($c);
-
-		$update = new Criteria();
-		$update->add(CuePointPeer::STATUS, CuePointStatus::DELETED);
+		$this->deleteCuePoints($c);
 			
-		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-		BasePeer::doUpdate($c, $update, $con);
-
-		foreach($cuePoints as $cuePoint)
-			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
-			
-		//re-index cue point entry
+		//re-index cue point on entry
 		$this->reIndexCuePointEntry($cuePoint);
 	}
 	
@@ -95,6 +85,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $entryId);
 			
+		$this->deleteCuePoints($c);
+	}
+	
+	protected function deleteCuePoints(Criteria $c)
+	{
 		CuePointPeer::setUseCriteriaFilter(false);
 		$cuePoints = CuePointPeer::doSelect($c);
 
@@ -103,6 +98,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
+		CuePointPeer::setUseCriteriaFilter(true);
 
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
@@ -354,6 +350,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				$cuePoint->indexToSearchIndex();
 			}
 		}
+		
+		if(self::shouldReIndexEntry($object, $modifiedColumns))
+		{
+			$this->reIndexCuePointEntry($object);
+		}
 
 		return true;
 	}
@@ -369,6 +370,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		}
 
 		if ( self::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
+		{
+			return true;
+		}
+		
+		if( self::shouldReIndexEntry($object, $modifiedColumns) )
 		{
 			return true;
 		}
@@ -401,6 +407,26 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		{
 			return true;
 		}
+
+		return false;
+	}
+	
+	public static function shouldReIndexEntry(BaseObject $object, array $modifiedColumns)
+	{
+		if(!($object instanceof CuePoint))
+			return false;
+		
+		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
+		if(!count($indexOnEntryTypes))
+			return false;
+			
+		if(!in_array($object->getType(), $indexOnEntryTypes))
+			return false;
+		
+		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
+		
+		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
+			return true;
 
 		return false;
 	}
@@ -454,7 +480,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
 	{
-		//index the entry after the cue point was added
+		//index the entry after the cue point was added|deleted
 		$entryId = $cuePoint->getEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 
