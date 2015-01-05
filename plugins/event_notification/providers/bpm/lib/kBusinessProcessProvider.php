@@ -27,6 +27,11 @@ abstract class kBusinessProcessProvider
 	abstract public function startBusinessProcess($processId, array $variables);
 	
 	/**
+	 * @return string caseId
+	 */
+	abstract public function abortCase($caseId);
+	
+	/**
 	 * @param string $caseId
 	 * @param string $eventId
 	 * @param string $message

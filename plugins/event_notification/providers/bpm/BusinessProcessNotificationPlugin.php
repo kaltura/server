@@ -85,7 +85,11 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 	{
 		if($baseClass == 'KalturaEventNotificationDispatchJobData')
 		{
-			if($enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_START) || $enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_SIGNAL))
+			if(
+				$enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_START) || 
+				$enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_SIGNAL) || 
+				$enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_ABORT)
+			)
 				return 'KalturaBusinessProcessNotificationDispatchJobData';
 		}
 		
@@ -109,7 +113,11 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 	
 		if($baseClass == 'Form_EventNotificationTemplateConfiguration')
 		{
-			if($enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_START || $enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_SIGNAL)
+			if(
+				$enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_START || 
+				$enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_SIGNAL || 
+				$enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_ABORT
+			)
 				return 'Form_BusinessProcessNotificationTemplateConfiguration';
 		}
 	
@@ -124,7 +132,11 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 	
 		if($baseClass == 'KDispatchEventNotificationEngine')
 		{
-			if($enumValue == KalturaEventNotificationTemplateType::BPM_START || $enumValue == KalturaEventNotificationTemplateType::BPM_SIGNAL)
+			if(
+				$enumValue == KalturaEventNotificationTemplateType::BPM_START ||
+				$enumValue == KalturaEventNotificationTemplateType::BPM_SIGNAL ||
+				$enumValue == KalturaEventNotificationTemplateType::BPM_ABORT
+			)
 				return 'KDispatchBusinessProcessNotificationEngine';
 		}
 			

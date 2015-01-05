@@ -75,6 +75,14 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 			
 		return null;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kBusinessProcessProvider::abortCase()
+	 */
+	public function abortCase($caseId)
+	{
+		$this->client->processInstances->deleteProcessInstance($caseId);
+	}
 
 	/* (non-PHPdoc)
 	 * @see kBusinessProcessProvider::signalCase()

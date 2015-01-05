@@ -33,7 +33,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 				$object = $event->getObject();
 				if($object instanceof entry)
 					$entryId = $object->getId();
-				elseif(method_exists($event, 'getEntryId'))
+				elseif(method_exists($object, 'getEntryId'))
 					$entryId = $object->getEntryId();
 			}
 			

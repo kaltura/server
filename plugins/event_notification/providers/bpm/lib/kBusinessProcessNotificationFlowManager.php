@@ -2,7 +2,7 @@
 /**
  * @package plugins.businessProcessNotification
  */
-class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventConsumer
+class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -42,5 +42,51 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 		return true;
 	}
 
-	
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
+	 */
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		$entryId = null;		
+		if($object instanceof entry)
+			$entryId = $object->getId();
+		elseif(method_exists($object, 'getEntryId'))
+			$entryId = $object->getEntryId();
+			
+		$partnerId = null;
+		if(method_exists($object, 'getPartnerId'))
+			$partnerId = $object->getPartnerId();
+			
+		$abortCaseJobType = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_ABORT);
+		
+		$scope = new kEventNotificationScope();
+		$scope->setObject($object);
+		$scope->setParentRaisedJob($raisedJob);
+		
+		$cases = BusinessProcessNotificationTemplate::getCases($object);
+		foreach($cases as $case)
+		{
+			$notificationTemplate = EventNotificationTemplatePeer::retrieveByPK($case['templateId']);
+			/* @var $notificationTemplate BusinessProcessStartNotificationTemplate */
+			if($notificationTemplate->getPartnerId())
+				$partnerId = $notificationTemplate->getPartnerId();
+				
+			$scope->setPartnerId($partnerId);
+			$jobData = $notificationTemplate->getJobData($scope);
+			kEventNotificationFlowManager::addEventNotificationDispatchJob($abortCaseJobType, $jobData, $partnerId, $entryId, $raisedJob);
+		}
+		return true;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		$cases = BusinessProcessNotificationTemplate::getCases($object);
+		if($cases)
+			return true;
+			
+		return false;
+	}
 }
