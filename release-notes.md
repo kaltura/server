@@ -1,5 +1,20 @@
 # Jupiter-10.2.0 #
 
+## Unicorn Connector ##
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		UnicornDistribution
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/add_permissions/2014_12_30_unicorn_callback_service.php
+
 ##link externalmedia->add permission to basic permission objects##
 - Issue Type: Back-End Request
 - Issue ID: SUP-2708
