@@ -131,6 +131,17 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());
 		
+		if ( $entry->getSourceType() == EntrySourceType::RECORDED_LIVE && $entry->getRootEntryId() )
+		{
+			$liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
+			if ( $liveEntry && $liveEntry instanceof LiveEntry )
+			{
+				/* @var $liveEntry LiveEntry */
+				$liveEntry->setRecordedEntryId( null );
+				$liveEntry->save();
+			}
+		}
+
 		$c = new Criteria();
 		$c->add(categoryEntryPeer::ENTRY_ID, $entry->getId());
 		if(!categoryEntryPeer::doSelectOne($c)) {
