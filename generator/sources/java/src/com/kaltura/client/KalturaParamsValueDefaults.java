@@ -36,8 +36,8 @@ public final class KalturaParamsValueDefaults {
 	public static final int KALTURA_UNDEF_INT = Integer.MIN_VALUE;
 	public static final int KALTURA_NULL_INT =  Integer.MAX_VALUE;
 	
-	public static final float KALTURA_UNDEF_FLOAT = Float.MIN_VALUE;
-	public static final float KALTURA_NULL_FLOAT =  Float.MAX_VALUE;
+	public static final double KALTURA_UNDEF_DOUBLE = Double.MIN_VALUE;
+	public static final double KALTURA_NULL_DOUBLE =  Double.MAX_VALUE;
 	
 	public static final long KALTURA_UNDEF_LONG =  Long.MIN_VALUE;
 	public static final long KALTURA_NULL_LONG =  Long.MAX_VALUE;

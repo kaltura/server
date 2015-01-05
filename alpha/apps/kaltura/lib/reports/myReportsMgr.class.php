@@ -40,7 +40,8 @@ class myReportsMgr
 	const REPORT_TYPE_OPERATION_SYSTEM = 22;
 	const REPORT_TYPE_BROWSERS = 23;
 	const REPORT_TYPE_LIVE = 24;
-	
+
+	const REPORTS_TABLE_MAX_QUERY_SIZE = 20000;
 	const REPORTS_CSV_MAX_QUERY_SIZE = 130000;
 	const REPORTS_TABLE_RESULTS_SINGLE_ITERATION_SIZE = 10000;
 	const REPORTS_COUNT_CACHE = 60;
@@ -57,7 +58,8 @@ class myReportsMgr
 										
 	static $end_user_filter_get_count_reports = array (self::REPORT_TYPE_PLATFORMS,
 										self::REPORT_TYPE_OPERATION_SYSTEM, 
-										self::REPORT_TYPE_BROWSERS);
+										self::REPORT_TYPE_BROWSERS,
+										self::REPORT_TYPE_TOP_CONTENT);
 										
 
 	public static function runQuery ( $query_file , $map , $debug = false )
@@ -371,6 +373,8 @@ class myReportsMgr
 			}
 		}
 		if ( ! $page_size || $page_size < 0 ) $page_size = 10;
+		$page_size = min($page_size , self::REPORTS_TABLE_MAX_QUERY_SIZE);
+		
 		if ( ! $page_index || $page_index < 0 ) $page_index = 0;
 
 		$result  = self::executeQueryByType( $partner_id , $report_type , self::REPORT_FLAVOR_TABLE , $input_filter ,$page_size , $page_index , $order_by , $object_ids, $offset );
@@ -1265,7 +1269,7 @@ class myReportsMgr
 	{
 		kApiCache::disableConditionalCache();
 	
-		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
+		$mysql_function = 'mysqli';
 		
 		$db_config = kConf::get( "reports_db_config" );
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;

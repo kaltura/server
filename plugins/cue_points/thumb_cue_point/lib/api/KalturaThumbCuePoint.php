@@ -40,6 +40,7 @@ class KalturaThumbCuePoint extends KalturaCuePoint
 		"assetId",
 		"title" => "name",
 		"description" => "text",
+		"subType",
 	);
 	
 	/* (non-PHPdoc)

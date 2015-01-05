@@ -88,7 +88,7 @@ class KProcessWrapper
 		$descriptorspec = array(); // stdin is a pipe that the child will read from
 		$other_options = array('suppress_errors' => FALSE, 'bypass_shell' => FALSE);
 		
-		KalturaLog::debug("Now executing [$cmdLine], [$other_options]");
+		KalturaLog::debug("Now executing [$cmdLine]");
 		$process = proc_open($cmdLine, $descriptorspec, $pipes, null, null, $other_options);
 		$this->pipes = $pipes;
 		$this->handle = $process;

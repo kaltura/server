@@ -818,6 +818,12 @@ class playManifestAction extends kalturaAction
 				array(assetParams::TAG_ISM),
 			);
 
+		case PlaybackProtocol::MPEG_DASH:
+			return array(
+				array('ipadnew', 'iphonenew'),
+				array('ipad', 'iphone'),
+			);
+			
 		case PlaybackProtocol::APPLE_HTTP:
 		case PlaybackProtocol::HDS:
 			return array(

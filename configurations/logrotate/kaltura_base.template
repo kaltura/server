@@ -6,6 +6,7 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_monit.log {
@@ -19,6 +20,7 @@
  postrotate
  service kaltura_monit restart
  endscript
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_deploy.log {
@@ -28,6 +30,7 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_scripts.log {
@@ -37,4 +40,5 @@
  compress
  dateext
  notifempty
+ su root kaltura
 }

@@ -1,3 +1,185 @@
+# Jupiter-10.2.0 #
+
+##add flavorasset->getwebplayablebyentryid permission to basic playback role##
+- Issue Type: Back-End Request
+- Issue ID: KMS-5334
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_base_playback_role_flavorasset_getwebplayablebyentryid_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Copy entitlement info from live entry to vod entry ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2313
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectCreatedHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Scheduled Tasks Enhancements 2 ##
+- Issue Type: New Feature
+- Issue ID: PLAT-1631
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following plugin to the list of plugins
+
+		ScheduledTaskContentDistribution
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_25_scheduled_task_update.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Jupiter-10.1.0 #
+
+## New UI Conf Type ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2245
+
+#### Configuration ####
+
+*admin.ini*
+
+Add the following line to the end of the settings.uiConfTypes[] list
+
+		settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::WEBCASTING
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Allow cue point search combined with entry filter ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2208
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+Need to re-index the entry in order for the cue points to get indexed on it.
+
+#### Known Issues & Limitations ####
+
+None.
+
+# Jupiter-10.0.0 #
+
+## Change emails_en to templace ##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-2244
+
+#### Configuration ####
+
+** emails_en **
+
+Requires cloning batch/batches/Mailer/emails_en.template.ini to batch/batches/Mailer/emails_en.ini and replace all place holders in it.
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+## sourceType filter ##
+- Issue Type: Change Request
+- Issue ID: PLAT-2148
+
+#### Configuration ####
+
+** sphinx/kaltura.conf **
+
+Add the following line to the kaltura_entry class in configurations/sphinx/kaltura.conf (or merged from configurations/sphinx/kaltura.conf.template)
+
+	rt_attr_uint = source
+
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+##add user->get permission to basic user role##
+- Issue Type: Customer request
+- Issue ID: SUP-2899
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_30_BASE_USER_SESSION_PERMISSION_add_USER_GET_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##Live reports - Export to CSV ##
+- Issue Type: Customer request
+- Issue ID: PLAT-2020
+
+#### Configuration ####
+
+Create the following directory for the generated reports - 
+@WEB_DIR@/content/reports/live/
+
+**local.ini**
+requires the configuration of 'live_report_sender_email' and 'live_report_sender_name'.
+
+**workers.ini**
+Requires the addition of 'KAsyncLiveReportExport' worker definition and enabling.
+a template can be found at batch.ini.template
+
+#### Deployment Scripts ####
+
+*Permissions*
+
+- execute: php deployment/updates/scripts/add_permissions/2014_11_20_export_live_reports_to_csv.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # IX-9.19.8 #
 
 ##Add support for multiple video/audio substreams##
@@ -106,6 +288,45 @@ Need to run an update SQL statment:
 None.
 
 # IX-9.19.6 #
+
+##Added PPT to image conversion##
+- Issue Type: Back-End Request
+- Issue ID: PLAT-1750
+
+#### Configuration ####
+In order to use, requires adding a new flavor_params such as: [Assuming 10025 == document / assetType / Image]
+
+	INSERT INTO flavor_params VALUES (581230,0,0,'PPT 2 Image','',NULL,'PPT 2 Image',0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,0,'jpg','',1,'',0,0,0,0,0,0,0,0,0,NULL,NULL,'a:3:{s:18:\"FlavorVideoBitrate\";i:1;s:19:\"requiredPermissions\";a:0:{}s:9:"sizeWidth";i:940;}',0,NULL,1,0,0,'[[{\"id\":\"document.ppt2Img\",\"extra\":null,\"command\":null}]]',NULL,10025);
+
+Place PowerPointConvertor.exe and PowerPointConvertor.exe.config in the same directory on your windows machine.
+f.i. /opt/kaltura/exe
+
+Requires adding a new windows worker. Sample configuration - 
+
+	[KAsyncConvertPpt : KAsyncConvert]
+	id = XXXXX
+	friendlyName = Convert ppt
+	params.isRemoteInput = 1
+	params.isRemoteOutput = 0
+	maximumExecutionTime = 36000
+	maxJobsEachRun = 1
+	filter.jobSubTypeIn = document.ppt2Img
+	params.ppt2ImgCmd = C:\opt\kaltura\exe\PowerPointConvertor.exe
+	baseLocalPath = C:\web\
+	baseTempSharedPath = /opt/kaltura/web/tmp/convert/
+	baseTempLocalPath = W:\tmp\convert\
+	params.localFileRoot = C:/output
+	params.remoteUrlDirectory = /output
+	params.fileCacheExpire = 36000
+	params.localTempPath = C:\opt\kaltura\tmp\convert
+	params.sharedTempPath = W:\tmp\convert\ 
+
+#### Deployment Scripts ####
+
+	php deployment/base/scripts/installPlugins.php
+
+#### Known Issues & Limitations ####
+None.
 
 ##add partner to 'exclude' list##
 - Issue Type: Customer request

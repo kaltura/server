@@ -10,6 +10,7 @@
  postrotate
  service red5 restart
  endscript
+ su root kaltura
 }
 
 @LOG_DIR@/kaltura_red5_error.log{
@@ -23,4 +24,5 @@
  postrotate
  service red5 restart
  endscript
+ su root kaltura
 }

@@ -426,7 +426,16 @@ class Partner extends BasePartner
 		return $this->putInCustomData( "partnerSpecificServices", $v );
 	}
 
-	
+	public function getDefThumbQuality()
+	{
+		return $this->getFromCustomData( "defThumbQuality" , null , 0);
+	}
+
+	public function setDefThumbQuality( $v )
+	{
+		return $this->putInCustomData( "defThumbQuality", $v );
+	}
+
 	public function getAllowAnonymousRanking()	{		return $this->getFromCustomData( "allowAnonymousRanking" , null, false  );	}
 	public function setAllowAnonymousRanking( $v )	{		return $this->putInCustomData( "allowAnonymousRanking", $v );	}
 	
@@ -1009,7 +1018,25 @@ class Partner extends BasePartner
 	public function getPrimaryBroadcastUrl()			{return $this->getFromCustomData('primary_broadcast_url');}
 	public function getSecondaryBroadcastUrl()			{return $this->getFromCustomData('secondary_broadcast_url');}
 	public function getLiveStreamPlaybackUrlConfigurations()		 	{return $this->getFromCustomData('live_stream_playback_url_configurations', null, array());}
-	
+
+
+    public function setLiveStreamBroadcastUrlConfigurations($key, $value)
+    {
+    	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
+    }
+    
+	public function getLiveStreamBroadcastUrlConfigurations($dc = null)
+	{
+		$config = (!is_null($dc) ? kConf::get($dc, 'broadcast') : kConf::getMap('broadcast'));
+		
+		$partnerConfig = $this->getFromCustomData($dc, 'live_stream_broadcast_url_configurations');
+		if($partnerConfig)
+		{
+			$config = kConf::mergeConfigItem($config, $partnerConfig, true);
+		}
+		
+		return $config;
+	}
 	
 	/**
 	 * @return kAkamaiLiveParams

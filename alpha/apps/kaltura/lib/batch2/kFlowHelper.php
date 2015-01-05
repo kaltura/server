@@ -14,7 +14,7 @@ class kFlowHelper
 	const MAX_INTER_FLOW_ITERATIONS_ALLOWED_ON_SOURCE = 2;
 	
 	const BULK_DOWNLOAD_EMAIL_PARAMS_SEPARATOR = '|,|';
-
+	
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -1805,7 +1805,7 @@ class kFlowHelper
 			{
 				if(self::isAssetExportFinished($fileSync, $asset))
 				{
-					if(!is_null($asset->getentry()->getReplacedEntryId()))
+					if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
 						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
 					
 					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
@@ -2639,6 +2639,126 @@ class kFlowHelper
 			$dbBatchJob->getPartner()->resetFeaturesStatusByType($featureStatusToRemove->getType());
 		}
 
+		return $dbBatchJob;
+	}
+	
+	protected static function createLiveReportExportDownloadUrl ($partner_id, $file_name)
+	{
+		// Extract simple download name
+		$regex = "/^{$partner_id}_Export_[a-zA-Z0-9]+_(?<fileName>[\w\-]+.csv)$/";
+		if(!preg_match($regex, $file_name, $matches)) {
+			KalturaLog::err("File name doesn't match expected format");
+			return null;
+		}
+		$downloadName = $matches['fileName'];
+		
+		// Add dc to enable redirection
+		$dc = kDataCenterMgr::getCurrentDc();
+		$file_name = $dc['id'] . "_" . $file_name;
+		
+		$ksStr = "";
+		$partner = PartnerPeer::retrieveByPK ( $partner_id );
+		$secret = $partner->getSecret ();
+		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+	
+		$expiry = kConf::get("live_report_export_expiry", 'local', 3 * 24 * 60 * 60);
+		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
+			
+		//url is built with DC url in order to be directed to the same DC of the saved file
+		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+		return $url;
+	}
+	
+	public static function handleLiveReportExportFinished(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
+		
+		// Move file from shared temp to it's final location
+		$fileName =  basename($data->outputPath);
+		$directory =  myContentStorage::getFSContentRootPath() . "/content/reports/live/" . $dbBatchJob->getPartnerId() ;
+		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+		
+		$moveFile = kFile::moveFile($data->outputPath, $filePath);
+		if(!$moveFile) {
+			KalturaLog::err("Failed to move report file from: " . $data->outputPath . " to: " . $filePath);
+			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
+		} 
+		
+		$data->outputPath = $filePath;
+		$dbBatchJob->setData($data);
+		$dbBatchJob->save();
+		
+		// Create download URL
+		$url = self::createLiveReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
+		if(!$url) {
+			KalturaLog::err("Failed to create download URL");
+			return kFlowHelper::handleLiveReportExportFailed($dbBatchJob, $data);
+		}
+		
+		// Create email params
+		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset); 
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_SUCCESS;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), $url);
+		$titleParams = array($time);
+		
+		
+		// Email it all
+		kJobsManager::addMailJob(
+				null,
+				0,
+				$dbBatchJob->getPartnerId(),
+				$email_id,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "live_report_sender_email" ),
+				kConf::get( "live_report_sender_name" ),
+				$data->recipientEmail,
+				$params,
+				$titleParams
+		);
+		
+		return $dbBatchJob;
+	}
+	
+	public static function handleLiveReportExportFailed(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
+	
+		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset);
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_FAILURE;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), 
+				$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
+		$titleParams = array($time);
+	
+		kJobsManager::addMailJob(
+				null,
+				0,
+				$dbBatchJob->getPartnerId(),
+				$email_id,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "live_report_sender_email" ),
+				kConf::get( "live_report_sender_name" ),
+				$data->recipientEmail,
+				$params,
+				$titleParams
+		);
+		return $dbBatchJob;
+	}
+	
+	public static function handleLiveReportExportAborted(BatchJob $dbBatchJob, kLiveReportExportJobData $data) {
+	
+		$time = date("m-d-y H:i", $data->timeReference + $data->timeZoneOffset);
+		$email_id = MailType::MAIL_TYPE_LIVE_REPORT_EXPORT_ABORT;
+		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
+		$titleParams = array($time);
+	
+		kJobsManager::addMailJob(
+				null,
+				0,
+				$dbBatchJob->getPartnerId(),
+				$email_id,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "live_report_sender_email" ),
+				kConf::get( "live_report_sender_name" ),
+				$data->recipientEmail,
+				$params,
+				$titleParams
+		);
 		return $dbBatchJob;
 	}
 	

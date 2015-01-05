@@ -2,8 +2,19 @@
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer
+class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
+	const MAX_COPIED_VOD_CUE_POINT_START_TIME = "maxCopiedVodCuePointStartTime";
+
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof CuePoint)
+			return true;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
 	 */
@@ -17,6 +28,18 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
+	 */
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if($object instanceof CuePoint)
+			$this->cuePointAdded($object);
+			
+		return true;
+	}
+	
 	
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
@@ -35,22 +58,23 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	/**
 	 * @param CuePoint $cuePoint
 	 */
+	protected function cuePointAdded(CuePoint $cuePoint)
+	{
+		$this->reIndexCuePointEntry($cuePoint);
+	}
+	
+	/**
+	 * @param CuePoint $cuePoint
+	 */
 	protected function cuePointDeleted(CuePoint $cuePoint) 
 	{
 		$c = new Criteria();
 		$c->add(CuePointPeer::PARENT_ID, $cuePoint->getId());
 			
-		CuePointPeer::setUseCriteriaFilter(false);
-		$cuePoints = CuePointPeer::doSelect($c);
-
-		$update = new Criteria();
-		$update->add(CuePointPeer::STATUS, CuePointStatus::DELETED);
+		$this->deleteCuePoints($c);
 			
-		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-		BasePeer::doUpdate($c, $update, $con);
-
-		foreach($cuePoints as $cuePoint)
-			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
+		//re-index cue point on entry
+		$this->reIndexCuePointEntry($cuePoint);
 	}
 	
 	/**
@@ -61,6 +85,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$c = new Criteria();
 		$c->add(CuePointPeer::ENTRY_ID, $entryId);
 			
+		$this->deleteCuePoints($c);
+	}
+	
+	protected function deleteCuePoints(Criteria $c)
+	{
 		CuePointPeer::setUseCriteriaFilter(false);
 		$cuePoints = CuePointPeer::doSelect($c);
 
@@ -69,6 +98,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			
 		$con = Propel::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 		BasePeer::doUpdate($c, $update, $con);
+		CuePointPeer::setUseCriteriaFilter(true);
 
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
@@ -287,40 +317,74 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		/* @var $object LiveEntry */
-		$select = new Criteria();
-		$select->add(CuePointPeer::ENTRY_ID, $object->getId());
-		$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
-		
-		$cuePoints = CuePointPeer::doSelect($select);
-		$cuePointsIds = array();
-		foreach($cuePoints as $cuePoint)
+		if ( self::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
 		{
-			/* @var $cuePoint CuePoint */
-			$cuePointsIds[] = $cuePoint->getId();
+			self::copyCuePointsFromLiveToVodEntry( $object );
 		}
-		
-		$update = new Criteria();
-		$update->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
-		
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
-		BasePeer::doUpdate($select, $update, $con);
-		
-		$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);
-		foreach($cuePoints as $cuePoint)
-		{
-			/* @var $cuePoint CuePoint */
-			$cuePoint->indexToSearchIndex();
-		}
-	}
 
+		if ( self::isAllMediaServersStopped( $object, $modifiedColumns ) )
+		{
+			/* @var $object LiveEntry */
+			$select = new Criteria();
+			$select->add(CuePointPeer::ENTRY_ID, $object->getId());
+			$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
+
+			$cuePoints = CuePointPeer::doSelect($select);
+			$cuePointsIds = array();
+			foreach($cuePoints as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$cuePointsIds[] = $cuePoint->getId();
+			}
+
+			$update = new Criteria();
+			$update->add(CuePointPeer::STATUS, CuePointStatus::HANDLED);
+
+			$con = Propel::getConnection(MetadataPeer::DATABASE_NAME);
+			BasePeer::doUpdate($select, $update, $con);
+
+			$cuePoints = CuePointPeer::retrieveByPKs($cuePointsIds);
+			foreach($cuePoints as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$cuePoint->indexToSearchIndex();
+			}
+		}
+		
+		if(self::shouldReIndexEntry($object, $modifiedColumns))
+		{
+			$this->reIndexCuePointEntry($object);
+		}
+
+		return true;
+	}
 
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof LiveEntry && !count($object->getMediaServers()))
+		if ( self::isAllMediaServersStopped($object, $modifiedColumns) )
+		{
+			return true;
+		}
+
+		if ( self::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
+		{
+			return true;
+		}
+		
+		if( self::shouldReIndexEntry($object, $modifiedColumns) )
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public static function isAllMediaServersStopped(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof LiveEntry && !$object->hasMediaServer())
 		{
 			// checking if the live-entry media-server was just unregistered
 			$customDataOldValues = $object->getCustomDataOldValues();
@@ -333,4 +397,97 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 	
+	public static function isCopyCuePointsFromLiveToVodEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if ( $object instanceof LiveEntry
+				&& $object->getType() == entryType::LIVE_STREAM
+				&& $object->getRecordedEntryId()
+				&& in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
+			)
+		{
+			return true;
+		}
+
+		return false;
+	}
+	
+	public static function shouldReIndexEntry(BaseObject $object, array $modifiedColumns)
+	{
+		if(!($object instanceof CuePoint))
+			return false;
+		
+		$indexOnEntryTypes = CuePointPlugin::getIndexOnEntryTypes();
+		if(!count($indexOnEntryTypes))
+			return false;
+			
+		if(!in_array($object->getType(), $indexOnEntryTypes))
+			return false;
+		
+		$fieldsToMonitor = array(CuePointPeer::TEXT, CuePointPeer::TAGS, CuePointPeer::NAME);
+		
+		if(count(array_intersect($fieldsToMonitor, $modifiedColumns)) > 0)
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * @param LiveEntry $liveEntry
+	 */
+	public static function copyCuePointsFromLiveToVodEntry( $liveEntry )
+	{
+		$vodEntryId = $liveEntry->getRecordedEntryId();
+		$vodEntry = entryPeer::retrieveByPK( $vodEntryId );
+
+		if ( ! $vodEntry )
+		{
+			KalturaLog::debug("Can't find recorded entry with id [$vodEntryId]");
+			return;
+		}
+
+		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntryId}]");
+
+		$c = new KalturaCriteria();
+		$c->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+		$c->addAnd(CuePointPeer::START_TIME, null, KalturaCriteria::ISNOTNULL );
+		$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL) ); // Don't copy future cuepoints
+
+		$maxCopiedVodCuePointStartTime = $liveEntry->getFromCustomData( self::MAX_COPIED_VOD_CUE_POINT_START_TIME );
+		if ( !is_null($maxCopiedVodCuePointStartTime) ) // Prev. cuepoints exist?
+		{
+			$c->addAnd( $c->getNewCriterion(CuePointPeer::START_TIME, $maxCopiedVodCuePointStartTime, KalturaCriteria::GREATER_THAN) );
+		}
+
+		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		$c->setLimit(100);
+		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
+
+		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
+		if ( $numLiveCuePointsToCopy > 0 )
+		{
+			KalturaLog::debug("Copying $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
+
+			foreach ( $liveCuePointsToCopy as $liveCuePoint )
+			{
+				$liveCuePoint->copyToEntry( $vodEntry );
+			}
+
+			$maxStartTime = $liveCuePointsToCopy[$numLiveCuePointsToCopy - 1]->getStartTime();
+			$liveEntry->putInCustomData( self::MAX_COPIED_VOD_CUE_POINT_START_TIME, $maxStartTime );
+			$liveEntry->save();
+		}
+	}
+	
+	protected function reIndexCuePointEntry(CuePoint $cuePoint)
+	{
+		//index the entry after the cue point was added|deleted
+		$entryId = $cuePoint->getEntryId();
+		$entry = entryPeer::retrieveByPK($entryId);
+
+		if($entry){
+			$entry->setUpdatedAt(time());
+			$entry->save();
+			$entry->indexToSearchIndex();
+		}
+	}
 }

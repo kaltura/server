@@ -76,6 +76,10 @@ class serveFlavorAction extends kalturaAction
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
 				$path = $parent_file_sync->getFullPath();
+				if ($fileParam && is_dir($path)) 
+				{
+					$path .= "/$fileParam";
+				}
 			}
 		
 			$renderer = new kRendererString(
