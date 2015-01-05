@@ -111,4 +111,35 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 			$dbCuePoint->save();
 		}
 	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if ( kCuePointManager::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		$this->deleteObsoleteThumbCuePoints( $object );
+	}
+
+	public function deleteObsoleteThumbCuePoints( $liveEntry )
+	{
+		$c = new KalturaCriteria();
+		$c->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::GREATER_THAN );
+		$c->add( CuePointPeer::TYPE, ThumbCuePointPlugin::getCuePointTypeCoreValue(ThumbCuePointType::THUMB) );
+
+		kCuePointManager::deleteCuePoints( $c );
+	}
 }
