@@ -36,31 +36,25 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		KalturaLog::debug(">>> inside objectChanged 1");
-		if(self::isTimedThumbAssetChangedToReady($object, $modifiedColumns))
+		/* @var $object timedThumbAsset */
+		$cuePointId = $object->getCuePointID();
+		if(!$cuePointId)
 		{
-			KalturaLog::debug(">>> inside objectChanged 2");
-			/* @var $object timedThumbAsset */
-			$cuePointId = $object->getCuePointID();
-			if(!$cuePointId)
-			{
-				KalturaLog::debug("CuePoint Id not found on object");
-				return true;
-			}
+			KalturaLog::debug("CuePoint Id not found on object");
+			return true;
+		}
 			
-			$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
-			if(!$cuePoint)
-			{
-				KalturaLog::debug("CuePoint with ID [$cuePointId] not found");
-				return true;
-			}
+		$cuePoint = CuePointPeer::retrieveByPK($cuePointId);
+		if(!$cuePoint)
+		{
+			KalturaLog::debug("CuePoint with ID [$cuePointId] not found");
+			return true;
+		}
 			
-			if($cuePoint->getStatus() == CuePointStatus::PENDING)
-			{
-				$cuePoint->setStatus(CuePointStatus::READY);
-				$cuePoint->save();	
-				return true;
-			}
+		if($cuePoint->getStatus() == CuePointStatus::PENDING)
+		{
+			$cuePoint->setStatus(CuePointStatus::READY);
+			$cuePoint->save();	
 		}
 		
 		return true;
