@@ -324,9 +324,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			self::copyCuePointsFromLiveToVodEntry( $object );
 		}
 
-		if ( self::isPostProcessCuePointsEvent( $object ) )
+		if ( self::isPostProcessCuePointsEvent( $object, $modifiedColumns ) )
 		{
-			self::postProcessCuePoints( $object, $modifiedColumns );
+			self::postProcessCuePoints( $object );
 		}
 		
 		if(self::shouldReIndexEntry($object, $modifiedColumns))
