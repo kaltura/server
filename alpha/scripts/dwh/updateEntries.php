@@ -76,18 +76,11 @@ function checkSphinxLag()
 $last_played_at = time();
 
 $increment = @$argv[1] == "increment";
-$reset  = @$argv[1] == "reset";
-
-if (!$increment && !$reset)
-{
-	die("Invalid usage: specify either increment or reset\n");
-}
-
 
 while($s = trim(fgets($f)))
 {
 	$sep = strpos($s, "\t") ? "\t" : " ";
-        list($partnerId, $entryId, $plays, $views) = explode($sep, $s);
+        list($entryId, $plays, $views) = explode($sep, $s);
 
 	myPartnerUtils::resetAllFilters();
 	entryPeer::setDefaultCriteriaFilter();
