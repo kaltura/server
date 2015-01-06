@@ -229,11 +229,8 @@ abstract class LiveEntry extends entry
 		$this->putInCustomData("dvr_window", $v);
 	}
 	
-	public function getLastElapsedRecordingTime()		{ return $this->getLastElapsedLiveDuration(); } // Left for backward compatibility
-	public function setLastElapsedRecordingTime( $v )	{ $this->setLastElapsedLiveDuration( $v ); }	// Left for backward compatibility
-
-	public function getLastElapsedLiveDuration()		{ return $this->getFromCustomData( "lastElapsedLiveDuration", null, 0 ); }
-	public function setLastElapsedLiveDuration( $v )	{ $this->putInCustomData( "lastElapsedLiveDuration" , $v ); }
+	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
+	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
 	public function getRecordedLengthInMsec()			{ return $this->getFromCustomData( "recordedLengthInMsec", null, 0 ); }
 	public function setRecordedLengthInMsec( $v )		{ $this->putInCustomData( "recordedLengthInMsec" , $v ); }

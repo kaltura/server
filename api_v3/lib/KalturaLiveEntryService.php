@@ -93,7 +93,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			if ( $isLastChunk )
 			{
 				$liveRecordingSegmentInfo = new kLiveRecordingSegmentInfo();
-				$liveRecordingSegmentInfo->setLiveStreamStartTime( $dbEntry->getLastElapsedLiveDuration() );
+				$liveRecordingSegmentInfo->setLiveStreamStartTime( $dbEntry->getLastElapsedRecordingTime() );
 				$liveRecordingSegmentInfo->setVodEntryEndTime( $recordedLengthInMsec );
 				$liveRecordingSegmentInfo->setVodToLiveDeltaTime( $currentDuration - $recordedLengthInMsec );
 
