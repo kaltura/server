@@ -59,6 +59,109 @@
 	</multirequest>
 	
 	<multirequest>
+		<!-- Flavor Created -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessStartNotificationTemplate">
+				<name>Flavor Status Equals</name>
+				<systemName>flavor_status_equals</systemName>
+				<description>Flavor life-cycle</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+				<eventObjectType>4</eventObjectType> <!-- EventNotificationEventObjectType::FLAVORASSET -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(assetPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Flavor-params-id equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getFlavorParamsId()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_flavor_params_id}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>endPoint</key>
+						<description>Server Host</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get('apphome_url')</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>partnerId</key>
+						<description>Partner ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getPartnerId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>adminSecret</key>
+						<description>Partner Administrator Secret</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getPartner()->getAdminSecret()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>entryId</key>
+						<description>Entry ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getEntryId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>flavorId</key>
+						<description>Flavor ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Flavor-asset status that triggers the event, See:KalturaFlavorAssetStatus:/api_v3/testmeDoc/?object=KalturaFlavorAssetStatus</description>
+						<value objectType="KalturaStringValue">
+							<description>Ready</description>
+							<value>2</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_flavor_params_id</key>
+						<description>Flavor-asset params id that triggers the event</description>
+						<value objectType="KalturaStringValue">
+							<description>Source</description>
+							<value>0</value>
+						</value>
+					</item>
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+	
+	<multirequest>
 		<!-- Entry Updated -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
@@ -68,6 +171,91 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+	
+	<multirequest>
+		<!-- Caption-Asset Status Equals -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
+				<name>Caption-Asset Status Equals</name>
+				<systemName>caption_asset_status_equals</systemName>
+				<description>Caption-asset status equals the specified trigger status</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+				<eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType> <!-- KalturaEventNotificationEventObjectType::CAPTION_ASSET -->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventFieldCondition">
+						<description>Status field modified</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>in_array(assetPeer::STATUS, $scope->getEvent()->getModifiedColumns())</code>
+						</field>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Status equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getStatus()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_status}</value>
+							</item>
+						</values>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Language equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getLanguage()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_language}</value>
+							</item>
+						</values>
+					</item>
+					<item objectType="KalturaFieldMatchCondition">
+						<description>Format equals</description>
+						<field objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getContainerFormat()</code>
+						</field>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{trigger_format}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_status</key>
+						<description>Caption-asset status that triggers the event, See:KalturaCaptionAssetStatus:/api_v3/testmeDoc/?object=KalturaCaptionAssetStatus</description>
+						<value objectType="KalturaStringValue">
+							<description>Ready</description>
+							<value>2</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_language</key>
+						<description>Caption-asset language that triggers the event, See:KalturaLanguage:/api_v3/testmeDoc/?object=KalturaLanguage</description>
+						<value objectType="KalturaStringValue">
+							<description>English</description>
+							<value>English</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_format</key>
+						<description>Caption-asset format that triggers the event, See:KalturaCaptionType:/api_v3/testmeDoc/?object=KalturaCaptionType</description>
+						<value objectType="KalturaStringValue">
+							<description>SRT</description>
+							<value>1</value>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
