@@ -376,7 +376,6 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	{
 		$cuePointCopy = $this->copy();
 		$cuePointCopy->setEntryId($entry->getId());
-		$cuePointCopy->save($con);
 		return $cuePointCopy;
 	}
 	

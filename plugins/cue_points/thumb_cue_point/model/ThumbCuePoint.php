@@ -50,6 +50,7 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 
 		// Offset the startTime according to the duration gap between the live and VOD entries
 		$vodThumbCuePoint->setStartTime( $adjustedStartTime );
+		$vodThumbCuePoint->save(); // Must save in order to produce an id
 
 		$timedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );	// Set the destination cue point's id
 		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
