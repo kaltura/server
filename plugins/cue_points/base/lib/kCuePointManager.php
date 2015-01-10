@@ -4,8 +4,6 @@
  */
 class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
-	const CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC = "liveDurationOffsetFromVodInMsec";
-
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 
 	/* (non-PHPdoc)
@@ -471,8 +469,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		if ( $numLiveCuePointsToCopy > 0 )
 		{
-			$liveDurationOffsetFromVodInMsec = $liveEntry->getFromCustomData( self::CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC, null, 0 );
-
 			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
@@ -495,10 +491,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 				}				
 			}
 		}
-
-		// Update the new duration offset between the live and vod entries.
-		$liveDurationOffsetFromVodInMsec = $liveEntry->getLengthInMsecs() - $vodEntry->getLengthInMsecs();
-		$liveEntry->putInCustomData( self::CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC, $liveDurationOffsetFromVodInMsec );
 
 		$liveEntry->save();
 
