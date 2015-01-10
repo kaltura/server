@@ -36,42 +36,8 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		return ThumbCuePointMetadataPlugin::getMetadataObjectTypeCoreValue(ThumbCuePointMetadataObjectType::THUMB_CUE_POINT);
 	}
 
-	public function getCopyFromLiveToVodEntryOffset( array $liveRecordingSegmentInfoArray )
+	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
 	{
-		$startTime = $this->getStartTime();
-		$vodToLiveDeltaTime = 0;
-
-		/* @var $liveRecordingSegmentInfo kLiveRecordingSegmentInfo */
-		foreach ( $liveRecordingSegmentInfoArray as $liveRecordingSegmentInfo )
-		{
-			if ( $startTime <= $liveRecordingSegmentInfo->getVodEntryEndTime() )
-			{
-				if ( $startTime >= $liveRecordingSegmentInfo->getLiveStreamStartTime() )
-				{
-					return $vodToLiveDeltaTime;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else
-			{
-				$vodToLiveDeltaTime = $liveRecordingSegmentInfo->getVodToLiveDeltaTime();
-			}
-		}
-
-		return null;
-	}
-
-	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, array $liveRecordingSegmentInfoArray )
-	{
-		$startTimeOffset = $this->getCopyFromLiveToVodEntryOffset( $liveRecordingSegmentInfoArray );
-		if ( is_null( $startTimeOffset ) ) // Null offset means we should not copy this live cuepoint to the VOD entry
-		{
-			return;
-		}
-
 		// Clone the cue point to the destination entry
 		$vodThumbCuePoint = parent::copyToEntry( $vodEntry );
 
@@ -83,8 +49,7 @@ class ThumbCuePoint extends CuePoint implements IMetadataObject
 		}
 
 		// Offset the startTime according to the duration gap between the live and VOD entries
-		$startTime = $vodThumbCuePoint->getStartTime();
-		$vodThumbCuePoint->setStartTime( $startTime - $startTimeOffset );
+		$vodThumbCuePoint->setStartTime( $adjustedStartTime );
 
 		$timedThumbAsset->setCuePointID( $vodThumbCuePoint->getId() );	// Set the destination cue point's id
 		$timedThumbAsset->setCustomDataObj();							// Write the cached custom data object into the thumb asset
