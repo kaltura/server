@@ -384,7 +384,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		return null;
 	}
 
-	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, array $liveRecordingSegmentInfoArray )
+	public function copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime )
 	{
 	}
 } // CuePoint
