@@ -1,3 +1,92 @@
+# Jupiter-10.2.0 #
+
+## Unicorn Connector ##
+- Issue Type: New Feature
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following line:
+
+		UnicornDistribution
+
+#### Deployment Scripts ####
+
+		php deployment/updates/scripts/add_permissions/2014_12_30_unicorn_callback_service.php
+
+##link externalmedia->add permission to basic permission objects##
+- Issue Type: Back-End Request
+- Issue ID: SUP-2708
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_externalmedia_add_permissions.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+##add flavorasset->getwebplayablebyentryid permission to basic playback role##
+- Issue Type: Back-End Request
+- Issue ID: KMS-5334
+
+#### Configuration ####
+
+None.
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_01_11_add_base_playback_role_flavorasset_getwebplayablebyentryid_permission.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Copy entitlement info from live entry to vod entry ##
+- Issue Type: New Feature
+- Issue ID: PLAT-2313
+
+#### Configuration ####
+
+*base.ini*
+
+Add the following line to the the event_consumers[] list
+
+		event_consumers[] = kObjectCreatedHandler
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Scheduled Tasks Enhancements 2 ##
+- Issue Type: New Feature
+- Issue ID: PLAT-1631
+
+#### Configuration ####
+
+*plugins.ini*
+
+Add the following plugin to the list of plugins
+
+		ScheduledTaskContentDistribution
+
+#### Deployment Scripts ####
+
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2014_11_25_scheduled_task_update.php
+
+#### Known Issues & Limitations ####
+
+None.
+
 # Jupiter-10.1.0 #
 
 ## New UI Conf Type ##

@@ -14,6 +14,11 @@ class kObjectTask
 	private $type;
 
 	/**
+	 * @var bool
+	 */
+	private $stopProcessingOnError;
+
+	/**
 	 * Key value array of the api object
 	 * @var array
 	 */
@@ -38,6 +43,22 @@ class kObjectTask
 	public function getType()
 	{
 		return $this->type;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getStopProcessingOnError()
+	{
+		return $this->stopProcessingOnError;
+	}
+
+	/**
+	 * @param bool $stopProcessingOnError
+	 */
+	public function setStopProcessingOnError($stopProcessingOnError)
+	{
+		$this->stopProcessingOnError = $stopProcessingOnError;
 	}
 
 	/**

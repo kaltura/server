@@ -83,6 +83,7 @@ class kApiCache extends kApiCacheBase
 	protected $_referrers = array();				// a request can theoritically have more than one referrer, in case of several baseEntry.getContextData calls in a single multirequest
 	protected static $_country = null;				// caches the country of the user issuing this request
 	protected static $_coordinates = null;			// caches the latitude and longitude of the user issuing this request
+	protected $minCacheTTL = null;
 	
 	protected $clientTag = null;
 	
@@ -521,6 +522,11 @@ class kApiCache extends kApiCacheBase
 				if (self::$_debugMode)
 					$this->debugLog("validateCachingRules - cache expired");
 				continue;
+			}
+
+			if (is_null($this->minCacheTTL) || $cacheTTL < $this->minCacheTTL)
+			{
+				$this->minCacheTTL = $cacheTTL;
 			}
 
 			if ($conditions)

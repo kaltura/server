@@ -27,6 +27,7 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 		{
 			try
 			{
+				self::setCurrentJob($job);
 				$job = $this->exec($job);
 			}
 			catch(KalturaException $kex)
@@ -44,6 +45,7 @@ abstract class KJobCloserWorker extends KJobHandlerWorker
 				KBatchBase::unimpersonate();
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
+			self::unsetCurrentJob();
 		}
 			
 		return $jobs;

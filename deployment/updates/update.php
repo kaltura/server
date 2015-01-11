@@ -231,11 +231,10 @@ class ScriptsRunner
 	
 	private function updateVersion($fileName)
 	{
-		$link = mysqli_connect($this->dbParams['host'] . ':' . $this->dbParams['port'], $this->dbParams['user'], $this->dbParams['password'], null);
+		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['dbname'], $this->dbParams['port']);
 		
-		$db_selected = mysqli_select_db($this->dbParams['dbname'], $link);
-		$filePathToInsert = mysqli_real_escape_string($fileName);
-		$result = mysqli_query("insert into version_management(filename, version) values ('" . $filePathToInsert . "'," . $this->version . ")");
+		$filePathToInsert = mysqli_real_escape_string($link, $fileName);
+		$result = mysqli_query($link, "insert into version_management(filename, version) values ('" . $filePathToInsert . "'," . $this->version . ")");
 		
 		return $result;
 	}

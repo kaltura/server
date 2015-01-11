@@ -109,7 +109,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$detectMsg = null;
 		if(isset($data->flavorParamsOutput) && isset($data->flavorParamsOutput->operators)
 		&& strstr($data->flavorParamsOutput->operators, "webexNbrplayer.WebexNbrplayer")!=false) {
-			$rv = $this->checkForValidityOfWebexProduct($data, realpath($mediaFile), $mediaInfo, &$detectMsg);
+			$rv = $this->checkForValidityOfWebexProduct($data, realpath($mediaFile), $mediaInfo, $detectMsg);
 			if($rv==false){
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::BLACK_OR_SILENT_CONTENT, $detectMsg, KalturaBatchJobStatus::FAILED);
 			}

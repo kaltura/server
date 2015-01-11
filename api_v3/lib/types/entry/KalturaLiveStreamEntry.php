@@ -73,6 +73,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	/**
 	 * URL Manager to handle the live stream URL (for instance, add token)
 	 * @var string
+	 * @deprecated
 	 */
 	public $urlManager;
 	
@@ -121,7 +122,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"streamName",
 		"streamUrl",
 	    "hlsStreamUrl",
-	    "urlManager",
 		"encodingIP1",
 		"encodingIP2",
 		"streamPassword",
