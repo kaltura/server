@@ -4,8 +4,6 @@
  */
 class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
-	const CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC = "liveDurationOffsetFromVodInMsec";
-
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 
 	/* (non-PHPdoc)
@@ -467,22 +465,32 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
 
 		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
-		KalturaLog::debug("Copying $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
+		KalturaLog::debug("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
 
 		if ( $numLiveCuePointsToCopy > 0 )
 		{
-			$liveDurationOffsetFromVodInMsec = $liveEntry->getFromCustomData( self::CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC, null, 0 );
-
-			$liveRecordingSegmentInfoArray = $liveEntry->getLiveRecordingSegmentInfoArray();
+			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
-				$liveCuePoint->copyFromLiveToVodEntry( $liveEntry, $vodEntry, $liveRecordingSegmentInfoArray );
+				$startTime = $liveCuePoint->getStartTime();
+
+				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
+				KalturaLog::debug("Preparing to copy $copyMsg");
+
+				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
+
+				if ( ! is_null( $totalVodOffsetTime ) )
+				{
+					$adjustedStartTime = $startTime - $totalVodOffsetTime;
+					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
+					$liveCuePoint->copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime );
+				}
+				else
+				{
+					KalturaLog::debug("Not copying $copyMsg" );
+				}				
 			}
 		}
-
-		// Update the new duration offset between the live and vod entries.
-		$liveDurationOffsetFromVodInMsec = $liveEntry->getLengthInMsecs() - $vodEntry->getLengthInMsecs();
-		$liveEntry->putInCustomData( self::CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC, $liveDurationOffsetFromVodInMsec );
 
 		$liveEntry->save();
 
