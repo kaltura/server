@@ -410,19 +410,27 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 
-	public static function postProcessCuePoints( $liveEntry )
+	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
 	{
-		/* @var $object LiveEntry */
 		$select = new Criteria();
-		$select->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
-		$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
 
-		$cuePoints = CuePointPeer::doSelect($select);
-		$cuePointsIds = array();
-		foreach($cuePoints as $cuePoint)
+		if ( $cuePointsIds )
 		{
-			/* @var $cuePoint CuePoint */
-			$cuePointsIds[] = $cuePoint->getId();
+			$select->add(CuePointPeer::ID, $cuePointsIds, Criteria::IN);
+		}
+		else
+		{
+			/* @var $liveEntry LiveEntry */
+			$select->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+			$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
+
+			$cuePoints = CuePointPeer::doSelect($select);
+			$cuePointsIds = array();
+			foreach($cuePoints as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$cuePointsIds[] = $cuePoint->getId();
+			}
 		}
 
 		$update = new Criteria();
@@ -467,11 +475,15 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
 		KalturaLog::debug("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
 
+		$processedCuePointIds = array();
+
 		if ( $numLiveCuePointsToCopy > 0 )
 		{
 			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
+				$processedCuePointIds[] = $liveCuePoint->getId();
+
 				$startTime = $liveCuePoint->getStartTime();
 
 				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
@@ -494,7 +506,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		$liveEntry->save();
 
-		self::postProcessCuePoints( $liveEntry );
+		KalturaLog::debug("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
+		if ( count($processedCuePointIds) )
+		{
+			self::postProcessCuePoints( $liveEntry, $processedCuePointIds );
+		}
 	}
 	
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
