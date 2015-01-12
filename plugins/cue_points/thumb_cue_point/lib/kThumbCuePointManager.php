@@ -11,6 +11,8 @@ class kThumbCuePointManager implements kObjectDeletedEventConsumer, kObjectChang
 	{
 		if($object instanceof timedThumbAsset && $object->getStatus() == asset::ASSET_STATUS_READY)
 			return true;
+			
+		return false;
 	}
 	
 	/* (non-PHPdoc)
