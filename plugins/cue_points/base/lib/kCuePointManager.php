@@ -410,12 +410,18 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 
-	public static function postProcessCuePoints( $liveEntry )
+	public static function postProcessCuePoints( $liveEntry, $maxStartTime = null )
 	{
 		/* @var $object LiveEntry */
 		$select = new Criteria();
 		$select->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
 		$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
+
+		if ( ! is_null( $maxStartTime ) )
+		{
+			KalturaLog::debug("Limiting cupied cuepoints to maxStartTime $maxStartTime");
+			$select->add( CuePointPeer::START_TIME, $maxStartTime, KalturaCriteria::LESS_EQUAL );
+		}
 
 		$cuePoints = CuePointPeer::doSelect($select);
 		$cuePointsIds = array();
@@ -455,9 +461,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		KalturaLog::log("Saving the live entry [{$liveEntry->getId()}] cue points into the associated VOD entry [{$vodEntry->getId()}]");
 
+		$maxStartTime = $liveEntry->getLengthInMsecs();
+
 		$c = new KalturaCriteria();
 		$c->add( CuePointPeer::ENTRY_ID, $liveEntry->getId() );
-		$c->add( CuePointPeer::START_TIME, $liveEntry->getLengthInMsecs(), KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
+		$c->add( CuePointPeer::START_TIME, $maxStartTime, KalturaCriteria::LESS_EQUAL ); // Don't copy future cuepoints
 		$c->add( CuePointPeer::STATUS, CuePointStatus::READY ); // READY, but not yet HANDLED
 
 		$c->addAscendingOrderByColumn(CuePointPeer::START_TIME);
@@ -494,7 +502,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 
 		$liveEntry->save();
 
-		self::postProcessCuePoints( $liveEntry );
+		self::postProcessCuePoints( $liveEntry, $maxStartTime );
 	}
 	
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)
