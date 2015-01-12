@@ -263,4 +263,61 @@
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
+	
+	
+	<multirequest>
+		<!-- Caption-Asset Status Equals -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
+				<name>Entry Integration Job Finished</name>
+				<systemName>entry_integration_job_finished</systemName>
+				<description>Entry Integration job finished</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
+				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+	
+	
+	<multirequest>
+		<!-- Caption-Asset Status Equals -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
+				<name>Category Integration Job Finished</name>
+				<systemName>category_integration_job_finished</systemName>
+				<description>Category Integration job finished</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
+				<eventObjectType>2</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORY -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+	
+	
+	<multirequest>
+		<!-- Caption-Asset Status Equals -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
+				<name>Asset Integration Job Finished</name>
+				<systemName>asset_integration_job_finished</systemName>
+				<description>Asset Integration job finished</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
+				<eventObjectType>3</eventObjectType> <!-- EventNotificationEventObjectType::ASSET -->
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
 </xml>
