@@ -61,19 +61,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$currentDuration = 0;
 		$currentDuration += (int)($duration * 1000);
 		
-		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
-		{
-			$dbEntry->setLengthInMsecs($currentDuration);
-
-			if ( $isLastChunk )
-			{
-				// Save last elapsed recording time
-				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
-			}
-
-			$dbEntry->save();
-		}
-	
 		$maxRecordingDuration = (kConf::get('max_live_recording_duration_hours') + 1) * 60 * 60 * 1000;
 		if($currentDuration > $maxRecordingDuration)
 		{
@@ -90,6 +77,37 @@ class KalturaLiveEntryService extends KalturaEntryService
 			chgrp($filename, kConf::get('content_group'));
 			chmod($filename, 0640);
 		}
+
+		if($dbAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) && $mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
+		{
+			$dbEntry->setLengthInMsecs($currentDuration);
+
+			// Extract the exact video segment duration from the recorded file
+			$mediaInfoParser = new KMediaInfoMediaParser($filename, kConf::get('bin_path_mediainfo'));
+			$recordedSegmentDurationInMsec = $mediaInfoParser->getMediaInfo()->videoDuration;
+
+			// Set the total recorded time
+			$recordedLengthInMsec = $dbEntry->getRecordedLengthInMsec() + $recordedSegmentDurationInMsec;
+			$dbEntry->setRecordedLengthInMsec( $recordedLengthInMsec );
+
+			if ( $isLastChunk )
+			{
+				$liveRecordingSegmentInfo = new kLiveRecordingSegmentInfo();
+				$liveRecordingSegmentInfo->setLiveStreamStartTime( $dbEntry->getLastElapsedRecordingTime() );
+				$liveRecordingSegmentInfo->setVodEntryEndTime( $recordedLengthInMsec );
+				$liveRecordingSegmentInfo->setVodToLiveDeltaTime( $currentDuration - $recordedLengthInMsec );
+
+				$liveRecordingSegmentInfoArray = $dbEntry->getLiveRecordingSegmentInfoArray();
+				$liveRecordingSegmentInfoArray[] = $liveRecordingSegmentInfo;
+				$dbEntry->setLiveRecordingSegmentInfoArray( $liveRecordingSegmentInfoArray );
+
+				// Save last elapsed recording time
+				$dbEntry->setLastElapsedRecordingTime( $currentDuration );
+			}
+
+			$dbEntry->save();
+		}
+
 		kJobsManager::addConvertLiveSegmentJob(null, $dbAsset, $mediaServerIndex, $filename, $currentDuration);
 		
 		if($mediaServerIndex == KalturaMediaServerIndex::PRIMARY)
