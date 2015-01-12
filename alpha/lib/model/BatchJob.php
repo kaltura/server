@@ -290,6 +290,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 				return FileSyncPeer::retrieveByPK($this->getObjectId());
 		
 			default:
+				// TODO implement IBatchable in relevant plugins
 				return KalturaPluginManager::loadObject('IBatchable', $this->getObjectId());
 		}
 		

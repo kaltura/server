@@ -3,7 +3,7 @@
  * @package plugins.integration
  * @subpackage lib.events
  */
-class kIntegrationJobClosedEvent extends KalturaEvent
+class kIntegrationJobClosedEvent extends KalturaEvent implements IKalturaObjectRelatedEvent, IKalturaContinualEvent
 {
 	const EVENT_CONSUMER = 'kIntegrationJobClosedEventConsumer';
 
@@ -44,5 +44,11 @@ class kIntegrationJobClosedEvent extends KalturaEvent
 		return $result;
 	}
 
-
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectRelatedEvent::getObject()
+	 */
+	public function getObject()
+	{
+		$this->batchJob->getObject();
+	}
 }
