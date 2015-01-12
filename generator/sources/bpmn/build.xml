@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Kaltura BPMN Deployment" default="deploy">
+
+	<property environment="env" />
+	<property name="catalina.home" value="${env.CATALINA_HOME}" />
+	<property name="java.lib.path" value="${basedir}/../java" />
+	<property name="jar.lib.path" value="${basedir}/lib" />
+	<property name="jar.filename" value="${jar.lib.path}/KalturaClientLib.jar" />
+	<property name="bar.filename" value="${basedir}/KalturaClientLib.bar" />
+
+	<target name="install-contrib">
+		<get src="http://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-0.6/ant-contrib-0.6-bin.zip" dest="ant-contrib-0.6-bin.zip" />
+		<unzip src="ant-contrib-0.6-bin.zip" dest="ant-contrib"/>
+		<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+			<classpath>
+				<pathelement location="${basedir}/ant-contrib/lib/ant-contrib-0.6.jar"/>
+			</classpath>
+		</taskdef>
+	</target>
+
+	<target name="jar" depends="install-contrib">
+		<if>
+			<available file="${jar.filename}" />
+			<then>
+				<echo message="Kaltura client lib jar [${jar.filename}] already exists."/>
+			</then>
+			<else>
+				<if>
+					<available file="${java.lib.path}" />
+					<then>
+						<mkdir dir="${jar.lib.path}" />
+						<copy todir="${jar.lib.path}">
+							<fileset dir="${java.lib.path}/lib"/>
+						</copy>
+						
+						<tempfile property="temp.classes" prefix="classes_" />
+						<mkdir dir="${temp.classes}" />
+						<javac srcdir="${java.lib.path}/src" encoding="UTF-8" destdir="${temp.classes}">
+							<classpath>
+								<fileset dir="${java.lib.path}/lib">
+									<include name="*.jar" />
+								</fileset>
+							</classpath>
+						</javac>
+						<copy todir="${temp.classes}">
+							<fileset dir="${java.lib.path}/src" excludes="**/*.java" />
+						</copy>
+						<jar jarfile="${jar.filename}">
+							<fileset dir="${temp.classes}" />
+						</jar>
+						<delete dir="${temp.classes}" />
+					</then>
+					<else>
+						<fail message="Java client library not found in ${java.lib.path}."/>
+					</else>
+				</if>
+			</else>
+		</if>
+	</target>
+	
+	<target name="bar">
+		<zip destfile="${bar.filename}">
+			<fileset dir="${basedir}/processes" />
+		</zip>
+	</target>
+	
+	<target name="compile">
+		<mkdir dir="${basedir}/deploy/bin"/>
+		<javac srcdir="${basedir}/deploy/src" encoding="UTF-8" destdir="${basedir}/deploy/bin">
+			<classpath>
+				<fileset dir="${catalina.home}/webapps/activiti-explorer/WEB-INF/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<copy todir="${basedir}/deploy/bin">
+			<fileset dir="${basedir}/deploy/src" excludes="**/*.java" />
+		</copy>
+	</target>
+	
+	<target name="deploy" depends="jar, bar, compile">
+		<copy todir="${catalina.home}/lib">
+			<fileset dir="${jar.lib.path}" />
+		</copy>
+		<java classname="com.kaltura.bpmn.deploy.DeployAllProcesses" failonerror="true">
+			<classpath>
+				<fileset dir="${catalina.home}/webapps/activiti-explorer/WEB-INF/lib">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="${basedir}/deploy/bin" />
+			</classpath>
+			<arg value="${bar.filename}" />
+		</java>
+	</target>
+
+</project>
