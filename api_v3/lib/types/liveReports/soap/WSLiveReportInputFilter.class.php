@@ -33,7 +33,7 @@ class WSLiveReportInputFilter extends WSBaseObject
 	public $partnerId;
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $orderBy;
 	
