@@ -131,7 +131,7 @@ execution.setVariable(\"response\", response);
 		$scriptNode = $scriptNodes->item(0);
 		$scriptNode->nodeValue = $script;
 		
-		$filename = "kaltura.$serviceName.$action.bpmn";
+		$filename = "processes/kaltura.$serviceName.$action.bpmn";
 		$this->addFile($filename, $bpmn->saveXML(), false);
 	}
 }
