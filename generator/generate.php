@@ -74,30 +74,22 @@ kFile::fullMkdir($outputPathBase);
 $config = new Zend_Config_Ini(__DIR__ . '/../configurations/generator.ini', null, array('allowModifications' => true));
 $config = KalturaPluginManager::mergeConfigs($config, 'generator', false);
 
-$defaults = null;
+$libsToGenerate = null;
 if (strtolower($generateSingle) == 'all')
 {
 	$generateSingle = null;
 }
 elseif(!$generateSingle)
 {
-	$defaults = file(__DIR__ . '/../configurations/generator.defaults.ini');
-	foreach($defaults as $key => &$default)
+	$libsToGenerate = file(__DIR__ . '/../configurations/generator.defaults.ini');
+	foreach($libsToGenerate as $key => &$default)
 		$default = strtolower(trim($default, " \t\r\n"));
 }
 
 //if we got specific generator request, tes if this requested generator does exist
 if ($generateSingle != null)
 {
-	$found = false;
-	foreach($config as $name => $item)
-	{
-		if (strtolower($name) === strtolower($generateSingle)) {
-			$found = true;
-			break;
-		}
-	}
-	if (!$found) throw new Exception("Configuration for [".$generateSingle."] was not found");
+	$libsToGenerate = array_intersect(explode(',', $generateSingle), array_keys($config->toArray()));
 }
 
 //get the API version
@@ -132,11 +124,7 @@ foreach($config as $name => $item)
 	if (!class_exists($generator))
 		throw new Exception("Generator [".$generator."] not found");
 	
-	// when generating a single client, skip the generators not relvant
-	if ($generateSingle && strtolower($name) !== strtolower($generateSingle)) 
-		continue;
-	
-	if($defaults && !in_array(strtolower($name), $defaults))
+	if($libsToGenerate && !in_array(strtolower($name), $libsToGenerate))
 		continue;
 
 	//check if this client should be internal or public (on the UI)
@@ -341,7 +329,7 @@ foreach($config as $name => $item)
 	{
 		//tar gzip the client library
 		if (!$shouldNotPackage) 
-			createPackage($outputPath, $name, $schemaGenDateOverride);
+			createPackage($outputPath, $name, $generatedDate, $schemaGenDateOverride);
 	}
 		
 	KalturaLog::info("$name generated successfully");
@@ -358,10 +346,8 @@ exit(0);
  * @param $outputPath 		The path the client library files are located at.
  * @param $generatorName	The name of the client library.
  */
-function createPackage($outputPath, $generatorName, $overrideGenDate = null)
+function createPackage($outputPath, $generatorName, $generatedDate, $overrideGenDate = null)
 {
-	global $generatedDate;
-	
 	KalturaLog::info("Trying to package");
 	$output = shell_exec("tar --version");
 	if ($output === null)
