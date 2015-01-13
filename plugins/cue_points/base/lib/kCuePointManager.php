@@ -504,8 +504,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			}
 		}
 
-		$liveEntry->save();
-
 		KalturaLog::debug("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
 		if ( count($processedCuePointIds) )
 		{
