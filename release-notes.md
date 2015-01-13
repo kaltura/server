@@ -12,7 +12,8 @@ Integration with Activiti BPM engine
 
 Add the following line:
 
-		Integration
+		Integration		
+		IntegrationEventNotifications
 		BusinessProcessNotification
 		ActivitiBusinessProcessNotification
 
@@ -40,9 +41,17 @@ Add the following lines as new sections:
 		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
 
 
+#### Deployment Preparations ####
+
+ - Reload configuration: `touch cache/base.reload`.
+ - Clear cache: `rm -rf cache/*`.
+ - Install plugins: `php deployment/base/scripts/installPlugins.php`.
+ - Generate clients: `php generator/generate.php`.
+ - Restart batch: `/etc/init.d/kaltura-batch restart`.
+
 #### Deployment Scripts ####
 
-		mysql deployment/updates/sql/2014_11_20_business_process_server.sql
+		mysql -uroot -p kaltura < deployment/updates/sql/2014_11_20_business_process_server.sql
 		php deployment/updates/scripts/add_permissions/2014_11_20_business_process_server_permissions.php
 		php tests/standAloneClient/exec.php tests/standAloneClient/bpmNotificationsTemplates.xml
 
@@ -79,10 +88,11 @@ Add the following lines as new sections:
  - Open zip: `unzip mysql-connector-java-5.0.8.zip`
  - Copy the mysql jdbc connector: `cp mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar $CATALINA_HOME/lib/`
  - Restart Apache Tomcat.
- - Open you browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
+ - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit
 	 - Password: kermit
  - Generate java and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php java,bpmn`
+ - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
  - Deploy processes **(replace tokens)**:
 	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
 	 - `ant`
