@@ -21,7 +21,7 @@ class kFlowHelper
 	 * @param string $msg
 	 * @return flavorAsset
 	 */
-	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
+	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null, $shouldAddSourceTag = null)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($flavorAsset)
@@ -38,6 +38,8 @@ class kFlowHelper
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
+		if ($shouldAddSourceTag)
+			$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);
@@ -153,7 +155,7 @@ class kFlowHelper
 		if(!$flavorAsset)
 		{
 			$msg = null;
-			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId(), $msg);
+			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId(), $msg, true);
 			if(!$flavorAsset)
 			{
 				KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
