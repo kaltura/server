@@ -50,7 +50,8 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IKaltu
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{			
-		$objectClass = self::getObjectClass($baseClass, $enumValue);
+		$class = get_called_class();
+		$objectClass = $class::getObjectClass($baseClass, $enumValue);
 		if (is_null($objectClass)) 
 		{
 			return null;
@@ -72,7 +73,8 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IKaltu
 	 */
 	public static function getIntegrationProviderCoreValue($valueName)
 	{
-		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		$class = get_called_class();
+		$value = $class::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('IntegrationProvider', $value);
 	}
 	
@@ -81,6 +83,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IKaltu
 	 */
 	public static function getApiValue($valueName)
 	{
-		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		$class = get_called_class();
+		return $class::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }
