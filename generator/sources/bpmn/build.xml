@@ -8,6 +8,14 @@
 	<property name="jar.filename" value="${jar.lib.path}/KalturaClientLib.jar" />
 	<property name="bar.filename" value="${basedir}/KalturaClientLib.bar" />
 
+	<target name="verify-version">
+		<fail message="Java 1.7 is required.">
+			<condition>
+				<not><equals arg1="${ant.java.version}" arg2="1.7" /></not>
+			</condition>
+		</fail>
+	</target>
+		
 	<target name="install-contrib">
 		<get src="http://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-0.6/ant-contrib-0.6-bin.zip" dest="ant-contrib-0.6-bin.zip" />
 		<unzip src="ant-contrib-0.6-bin.zip" dest="ant-contrib"/>
@@ -78,16 +86,18 @@
 		</copy>
 	</target>
 	
-	<target name="deploy" depends="jar, bar, compile">
+	<target name="deploy" depends="verify-version, jar, bar, compile">
 		<copy todir="${catalina.home}/lib">
 			<fileset dir="${jar.lib.path}" />
 		</copy>
 		<java classname="com.kaltura.bpmn.deploy.DeployAllProcesses" failonerror="true">
-			<classpath>
+			<classpath path="${basedir}/deploy/bin">
 				<fileset dir="${catalina.home}/webapps/activiti-explorer/WEB-INF/lib">
 					<include name="*.jar" />
 				</fileset>
-				<fileset dir="${basedir}/deploy/bin" />
+				<fileset dir="${basedir}/deploy/lib">
+					<include name="*.jar" />
+				</fileset>
 			</classpath>
 			<arg value="${bar.filename}" />
 		</java>
