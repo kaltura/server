@@ -66,14 +66,10 @@ class IntegrationPlugin extends KalturaPlugin implements IKalturaPermissions, IK
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('IntegrationBatchJobType', 'IntegrationEventNotificationEventType');
+			return array('IntegrationBatchJobType');
 	
 		if($baseEnumName == 'BatchJobType')
 			return array('IntegrationBatchJobType');
-	
-	
-		if($baseEnumName == 'EventNotificationEventType')
-			return array('IntegrationEventNotificationEventType');
 			
 		return array();
 	}
