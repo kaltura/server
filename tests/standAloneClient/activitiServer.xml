@@ -13,13 +13,13 @@
 	<multirequest>
 		<request service="businessProcessServer" action="add" plugin="businessProcessNotification" partnerId="0">
 			<template objectType="KalturaActivitiBusinessProcessServer">
-				<name>localhost</name>
-				<systemName>activiti-localhost</systemName>
-				<host>localhost</host>
-				<port>8080</port>
-				<protocol>http</protocol>
-				<username>kermit</username>
-				<password>kermit</password>
+				<name>{prompt:Activiti server name:}</name>
+				<systemName>{prompt:Activiti server system name:}</systemName>
+				<host>{prompt:Activiti server host:}</host>
+				<port>{prompt:Activiti server port:}</port>
+				<protocol>{prompt:Activiti server protocol (http/https):}</protocol>
+				<username>{prompt:Activiti server username:}</username>
+				<password>{prompt:Activiti server password:}</password>
 			</template>
 		</request>
 	</multirequest>

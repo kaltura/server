@@ -96,6 +96,7 @@ Add the following lines as new sections:
  - Deploy processes **(replace tokens)**:
 	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
 	 - `ant`
+ - Add Activiti server to Kaltura server using the API **(replace tokens)**: `php @APP_DIR@/tests/standAloneClient/exec.php @APP_DIR@/tests/standAloneClient/activitiServer.xml`
 
 ----------
 # Jupiter-10.2.0 #
