@@ -45,7 +45,7 @@ class KalturaSerializableStream extends Zend_Log_Writer_Stream
 	{
 		$errno = null;
 		$errstr = null;
-		if (strpos($this->_url, "://") !== false)
+		if (strpos($this->_url, "udg://") === 0)
 		{
 			$this->_stream = @fsockopen($this->_url, 0, $errno, $errstr, 1);
 		}
