@@ -22,13 +22,13 @@ class KalturaSerializableStream extends Zend_Log_Writer_Stream
 	 */
 	public function __construct($streamOrUrl, $mode = 'a')
 	{
-		parent::__construct($streamOrUrl, $mode);
-		
 		if (is_resource($streamOrUrl))
 			throw new Zend_Log_Exception("Cannot use KalturaSerializableStream with a resource");
 		
 		$this->_url = $streamOrUrl;
 		$this->_mode = $mode;
+
+		$this->initStream();
 	}
 
    	public function __sleep()
@@ -38,7 +38,25 @@ class KalturaSerializableStream extends Zend_Log_Writer_Stream
 
    	public function __wakeup()
 	{
-		if (! $this->_stream = @fopen($this->_url, $this->_mode, false))
+		$this->initStream();
+	}
+	
+	protected function initStream()
+	{
+		$errno = null;
+		$errstr = null;
+		if (strpos($this->_url, "://") !== false)
+		{
+			$this->_stream = @fsockopen($this->_url, 0, $errno, $errstr, 1);
+		}
+		else
+		{
+			$this->_stream = @fopen($this->_url, $this->_mode, false);
+		}
+		
+		if (! $this->_stream)
+		{
 			throw new Zend_Log_Exception("\"{$this->_url}\" cannot be opened with mode \"{$this->_mode}\"");
+		}
 	}
 }
