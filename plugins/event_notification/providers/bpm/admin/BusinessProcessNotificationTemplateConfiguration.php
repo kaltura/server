@@ -41,7 +41,7 @@ class Form_BusinessProcessNotificationTemplateConfiguration extends Form_EventNo
 		if($businessProcessProvider)
 		{
 			$processes = $businessProcessProvider->listBusinessProcesses();
-			asort($processes);
+			asort($processes, SORT_FLAG_CASE | SORT_NATURAL);
 		}
 			
  		$this->addElement('select', 'server_id', array(
