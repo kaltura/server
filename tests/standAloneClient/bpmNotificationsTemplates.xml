@@ -126,7 +126,7 @@
 						<key>adminSecret</key>
 						<description>Partner Administrator Secret</description>
 						<value objectType="KalturaEvalStringField">
-							<code>$scope->getEvent()->getObject()->getPartner()->getAdminSecret()</code>
+							<code>PartnerPeer::retrieveByPK($scope->getEvent()->getObject()->getPartnerId())->getAdminSecret()</code>
 						</value>
 					</item>
 					<item objectType="KalturaEventNotificationParameter">
