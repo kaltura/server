@@ -14,6 +14,7 @@ Add the following line:
 
 		Integration		
 		IntegrationEventNotifications
+		BpmEventNotificationIntegration
 		BusinessProcessNotification
 		ActivitiBusinessProcessNotification
 
