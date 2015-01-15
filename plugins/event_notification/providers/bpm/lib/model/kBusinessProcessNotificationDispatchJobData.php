@@ -6,13 +6,6 @@
 class kBusinessProcessNotificationDispatchJobData extends kEventNotificationDispatchJobData
 {
 	/**
-	 * Define the content dynamic parameters
-	 * 
-	 * @var array<key,value>
-	 */
-	private $contentParameters;
-	
-	/**
 	 * Define the business-process server id
 	 * 
 	 * @var int
@@ -114,21 +107,5 @@ class kBusinessProcessNotificationDispatchJobData extends kEventNotificationDisp
 	public function setServer(BusinessProcessServer $server)
 	{
 		$this->serverId = $server->getId();
-	}
-
-	/**
-	 * @return array<key,value> $contentParameters
-	 */
-	public function getContentParameters()
-	{
-		return $this->contentParameters;
-	}
-
-	/**
-	 * @param array<key,value> $contentParameters
-	 */
-	public function setContentParameters(array $contentParameters)
-	{
-		$this->contentParameters = $contentParameters;
 	}
 }

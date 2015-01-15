@@ -20,6 +20,9 @@ class KalturaBusinessProcessNotificationDispatchJobData extends KalturaEventNoti
 		'caseId',
 	);
 
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
@@ -36,7 +39,5 @@ class KalturaBusinessProcessNotificationDispatchJobData extends KalturaEventNoti
 		$server = $dbObject->getServer();
 		$this->server = KalturaBusinessProcessServer::getInstanceByType($server->getType());
 		$this->server->fromObject($server);
-		
-		$this->contentParameters = KalturaKeyValueArray::fromKeyValueArray($dbObject->getContentParameters());
 	}
 }
