@@ -47,6 +47,7 @@ class BusinessProcessNotificationTemplatesListProcessesAction extends KalturaApp
 	
 			$businessProcessProvider = kBusinessProcessProvider::get($server);
 			$processes = $businessProcessProvider->listBusinessProcesses();
+			asort($processes);
 		}
 		catch(Exception $e)
 		{

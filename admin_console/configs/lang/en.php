@@ -1134,6 +1134,7 @@ return array(
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_SAVED' => 'Object saved',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_UPDATED' => 'Object updated',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::OBJECT_REPLACED' => 'Object replaced',
+	'Kaltura_Client_EventNotification_Enum_EventNotificationEventType::INTEGRATION_JOB_CLOSED' => 'Integration job closed',
 
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::AD_CUE_POINT' => 'Ad cue-point',
 	'Kaltura_Client_EventNotification_Enum_EventNotificationEventObjectType::ANNOTATION' => 'Annotation',
