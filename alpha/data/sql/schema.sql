@@ -58,6 +58,7 @@ CREATE TABLE `kuser`
 	`indexed_partner_data_int` INTEGER,
 	`indexed_partner_data_string` VARCHAR(64),
 	`custom_data` TEXT,
+	`type` TINYINT,
 	PRIMARY KEY (`id`),
 	KEY `screen_name_index`(`screen_name`),
 	KEY `full_name_index`(`full_name`),
@@ -2339,6 +2340,37 @@ CREATE TABLE `file_asset`
 	PRIMARY KEY (`id`),
 	KEY `partner_object_status`(`partner_id`, `object_id`, `object_type`, `status`),
 	KEY `updated_at`(`updated_at`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- kuser_kgroup
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `kuser_kgroup`;
+
+
+CREATE TABLE `kuser_kgroup`
+(
+	`id` BIGINT  NOT NULL AUTO_INCREMENT,
+	`kuser_id` INTEGER  NOT NULL,
+	`puser_id` INTEGER  NOT NULL,
+	`kgroup_id` INTEGER  NOT NULL,
+	`pgroup_id` INTEGER  NOT NULL,
+	`status` TINYINT  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_kuser_index`(`kuser_id`, `partner_id`, `status`),
+	KEY `partner_kgroup_index`(`kgroup_id`, `partner_id`, `status`),
+	KEY `partner_index`(`partner_id`, `status`),
+	CONSTRAINT `kuser_kgroup_FK_1`
+		FOREIGN KEY (`kgroup_id`)
+		REFERENCES `kuser` (`id`),
+	CONSTRAINT `kuser_kgroup_FK_2`
+		FOREIGN KEY (`kuser_id`)
+		REFERENCES `kuser` (`id`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

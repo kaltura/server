@@ -47,6 +47,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="indexed_partner_data_int" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="indexed_partner_data_string" type="varchar" size="64" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="tinyint" />
 		<index name="screen_name_index">
 			<index-column name="screen_name" />
 		</index>
@@ -2043,4 +2044,36 @@
 			<index-column name="updated_at" />
 		</index>		
 	</table>
+    <table skipSql="false" abstract="false" name="kuser_kgroup">
+        <column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="bigint" autoIncrement="true" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="kuser_id" type="integer" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="puser_id" type="integer" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="kgroup_id" type="integer" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="pgroup_id" type="integer" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="status" type="tinyint" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="partner_id" type="integer" />
+        <column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
+        <column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+        <column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+        <foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
+            <reference local="kgroup_id" foreign="id" />
+        </foreign-key>
+        <foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
+            <reference local="kuser_id" foreign="id" />
+        </foreign-key>
+        <index name="partner_kuser_index">
+            <index-column name="kuser_id" />
+            <index-column name="partner_id" />
+            <index-column name="status" />
+        </index>
+        <index name="partner_kgroup_index">
+            <index-column name="kgroup_id" />
+            <index-column name="partner_id" />
+            <index-column name="status" />
+        </index>
+        <index name="partner_index">
+            <index-column name="partner_id" />
+            <index-column name="status" />
+        </index>
+    </table>
 </database>
