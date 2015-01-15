@@ -263,7 +263,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $metadataField;
 	}
 	
-	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false) {
+	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false , $metadataProfileId = null) {
 		
 		 if($isIndex) {
 		 	$result = MetadataPlugin::PLUGIN_NAME . '_text' . ' ' . MetadataPlugin::PLUGIN_NAME . '_text_' . $partnerId
@@ -274,11 +274,17 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		 
 		 if(is_null($partnerId))
 		 	return MetadataPlugin::PLUGIN_NAME . "_text << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
-		 else
-		 	return MetadataPlugin::PLUGIN_NAME . "_text_{$partnerId} << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_text_{$partnerId}";
+		else {
+			if($metadataProfileId)
+				$result = MetadataPlugin::PLUGIN_NAME . "_{$metadataProfileId} << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$metadataProfileId}";
+			else
+				$result = MetadataPlugin::PLUGIN_NAME . "_text_{$partnerId} << ( $text ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_text_{$partnerId}";
+
+			return $result;
+		}
 	}
 	
-	protected function createSphinxSearchPhrase($partnerScope = null, $text) {
+	protected function createSphinxSearchPhrase($partnerScope = null, $text, $metadataProfileId = null) {
 		
 		$prefix = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ';
 		
@@ -290,11 +296,11 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$partnerScope = kCurrentContext::getCurrentPartnerId();
 			
 			
-		return $prefix . MetadataSearchFilter::createSphinxSearchCondition($partnerScope, $text, false);
+		return $prefix . MetadataSearchFilter::createSphinxSearchCondition($partnerScope, $text, false , $metadataProfileId);
 	}
 	
 	
-	public function getFreeTextConditions($partnerScope, $freeTexts) 
+	public function getFreeTextConditions($partnerScope, $freeTexts , $metadataProfileIds = array()) 
 	{
 		KalturaLog::debug("freeText [$freeTexts]");
 		$additionalConditions = array();
@@ -323,6 +329,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			{
 				$freeText = SphinxUtils::escapeString($freeText);
 				$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeText);
+				foreach($metadataProfileIds as $metadataProfileId)
+					$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeTexts , $metadataProfileId);
 			}
 			
 			return $additionalConditions;
@@ -337,6 +345,9 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
 		$additionalConditions[] =  $this->createSphinxSearchPhrase($partnerScope, $freeTextExpr);
+		foreach($metadataProfileIds as $metadataProfileId)
+			$additionalConditions[] = $this->createSphinxSearchPhrase($partnerScope, $freeTexts , $metadataProfileId);
+
 		return $additionalConditions;
 	}
 	
