@@ -15,10 +15,22 @@ class KalturaIntegrationJobData extends KalturaJobData
 	 * @var KalturaIntegrationJobProviderData
 	 */
 	public $providerData;
+
+	/**
+	 * @var KalturaIntegrationTriggerType
+	 */
+	public $triggerType;
+
+	/**
+	 * Additional data that relevant for the trigger only
+	 * @var KalturaIntegrationJobTriggerData
+	 */
+	public $triggerData;
 	
 	private static $map_between_objects = array
 	(
 		"providerType" ,
+		"triggerType" ,
 	);
 
 	/* (non-PHPdoc)
@@ -38,10 +50,15 @@ class KalturaIntegrationJobData extends KalturaJobData
 		
 		$providerType = $sourceObject->getProviderType();
 		$this->providerData = KalturaPluginManager::loadObject('KalturaIntegrationJobProviderData', $providerType);
-			
 		$providerData = $sourceObject->getProviderData();
 		if($this->providerData && $providerData && $providerData instanceof kIntegrationJobProviderData)
 			$this->providerData->fromObject($providerData);
+			
+		$triggerType = $sourceObject->getTriggerType();
+		$this->triggerData = KalturaPluginManager::loadObject('KalturaIntegrationJobTriggerData', $triggerType);
+		$triggerData = $sourceObject->getTriggerData();
+		if($this->triggerData && $triggerData && $triggerData instanceof kIntegrationJobTriggerData)
+			$this->triggerData->fromObject($triggerData);
 	}
 	
 	/* (non-PHPdoc)
@@ -65,13 +82,28 @@ class KalturaIntegrationJobData extends KalturaJobData
 			}
 		}
 		
+		if($this->triggerType && $this->triggerData && $this->triggerData instanceof KalturaIntegrationJobTriggerData)
+		{
+			$triggerData = KalturaPluginManager::loadObject('kIntegrationJobTriggerData', $this->triggerType);
+			if($triggerData)
+			{
+				$triggerData = $this->triggerData->toObject($triggerData);
+				$object->setTriggerData($triggerData);
+			}
+		}
+		
 		return $object;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
 	public function validateForUsage($sourceObject)
 	{
 		$this->validatePropertyNotNull('providerType');
 		$this->validatePropertyNotNull('providerData');
+		$this->validatePropertyNotNull('triggerType');
+		$this->validatePropertyNotNull('triggerData');
 	}
 	
 	/* (non-PHPdoc)

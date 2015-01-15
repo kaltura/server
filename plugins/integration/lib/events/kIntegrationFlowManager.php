@@ -46,7 +46,10 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 				$batchJob->setEntryId($asset->getEntryId());
 		}
 		
+		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
+		
 		$jobType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
-		return kJobsManager::addJob($batchJob, $data, $jobType, $data->getProviderType());
+		$batchJob = kJobsManager::addJob($batchJob, $data, $jobType, $data->getProviderType());
+		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 }

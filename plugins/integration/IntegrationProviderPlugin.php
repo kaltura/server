@@ -24,7 +24,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IKaltu
 	{
 		$class = get_called_class();
 		$integrationVersion = $class::getRequiredIntegrationPluginVersion();
-		$dependency = new KalturaDependency(MetadataPlugin::getPluginName(), $integrationVersion);
+		$dependency = new KalturaDependency(IntegrationPlugin::getPluginName(), $integrationVersion);
 		
 		return array($dependency);
 	}
@@ -75,7 +75,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IKaltu
 	{
 		$class = get_called_class();
 		$value = $class::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore('IntegrationProvider', $value);
+		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
 	
 	/**

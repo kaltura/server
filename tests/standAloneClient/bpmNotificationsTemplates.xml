@@ -50,6 +50,15 @@
 						</value>
 					</item>
 				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>templateId</key>
+						<description>ID of the template to be passed to the process</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -136,6 +145,13 @@
 					</item>
 				</contentParameters>
 				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>templateId</key>
+						<description>ID of the template to be passed to the process</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>trigger_status</key>
 						<description>Flavor-asset status that triggers the event, See:KalturaFlavorAssetStatus:/api_v3/testmeDoc/?object=KalturaFlavorAssetStatus</description>
@@ -275,6 +291,8 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<message>jobClosed</message>
+				<eventId>jobClosedEvent</eventId>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -294,6 +312,8 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>2</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORY -->
+				<message>jobClosed</message>
+				<eventId>jobClosedEvent</eventId>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -313,6 +333,8 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>3</eventObjectType> <!-- EventNotificationEventObjectType::ASSET -->
+				<message>jobClosed</message>
+				<eventId>jobClosedEvent</eventId>
 			</template>
 		</request>
 		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
