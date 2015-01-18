@@ -97,11 +97,11 @@
 	    
     if (!isLandscape) {
         
-        labelUser.textAlignment = UITextAlignmentLeft;
+        labelUser.textAlignment = NSTextAlignmentLeft;
         labelUser.frame = CGRectMake(20, 10, labelUser.frame.size.width, labelUser.frame.size.height);
         viewUser.frame = CGRectMake(15, 45, viewUser.frame.size.width, viewUser.frame.size.height);
 
-        labelPassword.textAlignment = UITextAlignmentLeft;
+        labelPassword.textAlignment = NSTextAlignmentLeft;
         labelPassword.frame = CGRectMake(20, 90, labelPassword.frame.size.width, labelPassword.frame.size.height);
         viewPassword.frame = CGRectMake(15, 125, viewPassword.frame.size.width, viewPassword.frame.size.height);
 
@@ -109,11 +109,11 @@
         
     } else {
         
-        labelUser.textAlignment = UITextAlignmentRight;
+        labelUser.textAlignment = NSTextAlignmentRight;
         labelUser.frame = CGRectMake(20, 10, labelUser.frame.size.width, labelUser.frame.size.height);
         viewUser.frame = CGRectMake(140, 10, viewUser.frame.size.width, viewUser.frame.size.height);
         
-        labelPassword.textAlignment = UITextAlignmentRight;
+        labelPassword.textAlignment = NSTextAlignmentRight;
         labelPassword.frame = CGRectMake(20, 50, labelPassword.frame.size.width, labelPassword.frame.size.height);
         viewPassword.frame = CGRectMake(140, 50, viewPassword.frame.size.width, viewPassword.frame.size.height);
         

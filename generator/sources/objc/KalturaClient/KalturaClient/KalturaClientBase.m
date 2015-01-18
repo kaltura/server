@@ -38,6 +38,28 @@ static NSString* const KalturaServiceFormatXml = @"2";
 NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 
 /*
+ Class KalturaBool
+ */
+@implementation KalturaBool
++ (KALTURA_BOOL)NO_VALUE
+{
+	return 0;
+}
++ (KALTURA_BOOL)YES_VALUE
+{
+	return 1;
+}
++ (KALTURA_BOOL)NULL_VALUE
+{
+	return CHAR_MAX;
+}
++ (KALTURA_BOOL)UNDEF_VALUE
+{
+	return CHAR_MIN;
+}
+@end
+
+/*
  Class KalturaClientException
  */
 @implementation KalturaClientException
@@ -48,13 +70,13 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
  */
 @implementation KalturaSimpleTypeParser
 
-+ (BOOL)parseBool:(NSString*)aStr
++ (KALTURA_BOOL)parseBool:(NSString*)aStr
 {
     if (aStr == nil)
-        return NO;
+        return [KalturaBool NO_VALUE];
     if ([aStr compare:@"1"] != NSOrderedSame)
-        return NO;
-    return YES;
+        return [KalturaBool NO_VALUE];
+    return [KalturaBool YES_VALUE];
 }
 
 + (int)parseInt:(NSString*)aStr
@@ -260,7 +282,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 
 - (void)popKey:(NSString*)aKey
 {
-    int curLength = self->_prefix.length;
+    int curLength = (int)self->_prefix.length;
     NSRange range = NSMakeRange(curLength - aKey.length - 1, aKey.length + 1);
     [self->_prefix deleteCharactersInRange:range];
 }
@@ -326,7 +348,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     [param release];
 }
 
-- (void)addIfDefinedKey:(NSString*)aKey withBool:(BOOL)aVal
+- (void)addIfDefinedKey:(NSString*)aKey withBool:(KALTURA_BOOL)aVal
 {
     if (aVal == KALTURA_UNDEF_BOOL)
         return;
@@ -445,8 +467,8 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     {
         const char* keyPtr = [curParam.key UTF8String];
         const char* valuePtr = [curParam.value UTF8String];
-        CC_MD5_Update(&md5Ctx, keyPtr, strlen(keyPtr));
-        CC_MD5_Update(&md5Ctx, valuePtr, strlen(valuePtr));
+        CC_MD5_Update(&md5Ctx, keyPtr, (int)strlen(keyPtr));
+        CC_MD5_Update(&md5Ctx, valuePtr, (int)strlen(valuePtr));
     }
     CC_MD5_Final(md5Hash, &md5Ctx);
 
@@ -839,7 +861,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     [parser release];
 }
 
-- (BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction
+- (KALTURA_BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserSimpleType* parser = [[KalturaXmlParserSimpleType alloc] init];
     id result = [self queueService:aService withAction:aAction withParser:parser];
@@ -989,9 +1011,9 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     
     CC_SHA1_Init(&sha1Ctx);
     const char* secretPtr = [aSecret UTF8String];
-    CC_SHA1_Update(&sha1Ctx, secretPtr, strlen(secretPtr));
+    CC_SHA1_Update(&sha1Ctx, secretPtr, (int)strlen(secretPtr));
     const char* fieldsPtr = [aKsFields UTF8String];
-    CC_SHA1_Update(&sha1Ctx, fieldsPtr, strlen(fieldsPtr));
+    CC_SHA1_Update(&sha1Ctx, fieldsPtr, (int)strlen(fieldsPtr));
     
     CC_SHA1_Final(sha1Hash, &sha1Ctx);
     

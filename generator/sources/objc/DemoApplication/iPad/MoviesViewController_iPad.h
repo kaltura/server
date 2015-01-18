@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 #import <MessageUI/MFMailComposeViewController.h>
+#import <KALTURAPlayerSDK/KPViewController.h>
+
+extern const CGRect PlayeriPadCGRect;
 
 @interface MoviesViewController_iPad : UIViewController <UINavigationControllerDelegate, MFMailComposeViewControllerDelegate> {
     
@@ -45,6 +48,7 @@
     IBOutlet UILabel *labelInfoDuration;
     
     IBOutlet UITextView *textInfoDescription;
+    KPViewController* playerViewController;
     
 }
 
@@ -55,8 +59,13 @@
 - (IBAction)playInfoButtonPressed:(UIButton *)button;
 - (IBAction)shareButtonPressed:(UIButton *)button;
 
+// Supporting PlayerSDK
+- (void)stopAndRemovePlayer;
+- (void)toggleFullscreen:(NSNotification *)note;
+
 @property (nonatomic, retain) NSMutableArray *media;
 @property (nonatomic, retain) KalturaCategory *category;
 @property BOOL mostPopular;
+@property (retain, nonatomic) IBOutlet UIView *entryInfoView;
 
 @end
