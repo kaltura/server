@@ -366,6 +366,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{366, 14}, {40, 40}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="368128113"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -389,6 +390,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{50, 90}, {320, 180}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="431437426"/>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">2</int>
@@ -400,9 +402,11 @@
 								<int key="NSvFlags">301</int>
 								<string key="NSFrame">{{170, 145}, {80, 70}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="411735111"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+								<bool key="IBUIEnabled">NO</bool>
 								<int key="IBUIContentHorizontalAlignment">0</int>
 								<int key="IBUIContentVerticalAlignment">0</int>
 								<reference key="IBUIHighlightedTitleColor" ref="603041842"/>
@@ -427,6 +431,7 @@
 										<int key="NSvFlags">289</int>
 										<string key="NSFrame">{{195, 10}, {40, 40}}</string>
 										<reference key="NSSuperview" ref="817157461"/>
+										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="748797354"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -450,6 +455,7 @@
 										<int key="NSvFlags">289</int>
 										<string key="NSFrame">{{235, 10}, {40, 40}}</string>
 										<reference key="NSSuperview" ref="817157461"/>
+										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="5401180"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<int key="IBUITag">1</int>
@@ -474,6 +480,7 @@
 										<int key="NSvFlags">289</int>
 										<string key="NSFrame">{{275, 10}, {40, 40}}</string>
 										<reference key="NSSuperview" ref="817157461"/>
+										<reference key="NSWindow"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<int key="IBUITag">2</int>
 										<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -495,6 +502,7 @@
 								</array>
 								<string key="NSFrame">{{55, 451}, {320, 60}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="240698068"/>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">1</int>
@@ -508,6 +516,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{50, 35}, {320, 44}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="796933790"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -541,6 +550,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{50, 275}, {320, 24}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="36060151"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -561,6 +571,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{40, 305}, {340, 147}}</string>
 								<reference key="NSSuperview" ref="930188824"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="817157461"/>
 								<reference key="IBUIBackgroundColor" ref="995318013"/>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -583,6 +594,7 @@
 						</array>
 						<string key="NSFrame">{{176, 242}, {420, 520}}</string>
 						<reference key="NSSuperview" ref="921012429"/>
+						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="886619780"/>
 						<reference key="IBUIBackgroundColor" ref="528722541"/>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -590,6 +602,7 @@
 				</array>
 				<string key="NSFrameSize">{768, 1004}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="930188824"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">3</int>
@@ -720,6 +733,14 @@
 						<reference key="destination" ref="368128113"/>
 					</object>
 					<int key="connectionID">53</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">entryInfoView</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="930188824"/>
+					</object>
+					<int key="connectionID">58</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -1064,9 +1085,136 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">57</int>
+			<int key="maxID">58</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">KalturaThumbView</string>
+					<string key="superclassName">UIImageView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/KalturaThumbView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">MoviesViewController_iPad</string>
+					<string key="superclassName">UIViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="categoriesButtonPressed:">UIButton</string>
+						<string key="closeInfoButtonPressed:">UIButton</string>
+						<string key="menuBarButtonPressed:">UIButton</string>
+						<string key="playInfoButtonPressed:">UIButton</string>
+						<string key="shareButtonPressed:">UIButton</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="categoriesButtonPressed:">
+							<string key="name">categoriesButtonPressed:</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBActionInfo" key="closeInfoButtonPressed:">
+							<string key="name">closeInfoButtonPressed:</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBActionInfo" key="menuBarButtonPressed:">
+							<string key="name">menuBarButtonPressed:</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBActionInfo" key="playInfoButtonPressed:">
+							<string key="name">playInfoButtonPressed:</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBActionInfo" key="shareButtonPressed:">
+							<string key="name">shareButtonPressed:</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="activity">UIActivityIndicatorView</string>
+						<string key="buttonCategories">UIButton</string>
+						<string key="categoriesTableView">UITableView</string>
+						<string key="categoriesView">UIView</string>
+						<string key="entryInfoView">UIView</string>
+						<string key="imgInfoThumb">KalturaThumbView</string>
+						<string key="labelCategories">UILabel</string>
+						<string key="labelInfoDuration">UILabel</string>
+						<string key="labelInfoTitle">UILabel</string>
+						<string key="labelTitle">UILabel</string>
+						<string key="mediaTableView">UITableView</string>
+						<string key="searchLabel">UILabel</string>
+						<string key="searchText">UITextField</string>
+						<string key="textInfoDescription">UITextView</string>
+						<string key="viewInfo">UIView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="activity">
+							<string key="name">activity</string>
+							<string key="candidateClassName">UIActivityIndicatorView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="buttonCategories">
+							<string key="name">buttonCategories</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="categoriesTableView">
+							<string key="name">categoriesTableView</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="categoriesView">
+							<string key="name">categoriesView</string>
+							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="entryInfoView">
+							<string key="name">entryInfoView</string>
+							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="imgInfoThumb">
+							<string key="name">imgInfoThumb</string>
+							<string key="candidateClassName">KalturaThumbView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="labelCategories">
+							<string key="name">labelCategories</string>
+							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="labelInfoDuration">
+							<string key="name">labelInfoDuration</string>
+							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="labelInfoTitle">
+							<string key="name">labelInfoTitle</string>
+							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="labelTitle">
+							<string key="name">labelTitle</string>
+							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mediaTableView">
+							<string key="name">mediaTableView</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchLabel">
+							<string key="name">searchLabel</string>
+							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchText">
+							<string key="name">searchText</string>
+							<string key="candidateClassName">UITextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="textInfoDescription">
+							<string key="name">textInfoDescription</string>
+							<string key="candidateClassName">UITextView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="viewInfo">
+							<string key="name">viewInfo</string>
+							<string key="candidateClassName">UIView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/MoviesViewController_iPad.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBIPadFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">

@@ -134,7 +134,8 @@ static NSString* flavorID = @"";
     
     NSDictionary *dic = [self.bitrates objectAtIndex:ind];
     
-    [buttonBitrate setTitle:[Utils getStrBitrate:[dic objectForKey:@"bitrate"]] forState:UIControlStateNormal];
+    [buttonBitrate setTitle:[Utils getStrBitrate:[dic objectForKey:@"bitrate"]]
+                   forState:UIControlStateNormal];
 
     if ([flavorType isEqual:@"wv"])
     {
@@ -148,7 +149,10 @@ static NSString* flavorID = @"";
             [[Client instance] selectBitrate:ind];
         }
         
-        NSString *strURL = [[Client instance] getVideoURL:self.mediaEntry forMediaEntryDuration: self.mediaEntry.duration forFlavor:[dic objectForKey:@"id"] forFlavorType: flavorType];
+        NSString *strURL = [[Client instance] getVideoURL: self.mediaEntry
+                                    forMediaEntryDuration: self.mediaEntry.duration
+                                                forFlavor: [dic objectForKey:@"id"]
+                                            forFlavorType: flavorType];
         [[Client instance] playMovieFromUrl:strURL];
     }
     else
@@ -193,7 +197,7 @@ static NSString* flavorID = @"";
 
 - (void)bitrateButtonPressed:(UIButton *)button {
     
-    [self runWithBitrate:button.tag - 100];
+    [self runWithBitrate:(int)button.tag - 100];
     
     viewBitrates.alpha = 0.0;
     
