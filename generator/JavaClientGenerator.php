@@ -15,10 +15,12 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	private $_doc = null;
 	private $_csprojIncludes = array ();
 	protected $_baseClientPath = "src/com/kaltura/client";
+	protected $_usePrivateAttributes;
 	
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/java")
 	{
 		parent::__construct($xmlPath, $sourcePath, $config);
+		$this->_usePrivateAttributes = isset($config->usePrivateAttributes) ? $config->usePrivateAttributes : false;
 		$this->_doc = new KDOMDocument ();
 		$this->_doc->load ( $this->_xmlFile );
 	}
@@ -139,25 +141,26 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function generateEnumHashCodeFunctions(&$str, $enumType, $enumName)
 	{
-		if ($enumType == "string")
-		{
-			$str .= "    public String hashCode;\n\n";
-			$str .= "    $enumName(String hashCode) {\n";
-			$str .= "        this.hashCode = hashCode;\n";
-			$str .= "    }\n\n";
-			$str .= "    public String getHashCode() {\n";
-			$str .= "        return this.hashCode;\n";
-			$str .= "    }\n\n";
-		} else
-		{
-			$str .= "    public int hashCode;\n\n";
-			$str .= "    $enumName(int hashCode) {\n";
-			$str .= "        this.hashCode = hashCode;\n";
-			$str .= "    }\n\n";
-			$str .= "    public int getHashCode() {\n";
-			$str .= "        return this.hashCode;\n";
-			$str .= "    }\n\n";
+		$type = 'int';
+		if ($enumType == "string"){
+			$type = 'String';
 		}
+		
+		$visibility = 'public';
+		if($this->_usePrivateAttributes){
+			$visibility = 'private';
+		}
+		
+		$str .= "    $visibility $type hashCode;\n\n";
+		$str .= "    $enumName($type hashCode) {\n";
+		$str .= "        this.hashCode = hashCode;\n";
+		$str .= "    }\n\n";
+		$str .= "    public $type getHashCode() {\n";
+		$str .= "        return this.hashCode;\n";
+		$str .= "    }\n\n";
+		$str .= "    public void setHashCode($type hashCode) {\n";
+		$str .= "        this.hashCode = hashCode;\n";
+		$str .= "    }\n\n";
 	}
 		
 	function generateEnumGetFunction(&$str, $enumNode, $enumType,  $enumName) 
@@ -287,6 +290,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 
 		$needsArrayList = false;
 		$arrImportsEnums = array();
+		$arrFunctions = array();
 
 		foreach ( $classNode->childNodes as $propertyNode ) 
 		{
@@ -308,7 +312,23 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			if ($propType == "KalturaObjectBase")
 				$imports.= "import com.kaltura.client.KalturaObjectBase;\n";
 						
-			$propertyLine = "public $javaType $propName";
+			if($this->_usePrivateAttributes){
+				$propertyLine = "private";
+				
+				$functionName = ucfirst($propName);
+				$arrFunctions[] = "    public $javaType get{$functionName}(){";
+				$arrFunctions[] = "        return this.$propName;";
+				$arrFunctions[] = "    }";
+				$arrFunctions[] = "    ";
+				$arrFunctions[] = "    public void set{$functionName}($javaType $propName){";
+				$arrFunctions[] = "        this.$propName = $propName;";
+				$arrFunctions[] = "    }";
+			}
+			else{
+				$propertyLine = "public";
+			}
+			
+			$propertyLine .= " $javaType $propName";
 			
 			$initialValue = $this->getInitialPropertyValue($propertyNode);
 			if ($initialValue != "") 
@@ -319,6 +339,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine ( $desc );
 			
 			$this->appendLine ( "    $propertyLine;" );
+		}
+		
+		foreach($arrFunctions as $arrFunctionsLine){		
+			$this->appendLine($arrFunctionsLine);
 		}
 		
 		$arrImportsEnums = array_unique($arrImportsEnums);

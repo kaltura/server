@@ -92,7 +92,7 @@ Add the following lines as new sections:
  - Open your browser to validate installation **(replace tokens)**: http://@WWW_HOST@:8080/activiti-explorer/
 	 - Username: kermit
 	 - Password: kermit
- - Generate java and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php java,bpmn`
+ - Generate java pojo and bpmn clients **(replace tokens)**: `php @APP_DIR@/generator/generate.php pojo,bpmn`
  - Edit deployment configuration file **(replace tokens)**: `cp @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.template.xml @WEB_DIR@/content/clientlibs/bpmn/deploy/src/activiti.cfg.xml`
  - Deploy processes **(replace tokens)**:
 	 - `cd @WEB_DIR@/content/clientlibs/bpmn`

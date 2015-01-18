@@ -4,7 +4,7 @@ class AndroidClientGenerator extends JavaClientGenerator
 	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/android")
 	{
 		$this->_baseClientPath = "KalturaClient/" . $this->_baseClientPath;
-		parent::__construct($xmlPath, $sourcePath, $config);
+		parent::__construct($xmlPath, $config, $sourcePath);
 	}
 	
 	protected function normalizeSlashes($path)
