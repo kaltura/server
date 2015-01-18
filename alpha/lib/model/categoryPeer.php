@@ -20,6 +20,12 @@ class categoryPeer extends BasecategoryPeer
 	
 	private static $replace_character = "_";
 	
+	private static $ignoreDeleted = false;
+	
+	public static function setIgnoreDeleted ($ignore)
+	{
+		self::$ignoreDeleted = $ignore;
+	}
 	
 	public static function setDefaultCriteriaFilter ()
 	{
@@ -32,10 +38,14 @@ class categoryPeer extends BasecategoryPeer
 		
 		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id; 			
 		
-		if($partnerId != Partner::BATCH_PARTNER_ID)
+		if($partnerId != Partner::BATCH_PARTNER_ID || self::$ignoreDeleted)
+		{
 			$c->add ( self::STATUS, array(CategoryStatus::DELETED, CategoryStatus::PURGED), Criteria::NOT_IN );
+		}
 		else
+		{
 			$c->add ( self::STATUS, CategoryStatus::PURGED, Criteria::NOT_EQUAL );
+		}
 		
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
