@@ -90,7 +90,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$url4 = str_replace(array("'",' ','+'), '', $url4);
 		
 		$status = null;
-		for($i = 0; $i < 10; $i++)
+		for($i = 0; $i < 30; $i++)
 		{
 			$result = $curlWrapper->exec($url3);
 			
