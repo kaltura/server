@@ -16,9 +16,9 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	private $_csprojIncludes = array ();
 	protected $_baseClientPath = "src/com/kaltura/client";
 	
-	public function JavaClientGenerator($xmlPath, $sourcePath = "sources/java") 
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/java")
 	{
-		parent::ClientGeneratorFromXml ( $xmlPath, realpath ( $sourcePath ) );
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument ();
 		$this->_doc->load ( $this->_xmlFile );
 	}

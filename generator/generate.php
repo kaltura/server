@@ -198,7 +198,7 @@ foreach($config as $name => $item)
 			KalturaLog::info('Generating from api version: '.$apiVersionOverride.', generated at: '.strftime("%a %d %b %H:%M:%S %Y", $schemaGenDate));
 		}
 		
-		$instance = $reflectionClass->newInstance($tmpXmlFileName);
+		$instance = $reflectionClass->newInstance($tmpXmlFileName, $item);
 		
 		if($item->get("generateDocs"))
 			$instance->setGenerateDocs($item->get("generateDocs"));

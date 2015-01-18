@@ -13,12 +13,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	
 	protected $_projectSections = array();
 	
-	function __construct($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/objc")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/objc");
-			
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		$this->_doc = new KDOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}

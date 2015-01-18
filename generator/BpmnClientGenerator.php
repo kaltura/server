@@ -11,12 +11,9 @@ class BpmnClientGenerator extends ClientGeneratorFromXml
 	 */
 	protected $template = null;
 	
-	function BpmnClientGenerator($xmlPath, $sourcePath = null)
+	function __construct($xmlPath, Zend_Config $config, $sourcePath = "sources/bpmn")
 	{
-		if(!$sourcePath)
-			$sourcePath = realpath("sources/bpmn");
-		
-		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
+		parent::__construct($xmlPath, $sourcePath, $config);
 		
 		$this->template = file_get_contents("$sourcePath/action.template.bpmn");
 		$this->excludeSourcePaths[] = 'action.template.bpmn';
