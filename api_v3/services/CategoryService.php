@@ -11,7 +11,7 @@ class CategoryService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		if($serviceName == 'add')
+		if($actionName == 'add')
 		{
 			categoryPeer::setIgnoreDeleted(true);
 		}
