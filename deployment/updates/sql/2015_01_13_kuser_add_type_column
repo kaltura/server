@@ -1,0 +1,2 @@
+ALTER TABLE `kuser`
+ADD `type` tinyint(4) DEFAULT '0';

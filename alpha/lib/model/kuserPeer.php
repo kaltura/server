@@ -41,9 +41,10 @@ class kuserPeer extends BasekuserPeer
 	 * @param int $partnerId
 	 * @param string $puserId
 	 * @param bool $ignore_puser_kuser
+	 * @param KuserType $type
 	 * @return kuser
 	 */
-	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
+	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false, $type = KuserType::USER)
 	{
 		if(!$ignorePuserKuser && !kCurrentContext::isApiV3Context())
 		{
@@ -55,7 +56,8 @@ class kuserPeer extends BasekuserPeer
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partnerId);
 		$c->add(self::PUSER_ID, $puserId);
-		
+		$c->add(self::TYPE, $type);
+
 		// in case of more than one deleted kusers - get the last one
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
 		
@@ -65,14 +67,16 @@ class kuserPeer extends BasekuserPeer
 	/**
 	 * @param int $partner_id
 	 * @param array $puser_ids
+	 * @param KuserType $type
 	 * @return array<kuser>
 	 */
-	public static function getKuserByPartnerAndUids($partner_id , array $puser_ids)
+	public static function getKuserByPartnerAndUids($partner_id, array $puser_ids, $type = KuserType::USER)
 	{
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partner_id);
 		$c->add(self::PUSER_ID, $puser_ids, Criteria::IN);
-		return self::doSelect($c);			
+		$c->add(self::TYPE, $type);
+		return self::doSelect($c);
 	}
 	
 	public static function getActiveKuserByPartnerAndUid($partner_id , $puser_id)
@@ -624,4 +628,5 @@ class kuserPeer extends BasekuserPeer
 		self::setUseCriteriaFilter(true);
 		return $ret;
 	}
+
 }

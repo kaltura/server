@@ -15,4 +15,7 @@
  */
 class KuserKgroup extends BaseKuserKgroup {
 
+	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
+
+
 } // KuserKgroup
