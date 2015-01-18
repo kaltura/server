@@ -40,7 +40,7 @@ To run the JUnit test suite that accompanies this source:
 
 To auto compile run the tests on a Linux ENV:
  - Edit the src/com/kaltura/client/test/KalturaTestConfig.java file, enter valid data to ENDPOINT, PARTNER_ID, SECRET and ADMIN_SECRET variables.
- - run ./test.sh
+ - run ./testAPI/test.sh
 
   
 == SETUP log4j LOGGING IN ECLIPSE ==

@@ -1,20 +1,6 @@
 #!/bin/bash - 
-#===============================================================================
-#          FILE: test.sh
-#         USAGE: ./test.sh 
-#   DESCRIPTION: 
-#       OPTIONS: ---
-#  REQUIREMENTS: ---
-#          BUGS: ---
-#         NOTES: ---
-#        AUTHOR: Jess Portnoy (), <jess.portnoy@kaltura.com>
-#  ORGANIZATION: Kaltura, inc.
-#       CREATED: 01/18/2015 04:11:49 PM IST
-#      REVISION:  ---
-#===============================================================================
 
 #set -o nounset     # Treat unset variables as an error
-cd java
 mkdir -p bin
 cd bin
 cp ../src/DemoImage.jpg ../src/DemoVideo.flv .
