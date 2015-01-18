@@ -3,7 +3,7 @@
 
 	<property environment="env" />
 	<property name="catalina.home" value="${env.CATALINA_HOME}" />
-	<property name="java.lib.path" value="${basedir}/../java" />
+	<property name="java.lib.path" value="${basedir}/../pojo" />
 	<property name="jar.lib.path" value="${basedir}/lib" />
 	<property name="jar.filename" value="${jar.lib.path}/KalturaClientLib.jar" />
 	<property name="bar.filename" value="${basedir}/KalturaClientLib.bar" />
