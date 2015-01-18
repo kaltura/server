@@ -256,7 +256,17 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
-				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts);
+				$metadataProfileFields = array();
+				$metadataProfileFieldIds = array();
+
+				if ($metadataProfileId = $advancedSearch->getMetadataProfileId()){
+					$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+
+					foreach($metadataProfileFields as $metadataProfileField)
+						$metadataProfileFieldIds[] = $metadataProfileField->getId();
+				}
+
+				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts , $metadataProfileFieldIds);
 			}
 			
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, entryFilter::FREE_TEXT_FIELDS, $additionalConditions);
