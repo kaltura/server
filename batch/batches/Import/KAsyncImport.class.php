@@ -204,7 +204,12 @@ class KAsyncImport extends KJobHandlerWorker
 				foreach ($pluginInstances as $pluginInstance)
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
-					$data= $pluginInstance->handleImportContent($curlHeaderResponse, $data);
+					$data = $pluginInstance->handleImportContent($curlHeaderResponse, $data);
+					if (is_null($data))
+					{
+						KalturaLog::err("An error occurred while handling the content");
+						throw new KalturaException('An error occurred while handling the content' );
+					}
 				}
 			}
 
