@@ -119,7 +119,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$url4 = str_replace("ticket=ticket", "ticket=$ticket", $url4);
 		
 		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, false);
-		$fileName = pathinfo($importData->destFileLoclPath, PATHINFO_FILENAME);
+		$fileName = pathinfo($importData->destFileLocalPath, PATHINFO_FILENAME);
 		$destFileLocalPath = preg_replace("/$fileName\.[\w\d]+/", "$fileName.arf", $importData->destFileLocalPath);
 		$importData->destFileLocalPath = $destFileLocalPath;
 		KalturaLog::info('destination: ' . $importData->destFileLocalPath);
