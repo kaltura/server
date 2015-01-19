@@ -204,7 +204,13 @@ class KAsyncImport extends KJobHandlerWorker
 				foreach ($pluginInstances as $pluginInstance)
 				{
 					/* @var $pluginInstance IKalturaImportHandler */
-					$data= $pluginInstance->handleImportContent($curlHeaderResponse, $data);
+					$data = $pluginInstance->handleImportContent($curlHeaderResponse, $data, KBatchBase::$taskConfig->params);
+					if (is_null($data))
+					{
+						KalturaLog::err("An error occurred while handling the content");
+						//We want the retry mechanism to work
+						throw new KalturaException(KCurlWrapper::COULD_NOT_CONNECT_TO_HOST_ERROR);
+					}
 				}
 			}
 
