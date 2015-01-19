@@ -208,8 +208,8 @@ class KAsyncImport extends KJobHandlerWorker
 					if (is_null($data))
 					{
 						KalturaLog::err("An error occurred while handling the content");
-						//We want the retry mechanism to work
-						throw new KalturaException(KCurlWrapper::COULD_NOT_CONNECT_TO_HOST_ERROR);
+						//TODO: check why webex retries do not work
+						throw new KalturaException('An error occurred while handling the content' );
 					}
 				}
 			}
