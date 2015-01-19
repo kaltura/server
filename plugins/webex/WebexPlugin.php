@@ -22,7 +22,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 	 */
 	public static function handleImportContent($curlInfo,  $importData, $params) {
 		if (!($curlInfo->headers['content-length'] < 16000 && $curlInfo->headers['content-type'] == 'text/html'))
-			return $importData;
+			return null;
 		
 		KalturaLog::info('Handle Import data: Webex Plugin');
 		$matches = null;
@@ -38,7 +38,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		if (!$recordId)
 		{
 			KalturaLog::info('recordId value not found - exiting.');
-			return $importData;
+			return null;
 		}
 		
 		$data = file_get_contents($importData->destFileLocalPath);
@@ -135,7 +135,6 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 		$importData->fileSize = kFile::fileSize($importData->destFileLocalPath);
 		
 		return $importData;
-
 	}
 
 }
