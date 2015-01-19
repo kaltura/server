@@ -184,8 +184,9 @@ class KalturaDispatcher
 			}
 		}
 		
-		if(!($dbObject instanceof IOwnable))
+		if ( ! method_exists($dbObject, 'getId') )
 		{
+			KalturaLog::debug("Object of type " . get_class($dbObject) . " doesn't contain the getId() method");
 			return;
 		}
 	
@@ -203,6 +204,22 @@ class KalturaDispatcher
 				return;
 			}
 			
+		}
+
+		if ( ! method_exists($dbObject, 'getPuserId') )
+		{
+			KalturaLog::debug("Object of type " . get_class($dbObject) . " with id {$dbObject->getId()} doesn't contain the getPuserId() method");
+			return;
+		}
+
+		if ( ! ($dbObject instanceof IOwnable) )
+		{
+			$isOwner = (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid));
+
+			KalturaLog::debug("Object of type " . get_class($dbObject) . " doesn't implement the IOwnable interface"
+						. ($isOwner ? "" : " but would not be entitled because puser {$dbObject->getPuserId()} is not the owner of object {$dbObject->getId()}")
+					);
+			return;
 		}
 
 		if (strtolower($dbObject->getPuserId()) != strtolower(kCurrentContext::$ks_uid)) 
