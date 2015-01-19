@@ -9,7 +9,7 @@
 
 Add the following to the KAsyncImport worker configuartion:
 
-params.webex.iterations                                                                 = 30 
+params.webex.iterations                                                                 = 30  
 params.webex.sleep                                                                      = 4 
 
 *plugins.ini*
