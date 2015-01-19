@@ -258,8 +258,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 			{
 				$metadataProfileFields = array();
 				$metadataProfileFieldIds = array();
-
-				if ($metadataProfileId = $advancedSearch->getMetadataProfileId()){
+				$metadataProfileId = null;
+				
+				if ($advancedSearch instanceof MetadataSearchFilter)
+					$metadataProfileId = $advancedSearch->getMetadataProfileId();
+				
+				if ($metadataProfileId){
 					$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
 
 					foreach($metadataProfileFields as $metadataProfileField)
