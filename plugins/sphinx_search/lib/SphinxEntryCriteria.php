@@ -256,14 +256,20 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
-				$metadataProfileFields = array();
-				$metadataProfileFieldIds = array();
+				if ($advancedSearch instanceof MetadataSearchFilter)
+				{
+					$metadataProfileFields = array();
+					$metadataProfileFieldIds = array();
 
-				if ($metadataProfileId = $advancedSearch->getMetadataProfileId()){
-					$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+					$metadataProfileId = $advancedSearch->getMetadataProfileId();
 
-					foreach($metadataProfileFields as $metadataProfileField)
-						$metadataProfileFieldIds[] = $metadataProfileField->getId();
+					if ($metadataProfileId)
+					{
+						$metadataProfileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+
+						foreach($metadataProfileFields as $metadataProfileField)
+							$metadataProfileFieldIds[] = $metadataProfileField->getId();
+					}
 				}
 
 				$additionalConditions = $advancedSearch->getFreeTextConditions($filter->getPartnerSearchScope(), $freeTexts , $metadataProfileFieldIds);
