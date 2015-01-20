@@ -33,7 +33,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the puser_id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $puser_id;
 
@@ -45,7 +45,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the pgroup_id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $pgroup_id;
 
@@ -157,7 +157,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 	/**
 	 * Get the [puser_id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getPuserId()
 	{
@@ -177,7 +177,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 	/**
 	 * Get the [pgroup_id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getPgroupId()
 	{
@@ -347,7 +347,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [puser_id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     KuserKgroup The current object (for fluent API support)
 	 */
 	public function setPuserId($v)
@@ -356,7 +356,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[KuserKgroupPeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->puser_id !== $v) {
@@ -397,7 +397,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [pgroup_id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     KuserKgroup The current object (for fluent API support)
 	 */
 	public function setPgroupId($v)
@@ -406,7 +406,7 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[KuserKgroupPeer::PGROUP_ID] = $this->pgroup_id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->pgroup_id !== $v) {
@@ -615,9 +615,9 @@ abstract class BaseKuserKgroup extends BaseObject  implements Persistent {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
 			$this->kuser_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->puser_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->puser_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->kgroup_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->pgroup_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->pgroup_id = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;

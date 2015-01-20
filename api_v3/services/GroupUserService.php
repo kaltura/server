@@ -16,16 +16,19 @@ class GroupUserService extends KalturaBaseService
 	 */
 	function addAction(KalturaGroupUser $groupUser)
 	{
-		$groupUser->partnerId = $this->getPartnerId();
+		/* @var $dbGroupUser KuserKgroup*/
 		$dbGroupUser = $groupUser->toInsertableObject();
+		KalturaLog::debug("assaf ".print_r($dbGroupUser,true));
+		$dbGroupUser->setPartnerId($this->getPartnerId());
+		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
 		$groupUser->fromObject($dbGroupUser);
 		return $groupUser;
 	}
-	
+
 	/**
 	 * delete by userId and groupId
-	 * 
+	 *
 	 * @action delete
 	 * @param string $userId
 	 * @param string $groupId
@@ -33,15 +36,15 @@ class GroupUserService extends KalturaBaseService
 	 */
 	function deleteAction($userId, $groupId)
 	{
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = $this->getPartnerId();
 
 		//verify kuser exists
-		$kuser = kuserPeer::getKuserByPartnerAndUid( $userId , $partnerId, false , KuserType::USER);
+		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $userId, false, KuserType::USER);
 		if (! $kuser)
 			throw new KalturaAPIException ( KalturaErrors::USER_NOT_FOUND, $userId );
 
 		//verify group exists
-		$kgroup = kuserPeer::getKuserByPartnerAndUid( $groupId , $partnerId , false , KuserType::GROUP);
+		$kgroup = kuserPeer::getKuserByPartnerAndUid(  $partnerId, $groupId ,false, KuserType::GROUP);
 		if (! $kgroup)
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupId );
 
@@ -53,7 +56,7 @@ class GroupUserService extends KalturaBaseService
 		$dbKuserKgroup->save();
 		$groupUser = new KalturaGroupUser();
 		$groupUser->fromObject($dbKuserKgroup);
-		
+
 		return $groupUser;
 	}
 
@@ -63,7 +66,7 @@ class GroupUserService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaGroupUserFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaGroupUserListResponce
+	 * @return KalturaGroupUserListResponse
 	 * @throws KalturaErrors::MUST_FILTER_USERS_OR_GROUPS
 	 */
 	function listAction(KalturaGroupUserFilter $filter = null, KalturaFilterPager $pager = null)
@@ -78,7 +81,7 @@ class GroupUserService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 
 		
-		$kuserKgroupFilter = new kuserKgroupFilter();
+		$kuserKgroupFilter = new KuserKgroupFilter();
 		$filter->toObject($kuserKgroupFilter);
 		
 		$c = KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);

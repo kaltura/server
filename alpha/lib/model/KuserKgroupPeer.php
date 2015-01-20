@@ -27,7 +27,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 		$criteria->add(KuserKgroupPeer::KGROUP_ID, $kgroupId);
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
 
-		return categoryKuserPeer::doSelectOne($criteria);
+		return KuserKgroupPeer::doSelectOne($criteria);
 	}
 
 	/**
@@ -36,13 +36,11 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kuserId
 	 */
 	public static function deleteByKuserId(Kuser $kuserId){
-		$kuserKgroups = self::getKgroupsByKuserId($kuserId);
-		if (!is_null($kuserKgroups) && count($kuserKgroups)) {
-			foreach($kuserKgroups as $kuserKgroup) {
-				/* @var $kuserKgroup KuserKgroup */
-				$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
-				$kuserKgroup->save();
-			}
+		$kuserKgroups = self::getByKuserId($kuserId);
+		foreach($kuserKgroups as $kuserKgroup) {
+			/* @var $kuserKgroup KuserKgroup */
+			$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
+			$kuserKgroup->save();
 		}
 	}
 
@@ -52,13 +50,11 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kgroupId
 	 */
 	public static function deleteByKgroupId($kgroupId){
-		$kuserKgroups = self::getKusersByKgroupId($kgroupId);
-		if (!is_null($kuserKgroups) && count($kuserKgroups)) {
-			foreach($kuserKgroups as $kuserKgroup) {
-				/* @var $kuserKgroup KuserKgroup */
-				$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
-				$kuserKgroup->save();
-			}
+		$kuserKgroups = self::getByKgroupId($kgroupId);
+		foreach($kuserKgroups as $kuserKgroup) {
+			/* @var $kuserKgroup KuserKgroup */
+			$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
+			$kuserKgroup->save();
 		}
 	}
 
@@ -68,7 +64,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kgroupId
 	 * @return array
 	 */
-	public static function getKusersByKgroupId($kgroupId){
+	public static function getByKgroupId($kgroupId){
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KGROUP_ID, $kgroupId);
 		return KuserKgroupPeer::doSelect($c);
@@ -80,7 +76,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kuserId
 	 * @return array
 	 */
-	public static function getKgroupsByKuserId($kuserId){
+	public static function getByKuserId($kuserId){
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KUSER_ID, $kuserId);
 		return KuserKgroupPeer::doSelect($c);

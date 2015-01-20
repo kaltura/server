@@ -25,8 +25,8 @@ class KuserKgroupFilter extends baseObjectFilter
 		$this->allowed_order_fields = array ( "created_at" , "updated_at");
 		
 		$this->aliases = array ( 
-			"user_id" => "kuser_id",
-			"group_id" => "kgroup_id"
+			"user_id" => "puser_id",
+			"group_id" => "pgroup_id"
 		);
 	}
 

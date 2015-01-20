@@ -151,16 +151,13 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 			kJobsManager::addDeleteJob($kuser->getPartnerId(), DeleteObjectType::CATEGORY_USER, $filter);
 		}
 
-
-		switch ($kuser->getType()){
-			case KuserType::USER:
-				// remove user from groups
-				KuserKgroupPeer::deleteByKuserId($kuser->getId());
-				break;
-			case KuserType::GROUP:
-				// remove users from group
-				KuserKgroupPeer::deleteByKgroupId($kuser->getId());
-				break;
+		if ($kuser->getType() == KuserType::USER){
+			// remove user from groups
+			KuserKgroupPeer::deleteByKuserId($kuser->getId());
+		}
+		elseif 	($kuser->getType() == KuserType::GROUP){
+			// remove users from group
+			KuserKgroupPeer::deleteByKgroupId($kuser->getId());
 		}
 	}
 	

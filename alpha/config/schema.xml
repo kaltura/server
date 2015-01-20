@@ -2047,9 +2047,9 @@
     <table skipSql="false" abstract="false" name="kuser_kgroup">
         <column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="bigint" autoIncrement="true" />
         <column primaryKey="false" required="true" lazyLoad="false" name="kuser_id" type="integer" />
-        <column primaryKey="false" required="true" lazyLoad="false" name="puser_id" type="integer" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="puser_id"  type="varchar" size="100"  />
         <column primaryKey="false" required="true" lazyLoad="false" name="kgroup_id" type="integer" />
-        <column primaryKey="false" required="true" lazyLoad="false" name="pgroup_id" type="integer" />
+        <column primaryKey="false" required="true" lazyLoad="false" name="pgroup_id"  type="varchar" size="100"  />
         <column primaryKey="false" required="true" lazyLoad="false" name="status" type="tinyint" />
         <column primaryKey="false" required="true" lazyLoad="false" name="partner_id" type="integer" />
         <column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />

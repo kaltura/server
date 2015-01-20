@@ -54,8 +54,8 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 	
 	private static $map_between_objects = array
 	(
-		"userId" => "puser_id",
-		"groupId" => "pgroup_id",
+		"userId" => "puserId",
+		"groupId" => "pgroupId",
 		"partnerId",
 		"status",
 		"createdAt",
@@ -83,13 +83,15 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+
 		//verify kuser exists
-		$kuser = kuserPeer::getKuserByPartnerAndUid( $this->userId , $this->partnerId , false , KuserType::USER);
+		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $this->userId, false , KuserType::USER);
 		if (! $kuser)
 			throw new KalturaAPIException ( KalturaErrors::USER_NOT_FOUND, $this->userId );
 
 		//verify group exists
-		$kgroup = kuserPeer::getKuserByPartnerAndUid( $this->groupId , $this->partnerId , false , KuserType::GROUP);
+		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $this->groupId, false , KuserType::GROUP);
 		if (! $kgroup)
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $this->userId );
 
@@ -99,11 +101,9 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
 
 		//verify user does not belongs to more than max allowed groups
-		$kuserKgroups = KuserKgroupPeer::getKgroupsByKuserId($kuser->getId());
-		if(!is_null($kuserKgroups) && is_array($kuserKgroups)){
-			if ( count($kuserKgroup) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
-				throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
-			}
+		$kuserKgroups = KuserKgroupPeer::getByKuserId($kuser->getId());
+		if ( count($kuserKgroups) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
+			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
 
 		parent::validateForInsert ( $propertiesToSkip );

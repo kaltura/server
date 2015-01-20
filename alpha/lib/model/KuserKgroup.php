@@ -18,4 +18,38 @@ class KuserKgroup extends BaseKuserKgroup {
 	const MAX_NUMBER_OF_GROUPS_PER_USER = 100;
 
 
+	public function setPuserId($puserId)
+	{
+		if ( self::getPuserId() == $puserId )  // same value - don't set for nothing
+			return;
+
+		parent::setPuserId($puserId);
+
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		if (!$kuser)
+			throw new kCoreException("Invalid user Id [{$puserId}]", kCoreException::INVALID_USER_ID );
+
+		parent::setKuserId($kuser->getId());
+	}
+
+
+	public function setPgroupId($pgroupId)
+	{
+		if ( self::getPgroupId() == $pgroupId )  // same value - don't set for nothing
+			return;
+
+		parent::setPgroupId($pgroupId);
+
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+
+		$kgroup = kuserPeer::getKuserByPartnerAndUid($partnerId, $pgroupId, false, KuserType::GROUP);
+		if (!$kgroup)
+			throw new kCoreException("Invalid group Id [{$pgroupId}]", kCoreException::INVALID_USER_ID );
+
+		parent::setKgroupId($kgroup->getId());
+	}
+
+
 } // KuserKgroup

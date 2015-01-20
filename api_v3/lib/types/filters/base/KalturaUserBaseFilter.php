@@ -22,6 +22,7 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 		"firstNameStartsWith" => "_likex_first_name",
 		"lastNameStartsWith" => "_likex_last_name",
 		"isAdminEqual" => "_eq_is_admin",
+		"type" => "_eq_type"
 	);
 
 	static private $order_by_map = array
@@ -111,4 +112,9 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var KalturaNullableBoolean
 	 */
 	public $isAdminEqual;
+
+	/**
+	 * @var KalturaUserType
+	 */
+	public $type;
 }
