@@ -273,9 +273,9 @@ abstract class LiveEntry extends entry
 			$this->putInCustomData('live_stream_configurations', $v);
 	}
 	
-	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false)
+	public function getLiveStreamConfigurationByProtocol($format, $protocol, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
-		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly);
+		$configurations = $this->getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds);
 		foreach($configurations as $configuration)
 		{
 			/* @var $configuration kLiveStreamConfiguration */
@@ -286,7 +286,7 @@ abstract class LiveEntry extends entry
 		return null;
 	}
 	
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false)
+	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array())
 	{
 		$configurations = array();
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
@@ -381,37 +381,52 @@ abstract class LiveEntry extends entry
 			$streamName = $this->getId();
 			if(is_null($tag) && ($this->getConversionProfileId() || $this->getType() == entryType::LIVE_CHANNEL))
 				$tag = 'all';
+		
+			$queryString = array();
+			if($this->getDvrStatus() == DVRStatus::ENABLED)
+			{
+				$queryString[] = '?DVR';
+			}
 			
-			if($tag)
+			if(count($flavorParamsIds) === 1)
+			{
+				$streamName .= '_' . reset($flavorParamsIds);
+			}
+			elseif(count($flavorParamsIds) > 1)
+			{
+				$tag = implode('_', $flavorParamsIds);
+				$queryString[] = 'flavorIds=' . implode(',', $flavorParamsIds);
+				
 				$streamName = "smil:{$streamName}_{$tag}.smil";
+			}
+			elseif($tag)
+			{
+				$streamName = "smil:{$streamName}_{$tag}.smil";
+			}
+			
+			if(count($queryString))
+			{
+				$queryString = '?' . implode('&', $queryString);
+			}
+			else
+			{
+				$queryString = '';
+			}
 			
 			$rtmpStreamUrl = $manifestUrl;
 			
 			$manifestUrl .= $streamName;
-			$hlsStreamUrl = "$manifestUrl/playlist.m3u8";
-			$hdsStreamUrl = "$manifestUrl/manifest.f4m";
-			$slStreamUrl = "$manifestUrl/Manifest";
-			$mpdStreamUrl = "$manifestUrl/manifest.mpd";
+			$hlsStreamUrl = "$manifestUrl/playlist.m3u8" . $queryString;
+			$hdsStreamUrl = "$manifestUrl/manifest.f4m" . $queryString;
+			$slStreamUrl = "$manifestUrl/Manifest" . $queryString;
+			$mpdStreamUrl = "$manifestUrl/manifest.mpd" . $queryString;
 			
 			if($backupManifestUrl)
 			{
 				$backupManifestUrl .= "$backupApplicationName/";
 				$backupManifestUrl .= $streamName;
-				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8";
-				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m";
-			}
-			
-			if($this->getDvrStatus() == DVRStatus::ENABLED)
-			{
-				$hlsStreamUrl .= "?DVR";
-				$hdsStreamUrl .= "?DVR";
-				$slStreamUrl .= "?dvr";
-				
-				if($backupManifestUrl)
-				{
-					$hlsBackupStreamUrl .= "?DVR";
-					$hdsBackupStreamUrl .= "?DVR";
-				}
+				$hlsBackupStreamUrl = "$backupManifestUrl/playlist.m3u8" . $queryString;
+				$hdsBackupStreamUrl = "$backupManifestUrl/manifest.f4m" . $queryString;
 			}
 		}
 			
