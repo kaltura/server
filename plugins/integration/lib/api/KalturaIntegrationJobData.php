@@ -98,8 +98,10 @@ class KalturaIntegrationJobData extends KalturaJobData
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
 	 */
-	public function validateForUsage($sourceObject)
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+		
 		$this->validatePropertyNotNull('providerType');
 		$this->validatePropertyNotNull('providerData');
 		$this->validatePropertyNotNull('triggerType');
