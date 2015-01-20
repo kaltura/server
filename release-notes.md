@@ -40,6 +40,7 @@ Add the following lines as new sections:
 		type												= KAsyncIntegrateCloser
 		maximumExecutionTime								= 12000
 		scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
+		params.maxTimeBeforeFail							= 1000000
 
 
 #### Deployment Preparations ####
