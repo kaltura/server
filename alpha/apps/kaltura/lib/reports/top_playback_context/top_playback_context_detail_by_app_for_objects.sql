@@ -1,4 +1,5 @@
 SELECT 
+	context_id object_id,
 	cat.name name,
 	count_plays,
 	sum_time_viewed,
@@ -36,6 +37,6 @@ FROM
 	GROUP BY context_id
 	ORDER BY {SORT_FIELD}
 	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
-) AS ev_stats, dwh_dim_category cat
-WHERE ev_stats.context_id = cat.category_id
-AND cat.partner_id = {PARTNER_ID}
+) AS ev_stats LEFT JOIN dwh_dim_category cat
+ON ev_stats.context_id = cat.category_id
+
