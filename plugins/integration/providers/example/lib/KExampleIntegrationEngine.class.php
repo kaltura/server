@@ -16,7 +16,7 @@ class KExampleIntegrationEngine implements KIntegrationCloserEngine
 	/* (non-PHPdoc)
 	 * @see KIntegrationCloserEngine::close()
 	 */
-	public function close(KalturaBatchJob $job, KalturaIntegrationJobData $data)
+	public function close(KalturaBatchJob $job, KalturaIntegrationJobData &$data)
 	{
 		$this->doClose($job, $data, $data->providerData);
 	}
