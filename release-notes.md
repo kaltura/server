@@ -107,6 +107,13 @@ Add the following lines as new sections:
 
 #### Configuration ####
 
+*batch.ini* 
+
+Add the following to the KAsyncImport worker configuartion:
+
+params.webex.iterations                                                                 = 30  
+params.webex.sleep                                                                      = 4 
+
 *plugins.ini*
 
 Add the following line:

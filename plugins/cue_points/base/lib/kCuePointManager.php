@@ -4,8 +4,6 @@
  */
 class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
 {
-	const CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC = "liveDurationOffsetFromVodInMsec";
-
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 
 	/* (non-PHPdoc)
@@ -412,19 +410,27 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 
-	public static function postProcessCuePoints( $liveEntry )
+	public static function postProcessCuePoints( $liveEntry, $cuePointsIds = null )
 	{
-		/* @var $object LiveEntry */
 		$select = new Criteria();
-		$select->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
-		$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
 
-		$cuePoints = CuePointPeer::doSelect($select);
-		$cuePointsIds = array();
-		foreach($cuePoints as $cuePoint)
+		if ( $cuePointsIds )
 		{
-			/* @var $cuePoint CuePoint */
-			$cuePointsIds[] = $cuePoint->getId();
+			$select->add(CuePointPeer::ID, $cuePointsIds, Criteria::IN);
+		}
+		else
+		{
+			/* @var $liveEntry LiveEntry */
+			$select->add(CuePointPeer::ENTRY_ID, $liveEntry->getId());
+			$select->add(CuePointPeer::STATUS, CuePointStatus::READY);
+
+			$cuePoints = CuePointPeer::doSelect($select);
+			$cuePointsIds = array();
+			foreach($cuePoints as $cuePoint)
+			{
+				/* @var $cuePoint CuePoint */
+				$cuePointsIds[] = $cuePoint->getId();
+			}
 		}
 
 		$update = new Criteria();
@@ -467,26 +473,42 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		$liveCuePointsToCopy = CuePointPeer::doSelect($c);
 
 		$numLiveCuePointsToCopy = count($liveCuePointsToCopy);
-		KalturaLog::debug("Copying $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
+		KalturaLog::debug("About to copy $numLiveCuePointsToCopy cuepoints from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}]");
+
+		$processedCuePointIds = array();
 
 		if ( $numLiveCuePointsToCopy > 0 )
 		{
-			$liveDurationOffsetFromVodInMsec = $liveEntry->getFromCustomData( self::CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC, null, 0 );
-
-			$liveRecordingSegmentInfoArray = $liveEntry->getLiveRecordingSegmentInfoArray();
+			$recordedSegmentsInfo = $liveEntry->getRecordedSegmentsInfo();
 			foreach ( $liveCuePointsToCopy as $liveCuePoint )
 			{
-				$liveCuePoint->copyFromLiveToVodEntry( $liveEntry, $vodEntry, $liveRecordingSegmentInfoArray );
+				$processedCuePointIds[] = $liveCuePoint->getId();
+
+				$startTime = $liveCuePoint->getStartTime();
+
+				$copyMsg = "cuepoint [{$liveCuePoint->getId()}] from live entry [{$liveEntry->getId()}] to VOD entry [{$vodEntry->getId()}] with startTime [$startTime]";
+				KalturaLog::debug("Preparing to copy $copyMsg");
+
+				$totalVodOffsetTime = $recordedSegmentsInfo->getTotalVodTimeOffset( $startTime );
+
+				if ( ! is_null( $totalVodOffsetTime ) )
+				{
+					$adjustedStartTime = $startTime - $totalVodOffsetTime;
+					KalturaLog::debug("Copying $copyMsg and adjustedStartTime [$adjustedStartTime] (totalVodOffsetTime [$totalVodOffsetTime])" );
+					$liveCuePoint->copyFromLiveToVodEntry( $liveEntry, $vodEntry, $adjustedStartTime );
+				}
+				else
+				{
+					KalturaLog::debug("Not copying $copyMsg" );
+				}				
 			}
 		}
 
-		// Update the new duration offset between the live and vod entries.
-		$liveDurationOffsetFromVodInMsec = $liveEntry->getLengthInMsecs() - $vodEntry->getLengthInMsecs();
-		$liveEntry->putInCustomData( self::CUST_DATA_LIVE_DURATION_OFFSET_FROM_VOD_IN_MSEC, $liveDurationOffsetFromVodInMsec );
-
-		$liveEntry->save();
-
-		self::postProcessCuePoints( $liveEntry );
+		KalturaLog::debug("Post processing cuePointIds for live entry [{$liveEntry->getId()}]: " . print_r($processedCuePointIds,true) );
+		if ( count($processedCuePointIds) )
+		{
+			self::postProcessCuePoints( $liveEntry, $processedCuePointIds );
+		}
 	}
 	
 	protected function reIndexCuePointEntry(CuePoint $cuePoint)

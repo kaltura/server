@@ -26,6 +26,11 @@ class KalturaLiveReportInputFilter extends KalturaObject
 	 **/
 	public $live;
 	
+	/**
+	 * @var KalturaLiveReportOrderBy
+	 */
+	public $orderBy;
+	
 	public function getWSObject() {
 		$obj = new WSLiveReportInputFilter();
 		$obj->fromKalturaObject($this);
