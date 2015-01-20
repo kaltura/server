@@ -53,7 +53,7 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 				return 'KalturaExampleIntegrationJobProviderData';
 		}
 	
-		if($baseClass == 'KIntegrationEngine')
+		if($baseClass == 'KIntegrationEngine' || $baseClass == 'KIntegrationCloserEngine')
 		{
 			if($enumValue == KalturaIntegrationProviderType::EXAMPLE)
 				return 'KExampleIntegrationEngine';
