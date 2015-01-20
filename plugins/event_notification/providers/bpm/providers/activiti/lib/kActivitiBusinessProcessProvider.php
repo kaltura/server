@@ -39,7 +39,7 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 			foreach($processes->getData() as $process)
 			{
 				/* @var $process ActivitiListOfProcessDefinitionsResponseData */
-				$ret[$process->getId()] = $process->getName() . ' (V' . $process->getVersion() . ')';
+				$ret[$process->getKey()] = $process->getName();
 			}
 			
 			if(($processes->getStart() + $processes->getSize()) < $processes->getTotal())
@@ -69,7 +69,7 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 			$startVariables[] = $variable;
 		}
 		
-		$response = $this->client->processInstances->startProcessInstance($processId, null, $startVariables);
+		$response = $this->client->processInstances->startProcessInstance(null, null, $startVariables, $processId);
 		if($response)
 			return $response->getId();
 			
