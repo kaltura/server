@@ -10,7 +10,7 @@ class KExampleIntegrationEngine implements KIntegrationCloserEngine
 	 */
 	public function dispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data)
 	{
-		$this->doDispatch($job, $data, $data->providerData);
+		return $this->doDispatch($job, $data, $data->providerData);
 	}
 
 	/* (non-PHPdoc)
@@ -18,7 +18,7 @@ class KExampleIntegrationEngine implements KIntegrationCloserEngine
 	 */
 	public function close(KalturaBatchJob $job, KalturaIntegrationJobData &$data)
 	{
-		$this->doClose($job, $data, $data->providerData);
+		return $this->doClose($job, $data, $data->providerData);
 	}
 	
 	protected function doDispatch(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaExampleIntegrationJobProviderData $providerData)
@@ -29,7 +29,7 @@ class KExampleIntegrationEngine implements KIntegrationCloserEngine
 		// To wait for closer, return false
 		// To fail, throw exception
 		
-		return true;
+		return false;
 	}
 	
 	protected function doClose(KalturaBatchJob $job, KalturaIntegrationJobData &$data, KalturaExampleIntegrationJobProviderData $providerData)
