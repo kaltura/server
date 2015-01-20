@@ -54,7 +54,7 @@ Add the following lines as new sections:
 
 		mysql -uroot -p kaltura < deployment/updates/sql/2014_11_20_business_process_server.sql
 		php deployment/updates/scripts/add_permissions/2014_11_20_business_process_server_permissions.php
-		deployment/updates/scripts/add_permissions/2015_01_20_dispatch_integration_job.php
+		php deployment/updates/scripts/add_permissions/2015_01_20_dispatch_integration_job.php
 		php tests/standAloneClient/exec.php tests/standAloneClient/bpmNotificationsTemplates.xml
 
 #### Activiti Deployment Instructions ####
