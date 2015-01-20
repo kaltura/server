@@ -28,7 +28,7 @@ class kBpmEventNotificationIntegrationFlowManager implements kBatchJobStatusEven
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
 		if(		$dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION) 
-			&&	$dbBatchJob->getStatus() == KalturaBatchJobStatus::BATCHJOB_STATUS_DONT_PROCESS 
+			&&	$dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_DONT_PROCESS 
 			&&	$dbBatchJob->getData()->getTriggerType() == BpmEventNotificationIntegrationPlugin::getIntegrationTriggerCoreValue(BpmEventNotificationIntegrationTrigger::BPM_EVENT_NOTIFICATION)
 		)
 		{
