@@ -96,7 +96,7 @@ class BpmEventNotificationIntegrationPlugin extends KalturaPlugin implements IKa
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'kIntegrationJobTriggerData' && $enumValue == self::getIntegrationTriggerCoreValue(BpmEventNotificationIntegrationTrigger::BPM_EVENT_NOTIFICATION))
+		if($baseClass == 'kIntegrationJobTriggerData' && $enumValue == self::getApiValue(BpmEventNotificationIntegrationTrigger::BPM_EVENT_NOTIFICATION))
 		{
 			return 'kBpmEventNotificationIntegrationJobTriggerData';
 		}

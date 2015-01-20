@@ -42,7 +42,7 @@ class ExampleIntegrationPlugin extends IntegrationProviderPlugin
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'kIntegrationJobProviderData' && $enumValue == self::getIntegrationProviderCoreValue(ExampleIntegrationProvider::EXAMPLE))
+		if($baseClass == 'kIntegrationJobProviderData' && $enumValue == self::getApiValue(ExampleIntegrationProvider::EXAMPLE))
 		{
 			return 'kExampleIntegrationJobProviderData';
 		}
