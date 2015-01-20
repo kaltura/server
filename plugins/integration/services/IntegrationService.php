@@ -32,7 +32,7 @@ class IntegrationService extends KalturaBaseService
 	{
 		$jobData = $data->toObject();
 		$coreObjectType = kPluginableEnumsManager::apiToCore('BatchJobObjectType', $objectType);
-		$job = kIntegrationFlowManager::addintegrationJob($coreObjectType, $objectId, $data);
+		$job = kIntegrationFlowManager::addintegrationJob($coreObjectType, $objectId, $jobData);
 		if(!$job)
 			throw new KalturaAPIException(KalturaIntegrationErrors::INTEGRATION_DISPATCH_FAILED, $objectType);
 			
