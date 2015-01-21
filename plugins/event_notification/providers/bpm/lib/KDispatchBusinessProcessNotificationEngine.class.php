@@ -11,25 +11,7 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 	public function dispatch(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationDispatchJobData &$data)
 	{
 		$job = KJobHandlerWorker::getCurrentJob();
-		switch ($job->jobSubType)
-		{
-			case KalturaEventNotificationTemplateType::BPM_START:
-				return $this->startBusinessProcess($eventNotificationTemplate, $data);
-				
-			case KalturaEventNotificationTemplateType::BPM_SIGNAL:
-				return $this->signalCase($eventNotificationTemplate, $data);
-				
-			case KalturaEventNotificationTemplateType::BPM_ABORT:
-				return $this->abortCase($eventNotificationTemplate, $data);
-		}
-	}
-
-	/**
-	 * @param KalturaBusinessProcessStartNotificationTemplate $template
-	 * @param KalturaBusinessProcessNotificationDispatchJobData $data
-	 */
-	public function startBusinessProcess(KalturaBusinessProcessStartNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data)
-	{
+	
 		$variables = array();
 		if(is_array($data->contentParameters) && count($data->contentParameters))
 		{
@@ -40,6 +22,25 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 			}		
 		}
 		
+		switch ($job->jobSubType)
+		{
+			case KalturaEventNotificationTemplateType::BPM_START:
+				return $this->startBusinessProcess($eventNotificationTemplate, $data, $variables);
+				
+			case KalturaEventNotificationTemplateType::BPM_SIGNAL:
+				return $this->signalCase($eventNotificationTemplate, $data, $variables);
+				
+			case KalturaEventNotificationTemplateType::BPM_ABORT:
+				return $this->abortCase($eventNotificationTemplate, $data);
+		}
+	}
+
+	/**
+	 * @param KalturaBusinessProcessStartNotificationTemplate $template
+	 * @param KalturaBusinessProcessNotificationDispatchJobData $data
+	 */
+	public function startBusinessProcess(KalturaBusinessProcessStartNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data, $variables)
+	{	
 		$provider = kBusinessProcessProvider::get($data->server);
 		KalturaLog::debug("Starting business-process [{$template->processId}] with variables [" . print_r($variables, true) . "]");
 		$data->caseId = $provider->startBusinessProcess($template->processId, $variables);
@@ -50,11 +51,11 @@ class KDispatchBusinessProcessNotificationEngine extends KDispatchEventNotificat
 	 * @param KalturaBusinessProcessSignalNotificationTemplate $template
 	 * @param KalturaBusinessProcessNotificationDispatchJobData $data
 	 */
-	public function signalCase(KalturaBusinessProcessSignalNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data)
+	public function signalCase(KalturaBusinessProcessSignalNotificationTemplate $template, KalturaBusinessProcessNotificationDispatchJobData &$data, $variables)
 	{
 		$provider = kBusinessProcessProvider::get($data->server);
 		KalturaLog::debug("Signaling business-process [{$template->processId}] case [{$data->caseId}] with message [{$template->message}] on blocking event [{$template->eventId}]");
-		$provider->signalCase($data->caseId, $template->eventId, $template->message);
+		$provider->signalCase($data->caseId, $template->eventId, $template->message, $variables);
 	}
 
 	/**
