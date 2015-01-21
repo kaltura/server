@@ -98,7 +98,7 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 			$messageVariables[] = $variable;
 		}
 		
-		$processInstances = $this->client->executions->queryExecutions($caseId, null, $messageVariables);
+		$processInstances = $this->client->executions->queryExecutions($caseId, null, null);
 		
 		$action = 'messageEventReceived';
 		
@@ -107,7 +107,7 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 			/* @var $processInstance ActivitiQueryExecutionsResponseData */
 			if($processInstance->getActivityid() === $eventId)
 			{
-				$this->client->executions->executeAnActionOnAnExecution($processInstance->getId(), $action, null, null, $message);
+				$this->client->executions->executeAnActionOnAnExecution($processInstance->getId(), $action, null, $messageVariables, $message);
 			}
 		}
 	}
