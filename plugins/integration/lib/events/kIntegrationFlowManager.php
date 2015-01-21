@@ -11,6 +11,8 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
 		kEventsManager::raiseEvent(new kIntegrationJobClosedEvent($dbBatchJob));
+		
+		return true;
 	}
 
 	/* (non-PHPdoc)
