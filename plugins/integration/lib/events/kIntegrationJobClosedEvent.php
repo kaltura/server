@@ -44,6 +44,14 @@ class kIntegrationJobClosedEvent extends KalturaEvent implements IKalturaObjectR
 		return $result;
 	}
 
+	/**
+	 * @return BatchJob
+	 */
+	public function getBatchJob()
+	{
+		return $this->batchJob;
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaObjectRelatedEvent::getObject()
 	 */
