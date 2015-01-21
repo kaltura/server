@@ -14,6 +14,22 @@ class BusinessProcessSignalNotificationTemplate extends BusinessProcessNotificat
 		parent::__construct();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BusinessProcessNotificationTemplate::getJobData()
+	 */
+	public function getJobData(kScope $scope = null)
+	{
+		$jobData = parent::getJobData($scope);
+	
+		if($jobData->getObject())
+		{
+			$caseId = $this->getCaseId($jobData->getObject());
+			$jobData->setCaseId($caseId);
+		}
+		
+		return $jobData;
+	}
+	
 	public function getMessage()									{return $this->getFromCustomData(self::CUSTOM_DATA_MESSAGE);}
 	public function getEventId()									{return $this->getFromCustomData(self::CUSTOM_DATA_EVENT_ID);}
 	
