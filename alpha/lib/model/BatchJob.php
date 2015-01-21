@@ -278,16 +278,28 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		switch ($this->getObjectType())
 		{
 			case BatchJobObjectType::ENTRY:
-				return entryPeer::retrieveByPK($this->getObjectId());
+				entryPeer::setUseCriteriaFilter(false);
+				$object = entryPeer::retrieveByPK($this->getObjectId());
+				entryPeer::setUseCriteriaFilter(true);
+				return $object;
 				
 			case BatchJobObjectType::ASSET:
-				return assetPeer::retrieveById($this->getObjectId());
+				assetPeer::setUseCriteriaFilter(false);
+				$object = assetPeer::retrieveById($this->getObjectId());
+				assetPeer::setUseCriteriaFilter(true);
+				return $object;
 				
 			case BatchJobObjectType::CATEGORY:
-				return categoryPeer::retrieveByPK($this->getObjectId());
+				categoryPeer::setUseCriteriaFilter(false);
+				$object = categoryPeer::retrieveByPK($this->getObjectId());
+				categoryPeer::setUseCriteriaFilter(true);
+				return $object;
 				
 			case BatchJobObjectType::FILE_SYNC:
-				return FileSyncPeer::retrieveByPK($this->getObjectId());
+				FileSyncPeer::setUseCriteriaFilter(false);
+				$object = FileSyncPeer::retrieveByPK($this->getObjectId());
+				FileSyncPeer::setUseCriteriaFilter(true);
+				return $object;
 		
 			default:
 				// TODO implement IBatchable in relevant plugins
