@@ -20,12 +20,20 @@ class kIntegrationFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		if($dbBatchJob->getJobType() == IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION) && in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
+		if($dbBatchJob->getJobType() != IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION))
 		{
-			return true;
-		}
-				
-		return false;
+			return false;
+		} 
+		 
+		$closedStatusList = array(
+			BatchJob::BATCHJOB_STATUS_FINISHED,
+			BatchJob::BATCHJOB_STATUS_FAILED,
+			BatchJob::BATCHJOB_STATUS_ABORTED,
+			BatchJob::BATCHJOB_STATUS_FATAL,
+			BatchJob::BATCHJOB_STATUS_FINISHED_PARTIALLY
+		);
+		
+		return in_array($dbBatchJob->getStatus(), $closedStatusList);
 	}
 	
 	public static function addintegrationJob($objectType, $objectId, kIntegrationJobData $data) 
