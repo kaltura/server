@@ -49,7 +49,7 @@ class kIntegrationJobClosedEvent extends KalturaEvent implements IKalturaObjectR
 	 */
 	public function getObject()
 	{
-		$this->batchJob->getObject();
+		return $this->batchJob->getObject();
 	}
 	
 	/* (non-PHPdoc)
