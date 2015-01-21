@@ -291,6 +291,15 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>integrationEventNotifications.INTEGRATION_JOB_CLOSED</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>jobStatus</key>
+						<description>Job Status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getBatchJob()->getStatus()</code>
+						</value>
+					</item>
+				</contentParameters>
 				<message>jobClosed</message>
 				<eventId>jobClosedEvent</eventId>
 			</template>
@@ -312,6 +321,15 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>integrationEventNotifications.INTEGRATION_JOB_CLOSED</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>2</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORY -->
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>jobStatus</key>
+						<description>Job Status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getBatchJob()->getStatus()</code>
+						</value>
+					</item>
+				</contentParameters>
 				<message>jobClosed</message>
 				<eventId>jobClosedEvent</eventId>
 			</template>
@@ -333,6 +351,15 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>integrationEventNotifications.INTEGRATION_JOB_CLOSED</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>3</eventObjectType> <!-- EventNotificationEventObjectType::ASSET -->
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>jobStatus</key>
+						<description>Job Status</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getBatchJob()->getStatus()</code>
+						</value>
+					</item>
+				</contentParameters>
 				<message>jobClosed</message>
 				<eventId>jobClosedEvent</eventId>
 			</template>
