@@ -36,13 +36,14 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 				$parentJob = $event->getRaisedJob();
 			}
 		
-			if($event instanceof IKalturaObjectRelatedEvent)
+			$object = $scope->getObject();
+			if($object instanceof entry)
 			{
-				$object = $event->getObject();
-				if($object instanceof entry)
-					$entryId = $object->getId();
-				elseif(method_exists($object, 'getEntryId'))
-					$entryId = $object->getEntryId();
+				$entryId = $object->getId();
+			}
+			elseif(method_exists($object, 'getEntryId'))
+			{
+				$entryId = $object->getEntryId();
 			}
 		}
 		
