@@ -36,11 +36,8 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 		$template = EventNotificationTemplatePeer::retrieveByPK($data->getTemplateId());
 		if($template instanceof BusinessProcessNotificationTemplate)
 		{
-			$caseIds = $data->getCaseIdsArray();
-			foreach($caseIds as $caseId)
-			{
-				$template->addCaseId($object, $caseId);
-			}
+			$caseId = $data->getCaseId();
+			$template->addCaseId($object, $caseId);
 		}
 		
 		return true;
