@@ -82,7 +82,7 @@ abstract class BusinessProcessNotificationTemplate extends EventNotificationTemp
 				'caseId' => $caseId,
 				'templateId' => $this->getId(),
 			);
-			$object->putInCustomData($this->getServerId() . '_' . $this->getProcessId(), $caseId, 'businessProcessCases');
+			$object->putInCustomData($this->getServerId() . '_' . $this->getProcessId(), $value, 'businessProcessCases');
 			$object->save();
 		}
 	}
