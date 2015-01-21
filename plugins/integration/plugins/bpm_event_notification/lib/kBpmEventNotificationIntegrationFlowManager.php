@@ -21,7 +21,9 @@ class kBpmEventNotificationIntegrationFlowManager implements kBatchJobStatusEven
 		
 		$object = $dbBatchJob->getObject();
 		if($object)
-			$template->setCaseId($object, $triggerData->getCaseId());
+		{
+			$template->addCaseId($object, $triggerData->getCaseId());
+		}
 		
 		return true;
 	}
