@@ -51,7 +51,7 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 
 	protected function dispatchPerCase(kScope $scope, $eventNotificationType = null)
 	{
-		$jobData = parent::getJobData($scope);
+		$jobData = $this->getJobData($scope);
 		/* @var $jobData kBusinessProcessNotificationDispatchJobData */
 		if(!$jobData->getObject())
 		{
