@@ -36,7 +36,11 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 		$template = EventNotificationTemplatePeer::retrieveByPK($data->getTemplateId());
 		if($template instanceof BusinessProcessNotificationTemplate)
 		{
-			$template->setCaseId($object, $data->getCaseId());
+			$caseIds = $data->getCaseIdsArray();
+			foreach($caseIds as $caseId)
+			{
+				$template->addCaseId($object, $caseId);
+			}
 		}
 		
 		return true;
@@ -47,34 +51,23 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$entryId = null;		
-		if($object instanceof entry)
-			$entryId = $object->getId();
-		elseif(method_exists($object, 'getEntryId'))
-			$entryId = $object->getEntryId();
-			
-		$partnerId = null;
-		if(method_exists($object, 'getPartnerId'))
-			$partnerId = $object->getPartnerId();
-			
-		$abortCaseJobType = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_ABORT);
-		
 		$scope = new kEventNotificationScope();
 		$scope->setObject($object);
 		if($raisedJob)
 			$scope->setParentRaisedJob($raisedJob);
 		
-		$cases = BusinessProcessNotificationTemplate::getCases($object);
-		foreach($cases as $case)
+		$templateIds = BusinessProcessNotificationTemplate::getCaseTemplatesIds($object);
+		foreach($templateIds as $templateId)
 		{
-			$notificationTemplate = EventNotificationTemplatePeer::retrieveByPK($case['templateId']);
+			$notificationTemplate = EventNotificationTemplatePeer::retrieveByPK($templateId);
 			/* @var $notificationTemplate BusinessProcessStartNotificationTemplate */
+			
 			if($notificationTemplate->getPartnerId())
-				$partnerId = $notificationTemplate->getPartnerId();
+			{
+				$scope->setPartnerId($notificationTemplate->getPartnerId());
+			}
 				
-			$scope->setPartnerId($partnerId);
-			$jobData = $notificationTemplate->getJobData($scope);
-			kEventNotificationFlowManager::addEventNotificationDispatchJob($abortCaseJobType, $jobData, $partnerId, $entryId, $raisedJob);
+			$notificationTemplate->abort($scope);
 		}
 		return true;
 	}
@@ -84,7 +77,7 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		$cases = BusinessProcessNotificationTemplate::getCases($object);
+		$cases = BusinessProcessNotificationTemplate::getCaseTemplatesIds($object);
 		if($cases)
 			return true;
 			

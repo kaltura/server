@@ -3,13 +3,13 @@
  * @package plugins.businessProcessNotification
  * @subpackage model
  */
-abstract class BusinessProcessNotificationTemplate extends EventNotificationTemplate
+abstract class BusinessProcessNotificationTemplate extends BatchEventNotificationTemplate
 {
 	const CUSTOM_DATA_SERVER_ID = 'serverId';
 	const CUSTOM_DATA_PROCESS_ID = 'processId';
 	
 	/* (non-PHPdoc)
-	 * @see EventNotificationTemplate::getJobData()
+	 * @see BatchEventNotificationTemplate::getJobData()
 	 */
 	public function getJobData(kScope $scope = null)
 	{
@@ -48,40 +48,77 @@ abstract class BusinessProcessNotificationTemplate extends EventNotificationTemp
 		
 		return $jobData;
 	}
-	
-	public static function getCases(BaseObject $object)
+
+	protected function dispatchPerCase(kScope $scope, $eventNotificationType = null)
 	{
-		if(method_exists($object, 'getFromCustomData'))
+		$jobData = parent::getJobData($scope);
+		/* @var $jobData kBusinessProcessNotificationDispatchJobData */
+		if(!$jobData->getObject())
 		{
-			return $object->getFromCustomData(null, 'businessProcessCases', array());
+			return null;
 		}
-		return array();
+		
+		$caseIds = $this->getCaseIds($jobData->getObject());
+		$jobId = null;
+		foreach($caseIds as $caseId)
+		{
+			$currentJobData = clone $jobData;
+			$currentJobData->setCaseId($caseId);
+			$jobId = $this->dispatchJob($scope, $currentJobData, $eventNotificationType);
+		}
+		return $jobId;
 	}
 	
-	public function getCaseId(BaseObject $object)
+	public static function getCaseTemplatesIds(BaseObject $object)
 	{
 		if(method_exists($object, 'getFromCustomData'))
 		{
-			$value = $object->getFromCustomData($this->getServerId() . '_' . $this->getProcessId(), 'businessProcessCases');
-			if(!$value || !isset($value['caseId']))
+			$values = $object->getFromCustomData(null, 'businessProcessCases', array());
+			if(!$values || !count($values))
 			{
 				KalturaLog::err('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
 			}
-			return $value['caseId'];
+			$templatesIds = array();
+			foreach($values as $value)
+			{
+				$templatesIds[] = $value['templateId'];
+			}
+			return $templatesIds;
 		}
 		KalturaLog::err('Object [' . get_class($object) . '] does not support custom-data');
-		return null;
+		return array();
 	}
 	
-	public function setCaseId(BaseObject $object, $caseId)
+	public function getCaseIds(BaseObject $object)
+	{
+		if(method_exists($object, 'getFromCustomData'))
+		{
+			$values = $object->getFromCustomData($this->getServerId() . '_' . $this->getProcessId(), 'businessProcessCases');
+			if(!$values || !count($values))
+			{
+				KalturaLog::err('Object [' . get_class($object) . '][' . $object->getPrimaryKey() . '] case id not found in custom-data');
+			}
+			$caseIds = array();
+			foreach($values as $value)
+			{
+				$caseIds[] = $value['caseId'];
+			}
+			return $caseIds;
+		}
+		KalturaLog::err('Object [' . get_class($object) . '] does not support custom-data');
+		return array();
+	}
+	
+	public function addCaseId(BaseObject $object, $caseId)
 	{
 		if(method_exists($object, 'putInCustomData'))
 		{
-			$value = array(
+			$values = $this->getCaseIds($object);
+			$values[] = array(
 				'caseId' => $caseId,
 				'templateId' => $this->getId(),
 			);
-			$object->putInCustomData($this->getServerId() . '_' . $this->getProcessId(), $value, 'businessProcessCases');
+			$object->putInCustomData($this->getServerId() . '_' . $this->getProcessId(), $values, 'businessProcessCases');
 			$object->save();
 		}
 	}

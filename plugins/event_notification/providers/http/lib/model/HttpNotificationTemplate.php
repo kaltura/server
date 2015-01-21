@@ -3,7 +3,7 @@
  * @package plugins.httpNotification
  * @subpackage model
  */
-class HttpNotificationTemplate extends EventNotificationTemplate implements ISyncableFile
+class HttpNotificationTemplate extends BatchEventNotificationTemplate implements ISyncableFile
 {
 	const CUSTOM_DATA_URL = 'url';
 	const CUSTOM_DATA_DATA = 'data';
@@ -34,9 +34,9 @@ class HttpNotificationTemplate extends EventNotificationTemplate implements ISyn
 	}
 
 	/* (non-PHPdoc)
-	 * @see EventNotificationTemplate::getJobData()
+	 * @see BatchEventNotificationTemplate::getJobData()
 	 */
-	public function getJobData(kScope $scope = null)
+	protected function getJobData(kScope $scope = null)
 	{
 		$contentParametersValues = array();
 		
