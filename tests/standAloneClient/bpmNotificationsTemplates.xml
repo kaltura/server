@@ -289,7 +289,7 @@
 				<systemName>entry_integration_job_finished</systemName>
 				<description>Entry Integration job finished</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
+				<eventType>integrationEventNotifications.INTEGRATION_JOB_CLOSED</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>1</eventObjectType> <!-- EventNotificationEventObjectType::ENTRY -->
 				<message>jobClosed</message>
 				<eventId>jobClosedEvent</eventId>
@@ -310,7 +310,7 @@
 				<systemName>category_integration_job_finished</systemName>
 				<description>Category Integration job finished</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
+				<eventType>integrationEventNotifications.INTEGRATION_JOB_CLOSED</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>2</eventObjectType> <!-- EventNotificationEventObjectType::CATEGORY -->
 				<message>jobClosed</message>
 				<eventId>jobClosedEvent</eventId>
@@ -331,7 +331,7 @@
 				<systemName>asset_integration_job_finished</systemName>
 				<description>Asset Integration job finished</description>
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
-				<eventType>integrationEventNotifications.IntegrationJobClosed</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
+				<eventType>integrationEventNotifications.INTEGRATION_JOB_CLOSED</eventType> <!-- KalturaEventNotificationEventType::INTEGRATION_JOB_CLOSED -->
 				<eventObjectType>3</eventObjectType> <!-- EventNotificationEventObjectType::ASSET -->
 				<message>jobClosed</message>
 				<eventId>jobClosedEvent</eventId>

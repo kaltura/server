@@ -5,7 +5,7 @@
  */
 class IntegrationEventNotificationEventType implements IKalturaPluginEnum, EventNotificationEventType
 {
-	const INTEGRATION_JOB_CLOSED = 'IntegrationJobClosed';
+	const INTEGRATION_JOB_CLOSED = 'INTEGRATION_JOB_CLOSED';
 	
 	/**
 	 * 
