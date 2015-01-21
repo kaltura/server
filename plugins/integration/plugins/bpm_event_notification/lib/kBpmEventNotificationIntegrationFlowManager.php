@@ -19,7 +19,11 @@ class kBpmEventNotificationIntegrationFlowManager implements kBatchJobStatusEven
 		$template = EventNotificationTemplatePeer::retrieveByPK($triggerData->getTemplateId());
 		/* @var $template BusinessProcessNotificationTemplate */
 		
-		$template->setCaseId($dbBatchJob, $triggerData->getCaseId());
+		$object = $dbBatchJob->getObject();
+		if($object)
+			$template->setCaseId($object, $triggerData->getCaseId());
+		
+		return true;
 	}
 
 	/* (non-PHPdoc)
