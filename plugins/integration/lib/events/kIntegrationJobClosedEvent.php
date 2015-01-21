@@ -51,4 +51,15 @@ class kIntegrationJobClosedEvent extends KalturaEvent implements IKalturaObjectR
 	{
 		$this->batchJob->getObject();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaEvent::getScope()
+	 */
+	public function getScope()
+	{
+		$scope = parent::getScope();
+		$scope->setPartnerId($this->batchJob->getPartnerId());
+		
+		return $scope;
+	}
 }
