@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.kaltura.com/bpm">
+  <message id="jobClosed" name="jobClosed"></message>
+  <process id="kaltura-integrate" name="kaltura-integrate" isExecutable="true">
+    <startEvent id="theStart" name="Start"></startEvent>
+    <intermediateCatchEvent id="jobClosedEvent" name="Job Closed">
+      <messageEventDefinition messageRef="jobClosed"></messageEventDefinition>
+    </intermediateCatchEvent>
+    <endEvent id="theEnd" name="End"></endEvent>
+    <callActivity id="integration.dispatch" name="integration.dispatch" calledElement="kaltura-integration-dispatch">
+      <extensionElements>
+        <activiti:in source="client" target="client"></activiti:in>
+        <activiti:in source="data" target="data"></activiti:in>
+        <activiti:in source="objectType" target="objectType"></activiti:in>
+        <activiti:in source="objectId" target="objectId"></activiti:in>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow10" sourceRef="theStart" targetRef="set-process-id"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="integration.dispatch" targetRef="jobClosedEvent"></sequenceFlow>
+    <scriptTask id="set-process-id" name="Set Process ID" scriptFormat="javascript">
+      <script>importPackage(com.kaltura.client.enums);
+importPackage(com.kaltura.client.types);
+	
+println("Setting execution id [" + execution.id + "] and template id [" + templateId + "]");
+data.triggerType = KalturaIntegrationTriggerType.BPM_EVENT_NOTIFICATION;
+data.triggerData = new KalturaBpmEventNotificationIntegrationJobTriggerData(); 
+data.triggerData.caseId = execution.id;
+data.triggerData.templateId = templateId;
+
+jobStatus = null;
+execution.setVariable("jobStatus", jobStatus);
+
+println("Integration variables defined");
+</script>
+    </scriptTask>
+    <sequenceFlow id="flow12" sourceRef="set-process-id" targetRef="integration.dispatch"></sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="jobClosedEvent" targetRef="printStatus"></sequenceFlow>
+    <dataObject id="client" name="client" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="templateId" name="templateId" itemSubjectRef="xsd:int"></dataObject>
+    <dataObject id="data" name="data" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="objectType" name="objectType" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="objectId" name="objectId" itemSubjectRef="xsd:string"></dataObject>
+    <scriptTask id="printStatus" name="Print Status" scriptFormat="javascript">
+      <script>println("Integration job closed with status [" + jobStatus + "]");</script>
+    </scriptTask>
+    <sequenceFlow id="flow14" sourceRef="printStatus" targetRef="theEnd"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_kaltura-integrate">
+    <bpmndi:BPMNPlane bpmnElement="kaltura-integrate" id="BPMNPlane_kaltura-integrate">
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="jobClosedEvent" id="BPMNShape_jobClosedEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="259.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="integration.dispatch" id="BPMNShape_integration.dispatch">
+        <omgdc:Bounds height="55.0" width="276.0" x="70.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="set-process-id" id="BPMNShape_set-process-id">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="printStatus" id="BPMNShape_printStatus">
+        <omgdc:Bounds height="55.0" width="105.0" x="155.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="207.0" y="45.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="80.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="208.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="259.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="207.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="208.0" y="170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="207.0" y="294.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="207.0" y="375.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="400.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
