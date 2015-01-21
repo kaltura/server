@@ -28,6 +28,16 @@ abstract class BusinessProcessNotificationTemplate extends EventNotificationTemp
 				
 			$contentParametersValues[$contentParameter->getKey()] = $value->getValue();
 		}
+		$userParameters = $this->getUserParameters();
+		foreach($userParameters as $userParameter)
+		{
+			/* @var $userParameter kEventNotificationParameter */
+			$value = $userParameter->getValue();
+			if($scope && $value instanceof kStringField)
+				$value->setScope($scope);
+				
+			$contentParametersValues[$userParameter->getKey()] = $value->getValue();
+		}
 		$jobData->setContentParameters($contentParametersValues);
 		
 		if($scope instanceof kEventScope)
