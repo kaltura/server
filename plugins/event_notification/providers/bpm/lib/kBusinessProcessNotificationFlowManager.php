@@ -61,7 +61,8 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 		
 		$scope = new kEventNotificationScope();
 		$scope->setObject($object);
-		$scope->setParentRaisedJob($raisedJob);
+		if($raisedJob)
+			$scope->setParentRaisedJob($raisedJob);
 		
 		$cases = BusinessProcessNotificationTemplate::getCases($object);
 		foreach($cases as $case)
