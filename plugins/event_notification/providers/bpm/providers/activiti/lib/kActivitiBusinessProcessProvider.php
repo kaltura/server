@@ -81,7 +81,29 @@ class kActivitiBusinessProcessProvider extends kBusinessProcessProvider
 	 */
 	public function abortCase($caseId)
 	{
-		$this->client->processInstances->deleteProcessInstance($caseId);
+		$processInstances = $this->client->executions->queryExecutions($caseId, null, null);
+		
+		$action = 'messageEventReceived';
+		$processDeleted = false;
+		
+		foreach($processInstances->getData() as $processInstance)
+		{
+			/* @var $processInstance ActivitiQueryExecutionsResponseData */
+			try 
+			{
+				$this->client->processInstances->deleteProcessInstance($processInstance->getId());
+				$processDeleted = true;
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($e);
+			}
+		}
+		
+		if(!$processDeleted)
+		{
+			throw new Exception("Process case [$caseId] not found");
+		}
 	}
 
 	/* (non-PHPdoc)
