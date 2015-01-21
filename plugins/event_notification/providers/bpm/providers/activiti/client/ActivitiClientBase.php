@@ -137,8 +137,10 @@ abstract class ActivitiClientBase
 					curl_setopt($c, CURLOPT_INFILE, $f);
 					curl_setopt($c, CURLOPT_INFILESIZE, strlen($content));
 				}
-				
 				break;
+			
+			default:
+				curl_setopt($c, CURLOPT_CUSTOMREQUEST, $method);
 		}
 
 		curl_setopt($c, CURLOPT_URL, $url);
