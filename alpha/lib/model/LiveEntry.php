@@ -385,7 +385,7 @@ abstract class LiveEntry extends entry
 			$queryString = array();
 			if($this->getDvrStatus() == DVRStatus::ENABLED)
 			{
-				$queryString[] = '?DVR';
+				$queryString[] = 'DVR';
 			}
 			
 			if(count($flavorParamsIds) === 1)

@@ -22,7 +22,7 @@ class WebexPlugin extends KalturaPlugin implements IKalturaImportHandler
 	 */
 	public static function handleImportContent($curlInfo,  $importData, $params) {
 		if (!($curlInfo->headers['content-length'] < 16000 && $curlInfo->headers['content-type'] == 'text/html'))
-			return null;
+			return $importData;
 		
 		KalturaLog::info('Handle Import data: Webex Plugin');
 		$matches = null;

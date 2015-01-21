@@ -104,8 +104,8 @@ Add the following lines as new sections:
 ----------
 # Jupiter-10.2.0 #
 
-## Unicorn Connector ##
-- Issue Type: New Feature
+## Webex Fix ## 
+- Issue Type: bug fix
 
 #### Configuration ####
 
@@ -114,7 +114,12 @@ Add the following lines as new sections:
 Add the following to the KAsyncImport worker configuartion:
 
 params.webex.iterations                                                                 = 30  
-params.webex.sleep                                                                      = 4 
+params.webex.sleep 
+
+## Unicorn Connector ##
+- Issue Type: New Feature
+
+#### Configuration ####
 
 *plugins.ini*
 
