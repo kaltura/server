@@ -64,9 +64,13 @@ class kBusinessProcessNotificationDispatchJobData extends kEventNotificationDisp
 			return $this->caseId;
 
 		$template = EventNotificationTemplatePeer::retrieveByPK($this->getTemplateId());
+		/* @var $template BusinessProcessNotificationTemplate */
 		$object = $this->getObject();
 		if($template && $object)
-			return $template->getCaseId($object);
+		{
+			$cases = $template->getCaseIds($object);
+			return end($cases);
+		}
 	}
 
 	/**
