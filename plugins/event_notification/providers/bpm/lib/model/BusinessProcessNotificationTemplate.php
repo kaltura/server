@@ -88,7 +88,6 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 			}
 			return $templatesIds;
 		}
-		KalturaLog::err('Object [' . get_class($object) . '] does not support custom-data');
 		return array();
 	}
 	
