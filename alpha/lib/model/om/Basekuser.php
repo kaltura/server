@@ -2359,6 +2359,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$this->indexed_partner_data_int = ($row[$startcol + 43] !== null) ? (int) $row[$startcol + 43] : null;
 			$this->indexed_partner_data_string = ($row[$startcol + 44] !== null) ? (string) $row[$startcol + 44] : null;
 			$this->custom_data = ($row[$startcol + 45] !== null) ? (string) $row[$startcol + 45] : null;
+			$this->type = ($row[$startcol + 46] !== null) ? (int) $row[$startcol + 46] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2368,7 +2369,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 46; // 46 = kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 47; // 47 = kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kuser object", $e);
@@ -6879,6 +6880,16 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collKuserKgroupsRelatedByKgroupId) {
+				foreach ((array) $this->collKuserKgroupsRelatedByKgroupId as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
+			if ($this->collKuserKgroupsRelatedByKuserId) {
+				foreach ((array) $this->collKuserKgroupsRelatedByKuserId as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
 		$this->collkshows = null;
@@ -6895,6 +6906,8 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$this->collcategoryKusers = null;
 		$this->collUploadTokens = null;
 		$this->collKuserToUserRoles = null;
+		$this->collKuserKgroupsRelatedByKgroupId = null;
+		$this->collKuserKgroupsRelatedByKuserId = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */

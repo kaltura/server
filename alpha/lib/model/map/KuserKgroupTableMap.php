@@ -39,9 +39,9 @@ class KuserKgroupTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'BIGINT', true, null, null);
 		$this->addForeignKey('KUSER_ID', 'KuserId', 'INTEGER', 'kuser', 'ID', true, null, null);
-		$this->addColumn('PUSER_ID', 'PuserId', 'INTEGER', true, null, null);
+		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', true, 100, null);
 		$this->addForeignKey('KGROUP_ID', 'KgroupId', 'INTEGER', 'kuser', 'ID', true, null, null);
-		$this->addColumn('PGROUP_ID', 'PgroupId', 'INTEGER', true, null, null);
+		$this->addColumn('PGROUP_ID', 'PgroupId', 'VARCHAR', true, 100, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

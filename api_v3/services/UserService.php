@@ -251,7 +251,11 @@ class UserService extends KalturaBaseUserService
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 	
 		if (!$dbUser) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+			// if user is a group
+			$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId, false, KuserType::GROUP);
+			if (!$dbUser){
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+			}
 		}
 					
 		try {

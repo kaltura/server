@@ -17,6 +17,20 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 
 
 	/**
+	 * Creates default criteria filter
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+
+		$c =  KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);
+		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
+		self::$s_criteria_filter->setFilter($c);
+	}
+
+
+	/**
 	 * @param int $kuserId
 	 * @param int $kgroupId
 	 */
@@ -35,7 +49,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 *
 	 * @param int $kuserId
 	 */
-	public static function deleteByKuserId(Kuser $kuserId){
+	public static function deleteByKuserId($kuserId){
 		$kuserKgroups = self::getByKuserId($kuserId);
 		foreach($kuserKgroups as $kuserKgroup) {
 			/* @var $kuserKgroup KuserKgroup */
