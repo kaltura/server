@@ -75,6 +75,8 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"rootEntryIdEqual" => "_eq_root_entry_id",
 		"rootEntryIdIn" => "_in_root_entry_id",
 		"parentEntryIdEqual" => "_eq_parent_entry_id",
+		"entitledUsersEditMatchAnd" => "_matchand_entitled_users_edit",
+		"entitledUsersPublishMatchAnd" => "_matchand_entitled_users_publish",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -510,6 +512,16 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $parentEntryIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $entitledUsersEditMatchAnd;
+
+	/**
+	 * @var string
+	 */
+	public $entitledUsersPublishMatchAnd;
 
 	/**
 	 * @var string
