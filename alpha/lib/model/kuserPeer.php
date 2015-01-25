@@ -41,10 +41,9 @@ class kuserPeer extends BasekuserPeer
 	 * @param int $partnerId
 	 * @param string $puserId
 	 * @param bool $ignore_puser_kuser
-	 * @param KuserType $type
 	 * @return kuser
 	 */
-	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false, $type = KuserType::USER)
+	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
 	{
 		if(!$ignorePuserKuser && !kCurrentContext::isApiV3Context())
 		{
@@ -56,11 +55,10 @@ class kuserPeer extends BasekuserPeer
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partnerId);
 		$c->add(self::PUSER_ID, $puserId);
-		$c->add(self::TYPE, $type);
 
 		// in case of more than one deleted kusers - get the last one
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
-		
+
 		return self::doSelectOne($c);
 	}
 	
