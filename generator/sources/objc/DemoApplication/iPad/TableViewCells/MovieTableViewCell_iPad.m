@@ -35,7 +35,7 @@
 
 - (IBAction)selectCellView:(UIButton *)button {
     
-    NSNumber *num = [NSNumber numberWithInt:(index + button.tag)];
+    NSNumber *num = [NSNumber numberWithInt:(index + (int)button.tag)];
     
     [parentController performSelector:@selector(openMediaInfoByIndex:) withObject:num];
     

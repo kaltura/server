@@ -38,6 +38,7 @@ class kFlowHelper
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
+		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 		$flavorAsset->setPartnerId($partnerId);

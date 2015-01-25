@@ -16,6 +16,9 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
 			$url .= "/clipTo/" . $this->params->getClipTo();
+		else 
+			$url .= '/forceproxy/true';
+		
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
 		

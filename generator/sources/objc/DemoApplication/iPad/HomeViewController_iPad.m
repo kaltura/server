@@ -238,7 +238,7 @@
             videoRecorder.videoQuality = UIImagePickerControllerQualityTypeMedium;
             videoRecorder.videoMaximumDuration = 180;			//Specify in seconds (600 is default)
             
-            [self presentModalViewController:videoRecorder animated:YES];
+            [self presentViewController:videoRecorder animated:YES completion:nil];
         }
         [videoRecorder release];
     } else {
@@ -280,7 +280,7 @@
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     
     if (type == 0) {
-        [self dismissModalViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:nil];
     } else {
         [self.popoverController dismissPopoverAnimated:YES];
     }
@@ -291,7 +291,7 @@
 {
     
     if (type == 0) {
-        [self dismissModalViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:nil];
     } else {
         [self.popoverController dismissPopoverAnimated:YES];
         [self.popoverController release];
@@ -373,7 +373,7 @@
         
     }
         
-    selectedItem = textField.tag;
+    selectedItem = (int)textField.tag;
     
     
 }
@@ -393,7 +393,7 @@
         
     }
     
-    selectedItem = textView.tag;
+    selectedItem = (int)textView.tag;
 }
 
 #pragma PickerViewDelegate
@@ -462,7 +462,7 @@
 
 - (IBAction)menuButtonPressed:(UIButton *)button {
   
-    selectedMenu = button.tag;
+    selectedMenu = (int)button.tag;
     
     if (button.tag < 3) {
         
@@ -520,7 +520,7 @@
         viewUploadInfoEdit.frame = CGRectMake(350, 100, 300, 200);
 
         labelUploadingProcess.frame = CGRectMake(50, 10, 170, 30);
-        labelUploadingProcess.textAlignment = UITextAlignmentLeft;
+        labelUploadingProcess.textAlignment = NSTextAlignmentLeft;
         progressUploadingProcess.frame = CGRectMake(220, 20, 420, progressUploadingProcess.frame.size.height);
         
         viewUploadSuccess.frame = CGRectMake(0, 0, 700, 420);
@@ -528,7 +528,7 @@
         viewUploadSuccess.center = CGPointMake(width / 2, height / 2 - 100);
         
         labelUploadSuccess1.frame = CGRectMake(300, 320, 170, 40);
-        labelUploadSuccess1.textAlignment = UITextAlignmentLeft;
+        labelUploadSuccess1.textAlignment = NSTextAlignmentLeft;
         labelUploadSuccess2.frame = CGRectMake(160, 360, 380, 30);
         
         imageViewUploadSuccess.frame = CGRectMake(230, 310, 60, 50);
@@ -550,7 +550,7 @@
         viewUploadInfoEdit.frame = CGRectMake(70, 340, 300, 200);
 
         labelUploadingProcess.frame = CGRectMake(70, 10, 300, 30);
-        labelUploadingProcess.textAlignment = UITextAlignmentCenter;
+        labelUploadingProcess.textAlignment = NSTextAlignmentCenter;
         progressUploadingProcess.frame = CGRectMake(70, 50, 300, progressUploadingProcess.frame.size.height);
         
         viewUploadSuccess.frame = CGRectMake(0, 0, 440, 540);
@@ -558,7 +558,7 @@
         viewUploadSuccess.center = CGPointMake(width / 2, height / 2);
         
         labelUploadSuccess1.frame = CGRectMake(100, 340, 240, 40);
-        labelUploadSuccess1.textAlignment = UITextAlignmentCenter;
+        labelUploadSuccess1.textAlignment = NSTextAlignmentCenter;
         labelUploadSuccess2.frame = CGRectMake(100, 380, 240, 50);
         
         imageViewUploadSuccess.frame = CGRectMake(190, 450, 60, 50);
@@ -574,24 +574,24 @@
     
     app = (AppDelegate_iPad *)[[UIApplication sharedApplication] delegate];
     
-    menuButton0.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton0.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton0.titleLabel.numberOfLines = 0;
-	menuButton0.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton0.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton0.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:24]];
 	
-    menuButton1.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton1.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton1.titleLabel.numberOfLines = 0;
-	menuButton1.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton1.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton1.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:24]];
     
-    menuButton2.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton2.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton2.titleLabel.numberOfLines = 0;
-	menuButton2.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton2.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton2.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:24]];
 	
-    menuButton3.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    menuButton3.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	menuButton3.titleLabel.numberOfLines = 0;
-	menuButton3.titleLabel.textAlignment = UITextAlignmentCenter;
+	menuButton3.titleLabel.textAlignment = NSTextAlignmentCenter;
 	[menuButton3.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:24]];
     
     // Upload Select
@@ -599,14 +599,14 @@
     labelUploadSelectTitle.font = [UIFont fontWithName:@"Maven Pro" size:38];
     viewUploadSelect.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_table.png"]];
     
-    buttonUploadSelectRecord.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    buttonUploadSelectRecord.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	buttonUploadSelectRecord.titleLabel.numberOfLines = 0;
-    buttonUploadSelectRecord.titleLabel.textAlignment = UITextAlignmentCenter;
+    buttonUploadSelectRecord.titleLabel.textAlignment = NSTextAlignmentCenter;
     [buttonUploadSelectRecord setTitle:@"Record \na Video" forState:UIControlStateNormal];
     
-    buttonUploadSelectPick.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    buttonUploadSelectPick.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 	buttonUploadSelectPick.titleLabel.numberOfLines = 0;
-    buttonUploadSelectPick.titleLabel.textAlignment = UITextAlignmentCenter;
+    buttonUploadSelectPick.titleLabel.textAlignment = NSTextAlignmentCenter;
     [buttonUploadSelectPick setTitle:@"Pick from\nGallery" forState:UIControlStateNormal];
     
     [buttonUploadSelectRecord.titleLabel setFont:[UIFont fontWithName:@"Maven Pro" size:30]];

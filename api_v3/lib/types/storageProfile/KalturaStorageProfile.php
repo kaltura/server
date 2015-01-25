@@ -167,6 +167,21 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $deliveryProfileIds;
 	
+	/**
+	 * @var string
+	 */
+	public $privateKey;
+	
+    /**
+	 * @var string
+	 */
+	public $publicKey;
+	
+	/**
+	 * @var string
+	 */
+	public $passPhrase;
+		
 	private static $map_between_objects = array
 	(
 		"id",
@@ -197,6 +212,9 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		"rules",
 		"pathManagerParams",	
 		"deliveryProfileIds",
+		"privateKey",
+		"publicKey",
+		"passPhrase",
 	);
 	
 	/* (non-PHPdoc)

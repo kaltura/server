@@ -127,6 +127,8 @@ class kEntitlementUtils
 		if($ks)
 			$ksPrivacyContexts = $ks->getPrivacyContext();
 			
+		$allCategoriesEntry = array();
+		
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partner->getId()))
 		{ 
 			if(!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')

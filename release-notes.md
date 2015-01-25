@@ -1,5 +1,17 @@
 # Jupiter-10.2.0 #
 
+## Webex Fix ## 
+- Issue Type: bug fix
+
+#### Configuration ####
+
+*batch.ini* 
+
+Add the following to the KAsyncImport worker configuartion:
+
+params.webex.iterations                                                                 = 30  
+params.webex.sleep 
+
 ## Unicorn Connector ##
 - Issue Type: New Feature
 
