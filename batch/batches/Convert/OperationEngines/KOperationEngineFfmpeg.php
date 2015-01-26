@@ -8,7 +8,7 @@ class KOperationEngineFfmpeg  extends KSingleOutputOperationEngine
 	protected function getCmdLine()
 	{
 		$cmdLine=parent::getCmdLine();
-		$cmdLine=KConversionEngineFfmpeg::experementalFixing($cmdLine, $this->data->flavorParamsOutput, $this->cmd, $this->inFilePath, $this->outFilePath);
+		$cmdLine=KConversionEngineFfmpeg::experimentalFixing($cmdLine, $this->data->flavorParamsOutput, $this->cmd, $this->inFilePath, $this->outFilePath);
 		$cmdLine=KConversionEngineFfmpeg::expandForcedKeyframesParams($cmdLine);
 
 		$wmStr = strstr($this->operator->params, "watermark:");
