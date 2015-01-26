@@ -48,7 +48,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 			 */
 		foreach($cmdLines as $k=>$cmdLine){
 			$wmCmdLine = null;
-			$exec_cmd = self::experementalFixing($cmdLine->exec_cmd, $data->flavorParamsOutput, $this->getCmd(), $this->inFilePath, $this->outFilePath);
+			$exec_cmd = self::experimentalFixing($cmdLine->exec_cmd, $data->flavorParamsOutput, $this->getCmd(), $this->inFilePath, $this->outFilePath);
 			$exec_cmd = self::expandForcedKeyframesParams($exec_cmd);
 			
 			if(isset($wmData) && strstr($exec_cmd, "ffmpeg")!=false){
@@ -110,7 +110,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 	 * @param unknown_type $outFilePath
 	 * @return unknown|string
 	 */
-	public static function experementalFixing($cmdStr, $flavorParamsOutput, $binCmd, $srcFilePath, $outFilePath)
+	public static function experimentalFixing($cmdStr, $flavorParamsOutput, $binCmd, $srcFilePath, $outFilePath)
 	{
 /*
  * Samples - 
