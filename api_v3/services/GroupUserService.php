@@ -7,6 +7,13 @@
  */
 class GroupUserService extends KalturaBaseService
 {
+
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		$this->applyPartnerFilterForClass('KuserKgroup');
+	}
+
 	/**
 	 * Add new GroupUser
 	 * 
@@ -17,8 +24,31 @@ class GroupUserService extends KalturaBaseService
 	function addAction(KalturaGroupUser $groupUser)
 	{
 		/* @var $dbGroupUser KuserKgroup*/
+
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+
+		//verify kuser exists
+		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->userId, false , KuserType::USER);
+		if (! $kuser)
+			throw new KalturaAPIException ( KalturaErrors::USER_NOT_FOUND, $groupUser->userId );
+
+		//verify group exists
+		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId, false , KuserType::GROUP);
+		if (! $kgroup)
+			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
+
+		//verify kuser does not belongs to kgroup
+		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
+		if($kuserKgroup)
+			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
+
+		//verify user does not belongs to more than max allowed groups
+		$kuserKgroups = KuserKgroupPeer::retrieveByKuserId($kuser->getId());
+		if ( count($kuserKgroups) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
+			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
+		}
+
 		$dbGroupUser = $groupUser->toInsertableObject();
-		KalturaLog::debug("assaf ".print_r($dbGroupUser,true));
 		$dbGroupUser->setPartnerId($this->getPartnerId());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
@@ -32,7 +62,6 @@ class GroupUserService extends KalturaBaseService
 	 * @action delete
 	 * @param string $userId
 	 * @param string $groupId
-	 * @return KalturaGroupUser
 	 */
 	function deleteAction($userId, $groupId)
 	{
@@ -40,15 +69,27 @@ class GroupUserService extends KalturaBaseService
 
 		//verify kuser exists
 		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $userId, false, KuserType::USER);
-		if (! $kuser)
-			throw new KalturaAPIException ( KalturaErrors::USER_NOT_FOUND, $userId );
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+
 
 		//verify group exists
 		$kgroup = kuserPeer::getKuserByPartnerAndUid(  $partnerId, $groupId ,false, KuserType::GROUP);
-		if (! $kgroup)
-			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupId );
+		if (! $kgroup){
+			//if the delete worker was triggered due to group deletion
+			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
+				throw new KalturaAPIException(KalturaErrors::GROUP_NOT_FOUND, $groupId);
 
-		$dbKuserKgroup = KuserKgroupPeer::getByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
+			kuserPeer::setUseCriteriaFilter(false);
+			$kgroup = kuserPeer::getKuserByPartnerAndUid($partnerId, $groupId);
+			kuserPeer::setUseCriteriaFilter(true);
+
+			if (!$kgroup)
+				throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupId );
+		}
+
+
+		$dbKuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
 		if (!$dbKuserKgroup)
 			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXISTS, $userId, $groupId);
 
@@ -56,8 +97,6 @@ class GroupUserService extends KalturaBaseService
 		$dbKuserKgroup->save();
 		$groupUser = new KalturaGroupUser();
 		$groupUser->fromObject($dbKuserKgroup);
-
-		return $groupUser;
 	}
 
 	/**
@@ -87,16 +126,15 @@ class GroupUserService extends KalturaBaseService
 		$c = KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);
 		$kuserKgroupFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-		$c->applyFilters();
+//		$c->applyFilters();
 		
 		$list = KuserKgroupPeer::doSelect($c);
-		$totalCount = $c->getRecordsCount();
-		
+
 		$newList = KalturaGroupUserArray::fromDbArray($list);
 		
 		$response = new KalturaGroupUserListResponse();
 		$response->objects = $newList;
-		$response->totalCount = $totalCount;
+		$response->totalCount = KuserKgroupPeer::doCount($c);
 		
 		return $response;
 	}

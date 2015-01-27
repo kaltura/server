@@ -47,7 +47,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="indexed_partner_data_int" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="indexed_partner_data_string" type="varchar" size="64" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="tinyint" />
 		<index name="screen_name_index">
 			<index-column name="screen_name" />
 		</index>

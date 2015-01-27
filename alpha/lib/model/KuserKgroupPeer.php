@@ -15,7 +15,6 @@
  */
 class KuserKgroupPeer extends BaseKuserKgroupPeer {
 
-
 	/**
 	 * Creates default criteria filter
 	 */
@@ -26,6 +25,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 
 		$c =  KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);
 		$c->addAnd ( KuserKgroupPeer::STATUS, array(KuserKgroupStatus::DELETED), Criteria::NOT_IN);
+		$c->addAnd ( KuserKgroupPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId(), Criteria::EQUAL );
 		self::$s_criteria_filter->setFilter($c);
 	}
 
@@ -34,7 +34,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kuserId
 	 * @param int $kgroupId
 	 */
-	static public function getByKuserIdAndKgroupId ($kuserId, $kgroupId){
+	static public function retrieveByKuserIdAndKgroupId ($kuserId, $kgroupId){
 
 		$criteria = new Criteria();
 		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
@@ -50,7 +50,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kuserId
 	 */
 	public static function deleteByKuserId($kuserId){
-		$kuserKgroups = self::getByKuserId($kuserId);
+		$kuserKgroups = self::retrieveByKuserId($kuserId);
 		foreach($kuserKgroups as $kuserKgroup) {
 			/* @var $kuserKgroup KuserKgroup */
 			$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
@@ -64,7 +64,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kgroupId
 	 */
 	public static function deleteByKgroupId($kgroupId){
-		$kuserKgroups = self::getByKgroupId($kgroupId);
+		$kuserKgroups = self::retrieveByKgroupId($kgroupId);
 		foreach($kuserKgroups as $kuserKgroup) {
 			/* @var $kuserKgroup KuserKgroup */
 			$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
@@ -78,7 +78,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kgroupId
 	 * @return array
 	 */
-	public static function getByKgroupId($kgroupId){
+	public static function retrieveByKgroupId($kgroupId){
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KGROUP_ID, $kgroupId);
 		return KuserKgroupPeer::doSelect($c);
@@ -90,7 +90,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	 * @param int $kuserId
 	 * @return array
 	 */
-	public static function getByKuserId($kuserId){
+	public static function retrieveByKuserId($kuserId){
 		$c = new Criteria();
 		$c->add(KuserKgroupPeer::KUSER_ID, $kuserId);
 		return KuserKgroupPeer::doSelect($c);

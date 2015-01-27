@@ -25,7 +25,7 @@ class KuserKgroup extends BaseKuserKgroup {
 
 		parent::setPuserId($puserId);
 
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$kuser)
@@ -42,7 +42,7 @@ class KuserKgroup extends BaseKuserKgroup {
 
 		parent::setPgroupId($pgroupId);
 
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 
 		$kgroup = kuserPeer::getKuserByPartnerAndUid($partnerId, $pgroupId, false, KuserType::GROUP);
 		if (!$kgroup)
