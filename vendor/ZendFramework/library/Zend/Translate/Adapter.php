@@ -320,36 +320,36 @@ abstract class Zend_Translate_Adapter {
 
 		$defLocale = self::DEFAULT_LANGUAGE;
         
-        if (!isset($this->_translate[$locale])) {
-            $temp = explode('_', $locale);
-            if (!isset($this->_translate[$temp[0]]) and !isset($this->_translate[$locale])) {
-            	if (!isset($this->_translate[$defLocale])) {
-                	if (!$this->_options['disableNotices']) {
-                    	if ($this->_options['log']) {
-                        	$this->_options['log']->notice("The used language '{$locale}' and default language '{$defLocale}' have to be added before they can be used.");
-                    	} else {
-                    	    trigger_error("The used language '{$locale}' and default language '{$defLocale}' have to be added before they can be used.", E_USER_NOTICE);
-                    	}
-                	}
-            	}
-            	else
-            		$locale = $defLocale;
-            }
-			if ($local != $defLocale)
+		if (!isset($this->_translate[$locale])) {
+			$temp = explode('_', $locale);
+			if (!isset($this->_translate[$temp[0]]) and !isset($this->_translate[$locale])) {
+				if (!isset($this->_translate[$defLocale])) {
+					if (!$this->_options['disableNotices']) {
+						if ($this->_options['log']) {
+							$this->_options['log']->notice("The used language '{$locale}' and default language '{$defLocale}' have to be added before they can be used.");
+						} else {
+							trigger_error("The used language '{$locale}' and default language '{$defLocale}' have to be added before they can be used.", E_USER_NOTICE);
+						}
+					}
+				}
+				else
+					$locale = $defLocale;
+			}
+			if ($locale != $defLocale)
 				$locale = $temp[0];
-        }
+		}
 
-        if (empty($this->_translate[$locale])) {
-        	if($locale != $defLocale and empty($this->_translate[$defLocale])){
-            	if (!$this->_options['disableNotices']) {
-            	    if ($this->_options['log']) {
-            	        $this->_options['log']->notice("No translation for the used language '{$locale}' and default language '{$defLocale}' available.");
-            	    } else {
-            	        trigger_error("No translation for the used language '{$locale}' and default language '{$defLocale}' available.", E_USER_NOTICE);
-            	    }
-            	}
-        	}
-        }
+		if (empty($this->_translate[$locale])) {
+			if($locale != $defLocale and empty($this->_translate[$defLocale])){
+				if (!$this->_options['disableNotices']) {
+					if ($this->_options['log']) {
+						$this->_options['log']->notice("No translation for the used language '{$locale}' and default language '{$defLocale}' available.");
+					} else {
+						trigger_error("No translation for the used language '{$locale}' and default language '{$defLocale}' available.", E_USER_NOTICE);
+					}
+				}
+			}
+		}
 
         if ($this->_options['locale'] != $locale) {
             $this->_options['locale'] = $locale;
