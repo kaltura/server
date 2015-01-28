@@ -113,13 +113,9 @@ class GroupUserService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaGroupUserFilter();
 
-		if(!($filter->userIdEqual || $filter->userIdIn || $filter->groupIdEqual || $filter->groupIdIn))
-			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_GROUPS);
-
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 
-		
 		$kuserKgroupFilter = new KuserKgroupFilter();
 		$filter->toObject($kuserKgroupFilter);
 		

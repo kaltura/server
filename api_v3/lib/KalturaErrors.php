@@ -376,8 +376,6 @@ class KalturaErrors extends APIErrors
 
 	const GROUP_USER_DOES_NOT_EXISTS = "GROUP_USER_DOES_NOT_EXISTS;USER,GROUP;Invalid GroupUser for group [\"@GROUP@\"] and for user [\"@USER@\"]";
 
-	const MUST_FILTER_USERS_OR_GROUPS = "MUST_FILTER_USERS_OR_GROUPS;;Must filter users or groups";
-
 	const USER_LOGIN_ALREADY_ENABLED = "USER_LOGIN_ALREADY_ENABLED;;User is already allowed to login";
 
 	const USER_LOGIN_ALREADY_DISABLED = "USER_LOGIN_ALREADY_DISABLED;;User is already not allowed to login";
