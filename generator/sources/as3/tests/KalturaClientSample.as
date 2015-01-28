@@ -8,7 +8,7 @@
 // to do with audio, video, and animation what Wiki platfroms allow them to do with
 // text.
 //
-// Copyright (C) 2006-2011  Kaltura Inc.
+// Copyright (C) 2006-2015  Kaltura Inc.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -36,14 +36,14 @@
 
 	public class KalturaClientSample extends Sprite
 	{
-		private const API_SECRET:String = "YOUR_USER_SECRET";
-		private const KALTURA_PARTNER_ID:int = 54321;
+		private const API_SECRET:String = "@YOUR_USER_SECRET@";
+		private const KALTURA_PARTNER_ID:int = @YOUR_PARTNER_ID@;
 		
 		public function KalturaClientSample()
 		{
 			var configuration : KalturaConfig = new KalturaConfig();
 			var kaltura : KalturaClient = new KalturaClient( configuration );	
-			var startSession : SessionStart = new SessionStart(API_SECRET, 'testUser', KalturaSessionType.USER, KALTURA_PARTNER_ID);
+			var startSession : SessionStart = new SessionStart(@YOUR_PARTNER_SECRET@, 'testUser', KalturaSessionType.USER, KALTURA_PARTNER_ID);
 			startSession.addEventListener(KalturaEvent.COMPLETE, completed);
 			startSession.addEventListener(KalturaEvent.FAILED, failed);
 			kaltura.post( startSession );
