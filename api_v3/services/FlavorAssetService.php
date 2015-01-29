@@ -497,11 +497,18 @@ class FlavorAssetService extends KalturaAssetService
 		
 		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
-		
-		$totalCount = assetPeer::doCount($c);
-		
+
 		$pager->attachToCriteria($c);
 		$dbList = assetPeer::doSelect($c);
+
+		$resultCount = count($dbList);
+		if ($resultCount && $resultCount < $pager->pageSize)
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = assetPeer::doCount($c);
+		}
 		
 		$list = KalturaFlavorAssetArray::fromDbArray($dbList);
 		$response = new KalturaFlavorAssetListResponse();
