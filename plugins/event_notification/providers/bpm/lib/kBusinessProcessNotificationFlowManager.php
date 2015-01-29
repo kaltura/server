@@ -59,6 +59,11 @@ class kBusinessProcessNotificationFlowManager implements kBatchJobStatusEventCon
 			$notificationTemplate = EventNotificationTemplatePeer::retrieveByPK($templateId);
 			/* @var $notificationTemplate BusinessProcessStartNotificationTemplate */
 			
+			if(!$notificationTemplate->getAbortOnDeletion())
+			{
+				continue;
+			}
+			
 			if($notificationTemplate->getPartnerId())
 			{
 				$scope->setPartnerId($notificationTemplate->getPartnerId());

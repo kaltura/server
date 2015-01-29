@@ -12,6 +12,11 @@ class KalturaBpmEventNotificationIntegrationJobTriggerData extends KalturaIntegr
 	public $templateId;
 	
 	/**
+	 * @var string
+	 */
+	public $businessProcessId;
+	
+	/**
 	 * Execution unique id
 	 * @var string
 	 */
@@ -20,6 +25,7 @@ class KalturaBpmEventNotificationIntegrationJobTriggerData extends KalturaIntegr
 	private static $map_between_objects = array
 	(
 		'templateId' ,
+		'businessProcessId' ,
 		'caseId' ,
 	);
 

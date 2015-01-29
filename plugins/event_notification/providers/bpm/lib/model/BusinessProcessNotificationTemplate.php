@@ -7,6 +7,9 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 {
 	const CUSTOM_DATA_SERVER_ID = 'serverId';
 	const CUSTOM_DATA_PROCESS_ID = 'processId';
+	const CUSTOM_DATA_ABORT_ON_DELETION = 'abortOnDeletion';
+	const CUSTOM_DATA_MAIN_OBJECT_CODE = 'mainObjectCode';
+	
 	
 	/* (non-PHPdoc)
 	 * @see BatchEventNotificationTemplate::getJobData()
@@ -111,23 +114,51 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 		return array();
 	}
 	
-	public function addCaseId(BaseObject $object, $caseId)
+	public function addCaseId(BaseObject $object, $caseId, $processId = null)
 	{
+		$object = $this->getMainObject($object);
 		if(method_exists($object, 'putInCustomData'))
 		{
+			if(is_null($processId))
+			{
+				$processId = $this->getProcessId();
+			}
+			
 			$values = $this->getCaseIds($object);
 			$values[] = array(
 				'caseId' => $caseId,
+				'processId' => $processId,
 				'templateId' => $this->getId(),
 			);
-			$object->putInCustomData($this->getServerId() . '_' . $this->getProcessId(), $values, 'businessProcessCases');
+			$object->putInCustomData($this->getServerId() . '_' . $processId, $values, 'businessProcessCases');
 			$object->save();
 		}
+	}
+
+	protected function getMainObject(BaseObject $object)
+	{
+		$code = $this->getMainObjectCode();
+		if(is_null($code))
+		{
+			return $object;
+		}
+		
+		$object = eval("return $code;");
+		if($object && $object instanceof BaseObject)
+		{
+			return $object;
+		}
+	
+		return null;
 	}
 	
 	public function getServerId()									{return $this->getFromCustomData(self::CUSTOM_DATA_SERVER_ID);}
 	public function getProcessId()									{return $this->getFromCustomData(self::CUSTOM_DATA_PROCESS_ID);}
+	public function getAbortOnDeletion()							{return $this->getFromCustomData(self::CUSTOM_DATA_ABORT_ON_DELETION);}
+	public function getMainObjectCode()								{return $this->getFromCustomData(self::CUSTOM_DATA_MAIN_OBJECT_CODE);}
 	
 	public function setServerId($v)									{return $this->putInCustomData(self::CUSTOM_DATA_SERVER_ID, $v);}
 	public function setProcessId($v)								{return $this->putInCustomData(self::CUSTOM_DATA_PROCESS_ID, $v);}
+	public function setAbortOnDeletion($v)							{return $this->putInCustomData(self::CUSTOM_DATA_ABORT_ON_DELETION, $v);}
+	public function setMainObjectCode($v)							{return $this->putInCustomData(self::CUSTOM_DATA_MAIN_OBJECT_CODE, $v);}
 }
