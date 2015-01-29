@@ -285,7 +285,7 @@
 	
 	
 	<multirequest>
-		<!-- Caption-Asset Status Equals -->
+		<!-- Entry Integration Job Finished -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Entry Integration Job Finished</name>
@@ -315,7 +315,7 @@
 	
 	
 	<multirequest>
-		<!-- Caption-Asset Status Equals -->
+		<!-- Category Integration Job Finished -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Category Integration Job Finished</name>
@@ -345,7 +345,7 @@
 	
 	
 	<multirequest>
-		<!-- Caption-Asset Status Equals -->
+		<!-- Asset Integration Job Finished -->
 		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
 			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
 				<name>Asset Integration Job Finished</name>
