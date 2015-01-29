@@ -25,6 +25,7 @@ println("Setting execution id [" + execution.id + "] and template id [" + templa
 data.triggerType = KalturaIntegrationTriggerType.BPM_EVENT_NOTIFICATION;
 data.triggerData = new KalturaBpmEventNotificationIntegrationJobTriggerData(); 
 data.triggerData.caseId = execution.id;
+data.triggerData.businessProcessId = "kaltura-integrate";
 data.triggerData.templateId = templateId;
 
 jobStatus = null;

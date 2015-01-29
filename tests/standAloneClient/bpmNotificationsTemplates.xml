@@ -77,6 +77,8 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
 				<eventObjectType>4</eventObjectType> <!-- EventNotificationEventObjectType::FLAVORASSET -->
+				<abortOnDeletion>true</abortOnDeletion>
+				<mainObjectCode>$object->getentry()</mainObjectCode>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
 						<description>Status field modified</description>
@@ -205,6 +207,7 @@
 				<automaticDispatchEnabled>1</automaticDispatchEnabled>
 				<eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
 				<eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType> <!-- KalturaEventNotificationEventObjectType::CAPTION_ASSET -->
+				<mainObjectCode>$object->getentry()</mainObjectCode>
 				<eventConditions objectType="array">
 					<item objectType="KalturaEventFieldCondition">
 						<description>Status field modified</description>

@@ -12,11 +12,32 @@ class kBpmEventNotificationIntegrationJobTriggerData extends kIntegrationJobTrig
 	private $templateId;
 	
 	/**
+	 * @var string
+	 */
+	private $businessProcessId;
+	
+	/**
 	 * Execution unique id
 	 * @var string
 	 */
 	private $caseId;
 	
+	/**
+	 * @return the $businessProcessId
+	 */
+	public function getBusinessProcessId()
+	{
+		return $this->businessProcessId;
+	}
+
+	/**
+	 * @param string $businessProcessId
+	 */
+	public function setBusinessProcessId($businessProcessId)
+	{
+		$this->businessProcessId = $businessProcessId;
+	}
+
 	/**
 	 * @return the $templateId
 	 */
