@@ -53,7 +53,7 @@
 				<userParameters objectType="array">
 					<item objectType="KalturaEventNotificationParameter">
 						<key>templateId</key>
-						<description>ID of the template to be passed to the process</description>
+						<description>ID of the integration job finished template to be passed to the process</description>
 						<value objectType="KalturaStringValue">
 							<value></value>
 						</value>
