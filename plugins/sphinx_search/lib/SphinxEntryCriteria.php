@@ -256,10 +256,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$advancedSearch = $filter->getAdvancedSearch();
 			if($advancedSearch)
 			{
+				$metadataProfileFieldIds = array();
+				
 				if ($advancedSearch instanceof MetadataSearchFilter)
 				{
 					$metadataProfileFields = array();
-					$metadataProfileFieldIds = array();
 
 					$metadataProfileId = $advancedSearch->getMetadataProfileId();
 
