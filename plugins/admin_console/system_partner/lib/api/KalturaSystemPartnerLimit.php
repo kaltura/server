@@ -41,8 +41,6 @@ class KalturaSystemPartnerLimit extends KalturaObject
 
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$limit->max = $partner->getMaxLoginAttempts();
-				$limit->overagePrice = $partner->getMaxLoginAttemptsOveragePrice();
-				$limit->overageUnit = $partner->getMaxLoginAttemptsOverageUnit();
 				break;
 		}
 		
@@ -67,8 +65,6 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$this->validatePropertyMinValue('max', 0, true);
-				$this->validatePropertyMinValue('overagePrice', 0, true);
-				$this->validatePropertyMinValue('overageUnit', 0, true);
 				break;
 		}
 	}
@@ -97,8 +93,6 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				
 			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$partner->setMaxLoginAttempts($this->max);
-				$partner->setMaxLoginAttemptsOveragePrice($this->overagePrice);
-				$partner->setMaxLoginAttemptsOverageUnit($this->overageUnit);
 				break;
 		}
 	} 
