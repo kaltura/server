@@ -249,7 +249,10 @@ class playManifestAction extends kalturaAction
 		
 		if ($this->secureEntryHelper->shouldPreview())
 		{
-			$this->deliveryAttributes->setClipTo($this->secureEntryHelper->getPreviewLength() * 1000);
+			$previewLengthInMsecs = $this->secureEntryHelper->getPreviewLength() * 1000;
+			$entryLengthInMsecs = $this->entry->getLengthInMsecs();
+			if ($previewLengthInMsecs <  $entryLengthInMsecs)
+				$this->deliveryAttributes->setClipTo($previewLengthInMsecs);
 		}
 		else
 		{
