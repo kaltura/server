@@ -31,6 +31,7 @@ Linux
 ------
 To auto install, run:
 # ./setup.sh  </path/to/target/dir> <api_hostname> <partner_id> <partner_admin_secret>
+
 For a manual install:
 
 1. Unzip the package contents
