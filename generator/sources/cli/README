@@ -29,6 +29,12 @@ Installation instructions
 ==========================
 Linux
 ------
+To auto install, run:
+```
+# ./setup.sh  </path/to/target/dir> <api_hostname> <partner_id> <partner_admin_secret>
+```
+For a manual install:
+
 1. Unzip the package contents
 2. Replace the @BASEDIR@ token with the path to kalcliAutoComplete.php in:
 	kalcliAliases.sh
@@ -56,6 +62,10 @@ Linux
 		May be uncommented and modified in order to globally point to a different api host
 		The -u parameter may be used to override the api host via command line
 	d. Log Dir - The log directory that contains kaltura_api_v3.log (typically /var/log or /opt/kaltura/log)
+To run unittests:
+```
+# ./tests/sanity.sh </path/to/target/dir> <partner_id> 
+```
 
 Windows
 --------
