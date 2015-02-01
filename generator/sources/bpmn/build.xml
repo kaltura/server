@@ -2,14 +2,25 @@
 <project name="Kaltura BPMN Deployment" default="deploy">
 
 	<property environment="env" />
-	<property name="catalina.home" value="${env.CATALINA_HOME}" />
 	<property name="java.lib.path" value="${basedir}/../pojo" />
 	<property name="jar.lib.path" value="${basedir}/lib" />
 	<property name="jar.filename" value="${jar.lib.path}/KalturaClientLib.jar" />
 	<property name="bar.filename" value="${basedir}/KalturaClientLib.bar" />
 
+	<target name="set-home" depends="install-contrib">
+		<if>
+			<isset property="env.CATALINA_HOME" />
+			<then>
+				<property name="catalina.home" value="${env.CATALINA_HOME}" />		
+			</then>
+			<else>
+				<input message="Please entrer tomcat 7 home directory full path" addproperty="catalina.home" defaultvalue="/usr/share/tomcat7" />
+			</else>
+		</if>		
+	</target>
+	
 	<target name="verify-version">
-		<fail message="Java 1.7 is required.">
+		<fail message="Java 1.7 is required. If Java 1.7 is installed, set JAVA_HOME to its root directory.">
 			<condition>
 				<not><equals arg1="${ant.java.version}" arg2="1.7" /></not>
 			</condition>
@@ -72,7 +83,7 @@
 		</zip>
 	</target>
 	
-	<target name="compile">
+	<target name="compile" depends="set-home">
 		<mkdir dir="${basedir}/deploy/bin"/>
 		<javac srcdir="${basedir}/deploy/src" encoding="UTF-8" destdir="${basedir}/deploy/bin">
 			<classpath>
@@ -86,7 +97,7 @@
 		</copy>
 	</target>
 	
-	<target name="deploy" depends="verify-version, jar, bar, compile">
+	<target name="deploy" depends="verify-version, jar, bar, compile, set-home">
 		<copy todir="${catalina.home}/lib">
 			<fileset dir="${jar.lib.path}" />
 		</copy>
