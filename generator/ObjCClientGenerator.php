@@ -137,7 +137,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	{
 		if (kString::beginsWith($propertyName, 'new') ||
 			kString::beginsWith($propertyName, 'copy'))
-			return "_$propertyName";
+			return "a$propertyName";		// prefixing with _ still produces the warning, need to use a real letter
 		return $propertyName;
 	}
 	
