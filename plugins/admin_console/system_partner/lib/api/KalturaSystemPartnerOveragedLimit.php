@@ -62,12 +62,6 @@ class KalturaSystemPartnerOveragedLimit extends KalturaSystemPartnerLimit
 				$limit->overagePrice = $partner->getAdminLoginUsersOveragePrice();
 				$limit->overageUnit = $partner->getAdminLoginUsersOverageUnit();
 				break;
-				
-			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
-				$limit->max = $partner->getMaxLoginAttempts();
-				$limit->overagePrice = $partner->getMaxLoginAttemptsOveragePrice();
-				$limit->overageUnit = $partner->getMaxLoginAttemptsOverageUnit();
-				break;
 			
 			case KalturaSystemPartnerLimitType::BULK_SIZE:
 				$limit->max = $partner->getMaxBulkSize();
@@ -135,12 +129,6 @@ class KalturaSystemPartnerOveragedLimit extends KalturaSystemPartnerLimit
 				break;
 				
 			case KalturaSystemPartnerLimitType::ADMIN_LOGIN_USERS:
-				$this->validatePropertyMinValue('max', 0, true);
-				$this->validatePropertyMinValue('overagePrice', 0, true);
-				$this->validatePropertyMinValue('overageUnit', 0, true);
-				break;
-				
-			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				$this->validatePropertyMinValue('overageUnit', 0, true);
@@ -224,12 +212,6 @@ class KalturaSystemPartnerOveragedLimit extends KalturaSystemPartnerLimit
 				$partner->setAdminLoginUsersQuota($this->max);
 				$partner->setAdminLoginUsersOveragePrice($this->overagePrice);
 				$partner->setAdminLoginUsersOverageUnit($this->overageUnit);
-				break;
-			
-			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
-				$partner->setMaxLoginAttempts($this->max);
-				$partner->setMaxLoginAttemptsOveragePrice($this->overagePrice);
-				$partner->setMaxLoginAttemptsOverageUnit($this->overageUnit);
 				break;
 			
 			case KalturaSystemPartnerLimitType::BULK_SIZE:
