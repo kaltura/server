@@ -85,7 +85,7 @@ class DropFolderEventNotificationsPlugin extends KalturaPlugin implements IKaltu
 	 * @see IKalturaPlugin::getPluginName()
 	 */
 	public static function getPluginName() {
-		return self::getPluginName();
+		return self::PLUGIN_NAME;
 	}
 
 	
