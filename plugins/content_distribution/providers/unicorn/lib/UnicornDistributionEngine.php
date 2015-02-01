@@ -82,10 +82,10 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 		return false;
 	}
 	
-	protected function getNotificationUrl()
+	protected function getNotificationUrl(KalturaUnicornDistributionJobProviderData $providerData)
 	{
 		$job = KJobHandlerWorker::getCurrentJob();
-		$serviceUrl = trim(KBatchBase::$kClientConfig->serviceUrl, '/');
+		$serviceUrl = trim($providerData->notificationBaseUrl, '/');
 		return "$serviceUrl/api_v3/index.php/service/unicornDistribution_unicorn/action/notify/partnerId/{$job->partnerId}/id/{$job->id}";
 	}
 	
@@ -177,7 +177,7 @@ class UnicornDistributionEngine extends DistributionEngine implements IDistribut
 			$publicationRuleXml->addChild('EndDate', date($format, time() + self::FAR_FUTURE));
 		}
 		
-		$xml->addChild('NotificationURL', $this->getNotificationUrl());
+		$xml->addChild('NotificationURL', $this->getNotificationUrl($providerData));
 		$xml->addChild('NotificationRequestMethod', 'GET');
 		
 		return $xml->asXML();
