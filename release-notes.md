@@ -1,3 +1,20 @@
+# Jupiter-10.4.0 #
+
+##Drop Folder Email Notifications##
+- Issue Type - new feature 
+
+### Configuration ###
+*plugins.ini*  
+Add new line:  
+DropFolderEventNotifications
+
+###Installation  
+
+- Run:  
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFileFailedStatus.xml  
+
 # Jupiter-10.2.0 #
 
 ## Webex Fix ## 
