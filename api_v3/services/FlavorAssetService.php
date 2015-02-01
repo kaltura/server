@@ -940,7 +940,7 @@ class FlavorAssetService extends KalturaAssetService
 	 *
 	 * @action deleteLocalContent
 	 * @param string $assetId
-	 * @validateUser asset::entry id edit
+	 * @validateUser asset::entry assetId edit
 	 * @throws KalturaAPIException
 	 */
 	public function deleteLocalContentAction($assetId)
