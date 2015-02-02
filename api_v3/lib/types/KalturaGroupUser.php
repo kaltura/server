@@ -30,7 +30,6 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq
 	 */
 	public $partnerId;
 
@@ -95,4 +94,3 @@ class KalturaGroupUser extends KalturaObject implements IFilterable
 		return array();	
 	}
 }
-?>

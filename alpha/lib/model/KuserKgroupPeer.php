@@ -59,32 +59,6 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 	}
 
 	/**
-	 * delete all kuserKgroups that belong to kgroupId
-	 *
-	 * @param int $kgroupId
-	 */
-	public static function deleteByKgroupId($kgroupId){
-		$kuserKgroups = self::retrieveByKgroupId($kgroupId);
-		foreach($kuserKgroups as $kuserKgroup) {
-			/* @var $kuserKgroup KuserKgroup */
-			$kuserKgroup->setStatus(KuserKgroupStatus::DELETED);
-			$kuserKgroup->save();
-		}
-	}
-
-	/**
-	 * get kusers by kgroupId
-	 *
-	 * @param int $kgroupId
-	 * @return array
-	 */
-	public static function retrieveByKgroupId($kgroupId){
-		$c = new Criteria();
-		$c->add(KuserKgroupPeer::KGROUP_ID, $kgroupId);
-		return KuserKgroupPeer::doSelect($c);
-	}
-
-	/**
 	 * get kgroups by kuser
 	 *
 	 * @param int $kuserId

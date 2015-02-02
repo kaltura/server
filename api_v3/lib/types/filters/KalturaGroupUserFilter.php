@@ -13,7 +13,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 	 */
 	public function toObject($coreFilter = null, $props_to_skip = array()) 
 	{
-		$this->validateEntryIdFiltered();
+		$this->validateUserIdOrGroupIdFiltered();
 		if(is_null($coreFilter))
 			$coreFilter = new KuserKgroupFilter();
 			
@@ -26,7 +26,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 	}
 
 
-	protected function validateEntryIdFiltered()
+	protected function validateUserIdOrGroupIdFiltered()
 	{
 		if(!$this->userIdEqual && !$this->userIdIn && !$this->groupIdEqual && !$this->groupIdIn)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('userIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('userIdIn') . '/' . $this->getFormattedPropertyNameWithClassName('groupIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('groupIdIn'));

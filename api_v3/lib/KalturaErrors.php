@@ -374,7 +374,7 @@ class KalturaErrors extends APIErrors
 
 	const USER_EXCEEDED_MAX_GROUPS = "USER_EXCEEDED_MAX_GROUPS;;User exceeded max number of groups";
 
-	const GROUP_USER_DOES_NOT_EXISTS = "GROUP_USER_DOES_NOT_EXISTS;USER,GROUP;Invalid GroupUser for group [\"@GROUP@\"] and for user [\"@USER@\"]";
+	const GROUP_USER_DOES_NOT_EXIST = "GROUP_USER_DOES_NOT_EXISTS;USER,GROUP;Invalid GroupUser for group [\"@GROUP@\"] and for user [\"@USER@\"]";
 
 	const USER_LOGIN_ALREADY_ENABLED = "USER_LOGIN_ALREADY_ENABLED;;User is already allowed to login";
 

@@ -25,7 +25,7 @@ class GroupUserService extends KalturaBaseService
 	{
 		/* @var $dbGroupUser KuserKgroup*/
 
-		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$partnerId = $this->getPartnerId();
 
 		//verify kuser exists
 		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->userId, false , KuserType::USER);
@@ -43,8 +43,11 @@ class GroupUserService extends KalturaBaseService
 			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
 
 		//verify user does not belongs to more than max allowed groups
-		$kuserKgroups = KuserKgroupPeer::retrieveByKuserId($kuser->getId());
-		if ( count($kuserKgroups) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
+		$criteria = new Criteria();
+		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
+		$criteria->add(KuserKgroupPeer::KGROUP_ID, $kuser->getId());
+		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+		if ( KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
 
@@ -91,7 +94,7 @@ class GroupUserService extends KalturaBaseService
 
 		$dbKuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
 		if (!$dbKuserKgroup)
-			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXISTS, $userId, $groupId);
+			throw new KalturaAPIException(KalturaErrors::GROUP_USER_DOES_NOT_EXIST, $userId, $groupId);
 
 		$dbKuserKgroup->setStatus(KuserKgroupStatus::DELETED);
 		$dbKuserKgroup->save();

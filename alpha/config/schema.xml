@@ -2063,12 +2063,10 @@
         </foreign-key>
         <index name="partner_kuser_index">
             <index-column name="kuser_id" />
-            <index-column name="partner_id" />
             <index-column name="status" />
         </index>
         <index name="partner_kgroup_index">
             <index-column name="kgroup_id" />
-            <index-column name="partner_id" />
             <index-column name="status" />
         </index>
         <index name="partner_index">

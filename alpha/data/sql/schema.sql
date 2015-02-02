@@ -2362,8 +2362,8 @@ CREATE TABLE `kuser_kgroup`
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY `partner_kuser_index`(`kuser_id`, `partner_id`, `status`),
-	KEY `partner_kgroup_index`(`kgroup_id`, `partner_id`, `status`),
+	KEY `partner_kuser_index`(`kuser_id`, `status`),
+	KEY `partner_kgroup_index`(`kgroup_id`, `status`),
 	KEY `partner_index`(`partner_id`, `status`),
 	CONSTRAINT `kuser_kgroup_FK_1`
 	FOREIGN KEY (`kgroup_id`)
