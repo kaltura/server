@@ -1,5 +1,5 @@
 ----------
-# Jupiter-10.3.0 #
+# Jupiter-10.4.0 #
 
 ## Business Process Management Integration ##
 Integration with Activiti BPM engine
@@ -100,6 +100,22 @@ Add the following lines as new sections:
 	 - `cd @WEB_DIR@/content/clientlibs/bpmn`
 	 - `ant`
  - Add Activiti server to Kaltura server using the API **(replace tokens)**: `php @APP_DIR@/tests/standAloneClient/exec.php @APP_DIR@/tests/standAloneClient/activitiServer.xml`
+
+##Drop Folder Email Notifications##
+- Issue Type - new feature 
+
+### Configuration ###
+*plugins.ini*  
+Add new line:  
+DropFolderEventNotifications
+
+###Installation  
+
+- Run:  
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFileFailedStatus.xml  
+
 
 ----------
 # Jupiter-10.2.0 #

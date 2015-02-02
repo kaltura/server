@@ -1826,25 +1826,39 @@ class KalturaEntryService extends KalturaBaseService
 				$filter->userIdEqual = -1; // no result will be returned when the user is missing
 		}
 
-        if(!empty($filter->userIdIn))
-        {
-            $userIdsArr = array();
-            $userIds = explode(',',$filter->userIdIn);
-            $userArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $userIds);
+		if(!empty($filter->userIdIn))
+		{
+			$filter->userIdIn = $this->preparePusersToKusersFilter( $filter->userIdIn );
+		}
 
-            foreach($userArr as $user)
-            {
-                $userIdsArr[] =$user->getId();
-            }
-            if(!empty($userIdsArr))
-            {
-                $filter->userIdIn = implode(',',$userIdsArr);
-            }
-            else
-            {
-                $filter->userIdIn = -1;
-            }
-        }
+		if(!empty($filter->entitledUsersEditMatchAnd))
+		{
+			$filter->entitledUsersEditMatchAnd = $this->preparePusersToKusersFilter( $filter->entitledUsersEditMatchAnd );
+		}
+
+		if(!empty($filter->entitledUsersPublishMatchAnd))
+		{
+			$filter->entitledUsersPublishMatchAnd = $this->preparePusersToKusersFilter( $filter->entitledUsersPublishMatchAnd );
+		}
+	}
+
+	private function preparePusersToKusersFilter( $puserIdsCsv )
+	{
+		$kuserIdsArr = array();
+		$puserIdsArr = explode(',',$puserIdsCsv);
+		$kuserArr = kuserPeer::getKuserByPartnerAndUids($this->getPartnerId() , $puserIdsArr);
+
+		foreach($kuserArr as $kuser)
+		{
+			$kuserIdsArr[] = $kuser->getId();
+		}
+
+		if(!empty($kuserIdsArr))
+		{
+			return implode(',',$kuserIdsArr);
+		}
+
+		return -1; // no result will be returned if no puser exists
 	}
 
 	/**
