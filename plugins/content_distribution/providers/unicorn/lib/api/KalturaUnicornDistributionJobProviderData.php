@@ -19,9 +19,18 @@ class KalturaUnicornDistributionJobProviderData extends KalturaConfigurableDistr
 	 */
 	public $title;
 	
+	/**
+	 * The schema and host name to the Kaltura server, e.g. http://www.kaltura.com
+	 * 
+	 * @var string
+	 */
+	public $notificationBaseUrl;
+	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);
+		
+		$this->notificationBaseUrl = kConf::get('cdn_api_host');
 		
 		if(!$distributionJobData)
 			return;
