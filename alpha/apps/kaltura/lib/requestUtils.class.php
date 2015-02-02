@@ -12,6 +12,8 @@ class requestUtils extends infraRequestUtils
 	
 	private static $s_cookies_to_be_set = array();
 	
+	private static $stripTagsFilter = null;
+
 	public static function resolve($targetUrl, $referenceUrl)
 	{
 	    /* return if already absolute URL */
@@ -320,4 +322,65 @@ class requestUtils extends infraRequestUtils
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
 	
+	public static function initStringTagsFilter()
+	{
+		if ( self::$stripTagsFilter )
+		{
+			return;
+		}
+
+		/*
+		Note: Move hardcoded string to ini file
+		$confAllowedTags = $kConf::get('allowedTags');
+		*/	$confAllowedTags = "{img:[src,title,alt],a:[href,rel,target],span:[class,something,cool],div:[],br:[],b:[],i:[],u:[],ol:[],ul:[],li:[],blockquote:[]}";
+
+		$allowedAttributesPerTag = preg_replace('/(\w+)/', '"\1"', $confAllowedTags);
+		$allowedAttributesPerTag = json_decode($allowedAttributesPerTag, true);
+
+		if ( is_null( $allowedAttributesPerTag ) )
+		{
+			throw new kCoreException( kCoreException::INTERNAL_SERVER_ERROR );
+		}
+
+		$allowedTagNames = array();
+		foreach ( $allowedAttributesPerTag as $tagName => $attributes )
+		{
+			$allowedTagNames[$tagName] = array();
+			if ( is_array($attributes) && count($attributes) )
+			{
+				$allowedTagNames[$tagName] = $attributes;
+			}
+		}
+
+		self::$stripTagsFilter = new Zend_Filter_StripTags(array('allowTags' => $allowedTagNames));
+	}
+
+	public static function stripUnsafeHtmlTags( $origString, $fieldName = null )
+	{
+		if ( ! is_string($origString) ) // Avoid values like KalturaNullField, for example
+		{
+			return;
+		}
+
+		self::initStringTagsFilter();
+
+		// Zend_Filter_StripTags version
+		$modifiedString = self::$stripTagsFilter->filter( $origString );
+
+		if ( $modifiedString != $origString )
+		{
+			$msg = kCoreException::INTERNAL_SERVER_ERROR . ": Unsafe HTML tags found" . ($fieldName ? " in [$fieldName], " : " ")
+					. "\noriginal value: " . $origString
+					. "\nmodified value: " . $modifiedString
+				;
+
+			$e = new kCoreException( $msg );
+
+			// We're in monitoring mode so we'll return the original string unharmed.
+			// Real code should be: throw $e;
+			return $origString;
+		}
+
+		return $modifiedString;
+	}
 }
