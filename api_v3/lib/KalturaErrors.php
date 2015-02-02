@@ -546,4 +546,10 @@ class KalturaErrors extends APIErrors
 	 * Live reports Service
 	 */
 	const LIVE_REPORTS_WS_FAILURE = 'LIVE_REPORTS_WS_FAILURE;;failed to retrieve live analytics';
+		
+	
+	/*
+	 * Response Profiles
+	 */
+	const RESPONSE_PROFILE_NAME_NOT_FOUND = 'RESPONSE_PROFILE_NAME_NOT_FOUND;SYSTEM_NAME;Response profile name [@SYSTEM_NAME@] not found';
 }

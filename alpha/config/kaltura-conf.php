@@ -230,5 +230,8 @@ return array (
     'FileAssetTableMap' => 'lib/model/map/FileAssetTableMap.php',
     'FileAssetPeer' => 'lib/model/FileAssetPeer.php',
     'FileAsset' => 'lib/model/FileAsset.php',
+    'ResponseProfileTableMap' => 'lib/model/map/ResponseProfileTableMap.php',
+    'ResponseProfilePeer' => 'lib/model/ResponseProfilePeer.php',
+    'ResponseProfile' => 'lib/model/ResponseProfile.php',
   ),
 );
