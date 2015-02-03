@@ -108,7 +108,6 @@ class GroupUserService extends KalturaBaseService
 	 * @param KalturaGroupUserFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaGroupUserListResponse
-	 * @throws KalturaErrors::MUST_FILTER_USERS_OR_GROUPS
 	 */
 	function listAction(KalturaGroupUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
@@ -124,7 +123,7 @@ class GroupUserService extends KalturaBaseService
 		$c = KalturaCriteria::create(KuserKgroupPeer::OM_CLASS);
 		$kuserKgroupFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-//		$c->applyFilters();
+		$c->applyFilters();
 		
 		$list = KuserKgroupPeer::doSelect($c);
 
