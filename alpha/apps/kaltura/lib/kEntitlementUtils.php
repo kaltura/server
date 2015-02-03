@@ -197,7 +197,19 @@ class kEntitlementUtils
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
 			if($kuserId)
 			{
-				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::LIKE);
+				$criteria = new Criteria();
+				$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
+				$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+				$kuserKgroups = KuserKgroupPeer::doSelect($criteria);
+				$groupIds = array();
+				if ($kuserKgroups){
+					foreach ($kuserKgroups as $kuserKgroup){
+						/* @var $kuserKgroup KuserKgroup */
+						$groupIds[] = $kuserKgroup->getKgroupId();
+					}
+				}
+				$groupIds[] = $kuserId;
+				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $groupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addOr($crit);
 				$crit = $membersCrit;
 			}			

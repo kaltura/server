@@ -45,7 +45,6 @@ class GroupUserService extends KalturaBaseService
 		//verify user does not belongs to more than max allowed groups
 		$criteria = new Criteria();
 		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
-		$criteria->add(KuserKgroupPeer::KGROUP_ID, $kuser->getId());
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
 		if ( KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);

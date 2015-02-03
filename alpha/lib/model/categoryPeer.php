@@ -54,7 +54,19 @@ class categoryPeer extends BasecategoryPeer
 
 			if($kuser)
 			{
-				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::LIKE);
+				$criteria = new Criteria();
+				$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
+				$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+				$kuserKgroups = KuserKgroupPeer::doSelect($criteria);
+				$groupIds = array();
+				if ($kuserKgroups){
+					foreach ($kuserKgroups as $kuserKgroup){
+						/* @var $kuserKgroup KuserKgroup */
+						$groupIds[] = $kuserKgroup->getKgroupId();
+					}
+				}
+				$groupIds[] = $kuser->getId();
+				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $groupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
      			$crit->addOr($membersCrit);
 			}
@@ -379,10 +391,23 @@ class categoryPeer extends BasecategoryPeer
 		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
 		if($ksString <> '')
 			$kuser = kCurrentContext::getCurrentKsKuser();
-		
+
+
 		if($kuser)
 		{
-			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kuser->getId(), Criteria::LIKE);
+			$criteria = new Criteria();
+			$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
+			$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+			$kuserKgroups = KuserKgroupPeer::doSelect($criteria);
+			$groupIds = array();
+			if ($kuserKgroups){
+				foreach ($kuserKgroups as $kuserKgroup){
+					/* @var $kuserKgroup KuserKgroup */
+					$groupIds[] = $kuserKgroup->getKgroupId();
+				}
+			}
+			$groupIds[] = $kuser->getId();
+			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $groupIds, KalturaCriteria::IN_LIKE);
 			$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
    			$crit->addOr($membersCrit);
 		}
