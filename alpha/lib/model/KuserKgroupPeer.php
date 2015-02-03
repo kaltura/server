@@ -70,4 +70,21 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer {
 		return KuserKgroupPeer::doSelect($c);
 	}
 
+
+	/**
+	 * @param int $kuserId
+	 * @return array
+	 */
+	public static function retrieveKgroupIdsByKuserId($kuserId){
+		$kuserKgroups = self::retrieveByKuserId($kuserId);
+		$kgroupIds = array();
+		if ($kuserKgroups){
+			foreach ($kuserKgroups as $kuserKgroup){
+				/* @var $kuserKgroup KuserKgroup */
+				$kgroupIds[] = $kuserKgroup->getKgroupId();
+			}
+		}
+		return $kgroupIds;
+	}
+
 } // KuserKgroupPeer

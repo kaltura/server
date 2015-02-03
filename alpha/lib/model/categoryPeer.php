@@ -54,19 +54,10 @@ class categoryPeer extends BasecategoryPeer
 
 			if($kuser)
 			{
-				$criteria = new Criteria();
-				$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
-				$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-				$kuserKgroups = KuserKgroupPeer::doSelect($criteria);
-				$groupIds = array();
-				if ($kuserKgroups){
-					foreach ($kuserKgroups as $kuserKgroup){
-						/* @var $kuserKgroup KuserKgroup */
-						$groupIds[] = $kuserKgroup->getKgroupId();
-					}
-				}
-				$groupIds[] = $kuser->getId();
-				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $groupIds, KalturaCriteria::IN_LIKE);
+				// get the groups that the user belongs to in case she is not associated to the category directly
+				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+				$kgroupIds[] = $kuser->getId();
+				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
      			$crit->addOr($membersCrit);
 			}
@@ -395,19 +386,10 @@ class categoryPeer extends BasecategoryPeer
 
 		if($kuser)
 		{
-			$criteria = new Criteria();
-			$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
-			$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-			$kuserKgroups = KuserKgroupPeer::doSelect($criteria);
-			$groupIds = array();
-			if ($kuserKgroups){
-				foreach ($kuserKgroups as $kuserKgroup){
-					/* @var $kuserKgroup KuserKgroup */
-					$groupIds[] = $kuserKgroup->getKgroupId();
-				}
-			}
-			$groupIds[] = $kuser->getId();
-			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $groupIds, KalturaCriteria::IN_LIKE);
+			// get the groups that the user belongs to in case she is not associated to the category directly
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+			$kgroupIds[] = $kuser->getId();
+			$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 			$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
    			$crit->addOr($membersCrit);
 		}
