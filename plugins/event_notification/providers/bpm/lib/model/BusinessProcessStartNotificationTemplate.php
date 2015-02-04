@@ -5,7 +5,7 @@
  */
 class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificationTemplate
 {
-	private $disableParameters = false;
+	private $aborting = false;
 	
 	public function __construct()
 	{
@@ -18,7 +18,7 @@ class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificati
 	 */
 	public function getContentParameters()
 	{
-		return $this->disableParameters ? array() : parent::getContentParameters();
+		return $this->aborting ? array() : parent::getContentParameters();
 	}
 	
 	/* (non-PHPdoc)
@@ -26,7 +26,15 @@ class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificati
 	 */
 	public function getUserParameters()
 	{
-		return $this->disableParameters ? array() : parent::getUserParameters();
+		return $this->aborting ? array() : parent::getUserParameters();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BusinessProcessNotificationTemplate::getMainObject()
+	 */
+	protected function getMainObject(BaseObject $object)
+	{
+		return $this->aborting ? $object : parent::getMainObject($object);
 	}
 	
 	/* (non-PHPdoc)
@@ -35,17 +43,17 @@ class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificati
 	public function abort($scope)
 	{
 		$abortCaseJobType = BusinessProcessNotificationPlugin::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_ABORT);
-		$this->disableParameters = true;
+		$this->aborting = true;
 		try 
 		{
 			$ret = $this->dispatchPerCase($scope, $abortCaseJobType);	
 		}
 		catch (Exception $e)
 		{
-			$this->disableParameters = false;
+			$this->aborting = false;
 			throw $e;
 		}
-		$this->disableParameters = false;
+		$this->aborting = false;
 		return $ret;
 	}
 }
