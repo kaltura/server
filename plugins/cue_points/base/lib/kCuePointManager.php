@@ -36,12 +36,41 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	*/
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof mediaInfo)
+		if ( self::getVodEntryBasedOnMediaInfoFlavorAsset($object) )
 		{
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Return a VOD entry (sourceType = RECORDED_LIVE) based on the flavorAsset that is
+	 * associated with the given mediaInfo object
+	 * @param mediaInfo $mediaInfo
+	 * @return entry|null
+	 */
+	public static function getVodEntryBasedOnMediaInfoFlavorAsset( $mediaInfo )
+	{
+		if (! ($mediaInfo instanceof mediaInfo) )
+		{
+			return null;
+		}
+
+		$flavorAssetId = $mediaInfo->getFlavorAssetId();
+		$flavorAsset = assetPeer::retrieveById( $flavorAssetId );
+		if ( ! $flavorAsset || ! $flavorAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
+		{
+			return null;
+		}
+
+		$vodEntry = $flavorAsset->getentry();
+		if ( ! $vodEntry || $vodEntry->getSourceType() != EntrySourceType::RECORDED_LIVE )
+		{
+			return null;
+		}
+
+		return $vodEntry;
 	}
 
 	/* (non-PHPdoc)
@@ -75,10 +104,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	*/
 	public function objectCreated(BaseObject $object)
 	{
-		if ( $object instanceof mediaInfo )
-		{
-			self::copyCuePointsFromLiveToVodEntry( $object );
-		}
+		self::copyCuePointsFromLiveToVodEntry( $object );
 
 		return true;
 	}
@@ -452,19 +478,12 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	}
 
 	/**
-	 * @param mediaInfo $mediaInfo
+	 * @param entry $vodEntry
 	 */
 	public static function copyCuePointsFromLiveToVodEntry( $mediaInfo )
 	{
-		$flavorAssetId = $mediaInfo->getFlavorAssetId();
-		$flavorAsset = assetPeer::retrieveById( $flavorAssetId );
-		if ( ! $flavorAsset || ! $flavorAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
-		{
-			return;
-		}
-
-		$vodEntry = $flavorAsset->getentry();
-		if ( ! $vodEntry || $vodEntry->getSourceType() != EntrySourceType::RECORDED_LIVE )
+		$vodEntry = self::getVodEntryBasedOnMediaInfoFlavorAsset( $mediaInfo );
+		if ( ! $vodEntry )
 		{
 			return;
 		}
