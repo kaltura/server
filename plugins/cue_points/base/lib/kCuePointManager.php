@@ -57,8 +57,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			return null;
 		}
 
-		$flavorAssetId = $mediaInfo->getFlavorAssetId();
-		$flavorAsset = assetPeer::retrieveById( $flavorAssetId );
+		$flavorAsset = $mediaInfo->getasset();
 		if ( ! $flavorAsset || ! $flavorAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
 		{
 			return null;
