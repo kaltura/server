@@ -372,4 +372,105 @@
 			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
 		</request>
 	</multirequest>
+	
+	
+	<multirequest>
+		<!-- Metadata equals -->
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaBusinessProcessSignalNotificationTemplate">
+				<name>Metadata equals</name>
+				<systemName>metadata_equals</systemName>
+				<description>Metadata equals specific value</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>6</eventType> <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+				<eventObjectType>metadataEventNotifications.Metadata</eventObjectType> <!-- EventNotificationEventObjectType::METADATA -->
+				<mainObjectCode>kMetadataManager::getObjectFromPeer($object)</mainObjectCode>
+				<eventConditions objectType="array">
+					<item objectType="KalturaMetadataFieldChangedCondition">
+						<description>Metadata field changed</description>
+						<xPath>{metadata_field}</xPath>
+						<profileSystemName>{metadata_profile_system_name}</profileSystemName>
+						<versionA>{metadata_old_version}</versionA>
+						<versionB>{metadata_version}</versionB>
+					</item>
+					<item objectType="KalturaMatchMetadataCondition">
+						<description>Metadata field equals</description>
+						<xPath>{metadata_field}</xPath>
+						<profileSystemName>{metadata_profile_system_name}</profileSystemName>
+						<values objectType="array">
+							<item objectType="KalturaStringValue">
+								<value>{metadata_value}</value>
+							</item>
+						</values>
+					</item>
+				</eventConditions>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_id</key>
+						<description>Metadata ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_version</key>
+						<description>Metadata version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_old_version</key>
+						<description>Metadata previous version</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getPreviousVersion()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>object_id</key>
+						<description>Object ID</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getObjectId()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>object_type</key>
+						<description>Object type</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getEvent()->getObject()->getObjectType()</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_field</key>
+						<description>Custom metadata field to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_profile_system_name</key>
+						<description>Custom metadata profile system name to be compared</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>metadata_value</key>
+						<description>Custom metadata field value that triggers the event</description>
+						<value objectType="KalturaStringValue">
+							<value></value>
+						</value>
+					</item>
+				</userParameters>
+				<message>humanTranscriptDone</message>
+				<eventId>humanTranscriptDoneEvent</eventId>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
 </xml>
