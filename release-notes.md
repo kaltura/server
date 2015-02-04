@@ -1,4 +1,18 @@
+
+
+----------
 # Jupiter-10.4.0 #
+
+##Caption added HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PLAT-2412
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/captionAssetHttpNotifications.xml  
 
 ##Drop Folder Email Notifications##
 - Issue Type - new feature 
@@ -14,6 +28,9 @@ DropFolderEventNotifications
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
 - Run:  
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/emailDropFolderFileFailedStatus.xml  
+
+
+----------
 
 # Jupiter-10.2.0 #
 
