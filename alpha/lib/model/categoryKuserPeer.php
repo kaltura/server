@@ -51,6 +51,59 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 			
 		return false;
 	}
+
+
+	/**
+	 * @param int $categoryId
+	 * @param int $kuserId
+	 * @param array $requiredPermissions
+	 * @param null $con
+	 * @param bool $supportGroups
+	 * @return categoryKuser|null
+	 */
+	public static function isKuserHasPermissionInCategory($categoryId, $kuserId = null, $requiredPermissions = null, $con = null, $supportGroups = true){
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if(!$category)
+			return null;
+
+		if($category->getInheritedParentId())
+			$categoryId = $category->getInheritedParentId();
+
+		if(is_null($kuserId))
+			$kuserId = kCurrentContext::getCurrentKsKuserId();
+
+		if(is_null($requiredPermissions))
+			$requiredPermissions = array(PermissionName::CATEGORY_VIEW);
+
+		$categoryKuser = self::retrieveByCategoryIdAndActiveKuserId($categoryId, $kuserId, $requiredPermissions, $con);
+		if (!is_null($categoryKuser)){
+			return $categoryKuser;
+		}
+
+		//check if kuserId has permission in category by a junction group
+		if($supportGroups)
+		{
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
+			if (count($kgroupIds) == 0)
+				return null;
+
+			$criteria = new Criteria();
+			$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
+			$criteria->add(categoryKuserPeer::KUSER_ID, $kgroupIds, Criteria::IN);
+			$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
+			$categoryKusers = categoryKuserPeer::doSelect($criteria, $con);
+			if(!$categoryKusers)
+				return null;
+			foreach( $categoryKusers as $categoryKuser){
+				foreach($requiredPermissions as $requiredPermission){
+					if($categoryKuser->hasPermission($requiredPermission)){
+						return $categoryKuser;
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * 
@@ -63,19 +116,6 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	 */
 	public static function retrieveByCategoryIdAndActiveKuserId($categoryId, $kuserId = null, $requiredPermissions = null, $con = null)
 	{
-		if(is_null($kuserId))
-			$kuserId = kCurrentContext::getCurrentKsKuserId();
-			
-		if(is_null($requiredPermissions))
-			$requiredPermissions = array(PermissionName::CATEGORY_VIEW);
-			
-		$category = categoryPeer::retrieveByPK($categoryId);
-		if(!$category)
-			return null;
-		
-		if($category->getInheritedParentId())
-			$categoryId = $category->getInheritedParentId();
-			
 		$criteria = new Criteria();
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
 		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);

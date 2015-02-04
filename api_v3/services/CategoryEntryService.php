@@ -48,7 +48,7 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entiteld to assign entry to this category 
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser)
 			{
 				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] is not a member of the category [{$categoryEntry->categoryId}]");
@@ -85,7 +85,7 @@ class CategoryEntryService extends KalturaBaseService
 		
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser ||
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
@@ -141,7 +141,7 @@ class CategoryEntryService extends KalturaBaseService
 			$entry->getKuserId() != kCurrentContext::getCurrentKsKuserId() && 
 			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser || $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);		
 		}
@@ -234,7 +234,7 @@ class CategoryEntryService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
 
 				if(($category->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY) && 
-					!categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::getCurrentKsKuserId()))
+					!categoryKuserPeer::isKuserHasPermissionInCategory($category->getId(), kCurrentContext::getCurrentKsKuserId()))
 				{
 					throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $filter->categoryIdEqual);
 				}
@@ -385,7 +385,7 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entiteld to activate entry from category 
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser || 
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
@@ -427,7 +427,7 @@ class CategoryEntryService extends KalturaBaseService
 		//validate user is entiteld to reject entry from category 
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryId, kCurrentContext::getCurrentKsKuserId());
+			$categoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
 			if(!$categoryKuser || 
 				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
 				 $categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
