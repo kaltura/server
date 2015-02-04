@@ -2,7 +2,7 @@
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer
+class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 
@@ -13,6 +13,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	{
 		if($object instanceof CuePoint)
 			return true;
+
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -29,6 +31,19 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return false;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	*/
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if($object instanceof mediaInfo)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
@@ -55,6 +70,19 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 		return true;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated()
+	*/
+	public function objectCreated(BaseObject $object)
+	{
+		if ( $object instanceof mediaInfo )
+		{
+			self::copyCuePointsFromLiveToVodEntry( $object );
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param CuePoint $cuePoint
 	 */
@@ -317,11 +345,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ( self::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
-		{
-			self::copyCuePointsFromLiveToVodEntry( $object );
-		}
-
 		if ( self::isPostProcessCuePointsEvent( $object, $modifiedColumns ) )
 		{
 			self::postProcessCuePoints( $object );
@@ -345,11 +368,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			return true;
 		}
 
-		if ( self::isCopyCuePointsFromLiveToVodEvent($object, $modifiedColumns) )
-		{
-			return true;
-		}
-		
 		if( self::shouldReIndexEntry($object, $modifiedColumns) )
 		{
 			return true;
@@ -373,20 +391,6 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 			}
 		}
 		
-		return false;
-	}
-	
-	public static function isCopyCuePointsFromLiveToVodEvent(BaseObject $object, array $modifiedColumns)
-	{
-		if ( $object instanceof entry
-				&& $object->getSourceType() == EntrySourceType::RECORDED_LIVE
-				&& $object->getRootEntryId()
-				&& in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
-			)
-		{
-			return true;
-		}
-
 		return false;
 	}
 	
@@ -448,10 +452,23 @@ class kCuePointManager implements kObjectDeletedEventConsumer, kObjectChangedEve
 	}
 
 	/**
-	 * @param LiveEntry $liveEntry
+	 * @param mediaInfo $mediaInfo
 	 */
-	public static function copyCuePointsFromLiveToVodEntry( $vodEntry )
+	public static function copyCuePointsFromLiveToVodEntry( $mediaInfo )
 	{
+		$flavorAssetId = $mediaInfo->getFlavorAssetId();
+		$flavorAsset = assetPeer::retrieveById( $flavorAssetId );
+		if ( ! $flavorAsset || ! $flavorAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
+		{
+			return;
+		}
+
+		$vodEntry = $flavorAsset->getentry();
+		if ( ! $vodEntry || $vodEntry->getSourceType() != EntrySourceType::RECORDED_LIVE )
+		{
+			return;
+		}
+
 		$liveEntryId = $vodEntry->getRootEntryId();
 		/** @var $liveEntry KalturaLiveEntry */
 		$liveEntry = entryPeer::retrieveByPK( $liveEntryId );

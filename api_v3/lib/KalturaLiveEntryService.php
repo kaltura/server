@@ -116,7 +116,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if($recordedEntry)
 			{
-				$this->ingestAsset($recordedEntry, $dbAsset->getFlavorParamsId(), $filename);
+				$this->ingestAsset($recordedEntry, $dbAsset, $filename);
 			}
 		}
 		
@@ -125,8 +125,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 		return $entry;
 	}
 
-	private function ingestAsset(entry $entry, $flavorParamsId, $filename)
-	{	
+	private function ingestAsset(entry $entry, $dbAsset, $filename)
+	{
+		$flavorParamsId = $dbAsset->getFlavorParamsId();
 		$flavorParams = assetParamsPeer::retrieveByPKNoFilter($flavorParamsId);
 		
 		// is first chunk
@@ -144,6 +145,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$recordedAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 		$recordedAsset->setFlavorParamsId($flavorParams->getId());
 		$recordedAsset->setFromAssetParams($flavorParams);
+		$recordedAsset->addTags($dbAsset->getTagsArray());
 		
 		if($flavorParams->hasTag(assetParams::TAG_SOURCE))
 		{
