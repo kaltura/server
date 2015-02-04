@@ -101,6 +101,18 @@ Add the following lines as new sections:
 	 - `ant`
  - Add Activiti server to Kaltura server using the API **(replace tokens)**: `php @APP_DIR@/tests/standAloneClient/exec.php @APP_DIR@/tests/standAloneClient/activitiServer.xml`
 
+##Caption added HTTP Notifications##
+- Issue Type: new feature
+- Issue ID: PLAT-2412
+
+### Configuration ###
+None
+
+###Installation  
+- Run:  
+php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/captionAssetHttpNotifications.xml  
+
+
 ##Drop Folder Email Notifications##
 - Issue Type - new feature 
 
@@ -118,6 +130,10 @@ php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/stan
 
 
 ----------
+<<<<<<< HEAD
+=======
+
+>>>>>>> Jupiter-10.4.0-PLAT-2412
 # Jupiter-10.2.0 #
 
 ## Webex Fix ## 

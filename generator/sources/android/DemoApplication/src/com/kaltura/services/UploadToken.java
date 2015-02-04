@@ -26,16 +26,17 @@ import com.kaltura.client.types.KalturaUploadedFileTokenResource;
  * Upload files to the server
  */
 public class UploadToken extends Observable {
-
+    
     private String TAG;
     private File fileData;
     private KalturaUploadToken kalturaUploadToken;
     private KalturaClient client;
     private int setAttemptUpload;
     private KalturaMediaEntry newEntry;
-    private float uploadedFileSize;
+    private float remainingUploadFileSize;
     private boolean startUpload;
-
+    private int readSum = 0;
+    
     /**
      * Constructor Description of UploadToken
      *
@@ -47,10 +48,11 @@ public class UploadToken extends Observable {
         fileData = new File(TAG);
         this.setAttemptUpload = setAttemptUpload;
         kalturaUploadToken = new KalturaUploadToken();
-        uploadedFileSize = kalturaUploadToken.uploadedFileSize;
+        remainingUploadFileSize = kalturaUploadToken.uploadedFileSize;
         client = AdminUser.getClient();
+        
     }
-
+    
     /**
      * Get size uploading file in percent
      *
@@ -67,11 +69,11 @@ public class UploadToken extends Observable {
         }
         return res;
     }
-
+    
     public void setStartUpload(boolean startUpload) {
         this.startUpload = startUpload;
     }
-
+    
     /**
      * uploads a video file to Kaltura and assigns it to a given Media Entry
      * object
@@ -85,16 +87,16 @@ public class UploadToken extends Observable {
      */
     public boolean uploadMediaFileAndAttachToEmptyEntry(String TAG, KalturaMediaEntry entry, String pathfromURI) {
         Log.w(TAG, "\nUploading a video file...");
-
+        readSum = 0;
         fileData = new File(pathfromURI);
-
+        
         KalturaUploadToken upToken = null;
         try {
             upToken = client.getUploadTokenService().add();
         } catch (KalturaApiException ex) {
             Logger.getLogger(UploadToken.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         int sizeBuf = 1024 * 1000;
         byte buf[] = new byte[sizeBuf];
         int numRead = -1;
@@ -112,12 +114,17 @@ public class UploadToken extends Observable {
         boolean errUpload = false;
         Log.w(TAG, "HASH:" + new Float(fileData.length()).hashCode());
         int attemptUpload = 0;
-
+        
         boolean wasFirst = false;
         do {
             if (!errUpload) {
                 try {
                     Log.w(TAG, "Available bytes: " + fis.available());
+                    remainingUploadFileSize = fis.available();
+                    if(remainingUploadFileSize == 0){
+                        uploaded = true;
+                        break;
+                    }
                     buf = new byte[sizeBuf];
                     numRead = fis.read(buf);
                     Log.w(TAG, "Readed bytes: " + numRead);
@@ -134,20 +141,23 @@ public class UploadToken extends Observable {
                 if (attemptUpload >= setAttemptUpload) {
                     Log.w(TAG, "---");
                 }
-
+                
             }
-            if (fileData.length() - kalturaUploadToken.uploadedFileSize > numRead) {
-                if (kalturaUploadToken.uploadedFileSize <= uploadedFileSize) {
-                    if (addChunk(client, upToken.id, outFile, false, false, -1)) {
+            if (fileData.length() > sizeBuf) {
+                if (remainingUploadFileSize > sizeBuf) {
+                    if (addChunk(client, upToken.id, outFile, readSum != 0, false, readSum)) {
                         Log.w(TAG, "1 chunk[" + ++i + "] - uploaddFileSize: " + kalturaUploadToken.uploadedFileSize);
                         wasFirst = true;
+                        readSum += numRead;
                     } else {
                         Log.w(TAG, "error loading chunk!");
                         errUpload = true;
                     }
                 } else {
-                    if (addChunk(client, upToken.id, outFile, true, false, -1)) {
+                    if (addChunk(client, upToken.id, outFile, true, true, readSum)) {
                         Log.w(TAG, "n chunk[" + ++i + "] - uploaddFileSize: " + kalturaUploadToken.uploadedFileSize);
+                        readSum += numRead;
+                        uploaded = true;
                     } else {
                         Log.w(TAG, "error loading chunk!");
                         errUpload = true;
@@ -178,16 +188,15 @@ public class UploadToken extends Observable {
             setChanged();
             notifyObservers(getUploadedFileSize());
         } while (!uploaded && !(attemptUpload >= setAttemptUpload) && startUpload);
-
+        
         Log.w(TAG, "HASH:" + new Float(kalturaUploadToken.uploadedFileSize).hashCode());
-        if (new Float(kalturaUploadToken.uploadedFileSize).hashCode() == new Float(fileData.length()).hashCode()) {
-            uploaded = true;
+        if (uploaded) {
             startUpload = false;
             try {
                 KalturaUploadedFileTokenResource fileTokenResource = new KalturaUploadedFileTokenResource();
                 fileTokenResource.token = upToken.id;
                 newEntry = client.getMediaService().addContent(entry.id, fileTokenResource);
-
+                
                 Log.w(TAG, "\nUploaded a new Video file to entry: " + newEntry.id);
             } catch (KalturaApiException e) {
                 e.printStackTrace();
@@ -204,7 +213,7 @@ public class UploadToken extends Observable {
         }
         return uploaded;
     }
-
+    
     /**
      * @param KalturaClient client
      * @param String uploadTokenId
