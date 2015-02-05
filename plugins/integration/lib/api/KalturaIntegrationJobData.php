@@ -6,6 +6,11 @@
 class KalturaIntegrationJobData extends KalturaJobData
 {
 	/**
+	 * @var string
+	 */
+	public $callbackNotificationBaseUrl;
+	
+	/**
 	 * @var KalturaIntegrationProviderType
 	 */
 	public $providerType;
@@ -33,6 +38,17 @@ class KalturaIntegrationJobData extends KalturaJobData
 		"triggerType" ,
 	);
 
+	public function __construct($subType = null)
+	{
+		parent::__construct($subType);
+		
+		$baseUrl = 'http://' . kConf::get('cdn_api_host');
+		$baseUrl .= '/api_v3/index.php/service/integration_integration/action/notify';
+		// should add on the batch side : /partnerId/{$job->partnerId}/id/{$job->id}
+		
+		$this->callbackNotificationBaseUrl = $baseUrl;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
 	 */

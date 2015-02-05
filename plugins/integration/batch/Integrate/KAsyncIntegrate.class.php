@@ -13,6 +13,18 @@ class KAsyncIntegrate extends KJobHandlerWorker
 		return KalturaBatchJobType::INTEGRATION;
 	}
 	
+	/**
+	 * Static helper function to retrieve the notification URL from any engine
+	 * @return string
+	 */
+	public static function getCallbackNotificationUrl()
+	{
+		$job = self::getCurrentJob();
+		$data = $job->data;
+		/* @var $data KalturaIntegrationJobData */
+		return $data->callbackNotificationBaseUrl . "/partnerId/{$job->partnerId}/id/{$job->id}";
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */

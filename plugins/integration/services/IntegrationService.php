@@ -38,4 +38,37 @@ class IntegrationService extends KalturaBaseService
 			
 		return $job->getId();
 	}
+
+	/**
+	 * @action notify
+	 * @disableTags TAG_WIDGET_SESSION,TAG_ENTITLEMENT_ENTRY,TAG_ENTITLEMENT_CATEGORY
+	 * @param int $id integration job id
+	 */
+	public function notifyAction($id) 
+	{
+		$coreType = IntegrationPlugin::getBatchJobTypeCoreValue(IntegrationBatchJobType::INTEGRATION);
+		$batchJob = BatchJobPeer::retrieveByPK($id);
+		$invalid = false;
+		if(!$batchJob)
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] not found");
+		}
+		elseif($batchJob->getJobType() != $coreType)
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] wrong type [" . $batchJob->getJobType() . "] expected [" . $coreType . "]");
+		}
+		elseif($batchJob->getStatus() != KalturaBatchJobStatus::ALMOST_DONE)
+		{
+			$invalid = true;
+			KalturaLog::err("Job [$id] wrong status [" . $batchJob->getStatus() . "] expected [" . KalturaBatchJobStatus::ALMOST_DONE . "]");
+		}
+		if($invalid)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_BATCHJOB_ID, $id);
+		}
+			
+		kJobsManager::updateBatchJob($batchJob, KalturaBatchJobStatus::FINISHED);
+	}
 }
