@@ -36,6 +36,24 @@ class KalturaResponseProfile extends KalturaObject implements IFilterable
 	public $partnerId;
 	
 	/**
+	 * Creation time as Unix timestamp (In seconds) 
+	 * 
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $createdAt;
+	
+	/**
+	 * Update time as Unix timestamp (In seconds) 
+	 * 
+	 * @var time
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $updatedAt;
+	
+	/**
 	 * @var KalturaResponseProfileStatus
 	 * @readonly
 	 * @filter eq,in
@@ -62,6 +80,8 @@ class KalturaResponseProfile extends KalturaObject implements IFilterable
 		'name', 
 		'systemName', 
 		'partnerId',
+		'createdAt',
+		'updatedAt',
 		'status',
 		'type',
 		'fields',

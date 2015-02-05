@@ -552,4 +552,6 @@ class KalturaErrors extends APIErrors
 	 * Response Profiles
 	 */
 	const RESPONSE_PROFILE_NAME_NOT_FOUND = 'RESPONSE_PROFILE_NAME_NOT_FOUND;SYSTEM_NAME;Response profile name [@SYSTEM_NAME@] not found';
+	
+	const RESPONSE_PROFILE_ID_NOT_FOUND = 'RESPONSE_PROFILE_ID_NOT_FOUND;ID;Response profile id [@ID@] not found';
 }
