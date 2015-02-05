@@ -70,5 +70,14 @@ class Form_BusinessProcessNotificationTemplateConfiguration extends Form_EventNo
 				'required'		=> true,
 			));
 		}
+ 		
+		if($eventNotificationTemplate instanceof Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessStartNotificationTemplate)
+		{
+			$this->addElement('checkbox', 'abort_on_deletion', array(
+				'label'			=> 'Abort on deletion:',
+				'filters'		=> array('StringTrim'),
+				'required'		=> true,
+			));
+		}
 	}
 }

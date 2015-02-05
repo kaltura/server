@@ -20,13 +20,6 @@ abstract class KalturaBusinessProcessNotificationTemplate extends KalturaEventNo
 	public $processId;
 	
 	/**
-	 * Abort the process automatically if the triggering object deleted
-	 * @var bool
-	 * @requiresPermission update
-	 */
-	public $abortOnDeletion;
-	
-	/**
 	 * Code to load the main triggering object
 	 * @var string
 	 * @requiresPermission update
@@ -39,7 +32,6 @@ abstract class KalturaBusinessProcessNotificationTemplate extends KalturaEventNo
 	private static $map_between_objects = array(
 		'serverId',
 		'processId',
-		'abortOnDeletion',
 		'mainObjectCode',
 	);
 		 
