@@ -109,7 +109,7 @@ class ResponseProfileService extends KalturaBaseService
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$responseProfileFilter = new responseProfileFilter();
+		$responseProfileFilter = new ResponseProfileFilter();
 		$filter->toObject($responseProfileFilter);
 
 		$c = new Criteria();
