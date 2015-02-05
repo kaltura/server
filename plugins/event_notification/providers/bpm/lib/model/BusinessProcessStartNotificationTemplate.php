@@ -5,6 +5,8 @@
  */
 class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificationTemplate
 {
+	const CUSTOM_DATA_ABORT_ON_DELETION = 'abortOnDeletion';
+	
 	private $aborting = false;
 	
 	public function __construct()
@@ -56,4 +58,8 @@ class BusinessProcessStartNotificationTemplate extends BusinessProcessNotificati
 		$this->aborting = false;
 		return $ret;
 	}
+
+	public function getAbortOnDeletion()							{return $this->getFromCustomData(self::CUSTOM_DATA_ABORT_ON_DELETION);}
+
+	public function setAbortOnDeletion($v)							{return $this->putInCustomData(self::CUSTOM_DATA_ABORT_ON_DELETION, $v);}
 }

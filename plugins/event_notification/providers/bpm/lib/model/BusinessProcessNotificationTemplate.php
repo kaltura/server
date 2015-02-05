@@ -7,7 +7,6 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 {
 	const CUSTOM_DATA_SERVER_ID = 'serverId';
 	const CUSTOM_DATA_PROCESS_ID = 'processId';
-	const CUSTOM_DATA_ABORT_ON_DELETION = 'abortOnDeletion';
 	const CUSTOM_DATA_MAIN_OBJECT_CODE = 'mainObjectCode';
 	
 	
@@ -155,11 +154,9 @@ abstract class BusinessProcessNotificationTemplate extends BatchEventNotificatio
 	
 	public function getServerId()									{return $this->getFromCustomData(self::CUSTOM_DATA_SERVER_ID);}
 	public function getProcessId()									{return $this->getFromCustomData(self::CUSTOM_DATA_PROCESS_ID);}
-	public function getAbortOnDeletion()							{return $this->getFromCustomData(self::CUSTOM_DATA_ABORT_ON_DELETION);}
 	public function getMainObjectCode()								{return $this->getFromCustomData(self::CUSTOM_DATA_MAIN_OBJECT_CODE);}
 	
 	public function setServerId($v)									{return $this->putInCustomData(self::CUSTOM_DATA_SERVER_ID, $v);}
 	public function setProcessId($v)								{return $this->putInCustomData(self::CUSTOM_DATA_PROCESS_ID, $v);}
-	public function setAbortOnDeletion($v)							{return $this->putInCustomData(self::CUSTOM_DATA_ABORT_ON_DELETION, $v);}
 	public function setMainObjectCode($v)							{return $this->putInCustomData(self::CUSTOM_DATA_MAIN_OBJECT_CODE, $v);}
 }
