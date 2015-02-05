@@ -65,7 +65,10 @@ class kBusinessConvertDL
 			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
-				$newAsset->addTags($oldAsset->getTagsArray());
+				if ( $oldAsset->hasTag(assetParams::TAG_RECORDING_ANCHOR) )
+				{
+					$newAsset->addTags(array(assetParams::TAG_RECORDING_ANCHOR));
+				}
 
 				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
