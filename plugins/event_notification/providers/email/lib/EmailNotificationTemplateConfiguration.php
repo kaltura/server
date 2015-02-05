@@ -72,6 +72,36 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					$object->cc =  Kaltura_Client_ClientBase::getKalturaNullValue();
 				}
 			}
+
+			if(isset($properties['bcc_email']))
+			{
+				if (strlen(trim($properties['bcc_email'])))
+				{
+					$BCCemail = new Kaltura_Client_Type_StringValue();
+					$BCCemail->value = $properties['bcc_email'];
+
+					$BCCname = null;
+					if(isset($properties['bcc_name']) && strlen(trim($properties['bcc_name'])))
+					{
+						$BCCname = new Kaltura_Client_Type_StringValue();
+						$BCCname->value = $properties['bcc_name'];
+					}
+
+					$BCCrecipient = new Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient();
+					$BCCrecipient->email = $BCCemail;
+					$BCCrecipient->name = $BCCname;
+
+					$BCCrecipientProvider = new Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider();
+					$BCCrecipientProvider->emailRecipients = array();
+					$BCCrecipientProvider->emailRecipients[] = $BCCrecipient;
+
+					$object->bcc = $BCCrecipientProvider;
+				}
+				else //return special null so we can update to null
+				{
+					$object->bcc =  Kaltura_Client_ClientBase::getKalturaNullValue();
+				}
+			}	
 		}
 		return $object;
 	}
@@ -154,6 +184,41 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 					'value'                 => $CCNameValue,
 					'size'                  => 60,
 				'filters'               => array('StringTrim'),
+			));
+		}
+
+		if (!$object->bcc || ($object->bcc instanceof Kaltura_Client_EmailNotification_Type_EmailNotificationStaticRecipientProvider &&  count($object->bcc->emailRecipients) == 1 &&  get_class($object->bcc->emailRecipients[0]->email) == 'Kaltura_Client_Type_StringValue'))
+		{
+			$bcc = null;
+			if($object->bcc)
+			{
+				if(count($object->bcc->emailRecipients) > 1)
+				{
+					$this->addError("Multiple recipients is not supported in admin console, saving the configuration will remove the existing recipients list.");
+				}
+				elseif(count($object->bcc->emailRecipients))
+				{
+					$bcc = reset($object->bcc->emailRecipients);
+					/* @var $bcc Kaltura_Client_EmailNotification_Type_EmailNotificationRecipient */
+				}
+			}
+
+			$BCCEmailValue = $bcc ? $bcc->email->value : '';
+			$BCCNameValue = $bcc && $bcc->name ? $bcc->name->value : '';
+
+			$this->addElement('text', 'bcc_email', array(
+					'label'                 => 'Recipient e-mail (BCC):',
+					'value'                 => $BCCEmailValue,
+					'size'                  => 60,
+					'filters'               => array('StringTrim'),
+					'validators'    => array('EmailAddress'),
+			));
+
+			$this->addElement('text', 'bcc_name', array(
+					'label'                 => 'Recipient name (BCC):',
+					'value'                 => $BCCNameValue,
+					'size'                  => 60,
+					'filters'               => array('StringTrim'),
 			));
 		}
 	}
