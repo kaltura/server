@@ -100,6 +100,9 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 				
 			if($enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_SIGNAL))
 				return 'BusinessProcessSignalNotificationTemplate';
+				
+			if($enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_ABORT))
+				return 'BusinessProcessAbortNotificationTemplate';
 		}
 	
 		if($baseClass == 'KalturaEventNotificationTemplate')
@@ -109,6 +112,9 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 				
 			if($enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_SIGNAL))
 				return 'KalturaBusinessProcessSignalNotificationTemplate';
+				
+			if($enumValue == self::getBusinessProcessNotificationTemplateTypeCoreValue(BusinessProcessNotificationTemplateType::BPM_ABORT))
+				return 'KalturaBusinessProcessAbortNotificationTemplate';
 		}
 	
 		if($baseClass == 'Form_EventNotificationTemplateConfiguration')
@@ -128,6 +134,9 @@ class BusinessProcessNotificationPlugin extends KalturaPlugin implements IKaltur
 				
 			if($enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_SIGNAL)
 				return 'Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessSignalNotificationTemplate';
+				
+			if($enumValue == Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType::BPM_ABORT)
+				return 'Kaltura_Client_BusinessProcessNotification_Type_BusinessProcessAbortNotificationTemplate';
 		}
 	
 		if($baseClass == 'KDispatchEventNotificationEngine')
