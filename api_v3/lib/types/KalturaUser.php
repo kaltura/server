@@ -20,6 +20,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaUserType
+	 * @filter eq,in
 	 */
 	public $type;
 	

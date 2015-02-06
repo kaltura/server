@@ -9,6 +9,8 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	static private $map_between_objects = array
 	(
 		"partnerIdEqual" => "_eq_partner_id",
+		"typeEqual" => "_eq_type",
+		"typeIn" => "_in_type",
 		"screenNameLike" => "_like_screen_name",
 		"screenNameStartsWith" => "_likex_screen_name",
 		"emailLike" => "_like_email",
@@ -22,7 +24,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 		"firstNameStartsWith" => "_likex_first_name",
 		"lastNameStartsWith" => "_likex_last_name",
 		"isAdminEqual" => "_eq_is_admin",
-		"type" => "_eq_type"
 	);
 
 	static private $order_by_map = array
@@ -47,6 +48,16 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $partnerIdEqual;
+
+	/**
+	 * @var KalturaUserType
+	 */
+	public $typeEqual;
+
+	/**
+	 * @var string
+	 */
+	public $typeIn;
 
 	/**
 	 * @var string
@@ -112,9 +123,4 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var KalturaNullableBoolean
 	 */
 	public $isAdminEqual;
-
-	/**
-	 * @var KalturaUserType
-	 */
-	public $type;
 }

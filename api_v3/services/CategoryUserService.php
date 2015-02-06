@@ -255,7 +255,7 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function listAction(KalturaCategoryUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->categoryFullIdsStartsWith || $filter->categoryFullIdsEqual || $filter->userIdIn || $filter->userIdEqual))
+		if(!($filter->categoryIdEqual || $filter->categoryIdIn || $filter->categoryFullIdsStartsWith || $filter->categoryFullIdsEqual || $filter->userIdIn || $filter->userIdEqual || $filter->relatedGroupsByUserId))
 			throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_CATEGORY);			
 		
 		if (!$filter)
@@ -282,6 +282,35 @@ class CategoryUserService extends KalturaBaseService
 			}
 				
 			$filter->userIdIn = implode(',', $usersIds);
+		}
+
+		if ($filter->relatedGroupsByUserId){
+			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$userIds = array();
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($filter->relatedGroupsByUserId);
+			if (!is_null($kgroupIds) && is_array($kgroupIds))
+				$userIds = $kgroupIds;
+			$userIds[] = $filter->relatedGroupsByUserId;
+			$c = new Criteria();
+			$c->add(kuserPeer::PARTNER_ID, $partnerId);
+			$c->add(kuserPeer::PUSER_ID, $userIds, Criteria::IN);
+
+			$kusers = kuserPeer::doSelect($c);
+
+			$userIds = array();
+			foreach($kusers as $kuser)
+			{
+				/* @var $kuser kuser */
+				$userIds[] = $kuser->getId();
+			}
+
+			// if userIdIn is also set in the filter need to intersect the two arrays.
+			if(isset($filter->userIdIn)){
+				$curUserIds = explode(',',$filter->userIdIn);
+				$userIds = array_intersect($curUserIds, $userIds);
+			}
+
+			$filter->userIdIn = implode(',', $userIds);
 		}
 		
 		if($filter->userIdEqual)

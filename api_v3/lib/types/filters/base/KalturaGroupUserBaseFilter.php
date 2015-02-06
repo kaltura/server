@@ -8,10 +8,10 @@ abstract class KalturaGroupUserBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
-		"groupIdEqual" => "_eq_group_id",
-		"groupIdIn" => "_in_group_id",
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
+		"groupIdEqual" => "_eq_group_id",
+		"groupIdIn" => "_in_group_id",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -41,22 +41,22 @@ abstract class KalturaGroupUserBaseFilter extends KalturaFilter
 	/**
 	 * @var string
 	 */
-	public $groupIdEqual;
-
-	/**
-	 * @var string
-	 */
-	public $groupIdIn;
-
-	/**
-	 * @var string
-	 */
 	public $userIdEqual;
 
 	/**
 	 * @var string
 	 */
 	public $userIdIn;
+
+	/**
+	 * @var string
+	 */
+	public $groupIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $groupIdIn;
 
 	/**
 	 * @var KalturaGroupUserStatus
@@ -87,5 +87,4 @@ abstract class KalturaGroupUserBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
-
 }
