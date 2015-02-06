@@ -25,7 +25,6 @@ class DistributionProfileTests(KalturaBaseTest):
         resp = self.client.contentDistribution.distributionProfile.list()
         self.assertIsInstance(resp, KalturaDistributionProfileListResponse)   
         
-        import pdb; pdb.set_trace()        
         objs = resp.objects
         self.assertIsInstance(objs, list)
     
@@ -37,7 +36,6 @@ class entryDistributionTests(KalturaBaseTest):
         resp = self.client.contentDistribution.entryDistribution.list()
         self.assertIsInstance(resp, KalturaEntryDistributionListResponse)
     
-        import pdb; pdb.set_trace()
         objs = resp.objects
         self.assertIsInstance(objs, list)
     
