@@ -122,7 +122,7 @@ class CategoryService extends KalturaBaseService
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
+			$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
@@ -162,7 +162,7 @@ class CategoryService extends KalturaBaseService
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
+			$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}

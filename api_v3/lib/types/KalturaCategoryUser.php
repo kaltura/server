@@ -167,7 +167,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 				throw new KalturaAPIException ( KalturaErrors::CATEGORY_USER_ALREADY_EXISTS );
 		}
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($this->categoryId, kCurrentContext::getCurrentKsKuserId() );
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($this->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if ((! $currentKuserCategoryKuser || 
 				$currentKuserCategoryKuser->getPermissionLevel () != CategoryKuserPermissionLevel::MANAGER) && 
 				$category->getUserJoinPolicy () == UserJoinPolicyType::NOT_ALLOWED && 
@@ -227,7 +227,7 @@ class KalturaCategoryUser extends KalturaObject implements IFilterable {
 			}
 		}
 		
-		$currentKuserCategoryKuser = categoryKuserPeer::isKuserHasPermissionInCategory($sourceObject->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($sourceObject->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 		if(kEntitlementUtils::getEntitlementEnforcement() && 
 		(!$currentKuserCategoryKuser || !$currentKuserCategoryKuser->hasPermission(PermissionName::CATEGORY_EDIT)))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER, $sourceObject->getCategoryId());

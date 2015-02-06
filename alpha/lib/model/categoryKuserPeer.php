@@ -57,11 +57,11 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	 * @param int $categoryId
 	 * @param int $kuserId
 	 * @param array $requiredPermissions
-	 * @param null $con
 	 * @param bool $supportGroups
+	 * @param null $con
 	 * @return categoryKuser|null
 	 */
-	public static function isKuserHasPermissionInCategory($categoryId, $kuserId = null, $requiredPermissions = null, $con = null, $supportGroups = true){
+	public static function retrievePermittedKuserInCategory($categoryId, $kuserId = null, $requiredPermissions = null, $supportGroups = true, $con = null){
 		$category = categoryPeer::retrieveByPK($categoryId);
 		if(!$category)
 			return null;
@@ -114,7 +114,7 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 	 * 
 	 * @return categoryKuser
 	 */
-	public static function retrieveByCategoryIdAndActiveKuserId($categoryId, $kuserId = null, $requiredPermissions = null, $con = null)
+	public static function retrieveByCategoryIdAndActiveKuserId($categoryId, $kuserId, $requiredPermissions, $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(categoryKuserPeer::CATEGORY_ID, $categoryId);
