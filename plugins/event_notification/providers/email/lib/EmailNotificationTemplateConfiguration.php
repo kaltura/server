@@ -161,7 +161,7 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 	/* (non-PHPdoc)
 	 * @see Form_EventNotificationTemplateConfiguration::addTypeElements()
 	 */
-	protected function addTypeElements()
+	protected function addTypeElements(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate)
 	{
 		$format = new Kaltura_Form_Element_EnumSelect('format', array(
 			'enum' => 'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat',

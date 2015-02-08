@@ -17,7 +17,7 @@ function searchFolder($pluginsFolder, $level = 1)
 			continue;
 		}
 		
-		if ($level < 2)
+		if ($level < 4)
 		{
 			searchFolder($path, $level + 1);
 		}

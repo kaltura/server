@@ -56,6 +56,8 @@ enabledWorkers.KAsyncConcat							= 1
 enabledWorkers.KAsyncValidateLiveMediaServers		= 1
 enabledWorkers.KAsyncSyncCategoryPrivacyContext		= 1
 enabledWorkers.KAsyncTagIndex						= 1
+enabledWorkers.KAsyncIntegrate						= 1
+enabledWorkers.KAsyncIntegrateCloser				= 1
 
 
 [mainTemplate : template]
@@ -703,3 +705,18 @@ maximumExecutionTime								= 12000
 scriptPath											= batches/LiveReportExport/KAsyncLiveReportExportExe.php
 params.localTempPath								= @TMP_DIR@/reports
 params.sharedPath									= @WEB_DIR@/tmp/reports
+
+[KAsyncIntegrate : JobHandlerWorker]
+id													= 570
+friendlyName										= Integrate
+type												= KAsyncIntegrate
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateExe.php
+
+[KAsyncIntegrateCloser : JobHandlerWorker]
+id													= 580
+friendlyName										= Integrate Closer
+type												= KAsyncIntegrateCloser
+maximumExecutionTime								= 12000
+scriptPath											= ../plugins/integration/batch/Integrate/KAsyncIntegrateCloserExe.php
+params.maxTimeBeforeFail							= 1000000

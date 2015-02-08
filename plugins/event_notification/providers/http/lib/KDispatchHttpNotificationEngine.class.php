@@ -26,7 +26,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::dispatch()
 	 */
-	public function dispatch(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationDispatchJobData $data)
+	public function dispatch(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationDispatchJobData &$data)
 	{
 		$this->sendHttpRequest($eventNotificationTemplate, $data);
 	}
@@ -36,7 +36,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 	 * @param KalturaHttpNotificationDispatchJobData $data
 	 * @return boolean
 	 */
-	public function sendHttpRequest(KalturaHttpNotificationTemplate $httpNotificationTemplate, KalturaHttpNotificationDispatchJobData $data)
+	public function sendHttpRequest(KalturaHttpNotificationTemplate $httpNotificationTemplate, KalturaHttpNotificationDispatchJobData &$data)
 	{
 		/**
 		 * TODO

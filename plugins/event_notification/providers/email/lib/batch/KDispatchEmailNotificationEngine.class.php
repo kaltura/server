@@ -119,7 +119,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::dispatch()
 	 */
-	public function dispatch(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationDispatchJobData $data)
+	public function dispatch(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationDispatchJobData &$data)
 	{
 		$this->sendEmail($eventNotificationTemplate, $data);
 	}
@@ -129,7 +129,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 * @param KalturaEmailNotificationDispatchJobData $data
 	 * @return boolean
 	 */
-	protected function sendEmail(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData $data)
+	protected function sendEmail(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData &$data)
 	{
 		if(!count($data->to) && !count($data->cc) && !count($data->bcc))
 			throw new Exception("Recipient e-mail address cannot be null");

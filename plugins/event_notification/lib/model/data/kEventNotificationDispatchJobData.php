@@ -16,6 +16,13 @@ class kEventNotificationDispatchJobData extends kJobData
 	protected $jobId;
 	
 	/**
+	 * Define the content dynamic parameters
+	 * 
+	 * @var array<key,value>
+	 */
+	protected $contentParameters;
+	
+	/**
 	 * @return int $jobId
 	 */
 	public function getJobId() 
@@ -45,5 +52,21 @@ class kEventNotificationDispatchJobData extends kJobData
 	public function setTemplateId($templateId) 
 	{
 		$this->templateId = $templateId;
+	}
+
+	/**
+	 * @return array<key,value> $contentParameters
+	 */
+	public function getContentParameters()
+	{
+		return $this->contentParameters;
+	}
+
+	/**
+	 * @param array<key,value> $contentParameters
+	 */
+	public function setContentParameters(array $contentParameters)
+	{
+		$this->contentParameters = $contentParameters;
 	}
 }
