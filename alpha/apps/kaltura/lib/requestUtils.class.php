@@ -382,20 +382,23 @@ class requestUtils extends infraRequestUtils
 		// Zend_Filter_StripTags version
 		$modifiedString = self::getStripTagsFilter()->filter( $origString );
 
-		if ( $modifiedString != $origString )
+		if ( strtolower( $modifiedString ) != strtolower( $origString ) )
 		{
 			$msg = kCoreException::INTERNAL_SERVER_ERROR . ": Unsafe HTML tags found" . ($fieldName ? " in [$fieldName], " : " ")
-					. "\noriginal value: " . $origString
-					. "\nmodified value: " . $modifiedString
+					. "\noriginal value: [$origString]"
+					. "\nmodified value: [$modifiedString]"
+					. "\n"
 				;
 
 			$e = new kCoreException( $msg );
 
-			// We're in monitoring mode so we'll return the original string unharmed.
-			// Real code should be: throw $e;
-			return $origString;
+			// We're currently in monitoring mode so we won't perform any action.
+			// Real code should be:
+			//		throw $e; ==> if we do not allow unknown tags in input
+			// or
+			//		return $modifiedString; ==> if we will force-remove unknown tags
 		}
 
-		return $modifiedString;
+		return $origString;
 	}
 }
