@@ -322,13 +322,8 @@ class requestUtils extends infraRequestUtils
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
 	
-	public static function initStringTagsFilter()
+	public static function createStripTagsFilter()
 	{
-		if ( self::$stripTagsFilter )
-		{
-			return;
-		}
-
 		/*
 		Note: Move hardcoded string to ini file
 		$confAllowedTags = $kConf::get('allowedTags');
@@ -352,7 +347,29 @@ class requestUtils extends infraRequestUtils
 			}
 		}
 
-		self::$stripTagsFilter = new Zend_Filter_StripTags(array('allowTags' => $allowedTagNames));
+		return new Zend_Filter_StripTags(array('allowTags' => $allowedTagNames));
+	}
+
+	public static function getStripTagsFilter()
+	{
+		$cacheKey = null;
+		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		{
+			$cacheKey = 'stripTagsFilter-' . kConf::getCachedVersionId();
+			self::$stripTagsFilter = apc_fetch($cacheKey);
+		}
+
+		if ( ! self::$stripTagsFilter )
+		{
+			self::$stripTagsFilter = self::createStripTagsFilter();
+
+			if ( $cacheKey )
+			{
+				$success = apc_store( $cacheKey, self::$stripTagsFilter );
+			}
+		}
+
+		return self::$stripTagsFilter;
 	}
 
 	public static function stripUnsafeHtmlTags( $origString, $fieldName = null )
@@ -362,10 +379,8 @@ class requestUtils extends infraRequestUtils
 			return;
 		}
 
-		self::initStringTagsFilter();
-
 		// Zend_Filter_StripTags version
-		$modifiedString = self::$stripTagsFilter->filter( $origString );
+		$modifiedString = self::getStripTagsFilter()->filter( $origString );
 
 		if ( $modifiedString != $origString )
 		{
