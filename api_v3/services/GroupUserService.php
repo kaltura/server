@@ -28,13 +28,13 @@ class GroupUserService extends KalturaBaseService
 		$partnerId = $this->getPartnerId();
 
 		//verify kuser exists
-		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->userId, false , KuserType::USER);
-		if (! $kuser)
+		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->userId, false);
+		if ( !$kuser || $kuser != KuserType::USER)
 			throw new KalturaAPIException ( KalturaErrors::USER_NOT_FOUND, $groupUser->userId );
 
-		//verify group exists
-		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId, false , KuserType::GROUP);
-		if (! $kgroup)
+		//verify kgroup exists
+		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId, false);
+		if ( !$kgroup || $kgroup != KuserType::GROUP)
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
 
 		//verify kuser does not belongs to kgroup
