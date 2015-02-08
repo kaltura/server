@@ -199,7 +199,10 @@ class kEntitlementUtils
 			// this ugly code is temporery - since we have a bug in sphinxCriteria::getAllCriterionFields
 			if($kuserId)
 			{
-				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kuserId, Criteria::LIKE);
+				// get the groups that the user belongs to in case she is not associated to the category directly
+				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
+				$kgroupIds[] = $kuserId;
+				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addOr($crit);
 				$crit = $membersCrit;
 			}			

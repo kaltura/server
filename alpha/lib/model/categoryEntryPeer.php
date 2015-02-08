@@ -20,7 +20,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 	/**
 	 * For backward compatibility we need to keep entry->categories and 
 	 * entry->categoriesIds updated with categoryEntry. 
-	 * If the entry was already saved – shouldn’t save it from this class
+	 * If the entry was already saved ï¿½ shouldnï¿½t save it from this class
 	 */
 	public static function getSkipSave()
 	{
@@ -261,7 +261,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 			}
 			else
 			{
-				$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($category->getId(), kCurrentContext::getCurrentKsKuserId());
+				$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($category->getId(), kCurrentContext::getCurrentKsKuserId());
 				if(kEntitlementUtils::getEntitlementEnforcement() && 
 					$category->getContributionPolicy() != ContributionPolicyType::ALL &&
 					(!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
@@ -308,7 +308,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer {
 				$categoryEntryToDelete = categoryEntryPeer::retrieveByCategoryIdAndEntryId($category->getId(), $entry->getId());
 				if($categoryEntryToDelete)
 				{
-					$categoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryEntryToDelete->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
+					$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntryToDelete->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 					if($category->getPrivacyContexts() && (!$categoryKuser || $categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER))
 					{
 						//not entiteld to delete - should be set back on the entry.

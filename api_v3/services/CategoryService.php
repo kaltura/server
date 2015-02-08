@@ -127,7 +127,7 @@ class CategoryService extends KalturaBaseService
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
+			$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
@@ -167,7 +167,7 @@ class CategoryService extends KalturaBaseService
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
-			$currentKuserCategoryKuser = categoryKuserPeer::retrieveByCategoryIdAndActiveKuserId($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
+			$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryDb->getId(), kCurrentContext::getCurrentKsKuserId());
 			if(!$currentKuserCategoryKuser || $currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER)
 				throw new KalturaAPIException(KalturaErrors::NOT_ENTITLED_TO_UPDATE_CATEGORY);
 		}
@@ -207,8 +207,8 @@ class CategoryService extends KalturaBaseService
 		if ($pager == null)
 		{
 			$pager = new KalturaFilterPager();
-			//before falcon we didn’t have a pager for action category->list, 
-			//and since we added a pager – and remove the limit for partners categories, 
+			//before falcon we didnï¿½t have a pager for action category->list, 
+			//and since we added a pager ï¿½ and remove the limit for partners categories, 
 			//for backward compatibility this will be the page size. 
 			$pager->pageIndex = 1;
 			$pager->pageSize = Partner::MAX_NUMBER_OF_CATEGORIES;

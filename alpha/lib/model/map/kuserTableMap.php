@@ -83,6 +83,7 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('INDEXED_PARTNER_DATA_INT', 'IndexedPartnerDataInt', 'INTEGER', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_STRING', 'IndexedPartnerDataString', 'VARCHAR', false, 64, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'TINYINT', false, null, null);
 		// validators
 	} // initialize()
 
@@ -105,6 +106,8 @@ class kuserTableMap extends TableMap {
     $this->addRelation('categoryKuser', 'categoryKuser', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('UploadToken', 'UploadToken', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('KuserToUserRole', 'KuserToUserRole', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
+    $this->addRelation('KuserKgroupRelatedByKgroupId', 'KuserKgroup', RelationMap::ONE_TO_MANY, array('id' => 'kgroup_id', ), null, null);
+    $this->addRelation('KuserKgroupRelatedByKuserId', 'KuserKgroup', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
 	} // buildRelations()
 
 } // kuserTableMap
