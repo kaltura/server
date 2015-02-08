@@ -28,13 +28,13 @@ class GroupUserService extends KalturaBaseService
 		$partnerId = $this->getPartnerId();
 
 		//verify kuser exists
-		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->userId, false);
-		if ( !$kuser || $kuser != KuserType::USER)
+		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->userId);
+		if ( !$kuser || $kuser->getType() != KuserType::USER)
 			throw new KalturaAPIException ( KalturaErrors::USER_NOT_FOUND, $groupUser->userId );
 
 		//verify kgroup exists
-		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId, false);
-		if ( !$kgroup || $kgroup != KuserType::GROUP)
+		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId);
+		if ( !$kgroup || $kgroup->getType() != KuserType::GROUP)
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
 
 		//verify kuser does not belongs to kgroup
@@ -70,13 +70,13 @@ class GroupUserService extends KalturaBaseService
 		$partnerId = $this->getPartnerId();
 
 		//verify kuser exists
-		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $userId, false, KuserType::USER);
+		$kuser = kuserPeer::getKuserByPartnerAndUid( $partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 
 
 		//verify group exists
-		$kgroup = kuserPeer::getKuserByPartnerAndUid(  $partnerId, $groupId ,false, KuserType::GROUP);
+		$kgroup = kuserPeer::getKuserByPartnerAndUid(  $partnerId, $groupId);
 		if (! $kgroup){
 			//if the delete worker was triggered due to group deletion
 			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
