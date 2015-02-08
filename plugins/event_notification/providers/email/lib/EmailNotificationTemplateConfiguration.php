@@ -135,6 +135,8 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 			$headerEmailProperty = $headerName . '_email';
 			$headerNameProperty = $headerName . '_name';
 
+			$headerName = strtoupper($headerName);
+			
 			$this->addElement('text', $headerEmailProperty, array(
 					'label'                 => 'Recipient e-mail (' . $headerName . '):',
 					'value'                 => $objectEmailValue,
