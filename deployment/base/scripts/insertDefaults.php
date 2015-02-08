@@ -37,8 +37,9 @@ function handleDirectory($dirName)
 	while (false !== ($fileName = $dir->read()))
 	{
 		$filePath = realpath("$dirName/$fileName");
-		if($fileName[0] == '.' || is_dir($filePath) || !preg_match('/^\d+\.\w+\.ini$/', $fileName))
+		if($fileName[0] == '.' || is_dir($filePath)|| !preg_match('/^\d+\.\w+?\.?\w+\.ini$/', $fileName) || preg_match('/.*\.template\.ini$/',$fileName)){
 			continue;
+		}
 	
 		KalturaLog::debug("Validate file [$filePath]");
 		$objectConfigurations = parse_ini_file($filePath, true);
@@ -49,9 +50,7 @@ function handleDirectory($dirName)
 		if(preg_match_all('/@[A-Z_0-9]+@/', file_get_contents($filePath), $matches) > 0)
 			$errors[] = "Content file [$filePath] contains place holders: " . implode("\n\t", $matches[0]);
 	
-		list($order, $objectType, $fileExtension) = explode('.', $fileName, 3);
-		if($fileExtension == 'ini')
-			$fileNames[] = $fileName;
+		$fileNames[] = $fileName;
 	}
 	$dir->close();
 	if(count($errors))
