@@ -287,22 +287,22 @@ class CategoryUserService extends KalturaBaseService
 		if ($filter->relatedGroupsByUserId){
 			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 			$userIds = array();
-			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($filter->relatedGroupsByUserId);
-			if (!is_null($kgroupIds) && is_array($kgroupIds))
-				$userIds = $kgroupIds;
-			$userIds[] = $filter->relatedGroupsByUserId;
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
-			$c->add(kuserPeer::PUSER_ID, $userIds, Criteria::IN);
-
-			$kusers = kuserPeer::doSelect($c);
-
-			$userIds = array();
-			foreach($kusers as $kuser)
-			{
-				/* @var $kuser kuser */
-				$userIds[] = $kuser->getId();
+			$c->add(kuserPeer::PUSER_ID, $filter->relatedGroupsByUserId);
+			$c->add(kuserPeer::TYPE, KuserType::USER);
+			$kuser = kuserPeer::doSelectOne($c);
+			if (!$kuser){
+				$response = new KalturaCategoryUserListResponse();
+				$response->objects = new KalturaCategoryUserArray();
+				$response->totalCount = 0;
+				return $response;
 			}
+
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+			if (!is_null($kgroupIds) && is_array($kgroupIds))
+				$userIds = $kgroupIds;
+			$userIds[] = $kuser->getId();
 
 			// if userIdIn is also set in the filter need to intersect the two arrays.
 			if(isset($filter->userIdIn)){
