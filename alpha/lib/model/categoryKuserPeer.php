@@ -54,6 +54,8 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 
 
 	/**
+	 *  this function return categoryUser if the user has explicit or implicit (by group) required permissions on the category
+	 *
 	 * @param int $categoryId
 	 * @param int $kuserId
 	 * @param array $requiredPermissions

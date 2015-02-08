@@ -202,8 +202,8 @@ class CategoryService extends KalturaBaseService
 		if ($pager == null)
 		{
 			$pager = new KalturaFilterPager();
-			//before falcon we didn�t have a pager for action category->list, 
-			//and since we added a pager � and remove the limit for partners categories, 
+			//before falcon we didn't have a pager for action category->list,
+			//and since we added a pager - and remove the limit for partners categories,
 			//for backward compatibility this will be the page size. 
 			$pager->pageIndex = 1;
 			$pager->pageSize = Partner::MAX_NUMBER_OF_CATEGORIES;
