@@ -267,10 +267,10 @@ abstract class KalturaObject
 		// generate final code
 		if ($usesCustomData)
 		{
-			array_unshift($mappingFuncCode, '$customData = unserialize($srcObj->custom_data);');
+			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
 		}
 	
-		$result .= "\t\t\$get = array(" . implode("\n\t\t", array_keys($mappingFuncCode)) . "\n\t\t);\n\t}\n}";
+		$result .= "\t\t\$get = array('" . implode("',\n\t\t'", array_keys($mappingFuncCode)) . "'\n\t\t);\n\t}\n}";
 		$result .= "\t\t" . implode("\n\t\t", $mappingFuncCode) . "\n\t}\n}";
 		
 		return $result;
