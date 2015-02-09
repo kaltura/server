@@ -186,7 +186,7 @@ class KalturaRequestDeserializer
 	/**
 	 * @return IResponseProfile
 	 */
-	protected function getResponseProfile($paramName = 'responseProfile') {
+	public function getResponseProfile($paramName = 'responseProfile') {
 		if(!isset($this->paramsGrouped[$paramName])){
 			return null;
 		}
