@@ -1226,6 +1226,7 @@ return array(
 		"Kaltura_Client_Enum_DeliveryProfileType::LOCAL_PATH_RTMP" => "LOCAL_PATH_RTMP",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HLS" => "LIVE_HLS",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_HDS" => "LIVE_HDS",
+		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_DASH" => "LIVE_DASH",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_RTMP" => "LIVE_RTMP",
 		"Kaltura_Client_Enum_DeliveryProfileType::LIVE_AKAMAI_HDS" => "LIVE_AKAMAI_HDS",
 		
